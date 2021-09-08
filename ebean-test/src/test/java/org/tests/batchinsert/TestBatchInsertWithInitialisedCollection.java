@@ -3,7 +3,7 @@ package org.tests.batchinsert;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCachedBean;
 
@@ -26,7 +26,7 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
       list.add(bean);
     }
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Transaction txn = DB.beginTransaction();
     try {
@@ -39,7 +39,7 @@ public class TestBatchInsertWithInitialisedCollection extends BaseTestCase {
       txn.end();
     }
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(4);
     assertThat(loggedSql.get(0)).contains("insert into o_cached_bean (");
     assertThat(loggedSql.get(0)).contains("name) values (?");

@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,10 +45,10 @@ public class TestMultiCascadeBatch extends BaseTestCase {
     grandparent.setChildren(Collections.singletonList(parent));
     parent.setChildren(Collections.singletonList(child));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     grandparent.save();
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
 
     final List<Site> list = DB.find(Site.class).where()
       .idIn(grandparent.getId(), parent.getId(), child.getId())

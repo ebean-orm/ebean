@@ -2,7 +2,7 @@ package org.tests.inheritance.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.cache.CInhOne;
 import org.tests.model.basic.cache.CInhRef;
@@ -33,32 +33,32 @@ public class TestInheritanceRefCache extends BaseTestCase {
 
     Integer id = ref.getId();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     CInhRef gotRef = DB.find(CInhRef.class).setId(id).findOne();
 
     assertThat(gotRef).isInstanceOf(CInhRef.class);
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("from cinh_ref").contains("left join cinh_root");
 
     // fetch again - from cache (but fetch second bean from cache)
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     gotRef = DB.find(CInhRef.class).setId(id).findOne();
 
     assertThat(gotRef).isInstanceOf(CInhRef.class);
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(0);
 
 
     // fetch again - both from cache
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     gotRef = DB.find(CInhRef.class).setId(id).findOne();
 
     assertThat(gotRef).isInstanceOf(CInhRef.class);
     assertThat(gotRef.getRef()).isInstanceOf(CInhOne.class);
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(0);
 
   }
@@ -84,11 +84,11 @@ public class TestInheritanceRefCache extends BaseTestCase {
     ids.add(two.getId());
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(CInhRoot.class).setUseQueryCache(true).where().idIn(ids).setMapKey("licenseNumber").findMap();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("from cinh_root");
 
@@ -97,11 +97,11 @@ public class TestInheritanceRefCache extends BaseTestCase {
     DB.find(CInhRoot.class).setUseQueryCache(true).findList();
     DB.find(CInhRoot.class).setUseQueryCache(true).findList();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(CInhRoot.class).setUseQueryCache(true).where().idIn(ids).setMapKey("licenseNumber").findMap();
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(0);
   }
 

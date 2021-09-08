@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -19,11 +19,11 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
   @IgnorePlatform({Platform.SQLSERVER, Platform.HANA}) // has generated IDs
   public void test() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
 
       EdParent parent = new EdParent();
       parent.setName("MyComputer");
@@ -47,7 +47,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
       DB.commitTransaction();
 
       // insert statements for EdExtendedParent
-      List<String> loggedSql = LoggedSqlCollector.stop();
+      List<String> loggedSql = LoggedSql.stop();
       assertThat(loggedSql).hasSize(6);
       assertThat(loggedSql.get(0)).contains("insert into td_parent");
       assertThat(loggedSql.get(2)).contains("insert into td_child ");
@@ -60,11 +60,11 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
   @IgnorePlatform(Platform.HANA)
   public void test_noFlushOn_getterOfNonGeneratedProperty() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
 
       EdParent parent = new EdParent();
       parent.setName("MyComputer");
@@ -90,7 +90,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
       DB.commitTransaction();
 
       // insert statements for EdExtendedParent
-      List<String> loggedSql = LoggedSqlCollector.stop();
+      List<String> loggedSql = LoggedSql.stop();
       assertThat(loggedSql).hasSize(4);
       assertThat(loggedSql.get(0)).contains("insert into td_parent");
       assertThat(loggedSql.get(2)).contains("insert into td_child ");

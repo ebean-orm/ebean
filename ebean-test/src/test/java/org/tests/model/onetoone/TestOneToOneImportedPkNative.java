@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -38,13 +38,13 @@ public class TestOneToOneImportedPkNative extends BaseTestCase {
 
     assertThat(one).isNotNull();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     OtoBChild child1 = one.getChild();
     assertThat(child1).isNotNull();
     assertThat(child1.getChild()).isEqualTo("c1");
 
-    List<String> lazyLoadSql = LoggedSqlCollector.stop();
+    List<String> lazyLoadSql = LoggedSql.stop();
     assertThat(lazyLoadSql).hasSize(2);
     assertSql(lazyLoadSql.get(0)).contains("select t0.id, t0.name, t0.id from oto_bmaster t0 where t0.id = ?");
     assertSql(lazyLoadSql.get(1)).contains("select t0.master_id, t0.child, t0.master_id from oto_bchild t0 where t0.master_id = ?");

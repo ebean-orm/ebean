@@ -3,7 +3,7 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.PagedList;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -49,12 +49,12 @@ public class TestQueryFindPagedList extends BaseTestCase {
       .setMaxRows(4)
       .findPagedList();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = pagedList.getList();
 
     assertTrue(!orders.isEmpty());
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertEquals(1, loggedSql.size());
   }
@@ -157,12 +157,12 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     PagedList<Order> pagedList = DB.find(Order.class).setMaxRows(4).findPagedList();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = pagedList.getList();
 
     assertTrue(!orders.isEmpty());
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertEquals(1, loggedSql.size());
   }
@@ -211,7 +211,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
     PagedList<Order> pagedList = DB.find(Order.class).setMaxRows(3).findPagedList();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // kinda not normal but just wrap in a transaction to assert
     // the background fetch does not occur (which explicitly creates
@@ -225,7 +225,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
       // invoke it again but cached...
       int totalRowCountAgain = pagedList.getTotalCount();
 
-      List<String> loggedSql = LoggedSqlCollector.stop();
+      List<String> loggedSql = LoggedSql.stop();
 
       assertTrue(orders.size() < totalRowCount);
       assertEquals(2, loggedSql.size());
@@ -253,12 +253,12 @@ public class TestQueryFindPagedList extends BaseTestCase {
       .setMaxRows(6)
       .findPagedList();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     pagedList.getTotalCount();
     pagedList.getList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertEquals(2, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("select count(*) from o_order b where b.id > 0");

@@ -8,7 +8,7 @@ import io.ebean.SqlRow;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaTimedMetric;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -297,10 +297,10 @@ public class SqlQueryTests extends BaseTestCase {
     sqlQuery.setFirstRow(3);
     sqlQuery.setMaxRows(10);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     List<SqlRow> list = sqlQuery.findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     if (isSqlServer()) {
       // FIXME: we should order by primary key ALWAYS (not by first column) when no
@@ -325,9 +325,9 @@ public class SqlQueryTests extends BaseTestCase {
       SqlQuery sqlQuery = DB.sqlQuery("Select * from o_order order by id");
       sqlQuery.setFirstRow(3);
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       sqlQuery.findList();
-      List<String> sql = LoggedSqlCollector.stop();
+      List<String> sql = LoggedSql.stop();
 
       assertSql(sql.get(0)).contains("Select * from o_order order by id offset 3");
     }
@@ -341,9 +341,9 @@ public class SqlQueryTests extends BaseTestCase {
     SqlQuery sqlQuery = DB.sqlQuery("Select * from o_order order by id");
     sqlQuery.setMaxRows(10);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     sqlQuery.findList();
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     if (isSqlServer()) {
       assertSql(sql.get(0)).contains("Select * from o_order order by id offset 0 rows fetch next 10 rows only;");
@@ -367,9 +367,9 @@ public class SqlQueryTests extends BaseTestCase {
       .setLabel("findList-3-10");
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     sqlQuery.findList();
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     if (isSqlServer()) {
       assertSql(sql.get(0)).contains("select * from o_order where o_order.id > ? order by id offset 0 rows fetch next 10 rows only;");
@@ -393,9 +393,9 @@ public class SqlQueryTests extends BaseTestCase {
       .setMaxRows(10)
       .setLabel("findEach-Max10Rows");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     sqlQuery.findEach(bean -> bean.get("id"));
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     if (isSqlServer()) {
       assertSql(sql.get(0)).contains("offset 0 rows fetch next 10 rows only");

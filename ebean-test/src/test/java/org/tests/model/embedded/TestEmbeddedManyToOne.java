@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Property;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
@@ -37,7 +37,7 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
     DB.save(perAddr);
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     EPerAddr found = DB.find(EPerAddr.class, perAddr.getId());
 
@@ -45,7 +45,7 @@ public class TestEmbeddedManyToOne extends BaseTestCase {
     assertThat(found.getAddress().getCountry().getName()).startsWith("New");
 
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
 
     if (isH2()) {

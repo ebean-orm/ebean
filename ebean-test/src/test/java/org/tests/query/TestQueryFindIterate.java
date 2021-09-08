@@ -8,7 +8,7 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.datasource.DataSourcePool;
 import io.ebean.plugin.SpiServer;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -119,7 +119,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Order.class)
       .setLazyLoadBatchSize(10)
@@ -135,7 +135,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       });
 
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertEquals(3, loggedSql.size());
     assertTrue(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name from o_order t0 join o_customer t1"));
@@ -148,7 +148,7 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // make sure we don't hit the L2 cache for order shipments
     DB.cacheManager().clear(Order.class);
@@ -170,7 +170,7 @@ public class TestQueryFindIterate extends BaseTestCase {
         order.getShipments().size();
       });
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertEquals(2, loggedSql.size());
     assertThat(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name, t2.id, t2.order_qty, t2.ship_qty"));

@@ -5,7 +5,7 @@ import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantMode;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
@@ -42,25 +42,25 @@ public class MultiTenantPartitionTest extends BaseTestCase {
 
     UserContext.set("rob", "ten_1");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     MtContent content = new MtContent("first title");
     server.save(content);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertSql(sql.get(0)).contains("insert into mt_content (title, body, when_modified, when_created, version, tenant_id) values (?,?,?,?,?,?)");
 
     content.setBody("some body");
     server.save(content);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertSql(sql.get(0)).contains("update mt_content set body=?, when_modified=?, version=? where id=? and tenant_id=? and version=?");
 
     server.delete(content);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertSql(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=? and version=?");
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 
   @Test
@@ -71,10 +71,10 @@ public class MultiTenantPartitionTest extends BaseTestCase {
     MtContent content = new MtContent("first title");
     server.save(content);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     int rows = server.delete(MtContent.class, content.getId());
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
     assertThat(rows).isEqualTo(1);
 
@@ -93,11 +93,11 @@ public class MultiTenantPartitionTest extends BaseTestCase {
 
     List<Long> ids = Arrays.asList(a.getId(), b.getId(), 99998L);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     int rows = server.deleteAll(MtContent.class, ids);
     assertThat(rows).isEqualTo(2);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("delete from mt_content where id=? and tenant_id=?");
   }
 

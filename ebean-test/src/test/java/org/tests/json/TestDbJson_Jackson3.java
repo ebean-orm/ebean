@@ -8,7 +8,7 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
-import io.ebeantest.LoggedSql;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonJackson3;
 import org.tests.model.json.EBasicJsonList;

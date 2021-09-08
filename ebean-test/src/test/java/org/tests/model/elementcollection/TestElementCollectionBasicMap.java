@@ -2,7 +2,7 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -16,14 +16,14 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
   @Test
   public void test() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     EcmPerson person = new EcmPerson("MFiona021");
     person.getPhoneNumbers().put("home", "021 1234");
     person.getPhoneNumbers().put("work", "021 4321");
     DB.save(person);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(4);
       assertSql(sql.get(0)).contains("insert into ecm_person");
@@ -42,7 +42,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     person1.getPhoneNumbers().put("mob", "09 9876");
     DB.save(person1);
 
-    LoggedSqlCollector.current();
+    LoggedSql.collect();
 
     List<EcmPerson> found =
       DB.find(EcmPerson.class).where()
@@ -61,7 +61,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     assertThat(phoneNumbers1).containsValues("09 1234", "09 4321", "09 9876");
     assertThat(phoneNumbers1.get("mob")).isEqualTo("09 9876");
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version from ecm_person t0 where");
     assertSql(sql.get(1)).contains("select t0.ecm_person_id, t0.type, t0.phnum from ecm_person_phone_numbers t0 where");
@@ -76,7 +76,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
 
     assertThat(found2).hasSize(2);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version, t1.type, t1.phnum from ecm_person t0 left join ecm_person_phone_numbers t1");
 
@@ -84,7 +84,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     jsonToFrom(foundFirst);
     updateBasic(foundFirst);
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 
   private void updateBasic(EcmPerson bean) {
@@ -92,7 +92,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     bean.setName("Fiona021-mod-0");
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update ecm_person");
 
@@ -105,7 +105,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     bean.getPhoneNumbers().put("one", "01-22123");
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(7);
       assertSql(sql.get(0)).contains("update ecm_person set name=?, version=? where id=? and version=?");
@@ -129,7 +129,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
 
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(0);
 
     updateOnlyCollection(bean);
@@ -140,7 +140,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     bean.getPhoneNumbers().put("two", "01-4321");
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(7);
       assertSql(sql.get(0)).contains("delete from ecm_person_phone_numbers where ecm_person_id=?");
@@ -163,7 +163,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
 
     DB.delete(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("delete from ecm_person_phone_numbers where ecm_person_id = ?");
     assertSql(sql.get(1)).contains("delete from ecm_person where id=? and version=?");

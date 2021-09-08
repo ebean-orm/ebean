@@ -2,7 +2,7 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -15,14 +15,14 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
   @Test
   public void test() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     EcbmPerson person = new EcbmPerson("Fiona64021");
     person.getPhoneNumbers().put("home", new EcPhone("64", "021","1234"));
     person.getPhoneNumbers().put("work", new EcPhone("64","021","4321"));
     DB.save(person);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(4);
       assertSql(sql.get(0)).contains("insert into ecbm_person");
@@ -41,7 +41,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
 
     DB.save(person1);
 
-    LoggedSqlCollector.current();
+    LoggedSql.collect();
 
     List<EcbmPerson> found =
       DB.find(EcbmPerson.class).where()
@@ -67,13 +67,13 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     assertThat(found2).hasSize(2);
     EcbmPerson foundFirst = found2.get(0);
 
-    LoggedSqlCollector.current();
+    LoggedSql.collect();
 
     jsonToFrom(foundFirst);
 
     updateBasic(foundFirst);
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 
   private void updateBasic(EcbmPerson bean) {
@@ -81,7 +81,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     bean.setName("Fiona64-mod-0");
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update ecbm_person");
 
@@ -94,7 +94,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     bean.getPhoneNumbers().put("more", new EcPhone("01", "234", "123"));
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(7);
       assertSql(sql.get(0)).contains("update ecbm_person set name=?, version=? where id=? and version=?");
@@ -117,7 +117,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
 
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(0);
 
     updateOnlyCollection(bean);
@@ -128,7 +128,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     bean.getPhoneNumbers().put("other", new EcPhone("01", "12", "4321"));
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(7);
       assertSql(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
@@ -151,7 +151,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
 
     DB.delete(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id = ?");
     assertSql(sql.get(1)).contains("delete from ecbm_person where id=? and version=?");

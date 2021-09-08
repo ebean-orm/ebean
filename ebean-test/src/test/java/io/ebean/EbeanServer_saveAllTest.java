@@ -1,6 +1,6 @@
 package io.ebean;
 
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
@@ -19,11 +19,11 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     List<EBasicVer> someBeans = beans(3);
 
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.saveAll(someBeans);
 
     // assert
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(4);
     assertThat(loggedSql.get(0)).contains("insert into e_basicver (");
     assertThat(loggedSql.get(0)).contains("name, description, other, last_update) values (");
@@ -33,19 +33,19 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     }
 
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.updateAll(someBeans);
 
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(3);
     assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, last_update=? where id=? ");
 
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.deleteAll(someBeans);
 
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(4);
     assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=?");
   }
@@ -57,31 +57,31 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     try (Transaction transaction = server.beginTransaction()) {
       transaction.setBatchMode(true);
-      LoggedSqlCollector.start();
+      LoggedSql.start();
 
       for (EBasicVer bean : beans(2)) {
         server.save(bean);
       }
 
       // jdbc batch, no sql yet
-      assertThat(LoggedSqlCollector.current()).isEmpty();
+      assertThat(LoggedSql.collect()).isEmpty();
 
       server.saveAll(beans(3));
 
       // still batch, no sql yet
-      assertThat(LoggedSqlCollector.current()).isEmpty();
+      assertThat(LoggedSql.collect()).isEmpty();
 
       for (EBasicVer bean : beans(2)) {
         server.save(bean);
       }
       // still batch, no sql yet
-      assertThat(LoggedSqlCollector.current()).isEmpty();
+      assertThat(LoggedSql.collect()).isEmpty();
 
       // flush now
       transaction.commit();
 
       // and we have our SQL from jdbc batch flush
-      assertThat(LoggedSqlCollector.stop()).isNotEmpty();
+      assertThat(LoggedSql.stop()).isNotEmpty();
     }
 
   }
@@ -113,14 +113,14 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     Database server = DB.getDefault();
 
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     try (Transaction txn = server.beginTransaction()) {
       server.saveAll(someBeans, txn);
       txn.commit();
     }
 
     // assert
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(4);
     assertThat(loggedSql.get(0)).contains("insert into e_basicver (");
     assertThat(loggedSql.get(0)).contains("name, description, other, last_update) values (");
@@ -130,23 +130,23 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     }
 
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction txn = server.beginTransaction()) {
       server.updateAll(someBeans, txn);
       txn.commit();
     }
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(3);
     assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, last_update=? where id=? ");
 
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     try (Transaction txn = server.beginTransaction()) {
       server.deleteAll(someBeans, txn);
       txn.commit();
     }
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(4);
     assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=?");
   }

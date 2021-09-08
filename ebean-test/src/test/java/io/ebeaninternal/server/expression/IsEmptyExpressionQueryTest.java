@@ -3,7 +3,7 @@ package io.ebeaninternal.server.expression;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -35,13 +35,13 @@ public class IsEmptyExpressionQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(EUserNoFk.class)
       .where().isEmpty("files")
       .delete();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
 
     if (isPlatformSupportsDeleteTableAlias()) {

@@ -2,7 +2,7 @@ package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -22,10 +22,10 @@ public class TestOrderedList extends BaseTestCase {
       details.add(new OmOrderedDetail("d"+i));
     }
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(master);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql.size()).isGreaterThan(1);
     assertSql(sql.get(0)).contains("insert into om_ordered_master");
     boolean hasId = sql.get(1).contains(" (id, name");
@@ -38,14 +38,14 @@ public class TestOrderedList extends BaseTestCase {
     // update without any changes
     DB.save(master);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).isEmpty();
 
 
     // update just changing master
     master.setName("m1-mod");
     DB.save(master);
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
 
@@ -57,12 +57,12 @@ public class TestOrderedList extends BaseTestCase {
     OmOrderedMaster fresh = DB.find(OmOrderedMaster.class).setId(id).fetch("details").findOne();
     List<OmOrderedDetail> details1 = fresh.getDetails();
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertSql(sql.get(0)).contains("order by t0.id, t1.sort_order");
 
     // fetched, not dirty
     DB.save(fresh);
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).isEmpty();
 
 
@@ -76,7 +76,7 @@ public class TestOrderedList extends BaseTestCase {
 
     DB.save(fresh);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(7);
     assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
     assertSql(sql.get(1)).contains("update om_ordered_detail set version=?, sort_order=? where id=? and version=?");
@@ -85,7 +85,7 @@ public class TestOrderedList extends BaseTestCase {
     fresh.setName("m1-mod3");
     DB.save(fresh);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=? where id=? and version=?; -- bind(m1-mod3");
     assertSql(sql.get(1)).contains("update om_ordered_detail set name=?, version=?, sort_order=? where id=? and version=?");
@@ -93,7 +93,7 @@ public class TestOrderedList extends BaseTestCase {
 
     DB.delete(fresh);
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("delete from om_ordered_detail where master_id = ?");
     assertSqlBind(sql.get(1));

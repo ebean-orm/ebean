@@ -4,7 +4,7 @@ import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheRegion;
 import io.ebean.cache.ServerCacheStatistics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class PersonCacheTests {
 
     addTestData();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(PersonCacheInfo.class)
       .select("personId") // do not fetch name
@@ -70,7 +70,7 @@ public class PersonCacheTests {
       assertThat(email.getPersonInfo().getName()).isNotNull();
     }
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(3);
 
     assertThat(beanCacheInfo.statistics(true).getHitCount()).isEqualTo(3);
@@ -91,7 +91,7 @@ public class PersonCacheTests {
       assertThat(email.getPersonInfo().getName()).isNotNull();
     }
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
 
     assertThat(beanCacheInfo.statistics(true).getHitCount()).isEqualTo(3);

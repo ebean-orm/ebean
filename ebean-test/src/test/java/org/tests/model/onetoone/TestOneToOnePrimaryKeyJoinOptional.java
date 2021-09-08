@@ -3,7 +3,7 @@ package org.tests.model.onetoone;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -94,10 +94,10 @@ public class TestOneToOnePrimaryKeyJoinOptional extends BaseTestCase {
 
     OtoUPrime bean = DB.find(OtoUPrime.class, found.getPid());
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.delete(bean);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("delete from oto_uprime_extra where");
     assertSql(sql.get(1)).contains("delete from oto_uprime where");

@@ -3,7 +3,7 @@ package org.tests.inheritance;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
@@ -27,7 +27,7 @@ public class TestInheritanceQuery extends BaseTestCase {
     server().save(b2);
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<Parent> query = DB.find(Parent.class);
 
@@ -46,7 +46,7 @@ public class TestInheritanceQuery extends BaseTestCase {
     query2 = DB.find(Parent.class).setInheritType(ChildB.class);
     assertThat(query2.findList()).contains(b1, b2);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(4);
     assertSql(sql.get(1)).contains("where t0.type = 'A'");
     assertSql(sql.get(2)).contains("where t0.type = 'B'");

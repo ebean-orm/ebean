@@ -2,7 +2,7 @@ package org.tests.model.aggregation;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     DOrg org = MachineUseData.load();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<DMachine> machines = DB.find(DMachine.class)
       .setDisableLazyLoading(true)
@@ -29,7 +29,7 @@ public class TestAggregationMany extends BaseTestCase {
       assertThat(machine.getMachineStats()).isEmpty();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version, t0.organisation_id from dmachine t0 where t0.organisation_id = ?");
@@ -46,7 +46,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     DOrg org = MachineUseData.load();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<DMachine> machines = DB.find(DMachine.class)
       .setDisableLazyLoading(true)
@@ -60,7 +60,7 @@ public class TestAggregationMany extends BaseTestCase {
       assertThat(machine.getMachineStats()).isEmpty();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("select t0.id, t0.name, t1.name, sum(t1.use_secs), sum(t1.fuel) from dmachine t0 left join d_machine_aux_use t1 on t1.machine_id = t0.id where t0.organisation_id = ? group by t0.id, t0.name, t1.name order by t0.id");
@@ -71,7 +71,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     DOrg org = MachineUseData.load();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<DMachine> machines = DB.find(DMachine.class)
       .setDisableLazyLoading(true)
@@ -86,7 +86,7 @@ public class TestAggregationMany extends BaseTestCase {
       assertThat(machine.getMachineStats()).isEmpty();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("select t0.id, t0.name, sum(t1.use_secs), sum(t1.fuel) from dmachine t0 left join d_machine_aux_use t1 on t1.machine_id = t0.id where t0.organisation_id = ? group by t0.id, t0.name order by t0.id");

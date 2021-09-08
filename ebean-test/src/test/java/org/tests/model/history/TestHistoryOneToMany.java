@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
@@ -40,7 +40,7 @@ public class TestHistoryOneToMany extends BaseTestCase {
     DB.save(one);
     Thread.sleep(20);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<HiTOne> list = DB.find(HiTOne.class)
       .fetch("twos")
@@ -50,7 +50,7 @@ public class TestHistoryOneToMany extends BaseTestCase {
       .asOf(new Timestamp(System.currentTimeMillis()))
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getTwos()).hasSize(2);

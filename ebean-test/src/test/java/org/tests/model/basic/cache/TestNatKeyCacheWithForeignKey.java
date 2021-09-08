@@ -3,7 +3,7 @@ package org.tests.model.basic.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.cache.ServerCacheStatistics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -37,12 +37,12 @@ public class TestNatKeyCacheWithForeignKey extends BaseTestCase {
 
     resetAllMetrics();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final OCachedAppDetail found1 = findDetail(app0, "detail0");
     assertThat(found1).isNotNull();
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).as("Expected cache hit, no SQL query expected").isEmpty();
     assertThat(getStats().getHitCount()).isEqualTo(1);
   }
@@ -67,11 +67,11 @@ public class TestNatKeyCacheWithForeignKey extends BaseTestCase {
     assertThat(result0).hasSize(2);
     assertThat(getStats().getHitCount()).isEqualTo(0);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     final List<OCachedAppDetail> result1 = findListDetails(app0, "detail0", "detail1");
     assertThat(result1).hasSize(2);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).as("Expected cache hit, no SQL query expected").isEmpty();
     assertThat(getStats().getHitCount()).isEqualTo(2);
   }
@@ -96,11 +96,11 @@ public class TestNatKeyCacheWithForeignKey extends BaseTestCase {
     assertThat(result0).hasSize(2);
     assertThat(getStats().getHitCount()).isEqualTo(0);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     final List<OCachedAppDetail> result1 = findListApps("detail0", app0, app1);
     assertThat(result1).hasSize(2);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).as("Expected cache hit, no SQL query expected").isEmpty();
     assertThat(getStats().getHitCount()).isEqualTo(2);
   }

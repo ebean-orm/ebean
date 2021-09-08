@@ -1,7 +1,7 @@
 package io.ebean;
 
 import org.tests.model.basic.EBasicVer;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,10 +18,10 @@ public class EbeanServer_deleteTest extends BaseTestCase  {
     DB.save(someBean);
 
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.delete(someBean);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=? and ");
   }
@@ -34,7 +34,7 @@ public class EbeanServer_deleteTest extends BaseTestCase  {
 
     Database server = DB.getDefault();
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     Transaction txn = server.beginTransaction();
     try {
       server.delete(someBean, txn);
@@ -42,7 +42,7 @@ public class EbeanServer_deleteTest extends BaseTestCase  {
     } finally {
       txn.end();
     }
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=? and ");
   }

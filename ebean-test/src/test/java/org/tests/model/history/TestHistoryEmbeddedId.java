@@ -6,7 +6,7 @@ import io.ebean.ValuePair;
 import io.ebean.Version;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -33,13 +33,13 @@ public class TestHistoryEmbeddedId extends BaseTestCase {
     assertNotNull(found);
     assertThat(found.getName()).isEqualTo("notTen");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     final List<Version<HEmbiBean>> versions =
       DB.find(HEmbiBean.class)
       .setId(id)
       .findVersions();
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(versions).hasSize(2);
 
     final Map<String, ValuePair> diff = versions.get(0).getDiff();

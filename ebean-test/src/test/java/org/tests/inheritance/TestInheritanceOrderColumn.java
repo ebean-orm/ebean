@@ -2,8 +2,8 @@ package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebeantest.LoggedSql;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.inheritance.order.OrderMasterInheritance;
 import org.tests.inheritance.order.OrderedA;
@@ -30,9 +30,9 @@ public class TestInheritanceOrderColumn extends BaseTestCase {
     master.getReferenced().add(orderedA);
     master.getReferenced().add(orderedB);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(master);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(5);
     // Some platforms insert ids and others don't need to...
     assertSql(trimId(sql, 1))
@@ -53,7 +53,7 @@ public class TestInheritanceOrderColumn extends BaseTestCase {
 
     LoggedSql.start();
     DB.save(result);
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("update ordered_parent set sort_order=? where id=?");
 

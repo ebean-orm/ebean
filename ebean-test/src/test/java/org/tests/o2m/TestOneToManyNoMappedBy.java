@@ -2,7 +2,7 @@ package org.tests.o2m;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class TestOneToManyNoMappedBy extends BaseTestCase {
 
     account.save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final OmAccountDBO found = DB.find(OmAccountDBO.class)
       .where().eq("name", "one")
@@ -35,7 +35,7 @@ public class TestOneToManyNoMappedBy extends BaseTestCase {
       assertSame(found, child.getBananaRama());
     }
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(1)).contains("select t0.banana_rama_id, t0.id, t0.description, t0.banana_rama_id from om_account_child_dbo t0 where");
   }

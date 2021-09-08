@@ -2,7 +2,7 @@ package org.tests.model.composite;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class TestCompositeKeyUserClient extends BaseTestCase {
     client.setClientPK(new CkeClientKey(20, "susan"));
     client.setUser(user1);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(client);
 
@@ -38,7 +38,7 @@ public class TestCompositeKeyUserClient extends BaseTestCase {
 
     DB.save(client);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("insert into cke_client (cod_cpny, cod_client, notes, username) values (?,?,?,?)");

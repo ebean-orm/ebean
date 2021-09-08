@@ -6,7 +6,7 @@ import io.ebean.Query;
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.softdelete.EBasicNoSDChild;
 import org.tests.model.softdelete.EBasicSDChild;
@@ -36,11 +36,11 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     assertThat(bean.getVersion()).isEqualTo(1);
     assertThat(bean.getChildren().get(0).getVersion()).isEqualTo(1);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.delete(bean);
 
-//    List<String> loggedSql = LoggedSqlCollector.stop();
+//    List<String> loggedSql = LoggedSql.stop();
 //
 //    assertEquals(new Long(2), bean.getVersion());
 //    assertEquals(new Long(2), bean.getChildren().get(0).getVersion()); // Fails with 1
@@ -65,20 +65,20 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     bean.setName("findSingleAttribute");
     DB.save(bean);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final String name0 = DB.find(EBasicSoftDelete.class)
       .select("name")
       .where().eq("name", "findSingleAttribute")
       .findSingleAttribute();
 
-    List<String> sql0 = LoggedSqlCollector.current();
+    List<String> sql0 = LoggedSql.collect();
     assertThat(sql0.get(0)).contains("where t0.name = ? and t0.deleted =");
     assertThat(name0).isEqualTo("findSingleAttribute");
 
     // now soft delete the bean
     DB.delete(bean);
-    List<String> sqlUpdate = LoggedSqlCollector.current();
+    List<String> sqlUpdate = LoggedSql.collect();
     assertThat(sqlUpdate.get(0)).contains("update ebasic_sdchild set");
 
     // use setIncludeSoftDeletes
@@ -88,7 +88,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
       .setIncludeSoftDeletes()
       .findSingleAttribute();
 
-    List<String> sql1 = LoggedSqlCollector.current();
+    List<String> sql1 = LoggedSql.collect();
     assertThat(sql1.get(0)).doesNotContain(" and t0.deleted =");
     assertThat(name1).isEqualTo("findSingleAttribute");
 
@@ -99,7 +99,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
       .where().eq("name", "findSingleAttribute")
       .findSingleAttribute();
 
-    List<String> sql2 = LoggedSqlCollector.stop();
+    List<String> sql2 = LoggedSql.stop();
     assertThat(sql2.get(0)).contains(" and t0.deleted =");
     assertThat(name2).isNull();
   }
@@ -116,7 +116,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     DB.save(bean);
     DB.delete(bean.getChildren().get(0));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Object> ids = DB.find(EBasicSDChild.class).where().eq("owner", bean).findIds();
     assertThat(ids).hasSize(2);
@@ -124,7 +124,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
     List<EBasicSDChild> beans = DB.find(EBasicSDChild.class).where().eq("owner", bean).findList();
     assertThat(beans).hasSize(2);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("from ebasic_sdchild t0 where t0.owner_id = ? and t0.deleted = ");
@@ -336,10 +336,10 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     // -- test .findCount()
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     int rowCountAfter = DB.find(EBasicSoftDelete.class).findCount();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("where t0.deleted =");
 
@@ -347,11 +347,11 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     // -- test includeSoftDeletes().findCount()
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     int rowCountFull = DB.find(EBasicSoftDelete.class).setIncludeSoftDeletes().findCount();
     assertThat(rowCountFull).isGreaterThan(rowCountAfter);
 
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).doesNotContain("where coalesce(t0.deleted,false)=false");
   }
@@ -369,11 +369,11 @@ public class TestSoftDeleteBasic extends BaseTestCase {
       .setId(bean.getId())
       .findOne();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.delete(partial);
 
     // check lazy loading isn't invoked (deleted set to true without invoking lazy loading)
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(2);
     assertThat(loggedSql.get(0)).contains("update ebasic_sdchild set deleted=");
     assertThat(loggedSql.get(1)).contains("update ebasic_soft_delete set deleted=? where id=?");
@@ -392,11 +392,11 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     DB.save(bean);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.delete(bean);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     // The children without SoftDelete are left as is (so no third statement)
     assertThat(loggedSql).hasSize(2);
@@ -426,7 +426,7 @@ public class TestSoftDeleteBasic extends BaseTestCase {
 
     DB.delete(bean.getChildren().get(1));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<EBasicSoftDelete> query1 =
       DB.find(EBasicSoftDelete.class)

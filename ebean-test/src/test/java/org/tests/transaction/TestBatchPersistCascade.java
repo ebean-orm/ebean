@@ -6,7 +6,7 @@ import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
     Database ebeanServer = DB.getDefault();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Transaction txn = ebeanServer.beginTransaction();
     try {
@@ -48,7 +48,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
       txn.end();
     }
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertTrue(loggedSql.size() > 2);
 
 

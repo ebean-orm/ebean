@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Transaction;
 import org.tests.model.m2m.MnyB;
 import org.tests.model.m2m.MnyC;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,11 +40,11 @@ public class TestBeanStateReset extends BaseTestCase {
       DB.beanState(b).resetForInsert();
       b.getCs().clear();
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       b.setName("mod");
       b.save();
 
-      List<String> sql = LoggedSqlCollector.stop();
+      List<String> sql = LoggedSql.stop();
       assertSql(sql.get(0)).contains("insert into mny_b (id, name, version, when_created, when_modified, a_id) values (");
     }
 

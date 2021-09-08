@@ -3,7 +3,7 @@ package org.tests.model.basic.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.cache.ServerCacheStatistics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -55,12 +55,12 @@ public class TestNatKeyUid extends BaseTestCase {
     assertThat(result).hasSize(2);
     assertThat(appStats().getHitCount()).isEqualTo(0);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     result = findMany();
     assertThat(result).hasSize(2);
     assertThat(appStats().getHitCount()).isEqualTo(2);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).as("Expected hit cache, no sql").isEmpty();
   }
 

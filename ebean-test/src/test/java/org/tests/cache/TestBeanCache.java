@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,16 +40,16 @@ public class TestBeanCache extends BaseTestCase {
     assertNotNull(bean0);
 
     // expect to hit the cache, no SQL
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     OCachedBean bean1 = DB.find(OCachedBean.class, bean.getId());
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertNotNull(bean1);
     assertThat(sql).isEmpty();
 
     // expect to hit the cache, no SQL
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     OCachedBean bean2 = DB.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertNotNull(bean2);
     assertThat(sql).isEmpty();
   }
@@ -92,7 +92,7 @@ public class TestBeanCache extends BaseTestCase {
     beanCache.clear();
     beanCache.statistics(true);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     log.info("All misses (0 of 3) ...");
     List<OCachedBean> list = DB.find(OCachedBean.class)
@@ -102,7 +102,7 @@ public class TestBeanCache extends BaseTestCase {
 
     assertThat(list).hasSize(3);
     assertBeanCacheHitMiss(0, 3);
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       assertSql(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?,?,?,?,?)");
@@ -116,7 +116,7 @@ public class TestBeanCache extends BaseTestCase {
 
     assertBeanCacheHitMiss(3, 0);
     assertThat(list).hasSize(3);
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(0); // no misses
 
     // remove a bean so that we get a "partial" hit (2 out of 3 in cache)
@@ -130,7 +130,7 @@ public class TestBeanCache extends BaseTestCase {
 
     assertBeanCacheHitMiss(2, 1);
     assertThat(list).hasSize(3);
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // fetch the miss from DB
@@ -149,7 +149,7 @@ public class TestBeanCache extends BaseTestCase {
 
     assertBeanCacheHitMiss(1, 2);
     assertThat(list).hasSize(3);
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // fetch the misses from DB

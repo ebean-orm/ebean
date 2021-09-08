@@ -2,7 +2,7 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCachedBean;
 
@@ -29,9 +29,9 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
     assertNotNull(bean0);
 
     // expect to hit the cache, no SQL
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     OCachedBean bean1 = DB.find(OCachedBean.class, bean.getId());
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertNotNull(bean1);
     assertThat(sql).isEmpty();
 
@@ -41,9 +41,9 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
     assertEquals(deleted, 1);
 
     // expect not to hit the cache, expect SQL
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     OCachedBean bean2 = DB.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertNull(bean2);
     assertThat(sql).isNotEmpty();
   }
@@ -59,9 +59,9 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
     assertNotNull(bean0);
 
     // expect to hit the cache, no SQL
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     OCachedBean bean1 = DB.find(OCachedBean.class, bean.getId());
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertNotNull(bean1);
     assertThat(sql).isEmpty();
 
@@ -71,9 +71,9 @@ public class TestBeanCacheWithDeleteQuery extends BaseTestCase {
     assertEquals(updated, 1);
 
     // expect not to hit the cache, expect SQL
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     OCachedBean bean2 = DB.find(OCachedBean.class).setReadOnly(true).setId(String.valueOf(bean.getId())).findOne();
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertNotNull(bean2);
     assertThat(sql).isNotEmpty();
     assertEquals("updatedName", bean2.getName());

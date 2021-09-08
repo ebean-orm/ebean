@@ -2,7 +2,7 @@ package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -26,14 +26,14 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_OrderFindIds() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Integer> orderIds = DB.find(Order.class)
         .where().eq("totalItems", 3)
         .findIds();
     assertThat(orderIds).hasSize(2);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains(" left join (select order_id, count(*) as total_items,");
   }
@@ -41,14 +41,14 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_OrderFindList() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
         .where().eq("totalItems", 3)
         .findList();
     assertThat(orders).hasSize(2);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains(" left join (select order_id, count(*) as total_items,");
   }
@@ -56,14 +56,14 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_OrderFindCount() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int orders = DB.find(Order.class)
         .where().eq("totalItems", 3)
         .findCount();
     assertThat(orders).isEqualTo(2);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains("join (select order_id, count(*) as total_items,");
     assertSql(sql.get(0)).contains("select count(*) from ( select t0.id from o_order t0  left join (select order_id,");
@@ -72,7 +72,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_OrderFindCount_multiFormula() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int orders = DB.find(Order.class)
       .where()
@@ -82,7 +82,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     assertThat(orders).isEqualTo(2);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains("select count(*) from ( select t0.id from o_order t0  left join (select order_id,");
   }
@@ -90,7 +90,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_OrderFindSingleAttributeList() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Date> orderDates = DB.find(Order.class)
         .select("orderDate")
@@ -98,7 +98,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
         .findSingleAttributeList();
     assertThat(orderDates).hasSize(2);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains(" left join (select order_id, count(*) as total_items,");
     assertSql(sql.get(0)).contains("select t0.order_date from o_order t0");
@@ -107,7 +107,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_OrderFindOne() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Order order = DB.find(Order.class)
         .select("totalItems")
@@ -118,7 +118,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     assertThat(order.getTotalItems()).isEqualTo(3);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains("join (select order_id, count(*) as total_items,");
     if (isSqlServer()) {
@@ -131,13 +131,13 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_ParentPersonFindIds() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<ParentPerson> orderIds = DB.find(ParentPerson.class)
         .where().eq("totalAge", 3)
         .findIds();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?; --bind(3)");
   }
@@ -145,7 +145,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_ParentPersonFindList() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(ParentPerson.class)
         .select("identifier")
@@ -153,7 +153,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
         .where().eq("familyName", "foo")
         .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains("select t0.identifier from parent_person t0 where t0.family_name = ?");
   }
@@ -161,13 +161,13 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_ParentPersonFindCount() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(ParentPerson.class)
       .where().eq("totalAge", 3)
       .findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains("where coalesce(f2.child_age, 0) = ?)");
     assertSql(sql.get(0)).contains("select count(*) from ( select t0.identifier from parent_person t0 left join (select i2.parent_identifier, count(*) as child_count");
@@ -176,14 +176,14 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_ParentPersonFindSingleAttributeList() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(ParentPerson.class)
       .select("address")
       .where().eq("totalAge", 3)
       .findSingleAttributeList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains("select t0.address from parent_person t0 left join (select i2.parent_identifier");
     assertSql(sql.get(0)).contains("where coalesce(f2.child_age, 0) = ?; --bind(3)");
@@ -192,7 +192,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_ParentPersonFindOne() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(ParentPerson.class)
       .where().eq("totalAge", 3)
@@ -200,7 +200,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .orderById(true)
       .findOne();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ? order by t0.identifier");
   }
@@ -208,13 +208,13 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_ChildPersonParentFindIds() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(ChildPerson.class)
         .where().eq("parent.totalAge", 3)
         .findIds();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("select t0.identifier from child_person t0 left join (select i2.parent_identifier");
     assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");
@@ -223,13 +223,13 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
   @Test
   public void test_ChildPersonParentFindCount() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(ChildPerson.class)
         .where().eq("parent.totalAge", 3)
         .findCount();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("select count(*) from ( select t0.identifier");
     assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");

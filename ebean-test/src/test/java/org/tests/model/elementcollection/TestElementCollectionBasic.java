@@ -3,7 +3,7 @@ package org.tests.model.elementcollection;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -23,10 +23,10 @@ public class TestElementCollectionBasic extends BaseTestCase {
     person.getPhoneNumbers().add("021 1234");
     person.getPhoneNumbers().add("021 4321");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(person);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(eventLog()).containsOnly("preInsert", "postInsert");
     assertThat(sql).hasSize(4);
 
@@ -37,7 +37,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
 
     found.getPhoneNumbers().size();
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("from ec_person t0 where t0.id = ?");
     assertSql(sql.get(1)).contains("from ec_person_phone t0 where");
@@ -45,7 +45,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
     // save when not actually changed
     DB.save(found);
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).isEmpty();
     assertThat(eventLog()).isEmpty();
   }
@@ -54,7 +54,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
   public void test() {
 
     eventLog();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     EcPerson person = new EcPerson("Fiona021");
     person.getPhoneNumbers().add("021 1234");
@@ -63,7 +63,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
 
     assertThat(eventLog()).containsExactly("preInsert", "postInsert");
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(4);
       assertSql(sql.get(0)).contains("insert into ec_person");
@@ -83,7 +83,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
 
     assertThat(eventLog()).containsExactly("preInsert", "postInsert");
 
-    LoggedSqlCollector.current();
+    LoggedSql.collect();
 
     List<EcPerson> found =
       DB.find(EcPerson.class).where()
@@ -98,7 +98,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
     assertThat(phoneNumbers0).containsExactly("021 1234", "021 4321");
     assertThat(phoneNumbers1).containsExactly("09 1234", "09 4321");
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version from ec_person t0 where");
     assertSql(sql.get(1)).contains("select t0.owner_id, t0.phone from ec_person_phone t0 where");
@@ -113,7 +113,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
 
     assertThat(found2).hasSize(2);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version, t1.phone from ec_person t0 left join ec_person_phone t1");
 
@@ -122,7 +122,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
     jsonToFrom(foundFirst);
     updateBasic(foundFirst);
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 
   private void updateBasic(EcPerson bean) {
@@ -130,7 +130,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
     bean.setName("Fiona021-mod-0");
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update ec_person");
 
@@ -148,7 +148,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
       txn.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("update ec_person");
 
@@ -163,7 +163,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
     bean.getPhoneNumbers().add("01-22123");
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(7);
       assertSql(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
@@ -196,7 +196,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
       txn.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(9);
     assertSql(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
     assertSql(sql.get(2)).contains("delete from ec_person_phone where owner_id=?");
@@ -213,7 +213,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
 
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(0);
 
     assertThat(eventLog()).isEmpty();
@@ -230,7 +230,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
       txn.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(8);
     assertSql(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
     assertSqlBind(sql, 1);
@@ -247,7 +247,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
     bean.getPhoneNumbers().add("01-4321");
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(9);
       assertSql(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
@@ -275,7 +275,7 @@ public class TestElementCollectionBasic extends BaseTestCase {
 
     DB.delete(bean);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("delete from ec_person_phone where owner_id = ?");
     assertSql(sql.get(1)).contains("delete from ec_person where id=? and version=?");

@@ -2,7 +2,7 @@ package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,11 +20,11 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
     OtoAone a = new OtoAone("a1", "a test");
     b.setAone(a);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(b);
 
-    List<String> update = LoggedSqlCollector.current();
+    List<String> update = LoggedSql.collect();
     assertThat(update).hasSize(3);
     assertThat(update.get(0)).contains("insert into oto_aone");
     assertSqlBind(update.get(1));
@@ -32,7 +32,7 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
 
     DB.delete(b);
 
-    List<String> deletes = LoggedSqlCollector.stop();
+    List<String> deletes = LoggedSql.stop();
     assertThat(deletes).hasSize(2);
     assertThat(deletes.get(0)).contains("delete from oto_atwo");
     assertThat(deletes.get(1)).contains("delete from oto_aone");
@@ -46,11 +46,11 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
 
     b.setAone(a);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(b);
 
-    List<String> inserts = LoggedSqlCollector.current();
+    List<String> inserts = LoggedSql.collect();
     assertThat(inserts).hasSize(3);
     assertThat(inserts.get(0)).contains("insert into oto_aone");
     assertSqlBind(inserts.get(1));
@@ -58,7 +58,7 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
 
     DB.delete(b);
 
-    List<String> deletes = LoggedSqlCollector.stop();
+    List<String> deletes = LoggedSql.stop();
     assertThat(deletes).hasSize(2);
     assertThat(deletes.get(0)).contains("delete from oto_atwo");
     assertThat(deletes.get(1)).contains("delete from oto_aone");
@@ -75,13 +75,13 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
 
     DB.save(b);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     OtoAone a2 = new OtoAone("a4", "a test");
     b.setAone(a2);
     DB.save(b);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(5);
     assertSql(sql.get(0)).contains("insert into oto_aone");
     assertSqlBind(sql.get(1));
@@ -91,7 +91,7 @@ public class TestOneToOneOrphanStringId extends BaseTestCase {
 
     DB.delete(b);
 
-    List<String> deletes = LoggedSqlCollector.stop();
+    List<String> deletes = LoggedSql.stop();
     assertThat(deletes).hasSize(2);
     assertThat(deletes.get(0)).contains("delete from oto_atwo");
     assertThat(deletes.get(1)).contains("delete from oto_aone");

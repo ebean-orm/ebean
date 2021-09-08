@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -75,10 +75,10 @@ public class TestForeignKeyModes extends BaseTestCase {
     assertThat(found.getOnes()).isNotNull();
     assertThat(found.getOnes()).hasSize(0);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.delete(none);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("delete from dfk_none_via_mto_m_dfk_one where dfk_none_via_mto_m_id = ?");
     assertSqlBind(sql.get(1));
@@ -118,10 +118,10 @@ public class TestForeignKeyModes extends BaseTestCase {
     DB.save(one);
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.delete(one);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("delete from dfk_cascade_one where id=?");

@@ -3,7 +3,7 @@ package org.tests.rawsql.nativesql;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.EAddress;
 import org.tests.model.embedded.EPerson;
@@ -35,7 +35,7 @@ public class TestNativeWithEmbedded extends BaseTestCase {
 
     String sql = "select id, name, street, suburb, addr_city, addr_status, addr_jbean, jraw from eperson where id = ?";
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<EPerson> query = DB.findNative(EPerson.class, sql);
     query.setParameter(person.getId());
@@ -46,7 +46,7 @@ public class TestNativeWithEmbedded extends BaseTestCase {
     assertThat(one.getAddress().getJbean().getName()).isEqualTo("hi");
     assertThat(one.getAddress().getJraw().get("a")).isEqualTo("1");
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
   }
 }

@@ -8,7 +8,7 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -54,7 +54,7 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     try (Transaction transaction = DB.beginTransaction()) {
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
 
       EBasic basic0 = DB.find(EBasic.class, basic.getId());
       assertThat(basic0).isNotNull();
@@ -67,7 +67,7 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(basic1).isNotNull();
       assertThat(basic1).isSameAs(basic0);
 
-      List<String> sql = LoggedSqlCollector.stop();
+      List<String> sql = LoggedSql.stop();
       assertThat(sql).hasSize(2);
       if (isH2() || isPostgres()) {
         assertSql(sql.get(0)).contains("from e_basic t0 where t0.id =");

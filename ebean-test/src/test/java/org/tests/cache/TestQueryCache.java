@@ -6,7 +6,7 @@ import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -104,7 +104,7 @@ public class TestQueryCache extends BaseTestCase {
     new EColAB("04", "count").save();
     new EColAB("05", "count").save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int count0 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
@@ -118,20 +118,20 @@ public class TestQueryCache extends BaseTestCase {
       .eq("columnB", "count")
       .findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(1);
 
     // and now, ensure that we hit the database
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     int count2 = DB.find(EColAB.class)
         .setUseQueryCache(CacheMode.OFF)
         .where()
         .eq("columnB", "count")
         .findCount();
     assertThat(count2).isEqualTo(count1);
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
   }
 
@@ -139,7 +139,7 @@ public class TestQueryCache extends BaseTestCase {
   public void findCountDifferentQueries() {
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int count0 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
@@ -153,7 +153,7 @@ public class TestQueryCache extends BaseTestCase {
       .eq("columnB", "def")
       .findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(2); // different queries
@@ -164,7 +164,7 @@ public class TestQueryCache extends BaseTestCase {
   public void findCountFirstOnThenRecache() {
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int count0 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
@@ -178,7 +178,7 @@ public class TestQueryCache extends BaseTestCase {
       .eq("columnB", "uvw")
       .findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(2); // try recache as second query - it must fetch it
@@ -190,7 +190,7 @@ public class TestQueryCache extends BaseTestCase {
   public void findCountFirstRecacheThenOn() {
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int count0 = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.PUT)
@@ -204,7 +204,7 @@ public class TestQueryCache extends BaseTestCase {
       .eq("columnB", "xyz")
       .findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(1); // try recache as first query - second "ON" query must fetch it.
@@ -263,7 +263,7 @@ public class TestQueryCache extends BaseTestCase {
     new EColAB("04", "someId").save();
     new EColAB("05", "someId").save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Integer> colA_first = DB.find(EColAB.class)
       .setUseQueryCache(CacheMode.ON)
@@ -277,20 +277,20 @@ public class TestQueryCache extends BaseTestCase {
       .eq("columnB", "someId")
       .findIds();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(colA_first).isSameAs(colA_second);
     assertThat(colA_first).hasSize(3);
     assertThat(sql).hasSize(1);
 
     // and now, ensure that we hit the database
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     colA_second = DB.find(EColAB.class)
         .setUseQueryCache(CacheMode.PUT)
         .where()
         .eq("columnB", "someId")
         .findIds();
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
   }
@@ -311,7 +311,7 @@ public class TestQueryCache extends BaseTestCase {
   }
 
   void differentFindCount(Consumer<ExpressionList<EColAB>> q0, Consumer<ExpressionList<EColAB>> q1) {
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     ExpressionList<EColAB> el0 = DB.find(EColAB.class).setUseQueryCache(CacheMode.ON).where();
     q0.accept(el0);
@@ -321,7 +321,7 @@ public class TestQueryCache extends BaseTestCase {
     q1.accept(el1);
     el1.findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(2); // different queries
   }

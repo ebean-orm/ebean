@@ -4,7 +4,7 @@ package org.tests.model.elementcollection;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,11 +25,11 @@ public class EcmPersonTest extends BaseTestCase {
 
     final EcmPerson person = json.toBean(EcmPerson.class, asJson);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(person);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(4);
     assertSql(sql.get(0)).contains("insert into ecm_person ");

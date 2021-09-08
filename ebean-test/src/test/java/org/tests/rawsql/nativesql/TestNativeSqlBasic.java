@@ -3,7 +3,7 @@ package org.tests.rawsql.nativesql;
 import io.ebean.*;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -161,20 +161,20 @@ public class TestNativeSqlBasic extends BaseTestCase {
     List<Order> orders = DB.findNative(Order.class, nativeSql)
       .findList();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     for (Order order : orders) {
       order.getStatus();
     }
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).isEmpty();
 
     for (Order order : orders) {
       order.getCustomer().getName();
     }
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains(" from o_customer t0 where ");
   }

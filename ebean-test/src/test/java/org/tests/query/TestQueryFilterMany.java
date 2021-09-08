@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -24,7 +24,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Customer customer = DB.find(Customer.class)
       .fetchLazy("orders")
@@ -36,7 +36,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     final int size = customer.getOrders().size();
     assertThat(size).isGreaterThan(0);
 
-    List<String> sqlList = LoggedSqlCollector.stop();
+    List<String> sqlList = LoggedSql.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(1)).contains("status = ?");
 
@@ -50,7 +50,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
@@ -60,7 +60,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     final List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
-    List<String> sqlList = LoggedSqlCollector.stop();
+    List<String> sqlList = LoggedSql.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
     assertThat(sqlList.get(1)).contains("status = ?");
@@ -78,7 +78,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
@@ -91,7 +91,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     final List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
-    List<String> sqlList = LoggedSqlCollector.stop();
+    List<String> sqlList = LoggedSql.stop();
     assertEquals(2, sqlList.size());
 
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
@@ -110,7 +110,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
@@ -121,7 +121,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     final List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
-    List<String> sqlList = LoggedSqlCollector.stop();
+    List<String> sqlList = LoggedSql.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
     assertThat(sqlList.get(1)).contains("status = ?");
@@ -168,7 +168,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<Customer> query = DB.find(Customer.class)
       .filterMany("orders").raw("1=0")
@@ -180,7 +180,7 @@ public class TestQueryFilterMany extends BaseTestCase {
       assertThat(customer.getOrders()).isEmpty();
     }
 
-    List<String> sqlList = LoggedSqlCollector.stop();
+    List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
     assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where exists (select 1 from o_order x where x.kcustomer_id = t0.id and x.order_date is not null) and 1=0 order by t0.id");
   }
@@ -190,7 +190,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<Customer> query = DB.find(Customer.class)
       .fetch("orders")
@@ -199,7 +199,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     query.findCount();
 
-    List<String> sqlList = LoggedSqlCollector.stop();
+    List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
     assertThat(sqlList.get(0)).contains("select count(*) from o_customer");
   }
@@ -208,7 +208,7 @@ public class TestQueryFilterMany extends BaseTestCase {
   public void test_filterMany_copy_findList() {
 
     ResetBasicData.reset();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<Customer> query = DB.find(Customer.class)
       .fetch("orders")
@@ -217,7 +217,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     query.copy().findList();
 
-    List<String> sqlList = LoggedSqlCollector.stop();
+    List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
     assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where t1.status ");
     if (isPostgres()) {
@@ -231,7 +231,7 @@ public class TestQueryFilterMany extends BaseTestCase {
   public void test_filterMany_fetchQuery() {
 
     ResetBasicData.reset();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<Customer> query = DB.find(Customer.class)
       .fetchQuery("orders") // explicitly fetch orders separately
@@ -240,7 +240,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     query.findList();
 
-    List<String> sqlList = LoggedSqlCollector.stop();
+    List<String> sqlList = LoggedSql.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("from o_customer t0");
     if (isPostgres()) {
@@ -256,7 +256,7 @@ public class TestQueryFilterMany extends BaseTestCase {
   public void testDisjunction() {
 
     ResetBasicData.reset();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Customer.class)
       .filterMany("orders")
@@ -265,7 +265,7 @@ public class TestQueryFilterMany extends BaseTestCase {
       .eq("orderDate", LocalDate.now())
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains(" from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where (t1.status = ? or t1.order_date = ?) order by t0.id");
   }
@@ -274,13 +274,13 @@ public class TestQueryFilterMany extends BaseTestCase {
   public void testNestedFilterMany() {
 
     ResetBasicData.reset();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.find(Customer.class)
       .filterMany("contacts").isNotNull("firstName")
       .filterMany("contacts.notes").istartsWith("title", "foo")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where t1.first_name is not null order by t0.id; --bind()");
@@ -292,14 +292,14 @@ public class TestQueryFilterMany extends BaseTestCase {
   public void testFilterManyUsingExpression() {
 
     ResetBasicData.reset();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Customer.class)
       .where()
       .filterMany("contacts", "firstName isNotNull and email istartsWith ?", "rob")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {

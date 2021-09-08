@@ -1,7 +1,7 @@
 package org.tests.batchload;
 
 import io.ebean.*;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -19,14 +19,14 @@ public class TestSecondaryQueries extends TransactionalTestCase {
   @Test
   public void fetchQuery() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Order.class)
       .select("status")
       .fetchQuery("customer", "name")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(2);
     assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
@@ -37,7 +37,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
   @Test
   public void fetchLazy() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.cacheManager().clearAll();
 
     List<Order> orders = DB.find(Order.class)
@@ -47,7 +47,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
       .setUseCache(false)
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
@@ -56,14 +56,14 @@ public class TestSecondaryQueries extends TransactionalTestCase {
       assertThat(trimSql(sql.get(0), 2)).contains("select t0.id, t0.status, t0.kcustomer_id from o_order t0");
     }
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // invoke lazy loading
     for (Order order : orders) {
       order.getCustomer().getName();
     }
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.name from o_customer t0 where t0.id");
     platformAssertIn(sql.get(0), " where t0.id");
@@ -72,7 +72,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
   @Test
   public void fetchIterate() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (QueryIterator<Order> orders =
            DB.find(Order.class).select("status")
@@ -84,7 +84,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
         orders.next(); // dummy read
       }
     }
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
@@ -105,12 +105,12 @@ public class TestSecondaryQueries extends TransactionalTestCase {
       .fetchQuery("contacts")
       .setId(custId);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Customer cust = query.findOne();
     assertNotNull(cust);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     String generatedSql = query.getGeneratedSql();
     assertThat(generatedSql).contains("from o_customer t0 where t0.id = ?");
@@ -133,7 +133,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
       .query();
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> list = query.findList();
     assertTrue(!list.isEmpty());
@@ -142,7 +142,7 @@ public class TestSecondaryQueries extends TransactionalTestCase {
       order.getCustomer().getStatus();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     String generatedSql = sqlOf(query, 2);
     //select t0.id c0, t0.status c1, t0.kcustomer_id c2 from o_order t0 where t0.status = ? ; --bind(NEW)

@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,10 +30,10 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
     jack.setAddress(address2);
 
     // Fail do to uniqueness constraint
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(jack);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(5);
     assertSql(sql.get(0)).contains("delete from oto_cust_address where aid=? and version=?");
     assertSqlBind(sql.get(1));
@@ -44,7 +44,7 @@ public class TestOneToOneOrphanRemove extends BaseTestCase {
     jack.setAddress(null);
     DB.save(jack);
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("delete from oto_cust_address where aid=? and version=?");
     assertSqlBind(sql.get(1));

@@ -3,7 +3,7 @@ package org.tests.model.onetoone.album;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -21,11 +21,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     Cover cover = new Cover("a1");
     cover.save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.delete(Cover.class, cover.getId());
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isPlatformBooleanNative()) {
       assertSql(sql.get(0)).contains("update cover set deleted=true where id = ?");
@@ -54,11 +54,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
 
     cover1.setDeleted(false);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     cover1.update();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update cover set deleted=? where id=?; -- bind(false");
 
@@ -74,11 +74,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     Cover cover = new Cover("a1");
     cover.save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.getDefault().delete(Cover.class, cover.getId(), null);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isPlatformBooleanNative()) {
       assertSql(sql.get(0)).contains("update cover set deleted=true where id = ?");
@@ -94,11 +94,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     Cover cover = new Cover("a2");
     cover.save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.getDefault().deletePermanent(Cover.class, cover.getId(), null);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("delete from cover where id = ?");
   }
@@ -109,11 +109,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.deleteAll(Cover.class, ids(beans));
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isPlatformBooleanNative()) {
       assertSql(sql.get(0)).contains("update cover set deleted=true where id ");
@@ -128,14 +128,14 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction transaction = DB.beginTransaction()) {
       DB.getDefault().deleteAll(Cover.class, ids(beans), transaction);
       transaction.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isPlatformBooleanNative()) {
       assertSql(sql.get(0)).contains("update cover set deleted=true where id");
@@ -150,11 +150,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.deleteAllPermanent(Cover.class, ids(beans));
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     platformAssertIn(sql.get(0), "delete from cover where id ");
   }
@@ -165,11 +165,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.deleteAllPermanent(Cover.class, ids(beans));
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     platformAssertIn(sql.get(0), "delete from cover where id ");
   }
@@ -181,14 +181,14 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction transaction = DB.beginTransaction()) {
       DB.getDefault().deleteAllPermanent(Cover.class, ids(beans), transaction);
       transaction.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     platformAssertIn(sql.get(0), "delete from cover where id ");
   }
@@ -199,11 +199,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.deleteAll(beans);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
       assertSql(sql.get(0)).contains("update cover set deleted=? where id=?");
@@ -218,11 +218,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.deleteAll(beans);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
       assertSql(sql.get(0)).contains("update cover set deleted=? where id=?");
@@ -238,14 +238,14 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction transaction = DB.beginTransaction()) {
       DB.getDefault().deleteAll(beans, transaction);
       transaction.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     if (isPersistBatchOnCascade()) {
       assertSql(sql.get(0)).contains("update cover set deleted=? where id=?");
@@ -261,11 +261,11 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.deleteAllPermanent(beans);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("delete from cover where id=?");
   }
@@ -276,14 +276,14 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
     List<Cover> beans = beans(2);
     DB.saveAll(beans);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction transaction = DB.beginTransaction()) {
       DB.getDefault().deleteAllPermanent(beans, transaction);
       transaction.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("delete from cover where id=?");
   }

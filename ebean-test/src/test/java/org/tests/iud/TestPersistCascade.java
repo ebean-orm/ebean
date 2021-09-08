@@ -2,7 +2,7 @@ package org.tests.iud;
 
 import io.avaje.moduuid.ModUUID;
 import io.ebean.BaseTestCase;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -21,10 +21,10 @@ public class TestPersistCascade extends BaseTestCase {
       country.addCity(new PcfCity("city_" + ModUUID.newShortId(), mayor, viceMayor));
     }
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     country.save();
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
 
     if (isPersistBatchOnCascade()) {
       assertSql(sql.get(0)).contains("insert into pcf_country");

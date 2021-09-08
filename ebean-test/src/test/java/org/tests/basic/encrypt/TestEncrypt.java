@@ -7,7 +7,7 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicEncrypt;
 import org.tests.model.basic.EBasicEncryptRelate;
@@ -25,12 +25,12 @@ public class TestEncrypt extends BaseTestCase {
   @ForPlatform({Platform.H2, Platform.SQLSERVER}) // only run this on H2 - PGCrypto not happy on CI server
   public void testQueryBind() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.find(EBasicEncrypt.class)
       .where().startsWith("description", "Rob")
       .findList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("; --bind(****,Rob%)");
   }
@@ -39,7 +39,7 @@ public class TestEncrypt extends BaseTestCase {
   @ForPlatform({Platform.H2, Platform.SQLSERVER}) // only run this on H2 - PGCrypto not happy on CI server
   public void testQueryJoin() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(EBasicEncryptRelate.class)
       .where().eq("other.description", "foo")
@@ -49,7 +49,7 @@ public class TestEncrypt extends BaseTestCase {
       .where().eq("other.description", "foo")
       .findCount();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(2);
     assertThat(loggedSql.get(0)).contains("left join e_basicenc t1 on t1.id = t0.other_id");
     assertThat(loggedSql.get(1)).contains("left join e_basicenc t1 on t1.id = t0.other_id");

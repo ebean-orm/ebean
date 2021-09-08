@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -66,11 +66,11 @@ public class TestPrivateOwned extends BaseTestCase {
     DB.save(m0);
     assertThat(m0.getDetails()).hasSize(2);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     m0.getDetails().remove(0);
     DB.save(m0);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(2);
     assertThat(loggedSql.get(0)).contains("delete from t_detail_with_other_namexxxyy where id=?");
     assertSqlBind(loggedSql.get(1));
@@ -78,9 +78,9 @@ public class TestPrivateOwned extends BaseTestCase {
     TSMaster masterReload = DB.find(TSMaster.class, m0.getId());
     assertThat(masterReload.getDetails()).hasSize(1);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(m0);
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(0);
 
   }

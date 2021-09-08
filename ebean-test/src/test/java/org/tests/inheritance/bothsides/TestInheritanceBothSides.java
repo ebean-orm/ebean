@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -74,7 +74,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
 
   private void assertFetchAllSourceAs() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final List<SourceA> sourceAList = DB.find(SourceA.class)
       .fetch("target", "name")
@@ -87,7 +87,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
 
     assertThat(joinedNames).isEqualTo("|source a|target 1|source a2|target 1b");
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t1.id, t1.name from source_base t0 left join target_base t1 on t1.id = t0.target_id and t1.dtype = 'Target1' where t0.dtype = 'SourceA' order by t0.pos");
   }
@@ -97,7 +97,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
    */
   private void assertFetchAllDoubleLazyLoading() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final List<SourceBase> sources = DB.find(SourceBase.class).order("pos").findList();
     for (SourceBase source : sources) {
@@ -113,7 +113,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
       }
     }
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(3);
     //assertSql(sql.get(0)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t0.target_id, t0.target_id from source_base t0 order by t0.pos");

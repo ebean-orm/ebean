@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DB;
 import io.ebean.PagedList;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.carwheel.Car;
 import org.tests.model.carwheel.Tire;
@@ -71,7 +71,7 @@ public class TestCarWheelIud extends BaseTestCase {
 
     DB.saveAll(asList(car0, car1, car2));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final PagedList<Car> pagedList = DB.find(Car.class)
       .select("brand, totalSold")
@@ -84,7 +84,7 @@ public class TestCarWheelIud extends BaseTestCase {
     assertThat(list).hasSize(2);
     assertThat(count).isEqualTo(2);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     if (isH2() || isPostgres()) {
       assertSql(sql.get(0)).contains("select t0.brand, sum(t0.sold) from sa_car t0 group by t0.brand limit 10");

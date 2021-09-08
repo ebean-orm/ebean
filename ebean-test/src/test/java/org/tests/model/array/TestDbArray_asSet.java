@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
@@ -108,9 +108,9 @@ public class TestDbArray_asSet extends BaseTestCase {
   public void update_when_notDirty() {
 
     found.setName("jack");
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(found);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // we don't update the phone numbers (as they are not dirty)
     assertSql(sql.get(0)).contains("update earray_set_bean set name=?, version=? where");
@@ -122,9 +122,9 @@ public class TestDbArray_asSet extends BaseTestCase {
     found.getPhoneNumbers().add("9987");
     found.getUids().add(UUID.randomUUID());
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(found);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertSql(sql.get(0)).contains("update earray_set_bean set phone_numbers=?, uids=?, version=? where");
   }

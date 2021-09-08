@@ -6,7 +6,7 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import org.tests.model.json.EBasicHstore;
 import org.assertj.core.api.Assertions;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -52,9 +52,9 @@ public class TestHstore extends BaseTestCase {
     EBasicHstore found = DB.find(EBasicHstore.class, bean.getId());
     found.setName("modName");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(found);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // we don't update the map as it is not dirty
     assertSql(sql.get(0)).contains("update ebasic_hstore set name=?, version=? where");
@@ -66,9 +66,9 @@ public class TestHstore extends BaseTestCase {
     found.setName("modNamePlus");
     found.getMap().put("foo", "9987");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(found);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertSql(sql.get(0)).contains("update ebasic_hstore set name=?, map=?, version=? where id=? and version=?");
   }

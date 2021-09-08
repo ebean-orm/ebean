@@ -2,7 +2,7 @@ package org.tests.o2o;
 
 
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,13 +24,13 @@ public class TestOneToOneSaveWithoutChanges {
     OtoLevelB dbB = dbA.getB();
     OtoLevelC dbC = dbB.getC();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(dbA);
     DB.save(dbB);
     DB.save(dbC);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(0);
   }
 }

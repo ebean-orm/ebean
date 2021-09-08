@@ -10,7 +10,7 @@ import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -45,9 +45,9 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     assertNotNull(list);
 
     // check also select count(*)
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     assertThat(query.findCount()).isEqualTo(list.size());
-    List<String>sql = LoggedSqlCollector.stop();
+    List<String>sql = LoggedSql.stop();
     assertThat(sql.get(0)).startsWith("select count(*) from ( select r.id, r.name from o_customer r");
     assertThat(sql.get(0)).doesNotContain("order by");
   }
@@ -161,9 +161,9 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     }
 
     // check also select count(*)
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.findCount();
-    List<String>sql = LoggedSqlCollector.stop();
+    List<String>sql = LoggedSql.stop();
     assertThat(sql.get(0)).startsWith("select count(*) from ( select o.id, o.order_date, o.ship_date from o_order o");
     assertThat(sql.get(0)).doesNotContain("order by");
   }
@@ -196,9 +196,9 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     }
 
     // check also select count(*)
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.findCount();
-    List<String>sql = LoggedSqlCollector.stop();
+    List<String>sql = LoggedSql.stop();
     assertThat(sql.get(0)).startsWith("select count(*) from ( select o.id, o.order_date, o.ship_date from o_order o");
     assertThat(sql.get(0)).doesNotContain("order by");
   }

@@ -2,7 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.onetoone.album.Cover;
@@ -35,11 +35,11 @@ public class NoopExpressionTest extends BaseExpressionTest {
       .where().add(NoopExpression.INSTANCE)
       .query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     query.findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select count(*) from cover t0 where 1=1 and");
   }
 

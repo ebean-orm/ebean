@@ -1,7 +1,7 @@
 package org.tests.model.onetoone;
 
 import io.ebean.BaseTestCase;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,12 +16,12 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
     account.setName("AC234");
     account.save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Account fetchedAccount = Account.find.byId(account.getId());
     assertNotNull(fetchedAccount);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
 
     // select t0.id c0, t0.name c1, t0.version c2, t0.when_created c3, t0.when_updated c4, t1.id c5
@@ -47,7 +47,7 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
     user.setAccount(account);
     user.save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Account fetchedAccount = Account.find.byId(account.getId());
     assertNotNull(fetchedAccount);
@@ -56,7 +56,7 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
     assertEquals(user.getId(), fetchedAccount.getUser().getId());
     assertEquals(user.getName(), fetchedAccount.getUser().getName());
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(2, loggedSql.size());
 
     // select t0.id c0, t0.name c1, t0.version c2, t0.when_created c3, t0.when_updated c4, t1.id c5
@@ -85,7 +85,7 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
     user.setAccount(account);
     user.save();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Account fetchedAccount = Account.find.query().fetch("user").setId(account.getId()).findOne();
     assertNotNull(fetchedAccount);
@@ -94,7 +94,7 @@ public class TestOneToOneOptionalRelationship extends BaseTestCase {
     assertEquals(user.getId(), fetchedAccount.getUser().getId());
     assertEquals(user.getName(), fetchedAccount.getUser().getName());
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
 
     // select t0.id c0, t0.name c1, t0.version c2, t0.when_created c3, t0.when_updated c4, t1.id c5

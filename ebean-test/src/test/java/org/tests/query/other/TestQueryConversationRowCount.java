@@ -3,7 +3,7 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.converstation.Conversation;
 
@@ -52,7 +52,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     assertThat(generatedSql).contains("where t0.group_id = ? and ((t0.isopen = ? and u1.user_id = ?) or t0.isopen = ?)");
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.findCount();
 
     // select count(*) from (
@@ -62,7 +62,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     //   where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? )
     // ); --bind(1,true,1,true)
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
 
     String countSql = trimSql(loggedSql.get(0), 0);

@@ -2,7 +2,7 @@ package org.tests.model.orphanremoval;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,10 +22,10 @@ public class TestOrphanRemoveO2M extends BaseTestCase {
 
     master.getDetails().clear();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(master);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(DB.find(OrpDetail.class, "d1")).isNull();
     assertThat(DB.find(OrpDetail.class, "d2")).isNull();

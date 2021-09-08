@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.QueryType;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.basic.TOne;
@@ -35,21 +35,21 @@ public class TestQueryAdapter extends BaseTestCase {
     Query<TOne> notUsedQuery = DB.find(TOne.class);
     assertThat(notUsedQuery.getQueryType()).isEqualTo(QueryType.FIND);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.update(TOne.class)
       .set("name", "mod")
       .where().idEq(o.getId())
       .update();
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertSql(sql.get(0)).contains(" 2=2");
 
     DB.find(TOne.class)
       .where().idEq(o.getId())
       .delete();
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains(" 3=3");
 
   }

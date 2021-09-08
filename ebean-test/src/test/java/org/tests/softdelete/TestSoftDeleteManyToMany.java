@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import org.tests.model.softdelete.ESoftDelRole;
 import org.tests.model.softdelete.ESoftDelUser;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,10 +29,10 @@ public class TestSoftDeleteManyToMany extends BaseTestCase {
     DB.save(user1);
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.delete(user1);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     // No Delete from the relationship table
     assertThat(loggedSql).hasSize(1);

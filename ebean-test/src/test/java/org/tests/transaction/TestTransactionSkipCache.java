@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -39,10 +39,10 @@ public class TestTransactionSkipCache extends BaseTestCase {
     try {
       transaction.setSkipCache(true);
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       findUseQueryCache();
 
-      List<String> sql = LoggedSqlCollector.stop();
+      List<String> sql = LoggedSql.stop();
       assertThat(sql).as("We didn't use the L2 query cache").hasSize(1);
 
     } finally {

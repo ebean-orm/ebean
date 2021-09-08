@@ -7,7 +7,7 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.BBookmarkUser;
 import org.tests.model.basic.Contact;
@@ -34,7 +34,7 @@ public class TestDeleteByQuery extends BaseTestCase {
     createUser("deleteWithLimit3");
     createUser("deleteWithLimit4");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     final int rows = DB.find(BBookmarkUser.class)
       .where().startsWith("name", "deleteWithLimit")
       .setMaxRows(3)
@@ -42,7 +42,7 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     assertThat(rows).isEqualTo(3);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isSqlServer()) {
       assertSql(sql.get(0)).contains("delete from bbookmark_user where id in (select top 3 t0.id from bbookmark_user t0 where t0.name like ");
     } else {
@@ -74,20 +74,20 @@ public class TestDeleteByQuery extends BaseTestCase {
       .where().eq("org.name", "NahYeahMaybe")
       .query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.delete();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(trimSql(loggedSql.get(0), 1)).contains("delete from bbookmark_user where id in (select t0.id from bbookmark_user t0 left join bbookmark_org t1 on t1.id = t0.org_id where t1.name");
 
     Query<BBookmarkUser> query2 = server.find(BBookmarkUser.class)
       .where().eq("name", "NotARealFirstName").query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query2.delete();
 
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     if (isPlatformSupportsDeleteTableAlias()) {
       assertThat(loggedSql.get(0)).contains("delete from bbookmark_user t0 where t0.name =");
@@ -114,19 +114,19 @@ public class TestDeleteByQuery extends BaseTestCase {
 
     Query<Contact> query = server.find(Contact.class).where().eq("group.name", "NahYeahMaybe").query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.delete();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(trimSql(loggedSql.get(0), 1)).contains("select t0.id from contact t0 left join contact_group t1 on t1.id = t0.group_id where t1.name = ?");
 
     Query<Contact> query2 = server.find(Contact.class).where().eq("firstName", "NotARealFirstName").query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query2.delete();
 
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("select t0.id from contact t0 where t0.first_name = ?");
 
@@ -141,12 +141,12 @@ public class TestDeleteByQuery extends BaseTestCase {
   @Test
   public void queryByIdDelete() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(BBookmarkUser.class).where().eq("id", 7000).delete();
     DB.find(BBookmarkUser.class).setId(7000).delete();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isPlatformSupportsDeleteTableAlias()) {
       assertSql(sql.get(0)).contains("delete from bbookmark_user t0 where t0.id = ?");
       assertSql(sql.get(1)).contains("delete from bbookmark_user t0 where t0.id = ?");
@@ -162,12 +162,12 @@ public class TestDeleteByQuery extends BaseTestCase {
   @Test
   public void queryByIdDelete_withEscalation() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Contact.class).where().eq("id", 7000).delete();
     DB.find(Contact.class).setId(7000).delete();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     // escalate to fetch ids then delete ... but no rows found
     assertSql(sql.get(0)).contains("select t0.id from contact t0 where t0.id = ?");
     assertSql(sql.get(1)).contains("select t0.id from contact t0 where t0.id = ?");
@@ -179,7 +179,7 @@ public class TestDeleteByQuery extends BaseTestCase {
   @Test
   public void queryDelete_withTransactionNoCascade() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction transaction = DB.beginTransaction()) {
       transaction.setPersistCascade(false);
@@ -189,7 +189,7 @@ public class TestDeleteByQuery extends BaseTestCase {
       transaction.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isPlatformSupportsDeleteTableAlias()) {
       assertSql(sql.get(0)).contains("delete from contact t0 where t0.id = ?");
     } else if (!isMySql()){
@@ -200,14 +200,14 @@ public class TestDeleteByQuery extends BaseTestCase {
   @Test
   public void testWithForUpdate() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Customer.class)
       .where().eq("name", "Don Roberto")
       .query().forUpdate()
       .delete();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
       assertSql(sql.get(0)).contains("select t0.id from o_customer t0 with (updlock) where t0.name = ?");

@@ -7,7 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.config.dbplatform.IdType;
 
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.m2m.MnyB;
 import org.tests.model.m2m.MnyTopic;
@@ -45,7 +45,7 @@ public class TestBatchModelFlush extends BaseTestCase {
   @Test
   public void multipleTopLevel_expect_singleFlush() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // 2 unrelated "top level" beans being persisted
     MnyB m0 = new MnyB("BatchMultipleTop_0");
@@ -70,7 +70,7 @@ public class TestBatchModelFlush extends BaseTestCase {
       transaction.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // DEBUG io.ebean.SUM - txn[1001] BatchControl flush [MnyB:100 i:2, Role:101 i:2, MnyTopic:102 i:2]
 

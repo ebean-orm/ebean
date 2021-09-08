@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.tests.model.basic.UUOne;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     assertNotNull(DB.find(UUOne.class).where().idEq(inserted.get(2).getId()).findOne());
     assertBeanCacheHits(1);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<UUOne> list = DB.find(UUOne.class)
       .select("id")
@@ -55,7 +55,7 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     }
     list.get(0).getName();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("from uuone t0 where t0.name like ");
     platformAssertIn(sql.get(1), "from uuone t0 where t0.id");

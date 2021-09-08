@@ -3,7 +3,7 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderShipment;
@@ -30,11 +30,11 @@ public class TestQueryFetchManyTwoDeep extends BaseTestCase {
       .fetch("orders.details");
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Customer> list = query.findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertTrue(!list.isEmpty());
     String mainSql = sqlOf(query);

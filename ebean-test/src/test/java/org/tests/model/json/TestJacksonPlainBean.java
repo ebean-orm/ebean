@@ -2,7 +2,7 @@ package org.tests.model.json;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebeantest.LoggedSql;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

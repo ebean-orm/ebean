@@ -1,6 +1,6 @@
 package io.ebean;
 
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
@@ -20,7 +20,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
     final EBasicVer bean1 = bean("foo1");
     final EBasicVer bean2 = bean("foo2");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.saveAll(bean0, bean1, bean2);
 
@@ -28,7 +28,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
     assertNotNull(bean1.getId());
     assertNotNull(bean2.getId());
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(4);
     assertThat(loggedSql.get(0)).contains("insert into e_basicver");
     assertSqlBind(loggedSql, 1, 3);
@@ -52,10 +52,10 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
     }
 
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.deleteAll(EBasicVer.class, ids);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }
@@ -73,12 +73,12 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     Database db = DB.getDefault();
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     try (Transaction txn = db.beginTransaction()) {
       db.deleteAll(EBasicVer.class, ids, txn);
       txn.commit();
     }
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }
@@ -94,11 +94,11 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
       ids.add(someBean.getId());
     }
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.deleteAllPermanent(EBasicVer.class, ids);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }
@@ -117,12 +117,12 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
     Database db = DB.getDefault();
     // act
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     try (Transaction txn = db.beginTransaction()) {
       db.deleteAllPermanent(EBasicVer.class, ids, txn);
       txn.commit();
     }
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }

@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.FetchGroup;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -26,13 +26,13 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     loadCustomerBeanCache();
     customerBeanCache.statistics(true);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
       .fetchCache("customer", "status, name")
       .findList();
 
-    final List<String> sql0 = LoggedSqlCollector.current();
+    final List<String> sql0 = LoggedSql.collect();
     assertThat(sql0).hasSize(1);
 
     final ServerCacheStatistics statistics = customerBeanCache.statistics(true);
@@ -46,7 +46,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
       assertThat(customer.getStatus()).isNotNull();
     }
 
-    assertThat(LoggedSqlCollector.stop()).isEmpty();
+    assertThat(LoggedSql.stop()).isEmpty();
   }
 
   private void loadCustomerBeanCache() {
@@ -66,13 +66,13 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
     customerBeanCache.statistics(true);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
       .fetchCache("customer")
       .findList();
 
-    final List<String> sql0 = LoggedSqlCollector.current();
+    final List<String> sql0 = LoggedSql.collect();
     assertThat(sql0).hasSize(2);
     assertThat(sql0.get(0)).contains(" from o_order ");
     assertThat(sql0.get(1)).contains(" from o_customer t0 where t0.id ");
@@ -86,7 +86,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
       assertThat(customer.getStatus()).isNotNull();
     }
 
-    assertThat(LoggedSqlCollector.stop()).isEmpty();
+    assertThat(LoggedSql.stop()).isEmpty();
   }
 
   @Test
@@ -100,7 +100,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
 
     customerBeanCache.statistics(true);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
       .fetchCache("customer")
@@ -109,7 +109,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     for (Order order : orders) {
       assertThat(order.getCustomer().getName()).isNotNull();
     }
-    final List<String> sql0 = LoggedSqlCollector.current();
+    final List<String> sql0 = LoggedSql.collect();
     assertThat(sql0).hasSize(1);
 
     final ServerCacheStatistics statistics = customerBeanCache.statistics(true);
@@ -124,7 +124,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     }
 
     // assert we hit the DB the second time around
-    final List<String> sql1 = LoggedSqlCollector.stop();
+    final List<String> sql1 = LoggedSql.stop();
     assertThat(sql1).hasSize(1);
     assertThat(sql1.get(0)).contains(" from o_customer t0 ");
 
@@ -162,7 +162,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     initDataClearCache();
     customerBeanCache.statistics(true);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
       .select(fgCachePartial)
@@ -173,7 +173,7 @@ public class TestBeanFetchJoinCache extends BaseTestCase {
     final ServerCacheStatistics statistics1 = customerBeanCache.statistics(true);
     assertThat(statistics1.getMissCount()).isEqualTo(2);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains(" from o_order ");
     assertSql(sql.get(1)).contains(" from o_customer ");

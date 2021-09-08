@@ -3,7 +3,7 @@ package io.ebean;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.bean.EntityBean;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.converstation.User;
 
@@ -37,10 +37,10 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
 
     assertThat(beanState.loadedProps()).containsExactly("id", "name");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     user.update();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).doesNotContain("email");
   }
@@ -114,10 +114,10 @@ public class TestUnsetLoadedProperties extends BaseTestCase {
     updUser.setName("mod occ");
     updUser.markPropertyUnset("version");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     updUser.save();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("where id=?;");
   }
 }

@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -21,7 +21,7 @@ public class TestQueryBaseTable extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Customer one = DB.find(Customer.class)
       .setBaseTable("O_CUSTOMER")
@@ -40,7 +40,7 @@ public class TestQueryBaseTable extends BaseTestCase {
     assertThat(one.getName()).isEqualTo(two.getName());
     assertThat(three.getName()).isEqualTo("Fiona");
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("from O_CUSTOMER");

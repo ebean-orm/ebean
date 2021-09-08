@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.common.BeanList;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Animal;
 import org.tests.model.basic.AnimalShelter;
@@ -61,12 +61,12 @@ public class TestInheritanceOnMany extends BaseTestCase {
     dog.setRegistrationNumber("D2");
     DB.save(dog);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     // Dog is concrete so we return as Dog even though
     // it could be a BigDog (so we are trusting the caller)
     Dog ref = DB.reference(Dog.class, dog.getId());
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).isEmpty();
     assertNotNull(ref);
 
@@ -82,10 +82,10 @@ public class TestInheritanceOnMany extends BaseTestCase {
     bd.setRegistrationNumber("BG2");
     DB.save(bd);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     BigDog bigDog = DB.reference(BigDog.class, bd.getId());
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).isEmpty();
     assertNotNull(bigDog);
 
@@ -93,11 +93,11 @@ public class TestInheritanceOnMany extends BaseTestCase {
     assertEquals("BG2", bigDog.getRegistrationNumber());
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     // Animal is abstract so we hit the DB
     Animal animal = DB.reference(Animal.class, bd.getId());
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertThat(trimSql(sql.get(0), 2)).contains("select t0.species, t0.id from animal t0 where t0.id = ?");
     assertNotNull(animal);

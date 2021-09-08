@@ -2,7 +2,7 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,14 +14,14 @@ public class TestElementCollectionBasicMapAsLob extends BaseTestCase {
   @Test
   public void test() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     EcmcPerson person = new EcmcPerson("Lob021");
     person.getPhoneNumbers().put("home", "021 1234");
     person.getPhoneNumbers().put("work", "021 4321");
     DB.save(person);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(4);
       assertSql(sql.get(0)).contains("insert into ecmc_person");
@@ -34,7 +34,7 @@ public class TestElementCollectionBasicMapAsLob extends BaseTestCase {
       assertSql(sql.get(2)).contains("insert into ecmc_person_phone");
     }
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 
 }

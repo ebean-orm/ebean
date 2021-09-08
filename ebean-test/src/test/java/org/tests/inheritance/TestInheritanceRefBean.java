@@ -3,7 +3,7 @@ package org.tests.inheritance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
 import org.tests.inherit.Parent;
@@ -25,15 +25,15 @@ public class TestInheritanceRefBean extends BaseTestCase {
 
       Parent test;
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       test = server().reference(ChildA.class, idA);
       assertTrue(test instanceof ChildA);
-      assertEquals(0, LoggedSqlCollector.stop().size());
+      assertEquals(0, LoggedSql.stop().size());
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       test = server().reference(Parent.class, idB);
       assertTrue(test instanceof ChildB);
-      assertEquals(1, LoggedSqlCollector.stop().size());
+      assertEquals(1, LoggedSql.stop().size());
 
 
     }

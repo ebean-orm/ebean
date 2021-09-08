@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UUOne;
 import org.tests.model.basic.UUTwo;
@@ -44,11 +44,11 @@ public class TestMergeBasic extends BaseTestCase {
       .setClientGeneratedIds()
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.merge(one, options);
 
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     // fetch the Ids ... used to identity inserts, updates and deletes
     assertSql(sql.get(0)).contains("select t0.id, t1.id from uuone t0 left join uutwo t1 on t1.master_id = t0.id where t0.id = ?");
 
@@ -92,11 +92,11 @@ public class TestMergeBasic extends BaseTestCase {
       .addPath("comments")
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.merge(one, options);
 
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     // fetch the Ids ... used to identity inserts, updates and deletes
     assertSql(sql.get(0)).contains("select t0.id, t1.id from uuone t0 left join uutwo t1 on t1.master_id = t0.id where t0.id = ?");
 

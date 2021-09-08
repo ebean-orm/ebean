@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.text.PathProperties;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,7 @@ public class TestLazyForeignKeys extends BaseTestCase {
   @Test
   public void testFindOne() throws Exception {
     // use findOne without select, so lazy loading will occur
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     MainEntityRelation rel1 = DB.find(MainEntityRelation.class).findOne();
 
@@ -55,7 +55,7 @@ public class TestLazyForeignKeys extends BaseTestCase {
     assertFalse(rel1.getEntity1().isDeleted());
     assertTrue(rel1.getEntity2().isDeleted());
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("select t0.id, t0.attr1, t0.id1, t0.id2 from main_entity_relation");
     if (isSqlServer() || isOracle()) {

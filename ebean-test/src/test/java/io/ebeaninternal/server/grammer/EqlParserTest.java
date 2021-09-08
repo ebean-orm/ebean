@@ -8,7 +8,7 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiQuery;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderDetail;
@@ -532,12 +532,12 @@ public class EqlParserTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts (email) limit 10");
     query.findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city from o_customer t0 left join o_address");
     assertSql(sql.get(1)).contains("select t0.customer_id, t0.id, t0.email from contact t0 where (t0.customer_id)");

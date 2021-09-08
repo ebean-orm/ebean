@@ -6,7 +6,7 @@ import io.ebean.Query;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkWithLazyLoadingOnBuiltInMany() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<Order> query = DB.find(Order.class);
 
@@ -47,7 +47,7 @@ public class TestOrderByWithMany extends BaseTestCase {
     }
 
     // first one is the main query and others are lazy loading queries
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertTrue(loggedSql.size() > 1);
 
     String lazyLoadSql = loggedSql.get(1);

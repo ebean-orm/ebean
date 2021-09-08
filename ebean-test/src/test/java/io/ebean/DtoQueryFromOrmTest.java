@@ -5,7 +5,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -76,7 +76,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Contact> list = DB.find(Contact.class)
       .select("email, concat(lastName, ISO_WEEK(?)) as lastName")
@@ -86,7 +86,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     assertThat(list).isNotEmpty();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name, ISO_WEEK(?)) lastName from contact");
   }
@@ -97,7 +97,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 //
 //    ResetBasicData.reset();
 //
-//    LoggedSqlCollector.start();
+//    LoggedSql.start();
 //
 //    List<Contact> list = DB.find(Contact.class)
 //      .select("email, concat(lastName, ISO_WEEK(:date)) as lastName")
@@ -108,7 +108,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 //
 //    assertThat(list).isNotEmpty();
 //
-//    List<String> sql = LoggedSqlCollector.stop();
+//    List<String> sql = LoggedSql.stop();
 //    assertThat(sql).hasSize(2);
 //    assertSql(sql.get(0)).contains("select t0.id, t0.email, concat(t0.last_name, ISO_WEEK(?)) lastName from contact");
 //  }
@@ -118,7 +118,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DtoQuery<ContactDto> query = DB.find(Contact.class)
       // we must explicitly add the id property for DTO query (if we want it)
@@ -135,7 +135,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       assertThat(dto.getFullName()).isNotNull();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
       + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
@@ -145,7 +145,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DtoQuery<ContactDto2> query = DB.find(Contact.class)
       .where().isNotNull("email").order().asc("lastName")
@@ -162,7 +162,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       assertThat(dto.getId()).isGreaterThan(0);
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.id, t0.first_name, t0.last_name");
   }
 
@@ -171,7 +171,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DtoQuery<ContactDto> query = DB.find(Contact.class)
       .select("email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
@@ -186,7 +186,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       assertThat(dto.getFullName()).isNotNull();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
       + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
@@ -196,7 +196,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<ContactDto> contactDtos = DB.find(Contact.class).setLabel("emailFullName")
       .select("email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
@@ -209,7 +209,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       assertThat(dto.getFullName()).isNotNull();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     if (isSqlServer()) {
       assertSql(sql.get(0)).contains("select top 10 t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
@@ -226,7 +226,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<ContactDto> contactDtos = DB.find(Contact.class)
       .select("id, email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
@@ -240,7 +240,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       assertThat(dto.getEmail()).isNotNull();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isSqlServer()) {
       assertSql(sql.get(0)).contains("select top 10 t0.id, t0.email, "
         + concat("t0.last_name", ", ", "t0.first_name")
@@ -256,7 +256,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<ContactDto> contactDtos = DB.find(Contact.class)
       .select(concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("lastName").order()
@@ -270,7 +270,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       assertThat(dto.getEmail()).isNull();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select " + concat("t0.last_name", ", ", "t0.first_name") + " fullName from contact t0 where");
   }
 
@@ -279,7 +279,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<ContactTotals> contactDtos = DB.find(Contact.class).select("lastName, count(*) as totalCount").where()
       .isNotNull("lastName").having().gt("count(*)", 1).order().desc("count(*)").asDto(ContactTotals.class)
@@ -292,7 +292,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       assertThat(dto.getTotalCount()).isNotNull();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.last_name, count(*) totalCount from contact t0 where t0.last_name is not null group by t0.last_name having count(*) > ?");
   }
 

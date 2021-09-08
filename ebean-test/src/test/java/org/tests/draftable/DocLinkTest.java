@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.draftable.Doc;
 import org.tests.model.draftable.Link;
@@ -34,12 +34,12 @@ public class DocLinkTest extends BaseTestCase {
 
     assertThat(link).isNotNull();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // no lazy loading is invoked as draft property considered @Transient
     assertThat(link.isDraft()).isFalse();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).isEmpty();
 
   }

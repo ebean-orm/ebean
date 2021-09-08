@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.config.dbplatform.IdType;
 
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.o2m.jointable.inheritance.ClassA;
 import org.tests.o2m.jointable.inheritance.ClassB;
@@ -30,11 +30,11 @@ public class TestOneToManyJoinTableInheritance extends BaseTestCase {
     classA.getMonkeys().add(m1);
     classB.getMonkeys().add(m2);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.saveAll(Arrays.asList(classA, classB));
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
 
     assertThat(sql).hasSize(11);
     assertSql(sql.get(0)).contains("insert into class_super ");

@@ -3,8 +3,7 @@ package org.tests.query.aggregation;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import io.ebeantest.LoggedSql;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
@@ -64,7 +63,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int count =
       DB.find(TEventOne.class)
@@ -73,7 +72,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     assertThat(count).isGreaterThan(1);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select count(*) from tevent_one t0 where t0.name is not null");
   }
 
@@ -238,7 +237,7 @@ public class TestAggregationCount extends BaseTestCase {
     assertThat(sql).contains("having max(t0.version) >= ?");
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     for (TEventOne eventOne : list) {
       assertThat(eventOne.getStatus()).isNotNull();
@@ -250,7 +249,7 @@ public class TestAggregationCount extends BaseTestCase {
       assertThat(eventOne.getName()).isNull();
     }
 
-    List<String> lazyLoadSql = LoggedSqlCollector.stop();
+    List<String> lazyLoadSql = LoggedSql.stop();
     assertThat(lazyLoadSql).isEmpty();
   }
 
@@ -375,7 +374,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     String maxLastName =
       DB.find(Contact.class)
@@ -385,7 +384,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     assertThat(maxLastName).isNotNull();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select max(t0.last_name) from contact t0");
   }
 
@@ -394,7 +393,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Long count =
       DB.find(Contact.class)
@@ -404,7 +403,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     assertThat(count).isNotNull();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select count(distinct t0.last_name) from contact t0 where not exists (select 1 from contact_note x where x.contact_id = t0.id)");
   }
 
@@ -413,7 +412,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<String> names =
 
@@ -425,7 +424,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     assertThat(names).isNotEmpty();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select " + concat("t0.last_name",", ","t0.first_name") + " from contact t0 where t0.phone is null order by t0.last_name");
   }
 
@@ -434,7 +433,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<String> names =
 
@@ -446,7 +445,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     assertThat(names).isNotEmpty();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select " + concat("t0.updtime",", ","t0.first_name") + " from contact t0");
   }
 
@@ -455,7 +454,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Instant instant =
 
@@ -466,7 +465,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     assertThat(instant).isNotNull();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select max(t0.updtime) from contact t0 where t0.phone is null");
   }
 
@@ -476,7 +475,7 @@ public class TestAggregationCount extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Contact> contacts =
 
@@ -493,7 +492,7 @@ public class TestAggregationCount extends BaseTestCase {
       assertThat(lastName).contains(", ");
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name",", ","t0.first_name") + " lastName from contact t0 where t0.phone is null order by t0.last_name; --bind()");
   }
 

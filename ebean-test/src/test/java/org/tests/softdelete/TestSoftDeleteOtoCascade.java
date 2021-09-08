@@ -2,7 +2,7 @@ package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.softdelete.ESoftDelOneA;
 import org.tests.model.softdelete.ESoftDelOneB;
@@ -24,13 +24,13 @@ public class TestSoftDeleteOtoCascade extends BaseTestCase {
 
     DB.save(a);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // delete doesn't cascade to ESoftDelOneB as this is a
     // soft delete and ESoftDelOneB doesn't have soft delete flag
     DB.delete(a);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update esoft_del_one_a set deleted=?, version=? where id=? and version=?");
 

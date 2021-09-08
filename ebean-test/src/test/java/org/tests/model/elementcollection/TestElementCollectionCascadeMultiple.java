@@ -3,7 +3,7 @@ package org.tests.model.elementcollection;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.Transactional;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,11 +24,11 @@ public class TestElementCollectionCascadeMultiple extends BaseTestCase {
     top.setPerson(person);
     top.getPeople().add(person);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     save(top);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(9);
 
     assertSql(sql.get(0)).contains("insert into ecs_person");

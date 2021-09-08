@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MnocRole;
@@ -43,10 +43,10 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
     List<MnocRole> validRoles = loadedUser.getValidRoles();
     assertThat(validRoles).hasSize(2);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.delete(u0);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
     assertSql(sql.get(1)).contains("delete from mnoc_user where user_id=? and version=?");
@@ -71,10 +71,10 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
     user.setUserName("usr1-mod");
     user.setValidRoles(roles);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.update(user);
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(5);
     assertSql(sql.get(0)).contains("update mnoc_user set user_name=?, version=? where user_id=? and version=?");
     assertSql(sql.get(1)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
@@ -97,7 +97,7 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
     DB.save(u0);
     DB.save(u1);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
@@ -106,7 +106,7 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
       txn.commit();
     }
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(8);
     assertSql(sql.get(0)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
     assertThat(sql.get(4)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");

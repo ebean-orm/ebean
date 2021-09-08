@@ -7,7 +7,7 @@ import io.ebean.Pairs;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -100,7 +100,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<Integer> codes = asList(1001);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Map<String,OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
@@ -112,7 +112,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .setMapKey("sku")
       .findMap();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).isEmpty();
 
     assertThat(list).hasSize(1);
@@ -129,7 +129,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<Integer> codes = asList(1001, 1000);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Map<String,OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
@@ -141,7 +141,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .setMapKey("sku")
       .findMap();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - miss on 1000
@@ -158,7 +158,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     setup();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Map<String,OCachedNatKeyBean3> map = DB.find(OCachedNatKeyBean3.class)
       .where()
@@ -169,7 +169,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .setMapKey("code")
       .findMap();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - miss on 1000, 1002
@@ -190,7 +190,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<Integer> codes = asList(1001, 1000, 1002, 1003);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
@@ -202,7 +202,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .order().asc("code")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - (sku=3 ... we got hits on sku 1 and 2)
@@ -223,7 +223,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> skus = asList("2", "3");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
@@ -234,7 +234,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // no SQL - all beans from cache
     assertThat(sql).isEmpty();
@@ -253,7 +253,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     String storeId = "abc";
     List<String> skus = asList("3", "2", "4");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
@@ -264,7 +264,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with 2 bind params as we got not hits on the cache
@@ -349,7 +349,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .add("2", 1001)
       .add("3", 1000);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
@@ -359,7 +359,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(pairs.getEntries()).hasSize(3);
 
@@ -392,7 +392,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .add("2", 1001)
       .add("3", 1000);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
       .where()
@@ -402,7 +402,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(pairs.getEntries()).hasSize(3);
 

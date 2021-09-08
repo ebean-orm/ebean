@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -20,11 +20,11 @@ public class TestOnlyIdEntity extends BaseTestCase {
 
     final Database database = DB.getDefault();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     OnlyIdEntity bean = new OnlyIdEntity();
     database.save(bean);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(bean.getId()).isGreaterThan(0);
     assertThat(sql).hasSize(1);

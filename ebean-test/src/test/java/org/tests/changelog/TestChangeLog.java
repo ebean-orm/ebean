@@ -9,7 +9,7 @@ import io.ebean.annotation.ChangeLog;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.changelog.*;
-import io.ebeantest.LoggedSql;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

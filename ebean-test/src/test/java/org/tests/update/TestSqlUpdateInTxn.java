@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.meta.MetaTimedMetric;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.idkeys.db.AuditLog;
 
@@ -43,7 +43,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
   @Test
   public void testExecute_inTransaction_withBatch() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction transaction = DB.beginTransaction()) {
       transaction.setBatchMode(true);
@@ -61,7 +61,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
       transaction.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("update audit_log set description = description where id = ?");
     assertSqlBind(sql, 1, 2);
@@ -70,7 +70,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
   @Test
   public void testExecute_inTransaction_withoutBatch() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction transaction = DB.beginTransaction()) {
       transaction.setBatchMode(false);
@@ -88,7 +88,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
       transaction.commit();
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("update audit_log set description = description where id = ?; -- bind(999999)");
     assertSql(sql.get(1)).contains("update audit_log set description = description where id = ?; -- bind(999998)");

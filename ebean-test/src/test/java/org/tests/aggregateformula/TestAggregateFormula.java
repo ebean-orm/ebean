@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
@@ -25,7 +25,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Contact> contacts = DB.find(Contact.class)
       .setDistinct(true)
@@ -33,7 +33,7 @@ public class TestAggregateFormula extends BaseTestCase {
       .order("min(customer) asc nulls last")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select distinct t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name order by min(t0.customer_id) nulls last");
 
     assertThat(contacts).isNotEmpty();
@@ -49,13 +49,13 @@ public class TestAggregateFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Contact> contacts = DB.find(Contact.class)
       .select("lastName, min(customer)")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
 
     assertThat(contacts).isNotEmpty();
@@ -71,7 +71,7 @@ public class TestAggregateFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Contact> contacts = DB.find(Contact.class)
       .select("lastName, min(customer)")
@@ -83,7 +83,7 @@ public class TestAggregateFormula extends BaseTestCase {
       assertNotNull(customer.getName());
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
     assertSql(sql.get(1)).contains("select t0.id, t0.name, t0.status from o_customer t0 where");
@@ -100,7 +100,7 @@ public class TestAggregateFormula extends BaseTestCase {
   public void minOnManyToOne_withFetchQueryWithJoin() {
 
     ResetBasicData.reset();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Contact> contacts = DB.find(Contact.class)
       .select("lastName, min(customer)")
@@ -117,7 +117,7 @@ public class TestAggregateFormula extends BaseTestCase {
       }
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.last_name, min(t0.customer_id) from contact t0 group by t0.last_name");
     assertSql(sql.get(1)).contains("select t0.id, t0.name, t0.status, t1.id, t1.city, t1.country_code from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id where");
@@ -135,13 +135,13 @@ public class TestAggregateFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
       .select("status, sum(id)")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.status, sum(t0.id) from o_order t0 group by t0.status");
 
     assertThat(orders).isNotEmpty();
@@ -156,13 +156,13 @@ public class TestAggregateFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
       .select("status, sum(id) as id")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.status, sum(t0.id) id from o_order t0 group by t0.status");
 
     assertThat(orders).isNotEmpty();
@@ -177,13 +177,13 @@ public class TestAggregateFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Contact> contacts = DB.find(Contact.class)
       .select("customer, min(cretime)")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.customer_id, min(t0.cretime) from contact t0 group by t0.customer_id");
 
     assertThat(contacts).isNotEmpty();
@@ -194,13 +194,13 @@ public class TestAggregateFormula extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Contact> contacts = DB.find(Contact.class)
       .select("customer, min(cretime), max(updtime)")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select t0.customer_id, min(t0.cretime), max(t0.updtime) from contact t0 group by t0.customer_id");
 
     assertThat(contacts).isNotEmpty();

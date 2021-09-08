@@ -6,7 +6,7 @@ import io.ebean.FetchPath;
 import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;
 import io.ebean.text.PathProperties;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -26,11 +26,11 @@ public class TestMergeCustomer extends BaseTestCase {
     MCustomer mCustomer = partial("cust1", "(id,name,version)");
     mCustomer.setName("NotCust0");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.merge(mCustomer);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update mcustomer set name=?, version=? where id=? and version=?");
   }
@@ -48,11 +48,11 @@ public class TestMergeCustomer extends BaseTestCase {
     MergeOptions options = new MergeOptionsBuilder().build();
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.merge(mCustomer, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("update mcustomer set name=?, version=? where id=? and version=?");
   }
@@ -66,11 +66,11 @@ public class TestMergeCustomer extends BaseTestCase {
 
     MergeOptions options = new MergeOptionsBuilder().setClientGeneratedIds().build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     server().merge(mCustomer, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.id from mcustomer t0 where t0.id = ?");
     assertSql(sql.get(1)).contains("update mcustomer set name=?, version=? where id=? and version=?");
@@ -90,11 +90,11 @@ public class TestMergeCustomer extends BaseTestCase {
       .setClientGeneratedIds()
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     server().merge(mCustomer, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(5);
     assertSql(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id left join maddress t1 on t1.id = t0.billing_address_id where t0.id = ?");
     assertSql(sql.get(1)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
@@ -119,11 +119,11 @@ public class TestMergeCustomer extends BaseTestCase {
       .setClientGeneratedIds()
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     server().merge(mCustomer, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(6);
     assertSql(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id left join maddress t1 on t1.id = t0.billing_address_id where t0.id = ?");
     assertSql(sql.get(1)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
@@ -152,11 +152,11 @@ public class TestMergeCustomer extends BaseTestCase {
       .setClientGeneratedIds() // As we are using clientIds ... we don't know if the new UUID is an insert or update without checking
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     server().merge(mCustomer, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(7);
     assertSql(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id left join maddress t1 on t1.id = t0.billing_address_id where t0.id = ?");
 
@@ -210,10 +210,10 @@ public class TestMergeCustomer extends BaseTestCase {
       .addPath("contacts")
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     server().merge(mCustomer, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(20);
     }
@@ -236,10 +236,10 @@ public class TestMergeCustomer extends BaseTestCase {
       .addPath("contacts")
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     server().merge(mCustomer, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(20);
     }
@@ -274,10 +274,10 @@ public class TestMergeCustomer extends BaseTestCase {
       .addPath("contacts")
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     server().merge(mCustomer, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(16);
       assertSql(sql.get(0)).contains("select t0.id, t1.id from mcustomer t0 left join mcontact t1 on t1.customer_id = t0.id where t0.id = ?");
@@ -314,10 +314,10 @@ public class TestMergeCustomer extends BaseTestCase {
       .setDeletePermanent()
       .build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     server().merge(cust1, options);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isPersistBatchOnCascade()) {
 
       assertSql(sql.get(0)).contains("select t0.id, t3.id, t1.id, t2.id from mcustomer t0 left join maddress t3 on t3.id = t0.shipping_address_id left join maddress t1 on t1.id = t0.billing_address_id left join mcontact t2 on t2.customer_id = t0.id where t0.id = ?");

@@ -3,7 +3,7 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -20,7 +20,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Long productId = 1L;
 
@@ -64,7 +64,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     // u1.product_id = ?
     // ); --bind(1)
 
-    List<String> sqlLogged = LoggedSqlCollector.stop();
+    List<String> sqlLogged = LoggedSql.stop();
 
     assertEquals(list.size(), rowCount);
     assertEquals(2, sqlLogged.size());
@@ -89,10 +89,10 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
       .orderBy("cretime asc")
       .query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.findCount();
 
-    List<String> sqlLogged = LoggedSqlCollector.stop();
+    List<String> sqlLogged = LoggedSql.stop();
 
     assertEquals(1, sqlLogged.size());
     assertThat(trimSql(sqlLogged.get(0), 1)).contains("select count(*) from ( select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id and u1.id > 0 where u1.product_id = ?)");

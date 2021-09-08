@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 
@@ -33,7 +33,7 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
       txn.setUpdateAllLoadedProperties(true);
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
 
       basic2.setDescription("bbb-mod");
       server.save(basic2, txn);
@@ -44,7 +44,7 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
       txn.commit();
 
-      List<String> loggedSql = LoggedSqlCollector.stop();
+      List<String> loggedSql = LoggedSql.stop();
 
       assertEquals(2, loggedSql.size());
       // all properties in the bean
@@ -70,7 +70,7 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
 
     assertEquals(2, beans.size());
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
 
     Transaction txn = DB.beginTransaction();
@@ -92,7 +92,7 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
       txn.end();
     }
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(2);
     assertThat(loggedSql.get(0)).contains("update e_basicver set name=?, other=? where id=?; -- bind(");

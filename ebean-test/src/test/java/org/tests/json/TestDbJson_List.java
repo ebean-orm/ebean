@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.text.TextException;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.PlainBean;
@@ -102,9 +102,9 @@ public class TestDbJson_List extends BaseTestCase {
   private void update_when_notDirty() {
 
     found.setName("mod");
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(found);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // we don't update the phone numbers (as they are not dirty)
     // plain_bean=?, no longer included with dirty detection
@@ -118,9 +118,9 @@ public class TestDbJson_List extends BaseTestCase {
     //found.setName("modAgain");
     found.getTags().add("three");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(found);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // we don't update the phone numbers (as they are not dirty)
     // plain_bean=? not included using MD5 dirty detection
@@ -132,9 +132,9 @@ public class TestDbJson_List extends BaseTestCase {
     //found.setName("modAgain");
     found.getFlags().remove(42L);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(found);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // we don't update the phone numbers (as they are not dirty)
     // plain_bean=? not included with MD5 dirty detection
@@ -148,9 +148,9 @@ public class TestDbJson_List extends BaseTestCase {
     found.getBeanList().clear();
     found.getBeanMap().remove("key0");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(found);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // we don't update the phone numbers (as they are not dirty)
     // plain_bean=? not included with MD5 dirty detection

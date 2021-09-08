@@ -2,7 +2,7 @@ package org.tests.model.embedded;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,10 +17,10 @@ public class TestEmbeddedAttrOverride extends BaseTestCase {
     PrimaryRevision bean = new PrimaryRevision(100);
     bean.setName("hello");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(bean);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("insert into primary_revision (id, revision, name, version) values (?,?,?,?)");
   }

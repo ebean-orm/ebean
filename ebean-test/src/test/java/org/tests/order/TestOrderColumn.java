@@ -2,7 +2,7 @@ package org.tests.order;
 
 import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.Comparator;
@@ -97,9 +97,9 @@ public class TestOrderColumn extends TransactionalTestCase {
     children.get(1).getToys().get(0).setTitle("tt10");
     children.get(3).getToys().get(2).setTitle("tt32");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(result);
-    final List<String> sql = LoggedSqlCollector.current();
+    final List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(3);
 
     assertThat(sql.get(0)).contains("update order_toy set title=?, sort_order=? where id=?");
@@ -134,9 +134,9 @@ public class TestOrderColumn extends TransactionalTestCase {
 
     child.getToys().remove(1);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(result);
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(4);
     assertSql(sql.get(0)).contains("delete from order_toy where id=?");

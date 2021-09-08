@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.DB;
 import io.ebean.FutureIds;
 import io.ebean.Query;
-import io.ebeantest.LoggedSql;
+import io.ebean.test.LoggedSql;
 
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;

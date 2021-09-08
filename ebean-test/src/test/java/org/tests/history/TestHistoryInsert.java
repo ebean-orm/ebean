@@ -8,7 +8,7 @@ import io.ebean.Transaction;
 import io.ebean.Version;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import io.ebeantest.LoggedSql;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

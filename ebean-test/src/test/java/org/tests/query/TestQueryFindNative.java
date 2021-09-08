@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.PagedList;
 import org.assertj.core.util.Lists;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -23,13 +23,13 @@ public class TestQueryFindNative extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     String sql = "select id,first_name from contact where id in(:ids)";
     DB.findNative(Contact.class, sql).setParameter("ids", Lists.newArrayList(1, 2, 3)).findList();
     DB.findNative(Contact.class, sql).setParameter("ids", Lists.newArrayList(1, 2)).findList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(2);
     if (isH2()) {
       assertThat(loggedSql.get(0)).contains("(?,?,?)");
@@ -43,7 +43,7 @@ public class TestQueryFindNative extends BaseTestCase {
     ResetBasicData.reset();
     String sql = "select n.id from contact n where n.first_name like ?";
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int rowCount = server()
       .findNative(Contact.class, sql)
@@ -56,7 +56,7 @@ public class TestQueryFindNative extends BaseTestCase {
         .setParameter(1, "J%")
         .findIds();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(nativeIds).hasSize(rowCount);
 
@@ -77,12 +77,12 @@ public class TestQueryFindNative extends BaseTestCase {
       .setMaxRows(100)
       .findPagedList();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int listSize = pagedList.getList().size();
     int totalCount = pagedList.getTotalCount();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(listSize).isEqualTo(totalCount);
 
@@ -204,7 +204,7 @@ public class TestQueryFindNative extends BaseTestCase {
       "from o_customer " +
       "order by order_column_1";
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Customer> result = DB.findNative(Customer.class, sql)
       .setParameter(LocalDate.now())
@@ -214,7 +214,7 @@ public class TestQueryFindNative extends BaseTestCase {
       .findList();
 
     assertThat(result).isNotEmpty();
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     if (isH2()) {
       assertThat(loggedSql.get(0)).contains("from o_customer order by order_column_1 limit 10 offset 1");
@@ -231,7 +231,7 @@ public class TestQueryFindNative extends BaseTestCase {
       "from o_customer " +
       "order by order_column_1";
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Customer> result = DB.findNative(Customer.class, sql)
       .setParameter("date", LocalDate.now())
@@ -240,7 +240,7 @@ public class TestQueryFindNative extends BaseTestCase {
       .findList();
 
     assertThat(result).isNotEmpty();
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     if (isH2()) {
       assertThat(loggedSql.get(0)).contains("from o_customer order by order_column_1 limit 10 offset 1");
@@ -255,14 +255,14 @@ public class TestQueryFindNative extends BaseTestCase {
 
     String sql = "select * from o_customer";
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Customer> result = DB.findNative(Customer.class, sql)
             .fetchQuery("contacts")
             .findList();
 
     assertThat(result).isNotEmpty();
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     if (isH2()) {
       assertThat(loggedSql).hasSize(2);
@@ -278,14 +278,14 @@ public class TestQueryFindNative extends BaseTestCase {
 
     String sql = "select * from o_customer";
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Customer> result = DB.findNative(Customer.class, sql)
             .fetch("contacts", "firstName, lastName")
             .findList();
 
     assertThat(result).isNotEmpty();
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     if (isH2()) {
       assertThat(loggedSql).hasSize(2);
@@ -301,7 +301,7 @@ public class TestQueryFindNative extends BaseTestCase {
 
     String sql = "select * from o_customer";
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Customer> result = DB.findNative(Customer.class, sql)
             .fetchQuery("orders")
@@ -309,7 +309,7 @@ public class TestQueryFindNative extends BaseTestCase {
             .findList();
 
     assertThat(result).isNotEmpty();
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     if (isH2()) {
       assertThat(loggedSql).hasSize(3);
@@ -326,7 +326,7 @@ public class TestQueryFindNative extends BaseTestCase {
 
     String sql = "select * from o_customer";
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Customer> result = DB.findNative(Customer.class, sql)
             // with nativeSql fetch (default) are converted to fetchQuery()
@@ -335,7 +335,7 @@ public class TestQueryFindNative extends BaseTestCase {
             .findList();
 
     assertThat(result).isNotEmpty();
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     if (isH2()) {
       assertThat(loggedSql).hasSize(3);

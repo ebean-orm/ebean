@@ -2,7 +2,7 @@ package org.tests.defaultvalues;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -21,9 +21,9 @@ public class TestDefaults extends BaseTestCase {
       main.getRelatedModels().add(ref);
     }
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(main);
-    final List<String> current = LoggedSqlCollector.current();
+    final List<String> current = LoggedSql.collect();
 
     assertThat(current).isNotEmpty();
     if (isMySql() || isMariaDB()) {

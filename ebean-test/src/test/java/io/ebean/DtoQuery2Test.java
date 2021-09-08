@@ -2,7 +2,7 @@ package io.ebean;
 
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaQueryMetric;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +56,7 @@ public class DtoQuery2Test extends BaseTestCase {
     ResetBasicData.reset();
     final int expectedCount = server().find(Customer.class).findCount();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     int counter = 0;
     try (final QueryIterator<DCust> iterator = server().findDto(DCust.class, "select id, name from o_customer where id > :id")
       .setParameter("id", 0)
@@ -72,7 +72,7 @@ public class DtoQuery2Test extends BaseTestCase {
 
     assertThat(counter).isEqualTo(expectedCount);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
@@ -81,7 +81,7 @@ public class DtoQuery2Test extends BaseTestCase {
     ResetBasicData.reset();
     final int expectedCount = server().find(Customer.class).findCount();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (final Stream<DCust> stream =
            server()
@@ -96,7 +96,7 @@ public class DtoQuery2Test extends BaseTestCase {
       assertThat(names.size()).isEqualTo(expectedCount);
     }
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
@@ -105,12 +105,12 @@ public class DtoQuery2Test extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     server().findDto(DCust.class, "select id, name from o_customer where id > :id")
       .setParameter("id", 0)
       .findEach(it -> log.info("got " + it.getId() + " " + it.getName()));
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
@@ -119,7 +119,7 @@ public class DtoQuery2Test extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     server().findDto(DCust.class, "select id, name from o_customer where id > :id order by id desc")
       .setParameter("id", 0)
       .findEachWhile(customer -> {
@@ -127,7 +127,7 @@ public class DtoQuery2Test extends BaseTestCase {
         return customer.getId() > 3;
       });
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 

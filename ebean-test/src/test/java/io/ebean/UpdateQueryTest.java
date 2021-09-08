@@ -5,7 +5,7 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.ServerMetrics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
@@ -55,7 +55,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     UpdateQuery<Customer> update = server().update(Customer.class);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int rows = update
       .setRaw("status = status")
@@ -63,7 +63,7 @@ public class UpdateQueryTest extends BaseTestCase {
       .update();
 
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertThat(rows).isGreaterThan(0);
 
@@ -81,7 +81,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int rows = server().find(Customer.class)
       .where()
@@ -92,7 +92,7 @@ public class UpdateQueryTest extends BaseTestCase {
       .update();
 
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertThat(rows).isEqualTo(0);
 
@@ -103,7 +103,7 @@ public class UpdateQueryTest extends BaseTestCase {
   public void query_asUpdate_idIn() {
 
     ResetBasicData.reset();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     int rows = server().find(Customer.class)
       .where()
@@ -113,7 +113,7 @@ public class UpdateQueryTest extends BaseTestCase {
       .setLabel("asUpdateByIds")
       .update();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertThat(rows).isEqualTo(0);
 
@@ -201,7 +201,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     Country nz = server.reference(Country.class, "NZ");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     server.update(Customer.class)
       .set("status", Customer.Status.ACTIVE)
@@ -211,7 +211,7 @@ public class UpdateQueryTest extends BaseTestCase {
       .setMaxRows(100)
       .update();
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("update o_customer set status=?  where id in (select t0.id from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id where t1.country_code = ? and t0.id > ? limit 100)");
   }
 
@@ -221,7 +221,7 @@ public class UpdateQueryTest extends BaseTestCase {
 
     Database server = server();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     server.update(Customer.class)
       .set("status", Customer.Status.ACTIVE)
@@ -230,7 +230,7 @@ public class UpdateQueryTest extends BaseTestCase {
       .setMaxRows(100)
       .update();
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     if (isMySql() || isH2() || isMariaDB()) {
       assertSql(sql.get(0)).contains("update o_customer set status=? where id > ? limit 100");
     } else {

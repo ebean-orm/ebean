@@ -3,7 +3,7 @@ package org.tests.query.softdelete;
 import io.ebean.DB;
 import io.ebean.PagedList;
 import io.ebean.TransactionalTestCase;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.onetoone.album.Cover;
 
@@ -25,7 +25,7 @@ public class TestSoftDeletePagingList extends TransactionalTestCase {
     DB.saveAll(list);
     DB.delete(list.get(1));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     PagedList<Cover> pagedList = DB.find(Cover.class)
       .where().startsWith("s3Url", "SoftDelPaged-")
@@ -35,7 +35,7 @@ public class TestSoftDeletePagingList extends TransactionalTestCase {
     int totalRowCount = pagedList.getTotalCount();
     List<Cover> resultList = pagedList.getList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(resultList).hasSize(2);
     assertThat(totalRowCount).isEqualTo(2);

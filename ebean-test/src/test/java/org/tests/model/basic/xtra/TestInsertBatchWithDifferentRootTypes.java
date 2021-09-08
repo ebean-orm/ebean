@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -19,7 +19,7 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
   @IgnorePlatform(Platform.HANA)
   public void testDifferRootTypes() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     try (Transaction txn = DB.beginTransaction())  {
       txn.setBatchMode(true);
@@ -47,7 +47,7 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
       extendedParent.setChildren(children);
 
       // nothing flushed yet
-      List<String> loggedSql0 = LoggedSqlCollector.start();
+      List<String> loggedSql0 = LoggedSql.start();
       assertEquals(0, loggedSql0.size());
 
       // does not causes a flush as EdExtendedParent is same root as EdParent
@@ -55,14 +55,14 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
       DB.save(extendedParent);
 
       // insert statements for EdParent
-      List<String> loggedSql1 = LoggedSqlCollector.start();
+      List<String> loggedSql1 = LoggedSql.start();
 
       DB.commitTransaction();
 
       assertEquals(0, loggedSql1.size());
 
       // insert statements for EdExtendedParent
-      List<String> loggedSql2 = LoggedSqlCollector.start();
+      List<String> loggedSql2 = LoggedSql.start();
       assertEquals(7, loggedSql2.size());
 
     }

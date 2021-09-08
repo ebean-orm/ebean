@@ -2,7 +2,7 @@ package org.tests.o2m.jointable;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
     initialInsert();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // make m0 dirty ... but no cascade saved?
     m0.setFoodPreference("banana");
@@ -36,7 +36,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
     DB.save(troop);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(3);
       assertSql(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
@@ -54,7 +54,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
     assertThat(intersectionRows).isEqualTo(2L);
 
-    LoggedSqlCollector.current();
+    LoggedSql.collect();
     JtTroop fetchTroop = DB.find(JtTroop.class)
       .fetch("monkeys")
       .where().idEq(troop.getPid())
@@ -62,14 +62,14 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
     assertThat(fetchTroop.getMonkeys()).hasSize(2);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("from troop t0 left join troop_monkey t1z_ on t1z_.troop_pid = t0.pid left join monkey t1 on t1.mid = t1z_.monkey_mid where t0.pid = ?");
     assertSql(sql.get(0)).contains("select t0.pid, t0.name, t0.version, t1.mid, t1.name, t1.food_preference, t1.version");
 
     DB.delete(troop);
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("delete from troop_monkey where troop_pid = ?");
     assertSql(sql.get(1)).contains("delete from troop where pid=? and version=?");
@@ -90,10 +90,10 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     trainer.getMonkeys().add(new JtMonkey("FBet"));
     trainer.getMonkeys().add(new JtMonkey("FThe"));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.save(trainer);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
 
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(13);
@@ -123,10 +123,10 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     assertThat(intersectionRows).isEqualTo(5);
 
 
-    LoggedSqlCollector.current();
+    LoggedSql.collect();
     DB.delete(trainer);
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("delete from trainer_monkey where trainer_tid = ?");
     assertSql(sql.get(1)).contains("delete from trainer where tid=?");

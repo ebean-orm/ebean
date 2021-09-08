@@ -10,7 +10,7 @@ import io.ebean.meta.QueryPlanInit;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.meta.SortMetric;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -107,14 +107,14 @@ public class TestCustomerFinder extends BaseTestCase {
     try {
       Customer.find.currentTransaction().setBatchMode(true);
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       EBasic b = new EBasic("junk");
       DB.save(b);
 
-      assertTrue(LoggedSqlCollector.current().isEmpty());
+      assertTrue(LoggedSql.collect().isEmpty());
       Customer.find.flush();
 
-      List<String> sql = LoggedSqlCollector.stop();
+      List<String> sql = LoggedSql.stop();
       assertSql(sql.get(0)).contains("insert into e_basic");
     } finally {
       transaction.end();

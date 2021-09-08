@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -96,7 +96,7 @@ public class TestIdClassScalar extends BaseTestCase {
    */
   private void insertUpdateBridgeD(BUser user, BSite site) {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     BSiteUserD access = new BSiteUserD(BAccessLevel.ONE, site.id, user.id);
     DB.save(access);
@@ -112,7 +112,7 @@ public class TestIdClassScalar extends BaseTestCase {
       assertThat(bridge.getUserId()).isEqualTo(user.id);
     }
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("insert into bsite_user_d (site_id, user_id, access_level, version) values (?,?,?,?)");
     assertSql(sql.get(1)).contains("update bsite_user_d set access_level=?, version=? where site_id=? and user_id=? and version=?");
@@ -129,7 +129,7 @@ public class TestIdClassScalar extends BaseTestCase {
     one.setAccessLevel(BAccessLevel.THREE);
     DB.save(one);
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.site_id, t0.user_id, t0.site_id, t0.user_id, t0.access_level, t0.version from bsite_user_d t0 where t0.site_id=? and t0.user_id=?");
@@ -141,7 +141,7 @@ public class TestIdClassScalar extends BaseTestCase {
    */
   private void insertUpdateBridgeE(BUser user, BSite site) {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     BSiteUserE access = new BSiteUserE(BAccessLevel.ONE, site, user);
     DB.save(access);
@@ -152,7 +152,7 @@ public class TestIdClassScalar extends BaseTestCase {
     List<BSiteUserE> list = DB.find(BSiteUserE.class).findList();
     assertThat(list).isNotEmpty();
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("insert into bsite_user_e (site_id, user_id, access_level)");
     assertSql(sql.get(1)).contains("update bsite_user_e set access_level=? where site_id=? and user_id=?");
@@ -175,7 +175,7 @@ public class TestIdClassScalar extends BaseTestCase {
     one.setAccessLevel(BAccessLevel.THREE);
     DB.save(one);
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(2);
     assertSql(sql.get(0)).contains("select t0.site_id, t0.user_id, t0.access_level, t0.site_id, t0.user_id from bsite_user_e t0 where t0.site_id=? and t0.user_id=?");

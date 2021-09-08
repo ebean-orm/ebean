@@ -13,7 +13,7 @@ import io.ebean.annotation.Transactional;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
 import io.ebeaninternal.api.SpiTransaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicVer;
@@ -42,7 +42,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       transaction.setBatchMode(true);
       transaction.setLabel("TestBatchInsertFlush.no_cascade");
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
 
       TSMaster m = new TSMaster();
       m.setName("master1");
@@ -65,7 +65,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
       transaction.commit();
 
-      List<String> sql = LoggedSqlCollector.stop();
+      List<String> sql = LoggedSql.stop();
 
       // we get the 2 master inserts first
       assertSql(sql.get(0)).contains("insert into t_atable_thatisrelatively");
@@ -95,7 +95,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Transactional(batch = PersistBatch.ALL, flushOnQuery = false)
   public void transactional_flushOnQueryFalse() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(new EBasicVer("b1"));
     DB.save(new EBasicVer("b2"));
@@ -103,7 +103,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     // does not trigger JDBC batch with flushOnQuery = false
     DB.find(Customer.class).findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select count(*)");
   }
 
@@ -111,7 +111,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Transactional(batchSize = 20)
   public void transactional_flushOnSqlQuery() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(new EBasicVer("b1"));
     DB.save(new EBasicVer("b2"));
@@ -121,7 +121,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       .mapToScalar(Integer.class)
       .findOne();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("insert into e_basicver");
   }
 
@@ -129,7 +129,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Transactional(batchSize = 20)
   public void transactional_flushOnDtoQuery() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(new EBasicVer("b1"));
     DB.save(new EBasicVer("b2"));
@@ -138,7 +138,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     DB.findDto(DtoQuery2Test.DCust.class, "select id, name from o_customer")
     .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("insert into e_basicver");
   }
 
@@ -146,7 +146,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   @Transactional(batch = PersistBatch.ALL)
   public void transactional_flushOnQuery() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.save(new EBasicVer("b1"));
     DB.save(new EBasicVer("b2"));
@@ -154,7 +154,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     // by default triggers flush of JDBC batch
     DB.find(Customer.class).findCount();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("insert into e_basicver");
   }
 
@@ -164,7 +164,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
   public void transactional_flushOnGetId() {
 
     Database server = DB.getDefault();
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     EBasicVer b1 = new EBasicVer("b1");
     server.save(b1);
@@ -173,10 +173,10 @@ public class TestBatchInsertFlush extends BaseTestCase {
     server.save(b2);
 
     //flush here
-    assertThat(LoggedSqlCollector.current()).isEmpty();
+    assertThat(LoggedSql.collect()).isEmpty();
     Integer id = b1.getId();
     assertNotNull(id);
-    assertThat(LoggedSqlCollector.current()).hasSize(3);
+    assertThat(LoggedSql.collect()).hasSize(3);
 
     EBasicVer b3 = new EBasicVer("b3");
     server.save(b3);
@@ -189,7 +189,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     Database server = DB.getDefault();
     Transaction txn = server.beginTransaction();
     try {
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       txn.setBatchMode(true);
 
       EBasicVer b1 = new EBasicVer("b1");
@@ -199,10 +199,10 @@ public class TestBatchInsertFlush extends BaseTestCase {
       server.save(b2, txn);
 
       //flush here
-      assertThat(LoggedSqlCollector.current()).isEmpty();
+      assertThat(LoggedSql.collect()).isEmpty();
       Integer id = b1.getId();
       assertNotNull(id);
-      assertThat(LoggedSqlCollector.current()).hasSize(3);
+      assertThat(LoggedSql.collect()).hasSize(3);
 
       EBasicVer b3 = new EBasicVer("b3");
       server.save(b3, txn);
@@ -220,7 +220,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     Database server = DB.getDefault();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     EBasicVer b1 = new EBasicVer("b1");
     b1.setId(78965);
@@ -230,11 +230,11 @@ public class TestBatchInsertFlush extends BaseTestCase {
     b2.setId(78645);
     server.save(b2);
 
-    assertThat(LoggedSqlCollector.current()).isEmpty();
+    assertThat(LoggedSql.collect()).isEmpty();
     // dont flush here
     Integer id = b1.getId();
     assertNotNull(id);
-    assertThat(LoggedSqlCollector.current()).isEmpty();
+    assertThat(LoggedSql.collect()).isEmpty();
 
     EBasicVer b3 = new EBasicVer("b3");
     server.save(b3);
@@ -248,7 +248,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     Database server = DB.getDefault();
     Transaction txn = server.beginTransaction();
     try {
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       txn.setBatchMode(true);
 
       EBasicVer b1 = new EBasicVer("b1");
@@ -259,17 +259,17 @@ public class TestBatchInsertFlush extends BaseTestCase {
       b2.setId(21354);
       server.save(b2, txn);
 
-      assertThat(LoggedSqlCollector.current()).isEmpty();
+      assertThat(LoggedSql.collect()).isEmpty();
       //dont flush here
       Integer id = b1.getId();
       assertNotNull(id);
-      assertThat(LoggedSqlCollector.current()).isEmpty();
+      assertThat(LoggedSql.collect()).isEmpty();
 
       EBasicVer b3 = new EBasicVer("b3");
       server.save(b3, txn);
 
       txn.commit();
-      assertThat(LoggedSqlCollector.current()).hasSize(5);
+      assertThat(LoggedSql.collect()).hasSize(5);
 
     } finally {
       txn.end();

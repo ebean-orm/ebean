@@ -3,7 +3,7 @@ package org.tests.model.aggregation;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -42,11 +42,11 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .having().gt("totalKms", 1)
       .query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.findCount();
     query.findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
 
     if (isH2() || isPostgres()) {
@@ -136,12 +136,12 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .having().gt("sum(hours)", 2)
       .query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<DMachineStats> result = query.findList();
     assertThat(result).isNotEmpty();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("select sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id where t0.edate > ? group by t1.id, t1.name having sum(t0.hours) > ?");
   }
@@ -156,12 +156,12 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .having().gt("sum(hours)", 2)
       .query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<DMachineStats> result = query.findList();
     assertThat(result).isNotEmpty();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertSql(sql.get(0)).contains("select t0.edate, sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id where t0.edate > ? group by t0.edate, t1.id, t1.name having sum(t0.hours) > ?");  }
 
@@ -176,12 +176,12 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .having().gt("sum(hours)", 2)
       .query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<DMachineStats> result = query.findList();
     assertThat(result).isNotEmpty();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
 
     assertSql(sql.get(0)).contains("select sum(t0.total_kms), sum(t0.hours), t0.machine_id from d_machine_stats t0 where t0.edate > ? group by t0.machine_id having sum(t0.hours) > ?");
@@ -198,12 +198,12 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .having().gt("sum(hours)", 2)
       .query();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<DMachineStats> result = query.findList();
     assertThat(result).isNotEmpty();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
 
     assertSql(sql.get(0)).contains("select t0.edate, sum(t0.total_kms), sum(t0.hours), t0.machine_id from d_machine_stats t0 where t0.edate > ? group by t0.edate, t0.machine_id having sum(t0.hours) > ?");
@@ -226,7 +226,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_in_fetchClause_singleRowInMany() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<DMachine> query = DB.find(DMachine.class)
       .select("name")
@@ -238,7 +238,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
     assertThat(result).isNotEmpty();
     assertThat(result.get(0).getMachineStats().get(0).getTotalKms()).isNotNull();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
 
     assertThat(sqlOf(query)).contains("select t0.id, t0.name, sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id where t0.name = ? group by t0.id, t0.name order by t0.id");
@@ -247,7 +247,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
   @Test
   public void groupBy_in_fetchClause_multipleRowsInMany() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Query<DMachine> query = DB.find(DMachine.class)
       .select("name")
@@ -264,7 +264,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
     assertThat(firstStat.getRate()).isNotNull();
     assertThat(firstStat.getDate()).isNotNull();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
 
     assertThat(sqlOf(query)).contains("select t0.id, t0.name, t1.edate, max(t1.rate), sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id where t0.name = ? group by t0.id, t0.name, t1.edate order by t0.id");

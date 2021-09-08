@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.text.json.EJson;
-import io.ebeantest.LoggedSql;
+import io.ebean.test.LoggedSql;
 import org.tests.model.json.EBasicJsonMap;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonMapDetail;

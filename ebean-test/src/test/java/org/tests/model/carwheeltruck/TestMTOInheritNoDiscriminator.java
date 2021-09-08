@@ -2,7 +2,7 @@ package org.tests.model.carwheeltruck;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -16,7 +16,7 @@ public class TestMTOInheritNoDiscriminator extends BaseTestCase {
 
     final TTruckHolder holder = setup();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     final TTruckHolder found = DB.find(TTruckHolder.class)
       .fetch("items")
@@ -27,7 +27,7 @@ public class TestMTOInheritNoDiscriminator extends BaseTestCase {
     assertThat(found.getItems()).hasSize(2);
     assertThat(found.getItems()).extracting(TTruckHolderItem::getFoo).contains("a","b");
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
     if (isH2() || isPostgres()) {

@@ -7,7 +7,7 @@ import io.ebean.Expr;
 import io.ebean.Query;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -153,7 +153,7 @@ public class TestWhereRawClause extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Customer.class)
       .select("name").where().rawOrEmpty("name = any(?)", asList("Rob", "Fiona", "Jack"))
@@ -167,7 +167,7 @@ public class TestWhereRawClause extends BaseTestCase {
       .select("name").where().rawOrEmpty("name = any(?)", null)
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     assertThat(sql.get(0)).contains("select t0.id, t0.name from o_customer t0 where t0.name = any(?);");
     assertThat(sql.get(1)).contains("select t0.id, t0.name from o_customer t0; --bind()");

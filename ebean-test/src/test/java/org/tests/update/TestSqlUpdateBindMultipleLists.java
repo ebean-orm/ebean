@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
   @Test
   public void test() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     SqlUpdate sqlUpdate = DB.sqlUpdate("delete from o_customer where id in (:ids)");
 
@@ -31,7 +31,7 @@ public class TestSqlUpdateBindMultipleLists extends BaseTestCase {
     sqlUpdate.execute();
     assertEquals("delete from o_customer where id in (?,?)", sqlUpdate.getGeneratedSql());
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
   }
 

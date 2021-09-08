@@ -7,7 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,13 +127,13 @@ public class TestQueryFindEach extends BaseTestCase {
       PersistenceContext pc = spiTxn.getPersistenceContext();
       assertThat(pc.size(Customer.class)).isEqualTo(customerList.size());
 
-      LoggedSqlCollector.start();
+      LoggedSql.start();
       query.findEach(contact -> {
         // use customer from persistence context (otherwise would invoke lazy loading)
         assertNotNull(contact.getCustomer().getName());
       });
 
-      final List<String> sql = LoggedSqlCollector.stop();
+      final List<String> sql = LoggedSql.stop();
       assertThat(sql).hasSize(1);
     }
   }
@@ -170,7 +170,7 @@ public class TestQueryFindEach extends BaseTestCase {
 
     test_setLazyLoadBatchSize_withFetchLazy();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(OmBasicChild.class)
       .setLazyLoadBatchSize(100)
@@ -178,13 +178,13 @@ public class TestQueryFindEach extends BaseTestCase {
         assertNotNull(child.getParent().getName());
       });
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql.size()).isLessThan(50);
   }
 
   private void test_setLazyLoadBatchSize_withFetchLazy() {
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(OmBasicParent.class)
       .setLazyLoadBatchSize(5)
@@ -194,7 +194,7 @@ public class TestQueryFindEach extends BaseTestCase {
         it.getChildren().size();
       });
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(11);
     assertThat(sql.get(0)).contains(" from om_basic_parent ");
     for (int i = 1; i < 11; i++) {

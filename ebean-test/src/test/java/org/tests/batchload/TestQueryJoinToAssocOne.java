@@ -3,7 +3,7 @@ package org.tests.batchload;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.FetchConfig;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
@@ -25,7 +25,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = DB.find(Order.class)
@@ -35,7 +35,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     assertThat(l0).isNotEmpty();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(2);
 
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
@@ -51,7 +51,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = DB.find(Order.class)
@@ -62,7 +62,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     assertThat(l0).isNotEmpty();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(2);
 
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
@@ -77,7 +77,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = DB.find(Order.class)
@@ -102,7 +102,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     // normally invokes lazy loading
     order.getShipments().size();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(2);
 
     String secondaryQuery = trimSql(loggedSql.get(1), 1);
@@ -117,7 +117,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = DB.find(Order.class)
@@ -138,7 +138,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     assertThat(details).isEmpty();
     assertThat(details.size()).isEqualTo(0);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
   }
 
@@ -156,7 +156,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     DB.save(tenant);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     Tenant found = DB.find(Tenant.class)
       .setDisableLazyLoading(true)
@@ -166,7 +166,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     assertThat(found.getRoles().size()).isEqualTo(0);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
   }
 
@@ -181,7 +181,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     u.getRoles().put("disableLazyLoading", r0);
     DB.save(u);
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     MpUser found = DB.find(MpUser.class)
       .setDisableLazyLoading(true)
@@ -193,7 +193,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     assertThat(found.getRoles().size()).isEqualTo(0);
 
     // only 1 query ... no lazy loading query
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
 
     DB.deleteAll(Arrays.asList(found, r0));
@@ -204,7 +204,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // This will use 2 SQL queries to build this object graph
     List<Order> l0 = DB.find(Order.class)
@@ -225,7 +225,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     // normally invokes lazy loading
     orderDetail.getShipQty();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
 
     String originQuery = trimSql(loggedSql.get(0), 5);

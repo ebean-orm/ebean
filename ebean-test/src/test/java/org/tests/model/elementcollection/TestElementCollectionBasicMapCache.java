@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.PersistBatch;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -29,7 +29,7 @@ public class TestElementCollectionBasicMapCache extends BaseTestCase {
 
     one.getPhoneNumbers().size();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     EcmPerson two = DB.find(EcmPerson.class)
       .setId(person.getId())
@@ -38,12 +38,12 @@ public class TestElementCollectionBasicMapCache extends BaseTestCase {
     two.setName("CacheMod");
     two.getPhoneNumbers().put("mob", "027 234234");
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).isEmpty(); // cache hit containing phone numbers
 
     DB.save(two);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(7);
       assertSqlBind(sql, 4, 6);
@@ -53,7 +53,7 @@ public class TestElementCollectionBasicMapCache extends BaseTestCase {
 
     DB.save(two);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).isEmpty(); // no change
 
     EcmPerson three = DB.find(EcmPerson.class)
@@ -63,7 +63,7 @@ public class TestElementCollectionBasicMapCache extends BaseTestCase {
     assertThat(three.getName()).isEqualTo("CacheMod");
     assertThat(three.getPhoneNumbers().toString()).contains("021 1234", "021 4321", "027 234234");
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).isEmpty(); // cache hit
 
     three.getPhoneNumbers().put("oth", "09 6534");
@@ -71,7 +71,7 @@ public class TestElementCollectionBasicMapCache extends BaseTestCase {
     three.getPhoneNumbers().remove("work");
     DB.save(three);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(5); // cache hit
       assertSqlBind(sql, 3, 4);
@@ -88,12 +88,12 @@ public class TestElementCollectionBasicMapCache extends BaseTestCase {
     assertThat(four.getPhoneNumbers().toString()).contains("027 234234", "09 6534");
     assertThat(four.getPhoneNumbers()).hasSize(2);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).isEmpty(); // cache hit
 
     DB.delete(four);
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 
   @Override

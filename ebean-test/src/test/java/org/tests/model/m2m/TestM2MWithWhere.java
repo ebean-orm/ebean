@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebeantest.LoggedSql;
+import io.ebean.test.LoggedSql;
 
 /**
  * Tests M2M with complex where queries.

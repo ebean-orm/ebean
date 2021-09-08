@@ -6,7 +6,7 @@ import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +95,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     String storeId = "abc";
     List<String> skus = Arrays.asList("1", "2", "3");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     log.info("Partial (2 of 3) ...");
     List<OCachedNatKeyBean> list = DB.find(OCachedNatKeyBean.class)
@@ -106,7 +106,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with only 1 bind param - (sku=3 ... we got hits on sku 1 and 2)
@@ -125,7 +125,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
 
     assertThat(list).hasSize(3);
     assertThat(sql).hasSize(0);
@@ -144,7 +144,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
 
     assertThat(list).hasSize(3);
     assertThat(sql).hasSize(1);
@@ -164,7 +164,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     String storeId = "abc";
     List<String> skus = new ArrayList<>(Arrays.asList("1", "2"));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<OCachedNatKeyBean> list = DB.find(OCachedNatKeyBean.class)
       .where()
@@ -174,7 +174,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
 
     // no SQL - all beans from cache
     assertThat(sql).isEmpty();
@@ -193,7 +193,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
     String storeId = "abc";
     List<String> skus = new ArrayList<>(Arrays.asList("3", "4"));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<OCachedNatKeyBean> list = DB.find(OCachedNatKeyBean.class)
       .where()
@@ -203,7 +203,7 @@ public class TestCacheViaComplexNaturalKey extends BaseTestCase {
       .order("sku desc")
       .findList();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
       // in clause with 2 bind params as we got not hits on the cache

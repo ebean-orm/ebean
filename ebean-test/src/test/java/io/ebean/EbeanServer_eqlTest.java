@@ -1,6 +1,6 @@
 package io.ebean;
 
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -88,9 +88,9 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     }
 
     // check also select count(*)
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.findCount();
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql.get(0)).startsWith("select count(*) from o_customer t0;");
   }
 
@@ -114,9 +114,9 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     }
 
     // check also select count(*)
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     query.findCount();
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql.get(0)).startsWith("select count(*) from o_customer t0;");
 
   }

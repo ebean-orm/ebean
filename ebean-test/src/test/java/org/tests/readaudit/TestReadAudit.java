@@ -11,7 +11,7 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.event.readaudit.ReadEvent;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -169,7 +169,7 @@ public class TestReadAudit extends BaseTestCase {
 
     resetCounters();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<EBasicChangeLog> list = server.find(EBasicChangeLog.class)
       .setUseQueryCache(true)
@@ -192,7 +192,7 @@ public class TestReadAudit extends BaseTestCase {
 
     System.out.println("test_findList_useL2Cache> second query " + list1.size());
     assertThat(list1).hasSize(2);
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     System.out.println("test_findList_useL2Cache> sql: " + sql);
     //assertThat(sql).hasSize(1);
 

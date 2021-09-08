@@ -3,7 +3,7 @@ package org.tests.query.joins;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -20,7 +20,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
       .select("id, status, orderDate")
@@ -29,7 +29,7 @@ public class TestQueryJoinManyNonRoot extends BaseTestCase {
 
     assertTrue(!orders.isEmpty());
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertTrue(loggedSql.get(0).contains("select distinct "));
     assertTrue(loggedSql.get(0).contains(" from o_order t0 join o_order_detail u1 on u1.order_id = t0.id "));

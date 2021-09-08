@@ -1,7 +1,7 @@
 package org.tests.model.site;
 
 import io.ebean.BaseTestCase;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -21,10 +21,10 @@ public class TestTreeModel extends BaseTestCase {
     grandparent.setChildren(singletonList(parent));
     parent.setChildren(singletonList(child));
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     grandparent.save();
 
-    final List<String> sql = LoggedSqlCollector.stop();
+    final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(5);
     assertSql(sql.get(0)).contains("insert into tree_entity");
     assertSql(sql.get(1)).contains("insert into tree_entity");

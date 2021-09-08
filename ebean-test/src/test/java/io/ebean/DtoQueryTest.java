@@ -5,7 +5,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.meta.BasicMetricVisitor;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.ServerMetrics;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +57,12 @@ public class DtoQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     server().findDto(DCust.class, "select id, name from o_customer where id > :id")
       .setParameter("id", 0)
       .findEach(it -> log.info("got " + it.getId() + " " + it.getName()));
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 
@@ -71,7 +71,7 @@ public class DtoQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     server().findDto(DCust.class, "select id, name from o_customer where id > :id order by id desc")
       .setParameter("id", 0)
       .findEachWhile(customer -> {
@@ -79,7 +79,7 @@ public class DtoQueryTest extends BaseTestCase {
         return customer.getId() > 3;
       });
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("select id, name from o_customer where id > ?");
   }
 

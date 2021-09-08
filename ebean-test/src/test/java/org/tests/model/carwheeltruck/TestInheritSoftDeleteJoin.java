@@ -2,7 +2,7 @@ package org.tests.model.carwheeltruck;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebeantest.LoggedSql;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

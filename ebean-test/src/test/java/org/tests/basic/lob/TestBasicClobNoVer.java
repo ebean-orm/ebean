@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.tests.model.basic.EBasicClobNoVer;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -53,13 +53,13 @@ public class TestBasicClobNoVer extends BaseTestCase {
 
     assertThat(entity.getDescription()).isEqualTo("initialClobValue");
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // Refresh query includes all properties
     DB.refresh(entity);
 
     // Assert all properties fetched in refresh
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
     assertThat(trimSql(loggedSql.get(0), 2)).contains(sqlWithClob);
     assertThat(entity.getDescription()).isEqualTo("modified");

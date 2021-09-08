@@ -4,7 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,11 +35,11 @@ public class TestMergeM2M extends BaseTestCase {
 
     MergeOptions options = new MergeOptionsBuilder().addPath("groups").build();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.merge(m0, options);
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(6);
       assertSql(sql.get(0)).contains("select");
@@ -65,7 +65,7 @@ public class TestMergeM2M extends BaseTestCase {
 
     DB.merge(m1, options);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(9);
     assertSql(sql.get(0)).contains("select");
     assertSql(sql.get(1)).contains("delete from mmachine_mgroup");

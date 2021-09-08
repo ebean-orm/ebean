@@ -5,7 +5,7 @@ import io.ebean.DB;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
@@ -35,7 +35,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     List<OrderDetail> details = order.getDetails();
     assertEquals(details.size(), 0);
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
 
     assertThat(trimSql(loggedSql.get(0), 2)).contains("select t0.id, t0.status, t0.order_date,");
@@ -47,7 +47,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
@@ -61,7 +61,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     // normally invokes lazy loading
     assertNull(order.getCustomer().getStatus());
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
   }
 
@@ -70,7 +70,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
@@ -85,7 +85,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     // normally invokes lazy loading
     assertNull(order.getCustomer().getStatus());
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
   }
 }

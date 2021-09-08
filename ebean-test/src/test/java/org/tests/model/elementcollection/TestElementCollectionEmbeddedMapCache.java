@@ -2,7 +2,7 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,11 +25,11 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
       .fetch("phoneNumbers")
       .findOne();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     one.getPhoneNumbers().size();
 
-    List<String> sql = LoggedSqlCollector.current();
+    List<String> sql = LoggedSql.collect();
     assertThat(sql).isEmpty();
 
     EcbmPerson two = DB.find(EcbmPerson.class)
@@ -39,7 +39,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     two.getPhoneNumbers().size();
     assertThat(two.getPhoneNumbers().toString()).contains("64-021-1234", "64-021-4321");
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).isEmpty(); // cache hit
 
     two.getPhoneNumbers().put("mob", new EcPhone("61", "07", "11"));
@@ -47,7 +47,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
 
     DB.save(two);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(5); // update of collection only
       assertSql(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
@@ -69,7 +69,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     assertThat(three.getPhoneNumbers().toString()).contains("61-07-11", "64-021-4321");
     assertThat(three.getPhoneNumbers()).hasSize(2);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).isEmpty(); // cache hit
 
 
@@ -78,7 +78,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
 
     DB.save(three);
 
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(5);
 
     EcbmPerson four = DB.find(EcbmPerson.class)
@@ -90,10 +90,10 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
 
 
     DB.delete(four);
-    sql = LoggedSqlCollector.current();
+    sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
 
 
-    LoggedSqlCollector.stop();
+    LoggedSql.stop();
   }
 }

@@ -3,7 +3,7 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.PagedList;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -22,14 +22,14 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Order.class)
       .setFirstRow(3)
       .order().asc("id")
       .findList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("order by t0.id");
@@ -41,13 +41,13 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Order.class)
       .setMaxRows(10)
       .findList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(1);
     if (isH2()) {
@@ -61,7 +61,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Order.class)
       .setFirstRow(3)
@@ -69,7 +69,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
       .order().asc("id")
       .findList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("order by t0.id");
@@ -80,7 +80,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // maxRows 1 with no first rows means Ebean does not automatically
     // add the order by id to the query
@@ -88,7 +88,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
       .setMaxRows(1)
       .findList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).doesNotContain("order by t0.id");
@@ -99,7 +99,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     PagedList<Order> pagedList =
       DB.find(Order.class)
@@ -108,7 +108,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     pagedList.getList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(1);
     if (isH2()) {
@@ -121,7 +121,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Order.class)
       .setFirstRow(10)
@@ -130,7 +130,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
       .findPagedList()
       .getList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(1);
     if (isH2()) {
@@ -144,7 +144,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Order.class)
       .order().asc("orderDate")
@@ -152,7 +152,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
       .findPagedList()
       .getList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("order by t0.order_date");
@@ -163,7 +163,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Order.class)
       .order().asc("orderDate")
@@ -172,7 +172,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
       .findPagedList()
       .getList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(1);
     assertThat(loggedSql.get(0)).contains("order by t0.order_date, t0.id desc");

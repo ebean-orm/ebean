@@ -5,7 +5,7 @@ import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Query;
 import org.tests.model.basic.EBasicClobFetchEager;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -35,13 +35,13 @@ public class TestBasicClobFetchEager extends BaseTestCase {
     assertThat(sql).contains(expectedSql);
 
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // Same as previous query - clob included by default based on annotation
     DB.find(EBasicClobFetchEager.class, entity.getId());
 
     // Assert query same as previous ...
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(trimSql(loggedSql.get(0), 6)).contains(expectedSql);
 
@@ -66,13 +66,13 @@ public class TestBasicClobFetchEager extends BaseTestCase {
 
     assertEquals("initialClobValue", entity.getDescription());
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // Refresh query includes all properties
     server.refresh(entity);
 
     // Assert all properties fetched in refresh
-    loggedSql = LoggedSqlCollector.stop();
+    loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(trimSql(loggedSql.get(0), 6)).contains(expectedSql);
     assertEquals("modified", entity.getDescription());

@@ -2,7 +2,7 @@ package org.tests.delete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -23,10 +23,10 @@ public class TestDeleteCascadeWithListener extends BaseTestCase {
 
     DcMaster found = DB.find(DcMaster.class, m0.getId());
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
     DB.delete(found);
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(6);
       assertSql(sql.get(0)).contains("select t0.id from dc_detail t0 where master_id=?");

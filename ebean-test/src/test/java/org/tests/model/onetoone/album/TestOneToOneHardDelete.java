@@ -2,7 +2,7 @@ package org.tests.model.onetoone.album;
 
 
 import io.ebean.BaseTestCase;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -25,14 +25,14 @@ public class TestOneToOneHardDelete extends BaseTestCase {
 
     Album found1 = Album.find.byId(album.getId());
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // ---------------------
     // SOFT DELETE
     // ---------------------
     found1.delete();
 
-    List<String> sql = LoggedSqlCollector.stop();
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     // assert we loaded the missing/unloaded foreign key
     assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.cover_id from album t0 where t0.id = ?");
@@ -42,14 +42,14 @@ public class TestOneToOneHardDelete extends BaseTestCase {
 
     Album found2 = Album.find.query().setId(album.getId()).setIncludeSoftDeletes().findOne();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     // ---------------------
     // HARD DELETE
     // ---------------------
     found2.deletePermanent();
 
-    sql = LoggedSqlCollector.stop();
+    sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
     // assert we loaded the missing/unloaded foreign key
     assertThat(trimSql(sql.get(0), 1)).contains("select t0.id, t0.cover_id from album t0 where t0.id = ?");

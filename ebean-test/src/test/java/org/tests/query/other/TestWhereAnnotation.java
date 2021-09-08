@@ -2,7 +2,7 @@ package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.ebeantest.LoggedSqlCollector;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -21,13 +21,13 @@ public class TestWhereAnnotation extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     DB.find(Customer.class)
       .fetch("orders")
       .findList();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertEquals(1, loggedSql.size());
 
@@ -42,7 +42,7 @@ public class TestWhereAnnotation extends BaseTestCase {
 
     DB.cacheManager().clearAll();
 
-    LoggedSqlCollector.start();
+    LoggedSql.start();
 
     List<Customer> customers = DB.find(Customer.class)
       .order().asc("id")
@@ -52,7 +52,7 @@ public class TestWhereAnnotation extends BaseTestCase {
     assertThat(orders.size()).isGreaterThan(0);
     orders.get(0).getStatus();
 
-    List<String> loggedSql = LoggedSqlCollector.stop();
+    List<String> loggedSql = LoggedSql.stop();
 
     assertThat(loggedSql).hasSize(2);
     assertThat(loggedSql.get(1)).contains("t0.order_date is not null");
