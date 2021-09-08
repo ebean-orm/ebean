@@ -76,10 +76,74 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.200</version>
+      <version>1.4.199</version>
     </dependency>
 
     <!-- Test dependencies -->
+
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-jsr305</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-migration</artifactId>
+      <version>12.4.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>mod-uuid</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- validation annotations Size etc -->
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.1.0.Final</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <version>3.0.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.9.7</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>1.3.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.7</version>
+      <scope>test</scope>
+    </dependency>
+
 
     <dependency>
       <groupId>org.postgresql</groupId>
@@ -143,7 +207,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:12.6.0</tile>
+            <tile>io.ebean.tile:enhancement:12.11.3</tile>
           </tiles>
         </configuration>
       </plugin>

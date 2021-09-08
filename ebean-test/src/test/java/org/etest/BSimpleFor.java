@@ -1,4 +1,4 @@
-package org.test;
+package org.etest;
 
 import io.ebean.annotation.WhenModified;
 
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Entity
-public class BSimpleWithGen {
+public class BSimpleFor {
 
   @Id
   private Integer id;
@@ -29,11 +29,11 @@ public class BSimpleWithGen {
   @Version
   private long version;
 
-  public BSimpleWithGen(String name) {
+  public BSimpleFor(String name) {
     this.name = name;
   }
 
-  public BSimpleWithGen(String name, String other) {
+  public BSimpleFor(String name, String other) {
     this.name = name;
     this.other = other;
   }

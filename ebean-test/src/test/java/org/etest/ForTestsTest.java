@@ -1,4 +1,4 @@
-package org.test;
+package org.etest;
 
 import io.ebean.DB;
 import io.ebean.Transaction;
@@ -36,18 +36,18 @@ public class ForTestsTest {
   @Test
   public void rollbackTransactions() {
 
-    DB.find(BSimpleWithGen.class).delete();
+    DB.find(BSimpleFor.class).delete();
 
     ForTests.rollbackAll(this::doInsert);
 
-    final int count = DB.find(BSimpleWithGen.class).findCount();
+    final int count = DB.find(BSimpleFor.class).findCount();
     assertThat(count).isEqualTo(0);
   }
 
   @Transactional
   private void doInsert() {
 
-    BSimpleWithGen bean = new BSimpleWithGen("doInsert");
+    BSimpleFor bean = new BSimpleFor("doInsert");
     DB.save(bean);
   }
 

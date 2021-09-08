@@ -1,4 +1,4 @@
-package org.test;
+package org.etest;
 
 import io.ebean.DB;
 import io.ebean.annotation.Transactional;
@@ -34,7 +34,7 @@ public class ForTestsBeforeAfterTest {
   }
 
   private int getCount() {
-    return DB.find(BSimpleWithGen.class)
+    return DB.find(BSimpleFor.class)
         .where().eq("name", "ForTestsBeforeAfterTest")
         .findCount();
   }
@@ -42,7 +42,7 @@ public class ForTestsBeforeAfterTest {
   @Transactional
   private void doInsert() {
 
-    BSimpleWithGen bean = new BSimpleWithGen("ForTestsBeforeAfterTest");
+    BSimpleFor bean = new BSimpleFor("ForTestsBeforeAfterTest");
     DB.save(bean);
   }
 

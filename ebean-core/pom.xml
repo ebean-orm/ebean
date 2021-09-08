@@ -60,13 +60,13 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-ddl-generator</artifactId>
-<!--      <version>12.11.3</version>-->
-      <version>12.11.4A</version>
-      <scope>test</scope>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>io.ebean</groupId>-->
+<!--      <artifactId>ebean-ddl-generator</artifactId>-->
+<!--&lt;!&ndash;      <version>12.11.3</version>&ndash;&gt;-->
+<!--      <version>12.11.4A</version>-->
+<!--      <scope>test</scope>-->
+<!--    </dependency>-->
 
     <!-- test scope for supporting ebean-ddl-generator -->
     <dependency>
