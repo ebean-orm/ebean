@@ -144,7 +144,6 @@
       <scope>test</scope>
     </dependency>
 
-
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
@@ -196,6 +195,20 @@
 
   </dependencies>
 
+  <profiles>
+    <profile>
+      <id>db2</id>
+      <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.ibm.db2/jcc -->
+        <dependency>
+          <groupId>com.ibm.db2</groupId>
+          <artifactId>jcc</artifactId>
+          <version>11.5.5.0</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 
   <build>
     <plugins>
@@ -203,7 +216,7 @@
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.19</version>
+        <version>2.20</version>
         <extensions>true</extensions>
         <configuration>
           <tiles>

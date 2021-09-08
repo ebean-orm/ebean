@@ -18,20 +18,6 @@
     <tag>ebean-parent-12.8.0</tag>
   </scm>
 
-  <profiles>
-    <profile>
-      <id>db2</id>
-      <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.ibm.db2/jcc -->
-        <dependency>
-          <groupId>com.ibm.db2</groupId>
-          <artifactId>jcc</artifactId>
-          <version>11.5.5.0</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
   <dependencies>
 
     <dependency>
@@ -50,30 +36,6 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration-auto</artifactId>
       <version>1.1</version>
-    </dependency>
-
-    <!-- keep testing in core using ebean-ddl-generator & ebean-migration -->
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-migration</artifactId>
-      <version>12.4.0</version>
-      <scope>test</scope>
-    </dependency>
-
-<!--    <dependency>-->
-<!--      <groupId>io.ebean</groupId>-->
-<!--      <artifactId>ebean-ddl-generator</artifactId>-->
-<!--&lt;!&ndash;      <version>12.11.3</version>&ndash;&gt;-->
-<!--      <version>12.11.4A</version>-->
-<!--      <scope>test</scope>-->
-<!--    </dependency>-->
-
-    <!-- test scope for supporting ebean-ddl-generator -->
-    <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <version>2.3.2</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -188,98 +150,13 @@
     </dependency>
 
     <dependency>
-      <groupId>com.nuodb.jdbc</groupId>
-      <artifactId>nuodb-jdbc</artifactId>
-      <version>20.2.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.oracle.ojdbc</groupId>
-      <artifactId>ojdbc10</artifactId>
-      <version>19.3.0.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-test-docker</artifactId>
-      <version>4.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.xerial</groupId>
-      <artifactId>sqlite-jdbc</artifactId>
-      <version>3.15.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>2.3.4</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>mssql-jdbc</artifactId>
-      <version>7.2.2.jre8</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.17</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mariadb.jdbc</groupId>
-      <artifactId>mariadb-java-client</artifactId>
-      <version>2.6.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>com.sap.cloud.db.jdbc</groupId>
-      <artifactId>ngdbc</artifactId>
-      <version>2.3.48</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
       <version>1.0</version>
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.7</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>mod-uuid</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
-
 
   <build>
     <plugins>
