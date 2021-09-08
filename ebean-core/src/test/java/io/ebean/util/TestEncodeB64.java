@@ -1,4 +1,4 @@
-package org.tests.unitinternal;
+package io.ebean.util;
 
 import org.junit.jupiter.api.Test;
 

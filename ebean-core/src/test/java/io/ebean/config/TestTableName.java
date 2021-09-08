@@ -1,4 +1,4 @@
-package org.tests.config;
+package io.ebean.config;
 
 import io.ebean.BaseTestCase;
 import io.ebean.config.TableName;

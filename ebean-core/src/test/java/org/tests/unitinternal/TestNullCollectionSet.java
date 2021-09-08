@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestNullCollectionSet extends BaseTestCase {
 
@@ -30,7 +29,7 @@ public class TestNullCollectionSet extends BaseTestCase {
     assertTrue(details instanceof BeanCollection<?>);
 
     BeanCollection<?> bc = (BeanCollection<?>) details;
-    assertTrue(!bc.isPopulated());
+    assertFalse(bc.isPopulated());
     assertNotNull(bc.getOwnerBean());
     assertNotNull(bc.getPropertyName());
   }

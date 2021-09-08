@@ -1,4 +1,4 @@
-package org.tests.unitinternal;
+package io.ebeaninternal.server.type;
 
 import io.ebean.BaseTestCase;
 import io.ebean.config.EncryptKey;

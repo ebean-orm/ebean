@@ -46,7 +46,7 @@ public class TestOrderByParse extends BaseTestCase {
     o1 = new OrderBy<>("id desc");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("id desc", o1.toStringFormat());
 
     o1 = new OrderBy<>(" id  asc ");
@@ -65,7 +65,7 @@ public class TestOrderByParse extends BaseTestCase {
     OrderBy<Object> o1 = new OrderBy<>("id desc nulls high");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("id desc nulls high", o1.toStringFormat());
     assertFalse(o1.supportsSelect());
   }
@@ -77,7 +77,7 @@ public class TestOrderByParse extends BaseTestCase {
     o1.add("id desc nulls high");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("id desc nulls high", o1.toStringFormat());
   }
 
@@ -87,7 +87,7 @@ public class TestOrderByParse extends BaseTestCase {
     OrderBy<Object> o1 = new OrderBy<>("id desc nulls high, name");
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("id desc nulls high, name", o1.toStringFormat());
     assertEquals("name", o1.getProperties().get(1).getProperty());
     assertTrue(o1.getProperties().get(1).isAscending());
@@ -116,9 +116,9 @@ public class TestOrderByParse extends BaseTestCase {
     o1 = new OrderBy<>("  id desc , name  desc ");
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("name", o1.getProperties().get(1).getProperty());
-    assertTrue(!o1.getProperties().get(1).isAscending());
+    assertFalse(o1.getProperties().get(1).isAscending());
     assertEquals("id desc, name desc", o1.toStringFormat());
 
     o1 = new OrderBy<>("  id ascending, name  asc");
@@ -149,9 +149,9 @@ public class TestOrderByParse extends BaseTestCase {
     o1.desc("name");
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("name", o1.getProperties().get(1).getProperty());
-    assertTrue(!o1.getProperties().get(1).isAscending());
+    assertFalse(o1.getProperties().get(1).isAscending());
     assertEquals("id desc, name desc", o1.toStringFormat());
 
     o1.reverse();
@@ -188,7 +188,7 @@ public class TestOrderByParse extends BaseTestCase {
     o1.desc("id", "latin_1");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("id collate latin_1 desc", o1.toStringFormat());
     assertTrue(o1.supportsSelect());
 
@@ -198,7 +198,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertEquals("date", o1.getProperties().get(1).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id collate latin_1 desc, date", o1.toStringFormat());
     assertTrue(o1.supportsSelect());
@@ -209,7 +209,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertEquals("name", o1.getProperties().get(1).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id collate latin_1 desc, name collate latin_2", o1.toStringFormat());
     assertTrue(o1.supportsSelect());
@@ -219,7 +219,7 @@ public class TestOrderByParse extends BaseTestCase {
     o1.desc("id", "COLLATION_KEY(${}, 'latin_1')");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
-    assertTrue(!o1.getProperties().get(0).isAscending());
+    assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("COLLATION_KEY(id, 'latin_1') desc", o1.toStringFormat());
     assertTrue(o1.supportsSelect());
   }
@@ -235,7 +235,6 @@ public class TestOrderByParse extends BaseTestCase {
     assertEquals(o1, o2);
     assertEquals(o1, o3);
 
-
     OrderBy<Object> o4 = new OrderBy<>("id desc");
     OrderBy<Object> o5 = new OrderBy<>("oid desc nulls high");
     OrderBy<Object> o6 = new OrderBy<>("id desc nulls low");
@@ -247,7 +246,6 @@ public class TestOrderByParse extends BaseTestCase {
 
   @Test
   public void equals_with_collation() {
-
     OrderBy<Object> o1 = new OrderBy<>();
     o1.asc("name", "latin_1");
 
