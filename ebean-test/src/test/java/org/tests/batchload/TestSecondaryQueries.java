@@ -1,6 +1,9 @@
 package org.tests.batchload;
 
-import io.ebean.*;
+import io.ebean.DB;
+import io.ebean.Query;
+import io.ebean.QueryIterator;
+import io.ebean.TransactionalTestCase;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -10,9 +13,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSecondaryQueries extends TransactionalTestCase {
 

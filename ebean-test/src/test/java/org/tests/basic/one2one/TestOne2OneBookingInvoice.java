@@ -4,9 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestOne2OneBookingInvoice extends BaseTestCase {
 

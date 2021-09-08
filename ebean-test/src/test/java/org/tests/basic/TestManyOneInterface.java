@@ -2,12 +2,12 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.interfaces.Address;
 import org.tests.model.interfaces.IAddress;
 import org.tests.model.interfaces.IPerson;
 import org.tests.model.interfaces.Person;
-import org.junit.jupiter.api.Test;
 
 public class TestManyOneInterface extends BaseTestCase {
 

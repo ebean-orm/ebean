@@ -2,9 +2,9 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

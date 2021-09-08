@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.DB;
-import org.tests.model.basic.TJodaEntity;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.TJodaEntity;
 
 import java.sql.Timestamp;
 

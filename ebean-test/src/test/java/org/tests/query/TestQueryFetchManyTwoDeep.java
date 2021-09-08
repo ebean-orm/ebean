@@ -4,11 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

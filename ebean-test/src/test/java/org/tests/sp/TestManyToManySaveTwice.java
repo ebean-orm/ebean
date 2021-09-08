@@ -2,7 +2,6 @@ package org.tests.sp;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
 import org.tests.sp.model.car.Car;

@@ -5,9 +5,9 @@ import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

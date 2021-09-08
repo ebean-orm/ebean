@@ -1,13 +1,12 @@
 package org.tests.model.basic.cache;
 
-import java.util.UUID;
+import io.ebean.annotation.Cache;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.constraints.Size;
-
-import io.ebean.annotation.Cache;
+import java.util.UUID;
 
 @Entity
 @Cache(enableQueryCache = true, enableBeanCache = false)

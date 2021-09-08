@@ -1,6 +1,5 @@
 package io.ebean;
 
-import io.ebean.OrderBy;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

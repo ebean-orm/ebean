@@ -2,8 +2,8 @@ package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.UUOne;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.UUOne;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.UUID;

@@ -6,8 +6,8 @@ import io.ebean.event.AbstractBeanPersistListener;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistListener;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.tests.model.basic.EBasic;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasic;
 
 import static org.junit.jupiter.api.Assertions.*;
 

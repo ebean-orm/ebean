@@ -3,8 +3,8 @@ package org.tests.genkey;
 import io.ebean.BaseTestCase;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import org.tests.model.basic.TOne;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.TOne;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

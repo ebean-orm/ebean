@@ -1,11 +1,6 @@
 package org.tests.history;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.Transaction;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;

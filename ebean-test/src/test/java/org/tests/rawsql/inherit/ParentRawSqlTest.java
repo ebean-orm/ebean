@@ -6,19 +6,12 @@ import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tests.inherit.ChildA;
-import org.tests.inherit.ChildB;
-import org.tests.inherit.Data;
-import org.tests.inherit.EUncle;
-import org.tests.inherit.Parent;
-import org.tests.inherit.ParentAggregate;
+import org.tests.inherit.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ParentRawSqlTest extends BaseTestCase {
 

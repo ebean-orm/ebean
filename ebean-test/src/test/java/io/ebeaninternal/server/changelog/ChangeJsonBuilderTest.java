@@ -1,10 +1,8 @@
 package io.ebeaninternal.server.changelog;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
-import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;

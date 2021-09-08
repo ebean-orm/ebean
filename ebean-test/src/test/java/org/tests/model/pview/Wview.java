@@ -1,12 +1,7 @@
 package org.tests.model.pview;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
-
 import java.util.UUID;
 
 @Entity

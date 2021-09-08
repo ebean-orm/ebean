@@ -1,11 +1,6 @@
 package org.tests.model.basic;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
-
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 

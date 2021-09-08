@@ -2,11 +2,7 @@ package org.tests.model.onetoone;
 
 import io.ebean.annotation.DbForeignKey;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity

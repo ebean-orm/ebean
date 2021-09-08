@@ -6,10 +6,10 @@ import io.ebean.Database;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
+import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.EAddress;
 import org.tests.model.embedded.EInvoice;
 import org.tests.model.embedded.EInvoice.State;
-import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 

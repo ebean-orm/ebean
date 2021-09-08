@@ -1,19 +1,15 @@
 package org.tests.cache;
 
-import io.ebean.BaseTestCase;
-import io.ebean.CacheMode;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.Query;
-
-import org.tests.model.basic.EBasicVer;
+import io.ebean.*;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class TestQueryCacheReadOnly extends BaseTestCase {
 

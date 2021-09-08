@@ -2,8 +2,8 @@ package org.tests.json;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.json.EBasicJsonUnmapped;
 import org.junit.jupiter.api.Test;
+import org.tests.model.json.EBasicJsonUnmapped;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

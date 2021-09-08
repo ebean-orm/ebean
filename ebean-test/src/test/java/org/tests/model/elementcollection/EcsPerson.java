@@ -1,11 +1,6 @@
 package org.tests.model.elementcollection;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 

@@ -1,11 +1,6 @@
 package org.tests.query.other;
 
-import io.ebean.BaseTestCase;
-import io.ebean.CountDistinctOrder;
-import io.ebean.CountedValue;
-import io.ebean.DB;
-import io.ebean.DB;
-import io.ebean.Query;
+import io.ebean.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -15,11 +10,7 @@ import org.tests.inherit.Data;
 import org.tests.inherit.EUncle;
 import org.tests.lazyforeignkeys.MainEntity;
 import org.tests.lazyforeignkeys.MainEntityRelation;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
-import org.tests.model.basic.VwCustomer;
+import org.tests.model.basic.*;
 import org.tests.o2m.OmBasicParent;
 
 import java.sql.Date;

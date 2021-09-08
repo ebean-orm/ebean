@@ -4,11 +4,7 @@ import io.ebean.DB;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Transactional;
 import org.junit.jupiter.api.Test;
-import org.tests.batchinsert.o2o.MeterAddressData;
-import org.tests.batchinsert.o2o.MeterContractData;
-import org.tests.batchinsert.o2o.MeterSpecialNeedsClient;
-import org.tests.batchinsert.o2o.MeterSpecialNeedsContact;
-import org.tests.batchinsert.o2o.MeterVersion;
+import org.tests.batchinsert.o2o.*;
 
 public class TestBatchInsertOneToOne {
   private MeterVersion build(){

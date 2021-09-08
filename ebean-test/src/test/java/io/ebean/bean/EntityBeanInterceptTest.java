@@ -2,11 +2,11 @@ package io.ebean.bean;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.compositekeys.db.AuditInfo;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.sql.Date;
 import java.util.HashSet;

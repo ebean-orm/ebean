@@ -4,18 +4,14 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.text.TextException;
 import io.ebean.test.LoggedSql;
+import io.ebean.text.TextException;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.PlainBean;
 
 import javax.persistence.PersistenceException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;

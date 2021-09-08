@@ -4,8 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.Database;
-import org.tests.model.embedded.EMain;
 import org.junit.jupiter.api.Test;
+import org.tests.model.embedded.EMain;
 
 import static org.junit.jupiter.api.Assertions.*;
 

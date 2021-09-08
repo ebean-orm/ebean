@@ -3,10 +3,10 @@ package org.tests.cascade;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
-import org.tests.model.basic.TSDetail;
-import org.tests.model.basic.TSMaster;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.TSDetail;
+import org.tests.model.basic.TSMaster;
 
 import java.util.List;
 import java.util.Set;

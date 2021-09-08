@@ -3,9 +3,9 @@ package io.ebean;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.server.core.DefaultBeanState;
+import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.EMain;
 import org.tests.model.embedded.Eembeddable;
-import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;

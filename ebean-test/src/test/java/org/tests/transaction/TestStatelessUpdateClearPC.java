@@ -2,8 +2,8 @@ package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.EBasic;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

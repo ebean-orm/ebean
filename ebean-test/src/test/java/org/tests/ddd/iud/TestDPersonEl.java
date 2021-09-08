@@ -6,15 +6,16 @@ import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.json.JsonContext;
+import org.junit.jupiter.api.Test;
 import org.tests.model.ddd.DPerson;
 import org.tests.model.ivo.Money;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Currency;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestDPersonEl {
 

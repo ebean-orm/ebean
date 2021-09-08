@@ -1,10 +1,6 @@
 package org.tests.transaction;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.Transaction;
-import io.ebean.TxScope;
+import io.ebean.*;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxType;
 import org.junit.jupiter.api.Test;
@@ -14,10 +10,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTransactionalRequiresNew extends BaseTestCase {
 

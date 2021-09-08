@@ -2,7 +2,6 @@ package org.tests.batchload;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.FetchConfig;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;

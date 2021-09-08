@@ -2,9 +2,9 @@ package org.tests.cache;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCachedInhChildA;
 import org.tests.model.basic.OCachedInhRoot;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

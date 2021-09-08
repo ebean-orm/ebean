@@ -1,10 +1,6 @@
 package org.tests.inheritance.cascadedelete;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.PreRemove;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity

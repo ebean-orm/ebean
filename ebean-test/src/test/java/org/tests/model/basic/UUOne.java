@@ -2,11 +2,7 @@ package org.tests.model.basic;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.List;
 import java.util.UUID;
 

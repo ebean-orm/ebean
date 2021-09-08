@@ -2,10 +2,10 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.EEmbDatePeriod;
 import org.tests.model.embedded.EEmbInner;
 import org.tests.model.embedded.EEmbOuter;
-import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 

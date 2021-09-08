@@ -1,15 +1,10 @@
 package org.tests.model.m2m;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-
 import io.ebean.annotation.Identity;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Where;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Identity(start = 1000)

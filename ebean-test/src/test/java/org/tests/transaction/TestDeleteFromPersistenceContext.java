@@ -3,13 +3,11 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiTransaction;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotSame;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestDeleteFromPersistenceContext extends BaseTestCase {
 

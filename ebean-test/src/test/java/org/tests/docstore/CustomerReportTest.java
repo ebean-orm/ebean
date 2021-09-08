@@ -1,10 +1,8 @@
 package org.tests.docstore;
 
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Arrays;
-
+import io.ebean.BaseTestCase;
+import io.ebean.text.json.JsonReadOptions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Product;
@@ -12,8 +10,9 @@ import org.tests.model.basic.ResetBasicData;
 import org.tests.model.docstore.CustomerReport;
 import org.tests.model.docstore.ProductReport;
 
-import io.ebean.BaseTestCase;
-import io.ebean.text.json.JsonReadOptions;
+import java.util.Arrays;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomerReportTest extends BaseTestCase {
 

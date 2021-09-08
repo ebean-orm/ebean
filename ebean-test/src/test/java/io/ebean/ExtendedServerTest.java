@@ -1,6 +1,5 @@
 package io.ebean;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;

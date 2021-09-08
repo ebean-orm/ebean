@@ -1,10 +1,10 @@
 package io.ebean.json;
 
-import io.ebean.text.json.EJson;
-import io.ebeaninternal.json.ModifyAwareMap;
-import io.ebean.ModifyAwareType;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.ModifyAwareType;
+import io.ebean.text.json.EJson;
+import io.ebeaninternal.json.ModifyAwareMap;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,12 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

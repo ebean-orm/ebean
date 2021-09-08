@@ -2,8 +2,8 @@ package org.tests.basic.lob;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.TBytesOnly;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.TBytesOnly;
 
 public class TestByteOnly extends BaseTestCase {
 

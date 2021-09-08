@@ -6,12 +6,8 @@ import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteBeanVisitor;
 import io.ebean.text.json.JsonWriteOptions;
 import io.ebean.text.json.JsonWriter;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Country;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.*;
 
 import java.math.BigDecimal;
 import java.util.List;

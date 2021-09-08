@@ -1,11 +1,7 @@
 package io.ebean.event;
 
 
-import io.ebean.BaseTestCase;
-import io.ebean.BeanState;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.DatabaseFactory;
+import io.ebean.*;
 import io.ebean.config.DatabaseConfig;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;

@@ -1,15 +1,9 @@
 package org.tests.inheritance;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
-
 import io.ebean.annotation.Index;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 /**
  * Model class to reference an organization node.

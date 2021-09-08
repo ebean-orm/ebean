@@ -2,11 +2,10 @@ package org.tests.basic.join;
 
 import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
-
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Order.Status;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

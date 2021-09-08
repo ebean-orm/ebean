@@ -2,9 +2,9 @@ package io.ebean.plugin;
 
 import io.ebean.DB;
 import io.ebean.Database;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

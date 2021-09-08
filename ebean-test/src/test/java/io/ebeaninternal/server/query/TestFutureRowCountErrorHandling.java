@@ -1,20 +1,14 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.Query;
-import io.ebean.Transaction;
+import io.ebean.*;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestFutureRowCountErrorHandling extends BaseTestCase {
 

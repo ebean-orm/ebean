@@ -2,7 +2,6 @@ package org.tests.batchinsert;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;

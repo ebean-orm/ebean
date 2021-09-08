@@ -2,7 +2,6 @@ package org.tests.cascade;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.AfterEach;

@@ -2,11 +2,11 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.annotation.Platform;
 import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.metaannotation.SizeMedium;
-import org.junit.jupiter.api.Test;
 
 import javax.persistence.PersistenceException;
 

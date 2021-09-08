@@ -2,11 +2,7 @@ package org.tests.model.carwheeltruck;
 
 import org.tests.model.basic.EBasic;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.List;
 
 import static javax.persistence.CascadeType.ALL;

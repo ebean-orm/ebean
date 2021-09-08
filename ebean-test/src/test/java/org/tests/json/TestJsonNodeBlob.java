@@ -1,11 +1,11 @@
 package org.tests.json;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import org.tests.model.json.EBasicJsonNodeBlob;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
+import org.tests.model.json.EBasicJsonNodeBlob;
 
 import java.io.IOException;
 import java.util.Set;

@@ -1,8 +1,8 @@
 package io.ebean;
 
-import org.tests.model.basic.EBasicVer;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.util.List;
 

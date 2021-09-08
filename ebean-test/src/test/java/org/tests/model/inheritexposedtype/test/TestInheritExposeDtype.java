@@ -2,8 +2,8 @@ package org.tests.model.inheritexposedtype.test;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.inheritexposedtype.IXPhoto;
 import org.junit.jupiter.api.Test;
+import org.tests.model.inheritexposedtype.IXPhoto;
 
 public class TestInheritExposeDtype extends BaseTestCase {
 

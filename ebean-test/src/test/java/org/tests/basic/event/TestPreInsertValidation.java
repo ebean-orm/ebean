@@ -3,8 +3,8 @@ package org.tests.basic.event;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.TWithPreInsert;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.TWithPreInsert;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 

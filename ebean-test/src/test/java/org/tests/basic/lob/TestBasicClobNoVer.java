@@ -3,9 +3,9 @@ package org.tests.basic.lob;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.tests.model.basic.EBasicClobNoVer;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasicClobNoVer;
 
 import java.util.List;
 

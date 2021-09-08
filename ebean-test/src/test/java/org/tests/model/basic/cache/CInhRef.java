@@ -1,8 +1,7 @@
 package org.tests.model.basic.cache;
 
-import org.tests.model.basic.BasicDomain;
-
 import io.ebean.annotation.Cache;
+import org.tests.model.basic.BasicDomain;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;

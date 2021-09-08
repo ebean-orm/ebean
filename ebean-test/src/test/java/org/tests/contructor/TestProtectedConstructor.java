@@ -5,8 +5,8 @@ import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.bean.EntityBean;
-import org.tests.model.basic.MProtectedConstructBean;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.MProtectedConstructBean;
 
 import static org.junit.jupiter.api.Assertions.*;
 

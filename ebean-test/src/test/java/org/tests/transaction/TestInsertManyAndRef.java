@@ -2,9 +2,9 @@ package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.BBookmark;
 import org.tests.model.basic.BBookmarkUser;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

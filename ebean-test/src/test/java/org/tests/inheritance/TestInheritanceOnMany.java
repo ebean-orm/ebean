@@ -6,11 +6,7 @@ import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.common.BeanList;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Animal;
-import org.tests.model.basic.AnimalShelter;
-import org.tests.model.basic.BigDog;
-import org.tests.model.basic.Cat;
-import org.tests.model.basic.Dog;
+import org.tests.model.basic.*;
 
 import java.util.List;
 

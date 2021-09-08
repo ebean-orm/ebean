@@ -2,7 +2,6 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.Query;
 import io.ebean.annotation.ForPlatform;

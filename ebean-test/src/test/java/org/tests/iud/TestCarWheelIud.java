@@ -2,7 +2,6 @@ package org.tests.iud;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.PagedList;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;

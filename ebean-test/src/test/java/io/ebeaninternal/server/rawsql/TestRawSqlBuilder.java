@@ -1,12 +1,6 @@
 package io.ebeaninternal.server.rawsql;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.DB;
-import io.ebean.Query;
-import io.ebean.RawSql;
-import io.ebean.RawSqlBuilder;
-import io.ebean.SqlRow;
+import io.ebean.*;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.datasource.DataSourceConfig;
@@ -21,11 +15,7 @@ import org.tests.model.rawsql.ERawSqlAggBean;
 
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 

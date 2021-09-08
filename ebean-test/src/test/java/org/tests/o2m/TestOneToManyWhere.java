@@ -3,7 +3,6 @@ package org.tests.o2m;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
-
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

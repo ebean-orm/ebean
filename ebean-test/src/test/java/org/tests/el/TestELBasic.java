@@ -3,15 +3,11 @@ package org.tests.el;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanFkeyProperty;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyChain;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-import org.tests.model.basic.Customer;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
 
 import static org.junit.jupiter.api.Assertions.*;
 

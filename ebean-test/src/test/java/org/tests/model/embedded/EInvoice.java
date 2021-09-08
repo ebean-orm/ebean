@@ -2,11 +2,7 @@ package org.tests.model.embedded;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.Date;
 
 @Cache

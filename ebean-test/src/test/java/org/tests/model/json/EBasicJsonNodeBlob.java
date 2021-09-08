@@ -1,8 +1,8 @@
 package org.tests.model.json;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.ebean.annotation.DbJson;
 import io.ebean.annotation.DbJsonType;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

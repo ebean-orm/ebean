@@ -4,12 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.EBasic;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderDetail;
-import org.tests.model.basic.ResetBasicData;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.*;
 
 import java.util.List;
 import java.util.Random;

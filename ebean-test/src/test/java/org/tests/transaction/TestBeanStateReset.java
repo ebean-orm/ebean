@@ -3,17 +3,16 @@ package org.tests.transaction;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import org.tests.model.m2m.MnyB;
-import org.tests.model.m2m.MnyC;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.m2m.MnyB;
+import org.tests.model.m2m.MnyC;
 
 import javax.persistence.PersistenceException;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestBeanStateReset extends BaseTestCase {

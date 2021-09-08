@@ -1,10 +1,10 @@
 package org.tests.model.m2m;
 
+import io.ebean.annotation.Index;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-
-import io.ebean.annotation.Index;
 
 @Entity
 @Index(unique = true, columnNames = { "from_id", "to_id" })

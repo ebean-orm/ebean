@@ -1,15 +1,10 @@
 package org.tests.query;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Query;
-import io.ebean.RawSql;
-import io.ebean.RawSqlBuilder;
+import io.ebean.*;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MyAdHoc;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestMyAdHocSqlSelect extends BaseTestCase {

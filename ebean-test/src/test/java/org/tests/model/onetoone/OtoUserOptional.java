@@ -1,9 +1,9 @@
 package org.tests.model.onetoone;
 
+import org.tests.model.BaseModel;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import org.tests.model.BaseModel;
 
 @Entity
 @Table(name = "oto_user_model_optional")

@@ -6,11 +6,7 @@ import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.*;
 
 import java.util.List;
 

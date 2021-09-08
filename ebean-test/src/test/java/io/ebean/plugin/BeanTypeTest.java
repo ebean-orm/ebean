@@ -9,13 +9,7 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.junit.jupiter.api.Test;
 import org.tests.inheritance.Stockforecast;
-import org.tests.model.basic.Car;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderDetail;
-import org.tests.model.basic.Person;
-import org.tests.model.basic.Product;
-import org.tests.model.basic.Vehicle;
+import org.tests.model.basic.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;

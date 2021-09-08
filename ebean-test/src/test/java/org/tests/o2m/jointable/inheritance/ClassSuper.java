@@ -2,12 +2,7 @@ package org.tests.o2m.jointable.inheritance;
 
 import org.tests.o2m.jointable.JtMonkey;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.List;
 
 @Inheritance

@@ -1,18 +1,16 @@
 package org.tests.model.docstore;
 
-import java.util.List;
+import io.ebean.annotation.DocStore;
+import org.tests.model.basic.Customer;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import org.tests.model.basic.Customer;
-
-import io.ebean.annotation.DocStore;
+import java.util.List;
 
 /**
  * Entity that will stored as JSON in database
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  *
  */

@@ -1,11 +1,7 @@
 package org.tests.model.basic.metaannotation;
 
 import javax.validation.constraints.Size;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Meta-Annotation that defines &#64;Size(max=100)

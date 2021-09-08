@@ -2,9 +2,9 @@ package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;

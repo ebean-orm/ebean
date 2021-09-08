@@ -3,8 +3,8 @@ package org.tests.types;
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
-import org.tests.model.types.SomeFileBean;
 import org.junit.jupiter.api.Test;
+import org.tests.model.types.SomeFileBean;
 
 import java.io.File;
 import java.net.URL;

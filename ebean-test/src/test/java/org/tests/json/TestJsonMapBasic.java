@@ -3,10 +3,10 @@ package org.tests.json;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import io.ebean.text.json.EJson;
 import io.ebean.test.LoggedSql;
-import org.tests.model.json.EBasicJsonMap;
+import io.ebean.text.json.EJson;
 import org.junit.jupiter.api.Test;
+import org.tests.model.json.EBasicJsonMap;
 import org.tests.model.json.EBasicJsonMapDetail;
 
 import java.io.IOException;

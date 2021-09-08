@@ -3,9 +3,9 @@ package org.tests.query.joins;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

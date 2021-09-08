@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import org.tests.model.basic.UUOne;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.UUOne;
 
 import java.util.ArrayList;
 import java.util.List;

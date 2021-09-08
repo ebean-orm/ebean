@@ -6,11 +6,11 @@ import io.ebean.Database;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.SpiEbeanServer;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.composite.RCustomer;
 import org.tests.model.composite.RCustomerKey;
-import org.junit.jupiter.api.Test;
 import org.tests.model.embedded.UserInterestLive;
 import org.tests.model.embedded.UserInterestLiveKey;
 

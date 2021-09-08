@@ -1,7 +1,7 @@
 package org.tests.json.transientproperties;
 
-import io.ebean.annotation.Sql;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.ebean.annotation.Sql;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

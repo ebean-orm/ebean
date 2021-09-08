@@ -2,13 +2,8 @@ package org.tests.model.orphanremoval;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
-
 import java.util.List;
 
 @Cache

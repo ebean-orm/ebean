@@ -2,8 +2,8 @@ package org.tests.generated;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.EGenProps;
 import org.junit.jupiter.api.Test;
+import org.tests.model.EGenProps;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

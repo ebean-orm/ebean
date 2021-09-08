@@ -1,14 +1,12 @@
 package org.tests.refresh;
 
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.SqlRow;
 import io.ebean.TransactionalTestCase;
-
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

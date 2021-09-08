@@ -2,12 +2,7 @@ package org.tests.order;
 
 import io.ebean.annotation.Index;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 
 @Entity
 @MappedSuperclass

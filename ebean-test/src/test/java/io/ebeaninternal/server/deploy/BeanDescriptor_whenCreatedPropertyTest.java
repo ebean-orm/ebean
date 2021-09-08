@@ -3,9 +3,9 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

@@ -2,13 +2,8 @@ package org.tests.singleTableInheritance;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.singleTableInheritance.model.PalletLocation;
-import org.tests.singleTableInheritance.model.PalletLocationExternal;
-import org.tests.singleTableInheritance.model.Warehouse;
-import org.tests.singleTableInheritance.model.Zone;
-import org.tests.singleTableInheritance.model.ZoneExternal;
-import org.tests.singleTableInheritance.model.ZoneInternal;
 import org.junit.jupiter.api.Test;
+import org.tests.singleTableInheritance.model.*;
 
 import java.util.List;
 

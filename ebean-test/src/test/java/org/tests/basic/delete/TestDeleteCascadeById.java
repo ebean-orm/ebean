@@ -3,11 +3,11 @@ package org.tests.basic.delete;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

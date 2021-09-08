@@ -2,11 +2,11 @@ package org.tests.level.test;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.level.Level1;
 import org.tests.level.Level2;
 import org.tests.level.Level3;
 import org.tests.level.Level4;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;

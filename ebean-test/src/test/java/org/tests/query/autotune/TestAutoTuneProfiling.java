@@ -5,11 +5,7 @@ import io.ebean.DB;
 import io.ebean.ProfileLocation;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderDetail;
-import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.*;
 
 import java.util.List;
 import java.util.Random;

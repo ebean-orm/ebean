@@ -3,7 +3,6 @@ package org.tests.inheritance;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
-import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.inheritance.order.OrderMasterInheritance;
 import org.tests.inheritance.order.OrderedA;

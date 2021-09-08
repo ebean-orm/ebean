@@ -1,33 +1,17 @@
 package org.tests.cache;
 
-import io.ebean.BaseTestCase;
-import io.ebean.CacheMode;
-import io.ebean.DB;
-import io.ebean.SqlUpdate;
-import io.ebean.Transaction;
-import io.ebean.Update;
+import io.ebean.*;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebeaninternal.server.cache.CachedManyIds;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Country;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.OBeanChild;
-import org.tests.model.basic.OCachedBean;
-import org.tests.model.basic.OCachedBeanChild;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderDetail;
-import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCacheCollectionIds extends BaseTestCase {
 

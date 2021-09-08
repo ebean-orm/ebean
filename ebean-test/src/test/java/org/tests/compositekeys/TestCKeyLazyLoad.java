@@ -4,11 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.PagedList;
 import io.ebean.Query;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CKeyAssoc;
 import org.tests.model.basic.CKeyDetail;
 import org.tests.model.basic.CKeyParent;
 import org.tests.model.basic.CKeyParentId;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

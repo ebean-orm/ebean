@@ -1,10 +1,6 @@
 package org.tests.inheritance.company.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 /**
  * @author Per-Ingemar Andersson, It-huset i Norden AB

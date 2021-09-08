@@ -2,10 +2,10 @@ package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.m2m.Permission;
 import org.tests.model.m2m.Role;
 import org.tests.model.m2m.Tenant;
-import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.List;

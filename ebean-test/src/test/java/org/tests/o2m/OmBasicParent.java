@@ -1,12 +1,11 @@
 package org.tests.o2m;
 
+import io.ebean.annotation.Where;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Version;
-
-import io.ebean.annotation.Where;
-
 import java.util.List;
 
 import static javax.persistence.CascadeType.ALL;

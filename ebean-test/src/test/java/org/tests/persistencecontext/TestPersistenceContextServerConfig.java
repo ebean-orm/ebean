@@ -1,10 +1,6 @@
 package org.tests.persistencecontext;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Database;
-import io.ebean.DatabaseFactory;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
+import io.ebean.*;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;

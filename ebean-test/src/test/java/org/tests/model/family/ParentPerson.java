@@ -3,11 +3,7 @@ package org.tests.model.family;
 import io.ebean.annotation.Formula;
 import org.tests.model.basic.EBasic;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

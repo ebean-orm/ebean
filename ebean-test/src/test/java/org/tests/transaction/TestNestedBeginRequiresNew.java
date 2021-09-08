@@ -1,16 +1,12 @@
 package org.tests.transaction;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.Transaction;
-import io.ebean.TxScope;
-import org.tests.model.basic.Country;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Product;
+import io.ebean.*;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.Country;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.Product;
 
 public class TestNestedBeginRequiresNew extends BaseTestCase {
 

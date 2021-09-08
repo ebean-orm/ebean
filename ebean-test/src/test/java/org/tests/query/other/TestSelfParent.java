@@ -2,8 +2,8 @@ package org.tests.query.other;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.selfref.SelfParent;
 import org.junit.jupiter.api.Test;
+import org.tests.model.selfref.SelfParent;
 
 import java.util.List;
 

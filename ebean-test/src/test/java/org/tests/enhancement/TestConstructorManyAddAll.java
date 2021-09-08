@@ -1,9 +1,9 @@
 package org.tests.enhancement;
 
 import io.ebean.BaseTestCase;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

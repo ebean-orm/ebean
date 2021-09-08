@@ -4,9 +4,9 @@ import io.ebean.DB;
 import io.ebean.config.JsonConfig;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonWriteOptions;
+import org.junit.jupiter.api.Test;
 import org.tests.json.transientproperties.EJsonTransientEntityList;
 import org.tests.json.transientproperties.EJsonTransientList;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 

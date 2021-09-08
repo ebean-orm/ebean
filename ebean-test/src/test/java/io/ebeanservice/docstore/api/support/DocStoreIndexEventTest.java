@@ -1,14 +1,14 @@
 package io.ebeanservice.docstore.api.support;
 
-import io.ebean.DocStoreQueueEntry;
 import io.ebean.DB;
 import io.ebean.Database;
+import io.ebean.DocStoreQueueEntry;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
-import org.tests.model.basic.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.tests.model.basic.Order;
 
 import java.util.List;
 

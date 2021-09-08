@@ -1,15 +1,14 @@
 package org.tests.inheritance;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import io.ebean.BaseTestCase;
 import io.ebean.test.LoggedSql;
+import org.junit.jupiter.api.Test;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
 import org.tests.inherit.Parent;
-import org.junit.jupiter.api.Test;
 
-import io.ebean.BaseTestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestInheritanceRefBean extends BaseTestCase {
 

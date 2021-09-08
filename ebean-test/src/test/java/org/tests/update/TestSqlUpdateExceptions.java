@@ -1,10 +1,6 @@
 package org.tests.update;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.DuplicateKeyException;
-import io.ebean.SqlUpdate;
-import io.ebean.Transaction;
+import io.ebean.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

@@ -1,15 +1,10 @@
 package org.tests.model.cache;
 
+import io.ebean.annotation.Cache;
+
+import javax.persistence.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-
-import io.ebean.annotation.Cache;
 
 @Entity
 @Cache(enableQueryCache = true, enableBeanCache = true)

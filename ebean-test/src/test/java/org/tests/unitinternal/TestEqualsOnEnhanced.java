@@ -1,12 +1,12 @@
 package org.tests.unitinternal;
 
 import io.ebean.BaseTestCase;
-import io.ebean.bean.EntityBean;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
-import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TestEqualsOnEnhanced extends BaseTestCase {
 

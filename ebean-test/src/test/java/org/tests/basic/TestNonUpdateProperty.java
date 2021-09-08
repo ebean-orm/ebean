@@ -2,8 +2,8 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.MNonUpdPropEntity;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.MNonUpdPropEntity;
 
 public class TestNonUpdateProperty extends BaseTestCase {
 

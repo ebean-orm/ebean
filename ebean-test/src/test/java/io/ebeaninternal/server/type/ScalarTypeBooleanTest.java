@@ -3,15 +3,13 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
-import org.tests.model.basic.TOne;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.TOne;
 
 import java.sql.Types;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarTypeBooleanTest {
 

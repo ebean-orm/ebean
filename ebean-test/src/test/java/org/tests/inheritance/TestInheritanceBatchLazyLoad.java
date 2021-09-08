@@ -1,10 +1,10 @@
 package org.tests.inheritance;
 
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Car;
 import org.tests.model.basic.Truck;
 import org.tests.model.basic.Vehicle;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

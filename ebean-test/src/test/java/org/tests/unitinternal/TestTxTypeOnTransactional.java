@@ -3,12 +3,12 @@ package org.tests.unitinternal;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import org.tests.model.basic.EBasicVer;
-import org.tests.model.basic.xtra.DummyDao;
-import org.tests.model.basic.xtra.OptimisticLockExceptionThrowingDao;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.EBasicVer;
+import org.tests.model.basic.xtra.DummyDao;
+import org.tests.model.basic.xtra.OptimisticLockExceptionThrowingDao;
 
 import javax.persistence.OptimisticLockException;
 

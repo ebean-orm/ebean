@@ -1,12 +1,12 @@
 package org.tests.query.other;
 
+import com.sun.management.HotSpotDiagnosticMXBean;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import org.junit.jupiter.api.Disabled;
-import org.tests.model.basic.EBasic;
-import com.sun.management.HotSpotDiagnosticMXBean;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasic;
 
 import javax.management.MBeanServer;
 import java.io.File;

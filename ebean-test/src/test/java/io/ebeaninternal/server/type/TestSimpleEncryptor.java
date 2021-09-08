@@ -2,14 +2,13 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.BaseTestCase;
 import io.ebean.config.EncryptKey;
-import io.ebeaninternal.server.type.SimpleAesEncryptor;
-import org.tests.basic.encrypt.BasicEncryptKey;
 import org.junit.jupiter.api.Test;
+import org.tests.basic.encrypt.BasicEncryptKey;
+
+import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import java.sql.Timestamp;
 
 public class TestSimpleEncryptor extends BaseTestCase {
 

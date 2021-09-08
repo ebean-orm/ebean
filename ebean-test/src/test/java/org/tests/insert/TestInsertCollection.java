@@ -2,8 +2,8 @@ package org.tests.insert;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.Customer;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
 
 import java.util.ArrayList;
 import java.util.List;

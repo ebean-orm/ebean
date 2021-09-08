@@ -1,12 +1,8 @@
 package org.tests.query.other;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.Expression;
-import io.ebean.Query;
-import org.tests.model.basic.Customer;
+import io.ebean.*;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
 
 public class TestSubQueryBinding extends BaseTestCase {
 

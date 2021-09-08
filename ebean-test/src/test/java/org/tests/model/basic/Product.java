@@ -1,10 +1,6 @@
 package org.tests.model.basic;
 
-import io.ebean.annotation.Cache;
-import io.ebean.annotation.CacheQueryTuning;
-import io.ebean.annotation.CreatedTimestamp;
-import io.ebean.annotation.DocStore;
-import io.ebean.annotation.Identity;
+import io.ebean.annotation.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

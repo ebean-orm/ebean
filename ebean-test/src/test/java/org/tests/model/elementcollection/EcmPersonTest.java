@@ -3,8 +3,8 @@ package org.tests.model.elementcollection;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.text.json.JsonContext;
 import io.ebean.test.LoggedSql;
+import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

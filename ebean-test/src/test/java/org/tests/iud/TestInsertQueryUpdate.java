@@ -3,8 +3,8 @@ package org.tests.iud;
 import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
-import org.tests.model.basic.EBasicVer;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.util.Set;
 

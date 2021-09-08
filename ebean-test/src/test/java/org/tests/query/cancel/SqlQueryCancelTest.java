@@ -1,9 +1,13 @@
 package org.tests.query.cancel;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import io.ebean.*;
+import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.Platform;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasic;
 
+import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -11,20 +15,9 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.persistence.PersistenceException;
-
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.tests.model.basic.EBasic;
-
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.DtoQuery;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.SqlQuery;
-import io.ebean.annotation.ForPlatform;
-import io.ebean.annotation.Platform;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests, if all kind of queries are cancelable. There are two ways how to

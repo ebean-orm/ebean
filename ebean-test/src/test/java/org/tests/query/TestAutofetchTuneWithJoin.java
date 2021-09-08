@@ -6,15 +6,15 @@ import io.ebean.Query;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebeaninternal.api.SpiQuery;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAutofetchTuneWithJoin extends BaseTestCase {
 

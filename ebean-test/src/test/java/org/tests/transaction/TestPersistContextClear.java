@@ -6,10 +6,10 @@ import io.ebean.Database;
 import io.ebean.Transaction;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

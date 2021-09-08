@@ -2,13 +2,12 @@ package io.ebeaninternal.server.grammer;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebean.test.LoggedSql;
+import io.ebeaninternal.api.SpiQuery;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.OrderDetail;

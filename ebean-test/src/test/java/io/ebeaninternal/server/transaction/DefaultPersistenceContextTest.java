@@ -3,11 +3,7 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.deploy.PersistenceContextUtil;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Car;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Product;
-import org.tests.model.basic.Vehicle;
+import org.tests.model.basic.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;

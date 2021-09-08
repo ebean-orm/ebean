@@ -2,11 +2,9 @@ package org.tests.transaction;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.config.dbplatform.IdType;
-
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.m2m.MnyB;

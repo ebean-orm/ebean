@@ -3,7 +3,6 @@ package org.tests.o2m.jointable;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.config.dbplatform.IdType;
-
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.o2m.jointable.inheritance.ClassA;

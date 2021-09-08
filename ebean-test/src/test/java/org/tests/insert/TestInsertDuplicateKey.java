@@ -1,10 +1,9 @@
 package org.tests.insert;
 
 import io.ebean.BaseTestCase;
-import io.ebean.DuplicateKeyException;
 import io.ebean.DB;
+import io.ebean.DuplicateKeyException;
 import io.ebean.annotation.Transactional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

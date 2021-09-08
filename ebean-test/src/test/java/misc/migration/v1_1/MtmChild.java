@@ -1,11 +1,10 @@
 package misc.migration.v1_1;
 
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import java.util.List;
 
 @Entity
 @Table(name = "migtest_mtm_c")
@@ -38,7 +37,7 @@ public class MtmChild {
   public List<MtmMaster> getMasters() {
     return masters;
   }
-  
+
   public void setMasters(List<MtmMaster> masters) {
     this.masters = masters;
   }

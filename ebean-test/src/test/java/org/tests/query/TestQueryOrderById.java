@@ -6,8 +6,6 @@ import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class TestQueryOrderById extends BaseTestCase {
 
   @Test

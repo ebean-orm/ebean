@@ -1,13 +1,11 @@
 package org.tests.model.json;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbJson;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.*;
 
 import static io.ebean.annotation.MutationDetection.SOURCE;
@@ -25,35 +23,35 @@ public class EBasicOldValue {
 
   @DbJson(mutationDetection = SOURCE)
   Set<Long> longSet = new LinkedHashSet<>();
-  
+
   @DbJson(mutationDetection = SOURCE)
   Set<Integer> intSet = new LinkedHashSet<>();
-  
+
   @DbJson(mutationDetection = SOURCE)
   List<String> stringList = new ArrayList<>();
 
   @DbJson(mutationDetection = SOURCE)
   List<Long> longList = new ArrayList<>();
-  
+
   @DbJson(mutationDetection = SOURCE)
   List<Integer> intList = new ArrayList<>();
-  
+
   @DbJson(mutationDetection = SOURCE)
   Map<String, Object> objectMap = new LinkedHashMap<>();
 
   @DbJson(mutationDetection = SOURCE)
   Map<String, Long> longMap = new LinkedHashMap<>();
-  
+
   @DbJson(mutationDetection = SOURCE)
   Map<String, Integer> intMap = new LinkedHashMap<>();
 
   @DbJson(mutationDetection = SOURCE)
   JsonNode jsonNode;
-  
+
   @DbArray()
   List<String> stringArr = new ArrayList<>();
-  
-  
+
+
   public Long getId() {
     return id;
   }
@@ -141,15 +139,15 @@ public class EBasicOldValue {
   public void setIntMap(Map<String, Integer> intMap) {
     this.intMap = intMap;
   }
-  
+
   public JsonNode getJsonNode() {
     return jsonNode;
   }
-  
+
   public void setJsonNode(JsonNode jsonNode) {
     this.jsonNode = jsonNode;
   }
-  
+
   public List<String> getStringArr() {
     return stringArr;
   }

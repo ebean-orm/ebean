@@ -6,8 +6,8 @@ import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.bean.PersistenceContext;
-import io.ebeaninternal.api.SpiTransaction;
 import io.ebean.test.LoggedSql;
+import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,6 @@ import org.tests.model.basic.ResetBasicData;
 import org.tests.o2m.OmBasicChild;
 import org.tests.o2m.OmBasicParent;
 
-import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;

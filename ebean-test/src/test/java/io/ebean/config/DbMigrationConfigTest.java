@@ -1,9 +1,10 @@
 package io.ebean.config;
 
+import io.ebean.migration.MigrationConfig;
 import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
-import io.ebean.migration.MigrationConfig;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -4,8 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.tests.model.basic.MyLobSize;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.MyLobSize;
 
 import java.util.Set;
 

@@ -1,12 +1,8 @@
 package org.tests.merge;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.FetchPath;
-import io.ebean.MergeOptions;
-import io.ebean.MergeOptionsBuilder;
-import io.ebean.text.PathProperties;
+import io.ebean.*;
 import io.ebean.test.LoggedSql;
+import io.ebean.text.PathProperties;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

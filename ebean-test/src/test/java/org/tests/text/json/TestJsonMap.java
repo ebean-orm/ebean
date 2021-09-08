@@ -5,9 +5,9 @@ import io.ebean.DB;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;

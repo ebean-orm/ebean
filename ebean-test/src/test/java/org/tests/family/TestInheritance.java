@@ -13,10 +13,7 @@ import org.tests.model.family.ChildPerson;
 import org.tests.model.family.GrandParentPerson;
 import org.tests.model.family.ParentPerson;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestInheritance extends BaseTestCase {

@@ -1,8 +1,8 @@
 package io.ebean.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.jupiter.api.Test;
 import org.etest.PlainBean;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

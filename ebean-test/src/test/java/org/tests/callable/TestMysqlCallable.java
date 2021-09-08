@@ -5,8 +5,8 @@ import io.ebean.CallableSql;
 import io.ebean.DB;
 import io.ebean.Database;
 import org.junit.jupiter.api.Disabled;
-import org.tests.model.basic.EBasic;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

@@ -1,10 +1,6 @@
 package org.tests.model.basic;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity

@@ -1,16 +1,15 @@
 package org.tests.lifecycle;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Arrays;
-import java.util.List;
-
+import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicLog;
 import org.tests.model.basic.EBasicWithLog;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestLifecycleWithLog extends BaseTestCase {
 

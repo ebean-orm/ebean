@@ -2,9 +2,9 @@ package org.tests.m2m;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.m2m.MailBox;
 import org.tests.model.m2m.MailUser;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

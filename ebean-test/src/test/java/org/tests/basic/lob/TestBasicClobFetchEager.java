@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Query;
-import org.tests.model.basic.EBasicClobFetchEager;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasicClobFetchEager;
 
 import java.util.List;
 

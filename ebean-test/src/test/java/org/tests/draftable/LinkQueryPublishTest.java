@@ -4,8 +4,8 @@ import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.PagedList;
 import io.ebean.Query;
-import org.tests.model.draftable.Link;
 import org.junit.jupiter.api.Test;
+import org.tests.model.draftable.Link;
 
 import java.util.ArrayList;
 import java.util.List;

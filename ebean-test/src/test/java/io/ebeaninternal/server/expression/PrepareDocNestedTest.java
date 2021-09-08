@@ -4,8 +4,8 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebeaninternal.api.SpiExpression;
-import org.tests.model.basic.Order;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Order;
 
 import java.util.List;
 

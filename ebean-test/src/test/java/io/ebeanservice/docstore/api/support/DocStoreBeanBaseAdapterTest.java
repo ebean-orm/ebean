@@ -9,8 +9,8 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
-import org.tests.model.basic.Order;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Order;
 
 import java.io.IOException;
 

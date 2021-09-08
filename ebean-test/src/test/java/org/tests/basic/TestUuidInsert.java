@@ -2,8 +2,8 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.TUuidEntity;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.TUuidEntity;
 
 public class TestUuidInsert extends BaseTestCase {
 

@@ -1,11 +1,6 @@
 package org.tests.model.draftable;
 
-import io.ebean.annotation.Draft;
-import io.ebean.annotation.DraftDirty;
-import io.ebean.annotation.DraftReset;
-import io.ebean.annotation.Draftable;
-import io.ebean.annotation.History;
-import io.ebean.annotation.SoftDelete;
+import io.ebean.annotation.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

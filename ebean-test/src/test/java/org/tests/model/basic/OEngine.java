@@ -4,7 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Version;
-
 import java.io.Serializable;
 import java.util.UUID;
 

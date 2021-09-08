@@ -1,24 +1,9 @@
 package org.tests.model.basic;
 
-import io.ebean.annotation.Cache;
-import io.ebean.annotation.ChangeLog;
-import io.ebean.annotation.ChangeLogInsertMode;
-import io.ebean.annotation.DbComment;
-import io.ebean.annotation.DbEnumValue;
-import io.ebean.annotation.DocEmbedded;
-import io.ebean.annotation.DocStore;
-import io.ebean.annotation.JsonIgnore;
-import io.ebean.annotation.View;
-import io.ebean.annotation.Where;
+import io.ebean.annotation.*;
 import org.tests.model.basic.finder.CustomerFinder;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;

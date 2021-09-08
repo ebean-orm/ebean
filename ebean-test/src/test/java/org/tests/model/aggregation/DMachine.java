@@ -2,11 +2,7 @@ package org.tests.model.aggregation;
 
 import io.ebean.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity

@@ -3,8 +3,8 @@ package org.tests.persistencecontext;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
-import org.tests.model.basic.EBasic;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasic;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -2,10 +2,10 @@ package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.softdelete.ESoftDelRole;
-import org.tests.model.softdelete.ESoftDelUser;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.softdelete.ESoftDelRole;
+import org.tests.model.softdelete.ESoftDelUser;
 
 import java.util.List;
 

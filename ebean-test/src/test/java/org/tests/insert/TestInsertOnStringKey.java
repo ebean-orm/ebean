@@ -2,9 +2,9 @@ package org.tests.insert;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.orderentity.OrderEntity;
 import org.tests.model.orderentity.OrderItemEntity;
-import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

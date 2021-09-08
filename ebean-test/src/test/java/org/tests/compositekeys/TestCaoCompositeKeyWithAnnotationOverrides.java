@@ -2,9 +2,9 @@ package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.compositekeys.db.CaoBean;
 import org.tests.compositekeys.db.CaoKey;
-import org.junit.jupiter.api.Test;
 
 public class TestCaoCompositeKeyWithAnnotationOverrides extends BaseTestCase {
 

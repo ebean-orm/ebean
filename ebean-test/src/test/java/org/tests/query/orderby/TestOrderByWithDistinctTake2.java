@@ -3,8 +3,8 @@ package org.tests.query.orderby;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.tests.model.basic.Customer;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

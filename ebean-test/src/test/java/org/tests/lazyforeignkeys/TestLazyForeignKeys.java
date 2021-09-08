@@ -2,10 +2,9 @@ package org.tests.lazyforeignkeys;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.Query;
-import io.ebean.text.PathProperties;
 import io.ebean.test.LoggedSql;
+import io.ebean.text.PathProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

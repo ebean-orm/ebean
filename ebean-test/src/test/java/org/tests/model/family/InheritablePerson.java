@@ -2,11 +2,10 @@ package org.tests.model.family;
 
 import org.tests.model.basic.EBasic;
 
-import java.io.Serializable;
-
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import java.io.Serializable;
 
 @MappedSuperclass
 public abstract class InheritablePerson implements Serializable {

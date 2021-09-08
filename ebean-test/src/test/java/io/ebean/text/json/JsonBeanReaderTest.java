@@ -1,11 +1,11 @@
 package io.ebean.text.json;
 
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.PersistenceContext;
-import org.tests.model.basic.Customer;
-import com.fasterxml.jackson.core.JsonParser;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
 
 import java.io.StringReader;
 

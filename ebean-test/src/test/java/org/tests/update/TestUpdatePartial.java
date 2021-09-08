@@ -2,7 +2,6 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.SqlRow;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;

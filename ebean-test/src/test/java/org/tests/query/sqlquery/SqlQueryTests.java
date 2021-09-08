@@ -1,10 +1,6 @@
 package org.tests.query.sqlquery;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.RowMapper;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
+import io.ebean.*;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaTimedMetric;

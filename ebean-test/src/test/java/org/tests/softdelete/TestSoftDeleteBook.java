@@ -3,9 +3,9 @@ package org.tests.softdelete;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import org.junit.jupiter.api.Test;
 import org.tests.model.softdelete.ESoftDelBook;
 import org.tests.model.softdelete.ESoftDelUser;
-import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 

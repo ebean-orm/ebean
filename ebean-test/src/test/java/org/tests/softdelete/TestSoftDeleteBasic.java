@@ -1,11 +1,6 @@
 package org.tests.softdelete;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Query;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.softdelete.EBasicNoSDChild;

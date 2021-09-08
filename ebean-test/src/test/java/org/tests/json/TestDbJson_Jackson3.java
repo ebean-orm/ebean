@@ -10,11 +10,7 @@ import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
-import org.tests.model.json.EBasicJsonJackson3;
-import org.tests.model.json.EBasicJsonList;
-import org.tests.model.json.EBasicJsonMulti;
-import org.tests.model.json.PlainBean;
-import org.tests.model.json.PlainBeanDirtyAware;
+import org.tests.model.json.*;
 
 import java.util.Arrays;
 import java.util.List;

@@ -4,11 +4,11 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Query;
+import org.junit.jupiter.api.Test;
 import org.tests.model.composite.RCustomer;
 import org.tests.model.composite.RCustomerKey;
 import org.tests.model.composite.ROrder;
 import org.tests.model.composite.ROrderPK;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

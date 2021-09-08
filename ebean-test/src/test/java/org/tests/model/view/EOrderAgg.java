@@ -4,11 +4,7 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.View;
 import org.tests.model.basic.Order;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Cache(enableQueryCache = true)
 @Entity

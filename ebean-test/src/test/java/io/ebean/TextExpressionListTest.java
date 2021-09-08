@@ -1,11 +1,10 @@
 package io.ebean;
 
 
-import io.ebean.DB;
 import io.ebean.search.Match;
 import io.ebean.search.MultiMatch;
-import org.tests.model.basic.Order;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Order;
 
 public class TextExpressionListTest {
 

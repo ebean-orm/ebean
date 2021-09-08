@@ -2,14 +2,7 @@ package org.tests.model.elementcollection;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.Transient;
-import javax.persistence.Version;
-
+import javax.persistence.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

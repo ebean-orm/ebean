@@ -1,12 +1,10 @@
 package org.tests.batchload;
 
 import io.ebean.DB;
-import io.ebean.FetchConfig;
 import io.ebean.TransactionalTestCase;
-
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

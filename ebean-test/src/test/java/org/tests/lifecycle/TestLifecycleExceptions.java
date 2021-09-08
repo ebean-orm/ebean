@@ -2,14 +2,13 @@ package org.tests.lifecycle;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.EBasicWithLifecycleExceptions;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.io.IOException;
+import org.tests.model.basic.EBasicWithLifecycleExceptions;
 
 import javax.persistence.PersistenceException;
+import java.io.IOException;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class TestLifecycleExceptions extends BaseTestCase {
 

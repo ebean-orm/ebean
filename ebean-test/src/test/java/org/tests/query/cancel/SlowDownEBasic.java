@@ -1,13 +1,12 @@
 package org.tests.query.cancel;
 
+import io.ebean.DB;
+import io.ebean.Transaction;
+import org.h2.api.Trigger;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import org.h2.api.Trigger;
-
-import io.ebean.DB;
-import io.ebean.Transaction;
 
 /**
  * Class to artificially slow down selects on 'e_basic' table

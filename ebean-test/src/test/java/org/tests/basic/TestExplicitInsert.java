@@ -3,10 +3,10 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.MyEBasicConfigStartup;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

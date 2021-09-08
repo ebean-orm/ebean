@@ -6,8 +6,8 @@ import io.ebean.Query;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.OrmQueryRequestTestHelper;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import org.tests.model.basic.Order;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

@@ -1,18 +1,10 @@
 package misc.migration.v1_1;
 
-import io.ebean.annotation.DbDefault;
-import io.ebean.annotation.DbMigration;
-import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
-import io.ebean.annotation.NotNull;
+import io.ebean.annotation.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
-
 import java.sql.Timestamp;
 
 @Entity

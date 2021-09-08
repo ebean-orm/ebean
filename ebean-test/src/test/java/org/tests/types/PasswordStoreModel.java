@@ -1,11 +1,11 @@
 package org.tests.types;
 
+import org.tests.model.BaseModel;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.validation.constraints.Size;
-
-import org.tests.model.BaseModel;
 
 @Entity
 public class PasswordStoreModel extends BaseModel {

@@ -1,6 +1,9 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.*;
+import io.ebean.BaseTestCase;
+import io.ebean.EbeanServer;
+import io.ebean.Query;
+import io.ebean.Transaction;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.server.deploy.BeanDescriptor;

@@ -3,14 +3,12 @@ package org.tests.generated;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.MyCurrentUserProvider;
-import org.tests.model.EWhoProps;
 import org.junit.jupiter.api.Test;
+import org.tests.model.EWhoProps;
 import org.tests.model.generated.User;
 import org.tests.model.generated.WhoPropsOneToMany;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestGeneratedWho extends BaseTestCase {
 

@@ -1,11 +1,6 @@
 package org.tests.model.basic;
 
-import io.ebean.annotation.Cache;
-import io.ebean.annotation.CacheBeanTuning;
-import io.ebean.annotation.ChangeLog;
-import io.ebean.annotation.ChangeLogInsertMode;
-import io.ebean.annotation.DocStore;
-import io.ebean.annotation.ReadAudit;
+import io.ebean.annotation.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

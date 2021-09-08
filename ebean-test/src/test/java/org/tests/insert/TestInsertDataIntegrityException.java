@@ -3,15 +3,12 @@ package org.tests.insert;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DataIntegrityException;
-import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
-
-import javax.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 

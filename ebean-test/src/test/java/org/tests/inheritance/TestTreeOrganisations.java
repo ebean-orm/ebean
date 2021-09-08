@@ -2,10 +2,9 @@ package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
-import org.junit.jupiter.api.Test;
 
 public class TestTreeOrganisations extends BaseTestCase {
 

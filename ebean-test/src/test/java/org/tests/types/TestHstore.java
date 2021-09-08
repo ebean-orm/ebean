@@ -2,12 +2,10 @@ package org.tests.types;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.annotation.ForPlatform;
-import io.ebean.annotation.Platform;
-import org.tests.model.json.EBasicHstore;
-import org.assertj.core.api.Assertions;
 import io.ebean.test.LoggedSql;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.tests.model.json.EBasicHstore;
 
 import java.util.List;
 

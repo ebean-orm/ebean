@@ -8,11 +8,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,10 +1,6 @@
 package org.tests.model.onetoone;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity

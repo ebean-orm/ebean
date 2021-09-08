@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.DatabaseFactory;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
@@ -15,9 +11,7 @@ import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DefaultTransactionThreadLocalTest extends BaseTestCase {
 

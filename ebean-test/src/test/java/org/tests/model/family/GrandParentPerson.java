@@ -3,19 +3,14 @@ package org.tests.model.family;
 import io.ebean.annotation.Formula;
 import org.tests.model.basic.EBasic;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class GrandParentPerson extends InheritablePerson {
   private static final long serialVersionUID = 1L;
-  
+
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
   @OrderBy("identifier")
   private List<ParentPerson> children = new ArrayList<>();
@@ -41,8 +36,8 @@ public class GrandParentPerson extends InheritablePerson {
   @ManyToOne(optional = true, fetch = FetchType.EAGER)
   @Formula(select = "f3.id", join = "left join e_basic f3 on f3.name = ${ta}.family_name")
   private EBasic basicSameName;
-  
-  
+
+
   // Demonstrate formula usage
   @Formula(select = "coalesce(${ta}.some_bean_id,1)")
   @ManyToOne
@@ -84,11 +79,11 @@ public class GrandParentPerson extends InheritablePerson {
   public EBasic getEffectiveBean() {
     return effectiveBean;
   }
-  
+
   public EBasic getBasicSameName() {
     return basicSameName;
   }
-  
+
   public void setBasicSameName(EBasic basicSameName) {
     this.basicSameName = basicSameName;
   }

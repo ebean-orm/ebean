@@ -2,12 +2,12 @@ package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.AttributeHolder;
-import org.tests.model.basic.ListAttribute;
-import org.tests.model.basic.ListAttributeValue;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.AttributeHolder;
+import org.tests.model.basic.ListAttribute;
+import org.tests.model.basic.ListAttributeValue;
 
 import static org.junit.jupiter.api.Assertions.*;
 

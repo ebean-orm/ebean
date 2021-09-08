@@ -3,9 +3,9 @@ package org.tests.basic;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-import org.junit.jupiter.api.Test;
 
 public class TestM2MCascadeOne extends BaseTestCase {
 

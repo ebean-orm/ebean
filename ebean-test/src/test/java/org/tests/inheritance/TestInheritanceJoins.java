@@ -3,8 +3,6 @@ package org.tests.inheritance;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.DB;
-import io.ebean.Database;
 import org.junit.jupiter.api.Test;
 import org.tests.inheritance.model.CalculationResult;
 import org.tests.inheritance.model.Configurations;

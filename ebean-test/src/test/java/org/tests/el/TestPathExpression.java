@@ -5,10 +5,10 @@ import io.ebean.bean.EntityBean;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.plugin.SpiServer;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

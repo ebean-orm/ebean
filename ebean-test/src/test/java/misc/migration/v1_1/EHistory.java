@@ -1,14 +1,14 @@
 package misc.migration.v1_1;
 
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
-import io.ebean.annotation.Platform;
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.History;
+import io.ebean.annotation.Platform;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "migtest_e_history")

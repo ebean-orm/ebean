@@ -3,14 +3,8 @@ package org.tests.text.json;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
-import org.tests.model.basic.Car;
-import org.tests.model.basic.CarAccessory;
-import org.tests.model.basic.CarFuse;
-import org.tests.model.basic.Trip;
-import org.tests.model.basic.Truck;
-import org.tests.model.basic.Vehicle;
-import org.tests.model.basic.VehicleDriver;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.*;
 
 import java.util.List;
 

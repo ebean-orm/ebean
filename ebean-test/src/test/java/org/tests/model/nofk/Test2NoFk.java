@@ -2,7 +2,6 @@ package org.tests.model.nofk;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import org.junit.jupiter.api.BeforeEach;

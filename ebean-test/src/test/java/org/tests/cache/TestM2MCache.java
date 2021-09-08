@@ -1,13 +1,12 @@
 package org.tests.cache;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.cache.M2MCacheChild;
 import org.tests.model.cache.M2MCacheMaster;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestM2MCache extends BaseTestCase {
 

@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.BindValuesKey;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import io.ebeaninternal.api.BindValuesKey;
 
 public class RawExpressionTest extends BaseExpressionTest {
 

@@ -1,10 +1,9 @@
 package org.tests.model.basic;
 
-import java.io.Serializable;
-
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
+import java.io.Serializable;
 
 @MappedSuperclass
 public class TMappedSuper2 implements Serializable {

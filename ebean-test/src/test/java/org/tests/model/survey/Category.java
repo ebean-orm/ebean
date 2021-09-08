@@ -1,12 +1,6 @@
 package org.tests.model.survey;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -41,7 +35,7 @@ public class Category {
   public void setSequenceNumber(int number) {
     this.sequenceNumber = number;
   }
-  
+
   public int getSequenceNumber() {
     return sequenceNumber;
   }

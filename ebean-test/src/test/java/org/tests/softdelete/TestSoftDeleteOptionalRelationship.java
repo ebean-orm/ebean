@@ -2,11 +2,10 @@ package org.tests.softdelete;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
-import io.ebean.test.LoggedSql;
-import org.tests.model.softdelete.ESoftDelMid;
 import io.ebean.Finder;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.softdelete.ESoftDelMid;
 import org.tests.model.softdelete.ESoftDelY;
 import org.tests.model.softdelete.ESoftDelZ;
 

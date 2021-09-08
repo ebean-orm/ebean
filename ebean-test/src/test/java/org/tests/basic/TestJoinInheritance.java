@@ -2,12 +2,8 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Car;
-import org.tests.model.basic.Trip;
-import org.tests.model.basic.Vehicle;
-import org.tests.model.basic.VehicleDriver;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.*;
 
 import java.sql.Timestamp;
 import java.util.Date;

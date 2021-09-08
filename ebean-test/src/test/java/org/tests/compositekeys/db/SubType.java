@@ -1,7 +1,6 @@
 package org.tests.compositekeys.db;
 
 import io.ebean.annotation.Identity;
-import io.ebean.annotation.IdentityGenerated;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;

@@ -3,8 +3,8 @@ package org.tests.json.include;
 import io.ebean.DB;
 import io.ebean.config.JsonConfig;
 import io.ebean.text.json.JsonWriteOptions;
-import org.tests.json.transientproperties.EJsonTransientObject;
 import org.junit.jupiter.api.Test;
+import org.tests.json.transientproperties.EJsonTransientObject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

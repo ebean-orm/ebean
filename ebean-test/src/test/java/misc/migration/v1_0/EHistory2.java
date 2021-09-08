@@ -1,12 +1,12 @@
 package misc.migration.v1_0;
 
 
+import io.ebean.annotation.History;
+import io.ebean.annotation.HistoryExclude;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import io.ebean.annotation.History;
-import io.ebean.annotation.HistoryExclude;
 
 @Entity
 @Table(name = "migtest_e_history2")

@@ -1,10 +1,6 @@
 package org.tests.model.embedded;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 @Entity
 public class PrimaryRevision {

@@ -7,13 +7,13 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Customer.Status;
 import org.tests.model.embedded.EAddress;
 import org.tests.model.embedded.EPerson;
-import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
 

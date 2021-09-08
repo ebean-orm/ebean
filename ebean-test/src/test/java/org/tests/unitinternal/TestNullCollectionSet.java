@@ -3,9 +3,9 @@ package org.tests.unitinternal;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ENullCollection;
 import org.tests.model.basic.ENullCollectionDetail;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

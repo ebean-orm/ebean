@@ -3,17 +3,11 @@ package org.tests.inheritance;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.tests.model.basic.Car;
-import org.tests.model.basic.CarAccessory;
-import org.tests.model.basic.CarFuse;
-import org.tests.model.basic.Truck;
-import org.tests.model.basic.Vehicle;
-import org.tests.model.basic.VehicleDriver;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.*;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestInheritInsert extends BaseTestCase {

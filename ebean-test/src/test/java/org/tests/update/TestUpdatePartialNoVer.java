@@ -2,9 +2,9 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
-import org.junit.jupiter.api.Test;
 
 public class TestUpdatePartialNoVer extends BaseTestCase {
 

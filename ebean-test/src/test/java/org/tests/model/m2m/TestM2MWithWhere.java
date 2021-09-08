@@ -1,14 +1,13 @@
 package org.tests.model.m2m;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests M2M with complex where queries.

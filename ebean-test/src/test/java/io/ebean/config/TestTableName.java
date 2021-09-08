@@ -1,7 +1,6 @@
 package io.ebean.config;
 
 import io.ebean.BaseTestCase;
-import io.ebean.config.TableName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

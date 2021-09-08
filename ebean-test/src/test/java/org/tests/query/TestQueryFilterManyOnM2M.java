@@ -2,8 +2,8 @@ package org.tests.query;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.MUser;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.MUser;
 
 public class TestQueryFilterManyOnM2M extends BaseTestCase {
 

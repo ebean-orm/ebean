@@ -1,13 +1,9 @@
 package org.tests.rawsql;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.RawSql;
-import io.ebean.RawSqlBuilder;
-import io.ebean.Transaction;
+import io.ebean.*;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

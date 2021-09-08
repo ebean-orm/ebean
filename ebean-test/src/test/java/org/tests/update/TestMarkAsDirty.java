@@ -2,8 +2,8 @@ package org.tests.update;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.EBasicVer;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasicVer;
 
 import java.sql.Timestamp;
 

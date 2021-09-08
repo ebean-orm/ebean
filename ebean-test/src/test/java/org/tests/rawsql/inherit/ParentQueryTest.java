@@ -2,12 +2,11 @@ package org.tests.rawsql.inherit;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.inherit.ChildA;
 import org.tests.inherit.ChildB;
 import org.tests.inherit.Data;
 import org.tests.inherit.Parent;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;

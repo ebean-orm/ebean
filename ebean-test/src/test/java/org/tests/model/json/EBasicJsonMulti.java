@@ -2,13 +2,11 @@ package org.tests.model.json;
 
 import io.ebean.Model;
 import io.ebean.annotation.DbJson;
-import io.ebean.annotation.MutationDetection;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
 
-import static io.ebean.annotation.MutationDetection.NONE;
 import static io.ebean.annotation.MutationDetection.SOURCE;
 
 @Entity

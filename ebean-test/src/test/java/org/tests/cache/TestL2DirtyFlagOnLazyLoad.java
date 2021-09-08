@@ -8,9 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.L2CachedLazyDirtFlagResetBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestL2DirtyFlagOnLazyLoad extends BaseTestCase {
 

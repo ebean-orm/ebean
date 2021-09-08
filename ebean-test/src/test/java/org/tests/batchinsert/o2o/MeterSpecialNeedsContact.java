@@ -1,8 +1,8 @@
 package org.tests.batchinsert.o2o;
 
-import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import java.util.UUID;
 
 @Entity
 public class MeterSpecialNeedsContact {

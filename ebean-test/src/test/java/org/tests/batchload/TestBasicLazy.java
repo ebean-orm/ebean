@@ -3,15 +3,10 @@ package org.tests.batchload;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Expr;
-import io.ebean.FetchConfig;
 import io.ebean.Transaction;
-import org.tests.basic.MyTestDataSourcePoolListener;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
 import org.junit.jupiter.api.Test;
+import org.tests.basic.MyTestDataSourcePoolListener;
+import org.tests.model.basic.*;
 
 import java.util.ArrayList;
 import java.util.Collections;

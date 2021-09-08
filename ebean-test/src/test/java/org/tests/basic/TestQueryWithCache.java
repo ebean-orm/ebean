@@ -8,11 +8,10 @@ import io.ebean.cache.ServerCacheManager;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryWithCache extends BaseTestCase {

@@ -4,7 +4,6 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 

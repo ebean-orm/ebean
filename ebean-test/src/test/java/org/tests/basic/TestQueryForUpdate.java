@@ -1,11 +1,6 @@
 package org.tests.basic;
 
-import io.ebean.AcquireLockException;
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.Query;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;

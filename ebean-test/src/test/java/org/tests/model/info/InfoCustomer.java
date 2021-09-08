@@ -3,11 +3,7 @@ package org.tests.model.info;
 import io.ebean.Finder;
 import io.ebean.Model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 @Entity
 public class InfoCustomer extends Model {

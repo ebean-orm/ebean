@@ -4,9 +4,9 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UUOne;
 import org.tests.model.basic.UUTwo;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 

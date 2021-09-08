@@ -1,12 +1,7 @@
 package org.tests.cascade;
 
+import javax.persistence.*;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
 
 @Entity
 public class RelDetail {

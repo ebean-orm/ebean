@@ -1,14 +1,9 @@
 package org.tests.model.lazywithid;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
 import io.ebean.common.BeanList;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Tune {

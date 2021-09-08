@@ -4,11 +4,7 @@ import io.ebean.Finder;
 import io.ebean.Model;
 import io.ebean.annotation.SoftDelete;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 

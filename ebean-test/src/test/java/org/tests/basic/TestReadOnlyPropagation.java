@@ -4,11 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderDetail;
-import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.*;
 
 import java.util.Iterator;
 import java.util.List;

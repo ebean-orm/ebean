@@ -1,10 +1,11 @@
 package org.tests.transparentpersist;
 
 import io.ebean.*;
-import io.ebean.annotation.*;
+import io.ebean.annotation.Transactional;
+import io.ebean.annotation.TxOption;
+import io.ebean.test.LoggedSql;
 import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.tests.model.basic.Customer;

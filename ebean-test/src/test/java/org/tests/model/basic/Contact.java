@@ -1,21 +1,10 @@
 package org.tests.model.basic;
 
-import io.ebean.annotation.Cache;
-import io.ebean.annotation.ChangeLog;
-import io.ebean.annotation.CreatedTimestamp;
-import io.ebean.annotation.DocEmbedded;
-import io.ebean.annotation.DocStore;
 import io.ebean.annotation.Index;
+import io.ebean.annotation.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Version;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
-
 import java.sql.Timestamp;
 import java.util.List;
 

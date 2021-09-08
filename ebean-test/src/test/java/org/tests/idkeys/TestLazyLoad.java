@@ -1,14 +1,14 @@
 package org.tests.idkeys;
 
+import io.ebean.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TOne;
 
-import io.ebean.BaseTestCase;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.sql.SQLException;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test lazy loading

@@ -1,11 +1,11 @@
 package org.tests.model.basic;
 
+import io.ebean.annotation.Cache;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.Table;
-
-import io.ebean.annotation.Cache;
 
 /**
  * Cached entity for inheritance.

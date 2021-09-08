@@ -6,17 +6,7 @@ import io.ebean.annotation.PreSoftDelete;
 import io.ebean.annotation.SoftDelete;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.PostLoad;
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
-import javax.persistence.PostUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "e_basic_withlog")

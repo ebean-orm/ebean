@@ -3,9 +3,9 @@ package org.tests.inheritance;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TIntChild;
 import org.tests.model.basic.TIntRoot;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

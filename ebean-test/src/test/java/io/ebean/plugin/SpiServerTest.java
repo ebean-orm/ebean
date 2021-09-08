@@ -3,18 +3,14 @@ package io.ebean.plugin;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
-import org.tests.model.basic.Customer;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
 import org.tests.model.basic.VwCustomer;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 public class SpiServerTest extends BaseTestCase {

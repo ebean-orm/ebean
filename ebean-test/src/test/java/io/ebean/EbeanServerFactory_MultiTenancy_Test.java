@@ -1,11 +1,6 @@
 package io.ebean;
 
-import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.TenantCatalogProvider;
-import io.ebean.config.TenantDataSourceProvider;
-import io.ebean.config.TenantMode;
-import io.ebean.config.TenantSchemaProvider;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.jupiter.api.Test;

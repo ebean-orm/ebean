@@ -5,9 +5,9 @@ import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
-import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;

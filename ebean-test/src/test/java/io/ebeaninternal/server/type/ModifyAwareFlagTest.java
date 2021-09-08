@@ -3,11 +3,7 @@ package io.ebeaninternal.server.type;
 import io.ebeaninternal.json.ModifyAwareFlag;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

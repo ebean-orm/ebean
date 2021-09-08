@@ -3,8 +3,8 @@ package org.tests.model.elementcollection;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.annotation.PersistBatch;
-import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebean.test.LoggedSql;
+import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

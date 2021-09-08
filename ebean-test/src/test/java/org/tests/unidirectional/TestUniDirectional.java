@@ -2,9 +2,9 @@ package org.tests.unidirectional;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
-import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

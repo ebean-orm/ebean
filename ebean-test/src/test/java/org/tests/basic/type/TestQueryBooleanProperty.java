@@ -2,8 +2,8 @@ package org.tests.basic.type;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import org.tests.model.basic.TOne;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.TOne;
 
 public class TestQueryBooleanProperty extends BaseTestCase {
 

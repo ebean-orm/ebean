@@ -3,8 +3,8 @@ package org.tests.json;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.EJson;
-import org.tests.model.json.EBasicJsonMapClob;
 import org.junit.jupiter.api.Test;
+import org.tests.model.json.EBasicJsonMapClob;
 
 import java.io.IOException;
 import java.util.Map;

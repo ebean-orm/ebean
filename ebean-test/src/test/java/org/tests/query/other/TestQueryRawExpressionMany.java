@@ -3,10 +3,10 @@ package org.tests.query.other;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 

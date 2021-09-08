@@ -3,8 +3,8 @@ package org.tests.json.include;
 import io.ebean.DB;
 import io.ebean.config.JsonConfig;
 import io.ebean.text.json.JsonWriteOptions;
-import org.tests.model.basic.Order;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Order;
 
 import java.util.ArrayList;
 
