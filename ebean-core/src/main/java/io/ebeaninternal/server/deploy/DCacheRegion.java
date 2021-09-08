@@ -12,7 +12,7 @@ public final class DCacheRegion implements SpiCacheRegion {
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
