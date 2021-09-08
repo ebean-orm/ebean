@@ -3,7 +3,7 @@ package io.ebean.test;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
-import org.test.BSimpleWithGen;
+import org.etest.BSimpleFor;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ public class DbJsonTest {
   @Test
   public void of() {
 
-    DB.find(BSimpleWithGen.class).delete();
+    DB.find(BSimpleFor.class).delete();
 
-    BSimpleWithGen bean = new BSimpleWithGen("something");
+    BSimpleFor bean = new BSimpleFor("something");
     DB.save(bean);
 
     assertThat(bean.getVersion()).isEqualTo(1);
@@ -29,10 +29,10 @@ public class DbJsonTest {
       .assertContentMatches("/bean/example-bean.json");
 
 
-    BSimpleWithGen bean2 = new BSimpleWithGen("other");
+    BSimpleFor bean2 = new BSimpleFor("other");
     DB.save(bean2);
 
-    final List<BSimpleWithGen> beans = DB.find(BSimpleWithGen.class).findList();
+    final List<BSimpleFor> beans = DB.find(BSimpleFor.class).findList();
 
     DbJson.of(beans)
       //.withPlaceholder("_")
@@ -43,10 +43,10 @@ public class DbJsonTest {
   @Test
   public void assertContains_pass() {
 
-    BSimpleWithGen bean = new BSimpleWithGen("something-contains-me", "YeahNah");
+    BSimpleFor bean = new BSimpleFor("something-contains-me", "YeahNah");
     DB.save(bean);
 
-    BSimpleWithGen found = DB.find(BSimpleWithGen.class, bean.getId());
+    BSimpleFor found = DB.find(BSimpleFor.class, bean.getId());
 
     DbJson.of(found).assertContainsResource("/bean/contains-minimal.json");
     DbJson.of(found).assertContains(readResource("/bean/contains-with-version.json"));
@@ -57,7 +57,7 @@ public class DbJsonTest {
   @Test
   public void asJson() {
 
-    BSimpleWithGen bean = new BSimpleWithGen("other");
+    BSimpleFor bean = new BSimpleFor("other");
     DB.save(bean);
 
     String asJson = DbJson.of(bean)
