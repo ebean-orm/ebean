@@ -352,7 +352,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.idOnlyReference = isIdOnlyReference(propertiesBaseScalar);
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
-    this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.getCacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
+    this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.cacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
     this.jsonHelp = initJsonHelp();
     this.draftHelp = new BeanDescriptorDraftHelp<>(this);
     this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
@@ -453,7 +453,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the DatabaseConfig.
    */
   public DatabaseConfig config() {
-    return owner.getConfig();
+    return owner.config();
   }
 
   /**
@@ -935,25 +935,25 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the Encrypt key given the BeanProperty.
    */
   public EncryptKey encryptKey(BeanProperty p) {
-    return owner.getEncryptKey(baseTable, p.dbColumn());
+    return owner.encryptKey(baseTable, p.dbColumn());
   }
 
   /**
    * Return the Encrypt key given the table and column name.
    */
   public EncryptKey encryptKey(String tableName, String columnName) {
-    return owner.getEncryptKey(tableName, columnName);
+    return owner.encryptKey(tableName, columnName);
   }
 
   /**
    * Return the Scalar type for the given JDBC type.
    */
   public ScalarType<?> scalarType(int jdbcType) {
-    return owner.getScalarType(jdbcType);
+    return owner.scalarType(jdbcType);
   }
 
   public ScalarType<?> scalarType(String cast) {
-    return owner.getScalarType(cast);
+    return owner.scalarType(cast);
   }
 
   /**
@@ -1940,7 +1940,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the BeanDescriptor of another bean type.
    */
   public <U> BeanDescriptor<U> descriptor(Class<U> otherType) {
-    return owner.getBeanDescriptor(otherType);
+    return owner.descriptor(otherType);
   }
 
   /**

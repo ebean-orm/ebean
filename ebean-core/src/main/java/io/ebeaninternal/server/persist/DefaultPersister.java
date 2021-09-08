@@ -98,7 +98,7 @@ public final class DefaultPersister implements Persister {
 
     SpiUpdate<?> ormUpdate = (SpiUpdate<?>) update;
 
-    BeanManager<?> mgr = beanDescriptorManager.getBeanManager(ormUpdate.getBeanType());
+    BeanManager<?> mgr = beanDescriptorManager.beanManager(ormUpdate.getBeanType());
 
     if (mgr == null) {
       String msg = "No BeanManager found for type [" + ormUpdate.getBeanType() + "]. Is it an entity?";
@@ -187,7 +187,7 @@ public final class DefaultPersister implements Persister {
 
     draftHandler.fetchDestinationBeans(liveBeans, true);
 
-    BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
+    BeanManager<T> mgr = beanDescriptorManager.beanManager(beanType);
 
     for (T liveBean : liveBeans) {
       T draftBean = draftHandler.publishToDestinationBean(liveBean);
@@ -232,7 +232,7 @@ public final class DefaultPersister implements Persister {
 
     draftHandler.fetchDestinationBeans(draftBeans, false);
 
-    BeanManager<T> mgr = beanDescriptorManager.getBeanManager(beanType);
+    BeanManager<T> mgr = beanDescriptorManager.beanManager(beanType);
 
     List<T> livePublish = new ArrayList<>(draftBeans.size());
     for (T draftBean : draftBeans) {
@@ -640,7 +640,7 @@ public final class DefaultPersister implements Persister {
       return 0;
     }
 
-    BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(beanType);
+    BeanDescriptor<?> descriptor = beanDescriptorManager.descriptor(beanType);
     DeleteMode deleteMode = (permanent || !descriptor.isSoftDelete()) ? DeleteMode.HARD : DeleteMode.SOFT;
     if (descriptor.isMultiTenant()) {
       return deleteAsBeans(ids, transaction, deleteMode, descriptor);
@@ -679,7 +679,7 @@ public final class DefaultPersister implements Persister {
    */
   @Override
   public int delete(Class<?> beanType, Object id, Transaction transaction, boolean permanent) {
-    BeanDescriptor<?> descriptor = beanDescriptorManager.getBeanDescriptor(beanType);
+    BeanDescriptor<?> descriptor = beanDescriptorManager.descriptor(beanType);
     if (descriptor.isMultiTenant()) {
       // convert to a delete by bean
       EntityBean bean = descriptor.createEntityBean();
@@ -1274,7 +1274,7 @@ public final class DefaultPersister implements Persister {
    */
   @SuppressWarnings("unchecked")
   private <T> BeanManager<T> getBeanManager(Object bean) {
-    BeanManager<T> mgr = (BeanManager<T>) beanDescriptorManager.getBeanManager(bean.getClass());
+    BeanManager<T> mgr = (BeanManager<T>) beanDescriptorManager.beanManager(bean.getClass());
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(bean.getClass()));
     }

@@ -1391,7 +1391,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // FutureList query always run in it's own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
     if (!spiQuery.isDisableReadAudit()) {
-      BeanDescriptor<T> desc = beanDescriptorManager.getBeanDescriptor(spiQuery.getBeanType());
+      BeanDescriptor<T> desc = beanDescriptorManager.descriptor(spiQuery.getBeanType());
       desc.readAuditFutureList(spiQuery);
     }
     // Create a new transaction solely to execute the findList() at some future time
@@ -2049,7 +2049,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public List<BeanDescriptor<?>> descriptors() {
-    return beanDescriptorManager.getBeanDescriptorList();
+    return beanDescriptorManager.descriptorList();
   }
 
   /**
@@ -2061,13 +2061,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   public void register(BeanPersistController controller) {
-    for (BeanDescriptor<?> desc : beanDescriptorManager.getBeanDescriptorList()) {
+    for (BeanDescriptor<?> desc : beanDescriptorManager.descriptorList()) {
       desc.register(controller);
     }
   }
 
   public void deregister(BeanPersistController c) {
-    for (BeanDescriptor<?> desc : beanDescriptorManager.getBeanDescriptorList()) {
+    for (BeanDescriptor<?> desc : beanDescriptorManager.descriptorList()) {
       desc.deregister(c);
     }
   }
@@ -2103,7 +2103,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> BeanDescriptor<T> descriptor(Class<T> beanClass) {
-    return beanDescriptorManager.getBeanDescriptor(beanClass);
+    return beanDescriptorManager.descriptor(beanClass);
   }
 
   /**
@@ -2111,7 +2111,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public List<BeanDescriptor<?>> descriptors(String tableName) {
-    return beanDescriptorManager.getBeanDescriptors(tableName);
+    return beanDescriptorManager.descriptors(tableName);
   }
 
   /**
@@ -2127,7 +2127,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public List<? extends BeanType<?>> beanTypes(String tableName) {
-    return beanDescriptorManager.getBeanTypes(tableName);
+    return beanDescriptorManager.beanTypes(tableName);
   }
 
   @Override
@@ -2137,7 +2137,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public BeanDescriptor<?> descriptorByQueueId(String queueId) {
-    return beanDescriptorManager.getBeanDescriptorByQueueId(queueId);
+    return beanDescriptorManager.descriptorByQueueId(queueId);
   }
 
   /**
@@ -2153,7 +2153,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public BeanDescriptor<?> descriptorById(String beanClassName) {
-    return beanDescriptorManager.getBeanDescriptorByClassName(beanClassName);
+    return beanDescriptorManager.descriptorByClassName(beanClassName);
   }
 
   /**

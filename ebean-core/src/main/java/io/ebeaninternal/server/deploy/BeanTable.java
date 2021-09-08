@@ -103,7 +103,7 @@ public final class BeanTable {
     String lc = prop.dbColumn();
     String fk = lc;
     if (foreignKeyPrefix != null) {
-      fk = owner.getNamingConvention().getForeignKey(foreignKeyPrefix, fk);
+      fk = owner.namingConvention().getForeignKey(foreignKeyPrefix, fk);
     }
     if (complexKey) {
       // just to copy the column name rather than prefix with the foreignKeyPrefix.

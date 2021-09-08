@@ -154,13 +154,13 @@ final class AnnotationAssocManys extends AnnotationAssoc {
     if (!prop.getTableJoin().hasJoinColumns() && beanTable != null) {
       // use naming convention to define join (based on the bean name for this side of relationship)
       // A unidirectional OneToMany or OneToMany with no mappedBy property
-      NamingConvention nc = factory.getNamingConvention();
+      NamingConvention nc = factory.namingConvention();
       String fkeyPrefix = null;
       if (nc.isUseForeignKeyPrefix()) {
         fkeyPrefix = nc.getColumnFromProperty(descriptor.getBeanType(), descriptor.getName());
       }
       // Use the owning bean table to define the join
-      BeanTable owningBeanTable = factory.getBeanTable(descriptor.getBeanType());
+      BeanTable owningBeanTable = factory.beanTable(descriptor.getBeanType());
       owningBeanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), false, prop.getSqlFormulaSelect());
     }
   }
@@ -190,7 +190,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       fullTableName = descriptor.getBaseTable()+"_"+ CamelCaseHelper.toUnderscoreFromCamel(prop.getName());
     }
 
-    BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
+    BeanTable localTable = factory.beanTable(descriptor.getBeanType());
     if (collectionTable != null) {
       prop.getTableJoin().addJoinColumn(util, true, collectionTable.joinColumns(), localTable);
     }
@@ -296,8 +296,8 @@ final class AnnotationAssocManys extends AnnotationAssoc {
   private void readJoinTable(JoinTable joinTable, DeployBeanPropertyAssocMany<?> prop) {
     String intTableName = getFullTableName(joinTable);
     if (intTableName.isEmpty()) {
-      BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
-      BeanTable otherTable = factory.getBeanTable(prop.getTargetType());
+      BeanTable localTable = factory.beanTable(descriptor.getBeanType());
+      BeanTable otherTable = factory.beanTable(prop.getTargetType());
       intTableName = getM2MJoinTableName(localTable, otherTable);
     }
 
@@ -362,8 +362,8 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       intTableName = intJoin.getTable();
     }
 
-    BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
-    BeanTable otherTable = factory.getBeanTable(prop.getTargetType());
+    BeanTable localTable = factory.beanTable(descriptor.getBeanType());
+    BeanTable otherTable = factory.beanTable(prop.getTargetType());
 
     final String localTableName = localTable.getUnqualifiedBaseTable();
     final String otherTableName = otherTable.getUnqualifiedBaseTable();

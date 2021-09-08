@@ -19,7 +19,7 @@ final class BeanEmbeddedMetaFactory {
     // we can get a BeanDescriptor for an Embedded bean
     // and know that it is NOT recursive, as Embedded beans are
     // only allow to hold simple scalar types...
-    BeanDescriptor<?> targetDesc = owner.getBeanDescriptor(prop.getTargetType());
+    BeanDescriptor<?> targetDesc = owner.descriptor(prop.getTargetType());
     if (targetDesc == null) {
       String msg = "Could not find BeanDescriptor for " + prop.getTargetType()
         + ". Perhaps the EmbeddedId class is not registered? See https://ebean.io/docs/trouble-shooting#not-registered";

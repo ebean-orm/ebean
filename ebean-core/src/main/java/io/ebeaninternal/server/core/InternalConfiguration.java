@@ -175,7 +175,7 @@ public final class InternalConfiguration {
     this.dtoBeanManager = new DtoBeanManager(typeManager, xmlMap.readDtoMapping());
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlMap.xmlDeployment());
-    Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
+    Map<String, String> draftTableMap = beanDescriptorManager.draftTableMap();
     beanDescriptorManager.scheduleBackgroundTrim();
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
