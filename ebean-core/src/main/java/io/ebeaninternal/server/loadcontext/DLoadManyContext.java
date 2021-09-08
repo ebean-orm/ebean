@@ -29,7 +29,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
   private LoadBuffer currentBuffer;
 
   DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property, String path, OrmQueryProperties queryProps) {
-    super(parent, property.getBeanDescriptor(), path, queryProps);
+    super(parent, property.descriptor(), path, queryProps);
     this.property = property;
     this.docStoreMapped = property.isTargetDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)
@@ -203,7 +203,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
         boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
         if (useCache) {
           EntityBean ownerBean = bc.getOwnerBean();
-          BeanDescriptor<?> parentDesc = context.desc.getBeanDescriptor(ownerBean.getClass());
+          BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
           if (parentDesc.cacheManyPropLoad(context.property, bc, parentId, context.parent.isReadOnly())) {
             // we loaded the bean collection from cache so remove it from the buffer

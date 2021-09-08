@@ -40,8 +40,8 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public void initialise() {
-    this.idDesc = embIdProperty.getTargetDescriptor();
-    this.props = embIdProperty.getProperties();
+    this.idDesc = embIdProperty.targetDescriptor();
+    this.props = embIdProperty.properties();
     this.idInValueSql = idInExpandedForm ? idInExpanded() : idInCompressed();
   }
 
@@ -57,7 +57,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(idDesc.getBaseTableAlias()).append(".").append(props[i].dbColumn()).append("=?");
+      sb.append(idDesc.baseTableAlias()).append(".").append(props[i].dbColumn()).append("=?");
     }
     sb.append(")");
     return sb.toString();

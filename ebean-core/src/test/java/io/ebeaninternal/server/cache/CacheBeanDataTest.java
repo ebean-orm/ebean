@@ -79,7 +79,7 @@ public class CacheBeanDataTest extends BaseTestCase {
 
     SpiEbeanServer server = spiEbeanServer();
     BeanDescriptor<EPerson> desc = server.getBeanDescriptor(EPerson.class);
-    BeanPropertyAssocOne<?> addressBeanProperty = (BeanPropertyAssocOne<?>) desc.getBeanProperty("address");
+    BeanPropertyAssocOne<?> addressBeanProperty = (BeanPropertyAssocOne<?>) desc.beanProperty("address");
 
     EAddress address = new EAddress();
     address.setStreet("92 Someplace Else");

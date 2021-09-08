@@ -6,8 +6,6 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
-import java.util.EmptyStackException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -16,7 +14,7 @@ public class GeneratedCounterLongTest extends BaseTestCase {
 
   private GeneratedCounterLong counter = new GeneratedCounterLong();
 
-  private BeanProperty version = getBeanDescriptor(Customer.class).getBeanProperty("version");
+  private BeanProperty version = getBeanDescriptor(Customer.class).beanProperty("version");
 
   @Test
   public void when_null_expect_IllegalStateException() {

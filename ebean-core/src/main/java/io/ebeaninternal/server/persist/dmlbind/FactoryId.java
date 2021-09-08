@@ -21,7 +21,7 @@ public final class FactoryId {
       return new BindableIdScalar(id);
     } else {
       BeanPropertyAssocOne<?> embId = (BeanPropertyAssocOne<?>) id;
-      MatchedImportedProperty[] matches = MatchedImportedFactory.build(embId.getProperties(), desc);
+      MatchedImportedProperty[] matches = MatchedImportedFactory.build(embId.properties(), desc);
       return new BindableIdEmbedded(embId, matches);
     }
   }

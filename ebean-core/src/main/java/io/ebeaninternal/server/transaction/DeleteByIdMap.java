@@ -73,7 +73,7 @@ public final class DeleteByIdMap {
   void addDocStoreUpdates(DocStoreUpdates docStoreUpdates, DocStoreMode txnIndexMode) {
     for (BeanPersistIds deleteIds : beanMap.values()) {
       BeanDescriptor<?> desc = deleteIds.getBeanDescriptor();
-      DocStoreMode mode = desc.getDocStoreMode(PersistRequest.Type.DELETE, txnIndexMode);
+      DocStoreMode mode = desc.docStoreMode(PersistRequest.Type.DELETE, txnIndexMode);
       if (DocStoreMode.IGNORE != mode) {
         // Add to queue or bulk update entries
         boolean queue = (DocStoreMode.QUEUE == mode);

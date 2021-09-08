@@ -235,7 +235,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
   private void addPropertiesFromHeader(String[] line) {
     for (String aLine : line) {
-      ElPropertyValue elProp = descriptor.getElGetValue(aLine);
+      ElPropertyValue elProp = descriptor.elGetValue(aLine);
       if (elProp == null) {
         throw new TextException("Property [" + aLine + "] not found");
       }
@@ -248,7 +248,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
       } else if (elProp.isAssocProperty()) {
         BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.beanProperty();
-        String idProp = assocOne.getBeanDescriptor().getIdBinder().getIdProperty();
+        String idProp = assocOne.descriptor().idBinder().getIdProperty();
         addProperty(aLine + "." + idProp);
       } else {
         addProperty(aLine);

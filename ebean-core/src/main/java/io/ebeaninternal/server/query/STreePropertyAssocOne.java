@@ -13,7 +13,7 @@ public interface STreePropertyAssocOne extends STreePropertyAssoc {
   /**
    * Return the scalar type of the associated id property.
    */
-  ScalarDataReader<?> getIdReader();
+  ScalarDataReader<?> idReader();
 
   /**
    * Returns true, if this relation has a foreign key.

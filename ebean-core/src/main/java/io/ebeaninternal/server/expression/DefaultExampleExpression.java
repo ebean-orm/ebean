@@ -290,7 +290,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
 
           } else if ((beanProperty instanceof BeanPropertyAssocOne) && (value instanceof EntityBean)) {
             BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) beanProperty;
-            BeanDescriptor<?> targetDescriptor = assocOne.getTargetDescriptor();
+            BeanDescriptor<?> targetDescriptor = assocOne.targetDescriptor();
             addExpressions(list, targetDescriptor, (EntityBean) value, propName);
           }
         }

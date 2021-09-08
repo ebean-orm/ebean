@@ -58,15 +58,15 @@ final class BeanEmbeddedMetaFactory {
   }
 
   private static int dbLength(Column override, BeanProperty source) {
-    return (override != null && (override.length() != 255)) ? override.length() : source.getDbLength();
+    return (override != null && (override.length() != 255)) ? override.length() : source.dbLength();
   }
 
   private static int dbScale(Column override, BeanProperty source) {
-    return (override != null && (override.scale() != 0)) ? override.scale() : source.getDbScale();
+    return (override != null && (override.scale() != 0)) ? override.scale() : source.dbScale();
   }
 
   private static String getDbColumnDefn(Column override, BeanProperty source) {
-    return (override != null && !override.columnDefinition().isEmpty()) ? override.columnDefinition() : source.getDbColumnDefn();
+    return (override != null && !override.columnDefinition().isEmpty()) ? override.columnDefinition() : source.dbColumnDefn();
   }
 
 }

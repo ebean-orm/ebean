@@ -60,10 +60,10 @@ public final class LoadManyRequest extends LoadRequest {
     List<Object> idList = new ArrayList<>();
     BeanPropertyAssocMany<?> many = many();
     for (BeanCollection<?> bc : batch) {
-      idList.add(many.getParentId(bc.getOwnerBean()));
+      idList.add(many.parentId(bc.getOwnerBean()));
       bc.setLoader(server); // don't use the load buffer again
     }
-    if (many.getTargetDescriptor().isPadInExpression()) {
+    if (many.targetDescriptor().isPadInExpression()) {
       BindPadding.padIds(idList);
     }
     return idList;
@@ -76,11 +76,11 @@ public final class LoadManyRequest extends LoadRequest {
   public SpiQuery<?> createQuery(SpiEbeanServer server) {
     BeanPropertyAssocMany<?> many = many();
     SpiQuery<?> query = many.newQuery(server);
-    String orderBy = many.getLazyFetchOrderBy();
+    String orderBy = many.lazyFetchOrderBy();
     if (orderBy != null) {
       query.order(orderBy);
     }
-    String extraWhere = many.getExtraWhere();
+    String extraWhere = many.extraWhere();
     if (extraWhere != null) {
       // replace special ${ta} placeholder with the base table alias
       // which is always t0 and add the extra where clause
@@ -99,7 +99,7 @@ public final class LoadManyRequest extends LoadRequest {
     loadContext.configureQuery(query);
     if (onlyIds) {
       // lazy loading invoked via clear() and removeAll()
-      query.select(many.getTargetIdProperty());
+      query.select(many.targetIdProperty());
     }
     return query;
   }

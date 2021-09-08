@@ -55,7 +55,7 @@ final class DefaultBeanLoader {
     EntityBeanIntercept ebi = parentBean._ebean_getIntercept();
     PersistenceContext pc = ebi.getPersistenceContext();
     BeanDescriptor<?> parentDesc = server.getBeanDescriptor(parentBean.getClass());
-    BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>) parentDesc.getBeanProperty(propertyName);
+    BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>) parentDesc.beanProperty(propertyName);
     BeanCollection<?> beanCollection = null;
     ExpressionList<?> filterMany = null;
 
@@ -91,9 +91,9 @@ final class DefaultBeanLoader {
       query.setLoadDescription("+lazy", null);
     }
 
-    query.select(parentDesc.getIdBinder().getIdProperty());
+    query.select(parentDesc.idBinder().getIdProperty());
     if (onlyIds) {
-      query.fetch(many.name(), many.getTargetIdProperty());
+      query.fetch(many.name(), many.targetIdProperty());
     } else {
       query.fetch(many.name());
     }
@@ -177,7 +177,7 @@ final class DefaultBeanLoader {
     }
 
     BeanDescriptor<?> desc = server.getBeanDescriptor(bean.getClass());
-    if (EntityType.EMBEDDED == desc.getEntityType()) {
+    if (EntityType.EMBEDDED == desc.entityType()) {
       // lazy loading on an embedded bean property
       EntityBean embeddedOwner = (EntityBean) ebi.getEmbeddedOwner();
       refreshBeanInternal(embeddedOwner, mode, ebi.getEmbeddedOwnerIndex());

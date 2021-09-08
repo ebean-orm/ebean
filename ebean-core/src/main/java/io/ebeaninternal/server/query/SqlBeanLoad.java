@@ -50,7 +50,7 @@ public final class SqlBeanLoad {
       return null;
     }
     if ((bean == null)
-      || (lazyLoading && ebi.isLoadedProperty(prop.getPropertyIndex()))
+      || (lazyLoading && ebi.isLoadedProperty(prop.propertyIndex()))
       || (type != null && !prop.isAssignableFrom(type))) {
       // ignore this property
       // ... null: bean already in persistence context
@@ -62,7 +62,7 @@ public final class SqlBeanLoad {
     try {
       return prop.readSet(ctx, bean);
     } catch (Exception e) {
-      bean._ebean_getIntercept().setLoadError(prop.getPropertyIndex(), e);
+      bean._ebean_getIntercept().setLoadError(prop.propertyIndex(), e);
       ctx.handleLoadError(prop.fullName(), e);
       return prop.getValue(bean);
     }

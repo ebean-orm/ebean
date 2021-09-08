@@ -13,7 +13,7 @@ final class AssocOneHelpRefExported extends AssocOneHelp {
   AssocOneHelpRefExported(BeanPropertyAssocOne<?> property) {
     super(property);
     this.softDelete = property.targetDescriptor.isSoftDelete();
-    this.softDeletePredicate = (softDelete) ? property.targetDescriptor.getSoftDeletePredicate("") : null;
+    this.softDeletePredicate = (softDelete) ? property.targetDescriptor.softDeletePredicate("") : null;
   }
 
   /**

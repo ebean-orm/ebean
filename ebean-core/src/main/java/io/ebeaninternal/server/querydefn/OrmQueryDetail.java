@@ -307,14 +307,14 @@ public final class OrmQueryDetail implements Serializable {
       } else {
         OrmQueryProperties parentProp = fetchPaths.get(parentPath);
         if (parentProp == null) {
-          ElPropertyValue el = d.getElGetValue(parentPath);
+          ElPropertyValue el = d.elGetValue(parentPath);
           if (el == null) {
             throw new PersistenceException("Path [" + parentPath + "] not valid from " + d.fullName());
           }
           // add a missing parent path just fetching the Id property
           BeanPropertyAssoc<?> assocOne = (BeanPropertyAssoc<?>) el.beanProperty();
           if (addId) {
-            parentProp = new OrmQueryProperties(parentPath, assocOne.getTargetIdProperty());
+            parentProp = new OrmQueryProperties(parentPath, assocOne.targetIdProperty());
           } else {
             parentProp = new OrmQueryProperties(parentPath, Collections.emptySet());
           }
@@ -370,7 +370,7 @@ public final class OrmQueryDetail implements Serializable {
     int idx = 0;
     for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
       String fetchPath = entry.getKey();
-      ElPropertyDeploy elProp = desc.getElPropertyDeploy(fetchPath);
+      ElPropertyDeploy elProp = desc.elPropertyDeploy(fetchPath);
       if (elProp == null) {
         throw new PersistenceException("Invalid fetch path " + fetchPath + " from " + desc.fullName());
       }
@@ -430,13 +430,13 @@ public final class OrmQueryDetail implements Serializable {
    */
   public void setDefaultSelectClause(BeanDescriptor<?> desc) {
     if (desc.hasDefaultSelectClause() && !hasSelectClause()) {
-      baseProps = new OrmQueryProperties(null, desc.getDefaultSelectClause());
+      baseProps = new OrmQueryProperties(null, desc.defaultSelectClause());
     }
     for (OrmQueryProperties joinProps : fetchPaths.values()) {
       if (!joinProps.hasSelectClause()) {
-        BeanDescriptor<?> assocDesc = desc.getBeanDescriptor(joinProps.getPath());
+        BeanDescriptor<?> assocDesc = desc.descriptor(joinProps.getPath());
         if (assocDesc != null && assocDesc.hasDefaultSelectClause()) {
-          fetch(joinProps.getPath(), assocDesc.getDefaultSelectClause(), joinProps.getFetchConfig());
+          fetch(joinProps.getPath(), assocDesc.defaultSelectClause(), joinProps.getFetchConfig());
         }
       }
     }

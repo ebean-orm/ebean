@@ -49,7 +49,7 @@ final class InsertMeta {
     this.shadowFKey = shadowFKey;
 
     String tableName = desc.baseTable();
-    String draftTableName = desc.getDraftTable();
+    String draftTableName = desc.draftTable();
     this.sqlWithId = genSql(false, tableName, false);
     this.sqlDraftWithId = desc.isDraftable() ? genSql(false, draftTableName, true) : sqlWithId;
 
@@ -81,7 +81,7 @@ final class InsertMeta {
   }
 
   private static Bindable getDiscriminator(BeanDescriptor<?> desc) {
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    InheritInfo inheritInfo = desc.inheritInfo();
     return inheritInfo != null ? new BindableDiscriminator(inheritInfo) : null;
   }
 

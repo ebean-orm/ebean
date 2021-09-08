@@ -126,7 +126,7 @@ final class MergeHandler {
   }
 
   static MergeNode createMergeNode(String fullPath, BeanDescriptor<?> targetDesc, String path) {
-    BeanProperty prop = targetDesc.getBeanProperty(path);
+    BeanProperty prop = targetDesc.beanProperty(path);
     if (!(prop instanceof BeanPropertyAssoc)) {
       throw new PersistenceException("merge path [" + path + "] is not a ToMany or ToOne property of " + targetDesc.fullName());
     }

@@ -169,7 +169,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       // Mark Mutable scalar properties (like Hstore) as dirty where necessary
       beanDescriptor.checkMutableProperties(intercept);
     }
-    this.concurrencyMode = beanDescriptor.getConcurrencyMode(intercept);
+    this.concurrencyMode = beanDescriptor.concurrencyMode(intercept);
     this.publish = Flags.isPublish(flags);
     if (isMarkDraftDirty(publish)) {
       beanDescriptor.setDraftDirty(entityBean, true);
@@ -210,7 +210,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private DocStoreMode calcDocStoreMode(SpiTransaction txn, Type type) {
     DocStoreMode txnMode = (txn == null) ? null : txn.getDocStoreMode();
-    return beanDescriptor.getDocStoreMode(type, txnMode);
+    return beanDescriptor.docStoreMode(type, txnMode);
   }
 
   /**
@@ -272,28 +272,28 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void onUpdateGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      GeneratedProperty generatedProperty = prop.getGeneratedProperty();
+      GeneratedProperty generatedProperty = prop.generatedProperty();
       if (prop.isVersion()) {
         if (isLoadedProperty(prop)) {
           // @Version property must be loaded to be involved
           Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
           Object oldVal = prop.getValue(entityBean);
           setVersionValue(value);
-          intercept.setOldValue(prop.getPropertyIndex(), oldVal);
+          intercept.setOldValue(prop.propertyIndex(), oldVal);
         }
       } else {
         // @WhenModified set without invoking interception
         Object oldVal = prop.getValue(entityBean);
         Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
         prop.setValueChanged(entityBean, value);
-        intercept.setOldValue(prop.getPropertyIndex(), oldVal);
+        intercept.setOldValue(prop.propertyIndex(), oldVal);
       }
     }
   }
 
   private void onInsertGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
-      Object value = prop.getGeneratedProperty().getInsertValue(prop, entityBean, now());
+      Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
       prop.setValueChanged(entityBean, value);
     }
   }
@@ -704,21 +704,21 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return true if this property is loaded (full bean or included in partial bean).
    */
   public boolean isLoadedProperty(BeanProperty prop) {
-    return intercept.isLoadedProperty(prop.getPropertyIndex());
+    return intercept.isLoadedProperty(prop.propertyIndex());
   }
 
   /**
    * Return true if the property is dirty.
    */
   public boolean isDirtyProperty(BeanProperty prop) {
-    return intercept.isDirtyProperty(prop.getPropertyIndex());
+    return intercept.isDirtyProperty(prop.propertyIndex());
   }
 
   /**
    * Return the original / old value for the given property.
    */
   public Object getOrigValue(BeanProperty prop) {
-    return intercept.getOrigValue(prop.getPropertyIndex());
+    return intercept.getOrigValue(prop.propertyIndex());
   }
 
   @Override
@@ -752,7 +752,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Soft delete is executed as update so we want to set deleted=true property.
    */
   private void prepareForSoftDelete() {
-    beanDescriptor.setSoftDeleteValue(entityBean);
+    beanDescriptor.softDeleteValue(entityBean);
   }
 
   @Override
@@ -855,7 +855,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private void changeLog() {
-    BeanChange changeLogBean = beanDescriptor.getChangeLogBean(this);
+    BeanChange changeLogBean = beanDescriptor.changeLogBean(this);
     if (changeLogBean != null) {
       transaction.addBeanChange(changeLogBean);
     }
@@ -971,9 +971,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   public boolean isAddToUpdate(BeanProperty prop) {
     if (requestUpdateAllLoadedProps) {
-      return intercept.isLoadedProperty(prop.getPropertyIndex());
+      return intercept.isLoadedProperty(prop.propertyIndex());
     } else {
-      return intercept.isDirtyProperty(prop.getPropertyIndex());
+      return intercept.isDirtyProperty(prop.propertyIndex());
     }
   }
 
@@ -1154,9 +1154,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     } else {
       key = intercept.getDirtyPropertyKey();
     }
-    BeanProperty versionProperty = beanDescriptor.getVersionProperty();
+    BeanProperty versionProperty = beanDescriptor.versionProperty();
     if (versionProperty != null) {
-      if (intercept.isLoadedProperty(versionProperty.getPropertyIndex())) {
+      if (intercept.isLoadedProperty(versionProperty.propertyIndex())) {
         key.append('v');
       }
     }
@@ -1170,7 +1170,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the table to update depending if the request is a 'publish' one or normal.
    */
   public String updateTable() {
-    return publish ? beanDescriptor.baseTable() : beanDescriptor.getDraftTable();
+    return publish ? beanDescriptor.baseTable() : beanDescriptor.draftTable();
   }
 
   /**
@@ -1377,7 +1377,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the SQL used to fetch the last inserted id value.
    */
   public String getSelectLastInsertedId() {
-    return beanDescriptor.getSelectLastInsertedId(publish);
+    return beanDescriptor.selectLastInsertedId(publish);
   }
 
   /**

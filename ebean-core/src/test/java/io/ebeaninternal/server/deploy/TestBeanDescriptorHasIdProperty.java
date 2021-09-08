@@ -35,8 +35,8 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
     assertNotNull(beanDescriptor.idProperty());
     assertEquals("id", beanDescriptor.idProperty().name());
 
-    assertNotNull(beanDescriptor.getVersionProperty());
-    assertEquals("updtime", beanDescriptor.getVersionProperty().name());
+    assertNotNull(beanDescriptor.versionProperty());
+    assertEquals("updtime", beanDescriptor.versionProperty().name());
 
     Order order = new Order();
 
@@ -82,7 +82,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
 
     Order order = new Order();
     order.setId(42);
-    assertEquals(42, orderDesc.getIdForJson(order));
+    assertEquals(42, orderDesc.idForJson(order));
 
     assertEquals(42, orderDesc.convertIdFromJson(42));
     assertEquals(42, orderDesc.convertIdFromJson("42"));
@@ -99,7 +99,7 @@ public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
     BeanDescriptor<RCustomer> rcustDesc = spiServer.getBeanDescriptor(RCustomer.class);
 
     @SuppressWarnings("unchecked")
-    Map<String, Object> idForJson = (Map<String, Object>) rcustDesc.getIdForJson(rCustomer);
+    Map<String, Object> idForJson = (Map<String, Object>) rcustDesc.idForJson(rCustomer);
     assertEquals("comp", idForJson.get("company"));
     assertEquals("fred", idForJson.get("name"));
     assertEquals(2, idForJson.size());

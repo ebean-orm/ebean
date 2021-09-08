@@ -153,7 +153,7 @@ public class ModelBuildContext {
   private DbPlatformType getDbType(BeanProperty p) {
 
     if (p.isDbEncrypted()) {
-      return dbTypeMap.get(p.getDbEncryptedType());
+      return dbTypeMap.get(p.dbEncryptedType());
     }
     if (p.isLocalEncrypted()) {
       // scalar type potentially wrapping varbinary db type
@@ -163,7 +163,7 @@ public class ModelBuildContext {
     }
 
     // can be the logical JSON types (JSON, JSONB, JSONClob, JSONBlob, JSONVarchar)
-    int dbType = p.getDbType(platformTypes);
+    int dbType = p.dbType(platformTypes);
     if (dbType == 0) {
       throw new RuntimeException("No scalarType defined for " + p.fullName());
     }

@@ -27,8 +27,8 @@ final class MergeNodeAssocManyToMany extends MergeNode {
   @Override
   public void merge(MergeRequest request) {
     EntityBean parentBean = request.getBean();
-    Collection beans = many.getRawCollection(parentBean);
-    Collection outlines = many.getRawCollection(request.getOutline());
+    Collection beans = many.rawCollection(parentBean);
+    Collection outlines = many.rawCollection(request.getOutline());
 
     Map<Object, EntityBean> outlineIds = toMap(outlines);
     List<EntityBean> additions = new ArrayList<>();

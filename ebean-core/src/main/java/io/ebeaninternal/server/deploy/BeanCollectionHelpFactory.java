@@ -22,7 +22,7 @@ public final class BeanCollectionHelpFactory {
    */
   public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> many) {
     boolean elementCollection = many.isElementCollection();
-    ManyType manyType = many.getManyType();
+    ManyType manyType = many.manyType();
     switch (manyType) {
       case LIST:
         return elementCollection ? new BeanListHelpElement<>(many) : new BeanListHelp<>(many);
@@ -45,7 +45,7 @@ public final class BeanCollectionHelpFactory {
 
     } else if (manyType == SpiQuery.Type.MAP) {
       BeanDescriptor<T> target = request.descriptor();
-      ElPropertyValue elProperty = target.getElGetValue(request.query().getMapKey());
+      ElPropertyValue elProperty = target.elGetValue(request.query().getMapKey());
       return new BeanMapQueryHelp<>(elProperty);
 
     } else {

@@ -24,7 +24,7 @@ public class BeanPropertyAssocManyTest extends BaseTestCase {
 
   @SuppressWarnings("unchecked")
   private BeanPropertyAssocMany<Customer> contacts() {
-    return (BeanPropertyAssocMany<Customer>) customerDesc.getBeanProperty("contacts");
+    return (BeanPropertyAssocMany<Customer>) customerDesc.beanProperty("contacts");
   }
 
   @Test

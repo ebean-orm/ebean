@@ -42,7 +42,7 @@ public final class BeanPersistIds implements BinaryWritable {
    */
   public BeanPersistIds(BeanDescriptor<?> desc) {
     this.beanDescriptor = desc;
-    this.descriptorId = desc.getDescriptorId();
+    this.descriptorId = desc.descriptorId();
   }
 
   public static BeanPersistIds readBinaryMessage(SpiEbeanServer server, BinaryReadContext input) throws IOException {
@@ -56,7 +56,7 @@ public final class BeanPersistIds implements BinaryWritable {
   private void read(BinaryReadContext dataInput) throws IOException {
 
     dataInput.readInt(); // legacy read type
-    ids = readIdList(dataInput.in(), beanDescriptor.getIdBinder());
+    ids = readIdList(dataInput.in(), beanDescriptor.idBinder());
   }
 
   @Override
@@ -69,7 +69,7 @@ public final class BeanPersistIds implements BinaryWritable {
       os.writeInt(0);
     } else {
       os.writeInt(ids.size());
-      IdBinder idBinder = beanDescriptor.getIdBinder();
+      IdBinder idBinder = beanDescriptor.idBinder();
       for (Object idValue : ids) {
         idBinder.writeData(os, idValue);
       }

@@ -27,7 +27,7 @@ public final class BindableUnidirectional implements Bindable {
   public BindableUnidirectional(BeanDescriptor<?> desc, BeanPropertyAssocOne<?> unidirectional) {
     this.desc = desc;
     this.unidirectional = unidirectional;
-    this.importedId = unidirectional.getImportedId();
+    this.importedId = unidirectional.importedId();
   }
 
   @Override
@@ -57,7 +57,7 @@ public final class BindableUnidirectional implements Bindable {
     Object parentBean = persistRequest.parentBean();
     if (parentBean == null) {
       Class<?> localType = desc.type();
-      Class<?> targetType = unidirectional.getTargetType();
+      Class<?> targetType = unidirectional.targetType();
 
       String msg = "Error inserting bean [" + localType + "] with unidirectional relationship. ";
       msg += "For inserts you must use cascade save on the master bean [" + targetType + "].";

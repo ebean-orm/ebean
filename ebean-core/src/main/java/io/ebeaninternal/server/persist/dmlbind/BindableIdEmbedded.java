@@ -24,7 +24,7 @@ final class BindableIdEmbedded implements BindableId {
 
   BindableIdEmbedded(BeanPropertyAssocOne<?> embId, MatchedImportedProperty[] matches) {
     this.embId = embId;
-    this.props = embId.getProperties();
+    this.props = embId.properties();
     this.matches = matches;
   }
 

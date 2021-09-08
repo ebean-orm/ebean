@@ -87,15 +87,15 @@ class SqlTreeNodeBean implements SqlTreeNode {
                           List<SqlTreeNode> myChildren, boolean withId, STreePropertyAssocMany lazyLoadParent,
                           SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
     this.lazyLoadParent = lazyLoadParent;
-    this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.getIdBinder();
+    this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.idBinder();
     this.prefix = prefix;
     this.desc = desc;
-    this.inheritInfo = desc.getInheritInfo();
-    this.idBinder = desc.getIdBinder();
+    this.inheritInfo = desc.inheritInfo();
+    this.idBinder = desc.idBinder();
     this.temporalMode = temporalMode;
     this.temporalVersions = temporalMode == SpiQuery.TemporalMode.VERSIONS;
     this.nodeBeanProp = beanProp;
-    this.extraWhere = (beanProp == null) ? null : beanProp.getExtraWhere();
+    this.extraWhere = (beanProp == null) ? null : beanProp.extraWhere();
     this.aggregation = props.isAggregation();
     boolean aggregationRoot = props.isAggregationRoot();
     // the bean has an Id property and we want to use it
@@ -123,14 +123,14 @@ class SqlTreeNodeBean implements SqlTreeNode {
       // if we have no property ask first children (in a distinct select with join)
       if (children.length == 0) {
         // expected to be a findIds query
-        return desc.getIdBinder().getBeanProperty();
+        return desc.idBinder().getBeanProperty();
       }
       return children[0].getSingleAttributeReader();
     }
     if (properties[0] instanceof STreePropertyAssocOne) {
       STreePropertyAssocOne assocOne = (STreePropertyAssocOne)properties[0];
       if (assocOne.isAssocId()) {
-        return assocOne.getIdReader();
+        return assocOne.idReader();
       }
     }
     return properties[0];
@@ -184,7 +184,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     @Override
     void initBeanType() throws SQLException {
-      InheritInfo localInfo = readId ? inheritInfo.readType(ctx) : desc.getInheritInfo();
+      InheritInfo localInfo = readId ? inheritInfo.readType(ctx) : desc.inheritInfo();
       if (localInfo == null) {
         // the bean must be null
         localIdBinder = idBinder;
@@ -602,7 +602,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   @Override
   public final void addSoftDeletePredicate(SpiQuery<?> query) {
     if (desc.isSoftDelete()) {
-      query.addSoftDeletePredicate(desc.getSoftDeletePredicate(baseTableAlias));
+      query.addSoftDeletePredicate(desc.softDeletePredicate(baseTableAlias));
     }
   }
 
@@ -626,7 +626,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public void dependentTables(Set<String> tables) {
-    tables.add(nodeBeanProp.target().getBaseTable(temporalMode));
+    tables.add(nodeBeanProp.target().baseTable(temporalMode));
     for (SqlTreeNode child : children) {
       child.dependentTables(tables);
     }
@@ -642,7 +642,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
        appendJoinDiscriminator(ctx);
     }
     if (desc.isSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
-      ctx.append(" and ").append(desc.getSoftDeletePredicate(ctx.getTableAlias(prefix)));
+      ctx.append(" and ").append(desc.softDeletePredicate(ctx.getTableAlias(prefix)));
     }
     return sqlJoinType;
   }
@@ -658,7 +658,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
         String alias2 = alias + "z_";
 
         // adding the additional join to the intersection table
-        TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
+        TableJoin manyToManyJoin = manyProp.intersectionTableJoin();
         manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
         if (!manyProp.isExcludedFromHistory()) {
           intersectionAsOfTableAlias = true;

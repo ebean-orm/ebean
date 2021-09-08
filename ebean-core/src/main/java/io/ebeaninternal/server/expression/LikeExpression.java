@@ -29,7 +29,7 @@ final class LikeExpression extends AbstractValueExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
       // bind the key as well as the value
-      String encryptKey = prop.beanProperty().getEncryptKey().getStringValue();
+      String encryptKey = prop.beanProperty().encryptKey().getStringValue();
       request.addBindEncryptKey(encryptKey);
     }
     String bindValue = getValue(strValue(), caseInsensitive, type, request);
@@ -41,7 +41,7 @@ final class LikeExpression extends AbstractValueExpression {
     String pname = propName;
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
-      pname = prop.beanProperty().getDecryptProperty(propName);
+      pname = prop.beanProperty().decryptProperty(propName);
     }
     if (caseInsensitive) {
       request.append("lower(").append(pname).append(")");

@@ -29,9 +29,9 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
    */
   BeanMapHelp(BeanPropertyAssocMany<T> many) {
     this.many = many;
-    this.targetDescriptor = many.getTargetDescriptor();
+    this.targetDescriptor = many.targetDescriptor();
     this.propertyName = many.name();
-    this.beanProperty = targetDescriptor.getBeanProperty(many.getMapKey());
+    this.beanProperty = targetDescriptor.beanProperty(many.mapKey());
   }
 
   @Override
@@ -39,9 +39,9 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
   public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
 
     if (mapKey == null) {
-      mapKey = many.getMapKey();
+      mapKey = many.mapKey();
     }
-    BeanProperty beanProp = targetDescriptor.getBeanProperty(mapKey);
+    BeanProperty beanProp = targetDescriptor.beanProperty(mapKey);
 
     if (bc instanceof BeanMap<?, ?>) {
       BeanMap<Object, Object> bm = (BeanMap<Object, Object>) bc;
@@ -85,7 +85,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
     BeanMap<?, T> beanMap = new BeanMap<>(loader, ownerBean, propertyName);
     if (many != null) {
-      beanMap.setModifyListening(many.getModifyListenMode());
+      beanMap.setModifyListening(many.modifyListenMode());
     }
     return beanMap;
   }
@@ -108,7 +108,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
     BeanMap beanMap = new BeanMap(loader, parentBean, propertyName);
     if (many != null) {
-      beanMap.setModifyListening(many.getModifyListenMode());
+      beanMap.setModifyListening(many.modifyListenMode());
     }
     return beanMap;
   }
@@ -125,7 +125,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) bc;
     Map<?, ?> current = (Map<?, ?>) many.getValue(parentBean);
 
-    newBeanMap.setModifyListening(many.getModifyListenMode());
+    newBeanMap.setModifyListening(many.modifyListenMode());
     if (current == null) {
       // the currentMap is null? Not really expecting this...
       many.setValue(parentBean, newBeanMap);
@@ -134,7 +134,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
       // normally this case, replace just the underlying list
       BeanMap<?, ?> currentBeanMap = (BeanMap<?, ?>) current;
       currentBeanMap.setActualMap(newBeanMap.getActualMap());
-      currentBeanMap.setModifyListening(many.getModifyListenMode());
+      currentBeanMap.setModifyListening(many.modifyListenMode());
 
     } else {
       // replace the entire set

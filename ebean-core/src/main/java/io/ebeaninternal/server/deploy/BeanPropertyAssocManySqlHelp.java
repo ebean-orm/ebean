@@ -26,7 +26,7 @@ class BeanPropertyAssocManySqlHelp<T> {
     this.many = many;
     this.exportedProperties = exportedProperties;
     this.hasJoinTable = many.hasJoinTable();
-    this.descriptor = many.getBeanDescriptor();
+    this.descriptor = many.descriptor();
     this.exportedPropertyBindProto = deriveExportedPropertyBindProto();
 
     String delStmt;
@@ -118,13 +118,13 @@ class BeanPropertyAssocManySqlHelp<T> {
       query.setM2MIncludeJoin(many.inverseJoin);
     }
     String rawWhere = deriveWhereParentIdSql(true, tableAlias);
-    String expr = descriptor.getParentIdInExpr(parentIds.size(), rawWhere);
+    String expr = descriptor.parentIdInExpr(parentIds.size(), rawWhere);
     many.bindParentIdsIn(expr, parentIds, query);
   }
 
   List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds, boolean hard) {
     String rawWhere = deriveWhereParentIdSql(false, "");
-    SpiEbeanServer server = descriptor.getEbeanServer();
+    SpiEbeanServer server = descriptor.ebeanServer();
     SpiQuery<?> q = many.newQuery(server);
     many.bindParentIdEq(rawWhere, parentId, q);
     if (hard) {
@@ -141,7 +141,7 @@ class BeanPropertyAssocManySqlHelp<T> {
     String inClause = buildInClauseBinding(parentIds.size(), exportedPropertyBindProto);
     String expr = rawWhere + inClause;
 
-    SpiEbeanServer server = descriptor.getEbeanServer();
+    SpiEbeanServer server = descriptor.ebeanServer();
     SpiQuery<?> q = many.newQuery(server);
     //Query<?> q = server.find(propertyType);
     many.bindParentIdsIn(expr, parentIds, q);
@@ -209,7 +209,7 @@ class BeanPropertyAssocManySqlHelp<T> {
 
   private String buildInClauseBinding(int size, String bindProto) {
     if (descriptor.isSimpleId()) {
-      return descriptor.getIdBinder().getIdInValueExpr(false, size);
+      return descriptor.idBinder().getIdInValueExpr(false, size);
     }
     StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));
     sb.append(" in");

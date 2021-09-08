@@ -509,7 +509,7 @@ public final class WriteJson implements SpiJsonWriter {
         return currentIncludeProps.contains(prop.name());
       } else {
         // include only loaded properties
-        return currentBean._ebean_getIntercept().isLoadedProperty(prop.getPropertyIndex());
+        return currentBean._ebean_getIntercept().isLoadedProperty(prop.propertyIndex());
       }
     }
 

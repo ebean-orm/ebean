@@ -2,7 +2,6 @@ package org.tests.query.joins;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.FetchConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -23,7 +22,7 @@ public class TestQueryJoinQueryNonRoot extends BaseTestCase {
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<Order> d = server.getBeanDescriptor(Order.class);
-    ElPropertyValue elGetValue = d.getElGetValue("customer.contacts");
+    ElPropertyValue elGetValue = d.elGetValue("customer.contacts");
 
     assertTrue(elGetValue.containsMany());
 

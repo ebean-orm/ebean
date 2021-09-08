@@ -62,7 +62,7 @@ abstract class SaveManyBase implements SaveMany {
   final void modifyListenReset(BeanCollection<?> c) {
     if (insertedParent) {
       // after insert set the modify listening mode for private owned etc
-      c.setModifyListening(many.getModifyListenMode());
+      c.setModifyListening(many.modifyListenMode());
     }
     c.modifyReset();
   }

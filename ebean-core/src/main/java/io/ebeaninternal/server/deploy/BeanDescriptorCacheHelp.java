@@ -290,7 +290,7 @@ final class BeanDescriptorCacheHelp<T> {
     EntityBean ownerBean = bc.getOwnerBean();
     EntityBeanIntercept ebi = ownerBean._ebean_getIntercept();
     PersistenceContext persistenceContext = ebi.getPersistenceContext();
-    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
+    BeanDescriptor<?> targetDescriptor = many.targetDescriptor();
 
     List<Object> idList = entry.getIdList();
     bc.checkEmptyLazyLoad();
@@ -349,7 +349,7 @@ final class BeanDescriptorCacheHelp<T> {
       return null;
     }
 
-    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
+    BeanDescriptor<?> targetDescriptor = many.targetDescriptor();
     List<Object> idList = new ArrayList<>(actualDetails.size());
     for (Object bean : actualDetails) {
       idList.add(targetDescriptor.id(bean));

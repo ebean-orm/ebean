@@ -27,7 +27,7 @@ class BeanPropertyAssocManyJsonHelp {
    */
   BeanPropertyAssocManyJsonHelp(BeanPropertyAssocMany<?> many) {
     this.many = many;
-    boolean objectMapperPresent = many.getBeanDescriptor().getConfig().getClassLoadConfig().isJacksonObjectMapperPresent();
+    boolean objectMapperPresent = many.descriptor().config().getClassLoadConfig().isJacksonObjectMapperPresent();
     this.jsonTransient = !objectMapperPresent ? null : new BeanPropertyAssocManyJsonTransient();
   }
 

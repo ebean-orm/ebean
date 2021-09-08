@@ -89,7 +89,7 @@ public class DLoadContextTest extends BaseTestCase {
   @Test
   public void construct_when_fetch_expect_100_100_batchSize() {
 
-    BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>)getBeanDescriptor(Order.class).getBeanProperty("details");
+    BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>)getBeanDescriptor(Order.class).beanProperty("details");
     // the fetch is converted to a query join due to the maxRows
     OrmQueryRequest<Order> queryRequest = queryRequest(query().fetch("details").setMaxRows(50));
     queryRequest.initTransIfRequired();

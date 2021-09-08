@@ -378,7 +378,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     if (lazyLoadParentId != null) {
       if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
         // get the appropriate parent bean from the persistence context
-        this.lazyLoadParentBean = (EntityBean) lazyLoadManyProperty.getBeanDescriptor().contextGet(getPersistenceContext(), lazyLoadParentId);
+        this.lazyLoadParentBean = (EntityBean) lazyLoadManyProperty.descriptor().contextGet(getPersistenceContext(), lazyLoadParentId);
         this.lazyLoadParentId = lazyLoadParentId;
       }
       // add the loadedBean to the appropriate collection of lazyLoadParentBean
@@ -747,7 +747,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     if (auditIds == null) {
       auditIds = new ArrayList<>(100);
     }
-    auditIds.add(desc.getIdForJson(nextBean));
+    auditIds.add(desc.idForJson(nextBean));
     if (auditFindIterate && auditIds.size() >= 100) {
       auditIterateLogMessage();
     }

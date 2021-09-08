@@ -17,7 +17,7 @@ public final class CachedBeanDataFromBean {
 
     BeanProperty idProperty = desc.idProperty();
     if (idProperty != null) {
-      int propertyIndex = idProperty.getPropertyIndex();
+      int propertyIndex = idProperty.propertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
         data.put(idProperty.name(), idProperty.getCacheDataValue(bean));
       }
@@ -26,9 +26,9 @@ public final class CachedBeanDataFromBean {
     // extract all the non-many properties
     final boolean dirty = ebi.isDirty();
     for (BeanProperty prop : desc.propertiesNonMany()) {
-      if (dirty && ebi.isDirtyProperty(prop.getPropertyIndex())) {
+      if (dirty && ebi.isDirtyProperty(prop.propertyIndex())) {
         data.put(prop.name(), prop.getCacheDataValueOrig(ebi));
-      } else if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
+      } else if (ebi.isLoadedProperty(prop.propertyIndex())) {
         data.put(prop.name(), prop.getCacheDataValue(bean));
       }
     }
@@ -41,7 +41,7 @@ public final class CachedBeanDataFromBean {
 
     long version = desc.getVersion(bean);
     EntityBean sharableBean = createSharableBean(desc, bean, ebi);
-    return new CachedBeanData(sharableBean, desc.getDiscValue(), data, version);
+    return new CachedBeanData(sharableBean, desc.discValue(), data, version);
   }
 
   private static EntityBean createSharableBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept beanEbi) {

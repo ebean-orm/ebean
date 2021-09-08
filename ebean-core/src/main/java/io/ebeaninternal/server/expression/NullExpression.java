@@ -31,7 +31,7 @@ final class NullExpression extends AbstractExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
-    elProperty = desc.getElGetValue(propName);
+    elProperty = desc.elGetValue(propName);
     if (elProperty != null && elProperty.isAssocMany()) {
       // it is OneToMany or ManyToMany so going to be treated as isEmpty() expression
       assocMany = true;

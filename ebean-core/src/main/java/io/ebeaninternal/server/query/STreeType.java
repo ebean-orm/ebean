@@ -40,7 +40,7 @@ public interface STreeType {
   /**
    * Return the soft delete predicate using the given table alias.
    */
-  String getSoftDeletePredicate(String baseTableAlias);
+  String softDeletePredicate(String baseTableAlias);
 
   /**
    * Return the scalar properties.
@@ -65,12 +65,12 @@ public interface STreeType {
   /**
    * Return the inheritance information for this type.
    */
-  InheritInfo getInheritInfo();
+  InheritInfo inheritInfo();
 
   /**
    * Return the IdBinder for this type.
    */
-  IdBinder getIdBinder();
+  IdBinder idBinder();
 
   /**
    * Create a new entity bean instance.
@@ -95,7 +95,7 @@ public interface STreeType {
   /**
    * Return the base table to use given the temporalMode.
    */
-  String getBaseTable(SpiQuery.TemporalMode temporalMode);
+  String baseTable(SpiQuery.TemporalMode temporalMode);
 
   /**
    * Return true if the given path is an embedded bean.

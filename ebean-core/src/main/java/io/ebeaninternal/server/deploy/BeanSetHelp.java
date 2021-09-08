@@ -54,7 +54,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   public BeanCollection<T> createEmpty(EntityBean ownerBean) {
     BeanSet<T> beanSet = new BeanSet<>(loader, ownerBean, propertyName);
     if (many != null) {
-      beanSet.setModifyListening(many.getModifyListenMode());
+      beanSet.setModifyListening(many.modifyListenMode());
     }
     return beanSet;
   }
@@ -62,7 +62,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   @Override
   public BeanCollection<T> createReference(EntityBean parentBean) {
     BeanSet<T> beanSet = new BeanSet<>(loader, parentBean, propertyName);
-    beanSet.setModifyListening(many.getModifyListenMode());
+    beanSet.setModifyListening(many.modifyListenMode());
     return beanSet;
   }
 
@@ -76,7 +76,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
     BeanSet<?> newBeanSet = (BeanSet<?>) bc;
     Set<?> current = (Set<?>) many.getValue(parentBean);
-    newBeanSet.setModifyListening(many.getModifyListenMode());
+    newBeanSet.setModifyListening(many.modifyListenMode());
     if (current == null) {
       // the currentList is null?  Not really expecting this...
       many.setValue(parentBean, newBeanSet);
@@ -85,7 +85,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
       // normally this case, replace just the underlying list
       BeanSet<?> currentBeanSet = (BeanSet<?>) current;
       currentBeanSet.setActualSet(newBeanSet.getActualSet());
-      currentBeanSet.setModifyListening(many.getModifyListenMode());
+      currentBeanSet.setModifyListening(many.modifyListenMode());
 
     } else {
       // replace the entire set

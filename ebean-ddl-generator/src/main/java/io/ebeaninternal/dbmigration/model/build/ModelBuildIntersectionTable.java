@@ -24,8 +24,8 @@ class ModelBuildIntersectionTable {
   ModelBuildIntersectionTable(ModelBuildContext ctx, BeanPropertyAssocMany<?> manyProp) {
     this.ctx = ctx;
     this.manyProp = manyProp;
-    this.intersectionTableJoin = manyProp.getIntersectionTableJoin();
-    this.tableJoin = manyProp.getTableJoin();
+    this.intersectionTableJoin = manyProp.intersectionTableJoin();
+    this.tableJoin = manyProp.tableJoin();
   }
 
   public MTable build() {
@@ -39,7 +39,7 @@ class ModelBuildIntersectionTable {
 
     buildFkConstraints();
 
-    if (manyProp.getTargetDescriptor().isDraftable()) {
+    if (manyProp.targetDescriptor().isDraftable()) {
       ctx.createDraft(intersectionTable, false);
     }
 
@@ -50,16 +50,16 @@ class ModelBuildIntersectionTable {
 
     if (manyProp.hasForeignKeyConstraint()) {
       ctx.fkeyBuilder(intersectionTable)
-        .addForeignKey(manyProp.getBeanDescriptor(), intersectionTableJoin, true)
-        .addForeignKey(manyProp.getTargetDescriptor(), tableJoin, false);
+        .addForeignKey(manyProp.descriptor(), intersectionTableJoin, true)
+        .addForeignKey(manyProp.targetDescriptor(), tableJoin, false);
     }
     intersectionTable.checkDuplicateForeignKeys();
   }
 
   private MTable createTable() {
 
-    BeanDescriptor<?> localDesc = manyProp.getBeanDescriptor();
-    BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
+    BeanDescriptor<?> localDesc = manyProp.descriptor();
+    BeanDescriptor<?> targetDesc = manyProp.targetDescriptor();
 
     String tableName = intersectionTableJoin.getTable();
     MTable table = new MTable(tableName);
@@ -85,7 +85,7 @@ class ModelBuildIntersectionTable {
 
   private void addColumn(MTable table, BeanDescriptor<?> desc, String column, String findPropColumn) {
 
-    BeanProperty p = desc.getIdBinder().findBeanProperty(findPropColumn);
+    BeanProperty p = desc.idBinder().findBeanProperty(findPropColumn);
     if (p == null) {
       throw new RuntimeException("Could not find id property for " + findPropColumn);
     }

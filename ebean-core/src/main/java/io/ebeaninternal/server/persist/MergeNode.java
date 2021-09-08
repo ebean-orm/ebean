@@ -22,7 +22,7 @@ abstract class MergeNode {
 
   MergeNode(String fullPath, BeanPropertyAssoc<?> property) {
     this.fullPath = fullPath;
-    this.targetDescriptor = property.getTargetDescriptor();
+    this.targetDescriptor = property.targetDescriptor();
   }
 
   /**

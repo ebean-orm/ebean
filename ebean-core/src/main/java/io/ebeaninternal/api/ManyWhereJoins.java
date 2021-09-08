@@ -57,7 +57,7 @@ public final class ManyWhereJoins implements Serializable {
     if (join != null) {
       addJoin(join);
       if (p != null) {
-        String secondaryTableJoinPrefix = p.getSecondaryTableJoinPrefix();
+        String secondaryTableJoinPrefix = p.secondaryTableJoinPrefix();
         if (secondaryTableJoinPrefix != null) {
           addJoin(join + "." + secondaryTableJoinPrefix);
         }

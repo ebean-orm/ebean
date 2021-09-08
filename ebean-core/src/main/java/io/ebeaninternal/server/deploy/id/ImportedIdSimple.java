@@ -88,8 +88,8 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   @Override
   public void addFkeys(String name) {
-    BeanFkeyProperty fkey = new BeanFkeyProperty(name + "." + foreignProperty.name(), localDbColumn, owner.getDeployOrder());
-    owner.getBeanDescriptor().add(fkey);
+    BeanFkeyProperty fkey = new BeanFkeyProperty(name + "." + foreignProperty.name(), localDbColumn, owner.deployOrder());
+    owner.descriptor().add(fkey);
   }
 
   @Override

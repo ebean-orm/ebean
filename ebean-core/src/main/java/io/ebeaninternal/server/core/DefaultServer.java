@@ -703,7 +703,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
     }
 
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    InheritInfo inheritInfo = desc.inheritInfo();
     if (inheritInfo == null || inheritInfo.isConcrete()) {
       return (T) desc.contextRef(pc, null, false, id);
     }
@@ -952,11 +952,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (desc == null) {
       throw new PersistenceException(beanType.getName() + " is NOT an Entity Bean registered with this server?");
     }
-    String named = desc.getNamedQuery(namedQuery);
+    String named = desc.namedQuery(namedQuery);
     if (named != null) {
       return createQuery(beanType, named);
     }
-    SpiRawSql rawSql = desc.getNamedRawSql(namedQuery);
+    SpiRawSql rawSql = desc.namedRawSql(namedQuery);
     if (rawSql != null) {
       DefaultOrmQuery<T> query = createQuery(beanType);
       query.setRawSql(rawSql);
@@ -2293,7 +2293,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         return Collections.singleton(idProperty);
       }
     }
-    for (BeanProperty[] props : beanDesc.getUniqueProps()) {
+    for (BeanProperty[] props : beanDesc.uniqueProps()) {
       Set<Property> ret = checkUniqueness(entityBean, beanDesc, props, transaction);
       if (ret != null) {
         return ret;

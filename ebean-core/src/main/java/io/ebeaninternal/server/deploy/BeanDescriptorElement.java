@@ -35,7 +35,7 @@ abstract class BeanDescriptorElement<T> extends BeanDescriptor<T> {
   }
 
   @Override
-  public String getSimpleName() {
+  public String simpleName() {
     return simpleName;
   }
 

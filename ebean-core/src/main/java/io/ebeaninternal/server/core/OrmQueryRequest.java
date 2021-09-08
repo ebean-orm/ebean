@@ -78,7 +78,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
     super(server, t);
     this.beanDescriptor = query.getBeanDescriptor();
-    this.finder = beanDescriptor.getBeanFinder();
+    this.finder = beanDescriptor.beanFinder();
     this.queryEngine = queryEngine;
     this.query = query;
     this.readOnly = query.isReadOnly();
@@ -499,7 +499,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Determine and return the ToMany property that is included in the query.
    */
   public BeanPropertyAssocMany<?> determineMany() {
-    manyProperty = beanDescriptor.getManyProperty(query);
+    manyProperty = beanDescriptor.manyProperty(query);
     return manyProperty;
   }
 
@@ -515,7 +515,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * query plan for this query exists.
    */
   public CQueryPlan queryPlan() {
-    return beanDescriptor.getQueryPlan(queryPlanKey);
+    return beanDescriptor.queryPlan(queryPlanKey);
   }
 
   /**
@@ -533,7 +533,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Put the QueryPlan into the cache.
    */
   public void putQueryPlan(CQueryPlan queryPlan) {
-    beanDescriptor.putQueryPlan(queryPlanKey, queryPlan);
+    beanDescriptor.queryPlan(queryPlanKey, queryPlan);
   }
 
   @Override
@@ -617,7 +617,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   private ElPropertyValue mapProperty() {
-    ElPropertyValue property = beanDescriptor.getElGetValue(query.getMapKey());
+    ElPropertyValue property = beanDescriptor.elGetValue(query.getMapKey());
     if (property == null) {
       throw new IllegalStateException("Unknown map key property "+query.getMapKey());
     }
@@ -684,7 +684,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         Collection<T> actualDetails = ((BeanCollection<T>)cached).getActualDetails();
         List<Object> ids = new ArrayList<>(actualDetails.size());
         for (T bean : actualDetails) {
-          ids.add(beanDescriptor.getIdForJson(bean));
+          ids.add(beanDescriptor.idForJson(bean));
         }
         beanDescriptor.readAuditMany(queryPlanKey.getPartialKey(), "l2-query-cache", ids);
       }
@@ -761,7 +761,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return the base table alias for this query.
    */
   public String baseTableAlias() {
-    return query.getAlias(beanDescriptor.getBaseTableAlias());
+    return query.getAlias(beanDescriptor.baseTableAlias());
   }
 
   /**

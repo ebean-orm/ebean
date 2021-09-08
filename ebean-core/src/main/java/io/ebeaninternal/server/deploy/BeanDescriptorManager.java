@@ -439,10 +439,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
         List<BeanDescriptor<?>> list = tableToDescMap.computeIfAbsent(baseTable, k -> new ArrayList<>(1));
         list.add(desc);
       }
-      if (desc.getEntityType() == EntityType.VIEW && desc.isQueryCaching()) {
+      if (desc.entityType() == EntityType.VIEW && desc.isQueryCaching()) {
         // build map of tables to view entities dependent on those tables
         // for the purpose of invalidating appropriate query caches
-        String[] dependentTables = desc.getDependentTables();
+        String[] dependentTables = desc.dependentTables();
         if (dependentTables != null && dependentTables.length > 0) {
           for (String depTable : dependentTables) {
             depTable = depTable.toLowerCase();
@@ -515,7 +515,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   private void checkForValidEmbeddedId(BeanDescriptor<?> d) {
-    IdBinder idBinder = d.getIdBinder();
+    IdBinder idBinder = d.idBinder();
     if (idBinder instanceof IdBinderEmbedded) {
       IdBinderEmbedded embId = (IdBinderEmbedded) idBinder;
       BeanDescriptor<?> idBeanDescriptor = embId.getIdBeanDescriptor();
@@ -603,7 +603,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     }
     for (BeanPropertyAssocMany<?> many : desc.propertiesMany()) {
       if (many.isElementCollection()) {
-        elementDescriptors.add(many.getElementDescriptor());
+        elementDescriptors.add(many.elementDescriptor());
       }
     }
   }

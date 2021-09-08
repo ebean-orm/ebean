@@ -201,7 +201,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   @Override
   public boolean isFindById() {
     if (id == null && whereExpressions != null) {
-      id = whereExpressions.idEqualTo(beanDescriptor.getIdName());
+      id = whereExpressions.idEqualTo(beanDescriptor.idName());
       if (id != null) {
         whereExpressions = null;
       }
@@ -414,7 +414,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
     }
     if (orderBy != null) {
       for (Property orderProperty : orderBy.getProperties()) {
-        ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(orderProperty.getProperty());
+        ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(orderProperty.getProperty());
         if (elProp != null && elProp.containsFormulaWithJoin()) {
           manyWhereJoins.addFormulaWithJoin(orderProperty.getProperty());
         }
@@ -588,7 +588,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   public void setSelectId() {
     // clear select and fetch joins..
     detail.clear();
-    select(beanDescriptor.getIdBinder().getIdProperty());
+    select(beanDescriptor.idBinder().getIdProperty());
   }
 
   @Override
@@ -641,7 +641,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
     if (whereExpressions == null) {
       return null;
     }
-    BeanNaturalKey naturalKey = beanDescriptor.getNaturalKey();
+    BeanNaturalKey naturalKey = beanDescriptor.naturalKey();
     if (naturalKey == null) {
       return null;
     }
@@ -838,7 +838,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   @Override
   public void setDefaultRawSqlIfRequired() {
     if (beanDescriptor.isRawSqlBased() && rawSql == null) {
-      rawSql = beanDescriptor.getNamedRawSql(DEFAULT_QUERY_NAME);
+      rawSql = beanDescriptor.namedRawSql(DEFAULT_QUERY_NAME);
     }
   }
 
@@ -1014,8 +1014,8 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
     if (useDocStore) {
       sb.append("/ds");
     }
-    if (beanDescriptor.getDiscValue() != null) {
-      sb.append("/dv").append(beanDescriptor.getDiscValue());
+    if (beanDescriptor.discValue() != null) {
+      sb.append("/dv").append(beanDescriptor.discValue());
     }
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
       sb.append("/tm").append(temporalMode.ordinal());
@@ -1697,12 +1697,12 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
     if (type == beanType) {
       return this;
     }
-    InheritInfo inheritInfo = rootBeanDescriptor.getInheritInfo();
+    InheritInfo inheritInfo = rootBeanDescriptor.inheritInfo();
     inheritInfo = inheritInfo == null ? null : inheritInfo.readType(type);
     if (inheritInfo == null) {
       throw new IllegalArgumentException("Given type " + type + " is not a subtype of " + beanType);
     }
-    beanDescriptor = (BeanDescriptor<T>) rootBeanDescriptor.getBeanDescriptor(type);
+    beanDescriptor = (BeanDescriptor<T>) rootBeanDescriptor.descriptor(type);
     return this;
   }
 

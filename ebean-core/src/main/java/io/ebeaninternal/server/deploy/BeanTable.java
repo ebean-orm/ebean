@@ -90,7 +90,7 @@ public final class BeanTable {
     }
     if (idProperty instanceof BeanPropertyAssocOne<?>) {
       BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) idProperty;
-      BeanProperty[] props = assocOne.getProperties();
+      BeanProperty[] props = assocOne.properties();
       for (BeanProperty prop : props) {
         addToJoin(foreignKeyPrefix, join, reverse, sqlFormulaSelect, true, prop);
       }

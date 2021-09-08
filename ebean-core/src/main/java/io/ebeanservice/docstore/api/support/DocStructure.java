@@ -84,7 +84,7 @@ public class DocStructure {
    */
   private void prepare(String prop, BeanPropertyAssoc<?> embProp) {
 
-    BeanDescriptor<?> targetDesc = embProp.getTargetDescriptor();
+    BeanDescriptor<?> targetDesc = embProp.targetDescriptor();
 
     PathProperties manyRootPath = new PathProperties();
     manyRootPath.addToPath(null, targetDesc.idProperty().name());

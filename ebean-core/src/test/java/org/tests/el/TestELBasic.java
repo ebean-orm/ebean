@@ -23,20 +23,20 @@ public class TestELBasic extends BaseTestCase {
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<Customer> descriptor = server.getBeanDescriptor(Customer.class);
 
-    ElPropertyDeploy elId = descriptor.getElPropertyDeploy("id");
+    ElPropertyDeploy elId = descriptor.elPropertyDeploy("id");
     assertTrue(elId instanceof BeanProperty);
 
-    ElPropertyDeploy elBillAddress = descriptor.getElPropertyDeploy("billingAddress");
+    ElPropertyDeploy elBillAddress = descriptor.elPropertyDeploy("billingAddress");
     assertTrue(elBillAddress instanceof BeanPropertyAssocOne<?>);
 
-    ElPropertyDeploy elBillAddressId = descriptor.getElPropertyDeploy("billingAddress.id");
+    ElPropertyDeploy elBillAddressId = descriptor.elPropertyDeploy("billingAddress.id");
     assertTrue(elBillAddressId instanceof BeanFkeyProperty);
     assertEquals("billing_address_id", elBillAddressId.dbColumn());
     assertEquals("billingAddress.id", elBillAddressId.name());
     assertNull(elBillAddressId.elPrefix());
 
 
-    ElPropertyDeploy elBillAddressCity = descriptor.getElPropertyDeploy("billingAddress.city");
+    ElPropertyDeploy elBillAddressCity = descriptor.elPropertyDeploy("billingAddress.city");
     assertTrue(elBillAddressCity instanceof ElPropertyChain);
     assertEquals("billingAddress", elBillAddressCity.elPrefix());
     assertEquals("city", elBillAddressCity.name());
@@ -46,23 +46,23 @@ public class TestELBasic extends BaseTestCase {
 //		ElPropertyDeploy elBillAddressCountry = descriptor.getElPropertyDeploy("billingAddress.country");
 
 
-    ElPropertyDeploy elOrders = descriptor.getElPropertyDeploy("orders");
+    ElPropertyDeploy elOrders = descriptor.elPropertyDeploy("orders");
     assertTrue(elOrders instanceof BeanPropertyAssocMany<?>);
 
-    ElPropertyDeploy elOrderStatus = descriptor.getElPropertyDeploy("orders.status");
+    ElPropertyDeploy elOrderStatus = descriptor.elPropertyDeploy("orders.status");
     assertTrue(elOrderStatus instanceof ElPropertyChain);
     assertEquals("orders", elOrderStatus.elPrefix());
     assertEquals("status", elOrderStatus.name());
     assertEquals("${orders}status", elOrderStatus.elPlaceholder(false));
     assertEquals("status", elOrderStatus.dbColumn());
 
-    ElPropertyDeploy elOrderCust = descriptor.getElPropertyDeploy("orders.customer");
+    ElPropertyDeploy elOrderCust = descriptor.elPropertyDeploy("orders.customer");
     assertTrue(elOrderCust instanceof ElPropertyChain);
 
-    ElPropertyDeploy elOrderDetails = descriptor.getElPropertyDeploy("orders.details");
+    ElPropertyDeploy elOrderDetails = descriptor.elPropertyDeploy("orders.details");
     assertTrue(elOrderDetails instanceof ElPropertyChain);
 
-    ElPropertyDeploy elOrderDetailsId = descriptor.getElPropertyDeploy("orders.details.id");
+    ElPropertyDeploy elOrderDetailsId = descriptor.elPropertyDeploy("orders.details.id");
     assertTrue(elOrderDetailsId instanceof ElPropertyChain);
 
   }

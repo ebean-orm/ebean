@@ -130,7 +130,7 @@ final class CQueryBuilder {
     }
     // wrap as - delete from table where id in (select id ...)
     String sql = buildSqlDelete(null, request, predicates, sqlTree).getSql();
-    sql = request.descriptor().getDeleteByIdInSql() + "in (" + sql + ")";
+    sql = request.descriptor().deleteByIdInSql() + "in (" + sql + ")";
     sql = aliasReplace(sql, alias);
     return sql;
   }
@@ -157,7 +157,7 @@ final class CQueryBuilder {
     }
     // wrap as - update table set ... where id in (select id ...)
     String sql = buildSqlUpdate(null, request, predicates, sqlTree).getSql();
-    sql = updateClause + " " + request.descriptor().getWhereIdInSql() + "in (" + sql + ")";
+    sql = updateClause + " " + request.descriptor().whereIdInSql() + "in (" + sql + ")";
     sql = aliasReplace(sql, alias(rootTableAlias));
     return sql;
   }
@@ -182,7 +182,7 @@ final class CQueryBuilder {
     if (!query.isIncludeSoftDeletes()) {
       BeanDescriptor<?> desc = request.descriptor();
       if (desc.isSoftDelete()) {
-        query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
+        query.addSoftDeletePredicate(desc.softDeletePredicate(alias(query.getAlias())));
       }
     }
 
@@ -212,7 +212,7 @@ final class CQueryBuilder {
     query.setSelectId();
     BeanDescriptor<T> desc = request.descriptor();
     if (!query.isIncludeSoftDeletes() && desc.isSoftDelete()) {
-      query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
+      query.addSoftDeletePredicate(desc.softDeletePredicate(alias(query.getAlias())));
     }
     return buildFetchAttributeQuery(request);
   }
@@ -361,7 +361,7 @@ final class CQueryBuilder {
     BeanDescriptor<T> desc = request.descriptor();
     if (desc.isReadAuditing()) {
       // log the query plan based bean type (i.e. ignoring query disabling for logging the sql/plan)
-      desc.getReadAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.fullName(), queryPlan.getAuditQueryKey(), queryPlan.getSql()));
+      desc.readAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.fullName(), queryPlan.getAuditQueryKey(), queryPlan.getSql()));
     }
     // cache the query plan because we can reuse it and also
     // gather query performance statistics based on it.
@@ -455,11 +455,11 @@ final class CQueryBuilder {
       SpiRawSql.ColumnMapping.Column column = it.next();
       String propertyName = column.getPropertyName();
       if (!SpiRawSql.IGNORE_COLUMN.equals(propertyName)) {
-        ElPropertyValue el = descriptor.getElGetValue(propertyName);
+        ElPropertyValue el = descriptor.elGetValue(propertyName);
         if (el == null && propertyName.endsWith("Id")) {
           // try default naming convention for foreign key columns
           String foreignIdPath = assocOneIdPath(propertyName);
-          el = descriptor.getElGetValue(foreignIdPath);
+          el = descriptor.elGetValue(foreignIdPath);
           if (el != null) {
             propertyName = foreignIdPath;
           }
@@ -661,7 +661,7 @@ final class CQueryBuilder {
         appendAndOrWhere();
 
         BeanDescriptor<?> desc = request.descriptor();
-        String idSql = desc.getIdBinderIdSql(query.getAlias());
+        String idSql = desc.idBinderIdSql(query.getAlias());
         if (idSql.isEmpty()) {
           throw new IllegalStateException("Executing FindById query on entity bean " + desc.name()
             + " that doesn't have an @Id property??");

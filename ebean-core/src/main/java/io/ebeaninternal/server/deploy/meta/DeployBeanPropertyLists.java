@@ -194,7 +194,7 @@ public final class DeployBeanPropertyLists {
       mutable.add(prop);
     }
 
-    if (desc.getInheritInfo() != null && prop.isLocal()) {
+    if (desc.inheritInfo() != null && prop.isLocal()) {
       local.add(prop);
     }
 
@@ -356,7 +356,7 @@ public final class DeployBeanPropertyLists {
   public BeanProperty[] getGeneratedInsert() {
     List<BeanProperty> list = new ArrayList<>();
     for (BeanProperty prop : nonTransients) {
-      GeneratedProperty gen = prop.getGeneratedProperty();
+      GeneratedProperty gen = prop.generatedProperty();
       if (gen != null && gen.includeInInsert()) {
         list.add(prop);
       }
@@ -370,7 +370,7 @@ public final class DeployBeanPropertyLists {
   public BeanProperty[] getGeneratedUpdate() {
     List<BeanProperty> list = new ArrayList<>();
     for (BeanProperty prop : nonTransients) {
-      GeneratedProperty gen = prop.getGeneratedProperty();
+      GeneratedProperty gen = prop.generatedProperty();
       if (gen != null && gen.includeInUpdate()) {
         list.add(prop);
       }
@@ -391,12 +391,12 @@ public final class DeployBeanPropertyLists {
       if (imported != prop.isOneToOneExported()) {
         switch (mode) {
           case Save:
-            if (prop.getCascadeInfo().isSave()) {
+            if (prop.cascadeInfo().isSave()) {
               list.add(prop);
             }
             break;
           case Delete:
-            if (prop.getCascadeInfo().isDelete()) {
+            if (prop.cascadeInfo().isDelete()) {
               list.add(prop);
             }
             break;

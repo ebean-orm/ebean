@@ -44,7 +44,7 @@ final class BindableEncryptedProperty implements Bindable {
   public void dmlAppend(GenerateDmlRequest request) {
 
     // columnName = AES_ENCRYPT(?,?)
-    request.appendColumn(prop.dbColumn(), prop.getDbBind());
+    request.appendColumn(prop.dbColumn(), prop.dbBind());
   }
 
 
@@ -60,7 +60,7 @@ final class BindableEncryptedProperty implements Bindable {
     }
 
     // get Encrypt key
-    String encryptKeyValue = prop.getEncryptKey().getStringValue();
+    String encryptKeyValue = prop.encryptKey().getStringValue();
 
     if (!bindEncryptDataFirst) {
       // H2 encrypt function ... different parameter order

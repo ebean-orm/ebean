@@ -15,7 +15,7 @@ final class BindablePropertyJsonInsert extends BindableProperty {
 
   BindablePropertyJsonInsert(BeanProperty prop) {
     super(prop);
-    this.propertyIndex = prop.getPropertyIndex();
+    this.propertyIndex = prop.propertyIndex();
   }
 
   /**

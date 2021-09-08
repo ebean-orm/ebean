@@ -212,20 +212,20 @@ public class TestAnnotationBase extends BaseTestCase {
   public void testFindMaxSize() throws SecurityException {
     BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
     BeanProperty bp = descriptor.findProperty("constraintAnnotation");
-    assertEquals(40, bp.getDbLength());
+    assertEquals(40, bp.dbLength());
   }
 
   @Test
   public void testFindJakartaMaxSize() throws SecurityException {
     BeanDescriptor<TestJakartaAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestJakartaAnnotationBaseEntity.class);
     BeanProperty bp = descriptor.findProperty("constraintAnnotation");
-    assertEquals(40, bp.getDbLength());
+    assertEquals(40, bp.dbLength());
   }
 
   @Test
   public void annotationClassIndexes() throws SecurityException {
     BeanDescriptor<TestAnnotationBaseEntity> descriptor = spiEbeanServer().getBeanDescriptor(TestAnnotationBaseEntity.class);
-    final IndexDefinition[] indexDefinitions = descriptor.getIndexDefinitions();
+    final IndexDefinition[] indexDefinitions = descriptor.indexDefinitions();
     assertEquals(3, indexDefinitions.length);
   }
 

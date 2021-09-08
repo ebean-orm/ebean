@@ -203,7 +203,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       }
 
       LoadBeanRequest req = new LoadBeanRequest(this, ebi, context.hitCache);
-      context.desc.getEbeanServer().loadBean(req);
+      context.desc.ebeanServer().loadBean(req);
       list.clear();
     }
   }

@@ -294,7 +294,7 @@ public final class SqlTreeBuilder {
 
       String baseTable = (query == null) ? null : query.getBaseTable();
       if (baseTable == null) {
-        baseTable = desc.getBaseTable(temporalMode);
+        baseTable = desc.baseTable(temporalMode);
       }
       return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct, baseTable);
 
@@ -507,7 +507,7 @@ public final class SqlTreeBuilder {
       }
     }
 
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    InheritInfo inheritInfo = desc.inheritInfo();
     if (inheritInfo != null) {
       // add sub type properties
       inheritInfo.addChildrenProperties(selectProps);

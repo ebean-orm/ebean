@@ -739,7 +739,7 @@ public final class DefaultPersister implements Persister {
       // OneToOne exported side with delete cascade
       BeanPropertyAssocOne<?>[] expOnes = descriptor.propertiesOneExportedDelete();
       for (BeanPropertyAssocOne<?> expOne : expOnes) {
-        BeanDescriptor<?> targetDesc = expOne.getTargetDescriptor();
+        BeanDescriptor<?> targetDesc = expOne.targetDescriptor();
         // only cascade soft deletes when supported by target
         if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
           if (deleteMode.isHard() && targetDesc.isDeleteByStatement()) {
@@ -758,7 +758,7 @@ public final class DefaultPersister implements Persister {
       BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyDelete();
       for (BeanPropertyAssocMany<?> many : manys) {
         if (!many.isManyToMany()) {
-          BeanDescriptor<?> targetDesc = many.getTargetDescriptor();
+          BeanDescriptor<?> targetDesc = many.targetDescriptor();
           // only cascade soft deletes when supported by target
           if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
             if (deleteMode.isHard() && targetDesc.isDeleteByStatement()) {
@@ -948,7 +948,7 @@ public final class DefaultPersister implements Persister {
   private SaveManyBase saveManyRequest(boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     if (!many.isElementCollection()) {
       return new SaveManyBeans(this, insertedParent, many, parentBean, request);
-    } else if (many.getManyType().isMap()) {
+    } else if (many.manyType().isMap()) {
       return new SaveManyElementCollectionMap(this, insertedParent, many, parentBean, request);
     } else {
       return new SaveManyElementCollection(this, insertedParent, many, parentBean, request);
@@ -1019,7 +1019,7 @@ public final class DefaultPersister implements Persister {
         }
       } else {
 
-        if (ModifyListenMode.REMOVALS == many.getModifyListenMode()) {
+        if (ModifyListenMode.REMOVALS == many.modifyListenMode()) {
           // PrivateOwned ...
           // if soft delete then check target also supports soft delete
           if (deleteMode.isHard() || many.isTargetSoftDelete()) {
@@ -1059,9 +1059,9 @@ public final class DefaultPersister implements Persister {
   void deleteManyDetails(SpiTransaction t, BeanDescriptor<?> desc, EntityBean parentBean,
                          BeanPropertyAssocMany<?> many, List<Object> excludeDetailIds, DeleteMode deleteMode) {
 
-    if (many.getCascadeInfo().isDelete()) {
+    if (many.cascadeInfo().isDelete()) {
       // cascade delete the beans in the collection
-      BeanDescriptor<?> targetDesc = many.getTargetDescriptor();
+      BeanDescriptor<?> targetDesc = many.targetDescriptor();
       if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
         if (targetDesc.isDeleteByStatement()) {
           // Just delete all the children with one statement

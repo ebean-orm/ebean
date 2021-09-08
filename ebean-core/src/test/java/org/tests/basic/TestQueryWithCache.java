@@ -24,7 +24,7 @@ public class TestQueryWithCache extends BaseTestCase {
 
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<Country> beanDescriptor = server.getBeanDescriptor(Country.class);
-    CacheOptions cacheOptions = beanDescriptor.getCacheOptions();
+    CacheOptions cacheOptions = beanDescriptor.cacheOptions();
 
     assertNotNull(cacheOptions);
     assertTrue(cacheOptions.isReadOnly());

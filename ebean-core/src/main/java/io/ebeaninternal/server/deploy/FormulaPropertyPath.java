@@ -97,17 +97,17 @@ final class FormulaPropertyPath {
 
   STreeProperty build() {
     if (cast != null) {
-      ScalarType<?> scalarType = descriptor.getScalarType(cast);
+      ScalarType<?> scalarType = descriptor.scalarType(cast);
       if (scalarType == null) {
         throw new IllegalStateException("Unable to find scalarType for cast of [" + cast + "] on formula [" + formula + "] for type " + descriptor);
       }
       return create(scalarType);
     }
     if (isCount()) {
-      return create(descriptor.getScalarType(Types.BIGINT));
+      return create(descriptor.scalarType(Types.BIGINT));
     }
     if (isConcat()) {
-      return create(descriptor.getScalarType(Types.VARCHAR));
+      return create(descriptor.scalarType(Types.VARCHAR));
     }
     if (firstProp == null) {
       throw new IllegalStateException("unable to determine scalarType of formula [" + formula + "] for type " + descriptor + " - maybe use a cast like ::String ?");

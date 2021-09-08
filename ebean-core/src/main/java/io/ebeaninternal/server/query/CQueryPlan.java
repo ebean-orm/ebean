@@ -93,7 +93,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.profileLocation = query.getProfileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType(), request.descriptor().getSimpleName());
+    this.name = deriveName(label, query.getType(), request.descriptor().simpleName());
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.sqlTree = sqlTree;
@@ -117,7 +117,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.profileLocation = query.getProfileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType(), request.descriptor().getSimpleName());
+    this.name = deriveName(label, query.getType(), request.descriptor().simpleName());
     this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
     this.sql = sql;

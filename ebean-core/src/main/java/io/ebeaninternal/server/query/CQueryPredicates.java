@@ -328,14 +328,14 @@ public final class CQueryPredicates {
     String orderBy = parseOrderBy();
 
     BeanDescriptor<?> desc = request.descriptor();
-    String orderById = desc.getDefaultOrderBy();
+    String orderById = desc.defaultOrderBy();
 
     if (orderBy == null) {
       orderBy = orderById;
     }
 
     // check for default ordering on the many property...
-    String manyOrderBy = manyProp.getFetchOrderBy();
+    String manyOrderBy = manyProp.fetchOrderBy();
     if (manyOrderBy != null) {
       orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.name(), manyOrderBy);
     }

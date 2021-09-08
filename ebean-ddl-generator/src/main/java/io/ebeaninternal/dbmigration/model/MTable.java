@@ -90,10 +90,10 @@ public class MTable {
 
   public MTable(BeanDescriptor<?> descriptor) {
     this.name = descriptor.baseTable();
-    this.identityMode = descriptor.getIdentityMode();
-    this.storageEngine = descriptor.getStorageEngine();
-    this.partitionMeta = descriptor.getPartitionMeta();
-    this.comment = descriptor.getDbComment();
+    this.identityMode = descriptor.identityMode();
+    this.storageEngine = descriptor.storageEngine();
+    this.partitionMeta = descriptor.partitionMeta();
+    this.comment = descriptor.dbComment();
     if (descriptor.isHistorySupport()) {
       withHistory = true;
       BeanProperty whenCreated = descriptor.whenCreatedProperty();

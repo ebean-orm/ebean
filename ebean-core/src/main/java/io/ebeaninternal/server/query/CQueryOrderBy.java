@@ -54,7 +54,7 @@ final class CQueryOrderBy {
   private String parseProperty(Property p) {
 
     String propName = p.getProperty();
-    ElPropertyValue el = desc.getElGetValue(propName);
+    ElPropertyValue el = desc.elGetValue(propName);
     if (el == null) {
       return p.toStringFormat();
     }
@@ -62,7 +62,7 @@ final class CQueryOrderBy {
     BeanProperty beanProperty = el.beanProperty();
     if (beanProperty instanceof BeanPropertyAssoc<?>) {
       BeanPropertyAssoc<?> ap = (BeanPropertyAssoc<?>) beanProperty;
-      IdBinder idBinder = ap.getTargetDescriptor().getIdBinder();
+      IdBinder idBinder = ap.targetDescriptor().idBinder();
       return idBinder.getOrderBy(el.elName(), p.isAscending());
     }
 

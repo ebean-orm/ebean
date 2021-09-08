@@ -28,7 +28,7 @@ final class MatchedImportedFactory {
     for (BeanPropertyAssocOne<?> assocOne1 : desc.propertiesOne()) {
       if (assocOne1.isImportedPrimaryKey()) {
         // search using the ImportedId from the assoc one
-        BeanProperty foreignMatch = assocOne1.getImportedId().findMatchImport(dbColumn);
+        BeanProperty foreignMatch = assocOne1.importedId().findMatchImport(dbColumn);
         if (foreignMatch != null) {
           return new MatchedImportedEmbedded(prop, assocOne1, foreignMatch);
         }

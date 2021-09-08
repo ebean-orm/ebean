@@ -314,9 +314,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.secondaryTableJoin = source.secondaryTableJoin;
     this.secondaryTableJoinPrefix = source.secondaryTableJoinPrefix;
     this.dbComment = source.dbComment;
-    this.dbBind = source.getDbBind();
+    this.dbBind = source.dbBind();
     this.dbEncrypted = source.isDbEncrypted();
-    this.dbEncryptedType = source.getDbEncryptedType();
+    this.dbEncryptedType = source.dbEncryptedType();
     this.dbEncryptFunction = source.dbEncryptFunction;
     this.dbRead = source.isDbRead();
     this.dbInsertable = source.isDbInsertable();
@@ -331,14 +331,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.version = source.isVersion();
     this.embedded = source.isEmbedded();
     this.id = source.isId();
-    this.generatedProperty = source.getGeneratedProperty();
+    this.generatedProperty = source.generatedProperty();
     this.getter = source.getter;
     this.setter = source.setter;
-    this.dbType = source.getDbType(true);
+    this.dbType = source.dbType(true);
     this.scalarType = source.scalarType;
     this.lob = isLobType(dbType);
     this.propertyType = source.type();
-    this.field = source.getField();
+    this.field = source.field();
     this.docOptions = source.docOptions;
     this.unmappedJson = source.unmappedJson;
     this.elPrefix = override.replace(source.elPrefix, source.dbColumn);
@@ -363,7 +363,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the order this property appears in the bean.
    */
-  public int getDeployOrder() {
+  public int deployOrder() {
     return deployOrder;
   }
 
@@ -381,7 +381,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the BeanDescriptor that owns this property.
    */
-  public BeanDescriptor<?> getBeanDescriptor() {
+  public BeanDescriptor<?> descriptor() {
     return descriptor;
   }
 
@@ -424,23 +424,23 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the encrypt key for the column matching this property.
    */
-  public EncryptKey getEncryptKey() {
-    return descriptor.getEncryptKey(this);
+  public EncryptKey encryptKey() {
+    return descriptor.encryptKey(this);
   }
 
   @Override
   public String encryptKeyAsString() {
-    return getEncryptKey().getStringValue();
+    return encryptKey().getStringValue();
   }
 
-  public String getDecryptProperty(String propertyName) {
+  public String decryptProperty(String propertyName) {
     return dbEncryptFunction.getDecryptSql(propertyName);
   }
 
   /**
    * Return the SQL for the column including decryption function and column alias.
    */
-  private String getDecryptSqlWithColumnAlias(String tableAlias) {
+  private String decryptSqlWithColumnAlias(String tableAlias) {
     return dbEncryptFunction.getDecryptSql(tableAlias + "." + this.dbColumn()) + ENC_PREFIX + tableAlias + "_" + this.dbColumn();
   }
 
@@ -468,7 +468,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Returns null unless this property is using a secondary table. In that
    * case this returns the logical property prefix.
    */
-  public String getSecondaryTableJoinPrefix() {
+  public String secondaryTableJoinPrefix() {
     return secondaryTableJoinPrefix;
   }
 
@@ -488,7 +488,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
         ctx.pushTableAlias(ctx.getRelativePrefix(secondaryTableJoinPrefix));
       }
       if (dbEncrypted) {
-        ctx.appendRawColumn(getDecryptSqlWithColumnAlias(ctx.peekTableAlias()));
+        ctx.appendRawColumn(decryptSqlWithColumnAlias(ctx.peekTableAlias()));
         ctx.addEncryptedProp(this);
       } else {
         ctx.appendColumn(dbColumn);
@@ -604,14 +604,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the DB literal expression to set the deleted state to true.
    */
-  String getSoftDeleteDbSet() {
+  String softDeleteDbSet() {
     return softDeleteDbSet;
   }
 
   /**
    * Return the DB literal predicate used to filter out soft deleted rows from a query.
    */
-  String getSoftDeleteDbPredicate(String tableAlias) {
+  String softDeleteDbPredicate(String tableAlias) {
     return tableAlias + softDeleteDbPredicate;
   }
 
@@ -824,7 +824,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the position of this property in the enhanced bean.
    */
-  public int getPropertyIndex() {
+  public int propertyIndex() {
     return propertyIndex;
   }
 
@@ -961,21 +961,21 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the DB max length (varchar) or precision (decimal).
    */
-  public int getDbLength() {
+  public int dbLength() {
     return dbLength;
   }
 
   /**
    * Return the DB scale for numeric columns.
    */
-  public int getDbScale() {
+  public int dbScale() {
     return dbScale;
   }
 
   /**
    * Return a specific column DDL definition if specified (otherwise null).
    */
-  public String getDbColumnDefn() {
+  public String dbColumnDefn() {
     return dbColumnDefn;
   }
 
@@ -985,7 +985,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * For an Enum returns IN expression for the set of Enum values.
    * </p>
    */
-  public Set<String> getDbCheckConstraintValues() {
+  public Set<String> dbCheckConstraintValues() {
     if (scalarType instanceof ScalarTypeEnum) {
       return ((ScalarTypeEnum<?>) scalarType).getDbCheckConstraintValues();
     }
@@ -1005,28 +1005,28 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the DB column default to use for DDL.
    */
-  public String getDbColumnDefault() {
+  public String dbColumnDefault() {
     return dbColumnDefn != null ? null : dbColumnDefault;
   }
 
   /**
    * Return the DDL-Migration Infos
    */
-  public List<DbMigrationInfo> getDbMigrationInfos() {
+  public List<DbMigrationInfo> dbMigrationInfos() {
     return dbMigrationInfos;
   }
 
   /**
    * Return the bean Field associated with this property.
    */
-  private Field getField() {
+  private Field field() {
     return field;
   }
 
   /**
    * Return the GeneratedValue. Used to generate update timestamp etc.
    */
-  public GeneratedProperty getGeneratedProperty() {
+  public GeneratedProperty generatedProperty() {
     return generatedProperty;
   }
 
@@ -1124,7 +1124,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the comment for the associated DB column.
    */
-  public String getDbComment() {
+  public String dbComment() {
     return dbComment;
   }
 
@@ -1133,7 +1133,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    *
    * @param platformTypes Set as false when we want logical platform agnostic types.
    */
-  public int getDbType(boolean platformTypes) {
+  public int dbType(boolean platformTypes) {
     if (platformTypes || !(scalarType instanceof ScalarTypeLogicalType)) {
       return dbType;
     }
@@ -1182,7 +1182,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the DB bind parameter. Typically is "?" but different for
    * encrypted bind.
    */
-  public String getDbBind() {
+  public String dbBind() {
     return dbBind;
   }
 
@@ -1207,7 +1207,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return dbEncrypted;
   }
 
-  public int getDbEncryptedType() {
+  public int dbEncryptedType() {
     return dbEncryptedType;
   }
 

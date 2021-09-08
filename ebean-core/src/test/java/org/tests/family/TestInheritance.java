@@ -25,8 +25,8 @@ public class TestInheritance extends BaseTestCase {
   @Test
   public void testDescriptor() {
     BeanDescriptor<GrandParentPerson> desc = spiEbeanServer().getBeanDescriptor(GrandParentPerson.class);
-    BeanProperty prop1 = desc.getBeanProperty("someBean");
-    BeanProperty prop2 = desc.getBeanProperty("effectiveBean");
+    BeanProperty prop1 = desc.beanProperty("someBean");
+    BeanProperty prop2 = desc.beanProperty("effectiveBean");
 
     assertEquals(BeanPropertyAssocOne.class, prop1.getClass());
     assertEquals(BeanPropertyAssocOne.class, prop2.getClass());

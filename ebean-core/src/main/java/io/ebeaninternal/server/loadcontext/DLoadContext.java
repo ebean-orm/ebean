@@ -67,7 +67,7 @@ public final class DLoadContext implements LoadContext {
   public DLoadContext(BeanDescriptor<?> rootDescriptor, PersistenceContext persistenceContext) {
     this.useDocStore = true;
     this.rootDescriptor = rootDescriptor;
-    this.ebeanServer = rootDescriptor.getEbeanServer();
+    this.ebeanServer = rootDescriptor.ebeanServer();
     this.persistenceContext = persistenceContext;
     this.origin = initOrigin();
     this.defaultBatchSize = 100;
@@ -161,7 +161,7 @@ public final class DLoadContext implements LoadContext {
    * used to build the appropriate query for +query or +lazy loading.
    */
   private void registerSecondaryQuery(OrmQueryProperties props) {
-    ElPropertyValue elGetValue = rootDescriptor.getElGetValue(props.getPath());
+    ElPropertyValue elGetValue = rootDescriptor.elGetValue(props.getPath());
     boolean many = elGetValue.beanProperty().containsMany();
     registerSecondaryNode(many, props);
   }
@@ -295,7 +295,7 @@ public final class DLoadContext implements LoadContext {
   }
 
   DLoadBeanContext getBeanContextWithInherit(String path, BeanPropertyAssocOne<?> property) {
-    String key = path + ":" + property.getTargetDescriptor().name();
+    String key = path + ":" + property.targetDescriptor().name();
     return beanMap.computeIfAbsent(key, p -> createBeanContext(property, path, null));
   }
 
@@ -323,11 +323,11 @@ public final class DLoadContext implements LoadContext {
 
   private DLoadBeanContext createBeanContext(String path, OrmQueryProperties queryProps) {
     BeanPropertyAssoc<?> p = (BeanPropertyAssoc<?>) getBeanProperty(rootDescriptor, path);
-    return new DLoadBeanContext(this, p.getTargetDescriptor(), path, queryProps);
+    return new DLoadBeanContext(this, p.targetDescriptor(), path, queryProps);
   }
 
   private DLoadBeanContext createBeanContext(BeanPropertyAssoc<?> property, String path, OrmQueryProperties queryProps) {
-    return new DLoadBeanContext(this, property.getTargetDescriptor(), path, queryProps);
+    return new DLoadBeanContext(this, property.targetDescriptor(), path, queryProps);
   }
 
   private BeanProperty getBeanProperty(BeanDescriptor<?> desc, String path) {

@@ -76,7 +76,7 @@ public final class DeployUpdateParser extends DeployParser {
     if (expression.equalsIgnoreCase(beanDescriptor.name())) {
       return beanDescriptor.baseTable();
     }
-    ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(expression);
+    ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(expression);
     return elProp != null ? elProp.dbColumn() : null;
   }
 

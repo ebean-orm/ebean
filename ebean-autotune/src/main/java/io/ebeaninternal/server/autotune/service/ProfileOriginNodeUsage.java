@@ -43,14 +43,14 @@ public class ProfileOriginNodeUsage {
     try {
       BeanDescriptor<?> desc = rootDesc;
       if (path != null) {
-        ElPropertyValue elGetValue = rootDesc.getElGetValue(path);
+        ElPropertyValue elGetValue = rootDesc.elGetValue(path);
         if (elGetValue == null) {
           logger.warn("AutoTune: Can't find join for path[" + path + "] for " + rootDesc.name());
           return;
         } else {
           BeanProperty beanProperty = elGetValue.beanProperty();
           if (beanProperty instanceof BeanPropertyAssoc<?>) {
-            desc = ((BeanPropertyAssoc<?>) beanProperty).getTargetDescriptor();
+            desc = ((BeanPropertyAssoc<?>) beanProperty).targetDescriptor();
           }
         }
       }
@@ -83,7 +83,7 @@ public class ProfileOriginNodeUsage {
       }
 
       if ((modified || addVersionProperty) && desc != null) {
-        BeanProperty versionProp = desc.getVersionProperty();
+        BeanProperty versionProp = desc.versionProperty();
         if (versionProp != null) {
           addedToPath = true;
           pathProps.addToPath(path, versionProp.name());
@@ -92,7 +92,7 @@ public class ProfileOriginNodeUsage {
 
       if (toOneIdProperty != null && !addedToPath) {
         // add ToOne property to parent path
-        ElPropertyValue assocOne = rootDesc.getElGetValue(path);
+        ElPropertyValue assocOne = rootDesc.elGetValue(path);
         pathProps.addToPath(SplitName.parent(path), assocOne.name());
       }
     } finally {

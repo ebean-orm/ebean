@@ -52,7 +52,7 @@ final class UpdateMeta extends BaseMeta {
     String key = persistRequest.updatePlanHash();
     // check if we can use a cached UpdatePlan
     BeanDescriptor<?> beanDescriptor = persistRequest.descriptor();
-    SpiUpdatePlan updatePlan = beanDescriptor.getUpdatePlan(key);
+    SpiUpdatePlan updatePlan = beanDescriptor.updatePlan(key);
     if (updatePlan != null) {
       return updatePlan;
     }
@@ -70,7 +70,7 @@ final class UpdateMeta extends BaseMeta {
 
     updatePlan = new UpdatePlan(key, mode, sql, bindableList);
     // add the UpdatePlan to the cache
-    beanDescriptor.putUpdatePlan(key, updatePlan);
+    beanDescriptor.updatePlan(key, updatePlan);
     return updatePlan;
   }
 

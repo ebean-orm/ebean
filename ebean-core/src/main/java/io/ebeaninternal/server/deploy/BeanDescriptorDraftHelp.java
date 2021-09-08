@@ -19,7 +19,7 @@ final class BeanDescriptorDraftHelp<T> {
 
   BeanDescriptorDraftHelp(BeanDescriptor<T> desc) {
     this.desc = desc;
-    this.draftDirty = desc.getDraftDirty();
+    this.draftDirty = desc.draftDirty();
     this.resetProperties = resetProperties();
   }
 
@@ -74,7 +74,7 @@ final class BeanDescriptorDraftHelp<T> {
       prop.publish(draft, live);
     }
     for (BeanPropertyAssocMany<?> many : desc.propertiesMany()) {
-      if (many.getTargetDescriptor().isDraftable()) {
+      if (many.targetDescriptor().isDraftable()) {
         many.publishMany(draft, live);
       }
     }
@@ -86,12 +86,12 @@ final class BeanDescriptorDraftHelp<T> {
    */
   void draftQueryOptimise(Query<T> query) {
     for (BeanPropertyAssocOne<?> anOne : desc.propertiesOne()) {
-      if (anOne.getTargetDescriptor().isDraftableElement()) {
+      if (anOne.targetDescriptor().isDraftableElement()) {
         query.fetch(anOne.name());
       }
     }
     for (BeanPropertyAssocMany<?> aMany : desc.propertiesMany()) {
-      if (aMany.getTargetDescriptor().isDraftableElement()) {
+      if (aMany.targetDescriptor().isDraftableElement()) {
         query.fetch(aMany.name());
       }
     }
