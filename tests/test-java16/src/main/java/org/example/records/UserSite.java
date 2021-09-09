@@ -25,27 +25,27 @@ public class UserSite extends Model {
     this.siteId = siteId;
   }
 
-  public UUID getUserId() {
+  public UUID userId() {
     return userId;
   }
 
-  public UUID getSiteId() {
+  public UUID siteId() {
     return siteId;
   }
 
-  public void setNote(String note) {
+  public void note(String note) {
     this.note = note;
   }
 
-  public void setVersion(long version) {
+  public void version(long version) {
     this.version = version;
   }
 
-  public String getNote() {
+  public String note() {
     return note;
   }
 
-  public long getVersion() {
+  public long version() {
     return version;
   }
 }
