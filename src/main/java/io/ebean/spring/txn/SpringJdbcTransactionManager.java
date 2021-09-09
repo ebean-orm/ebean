@@ -52,7 +52,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
     // RB: At this stage not exposing TransactionManager to
     // the public API and hence the Object type and casting here
     this.transactionManager = (TransactionManager) txnMgr;
-    this.dataSource = transactionManager.getDataSource();
+    this.dataSource = transactionManager.dataSource();
   }
 
   /**
@@ -67,7 +67,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
     ConnectionHolder holder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
     if (holder == null || !holder.isSynchronizedWithTransaction()) {
       // no current Spring transaction
-      SpiTransaction currentEbeanTransaction = transactionManager.getInScope();
+      SpiTransaction currentEbeanTransaction = transactionManager.inScope();
       if (currentEbeanTransaction == null || !currentEbeanTransaction.isActive()) {
         return null;
       } else {
