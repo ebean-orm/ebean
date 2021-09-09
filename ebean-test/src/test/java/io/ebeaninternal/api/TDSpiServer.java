@@ -138,6 +138,10 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
+  public void lock(Object bean) {
+  }
+
+  @Override
   public Object nextId(Class<?> beanType) {
     return null;
   }

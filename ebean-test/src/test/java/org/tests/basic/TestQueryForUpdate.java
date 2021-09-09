@@ -7,12 +7,13 @@ import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
+import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryForUpdate extends BaseTestCase {
 
@@ -37,6 +38,69 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sqlOf(query)).contains("for update");
     } else {
       assertThat(sqlOf(query)).contains("for update");
+    }
+  }
+
+  @Test
+  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  public void testForUpdate_when_alreadyInPCAsReference() {
+    ResetBasicData.reset();
+    Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
+    Integer customerId = o0.getCustomer().getId();
+
+    try (Transaction transaction = DB.beginTransaction()) {
+
+      LoggedSql.start();
+      Order order = DB.find(Order.class, o0.getId());
+      assert order != null;
+
+      Customer customer = order.getCustomer();
+      assertTrue(DB.beanState(customer).isReference());
+      assertEquals(customerId, customer.getId());
+
+      Customer customer1 = DB.find(Customer.class).where().idEq(customer.getId()).forUpdate().findOne();
+
+      assertThat(customer).isSameAs(customer1);
+      assertThat(customer.getName()).isNotNull();
+
+      List<String> sql = LoggedSql.stop();
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("from o_order");
+      assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ?   for update");
+
+      transaction.commit();
+    }
+  }
+
+  @Test
+  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  public void testForUpdate_when_alreadyInPCAsReference_usingLock() {
+    ResetBasicData.reset();
+    Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
+    Integer customerId = o0.getCustomer().getId();
+
+    try (Transaction transaction = DB.beginTransaction()) {
+
+      LoggedSql.start();
+      Order order = DB.find(Order.class, o0.getId());
+      assert order != null;
+
+      Customer customer = order.getCustomer();
+      assertEquals(customerId, customer.getId());
+      assertTrue(DB.beanState(customer).isReference());
+
+      DB.lock(customer); // load the customer bean using select for update
+      // bean is now loaded and database row lock held until commit
+      assertFalse(DB.beanState(customer).isReference());
+
+      assertThat(customer.getName()).isNotNull();
+
+      List<String> sql = LoggedSql.stop();
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("from o_order");
+      assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ?   for update");
+
+      transaction.commit();
     }
   }
 

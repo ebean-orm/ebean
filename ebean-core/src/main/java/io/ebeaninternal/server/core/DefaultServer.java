@@ -129,16 +129,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.Clock;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -928,6 +919,20 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       throw new PersistenceException(bean.getClass().getName() + " is NOT an Entity Bean registered with this server?");
     }
     executeInTrans((txn) -> persister.merge(desc, checkEntityBean(bean), options, txn), transaction);
+  }
+
+  @Override
+  public void lock(Object bean) {
+    BeanDescriptor<?> desc = descriptor(bean.getClass());
+    if (desc == null) {
+      throw new PersistenceException(bean.getClass() + " is NOT an Entity Bean registered with this server?");
+    }
+    Object id = desc.id(bean);
+    Objects.requireNonNull(id, "Bean missing an @Id value which is required to lock");
+    new DefaultOrmQuery<>(desc, this, expressionFactory)
+      .setId(id)
+      .withLock(Query.LockType.DEFAULT, Query.LockWait.NOWAIT)
+      .findOne();
   }
 
   @Override

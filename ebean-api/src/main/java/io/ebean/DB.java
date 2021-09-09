@@ -1273,6 +1273,21 @@ public final class DB {
   }
 
   /**
+   * Load and lock the bean using {@code select for update}.
+   * <p>
+   * This should be executed inside a transaction.
+   * <p>
+   * The bean needs to have an ID property set and can be a reference bean (only has ID)
+   * or partially or fully populated bean. This will load all the properties of the bean
+   * from the database using {@code select for update}.
+   *
+   * @param bean The entity bean that we wish to obtain a database lock on.
+   */
+  public static void lock(Object bean) {
+    getDefault().lock(bean);
+  }
+
+  /**
    * Deprecated migrate to cacheManager().
    */
   @Deprecated

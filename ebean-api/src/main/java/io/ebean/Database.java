@@ -1715,6 +1715,20 @@ public interface Database {
   <T> Set<String> validateQuery(Query<T> query);
 
   /**
+   * Load and lock the bean using {@code select for update}.
+   * <p>
+   * This should be executed inside a transaction and results in the bean being loaded or
+   * refreshed from the database and a database row lock held via {@code select for update}.
+   * <p>
+   * The bean needs to have an ID property set and can be a reference bean (only has ID)
+   * or partially or fully populated bean. This will load all the properties of the bean
+   * from the database using {@code select for update} obtaining a database row lock (using WAIT).
+   *
+   * @param bean The entity bean that we wish to obtain a database lock on.
+   */
+  void lock(Object bean);
+
+  /**
    * Truncate all the given tables.
    */
   void truncate(String... tables);
