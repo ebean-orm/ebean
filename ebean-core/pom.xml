@@ -89,13 +89,6 @@
       <optional>true</optional>
     </dependency>
 
-    <dependency>
-      <groupId>javax.naming</groupId>
-      <artifactId>jndi</artifactId>
-      <version>1.2.1</version>
-      <optional>true</optional>
-    </dependency>
-
     <!-- validation annotations Size etc -->
     <dependency>
       <groupId>javax.validation</groupId>
