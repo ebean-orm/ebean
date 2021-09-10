@@ -28,7 +28,7 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
 
   public DefaultExpressionRequest(SpiOrmQueryRequest<?> queryRequest, DeployParser deployParser, Binder binder, SpiExpressionList<?> expressionList) {
     this.queryRequest = queryRequest;
-    this.beanDescriptor = queryRequest.getBeanDescriptor();
+    this.beanDescriptor = queryRequest.descriptor();
     this.deployParser = deployParser;
     this.binder = binder;
     this.expressionList = expressionList;
@@ -84,7 +84,7 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
   @Override
   public void appendLike(boolean rawLikeExpression) {
     sql.append(" ");
-    sql.append(queryRequest.getDBLikeClause(rawLikeExpression));
+    sql.append(queryRequest.dbLikeClause(rawLikeExpression));
     sql.append(" ");
   }
 

@@ -50,7 +50,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
   public BeanCollection<T> createEmpty(EntityBean parentBean) {
     BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
     if (many != null) {
-      beanList.setModifyListening(many.getModifyListenMode());
+      beanList.setModifyListening(many.modifyListenMode());
     }
     return beanList;
   }
@@ -59,7 +59,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
   public BeanCollection<T> createReference(EntityBean parentBean) {
 
     BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
-    beanList.setModifyListening(many.getModifyListenMode());
+    beanList.setModifyListening(many.modifyListenMode());
     return beanList;
   }
 
@@ -77,7 +77,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
 
     List<?> currentList = (List<?>) many.getValue(parentBean);
 
-    newBeanList.setModifyListening(many.getModifyListenMode());
+    newBeanList.setModifyListening(many.modifyListenMode());
 
     if (currentList == null) {
       // the currentList is null? Not really expecting this...
@@ -87,7 +87,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
       // normally this case, replace just the underlying list
       BeanList<?> currentBeanList = (BeanList<?>) currentList;
       currentBeanList.setActualList(newBeanList.getActualList());
-      currentBeanList.setModifyListening(many.getModifyListenMode());
+      currentBeanList.setModifyListening(many.modifyListenMode());
 
     } else {
       // replace the entire list with the BeanList

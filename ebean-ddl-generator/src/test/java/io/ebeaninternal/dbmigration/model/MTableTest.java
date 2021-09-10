@@ -6,13 +6,12 @@ import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropTable;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MTableTest {
 
@@ -155,27 +154,26 @@ public class MTableTest {
     assertThat(base.getColumn("name")).isNull();
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void test_apply_dropColumn_doesNotExist() {
-
     MTable base = base();
 
     DropColumn dropColumn = new DropColumn();
     dropColumn.setTableName(base.getName());
     dropColumn.setColumnName("DoesNotExist");
-    base.apply(dropColumn);
+    assertThrows(IllegalStateException.class, () -> base.apply(dropColumn));
   }
 
-  @Test(expected = IllegalStateException.class)
+  @Test
   public void test_apply_alterColumn_doesNotExist() {
-
     MTable base = base();
 
     AlterColumn alterColumn = new AlterColumn();
     alterColumn.setTableName(base.getName());
     alterColumn.setColumnName("DoesNotExist");
     alterColumn.setType("integer");
-    base.apply(alterColumn);
+
+    assertThrows(IllegalStateException.class, () ->  base.apply(alterColumn));
   }
 
   @Test

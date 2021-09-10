@@ -35,7 +35,7 @@ abstract class BeanDescriptorElement<T> extends BeanDescriptor<T> {
   }
 
   @Override
-  public String getSimpleName() {
+  public String simpleName() {
     return simpleName;
   }
 
@@ -52,7 +52,7 @@ abstract class BeanDescriptorElement<T> extends BeanDescriptor<T> {
     if (props.length != 1) {
       throw new IllegalStateException("Expecting 1 property for element scalar but got " + Arrays.toString(props));
     }
-    return props[0].getScalarType();
+    return props[0].scalarType();
   }
 
   /**

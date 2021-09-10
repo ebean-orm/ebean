@@ -19,7 +19,7 @@ final class BeanEmbeddedMetaFactory {
     // we can get a BeanDescriptor for an Embedded bean
     // and know that it is NOT recursive, as Embedded beans are
     // only allow to hold simple scalar types...
-    BeanDescriptor<?> targetDesc = owner.getBeanDescriptor(prop.getTargetType());
+    BeanDescriptor<?> targetDesc = owner.descriptor(prop.getTargetType());
     if (targetDesc == null) {
       String msg = "Could not find BeanDescriptor for " + prop.getTargetType()
         + ". Perhaps the EmbeddedId class is not registered? See https://ebean.io/docs/trouble-shooting#not-registered";
@@ -34,7 +34,7 @@ final class BeanEmbeddedMetaFactory {
     BeanProperty[] embeddedProperties = new BeanProperty[sourceProperties.length];
 
     for (int i = 0; i < sourceProperties.length; i++) {
-      String propertyName = sourceProperties[i].getName();
+      String propertyName = sourceProperties[i].name();
       Column column = propColMap.get(propertyName);
       String dbColumn = dbColumn(columnPrefix, column, sourceProperties[i]);
       boolean dbNullable = dbNullable(column, sourceProperties[i]);
@@ -49,7 +49,7 @@ final class BeanEmbeddedMetaFactory {
   }
 
   private static String dbColumn(String prefix, Column override, BeanProperty source) {
-    String dbCol = (override != null && !override.name().isEmpty()) ? override.name() : source.getDbColumn();
+    String dbCol = (override != null && !override.name().isEmpty()) ? override.name() : source.dbColumn();
     return prefix == null ? dbCol : prefix + dbCol;
   }
 
@@ -58,15 +58,15 @@ final class BeanEmbeddedMetaFactory {
   }
 
   private static int dbLength(Column override, BeanProperty source) {
-    return (override != null && (override.length() != 255)) ? override.length() : source.getDbLength();
+    return (override != null && (override.length() != 255)) ? override.length() : source.dbLength();
   }
 
   private static int dbScale(Column override, BeanProperty source) {
-    return (override != null && (override.scale() != 0)) ? override.scale() : source.getDbScale();
+    return (override != null && (override.scale() != 0)) ? override.scale() : source.dbScale();
   }
 
   private static String getDbColumnDefn(Column override, BeanProperty source) {
-    return (override != null && !override.columnDefinition().isEmpty()) ? override.columnDefinition() : source.getDbColumnDefn();
+    return (override != null && !override.columnDefinition().isEmpty()) ? override.columnDefinition() : source.dbColumnDefn();
   }
 
 }

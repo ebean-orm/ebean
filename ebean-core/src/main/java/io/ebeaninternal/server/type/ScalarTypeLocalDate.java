@@ -19,6 +19,7 @@ final class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
     super(mode, LocalDate.class, false, Types.DATE);
   }
 
+  @Override
   protected String toIsoFormat(LocalDate value) {
     return value.toString();
   }

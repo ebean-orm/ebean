@@ -39,7 +39,7 @@ final class AllEqualsExpression extends NonPrepareExpression {
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propMap != null) {
       for (String propertyName : propMap.keySet()) {
-        ElPropertyDeploy elProp = desc.getElPropertyDeploy(name(propertyName));
+        ElPropertyDeploy elProp = desc.elPropertyDeploy(name(propertyName));
         if (elProp != null && elProp.containsMany()) {
           manyWhereJoin.add(elProp);
         }

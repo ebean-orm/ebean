@@ -6,7 +6,7 @@ import io.ebean.SqlUpdate;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DbMigrationTest extends BaseTestCase {
 
   private void runScript(boolean expectErrors, String scriptName) throws IOException {
-    String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().getPlatform().name().toLowerCase() + "/" + scriptName);
+    String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().platform().name().toLowerCase() + "/" + scriptName);
     runScript(expectErrors, ddl, scriptName);
   }
 

@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
@@ -8,18 +8,18 @@ import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PlatformDdl_dropUniqueConstraintTest {
 
-  private PlatformDdl h2Ddl = PlatformDdlBuilder.create(new H2Platform());
-  private PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
-  private PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
-  private PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
-  private PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServer17Platform());
-  private PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
+  private final PlatformDdl h2Ddl = PlatformDdlBuilder.create(new H2Platform());
+  private final PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
+  private final PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
+  private final PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
+  private final PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServer17Platform());
+  private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
 
   @Test
   public void test() throws Exception {
@@ -39,8 +39,8 @@ public class PlatformDdl_dropUniqueConstraintTest {
     sql = mysqlDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("alter table mytab drop index uq_name", sql);
 
-    ServerConfig serverConfig = new ServerConfig();
-    hanaDdl.configure(serverConfig);
+    DatabaseConfig config = new DatabaseConfig();
+    hanaDdl.configure(config);
     sql = hanaDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("delimiter $$\n" +
         "do\n" +

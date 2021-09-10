@@ -95,6 +95,7 @@ final class ScalarTypeUtilDate {
       super(mode, Date.class, false, Types.DATE);
     }
 
+    @Override
     protected String toIsoFormat(java.util.Date value) {
       return UtilDateParser.format(value);
     }

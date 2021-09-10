@@ -30,7 +30,7 @@ class UserRoleTest {
       .id.eq(new UserRoleId(42, "R7"))
       .findOne();
 
-    UserRoleId id1 = found.getId();
+    UserRoleId id1 = found.id();
     assertThat(id1).isEqualTo(id);
     assertThat(id1.userId()).isEqualTo(42);
     assertThat(id1.roleId()).isEqualTo("R7");

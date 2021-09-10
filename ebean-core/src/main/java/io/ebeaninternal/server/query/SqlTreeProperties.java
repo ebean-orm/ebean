@@ -35,11 +35,11 @@ public final class SqlTreeProperties {
 
   public void add(STreeProperty prop) {
     propsList.add(prop);
-    propNames.add(prop.getName());
+    propNames.add(prop.name());
     if (prop.isAggregation()) {
       if (!aggregation) {
         aggregation = true;
-        aggregationPath = prop.getElPrefix();
+        aggregationPath = prop.elPrefix();
       }
       if (prop.isAggregationManyToOne()) {
         aggregationManyToOne = true;

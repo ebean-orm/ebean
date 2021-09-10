@@ -8,9 +8,9 @@ import org.example.domain.Order;
 import org.example.domain.otherpackage.PhoneNumber;
 import org.example.domain.query.QCustomer;
 import org.example.domain.query.QOrder;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -55,12 +55,12 @@ public class QOrderTest {
   private static Order order;
   private static Customer customer;
 
-  @BeforeClass
+  @BeforeAll
   public static void before() {
     setupData();
   }
 
-  @AfterClass
+  @AfterAll
   public static void after() {
     DB.delete(order);
     DB.delete(customer);

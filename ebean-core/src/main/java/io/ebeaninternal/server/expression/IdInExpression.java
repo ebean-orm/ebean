@@ -81,7 +81,7 @@ public final class IdInExpression extends NonPrepareExpression {
 
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
-    IdBinder idBinder = descriptor.getIdBinder();
+    IdBinder idBinder = descriptor.idBinder();
     idBinder.addIdInBindValues(request, idCollection);
   }
 
@@ -92,11 +92,11 @@ public final class IdInExpression extends NonPrepareExpression {
 
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
-    IdBinder idBinder = descriptor.getIdBinder();
+    IdBinder idBinder = descriptor.idBinder();
     if (idCollection.isEmpty()) {
       request.append(SQL_FALSE); // append false for this stage
     } else {
-      request.append(descriptor.getIdBinder().getBindIdInSql(null));
+      request.append(descriptor.idBinder().getBindIdInSql(null));
       String inClause = idBinder.getIdInValueExpr(false, idCollection.size());
       request.append(inClause);
     }
@@ -105,15 +105,15 @@ public final class IdInExpression extends NonPrepareExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
     BeanDescriptor<?> descriptor = request.getBeanDescriptor();
-    IdBinder idBinder = descriptor.getIdBinder();
+    IdBinder idBinder = descriptor.idBinder();
     if (idCollection.isEmpty()) {
       request.append(SQL_FALSE); // append false for this stage
     } else {
       if (idBinder.isComplexId()) {
-        request.append(descriptor.getIdBinderInLHSSql());
+        request.append(descriptor.idBinderInLHSSql());
         request.append(idBinder.getIdInValueExpr(false, idCollection.size()));
       } else {
-        request.append(idBinder.getBeanProperty().getName());
+        request.append(idBinder.getBeanProperty().name());
         request.appendInExpression(false, idCollection);
       }
     }

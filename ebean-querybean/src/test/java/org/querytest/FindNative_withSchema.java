@@ -5,7 +5,7 @@ import org.example.domain.Customer;
 import org.example.domain.Order;
 import org.example.domain.OrderDetail;
 import org.example.domain.Product;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

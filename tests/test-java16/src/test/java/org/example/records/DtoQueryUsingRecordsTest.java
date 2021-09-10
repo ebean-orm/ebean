@@ -16,7 +16,7 @@ class DtoQueryUsingRecordsTest {
   void dtoQuery_projectRecords() {
 
     var course = new Course("Calculus");
-    course.setSummary("Something here");
+    course.summary("Something here");
     course.save();
 
     performOrmQuery();
@@ -41,7 +41,7 @@ class DtoQueryUsingRecordsTest {
       .findList();
 
     assertThat(records).hasSize(1);
-    assertThat(records.get(0).name()).isEqualTo(course.getName());
+    assertThat(records.get(0).name()).isEqualTo(course.name());
   }
 
   private void records_via_OrmQueryToDtoQuery(Course course) {
@@ -52,7 +52,7 @@ class DtoQueryUsingRecordsTest {
       .findList();
 
     assertThat(records2).hasSize(1);
-    assertThat(records2.get(0).name()).isEqualTo(course.getName());
+    assertThat(records2.get(0).name()).isEqualTo(course.name());
   }
 
   public record Foo(long id, String name){}

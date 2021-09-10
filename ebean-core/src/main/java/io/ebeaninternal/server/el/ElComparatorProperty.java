@@ -43,13 +43,13 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
       return val2 == null ? 0 : nullOrder;
     }
     if (elGetValue.isAssocId()) {
-      val1 = elGetValue.getAssocIdValues((EntityBean) val1)[0]; // TODO: compound key not yet supported
+      val1 = elGetValue.assocIdValues((EntityBean) val1)[0]; // TODO: compound key not yet supported
     }
     if (val2 == null) {
       return -1 * nullOrder;
     }
     if (elGetValue.isAssocId()) {
-      val2 = elGetValue.getAssocIdValues((EntityBean) val2)[0];
+      val2 = elGetValue.assocIdValues((EntityBean) val2)[0];
     }
     Comparable c = (Comparable) val1;
     return asc * c.compareTo(val2);

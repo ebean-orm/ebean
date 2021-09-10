@@ -60,42 +60,25 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private static final Logger log = LoggerFactory.getLogger(OrmQueryRequest.class);
 
   private final BeanDescriptor<T> beanDescriptor;
-
   private final OrmQueryEngine queryEngine;
-
   private final SpiQuery<T> query;
-
   private final BeanFindController finder;
-
   private final Boolean readOnly;
-
   private LoadContext loadContext;
-
   private PersistenceContext persistenceContext;
-
   private JsonReadOptions jsonRead;
-
   private HashQuery cacheKey;
-
   private CQueryPlanKey queryPlanKey;
-
   private SpiQuerySecondary secondaryQueries;
-
   private List<T> cacheBeans;
-
   private BeanPropertyAssocMany<?> manyProperty;
-
   private boolean inlineCountDistinct;
-
   private Set<String> dependentTables;
 
-  /**
-   * Create the InternalQueryRequest.
-   */
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
     super(server, t);
     this.beanDescriptor = query.getBeanDescriptor();
-    this.finder = beanDescriptor.getBeanFinder();
+    this.finder = beanDescriptor.beanFinder();
     this.queryEngine = queryEngine;
     this.query = query;
     this.readOnly = query.isReadOnly();
@@ -145,8 +128,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return the database platform like clause.
    */
   @Override
-  public String getDBLikeClause(boolean rawLikeExpression) {
-    return ebeanServer.getDatabasePlatform().getLikeClause(rawLikeExpression);
+  public String dbLikeClause(boolean rawLikeExpression) {
+    return server.databasePlatform().getLikeClause(rawLikeExpression);
   }
 
   /**
@@ -154,7 +137,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public String escapeLikeString(String value) {
-    return ebeanServer.getDatabasePlatform().escapeLikeString(value);
+    return server.databasePlatform().escapeLikeString(value);
   }
 
   @Override
@@ -171,9 +154,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * <p>
    * If -1 is returned then NO secondary queries are registered and simple
    * iteration is fine.
-   * </p>
    */
-  public int getSecondaryQueriesMinBatchSize() {
+  public int secondaryQueriesMinBatchSize() {
     return loadContext.getSecondaryQueriesMinBatchSize();
   }
 
@@ -188,14 +170,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return the BeanDescriptor for the associated bean.
    */
   @Override
-  public BeanDescriptor<T> getBeanDescriptor() {
+  public BeanDescriptor<T> descriptor() {
     return beanDescriptor;
   }
 
   /**
    * Return the graph context for this query.
    */
-  public LoadContext getGraphContext() {
+  public LoadContext loadContext() {
     return loadContext;
   }
 
@@ -208,7 +190,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Run BeanQueryAdapter preQuery() if needed.
    */
   private void adapterPreQuery() {
-    BeanQueryAdapter queryAdapter = beanDescriptor.getQueryAdapter();
+    BeanQueryAdapter queryAdapter = beanDescriptor.queryAdapter();
     if (queryAdapter != null) {
       queryAdapter.preQuery(this);
     }
@@ -244,7 +226,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Return the PersistenceContext used for this request.
    */
-  public PersistenceContext getPersistenceContext() {
+  public PersistenceContext persistenceContext() {
     return persistenceContext;
   }
 
@@ -271,15 +253,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (transaction == null) {
       if (query.getType().isUpdate()) {
         // bulk update or delete query
-        transaction = ebeanServer.beginServerTransaction();
+        transaction = server.beginServerTransaction();
       } else {
         // create an implicit transaction to execute this query
         // potentially using read-only DataSource with autoCommit
-        transaction = ebeanServer.createReadOnlyTransaction(query.getTenantId());
+        transaction = server.createReadOnlyTransaction(query.getTenantId());
       }
       createdTransaction = true;
     }
-    persistenceContext = getPersistenceContext(query, transaction);
+    persistenceContext = persistenceContext(query, transaction);
     loadContext = new DLoadContext(this, secondaryQueries);
   }
 
@@ -305,7 +287,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public JsonReadOptions createJsonReadOptions() {
-    persistenceContext = getPersistenceContext(query, transaction);
+    persistenceContext = persistenceContext(query, transaction);
     if (query.getPersistenceContext() == null) {
       query.setPersistenceContext(persistenceContext);
     }
@@ -336,14 +318,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Get the TransactionContext either explicitly set on the query or
    * transaction scoped.
    */
-  private PersistenceContext getPersistenceContext(SpiQuery<?> query, SpiTransaction t) {
+  private PersistenceContext persistenceContext(SpiQuery<?> query, SpiTransaction t) {
     // check if there is already a persistence context set which is the case
     // when lazy loading or query joins are executed
     PersistenceContext ctx = query.getPersistenceContext();
     if (ctx != null) return ctx;
 
     // determine the scope (from the query and then server)
-    PersistenceContextScope scope = ebeanServer.getPersistenceContextScope(query);
+    PersistenceContextScope scope = server.persistenceContextScope(query);
     if (scope == PersistenceContextScope.QUERY || t == null) {
       return new DefaultPersistenceContext();
     }
@@ -365,7 +347,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       transaction.commit();
       if (query.getType().isUpdate()) {
         // for implicit update/delete queries clear the thread local
-        ebeanServer.clearServerTransaction();
+        server.clearServerTransaction();
       }
     }
   }
@@ -486,9 +468,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public <K> Map<K, T> findMap() {
     String mapKey = query.getMapKey();
     if (mapKey == null) {
-      BeanProperty idProp = beanDescriptor.getIdProperty();
+      BeanProperty idProp = beanDescriptor.idProperty();
       if (idProp != null) {
-        query.setMapKey(idProp.getName());
+        query.setMapKey(idProp.name());
       } else {
         throw new PersistenceException("No mapKey specified for query");
       }
@@ -504,12 +486,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Return a bean specific finder if one has been set.
    */
-  public BeanFindController getBeanFinder() {
+  public BeanFindController finder() {
     return finder;
   }
 
   @Override
-  public SpiQuery<T> getQuery() {
+  public SpiQuery<T> query() {
     return query;
   }
 
@@ -517,14 +499,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Determine and return the ToMany property that is included in the query.
    */
   public BeanPropertyAssocMany<?> determineMany() {
-    manyProperty = beanDescriptor.getManyProperty(query);
+    manyProperty = beanDescriptor.manyProperty(query);
     return manyProperty;
   }
 
   /**
    * Return the many property that is fetched in the query or null if there is not one.
    */
-  public BeanPropertyAssocMany<?> getManyProperty() {
+  public BeanPropertyAssocMany<?> manyProperty() {
     return manyProperty;
   }
 
@@ -532,8 +514,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return a queryPlan for the current query if one exists. Returns null if no
    * query plan for this query exists.
    */
-  public CQueryPlan getQueryPlan() {
-    return beanDescriptor.getQueryPlan(queryPlanKey);
+  public CQueryPlan queryPlan() {
+    return beanDescriptor.queryPlan(queryPlanKey);
   }
 
   /**
@@ -542,9 +524,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * This identifies the query plan for a given bean type. It effectively
    * matches a SQL statement with ? bind variables. A query plan can be reused
    * with just the bind variables changing.
-   * </p>
    */
-  public CQueryPlanKey getQueryPlanKey() {
+  public CQueryPlanKey queryPlanKey() {
     return queryPlanKey;
   }
 
@@ -552,7 +533,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Put the QueryPlan into the cache.
    */
   public void putQueryPlan(CQueryPlan queryPlan) {
-    beanDescriptor.putQueryPlan(queryPlanKey, queryPlan);
+    beanDescriptor.queryPlan(queryPlanKey, queryPlan);
   }
 
   @Override
@@ -608,7 +589,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
-  public List<T> getBeanCacheHits() {
+  public List<T> beanCacheHits() {
     OrderBy<T> orderBy = query.getOrderBy();
     if (orderBy != null) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
@@ -617,7 +598,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
-  public <K> Map<K, T> getBeanCacheHitsAsMap() {
+  public <K> Map<K, T> beanCacheHitsAsMap() {
     OrderBy<T> orderBy = query.getOrderBy();
     if (orderBy != null) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
@@ -636,7 +617,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   private ElPropertyValue mapProperty() {
-    ElPropertyValue property = beanDescriptor.getElGetValue(query.getMapKey());
+    ElPropertyValue property = beanDescriptor.elGetValue(query.getMapKey());
     if (property == null) {
       throw new IllegalStateException("Unknown map key property "+query.getMapKey());
     }
@@ -665,7 +646,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (!beanDescriptor.isNaturalKeyCaching()) {
       return false;
     }
-
     NaturalKeyQueryData<T> data = query.naturalKey();
     if (data != null) {
       NaturalKeySet naturalKeySet = data.buildKeys();
@@ -688,30 +668,27 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public Object getFromQueryCache() {
     if (query.getUseQueryCache() == CacheMode.OFF
       || (transaction != null && transaction.isSkipCache())
-      || ebeanServer.isDisableL2Cache()) {
+      || server.isDisableL2Cache()) {
       return null;
     } else {
       cacheKey = query.queryHash();
     }
-
     if (!query.getUseQueryCache().isGet()) {
       return null;
     }
 
     Object cached = beanDescriptor.queryCacheGet(cacheKey);
-
     if (cached != null && isAuditReads() && readAuditQueryType()) {
       if (cached instanceof BeanCollection) {
         // raw sql can't use L2 cache so normal queries only in here
         Collection<T> actualDetails = ((BeanCollection<T>)cached).getActualDetails();
         List<Object> ids = new ArrayList<>(actualDetails.size());
         for (T bean : actualDetails) {
-          ids.add(beanDescriptor.getIdForJson(bean));
+          ids.add(beanDescriptor.idForJson(bean));
         }
         beanDescriptor.readAuditMany(queryPlanKey.getPartialKey(), "l2-query-cache", ids);
       }
     }
-
     if (Boolean.FALSE.equals(query.isReadOnly())) {
       // return shallow copies if readonly is explicitly set to false
       if (cached instanceof BeanCollection) {
@@ -750,7 +727,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
-   * Set an Query object that owns the PreparedStatement that can be cancelled.
+   * Set a Query object that owns the PreparedStatement that can be cancelled.
    */
   public void setCancelableQuery(CancelableQuery cancelableQuery) {
     query.setCancelableQuery(cancelableQuery);
@@ -766,16 +743,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Return the batch size for lazy loading on this bean query request.
    */
-  public int getLazyLoadBatchSize() {
+  public int lazyLoadBatchSize() {
     int batchSize = query.getLazyLoadBatchSize();
-    return (batchSize > 0) ? batchSize : ebeanServer.getLazyLoadBatchSize();
+    return (batchSize > 0) ? batchSize : server.lazyLoadBatchSize();
   }
 
   /**
    * Return true if read auditing is on for this query request.
    * <p>
    * This means that read audit is on for this bean type and that query has not explicitly disabled it.
-   * </p>
    */
   public boolean isAuditReads() {
     return beanDescriptor.isReadAuditing() && !query.isDisableReadAudit();
@@ -784,8 +760,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Return the base table alias for this query.
    */
-  public String getBaseTableAlias() {
-    return query.getAlias(beanDescriptor.getBaseTableAlias());
+  public String baseTableAlias() {
+    return query.getAlias(beanDescriptor.baseTableAlias());
   }
 
   /**
@@ -798,7 +774,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Return the tenantId associated with this request.
    */
-  public Object getTenantId() {
+  public Object tenantId() {
     return (transaction == null) ? null : transaction.getTenantId();
   }
 
@@ -806,7 +782,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Check for slow query event.
    */
   public void slowQueryCheck(long executionTimeMicros, int rowCount) {
-    ebeanServer.slowQueryCheck(executionTimeMicros, rowCount, query);
+    server.slowQueryCheck(executionTimeMicros, rowCount, query);
   }
 
   public void setInlineCountDistinct() {
@@ -830,6 +806,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return true if no MaxRows or use LIMIT in SQL update.
    */
   public boolean isInlineSqlUpdateLimit() {
-    return query.getMaxRows() < 1 || ebeanServer.getDatabasePlatform().isInlineSqlUpdateLimit();
+    return query.getMaxRows() < 1 || server.databasePlatform().isInlineSqlUpdateLimit();
   }
 }

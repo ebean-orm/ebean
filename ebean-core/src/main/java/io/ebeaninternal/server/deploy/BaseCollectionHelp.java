@@ -17,8 +17,8 @@ abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
 
   BaseCollectionHelp(BeanPropertyAssocMany<T> many) {
     this.many = many;
-    this.targetDescriptor = many.getTargetDescriptor();
-    this.propertyName = many.getName();
+    this.targetDescriptor = many.targetDescriptor();
+    this.propertyName = many.name();
   }
 
    BaseCollectionHelp() {

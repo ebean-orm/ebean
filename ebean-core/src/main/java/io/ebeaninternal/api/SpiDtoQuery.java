@@ -37,11 +37,6 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   boolean isRelaxedMode();
 
   /**
-   * Return the label for the query.
-   */
-  String getLabel();
-
-  /**
    * Return the label with fallback to profile location label.
    */
   String getPlanLabel();

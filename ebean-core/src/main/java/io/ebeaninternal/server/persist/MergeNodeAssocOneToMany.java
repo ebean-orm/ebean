@@ -20,8 +20,8 @@ final class MergeNodeAssocOneToMany extends MergeNode {
 
   @Override
   public void merge(MergeRequest request) {
-    Collection beans = many.getRawCollection(request.getBean());
-    Collection outlines = many.getRawCollection(request.getOutline());
+    Collection beans = many.rawCollection(request.getBean());
+    Collection outlines = many.rawCollection(request.getOutline());
 
     Map<Object, EntityBean> outlineIds = toMap(outlines);
     if (beans != null) {

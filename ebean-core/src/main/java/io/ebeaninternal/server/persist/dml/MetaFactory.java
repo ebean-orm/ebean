@@ -55,7 +55,7 @@ final class MetaFactory {
     embeddedFact.create(setList, desc, DmlMode.UPDATE, includeLobs);
     assocOneFact.create(setList, desc, DmlMode.UPDATE);
 
-    BeanProperty orderColumn = desc.getOrderColumn();
+    BeanProperty orderColumn = desc.orderColumn();
     if (orderColumn != null) {
       setList.add(new BindableOrderColumn(orderColumn));
     }
@@ -89,7 +89,7 @@ final class MetaFactory {
     assocOneFact.create(allList, desc, DmlMode.INSERT);
 
     BindableList allBindable = new BindableList(allList);
-    BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
+    BeanPropertyAssocOne<?> unidirectional = desc.unidirectional();
     Bindable shadowFkey;
     if (unidirectional == null) {
       shadowFkey = null;

@@ -10,13 +10,13 @@ import org.geolatte.geom.Point;
 import org.geolatte.geom.Polygon;
 import org.geolatte.geom.PositionSequenceBuilders;
 import org.geolatte.geom.crs.CoordinateReferenceSystems;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.geolatte.geom.codec.Wkt.toWkt;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.AssertJUnit.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestQuery {
 
@@ -88,20 +88,17 @@ public class TestQuery {
     )
   );
 
-  @BeforeTest
+  @BeforeEach
   public void setupObjects() {
     OtherBeanGeoLatte geoLatte = new OtherBeanGeoLatte();
     geoLatte.setWgs84Point(wgs84Point);
     DB.save(geoLatte);
   }
 
-  @AfterTest
+  @AfterEach
   public void cleanup() {
-    DB
-      .find(MyBean.class)
-      .delete();
-    DB.find(OtherBeanGeoLatte.class)
-      .delete();
+    DB.find(MyBean.class).delete();
+    DB.find(OtherBeanGeoLatte.class).delete();
   }
 
   @Test

@@ -33,7 +33,7 @@ final class CQueryBuilderRawSql {
 
     if (!rsql.isParsed()) {
       String sql = rsql.getUnparsedSql();
-      BindParams bindParams = request.getQuery().getBindParams();
+      BindParams bindParams = request.query().getBindParams();
       if (bindParams != null && bindParams.requiresNamedParamsPrepare()) {
         // convert named parameters into positioned parameters
         sql = BindParamsParser.parse(bindParams, sql);
@@ -46,7 +46,7 @@ final class CQueryBuilderRawSql {
     // build the actual sql String
     String sql = buildMainQuery(orderBy, request, predicates, rsql);
 
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     if (query.hasMaxRowsOrFirstRow() && sqlLimiter != null) {
       // wrap with a limit offset or ROW_NUMBER() etc
       return sqlLimiter.limit(new OrmQueryLimitRequest(sql, orderBy, query, dbPlatform, rsql.isDistinct() || query.isDistinct()));
@@ -66,7 +66,7 @@ final class CQueryBuilderRawSql {
     sb.append(" ");
 
     String s = sql.getPreWhere();
-    BindParams bindParams = request.getQuery().getBindParams();
+    BindParams bindParams = request.query().getBindParams();
     if (bindParams != null && bindParams.requiresNamedParamsPrepare()) {
       // convert named parameters into positioned parameters
       // Named Parameters only allowed prior to dynamic where
@@ -77,15 +77,15 @@ final class CQueryBuilderRawSql {
     sb.append(" ");
 
     String dynamicWhere = null;
-    if (request.getQuery().getId() != null) {
+    if (request.query().getId() != null) {
       // need to convert this as well. This avoids the
       // assumption that id has its proper dbColumn assigned
       // which may change if using multiple raw sql statements
       // against the same bean.
-      BeanDescriptor<?> descriptor = request.getBeanDescriptor();
+      BeanDescriptor<?> descriptor = request.descriptor();
       //FIXME: I think this is broken... needs to be logical
       // and then parsed for RawSqlSelect...
-      dynamicWhere = descriptor.getIdBinderIdSql(null);
+      dynamicWhere = descriptor.idBinderIdSql(null);
     }
 
     String dbWhere = predicates.getDbWhere();

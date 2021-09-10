@@ -90,7 +90,7 @@ public final class DeployBeanPropertyLists {
         discProperty = null;
       }
       BeanProperty beanProp = createBeanProperty(owner, prop);
-      propertyMap.put(beanProp.getName(), beanProp);
+      propertyMap.put(beanProp.name(), beanProp);
     }
 
     int order = 0;
@@ -102,13 +102,13 @@ public final class DeployBeanPropertyLists {
     if (orderColumn != null) {
       orderColumn.setDeployOrder(order);
       allocateToList(orderColumn);
-      propertyMap.put(orderColumn.getName(), orderColumn);
+      propertyMap.put(orderColumn.name(), orderColumn);
     }
 
     if (discProperty != null) {
       // put the discriminator property into the property map only
       // (after the real properties have been organised into their lists)
-      propertyMap.put(discProperty.getName(), discProperty);
+      propertyMap.put(discProperty.name(), discProperty);
     }
   }
 
@@ -184,7 +184,7 @@ public final class DeployBeanPropertyLists {
     }
     if (prop.isId()) {
       if (id != null) {
-        throw new IllegalStateException("More that one @Id property on " + desc.getFullName() + " ?");
+        throw new IllegalStateException("More that one @Id property on " + desc.fullName() + " ?");
       }
       id = prop;
       return;
@@ -194,7 +194,7 @@ public final class DeployBeanPropertyLists {
       mutable.add(prop);
     }
 
-    if (desc.getInheritInfo() != null && prop.isLocal()) {
+    if (desc.inheritInfo() != null && prop.isLocal()) {
       local.add(prop);
     }
 
@@ -225,7 +225,7 @@ public final class DeployBeanPropertyLists {
           if (versionProperty == null) {
             versionProperty = prop;
           } else {
-            logger.warn("Multiple @Version properties - property " + prop.getFullBeanName() + " not treated as a version property");
+            logger.warn("Multiple @Version properties - property " + prop.fullName() + " not treated as a version property");
           }
         } else if (prop.isDraftDirty()) {
           draftDirty = prop;
@@ -356,7 +356,7 @@ public final class DeployBeanPropertyLists {
   public BeanProperty[] getGeneratedInsert() {
     List<BeanProperty> list = new ArrayList<>();
     for (BeanProperty prop : nonTransients) {
-      GeneratedProperty gen = prop.getGeneratedProperty();
+      GeneratedProperty gen = prop.generatedProperty();
       if (gen != null && gen.includeInInsert()) {
         list.add(prop);
       }
@@ -370,7 +370,7 @@ public final class DeployBeanPropertyLists {
   public BeanProperty[] getGeneratedUpdate() {
     List<BeanProperty> list = new ArrayList<>();
     for (BeanProperty prop : nonTransients) {
-      GeneratedProperty gen = prop.getGeneratedProperty();
+      GeneratedProperty gen = prop.generatedProperty();
       if (gen != null && gen.includeInUpdate()) {
         list.add(prop);
       }
@@ -391,12 +391,12 @@ public final class DeployBeanPropertyLists {
       if (imported != prop.isOneToOneExported()) {
         switch (mode) {
           case Save:
-            if (prop.getCascadeInfo().isSave()) {
+            if (prop.cascadeInfo().isSave()) {
               list.add(prop);
             }
             break;
           case Delete:
-            if (prop.getCascadeInfo().isDelete()) {
+            if (prop.cascadeInfo().isDelete()) {
               list.add(prop);
             }
             break;

@@ -47,6 +47,11 @@ final class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
+  public String format(Object value) {
+    return String.valueOf(value);
+  }
+
+  @Override
   public String formatValue(Long t) {
     return t.toString();
   }

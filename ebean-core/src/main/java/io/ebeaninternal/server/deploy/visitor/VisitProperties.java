@@ -21,11 +21,11 @@ public class VisitProperties {
   }
 
   protected void visitProperties(BeanDescriptor<?> desc, BeanPropertyVisitor propertyVisitor) {
-    BeanProperty idProp = desc.getIdProperty();
+    BeanProperty idProp = desc.idProperty();
     if (idProp != null) {
       visit(propertyVisitor, idProp);
     }
-    BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
+    BeanPropertyAssocOne<?> unidirectional = desc.unidirectional();
     if (unidirectional != null) {
       visit(propertyVisitor, unidirectional);
     }
@@ -51,7 +51,7 @@ public class VisitProperties {
       if (assocOne.isEmbedded()) {
         // Embedded bean
         pv.visitEmbedded(assocOne);
-        BeanProperty[] embProps = assocOne.getProperties();
+        BeanProperty[] embProps = assocOne.properties();
         for (BeanProperty embProp : embProps) {
           pv.visitEmbeddedScalar(embProp, assocOne);
         }
@@ -73,7 +73,7 @@ public class VisitProperties {
    * Visit all the other inheritance properties that are not on the root.
    */
   protected void visitInheritanceProperties(BeanDescriptor<?> descriptor, BeanPropertyVisitor pv) {
-    InheritInfo inheritInfo = descriptor.getInheritInfo();
+    InheritInfo inheritInfo = descriptor.inheritInfo();
     if (inheritInfo != null && inheritInfo.isRoot()) {
       // add all properties on the children objects
       inheritInfo.visitChildren(new InheritChildVisitor(this, pv));
