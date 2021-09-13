@@ -3,9 +3,6 @@ package org.tests.model.controller;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-/**
- * @author Jonas P&ouml;hler, FOCONIS AG
- */
 @Entity
 public class SoftRefA {
 

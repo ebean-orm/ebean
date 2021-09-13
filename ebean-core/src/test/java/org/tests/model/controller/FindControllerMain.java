@@ -4,9 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Transient;
 
-/**
- * @author Jonas P&ouml;hler, FOCONIS AG
- */
 @Entity
 public class FindControllerMain {
 

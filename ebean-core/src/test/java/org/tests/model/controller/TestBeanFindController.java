@@ -1,8 +1,6 @@
 package org.tests.model.controller;
 
-import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.plugin.BeanType;
@@ -12,9 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Jonas P&ouml;hler, FOCONIS AG
- */
 public class TestBeanFindController implements BeanFindController {
 
   @Override
