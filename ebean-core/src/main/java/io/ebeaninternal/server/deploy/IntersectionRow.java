@@ -72,7 +72,7 @@ public final class IntersectionRow {
       sb.append("delete from ").append(tableName);
     } else {
       sb.append("update ").append(tableName).append(" set ");
-      sb.append(targetDescriptor.getSoftDeleteDbSet());
+      sb.append(targetDescriptor.softDeleteDbSet());
     }
     sb.append(" where ");
     int count = setBindParams(bindParams, sb);

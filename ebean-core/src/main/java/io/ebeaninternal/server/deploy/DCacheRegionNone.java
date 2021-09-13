@@ -7,7 +7,7 @@ final class DCacheRegionNone implements SpiCacheRegion {
   static final SpiCacheRegion INSTANCE = new DCacheRegionNone();
 
   @Override
-  public String getName() {
+  public String name() {
     return "<none>";
   }
 

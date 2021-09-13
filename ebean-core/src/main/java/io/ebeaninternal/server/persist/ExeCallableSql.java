@@ -56,15 +56,15 @@ final class ExeCallableSql {
 
   private CallableStatement bindStmt(PersistRequestCallableSql request, boolean batchThisRequest) throws SQLException {
     request.startBind(batchThisRequest);
-    SpiCallableSql callableSql = request.getCallableSql();
-    SpiTransaction t = request.getTransaction();
+    SpiCallableSql callableSql = request.callableSql();
+    SpiTransaction t = request.transaction();
 
     String sql = callableSql.getSql();
     BindParams bindParams = callableSql.getBindParams();
 
     // process named parameters if required
     sql = BindParamsParser.parse(bindParams, sql);
-    boolean logSql = request.isLogSql();
+    boolean logSql = request.logSql();
 
     CallableStatement cstmt;
     if (batchThisRequest) {

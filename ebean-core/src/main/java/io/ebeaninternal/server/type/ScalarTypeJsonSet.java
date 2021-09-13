@@ -9,6 +9,7 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
+import io.ebeaninternal.json.ModifyAwareSet;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -38,6 +39,45 @@ final class ScalarTypeJsonSet {
     return new ScalarTypeJsonSet.Varchar(docPropertyType, nullable, keepSource);
   }
 
+  @SuppressWarnings("rawtypes")
+  static final class VarcharWithConverter extends ScalarTypeJsonSet.Base {
+    private final ArrayElementConverter converter;
+
+    VarcharWithConverter(DocPropertyType docType, boolean nullable, boolean keepSource, ArrayElementConverter converter) {
+      super(Types.VARCHAR, docType, nullable, keepSource);
+      this.converter = converter;
+    }
+
+    @Override
+    Set readJsonConvert(String json) {
+      try {
+        return convertElements(EJson.parseSet(json, false));
+      } catch (IOException e) {
+        throw new TextException("Failed to parse JSON [{}] as List", json, e);
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Set convertElements(Set<Object> rawSet) {
+      if (rawSet == null) {
+        return null;
+      }
+      final Set result = new LinkedHashSet(rawSet.size());
+      for (Object o : rawSet) {
+        result.add(converter.fromSerialized(o));
+      }
+      return new ModifyAwareSet(result);
+    }
+
+    @Override
+    public Set parse(String value) {
+      try {
+        return convertElements(EJson.parseSet(value, false));
+      } catch (IOException e) {
+        throw new PersistenceException("Failed to parse JSON content as Set: [" + value + "]", e);
+      }
+    }
+  }
   /**
    * List mapped to DB VARCHAR.
    */
@@ -86,8 +126,11 @@ final class ScalarTypeJsonSet {
       if (keepSource) {
         reader.pushJson(json);
       }
+      return readJsonConvert(json);
+    }
+
+    Set readJsonConvert(String json) {
       try {
-        // parse JSON into modifyAware list
         return EJson.parseSet(json, true);
       } catch (IOException e) {
         throw new TextException("Failed to parse JSON [{}] as Set", json, e);
@@ -130,7 +173,7 @@ final class ScalarTypeJsonSet {
     }
 
     @Override
-    public final Set parse(String value) {
+    public Set parse(String value) {
       try {
         return convertList(EJson.parseList(value));
       } catch (IOException e) {

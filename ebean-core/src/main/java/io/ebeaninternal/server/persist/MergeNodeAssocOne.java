@@ -51,10 +51,10 @@ final class MergeNodeAssocOne extends MergeNode {
   private boolean isUpdate(Object beanId, Object outlineId, MergeRequest request) {
     return Objects.equals(beanId, outlineId)
       || !request.isClientGeneratedIds()
-      || request.idExists(targetDescriptor.getBeanType(), beanId);
+      || request.idExists(targetDescriptor.type(), beanId);
   }
 
   private EntityBean getEntityBean(Object bean) {
-    return (EntityBean) one.getVal(bean);
+    return (EntityBean) one.value(bean);
   }
 }

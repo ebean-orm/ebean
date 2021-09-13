@@ -48,16 +48,13 @@ import java.util.concurrent.atomic.AtomicLong;
 public class TransactionManager implements SpiTransactionManager {
 
   private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
-
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
   private final SpiServer server;
-
   private final BeanDescriptorManager beanDescriptorManager;
 
   /**
-   * Ebean defaults this to true but for EJB compatible behaviour set this to
-   * false;
+   * Ebean defaults this to true but for EJB compatible behaviour set this to false;
    */
   private final boolean rollbackOnChecked;
 
@@ -65,9 +62,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Prefix for transaction id's (logging).
    */
   final String prefix;
-
   private final String externalTransPrefix;
-
   private final AtomicLong counter = new AtomicLong(1000L);
 
   /**
@@ -80,69 +75,38 @@ public class TransactionManager implements SpiTransactionManager {
    * to close queryOnly transactions rather than commit or rollback them.
    */
   private final OnQueryOnly onQueryOnly;
-
   private final BackgroundExecutor backgroundExecutor;
-
   private final ClusterManager clusterManager;
-
   private final String serverName;
-
   private final boolean docStoreActive;
 
   /**
    * The elastic search index update processor.
    */
   final DocStoreUpdateProcessor docStoreUpdateProcessor;
-
   private final boolean autoPersistUpdates;
-
   private final boolean persistBatch;
-
   private final boolean persistBatchOnCascade;
-
   private final BulkEventListenerMap bulkEventListenerMap;
-
-  /**
-   * Used to prepare the change set setting user context information in the
-   * foreground thread before logging.
-   */
   private final ChangeLogPrepare changeLogPrepare;
-
-  /**
-   * Performs the actual logging of the change set in background.
-   */
   private final ChangeLogListener changeLogListener;
-
-  /**
-   * Use Background executor to perform change-logging
-   */
   private final boolean changeLogAsync;
-
   final boolean notifyL2CacheInForeground;
-
   private final boolean viewInvalidation;
-
   private final boolean skipCacheAfterWrite;
-
   private final TransactionFactory transactionFactory;
-
   private final SpiLogManager logManager;
   private final SpiLogger txnLogger;
   private final boolean txnDebug;
-
   private final DatabasePlatform databasePlatform;
-
   private final SpiProfileHandler profileHandler;
-
   private final TimedMetric txnMain;
   private final TimedMetric txnReadOnly;
   private final TimedMetricMap txnNamed;
   private final TransactionScopeManager scopeManager;
-
   private final TableModState tableModState;
   private final ServerCacheNotify cacheNotify;
   private final boolean supportsSavepointId;
-
   private final ConcurrentHashMap<String, ProfileLocation> profileLocations = new ConcurrentHashMap<>();
 
   /**
@@ -163,8 +127,8 @@ public class TransactionManager implements SpiTransactionManager {
     this.rollbackOnChecked = options.config.isTransactionRollbackOnChecked();
     this.beanDescriptorManager = options.descMgr;
     this.viewInvalidation = options.descMgr.requiresViewEntityCacheInvalidation();
-    this.changeLogPrepare = options.descMgr.getChangeLogPrepare();
-    this.changeLogListener = options.descMgr.getChangeLogListener();
+    this.changeLogPrepare = options.descMgr.changeLogPrepare();
+    this.changeLogListener = options.descMgr.changeLogListener();
     this.changeLogAsync = options.config.isChangeLogAsync();
     this.clusterManager = options.clusterManager;
     this.serverName = options.config.getName();
@@ -201,6 +165,7 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Return the scope manager.
    */
+  @Override
   public final TransactionScopeManager scope() {
     return scopeManager;
   }

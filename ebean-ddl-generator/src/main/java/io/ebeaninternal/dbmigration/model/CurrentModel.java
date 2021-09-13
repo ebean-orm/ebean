@@ -42,7 +42,7 @@ public class CurrentModel {
    * Construct with a given EbeanServer instance for DDL create all generation, not migration.
    */
   public CurrentModel(SpiEbeanServer server) {
-    this(server, server.getServerConfig().getConstraintNaming(), true);
+    this(server, server.config().getConstraintNaming(), true);
   }
 
   /**
@@ -58,11 +58,11 @@ public class CurrentModel {
 
   private CurrentModel(SpiEbeanServer server, DbConstraintNaming constraintNaming, boolean platformTypes) {
     this.server = server;
-    this.databasePlatform = server.getDatabasePlatform();
+    this.databasePlatform = server.databasePlatform();
     this.constraintNaming = constraintNaming;
     this.platformTypes = platformTypes;
-    this.ddlHeader = server.getServerConfig().getDdlHeader();
-    this.jaxbPresent = Detect.isJAXBPresent(server.getServerConfig());
+    this.ddlHeader = server.config().getDdlHeader();
+    this.jaxbPresent = Detect.isJAXBPresent(server.config());
   }
 
   public DdlOptions getDdlOptions() {
@@ -139,7 +139,7 @@ public class CurrentModel {
     if (extraDdl != null) {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
-        if (script.isInit() && matchPlatform(server.getDatabasePlatform().getPlatform(), script.getPlatforms())) {
+        if (script.isInit() && matchPlatform(server.platform(), script.getPlatforms())) {
           ddl.append(prefix).append(script.getName()).append('\n');
           ddl.append(script.getValue());
         }
@@ -181,7 +181,7 @@ public class CurrentModel {
    * Return the platform specific DdlHandler (to generate DDL).
    */
   private DdlHandler handler() {
-    return PlatformDdlBuilder.create(databasePlatform).createDdlHandler(server.getServerConfig());
+    return PlatformDdlBuilder.create(databasePlatform).createDdlHandler(server.config());
   }
 
   /**

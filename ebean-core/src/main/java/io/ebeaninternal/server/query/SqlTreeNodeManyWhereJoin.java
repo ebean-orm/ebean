@@ -94,18 +94,18 @@ final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     if (nodeBeanProp instanceof STreePropertyAssocOne) {
       nodeBeanProp.addJoin(joinType, parentAlias, alias, ctx);
       if (softDelete) {
-        ctx.append(" and ").append(target.getSoftDeletePredicate(alias));
+        ctx.append(" and ").append(target.softDeletePredicate(alias));
       }
     } else {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
       if (!manyProp.hasJoinTable()) {
         manyProp.addJoin(joinType, parentAlias, alias, ctx);
         if (softDelete) {
-          ctx.append(" and ").append(target.getSoftDeletePredicate(alias));
+          ctx.append(" and ").append(target.softDeletePredicate(alias));
         }
       } else {
         String alias2 = alias + "z_";
-        TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
+        TableJoin manyToManyJoin = manyProp.intersectionTableJoin();
         manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
         manyProp.addJoin(joinType, alias2, alias, ctx);
       }
@@ -114,7 +114,7 @@ final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
   @Override
   public void dependentTables(Set<String> tables) {
-    tables.add(nodeBeanProp.target().getBaseTable(SpiQuery.TemporalMode.CURRENT));
+    tables.add(nodeBeanProp.target().baseTable(SpiQuery.TemporalMode.CURRENT));
   }
 
   @Override

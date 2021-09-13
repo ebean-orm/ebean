@@ -206,7 +206,7 @@ public final class BindParamsParser {
     String tableName = keyNamedParam.substring(ENCRYPTKEY_PREFIX_LEN, pos);
     String columnName = keyNamedParam.substring(pos + ENCRYPTKEY_GAP_LEN);
 
-    EncryptKey key = beanDescriptor.getEncryptKey(tableName, columnName);
+    EncryptKey key = beanDescriptor.encryptKey(tableName, columnName);
     String strKey = key.getStringValue();
 
     return params.setEncryptionKey(keyNamedParam, strKey);

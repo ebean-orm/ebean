@@ -74,8 +74,8 @@ final class ExeUpdateSql {
 
   private PreparedStatement bindStmt(PersistRequestUpdateSql request, boolean batchThisRequest) throws SQLException {
     request.startBind(batchThisRequest);
-    SpiSqlUpdate updateSql = request.getUpdateSql();
-    SpiTransaction t = request.getTransaction();
+    SpiSqlUpdate updateSql = request.updateSql();
+    SpiTransaction t = request.transaction();
 
     BindParams bindParams = updateSql.getBindParams();
 

@@ -18,25 +18,17 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   }
 
   private final SpiSqlUpdate updateSql;
-
   private int rowCount;
-
   private String bindLog;
-
   private SqlType sqlType;
-
   private String tableName;
-
   private boolean addBatch;
-
   private final boolean forceNoBatch;
-
   private boolean batchThisRequest;
   private boolean flushQueue;
 
   public PersistRequestUpdateSql(SpiEbeanServer server, SpiSqlUpdate sqlUpdate,
                                  SpiTransaction t, PersistExecute persistExecute, boolean forceNoBatch) {
-
     super(server, t, persistExecute, sqlUpdate.getLabel());
     this.type = Type.UPDATESQL;
     this.updateSql = sqlUpdate;
@@ -105,7 +97,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * Return the UpdateSql.
    */
-  public SpiSqlUpdate getUpdateSql() {
+  public SpiSqlUpdate updateSql() {
     return updateSql;
   }
 
@@ -145,6 +137,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
     this.bindLog = bindLog;
   }
 
+  @Override
   public void startBind(boolean batchThisRequest) {
     this.batchThisRequest = batchThisRequest;
     super.startBind(batchThisRequest);
@@ -170,7 +163,6 @@ public final class PersistRequestUpdateSql extends PersistRequest {
     if (transaction.isLogSql() && !batchThisRequest) {
       transaction.logSql(Str.add(TrimLogSql.trim(updateSql.getGeneratedSql()), "; -- bind(", bindLog, ") rows(", String.valueOf(rowCount), ")"));
     }
-
     if (updateSql.isAutoTableMod()) {
       // add the modification info to the TransactionEvent
       // this is used to invalidate cached objects etc

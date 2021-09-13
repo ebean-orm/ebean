@@ -84,7 +84,7 @@ final class IsEmptyExpression extends AbstractExpression {
     }
     request
       .append("exists (select 1 from ")
-      .append(prop.getAssocIsEmpty(request, propertyPath))
+      .append(prop.assocIsEmpty(request, propertyPath))
       .append(")");
   }
 

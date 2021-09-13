@@ -27,7 +27,7 @@ public final class DefaultCacheAdapter implements ServerCacheManager {
   }
 
   @Override
-  public boolean isLocalL2Caching() {
+  public boolean localL2Caching() {
     return cacheManager.isLocalL2Caching();
   }
 
@@ -37,37 +37,37 @@ public final class DefaultCacheAdapter implements ServerCacheManager {
   }
 
   @Override
-  public void setEnabledRegions(String regions) {
+  public void enabledRegions(String regions) {
     cacheManager.setEnabledRegions(regions);
   }
 
   @Override
-  public ServerCacheRegion getRegion(String region) {
+  public ServerCacheRegion region(String region) {
     return cacheManager.getRegion(region);
   }
 
   @Override
-  public void setAllRegionsEnabled(boolean enabled) {
+  public void allRegionsEnabled(boolean enabled) {
     cacheManager.setAllRegionsEnabled(enabled);
   }
 
   @Override
-  public ServerCache getNaturalKeyCache(Class<?> beanType) {
+  public ServerCache naturalKeyCache(Class<?> beanType) {
     return cacheManager.getNaturalKeyCache(beanType);
   }
 
   @Override
-  public ServerCache getBeanCache(Class<?> beanType) {
+  public ServerCache beanCache(Class<?> beanType) {
     return cacheManager.getBeanCache(beanType);
   }
 
   @Override
-  public ServerCache getCollectionIdsCache(Class<?> beanType, String propertyName) {
+  public ServerCache collectionIdsCache(Class<?> beanType, String propertyName) {
     return cacheManager.getCollectionIdsCache(beanType, propertyName);
   }
 
   @Override
-  public ServerCache getQueryCache(Class<?> beanType) {
+  public ServerCache queryCache(Class<?> beanType) {
     return cacheManager.getQueryCache(beanType);
   }
 

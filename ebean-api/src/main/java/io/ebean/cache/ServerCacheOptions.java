@@ -18,7 +18,6 @@ public class ServerCacheOptions {
    * Construct with no set options.
    */
   public ServerCacheOptions() {
-
   }
 
   /**
@@ -73,7 +72,6 @@ public class ServerCacheOptions {
    * Return a copy of this object.
    */
   public ServerCacheOptions copy() {
-
     ServerCacheOptions copy = new ServerCacheOptions();
     copy.maxSize = maxSize;
     copy.maxIdleSecs = maxIdleSecs;

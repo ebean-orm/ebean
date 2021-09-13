@@ -3,7 +3,7 @@ package io.ebeaninternal.dbmigration.model;
 import io.ebean.migration.MigrationVersion;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

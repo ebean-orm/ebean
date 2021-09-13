@@ -15,33 +15,33 @@ public final class CachedBeanDataFromBean {
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
     Map<String, Object> data = new LinkedHashMap<>();
 
-    BeanProperty idProperty = desc.getIdProperty();
+    BeanProperty idProperty = desc.idProperty();
     if (idProperty != null) {
-      int propertyIndex = idProperty.getPropertyIndex();
+      int propertyIndex = idProperty.propertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
-        data.put(idProperty.getName(), idProperty.getCacheDataValue(bean));
+        data.put(idProperty.name(), idProperty.getCacheDataValue(bean));
       }
     }
 
     // extract all the non-many properties
     final boolean dirty = ebi.isDirty();
     for (BeanProperty prop : desc.propertiesNonMany()) {
-      if (dirty && ebi.isDirtyProperty(prop.getPropertyIndex())) {
-        data.put(prop.getName(), prop.getCacheDataValueOrig(ebi));
-      } else if (ebi.isLoadedProperty(prop.getPropertyIndex())) {
-        data.put(prop.getName(), prop.getCacheDataValue(bean));
+      if (dirty && ebi.isDirtyProperty(prop.propertyIndex())) {
+        data.put(prop.name(), prop.getCacheDataValueOrig(ebi));
+      } else if (ebi.isLoadedProperty(prop.propertyIndex())) {
+        data.put(prop.name(), prop.getCacheDataValue(bean));
       }
     }
 
     for (BeanPropertyAssocMany<?> prop : desc.propertiesMany()) {
       if (prop.isElementCollection()) {
-        data.put(prop.getName(), prop.getCacheDataValue(bean));
+        data.put(prop.name(), prop.getCacheDataValue(bean));
       }
     }
 
     long version = desc.getVersion(bean);
     EntityBean sharableBean = createSharableBean(desc, bean, ebi);
-    return new CachedBeanData(sharableBean, desc.getDiscValue(), data, version);
+    return new CachedBeanData(sharableBean, desc.discValue(), data, version);
   }
 
   private static EntityBean createSharableBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept beanEbi) {
@@ -54,7 +54,7 @@ public final class CachedBeanDataFromBean {
 
     // create a readOnly sharable instance by copying the data
     EntityBean sharableBean = desc.createEntityBean();
-    BeanProperty idProp = desc.getIdProperty();
+    BeanProperty idProp = desc.idProperty();
     if (idProp != null) {
       Object v = idProp.getValue(bean);
       idProp.setValue(sharableBean, v);

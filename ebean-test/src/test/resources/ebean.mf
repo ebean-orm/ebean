@@ -1,2 +1,7 @@
-entity-packages: org.test
-transactional-packages: org.test
+agent-use-only: true
+profile-location: true
+entity-packages: org,misc
+transactional-packages: org
+querybean-packages: none
+synthetic: true
+

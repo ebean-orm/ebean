@@ -37,6 +37,6 @@ public class DocStoreIndexEvent<T> implements DocStoreUpdate {
    */
   @Override
   public void addToQueue(DocStoreUpdates docStoreUpdates) {
-    docStoreUpdates.queueIndex(beanType.getDocStoreQueueId(), idValue);
+    docStoreUpdates.queueIndex(beanType.docStoreQueueId(), idValue);
   }
 }

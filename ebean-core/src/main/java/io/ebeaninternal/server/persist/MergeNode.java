@@ -22,7 +22,7 @@ abstract class MergeNode {
 
   MergeNode(String fullPath, BeanPropertyAssoc<?> property) {
     this.fullPath = fullPath;
-    this.targetDescriptor = property.getTargetDescriptor();
+    this.targetDescriptor = property.targetDescriptor();
   }
 
   /**
@@ -71,8 +71,8 @@ abstract class MergeNode {
    * Add to the query to fetch the Ids values for the foreign keys basically.
    */
   final void addSelectId(Query<?> query) {
-    BeanProperty idProperty = targetDescriptor.getIdProperty();
-    query.fetch(fullPath, idProperty.getName());
+    BeanProperty idProperty = targetDescriptor.idProperty();
+    query.fetch(fullPath, idProperty.name());
   }
 
   /**

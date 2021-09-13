@@ -16,8 +16,8 @@ public class ModelBuildElementTable {
    */
   public static void build(ModelBuildContext ctx, BeanPropertyAssocMany<?> manyProp) {
 
-    BeanTable beanTable = manyProp.getBeanTable();
-    BeanDescriptor<?> targetDescriptor = manyProp.getTargetDescriptor();
+    BeanTable beanTable = manyProp.beanTable();
+    BeanDescriptor<?> targetDescriptor = manyProp.targetDescriptor();
     MTable table = new MTable(beanTable.getBaseTable());
 
     VisitProperties.visit(targetDescriptor, new ModelBuildPropertyVisitor(ctx, table, targetDescriptor));

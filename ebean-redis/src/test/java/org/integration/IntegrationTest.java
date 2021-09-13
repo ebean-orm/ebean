@@ -3,7 +3,7 @@ package org.integration;
 import io.ebean.DB;
 import org.domain.Person;
 import org.domain.query.QPerson;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class IntegrationTest {
 
     System.out.println("one2 " + one2);
 
-    DB.getServerCacheManager().clear(Person.class);
+    DB.cacheManager().clear(Person.class);
 
     System.out.println("done");
   }

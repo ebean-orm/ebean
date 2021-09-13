@@ -6,11 +6,12 @@ import io.ebeaninternal.dbmigration.migration.CreateTable;
 import io.ebeaninternal.dbmigration.migration.IdentityType;
 import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class MTableIdentityTest {
 

@@ -886,7 +886,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Return the underlying connection for public use.
    */
   @Override
-  public Connection getConnection() {
+  public Connection connection() {
     queryOnly = false;
     return getInternalConnection();
   }

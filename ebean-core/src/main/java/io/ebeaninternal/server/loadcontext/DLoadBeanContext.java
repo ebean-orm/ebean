@@ -39,7 +39,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
 
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> collection) {
-    String path = fullPath + "." + many.getName();
+    String path = fullPath + "." + many.name();
     parent.register(path, many, collection);
   }
 
@@ -131,7 +131,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
-    public int getBatchSize() {
+    public int batchSize() {
       return batchSize;
     }
 
@@ -154,7 +154,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
-    public List<EntityBeanIntercept> getBatch() {
+    public List<EntityBeanIntercept> batch() {
       return list;
     }
 
@@ -164,17 +164,17 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
-    public String getFullPath() {
+    public String fullPath() {
       return context.fullPath;
     }
 
     @Override
-    public BeanDescriptor<?> getBeanDescriptor() {
+    public BeanDescriptor<?> descriptor() {
       return context.desc;
     }
 
     @Override
-    public PersistenceContext getPersistenceContext() {
+    public PersistenceContext persistenceContext() {
       return persistenceContext;
     }
 
@@ -203,7 +203,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       }
 
       LoadBeanRequest req = new LoadBeanRequest(this, ebi, context.hitCache);
-      context.desc.getEbeanServer().loadBean(req);
+      context.desc.ebeanServer().loadBean(req);
       list.clear();
     }
   }

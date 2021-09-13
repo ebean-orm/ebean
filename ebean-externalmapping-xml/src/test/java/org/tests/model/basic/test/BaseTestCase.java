@@ -11,7 +11,7 @@ public class BaseTestCase {
   }
 
   protected Platform platform() {
-    return spiEbeanServer().getDatabasePlatform().getPlatform().base();
+    return spiEbeanServer().platform().base();
   }
 
   protected SpiEbeanServer spiEbeanServer() {

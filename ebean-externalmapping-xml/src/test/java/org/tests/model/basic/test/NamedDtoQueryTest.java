@@ -1,7 +1,7 @@
 package org.tests.model.basic.test;
 
 import io.ebean.DB;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CustDto;
 import org.tests.model.basic.Customer;
 

@@ -126,8 +126,16 @@ public final class DB {
    * an expression that uses OR like Expression e = Expr.or(..., ...);
    * </p>
    */
+  public static ExpressionFactory expressionFactory() {
+    return getDefault().expressionFactory();
+  }
+
+  /**
+   * Deprecated migrate to expressionFactory().
+   */
+  @Deprecated
   public static ExpressionFactory getExpressionFactory() {
-    return getDefault().getExpressionFactory();
+    return expressionFactory();
   }
 
   /**
@@ -650,8 +658,16 @@ public final class DB {
    * @param beanType the type of entity bean
    * @param id       the id value
    */
+  public static <T> T reference(Class<T> beanType, Object id) {
+    return getDefault().reference(beanType, id);
+  }
+
+  /**
+   * Deprecated migrate to beanId().
+   */
+  @Deprecated
   public static <T> T getReference(Class<T> beanType, Object id) {
-    return getDefault().getReference(beanType, id);
+    return reference(beanType, id);
   }
 
   /**
@@ -660,14 +676,12 @@ public final class DB {
    * <ul>
    * <li>asc - ascending order (which is the default)</li>
    * <li>desc - Descending order</li>
-   * <li>nullsHigh - Treat null values as high/large values (which is the
-   * default)</li>
+   * <li>nullsHigh - Treat null values as high/large values (which is the default)</li>
    * <li>nullsLow- Treat null values as low/very small values</li>
    * </ul>
    * <p>
    * If you leave off any keywords the defaults are ascending order and treating
    * nulls as high values.
-   * </p>
    * <p>
    * Note that the sorting uses a Comparator and Collections.sort(); and does
    * not invoke a DB query.
@@ -1231,30 +1245,77 @@ public final class DB {
    * This will return null if the bean is not an enhanced entity bean.
    * </p>
    */
+  public static BeanState beanState(Object bean) {
+    return getDefault().beanState(bean);
+  }
+
+  /**
+   * Deprecated migrate to beanState().
+   */
+  @Deprecated
   public static BeanState getBeanState(Object bean) {
-    return getDefault().getBeanState(bean);
+    return beanState(bean);
   }
 
   /**
    * Return the value of the Id property for a given bean.
    */
+  public static Object beanId(Object bean) {
+    return getDefault().beanId(bean);
+  }
+
+  /**
+   * Deprecated migrate to beanId().
+   */
+  @Deprecated
   public static Object getBeanId(Object bean) {
-    return getDefault().getBeanId(bean);
+    return beanId(bean);
+  }
+
+  /**
+   * Load and lock the bean using {@code select for update}.
+   * <p>
+   * This should be executed inside a transaction.
+   * <p>
+   * The bean needs to have an ID property set and can be a reference bean (only has ID)
+   * or partially or fully populated bean. This will load all the properties of the bean
+   * from the database using {@code select for update}.
+   *
+   * @param bean The entity bean that we wish to obtain a database lock on.
+   */
+  public static void lock(Object bean) {
+    getDefault().lock(bean);
+  }
+
+  /**
+   * Deprecated migrate to cacheManager().
+   */
+  @Deprecated
+  public static ServerCacheManager getServerCacheManager() {
+    return getDefault().cacheManager();
   }
 
   /**
    * Return the manager of the level 2 cache ("L2" cache).
    */
-  public static ServerCacheManager getServerCacheManager() {
-    return getDefault().getServerCacheManager();
+  public static ServerCacheManager cacheManager() {
+    return getDefault().cacheManager();
   }
 
   /**
    * Return the BackgroundExecutor service for asynchronous processing of
    * queries.
    */
+  public static BackgroundExecutor backgroundExecutor() {
+    return getDefault().backgroundExecutor();
+  }
+
+  /**
+   * Deprecated migrate to backgroundExecutor().
+   */
+  @Deprecated
   public static BackgroundExecutor getBackgroundExecutor() {
-    return getDefault().getBackgroundExecutor();
+    return backgroundExecutor();
   }
 
   /**
