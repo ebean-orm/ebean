@@ -10,11 +10,18 @@ import org.junit.jupiter.api.Test;
 import org.tests.example.ModUuidGenerator;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ECustomId;
+import org.tests.model.controller.FindControllerMain;
+import org.tests.model.controller.SoftRefA;
+import org.tests.model.controller.SoftRefB;
+import org.tests.model.controller.TestBeanFindController;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BeanFindControllerTest extends BaseTestCase {
 
