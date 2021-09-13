@@ -124,12 +124,12 @@ public class TCsvReader<T> implements CsvReader<T> {
   @Override
   public void addDateTime(String propertyName, String dateTimeFormat, Locale locale) {
 
-    ExpressionPath elProp = descriptor.getExpressionPath(propertyName);
+    ExpressionPath elProp = descriptor.expressionPath(propertyName);
     if (!elProp.isDateTimeCapable()) {
       throw new TextException("Property " + propertyName + " is not DateTime capable");
     }
     if (dateTimeFormat == null) {
-      dateTimeFormat = getDefaultDateTimeFormat(elProp.getJdbcType());
+      dateTimeFormat = getDefaultDateTimeFormat(elProp.jdbcType());
     }
 
     if (locale == null) {
@@ -160,9 +160,9 @@ public class TCsvReader<T> implements CsvReader<T> {
   @Override
   public void addProperty(String propertyName, StringParser parser) {
 
-    ExpressionPath elProp = descriptor.getExpressionPath(propertyName);
+    ExpressionPath elProp = descriptor.expressionPath(propertyName);
     if (parser == null) {
-      parser = elProp.getStringParser();
+      parser = elProp.stringParser();
     }
     CsvColumn column = new CsvColumn(elProp, parser);
     columnList.add(column);
@@ -235,20 +235,20 @@ public class TCsvReader<T> implements CsvReader<T> {
 
   private void addPropertiesFromHeader(String[] line) {
     for (String aLine : line) {
-      ElPropertyValue elProp = descriptor.getElGetValue(aLine);
+      ElPropertyValue elProp = descriptor.elGetValue(aLine);
       if (elProp == null) {
         throw new TextException("Property [" + aLine + "] not found");
       }
 
-      if (Types.TIME == elProp.getJdbcType()) {
+      if (Types.TIME == elProp.jdbcType()) {
         addProperty(aLine, TIME_PARSER);
 
-      } else if (isDateTimeType(elProp.getJdbcType())) {
+      } else if (isDateTimeType(elProp.jdbcType())) {
         addDateTime(aLine, null, null);
 
       } else if (elProp.isAssocProperty()) {
-        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.getBeanProperty();
-        String idProp = assocOne.getBeanDescriptor().getIdBinder().getIdProperty();
+        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.beanProperty();
+        String idProp = assocOne.descriptor().idBinder().getIdProperty();
         addProperty(aLine + "." + idProp);
       } else {
         addProperty(aLine);

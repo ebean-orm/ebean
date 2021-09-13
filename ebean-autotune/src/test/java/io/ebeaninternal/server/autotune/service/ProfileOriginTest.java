@@ -5,7 +5,7 @@ import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.autofetch.BaseTestCase;
 import org.tests.model.basic.Order;
 

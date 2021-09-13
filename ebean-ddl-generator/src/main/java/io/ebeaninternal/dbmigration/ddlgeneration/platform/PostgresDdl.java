@@ -24,6 +24,7 @@ public class PostgresDdl extends PlatformDdl {
     this.indexConcurrent = "concurrently ";
   }
 
+  @Override
   public String setLockTimeout(int lockTimeoutSeconds) {
     return "set lock_timeout = " + (lockTimeoutSeconds * 1000);
   }

@@ -7,7 +7,7 @@ import io.ebeaninternal.dbmigration.migration.DropIndex;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
@@ -158,7 +158,7 @@ public class ModelContainerTest {
   public void apply_renameColumn() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("6.0__renameColumn.model.xml"), ver("6.0"));
-    
+
     final MTable table = container.getTable("document");
     assertThat(table.getColumn("title")).isNotNull();
     assertThat(table.getColumn("short_title")).isNull();

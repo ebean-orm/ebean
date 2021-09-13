@@ -208,7 +208,7 @@ final class BeanLifecycleAdapterFactory {
 
     private void invoke(Method[] methods, BeanPersistRequest<?> request) {
       for (Method method : methods) {
-        invoke(method, request.getBean());
+        invoke(method, request.bean());
       }
     }
 

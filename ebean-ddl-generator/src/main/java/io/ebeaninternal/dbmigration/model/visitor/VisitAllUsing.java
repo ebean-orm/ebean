@@ -21,7 +21,7 @@ public final class VisitAllUsing extends VisitProperties {
    * Visit all the descriptors for a given server.
    */
   public VisitAllUsing(BeanVisitor visitor, SpiEbeanServer server) {
-    this(visitor, server.getBeanDescriptors());
+    this(visitor, server.descriptors());
   }
 
   /**

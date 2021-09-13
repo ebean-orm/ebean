@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.11.2-SNAPSHOT</version>
+  <version>12.11.5-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -18,7 +18,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-parent-12.8.0</tag>
+    <tag>ebean-parent-12.11.4</tag>
   </scm>
 
   <licenses>
@@ -66,9 +66,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.avaje.composite</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.199</version>
       <scope>test</scope>
     </dependency>
 
@@ -90,6 +90,7 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
+    <!-- <module>tests</module> -->
   </modules>
 
 </project>

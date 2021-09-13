@@ -2,8 +2,8 @@ package io.ebean.test.config.platform;
 
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
 
@@ -145,7 +145,7 @@ public class ConfigTest {
     assertThat(config.ignoreDockerShutdown("./src/test/resources/file-does-not-exist")).isFalse();
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void run_local_only_ignoreDockerShutdown() {
 

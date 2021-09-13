@@ -80,9 +80,9 @@ public final class InheritInfo {
    */
   public void appendCheckConstraintValues(final String propertyName, final Set<String> checkConstraintValues) {
     visitChildren(inheritInfo -> {
-      BeanProperty prop = inheritInfo.desc().getBeanProperty(propertyName);
+      BeanProperty prop = inheritInfo.desc().beanProperty(propertyName);
       if (prop != null) {
-        Set<String> values = prop.getDbCheckConstraintValues();
+        Set<String> values = prop.dbCheckConstraintValues();
         if (values != null) {
           checkConstraintValues.addAll(values);
         }
@@ -236,7 +236,7 @@ public final class InheritInfo {
    * Return the IdBinder for this type.
    */
   public IdBinder getIdBinder() {
-    return descriptor.getIdBinder();
+    return descriptor.idBinder();
   }
 
   /**

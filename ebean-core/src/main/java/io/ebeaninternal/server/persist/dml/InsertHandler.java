@@ -47,8 +47,8 @@ public final class InsertHandler extends DmlHandler {
    */
   @Override
   public void bind() throws SQLException {
-    BeanDescriptor<?> desc = persistRequest.getBeanDescriptor();
-    EntityBean bean = persistRequest.getEntityBean();
+    BeanDescriptor<?> desc = persistRequest.descriptor();
+    EntityBean bean = persistRequest.entityBean();
     Object idValue = desc.getId(bean);
     boolean withId = !isNullOrZero(idValue);
 
@@ -67,7 +67,7 @@ public final class InsertHandler extends DmlHandler {
       }
     }
 
-    SpiTransaction t = persistRequest.getTransaction();
+    SpiTransaction t = persistRequest.transaction();
     // get the appropriate sql
     sql = meta.getSql(withId, persistRequest.isPublish());
     PreparedStatement pstmt;
@@ -148,7 +148,7 @@ public final class InsertHandler extends DmlHandler {
     PreparedStatement stmt = null;
     ResultSet rset = null;
     try {
-      stmt = transaction.getConnection().prepareStatement(persistRequest.getSelectLastInsertedId());
+      stmt = transaction.connection().prepareStatement(persistRequest.getSelectLastInsertedId());
       rset = stmt.executeQuery();
       setGeneratedKey(rset);
     } finally {

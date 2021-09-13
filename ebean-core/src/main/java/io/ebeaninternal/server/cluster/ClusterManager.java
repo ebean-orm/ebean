@@ -56,7 +56,7 @@ public class ClusterManager implements ServerLookup {
   public void registerServer(EbeanServer server) {
     lock.lock();
     try {
-      serverMap.put(server.getName(), server);
+      serverMap.put(server.name(), server);
       if (!started) {
         startup();
       }

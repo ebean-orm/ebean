@@ -8,7 +8,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Person;
 import org.tests.model.basic.Phone;
 

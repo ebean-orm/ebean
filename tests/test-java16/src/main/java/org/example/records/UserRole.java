@@ -22,15 +22,15 @@ public class UserRole extends Model {
     this.note = note;
   }
 
-  public UserRoleId getId() {
+  public UserRoleId id() {
     return id;
   }
 
-  public String getNote() {
+  public String note() {
     return note;
   }
 
-  public long getVersion() {
+  public long version() {
     return version;
   }
 }

@@ -318,8 +318,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Connection getConnection() {
-    return transaction.getConnection();
+  public Connection connection() {
+    return transaction.connection();
   }
 
   @Override

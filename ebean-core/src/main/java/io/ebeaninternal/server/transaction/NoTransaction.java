@@ -288,7 +288,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public Connection getConnection() {
+  public Connection connection() {
     return null;
   }
 

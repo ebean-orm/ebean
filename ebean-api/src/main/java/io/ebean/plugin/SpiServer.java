@@ -16,32 +16,80 @@ public interface SpiServer extends Database {
   /**
    * Return the DatabaseConfig.
    */
-  DatabaseConfig getServerConfig();
+  DatabaseConfig config();
+
+  /**
+   * Migrate to config().
+   */
+  @Deprecated
+  default DatabaseConfig getServerConfig() {
+    return config();
+  }
 
   /**
    * Return the DatabasePlatform for this database.
    */
-  DatabasePlatform getDatabasePlatform();
+  DatabasePlatform databasePlatform();
+
+  /**
+   * Migrate to config().
+   */
+  @Deprecated
+  default DatabasePlatform getDatabasePlatform() {
+    return databasePlatform();
+  }
 
   /**
    * Return all the bean types registered on this server instance.
    */
-  List<? extends BeanType<?>> getBeanTypes();
+  List<? extends BeanType<?>> beanTypes();
+
+  /**
+   * Migrate to beanTypes().
+   */
+  @Deprecated
+  default List<? extends BeanType<?>> getBeanTypes() {
+    return beanTypes();
+  }
 
   /**
    * Return the bean type for a given entity bean class.
    */
-  <T> BeanType<T> getBeanType(Class<T> beanClass);
+  <T> BeanType<T> beanType(Class<T> beanClass);
+
+  /**
+   * Migrate to beanType().
+   */
+  @Deprecated
+  default <T> BeanType<T> getBeanType(Class<T> beanClass) {
+    return beanType(beanClass);
+  }
 
   /**
    * Return the bean types mapped to the given base table.
    */
-  List<? extends BeanType<?>> getBeanTypes(String baseTableName);
+  List<? extends BeanType<?>> beanTypes(String baseTableName);
+
+  /**
+   * Migrate to beanTypes().
+   */
+  @Deprecated
+  default List<? extends BeanType<?>> getBeanTypes(String baseTableName) {
+    return beanTypes(baseTableName);
+  }
 
   /**
    * Return the bean type for a given doc store queueId.
    */
-  BeanType<?> getBeanTypeForQueueId(String queueId);
+  BeanType<?> beanTypeForQueueId(String queueId);
+
+  /**
+   * Migrate to beanTypes().
+   */
+  @Deprecated
+  default BeanType<?> getBeanTypeForQueueId(String queueId) {
+    return beanTypeForQueueId(queueId);
+  }
 
   /**
    * Return a BeanLoader.

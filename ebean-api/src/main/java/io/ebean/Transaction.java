@@ -538,7 +538,15 @@ public interface Transaction extends AutoCloseable {
    * Examples of when a developer may wish to use the connection directly are:
    * Savepoints, advanced CLOB BLOB use and advanced stored procedure calls.
    */
-  Connection getConnection();
+  Connection connection();
+
+  /**
+   * Deprecated migrate to connection().
+   */
+  @Deprecated
+  default Connection getConnection() {
+    return connection();
+  }
 
   /**
    * Add table modification information to the TransactionEvent.

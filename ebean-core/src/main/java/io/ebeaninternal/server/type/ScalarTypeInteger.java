@@ -72,6 +72,11 @@ final class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
+  public String format(Object value) {
+    return String.valueOf(value);
+  }
+
+  @Override
   public String formatValue(Integer v) {
     return v.toString();
   }

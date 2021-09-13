@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.autotune.service;
 
 import io.ebeaninternal.server.autotune.model.Autotune;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.InputStream;

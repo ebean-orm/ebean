@@ -21,18 +21,18 @@ class BeanPropertyAssocManyJsonTransient {
    */
   void jsonReadUsingObjectMapper(BeanPropertyAssocMany<?> many, SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     ObjectMapper mapper = readJson.getObjectMapper();
-    ManyType manyType = many.getManyType();
+    ManyType manyType = many.manyType();
 
     Object value;
     if (manyType.isMap()) {
       // read map using Jackson object mapper with unknown key type
       TypeFactory typeFactory = mapper.getTypeFactory();
-      JavaType target = typeFactory.constructType(many.getTargetType());
+      JavaType target = typeFactory.constructType(many.targetType());
       MapType jacksonType = typeFactory.constructMapType(LinkedHashMap.class, TypeFactory.unknownType(), target);
       value = mapper.readValue(readJson.getParser(), jacksonType);
     } else {
       // read list or set using Jackson object mapper
-      CollectionType jacksonType = mapper.getTypeFactory().constructCollectionType(manyType.getCollectionType(), many.getTargetType());
+      CollectionType jacksonType = mapper.getTypeFactory().constructCollectionType(manyType.getCollectionType(), many.targetType());
       value = mapper.readValue(readJson.getParser(), jacksonType);
     }
     many.setValue(parentBean, value);

@@ -43,14 +43,14 @@ public class ProfileOriginNodeUsage {
     try {
       BeanDescriptor<?> desc = rootDesc;
       if (path != null) {
-        ElPropertyValue elGetValue = rootDesc.getElGetValue(path);
+        ElPropertyValue elGetValue = rootDesc.elGetValue(path);
         if (elGetValue == null) {
-          logger.warn("AutoTune: Can't find join for path[" + path + "] for " + rootDesc.getName());
+          logger.warn("AutoTune: Can't find join for path[" + path + "] for " + rootDesc.name());
           return;
         } else {
-          BeanProperty beanProperty = elGetValue.getBeanProperty();
+          BeanProperty beanProperty = elGetValue.beanProperty();
           if (beanProperty instanceof BeanPropertyAssoc<?>) {
-            desc = ((BeanPropertyAssoc<?>) beanProperty).getTargetDescriptor();
+            desc = ((BeanPropertyAssoc<?>) beanProperty).targetDescriptor();
           }
         }
       }
@@ -61,7 +61,7 @@ public class ProfileOriginNodeUsage {
       for (String propName : aggregateUsed) {
         BeanProperty beanProp = desc.findPropertyFromPath(propName);
         if (beanProp == null) {
-          logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.getName());
+          logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.name());
 
         } else {
           if (beanProp.isId()) {
@@ -76,24 +76,24 @@ public class ProfileOriginNodeUsage {
               // (which is the default for Lob's so typical).
             } else {
               addedToPath = true;
-              pathProps.addToPath(path, beanProp.getName());
+              pathProps.addToPath(path, beanProp.name());
             }
           }
         }
       }
 
       if ((modified || addVersionProperty) && desc != null) {
-        BeanProperty versionProp = desc.getVersionProperty();
+        BeanProperty versionProp = desc.versionProperty();
         if (versionProp != null) {
           addedToPath = true;
-          pathProps.addToPath(path, versionProp.getName());
+          pathProps.addToPath(path, versionProp.name());
         }
       }
 
       if (toOneIdProperty != null && !addedToPath) {
         // add ToOne property to parent path
-        ElPropertyValue assocOne = rootDesc.getElGetValue(path);
-        pathProps.addToPath(SplitName.parent(path), assocOne.getName());
+        ElPropertyValue assocOne = rootDesc.elGetValue(path);
+        pathProps.addToPath(SplitName.parent(path), assocOne.name());
       }
     } finally {
       lock.unlock();

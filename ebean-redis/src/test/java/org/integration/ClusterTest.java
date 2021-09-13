@@ -7,7 +7,7 @@ import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import org.domain.query.QPerson;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
 
@@ -30,7 +30,7 @@ public class ClusterTest {
   public void testBothNear() {
     // ensure the default server exists first
     final Database db = DB.getDefault();
-    Database other = createOther(db.getPluginApi().getDataSource());
+    Database other = createOther(db.pluginApi().dataSource());
 
     new QPerson()
       .name.eq("Someone")
@@ -39,13 +39,14 @@ public class ClusterTest {
     Person foo = new Person("Someone");
     foo.save();
 
-    DB.getServerCacheManager().clearAll();
-    other.getMetaInfoManager().resetAllMetrics();
+    DB.cacheManager().clearAll();
+    DB.getDefault().metaInfo().resetAllMetrics();
+    other.metaInfo().resetAllMetrics();
 
     Person fooA = DB.find(Person.class, foo.getId());
     Person fooB = other.find(Person.class, foo.getId());
 
-    DuelCache dualCacheA = (DuelCache) DB.getServerCacheManager().getBeanCache(Person.class);
+    DuelCache dualCacheA = (DuelCache) DB.cacheManager().beanCache(Person.class);
     assertCounts(dualCacheA, 0, 1, 0, 1);
     fooA = DB.find(Person.class, foo.getId());
     assertCounts(dualCacheA, 1, 1, 0, 1);
@@ -53,7 +54,7 @@ public class ClusterTest {
     fooA = DB.find(Person.class, foo.getId());
     assertCounts(dualCacheA, 2, 1, 0, 1);
     fooB = other.find(Person.class, foo.getId());
-    DuelCache dualCacheB = (DuelCache) other.getServerCacheManager().getBeanCache(Person.class);
+    DuelCache dualCacheB = (DuelCache) other.cacheManager().beanCache(Person.class);
     assertCounts(dualCacheB, 2, 1, 1, 0);
   }
 
@@ -61,17 +62,17 @@ public class ClusterTest {
   public void test() throws InterruptedException {
     // ensure the default server exists first
     final Database db = DB.getDefault();
-    Database other = createOther(db.getPluginApi().getDataSource());
+    Database other = createOther(db.pluginApi().dataSource());
 
     for (int i = 0; i < 10; i++) {
       Person foo = new Person("name " + i);
       foo.save();
     }
 
-    other.getServerCacheManager().clearAll();
-    other.getMetaInfoManager().resetAllMetrics();
+    other.cacheManager().clearAll();
+    other.metaInfo().resetAllMetrics();
 
-    DuelCache dualCache = (DuelCache) other.getServerCacheManager().getBeanCache(Person.class);
+    DuelCache dualCache = (DuelCache) other.cacheManager().beanCache(Person.class);
 
     Person foo0 = other.find(Person.class, 1);
     assertCounts(dualCache, 0, 1, 0, 1);

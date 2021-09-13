@@ -11,15 +11,15 @@ import java.util.List;
  */
 public interface LoadBeanBuffer {
 
-  int getBatchSize();
+  int batchSize();
 
-  List<EntityBeanIntercept> getBatch();
+  List<EntityBeanIntercept> batch();
 
-  BeanDescriptor<?> getBeanDescriptor();
+  BeanDescriptor<?> descriptor();
 
-  PersistenceContext getPersistenceContext();
+  PersistenceContext persistenceContext();
 
-  String getFullPath();
+  String fullPath();
 
   void configureQuery(SpiQuery<?> query, String lazyLoadProperty);
 

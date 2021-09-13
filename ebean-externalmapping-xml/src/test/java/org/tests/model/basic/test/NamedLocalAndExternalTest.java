@@ -3,7 +3,7 @@ package org.tests.model.basic.test;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 import static org.assertj.core.api.Assertions.assertThat;

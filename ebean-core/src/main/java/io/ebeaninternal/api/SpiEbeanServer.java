@@ -8,6 +8,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
 /**
  * Service Provider extension to EbeanServer.
  */
-public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollectionLoader {
+public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, BeanCollectionLoader {
 
   /**
    * Return true if the L2 cache has been disabled.
@@ -51,16 +52,6 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   Object currentTenantId();
 
   /**
-   * Return the server configuration.
-   */
-  DatabaseConfig getServerConfig();
-
-  /**
-   * Return the DatabasePlatform for this server.
-   */
-  DatabasePlatform getDatabasePlatform();
-
-  /**
    * Create an object to represent the current CallStack.
    * <p>
    * Typically used to identify the origin of queries for AutoTune and object
@@ -72,7 +63,7 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   /**
    * Return the PersistenceContextScope to use defined at query or server level.
    */
-  PersistenceContextScope getPersistenceContextScope(SpiQuery<?> query);
+  PersistenceContextScope persistenceContextScope(SpiQuery<?> query);
 
   /**
    * Clear the query execution statistics.
@@ -82,32 +73,32 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   /**
    * Return the transaction manager.
    */
-  SpiTransactionManager getTransactionManager();
+  SpiTransactionManager transactionManager();
 
   /**
    * Return all the descriptors.
    */
-  List<BeanDescriptor<?>> getBeanDescriptors();
+  List<BeanDescriptor<?>> descriptors();
 
   /**
    * Return the BeanDescriptor for a given type of bean.
    */
-  <T> BeanDescriptor<T> getBeanDescriptor(Class<T> type);
+  <T> BeanDescriptor<T> descriptor(Class<T> type);
 
   /**
    * Return BeanDescriptor using it's unique id.
    */
-  BeanDescriptor<?> getBeanDescriptorById(String className);
+  BeanDescriptor<?> descriptorById(String className);
 
   /**
    * Return BeanDescriptor using it's unique doc store queueId.
    */
-  BeanDescriptor<?> getBeanDescriptorByQueueId(String queueId);
+  BeanDescriptor<?> descriptorByQueueId(String queueId);
 
   /**
    * Return BeanDescriptors mapped to this table.
    */
-  List<BeanDescriptor<?>> getBeanDescriptors(String tableName);
+  List<BeanDescriptor<?>> descriptors(String tableName);
 
   /**
    * Process committed changes from another framework.
@@ -179,7 +170,7 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   /**
    * Return the default batch size for lazy loading.
    */
-  int getLazyLoadBatchSize();
+  int lazyLoadBatchSize();
 
   /**
    * Return true if the type is known as an Entity or Xml type or a List Set or
@@ -190,18 +181,18 @@ public interface SpiEbeanServer extends ExtendedServer, EbeanServer, BeanCollect
   /**
    * Return the ReadAuditLogger to use for logging all read audit events.
    */
-  ReadAuditLogger getReadAuditLogger();
+  ReadAuditLogger readAuditLogger();
 
   /**
    * Return the ReadAuditPrepare used to populate the read audit events with
    * user context information (user id, user ip address etc).
    */
-  ReadAuditPrepare getReadAuditPrepare();
+  ReadAuditPrepare readAuditPrepare();
 
   /**
    * Return the DataTimeZone to use when reading/writing timestamps via JDBC.
    */
-  DataTimeZone getDataTimeZone();
+  DataTimeZone dataTimeZone();
 
   /**
    * Check for slow query event.

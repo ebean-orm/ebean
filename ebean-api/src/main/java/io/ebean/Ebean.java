@@ -103,7 +103,7 @@ public final class Ebean {
    * </p>
    */
   public static ExpressionFactory getExpressionFactory() {
-    return getDefault().getExpressionFactory();
+    return getDefault().expressionFactory();
   }
 
   /**
@@ -642,7 +642,7 @@ public final class Ebean {
    * @param id       the id value
    */
   public static <T> T getReference(Class<T> beanType, Object id) {
-    return getDefault().getReference(beanType, id);
+    return getDefault().reference(beanType, id);
   }
 
   /**
@@ -1201,14 +1201,14 @@ public final class Ebean {
    * </p>
    */
   public static BeanState getBeanState(Object bean) {
-    return getDefault().getBeanState(bean);
+    return getDefault().beanState(bean);
   }
 
   /**
    * Return the manager of the server cache ("L2" cache).
    */
   public static ServerCacheManager getServerCacheManager() {
-    return getDefault().getServerCacheManager();
+    return getDefault().cacheManager();
   }
 
   /**
@@ -1216,7 +1216,7 @@ public final class Ebean {
    * queries.
    */
   public static BackgroundExecutor getBackgroundExecutor() {
-    return getDefault().getBackgroundExecutor();
+    return getDefault().backgroundExecutor();
   }
 
   /**

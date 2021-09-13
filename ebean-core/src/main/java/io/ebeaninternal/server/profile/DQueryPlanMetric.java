@@ -27,7 +27,7 @@ final class DQueryPlanMetric implements QueryPlanMetric {
   }
 
   @Override
-  public TimedMetric getMetric() {
+  public TimedMetric metric() {
     return metric;
   }
 

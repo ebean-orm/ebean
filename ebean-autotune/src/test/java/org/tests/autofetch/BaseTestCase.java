@@ -11,6 +11,6 @@ public class BaseTestCase {
   }
 
   protected <T> BeanDescriptor<T> getBeanDescriptor(Class<T> cls) {
-    return spiEbeanServer().getBeanDescriptor(cls);
+    return spiEbeanServer().descriptor(cls);
   }
 }

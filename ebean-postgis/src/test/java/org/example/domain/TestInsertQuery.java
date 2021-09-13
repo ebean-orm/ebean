@@ -1,13 +1,13 @@
 package org.example.domain;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
+import org.junit.jupiter.api.Test;
 import org.postgis.LineString;
 import org.postgis.MultiLineString;
 import org.postgis.MultiPoint;
 import org.postgis.MultiPolygon;
 import org.postgis.Point;
 import org.postgis.Polygon;
-import org.testng.annotations.Test;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -17,16 +17,16 @@ public class TestInsertQuery {
   /**
    * Not automated this test yet.
    */
-  @Test(enabled = false)
+  @Test
   public void insert() throws SQLException {
 
 
-    List<MyBean> list = Ebean.find(MyBean.class).findList();
+    List<MyBean> list = DB.find(MyBean.class).findList();
     for (MyBean MyBean : list) {
       System.out.println(MyBean.getPoint());
     }
 
-    List<MyBean> list1 = Ebean.find(MyBean.class)
+    List<MyBean> list1 = DB.find(MyBean.class)
         .where()
         .raw("st_within(st_pointfromwkb(st_point(?, ?), 4674), poly)", 1.9, 1.9)
         .findList();
@@ -50,10 +50,10 @@ public class TestInsertQuery {
     p.setMultiPoint(multiPoint);
     p.setMpoly(mpoly);
 
-    Ebean.save(p);
+    DB.save(p);
 
     List<String> content =
-      Ebean.find(MyBean.class)
+      DB.find(MyBean.class)
       .select("ST_AsText(lineString)::String")
       .findSingleAttributeList();
 

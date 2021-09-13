@@ -63,7 +63,7 @@ public final class CacheChangeSet {
    * Add an entry to clear a query cache.
    */
   public void addInvalidate(BeanDescriptor<?> descriptor) {
-    touchedTables.add(descriptor.getBaseTable());
+    touchedTables.add(descriptor.baseTable());
   }
 
   /**
@@ -78,7 +78,7 @@ public final class CacheChangeSet {
    */
   public void addClearQuery(BeanDescriptor<?> descriptor) {
     queryCaches.add(descriptor);
-    touchedTables.add(descriptor.getBaseTable());
+    touchedTables.add(descriptor.baseTable());
   }
 
   /**
@@ -125,7 +125,7 @@ public final class CacheChangeSet {
       entry.addId(id);
     } else {
       beanRemoveMap.put(desc, new CacheChangeBeanRemove(id, desc));
-      touchedTables.add(desc.getBaseTable());
+      touchedTables.add(desc.baseTable());
     }
   }
 
@@ -138,7 +138,7 @@ public final class CacheChangeSet {
       entry.addIds(ids);
     } else {
       beanRemoveMap.put(desc, new CacheChangeBeanRemove(desc, ids));
-      touchedTables.add(desc.getBaseTable());
+      touchedTables.add(desc.baseTable());
     }
   }
 
@@ -146,7 +146,7 @@ public final class CacheChangeSet {
    * Update a bean entry.
    */
   public <T> void addBeanUpdate(BeanDescriptor<T> desc, String key, Map<String, Object> changes, boolean updateNaturalKey, long version) {
-    touchedTables.add(desc.getBaseTable());
+    touchedTables.add(desc.baseTable());
     entries.add(new CacheChangeBeanUpdate(desc, key, changes, updateNaturalKey, version));
   }
 

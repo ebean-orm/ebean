@@ -14,7 +14,7 @@ final class BindablePropertyJsonUpdate extends BindableProperty {
 
   BindablePropertyJsonUpdate(BeanProperty prop) {
     super(prop);
-    this.propertyIndex = prop.getPropertyIndex();
+    this.propertyIndex = prop.propertyIndex();
   }
 
   /**
