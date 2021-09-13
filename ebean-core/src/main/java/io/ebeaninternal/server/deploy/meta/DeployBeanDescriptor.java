@@ -192,7 +192,7 @@ public class DeployBeanDescriptor<T> {
    * Return the DeployBeanInfo for the given bean class.
    */
   DeployBeanInfo<?> getDeploy(Class<?> cls) {
-    return manager.getDeploy(cls);
+    return manager.deploy(cls);
   }
 
   public void setStorageEngine(String storageEngine) {

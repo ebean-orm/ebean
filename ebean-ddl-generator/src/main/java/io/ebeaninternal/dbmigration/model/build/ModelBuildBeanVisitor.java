@@ -36,7 +36,7 @@ public class ModelBuildBeanVisitor implements BeanVisitor {
     // add the table to the model
     ctx.addTable(table);
 
-    InheritInfo inheritInfo = descriptor.getInheritInfo();
+    InheritInfo inheritInfo = descriptor.inheritInfo();
     if (inheritInfo != null && inheritInfo.isRoot()) {
       // add the discriminator column
       String discColumn = inheritInfo.getDiscriminatorColumn();

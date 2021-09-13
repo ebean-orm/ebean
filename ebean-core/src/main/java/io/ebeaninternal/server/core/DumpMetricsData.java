@@ -24,7 +24,7 @@ final class DumpMetricsData {
   }
 
   List<MetricData> data() {
-    collect(database.getMetaInfoManager().collectMetrics());
+    collect(database.metaInfo().collectMetrics());
     return list;
   }
 

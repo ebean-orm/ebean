@@ -37,7 +37,7 @@ final class CaseInsensitiveEqualExpression extends AbstractValueExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
       // bind the key as well as the value
-      String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
+      String encryptKey = prop.beanProperty().encryptKey().getStringValue();
       request.addBindEncryptKey(encryptKey);
     }
 
@@ -49,7 +49,7 @@ final class CaseInsensitiveEqualExpression extends AbstractValueExpression {
     String pname = propName;
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
-      pname = prop.getBeanProperty().getDecryptProperty(propName);
+      pname = prop.beanProperty().decryptProperty(propName);
     }
     if (not) {
       request.append("lower(").append(pname).append(") != ?");

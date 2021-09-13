@@ -85,15 +85,15 @@ public class CQueryPlan implements SpiQueryPlan {
    * Create a query plan based on a OrmQueryRequest.
    */
   CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
-    this.server = request.getServer();
-    this.dataTimeZone = server.getDataTimeZone();
-    this.beanType = request.getBeanDescriptor().getBeanType();
-    this.planKey = request.getQueryPlanKey();
-    SpiQuery<?> query = request.getQuery();
+    this.server = request.server();
+    this.dataTimeZone = server.dataTimeZone();
+    this.beanType = request.descriptor().type();
+    this.planKey = request.queryPlanKey();
+    SpiQuery<?> query = request.query();
     this.profileLocation = query.getProfileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
+    this.name = deriveName(label, query.getType(), request.descriptor().simpleName());
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.sqlTree = sqlTree;
@@ -110,14 +110,14 @@ public class CQueryPlan implements SpiQueryPlan {
    * Create a query plan for a raw sql query.
    */
   CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, String logWhereSql) {
-    this.server = request.getServer();
-    this.dataTimeZone = server.getDataTimeZone();
-    this.beanType = request.getBeanDescriptor().getBeanType();
-    SpiQuery<?> query = request.getQuery();
+    this.server = request.server();
+    this.dataTimeZone = server.dataTimeZone();
+    this.beanType = request.descriptor().type();
+    SpiQuery<?> query = request.query();
     this.profileLocation = query.getProfileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
     this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType(), request.getBeanDescriptor().getSimpleName());
+    this.name = deriveName(label, query.getType(), request.descriptor().simpleName());
     this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
     this.sql = sql;
@@ -221,7 +221,7 @@ public class CQueryPlan implements SpiQueryPlan {
     DataBind dataBind = new DataBind(dataTimeZone, stmt, conn);
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
-        dataBind.setString(encryptedProp.getEncryptKeyAsString());
+        dataBind.setString(encryptedProp.encryptKeyAsString());
       }
     }
     return dataBind;
@@ -231,7 +231,7 @@ public class CQueryPlan implements SpiQueryPlan {
     DataBindCapture dataBind = DataBindCapture.of(dataTimeZone);
     if (encryptedProps != null) {
       for (STreeProperty encryptedProp : encryptedProps) {
-        dataBind.setString(encryptedProp.getEncryptKeyAsString());
+        dataBind.setString(encryptedProp.encryptKeyAsString());
       }
     }
     return dataBind;

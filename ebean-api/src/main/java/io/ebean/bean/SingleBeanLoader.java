@@ -20,7 +20,7 @@ public abstract class SingleBeanLoader implements BeanLoader {
 
   @Override
   public String getName() {
-    return database.getName();
+    return database.name();
   }
 
   @Override
@@ -39,7 +39,7 @@ public abstract class SingleBeanLoader implements BeanLoader {
 
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
-      database.getPluginApi().loadBeanL2(ebi);
+      database.pluginApi().loadBeanL2(ebi);
     }
   }
 
@@ -53,7 +53,7 @@ public abstract class SingleBeanLoader implements BeanLoader {
 
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
-      database.getPluginApi().loadBeanRef(ebi);
+      database.pluginApi().loadBeanRef(ebi);
     }
   }
 
@@ -67,7 +67,7 @@ public abstract class SingleBeanLoader implements BeanLoader {
 
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
-      database.getPluginApi().loadBean(ebi);
+      database.pluginApi().loadBean(ebi);
     }
   }
 }

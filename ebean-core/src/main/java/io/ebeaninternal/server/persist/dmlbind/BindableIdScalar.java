@@ -32,7 +32,7 @@ final class BindableIdScalar implements BindableId {
 
   @Override
   public String getIdentityColumn() {
-    return uidProp.getDbColumn();
+    return uidProp.dbColumn();
   }
 
   @Override
@@ -64,7 +64,7 @@ final class BindableIdScalar implements BindableId {
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
 
-    request.appendColumn(uidProp.getDbColumn());
+    request.appendColumn(uidProp.dbColumn());
   }
 
   @Override

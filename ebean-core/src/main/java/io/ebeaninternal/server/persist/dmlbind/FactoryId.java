@@ -13,7 +13,7 @@ public final class FactoryId {
    * Add uniqueId properties.
    */
   public BindableId createId(BeanDescriptor<?> desc) {
-    BeanProperty id = desc.getIdProperty();
+    BeanProperty id = desc.idProperty();
     if (id == null) {
       return new BindableIdEmpty();
     }
@@ -21,7 +21,7 @@ public final class FactoryId {
       return new BindableIdScalar(id);
     } else {
       BeanPropertyAssocOne<?> embId = (BeanPropertyAssocOne<?>) id;
-      MatchedImportedProperty[] matches = MatchedImportedFactory.build(embId.getProperties(), desc);
+      MatchedImportedProperty[] matches = MatchedImportedFactory.build(embId.properties(), desc);
       return new BindableIdEmbedded(embId, matches);
     }
   }

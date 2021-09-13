@@ -20,7 +20,7 @@ class BindableAssocOne implements Bindable {
 
   BindableAssocOne(BeanPropertyAssocOne<?> assocOne) {
     this.assocOne = assocOne;
-    this.importedId = assocOne.getImportedId();
+    this.importedId = assocOne.importedId();
   }
 
   @Override

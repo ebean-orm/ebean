@@ -120,34 +120,82 @@ public interface Database {
   /**
    * Return AutoTune which is used to control the AutoTune service at runtime.
    */
-  AutoTune getAutoTune();
+  AutoTune autoTune();
+
+  /**
+   * Deprecated migrate to autoTune().
+   */
+  @Deprecated
+  default AutoTune getAutoTune() {
+    return autoTune();
+  }
 
   /**
    * Return the associated DataSource for this Database instance.
    */
-  DataSource getDataSource();
+  DataSource dataSource();
+
+  /**
+   * Deprecated migrate to dataSource().
+   */
+  @Deprecated
+  default DataSource getDataSource() {
+    return dataSource();
+  }
 
   /**
    * Return the associated read only DataSource for this Database instance (can be null).
    */
-  DataSource getReadOnlyDataSource();
+  DataSource readOnlyDataSource();
+
+  /**
+   * Deprecated migrate to readOnlyDataSource().
+   */
+  @Deprecated
+  default DataSource getReadOnlyDataSource() {
+    return readOnlyDataSource();
+  }
 
   /**
    * Return the name. This is used with {@link DB#byName(String)} to get a
    * Database that was registered with the DB singleton.
    */
-  String getName();
+  String name();
+
+  /**
+   * Deprecated migrate to name().
+   */
+  @Deprecated
+  default String getName() {
+    return name();
+  }
 
   /**
    * Return the ExpressionFactory for this database.
    */
-  ExpressionFactory getExpressionFactory();
+  ExpressionFactory expressionFactory();
+
+  /**
+   * Deprecated migrate to expressionFactory().
+   */
+  @Deprecated
+  default ExpressionFactory getExpressionFactory() {
+    return expressionFactory();
+  }
 
   /**
    * Return the MetaInfoManager which is used to get meta data from the Database
    * such as query execution statistics.
    */
-  MetaInfoManager getMetaInfoManager();
+  MetaInfoManager metaInfo();
+
+  /**
+   * Deprecated migrate to metaInfo().
+   */
+  @Deprecated
+  default MetaInfoManager getMetaInfoManager() {
+    return metaInfo();
+  }
 
   /**
    * Return the platform used for this database instance.
@@ -166,12 +214,28 @@ public interface Database {
    *
    * @return platform for this database instance
    */
-  Platform getPlatform();
+  Platform platform();
+
+  /**
+   * Deprecated migrate to platform().
+   */
+  @Deprecated
+  default Platform getPlatform() {
+    return platform();
+  }
 
   /**
    * Return the extended API intended for use by plugins.
    */
-  SpiServer getPluginApi();
+  SpiServer pluginApi();
+
+  /**
+   * Deprecated migrate to pluginApi().
+   */
+  @Deprecated
+  default SpiServer getPluginApi() {
+    return pluginApi();
+  }
 
   /**
    * Return the BeanState for a given entity bean.
@@ -179,12 +243,28 @@ public interface Database {
    * This will return null if the bean is not an enhanced entity bean.
    * </p>
    */
-  BeanState getBeanState(Object bean);
+  BeanState beanState(Object bean);
+
+  /**
+   * Deprecated migrate to beanState().
+   */
+  @Deprecated
+  default BeanState getBeanState(Object bean) {
+    return beanState(bean);
+  }
 
   /**
    * Return the value of the Id property for a given bean.
    */
-  Object getBeanId(Object bean);
+  Object beanId(Object bean);
+
+  /**
+   * Deprecated migrate to beanId().
+   */
+  @Deprecated
+  default Object getBeanId(Object bean) {
+    return beanId(bean);
+  }
 
   /**
    * Set the Id value onto the bean converting the type of the id value if necessary.
@@ -196,7 +276,15 @@ public interface Database {
    * @param bean The entity bean to set the id value on.
    * @param id   The id value to set.
    */
-  Object setBeanId(Object bean, Object id);
+  Object beanId(Object bean, Object id);
+
+  /**
+   * Deprecated migrate to beanId().
+   */
+  @Deprecated
+  default Object setBeanId(Object bean, Object id) {
+    return beanId(bean, id);
+  }
 
   /**
    * Return a map of the differences between two objects of the same type.
@@ -862,7 +950,15 @@ public interface Database {
    * @param id       the id value
    */
   @Nonnull
-  <T> T getReference(Class<T> beanType, Object id);
+  <T> T reference(Class<T> beanType, Object id);
+
+  /**
+   * Deprecated migrate to reference().
+   */
+  @Deprecated
+  default <T> T getReference(Class<T> beanType, Object id) {
+    return reference(beanType, id);
+  }
 
   /**
    * Return the extended API for Database.
@@ -1431,13 +1527,29 @@ public interface Database {
   /**
    * Return the manager of the server cache ("L2" cache).
    */
-  ServerCacheManager getServerCacheManager();
+  ServerCacheManager cacheManager();
+
+  /**
+   * Deprecated migrate to cacheManager().
+   */
+  @Deprecated
+  default ServerCacheManager getServerCacheManager() {
+    return cacheManager();
+  }
 
   /**
    * Return the BackgroundExecutor service for asynchronous processing of
    * queries.
    */
-  BackgroundExecutor getBackgroundExecutor();
+  BackgroundExecutor backgroundExecutor();
+
+  /**
+   * Deprecated migrate to backgroundExecutor().
+   */
+  @Deprecated
+  default BackgroundExecutor getBackgroundExecutor() {
+    return backgroundExecutor();
+  }
 
   /**
    * Return the JsonContext for reading/writing JSON.
@@ -1601,6 +1713,20 @@ public interface Database {
    * </p>
    */
   <T> Set<String> validateQuery(Query<T> query);
+
+  /**
+   * Load and lock the bean using {@code select for update}.
+   * <p>
+   * This should be executed inside a transaction and results in the bean being loaded or
+   * refreshed from the database and a database row lock held via {@code select for update}.
+   * <p>
+   * The bean needs to have an ID property set and can be a reference bean (only has ID)
+   * or partially or fully populated bean. This will load all the properties of the bean
+   * from the database using {@code select for update} obtaining a database row lock (using WAIT).
+   *
+   * @param bean The entity bean that we wish to obtain a database lock on.
+   */
+  void lock(Object bean);
 
   /**
    * Truncate all the given tables.

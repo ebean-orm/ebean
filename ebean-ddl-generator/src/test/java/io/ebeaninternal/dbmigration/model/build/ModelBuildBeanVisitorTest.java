@@ -15,7 +15,7 @@ import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CKeyAssoc;
 import org.tests.model.basic.CKeyDetail;
 import org.tests.model.basic.CKeyParent;
@@ -34,7 +34,7 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
 
     ModelContainer model = new ModelContainer();
 
-    DbConstraintNaming constraintNaming = defaultServer.getServerConfig().getConstraintNaming();
+    DbConstraintNaming constraintNaming = defaultServer.config().getConstraintNaming();
     constraintNaming.setMaxLength(new DefaultConstraintMaxLength(60));
     ModelBuildContext ctx = new ModelBuildContext(model, new H2Platform(), constraintNaming, true);
 

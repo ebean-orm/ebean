@@ -503,7 +503,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * Return the underlying connection for public use.
    */
   @Override
-  public Connection getConnection() {
+  public Connection connection() {
     return getInternalConnection();
   }
 

@@ -56,15 +56,15 @@ public final class DeployPropertyParser extends DeployParser {
 
   @Override
   public String getDeployWord(String expression) {
-    ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(expression);
+    ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(expression);
     if (elProp == null) {
       return null;
     } else {
       if (catchFirst && firstProp == null) {
         firstProp = elProp;
       }
-      addIncludes(elProp.getElPrefix());
-      return elProp.getElPlaceholder(encrypted);
+      addIncludes(elProp.elPrefix());
+      return elProp.elPlaceholder(encrypted);
     }
   }
 

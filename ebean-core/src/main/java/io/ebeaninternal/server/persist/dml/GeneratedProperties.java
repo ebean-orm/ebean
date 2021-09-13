@@ -61,7 +61,7 @@ final class GeneratedProperties {
 
     SetValue(BeanProperty property) {
       this.property = property;
-      this.generatedProperty = property.getGeneratedProperty();
+      this.generatedProperty = property.generatedProperty();
     }
 
     void preInsert(EntityBean bean, long now) {

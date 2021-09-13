@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import io.ebean.migration.MigrationVersion;
 

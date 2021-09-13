@@ -54,7 +54,7 @@ final class IdExpression extends NonPrepareExpression implements SpiExpression {
     // 'flatten' EmbeddedId and multiple Id cases
     // into an array of the underlying scalar field values
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
-    Object[] bindIdValues = r.getBeanDescriptor().getBindIdValues(value);
+    Object[] bindIdValues = r.getBeanDescriptor().bindIdValues(value);
     for (Object bindIdValue : bindIdValues) {
       request.addBindValue(bindIdValue);
     }
@@ -64,7 +64,7 @@ final class IdExpression extends NonPrepareExpression implements SpiExpression {
   public void addSql(SpiExpressionRequest request) {
 
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
-    String idSql = r.getBeanDescriptor().getIdBinderIdSql(null);
+    String idSql = r.getBeanDescriptor().idBinderIdSql(null);
 
     request.append(idSql);
   }

@@ -11,7 +11,7 @@ import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CKeyAssoc;
 import org.tests.model.basic.CKeyDetail;
 import org.tests.model.basic.CKeyParent;

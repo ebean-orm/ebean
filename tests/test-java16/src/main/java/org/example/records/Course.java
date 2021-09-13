@@ -19,15 +19,15 @@ public class Course extends BaseModel {
     this.name = name;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public String getSummary() {
+  public String summary() {
     return summary;
   }
 
-  public void setSummary(String summary) {
+  public void summary(String summary) {
     this.summary = summary;
   }
 }

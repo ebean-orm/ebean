@@ -46,7 +46,7 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
   @Override
   public void configure(SpiServer server) {
     jsonBuilder = new ChangeJsonBuilder();
-    Properties properties = server.getServerConfig().getProperties();
+    Properties properties = server.config().getProperties();
     if (properties != null) {
       String bufferSize = properties.getProperty("ebean.changeLog.bufferSize");
       if (bufferSize != null) {

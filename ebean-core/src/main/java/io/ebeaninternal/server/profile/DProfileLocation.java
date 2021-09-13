@@ -82,6 +82,7 @@ class DProfileLocation implements ProfileLocation {
     }
   }
 
+  @Override
   public void setTraceCount(int traceCount) {
     this.traceCount = traceCount;
   }

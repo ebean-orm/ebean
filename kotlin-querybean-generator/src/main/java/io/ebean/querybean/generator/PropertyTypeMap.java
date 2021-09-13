@@ -55,6 +55,7 @@ class PropertyTypeMap {
     map.put("java.lang.Class<?>", new PropertyType("PClass"));
     addType(Locale.class);
     addType(File.class);
+    map.put("byte[]", new PropertyType("PByteArray"));
     addType(InetAddress.class);
     map.put(URI.class.getName(), new PropertyType("PUri"));
     map.put(URL.class.getName(), new PropertyType("PUrl"));
