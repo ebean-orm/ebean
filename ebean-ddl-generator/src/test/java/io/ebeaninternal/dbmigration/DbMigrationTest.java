@@ -1,9 +1,9 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.BaseTestCase;
+import io.localtest.BaseTestCase;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
-import io.ebean.annotation.IgnorePlatform;
+import io.localtest.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 import org.junit.jupiter.api.Test;
