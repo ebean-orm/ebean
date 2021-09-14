@@ -2,6 +2,7 @@ package org.tests.idkeys;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.sql.SQLException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,11 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.multitenant.partition.UserContext;
 import org.tests.idkeys.db.GenKeySequence;
 
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
-import io.ebean.config.ServerConfig;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantDataSourceProvider;
 import io.ebean.config.TenantMode;
+import io.ebean.config.TenantSchemaProvider;
 import io.ebean.config.dbplatform.h2.H2Platform;
 
 /**
@@ -27,9 +29,9 @@ public class TestSequenceMultiTenant {
    * Tests sequences using multi tenancy per database
    */
   @Test
-  public void test_multi_tenant_sequences() {
+  public void test_multi_tenant_db_sequences() {
 
-    EbeanServer db = init();
+    Database db = setupDb();
 
     UserContext.set("4711", "1");
     assertEquals(1L, db.nextId(GenKeySequence.class));
@@ -43,9 +45,9 @@ public class TestSequenceMultiTenant {
 
   }
 
-  private static EbeanServer init() {
+  private static Database setupDb() {
 
-    ServerConfig config = new ServerConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     config.setName("h2multitenantseq");
     config.loadFromProperties();
@@ -66,32 +68,100 @@ public class TestSequenceMultiTenant {
         if (tenantId == null) {
           tenantId = "1";
         }
-        return map.computeIfAbsent(tenantId,
-            TestSequenceMultiTenant::createDataSource);
+        return map.computeIfAbsent(tenantId, this::createDataSource);
+      }
+
+      private DataSource createDataSource(Object tenantId) {
+
+        DatabaseConfig config = new DatabaseConfig();
+
+        config.setName("h2multitenantseq");
+        config.loadFromProperties();
+        config.setDdlRun(true);
+        config.setDdlExtra(false);
+        config.setRegister(false);
+        config.setDefaultServer(false);
+        config.getDataSourceConfig().setUrl("jdbc:h2:mem:h2multitenantseq-" + tenantId);
+
+        return DatabaseFactory.create(config).pluginApi().dataSource();
       }
     });
 
     config.getClasses().add(GenKeySequence.class);
 
-    return EbeanServerFactory.create(config);
+    return DatabaseFactory.create(config);
   }
 
-  private static DataSource createDataSource(Object tenantId) {
+  
+  /**
+   * Tests sequences using multi tenancy per schema
+   */
+  @Test
+  public void test_multi_tenant_schema_sequences() throws SQLException {
+    createDDl("PUBLIC");
+    createDDl("TENANT_SCHEMA_1");
+    createDDl("TENANT_SCHEMA_2");
 
-    ServerConfig config = new ServerConfig();
+    Database db = setupSchema();
+
+    UserContext.set("4711", "1");
+    assertEquals(1L, db.nextId(GenKeySequence.class));
+    assertEquals(2L, db.nextId(GenKeySequence.class));
+
+    UserContext.set("5711", "2");
+    assertEquals(1L, db.nextId(GenKeySequence.class));
+
+    UserContext.set("4711", "1");
+    assertEquals(3L, db.nextId(GenKeySequence.class));
+  }
+
+  private Database setupSchema() {
+
+    DatabaseConfig config = new DatabaseConfig();
 
     config.setName("h2multitenantseq");
     config.loadFromProperties();
+    config.setDdlGenerate(true);
+    config.setDdlRun(false);
+    config.setDdlExtra(false);
+    config.setRegister(false);
+    config.setDefaultServer(false);
+    config.setCurrentTenantProvider(() -> UserContext.get().getTenantId());
+    config.setTenantMode(TenantMode.SCHEMA);
+    config.setDatabasePlatform(new H2Platform());
+    config.getDataSourceConfig().setUrl("jdbc:h2:mem:h2multitenantseq;DB_CLOSE_ON_EXIT=FALSE;");
+    config.setTenantSchemaProvider(new TenantSchemaProvider() {
+
+      @Override
+      public String schema(Object tenantId) {
+        return tenantId == null
+            ? "TENANT_SCHEMA_1"
+            : "TENANT_SCHEMA_1" + tenantId;
+      }
+    });
+
+    config.getClasses().add(GenKeySequence.class);
+
+    return DatabaseFactory.create(config);
+  }
+  
+  private void createDDl(String schema) {
+    DatabaseConfig config = new DatabaseConfig();
+
+    config.setName("h2multitenantseq");
+    config.loadFromProperties();
+    config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
     config.setRegister(false);
     config.setDefaultServer(false);
-    config.getDataSourceConfig()
-        .setUrl("jdbc:h2:mem:h2multitenantseq-" + tenantId);
+    config.getDataSourceConfig().setUrl(
+        "jdbc:h2:mem:h2multitenantseq;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS "
+            + schema + "\\;SET SCHEMA " + schema);
 
-    EbeanServer server = EbeanServerFactory.create(config);
+    config.getClasses().add(GenKeySequence.class);
 
-    return server.getPluginApi().getDataSource();
+    DatabaseFactory.create(config).shutdown();
   }
-
+  
 }
