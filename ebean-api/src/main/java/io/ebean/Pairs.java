@@ -3,6 +3,7 @@ package io.ebean;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Holds a list of value object pairs.
@@ -62,15 +63,14 @@ import java.util.List;
  * </p>
  * <pre>{@code sql
  *
- *   create index ix_name on table_name ((sku || '-' || code));
+ *   create index ix_name on table_name (sku || '-' || code);
  *
  * }</pre>
  */
-public class Pairs {
+public final class Pairs {
 
   private final String property0;
   private final String property1;
-
   private final List<Entry> entries = new ArrayList<>();
 
   /**
@@ -139,9 +139,17 @@ public class Pairs {
   /**
    * Set the separator character used with DB varchar concatenation to combine the 2 values.
    */
-  public Pairs setConcatSeparator(String concatSeparator) {
+  public Pairs concatSeparator(String concatSeparator) {
     this.concatSeparator = concatSeparator;
     return this;
+  }
+
+  /**
+   * Deprecated migrate to concatSeparator()
+   */
+  @Deprecated
+  public Pairs setConcatSeparator(String concatSeparator) {
+    return concatSeparator(concatSeparator);
   }
 
   /**
@@ -154,9 +162,17 @@ public class Pairs {
   /**
    * Add a suffix used with DB varchar concatenation to combine the 2 values.
    */
-  public Pairs setConcatSuffix(String concatSuffix) {
+  public Pairs concatSuffix(String concatSuffix) {
     this.concatSuffix = concatSuffix;
     return this;
+  }
+
+  /**
+   * Deprecated migrate to concatSuffix()
+   */
+  @Deprecated
+  public Pairs setConcatSuffix(String concatSuffix) {
+    return concatSuffix(concatSuffix);
   }
 
   @Override
@@ -208,16 +224,13 @@ public class Pairs {
     public boolean equals(Object o) {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
-
       Entry that = (Entry) o;
       return a.equals(that.a) && b.equals(that.b);
     }
 
     @Override
     public int hashCode() {
-      int result = a.hashCode();
-      result = 92821 * result + b.hashCode();
-      return result;
+      return Objects.hash(a, b);
     }
   }
 }
