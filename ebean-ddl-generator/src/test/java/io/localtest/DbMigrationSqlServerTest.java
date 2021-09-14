@@ -1,6 +1,7 @@
-package io.ebean.dbmigration;
+package io.localtest;
 
 import io.ebean.annotation.Platform;
+import io.ebean.dbmigration.DbMigration;
 import io.ebeaninternal.api.DbOffline;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
