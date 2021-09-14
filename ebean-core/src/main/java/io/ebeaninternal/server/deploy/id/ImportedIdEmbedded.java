@@ -18,12 +18,10 @@ import java.sql.SQLException;
 /**
  * Imported Embedded id.
  */
-public class ImportedIdEmbedded implements ImportedId {
+public final class ImportedIdEmbedded implements ImportedId {
 
   private final BeanPropertyAssoc<?> owner;
-
   private final BeanPropertyAssocOne<?> foreignAssocOne;
-
   private final ImportedIdSimple[] imported;
 
   public ImportedIdEmbedded(BeanPropertyAssoc<?> owner, BeanPropertyAssocOne<?> foreignAssocOne, ImportedIdSimple[] imported) {
@@ -34,13 +32,11 @@ public class ImportedIdEmbedded implements ImportedId {
 
   @Override
   public void addFkeys(String name) {
-
-    BeanProperty[] embeddedProps = foreignAssocOne.getProperties();
-
+    BeanProperty[] embeddedProps = foreignAssocOne.properties();
     for (int i = 0; i < imported.length; i++) {
-      String n = name + "." + foreignAssocOne.getName() + "." + embeddedProps[i].getName();
-      BeanFkeyProperty fkey = new BeanFkeyProperty(n, imported[i].localDbColumn, foreignAssocOne.getDeployOrder());
-      owner.getBeanDescriptor().add(fkey);
+      String n = name + "." + foreignAssocOne.name() + "." + embeddedProps[i].name();
+      BeanFkeyProperty fkey = new BeanFkeyProperty(n, imported[i].localDbColumn, foreignAssocOne.deployOrder());
+      owner.descriptor().add(fkey);
     }
   }
 
@@ -63,7 +59,6 @@ public class ImportedIdEmbedded implements ImportedId {
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
-
     boolean update = request.isUpdate();
     for (ImportedIdSimple anImported : imported) {
       if (anImported.isInclude(update)) {
@@ -74,7 +69,6 @@ public class ImportedIdEmbedded implements ImportedId {
 
   @Override
   public String importedIdClause() {
-
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < imported.length; i++) {
       if (i > 0) {
@@ -87,9 +81,7 @@ public class ImportedIdEmbedded implements ImportedId {
 
   @Override
   public int bind(int position, SqlUpdate update, EntityBean bean) {
-
     int pos = position;
-
     EntityBean embedded = (EntityBean) foreignAssocOne.getValue(bean);
     for (ImportedIdSimple anImported : imported) {
       if (anImported.owner.isUpdateable()) {
@@ -102,9 +94,7 @@ public class ImportedIdEmbedded implements ImportedId {
 
   @Override
   public Object bind(BindableRequest request, EntityBean bean) throws SQLException {
-
     Object embeddedId = (bean == null) ? null : foreignAssocOne.getValue(bean);
-
     boolean update = request.isUpdate();
     if (embeddedId == null) {
       for (ImportedIdSimple anImported : imported) {
@@ -114,7 +104,6 @@ public class ImportedIdEmbedded implements ImportedId {
       }
       // return anything non-null to skip a derived relationship update
       return Object.class;
-
     } else {
       EntityBean embedded = (EntityBean) embeddedId;
       for (ImportedIdSimple anImported : imported) {
@@ -129,7 +118,6 @@ public class ImportedIdEmbedded implements ImportedId {
 
   @Override
   public void buildImport(IntersectionRow row, EntityBean other) {
-
     EntityBean embeddedId = (EntityBean) foreignAssocOne.getValue(other);
     if (embeddedId == null) {
       throw new PersistenceException("Foreign Key value null?");
@@ -164,7 +152,6 @@ public class ImportedIdEmbedded implements ImportedId {
    */
   @Override
   public BeanProperty findMatchImport(String matchDbColumn) {
-
     for (ImportedIdSimple anImported : imported) {
       BeanProperty p = anImported.findMatchImport(matchDbColumn);
       if (p != null) {

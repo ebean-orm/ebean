@@ -26,8 +26,8 @@ class BeanDescriptorElementScalarMap<T> extends BeanDescriptorElement<T> {
     if (props.length != 2) {
       throw new IllegalStateException("Expecting 2 properties for key and value but got " + Arrays.toString(props));
     }
-    this.scalarTypeKey = props[0].getScalarType();
-    this.scalarTypeVal = props[1].getScalarType();
+    this.scalarTypeKey = props[0].scalarType();
+    this.scalarTypeVal = props[1].scalarType();
     this.stringKey = String.class.equals(scalarTypeKey.getType());
   }
 
@@ -49,7 +49,6 @@ class BeanDescriptorElementScalarMap<T> extends BeanDescriptorElement<T> {
 
   @Override
   public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-
     JsonParser parser = readJson.getParser();
     ElementCollector add = elementHelp.createCollector();
     do {
@@ -69,7 +68,6 @@ class BeanDescriptorElementScalarMap<T> extends BeanDescriptorElement<T> {
         add.addKeyValue(key, val);
       }
     } while (true);
-
     return add.collection();
   }
 

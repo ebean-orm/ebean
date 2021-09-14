@@ -14,7 +14,7 @@ import io.ebeaninternal.api.NaturalKeyQueryData;
 /**
  * Base class for simple expressions.
  */
-public abstract class AbstractExpression implements SpiExpression {
+abstract class AbstractExpression implements SpiExpression {
 
   protected String propName;
 
@@ -56,7 +56,7 @@ public abstract class AbstractExpression implements SpiExpression {
 
   protected String propertyNestedPath(String propertyName, BeanDescriptor<?> desc) {
     if (propertyName != null) {
-      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
+      ElPropertyDeploy elProp = desc.elPropertyDeploy(propertyName);
       if (elProp != null && elProp.containsMany()) {
         return SplitName.begin(propName);
       }
@@ -66,7 +66,6 @@ public abstract class AbstractExpression implements SpiExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
-
     propertyContainsMany(propName, desc, manyWhereJoin);
   }
 
@@ -75,7 +74,7 @@ public abstract class AbstractExpression implements SpiExpression {
    */
   protected void propertyContainsMany(String propertyName, BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propertyName != null) {
-      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
+      ElPropertyDeploy elProp = desc.elPropertyDeploy(propertyName);
       if (elProp != null) {
         if (elProp.containsFormulaWithJoin()) {
           // for findCount query select clause
@@ -103,7 +102,6 @@ public abstract class AbstractExpression implements SpiExpression {
   }
 
   protected final ElPropertyValue getElProp(SpiExpressionRequest request) {
-
-    return request.getBeanDescriptor().getElGetValue(propName);
+    return request.getBeanDescriptor().elGetValue(propName);
   }
 }

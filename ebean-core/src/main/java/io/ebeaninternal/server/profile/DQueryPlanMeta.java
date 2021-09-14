@@ -3,7 +3,7 @@ package io.ebeaninternal.server.profile;
 import io.ebean.ProfileLocation;
 import io.ebeaninternal.server.util.Md5;
 
-class DQueryPlanMeta {
+final class DQueryPlanMeta {
 
   private final Class<?> type;
   private final String label;

@@ -16,7 +16,7 @@ import java.sql.Types;
 /**
  * Base ScalarType for String type using Varchar, Clob and LongVarchar.
  */
-public abstract class ScalarTypeStringBase extends ScalarTypeBase<String> {
+abstract class ScalarTypeStringBase extends ScalarTypeBase<String> {
 
   ScalarTypeStringBase(boolean jdbcNative, int jdbcType) {
     super(String.class, jdbcNative, jdbcType);

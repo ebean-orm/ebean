@@ -17,12 +17,12 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   /**
    * Return the property name.
    */
-  String getName();
+  String name();
 
   /**
    * Return the full property name (for error messages).
    */
-  String getFullBeanName();
+  String fullName();
 
   /**
    * Return true if the property is the Id.
@@ -54,17 +54,17 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   /**
    * Return the encryption key as a string value (when the property is encrypted).
    */
-  String getEncryptKeyAsString();
+  String encryptKeyAsString();
 
   /**
    * Return the Expression language prefix (join path).
    */
-  String getElPrefix();
+  String elPrefix();
 
   /**
    * Return the underlying scalar type for the property (for findSingleAttribute).
    */
-  ScalarType<?> getScalarType();
+  ScalarType<?> scalarType();
 
   /**
    * For RawSql build the select chain.

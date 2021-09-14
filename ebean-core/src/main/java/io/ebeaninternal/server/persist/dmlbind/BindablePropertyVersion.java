@@ -11,11 +11,11 @@ import java.util.List;
 /**
  * Bindable for a Version BeanProperty. Obtains value from 'old values'.
  */
-public class BindablePropertyVersion implements Bindable {
+final class BindablePropertyVersion implements Bindable {
 
   private final BeanProperty prop;
 
-  public BindablePropertyVersion(BeanProperty prop) {
+  BindablePropertyVersion(BeanProperty prop) {
     this.prop = prop;
   }
 
@@ -38,7 +38,7 @@ public class BindablePropertyVersion implements Bindable {
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
-    request.appendColumn(prop.getDbColumn());
+    request.appendColumn(prop.dbColumn());
   }
 
   /**
@@ -48,7 +48,7 @@ public class BindablePropertyVersion implements Bindable {
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     // get prior version value from 'old values'
-    Object value = bean._ebean_getIntercept().getOrigValue(prop.getPropertyIndex());
+    Object value = bean._ebean_getIntercept().getOrigValue(prop.propertyIndex());
     request.bind(value, prop);
   }
 }

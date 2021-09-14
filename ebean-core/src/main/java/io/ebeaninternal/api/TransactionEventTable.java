@@ -28,21 +28,18 @@ public final class TransactionEventTable implements Serializable, BinaryWritable
   }
 
   public void add(TransactionEventTable table) {
-
     for (TableIUD iud : table.values()) {
       add(iud);
     }
   }
 
   public void add(String table, boolean insert, boolean update, boolean delete) {
-
     table = table.toUpperCase();
     add(new TableIUD(table, insert, update, delete));
   }
 
   public void add(TableIUD newTableIUD) {
-
-    TableIUD existingTableIUD = map.put(newTableIUD.getTableName(), newTableIUD);
+    TableIUD existingTableIUD = map.put(newTableIUD.tableName(), newTableIUD);
     if (existingTableIUD != null) {
       newTableIUD.add(existingTableIUD);
     }
@@ -56,7 +53,7 @@ public final class TransactionEventTable implements Serializable, BinaryWritable
     return map.values();
   }
 
-  public static class TableIUD implements Serializable, BulkTableEvent, BinaryWritable {
+  public static final class TableIUD implements Serializable, BulkTableEvent, BinaryWritable {
 
     private static final long serialVersionUID = -1958317571064162089L;
 
@@ -73,12 +70,10 @@ public final class TransactionEventTable implements Serializable, BinaryWritable
     }
 
     public static TableIUD readBinaryMessage(BinaryReadContext dataInput) throws IOException {
-
       String table = dataInput.readUTF();
       boolean insert = dataInput.readBoolean();
       boolean update = dataInput.readBoolean();
       boolean delete = dataInput.readBoolean();
-
       return new TableIUD(table, insert, update, delete);
     }
 
@@ -109,7 +104,7 @@ public final class TransactionEventTable implements Serializable, BinaryWritable
     }
 
     @Override
-    public String getTableName() {
+    public String tableName() {
       return table;
     }
 

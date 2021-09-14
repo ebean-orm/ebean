@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Creates the order by expression clause.
  */
-class CQueryOrderBy {
+final class CQueryOrderBy {
 
   private final BeanDescriptor<?> desc;
 
@@ -54,16 +54,16 @@ class CQueryOrderBy {
   private String parseProperty(Property p) {
 
     String propName = p.getProperty();
-    ElPropertyValue el = desc.getElGetValue(propName);
+    ElPropertyValue el = desc.elGetValue(propName);
     if (el == null) {
       return p.toStringFormat();
     }
 
-    BeanProperty beanProperty = el.getBeanProperty();
+    BeanProperty beanProperty = el.beanProperty();
     if (beanProperty instanceof BeanPropertyAssoc<?>) {
       BeanPropertyAssoc<?> ap = (BeanPropertyAssoc<?>) beanProperty;
-      IdBinder idBinder = ap.getTargetDescriptor().getIdBinder();
-      return idBinder.getOrderBy(el.getElName(), p.isAscending());
+      IdBinder idBinder = ap.targetDescriptor().idBinder();
+      return idBinder.getOrderBy(el.elName(), p.isAscending());
     }
 
     return p.toStringFormat();

@@ -16,7 +16,7 @@ import java.sql.Statement;
  *
  * @author Roland Praml, FOCONIS AG
  */
-public class QueryPlanLoggerOracle extends QueryPlanLogger {
+public final class QueryPlanLoggerOracle extends QueryPlanLogger {
 
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {

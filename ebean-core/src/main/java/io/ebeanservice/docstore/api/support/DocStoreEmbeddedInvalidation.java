@@ -18,6 +18,6 @@ public class DocStoreEmbeddedInvalidation {
   }
 
   public void embeddedInvalidate(PersistRequestBean<?> request, DocStoreUpdates docStoreUpdates) {
-    docStoreUpdates.addNested(queueId, path, request.getBeanId());
+    docStoreUpdates.addNested(queueId, path, request.beanId());
   }
 }

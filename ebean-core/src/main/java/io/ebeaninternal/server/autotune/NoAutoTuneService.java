@@ -5,7 +5,7 @@ import io.ebeaninternal.api.SpiQuery;
 /**
  * Noop service when AutoTuneService is not available.
  */
-public class NoAutoTuneService implements AutoTuneService {
+public final class NoAutoTuneService implements AutoTuneService {
 
   @Override
   public void startup() {

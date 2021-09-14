@@ -18,19 +18,16 @@ import java.util.List;
  * parentBean.
  * </p>
  */
-public class BindableUnidirectional implements Bindable {
+public final class BindableUnidirectional implements Bindable {
 
   private final BeanPropertyAssocOne<?> unidirectional;
-
   private final ImportedId importedId;
-
   private final BeanDescriptor<?> desc;
 
   public BindableUnidirectional(BeanDescriptor<?> desc, BeanPropertyAssocOne<?> unidirectional) {
     this.desc = desc;
     this.unidirectional = unidirectional;
-    this.importedId = unidirectional.getImportedId();
-
+    this.importedId = unidirectional.importedId();
   }
 
   @Override
@@ -54,22 +51,18 @@ public class BindableUnidirectional implements Bindable {
     importedId.dmlAppend(request);
   }
 
-
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
     PersistRequestBean<?> persistRequest = request.getPersistRequest();
-    Object parentBean = persistRequest.getParentBean();
-
+    Object parentBean = persistRequest.parentBean();
     if (parentBean == null) {
-      Class<?> localType = desc.getBeanType();
-      Class<?> targetType = unidirectional.getTargetType();
+      Class<?> localType = desc.type();
+      Class<?> targetType = unidirectional.targetType();
 
       String msg = "Error inserting bean [" + localType + "] with unidirectional relationship. ";
       msg += "For inserts you must use cascade save on the master bean [" + targetType + "].";
       throw new PersistenceException(msg);
     }
-
     importedId.bind(request, (EntityBean) parentBean);
   }
 

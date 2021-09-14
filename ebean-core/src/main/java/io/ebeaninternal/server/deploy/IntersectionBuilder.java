@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Helper to build IntersectionTable.
  */
-public class IntersectionBuilder {
+public final class IntersectionBuilder {
 
   private final String publishTable;
   private final String draftTable;

@@ -3,7 +3,7 @@ package io.ebeaninternal.server.expression.platform;
 /**
  * Helper for determining type casting for JSON and ARRAY expressions.
  */
-public class PostgresCast {
+final class PostgresCast {
 
   /**
    * Postgres CAST the type if necessary.
@@ -11,15 +11,14 @@ public class PostgresCast {
    * This is generally necessary for JSON expressions as text values always returned from the json operators used.
    * </p>
    */
-  protected static String cast(Object value) {
+  static String cast(Object value) {
     return cast(value, false);
   }
 
   /**
    * Postgres CAST the type if necessary additionally specify if DB ARRAY is used.
    */
-  protected static String cast(Object value, boolean asArray) {
-
+  static String cast(Object value, boolean asArray) {
     if (value == null) {
       // for exists and not-exists expressions
       return "";

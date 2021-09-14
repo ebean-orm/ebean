@@ -8,9 +8,9 @@ import java.nio.file.Paths;
 /**
  * ScalarType for java.nio.file.Path which converts to and from a VARCHAR database column.
  */
-public class ScalarTypePath extends ScalarTypeBaseVarchar<Path> {
+final class ScalarTypePath extends ScalarTypeBaseVarchar<Path> {
 
-  public ScalarTypePath() {
+  ScalarTypePath() {
     super(Path.class);
   }
 

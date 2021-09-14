@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class RemoteTableMod implements BinaryWritable {
+public final class RemoteTableMod implements BinaryWritable {
 
   private final long timestamp;
 

@@ -7,11 +7,10 @@ import io.ebeaninternal.api.SpiTransaction;
 /**
  * Request object used for processing the merge.
  */
-class MergeRequest {
+final class MergeRequest {
 
   private final EntityBean bean;
   private final EntityBean outline;
-
   private final MergeContext context;
 
   MergeRequest(MergeContext context, EntityBean bean, EntityBean outline) {

@@ -9,7 +9,7 @@ import java.io.Serializable;
  * query that includes the filterMany.
  * </p>
  */
-public class FilterExprPath implements Serializable {
+public final class FilterExprPath implements Serializable {
 
   private static final long serialVersionUID = -6420905565372842018L;
 

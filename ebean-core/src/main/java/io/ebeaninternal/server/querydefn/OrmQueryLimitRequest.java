@@ -4,16 +4,12 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.SqlLimitRequest;
 import io.ebeaninternal.api.SpiQuery;
 
-public class OrmQueryLimitRequest implements SqlLimitRequest {
+public final class OrmQueryLimitRequest implements SqlLimitRequest {
 
   private final SpiQuery<?> ormQuery;
-
   private final DatabasePlatform dbPlatform;
-
   private final String sql;
-
   private final String sqlOrderBy;
-
   private final boolean distinct;
 
   public OrmQueryLimitRequest(String sql, String sqlOrderBy, SpiQuery<?> ormQuery, DatabasePlatform dbPlatform, boolean distinct) {

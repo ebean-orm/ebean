@@ -2,12 +2,12 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebeaninternal.api.SpiCacheRegion;
 
-class DCacheRegionNone implements SpiCacheRegion {
+final class DCacheRegionNone implements SpiCacheRegion {
 
   static final SpiCacheRegion INSTANCE = new DCacheRegionNone();
 
   @Override
-  public String getName() {
+  public String name() {
     return "<none>";
   }
 

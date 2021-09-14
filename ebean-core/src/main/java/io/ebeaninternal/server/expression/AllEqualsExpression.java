@@ -13,7 +13,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-class AllEqualsExpression extends NonPrepareExpression {
+final class AllEqualsExpression extends NonPrepareExpression {
 
   private final Map<String, Object> propMap;
 
@@ -21,7 +21,7 @@ class AllEqualsExpression extends NonPrepareExpression {
     this.propMap = propMap;
   }
 
-  protected String name(String propName) {
+  String name(String propName) {
     return propName;
   }
 
@@ -39,7 +39,7 @@ class AllEqualsExpression extends NonPrepareExpression {
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propMap != null) {
       for (String propertyName : propMap.keySet()) {
-        ElPropertyDeploy elProp = desc.getElPropertyDeploy(name(propertyName));
+        ElPropertyDeploy elProp = desc.elPropertyDeploy(name(propertyName));
         if (elProp != null && elProp.containsMany()) {
           manyWhereJoin.add(elProp);
         }
@@ -56,7 +56,6 @@ class AllEqualsExpression extends NonPrepareExpression {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
     if (propMap.isEmpty()) {
       return;
     }
@@ -70,23 +69,17 @@ class AllEqualsExpression extends NonPrepareExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     if (propMap.isEmpty()) {
       return;
     }
-
     request.append("(");
-
     int count = 0;
     for (Map.Entry<String, Object> entry : propMap.entrySet()) {
-
       Object value = entry.getValue();
       String propName = entry.getKey();
-
       if (count > 0) {
         request.append("and ");
       }
-
       request.append(name(propName));
       if (value == null) {
         request.append(" is null ");
@@ -106,7 +99,6 @@ class AllEqualsExpression extends NonPrepareExpression {
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-
     builder.append("AllEquals[");
     for (Entry<String, Object> entry : propMap.entrySet()) {
       Object value = entry.getValue();
@@ -135,20 +127,16 @@ class AllEqualsExpression extends NonPrepareExpression {
     if (!(other instanceof AllEqualsExpression)) {
       return false;
     }
-
     AllEqualsExpression that = (AllEqualsExpression) other;
     return isSameByValue(that, true);
   }
 
   private boolean isSameByValue(AllEqualsExpression that, boolean byValue) {
-
     if (propMap.size() != that.propMap.size()) {
       return false;
     }
-
     Iterator<Entry<String, Object>> thisIt = propMap.entrySet().iterator();
     Iterator<Entry<String, Object>> thatIt = that.propMap.entrySet().iterator();
-
     while (thisIt.hasNext() && thatIt.hasNext()) {
       Entry<String, Object> thisNext = thisIt.next();
       Entry<String, Object> thatNext = thatIt.next();
@@ -160,7 +148,6 @@ class AllEqualsExpression extends NonPrepareExpression {
         return false;
       }
     }
-
     return true;
   }
 }

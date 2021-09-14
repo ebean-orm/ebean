@@ -1,13 +1,13 @@
 package io.ebean.test.config.provider;
 
-import io.ebean.config.ServerConfig;
-import org.junit.Test;
+import io.ebean.config.DatabaseConfig;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProviderAutoConfigTest {
 
-  private ProviderAutoConfig config = new ProviderAutoConfig(new ServerConfig());
+  private final ProviderAutoConfig config = new ProviderAutoConfig(new DatabaseConfig());
 
   @Test
   public void msg() {

@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * Support 'asDraft' queries.
  */
-class CQueryDraftSupport {
+final class CQueryDraftSupport {
 
   /**
    * The mapping of base tables to their matching 'draft' table.

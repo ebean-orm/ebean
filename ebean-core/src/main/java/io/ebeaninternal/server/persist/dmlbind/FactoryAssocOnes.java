@@ -9,16 +9,12 @@ import java.util.List;
 /**
  * A factory that builds Bindable for BeanPropertyAssocOne properties.
  */
-public class FactoryAssocOnes {
-
-  public FactoryAssocOnes() {
-  }
+public final class FactoryAssocOnes {
 
   /**
    * Add foreign key columns from associated one beans.
    */
   public void create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode) {
-
     for (BeanPropertyAssocOne<?> one : desc.propertiesOneImported()) {
       if (!one.isImportedPrimaryKey()) {
         switch (mode) {

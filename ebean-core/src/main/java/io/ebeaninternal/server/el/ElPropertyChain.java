@@ -22,30 +22,22 @@ import java.util.Arrays;
  * no further processing of the chain occurs.
  * </p>
  */
-public class ElPropertyChain implements ElPropertyValue {
+public final class ElPropertyChain implements ElPropertyValue {
 
   private final String prefix;
-
   private final String placeHolder;
   private final String placeHolderEncrypted;
-
   private final String name;
-
   private final String expression;
-
   private final boolean containsMany;
-
   private final ElPropertyValue[] chain;
-
   private final boolean assocId;
   private final int last;
   private final BeanProperty lastBeanProperty;
   private final ScalarType<?> scalarType;
-
   private final ElPropertyValue lastElPropertyValue;
 
   public ElPropertyChain(boolean containsMany, boolean embedded, String expression, ElPropertyValue[] chain) {
-
     this.containsMany = containsMany;
     this.chain = chain;
     this.expression = expression;
@@ -67,9 +59,9 @@ public class ElPropertyChain implements ElPropertyValue {
     this.assocId = chain[chain.length - 1].isAssocId();
 
     this.last = chain.length - 1;
-    this.lastBeanProperty = chain[chain.length - 1].getBeanProperty();
+    this.lastBeanProperty = chain[chain.length - 1].beanProperty();
     if (lastBeanProperty != null) {
-      this.scalarType = lastBeanProperty.getScalarType();
+      this.scalarType = lastBeanProperty.scalarType();
     } else {
       // case for nested compound type (non-scalar)
       this.scalarType = null;
@@ -85,8 +77,8 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public int getFetchPreference() {
-    return chain[0].getFetchPreference();
+  public int fetchPreference() {
+    return chain[0].fetchPreference();
   }
 
   @Override
@@ -96,9 +88,9 @@ public class ElPropertyChain implements ElPropertyValue {
 
   private String getElPlaceHolder(String prefix, ElPropertyValue lastElPropertyValue, boolean encrypted) {
     if (prefix == null) {
-      return lastElPropertyValue.getElPlaceholder(encrypted);
+      return lastElPropertyValue.elPlaceholder(encrypted);
     }
-    String el = lastElPropertyValue.getElPlaceholder(encrypted);
+    String el = lastElPropertyValue.elPlaceholder(encrypted);
     if (!el.contains("${}")) {
       // typically a secondary table property
       return el.replace("${", "${" + prefix + ".");
@@ -119,15 +111,12 @@ public class ElPropertyChain implements ElPropertyValue {
     if (!expression.startsWith(sinceProperty)) {
       return containsMany;
     }
-
     int i = 1 + SplitName.count(sinceProperty);
-
     for (; i < chain.length; i++) {
-      if (chain[i].getBeanProperty().containsMany()) {
+      if (chain[i].beanProperty().containsMany()) {
         return true;
       }
     }
-
     return false;
   }
 
@@ -142,22 +131,22 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getElPrefix() {
+  public String elPrefix() {
     return prefix;
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
   @Override
-  public String getElName() {
+  public String elName() {
     return expression;
   }
 
   @Override
-  public String getElPlaceholder(boolean encrypted) {
+  public String elPlaceholder(boolean encrypted) {
     return encrypted ? placeHolderEncrypted : placeHolder;
   }
 
@@ -177,30 +166,30 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
-    return lastElPropertyValue.getAssocIsEmpty(request, path);
+  public String assocIsEmpty(SpiExpressionRequest request, String path) {
+    return lastElPropertyValue.assocIsEmpty(request, path);
   }
 
   @Override
-  public Object[] getAssocIdValues(EntityBean bean) {
+  public Object[] assocIdValues(EntityBean bean) {
     // Don't navigate the object graph as bean
     // is assumed to be the appropriate type
-    return lastElPropertyValue.getAssocIdValues(bean);
+    return lastElPropertyValue.assocIdValues(bean);
   }
 
   @Override
-  public String getAssocIdExpression(String prefix, String operator) {
-    return lastElPropertyValue.getAssocIdExpression(expression, operator);
+  public String assocIdExpression(String prefix, String operator) {
+    return lastElPropertyValue.assocIdExpression(expression, operator);
   }
 
   @Override
-  public String getAssocIdInExpr(String prefix) {
-    return lastElPropertyValue.getAssocIdInExpr(prefix);
+  public String assocIdInExpr(String prefix) {
+    return lastElPropertyValue.assocIdInExpr(prefix);
   }
 
   @Override
-  public String getAssocIdInValueExpr(boolean not, int size) {
-    return lastElPropertyValue.getAssocIdInValueExpr(not, size);
+  public String assocIdInValueExpr(boolean not, int size) {
+    return lastElPropertyValue.assocIdInValueExpr(not, size);
   }
 
   @Override
@@ -209,7 +198,7 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public Property getProperty() {
+  public Property property() {
     return lastBeanProperty;
   }
 
@@ -229,12 +218,12 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public String getDbColumn() {
-    return lastElPropertyValue.getDbColumn();
+  public String dbColumn() {
+    return lastElPropertyValue.dbColumn();
   }
 
   @Override
-  public BeanProperty getBeanProperty() {
+  public BeanProperty beanProperty() {
     return lastBeanProperty;
   }
 
@@ -245,7 +234,7 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return scalarType == null ? 0 : scalarType.getJdbcType();
   }
 
@@ -255,7 +244,7 @@ public class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public StringParser getStringParser() {
+  public StringParser stringParser() {
     return scalarType;
   }
 
@@ -281,7 +270,6 @@ public class ElPropertyChain implements ElPropertyValue {
 
   @Override
   public Object pathGetNested(Object bean) {
-
     Object prevBean = bean;
     for (int i = 0; i < last; i++) {
       // always return non null prevBean
@@ -293,7 +281,6 @@ public class ElPropertyChain implements ElPropertyValue {
 
   @Override
   public void pathSet(Object bean, Object value) {
-
     Object prevBean = bean;
     for (int i = 0; i < last; i++) {
       prevBean = chain[i].pathGetNested(prevBean);
@@ -309,6 +296,5 @@ public class ElPropertyChain implements ElPropertyValue {
       }
     }
   }
-
 
 }

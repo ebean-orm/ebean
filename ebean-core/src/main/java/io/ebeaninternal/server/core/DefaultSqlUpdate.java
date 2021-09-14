@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Update;
 import io.ebeaninternal.api.BindParams;
@@ -143,7 +143,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
       return server.execute(this);
     } else {
       // Hopefully this doesn't catch anyone out...
-      return Ebean.execute(this);
+      return DB.getDefault().execute(this);
     }
   }
 
@@ -167,7 +167,6 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return server.executeBatch(this, transaction);
   }
 
-
   @Override
   public void addBatch() {
     if (server == null) {
@@ -179,7 +178,6 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
         throw new IllegalStateException("No current transaction? Must have a transaction to use addBatch()");
       }
     }
-
     batched = true;
     server.addBatch(this, transaction);
   }
@@ -287,8 +285,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     return this;
   }
 
-  private SqlUpdate setParamWithBindExpansion(int position, Collection values, String bindLiteral) {
-
+  private SqlUpdate setParamWithBindExpansion(int position, Collection<?> values, String bindLiteral) {
     StringBuilder sqlExpand = new StringBuilder(values.size() * 2);
     position = position + bindExpansion;
     int offset = 0;
@@ -310,10 +307,9 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
       String bindLiteral = "?" + position;
       int pos = baseSql.indexOf(bindLiteral);
       if (pos > -1) {
-        return setParamWithBindExpansion(position, (Collection) value, bindLiteral);
+        return setParamWithBindExpansion(position, (Collection<?>) value, bindLiteral);
       }
     }
-
     bindParams.setParameter(bindExpansion + position, value);
     return this;
   }

@@ -37,7 +37,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * The tree structure is flattened into a SqlSelectChain. The SqlSelectChain is
  * the key object used in reading the flat resultSet back into Objects.
  */
-public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
+public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
 
   private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
@@ -184,7 +184,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     this.request = request;
     this.audit = request.isAuditReads();
     this.queryPlan = queryPlan;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.queryMode = query.getMode();
     this.lazyLoadManyProperty = query.getLazyLoadMany();
     this.readOnly = request.isReadOnly();
@@ -202,7 +202,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     this.sql = queryPlan.getSql();
     this.rawSql = queryPlan.isRawSql();
     this.logWhereSql = queryPlan.getLogWhereSql();
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.predicates = predicates;
     if (lazyLoadManyProperty != null) {
       this.help = NOOP_ADD;
@@ -216,7 +216,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     if (request.isFindById()) {
       return null;
     } else {
-      SpiQuery.Type manyType = request.getQuery().getType();
+      SpiQuery.Type manyType = request.query().getType();
       if (manyType == null) {
         // subQuery compiled for InQueryExpression
         return null;
@@ -306,7 +306,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
       // cancelled before we started
       query.checkCancelled();
       startNano = System.nanoTime();
-      SpiTransaction t = request.getTransaction();
+      SpiTransaction t = request.transaction();
       profileOffset = t.profileOffset();
       if (query.isRawSql()) {
         ResultSet suppliedResultSet = query.getRawSql().getResultSet();
@@ -370,7 +370,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
    */
   @Override
   public PersistenceContext getPersistenceContext() {
-    return request.getPersistenceContext();
+    return request.persistenceContext();
   }
 
   @Override
@@ -378,7 +378,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     if (lazyLoadParentId != null) {
       if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
         // get the appropriate parent bean from the persistence context
-        this.lazyLoadParentBean = (EntityBean) lazyLoadManyProperty.getBeanDescriptor().contextGet(getPersistenceContext(), lazyLoadParentId);
+        this.lazyLoadParentBean = (EntityBean) lazyLoadManyProperty.descriptor().contextGet(getPersistenceContext(), lazyLoadParentId);
         this.lazyLoadParentId = lazyLoadParentId;
       }
       // add the loadedBean to the appropriate collection of lazyLoadParentBean
@@ -564,7 +564,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   public void profile() {
     getTransaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.getName(), loadedBeanCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.getProfileId());
   }
 
   QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {
@@ -585,20 +585,20 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   @Override
   public void registerBeanInherit(BeanPropertyAssocOne<?> property, EntityBeanIntercept ebi) {
-    String path = getPath(property.getName());
-    request.getGraphContext().register(path, ebi, property);
+    String path = getPath(property.name());
+    request.loadContext().register(path, ebi, property);
   }
 
   @Override
   public void register(String path, EntityBeanIntercept ebi) {
     path = getPath(path);
-    request.getGraphContext().register(path, ebi);
+    request.loadContext().register(path, ebi);
   }
 
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
-    String path = getPath(many.getName());
-    request.getGraphContext().register(path, many, bc);
+    String path = getPath(many.name());
+    request.loadContext().register(path, many, bc);
   }
 
   /**
@@ -630,14 +630,14 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
   }
 
   public SpiTransaction getTransaction() {
-    return request.getTransaction();
+    return request.transaction();
   }
 
   /**
    * Return the short bean name.
    */
   String getBeanName() {
-    return desc.getName();
+    return desc.name();
   }
 
   /**
@@ -683,7 +683,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
 
   @Override
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
-    ObjectGraphNode node = request.getGraphContext().getObjectGraphNode(prefix);
+    ObjectGraphNode node = request.loadContext().getObjectGraphNode(prefix);
     ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListenerRef));
   }
 
@@ -747,7 +747,7 @@ public class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTran
     if (auditIds == null) {
       auditIds = new ArrayList<>(100);
     }
-    auditIds.add(desc.getIdForJson(nextBean));
+    auditIds.add(desc.idForJson(nextBean));
     if (auditFindIterate && auditIds.size() >= 100) {
       auditIterateLogMessage();
     }

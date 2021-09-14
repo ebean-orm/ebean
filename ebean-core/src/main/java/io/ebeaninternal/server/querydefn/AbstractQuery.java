@@ -15,14 +15,12 @@ import io.ebeaninternal.api.SpiCancelableQuery;
  */
 public class AbstractQuery implements SpiCancelableQuery {
 
+  private final ReentrantLock lock = new ReentrantLock();
   private boolean cancelled;
-
   private CancelableQuery cancelableQuery;
 
-  private final ReentrantLock lock = new ReentrantLock();
-  
   @Override
-  public void cancel() {
+  public final void cancel() {
     lock.lock();
     try {
       if (!cancelled) {
@@ -37,14 +35,14 @@ public class AbstractQuery implements SpiCancelableQuery {
   }
 
   @Override
-  public void checkCancelled() {
+  public final void checkCancelled() {
     if (cancelled) {
       throw new PersistenceException("Query was cancelled");
     }
   }
 
   @Override
-  public void setCancelableQuery(CancelableQuery cancelableQuery) {
+  public final void setCancelableQuery(CancelableQuery cancelableQuery) {
     lock.lock();
     try {
       checkCancelled();

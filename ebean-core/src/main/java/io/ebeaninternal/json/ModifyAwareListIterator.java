@@ -7,10 +7,9 @@ import java.util.ListIterator;
 /**
  * Modify aware wrapper of a ListIterator.
  */
-public class ModifyAwareListIterator<E> implements ListIterator<E> {
+public final class ModifyAwareListIterator<E> implements ListIterator<E> {
 
   final ModifyAwareType owner;
-
   final ListIterator<E> iterator;
 
   public ModifyAwareListIterator(ModifyAwareType owner, ListIterator<E> iterator) {

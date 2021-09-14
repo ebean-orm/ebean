@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
@@ -26,7 +25,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
-public class SaveManyBeans extends SaveManyBase {
+public final class SaveManyBeans extends SaveManyBase {
 
   private static final Logger log = LoggerFactory.getLogger(SaveManyBeans.class);
 
@@ -42,10 +41,10 @@ public class SaveManyBeans extends SaveManyBase {
 
   SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(persister, insertedParent, many, parentBean, request);
-    this.cascade = many.getCascadeInfo().isSave();
+    this.cascade = many.cascadeInfo().isSave();
     this.publish = request.isPublish();
-    this.targetDescriptor = many.getTargetDescriptor();
-    this.isMap = many.getManyType().isMap();
+    this.targetDescriptor = many.targetDescriptor();
+    this.isMap = many.manyType().isMap();
     this.saveRecurseSkippable = many.isSaveRecurseSkippable();
     this.deleteMode = targetDescriptor.isSoftDelete() ? DeleteMode.SOFT : DeleteMode.HARD;
     this.untouchedBeanCollection = untouchedBeanCollection();
@@ -96,11 +95,11 @@ public class SaveManyBeans extends SaveManyBase {
     if (!many.isManyToMany()) {
       return true;
     }
-    return transaction.isSaveAssocManyIntersection(many.getIntersectionTableJoin().getTable(), many.getBeanDescriptor().rootName());
+    return transaction.isSaveAssocManyIntersection(many.intersectionTableJoin().getTable(), many.descriptor().rootName());
   }
 
   private boolean isModifyListenMode() {
-    return BeanCollection.ModifyListenMode.REMOVALS == many.getModifyListenMode();
+    return BeanCollection.ModifyListenMode.REMOVALS == many.modifyListenMode();
   }
 
   /**
@@ -121,7 +120,7 @@ public class SaveManyBeans extends SaveManyBase {
       if (!insertedParent && canSkipForOrderColumn() && saveRecurseSkippable) {
         return;
       }
-      orderColumn = targetDescriptor.getOrderColumn();
+      orderColumn = targetDescriptor.orderColumn();
     }
 
     if (insertedParent) {
@@ -133,7 +132,7 @@ public class SaveManyBeans extends SaveManyBase {
       // collect the Id's (to exclude from deleteManyDetails)
       List<Object> detailIds = collectIds(collection, targetDescriptor, isMap);
       // deleting missing children - children not in our collected detailIds
-      persister.deleteManyDetails(transaction, many.getBeanDescriptor(), parentBean, many, detailIds, deleteMode);
+      persister.deleteManyDetails(transaction, many.descriptor(), parentBean, many, detailIds, deleteMode);
     }
 
     transaction.depth(+1);
@@ -165,11 +164,15 @@ public class SaveManyBeans extends SaveManyBase {
         if (many.hasJoinTable()) {
           skipSavingThisBean = targetDescriptor.isReference(ebi);
         } else {
-          if (orderColumn != null && !Objects.equals(sortOrder, orderColumn.getValue(detail))) {
-            orderColumn.setValue(detail, sortOrder);
-            ebi.setDirty(true);
+          int originalOrder = 0;
+          if (orderColumn != null) {
+            originalOrder = detail._ebean_getIntercept().getSortOrder();
+            if (sortOrder != originalOrder) {
+              detail._ebean_intercept().setSortOrder(sortOrder);
+              ebi.setDirty(true);
+            }
           }
-          if (targetDescriptor.isReference(ebi)) {
+          if (targetDescriptor.isReference(ebi) && originalOrder == 0) {
             // we can skip this one
             skipSavingThisBean = true;
           } else if (ebi.isNewOrDirty()) {
@@ -183,10 +186,10 @@ public class SaveManyBeans extends SaveManyBase {
         }
 
         if (!skipSavingThisBean) {
-          persister.saveRecurse(detail, transaction, parentBean, request.getFlags());
+          persister.saveRecurse(detail, transaction, parentBean, request.flags());
           if (many.hasOrderColumn()) {
             // Clear the bean from the PersistenceContext (L1 cache), because the order of referenced beans might have changed
-            final BeanDescriptor<?> beanDescriptor = many.getBeanDescriptor();
+            final BeanDescriptor<?> beanDescriptor = many.descriptor();
             beanDescriptor.contextClear(transaction.getPersistenceContext(), beanDescriptor.getId(parentBean));
           }
         }
@@ -222,7 +225,7 @@ public class SaveManyBeans extends SaveManyBase {
         detailBean = ((Map.Entry<?, ?>) detailBean).getValue();
       }
       if (detailBean instanceof EntityBean) {
-        Object id = targetDescriptor.getId((EntityBean) detailBean);
+        Object id = targetDescriptor.id(detailBean);
         if (!isNullOrZero(id)) {
           // remember the Id (other details not in the collection) will be removed
           detailIds.add(id);
@@ -274,7 +277,7 @@ public class SaveManyBeans extends SaveManyBase {
       } else if (value instanceof Collection<?>) {
         additions = (Collection<?>) value;
       } else {
-        throw new PersistenceException("Unhandled ManyToMany type " + value.getClass().getName() + " for " + many.getFullBeanName());
+        throw new PersistenceException("Unhandled ManyToMany type " + value.getClass().getName() + " for " + many.fullName());
       }
       if (!vanillaCollection) {
         BeanCollection<?> manyValue = (BeanCollection<?>) value;
@@ -332,7 +335,7 @@ public class SaveManyBeans extends SaveManyBase {
   }
 
   private boolean isChangedProperty() {
-    return parentBean._ebean_getIntercept().isChangedProperty(many.getPropertyIndex());
+    return parentBean._ebean_getIntercept().isChangedProperty(many.propertyIndex());
   }
 
   private void removeAssocManyOrphans() {
@@ -341,14 +344,14 @@ public class SaveManyBeans extends SaveManyBase {
     }
     if (!(value instanceof BeanCollection<?>)) {
       if (!insertedParent && cascade && isChangedProperty()) {
-        persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 0);
+        persister.addToFlushQueue(many.deleteByParentId(request.beanId(), null), transaction, 0);
       }
     } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
       Set<?> modifyRemovals = c.getModifyRemovals();
       if (insertedParent) {
         // after insert set the modify listening mode for private owned etc
-        c.setModifyListening(many.getModifyListenMode());
+        c.setModifyListening(many.modifyListenMode());
       }
       // We must not reset when we still have to update other entities in the collection and set their new orderColumn value
       if (!many.hasOrderColumn()) {
@@ -360,7 +363,7 @@ public class SaveManyBeans extends SaveManyBase {
             EntityBean eb = (EntityBean) removedBean;
             if (eb._ebean_intercept().isOrphanDelete()) {
               // only delete if the bean was loaded meaning that it is known to exist in the DB
-              persister.deleteRequest(persister.createDeleteRemoved(removedBean, transaction, request.getFlags()));
+              persister.deleteRequest(persister.createDeleteRemoved(removedBean, transaction, request.flags()));
             }
           }
         }
@@ -375,7 +378,7 @@ public class SaveManyBeans extends SaveManyBase {
     BeanCollection.ModifyListenMode mode = manyValue.getModifyListening();
     if (mode == null) {
       // new collection persisted for the first time
-      manyValue.setModifyListening(prop.getModifyListenMode());
+      manyValue.setModifyListening(prop.modifyListenMode());
       return true;
     }
     return false;

@@ -27,34 +27,20 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   private static final short BATCHED_FIRST = 1;
   private static final short BATCHED = 2;
 
-  /**
-   * The originating request.
-   */
   final PersistRequestBean<?> persistRequest;
-
   private final StringBuilder bindLog;
-
   final SpiTransaction transaction;
-
   private final boolean logLevelSql;
-
   private final long now;
-
-  /**
-   * The PreparedStatement used for the dml.
-   */
   DataBind dataBind;
-
   BatchedPstmt batchedPstmt;
-
   String sql;
-
   private short batchedStatus;
 
   DmlHandler(PersistRequestBean<?> persistRequest) {
     this.now = System.currentTimeMillis();
     this.persistRequest = persistRequest;
-    this.transaction = persistRequest.getTransaction();
+    this.transaction = persistRequest.transaction();
     this.logLevelSql = transaction.isLogSql();
     if (logLevelSql) {
       this.bindLog = new StringBuilder(50);
@@ -82,7 +68,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Bind to the statement returning the DataBind.
    */
   DataBind bind(PreparedStatement stmt) {
-    return new DataBind(persistRequest.getDataTimeZone(), stmt, transaction.getInternalConnection());
+    return new DataBind(persistRequest.dataTimeZone(), stmt, transaction.getInternalConnection());
   }
 
   /**
@@ -117,7 +103,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     } catch (OptimisticLockException e) {
       // add the SQL and bind values to error message
       String m = e.getMessage() + " sql[" + sql + "] bind[" + bindLog + "]";
-      persistRequest.getTransaction().logSummary("OptimisticLockException:" + m);
+      persistRequest.transaction().logSummary("OptimisticLockException:" + m);
       throw new OptimisticLockException(m, null, e.getEntity());
     }
   }
@@ -226,7 +212,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   private void bindInternal(boolean log, Object value, BeanProperty prop) throws SQLException {
-
     if (log) {
       if (bindLog.length() > 0) {
         bindLog.append(",");
@@ -249,14 +234,12 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
   PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
-
     Connection conn = t.getInternalConnection();
     if (genKeys) {
       // the Id generated is always the first column
       // Required to stop Oracle10 giving us Oracle rowId??
       // Other jdbc drivers seem fine without this hint.
       return conn.prepareStatement(sql, GENERATED_KEY_COLUMNS);
-
     } else {
       return conn.prepareStatement(sql);
     }
@@ -272,7 +255,6 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       batchedStatus = batchedPstmt.isEmpty() ? BATCHED_FIRST : BATCHED;
       return batchedPstmt.getStatement(request);
     }
-
     batchedStatus = BATCHED_FIRST;
     PreparedStatement stmt = getPstmt(t, sql, genKeys);
     batchedPstmt = new BatchedPstmt(stmt, genKeys, sql, t);

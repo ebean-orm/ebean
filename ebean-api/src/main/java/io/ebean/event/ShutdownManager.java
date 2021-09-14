@@ -14,10 +14,9 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Manages the shutdown of the JVM Runtime.
+ * Manages the shutdown of Ebean.
  * <p>
  * Makes sure all the resources are shutdown properly and in order.
- * </p>
  */
 public final class ShutdownManager {
 
@@ -44,6 +43,9 @@ public final class ShutdownManager {
   private ShutdownManager() {
   }
 
+  /**
+   * Registers the container (potentially with cluster management).
+   */
   public static void registerContainer(SpiContainer ebeanContainer) {
     container = ebeanContainer;
   }
@@ -94,7 +96,7 @@ public final class ShutdownManager {
   /**
    * Register the shutdown hook with the Runtime.
    */
-  protected static void registerShutdownHook() {
+  private static void registerShutdownHook() {
     lock.lock();
     try {
       String value = System.getProperty("ebean.registerShutdownHook");
@@ -123,13 +125,10 @@ public final class ShutdownManager {
         // Already run shutdown...
         return;
       }
-
       if (logger.isDebugEnabled()) {
         logger.debug("Shutting down");
       }
-
       stopping = true;
-
       deregisterShutdownHook();
 
       String shutdownRunner = System.getProperty("ebean.shutdown.runnable");
@@ -147,7 +146,6 @@ public final class ShutdownManager {
         // shutdown cluster networking if active
         container.shutdown();
       }
-
       // shutdown any registered servers that have not
       // already been shutdown manually
       for (Database server : databases) {
@@ -158,7 +156,6 @@ public final class ShutdownManager {
           ex.printStackTrace();
         }
       }
-
       if ("true".equalsIgnoreCase(System.getProperty("ebean.datasource.deregisterAllDrivers", "false"))) {
         deregisterAllJdbcDrivers();
       }
@@ -168,15 +165,15 @@ public final class ShutdownManager {
   }
 
   private static void deregisterAllJdbcDrivers() {
-    // This manually deregisters all JDBC drivers
+    // This manually de-registers all JDBC drivers
     Enumeration<Driver> drivers = DriverManager.getDrivers();
     while (drivers.hasMoreElements()) {
       Driver driver = drivers.nextElement();
       try {
-        logger.info("Deregistering jdbc driver: " + driver);
+        logger.info("De-registering jdbc driver: " + driver);
         DriverManager.deregisterDriver(driver);
       } catch (SQLException e) {
-        logger.error("Error deregistering driver " + driver, e);
+        logger.error("Error de-registering driver " + driver, e);
       }
     }
   }
@@ -209,6 +206,9 @@ public final class ShutdownManager {
   }
 
   private static class ShutdownHook extends Thread {
+    private ShutdownHook() {
+      super("EbeanHook");
+    }
     @Override
     public void run() {
       ShutdownManager.shutdown();

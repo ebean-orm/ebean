@@ -5,7 +5,7 @@ package io.ebean.typequery;
  *
  * @param <R> the root query bean type
  */
-public class PLong<R> extends PBaseNumber<R, Long> {
+public final class PLong<R> extends PBaseNumber<R, Long> {
 
   /**
    * Construct with a property name and root instance.

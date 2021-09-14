@@ -13,36 +13,41 @@ public class RecordAsEmbeddedTest {
   void insert_query() {
 
     var contact = new Contact("Rob");
-    contact.setWorkAddress(new Address("45 work", "workling", "wo"));
-    contact.setHomeAddress(new Address("94 home st", "homeline", "wo"));
+    contact.workAddress(new Address("45 work", "workling", "wo"));
+    contact.homeAddress(new Address("94 home st", "homeline", "wo"));
 
     contact.save();
 
     Contact found = new QContact()
-      .id.eq(contact.getId())
+      .id.eq(contact.id())
       .findOne();
 
-    assertThat(found.getWorkAddress().toString()).isEqualTo("Address[line1=45 work, line2=workling, city=wo]");
-    assertThat(found.getHomeAddress().toString()).isEqualTo("Address[line1=94 home st, line2=homeline, city=wo]");
+    assert found != null;
+
+    assertThat(found.workAddress().toString()).isEqualTo("Address[line1=45 work, line2=workling, city=wo]");
+    assertThat(found.homeAddress().toString()).isEqualTo("Address[line1=94 home st, line2=homeline, city=wo]");
 
     Contact foundPartial = new QContact()
       .select(name, homeAddress)
-      .id.eq(contact.getId())
+      .id.eq(contact.id())
       .findOne();
 
-    // invoke lazy loading on getWorkAddress
-    assertThat(foundPartial.getWorkAddress().toString()).isEqualTo("Address[line1=45 work, line2=workling, city=wo]");
-    assertThat(foundPartial.getHomeAddress().toString()).isEqualTo("Address[line1=94 home st, line2=homeline, city=wo]");
+    assert foundPartial != null;
+
+    // invoke lazy loading on workAddress
+    assertThat(foundPartial.workAddress().toString()).isEqualTo("Address[line1=45 work, line2=workling, city=wo]");
+    assertThat(foundPartial.homeAddress().toString()).isEqualTo("Address[line1=94 home st, line2=homeline, city=wo]");
 
     Contact foundNoLazyLoading = new QContact()
       .select(name, homeAddress)
       .setDisableLazyLoading(true)
-      .id.eq(contact.getId())
+      .id.eq(contact.id())
       .findOne();
 
-    // no lazy loading on getWorkAddress this time
-    assertThat(foundNoLazyLoading.getWorkAddress()).isNull();
-    assertThat(foundNoLazyLoading.getHomeAddress().toString()).isEqualTo("Address[line1=94 home st, line2=homeline, city=wo]");
+    assert foundNoLazyLoading != null;
+    // no lazy loading on workAddress this time
+    assertThat(foundNoLazyLoading.workAddress()).isNull();
+    assertThat(foundNoLazyLoading.homeAddress().toString()).isEqualTo("Address[line1=94 home st, line2=homeline, city=wo]");
 
   }
 }

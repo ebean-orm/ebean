@@ -39,7 +39,7 @@ import java.util.ArrayList;
  *
  * }</pre>
  */
-public class DefaultExampleExpression implements SpiExpression, ExampleExpression {
+final class DefaultExampleExpression implements SpiExpression, ExampleExpression {
 
   /**
    * The example bean containing the properties.
@@ -75,7 +75,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
    * @param caseInsensitive if true use case insensitive expressions
    * @param likeType        the type of Like wild card used
    */
-  public DefaultExampleExpression(EntityBean entity, boolean caseInsensitive, LikeType likeType) {
+  DefaultExampleExpression(EntityBean entity, boolean caseInsensitive, LikeType likeType) {
     this.entity = entity;
     this.caseInsensitive = caseInsensitive;
     this.likeType = likeType;
@@ -276,7 +276,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
       if (!beanProperty.isTransient()) {
         Object value = beanProperty.getValue(bean);
         if (value != null) {
-          String propName = SplitName.add(prefix, beanProperty.getName());
+          String propName = SplitName.add(prefix, beanProperty.name());
           if (beanProperty.isScalar()) {
             if (value instanceof String) {
               list.add(new LikeExpression(propName, value, caseInsensitive, likeType));
@@ -290,7 +290,7 @@ public class DefaultExampleExpression implements SpiExpression, ExampleExpressio
 
           } else if ((beanProperty instanceof BeanPropertyAssocOne) && (value instanceof EntityBean)) {
             BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) beanProperty;
-            BeanDescriptor<?> targetDescriptor = assocOne.getTargetDescriptor();
+            BeanDescriptor<?> targetDescriptor = assocOne.targetDescriptor();
             addExpressions(list, targetDescriptor, (EntityBean) value, propName);
           }
         }

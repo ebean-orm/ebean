@@ -8,7 +8,7 @@ import javax.persistence.PersistenceException;
 /**
  * Document store based BeanPersister.
  */
-class DocStoreBeanPersister implements BeanPersister {
+final class DocStoreBeanPersister implements BeanPersister {
 
   private final GeneratedProperties generatedProperties;
 
@@ -19,13 +19,13 @@ class DocStoreBeanPersister implements BeanPersister {
   @Override
   public void insert(PersistRequestBean<?> request) throws PersistenceException {
     //request.setIdValueForDocStore();
-    generatedProperties.preInsert(request.getEntityBean(), request.now());
+    generatedProperties.preInsert(request.entityBean(), request.now());
     request.docStorePersist();
   }
 
   @Override
   public void update(PersistRequestBean<?> request) throws PersistenceException {
-    generatedProperties.preUpdate(request.getEntityBean(), request.now());
+    generatedProperties.preUpdate(request.entityBean(), request.now());
     request.docStorePersist();
   }
 

@@ -21,23 +21,19 @@ public class VisitProperties {
   }
 
   protected void visitProperties(BeanDescriptor<?> desc, BeanPropertyVisitor propertyVisitor) {
-    BeanProperty idProp = desc.getIdProperty();
+    BeanProperty idProp = desc.idProperty();
     if (idProp != null) {
       visit(propertyVisitor, idProp);
     }
-
-    BeanPropertyAssocOne<?> unidirectional = desc.getUnidirectional();
+    BeanPropertyAssocOne<?> unidirectional = desc.unidirectional();
     if (unidirectional != null) {
       visit(propertyVisitor, unidirectional);
     }
-
-    BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-    for (BeanProperty p : propertiesNonTransient) {
+    for (BeanProperty p : desc.propertiesNonTransient()) {
       if (p.isDDLColumn()) {
         visit(propertyVisitor, p);
       }
     }
-
     visitInheritanceProperties(desc, propertyVisitor);
     propertyVisitor.visitEnd();
   }
@@ -46,7 +42,6 @@ public class VisitProperties {
    * Visit the property.
    */
   protected void visit(BeanPropertyVisitor pv, BeanProperty p) {
-
     if (p instanceof BeanPropertyAssocMany<?>) {
       // oneToMany or manyToMany
       pv.visitMany((BeanPropertyAssocMany<?>) p);
@@ -56,20 +51,17 @@ public class VisitProperties {
       if (assocOne.isEmbedded()) {
         // Embedded bean
         pv.visitEmbedded(assocOne);
-        BeanProperty[] embProps = assocOne.getProperties();
+        BeanProperty[] embProps = assocOne.properties();
         for (BeanProperty embProp : embProps) {
           pv.visitEmbeddedScalar(embProp, assocOne);
         }
-
       } else if (assocOne.isOneToOneExported()) {
         // associated one exported
         pv.visitOneExported(assocOne);
-
       } else {
         // associated one imported
         pv.visitOneImported(assocOne);
       }
-
     } else {
       // simple scalar type
       pv.visitScalar(p, true);
@@ -81,8 +73,7 @@ public class VisitProperties {
    * Visit all the other inheritance properties that are not on the root.
    */
   protected void visitInheritanceProperties(BeanDescriptor<?> descriptor, BeanPropertyVisitor pv) {
-
-    InheritInfo inheritInfo = descriptor.getInheritInfo();
+    InheritInfo inheritInfo = descriptor.inheritInfo();
     if (inheritInfo != null && inheritInfo.isRoot()) {
       // add all properties on the children objects
       inheritInfo.visitChildren(new InheritChildVisitor(this, pv));

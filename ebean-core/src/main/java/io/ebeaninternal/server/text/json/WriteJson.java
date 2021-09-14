@@ -21,22 +21,15 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public class WriteJson implements SpiJsonWriter {
+public final class WriteJson implements SpiJsonWriter {
 
   private final SpiEbeanServer server;
-
   private final JsonGenerator generator;
-
   private final FetchPath fetchPath;
-
   private final Map<String, JsonWriteBeanVisitor<?>> visitors;
-
   private final PathStack pathStack;
-
   private final ArrayStack<Object> parentBeans;
-
   private final Object objectMapper;
-
   private final JsonConfig.Include include;
 
   /**
@@ -513,10 +506,10 @@ public class WriteJson implements SpiJsonWriter {
         return true;
       if (currentIncludeProps != null) {
         // explicitly controlled by pathProperties
-        return currentIncludeProps.contains(prop.getName());
+        return currentIncludeProps.contains(prop.name());
       } else {
         // include only loaded properties
-        return currentBean._ebean_getIntercept().isLoadedProperty(prop.getPropertyIndex());
+        return currentBean._ebean_getIntercept().isLoadedProperty(prop.propertyIndex());
       }
     }
 
@@ -525,7 +518,7 @@ public class WriteJson implements SpiJsonWriter {
         return false;
       } else if (!explicitAllProps && currentIncludeProps != null) {
         // explicitly controlled by pathProperties
-        return currentIncludeProps.contains(prop.getName());
+        return currentIncludeProps.contains(prop.name());
       } else {
         // by default include transient properties
         return true;
@@ -536,7 +529,7 @@ public class WriteJson implements SpiJsonWriter {
     public void write(WriteJson writeJson) {
 
       try {
-        BeanProperty beanProp = desc.getIdProperty();
+        BeanProperty beanProp = desc.idProperty();
         if (beanProp != null) {
           if (isIncludeProperty(beanProp)) {
             beanProp.jsonWrite(writeJson, currentBean);
@@ -607,7 +600,7 @@ public class WriteJson implements SpiJsonWriter {
   }
 
   private <T> BeanDescriptor<T> getDescriptor(Class<T> cls) {
-    BeanDescriptor<T> d = server.getBeanDescriptor(cls);
+    BeanDescriptor<T> d = server.descriptor(cls);
     if (d == null) {
       throw new RuntimeException("No BeanDescriptor found for " + cls);
     }

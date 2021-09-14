@@ -10,23 +10,19 @@ import java.util.Map;
  *
  * Uses this to map a mapping request (columns) to a 'query plan' (constructor and setters).
  */
-class DtoMeta {
+final class DtoMeta {
 
   private final Class<?> dtoType;
   private final Map<String, DtoMetaProperty> propMap = new LinkedHashMap<>();
-
   private final Map<Integer, DtoMetaConstructor> constructorMap = new LinkedHashMap<>();
-
   private final DtoMetaConstructor defaultConstructor;
   private final DtoMetaConstructor maxArgConstructor;
 
   DtoMeta(Class<?> dtoType, List<DtoMetaConstructor> constructors, List<DtoMetaProperty> properties) {
     this.dtoType = dtoType;
-
     for (DtoMetaProperty property : properties) {
       propMap.put(property.getName().toUpperCase(), property);
     }
-
     int maxArg = 0;
 
     DtoMetaConstructor defaultConstructor = null;
@@ -47,9 +43,7 @@ class DtoMeta {
   }
 
   public DtoQueryPlan match(DtoMappingRequest request) {
-
     DtoColumn[] cols = request.getColumnMeta();
-
     int colLen = cols.length;
     DtoMetaConstructor constructor = constructorMap.get(colLen);
     if (constructor != null) {

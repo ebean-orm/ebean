@@ -14,11 +14,10 @@ import java.io.IOException;
 /**
  * Wraps a single expression with nestedPath for document queries.
  */
-class NestedPathWrapperExpression implements SpiExpression {
+final class NestedPathWrapperExpression implements SpiExpression {
 
-  protected final String nestedPath;
-
-  protected final SpiExpression delegate;
+  final String nestedPath;
+  final SpiExpression delegate;
 
   NestedPathWrapperExpression(String nestedPath, SpiExpression delegate) {
     this.nestedPath = nestedPath;

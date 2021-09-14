@@ -20,11 +20,8 @@ import java.util.UUID;
 public abstract class AnnotationParser extends AnnotationBase {
 
   final DeployBeanInfo<?> info;
-
   final DeployBeanDescriptor<?> descriptor;
-
   final Class<?> beanType;
-
   final ReadAnnotationConfig readConfig;
 
   AnnotationParser(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig) {
@@ -83,7 +80,6 @@ public abstract class AnnotationParser extends AnnotationBase {
    * Read an AttributeOverrides if they exist for this embedded bean.
    */
   void readEmbeddedAttributeOverrides(DeployBeanPropertyAssocOne<?> prop) {
-
     Set<AttributeOverride> attrOverrides = annotationAttributeOverrides(prop);
     if (!attrOverrides.isEmpty()) {
       Map<String, Column> propMap = new HashMap<>(attrOverrides.size());

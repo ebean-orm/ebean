@@ -1,11 +1,10 @@
 package io.ebeaninternal.server.querydefn;
 
-public class SimpleTextParser {
+public final class SimpleTextParser {
 
   private final String oql;
   private final char[] chars;
   private final int eof;
-
   private int pos;
   private String word;
   private String lowerWord;

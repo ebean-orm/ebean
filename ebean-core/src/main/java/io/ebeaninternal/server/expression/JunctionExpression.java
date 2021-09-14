@@ -48,11 +48,10 @@ import java.util.function.Predicate;
 /**
  * Junction implementation.
  */
-class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
+final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
-  protected DefaultExpressionList<T> exprList;
-
-  protected Junction.Type type;
+  DefaultExpressionList<T> exprList;
+  Junction.Type type;
 
   JunctionExpression(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
     this.type = type;

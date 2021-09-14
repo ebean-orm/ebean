@@ -113,7 +113,7 @@ import java.util.ServiceLoader;
  * Used to extend the DatabaseConfig with additional objects used to configure and
  * construct an Database.
  */
-public class InternalConfiguration {
+public final class InternalConfiguration {
 
   private static final Logger logger = LoggerFactory.getLogger(InternalConfiguration.class);
 
@@ -177,7 +177,7 @@ public class InternalConfiguration {
     this.dataSourceSupplier = createDataSourceSupplier();
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlMap.xmlDeployment());
-    Map<String, String> draftTableMap = beanDescriptorManager.getDraftTableMap();
+    Map<String, String> draftTableMap = beanDescriptorManager.draftTableMap();
     beanDescriptorManager.scheduleBackgroundTrim();
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);

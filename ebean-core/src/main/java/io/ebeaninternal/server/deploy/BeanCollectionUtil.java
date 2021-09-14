@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Utility methods for BeanCollections.
  */
-public class BeanCollectionUtil {
+public final class BeanCollectionUtil {
 
   /**
    * Return true if this is a bean collection and not considered dirty.
@@ -66,7 +66,6 @@ public class BeanCollectionUtil {
       // returns a collection of beans
       return bc.getActualDetails();
     }
-
     if (o instanceof Map<?, ?>) {
       // yes, we want the entrySet (to set the keys)
       return ((Map<?, ?>) o).values();

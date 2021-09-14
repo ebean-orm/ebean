@@ -4,7 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-class UtilDateParser {
+final class UtilDateParser {
 
   private static final SimpleDateFormat dateTimeProto = new SimpleDateFormat("yyyy-MM-dd");
 

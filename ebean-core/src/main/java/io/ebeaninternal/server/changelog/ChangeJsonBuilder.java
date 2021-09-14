@@ -14,21 +14,14 @@ import java.util.Map;
 /**
  * Builds JSON document for a bean change.
  */
-class ChangeJsonBuilder {
+final class ChangeJsonBuilder {
 
-  protected final JsonFactory jsonFactory = new JsonFactory();
-
-  protected final JsonContext json;
-
-  ChangeJsonBuilder(JsonContext json) {
-    this.json = json;
-  }
+  private final JsonFactory jsonFactory = new JsonFactory();
 
   /**
    * Write the bean change as JSON.
    */
   void writeBeanJson(Writer writer, BeanChange bean, ChangeSet changeSet) throws IOException {
-
     try (JsonGenerator generator = jsonFactory.createGenerator(writer)) {
       writeBeanChange(generator, bean, changeSet);
       generator.flush();
@@ -39,9 +32,7 @@ class ChangeJsonBuilder {
    * Write the bean change as JSON document containing the transaction header details.
    */
   private void writeBeanChange(JsonGenerator gen, BeanChange bean, ChangeSet changeSet) throws IOException {
-
     gen.writeStartObject();
-
     gen.writeNumberField("ts", bean.getEventTime());
     gen.writeStringField("change", bean.getEvent().getCode());
     gen.writeStringField("type", bean.getType());
@@ -49,9 +40,7 @@ class ChangeJsonBuilder {
     if (bean.getTenantId() != null) {
       gen.writeStringField("tenantId", bean.getTenantId().toString());
     }
-
     writeBeanTransactionDetails(gen, changeSet);
-
     writeBeanValues(gen, bean);
     gen.writeEndObject();
   }
@@ -60,7 +49,6 @@ class ChangeJsonBuilder {
    * Denormalise by writing the transaction header details.
    */
   private void writeBeanTransactionDetails(JsonGenerator gen, ChangeSet changeSet) throws IOException {
-
     String source = changeSet.getSource();
     if (source != null) {
       gen.writeStringField("source", source);
@@ -87,12 +75,10 @@ class ChangeJsonBuilder {
    * For insert and update write the new/old values.
    */
   private void writeBeanValues(JsonGenerator gen, BeanChange bean) throws IOException {
-
     if (bean.getEvent() != ChangeType.DELETE) {
       gen.writeFieldName("data");
       gen.writeRaw(":");
       gen.writeRaw(bean.getData());
-
       String oldData = bean.getOldData();
       if (oldData != null) {
         gen.writeRaw(",\"oldData\":");

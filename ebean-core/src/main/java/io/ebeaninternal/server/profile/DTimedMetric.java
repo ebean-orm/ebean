@@ -12,16 +12,12 @@ import java.util.concurrent.atomic.LongAdder;
  * It is intended for high concurrent updates to the statistics and relatively infrequent reads.
  * </p>
  */
-class DTimedMetric implements TimedMetric {
+final class DTimedMetric implements TimedMetric {
 
   private final String name;
-
   private final LongAdder count = new LongAdder();
-
   private final LongAdder total = new LongAdder();
-
   private final LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
-
   private boolean collected;
 
   DTimedMetric(String name) {

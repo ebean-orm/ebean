@@ -5,7 +5,7 @@ package io.ebean.typequery;
  *
  * @param <R> the root query bean type
  */
-public class PShort<R> extends PBaseNumber<R, Short> {
+public final class PShort<R> extends PBaseNumber<R, Short> {
 
   /**
    * Construct with a property name and root instance.

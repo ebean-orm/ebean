@@ -3,7 +3,7 @@ package io.ebeaninternal.util;
 import java.math.BigDecimal;
 import java.net.URL;
 
-public class ValueUtil {
+public final class ValueUtil {
 
   /**
    * Helper method to check if two objects are equal.

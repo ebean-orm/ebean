@@ -30,44 +30,28 @@ public final class SqlTreeBuilder {
   private static final Logger logger = LoggerFactory.getLogger(SqlTreeBuilder.class);
 
   private final SpiQuery<?> query;
-
   private final STreeType desc;
-
   private final OrmQueryDetail queryDetail;
-
   private final CQueryPredicates predicates;
-
   private final boolean subQuery;
-
   private final boolean distinctOnPlatform;
   /**
    * Property if resultSet contains master and detail rows.
    */
   private STreePropertyAssocMany manyProperty;
-
   private final SqlTreeAlias alias;
-
   private final DefaultDbSqlContext ctx;
-
   private final HashSet<String> selectIncludes = new HashSet<>();
-
   private final ManyWhereJoins manyWhereJoins;
-
   private final TableJoin includeJoin;
-
   private final boolean rawSql;
-
   /**
    * rawNoId true if the RawSql does not include the @Id property
    */
   private final boolean rawNoId;
-
   private final boolean disableLazyLoad;
-
   private final SpiQuery.TemporalMode temporalMode;
-
   private SqlTreeNode rootNode;
-
   private boolean sqlDistinct;
 
   /**
@@ -75,9 +59,9 @@ public final class SqlTreeBuilder {
    */
   SqlTreeBuilder(OrmQueryRequest<?> request, CQueryPredicates predicates, OrmQueryDetail queryDetail, boolean rawNoId) {
     this.rawSql = true;
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.rawNoId = rawNoId;
-    this.disableLazyLoad = request.getQuery().isDisableLazyLoading();
+    this.disableLazyLoad = request.query().isDisableLazyLoading();
     this.query = null;
     this.subQuery = false;
     this.distinctOnPlatform = false;
@@ -98,20 +82,20 @@ public final class SqlTreeBuilder {
   SqlTreeBuilder(String columnAliasPrefix, CQueryBuilder builder, OrmQueryRequest<?> request, CQueryPredicates predicates) {
     this.rawSql = false;
     this.rawNoId = false;
-    this.desc = request.getBeanDescriptor();
-    this.query = request.getQuery();
+    this.desc = request.descriptor();
+    this.query = request.query();
     this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
     this.subQuery = Type.SQ_EXISTS == query.getType()
-        || Type.SQ_IN == query.getType() 
-        || Type.ID_LIST == query.getType() 
-        || Type.DELETE == query.getType() 
+        || Type.SQ_IN == query.getType()
+        || Type.ID_LIST == query.getType()
+        || Type.DELETE == query.getType()
         || query.isCountDistinct();
     this.includeJoin = query.getM2mIncludeJoin();
     this.manyWhereJoins = query.getManyWhereJoins();
     this.queryDetail = query.getDetail();
     this.predicates = predicates;
-    this.alias = new SqlTreeAlias(request.getBaseTableAlias(), temporalMode);
+    this.alias = new SqlTreeAlias(request.baseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.getHistorySupport(query);
@@ -242,7 +226,7 @@ public final class SqlTreeBuilder {
     List<SqlTreeNode> myJoinList = new ArrayList<>();
     List<STreePropertyAssocOne> extraProps = new ArrayList<>();
     for (STreePropertyAssocOne one : desc.propsOne()) {
-      String propPrefix = SplitName.add(prefix, one.getName());
+      String propPrefix = SplitName.add(prefix, one.name());
       if (isIncludeBean(propPrefix)) {
         selectIncludes.add(propPrefix);
         if (!one.hasForeignKey()) {
@@ -253,7 +237,7 @@ public final class SqlTreeBuilder {
     }
 
     for (STreePropertyAssocMany many : desc.propsMany()) {
-      String propPrefix = SplitName.add(prefix, many.getName());
+      String propPrefix = SplitName.add(prefix, many.name());
       if (isIncludeMany(propPrefix, many)) {
         selectIncludes.add(propPrefix);
         buildSelectChain(propPrefix, many, many.target(), myJoinList);
@@ -310,18 +294,34 @@ public final class SqlTreeBuilder {
 
       String baseTable = (query == null) ? null : query.getBaseTable();
       if (baseTable == null) {
-        baseTable = desc.getBaseTable(temporalMode);
+        baseTable = desc.baseTable(temporalMode);
       }
       return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct, baseTable);
 
     } else if (prop instanceof STreePropertyAssocMany) {
-      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, temporalMode, disableLazyLoad);
+      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, withId(), temporalMode, disableLazyLoad);
 
     } else {
-      // do not read Id on child beans (e.g. when used with fetch())
-      boolean withId = isNotSingleAttribute() && !subQuery;
-      return new SqlTreeNodeBean(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
+      return new SqlTreeNodeBean(prefix, prop, props, myList, withId(), temporalMode, disableLazyLoad);
     }
+  }
+
+  boolean withId() {
+    return isNotSingleAttribute() && !subQuery;
+  }
+
+  /**
+   * Return true if the Id property should be excluded (as it is automatically included).
+   */
+  private boolean excludeIdProperty() {
+    return query == null || !query.isSingleAttribute() && !query.isManualId();
+  }
+
+  /**
+   * Return true if the query is not a single attribute query.
+   */
+  private boolean isNotSingleAttribute() {
+    return query == null || !query.isSingleAttribute();
   }
 
   /**
@@ -413,11 +413,11 @@ public final class SqlTreeBuilder {
           } else {
             logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
           }
-        } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.getName()))) {
+        } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.name()))) {
           // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
         } else {
-          logger.error("property [" + p.getFullBeanName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
+          logger.error("property [" + p.fullName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
         }
       }
 
@@ -440,7 +440,7 @@ public final class SqlTreeBuilder {
         // included as a bean join. With a bean join
         // the property should be excluded as the bean
         // join has its own node in the SqlTree.
-        if (!queryProps.isIncludedBeanJoin(p.getName())) {
+        if (!queryProps.isIncludedBeanJoin(p.name())) {
           // include the property... which basically
           // means include the foreign key column(s)
           selectProps.add(p);
@@ -497,7 +497,7 @@ public final class SqlTreeBuilder {
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
       //noinspection StatementWithEmptyBody
       if (queryProps != null
-        && queryProps.isIncludedBeanJoin(propertyAssocOne.getName())
+        && queryProps.isIncludedBeanJoin(propertyAssocOne.name())
         && propertyAssocOne.hasForeignKey()
         && !propertyAssocOne.isFormula()) {
         // if it is a joined bean with FK constraint... then don't add the property
@@ -507,7 +507,7 @@ public final class SqlTreeBuilder {
       }
     }
 
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    InheritInfo inheritInfo = desc.inheritInfo();
     if (inheritInfo != null) {
       // add sub type properties
       inheritInfo.addChildrenProperties(selectProps);
@@ -682,20 +682,6 @@ public final class SqlTreeBuilder {
       }
       return extras.toArray(new String[0]);
     }
-
   }
 
-  /**
-   * Return true if the Id property should be excluded (as it is automatically included).
-   */
-  private boolean excludeIdProperty() {
-    return query == null || !query.isSingleAttribute() && !query.isManualId();
-  }
-
-  /**
-   * Return true if the query is not a single attribute query.
-   */
-  private boolean isNotSingleAttribute() {
-    return query == null || !query.isSingleAttribute();
-  }
 }

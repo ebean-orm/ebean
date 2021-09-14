@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Used to generate a (java.util.Date) timestamp when a bean is inserted.
  */
-public class GeneratedInsertDate implements GeneratedProperty, GeneratedWhenCreated {
+final class GeneratedInsertDate implements GeneratedProperty, GeneratedWhenCreated {
 
   /**
    * Return the current time as a Timestamp.

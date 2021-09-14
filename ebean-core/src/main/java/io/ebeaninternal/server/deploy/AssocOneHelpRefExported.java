@@ -5,16 +5,15 @@ import io.ebeaninternal.server.query.SqlJoinType;
 /**
  * Helper for BeanPropertyAssocOne for OneToOne exported reference - not so common.
  */
-class AssocOneHelpRefExported extends AssocOneHelp {
+final class AssocOneHelpRefExported extends AssocOneHelp {
 
   private final boolean softDelete;
-
   private final String softDeletePredicate;
 
   AssocOneHelpRefExported(BeanPropertyAssocOne<?> property) {
     super(property);
     this.softDelete = property.targetDescriptor.isSoftDelete();
-    this.softDeletePredicate = (softDelete) ? property.targetDescriptor.getSoftDeletePredicate("") : null;
+    this.softDeletePredicate = (softDelete) ? property.targetDescriptor.softDeletePredicate("") : null;
   }
 
   /**
@@ -22,9 +21,8 @@ class AssocOneHelpRefExported extends AssocOneHelp {
    */
   @Override
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
-
     // set appropriate tableAlias for the exported id columns
-    String relativePrefix = ctx.getRelativePrefix(property.getName());
+    String relativePrefix = ctx.getRelativePrefix(property.name());
     ctx.pushTableAlias(relativePrefix);
     property.targetIdBinder.appendSelect(ctx, subQuery);
     ctx.popTableAlias();
@@ -32,8 +30,7 @@ class AssocOneHelpRefExported extends AssocOneHelp {
 
   @Override
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-
-    String relativePrefix = ctx.getRelativePrefix(property.getName());
+    String relativePrefix = ctx.getRelativePrefix(property.name());
     if (softDelete && !ctx.isIncludeSoftDelete()) {
       property.tableJoin.addJoin(joinType, relativePrefix, ctx, softDeletePredicate);
     } else {

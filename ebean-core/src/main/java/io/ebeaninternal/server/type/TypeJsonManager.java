@@ -5,7 +5,7 @@ import io.ebean.ModifyAwareType;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.config.dbplatform.DbPlatformType;
 
-class TypeJsonManager {
+final class TypeJsonManager {
 
   private final boolean postgres;
   private final ObjectMapper objectMapper;

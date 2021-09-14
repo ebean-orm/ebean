@@ -12,15 +12,11 @@ import java.util.Set;
 /**
  * Map that is wraps an underlying map for the purpose of detecting changes.
  */
-public class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, Serializable {
+public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
 
   final ModifyAwareType owner;
-
-  /**
-   * The underlying map.
-   */
   final Map<K, V> map;
 
   public ModifyAwareMap(Map<K, V> underlying) {

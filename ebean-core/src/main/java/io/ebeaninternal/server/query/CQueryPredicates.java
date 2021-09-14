@@ -22,6 +22,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,80 +38,57 @@ import java.util.Set;
  * named parameters and expression values into the prepared statement.
  * </p>
  */
-public class CQueryPredicates {
+public final class CQueryPredicates {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryPredicates.class);
 
   private final Binder binder;
-
   private final OrmQueryRequest<?> request;
-
   private final SpiQuery<?> query;
-
   private final Object idValue;
-
-  /**
-   * Named bind parameters.
-   */
   private final BindParams bindParams;
-
-  /**
-   * Bind values from the where expressions.
-   */
   private DefaultExpressionRequest filterMany;
-
   /**
    * SQL generated from the where expressions.
    */
   private String filterManyExprSql;
-
   /**
    * Bind values from the where expressions.
    */
   private DefaultExpressionRequest where;
-
   /**
    * SQL generated from the where expressions.
    */
   private String whereExprSql;
-
   /**
    * Bind values for having expression.
    */
   private DefaultExpressionRequest having;
-
   /**
    * SQL generated from the having expression.
    */
   private String havingExprSql;
-
   private String dbHaving;
-
   /**
    * logicalWhere with property names converted to db columns.
    */
   private String dbWhere;
-
   /**
    * Filter than can apply to a many fetch join.
    */
   private String dbFilterMany;
-
   private String dbOrderBy;
-
   private String dbUpdateClause;
-
   /**
    * Includes from where and order by clauses.
    */
   private Set<String> predicateIncludes;
-
   private Set<String> orderByIncludes;
 
   CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
     this.binder = binder;
     this.request = request;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.bindParams = query.getBindParams();
     this.idValue = query.getId();
   }
@@ -137,7 +115,7 @@ public class CQueryPredicates {
       dataBind.append(", ");
     }
 
-    CQueryPlan queryPlan = request.getQueryPlan();
+    CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
       int asOfTableCount = queryPlan.getAsOfTableCount();
       if (asOfTableCount > 0) {
@@ -154,7 +132,7 @@ public class CQueryPredicates {
 
     if (idValue != null) {
       // this is a find by id type query...
-      request.getBeanDescriptor().bindId(dataBind, idValue);
+      request.descriptor().bindId(dataBind, idValue);
       dataBind.append(idValue);
       dataBind.append(", ");
     }
@@ -234,7 +212,7 @@ public class CQueryPredicates {
 
     BeanPropertyAssocMany<?> manyProperty = request.determineMany();
     if (manyProperty != null) {
-      OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.getName(), false);
+      OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.name(), false);
       SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
       if (filterManyExpr != null) {
         this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
@@ -266,7 +244,7 @@ public class CQueryPredicates {
   private void parsePropertiesToDbColumns(DeployParser deployParser) {
 
     // order by is dependent on the manyProperty (if there is one)
-    String logicalOrderBy = deriveOrderByWithMany(request.getManyProperty());
+    String logicalOrderBy = deriveOrderByWithMany(request.manyProperty());
     if (logicalOrderBy != null) {
       dbOrderBy = deployParser.parse(logicalOrderBy);
     }
@@ -334,7 +312,7 @@ public class CQueryPredicates {
     if (orderBy == null) {
       return null;
     }
-    return CQueryOrderBy.parse(request.getBeanDescriptor(), orderBy);
+    return CQueryOrderBy.parse(request.descriptor(), orderBy);
   }
 
   /**
@@ -349,17 +327,17 @@ public class CQueryPredicates {
 
     String orderBy = parseOrderBy();
 
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
-    String orderById = desc.getDefaultOrderBy();
+    BeanDescriptor<?> desc = request.descriptor();
+    String orderById = desc.defaultOrderBy();
 
     if (orderBy == null) {
       orderBy = orderById;
     }
 
     // check for default ordering on the many property...
-    String manyOrderBy = manyProp.getFetchOrderBy();
+    String manyOrderBy = manyProp.fetchOrderBy();
     if (manyOrderBy != null) {
-      orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.getName(), manyOrderBy);
+      orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.name(), manyOrderBy);
     }
 
     if (request.isFindById()) {
@@ -375,7 +353,7 @@ public class CQueryPredicates {
     // we need to make sure their is an order by on the
     // top level first (to ensure master/detail construction).
 
-    int manyPos = orderBy.indexOf(manyProp.getName());
+    int manyPos = orderBy.indexOf(manyProp.name());
     int idPos = orderBy.indexOf(" " + orderById);
 
     if (manyPos == -1) {
@@ -392,9 +370,9 @@ public class CQueryPredicates {
     if (idPos <= -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
-        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.getName();
+        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name();
         msg += "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById + "]";
-        msg += " must come before the many property [" + manyProp.getName() + "] in the orderBy.";
+        msg += " must come before the many property [" + manyProp.name() + "] in the orderBy.";
         msg += " Ebean has automatically modified the orderBy clause to do this.";
 
         logger.warn(msg);
@@ -411,7 +389,7 @@ public class CQueryPredicates {
    * Return the bind values for the where expression.
    */
   public List<Object> getWhereExprBindValues() {
-    return where.getBindValues();
+    return where == null ? Collections.emptyList() : where.getBindValues();
   }
 
   /**

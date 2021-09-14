@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.Database;
 import io.ebean.SqlUpdate;
 
-public class IntersectionTable {
+public final class IntersectionTable {
 
   private final String insertSql;
   private final String deleteSql;

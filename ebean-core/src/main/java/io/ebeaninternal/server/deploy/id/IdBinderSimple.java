@@ -26,21 +26,17 @@ import java.util.List;
 public final class IdBinderSimple implements IdBinder {
 
   private final BeanProperty idProperty;
-
   private final String bindIdSql;
-
   private final Class<?> expectedType;
-
   private final MultiValueBind multiValueBind;
-
   @SuppressWarnings("rawtypes")
   private final ScalarType scalarType;
 
   public IdBinderSimple(BeanProperty idProperty, MultiValueBind multiValueBind) {
     this.idProperty = idProperty;
-    this.scalarType = idProperty.getScalarType();
-    this.expectedType = idProperty.getPropertyType();
-    bindIdSql = InternString.intern(idProperty.getDbColumn() + " = ? ");
+    this.scalarType = idProperty.scalarType();
+    this.expectedType = idProperty.type();
+    bindIdSql = InternString.intern(idProperty.dbColumn() + " = ? ");
     this.multiValueBind = multiValueBind;
   }
 
@@ -56,12 +52,11 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getOrderBy(String pathPrefix, boolean ascending) {
-
     StringBuilder sb = new StringBuilder();
     if (pathPrefix != null) {
       sb.append(pathPrefix).append(".");
     }
-    sb.append(idProperty.getName());
+    sb.append(idProperty.name());
     if (!ascending) {
       sb.append(" desc");
     }
@@ -80,12 +75,12 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getIdProperty() {
-    return idProperty.getName();
+    return idProperty.name();
   }
 
   @Override
   public BeanProperty findBeanProperty(String dbColumnName) {
-    if (dbColumnName.equalsIgnoreCase(idProperty.getDbColumn())) {
+    if (dbColumnName.equalsIgnoreCase(idProperty.dbColumn())) {
       return idProperty;
     }
     return null;
@@ -98,15 +93,15 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String getDefaultOrderBy() {
-    return idProperty.getName();
+    return idProperty.name();
   }
 
   @Override
   public String getBindIdInSql(String baseTableAlias) {
     if (baseTableAlias == null) {
-      return idProperty.getDbColumn();
+      return idProperty.dbColumn();
     } else {
-      return baseTableAlias + "." + idProperty.getDbColumn();
+      return baseTableAlias + "." + idProperty.dbColumn();
     }
   }
 
@@ -221,7 +216,7 @@ public final class IdBinderSimple implements IdBinder {
       sb.append(prefix);
       sb.append(".");
     }
-    sb.append(idProperty.getName());
+    sb.append(idProperty.name());
     sb.append(operator);
     return sb.toString();
   }
@@ -233,7 +228,7 @@ public final class IdBinderSimple implements IdBinder {
       sb.append(prefix);
       sb.append(".");
     }
-    sb.append(idProperty.getName());
+    sb.append(idProperty.name());
     return sb.toString();
   }
 

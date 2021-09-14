@@ -13,19 +13,12 @@ final class FormulaPropertyPath {
   private static final String DISTINCT_ = "distinct ";
 
   private final BeanDescriptor<?> descriptor;
-
   private final String formula;
-
   private final String outerFunction;
-
   private final String internalExpression;
-
   private final ElPropertyDeploy firstProp;
-
   private final String parsedAggregation;
-
   private boolean countDistinct;
-
   private String cast;
   private String alias;
 
@@ -36,7 +29,6 @@ final class FormulaPropertyPath {
   FormulaPropertyPath(BeanDescriptor<?> descriptor, String formula, String path) {
     this.descriptor = descriptor;
     this.formula = formula;
-
     int openBracket = formula.indexOf('(');
     int closeBracket = formula.lastIndexOf(')');
     if (openBracket == -1 || closeBracket == -1) {
@@ -49,7 +41,6 @@ final class FormulaPropertyPath {
       // ::CastType as foo
       parseSuffix(formula.substring(closeBracket + 1).trim());
     }
-
     DeployPropertyParser parser = descriptor.parser().setCatchFirst(true);
     String parsed = parser.parse(internalExpression);
     if (path != null) {
@@ -105,41 +96,38 @@ final class FormulaPropertyPath {
   }
 
   STreeProperty build() {
-
     if (cast != null) {
-      ScalarType<?> scalarType = descriptor.getScalarType(cast);
+      ScalarType<?> scalarType = descriptor.scalarType(cast);
       if (scalarType == null) {
         throw new IllegalStateException("Unable to find scalarType for cast of [" + cast + "] on formula [" + formula + "] for type " + descriptor);
       }
       return create(scalarType);
     }
     if (isCount()) {
-      return create(descriptor.getScalarType(Types.BIGINT));
+      return create(descriptor.scalarType(Types.BIGINT));
     }
     if (isConcat()) {
-      return create(descriptor.getScalarType(Types.VARCHAR));
+      return create(descriptor.scalarType(Types.VARCHAR));
     }
     if (firstProp == null) {
       throw new IllegalStateException("unable to determine scalarType of formula [" + formula + "] for type " + descriptor + " - maybe use a cast like ::String ?");
     }
-
     // determine scalarType based on first property found by parser
-    final BeanProperty property = firstProp.getBeanProperty();
+    final BeanProperty property = firstProp.beanProperty();
     if (!property.isAssocId()) {
-      return create(property.getScalarType());
+      return create(property.scalarType());
     } else {
       return createManyToOne(property);
     }
   }
 
   private DynamicPropertyAggregationFormula create(ScalarType<?> scalarType) {
-
     String logicalName = logicalName();
     return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), target(logicalName), alias);
   }
 
+  @SuppressWarnings("rawtypes")
   private DynamicPropertyAggregationFormula createManyToOne(BeanProperty property) {
-
     String logicalName = logicalName();
     return new DynamicPropertyAggregationFormulaMTO((BeanPropertyAssocOne) property, logicalName, parsedAggregation, isAggregate(), target(logicalName), alias);
   }

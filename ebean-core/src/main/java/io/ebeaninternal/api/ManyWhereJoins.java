@@ -17,16 +17,13 @@ import java.util.TreeSet;
  * Holds the joins needs to support the many where predicates.
  * These joins are independent of any 'fetch' joins on the many.
  */
-public class ManyWhereJoins implements Serializable {
+public final class ManyWhereJoins implements Serializable {
 
   private static final long serialVersionUID = -6490181101871795417L;
 
   private final TreeMap<String, PropertyJoin> joins = new TreeMap<>();
-
   private List<String> formulaJoinProperties;
-
   private boolean aggregation;
-
   /**
    * 'Mode' indicating that joins added while this is true are required to be outer joins.
    */
@@ -52,15 +49,15 @@ public class ManyWhereJoins implements Serializable {
    */
   public void add(ElPropertyDeploy elProp) {
 
-    String join = elProp.getElPrefix();
-    BeanProperty p = elProp.getBeanProperty();
+    String join = elProp.elPrefix();
+    BeanProperty p = elProp.beanProperty();
     if (p instanceof BeanPropertyAssocMany<?>) {
-      join = addManyToJoin(join, p.getName());
+      join = addManyToJoin(join, p.name());
     }
     if (join != null) {
       addJoin(join);
       if (p != null) {
-        String secondaryTableJoinPrefix = p.getSecondaryTableJoinPrefix();
+        String secondaryTableJoinPrefix = p.secondaryTableJoinPrefix();
         if (secondaryTableJoinPrefix != null) {
           addJoin(join + "." + secondaryTableJoinPrefix);
         }

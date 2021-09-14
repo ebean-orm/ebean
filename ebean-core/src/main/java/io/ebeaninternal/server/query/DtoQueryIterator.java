@@ -6,7 +6,7 @@ import io.ebeaninternal.server.core.DtoQueryRequest;
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 
-class DtoQueryIterator<T> implements QueryIterator<T> {
+final class DtoQueryIterator<T> implements QueryIterator<T> {
 
   private final DtoQueryRequest<T> request;
   private boolean closed;

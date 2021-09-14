@@ -5,16 +5,9 @@ import io.ebeaninternal.server.query.SqlJoinType;
 /**
  * Represents a join required for a given property and whether than needs to be an outer join.
  */
-public class PropertyJoin {
+public final class PropertyJoin {
 
-  /**
-   * The property name.
-   */
   private final String property;
-
-  /**
-   * Set to true if the property needs to be an outer join.
-   */
   private final SqlJoinType joinType;
 
   public PropertyJoin(String property, SqlJoinType joinType) {

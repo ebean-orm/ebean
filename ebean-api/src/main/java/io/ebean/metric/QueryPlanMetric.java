@@ -10,7 +10,15 @@ public interface QueryPlanMetric {
   /**
    * Return the underlying timed metric.
    */
-  TimedMetric getMetric();
+  TimedMetric metric();
+
+  /**
+   * Deprecated migrate to metric().
+   */
+  @Deprecated
+  default TimedMetric getMetric() {
+    return metric();
+  }
 
   /**
    * Visit the underlying metric.

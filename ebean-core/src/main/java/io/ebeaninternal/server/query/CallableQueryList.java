@@ -12,8 +12,7 @@ import java.util.concurrent.Callable;
  *
  * @param <T> the entity bean type
  */
-public class CallableQueryList<T> extends CallableQuery<T> implements Callable<List<T>> {
-
+public final class CallableQueryList<T> extends CallableQuery<T> implements Callable<List<T>> {
 
   public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
     super(server, query, t);

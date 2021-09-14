@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Save details for a simple scalar map element collection.
  */
-class SaveManyElementCollectionMap extends SaveManyBase {
+final class SaveManyElementCollectionMap extends SaveManyBase {
 
   private Set<Map.Entry<?, ?>> entries;
 
@@ -45,7 +45,7 @@ class SaveManyElementCollectionMap extends SaveManyBase {
 
   private void saveCollection() {
     SpiSqlUpdate proto = many.insertElementCollection();
-    Object parentId = request.getBeanId();
+    Object parentId = request.beanId();
     for (Map.Entry<?, ?> entry : entries) {
       final SpiSqlUpdate sqlInsert = proto.copy();
       sqlInsert.setParameter(parentId);

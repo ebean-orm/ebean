@@ -7,18 +7,13 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 /**
  * Creates a Bindable to support version concurrency where clauses.
  */
-public class FactoryVersion {
-
-
-  public FactoryVersion() {
-  }
+public final class FactoryVersion {
 
   /**
    * Create a Bindable for the version property(s) for a bean type.
    */
   public Bindable create(BeanDescriptor<?> desc) {
-
-    BeanProperty versionProperty = desc.getVersionProperty();
+    BeanProperty versionProperty = desc.versionProperty();
     return (versionProperty == null) ? null : new BindablePropertyVersion(versionProperty);
   }
 
@@ -26,8 +21,7 @@ public class FactoryVersion {
    * Create a Bindable for the version property(s) for a bean type.
    */
   public Bindable createForDelete(BeanDescriptor<?> desc) {
-
-    BeanProperty versionProperty = desc.getVersionProperty();
+    BeanProperty versionProperty = desc.versionProperty();
     return (versionProperty == null) ? null : new BindableProperty(versionProperty);
   }
 
@@ -35,8 +29,7 @@ public class FactoryVersion {
    * Create a Bindable for TenantId If multi-tenant with partitioning is on this bean type.
    */
   public Bindable createTenantId(BeanDescriptor<?> desc) {
-
-    BeanProperty tenant = desc.getTenantProperty();
+    BeanProperty tenant = desc.tenantProperty();
     if (tenant == null) {
       return null;
     } else if (tenant instanceof BeanPropertyAssocOne) {

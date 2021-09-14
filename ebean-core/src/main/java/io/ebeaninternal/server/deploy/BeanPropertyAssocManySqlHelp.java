@@ -7,6 +7,7 @@ import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.deploy.visitor.BaseTablePropertyVisitor;
 import io.ebeaninternal.server.deploy.visitor.VisitProperties;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
+import io.ebeaninternal.server.util.Str;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ class BeanPropertyAssocManySqlHelp<T> {
     this.many = many;
     this.exportedProperties = exportedProperties;
     this.hasJoinTable = many.hasJoinTable();
-    this.descriptor = many.getBeanDescriptor();
+    this.descriptor = many.descriptor();
     this.exportedPropertyBindProto = deriveExportedPropertyBindProto();
 
     String delStmt;
@@ -44,7 +45,6 @@ class BeanPropertyAssocManySqlHelp<T> {
   }
 
   private String elementCollectionInsert() {
-
     StringBuilder sb = new StringBuilder(200);
     sb.append("insert into ").append(many.targetTable()).append(" (");
     append(sb);
@@ -55,7 +55,6 @@ class BeanPropertyAssocManySqlHelp<T> {
     appendBind(sb, exportedProperties.length, true);
     appendBind(sb, cols.colCount, false);
     sb.append(")");
-
     return sb.toString();
   }
 
@@ -66,7 +65,6 @@ class BeanPropertyAssocManySqlHelp<T> {
   private static class Cols extends BaseTablePropertyVisitor {
 
     int colCount;
-
     private final StringBuilder sb;
 
     private Cols(StringBuilder sb) {
@@ -75,7 +73,7 @@ class BeanPropertyAssocManySqlHelp<T> {
 
     @Override
     public void visitEmbeddedScalar(BeanProperty p, BeanPropertyAssocOne<?> embedded) {
-      sb.append(",").append(p.getDbColumn());
+      sb.append(",").append(p.dbColumn());
       colCount++;
     }
 
@@ -86,7 +84,7 @@ class BeanPropertyAssocManySqlHelp<T> {
 
     @Override
     public void visitScalar(BeanProperty p, boolean allowNonNull) {
-      sb.append(",").append(p.getDbColumn());
+      sb.append(",").append(p.dbColumn());
       colCount++;
     }
 
@@ -97,7 +95,6 @@ class BeanPropertyAssocManySqlHelp<T> {
   }
 
   String lazyFetchOrderBy(String fetchOrderBy) {
-
     // derive lazyFetchOrderBy
     StringBuilder sb = new StringBuilder(50);
     for (int i = 0; i < exportedProperties.length; i++) {
@@ -116,22 +113,18 @@ class BeanPropertyAssocManySqlHelp<T> {
    * Add a where clause to the query for a given list of parent Id's.
    */
   void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds) {
-
     String tableAlias = hasJoinTable ? "int_." : "t0.";
     if (hasJoinTable) {
       query.setM2MIncludeJoin(many.inverseJoin);
     }
     String rawWhere = deriveWhereParentIdSql(true, tableAlias);
-    String expr = descriptor.getParentIdInExpr(parentIds.size(), rawWhere);
-
+    String expr = descriptor.parentIdInExpr(parentIds.size(), rawWhere);
     many.bindParentIdsIn(expr, parentIds, query);
   }
 
   List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds, boolean hard) {
-
     String rawWhere = deriveWhereParentIdSql(false, "");
-
-    SpiEbeanServer server = descriptor.getEbeanServer();
+    SpiEbeanServer server = descriptor.ebeanServer();
     SpiQuery<?> q = many.newQuery(server);
     many.bindParentIdEq(rawWhere, parentId, q);
     if (hard) {
@@ -140,18 +133,15 @@ class BeanPropertyAssocManySqlHelp<T> {
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       q.where().not(q.getExpressionFactory().idIn(excludeDetailIds));
     }
-
     return server.findIds(q, t);
   }
 
   List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, List<Object> excludeDetailIds, boolean hard) {
-
     String rawWhere = deriveWhereParentIdSql(true, "");
     String inClause = buildInClauseBinding(parentIds.size(), exportedPropertyBindProto);
-
     String expr = rawWhere + inClause;
 
-    SpiEbeanServer server = descriptor.getEbeanServer();
+    SpiEbeanServer server = descriptor.ebeanServer();
     SpiQuery<?> q = many.newQuery(server);
     //Query<?> q = server.find(propertyType);
     many.bindParentIdsIn(expr, parentIds, q);
@@ -161,7 +151,6 @@ class BeanPropertyAssocManySqlHelp<T> {
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       q.where().not(q.getExpressionFactory().idIn(excludeDetailIds));
     }
-
     return server.findIds(q, t);
   }
 
@@ -172,12 +161,8 @@ class BeanPropertyAssocManySqlHelp<T> {
   }
 
   SpiSqlUpdate deleteByParentIdList(List<Object> parentIds) {
-
-    StringBuilder sb = new StringBuilder(100);
-    sb.append(deleteByParentIdInSql);
-    sb.append(buildInClauseBinding(parentIds.size(), exportedPropertyBindProto));
-
-    DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
+    String sql = Str.add(deleteByParentIdInSql, buildInClauseBinding(parentIds.size(), exportedPropertyBindProto));
+    DefaultSqlUpdate delete = new DefaultSqlUpdate(sql);
     many.bindParentIds(delete, parentIds);
     return delete;
   }
@@ -202,17 +187,14 @@ class BeanPropertyAssocManySqlHelp<T> {
   }
 
   private String deriveWhereParentIdSql(boolean inClause, String tableAlias) {
-
     StringBuilder sb = new StringBuilder();
-
     if (inClause) {
       sb.append("(");
     }
     for (int i = 0; i < exportedProperties.length; i++) {
       String fkColumn = exportedProperties[i].getForeignDbColumn();
       if (i > 0) {
-        String s = inClause ? "," : " and ";
-        sb.append(s);
+        sb.append(inClause ? "," : " and ");
       }
       sb.append(tableAlias).append(fkColumn);
       if (!inClause) {
@@ -226,9 +208,8 @@ class BeanPropertyAssocManySqlHelp<T> {
   }
 
   private String buildInClauseBinding(int size, String bindProto) {
-
     if (descriptor.isSimpleId()) {
-      return descriptor.getIdBinder().getIdInValueExpr(false, size);
+      return descriptor.idBinder().getIdInValueExpr(false, size);
     }
     StringBuilder sb = new StringBuilder(10 + (size * (bindProto.length() + 1)));
     sb.append(" in");

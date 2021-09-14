@@ -55,170 +55,119 @@ public class DeployBeanProperty {
    * Flag to mark this at part of the unique id.
    */
   private boolean id;
-
   boolean importedPrimaryKey;
-
   /**
    * Flag to mark the property as embedded. This could be on
    * BeanPropertyAssocOne rather than here. Put it here for checking Id type
    * (embedded or not).
    */
   private boolean embedded;
-
   /**
    * Flag indicating if this the version property.
    */
   private boolean versionColumn;
-
   private boolean fetchEager = true;
-
   /**
    * Set if this property is nullable.
    */
   private boolean nullable = true;
-
   private boolean unique;
-
   private boolean discriminator;
-
   /**
    * The length or precision of the DB column.
    */
   private int dbLength;
-
   private int dbScale;
-
   private String dbColumnDefn;
-
   private boolean isTransient;
-
   private boolean localEncrypted;
-
   private boolean jsonSerialize = true;
   private boolean jsonDeserialize = true;
   private MutationDetection mutationDetection;
-
   private boolean dbEncrypted;
   private DbEncryptFunction dbEncryptFunction;
-
   private int dbEncryptedType;
-
   private String dbBind = "?";
-
   /**
    * Is this property include in database resultSet.
    */
   private boolean dbRead;
-
   /**
    * Include this in DB insert.
    */
   private boolean dbInsertable;
-
   /**
    * Include this in a DB update.
    */
   private boolean dbUpdateable;
-
   private DeployTableJoin secondaryTableJoin;
-
   private String secondaryTableJoinPrefix;
-
   /**
    * Set to true if this property is based on a secondary table.
    */
   private String secondaryTable;
-
   /**
    * The type that owns this property.
    */
   private Class<?> owningType;
-
   /**
    * True if the property is a Clob, Blob LongVarchar or LongVarbinary.
    */
   private boolean lob;
-
   private boolean naturalKey;
-
   /**
    * The logical bean property name.
    */
   private String name;
-
   /**
    * The reflected field.
    */
   private Field field;
-
   /**
    * The bean type.
    */
   private final Class<?> propertyType;
-
   private final Type genericType;
-
   /**
    * Set for Non-JDBC types to provide logical to db type conversion.
    */
   private ScalarType<?> scalarType;
-
   /**
    * The database column. This can include quoted identifiers.
    */
   private String dbColumn;
-
   private String aggregationPrefix;
   private String aggregation;
   private String aggregationParsed;
-
   private String sqlFormulaSelect;
   private String sqlFormulaJoin;
-
   /**
    * The jdbc data type this maps to.
    */
   private int dbType;
-
   private final DeployDocPropertyOptions docMapping = new DeployDocPropertyOptions();
-
   private int propertyIndex;
-
   private BeanPropertyGetter getter;
-
   private BeanPropertySetter setter;
-
   /**
    * Generator for insert or update timestamp etc.
    */
   private GeneratedProperty generatedProperty;
-
   final DeployBeanDescriptor<?> desc;
-
   private boolean undirectionalShadow;
-
   private boolean elementProperty;
-
   private int sortOrder;
-
   private boolean excludedFromHistory;
-
   private boolean tenantId;
-
   private boolean draft;
   private boolean draftOnly;
   private boolean draftDirty;
   private boolean draftReset;
-
   private boolean softDelete;
   private boolean unmappedJson;
-
   private String dbComment;
-
   private String dbColumnDefault;
-
   private List<DbMigrationInfo> dbMigrationInfos;
-
   private Set<Annotation> metaAnnotations;
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {

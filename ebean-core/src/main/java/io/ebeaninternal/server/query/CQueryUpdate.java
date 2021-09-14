@@ -16,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Executes the update query.
  */
-class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
+final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
 
   private final CQueryPlan queryPlan;
   private final OrmQueryRequest<?> request;
@@ -37,9 +37,9 @@ class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
   CQueryUpdate(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
     this.queryPlan = queryPlan;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.sql = queryPlan.getSql();
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.predicates = predicates;
     query.setGeneratedSql(sql);
   }
@@ -98,7 +98,7 @@ class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
   }
 
   private SpiTransaction getTransaction() {
-    return request.getTransaction();
+    return request.transaction();
   }
 
   /**
@@ -113,7 +113,7 @@ class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery {
   public void profile() {
     getTransaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.getName(), rowCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
   }
 
   @Override

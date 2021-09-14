@@ -11,21 +11,21 @@ import java.util.List;
 /**
  * Bindable for a single BeanProperty.
  */
-public class BindableProperty implements Bindable {
+class BindableProperty implements Bindable {
 
   final BeanProperty prop;
 
-  public BindableProperty(BeanProperty prop) {
+  BindableProperty(BeanProperty prop) {
     this.prop = prop;
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return prop.toString();
   }
 
   @Override
-  public boolean isDraftOnly() {
+  public final boolean isDraftOnly() {
     return prop.isDraftOnly();
   }
 
@@ -37,8 +37,8 @@ public class BindableProperty implements Bindable {
   }
 
   @Override
-  public void dmlAppend(GenerateDmlRequest request) {
-    request.appendColumn(prop.getDbColumn());
+  public final void dmlAppend(GenerateDmlRequest request) {
+    request.appendColumn(prop.dbColumn());
   }
 
   /**
@@ -46,7 +46,6 @@ public class BindableProperty implements Bindable {
    */
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
     Object value = null;
     if (bean != null) {
       value = prop.getValue(bean);

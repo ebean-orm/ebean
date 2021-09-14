@@ -41,7 +41,7 @@ import java.util.Set;
 /**
  * Read the deployment annotation for Assoc Many beans.
  */
-class AnnotationAssocManys extends AnnotationAssoc {
+final class AnnotationAssocManys extends AnnotationAssoc {
 
   AnnotationAssocManys(DeployBeanInfo<?> info, ReadAnnotationConfig readConfig, BeanDescriptorManager factory) {
     super(info, readConfig, factory);
@@ -69,7 +69,6 @@ class AnnotationAssocManys extends AnnotationAssoc {
   }
 
   private void read(DeployBeanPropertyAssocMany<?> prop) {
-
     OneToMany oneToMany = get(prop, OneToMany.class);
     if (oneToMany != null) {
       readToOne(oneToMany, prop);
@@ -105,27 +104,22 @@ class AnnotationAssocManys extends AnnotationAssoc {
     if (get(prop, HistoryExclude.class) != null) {
       prop.setExcludedFromHistory();
     }
-
     OrderBy orderBy = get(prop, OrderBy.class);
     if (orderBy != null) {
       prop.setFetchOrderBy(orderBy.value());
     }
-
     MapKey mapKey = get(prop, MapKey.class);
     if (mapKey != null) {
       prop.setMapKey(mapKey.name());
     }
-
     Where where = prop.getMetaAnnotationWhere(platform);
     if (where != null) {
       prop.setExtraWhere(processFormula(where.clause()));
     }
-
     FetchPreference fetchPreference = get(prop, FetchPreference.class);
     if (fetchPreference != null) {
       prop.setFetchPreference(fetchPreference.value());
     }
-
     // check for manually defined joins
     BeanTable beanTable = prop.getBeanTable();
 
@@ -147,33 +141,26 @@ class AnnotationAssocManys extends AnnotationAssoc {
     } else if (prop.isManyToMany()) {
       checkSelfManyToMany(prop);
     }
-
     if (prop.getMappedBy() != null) {
       // the join is derived by reversing the join information
       // from the mapped by property.
       // Refer BeanDescriptorManager.readEntityRelationships()
       return;
     }
-
     if (prop.isManyToMany()) {
       manyToManyDefaultJoins(prop);
       return;
     }
-
     if (!prop.getTableJoin().hasJoinColumns() && beanTable != null) {
-
       // use naming convention to define join (based on the bean name for this side of relationship)
       // A unidirectional OneToMany or OneToMany with no mappedBy property
-
-      NamingConvention nc = factory.getNamingConvention();
-
+      NamingConvention nc = factory.namingConvention();
       String fkeyPrefix = null;
       if (nc.isUseForeignKeyPrefix()) {
         fkeyPrefix = nc.getColumnFromProperty(descriptor.getBeanType(), descriptor.getName());
       }
-
       // Use the owning bean table to define the join
-      BeanTable owningBeanTable = factory.getBeanTable(descriptor.getBeanType());
+      BeanTable owningBeanTable = factory.beanTable(descriptor.getBeanType());
       owningBeanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), false, prop.getSqlFormulaSelect());
     }
   }
@@ -186,7 +173,6 @@ class AnnotationAssocManys extends AnnotationAssoc {
 
   @SuppressWarnings("unchecked")
   private void readElementCollection(DeployBeanPropertyAssocMany<?> prop, ElementCollection elementCollection) {
-
     prop.setElementCollection();
     if (!elementCollection.targetClass().equals(void.class)) {
       prop.setTargetType(elementCollection.targetClass());
@@ -199,13 +185,12 @@ class AnnotationAssocManys extends AnnotationAssoc {
     }
 
     CollectionTable collectionTable = get(prop, CollectionTable.class);
-
     String fullTableName = getFullTableName(collectionTable);
     if (fullTableName == null) {
       fullTableName = descriptor.getBaseTable()+"_"+ CamelCaseHelper.toUnderscoreFromCamel(prop.getName());
     }
 
-    BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
+    BeanTable localTable = factory.beanTable(descriptor.getBeanType());
     if (collectionTable != null) {
       prop.getTableJoin().addJoinColumn(util, true, collectionTable.joinColumns(), localTable);
     }
@@ -213,8 +198,8 @@ class AnnotationAssocManys extends AnnotationAssoc {
       BeanProperty localId = localTable.getIdProperty();
       if (localId != null) {
         // add foreign key based on convention
-        String fkColName = namingConvention.getForeignKey(descriptor.getBaseTable(), localId.getName());
-        prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), fkColName));
+        String fkColName = namingConvention.getForeignKey(descriptor.getBaseTable(), localId.name());
+        prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localId.dbColumn(), fkColName));
       }
     }
 
@@ -288,7 +273,6 @@ class AnnotationAssocManys extends AnnotationAssoc {
   }
 
   private void setElementProperty(DeployBeanProperty elementProp, String name, String dbColumn, int sortOrder) {
-
     if (dbColumn == null) {
       dbColumn = "value";
     }
@@ -310,11 +294,10 @@ class AnnotationAssocManys extends AnnotationAssoc {
    * </p>
    */
   private void readJoinTable(JoinTable joinTable, DeployBeanPropertyAssocMany<?> prop) {
-
     String intTableName = getFullTableName(joinTable);
     if (intTableName.isEmpty()) {
-      BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
-      BeanTable otherTable = factory.getBeanTable(prop.getTargetType());
+      BeanTable localTable = factory.beanTable(descriptor.getBeanType());
+      BeanTable otherTable = factory.beanTable(prop.getTargetType());
       intTableName = getM2MJoinTableName(localTable, otherTable);
     }
 
@@ -369,9 +352,7 @@ class AnnotationAssocManys extends AnnotationAssoc {
    * </p>
    */
   private void manyToManyDefaultJoins(DeployBeanPropertyAssocMany<?> prop) {
-
     String intTableName = null;
-
     DeployTableJoin intJoin = prop.getIntersectionJoin();
     if (intJoin == null) {
       intJoin = new DeployTableJoin();
@@ -381,8 +362,8 @@ class AnnotationAssocManys extends AnnotationAssoc {
       intTableName = intJoin.getTable();
     }
 
-    BeanTable localTable = factory.getBeanTable(descriptor.getBeanType());
-    BeanTable otherTable = factory.getBeanTable(prop.getTargetType());
+    BeanTable localTable = factory.beanTable(descriptor.getBeanType());
+    BeanTable otherTable = factory.beanTable(prop.getTargetType());
 
     final String localTableName = localTable.getUnqualifiedBaseTable();
     final String otherTableName = otherTable.getUnqualifiedBaseTable();
@@ -396,8 +377,6 @@ class AnnotationAssocManys extends AnnotationAssoc {
     }
 
     DeployTableJoin destJoin = prop.getTableJoin();
-
-
     if (intJoin.hasJoinColumns() && destJoin.hasJoinColumns()) {
       // already defined the foreign key columns etc
       return;
@@ -407,8 +386,8 @@ class AnnotationAssocManys extends AnnotationAssoc {
       BeanProperty localId = localTable.getIdProperty();
       if (localId != null) {
         // add the source to intersection join columns
-        String fkCol = namingConvention.deriveM2MColumn(localTableName, localId.getDbColumn());
-        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.getDbColumn(), fkCol));
+        String fkCol = namingConvention.deriveM2MColumn(localTableName, localId.dbColumn());
+        intJoin.addJoinColumn(new DeployTableJoinColumn(localId.dbColumn(), fkCol));
       }
     }
 
@@ -417,8 +396,8 @@ class AnnotationAssocManys extends AnnotationAssoc {
       BeanProperty otherId = otherTable.getIdProperty();
       if (otherId != null) {
         // set the intersection to dest table join columns
-        String fkCol = namingConvention.deriveM2MColumn(otherTableName, otherId.getDbColumn());
-        destJoin.addJoinColumn(new DeployTableJoinColumn(fkCol, otherId.getDbColumn()));
+        String fkCol = namingConvention.deriveM2MColumn(otherTableName, otherId.dbColumn());
+        destJoin.addJoinColumn(new DeployTableJoinColumn(fkCol, otherId.dbColumn()));
       }
     }
 
@@ -448,7 +427,6 @@ class AnnotationAssocManys extends AnnotationAssoc {
   }
 
   private String getM2MJoinTableName(BeanTable lhsTable, BeanTable rhsTable) {
-
     TableName lhs = new TableName(lhsTable.getBaseTable());
     TableName rhs = new TableName(rhsTable.getBaseTable());
     TableName joinTable = namingConvention.getM2MJoinTableName(lhs, rhs);

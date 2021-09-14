@@ -6,7 +6,7 @@ import io.ebean.core.type.ScalarType;
 /**
  * Multi value binder that uses Postgres Array.
  */
-public class PostgresMultiValueBind extends AbstractMultiValueBind {
+public final class PostgresMultiValueBind extends AbstractMultiValueBind {
 
   @Override
   public String getInExpression(boolean not, ScalarType<?> type, int size) {

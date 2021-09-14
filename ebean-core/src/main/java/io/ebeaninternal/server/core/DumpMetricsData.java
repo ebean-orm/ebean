@@ -14,10 +14,9 @@ import java.util.List;
 /**
  * Dump the metrics into a list of MetricData.
  */
-class DumpMetricsData {
+final class DumpMetricsData {
 
   private final Database database;
-
   private final List<MetricData> list = new ArrayList<>();
 
   DumpMetricsData(Database database) {
@@ -25,12 +24,11 @@ class DumpMetricsData {
   }
 
   List<MetricData> data() {
-    collect(database.getMetaInfoManager().collectMetrics());
+    collect(database.metaInfo().collectMetrics());
     return list;
   }
 
   private void collect(ServerMetrics serverMetrics) {
-
     final List<MetaTimedMetric> timedMetrics = serverMetrics.timedMetrics();
     final List<MetaCountMetric> countMetrics = serverMetrics.countMetrics();
     final List<MetaQueryMetric> queryMetrics = serverMetrics.queryMetrics();

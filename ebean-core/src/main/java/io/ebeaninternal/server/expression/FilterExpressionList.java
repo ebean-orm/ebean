@@ -18,14 +18,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class FilterExpressionList<T> extends DefaultExpressionList<T> {
+public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
   private static final String notAllowedMessage = "This method is not allowed on a filter";
 
   private final Query<T> rootQuery;
-
   private final FilterExprPath pathPrefix;
-
   private int firstRow;
   private int maxRows;
   private String orderByClause;

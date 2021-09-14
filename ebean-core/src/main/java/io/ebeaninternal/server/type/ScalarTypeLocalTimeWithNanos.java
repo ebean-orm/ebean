@@ -11,9 +11,9 @@ import java.time.LocalTime;
 /**
  * ScalarType for java.time.LocalTime stored with Nanos as DB BIGINT type.
  */
-public class ScalarTypeLocalTimeWithNanos extends ScalarTypeLocalTime {
+final class ScalarTypeLocalTimeWithNanos extends ScalarTypeLocalTime {
 
-  public ScalarTypeLocalTimeWithNanos() {
+  ScalarTypeLocalTimeWithNanos() {
     super(Types.BIGINT);
   }
 

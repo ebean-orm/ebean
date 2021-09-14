@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * executed. The lowest depth is executed first.
  * </p>
  */
-class BatchedBeanHolder {
+final class BatchedBeanHolder {
 
   /**
    * The owning queue.
@@ -57,7 +57,7 @@ class BatchedBeanHolder {
    */
   BatchedBeanHolder(BatchControl control, BeanDescriptor<?> beanDescriptor, int order) {
     this.control = control;
-    this.shortDesc = beanDescriptor.getName() + ":" + order;
+    this.shortDesc = beanDescriptor.name() + ":" + order;
     this.order = order;
   }
 
@@ -127,7 +127,7 @@ class BatchedBeanHolder {
   public int append(PersistRequestBean<?> request) {
     empty = false;
     request.setBatched();
-    switch (request.getType()) {
+    switch (request.type()) {
       case INSERT:
         if (inserts == null) {
           inserts = new ArrayList<>();
@@ -151,7 +151,7 @@ class BatchedBeanHolder {
         return deletes.size();
 
       default:
-        throw new RuntimeException("Invalid type code " + request.getType());
+        throw new RuntimeException("Invalid type code " + request.type());
     }
   }
 

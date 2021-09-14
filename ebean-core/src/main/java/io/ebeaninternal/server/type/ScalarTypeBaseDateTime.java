@@ -21,11 +21,11 @@ import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.parseIso;
 /**
  * Base type for DateTime types.
  */
-public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
+abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
   protected final JsonConfig.DateTime mode;
 
-  public ScalarTypeBaseDateTime(JsonConfig.DateTime mode, Class<T> type, boolean jdbcNative, int jdbcType) {
+  ScalarTypeBaseDateTime(JsonConfig.DateTime mode, Class<T> type, boolean jdbcNative, int jdbcType) {
     super(type, jdbcNative, jdbcType);
     this.mode = mode;
   }

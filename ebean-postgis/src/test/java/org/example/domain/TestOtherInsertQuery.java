@@ -1,6 +1,6 @@
 package org.example.domain;
 
-import io.ebean.Ebean;
+import io.ebean.DB;
 import org.geolatte.geom.Point;
 import org.geolatte.geom.Polygon;
 import org.geolatte.geom.codec.Wkt;
@@ -8,9 +8,9 @@ import org.geolatte.geom.LineString;
 import org.geolatte.geom.MultiLineString;
 import org.geolatte.geom.MultiPoint;
 import org.geolatte.geom.MultiPolygon;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class TestOtherInsertQuery {
@@ -18,16 +18,16 @@ public class TestOtherInsertQuery {
   /**
    * Not automated this test yet.
    */
-  @Test(enabled = false)
-  public void insert() throws SQLException {
+  @Disabled
+  @Test
+  public void insert() {
 
-
-    List<OtherBeanGeoLatte> list = Ebean.find(OtherBeanGeoLatte.class).findList();
+    List<OtherBeanGeoLatte> list = DB.find(OtherBeanGeoLatte.class).findList();
     for (OtherBeanGeoLatte OtherBeanGeoLatte : list) {
       System.out.println(OtherBeanGeoLatte.getPoint());
     }
 
-    List<OtherBeanGeoLatte> list1 = Ebean.find(OtherBeanGeoLatte.class)
+    List<OtherBeanGeoLatte> list1 = DB.find(OtherBeanGeoLatte.class)
         .where()
         .raw("st_within(st_pointfromwkb(st_point(?, ?), 4674), poly)", 1.9, 1.9)
         .findList();
@@ -52,6 +52,6 @@ public class TestOtherInsertQuery {
     p.setMultiPoint(multiPoint);
     p.setMultiLineString(multiLineString);
 
-    Ebean.save(p);
+    DB.save(p);
   }
 }

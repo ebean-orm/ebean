@@ -5,7 +5,7 @@ import io.ebean.annotation.Platform;
 /**
  * Holds multiple column unique constraints defined for an entity.
  */
-public class IndexDefinition {
+public final class IndexDefinition {
 
   private final String[] columns;
   private final String name;

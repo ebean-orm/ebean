@@ -21,7 +21,7 @@ import java.util.List;
  * helps fetch the foreign keys and delete the appropriate rows.
  * </p>
  */
-class DeleteUnloadedForeignKeys {
+final class DeleteUnloadedForeignKeys {
 
   private final List<BeanPropertyAssocOne<?>> propList = new ArrayList<>(4);
 
@@ -49,14 +49,14 @@ class DeleteUnloadedForeignKeys {
    */
   void queryForeignKeys() {
 
-    BeanDescriptor<?> descriptor = request.getBeanDescriptor();
-    SpiQuery<?> q = (SpiQuery<?>) server.createQuery(descriptor.getBeanType());
+    BeanDescriptor<?> descriptor = request.descriptor();
+    SpiQuery<?> q = (SpiQuery<?>) server.createQuery(descriptor.type());
 
-    Object id = request.getBeanId();
+    Object id = request.beanId();
 
     StringBuilder sb = new StringBuilder(30);
     for (BeanPropertyAssocOne<?> aPropList : propList) {
-      sb.append(aPropList.getName()).append(",");
+      sb.append(aPropList.name()).append(",");
     }
 
     // run query in a separate persistence context
@@ -67,9 +67,9 @@ class DeleteUnloadedForeignKeys {
     q.setIncludeSoftDeletes();
     q.where().idEq(id);
 
-    SpiTransaction t = request.getTransaction();
+    SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
-      t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.getName() + " id:" + id);
+      t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.name() + " id:" + id);
     }
     beanWithForeignKeys = (EntityBean) server.findOne(q, t);
   }
@@ -87,9 +87,9 @@ class DeleteUnloadedForeignKeys {
         // if bean exists with a unique id then delete it
         if (detailBean != null && prop.hasId((EntityBean) detailBean)) {
           if (deletePermanent) {
-            server.deletePermanent(detailBean, request.getTransaction());
+            server.deletePermanent(detailBean, request.transaction());
           } else {
-            server.delete(detailBean, request.getTransaction());
+            server.delete(detailBean, request.transaction());
           }
         }
       }

@@ -14,23 +14,18 @@ import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.List;
 
-class DumpMetricsJson implements ServerMetricsAsJson {
+final class DumpMetricsJson implements ServerMetricsAsJson {
 
   private final Database database;
-
   private Appendable writer;
-
   /**
    * By default include sql and location attributes for the initial collection only.
    */
   private int includeExtraAttributes = 1;
-
   private boolean withHeader = true;
   private boolean withHash = true;
   private String newLine = "\n";
-
   private Comparator<MetaTimedMetric> sortBy = SortMetric.NAME;
-
   private int listCounter;
   private int objKeyCounter;
 
@@ -71,14 +66,14 @@ class DumpMetricsJson implements ServerMetricsAsJson {
   @Override
   public String json() {
     writer = new StringWriter();
-    collect(database.getMetaInfoManager().collectMetrics());
+    collect(database.metaInfo().collectMetrics());
     return writer.toString();
   }
 
   @Override
   public void write(Appendable buffer) {
     writer = buffer;
-    collect(database.getMetaInfoManager().collectMetrics());
+    collect(database.metaInfo().collectMetrics());
   }
 
   private void collect(ServerMetrics serverMetrics) {
@@ -117,7 +112,7 @@ class DumpMetricsJson implements ServerMetricsAsJson {
     if (withHeader) {
       objStart();
       key("db");
-      val(database.getName());
+      val(database.name());
       key("metrics");
       listStart();
     }

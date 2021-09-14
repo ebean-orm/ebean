@@ -9,7 +9,7 @@ public interface STreePropertyAssoc extends STreeProperty {
   /**
    * Return the extra where clause if set.
    */
-  String getExtraWhere();
+  String extraWhere();
 
   /**
    * Return the type of the target (other side).
@@ -19,7 +19,7 @@ public interface STreePropertyAssoc extends STreeProperty {
   /**
    * Return the IdBinder of the underlying type.
    */
-  IdBinder getIdBinder();
+  IdBinder idBinder();
 
   /**
    * Add a Join with the given alias.
@@ -44,5 +44,5 @@ public interface STreePropertyAssoc extends STreeProperty {
   /**
    * Return the soft delete predicate.
    */
-  String getSoftDeletePredicate(String tableAlias);
+  String softDeletePredicate(String tableAlias);
 }

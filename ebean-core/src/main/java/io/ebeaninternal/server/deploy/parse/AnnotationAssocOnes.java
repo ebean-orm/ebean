@@ -30,7 +30,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 /**
  * Read the deployment annotations for Associated One beans.
  */
-public class AnnotationAssocOnes extends AnnotationAssoc {
+final class AnnotationAssocOnes extends AnnotationAssoc {
 
   private static final Logger log = LoggerFactory.getLogger(AnnotationAssocOnes.class);
 
@@ -145,7 +145,7 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
 
       } else {
         // use naming convention to define join.
-        NamingConvention nc = factory.getNamingConvention();
+        NamingConvention nc = factory.namingConvention();
 
         String fkeyPrefix = null;
         if (nc.isUseForeignKeyPrefix()) {
@@ -231,11 +231,9 @@ public class AnnotationAssocOnes extends AnnotationAssoc {
     if (!primaryKeyJoin.referencedColumnName().isEmpty()) {
       log.info("Automatically determining join columns for @PrimaryKeyJoinColumn - Ignoring PrimaryKeyJoinColumn.referencedColumnName attribute [{}] on {}", primaryKeyJoin.referencedColumnName(), prop.getFullBeanName());
     }
-
-    BeanTable baseBeanTable = factory.getBeanTable(info.getDescriptor().getBeanType());
+    BeanTable baseBeanTable = factory.beanTable(info.getDescriptor().getBeanType());
     String localPrimaryKey = baseBeanTable.getIdColumn();
     String foreignColumn = getBeanTable(prop).getIdColumn();
-
     prop.getTableJoin().addJoinColumn(new DeployTableJoinColumn(localPrimaryKey, foreignColumn, false, false));
   }
 

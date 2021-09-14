@@ -22,7 +22,7 @@ abstract class MergeNode {
 
   MergeNode(String fullPath, BeanPropertyAssoc<?> property) {
     this.fullPath = fullPath;
-    this.targetDescriptor = property.getTargetDescriptor();
+    this.targetDescriptor = property.targetDescriptor();
   }
 
   /**
@@ -33,7 +33,7 @@ abstract class MergeNode {
   /**
    * Add a child node given the fullPath and relative path.
    */
-  MergeNode addChild(String fullPath, String path) {
+  final MergeNode addChild(String fullPath, String path) {
     MergeNode childNode = MergeHandler.createMergeNode(fullPath, targetDescriptor, path);
     if (children == null) {
       children = new LinkedHashMap<>();
@@ -45,7 +45,7 @@ abstract class MergeNode {
   /**
    * Return the node given the relative path.
    */
-  MergeNode get(String path) {
+  final MergeNode get(String path) {
     if (children != null) {
       return children.get(path);
     }
@@ -55,8 +55,7 @@ abstract class MergeNode {
   /**
    * Return the outline beans as a map keyed by Id values.
    */
-  Map<Object, EntityBean> toMap(Collection outlines) {
-
+  final Map<Object, EntityBean> toMap(Collection outlines) {
     Map<Object, EntityBean> outlineMap = new HashMap<>();
     if (outlines != null) {
       for (Object out : outlines) {
@@ -71,17 +70,15 @@ abstract class MergeNode {
   /**
    * Add to the query to fetch the Ids values for the foreign keys basically.
    */
-  void addSelectId(Query<?> query) {
-
-    BeanProperty idProperty = targetDescriptor.getIdProperty();
-    query.fetch(fullPath, idProperty.getName());
+  final void addSelectId(Query<?> query) {
+    BeanProperty idProperty = targetDescriptor.idProperty();
+    query.fetch(fullPath, idProperty.name());
   }
 
   /**
    * Cascade the merge processing if this has child nodes.
    */
-  void cascade(EntityBean entityBean, EntityBean outlineBean, MergeRequest request) {
-
+  final void cascade(EntityBean entityBean, EntityBean outlineBean, MergeRequest request) {
     if (children != null && !children.isEmpty()) {
       MergeRequest sub = request.sub(entityBean, outlineBean);
       for (MergeNode node : children.values()) {

@@ -7,7 +7,7 @@ import org.joda.time.DateTime;
  *
  * @param <R> the root query bean type
  */
-public class PJodaDateTime<R> extends PBaseDate<R,DateTime> {
+public final class PJodaDateTime<R> extends PBaseDate<R,DateTime> {
 
   /**
    * Construct with a property name and root instance.

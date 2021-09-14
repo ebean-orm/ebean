@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-class EJsonWriter {
+final class EJsonWriter {
 
   /**
    * Base jsonFactory implementation used when it is not passed in.

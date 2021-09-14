@@ -10,14 +10,12 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import java.util.Comparator;
 import java.util.List;
 
-class DumpMetrics {
+final class DumpMetrics {
 
   private final SpiEbeanServer server;
   private final String options;
-
   private final String nameFormat;
   private final String nameFormatTimed;
-
   private boolean dumpHash;
   private boolean dumpSql;
   private boolean dumpLoc;
@@ -75,8 +73,8 @@ class DumpMetrics {
 
   void dump() {
 
-    out("-- Dumping metrics for " + server.getName() + " -- ");
-    ServerMetrics serverMetrics = server.getMetaInfoManager().collectMetrics();
+    out("-- Dumping metrics for " + server.name() + " -- ");
+    ServerMetrics serverMetrics = server.metaInfo().collectMetrics();
 
     for (MetaTimedMetric metric : serverMetrics.timedMetrics()) {
       log(metric);

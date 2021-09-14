@@ -19,18 +19,14 @@ import java.util.Map;
 /**
  * Manages the bean and query caches.
  */
-public class DefaultServerCacheManager implements SpiCacheManager {
+public final class DefaultServerCacheManager implements SpiCacheManager {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.REGION");
 
   private final Map<String, SpiCacheRegion> regionMap = new HashMap<>();
-
   private final ClusterManager clusterManager;
-
   private final DefaultCacheHolder cacheHolder;
-
   private final boolean localL2Caching;
-
   private final String serverName;
 
   /**
@@ -69,17 +65,17 @@ public class DefaultServerCacheManager implements SpiCacheManager {
       List<String> enabled = new ArrayList<>();
 
       for (SpiCacheRegion region : regionMap.values()) {
-        if (enabledRegionNames.contains(region.getName())) {
-          enabled.add(region.getName());
+        if (enabledRegionNames.contains(region.name())) {
+          enabled.add(region.name());
           if (!region.isEnabled()) {
             region.setEnabled(true);
-            log.debug("Cache region[{}] enabled", region.getName());
+            log.debug("Cache region[{}] enabled", region.name());
           }
         } else {
-          disabled.add(region.getName());
+          disabled.add(region.name());
           if (region.isEnabled()) {
             region.setEnabled(false);
-            log.debug("Cache region[{}] disabled", region.getName());
+            log.debug("Cache region[{}] disabled", region.name());
           }
         }
       }

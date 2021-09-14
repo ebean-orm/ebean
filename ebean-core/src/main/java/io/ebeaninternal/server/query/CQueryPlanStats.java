@@ -10,11 +10,8 @@ import io.ebean.metric.TimedMetricStats;
 public final class CQueryPlanStats {
 
   private final CQueryPlan queryPlan;
-
   private final TimedMetric timedMetric;
-
   private boolean collected;
-
   private long lastQueryTime;
 
   /**

@@ -7,10 +7,9 @@ import javax.persistence.PersistenceException;
 /**
  * Named parameter used as placeholder in expressions created by EQL language parsing.
  */
-class ONamedParam implements SpiNamedParam {
+final class ONamedParam implements SpiNamedParam {
 
   private final String name;
-
   private Object value;
 
   /**

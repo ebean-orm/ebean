@@ -12,10 +12,9 @@ import javax.sql.DataSource;
 /**
  * Initialise the main DataSource and read-only DataSource.
  */
-class InitDataSource {
+final class InitDataSource {
 
   private final JndiDataSourceLookup jndiDataSourceFactory = new JndiDataSourceLookup();
-
   private final DatabaseConfig config;
 
   /**

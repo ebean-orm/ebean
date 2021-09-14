@@ -27,7 +27,7 @@ import java.util.Map;
  * persisting features are attempted to be used - which is not expected).
  * </p>
  */
-class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCodes {
+final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   private static final Logger logger = LoggerFactory.getLogger(ImplicitReadOnlyTransaction.class);
 
@@ -503,7 +503,7 @@ class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCode
    * Return the underlying connection for public use.
    */
   @Override
-  public Connection getConnection() {
+  public Connection connection() {
     return getInternalConnection();
   }
 

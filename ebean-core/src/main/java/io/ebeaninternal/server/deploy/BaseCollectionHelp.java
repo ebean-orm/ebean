@@ -13,13 +13,12 @@ abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
   final BeanPropertyAssocMany<T> many;
   private final BeanDescriptor<T> targetDescriptor;
   final String propertyName;
-
   BeanCollectionLoader loader;
 
   BaseCollectionHelp(BeanPropertyAssocMany<T> many) {
     this.many = many;
-    this.targetDescriptor = many.getTargetDescriptor();
-    this.propertyName = many.getName();
+    this.targetDescriptor = many.targetDescriptor();
+    this.propertyName = many.name();
   }
 
    BaseCollectionHelp() {

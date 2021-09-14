@@ -9,7 +9,7 @@ import java.sql.SQLException;
 /**
  * Jta based transaction.
  */
-public class JtaTransaction extends JdbcTransaction {
+public final class JtaTransaction extends JdbcTransaction {
 
   private final UserTransaction userTransaction;
 

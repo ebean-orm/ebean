@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Base compiled query request for single attribute queries.
  */
-class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, CancelableQuery {
+final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, CancelableQuery {
 
   private static final Logger logger = LoggerFactory.getLogger(CQueryFetchSingleAttribute.class);
 
@@ -50,9 +50,9 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Cancelab
   CQueryFetchSingleAttribute(OrmQueryRequest<?> request, CQueryPredicates predicates, CQueryPlan queryPlan, boolean containsCounts) {
     this.request = request;
     this.queryPlan = queryPlan;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.sql = queryPlan.getSql();
-    this.desc = request.getBeanDescriptor();
+    this.desc = request.descriptor();
     this.predicates = predicates;
     this.containsCounts = containsCounts;
     this.reader = queryPlan.getSingleAttributeScalarType();
@@ -66,7 +66,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Cancelab
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindAttr exeMicros[").append(executionTimeMicros)
       .append("] rows[").append(rowCount)
-      .append("] type[").append(desc.getName())
+      .append("] type[").append(desc.name())
       .append("] predicates[").append(predicates.getLogWhereSql())
       .append("] bind[").append(bindLog).append("]");
     return sb.toString();
@@ -105,7 +105,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Cancelab
   }
 
   private SpiTransaction getTransaction() {
-    return request.getTransaction();
+    return request.transaction();
   }
 
   /**
@@ -140,7 +140,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Cancelab
     } finally {
       lock.unlock();
     }
-    dataReader = new RsetDataReader(request.getDataTimeZone(), pstmt.executeQuery());
+    dataReader = new RsetDataReader(request.dataTimeZone(), pstmt.executeQuery());
     query.checkCancelled();
   }
 
@@ -168,7 +168,7 @@ class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Cancelab
   public void profile() {
     getTransaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.getName(), rowCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
   }
 
   Set<String> getDependentTables() {

@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CallableSql;
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.BindParams.Param;
 import io.ebeaninternal.api.SpiCallableSql;
@@ -9,39 +9,23 @@ import io.ebeaninternal.api.TransactionEventTable;
 
 import java.io.Serializable;
 import java.sql.CallableStatement;
-import java.sql.SQLException;
 
-
-public class DefaultCallableSql implements Serializable, SpiCallableSql {
+final class DefaultCallableSql implements Serializable, SpiCallableSql {
 
   private static final long serialVersionUID = 8984272253185424701L;
-
-  private transient final EbeanServer server;
-
-  /**
-   * The callable sql.
-   */
-  private String sql;
-
-  /**
-   * To display in the transaction log to help identify the procedure.
-   */
-  private String label;
-
-  private int timeout;
 
   /**
    * Holds the table modification information. On commit this information is
    * used to manage the cache etc.
    */
   private final TransactionEventTable transactionEvent = new TransactionEventTable();
-
   private final BindParams bindParameters = new BindParams();
+  private transient final Database server;
+  private String sql;
+  private String label;
+  private int timeout;
 
-  /**
-   * Create with callable sql.
-   */
-  public DefaultCallableSql(EbeanServer server, String sql) {
+  DefaultCallableSql(Database server, String sql) {
     this.server = server;
     this.sql = sql;
   }
@@ -108,13 +92,12 @@ public class DefaultCallableSql implements Serializable, SpiCallableSql {
   }
 
   @Override
-  public boolean executeOverride(CallableStatement cstmt) throws SQLException {
+  public boolean executeOverride(CallableStatement statement) {
     return false;
   }
 
   @Override
   public CallableSql addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
-
     transactionEvent.add(tableName, inserts, updates, deletes);
     return this;
   }
@@ -122,7 +105,7 @@ public class DefaultCallableSql implements Serializable, SpiCallableSql {
   /**
    * Return the TransactionEvent which holds the table modification
    * information for this CallableSql. This information is merged into the
-   * transaction after the transaction is commited.
+   * transaction after the transaction is committed.
    */
   @Override
   public TransactionEventTable getTransactionEventTable() {

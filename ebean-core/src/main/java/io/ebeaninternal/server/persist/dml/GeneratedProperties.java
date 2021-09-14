@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Executes the generated property (like WhenCreated, WhoCreated etc) for doc store persisting.
  */
-class GeneratedProperties {
+final class GeneratedProperties {
 
   /**
    * Create the GeneratedProperties for the given bean type.
@@ -61,7 +61,7 @@ class GeneratedProperties {
 
     SetValue(BeanProperty property) {
       this.property = property;
-      this.generatedProperty = property.getGeneratedProperty();
+      this.generatedProperty = property.generatedProperty();
     }
 
     void preInsert(EntityBean bean, long now) {

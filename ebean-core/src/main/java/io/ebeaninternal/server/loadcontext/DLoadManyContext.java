@@ -21,18 +21,15 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * ToMany bean load context.
  */
-class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
+final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
-  protected final BeanPropertyAssocMany<?> property;
-
+  private final BeanPropertyAssocMany<?> property;
   private final boolean docStoreMapped;
-
   private List<LoadBuffer> bufferList;
-
   private LoadBuffer currentBuffer;
 
   DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property, String path, OrmQueryProperties queryProps) {
-    super(parent, property.getBeanDescriptor(), path, queryProps);
+    super(parent, property.descriptor(), path, queryProps);
     this.property = property;
     this.docStoreMapped = property.isTargetDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)
@@ -77,7 +74,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
 
   public String getName() {
-    return parent.getEbeanServer().getName();
+    return parent.getEbeanServer().name();
   }
 
   public void register(BeanCollection<?> bc) {
@@ -180,7 +177,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return context.serverName;
     }
 
@@ -206,7 +203,7 @@ class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
         boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
         if (useCache) {
           EntityBean ownerBean = bc.getOwnerBean();
-          BeanDescriptor<?> parentDesc = context.desc.getBeanDescriptor(ownerBean.getClass());
+          BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
           if (parentDesc.cacheManyPropLoad(context.property, bc, parentId, context.parent.isReadOnly())) {
             // we loaded the bean collection from cache so remove it from the buffer

@@ -18,7 +18,7 @@ import java.sql.Types;
 /**
  * ScalarType for Byte.
  */
-public class ScalarTypeByte extends ScalarTypeBase<Byte> {
+final class ScalarTypeByte extends ScalarTypeBase<Byte> {
 
   public ScalarTypeByte() {
     super(Byte.class, true, Types.TINYINT);

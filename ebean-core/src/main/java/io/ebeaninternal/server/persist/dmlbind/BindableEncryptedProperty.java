@@ -12,13 +12,13 @@ import java.util.List;
 /**
  * Bindable for a DB encrypted BeanProperty.
  */
-public class BindableEncryptedProperty implements Bindable {
+final class BindableEncryptedProperty implements Bindable {
 
   private final BeanProperty prop;
 
   private final boolean bindEncryptDataFirst;
 
-  public BindableEncryptedProperty(BeanProperty prop, boolean bindEncryptDataFirst) {
+  BindableEncryptedProperty(BeanProperty prop, boolean bindEncryptDataFirst) {
     this.prop = prop;
     this.bindEncryptDataFirst = bindEncryptDataFirst;
   }
@@ -44,7 +44,7 @@ public class BindableEncryptedProperty implements Bindable {
   public void dmlAppend(GenerateDmlRequest request) {
 
     // columnName = AES_ENCRYPT(?,?)
-    request.appendColumn(prop.getDbColumn(), prop.getDbBind());
+    request.appendColumn(prop.dbColumn(), prop.dbBind());
   }
 
 
@@ -60,17 +60,17 @@ public class BindableEncryptedProperty implements Bindable {
     }
 
     // get Encrypt key
-    String encryptKeyValue = prop.getEncryptKey().getStringValue();
+    String encryptKeyValue = prop.encryptKey().getStringValue();
 
     if (!bindEncryptDataFirst) {
       // H2 encrypt function ... different parameter order
-      request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.getName() + "=****");
+      request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.name() + "=****");
     }
     request.bindNoLog(value, prop);
 
     if (bindEncryptDataFirst) {
       // MySql, Postgres, Oracle
-      request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.getName() + "=****");
+      request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.name() + "=****");
     }
   }
 

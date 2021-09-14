@@ -5,9 +5,9 @@ import java.time.OffsetTime;
 /**
  * ScalarType for java.time.OffsetTime stored as DB VARCHAR
  */
-public class ScalarTypeOffsetTime extends ScalarTypeBaseVarchar<OffsetTime> {
+final class ScalarTypeOffsetTime extends ScalarTypeBaseVarchar<OffsetTime> {
 
-  public ScalarTypeOffsetTime() {
+  ScalarTypeOffsetTime() {
     super(OffsetTime.class);
   }
 

@@ -12,7 +12,7 @@ import java.util.List;
  * Represents a node in the Inheritance tree.
  * Holds information regarding Super Subclass support.
  */
-public class DeployInheritInfo {
+public final class DeployInheritInfo {
 
   /**
    * the default discriminator column according to the JPA 1.0 spec.
@@ -21,16 +21,12 @@ public class DeployInheritInfo {
 
   private String discriminatorStringValue;
   private Object discriminatorObjectValue;
-
   private int columnType;
   private String columnName;
   private int columnLength;
   private String columnDefn;
-
   private final Class<?> type;
-
   private Class<?> parent;
-
   private final ArrayList<DeployInheritInfo> children = new ArrayList<>();
 
   /**
@@ -207,7 +203,6 @@ public class DeployInheritInfo {
   }
 
   public String getWhere() {
-
     List<Object> discList = new ArrayList<>();
     appendDiscriminator(discList);
     return buildWhereLiteral(discList);

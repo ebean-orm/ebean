@@ -8,7 +8,7 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
 
-class NativeILikeExpression extends AbstractExpression {
+final class NativeILikeExpression extends AbstractExpression {
 
   private final String val;
 
@@ -28,7 +28,7 @@ class NativeILikeExpression extends AbstractExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
       // bind the key as well as the value
-      String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
+      String encryptKey = prop.beanProperty().encryptKey().getStringValue();
       request.addBindEncryptKey(encryptKey);
     }
     request.addBindValue(val);
@@ -40,7 +40,7 @@ class NativeILikeExpression extends AbstractExpression {
     String pname = propName;
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
-      pname = prop.getBeanProperty().getDecryptProperty(propName);
+      pname = prop.beanProperty().decryptProperty(propName);
     }
 
     request.append(pname).append(" ilike ?");

@@ -23,14 +23,13 @@ final class DeleteMeta extends BaseMeta {
   DeleteMeta(BeanDescriptor<?> desc, BindableId id, Bindable version, Bindable tenantId) {
     super(id, version, tenantId);
 
-    String tableName = desc.getBaseTable();
+    String tableName = desc.baseTable();
     this.sqlNone = genSql(ConcurrencyMode.NONE, tableName);
     this.sqlVersion = genSql(ConcurrencyMode.VERSION, tableName);
     if (desc.isDraftable()) {
-      String draftTableName = desc.getDraftTable();
+      String draftTableName = desc.draftTable();
       this.sqlDraftNone = genSql(ConcurrencyMode.NONE, draftTableName);
       this.sqlDraftVersion = genSql(ConcurrencyMode.VERSION, draftTableName);
-
     } else {
       this.sqlDraftNone = sqlNone;
       this.sqlDraftVersion = sqlVersion;
@@ -41,15 +40,13 @@ final class DeleteMeta extends BaseMeta {
    * Bind the request based on the concurrency mode.
    */
   public void bind(PersistRequestBean<?> persist, DmlHandler bind) throws SQLException {
-
-    EntityBean bean = persist.getEntityBean();
-
+    EntityBean bean = persist.entityBean();
     id.dmlBind(bind, bean);
     if (tenantId != null) {
       tenantId.dmlBind(bind, bean);
     }
 
-    if (persist.getConcurrencyMode() == ConcurrencyMode.VERSION) {
+    if (persist.concurrencyMode() == ConcurrencyMode.VERSION) {
       version.dmlBind(bind, bean);
     }
   }
@@ -58,13 +55,12 @@ final class DeleteMeta extends BaseMeta {
    * get or generate the sql based on the concurrency mode.
    */
   public String getSql(PersistRequestBean<?> request) {
-
     if (id.isEmpty()) {
-      throw new IllegalStateException("Can not deleteById on " + request.getFullName() + " as no @Id property");
+      throw new IllegalStateException("Can not deleteById on " + request.fullName() + " as no @Id property");
     }
 
     boolean publish = request.isPublish();
-    switch (request.getConcurrencyMode()) {
+    switch (request.concurrencyMode()) {
       case NONE:
         return publish ? sqlNone : sqlDraftNone;
 
@@ -72,15 +68,12 @@ final class DeleteMeta extends BaseMeta {
         return publish ? sqlVersion : sqlDraftVersion;
 
       default:
-        throw new RuntimeException("Invalid mode " + request.getConcurrencyMode());
+        throw new RuntimeException("Invalid mode " + request.concurrencyMode());
     }
   }
 
   private String genSql(ConcurrencyMode conMode, String table) {
-
-    GenerateDmlRequest request = new GenerateDmlRequest();
-    request.append("delete from ").append(table);
-    request.append(" where ");
+    GenerateDmlRequest request = new GenerateDmlRequest().append("delete from ").append(table).append(" where ");
     return appendWhere(request, conMode);
   }
 

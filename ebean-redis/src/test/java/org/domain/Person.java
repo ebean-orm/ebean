@@ -2,12 +2,14 @@ package org.domain;
 
 
 import io.ebean.annotation.Cache;
+import io.ebean.annotation.CacheBeanTuning;
 import io.ebean.annotation.Index;
 
 import javax.persistence.Entity;
 import java.time.LocalDate;
 
 @Cache(enableQueryCache = true, nearCache = true, naturalKey = "name")
+@CacheBeanTuning(maxSecsToLive = 1)
 @Entity
 public class Person extends EBase {
 

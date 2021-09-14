@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Version;
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
@@ -22,7 +21,7 @@ import java.util.Set;
  * etc in this case we must add an extra join.
  * </p>
  */
-class SqlTreeNodeExtraJoin implements SqlTreeNode {
+final class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   private final STreePropertyAssoc assocBeanProperty;
   private final SpiQuery.TemporalMode temporalMode;
@@ -102,7 +101,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
   @Override
   public void dependentTables(Set<String> tables) {
-    tables.add(assocBeanProperty.target().getBaseTable(SpiQuery.TemporalMode.CURRENT));
+    tables.add(assocBeanProperty.target().baseTable(SpiQuery.TemporalMode.CURRENT));
     if (children != null) {
       for (SqlTreeNode child : children) {
         child.dependentTables(tables);
@@ -124,7 +123,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
         String parentAlias = ctx.getTableAlias(split[0]);
         String alias2 = alias + "z_";
 
-        TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
+        TableJoin manyToManyJoin = manyProp.intersectionTableJoin();
         manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
 
         assocBeanProperty.addJoin(joinType, alias2, alias, ctx);
@@ -150,7 +149,7 @@ class SqlTreeNodeExtraJoin implements SqlTreeNode {
       }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
       if (!oneToOneExported && assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
-        ctx.append(" and ").append(assocBeanProperty.getSoftDeletePredicate(ctx.getTableAlias(prefix)));
+        ctx.append(" and ").append(assocBeanProperty.softDeletePredicate(ctx.getTableAlias(prefix)));
       }
     }
 

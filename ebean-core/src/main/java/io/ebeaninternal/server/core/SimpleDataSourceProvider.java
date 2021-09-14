@@ -10,10 +10,9 @@ import java.sql.SQLException;
 /**
  * Simple DataSource supplier when no multi-tenancy used.
  */
-class SimpleDataSourceProvider implements DataSourceSupplier {
+final class SimpleDataSourceProvider implements DataSourceSupplier {
 
   private final DataSource dataSource;
-
   private final DataSource readOnlyDataSource;
 
   SimpleDataSourceProvider(DataSource dataSource, DataSource readOnlyDataSource) {

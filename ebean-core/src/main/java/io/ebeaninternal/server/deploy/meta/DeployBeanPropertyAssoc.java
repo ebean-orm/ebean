@@ -13,38 +13,29 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
    * The type of the joined bean.
    */
   Class<T> targetType;
-
   /**
    * Persist settings.
    */
   final BeanCascadeInfo cascadeInfo = new BeanCascadeInfo();
-
   /**
    * The join table information.
    */
   private BeanTable beanTable;
-
   /**
    * Join between the beans.
    */
   final DeployTableJoin tableJoin = new DeployTableJoin();
-
   /**
    * Literal added to where clause of lazy loading query.
    */
   private String extraWhere;
-
   /**
    * From the deployment mappedBy attribute.
    */
   private String mappedBy;
-
   private String docStoreDoc;
-
   private int fetchPreference = 1000;
-
   private PropertyForeignKey foreignKey;
-
   boolean orphanRemoval;
 
   /**

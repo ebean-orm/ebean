@@ -14,9 +14,9 @@ import java.util.UUID;
 /**
  * Base UUID type for string formatting, json handling etc.
  */
-public abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements ScalarTypeLogicalType {
+abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements ScalarTypeLogicalType {
 
-  public ScalarTypeUUIDBase(boolean jdbcNative, int jdbcType) {
+  ScalarTypeUUIDBase(boolean jdbcNative, int jdbcType) {
     super(UUID.class, jdbcNative, jdbcType);
   }
 
@@ -33,6 +33,11 @@ public abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements
   @Override
   public boolean isDirty(Object value) {
     return true;
+  }
+
+  @Override
+  public String format(Object value) {
+    return String.valueOf(value);
   }
 
   @Override

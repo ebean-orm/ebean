@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Delete bean handler.
  */
-public class DeleteHandler extends DmlHandler {
+final class DeleteHandler extends DmlHandler {
 
   private final DeleteMeta meta;
 
@@ -29,10 +29,8 @@ public class DeleteHandler extends DmlHandler {
    */
   @Override
   public void bind() throws SQLException {
-
     sql = meta.getSql(persistRequest);
-    SpiTransaction t = persistRequest.getTransaction();
-
+    SpiTransaction t = persistRequest.transaction();
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
       pstmt = getPstmtBatch(t, sql, persistRequest, false);

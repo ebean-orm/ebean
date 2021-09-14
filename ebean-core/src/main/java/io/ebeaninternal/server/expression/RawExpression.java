@@ -11,10 +11,9 @@ import io.ebeaninternal.server.persist.MultiValueWrapper;
 import java.io.IOException;
 import java.util.Collection;
 
-class RawExpression extends NonPrepareExpression {
+final class RawExpression extends NonPrepareExpression {
 
   final String sql;
-
   final Object[] values;
 
   RawExpression(String sql, Object[] values) {

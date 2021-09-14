@@ -2,10 +2,9 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.annotation.PartitionMode;
 
-public class PartitionMeta {
+public final class PartitionMeta {
 
   private final PartitionMode mode;
-
   private String property;
 
   public PartitionMeta(PartitionMode mode, String property) {

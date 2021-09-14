@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-class InExpression extends AbstractExpression {
+final class InExpression extends AbstractExpression {
 
   private final boolean not;
 
@@ -117,7 +117,7 @@ class InExpression extends AbstractExpression {
       List<Object> idList = new ArrayList<>();
       for (Object bindValue : bindValues) {
         // extract the id values from the bean
-        Object[] ids = prop.getAssocIdValues((EntityBean) bindValue);
+        Object[] ids = prop.assocIdValues((EntityBean) bindValue);
         if (ids != null) {
           Collections.addAll(idList, ids);
         }
@@ -145,8 +145,8 @@ class InExpression extends AbstractExpression {
     }
 
     if (prop != null) {
-      request.append(prop.getAssocIdInExpr(propName));
-      request.append(prop.getAssocIdInValueExpr(not, bindValues.size()));
+      request.append(prop.assocIdInExpr(propName));
+      request.append(prop.assocIdInValueExpr(not, bindValues.size()));
     } else {
       request.append(propName);
       request.appendInExpression(not, bindValues);

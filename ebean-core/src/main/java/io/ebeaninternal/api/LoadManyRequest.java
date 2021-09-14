@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebean.CacheMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.core.BindPadding;
@@ -15,16 +16,13 @@ import java.util.List;
 /**
  * Request for loading Associated Many Beans.
  */
-public class LoadManyRequest extends LoadRequest {
+public final class LoadManyRequest extends LoadRequest {
 
   private static final Logger logger = LoggerFactory.getLogger(LoadManyRequest.class);
 
   private final List<BeanCollection<?>> batch;
-
   private final LoadManyBuffer loadContext;
-
   private final boolean onlyIds;
-
   private final boolean loadCache;
 
   /**
@@ -50,96 +48,58 @@ public class LoadManyRequest extends LoadRequest {
   }
 
   @Override
-  public Class<?> getBeanType() {
-    return loadContext.getBeanDescriptor().getBeanType();
+  public Class<?> beanType() {
+    return loadContext.getBeanDescriptor().type();
   }
 
-  public String getDescription() {
-    return "path:" + loadContext.getFullPath() + " size:" + batch.size();
-  }
-
-  /**
-   * Return the batch of collections to actually load.
-   */
-  public List<BeanCollection<?>> getBatch() {
-    return batch;
-  }
-
-  /**
-   * Return true if lazy loading should only load the id values.
-   * <p>
-   * This for use when lazy loading is invoked on methods such as clear() and removeAll() where it
-   * generally makes sense to only fetch the Id values as the other property information is not
-   * used.
-   */
-  private boolean isOnlyIds() {
-    return onlyIds;
-  }
-
-  /**
-   * Return true if we should load the Collection ids into the cache.
-   */
-  private boolean isLoadCache() {
-    return loadCache;
-  }
-
-  /**
-   * Return the batch size used for this load context.
-   */
-  public int getBatchSize() {
-    return loadContext.getBatchSize();
+  public String description() {
+    return loadContext.getFullPath();
   }
 
   private List<Object> parentIdList(SpiEbeanServer server) {
     List<Object> idList = new ArrayList<>();
-    BeanPropertyAssocMany<?> many = getMany();
+    BeanPropertyAssocMany<?> many = many();
     for (BeanCollection<?> bc : batch) {
-      idList.add(many.getParentId(bc.getOwnerBean()));
+      idList.add(many.parentId(bc.getOwnerBean()));
       bc.setLoader(server); // don't use the load buffer again
     }
-    if (many.getTargetDescriptor().isPadInExpression()) {
+    if (many.targetDescriptor().isPadInExpression()) {
       BindPadding.padIds(idList);
     }
     return idList;
   }
 
-  private BeanPropertyAssocMany<?> getMany() {
+  private BeanPropertyAssocMany<?> many() {
     return loadContext.getBeanProperty();
   }
 
   public SpiQuery<?> createQuery(SpiEbeanServer server) {
-    BeanPropertyAssocMany<?> many = getMany();
+    BeanPropertyAssocMany<?> many = many();
     SpiQuery<?> query = many.newQuery(server);
-    String orderBy = many.getLazyFetchOrderBy();
+    String orderBy = many.lazyFetchOrderBy();
     if (orderBy != null) {
       query.order(orderBy);
     }
-
-    String extraWhere = many.getExtraWhere();
+    String extraWhere = many.extraWhere();
     if (extraWhere != null) {
       // replace special ${ta} placeholder with the base table alias
       // which is always t0 and add the extra where clause
       query.where().raw(extraWhere.replace("${ta}", "t0").replace("${mta}", "int_"));
     }
-
     query.setLazyLoadForParents(many);
     many.addWhereParentIdIn(query, parentIdList(server), loadContext.isUseDocStore());
     query.setPersistenceContext(loadContext.getPersistenceContext());
-
-    String mode = isLazy() ? "+lazy" : "+query";
-    query.setLoadDescription(mode, getDescription());
-
-    if (isLazy()) {
-      // cascade the batch size (if set) for further lazy loading
-      query.setLazyLoadBatchSize(getBatchSize());
+    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
+    if (lazy) {
+      query.setLazyLoadBatchSize(loadContext.getBatchSize());
+    } else {
+      query.setBeanCacheMode(CacheMode.OFF);
     }
-
-    // potentially changes the joins and selected properties
+    // potentially changes the joins, selected properties, cache mode
     loadContext.configureQuery(query);
-
-    if (isOnlyIds()) {
-      // override to just select the Id values
-      query.select(many.getTargetIdProperty());
+    if (onlyIds) {
+      // lazy loading invoked via clear() and removeAll()
+      query.select(many.targetIdProperty());
     }
     return query;
   }
@@ -149,7 +109,7 @@ public class LoadManyRequest extends LoadRequest {
    */
   public void postLoad() {
     BeanDescriptor<?> desc = loadContext.getBeanDescriptor();
-    BeanPropertyAssocMany<?> many = getMany();
+    BeanPropertyAssocMany<?> many = many();
     // check for BeanCollection's that where never processed
     // in the +query or +lazy load due to no rows (predicates)
     for (BeanCollection<?> bc : batch) {
@@ -159,9 +119,8 @@ public class LoadManyRequest extends LoadRequest {
           Object parentId = desc.getId(ownerBean);
           logger.debug("BeanCollection after lazy load was empty. type:" + ownerBean.getClass().getName() + " id:" + parentId + " owner:" + ownerBean);
         }
-      } else if (isLoadCache() && many.isUseCache()) {
-        Object parentId = desc.getId(bc.getOwnerBean());
-        desc.cacheManyPropPut(many, bc, parentId);
+      } else if (loadCache && many.isUseCache()) {
+        desc.cacheManyPropPut(many, bc, desc.getId(bc.getOwnerBean()));
       }
     }
   }

@@ -9,13 +9,13 @@ import java.sql.SQLException;
 /**
  * For JSON Jackson properties - dirty detection via MD5 of json content.
  */
-class BindablePropertyJsonInsert extends BindableProperty {
+final class BindablePropertyJsonInsert extends BindableProperty {
 
   private final int propertyIndex;
 
   BindablePropertyJsonInsert(BeanProperty prop) {
     super(prop);
-    this.propertyIndex = prop.getPropertyIndex();
+    this.propertyIndex = prop.propertyIndex();
   }
 
   /**

@@ -1,7 +1,8 @@
 package io.ebeaninternal.api;
 
-import io.ebean.bean.EntityBean;
+import io.ebean.CacheMode;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
@@ -13,79 +14,52 @@ import java.util.Set;
 /**
  * Request for loading ManyToOne and OneToOne relationships.
  */
-public class LoadBeanRequest extends LoadRequest {
+public final class LoadBeanRequest extends LoadRequest {
 
   private final List<EntityBeanIntercept> batch;
-
   private final LoadBeanBuffer loadBuffer;
-
   private final String lazyLoadProperty;
-
   private final boolean loadCache;
-
-  private boolean loadedFromCache;
+  private final boolean alreadyLoaded;
 
   /**
    * Construct for lazy load request.
    */
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, EntityBeanIntercept ebi, boolean loadCache) {
-    this(LoadBuffer, null, true, ebi.getLazyLoadProperty(), loadCache);
-    this.loadedFromCache = ebi.isLoadedFromCache();
+  public LoadBeanRequest(LoadBeanBuffer loadBuffer, EntityBeanIntercept ebi, boolean loadCache) {
+    this(loadBuffer, null, true, ebi.getLazyLoadProperty(), ebi.isLoaded(), loadCache || ebi.isLoadedFromCache());
   }
 
   /**
    * Construct for secondary query.
    */
-  public LoadBeanRequest(LoadBeanBuffer LoadBuffer, OrmQueryRequest<?> parentRequest) {
-    this(LoadBuffer, parentRequest, false, null, false);
+  public LoadBeanRequest(LoadBeanBuffer loadBuffer, OrmQueryRequest<?> parentRequest) {
+    this(loadBuffer, parentRequest, false, null, false, false);
   }
 
   private LoadBeanRequest(LoadBeanBuffer loadBuffer, OrmQueryRequest<?> parentRequest, boolean lazy,
-                          String lazyLoadProperty, boolean loadCache) {
-
+                          String lazyLoadProperty, boolean alreadyLoaded, boolean loadCache) {
     super(parentRequest, lazy);
     this.loadBuffer = loadBuffer;
-    this.batch = loadBuffer.getBatch();
+    this.batch = loadBuffer.batch();
     this.lazyLoadProperty = lazyLoadProperty;
+    this.alreadyLoaded = alreadyLoaded;
     this.loadCache = loadCache;
   }
 
   @Override
-  public Class<?> getBeanType() {
-    return loadBuffer.getBeanDescriptor().getBeanType();
+  public Class<?> beanType() {
+    return loadBuffer.descriptor().type();
   }
 
-  /**
-   * Return true if the beans invoking lazy loading were previously loaded from cache.
-   */
-  public boolean isLoadedFromCache() {
-    return loadedFromCache;
-  }
-
-  private boolean isLoadCache() {
-    return loadCache;
-  }
-
-  public String getDescription() {
-    return "path:" + loadBuffer.getFullPath() + " batch:" + batch.size();
+  public String description() {
+    return loadBuffer.fullPath();
   }
 
   /**
    * Return the batch of beans to actually load.
    */
-  public List<EntityBeanIntercept> getBatch() {
+  public List<EntityBeanIntercept> batch() {
     return batch;
-  }
-
-  /**
-   * Return the load context.
-   */
-  private LoadBeanBuffer getLoadContext() {
-    return loadBuffer;
-  }
-
-  public int getBatchSize() {
-    return getLoadContext().getBatchSize();
   }
 
   /**
@@ -93,7 +67,7 @@ public class LoadBeanRequest extends LoadRequest {
    */
   public List<Object> getIdList() {
     List<Object> idList = new ArrayList<>();
-    BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
+    BeanDescriptor<?> desc = loadBuffer.descriptor();
     for (EntityBeanIntercept ebi : batch) {
       idList.add(desc.getId(ebi.getOwner()));
     }
@@ -104,16 +78,21 @@ public class LoadBeanRequest extends LoadRequest {
    * Configure the query for lazy loading execution.
    */
   public void configureQuery(SpiQuery<?> query, List<Object> idList) {
-    query.setMode(SpiQuery.Mode.LAZYLOAD_BEAN);
-    query.setPersistenceContext(loadBuffer.getPersistenceContext());
-    String mode = isLazy() ? "+lazy" : "+query";
-    query.setLoadDescription(mode, getDescription());
-
-    if (isLazy()) {
-      // cascade the batch size (if set) for further lazy loading
-      query.setLazyLoadBatchSize(getBatchSize());
+    query.setMode(Mode.LAZYLOAD_BEAN);
+    query.setPersistenceContext(loadBuffer.persistenceContext());
+    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
+    if (lazy) {
+      query.setLazyLoadBatchSize(loadBuffer.batchSize());
+      if (alreadyLoaded) {
+        query.setBeanCacheMode(CacheMode.OFF);
+      }
+    } else {
+      query.setBeanCacheMode(CacheMode.OFF);
     }
     loadBuffer.configureQuery(query, lazyLoadProperty);
+    if (loadCache) {
+      query.setBeanCacheMode(CacheMode.PUT);
+    }
     if (idList.size() == 1) {
       query.where().idEq(idList.get(0));
     } else {
@@ -126,13 +105,12 @@ public class LoadBeanRequest extends LoadRequest {
    */
   public void postLoad(List<?> list) {
     Set<Object> loadedIds = new HashSet<>();
-    BeanDescriptor<?> desc = loadBuffer.getBeanDescriptor();
+    BeanDescriptor<?> desc = loadBuffer.descriptor();
     // collect Ids and maybe load bean cache
     for (Object bean : list) {
-      EntityBean loadedBean = (EntityBean) bean;
-      loadedIds.add(desc.getId(loadedBean));
+      loadedIds.add(desc.id(bean));
     }
-    if (isLoadCache()) {
+    if (loadCache) {
       desc.cacheBeanPutAll(list);
     }
     if (lazyLoadProperty != null) {

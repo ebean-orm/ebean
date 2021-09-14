@@ -31,17 +31,13 @@ import java.util.Map;
 /**
  * Default implementation of LoadContext.
  */
-public class DLoadContext implements LoadContext {
+public final class DLoadContext implements LoadContext {
 
   private final SpiEbeanServer ebeanServer;
-
   private final BeanDescriptor<?> rootDescriptor;
-
   private final Map<String, DLoadBeanContext> beanMap = new HashMap<>();
   private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
-
   private final DLoadBeanContext rootBeanContext;
-
   private final boolean asDraft;
   private final Timestamp asOf;
   private final Boolean readOnly;
@@ -60,13 +56,9 @@ public class DLoadContext implements LoadContext {
   private final String planLabel;
   private final ProfileLocation profileLocation;
   private final ProfilingListener profilingListener;
-
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
-
   private PersistenceContext persistenceContext;
-
   private List<OrmQueryProperties> secQuery;
-
   private Object tenantId;
 
   /**
@@ -75,7 +67,7 @@ public class DLoadContext implements LoadContext {
   public DLoadContext(BeanDescriptor<?> rootDescriptor, PersistenceContext persistenceContext) {
     this.useDocStore = true;
     this.rootDescriptor = rootDescriptor;
-    this.ebeanServer = rootDescriptor.getEbeanServer();
+    this.ebeanServer = rootDescriptor.ebeanServer();
     this.persistenceContext = persistenceContext;
     this.origin = initOrigin();
     this.defaultBatchSize = 100;
@@ -95,17 +87,17 @@ public class DLoadContext implements LoadContext {
 
   private ObjectGraphOrigin initOrigin() {
     CallOrigin callOrigin = ebeanServer.createCallOrigin();
-    return new ObjectGraphOrigin(0, callOrigin, rootDescriptor.getFullName());
+    return new ObjectGraphOrigin(0, callOrigin, rootDescriptor.fullName());
   }
 
   public DLoadContext(OrmQueryRequest<?> request, SpiQuerySecondary secondaryQueries) {
-    this.tenantId = request.getTenantId();
-    this.persistenceContext = request.getPersistenceContext();
-    this.ebeanServer = request.getServer();
-    this.defaultBatchSize = request.getLazyLoadBatchSize();
-    this.rootDescriptor = request.getBeanDescriptor();
+    this.tenantId = request.tenantId();
+    this.persistenceContext = request.persistenceContext();
+    this.ebeanServer = request.server();
+    this.defaultBatchSize = request.lazyLoadBatchSize();
+    this.rootDescriptor = request.descriptor();
 
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     this.useDocStore = query.isUseDocStore();
     this.asOf = query.getAsOf();
     this.asDraft = query.isAsDraft();
@@ -169,8 +161,8 @@ public class DLoadContext implements LoadContext {
    * used to build the appropriate query for +query or +lazy loading.
    */
   private void registerSecondaryQuery(OrmQueryProperties props) {
-    ElPropertyValue elGetValue = rootDescriptor.getElGetValue(props.getPath());
-    boolean many = elGetValue.getBeanProperty().containsMany();
+    ElPropertyValue elGetValue = rootDescriptor.elGetValue(props.getPath());
+    boolean many = elGetValue.beanProperty().containsMany();
     registerSecondaryNode(many, props);
   }
 
@@ -303,7 +295,7 @@ public class DLoadContext implements LoadContext {
   }
 
   DLoadBeanContext getBeanContextWithInherit(String path, BeanPropertyAssocOne<?> property) {
-    String key = path + ":" + property.getTargetDescriptor().getName();
+    String key = path + ":" + property.targetDescriptor().name();
     return beanMap.computeIfAbsent(key, p -> createBeanContext(property, path, null));
   }
 
@@ -331,11 +323,11 @@ public class DLoadContext implements LoadContext {
 
   private DLoadBeanContext createBeanContext(String path, OrmQueryProperties queryProps) {
     BeanPropertyAssoc<?> p = (BeanPropertyAssoc<?>) getBeanProperty(rootDescriptor, path);
-    return new DLoadBeanContext(this, p.getTargetDescriptor(), path, queryProps);
+    return new DLoadBeanContext(this, p.targetDescriptor(), path, queryProps);
   }
 
   private DLoadBeanContext createBeanContext(BeanPropertyAssoc<?> property, String path, OrmQueryProperties queryProps) {
-    return new DLoadBeanContext(this, property.getTargetDescriptor(), path, queryProps);
+    return new DLoadBeanContext(this, property.targetDescriptor(), path, queryProps);
   }
 
   private BeanProperty getBeanProperty(BeanDescriptor<?> desc, String path) {

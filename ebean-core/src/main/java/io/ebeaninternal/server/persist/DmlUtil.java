@@ -4,7 +4,7 @@ package io.ebeaninternal.server.persist;
 /**
  * Utility object with helper methods for DML.
  */
-public class DmlUtil {
+public final class DmlUtil {
 
   /**
    * Return true if the value is null or a Numeric 0 (for primitive int's and long's) or Option empty.

@@ -35,7 +35,7 @@ abstract class DLoadBaseContext {
 
   DLoadBaseContext(DLoadContext parent, BeanDescriptor<?> desc, String path, OrmQueryProperties queryProps) {
     this.parent = parent;
-    this.serverName = parent.getEbeanServer().getName();
+    this.serverName = parent.getEbeanServer().name();
     this.desc = desc;
     this.queryProps = queryProps;
     this.fullPath = parent.getFullPath(path);

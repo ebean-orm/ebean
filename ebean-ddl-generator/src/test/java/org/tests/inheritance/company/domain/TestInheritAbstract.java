@@ -1,28 +1,30 @@
 package org.tests.inheritance.company.domain;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
-import junit.framework.TestCase;
-import org.junit.Assert;
+import io.ebean.DB;
+import io.ebean.Database;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class TestInheritAbstract extends TestCase {
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+public class TestInheritAbstract {
+
+  @Test
   public void testMe() {
-
-    EbeanServer server = Ebean.getServer(null);
+    Database server = DB.getDefault();
 
     List<AbstractBar> list0 = server.find(AbstractBar.class)
       .findList();
 
-    Assert.assertNotNull(list0);
+    assertNotNull(list0);
 
     List<AbstractBar> list1 = server.find(AbstractBar.class)
       .fetch("foo", "importantText")
       .findList();
 
-    Assert.assertNotNull(list1);
+    assertNotNull(list1);
 
     Foo f = new Foo();
     f.setImportantText("blah");
@@ -37,16 +39,14 @@ public class TestInheritAbstract extends TestCase {
       .fetch("foo", "importantText")
       .findList();
 
-    Assert.assertNotNull(list2);
-    Assert.assertTrue(!list2.isEmpty());
+    assertNotNull(list2);
+    assertThat(list2).isNotEmpty();
 
     for (AbstractBar abstractBar : list2) {
       Foo foo = abstractBar.getFoo();
       String importantText = foo.getImportantText();
-      Assert.assertNotNull(importantText);
+      assertNotNull(importantText);
     }
-
-
   }
 
 }

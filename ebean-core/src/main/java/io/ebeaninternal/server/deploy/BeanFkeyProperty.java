@@ -16,7 +16,6 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   private final String name;
   private final String dbColumn;
   private final boolean containsMany;
-
   private final int deployOrder;
 
   public BeanFkeyProperty(String name, String dbColumn, int deployOrder) {
@@ -43,7 +42,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public int getFetchPreference() {
+  public int fetchPreference() {
     // return some decently high value
     return 1000;
   }
@@ -102,17 +101,17 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public String getDbColumn() {
+  public String dbColumn() {
     return dbColumn;
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
   @Override
-  public String getElName() {
+  public String elName() {
     return name;
   }
 
@@ -120,7 +119,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public Object[] getAssocIdValues(EntityBean value) {
+  public Object[] assocIdValues(EntityBean value) {
     return null;
   }
 
@@ -128,7 +127,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public String getAssocIdExpression(String prefix, String operator) {
+  public String assocIdExpression(String prefix, String operator) {
     return null;
   }
 
@@ -136,7 +135,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public String getAssocIdInExpr(String prefix) {
+  public String assocIdInExpr(String prefix) {
     return null;
   }
 
@@ -144,12 +143,12 @@ public final class BeanFkeyProperty implements ElPropertyValue {
    * Returns null as not an AssocOne.
    */
   @Override
-  public String getAssocIdInValueExpr(boolean not, int size) {
+  public String assocIdInValueExpr(boolean not, int size) {
     return null;
   }
 
   @Override
-  public String getAssocIsEmpty(SpiExpressionRequest request, String path) {
+  public String assocIsEmpty(SpiExpressionRequest request, String path) {
     throw new RuntimeException("Not Supported or Expected");
   }
 
@@ -172,12 +171,12 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public String getElPlaceholder(boolean encrypted) {
+  public String elPlaceholder(boolean encrypted) {
     return placeHolder;
   }
 
   @Override
-  public String getElPrefix() {
+  public String elPrefix() {
     return prefix;
   }
 
@@ -187,12 +186,12 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return 0;
   }
 
   @Override
-  public BeanProperty getBeanProperty() {
+  public BeanProperty beanProperty() {
     return null;
   }
 
@@ -202,7 +201,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public StringParser getStringParser() {
+  public StringParser stringParser() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
@@ -227,7 +226,7 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public Property getProperty() {
+  public Property property() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 

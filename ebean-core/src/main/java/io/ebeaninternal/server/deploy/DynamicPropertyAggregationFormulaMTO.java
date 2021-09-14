@@ -2,12 +2,13 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebeaninternal.server.query.SqlBeanLoad;
 
-public class DynamicPropertyAggregationFormulaMTO extends DynamicPropertyAggregationFormula {
+@SuppressWarnings("rawtypes")
+public final class DynamicPropertyAggregationFormulaMTO extends DynamicPropertyAggregationFormula {
 
   private final BeanPropertyAssocOne prop;
 
   DynamicPropertyAggregationFormulaMTO(BeanPropertyAssocOne prop, String name, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias) {
-    super(name, prop.getIdScalarType(), parsedFormula, aggregate, asTarget, alias);
+    super(name, prop.idScalarType(), parsedFormula, aggregate, asTarget, alias);
     this.prop = prop;
   }
 

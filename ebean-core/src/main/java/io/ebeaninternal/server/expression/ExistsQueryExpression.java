@@ -16,15 +16,12 @@ import io.ebeaninternal.server.query.CQuery;
 import java.io.IOException;
 import java.util.List;
 
-class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpression {
+final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpression {
 
-  protected final boolean not;
-
-  protected final SpiQuery<?> subQuery;
-
-  protected List<Object> bindParams;
-
-  protected String sql;
+  private final boolean not;
+  private final SpiQuery<?> subQuery;
+  private List<Object> bindParams;
+  private String sql;
 
   ExistsQueryExpression(SpiQuery<?> subQuery, boolean not) {
     this.subQuery = subQuery;
@@ -67,7 +64,6 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-
     CQuery<?> subQuery = compileSubQuery(request);
     this.bindParams = subQuery.getPredicates().getWhereExprBindValues();
     this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
@@ -83,7 +79,7 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
    */
   protected CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
-    return ebeanServer.compileQuery(Type.SQ_EXISTS, subQuery, queryRequest.getTransaction());
+    return ebeanServer.compileQuery(Type.SQ_EXISTS, subQuery, queryRequest.transaction());
   }
 
   @Override
@@ -99,7 +95,6 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     if (not) {
       request.append(" not");
     }
@@ -110,7 +105,6 @@ class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpress
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }

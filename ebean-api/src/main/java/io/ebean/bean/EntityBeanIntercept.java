@@ -843,7 +843,7 @@ public final class EntityBeanIntercept implements Serializable {
         }
         // For stand alone reference bean or after deserialisation lazy load
         // using the ebeanServer. Synchronise only on the bean.
-        loadBeanInternal(loadProperty, database.getPluginApi().beanLoader());
+        loadBeanInternal(loadProperty, database.pluginApi().beanLoader());
         return;
       }
     } finally {
@@ -1232,7 +1232,8 @@ public final class EntityBeanIntercept implements Serializable {
     if (mutableNext == null) {
       return null;
     }
-    return mutableNext[propertyIndex].content();
+    final MutableValueNext next = mutableNext[propertyIndex];
+    return next != null ? next.content() : null;
   }
 
 }

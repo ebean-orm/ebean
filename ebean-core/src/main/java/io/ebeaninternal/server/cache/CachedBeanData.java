@@ -11,13 +11,12 @@ import java.util.Map;
 /**
  * Data held in the bean cache for cached beans.
  */
-public class CachedBeanData implements Externalizable {
+public final class CachedBeanData implements Externalizable {
 
   private long whenCreated;
   private long version;
   private String discValue;
   private Map<String, Object> data;
-
   /**
    * The sharable bean is effectively transient (near cache only).
    */

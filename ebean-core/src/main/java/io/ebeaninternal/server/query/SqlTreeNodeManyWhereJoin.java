@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Version;
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
@@ -15,21 +14,16 @@ import java.util.Set;
 /**
  * Join to Many (or child of a many) to support where clause predicates on many properties.
  */
-class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
+final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
   private final String parentPrefix;
-
   private final String prefix;
-
   private final STreePropertyAssoc nodeBeanProp;
-
   private final STreeType target;
-
   /**
    * The many where join which is either INNER or OUTER.
    */
   private final SqlJoinType manyJoinType;
-
   private final boolean softDelete;
 
   SqlTreeNodeManyWhereJoin(String prefix, STreePropertyAssoc prop, SqlJoinType manyJoinType, SpiQuery.TemporalMode temporalMode) {
@@ -100,18 +94,18 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
     if (nodeBeanProp instanceof STreePropertyAssocOne) {
       nodeBeanProp.addJoin(joinType, parentAlias, alias, ctx);
       if (softDelete) {
-        ctx.append(" and ").append(target.getSoftDeletePredicate(alias));
+        ctx.append(" and ").append(target.softDeletePredicate(alias));
       }
     } else {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
       if (!manyProp.hasJoinTable()) {
         manyProp.addJoin(joinType, parentAlias, alias, ctx);
         if (softDelete) {
-          ctx.append(" and ").append(target.getSoftDeletePredicate(alias));
+          ctx.append(" and ").append(target.softDeletePredicate(alias));
         }
       } else {
         String alias2 = alias + "z_";
-        TableJoin manyToManyJoin = manyProp.getIntersectionTableJoin();
+        TableJoin manyToManyJoin = manyProp.intersectionTableJoin();
         manyToManyJoin.addJoin(joinType, parentAlias, alias2, ctx);
         manyProp.addJoin(joinType, alias2, alias, ctx);
       }
@@ -120,7 +114,7 @@ class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
   @Override
   public void dependentTables(Set<String> tables) {
-    tables.add(nodeBeanProp.target().getBaseTable(SpiQuery.TemporalMode.CURRENT));
+    tables.add(nodeBeanProp.target().baseTable(SpiQuery.TemporalMode.CURRENT));
   }
 
   @Override

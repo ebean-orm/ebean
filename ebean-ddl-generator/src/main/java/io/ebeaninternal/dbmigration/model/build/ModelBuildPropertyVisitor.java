@@ -50,7 +50,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     this.ctx = ctx;
     this.table = table;
     this.beanDescriptor = beanDescriptor;
-    addIndexes(beanDescriptor.getIndexDefinitions());
+    addIndexes(beanDescriptor.indexDefinitions());
   }
 
   /**
@@ -187,21 +187,21 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   @Override
   public void visitOneImported(BeanPropertyAssocOne<?> p) {
 
-    TableJoinColumn[] columns = p.getTableJoin().columns();
+    TableJoinColumn[] columns = p.tableJoin().columns();
     if (columns.length == 0) {
-      throw new RuntimeException("No join columns for " + p.getFullBeanName());
+      throw new RuntimeException("No join columns for " + p.fullName());
     }
 
-    ImportedId importedId = p.getImportedId();
+    ImportedId importedId = p.importedId();
 
     List<MColumn> modelColumns = new ArrayList<>(columns.length);
 
     MCompoundForeignKey compoundKey = null;
     if (columns.length > 1) {
       // compound foreign key
-      String refTable = p.getTargetDescriptor().getBaseTable();
-      String fkName = foreignKeyConstraintName(p.getName());
-      String fkIndex = foreignKeyIndexName(p.getName());
+      String refTable = p.targetDescriptor().baseTable();
+      String fkName = foreignKeyConstraintName(p.name());
+      String fkIndex = foreignKeyIndexName(p.name());
       compoundKey = new MCompoundForeignKey(fkName, refTable, fkIndex);
       table.addForeignKey(compoundKey);
     }
@@ -214,25 +214,25 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         throw new RuntimeException("Imported BeanProperty not found?");
       }
       String columnDefn = ctx.getColumnDefn(importedProperty, true);
-      String refColumn = importedProperty.getDbColumn();
+      String refColumn = importedProperty.dbColumn();
 
       MColumn col = table.addColumn(dbCol, columnDefn, !p.isNullable());
-      col.setDbMigrationInfos(p.getDbMigrationInfos());
-      col.setDefaultValue(p.getDbColumnDefault());
+      col.setDbMigrationInfos(p.dbMigrationInfos());
+      col.setDefaultValue(p.dbColumnDefault());
       if (columns.length == 1) {
-        if (p.hasForeignKeyConstraint() && !importedProperty.getBeanDescriptor().suppressForeignKey()) {
+        if (p.hasForeignKeyConstraint() && !importedProperty.descriptor().suppressForeignKey()) {
           // single references column (put it on the column)
-          String refTable = importedProperty.getBeanDescriptor().getBaseTable();
+          String refTable = importedProperty.descriptor().getBaseTable();
           if (refTable == null) {
             // odd case where an EmbeddedId only has 1 property
-            refTable = p.getTargetDescriptor().getBaseTable();
+            refTable = p.targetDescriptor().getBaseTable();
           }
           col.setReferences(refTable + "." + refColumn);
           col.setForeignKeyName(foreignKeyConstraintName(col.getName()));
           if (p.hasForeignKeyIndex()) {
             col.setForeignKeyIndex(foreignKeyIndexName(col.getName()));
           }
-          PropertyForeignKey foreignKey = p.getForeignKey();
+          PropertyForeignKey foreignKey = p.foreignKey();
           if (foreignKey != null) {
             col.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
           }
@@ -253,7 +253,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
       } else {
         String[] cols = indexSetAdd(toColumnNames(modelColumns));
-        String uqName = uniqueConstraintName(p.getName());
+        String uqName = uniqueConstraintName(p.name());
         table.addUniqueConstraint(new MCompoundUniqueConstraint(cols, uqName));
       }
     }
@@ -268,17 +268,17 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
     // using non-strict mode to render the DB type such that we have a
     // "logical" type like jsonb(200) that can map to JSONB or VARCHAR(200)
-    MColumn col = new MColumn(p.getDbColumn(), ctx.getColumnDefn(p, false));
-    col.setComment(p.getDbComment());
+    MColumn col = new MColumn(p.dbColumn(), ctx.getColumnDefn(p, false));
+    col.setComment(p.dbComment());
     col.setDraftOnly(p.isDraftOnly());
     col.setHistoryExclude(p.isExcludedFromHistory());
 
-    if (p.isId()) {
+    if (p.isId() || p.isImportedPrimaryKey()) {
       col.setPrimaryKey(true);
-      if (p.getBeanDescriptor().isUseIdGenerator()) {
+      if (p.descriptor().isUseIdGenerator()) {
         col.setIdentity(true);
       }
-      TableJoin primaryKeyJoin = p.getBeanDescriptor().getPrimaryKeyJoin();
+      TableJoin primaryKeyJoin = p.descriptor().primaryKeyJoin();
       if (primaryKeyJoin != null && !table.isPartitioned()) {
         final PropertyForeignKey foreignKey = primaryKeyJoin.getForeignKey();
         if (foreignKey == null || !foreignKey.isNoConstraint()) {
@@ -291,25 +291,25 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
         }
       }
     } else {
-      col.setDefaultValue(p.getDbColumnDefault());
+      col.setDefaultValue(p.dbColumnDefault());
       if (allowNonNull && (!p.isNullable() || p.isDDLNotNull())) {
         col.setNotnull(true);
       }
     }
 
-    col.setDbMigrationInfos(p.getDbMigrationInfos());
+    col.setDbMigrationInfos(p.dbMigrationInfos());
 
     if (p.isUnique() && !p.isId()) {
       col.setUnique(uniqueConstraintName(col.getName()));
       indexSetAdd(col.getName());
     }
-    Set<String> checkConstraintValues = p.getDbCheckConstraintValues();
+    Set<String> checkConstraintValues = p.dbCheckConstraintValues();
     if (checkConstraintValues != null) {
       if (beanDescriptor.hasInheritance()) {
-        InheritInfo inheritInfo = beanDescriptor.getInheritInfo();
-        inheritInfo.appendCheckConstraintValues(p.getName(), checkConstraintValues);
+        InheritInfo inheritInfo = beanDescriptor.inheritInfo();
+        inheritInfo.appendCheckConstraintValues(p.name(), checkConstraintValues);
       }
-      col.setCheckConstraint(buildCheckConstraint(p.getDbColumn(), checkConstraintValues));
+      col.setCheckConstraint(buildCheckConstraint(p.dbColumn(), checkConstraintValues));
       col.setCheckConstraintName(checkConstraintName(col.getName()));
     }
 

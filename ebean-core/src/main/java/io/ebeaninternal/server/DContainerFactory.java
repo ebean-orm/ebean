@@ -8,7 +8,7 @@ import io.ebeaninternal.server.core.DefaultContainer;
 /**
  * Default container factory found via service loader.
  */
-public class DContainerFactory implements SpiContainerFactory {
+public final class DContainerFactory implements SpiContainerFactory {
 
   @Override
   public SpiContainer create(ContainerConfig containerConfig) {

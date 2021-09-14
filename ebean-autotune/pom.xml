@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.11.1-SNAPSHOT</version>
+    <version>12.11.5-SNAPSHOT</version>
   </parent>
 <!--  <parent>-->
 <!--    <groupId>org.avaje</groupId>-->
@@ -14,7 +14,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-parent-12.8.0</tag>
+    <tag>ebean-parent-12.11.4</tag>
   </scm>
 
   <name>ebean autotune</name>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.11.1-SNAPSHOT</version>
+      <version>12.11.5-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
@@ -46,9 +46,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.avaje.composite</groupId>
+      <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.1</version>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -59,12 +59,12 @@
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.19</version>
+        <version>2.24</version>
         <extensions>true</extensions>
         <configuration>
           <tiles>
             <!-- other tiles ... -->
-            <tile>io.ebean.tile:enhancement:12.6.0</tile>
+            <tile>io.ebean.tile:enhancement:12.11.3</tile>
           </tiles>
         </configuration>
       </plugin>

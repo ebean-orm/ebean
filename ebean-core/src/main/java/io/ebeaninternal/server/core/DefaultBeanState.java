@@ -11,7 +11,7 @@ import java.util.Set;
 /**
  * Default implementation of BeanState.
  */
-public class DefaultBeanState implements BeanState {
+public final class DefaultBeanState implements BeanState {
 
   private final EntityBeanIntercept intercept;
 
@@ -45,17 +45,17 @@ public class DefaultBeanState implements BeanState {
   }
 
   @Override
-  public Set<String> getLoadedProps() {
+  public Set<String> loadedProps() {
     return intercept.getLoadedPropertyNames();
   }
 
   @Override
-  public Set<String> getChangedProps() {
+  public Set<String> changedProps() {
     return intercept.getDirtyPropertyNames();
   }
 
   @Override
-  public Map<String, ValuePair> getDirtyValues() {
+  public Map<String, ValuePair> dirtyValues() {
     return intercept.getDirtyValues();
   }
 
@@ -90,8 +90,12 @@ public class DefaultBeanState implements BeanState {
   }
 
   @Override
-  public Map<String, Exception> getLoadErrors() {
+  public Map<String, Exception> loadErrors() {
     return intercept.getLoadErrors();
   }
 
+  @Override
+  public int sortOrder() {
+    return intercept.getSortOrder();
+  }
 }

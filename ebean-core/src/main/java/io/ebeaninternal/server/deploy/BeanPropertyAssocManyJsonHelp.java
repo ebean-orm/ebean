@@ -17,7 +17,6 @@ class BeanPropertyAssocManyJsonHelp {
    * The associated many property.
    */
   private final BeanPropertyAssocMany<?> many;
-
   /**
    * Helper used to read json for transient 'many' properties.
    */
@@ -28,7 +27,7 @@ class BeanPropertyAssocManyJsonHelp {
    */
   BeanPropertyAssocManyJsonHelp(BeanPropertyAssocMany<?> many) {
     this.many = many;
-    boolean objectMapperPresent = many.getBeanDescriptor().getConfig().getClassLoadConfig().isJacksonObjectMapperPresent();
+    boolean objectMapperPresent = many.descriptor().config().getClassLoadConfig().isJacksonObjectMapperPresent();
     this.jsonTransient = !objectMapperPresent ? null : new BeanPropertyAssocManyJsonTransient();
   }
 
@@ -36,7 +35,6 @@ class BeanPropertyAssocManyJsonHelp {
    * Read the JSON for this property.
    */
   public void jsonRead(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-
     if (!this.many.jsonDeserialize) {
       return;
     }
@@ -59,9 +57,8 @@ class BeanPropertyAssocManyJsonHelp {
    * Read a Transient property using Jackson ObjectMapper.
    */
   private void jsonReadTransientUsingObjectMapper(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-
     if (jsonTransient == null) {
-      throw new IllegalStateException("Jackson ObjectMapper is required to read this Transient property " + many.getFullBeanName());
+      throw new IllegalStateException("Jackson ObjectMapper is required to read this Transient property " + many.fullName());
     }
     jsonTransient.jsonReadUsingObjectMapper(many, readJson, parentBean);
   }

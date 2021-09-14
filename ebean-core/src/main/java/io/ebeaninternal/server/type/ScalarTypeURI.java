@@ -8,9 +8,9 @@ import java.net.URISyntaxException;
 /**
  * ScalarType for java.net.URI which converts to and from a VARCHAR database column.
  */
-public class ScalarTypeURI extends ScalarTypeBaseVarchar<URI> {
+final class ScalarTypeURI extends ScalarTypeBaseVarchar<URI> {
 
-  public ScalarTypeURI() {
+  ScalarTypeURI() {
     super(URI.class);
   }
 

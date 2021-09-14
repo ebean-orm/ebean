@@ -12,14 +12,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class IntersectionRow {
+public final class IntersectionRow {
 
   private final String tableName;
-
   private final BeanDescriptor<?> targetDescriptor;
-
   private final LinkedHashMap<String, Object> values = new LinkedHashMap<>();
-
   private List<Object> excludeIds;
   private BeanDescriptor<?> excludeDescriptor;
 
@@ -75,7 +72,7 @@ public class IntersectionRow {
       sb.append("delete from ").append(tableName);
     } else {
       sb.append("update ").append(tableName).append(" set ");
-      sb.append(targetDescriptor.getSoftDeleteDbSet());
+      sb.append(targetDescriptor.softDeleteDbSet());
     }
     sb.append(" where ");
     int count = setBindParams(bindParams, sb);

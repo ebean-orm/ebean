@@ -11,7 +11,7 @@ import io.ebeaninternal.server.deploy.id.ImportedId;
  * Deferred update of a relationship where an Id value is not initially available
  * so instead we execute this later as a SqlUpdate statement.
  */
-public class PersistDeferredRelationship {
+public final class PersistDeferredRelationship {
 
   private final SpiEbeanServer ebeanServer;
   private final BeanDescriptor<?> beanDescriptor;
@@ -35,13 +35,13 @@ public class PersistDeferredRelationship {
    */
   public void execute(SpiTransaction transaction) {
 
-    String sql = beanDescriptor.getUpdateImportedIdSql(importedId);
+    String sql = beanDescriptor.updateImportedIdSql(importedId);
     SqlUpdate sqlUpdate = ebeanServer.sqlUpdate(sql);
 
     // bind the set clause for the importedId
     int pos = importedId.bind(1, sqlUpdate, assocBean);
     // bind the where clause for the bean
-    Object[] idValues = beanDescriptor.getIdBinder().getIdValues(bean);
+    Object[] idValues = beanDescriptor.idBinder().getIdValues(bean);
     for (int j = 0; j < idValues.length; j++) {
       sqlUpdate.setParameter(pos + j, idValues[j]);
     }

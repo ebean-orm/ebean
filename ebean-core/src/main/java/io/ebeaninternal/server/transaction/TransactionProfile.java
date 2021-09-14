@@ -5,7 +5,7 @@ import io.ebean.ProfileLocation;
 /**
  * Profiling information for a single transaction that has completed.
  */
-public class TransactionProfile {
+public final class TransactionProfile {
 
   private final ProfileLocation location;
   private final String label;

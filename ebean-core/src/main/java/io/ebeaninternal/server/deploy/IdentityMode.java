@@ -4,7 +4,7 @@ import io.ebean.annotation.IdentityGenerated;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
 
-public class IdentityMode {
+public final class IdentityMode {
 
   public static IdentityMode NONE = new IdentityMode();
 

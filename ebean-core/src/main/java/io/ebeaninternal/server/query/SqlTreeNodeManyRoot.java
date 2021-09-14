@@ -13,8 +13,8 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   private final STreePropertyAssocMany manyProp;
 
   SqlTreeNodeManyRoot(String prefix, STreePropertyAssocMany prop, SqlTreeProperties props, List<SqlTreeNode> myList,
-                      SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
-    super(prefix, prop, props, myList, true, temporalMode, disableLazyLoad);
+                      boolean withId, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+    super(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad);
     this.manyProp = prop;
   }
 

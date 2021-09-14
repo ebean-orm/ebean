@@ -7,7 +7,7 @@ import java.time.ZoneId;
  *
  * @param <R> the root query bean type
  */
-public class PZoneId<R> extends PBaseValueEqual<R,ZoneId> {
+public final class PZoneId<R> extends PBaseValueEqual<R,ZoneId> {
 
   /**
    * Construct with a property name and root instance.

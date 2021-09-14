@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * List of Bindable items.
  */
-public class BindableList implements Bindable {
+public final class BindableList implements Bindable {
 
   private final Bindable[] items;
 

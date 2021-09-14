@@ -40,7 +40,7 @@ import java.util.List;
  * Generates the SQL SELECT statements taking into account the physical
  * deployment properties.
  */
-class CQueryBuilder {
+final class CQueryBuilder {
 
   private final String columnAliasPrefix;
   private final SqlLimiter sqlLimiter;
@@ -88,12 +88,12 @@ class CQueryBuilder {
    * Build the delete query.
    */
   <T> CQueryUpdate buildUpdateQuery(boolean deleteRequest, OrmQueryRequest<T> request) {
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
     String rootTableAlias = query.getAlias();
     query.setupForDeleteOrUpdate();
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
-    CQueryPlan queryPlan = request.getQueryPlan();
+    CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
       // skip building the SqlTree and Sql string
       predicates.prepare(false);
@@ -117,7 +117,7 @@ class CQueryBuilder {
 
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
     String alias = alias(rootTableAlias);
-    if (sqlTree.noJoins() && !request.getQuery().hasMaxRowsOrFirstRow()) {
+    if (sqlTree.noJoins() && !request.query().hasMaxRowsOrFirstRow()) {
       if (dbPlatform.isSupportsDeleteTableAlias()) {
         // delete from table <alias> ...
         return aliasReplace(buildSqlDelete("delete", request, predicates, sqlTree).getSql(), alias);
@@ -130,7 +130,7 @@ class CQueryBuilder {
     }
     // wrap as - delete from table where id in (select id ...)
     String sql = buildSqlDelete(null, request, predicates, sqlTree).getSql();
-    sql = request.getBeanDescriptor().getDeleteByIdInSql() + "in (" + sql + ")";
+    sql = request.descriptor().deleteByIdInSql() + "in (" + sql + ")";
     sql = aliasReplace(sql, alias);
     return sql;
   }
@@ -145,7 +145,7 @@ class CQueryBuilder {
 
   private <T> String buildUpdateSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
     StringBuilder sb = new StringBuilder(200);
-    sb.append("update ").append(request.getBeanDescriptor().getBaseTable());
+    sb.append("update ").append(request.descriptor().baseTable());
     if (rootTableAlias != null) {
       sb.append(" ").append(rootTableAlias);
     }
@@ -157,7 +157,7 @@ class CQueryBuilder {
     }
     // wrap as - update table set ... where id in (select id ...)
     String sql = buildSqlUpdate(null, request, predicates, sqlTree).getSql();
-    sql = updateClause + " " + request.getBeanDescriptor().getWhereIdInSql() + "in (" + sql + ")";
+    sql = updateClause + " " + request.descriptor().whereIdInSql() + "in (" + sql + ")";
     sql = aliasReplace(sql, alias(rootTableAlias));
     return sql;
   }
@@ -177,17 +177,17 @@ class CQueryBuilder {
   }
 
   CQueryFetchSingleAttribute buildFetchAttributeQuery(OrmQueryRequest<?> request) {
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     query.setSingleAttribute();
     if (!query.isIncludeSoftDeletes()) {
-      BeanDescriptor<?> desc = request.getBeanDescriptor();
+      BeanDescriptor<?> desc = request.descriptor();
       if (desc.isSoftDelete()) {
-        query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
+        query.addSoftDeletePredicate(desc.softDeletePredicate(alias(query.getAlias())));
       }
     }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
-    CQueryPlan queryPlan = request.getQueryPlan();
+    CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
       predicates.prepare(false);
       return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
@@ -208,11 +208,11 @@ class CQueryBuilder {
    * Build the find ids query.
    */
   <T> CQueryFetchSingleAttribute buildFetchIdsQuery(OrmQueryRequest<T> request) {
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
     query.setSelectId();
-    BeanDescriptor<T> desc = request.getBeanDescriptor();
+    BeanDescriptor<T> desc = request.descriptor();
     if (!query.isIncludeSoftDeletes() && desc.isSoftDelete()) {
-      query.addSoftDeletePredicate(desc.getSoftDeletePredicate(alias(query.getAlias())));
+      query.addSoftDeletePredicate(desc.softDeletePredicate(alias(query.getAlias())));
     }
     return buildFetchAttributeQuery(request);
   }
@@ -235,7 +235,7 @@ class CQueryBuilder {
    * Build the row count query.
    */
   <T> CQueryRowCount buildRowCountQuery(OrmQueryRequest<T> request) {
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
     // always set the order by to null for row count query
     query.setOrder(null);
     query.setFirstRow(0);
@@ -252,7 +252,7 @@ class CQueryBuilder {
     }
 
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
-    CQueryPlan queryPlan = request.getQueryPlan();
+    CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
       // skip building the SqlTree and Sql string
       predicates.prepare(false);
@@ -304,7 +304,7 @@ class CQueryBuilder {
    * Return true if the query includes an aggregation property.
    */
   private <T> boolean includesAggregation(OrmQueryRequest<T> request, SpiQuery<T> query) {
-    return request.getBeanDescriptor().includesAggregation(query.getDetail());
+    return request.descriptor().includesAggregation(query.getDetail());
   }
 
   private String wrapSelectCount(String sql) {
@@ -321,7 +321,7 @@ class CQueryBuilder {
    */
   <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {
     CQueryPredicates predicates = new CQueryPredicates(binder, request);
-    CQueryPlan queryPlan = request.getQueryPlan();
+    CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
       // Reuse the query plan so skip generating SqlTree and SQL.
       // We do prepare and bind the new parameters
@@ -340,7 +340,7 @@ class CQueryBuilder {
     predicates.prepare(true);
 
     // Build the tree structure that represents the query.
-    SpiQuery<T> query = request.getQuery();
+    SpiQuery<T> query = request.query();
 
     SqlTree sqlTree = createSqlTree(request, predicates);
     if (query.isAsOfQuery()) {
@@ -358,10 +358,10 @@ class CQueryBuilder {
       queryPlan = new CQueryPlan(request, res, sqlTree, false, predicates.getLogWhereSql());
     }
 
-    BeanDescriptor<T> desc = request.getBeanDescriptor();
+    BeanDescriptor<T> desc = request.descriptor();
     if (desc.isReadAuditing()) {
       // log the query plan based bean type (i.e. ignoring query disabling for logging the sql/plan)
-      desc.getReadAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.getFullName(), queryPlan.getAuditQueryKey(), queryPlan.getSql()));
+      desc.readAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.fullName(), queryPlan.getAuditQueryKey(), queryPlan.getSql()));
     }
     // cache the query plan because we can reuse it and also
     // gather query performance statistics based on it.
@@ -401,7 +401,7 @@ class CQueryBuilder {
    * Create the SqlTree by reading the ResultSetMetaData and mapping table/columns to bean property paths.
    */
   private SqlTree createNativeSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     // parse named parameters returning the final sql to execute
     String sql = predicates.parseBindParams(query.getNativeSql());
     if (query.hasMaxRowsOrFirstRow()) {
@@ -409,9 +409,9 @@ class CQueryBuilder {
     }
     query.setGeneratedSql(sql);
 
-    Connection connection = request.getTransaction().getConnection();
+    Connection connection = request.transaction().connection();
 
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
+    BeanDescriptor<?> desc = request.descriptor();
     try {
       // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable
       // statement here by specifying ResultSet.CONCUR_UPDATABLE
@@ -445,8 +445,8 @@ class CQueryBuilder {
   }
 
   private SqlTree createRawSqlSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
-    BeanDescriptor<?> descriptor = request.getBeanDescriptor();
-    ColumnMapping columnMapping = request.getQuery().getRawSql().getColumnMapping();
+    BeanDescriptor<?> descriptor = request.descriptor();
+    ColumnMapping columnMapping = request.query().getRawSql().getColumnMapping();
     PathProperties pathProps = new PathProperties();
 
     // convert list of columns into (tree like) PathProperties
@@ -455,17 +455,17 @@ class CQueryBuilder {
       SpiRawSql.ColumnMapping.Column column = it.next();
       String propertyName = column.getPropertyName();
       if (!SpiRawSql.IGNORE_COLUMN.equals(propertyName)) {
-        ElPropertyValue el = descriptor.getElGetValue(propertyName);
+        ElPropertyValue el = descriptor.elGetValue(propertyName);
         if (el == null && propertyName.endsWith("Id")) {
           // try default naming convention for foreign key columns
           String foreignIdPath = assocOneIdPath(propertyName);
-          el = descriptor.getElGetValue(foreignIdPath);
+          el = descriptor.elGetValue(foreignIdPath);
           if (el != null) {
             propertyName = foreignIdPath;
           }
         }
         if (el == null) {
-          throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.getFullName());
+          throw new PersistenceException("Property [" + propertyName + "] not found on " + descriptor.fullName());
         }
         addRawColumnMapping(pathProps, column, propertyName, el);
       }
@@ -478,8 +478,8 @@ class CQueryBuilder {
     }
     // check if @Id property included in RawSql
     boolean rawNoId = true;
-    BeanProperty idProperty = descriptor.getIdProperty();
-    if (idProperty != null && columnMapping.contains(idProperty.getName())) {
+    BeanProperty idProperty = descriptor.idProperty();
+    if (idProperty != null && columnMapping.contains(idProperty.name())) {
       // contains the @Id property for the root level bean
       rawNoId = false;
     }
@@ -488,7 +488,7 @@ class CQueryBuilder {
   }
 
   private void addRawColumnMapping(PathProperties pathProps, Column column, String propertyName, ElPropertyValue el) {
-    BeanProperty beanProperty = el.getBeanProperty();
+    BeanProperty beanProperty = el.beanProperty();
     if (beanProperty.isId()) {
       if (propertyName.contains(".")) {
         // For @Id properties we chop off the last part of the path
@@ -523,7 +523,7 @@ class CQueryBuilder {
    * Return the SQL response with row limiting (when not an update statement).
    */
   private SqlLimitResponse buildSql(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select) {
-    SpiQuery<?> query = request.getQuery();
+    SpiQuery<?> query = request.query();
     if (query.isNativeSql()) {
       return new SqlLimitResponse(query.getGeneratedSql());
     }
@@ -562,7 +562,7 @@ class CQueryBuilder {
     private BuildReq(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select, boolean updateStatement) {
       this.selectClause = selectClause;
       this.request = request;
-      this.query = request.getQuery();
+      this.query = request.query();
       this.predicates = predicates;
       this.select = select;
       this.updateStatement = updateStatement;
@@ -583,7 +583,7 @@ class CQueryBuilder {
           sb.append("r1.attribute_, count(*) from (select ");
           if (distinct) {
             sb.append("distinct t0.");
-            sb.append(request.getBeanDescriptor().getIdProperty().getDbColumn()).append(", ");
+            sb.append(request.descriptor().idProperty().dbColumn()).append(", ");
           }
           sb.append(select.getSelectSql()).append(" as attribute_");
         } else {
@@ -652,7 +652,7 @@ class CQueryBuilder {
     private void appendHistoryAsOfPredicate() {
       if (query.isAsOfBaseTable() && !historySupport.isStandardsBased()) {
         appendAndOrWhere();
-        sb.append(historySupport.getAsOfPredicate(request.getBaseTableAlias()));
+        sb.append(historySupport.getAsOfPredicate(request.baseTableAlias()));
       }
     }
 
@@ -660,10 +660,10 @@ class CQueryBuilder {
       if (request.isFindById() || query.getId() != null) {
         appendAndOrWhere();
 
-        BeanDescriptor<?> desc = request.getBeanDescriptor();
-        String idSql = desc.getIdBinderIdSql(query.getAlias());
+        BeanDescriptor<?> desc = request.descriptor();
+        String idSql = desc.idBinderIdSql(query.getAlias());
         if (idSql.isEmpty()) {
-          throw new IllegalStateException("Executing FindById query on entity bean " + desc.getName()
+          throw new IllegalStateException("Executing FindById query on entity bean " + desc.name()
             + " that doesn't have an @Id property??");
         }
         if (updateStatement) {

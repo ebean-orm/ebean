@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Helper for evaluating named parameters.
  */
-class NamedParamHelp {
+final class NamedParamHelp {
 
   /**
    * Return the bind value taking into account named parameters.

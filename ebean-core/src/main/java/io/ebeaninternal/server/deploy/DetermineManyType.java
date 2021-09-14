@@ -7,10 +7,7 @@ import java.util.Set;
 /**
  * Determine the Many Type for a property.
  */
-public class DetermineManyType {
-
-  public DetermineManyType() {
-  }
+public final class DetermineManyType {
 
   public ManyType getManyType(Class<?> type) {
     if (type.equals(List.class)) {

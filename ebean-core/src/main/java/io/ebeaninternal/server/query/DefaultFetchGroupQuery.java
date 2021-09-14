@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 /**
  * Implementation of FetchGroup query for use to create FetchGroup via query beans.
  */
-class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
+final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
 

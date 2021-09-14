@@ -15,15 +15,11 @@ import java.util.Set;
 public final class DeployPropertyParser extends DeployParser {
 
   private static final String JOIN = "join";
-
   private static final String FROM = "from";
 
   private final BeanDescriptor<?> beanDescriptor;
-
   private final Set<String> includes = new HashSet<>();
-
   private boolean catchFirst;
-
   private ElPropertyDeploy firstProp;
 
   DeployPropertyParser(BeanDescriptor<?> beanDescriptor) {
@@ -60,15 +56,15 @@ public final class DeployPropertyParser extends DeployParser {
 
   @Override
   public String getDeployWord(String expression) {
-    ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(expression);
+    ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(expression);
     if (elProp == null) {
       return null;
     } else {
       if (catchFirst && firstProp == null) {
         firstProp = elProp;
       }
-      addIncludes(elProp.getElPrefix());
-      return elProp.getElPlaceholder(encrypted);
+      addIncludes(elProp.elPrefix());
+      return elProp.elPlaceholder(encrypted);
     }
   }
 

@@ -8,7 +8,7 @@ import io.ebean.config.DatabaseConfig;
 /**
  * Default implementation of ServerCachePlugin.
  */
-public class DefaultServerCachePlugin implements ServerCachePlugin {
+public final class DefaultServerCachePlugin implements ServerCachePlugin {
 
   /**
    * Creates the default ServerCacheFactory.

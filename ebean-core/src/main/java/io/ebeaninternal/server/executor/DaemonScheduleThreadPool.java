@@ -15,9 +15,7 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
   private static final Logger logger = LoggerFactory.getLogger(DaemonScheduleThreadPool.class);
 
   private final ReentrantLock lock = new ReentrantLock();
-
   private final String namePrefix;
-
   private final int shutdownWaitSeconds;
 
   /**

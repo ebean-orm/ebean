@@ -30,7 +30,7 @@ import java.util.List;
  * lifecycle events.
  * </p>
  */
-class BeanLifecycleAdapterFactory {
+final class BeanLifecycleAdapterFactory {
 
   private final boolean postConstructPresent;
 
@@ -42,20 +42,16 @@ class BeanLifecycleAdapterFactory {
    * Register a BeanPersistController for methods annotated with lifecycle events.
    */
   void addLifecycleMethods(DeployBeanDescriptor<?> deployDesc) {
-
     Method[] methods = deployDesc.getBeanType().getMethods();
-
     // look for annotated methods
     MethodsHolder methodHolder = new MethodsHolder();
     for (Method m : methods) {
       methodHolder.checkMethod(m, postConstructPresent);
     }
-
     if (methodHolder.hasPersistMethods()) {
       // has pre/post persist annotated methods
       deployDesc.addPersistController(new PersistAdapter(new PersistMethodsHolder(methodHolder)));
     }
-
     if (!methodHolder.postLoads.isEmpty()) {
       // has postLoad methods
       deployDesc.addPostLoad(new PostLoadAdapter(methodHolder.postLoads));
@@ -69,7 +65,7 @@ class BeanLifecycleAdapterFactory {
   /**
    * Holds Methods for the lifecycle events.s
    */
-  private static class MethodsHolder {
+  private static final class MethodsHolder {
 
     private boolean hasPersistMethods;
     private final List<Method> preInserts = new ArrayList<>();
@@ -162,7 +158,7 @@ class BeanLifecycleAdapterFactory {
   /**
    * Holds Methods for the lifecycle events.s
    */
-  private static class PersistMethodsHolder {
+  private static final class PersistMethodsHolder {
 
     private final Method[] preInserts;
     private final Method[] postInserts;
@@ -188,7 +184,7 @@ class BeanLifecycleAdapterFactory {
   /**
    * BeanPersistAdapter using reflection to invoke lifecycle methods.
    */
-  private static class PersistAdapter extends BeanPersistAdapter {
+  private static final class PersistAdapter extends BeanPersistAdapter {
 
     private final PersistMethodsHolder methodHolder;
 
@@ -212,7 +208,7 @@ class BeanLifecycleAdapterFactory {
 
     private void invoke(Method[] methods, BeanPersistRequest<?> request) {
       for (Method method : methods) {
-        invoke(method, request.getBean());
+        invoke(method, request.bean());
       }
     }
 
@@ -264,7 +260,7 @@ class BeanLifecycleAdapterFactory {
   /**
    * BeanPostLoad using reflection to invoke lifecycle methods.
    */
-  private static class PostLoadAdapter implements BeanPostLoad {
+  private static final class PostLoadAdapter implements BeanPostLoad {
 
     private final Method[] postLoadMethods;
 
@@ -297,7 +293,7 @@ class BeanLifecycleAdapterFactory {
   /**
    * PostConstructAdapter using reflection to invoke lifecycle methods.
    */
-  private static class PostConstructAdapter implements BeanPostConstructListener {
+  private static final class PostConstructAdapter implements BeanPostConstructListener {
 
     private final Method[] postConstructMethods;
 

@@ -26,22 +26,22 @@ abstract class BaseFuture<T> implements Future<T> {
   }
 
   @Override
-  public T get() throws InterruptedException, ExecutionException {
+  public final T get() throws InterruptedException, ExecutionException {
     return futureTask.get();
   }
 
   @Override
-  public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+  public final T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     return futureTask.get(timeout, unit);
   }
 
   @Override
-  public boolean isCancelled() {
+  public final boolean isCancelled() {
     return futureTask.isCancelled();
   }
 
   @Override
-  public boolean isDone() {
+  public final boolean isDone() {
     return futureTask.isDone();
   }
 

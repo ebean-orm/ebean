@@ -8,7 +8,7 @@ import java.util.Arrays;
 /**
  * Default CallStackFactory where the Hash function for StackTraceElement includes the line number.
  */
-public class DefaultCallOriginFactory implements CallOriginFactory {
+public final class DefaultCallOriginFactory implements CallOriginFactory {
 
   private static final int IGNORE_LEADING_ELEMENTS = 5;
 

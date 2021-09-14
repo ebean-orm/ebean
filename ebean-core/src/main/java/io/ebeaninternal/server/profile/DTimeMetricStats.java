@@ -5,13 +5,12 @@ import io.ebean.metric.TimedMetricStats;
 /**
  * Snapshot of the current statistics for a Counter or TimeCounter.
  */
-class DTimeMetricStats implements TimedMetricStats {
+final class DTimeMetricStats implements TimedMetricStats {
 
   private final boolean collected;
   private final long count;
   private final long total;
   private final long max;
-
   private String name;
   private String location;
 

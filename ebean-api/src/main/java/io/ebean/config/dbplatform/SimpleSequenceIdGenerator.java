@@ -61,7 +61,7 @@ public class SimpleSequenceIdGenerator implements PlatformIdGenerator {
     PreparedStatement pstmt = null;
     ResultSet rset = null;
     try {
-      c = useTxnConnection ? t.getConnection() : dataSource.getConnection();
+      c = useTxnConnection ? t.connection() : dataSource.getConnection();
       pstmt = c.prepareStatement(sql);
       rset = pstmt.executeQuery();
       if (rset.next()) {

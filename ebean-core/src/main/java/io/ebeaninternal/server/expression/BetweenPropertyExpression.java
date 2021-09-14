@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * Between expression where a value is between two properties.
  */
-class BetweenPropertyExpression extends NonPrepareExpression {
+final class BetweenPropertyExpression extends NonPrepareExpression {
 
   private static final String BETWEEN = " between ";
 
@@ -34,7 +34,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
     this.highProperty = path + "." + highProperty;
   }
 
-  protected String name(String propName) {
+  String name(String propName) {
     return propName;
   }
 
@@ -52,7 +52,7 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   @Override
   public String nestedPath(BeanDescriptor<?> desc) {
-    ElPropertyDeploy elProp = desc.getElPropertyDeploy(name(lowProperty));
+    ElPropertyDeploy elProp = desc.elPropertyDeploy(name(lowProperty));
     if (elProp != null && elProp.containsMany()) {
       // assumes highProperty is also nested property which seems reasonable
       return SplitName.begin(lowProperty);
@@ -62,13 +62,11 @@ class BetweenPropertyExpression extends NonPrepareExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
-
-    ElPropertyDeploy elProp = desc.getElPropertyDeploy(name(lowProperty));
+    ElPropertyDeploy elProp = desc.elPropertyDeploy(name(lowProperty));
     if (elProp != null && elProp.containsMany()) {
       manyWhereJoin.add(elProp);
     }
-
-    elProp = desc.getElPropertyDeploy(name(highProperty));
+    elProp = desc.elPropertyDeploy(name(highProperty));
     if (elProp != null && elProp.containsMany()) {
       manyWhereJoin.add(elProp);
     }

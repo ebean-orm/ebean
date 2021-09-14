@@ -8,7 +8,7 @@ import java.net.InetAddress;
  * @param <R> the root query bean type
  */
 
-public class PInetAddress<R> extends PBaseValueEqual<R,InetAddress> {
+public final class PInetAddress<R> extends PBaseValueEqual<R,InetAddress> {
 
   /**
    * Construct with a property name and root instance.

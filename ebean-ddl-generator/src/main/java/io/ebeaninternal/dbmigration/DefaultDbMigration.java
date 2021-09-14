@@ -128,7 +128,7 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setServer(Database database) {
     this.server = (SpiEbeanServer) database;
-    setServerConfig(server.getServerConfig());
+    setServerConfig(server.config());
   }
 
   @Override
@@ -677,7 +677,7 @@ public class DefaultDbMigration implements DbMigration {
     }
     if (vanillaPlatform || databasePlatform == null) {
       // not explicitly set so use the platform of the server
-      databasePlatform = server.getDatabasePlatform();
+      databasePlatform = server.databasePlatform();
     }
     if (databaseConfig != null) {
       if (strictMode != null) {

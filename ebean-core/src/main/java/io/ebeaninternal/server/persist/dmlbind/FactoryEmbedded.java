@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * A factory that builds Bindable for embedded bean properties.
  */
-public class FactoryEmbedded {
+public final class FactoryEmbedded {
 
   private final FactoryProperty factoryProperty;
 
@@ -23,9 +23,8 @@ public class FactoryEmbedded {
    * Add bindable for the embedded properties to the list.
    */
   public void create(List<Bindable> list, BeanDescriptor<?> desc, DmlMode mode, boolean withLobs) {
-
     for (BeanPropertyAssocOne<?> anEmbedded : desc.propertiesEmbedded()) {
-      BeanProperty[] props = anEmbedded.getProperties();
+      BeanProperty[] props = anEmbedded.properties();
       List<Bindable> bindList = new ArrayList<>(props.length);
       for (BeanProperty prop : props) {
         Bindable item = factoryProperty.create(prop, mode, withLobs, true);

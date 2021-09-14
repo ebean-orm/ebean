@@ -6,7 +6,7 @@ import io.ebeaninternal.api.SpiProfileHandler;
 /**
  * A do nothing SpiProfileHandler.
  */
-public class NoopProfileHandler implements SpiProfileHandler {
+public final class NoopProfileHandler implements SpiProfileHandler {
 
   @Override
   public void collectTransactionProfile(TransactionProfile transactionProfile) {

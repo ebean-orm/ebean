@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Collects the generated properties for inserts and updates for a given bean type.
  */
-class GeneratedPropertyCollector {
+final class GeneratedPropertyCollector {
 
   private final List<BeanProperty> preInsert = new ArrayList<>();
   private final List<BeanProperty> preUpdate = new ArrayList<>();
@@ -26,7 +26,7 @@ class GeneratedPropertyCollector {
   }
 
   private void add(BeanProperty prop) {
-    GeneratedProperty gen = prop.getGeneratedProperty();
+    GeneratedProperty gen = prop.generatedProperty();
     if (gen != null) {
       if (gen.includeInInsert()) {
         preInsert.add(prop);

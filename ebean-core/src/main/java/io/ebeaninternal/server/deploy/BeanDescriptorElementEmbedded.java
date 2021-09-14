@@ -12,12 +12,11 @@ import java.io.IOException;
 /**
  * Bean descriptor used with element collection of list/set of embeddable.
  */
+@SuppressWarnings("rawtypes")
 class BeanDescriptorElementEmbedded<T> extends BeanDescriptorElement<T> {
 
   private final BeanPropertyAssocOne embeddedProperty;
-
   private final EntityBean prototype;
-
   private BeanDescriptor targetDescriptor;
 
   BeanDescriptorElementEmbedded(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, ElementHelp elementHelp) {
@@ -43,7 +42,7 @@ class BeanDescriptorElementEmbedded<T> extends BeanDescriptorElement<T> {
   @Override
   public void initialiseOther(BeanDescriptorInitContext initContext) {
     super.initialiseOther(initContext);
-    this.targetDescriptor = embeddedProperty.getTargetDescriptor();
+    this.targetDescriptor = embeddedProperty.targetDescriptor();
   }
 
   @Override

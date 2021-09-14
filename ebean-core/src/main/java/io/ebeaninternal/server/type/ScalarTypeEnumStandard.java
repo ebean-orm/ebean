@@ -28,17 +28,17 @@ import java.util.Set;
  * Ebean specific @EnumMapping.
  * </p>
  */
-public class ScalarTypeEnumStandard {
+final class ScalarTypeEnumStandard {
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public static class StringEnum extends EnumBase implements ScalarTypeEnum {
+  static final class StringEnum extends EnumBase implements ScalarTypeEnum {
 
     private final int length;
 
     /**
      * Create a ScalarTypeEnum.
      */
-    public StringEnum(Class enumType) {
+    StringEnum(Class enumType) {
       super(enumType, false, Types.VARCHAR);
       this.length = maxValueLength(enumType);
     }
@@ -63,15 +63,12 @@ public class ScalarTypeEnumStandard {
     }
 
     private int maxValueLength(Class<?> enumType) {
-
       int maxLen = 0;
-
       Object[] ea = enumType.getEnumConstants();
       for (Object anEa : ea) {
         Enum<?> e = (Enum<?>) anEa;
         maxLen = Math.max(maxLen, e.name().length());
       }
-
       return maxLen;
     }
 
@@ -120,14 +117,14 @@ public class ScalarTypeEnumStandard {
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public static class OrdinalEnum extends EnumBase implements ScalarTypeEnum {
+  static final class OrdinalEnum extends EnumBase implements ScalarTypeEnum {
 
     private final Object[] enumArray;
 
     /**
      * Create a ScalarTypeEnum.
      */
-    public OrdinalEnum(Class enumType) {
+    OrdinalEnum(Class enumType) {
       super(enumType, false, Types.INTEGER);
       this.enumArray = EnumSet.allOf(enumType).toArray();
     }
@@ -203,11 +200,11 @@ public class ScalarTypeEnumStandard {
   }
 
   @SuppressWarnings({"rawtypes", "unchecked"})
-  public abstract static class EnumBase extends ScalarTypeBase {
+  abstract static class EnumBase extends ScalarTypeBase {
 
     protected final Class enumType;
 
-    public EnumBase(Class<?> type, boolean jdbcNative, int jdbcType) {
+    EnumBase(Class<?> type, boolean jdbcNative, int jdbcType) {
       super(type, jdbcNative, jdbcType);
       this.enumType = type;
     }

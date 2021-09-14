@@ -32,77 +32,47 @@ import java.util.stream.Stream;
 /**
  * Default implementation of an Object Relational query.
  */
-public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
+public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";
-
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
-
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
-
   private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private final Class<T> beanType;
-
   private final ExpressionFactory expressionFactory;
-
   private final BeanDescriptor<T> rootBeanDescriptor;
-
   private BeanDescriptor<T> beanDescriptor;
-
   private SpiEbeanServer server;
-
   private SpiTransaction transaction;
-
   /**
    * For lazy loading of ManyToMany we need to add a join to the intersection table. This is that
    * join to the intersection table.
    */
   private TableJoin m2mIncludeJoin;
-
   private ProfilingListener profilingListener;
-
   private Type type;
-
   private String label;
-
   private Mode mode = Mode.NORMAL;
-
   private Object tenantId;
-
   /**
    * Holds query in structured form.
    */
   private OrmQueryDetail detail;
-
   private int maxRows;
-
   private int firstRow;
-
-  /**
-   * Set to true to disable lazy loading on the object graph returned.
-   */
   private boolean disableLazyLoading;
-
   /**
    * Lazy loading batch size (can override server wide default).
    */
   private int lazyLoadBatchSize;
-
   private OrderBy<T> orderBy;
-
   private String loadMode;
-
   private String loadDescription;
-
   private String generatedSql;
-
   private String lazyLoadProperty;
-
   private String lazyLoadManyPath;
-
   private boolean allowLoadErrors;
-
   /**
    * Flag set for report/DTO beans when we may choose to explicitly include the Id property.
    */
@@ -141,106 +111,64 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Bind parameters when using the query language.
    */
   private BindParams bindParams;
-
   private DefaultExpressionList<T> textExpressions;
-
   private DefaultExpressionList<T> whereExpressions;
-
   private DefaultExpressionList<T> havingExpressions;
-
   private boolean asOfBaseTable;
-
   private int asOfTableCount;
 
   /**
    * Set for flashback style 'as of' query.
    */
   private Timestamp asOf;
-
   private TemporalMode temporalMode = TemporalMode.CURRENT;
-
   private Timestamp versionsStart;
   private Timestamp versionsEnd;
-
   private List<String> softDeletePredicates;
-
   private boolean disableReadAudit;
-
   private int bufferFetchSizeHint;
-
   private boolean usageProfiling = true;
-
   private CacheMode useBeanCache = CacheMode.AUTO;
-
   private CacheMode useQueryCache = CacheMode.OFF;
-
   private Boolean readOnly;
-
   private PersistenceContextScope persistenceContextScope;
 
   /**
    * Allow for explicit on off or null for default.
    */
   private Boolean autoTune;
-
   private LockWait forUpdate;
   private LockType lockType;
-
   private boolean singleAttribute;
-
   private CountDistinctOrder countDistinctOrder;
-
-  /**
-   * Set to true if this query has been tuned by autoTune.
-   */
   private boolean autoTuned;
-
-  /**
-   * Root table alias. For {@link Query#alias(String)} command.
-   */
   private String rootTableAlias;
-
   private String baseTable;
-
   /**
    * The node of the bean or collection that fired lazy loading. Not null if profiling is on and
    * this query is for lazy loading. Used to hook back a lazy loading query to the "original" query
    * point.
    */
   private ObjectGraphNode parentNode;
-
   private BeanPropertyAssocMany<?> lazyLoadForParentsProperty;
-
-  /**
-   * Hash of final query after AutoTune tuning.
-   */
   private CQueryPlanKey queryPlanKey;
-
   private PersistenceContext persistenceContext;
-
   private ManyWhereJoins manyWhereJoins;
-
   private SpiRawSql rawSql;
-
   private boolean useDocStore;
-
   private String docIndexName;
-
   private OrmUpdateProperties updateProperties;
-
   private String nativeSql;
-
   private boolean orderById;
-
   private ProfileLocation profileLocation;
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
     this.rootBeanDescriptor = desc;
-    this.beanType = desc.getBeanType();
+    this.beanType = desc.type();
     this.server = server;
-    this.orderById = server.getServerConfig().isDefaultOrderById();
-    this.disableLazyLoading = server.getServerConfig().isDisableLazyLoading();
+    this.orderById = server.config().isDefaultOrderById();
+    this.disableLazyLoading = server.config().isDisableLazyLoading();
     this.expressionFactory = expressionFactory;
     this.detail = new OrmQueryDetail();
   }
@@ -273,7 +201,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public boolean isFindById() {
     if (id == null && whereExpressions != null) {
-      id = whereExpressions.idEqualTo(beanDescriptor.getIdName());
+      id = whereExpressions.idEqualTo(beanDescriptor.idName());
       if (id != null) {
         whereExpressions = null;
       }
@@ -486,7 +414,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     }
     if (orderBy != null) {
       for (Property orderProperty : orderBy.getProperties()) {
-        ElPropertyDeploy elProp = beanDescriptor.getElPropertyDeploy(orderProperty.getProperty());
+        ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(orderProperty.getProperty());
         if (elProp != null && elProp.containsFormulaWithJoin()) {
           manyWhereJoins.addFormulaWithJoin(orderProperty.getProperty());
         }
@@ -660,7 +588,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public void setSelectId() {
     // clear select and fetch joins..
     detail.clear();
-    select(beanDescriptor.getIdBinder().getIdProperty());
+    select(beanDescriptor.idBinder().getIdProperty());
   }
 
   @Override
@@ -713,7 +641,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (whereExpressions == null) {
       return null;
     }
-    BeanNaturalKey naturalKey = beanDescriptor.getNaturalKey();
+    BeanNaturalKey naturalKey = beanDescriptor.naturalKey();
     if (naturalKey == null) {
       return null;
     }
@@ -910,7 +838,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public void setDefaultRawSqlIfRequired() {
     if (beanDescriptor.isRawSqlBased() && rawSql == null) {
-      rawSql = beanDescriptor.getNamedRawSql(DEFAULT_QUERY_NAME);
+      rawSql = beanDescriptor.namedRawSql(DEFAULT_QUERY_NAME);
     }
   }
 
@@ -1086,8 +1014,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (useDocStore) {
       sb.append("/ds");
     }
-    if (beanDescriptor.getDiscValue() != null) {
-      sb.append("/dv").append(beanDescriptor.getDiscValue());
+    if (beanDescriptor.discValue() != null) {
+      sb.append("/dv").append(beanDescriptor.discValue());
     }
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
       sb.append("/tm").append(temporalMode.ordinal());
@@ -1304,10 +1232,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public void resetBeanCacheAutoMode(boolean findOne) {
-    if (useBeanCache == CacheMode.AUTO) {
-      if (!findOne || useQueryCache != CacheMode.OFF) {
-        useBeanCache = CacheMode.OFF;
-      }
+    if (useBeanCache == CacheMode.AUTO && useQueryCache != CacheMode.OFF) {
+      useBeanCache = CacheMode.OFF;
     }
   }
 
@@ -1411,6 +1337,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     return fetchInternal(path, null, FETCH_QUERY);
   }
 
+  @Override
   public Query<T> fetchCache(String path) {
     return fetchInternal(path, null, FETCH_CACHE);
   }
@@ -1761,7 +1688,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public Class<? extends T> getInheritType() {
-    return beanDescriptor.getBeanType();
+    return beanDescriptor.type();
   }
 
   @SuppressWarnings("unchecked")
@@ -1770,12 +1697,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (type == beanType) {
       return this;
     }
-    InheritInfo inheritInfo = rootBeanDescriptor.getInheritInfo();
+    InheritInfo inheritInfo = rootBeanDescriptor.inheritInfo();
     inheritInfo = inheritInfo == null ? null : inheritInfo.readType(type);
     if (inheritInfo == null) {
       throw new IllegalArgumentException("Given type " + type + " is not a subtype of " + beanType);
     }
-    beanDescriptor = (BeanDescriptor<T>) rootBeanDescriptor.getBeanDescriptor(type);
+    beanDescriptor = (BeanDescriptor<T>) rootBeanDescriptor.descriptor(type);
     return this;
   }
 

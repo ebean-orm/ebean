@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Binds bean values to a PreparedStatement.
  */
-public class Binder {
+public final class Binder {
 
   private static final Logger logger = LoggerFactory.getLogger(Binder.class);
 

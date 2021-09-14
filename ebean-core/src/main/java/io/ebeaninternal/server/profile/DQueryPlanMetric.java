@@ -6,7 +6,7 @@ import io.ebean.metric.QueryPlanMetric;
 import io.ebean.metric.TimedMetric;
 import io.ebean.metric.TimedMetricStats;
 
-class DQueryPlanMetric implements QueryPlanMetric {
+final class DQueryPlanMetric implements QueryPlanMetric {
 
   private final DQueryPlanMeta meta;
   private final DTimedMetric metric;
@@ -27,7 +27,7 @@ class DQueryPlanMetric implements QueryPlanMetric {
   }
 
   @Override
-  public TimedMetric getMetric() {
+  public TimedMetric metric() {
     return metric;
   }
 

@@ -16,9 +16,9 @@ import java.sql.Types;
 /**
  * ScalarType for Long and long.
  */
-public class ScalarTypeLong extends ScalarTypeBase<Long> {
+final class ScalarTypeLong extends ScalarTypeBase<Long> {
 
-  public ScalarTypeLong() {
+  ScalarTypeLong() {
     super(Long.class, true, Types.BIGINT);
   }
 
@@ -44,6 +44,11 @@ public class ScalarTypeLong extends ScalarTypeBase<Long> {
   @Override
   public Long toBeanType(Object value) {
     return BasicTypeConverter.toLong(value);
+  }
+
+  @Override
+  public String format(Object value) {
+    return String.valueOf(value);
   }
 
   @Override

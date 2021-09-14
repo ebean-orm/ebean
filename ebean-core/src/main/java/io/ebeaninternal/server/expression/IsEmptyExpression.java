@@ -10,12 +10,10 @@ import io.ebean.util.SplitName;
 
 import java.io.IOException;
 
-class IsEmptyExpression extends AbstractExpression {
+final class IsEmptyExpression extends AbstractExpression {
 
   private final boolean empty;
-
   private final String propertyPath;
-
   private String nestedPath;
 
   IsEmptyExpression(String propertyName, boolean empty) {
@@ -86,7 +84,7 @@ class IsEmptyExpression extends AbstractExpression {
     }
     request
       .append("exists (select 1 from ")
-      .append(prop.getAssocIsEmpty(request, propertyPath))
+      .append(prop.assocIsEmpty(request, propertyPath))
       .append(")");
   }
 

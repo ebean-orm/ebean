@@ -1,9 +1,8 @@
 package io.ebeaninternal.server.querydefn;
 
-public class NaturalKeyBindParam {
+public final class NaturalKeyBindParam {
 
   private final String name;
-
   private final Object value;
 
   public NaturalKeyBindParam(String name, Object value) {

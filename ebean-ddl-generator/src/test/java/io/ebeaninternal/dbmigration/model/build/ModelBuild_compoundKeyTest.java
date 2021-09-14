@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 
-import io.ebean.BaseTestCase;
+import io.localtest.BaseTestCase;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -11,7 +11,7 @@ import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CKeyAssoc;
 import org.tests.model.basic.CKeyDetail;
 import org.tests.model.basic.CKeyParent;

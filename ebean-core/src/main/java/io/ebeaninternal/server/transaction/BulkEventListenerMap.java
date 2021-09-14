@@ -8,12 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-public class BulkEventListenerMap {
+public final class BulkEventListenerMap {
 
   private final HashMap<String, Entry> map = new HashMap<>();
 
   public BulkEventListenerMap(List<BulkTableEventListener> listeners) {
-
     if (listeners != null) {
       for (BulkTableEventListener l : listeners) {
         Set<String> tables = l.registeredTables();
@@ -29,8 +28,7 @@ public class BulkEventListenerMap {
   }
 
   public void process(BulkTableEvent event) {
-
-    Entry entry = map.get(event.getTableName());
+    Entry entry = map.get(event.tableName());
     if (entry != null) {
       entry.process(event);
     }
@@ -42,7 +40,7 @@ public class BulkEventListenerMap {
     entry.add(l);
   }
 
-  private static class Entry {
+  private static final class Entry {
 
     final List<BulkTableEventListener> listeners = new ArrayList<>();
 

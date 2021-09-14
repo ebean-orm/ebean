@@ -15,10 +15,9 @@ import java.io.IOException;
  * This is used such that a load context and persistence context can be used to span multiple marshalling requests.
  * </p>
  */
-public class DJsonBeanReader<T> implements JsonBeanReader<T> {
+public final class DJsonBeanReader<T> implements JsonBeanReader<T> {
 
   private final BeanDescriptor<T> desc;
-
   private final SpiJsonReader readJson;
 
   public DJsonBeanReader(BeanDescriptor<T> desc, SpiJsonReader readJson) {

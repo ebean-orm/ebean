@@ -43,18 +43,14 @@ import java.util.Set;
 /**
  * Default implementation of JsonContext.
  */
-public class DJsonContext implements SpiJsonContext {
+public final class DJsonContext implements SpiJsonContext {
 
   private static final PrettyPrinter PRETTY_PRINTER = new Pretty();
 
   private final SpiEbeanServer server;
-
   private final JsonFactory jsonFactory;
-
   private final Object defaultObjectMapper;
-
   private final JsonConfig.Include defaultInclude;
-
   private final DJsonScalar jsonScalar;
 
   private static class Pretty extends DefaultPrettyPrinter {
@@ -66,8 +62,8 @@ public class DJsonContext implements SpiJsonContext {
   public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory, TypeManager typeManager) {
     this.server = server;
     this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
-    this.defaultObjectMapper = this.server.getServerConfig().getObjectMapper();
-    this.defaultInclude = this.server.getServerConfig().getJsonInclude();
+    this.defaultObjectMapper = this.server.config().getObjectMapper();
+    this.defaultInclude = this.server.config().getJsonInclude();
     this.jsonScalar = new DJsonScalar(typeManager);
   }
 
@@ -429,7 +425,7 @@ public class DJsonContext implements SpiJsonContext {
    * Return the BeanDescriptor for the given bean type.
    */
   private <T> BeanDescriptor<T> getDescriptor(Class<T> beanType) {
-    BeanDescriptor<T> d = server.getBeanDescriptor(beanType);
+    BeanDescriptor<T> d = server.descriptor(beanType);
     if (d == null) {
       throw new RuntimeException("No BeanDescriptor found for " + beanType);
     }

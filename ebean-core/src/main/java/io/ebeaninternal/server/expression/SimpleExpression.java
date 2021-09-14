@@ -11,7 +11,7 @@ import io.ebeaninternal.api.NaturalKeyQueryData;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class SimpleExpression extends AbstractValueExpression {
+public final class SimpleExpression extends AbstractValueExpression {
 
   private final Op type;
 
@@ -44,8 +44,8 @@ public class SimpleExpression extends AbstractValueExpression {
     }
     ExpressionPath prop = context.getExpressionPath(propName);
     if (prop != null && prop.isAssocId()) {
-      String idName = prop.getAssocIdExpression(propName, "");
-      Object[] ids = prop.getAssocIdValues((EntityBean) value());
+      String idName = prop.assocIdExpression(propName, "");
+      Object[] ids = prop.assocIdValues((EntityBean) value());
       if (ids == null || ids.length != 1) {
         throw new IllegalArgumentException("Expecting 1 Id value for " + idName + " but got " + Arrays.toString(ids));
       }
@@ -73,7 +73,7 @@ public class SimpleExpression extends AbstractValueExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        Object[] ids = prop.getAssocIdValues((EntityBean) value());
+        Object[] ids = prop.assocIdValues((EntityBean) value());
         if (ids != null) {
           for (Object id : ids) {
             request.addBindValue(id);
@@ -83,7 +83,7 @@ public class SimpleExpression extends AbstractValueExpression {
       }
       if (prop.isDbEncrypted()) {
         // bind the key as well as the value
-        String encryptKey = prop.getBeanProperty().getEncryptKey().getStringValue();
+        String encryptKey = prop.beanProperty().encryptKey().getStringValue();
         request.addBindEncryptKey(encryptKey);
       } else if (prop.isLocalEncrypted()) {
         Object bindVal = prop.localEncrypt(value());
@@ -101,11 +101,11 @@ public class SimpleExpression extends AbstractValueExpression {
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        request.append(prop.getAssocIdExpression(propName, type.bind()));
+        request.append(prop.assocIdExpression(propName, type.bind()));
         return;
       }
       if (prop.isDbEncrypted()) {
-        String dsql = prop.getBeanProperty().getDecryptProperty(propName);
+        String dsql = prop.beanProperty().decryptProperty(propName);
         request.append(dsql).append(type.bind());
         return;
       }

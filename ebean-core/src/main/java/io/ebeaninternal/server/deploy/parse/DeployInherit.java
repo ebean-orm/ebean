@@ -15,12 +15,11 @@ import java.util.Map;
 /**
  * Builds the InheritInfo deployment information.
  */
-public class DeployInherit {
+public final class DeployInherit {
 
   private final Map<Class<?>, DeployInheritInfo> deployMap = new LinkedHashMap<>();
 
   private final Map<Class<?>, InheritInfo> finalMap = new LinkedHashMap<>();
-
   private final BootupClasses bootupClasses;
 
   /**
@@ -37,26 +36,21 @@ public class DeployInherit {
   }
 
   private void initialise() {
-    List<Class<?>> entityList = bootupClasses.getEntities();
-
-    findInheritClasses(entityList);
+    findInheritClasses(bootupClasses.getEntities());
     buildDeployTree();
     buildFinalTree();
   }
 
   private void findInheritClasses(List<Class<?>> entityList) {
-
     // go through each class and initialise the info object...
     for (Class<?> cls : entityList) {
       if (isInheritanceClass(cls)) {
-        DeployInheritInfo info = createInfo(cls);
-        deployMap.put(cls, info);
+        deployMap.put(cls, createInfo(cls));
       }
     }
   }
 
   private void buildDeployTree() {
-
     for (DeployInheritInfo info : deployMap.values()) {
       if (!info.isRoot()) {
         DeployInheritInfo parent = getInfo(info.getParent());
@@ -66,7 +60,6 @@ public class DeployInherit {
   }
 
   private void buildFinalTree() {
-
     for (DeployInheritInfo deploy : deployMap.values()) {
       if (deploy.isRoot()) {
         // build tree top down...
@@ -76,17 +69,14 @@ public class DeployInherit {
   }
 
   private void createFinalInfo(InheritInfo root, InheritInfo parent, DeployInheritInfo deploy) {
-
     InheritInfo node = new InheritInfo(root, parent, deploy);
     if (parent != null) {
       parent.addChild(node);
     }
     finalMap.put(node.getType(), node);
-
     if (root == null) {
       root = node;
     }
-
     // buildFinalChildren(root, child, deploy);
     for (DeployInheritInfo childDeploy : deploy.children()) {
       createFinalInfo(root, node, childDeploy);
@@ -101,9 +91,7 @@ public class DeployInherit {
   }
 
   private DeployInheritInfo createInfo(Class<?> cls) {
-
     DeployInheritInfo info = new DeployInheritInfo(cls);
-
     Class<?> parent = findParent(cls);
     if (parent != null) {
       info.setParent(parent);
@@ -121,7 +109,6 @@ public class DeployInherit {
       info.setColumnLength(da.length());
       info.setColumnDefn(da.columnDefinition());
     }
-
     if (!info.isAbstract()) {
       DiscriminatorValue dv = AnnotationUtil.get(cls, DiscriminatorValue.class); // do not search recursive
       if (dv != null) {

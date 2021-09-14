@@ -7,7 +7,7 @@ import java.util.Locale;
  *
  * @param <R> the root query bean type
  */
-public class PLocale<R> extends PBaseString<R, Locale> {
+public final class PLocale<R> extends PBaseString<R, Locale> {
 
   /**
    * Construct with a property name and root instance.

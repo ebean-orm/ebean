@@ -17,14 +17,11 @@ import java.io.IOException;
  * Note that for OneToMany/ManyToMany this effectively gets translated into isEmpty()/isNotEmpty().
  * </p>
  */
-class NullExpression extends AbstractExpression {
+final class NullExpression extends AbstractExpression {
 
   private final boolean notNull;
-
   private ElPropertyValue elProperty;
-
   private boolean assocMany;
-
   private String propertyPath;
 
   NullExpression(String propertyName, boolean notNull) {
@@ -34,7 +31,7 @@ class NullExpression extends AbstractExpression {
 
   @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
-    elProperty = desc.getElGetValue(propName);
+    elProperty = desc.elGetValue(propName);
     if (elProperty != null && elProperty.isAssocMany()) {
       // it is OneToMany or ManyToMany so going to be treated as isEmpty() expression
       assocMany = true;
@@ -69,7 +66,7 @@ class NullExpression extends AbstractExpression {
 
     String nullExpr = notNull ? " is not null" : " is null";
     if (elProperty != null && elProperty.isAssocId()) {
-      request.append(elProperty.getAssocIdExpression(propName, nullExpr));
+      request.append(elProperty.assocIdExpression(propName, nullExpr));
     } else {
       request.append(propName).append(nullExpr);
     }

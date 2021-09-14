@@ -40,7 +40,6 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
         beanSet.setActualSet(new LinkedHashSet<>());
       }
       return beanSet;
-
     } else {
       throw new RuntimeException("Unhandled type " + bc);
     }
@@ -55,34 +54,29 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   public BeanCollection<T> createEmpty(EntityBean ownerBean) {
     BeanSet<T> beanSet = new BeanSet<>(loader, ownerBean, propertyName);
     if (many != null) {
-      beanSet.setModifyListening(many.getModifyListenMode());
+      beanSet.setModifyListening(many.modifyListenMode());
     }
     return beanSet;
   }
 
   @Override
   public BeanCollection<T> createReference(EntityBean parentBean) {
-
     BeanSet<T> beanSet = new BeanSet<>(loader, parentBean, propertyName);
-    beanSet.setModifyListening(many.getModifyListenMode());
+    beanSet.setModifyListening(many.modifyListenMode());
     return beanSet;
   }
 
   @Override
   public void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
-
     BeanSet<?> newBeanSet = (BeanSet<?>) server.findSet(query, t);
     refresh(newBeanSet, parentBean);
   }
 
   @Override
   public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
-
     BeanSet<?> newBeanSet = (BeanSet<?>) bc;
-
     Set<?> current = (Set<?>) many.getValue(parentBean);
-
-    newBeanSet.setModifyListening(many.getModifyListenMode());
+    newBeanSet.setModifyListening(many.modifyListenMode());
     if (current == null) {
       // the currentList is null?  Not really expecting this...
       many.setValue(parentBean, newBeanSet);
@@ -91,7 +85,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
       // normally this case, replace just the underlying list
       BeanSet<?> currentBeanSet = (BeanSet<?>) current;
       currentBeanSet.setActualSet(newBeanSet.getActualSet());
-      currentBeanSet.setModifyListening(many.getModifyListenMode());
+      currentBeanSet.setModifyListening(many.modifyListenMode());
 
     } else {
       // replace the entire set
@@ -101,7 +95,6 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   public void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
-
     Set<?> set;
     if (collection instanceof BeanCollection<?>) {
       BeanSet<?> bc = (BeanSet<?>) collection;

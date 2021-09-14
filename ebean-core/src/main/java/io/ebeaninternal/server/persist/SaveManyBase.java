@@ -30,10 +30,10 @@ abstract class SaveManyBase implements SaveMany {
   SaveManyBase(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     this.persister = persister;
     this.request = request;
-    this.server = request.getServer();
+    this.server = request.server();
     this.many = many;
     this.parentBean = parentBean;
-    this.transaction = request.getTransaction();
+    this.transaction = request.transaction();
     this.value = many.getValue(parentBean);
     this.insertedParent = insertedParent;
     if (!insertedParent) {
@@ -46,33 +46,33 @@ abstract class SaveManyBase implements SaveMany {
    */
   abstract void save();
 
-  void preElementCollectionUpdate() {
+  final void preElementCollectionUpdate() {
     if (!insertedParent) {
       request.preElementCollectionUpdate();
-      persister.addToFlushQueue(many.deleteByParentId(request.getBeanId(), null), transaction, 1);
+      persister.addToFlushQueue(many.deleteByParentId(request.beanId(), null), transaction, 1);
     }
   }
 
-  void resetModifyState() {
+  final void resetModifyState() {
     if (value instanceof BeanCollection<?>) {
       modifyListenReset((BeanCollection<?>) value);
     }
   }
 
-  void modifyListenReset(BeanCollection<?> c) {
+  final void modifyListenReset(BeanCollection<?> c) {
     if (insertedParent) {
       // after insert set the modify listening mode for private owned etc
-      c.setModifyListening(many.getModifyListenMode());
+      c.setModifyListening(many.modifyListenMode());
     }
     c.modifyReset();
   }
 
-  void postElementCollectionUpdate() {
+  final void postElementCollectionUpdate() {
     if (!insertedParent) {
       if (request.isNotifyCache()) {
         try {
           String asJson = many.jsonWriteCollection(value);
-          request.addCollectionChange(many.getName(), asJson);
+          request.addCollectionChange(many.name(), asJson);
         } catch (IOException e) {
           log.error("Error build element collection entry for L2 cache", e);
         }

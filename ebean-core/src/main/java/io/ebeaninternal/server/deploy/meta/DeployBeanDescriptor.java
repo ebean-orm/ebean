@@ -70,131 +70,86 @@ public class DeployBeanDescriptor<T> {
   private static final String I_SCALAOBJECT = "scala.ScalaObject";
 
   private final DatabaseConfig config;
-
   private final BeanDescriptorManager manager;
-
   /**
    * Map of BeanProperty Linked so as to preserve order.
    */
   private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<>();
-
   private Map<String, SpiRawSql> namedRawSql;
-
   private Map<String, String> namedQuery;
-
   private EntityType entityType;
-
   private DeployBeanPropertyAssocOne<?> unidirectional;
-
   private DeployBeanProperty orderColumn;
-
   private Class<?> idClass;
-
   private DeployBeanPropertyAssocOne<?> idClassProperty;
-
   private DeployIdentityMode identityMode = DeployIdentityMode.auto();
-
   private PlatformIdGenerator idGenerator;
-
   /**
    * Set true when explicit auto generated Id.
    */
   private boolean idGeneratedValue;
-
   /**
    * Used with Identity columns but no getGeneratedKeys support.
    */
   private String selectLastInsertedId;
   private String selectLastInsertedIdDraft;
-
   /**
    * The concurrency mode for beans of this type.
    */
   private ConcurrencyMode concurrencyMode;
-
   private List<IndexDefinition> indexDefinitions;
-
   private String storageEngine;
-
   /**
    * The base database table.
    */
   private String baseTable;
-
   private String baseTableAsOf;
-
   private String baseTableVersionsBetween;
-
   private String draftTable;
-
   private String[] dependentTables;
-
   private boolean historySupport;
-
   private boolean readAuditing;
-
   private boolean draftable;
-
   private boolean draftableElement;
-
   private TableName baseTableFull;
-
   private String[] properties;
-
   /**
    * The EntityBean type used to create new EntityBeans.
    */
   private final Class<T> beanType;
-
   private final List<BeanPersistController> persistControllers = new ArrayList<>();
   private final List<BeanPersistListener> persistListeners = new ArrayList<>();
   private final List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
   private final List<BeanPostLoad> postLoaders = new ArrayList<>();
   private final List<BeanPostConstructListener> postConstructListeners = new ArrayList<>();
-
   private CacheOptions cacheOptions = CacheOptions.NO_CACHING;
-
   /**
    * If set overrides the find implementation. Server side only.
    */
   private BeanFindController beanFinder;
-
   /**
    * Inheritance information. Server side only.
    */
   private InheritInfo inheritInfo;
-
   private String name;
-
   private ChangeLogFilter changeLogFilter;
-
   private String dbComment;
-
   private PartitionMeta partitionMeta;
-
   /**
    * One of NONE, INDEX or EMBEDDED.
    */
   private boolean docStoreMapped;
-
   private DocStore docStore;
-
   private PathProperties docStorePathProperties;
-
   private String docStoreQueueId;
-
   private String docStoreIndexName;
-
   private String docStoreIndexType;
-
   private DocStoreMode docStorePersist;
   private DocStoreMode docStoreInsert;
   private DocStoreMode docStoreUpdate;
   private DocStoreMode docStoreDelete;
-
   private DeployBeanProperty idProperty;
   private TableJoin primaryKeyJoin;
-
   private Object jacksonAnnotatedClass;
 
   /**
@@ -237,7 +192,7 @@ public class DeployBeanDescriptor<T> {
    * Return the DeployBeanInfo for the given bean class.
    */
   DeployBeanInfo<?> getDeploy(Class<?> cls) {
-    return manager.getDeploy(cls);
+    return manager.deploy(cls);
   }
 
   public void setStorageEngine(String storageEngine) {

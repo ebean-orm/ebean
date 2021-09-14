@@ -13,7 +13,6 @@ class DProfileLocation implements ProfileLocation {
   private String fullLocation;
   private String location;
   private String label;
-
   private final int lineNumber;
   private int traceCount;
 
@@ -83,6 +82,7 @@ class DProfileLocation implements ProfileLocation {
     }
   }
 
+  @Override
   public void setTraceCount(int traceCount) {
     this.traceCount = traceCount;
   }

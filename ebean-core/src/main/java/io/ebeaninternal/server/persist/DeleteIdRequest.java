@@ -5,15 +5,17 @@ import io.ebean.Transaction;
 import io.ebean.event.BeanDeleteIdRequest;
 import io.ebeaninternal.api.SpiEbeanServer;
 
-class DeleteIdRequest implements BeanDeleteIdRequest {
+final class DeleteIdRequest implements BeanDeleteIdRequest {
 
   private final EbeanServer server;
   private final Transaction transaction;
+  private Class<?> beanType;
   private Object id;
 
-  DeleteIdRequest(SpiEbeanServer server, Transaction transaction, Object id) {
+  DeleteIdRequest(SpiEbeanServer server, Transaction transaction, Class<?> beanType, Object id) {
     this.server = server;
     this.transaction = transaction;
+    this.beanType = beanType;
     this.id = id;
   }
 
@@ -27,12 +29,17 @@ class DeleteIdRequest implements BeanDeleteIdRequest {
   }
 
   @Override
-  public Transaction getTransaction() {
+  public Transaction transaction() {
     return transaction;
   }
 
   @Override
-  public Object getId() {
+  public Class<?> beanType() {
+    return beanType;
+  }
+
+  @Override
+  public Object id() {
     return id;
   }
 }

@@ -17,7 +17,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
-class DScriptRunner implements ScriptRunner {
+final class DScriptRunner implements ScriptRunner {
 
   private static final String NEWLINE = "\n";
 
@@ -26,7 +26,7 @@ class DScriptRunner implements ScriptRunner {
 
   DScriptRunner(SpiEbeanServer server) {
     this.server = server;
-    this.platformName = this.server.getDatabasePlatform().getPlatform().base().name();
+    this.platformName = this.server.platform().base().name();
   }
 
   @Override
@@ -102,7 +102,7 @@ class DScriptRunner implements ScriptRunner {
 
   private Connection obtainConnection() {
     try {
-      return server.getDataSource().getConnection();
+      return server.dataSource().getConnection();
     } catch (SQLException e) {
       throw new PersistenceException("Failed to obtain connection to run script", e);
     }
