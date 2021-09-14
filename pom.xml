@@ -40,7 +40,7 @@
   <properties>
     <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.12.1</jackson.version>
-    <ebean-ddl-runner.version>1.0</ebean-ddl-runner.version>
+    <ebean-ddl-runner.version>1.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.1</ebean-migration-auto.version>
     <ebean-migration.version>12.11.0</ebean-migration.version>
     <ebean-test-docker.version>4.1</ebean-test-docker.version>
