@@ -1,15 +1,15 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
+import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ManyWhereJoins;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebean.util.SplitName;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 /**
  * Base class for simple expressions.
@@ -78,7 +78,7 @@ abstract class AbstractExpression implements SpiExpression {
       if (elProp != null) {
         if (elProp.containsFormulaWithJoin()) {
           // for findCount query select clause
-          manyWhereJoin.addFormulaWithJoin(elProp.getElPrefix(), elProp.getName());
+          manyWhereJoin.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
         }
         if (elProp.containsMany()) {
           // for findCount we join to a many property
