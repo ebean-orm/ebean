@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.11.2-SNAPSHOT</version>
+    <version>12.11.5-SNAPSHOT</version>
   </parent>
 
   <name>querybean generator</name>
@@ -14,9 +14,9 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.avaje.composite</groupId>
-      <artifactId>composite-testing</artifactId>
-      <version>3.1</version>
+      <groupId>io.avaje</groupId>
+      <artifactId>junit</artifactId>
+      <version>1.0</version>
       <scope>test</scope>
     </dependency>
 

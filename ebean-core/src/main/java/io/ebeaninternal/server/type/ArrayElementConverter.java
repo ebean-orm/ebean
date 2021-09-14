@@ -104,6 +104,7 @@ interface ArrayElementConverter<T> {
    */
   class StringConverter implements ArrayElementConverter<String> {
 
+    @Override
     public String fromDbArray(Object rawValue) {
       return (String) rawValue;
     }

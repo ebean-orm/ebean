@@ -1,11 +1,11 @@
 package io.ebeaninternal.xmlmapping.model;
 
 import io.ebeaninternal.xmlmapping.XmlMappingReader;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class XmlMappingReaderTest {
 

@@ -54,6 +54,6 @@ final class ExportedProperty {
     if (path != null) {
       sb.append(path).append(".");
     }
-    sb.append(property.getName());
+    sb.append(property.name());
   }
 }

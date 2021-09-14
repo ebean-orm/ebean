@@ -8,7 +8,15 @@ public interface BulkTableEvent {
   /**
    * Return the name of the table that was involved.
    */
-  String getTableName();
+  String tableName();
+
+  /**
+   * Deprecated migrate to tableName().
+   */
+  @Deprecated
+  default String getTableName() {
+    return tableName();
+  }
 
   /**
    * Return true if rows were inserted.

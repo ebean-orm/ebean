@@ -3,8 +3,6 @@ package io.ebeaninternal.server.deploy.meta;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanTable;
 
-import javax.persistence.JoinColumn;
-
 /**
  * A join pair of local and foreign properties.
  */
@@ -87,7 +85,7 @@ public final class DeployTableJoinColumn {
     if (localDbColumn == null) {
       BeanProperty idProperty = beanTable.getIdProperty();
       if (idProperty != null) {
-        localDbColumn = idProperty.getDbColumn();
+        localDbColumn = idProperty.dbColumn();
       }
     }
   }

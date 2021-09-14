@@ -2,7 +2,7 @@ package org.tests.model.basic.test;
 
 import io.ebean.DB;
 import io.ebean.Query;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 
 import java.util.List;

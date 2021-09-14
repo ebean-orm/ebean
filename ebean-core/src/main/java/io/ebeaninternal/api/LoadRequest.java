@@ -9,22 +9,19 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 public abstract class LoadRequest {
 
   protected final OrmQueryRequest<?> parentRequest;
-
   protected final Transaction transaction;
-
   protected final boolean lazy;
 
-  public LoadRequest(OrmQueryRequest<?> parentRequest, boolean lazy) {
-
+  LoadRequest(OrmQueryRequest<?> parentRequest, boolean lazy) {
     this.parentRequest = parentRequest;
-    this.transaction = parentRequest == null ? null : parentRequest.getTransaction();
+    this.transaction = parentRequest == null ? null : parentRequest.transaction();
     this.lazy = lazy;
   }
 
   /**
    * Return the associated bean type for this load request.
    */
-  public abstract Class<?> getBeanType();
+  public abstract Class<?> beanType();
 
   /**
    * Return true if this is a lazy load and false if it is a secondary query.
@@ -39,7 +36,7 @@ public abstract class LoadRequest {
    * Lazy loading queries run in their own transaction.
    * </p>
    */
-  public Transaction getTransaction() {
+  public Transaction transaction() {
     return transaction;
   }
 
@@ -48,6 +45,6 @@ public abstract class LoadRequest {
    * So one of - findIterate(), findEach(), findEachWhile() or findVisit().
    */
   public boolean isParentFindIterate() {
-    return parentRequest != null && parentRequest.getQuery().getType() == SpiQuery.Type.ITERATE;
+    return parentRequest != null && parentRequest.query().getType() == SpiQuery.Type.ITERATE;
   }
 }

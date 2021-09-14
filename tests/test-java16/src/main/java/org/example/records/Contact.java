@@ -28,31 +28,31 @@ public class Contact extends Model {
     this.name = name;
   }
 
-  public String getName() {
+  public String name() {
     return name;
   }
 
-  public Address getHomeAddress() {
+  public Address homeAddress() {
     return homeAddress;
   }
 
-  public void setHomeAddress(Address homeAddress) {
+  public void homeAddress(Address homeAddress) {
     this.homeAddress = homeAddress;
   }
 
-  public Address getWorkAddress() {
+  public Address workAddress() {
     return workAddress;
   }
 
-  public void setWorkAddress(Address workAddress) {
+  public void workAddress(Address workAddress) {
     this.workAddress = workAddress;
   }
 
-  public long getId() {
+  public long id() {
     return id;
   }
 
-  public long getVersion() {
+  public long version() {
     return version;
   }
 }

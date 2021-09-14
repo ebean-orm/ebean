@@ -54,10 +54,10 @@ final class BeanChangeJson implements BeanDiffVisitor {
   public void visitPush(int position) {
     stack.push(descriptor);
     BeanPropertyAssocOne<?> embedded = (BeanPropertyAssocOne<?>)descriptor.propertiesIndex[position];
-    descriptor = embedded.getTargetDescriptor();
-    newJson.writeStartObject(embedded.getName());
+    descriptor = embedded.targetDescriptor();
+    newJson.writeStartObject(embedded.name());
     if (oldJson != null) {
-      oldJson.writeStartObject(embedded.getName());
+      oldJson.writeStartObject(embedded.name());
     }
   }
 

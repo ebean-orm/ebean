@@ -65,6 +65,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     return new DefaultPersistenceContext(this, false);
   }
 
+  @Override
   public boolean resetLimit() {
     lock.lock();
     try {
@@ -335,7 +336,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
      * Add the dirty beans to the list.
      */
     void dirtyBeans(SpiBeanTypeManager manager, List<Object> list) {
-      final SpiBeanType beanType = manager.getBeanType(rootType);
+      final SpiBeanType beanType = manager.beanType(rootType);
       for (Object value : map.values()) {
         EntityBean bean = (EntityBean) value;
         if (bean._ebean_getIntercept().isDirty() || beanType.isToManyDirty(bean)) {

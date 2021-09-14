@@ -34,6 +34,6 @@ public class DocStoreDeleteEvent implements DocStoreUpdate {
    */
   @Override
   public void addToQueue(DocStoreUpdates docStoreUpdates) {
-    docStoreUpdates.queueDelete(beanType.getDocStoreQueueId(), idValue);
+    docStoreUpdates.queueDelete(beanType.docStoreQueueId(), idValue);
   }
 }

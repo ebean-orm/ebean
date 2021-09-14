@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.migrationreader;
 
 import io.ebeaninternal.dbmigration.migration.Migration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 

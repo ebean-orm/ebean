@@ -36,6 +36,11 @@ abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements Scalar
   }
 
   @Override
+  public String format(Object value) {
+    return String.valueOf(value);
+  }
+
+  @Override
   public String formatValue(UUID value) {
     return value.toString();
   }

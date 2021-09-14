@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Types;
 import java.time.LocalDate;

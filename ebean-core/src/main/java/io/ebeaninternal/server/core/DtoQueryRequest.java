@@ -66,7 +66,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   @Override
   protected void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException {
     this.resultSet = resultSet;
-    this.dataReader = new RsetDataReader(server.getDataTimeZone(), resultSet);
+    this.dataReader = new RsetDataReader(server.dataTimeZone(), resultSet);
     obtainPlan(queryPlanKey);
   }
 
@@ -114,6 +114,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     return queryEngine.findList(this);
   }
 
+  @Override
   public boolean next() throws SQLException {
     query.checkCancelled();
     return dataReader.next();

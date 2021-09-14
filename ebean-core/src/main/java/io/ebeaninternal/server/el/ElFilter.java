@@ -24,18 +24,18 @@ public final class ElFilter<T> implements Filter<T> {
 
   private Object convertValue(String propertyName, Object value) {
     // convert type of value to match expected type
-    ElPropertyValue elGetValue = beanDescriptor.getElGetValue(propertyName);
+    ElPropertyValue elGetValue = beanDescriptor.elGetValue(propertyName);
     return elGetValue.convert(value);
   }
 
   private ElComparator<T> getElComparator(String propertyName) {
 
-    return beanDescriptor.getElComparator(propertyName);
+    return beanDescriptor.elComparator(propertyName);
   }
 
   private ElPropertyValue getElGetValue(String propertyName) {
 
-    return beanDescriptor.getElGetValue(propertyName);
+    return beanDescriptor.elGetValue(propertyName);
   }
 
   @Override

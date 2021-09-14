@@ -29,7 +29,7 @@ abstract class AnnotationAssoc extends AnnotationParser {
   }
 
   BeanTable getBeanTable(DeployBeanPropertyAssoc<?> prop) {
-    return factory.getBeanTable(prop.getTargetType());
+    return factory.beanTable(prop.getTargetType());
   }
 
   private String errorMsgMissingBeanTable(Class<?> type, String from) {

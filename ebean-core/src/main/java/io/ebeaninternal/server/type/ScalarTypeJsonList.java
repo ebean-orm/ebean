@@ -9,11 +9,13 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
+import io.ebeaninternal.json.ModifyAwareList;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,6 +36,46 @@ final class ScalarTypeJsonList {
       }
     }
     return new ScalarTypeJsonList.Varchar(docType, nullable, keepSource);
+  }
+
+  @SuppressWarnings("rawtypes")
+  static final class VarcharWithConverter extends ScalarTypeJsonList.Base {
+    private final ArrayElementConverter converter;
+
+    VarcharWithConverter(DocPropertyType docType, boolean nullable, boolean keepSource, ArrayElementConverter converter) {
+      super(Types.VARCHAR, docType, nullable, keepSource);
+      this.converter = converter;
+    }
+
+    @Override
+    List readJsonConvert(String json) {
+      try {
+        return convertElements(EJson.parseList(json, false));
+      } catch (IOException e) {
+        throw new TextException("Failed to parse JSON [{}] as List", json, e);
+      }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List convertElements(List<Object> rawList) {
+      if (rawList == null) {
+        return null;
+      }
+      final List result = new ArrayList<>(rawList.size());
+      for (Object o : rawList) {
+        result.add(converter.fromSerialized(o));
+      }
+      return new ModifyAwareList(result);
+    }
+
+    @Override
+    public List parse(String value) {
+      try {
+        return convertElements(EJson.parseList(value, false));
+      } catch (IOException e) {
+        throw new TextException("Failed to parse JSON [{}] as List", value, e);
+      }
+    }
   }
 
   /**
@@ -86,6 +128,10 @@ final class ScalarTypeJsonList {
       if (keepSource) {
         reader.pushJson(json);
       }
+      return readJsonConvert(json);
+    }
+
+    List readJsonConvert(String json) {
       try {
         // parse JSON into modifyAware list
         return EJson.parseList(json, true);
@@ -130,7 +176,7 @@ final class ScalarTypeJsonList {
     }
 
     @Override
-    public final List parse(String value) {
+    public List parse(String value) {
       try {
         return EJson.parseList(value, false);
       } catch (IOException e) {

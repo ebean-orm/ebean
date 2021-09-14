@@ -22,12 +22,12 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
    * Return the query.
    */
   @Override
-  SpiQuery<T> getQuery();
+  SpiQuery<T> query();
 
   /**
    * Return the associated BeanDescriptor.
    */
-  BeanDescriptor<T> getBeanDescriptor();
+  BeanDescriptor<T> descriptor();
 
   /**
    * Prepare the query for execution.
@@ -145,12 +145,12 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   /**
    * Return the bean cache hits (when all hits / no misses).
    */
-  List<T> getBeanCacheHits();
+  List<T> beanCacheHits();
 
   /**
    * Return the bean cache hits for findMap (when all hits / no misses).
    */
-  <K> Map<K,T> getBeanCacheHitsAsMap();
+  <K> Map<K,T> beanCacheHitsAsMap();
 
   /**
    * Reset Bean cache mode AUTO - require explicit setting for bean cache use with findList().
@@ -160,7 +160,7 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   /**
    * Return the Database platform like clause.
    */
-  String getDBLikeClause(boolean rawLikeExpression);
+  String dbLikeClause(boolean rawLikeExpression);
 
   /**
    * Escapes a string to use it as exact match in Like clause.

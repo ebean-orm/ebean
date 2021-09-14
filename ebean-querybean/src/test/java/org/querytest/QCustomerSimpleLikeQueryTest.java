@@ -2,7 +2,7 @@ package org.querytest;
 
 import org.example.domain.Customer;
 import org.example.domain.query.QCustomer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Date;
 import java.util.List;

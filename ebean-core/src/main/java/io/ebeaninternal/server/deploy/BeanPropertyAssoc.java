@@ -117,10 +117,10 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   }
 
   void initialiseTargetDescriptor(BeanDescriptorInitContext initContext) {
-    targetDescriptor = descriptor.getBeanDescriptor(targetType);
+    targetDescriptor = descriptor.descriptor(targetType);
     if (!isTransient) {
-      targetIdBinder = targetDescriptor.getIdBinder();
-      targetInheritInfo = targetDescriptor.getInheritInfo();
+      targetIdBinder = targetDescriptor.idBinder();
+      targetInheritInfo = targetDescriptor.inheritInfo();
       saveRecurseSkippable = targetDescriptor.isSaveRecurseSkippable();
       if (!targetIdBinder.isComplexId()) {
         targetIdProperty = targetIdBinder.getIdProperty();
@@ -129,14 +129,14 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   }
 
   @Override
-  public int getFetchPreference() {
+  public int fetchPreference() {
     return fetchPreference;
   }
 
   /**
    * Return the extra configuration for the foreign key.
    */
-  public PropertyForeignKey getForeignKey() {
+  public PropertyForeignKey foreignKey() {
     return foreignKey;
   }
 
@@ -159,7 +159,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   ElPropertyValue createElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     // associated or embedded bean
-    BeanDescriptor<?> embDesc = getTargetDescriptor();
+    BeanDescriptor<?> embDesc = targetDescriptor();
     if (chain == null) {
       chain = new ElPropertyChainBuilder(isEmbedded(), propName);
     }
@@ -198,7 +198,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * Return the mappedBy property.
    * This will be null on the owning side.
    */
-  public String getMappedBy() {
+  public String mappedBy() {
     return mappedBy;
   }
 
@@ -208,19 +208,19 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * This will return null for multiple Id properties.
    * </p>
    */
-  public String getTargetIdProperty() {
+  public String targetIdProperty() {
     return targetIdProperty;
   }
 
   /**
    * Return the BeanDescriptor of the target.
    */
-  public BeanDescriptor<T> getTargetDescriptor() {
+  public BeanDescriptor<T> targetDescriptor() {
     return targetDescriptor;
   }
 
   SpiEbeanServer server() {
-    return descriptor.getEbeanServer();
+    return descriptor.ebeanServer();
   }
 
   /**
@@ -229,12 +229,12 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * We use target descriptor rather than target property type to support ElementCollection.
    */
   public SpiQuery<T> newQuery(SpiEbeanServer server) {
-    return new DefaultOrmQuery<>(targetDescriptor, server, server.getExpressionFactory());
+    return new DefaultOrmQuery<>(targetDescriptor, server, server.expressionFactory());
   }
 
   @Override
-  public IdBinder getIdBinder() {
-    return descriptor.getIdBinder();
+  public IdBinder idBinder() {
+    return descriptor.idBinder();
   }
 
   @Override
@@ -251,8 +251,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   }
 
   @Override
-  public String getSoftDeletePredicate(String tableAlias) {
-    return targetDescriptor.getSoftDeletePredicate(tableAlias);
+  public String softDeletePredicate(String tableAlias) {
+    return targetDescriptor.softDeletePredicate(tableAlias);
   }
 
   /**
@@ -283,8 +283,8 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * Return true if the unique id properties are all not null for this bean.
    */
   public boolean hasId(EntityBean bean) {
-    BeanDescriptor<?> targetDesc = getTargetDescriptor();
-    BeanProperty idProp = targetDesc.getIdProperty();
+    BeanDescriptor<?> targetDesc = targetDescriptor();
+    BeanProperty idProp = targetDesc.idProperty();
     // all the unique properties are non-null
     return idProp == null || idProp.getValue(bean) != null;
   }
@@ -296,7 +296,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * set or map.
    * </p>
    */
-  public Class<?> getTargetType() {
+  public Class<?> targetType() {
     return targetType;
   }
 
@@ -305,14 +305,14 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * to this bean type.
    */
   @Override
-  public String getExtraWhere() {
+  public String extraWhere() {
     return extraWhere;
   }
 
   /**
    * Return the elastic search doc for this embedded property.
    */
-  private String getDocStoreDoc() {
+  private String docStoreDoc() {
     return docStoreDoc;
   }
 
@@ -321,7 +321,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   @Override
   public void docStoreInclude(boolean includeByDefault, DocStructure docStructure) {
-    String embeddedDoc = getDocStoreDoc();
+    String embeddedDoc = docStoreDoc();
     if (embeddedDoc == null) {
       // not annotated so use include by default
       // which is *ToOne included and *ToMany excluded
@@ -399,21 +399,21 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * Return the underlying BeanTable for this property.
    */
-  public BeanTable getBeanTable() {
+  public BeanTable beanTable() {
     return beanTable;
   }
 
   /**
    * return the join to use for the bean.
    */
-  public TableJoin getTableJoin() {
+  public TableJoin tableJoin() {
     return tableJoin;
   }
 
   /**
    * Get the persist info.
    */
-  public BeanCascadeInfo getCascadeInfo() {
+  public BeanCascadeInfo cascadeInfo() {
     return cascadeInfo;
   }
 
@@ -422,10 +422,10 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * descriptor back to local database columns in the TableJoin.
    */
   ImportedId createImportedId(BeanPropertyAssoc<?> owner, BeanDescriptor<?> target, TableJoin join) {
-    BeanProperty idProp = target.getIdProperty();
+    BeanProperty idProp = target.idProperty();
     BeanProperty[] others = target.propertiesBaseScalar();
     if (descriptor.isRawSqlBased()) {
-      String dbColumn = owner.getDbColumn();
+      String dbColumn = owner.dbColumn();
       return new ImportedIdSimple(owner, dbColumn, null, idProp, 0);
     }
     if (idProp == null) {
@@ -445,7 +445,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     } else {
       // embedded id
       BeanPropertyAssocOne<?> embProp = (BeanPropertyAssocOne<?>) idProp;
-      BeanProperty[] embBaseProps = embProp.getTargetDescriptor().propertiesBaseScalar();
+      BeanProperty[] embBaseProps = embProp.targetDescriptor().propertiesBaseScalar();
       ImportedIdSimple[] scalars = createImportedList(owner, cols, embBaseProps, others);
       return new ImportedIdEmbedded(owner, embProp, scalars);
     }
@@ -466,16 +466,16 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     boolean insertable = col.isInsertable();
     boolean updateable = col.isUpdateable();
     for (int j = 0; j < props.length; j++) {
-      if (props[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
+      if (props[j].dbColumn().equalsIgnoreCase(matchColumn)) {
         return new ImportedIdSimple(owner, localColumn, localSqlFormula, props[j], j, insertable, updateable);
       }
     }
     for (int j = 0; j < others.length; j++) {
-      if (others[j].getDbColumn().equalsIgnoreCase(matchColumn)) {
+      if (others[j].dbColumn().equalsIgnoreCase(matchColumn)) {
         return new ImportedIdSimple(owner, localColumn, localSqlFormula, others[j], j + props.length, insertable, updateable);
       }
     }
-    String msg = "Error with the Join on [" + getFullBeanName()
+    String msg = "Error with the Join on [" + fullName()
       + "]. Could not find the local match for [" + matchColumn + "] "//in table["+searchTable+"]?"
       + " Perhaps an error in a @JoinColumn";
     throw new PersistenceException(msg);
@@ -566,7 +566,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
       }
     }
 
-    String msg = "Error with the Join on [" + getFullBeanName()
+    String msg = "Error with the Join on [" + fullName()
       + "]. Could not find the matching foreign key for [" + matchColumn + "] in table[" + searchTable + "]?"
       + " Perhaps using a @JoinColumn with the name/referencedColumnName attributes swapped? "
       + " or a @JoinColumn needs an explicit referencedColumnName specified?";

@@ -19,20 +19,15 @@ import java.util.List;
 public final class PersistRequestCallableSql extends PersistRequest {
 
   private final SpiCallableSql callableSql;
-
   private int rowCount;
-
   private String bindLog;
-
   private CallableStatement cstmt;
-
   private BindParams bindParam;
 
   /**
    * Create.
    */
   public PersistRequestCallableSql(SpiEbeanServer server, CallableSql cs, SpiTransaction t, PersistExecute persistExecute) {
-
     super(server, t, persistExecute, cs.getLabel());
     this.type = PersistRequest.Type.CALLABLESQL;
     this.callableSql = (SpiCallableSql) cs;
@@ -56,7 +51,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
   /**
    * Return the CallableSql.
    */
-  public SpiCallableSql getCallableSql() {
+  public SpiCallableSql callableSql() {
     return callableSql;
   }
 
@@ -97,13 +92,11 @@ public final class PersistRequestCallableSql extends PersistRequest {
 
     // register table modifications with the transaction event
     TransactionEventTable tableEvents = callableSql.getTransactionEventTable();
-
     if (tableEvents != null && !tableEvents.isEmpty()) {
       transaction.getEvent().add(tableEvents);
     } else {
       transaction.markNotQueryOnly();
     }
-
   }
 
   /**
@@ -120,7 +113,6 @@ public final class PersistRequestCallableSql extends PersistRequest {
    * Execute the statement in normal non batch mode.
    */
   public int executeUpdate() throws SQLException {
-
     // check to see if the execution has been overridden
     // only works in non-batch mode
     if (callableSql.executeOverride(cstmt)) {
@@ -129,20 +121,15 @@ public final class PersistRequestCallableSql extends PersistRequest {
       // rowCount = callableSql.getRowCount();
       // return rowCount;
     }
-
     rowCount = cstmt.executeUpdate();
-
     // only read in non-batch mode
     readOutParams();
-
     return rowCount;
   }
 
   private void readOutParams() throws SQLException {
-
     List<Param> list = bindParam.positionedParameters();
     int pos = 0;
-
     for (Param param : list) {
       pos++;
       if (param.isOutParam()) {
@@ -151,5 +138,4 @@ public final class PersistRequestCallableSql extends PersistRequest {
       }
     }
   }
-
 }

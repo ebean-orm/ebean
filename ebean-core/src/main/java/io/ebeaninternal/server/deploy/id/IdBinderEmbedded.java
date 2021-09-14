@@ -35,13 +35,13 @@ public final class IdBinderEmbedded implements IdBinder {
   public IdBinderEmbedded(boolean idInExpandedForm, BeanPropertyAssocOne<?> embIdProperty) {
     this.idInExpandedForm = idInExpandedForm;
     this.embIdProperty = embIdProperty;
-    this.idClass = "_idClass".equals(embIdProperty.getName());
+    this.idClass = "_idClass".equals(embIdProperty.name());
   }
 
   @Override
   public void initialise() {
-    this.idDesc = embIdProperty.getTargetDescriptor();
-    this.props = embIdProperty.getProperties();
+    this.idDesc = embIdProperty.targetDescriptor();
+    this.props = embIdProperty.properties();
     this.idInValueSql = idInExpandedForm ? idInExpanded() : idInCompressed();
   }
 
@@ -57,7 +57,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(idDesc.getBaseTableAlias()).append(".").append(props[i].getDbColumn()).append("=?");
+      sb.append(idDesc.baseTableAlias()).append(".").append(props[i].dbColumn()).append("=?");
     }
     sb.append(")");
     return sb.toString();
@@ -91,9 +91,9 @@ public final class IdBinderEmbedded implements IdBinder {
         sb.append(pathPrefix).append(".");
       }
       if (!idClass) {
-        sb.append(embIdProperty.getName()).append(".");
+        sb.append(embIdProperty.name()).append(".");
       }
-      sb.append(props[i].getName());
+      sb.append(props[i].name());
       if (!ascending) {
         sb.append(" desc");
       }
@@ -107,13 +107,13 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public String getIdProperty() {
-    return embIdProperty.getName();
+    return embIdProperty.name();
   }
 
   @Override
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
     if (!idClass) {
-      prefix = SplitName.add(prefix, embIdProperty.getName());
+      prefix = SplitName.add(prefix, embIdProperty.name());
     }
     for (BeanProperty prop : props) {
       prop.buildRawSqlSelectChain(prefix, selectChain);
@@ -123,7 +123,7 @@ public final class IdBinderEmbedded implements IdBinder {
   @Override
   public BeanProperty findBeanProperty(String dbColumnName) {
     for (BeanProperty prop : props) {
-      if (dbColumnName.equalsIgnoreCase(prop.getDbColumn())) {
+      if (dbColumnName.equalsIgnoreCase(prop.dbColumn())) {
         return prop;
       }
     }
@@ -143,9 +143,9 @@ public final class IdBinderEmbedded implements IdBinder {
         sb.append(", ");
       }
       if (!idClass) {
-        sb.append(embIdProperty.getName()).append(".");
+        sb.append(embIdProperty.name()).append(".");
       }
-      sb.append(props[i].getName());
+      sb.append(props[i].name());
     }
     return sb.toString();
   }
@@ -173,7 +173,7 @@ public final class IdBinderEmbedded implements IdBinder {
         if (i > 0) {
           sb.append(" and ");
         }
-        sb.append(props[i].getDbColumn()).append("=?");
+        sb.append(props[i].dbColumn()).append("=?");
       }
       sb.append(")");
     }
@@ -235,7 +235,7 @@ public final class IdBinderEmbedded implements IdBinder {
     EntityBean ebValue = (EntityBean) embIdProperty.getValue(bean);
     Map<String, Object> map = new LinkedHashMap<>();
     for (BeanProperty prop : props) {
-      map.put(prop.getName(), prop.getValue(ebValue));
+      map.put(prop.name(), prop.getValue(ebValue));
     }
     return map;
   }
@@ -249,7 +249,7 @@ public final class IdBinderEmbedded implements IdBinder {
     Map<String, Object> map = (Map<String, Object>) value;
     EntityBean idValue = idDesc.createEntityBean();
     for (BeanProperty prop : props) {
-      prop.setValue(idValue, map.get(prop.getName()));
+      prop.setValue(idValue, map.get(prop.name()));
     }
     return idValue;
   }
@@ -358,7 +358,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (prefix != null) {
         sb.append(prefix).append(".");
       }
-      sb.append(props[i].getName());
+      sb.append(props[i].name());
     }
     sb.append(")");
     return sb.toString();
@@ -375,9 +375,9 @@ public final class IdBinderEmbedded implements IdBinder {
         sb.append(prefix).append(".");
       }
       if (!idClass) {
-        sb.append(embIdProperty.getName()).append(".");
+        sb.append(embIdProperty.name()).append(".");
       }
-      sb.append(props[i].getName()).append(operator);
+      sb.append(props[i].name()).append(operator);
     }
     return sb.toString();
   }
@@ -392,7 +392,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (baseTableAlias != null) {
         sb.append(baseTableAlias).append(".");
       }
-      sb.append(props[i].getDbColumn()).append("=?");
+      sb.append(props[i].dbColumn()).append("=?");
     }
     return sb.toString();
   }
@@ -411,7 +411,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (baseTableAlias != null) {
         sb.append(baseTableAlias).append(".");
       }
-      sb.append(props[i].getDbColumn());
+      sb.append(props[i].dbColumn());
     }
     sb.append(")");
     return sb.toString();

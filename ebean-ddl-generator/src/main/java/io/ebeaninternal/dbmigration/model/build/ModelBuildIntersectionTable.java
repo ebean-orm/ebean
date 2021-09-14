@@ -5,7 +5,6 @@ import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.PropertyForeignKey;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
 
@@ -25,8 +24,8 @@ class ModelBuildIntersectionTable {
   ModelBuildIntersectionTable(ModelBuildContext ctx, BeanPropertyAssocMany<?> manyProp) {
     this.ctx = ctx;
     this.manyProp = manyProp;
-    this.intersectionTableJoin = manyProp.getIntersectionTableJoin();
-    this.tableJoin = manyProp.getTableJoin();
+    this.intersectionTableJoin = manyProp.intersectionTableJoin();
+    this.tableJoin = manyProp.tableJoin();
   }
 
   public MTable build() {
@@ -34,13 +33,13 @@ class ModelBuildIntersectionTable {
     intersectionTable = createTable();
     MTable existingTable = ctx.addTable(intersectionTable);
     if (existingTable != null) {
-      throw new IllegalStateException("Property " + manyProp.getFullBeanName() + " has duplicate ManyToMany intersection table " + intersectionTable.getName()
+      throw new IllegalStateException("Property " + manyProp.fullName() + " has duplicate ManyToMany intersection table " + intersectionTable.getName()
         + ". Please use @JoinTable to define unique table to use");
     }
 
     buildFkConstraints();
 
-    if (manyProp.getTargetDescriptor().isDraftable()) {
+    if (manyProp.targetDescriptor().isDraftable()) {
       ctx.createDraft(intersectionTable, false);
     }
 
@@ -51,16 +50,16 @@ class ModelBuildIntersectionTable {
 
     if (manyProp.hasForeignKeyConstraint()) {
       ctx.fkeyBuilder(intersectionTable)
-        .addForeignKey(manyProp.getBeanDescriptor(), intersectionTableJoin, true)
-        .addForeignKey(manyProp.getTargetDescriptor(), tableJoin, false);
+        .addForeignKey(manyProp.descriptor(), intersectionTableJoin, true)
+        .addForeignKey(manyProp.targetDescriptor(), tableJoin, false);
     }
     intersectionTable.checkDuplicateForeignKeys();
   }
 
   private MTable createTable() {
 
-    BeanDescriptor<?> localDesc = manyProp.getBeanDescriptor();
-    BeanDescriptor<?> targetDesc = manyProp.getTargetDescriptor();
+    BeanDescriptor<?> localDesc = manyProp.descriptor();
+    BeanDescriptor<?> targetDesc = manyProp.targetDescriptor();
 
     String tableName = intersectionTableJoin.getTable();
     MTable table = new MTable(tableName);
@@ -86,7 +85,7 @@ class ModelBuildIntersectionTable {
 
   private void addColumn(MTable table, BeanDescriptor<?> desc, String column, String findPropColumn) {
 
-    BeanProperty p = desc.getIdBinder().findBeanProperty(findPropColumn);
+    BeanProperty p = desc.idBinder().findBeanProperty(findPropColumn);
     if (p == null) {
       throw new RuntimeException("Could not find id property for " + findPropColumn);
     }

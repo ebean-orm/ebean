@@ -38,7 +38,7 @@ final class ExeOrmUpdate {
         // return -1 to indicate batch mode
         return -1;
       } else {
-        SpiUpdate<?> ormUpdate = request.getOrmUpdate();
+        SpiUpdate<?> ormUpdate = request.ormUpdate();
         if (ormUpdate.getTimeout() > 0) {
           pstmt.setQueryTimeout(ormUpdate.getTimeout());
         }
@@ -49,7 +49,7 @@ final class ExeOrmUpdate {
       }
 
     } catch (SQLException ex) {
-      throw new PersistenceException("Error executing: " + request.getOrmUpdate().getGeneratedSql(), ex);
+      throw new PersistenceException("Error executing: " + request.ormUpdate().getGeneratedSql(), ex);
 
     } finally {
       if (!batchThisRequest) {
@@ -62,14 +62,14 @@ final class ExeOrmUpdate {
    * Convert bean and property names to db table and columns.
    */
   private String translate(PersistRequestOrmUpdate request, String sql) {
-    BeanDescriptor<?> descriptor = request.getBeanDescriptor();
+    BeanDescriptor<?> descriptor = request.descriptor();
     return descriptor.convertOrmUpdateToSql(sql);
   }
 
   private PreparedStatement bindStmt(PersistRequestOrmUpdate request, boolean batchThisRequest) throws SQLException {
     request.startBind(batchThisRequest);
-    SpiUpdate<?> ormUpdate = request.getOrmUpdate();
-    SpiTransaction t = request.getTransaction();
+    SpiUpdate<?> ormUpdate = request.ormUpdate();
+    SpiTransaction t = request.transaction();
 
     String sql = ormUpdate.getUpdateStatement();
 

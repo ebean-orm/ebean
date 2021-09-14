@@ -38,7 +38,7 @@ public final class UpdateHandler extends DmlHandler {
     }
 
     sql = updatePlan.getSql();
-    SpiTransaction t = persistRequest.getTransaction();
+    SpiTransaction t = persistRequest.transaction();
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
       pstmt = getPstmtBatch(t, sql, persistRequest, false);

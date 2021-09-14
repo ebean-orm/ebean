@@ -57,7 +57,7 @@ final class BeanDescriptorJsonHelp<T> {
     // render the dirty properties
     BeanProperty[] props = desc.propertiesNonTransient();
     for (BeanProperty prop : props) {
-      if (dirtyProps[prop.getPropertyIndex()]) {
+      if (dirtyProps[prop.propertyIndex()]) {
         prop.jsonWrite(writeJson, bean);
       }
     }
@@ -123,7 +123,7 @@ final class BeanDescriptorJsonHelp<T> {
       JsonToken event = parser.nextToken();
       if (JsonToken.FIELD_NAME == event) {
         String key = parser.getCurrentName();
-        BeanProperty p = desc.getBeanProperty(key);
+        BeanProperty p = desc.beanProperty(key);
         if (p != null) {
           p.jsonRead(readJson, bean);
         } else {
@@ -145,7 +145,7 @@ final class BeanDescriptorJsonHelp<T> {
       desc.setUnmappedJson(bean, unmappedProperties);
     }
     Object contextBean = null;
-    Object id = desc.beanId(bean);
+    Object id = desc.id(bean);
     if (!isNullOrZero(id)) {
       // check if the bean has already been loaded
       contextBean = readJson.persistenceContextPutIfAbsent(id, bean, desc);

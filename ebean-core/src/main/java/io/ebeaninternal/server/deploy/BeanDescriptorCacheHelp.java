@@ -124,7 +124,7 @@ final class BeanDescriptorCacheHelp<T> {
       if (cacheNotifyOnAll || cacheNotifyOnDelete) {
         String notifyMode = cacheNotifyOnAll ? "All" : "Delete";
         logger.debug("l2 caching on {} - beanCaching:{} queryCaching:{} notifyMode:{} ",
-          desc.getFullName(), isBeanCaching(), isQueryCaching(), notifyMode);
+          desc.fullName(), isBeanCaching(), isQueryCaching(), notifyMode);
       }
     }
   }
@@ -282,7 +282,7 @@ final class BeanDescriptorCacheHelp<T> {
       // held as part of the bean cache so skip
       return false;
     }
-    CachedManyIds entry = manyPropGet(parentId, many.getName());
+    CachedManyIds entry = manyPropGet(parentId, many.name());
     if (entry == null) {
       // not in cache so return unsuccessful
       return false;
@@ -290,7 +290,7 @@ final class BeanDescriptorCacheHelp<T> {
     EntityBean ownerBean = bc.getOwnerBean();
     EntityBeanIntercept ebi = ownerBean._ebean_getIntercept();
     PersistenceContext persistenceContext = ebi.getPersistenceContext();
-    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
+    BeanDescriptor<?> targetDescriptor = many.targetDescriptor();
 
     List<Object> idList = entry.getIdList();
     bc.checkEmptyLazyLoad();
@@ -316,7 +316,7 @@ final class BeanDescriptorCacheHelp<T> {
           // add as JSON to bean cache
           String asJson = many.jsonWriteCollection(details);
           Map<String, Object> changes = new HashMap<>();
-          changes.put(many.getName(), asJson);
+          changes.put(many.name(), asJson);
 
           CachedBeanData newData = data.update(changes, data.getVersion());
           if (beanLog.isDebugEnabled()) {
@@ -330,7 +330,7 @@ final class BeanDescriptorCacheHelp<T> {
     } else {
       CachedManyIds entry = createManyIds(many, details);
       if (entry != null) {
-        cachePutManyIds(parentId, many.getName(), entry);
+        cachePutManyIds(parentId, many.name(), entry);
       }
     }
   }
@@ -349,10 +349,10 @@ final class BeanDescriptorCacheHelp<T> {
       return null;
     }
 
-    BeanDescriptor<?> targetDescriptor = many.getTargetDescriptor();
+    BeanDescriptor<?> targetDescriptor = many.targetDescriptor();
     List<Object> idList = new ArrayList<>(actualDetails.size());
     for (Object bean : actualDetails) {
-      idList.add(targetDescriptor.getId((EntityBean) bean));
+      idList.add(targetDescriptor.id(bean));
     }
     return new CachedManyIds(idList);
   }
@@ -375,7 +375,7 @@ final class BeanDescriptorCacheHelp<T> {
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
       T bean = convertToBean(entry.getKey(), false, context, cachedBeanData);
-      result.add(bean, desc.getBeanId(bean));
+      result.add(bean, desc.id(bean));
     }
     return result;
   }
@@ -773,7 +773,7 @@ final class BeanDescriptorCacheHelp<T> {
 
   void cacheUpdateQuery(boolean update, SpiTransaction transaction) {
     if (invalidateQueryCache || cacheNotifyOnAll || (!update && cacheNotifyOnDelete)) {
-      transaction.getEvent().add(desc.getBaseTable(), false, update, !update);
+      transaction.getEvent().add(desc.baseTable(), false, update, !update);
     }
   }
 
@@ -803,7 +803,7 @@ final class BeanDescriptorCacheHelp<T> {
       if (beanCache != null) {
         changeSet.addBeanRemove(desc, id);
       }
-      cacheDeleteImported(true, deleteRequest.getEntityBean(), changeSet);
+      cacheDeleteImported(true, deleteRequest.entityBean(), changeSet);
     }
   }
 
@@ -815,8 +815,8 @@ final class BeanDescriptorCacheHelp<T> {
       changeSet.addInvalidate(desc);
     } else {
       queryCacheClear(changeSet);
-      cacheDeleteImported(false, insertRequest.getEntityBean(), changeSet);
-      changeSet.addBeanInsert(desc.getBaseTable());
+      cacheDeleteImported(false, insertRequest.entityBean(), changeSet);
+      changeSet.addBeanInsert(desc.baseTable());
     }
   }
 
@@ -839,13 +839,13 @@ final class BeanDescriptorCacheHelp<T> {
         // query caching only
         return;
       }
-      List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.getUpdatedManyForL2Cache();
+      List<BeanPropertyAssocMany<?>> manyCollections = updateRequest.updatedManyForL2Cache();
       if (manyCollections != null) {
         for (BeanPropertyAssocMany<?> many : manyCollections) {
-          Object details = many.getValue(updateRequest.getEntityBean());
+          Object details = many.getValue(updateRequest.entityBean());
           CachedManyIds entry = createManyIds(many, details);
           if (entry != null) {
-            changeSet.addManyPut(desc, many.getName(), id, entry);
+            changeSet.addManyPut(desc, many.name(), id, entry);
           }
         }
       }

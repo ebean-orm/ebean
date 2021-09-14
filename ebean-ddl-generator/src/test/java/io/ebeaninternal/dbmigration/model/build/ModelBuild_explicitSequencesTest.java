@@ -1,14 +1,14 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 
-import io.ebean.BaseTestCase;
+import io.localtest.BaseTestCase;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Person;
 import org.tests.model.basic.Phone;
 

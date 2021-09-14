@@ -38,7 +38,7 @@ final class BindablePropertyVersion implements Bindable {
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
-    request.appendColumn(prop.getDbColumn());
+    request.appendColumn(prop.dbColumn());
   }
 
   /**
@@ -48,7 +48,7 @@ final class BindablePropertyVersion implements Bindable {
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
 
     // get prior version value from 'old values'
-    Object value = bean._ebean_getIntercept().getOrigValue(prop.getPropertyIndex());
+    Object value = bean._ebean_getIntercept().getOrigValue(prop.propertyIndex());
     request.bind(value, prop);
   }
 }
