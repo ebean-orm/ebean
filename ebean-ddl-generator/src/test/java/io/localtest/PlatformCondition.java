@@ -1,6 +1,7 @@
-package io.ebean;
+package io.localtest;
 
-import io.ebean.annotation.ForPlatform;
+import io.ebean.DB;
+import io.localtest.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;

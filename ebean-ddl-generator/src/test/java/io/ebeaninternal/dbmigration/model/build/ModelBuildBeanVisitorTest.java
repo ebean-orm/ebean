@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 
-import io.ebean.BaseTestCase;
+import io.localtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
