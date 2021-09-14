@@ -71,8 +71,8 @@ final class DmlBeanPersister implements BeanPersister {
     } catch (SQLException e) {
       // log the error to the transaction log
       String msg = "Error[" + StringHelper.removeNewLines(e.getMessage()) + "]";
-      if (request.getTransaction().isLogSummary()) {
-        request.getTransaction().logSummary(msg);
+      if (request.transaction().isLogSummary()) {
+        request.transaction().logSummary(msg);
       }
       throw dbPlatform.translate(msg, e);
     } finally {

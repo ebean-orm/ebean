@@ -1,8 +1,8 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
-import io.ebean.BaseTestCase;
-import io.ebean.Ebean;
-import io.ebean.config.ServerConfig;
+import io.localtest.BaseTestCase;
+import io.ebean.DB;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
@@ -11,14 +11,14 @@ import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BaseDdlHandlerTest extends BaseTestCase {
 
-  private ServerConfig serverConfig = new ServerConfig();
+  private final DatabaseConfig serverConfig = new DatabaseConfig();
 
   private DdlHandler handler(DatabasePlatform platform) {
     return PlatformDdlBuilder.create(platform).createDdlHandler(serverConfig);
@@ -223,11 +223,11 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void generateChangeSetFromModel() throws Exception {
 
-    SpiEbeanServer defaultServer = (SpiEbeanServer) Ebean.getDefaultServer();
+    SpiEbeanServer defaultServer = (SpiEbeanServer) DB.getDefault();
 
     ChangeSet createChangeSet = new CurrentModel(defaultServer).getChangeSet();
 
@@ -243,11 +243,10 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     assertThat(write.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
 
-  @Ignore
+  @Disabled
   @Test
   public void generateChangeSetFromModel_given_postgresTypes() throws Exception {
-
-    SpiEbeanServer defaultServer = (SpiEbeanServer) Ebean.getDefaultServer();
+    SpiEbeanServer defaultServer = (SpiEbeanServer) DB.getDefault();
 
     ChangeSet createChangeSet = new CurrentModel(defaultServer).getChangeSet();
 

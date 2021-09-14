@@ -38,7 +38,7 @@ class BindableProperty implements Bindable {
 
   @Override
   public final void dmlAppend(GenerateDmlRequest request) {
-    request.appendColumn(prop.getDbColumn());
+    request.appendColumn(prop.dbColumn());
   }
 
   /**

@@ -32,11 +32,11 @@ public final class ImportedIdEmbedded implements ImportedId {
 
   @Override
   public void addFkeys(String name) {
-    BeanProperty[] embeddedProps = foreignAssocOne.getProperties();
+    BeanProperty[] embeddedProps = foreignAssocOne.properties();
     for (int i = 0; i < imported.length; i++) {
-      String n = name + "." + foreignAssocOne.getName() + "." + embeddedProps[i].getName();
-      BeanFkeyProperty fkey = new BeanFkeyProperty(n, imported[i].localDbColumn, foreignAssocOne.getDeployOrder());
-      owner.getBeanDescriptor().add(fkey);
+      String n = name + "." + foreignAssocOne.name() + "." + embeddedProps[i].name();
+      BeanFkeyProperty fkey = new BeanFkeyProperty(n, imported[i].localDbColumn, foreignAssocOne.deployOrder());
+      owner.descriptor().add(fkey);
     }
   }
 

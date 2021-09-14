@@ -162,30 +162,22 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  /**
-   * Return the factory to use to support DB ARRAY types.
-   */
   private PlatformArrayTypeFactory arrayTypeListFactory(DatabasePlatform databasePlatform) {
     if (databasePlatform.isNativeArrayType()) {
       return ScalarTypeArrayList.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArrayListH2.factory();
     }
-    // not supported for this DB platform
-    return null;
+    return new PlatformArrayTypeJsonList();
   }
 
-  /**
-   * Return the factory to use to support DB ARRAY types.
-   */
   private PlatformArrayTypeFactory arrayTypeSetFactory(DatabasePlatform databasePlatform) {
     if (databasePlatform.isNativeArrayType()) {
       return ScalarTypeArraySet.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArraySetH2.factory();
     }
-    // not supported for this DB platform
-    return null;
+    return new PlatformArrayTypeJsonSet();
   }
 
   /**
@@ -305,25 +297,17 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private ScalarType<?> getArrayScalarTypeSet(Type valueType, boolean nullable) {
-    if (arrayTypeSetFactory != null) {
-      if (isEnumType(valueType)) {
-        return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
-      }
-      return arrayTypeSetFactory.typeFor(valueType, nullable);
+    if (isEnumType(valueType)) {
+      return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
     }
-    // fallback to JSON storage in VARCHAR column
-    return new ScalarTypeJsonSet.Varchar(getDocType(valueType), nullable, false); // TODO: keepSource for @DbArray?
+    return arrayTypeSetFactory.typeFor(valueType, nullable);
   }
 
   private ScalarType<?> getArrayScalarTypeList(Type valueType, boolean nullable) {
-    if (arrayTypeListFactory != null) {
-      if (isEnumType(valueType)) {
-        return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
-      }
-      return arrayTypeListFactory.typeFor(valueType, nullable);
+    if (isEnumType(valueType)) {
+      return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
     }
-    // fallback to JSON storage in VARCHAR column
-    return new ScalarTypeJsonList.Varchar(getDocType(valueType), nullable, false); // TODO: keepSource for @DbArray?
+    return arrayTypeListFactory.typeFor(valueType, nullable);
   }
 
   private Class<? extends Enum<?>> asEnumClass(Type valueType) {

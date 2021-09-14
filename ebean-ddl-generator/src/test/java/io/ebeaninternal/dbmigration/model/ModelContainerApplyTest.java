@@ -7,7 +7,7 @@ import io.ebeaninternal.dbmigration.migration.CreateTable;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

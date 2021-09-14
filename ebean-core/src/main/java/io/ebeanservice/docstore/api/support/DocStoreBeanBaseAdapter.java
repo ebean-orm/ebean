@@ -104,7 +104,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   public DocStoreBeanBaseAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
 
     this.desc = desc;
-    this.server = desc.getEbeanServer();
+    this.server = desc.ebeanServer();
     this.mapped = deploy.isDocStoreMapped();
     this.pathProps = deploy.getDocStorePathProperties();
     this.docStore = deploy.getDocStore();
@@ -174,12 +174,12 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
       for (PathProperties.Props pathProp : pathProps) {
         String path = pathProp.getPath();
         if (path != null) {
-          BeanDescriptor<?> targetDesc = desc.getBeanDescriptor(path);
-          BeanProperty idProperty = targetDesc.getIdProperty();
+          BeanDescriptor<?> targetDesc = desc.descriptor(path);
+          BeanProperty idProperty = targetDesc.idProperty();
           if (idProperty != null) {
             // embedded beans don't have id property
-            String fullPath = path + "." + idProperty.getName();
-            targetDesc.docStoreAdapter().registerInvalidationPath(desc.getDocStoreQueueId(), fullPath, pathProp.getProperties());
+            String fullPath = path + "." + idProperty.name();
+            targetDesc.docStoreAdapter().registerInvalidationPath(desc.docStoreQueueId(), fullPath, pathProp.getProperties());
           }
         }
       }
@@ -221,9 +221,9 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   protected int[] getPropertyPositions(Set<String> properties) {
     List<Integer> posList = new ArrayList<>();
     for (String property : properties) {
-      BeanProperty prop = desc.getBeanProperty(property);
+      BeanProperty prop = desc.beanProperty(property);
       if (prop != null) {
-        posList.add(prop.getPropertyIndex());
+        posList.add(prop.propertyIndex());
       }
     }
     int[] pos = new int[posList.size()];
@@ -263,7 +263,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
       property.docStoreInclude(includeByDefault, docStructure);
     }
 
-    InheritInfo inheritInfo = desc.getInheritInfo();
+    InheritInfo inheritInfo = desc.inheritInfo();
     if (inheritInfo != null) {
       inheritInfo.visitChildren(inheritInfo1 -> {
         for (BeanProperty localProperty : inheritInfo1.localProperties()) {
@@ -323,7 +323,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * Return the supplied value or default to the bean name lower case.
    */
   protected String derive(BeanType<?> desc, String suppliedValue) {
-    return (suppliedValue != null && !suppliedValue.isEmpty()) ? suppliedValue : desc.getName().toLowerCase();
+    return (suppliedValue != null && !suppliedValue.isEmpty()) ? suppliedValue : desc.name().toLowerCase();
   }
 
   @Override

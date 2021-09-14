@@ -12,7 +12,7 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan {
 
   DtoQueryPlanBase(DtoMappingRequest request) {
     this.planMetric = request.createMetric();
-    this.metric = planMetric.getMetric();
+    this.metric = planMetric.metric();
   }
 
   @Override

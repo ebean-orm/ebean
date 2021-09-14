@@ -2,13 +2,13 @@ package org.querytest;
 
 import org.example.domain.query.QAreaImpl;
 import org.example.domain.query.QCityImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TargetTest {
 
   @Test
   public void test_oneToMany() {
-    
+
     new QAreaImpl()
       .cities.fetch()
       .findList();

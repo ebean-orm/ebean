@@ -181,7 +181,7 @@ public final class BatchControl {
    * Add the request to the batch and return true if we should flush.
    */
   private boolean addToBatch(PersistRequestBean<?> request) {
-    Object alreadyInBatch = persistedBeans.put(request.getEntityBean(), DUMMY);
+    Object alreadyInBatch = persistedBeans.put(request.entityBean(), DUMMY);
     if (alreadyInBatch != null) {
       // special case where the same bean instance has already been
       // added to the batch (doesn't really occur with non-batching
@@ -345,7 +345,7 @@ public final class BatchControl {
   private BatchedBeanHolder getBeanHolder(PersistRequestBean<?> request) {
 
     int depth = transaction.depth();
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
+    BeanDescriptor<?> desc = request.descriptor();
 
     // batching by bean type AND depth
     String key = desc.rootName() + ":" + depth;

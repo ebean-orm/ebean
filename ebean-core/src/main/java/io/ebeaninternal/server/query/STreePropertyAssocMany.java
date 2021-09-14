@@ -41,7 +41,7 @@ public interface STreePropertyAssocMany extends STreePropertyAssoc {
   /**
    * Return the intersection table join.
    */
-  TableJoin getIntersectionTableJoin();
+  TableJoin intersectionTableJoin();
 
   /**
    * Add a bean to the collection.

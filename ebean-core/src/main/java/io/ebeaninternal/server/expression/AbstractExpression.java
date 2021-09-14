@@ -56,7 +56,7 @@ abstract class AbstractExpression implements SpiExpression {
 
   protected String propertyNestedPath(String propertyName, BeanDescriptor<?> desc) {
     if (propertyName != null) {
-      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
+      ElPropertyDeploy elProp = desc.elPropertyDeploy(propertyName);
       if (elProp != null && elProp.containsMany()) {
         return SplitName.begin(propName);
       }
@@ -74,7 +74,7 @@ abstract class AbstractExpression implements SpiExpression {
    */
   protected void propertyContainsMany(String propertyName, BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propertyName != null) {
-      ElPropertyDeploy elProp = desc.getElPropertyDeploy(propertyName);
+      ElPropertyDeploy elProp = desc.elPropertyDeploy(propertyName);
       if (elProp != null) {
         if (elProp.containsFormulaWithJoin()) {
           // for findCount query select clause
@@ -102,6 +102,6 @@ abstract class AbstractExpression implements SpiExpression {
   }
 
   protected final ElPropertyValue getElProp(SpiExpressionRequest request) {
-    return request.getBeanDescriptor().getElGetValue(propName);
+    return request.getBeanDescriptor().elGetValue(propName);
   }
 }

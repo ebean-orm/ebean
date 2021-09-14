@@ -14,19 +14,11 @@ import io.ebeaninternal.server.persist.PersistExecute;
 public final class PersistRequestOrmUpdate extends PersistRequest {
 
   private final BeanDescriptor<?> beanDescriptor;
-
   private final SpiUpdate<?> ormUpdate;
-
   private int rowCount;
-
   private String bindLog;
 
-  /**
-   * Create.
-   */
-  public PersistRequestOrmUpdate(SpiEbeanServer server, BeanManager<?> mgr, SpiUpdate<?> ormUpdate,
-                                 SpiTransaction t, PersistExecute persistExecute) {
-
+  public PersistRequestOrmUpdate(SpiEbeanServer server, BeanManager<?> mgr, SpiUpdate<?> ormUpdate, SpiTransaction t, PersistExecute persistExecute) {
     super(server, t, persistExecute, ormUpdate.getLabel());
     this.beanDescriptor = mgr.getBeanDescriptor();
     this.ormUpdate = ormUpdate;
@@ -34,10 +26,10 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
 
   @Override
   public void profile(long offset, int flushCount) {
-    profileBase(EVT_ORMUPDATE, offset, beanDescriptor.getName(), flushCount);
+    profileBase(EVT_ORMUPDATE, offset, beanDescriptor.name(), flushCount);
   }
 
-  public BeanDescriptor<?> getBeanDescriptor() {
+  public BeanDescriptor<?> descriptor() {
     return beanDescriptor;
   }
 
@@ -51,11 +43,10 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
     return executeStatement();
   }
 
-
   /**
    * Return the UpdateSql.
    */
-  public SpiUpdate<?> getOrmUpdate() {
+  public SpiUpdate<?> ormUpdate() {
     return ormUpdate;
   }
 
@@ -91,14 +82,11 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
     }
     OrmUpdateType ormUpdateType = ormUpdate.getOrmUpdateType();
     String tableName = ormUpdate.getBaseTable();
-
     if (transaction.isLogSummary()) {
       String m = ormUpdateType + " table[" + tableName + "] rows[" + rowCount + "] bind[" + bindLog + "]";
       transaction.logSummary(m);
     }
-
     if (ormUpdate.isNotifyCache()) {
-
       // add the modification info to the TransactionEvent
       // this is used to invalidate cached objects etc
       switch (ormUpdateType) {
@@ -116,5 +104,4 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
       }
     }
   }
-
 }

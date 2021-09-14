@@ -35,13 +35,13 @@ public final class PersistDeferredRelationship {
    */
   public void execute(SpiTransaction transaction) {
 
-    String sql = beanDescriptor.getUpdateImportedIdSql(importedId);
+    String sql = beanDescriptor.updateImportedIdSql(importedId);
     SqlUpdate sqlUpdate = ebeanServer.sqlUpdate(sql);
 
     // bind the set clause for the importedId
     int pos = importedId.bind(1, sqlUpdate, assocBean);
     // bind the where clause for the bean
-    Object[] idValues = beanDescriptor.getIdBinder().getIdValues(bean);
+    Object[] idValues = beanDescriptor.idBinder().getIdValues(bean);
     for (int j = 0; j < idValues.length; j++) {
       sqlUpdate.setParameter(pos + j, idValues[j]);
     }

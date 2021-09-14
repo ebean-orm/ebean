@@ -13,9 +13,7 @@ import java.util.Set;
 public class QueryCacheEntry {
 
   private final Object value;
-
   private final Set<String> dependentTables;
-
   private final long timestamp;
 
   /**

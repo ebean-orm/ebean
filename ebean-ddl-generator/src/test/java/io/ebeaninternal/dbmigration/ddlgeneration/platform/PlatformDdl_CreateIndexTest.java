@@ -10,10 +10,10 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PlatformDdl_CreateIndexTest {
 
@@ -25,7 +25,7 @@ public class PlatformDdl_CreateIndexTest {
   private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
 
   {
-    DatabaseConfig config = DB.getDefault().getPluginApi().getServerConfig();
+    DatabaseConfig config = DB.getDefault().pluginApi().config();
     h2Ddl.configure(config);
     pgDdl.configure(config);
     mysqlDdl.configure(config);

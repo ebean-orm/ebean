@@ -15,7 +15,7 @@ final class DefaultQueryPlanListener implements QueryPlanListener {
   @Override
   public void process(QueryPlanCapture capture) {
     // better to log this in JSON form?
-    String dbName = capture.getDatabase().getName();
+    String dbName = capture.getDatabase().name();
     for (MetaQueryPlan plan : capture.getPlans()) {
       log.info("queryPlan  db:{} label:{} queryTimeMicros:{} loc:{} sql:{} bind:{} plan:{}",
         dbName, plan.label(), plan.queryTimeMicros(), plan.profileLocation(),

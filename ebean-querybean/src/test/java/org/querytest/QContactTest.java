@@ -1,7 +1,7 @@
 package org.querytest;
 
 import org.example.domain.query.QContact;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 

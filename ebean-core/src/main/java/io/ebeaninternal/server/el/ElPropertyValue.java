@@ -14,17 +14,17 @@ public interface ElPropertyValue extends ElPropertyDeploy, ExpressionPath {
   /**
    * Return the logical id value expression taking into account embedded id's.
    */
-  String getAssocIdInValueExpr(boolean not, int size);
+  String assocIdInValueExpr(boolean not, int size);
 
   /**
    * Return the logical id in expression taking into account embedded id's.
    */
-  String getAssocIdInExpr(String prefix);
+  String assocIdInExpr(String prefix);
 
   /**
    * Return the logical where clause to support "Is empty".
    */
-  String getAssocIsEmpty(SpiExpressionRequest request, String path);
+  String assocIsEmpty(SpiExpressionRequest request, String path);
 
   /**
    * Return true if this is an ManyToOne or OneToOne associated bean property.

@@ -28,7 +28,7 @@ public final class BulkEventListenerMap {
   }
 
   public void process(BulkTableEvent event) {
-    Entry entry = map.get(event.getTableName());
+    Entry entry = map.get(event.tableName());
     if (entry != null) {
       entry.process(event);
     }

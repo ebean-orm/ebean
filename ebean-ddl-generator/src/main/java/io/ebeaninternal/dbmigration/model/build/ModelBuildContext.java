@@ -145,7 +145,7 @@ public class ModelBuildContext {
   public String getColumnDefn(BeanProperty p, boolean strict) {
     DbPlatformType dbType = getDbType(p);
     if (dbType == null) {
-      throw new IllegalStateException("Unknown DbType mapping for " + p.getFullBeanName());
+      throw new IllegalStateException("Unknown DbType mapping for " + p.fullName());
     }
     return p.renderDbType(dbType, strict);
   }
@@ -153,19 +153,19 @@ public class ModelBuildContext {
   private DbPlatformType getDbType(BeanProperty p) {
 
     if (p.isDbEncrypted()) {
-      return dbTypeMap.get(p.getDbEncryptedType());
+      return dbTypeMap.get(p.dbEncryptedType());
     }
     if (p.isLocalEncrypted()) {
       // scalar type potentially wrapping varbinary db type
-      ScalarType<Object> scalarType = p.getScalarType();
+      ScalarType<Object> scalarType = p.scalarType();
       int jdbcType = scalarType.getJdbcType();
       return dbTypeMap.get(jdbcType);
     }
 
     // can be the logical JSON types (JSON, JSONB, JSONClob, JSONBlob, JSONVarchar)
-    int dbType = p.getDbType(platformTypes);
+    int dbType = p.dbType(platformTypes);
     if (dbType == 0) {
-      throw new RuntimeException("No scalarType defined for " + p.getFullBeanName());
+      throw new RuntimeException("No scalarType defined for " + p.fullName());
     }
     return dbTypeMap.get(dbType);
   }

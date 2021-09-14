@@ -17,19 +17,19 @@ public class BaseModel extends Model {
   @Version
   long version;
 
-  public long getId() {
+  public long id() {
     return id;
   }
 
-  public void setId(long id) {
+  public void id(long id) {
     this.id = id;
   }
 
-  public long getVersion() {
+  public long version() {
     return version;
   }
 
-  public void setVersion(long version) {
+  public void version(long version) {
     this.version = version;
   }
 }

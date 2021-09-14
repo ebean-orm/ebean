@@ -115,7 +115,7 @@ final class DbContext {
    * Register a server so we can get it by its name.
    */
   void register(Database server, boolean isDefault) {
-    registerWithName(server.getName(), server, isDefault);
+    registerWithName(server.name(), server, isDefault);
   }
 
   private void registerWithName(String name, Database server, boolean isDefault) {

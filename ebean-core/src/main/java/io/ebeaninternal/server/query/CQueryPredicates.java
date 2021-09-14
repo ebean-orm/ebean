@@ -88,7 +88,7 @@ public final class CQueryPredicates {
   CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
     this.binder = binder;
     this.request = request;
-    this.query = request.getQuery();
+    this.query = request.query();
     this.bindParams = query.getBindParams();
     this.idValue = query.getId();
   }
@@ -115,7 +115,7 @@ public final class CQueryPredicates {
       dataBind.append(", ");
     }
 
-    CQueryPlan queryPlan = request.getQueryPlan();
+    CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
       int asOfTableCount = queryPlan.getAsOfTableCount();
       if (asOfTableCount > 0) {
@@ -132,7 +132,7 @@ public final class CQueryPredicates {
 
     if (idValue != null) {
       // this is a find by id type query...
-      request.getBeanDescriptor().bindId(dataBind, idValue);
+      request.descriptor().bindId(dataBind, idValue);
       dataBind.append(idValue);
       dataBind.append(", ");
     }
@@ -212,7 +212,7 @@ public final class CQueryPredicates {
 
     BeanPropertyAssocMany<?> manyProperty = request.determineMany();
     if (manyProperty != null) {
-      OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.getName(), false);
+      OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.name(), false);
       SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
       if (filterManyExpr != null) {
         this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
@@ -244,7 +244,7 @@ public final class CQueryPredicates {
   private void parsePropertiesToDbColumns(DeployParser deployParser) {
 
     // order by is dependent on the manyProperty (if there is one)
-    String logicalOrderBy = deriveOrderByWithMany(request.getManyProperty());
+    String logicalOrderBy = deriveOrderByWithMany(request.manyProperty());
     if (logicalOrderBy != null) {
       dbOrderBy = deployParser.parse(logicalOrderBy);
     }
@@ -312,7 +312,7 @@ public final class CQueryPredicates {
     if (orderBy == null) {
       return null;
     }
-    return CQueryOrderBy.parse(request.getBeanDescriptor(), orderBy);
+    return CQueryOrderBy.parse(request.descriptor(), orderBy);
   }
 
   /**
@@ -327,17 +327,17 @@ public final class CQueryPredicates {
 
     String orderBy = parseOrderBy();
 
-    BeanDescriptor<?> desc = request.getBeanDescriptor();
-    String orderById = desc.getDefaultOrderBy();
+    BeanDescriptor<?> desc = request.descriptor();
+    String orderById = desc.defaultOrderBy();
 
     if (orderBy == null) {
       orderBy = orderById;
     }
 
     // check for default ordering on the many property...
-    String manyOrderBy = manyProp.getFetchOrderBy();
+    String manyOrderBy = manyProp.fetchOrderBy();
     if (manyOrderBy != null) {
-      orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.getName(), manyOrderBy);
+      orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.name(), manyOrderBy);
     }
 
     if (request.isFindById()) {
@@ -353,7 +353,7 @@ public final class CQueryPredicates {
     // we need to make sure their is an order by on the
     // top level first (to ensure master/detail construction).
 
-    int manyPos = orderBy.indexOf(manyProp.getName());
+    int manyPos = orderBy.indexOf(manyProp.name());
     int idPos = orderBy.indexOf(" " + orderById);
 
     if (manyPos == -1) {
@@ -370,9 +370,9 @@ public final class CQueryPredicates {
     if (idPos <= -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
-        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.getName();
+        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name();
         msg += "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById + "]";
-        msg += " must come before the many property [" + manyProp.getName() + "] in the orderBy.";
+        msg += " must come before the many property [" + manyProp.name() + "] in the orderBy.";
         msg += " Ebean has automatically modified the orderBy clause to do this.";
 
         logger.warn(msg);

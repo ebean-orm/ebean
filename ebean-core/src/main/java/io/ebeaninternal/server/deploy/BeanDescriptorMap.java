@@ -20,22 +20,22 @@ public interface BeanDescriptorMap {
   /**
    * Return the name of the server/database.
    */
-  String getServerName();
+  String name();
 
   /**
    * Return the DatabaseConfig.
    */
-  DatabaseConfig getConfig();
+  DatabaseConfig config();
 
   /**
    * Return the Cache Manager.
    */
-  SpiCacheManager getCacheManager();
+  SpiCacheManager cacheManager();
 
   /**
    * Return the naming convention.
    */
-  NamingConvention getNamingConvention();
+  NamingConvention namingConvention();
 
   /**
    * Return true if multiple values can be bound as Array or Table Value and hence share the same query plan.
@@ -45,12 +45,12 @@ public interface BeanDescriptorMap {
   /**
    * Return the BeanDescriptor for a given class.
    */
-  <T> BeanDescriptor<T> getBeanDescriptor(Class<T> entityType);
+  <T> BeanDescriptor<T> descriptor(Class<T> entityType);
 
   /**
    * Return the Encrypt key given the table and column name.
    */
-  EncryptKey getEncryptKey(String tableName, String columnName);
+  EncryptKey encryptKey(String tableName, String columnName);
 
   /**
    * Create a IdBinder for this bean property.
@@ -65,18 +65,18 @@ public interface BeanDescriptorMap {
   /**
    * Return the scalarType for the given JDBC type.
    */
-  ScalarType<?> getScalarType(int jdbcType);
+  ScalarType<?> scalarType(int jdbcType);
 
   /**
    * Return the scalarType for the given logical type.
    */
-  ScalarType<?> getScalarType(String cast);
+  ScalarType<?> scalarType(String cast);
 
   /**
    * Return true if Jackson core is present on the classpath.
    */
   boolean isJacksonCorePresent();
-  
+
   /**
    * Returns true, if the given table (or view) is managed by ebean
    * (= an entity exists)
