@@ -613,11 +613,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
-  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (!isTransient && !primaryKeyExport) {
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
-        ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
+        ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
       }
     }
   }

@@ -416,7 +416,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
       for (Property orderProperty : orderBy.getProperties()) {
         ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(orderProperty.getProperty());
         if (elProp != null && elProp.containsFormulaWithJoin()) {
-          manyWhereJoins.addFormulaWithJoin(orderProperty.getProperty());
+          manyWhereJoins.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
         }
       }
     }

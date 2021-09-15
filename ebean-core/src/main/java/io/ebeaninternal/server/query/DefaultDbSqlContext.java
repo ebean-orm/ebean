@@ -214,9 +214,9 @@ final class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType) {
+  public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String manyWhere) {
     // replace ${ta} place holder with the real table alias...
-    String tableAlias = tableAliasStack.peek();
+    String tableAlias = manyWhere == null ? tableAliasStack.peek() : getTableAliasManyWhere(manyWhere);
     String converted = sqlFormulaJoin.replace(tableAliasPlaceHolder, tableAlias);
     if (formulaJoins == null) {
       formulaJoins = new HashSet<>();
