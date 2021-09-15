@@ -77,7 +77,7 @@ public class InPairsExpressionTest extends BaseExpressionTest {
   public void diffSeparator_diff() throws Exception {
 
     InPairsExpression e0 = new InPairsExpression(pairs(), false);
-    InPairsExpression e1 = new InPairsExpression(pairs().setConcatSeparator(":"), false);
+    InPairsExpression e1 = new InPairsExpression(pairs().concatSeparator(":"), false);
     different(e0, e1);
   }
 
@@ -85,7 +85,7 @@ public class InPairsExpressionTest extends BaseExpressionTest {
   public void diffSuffix_diff() throws Exception {
 
     InPairsExpression e0 = new InPairsExpression(pairs(), false);
-    InPairsExpression e1 = new InPairsExpression(pairs().setConcatSuffix(":"), false);
+    InPairsExpression e1 = new InPairsExpression(pairs().concatSuffix(":"), false);
     different(e0, e1);
   }
 

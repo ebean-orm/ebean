@@ -1,7 +1,6 @@
 package io.ebean.test;
 
 import io.ebeaninternal.api.SpiLogger;
-import io.ebeaninternal.server.logger.DSpiLogger;
 
 import java.util.List;
 
@@ -44,7 +43,7 @@ public class LoggedSql {
   /**
    * Internal use - register the logger for <code>io.ebean.SQL</code>.
    */
-  static SpiLogger register(DSpiLogger logger) {
+  static SpiLogger register(SpiLogger logger) {
     if (sqlLogger == null) {
       sqlLogger = new CaptureLogger(logger);
     }

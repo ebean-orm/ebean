@@ -26,6 +26,7 @@ public interface TxnProfileEventCodes {
   String FIND_MANY = "fm";
   String FIND_ITERATE = "fe";
   String FIND_ID_LIST = "fi";
+  String FIND_EXISTS = "ex";
   String FIND_ATTRIBUTE = "fa";
   String FIND_COUNT = "fc";
   String FIND_SUBQUERY = "fs";
