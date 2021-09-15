@@ -78,7 +78,7 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
    * Compile/build the sub query.
    */
   protected CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
-    SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
+    SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.database();
     return ebeanServer.compileQuery(Type.SQ_EXISTS, subQuery, queryRequest.transaction());
   }
 

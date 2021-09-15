@@ -54,7 +54,7 @@ public class TestBeanFindController implements BeanFindController {
 
     elementsMap.forEach((beanType, ids) -> {
       final Map<Integer, FindControllerMain> idLookup = controllerLookup.get(beanType);
-      request.getEbeanServer().find(beanType).where()
+      request.database().find(beanType).where()
         .idIn(ids).setMapKey("id")
         .findMap().forEach((id, bean) -> idLookup.get((Integer) id).setTarget(bean));
     });
@@ -69,18 +69,17 @@ public class TestBeanFindController implements BeanFindController {
     Class<?> beanType = beanTypeFor(findControllerMain.getTargetTableName(), request);
 
     if (beanType != null) {
-      findControllerMain.setTarget(request.getEbeanServer().find(beanType, findControllerMain.getTargetId()));
+      findControllerMain.setTarget(request.database().find(beanType, findControllerMain.getTargetId()));
     }
 
     return result;
   }
 
   private Class<?> beanTypeFor(String tableName, BeanQueryRequest<?> request) {
-    List<? extends BeanType<?>> types = request.getEbeanServer()
-      .getPluginApi().getBeanTypes(tableName);
+    List<? extends BeanType<?>> types = request.database().pluginApi().beanTypes(tableName);
     for (BeanType<?> type : types) {
       if (type.isInheritanceRoot()) {
-        return type.getBeanType();
+        return type.type();
       }
     }
     return null;
