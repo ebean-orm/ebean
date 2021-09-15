@@ -2,7 +2,7 @@ package io.ebean.test;
 
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
-import io.ebeaninternal.server.logger.DSpiLogger;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -15,11 +15,39 @@ public class CapturingLoggerFactory implements SpiLoggerFactory {
 
   @Override
   public SpiLogger create(String name) {
-
-    DSpiLogger logger = new DSpiLogger(LoggerFactory.getLogger(name));
+    SpiLogger logger = new LogAdapter(LoggerFactory.getLogger(name));
     if (name.equals("io.ebean.SQL")) {
       return LoggedSql.register(logger);
     }
     return logger;
+  }
+
+  private static final class LogAdapter implements SpiLogger {
+
+    private final Logger logger;
+
+    LogAdapter(Logger logger) {
+      this.logger = logger;
+    }
+
+    @Override
+    public boolean isDebug() {
+      return logger.isDebugEnabled();
+    }
+
+    @Override
+    public boolean isTrace() {
+      return logger.isTraceEnabled();
+    }
+
+    @Override
+    public void debug(String msg) {
+      logger.debug(msg);
+    }
+
+    @Override
+    public void trace(String msg) {
+      logger.trace(msg);
+    }
   }
 }

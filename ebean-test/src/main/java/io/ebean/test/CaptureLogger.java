@@ -8,12 +8,10 @@ import java.util.List;
 /**
  * Capture the log messages (executed SQL) for testing.
  */
-class CaptureLogger implements SpiLogger {
+final class CaptureLogger implements SpiLogger {
 
   private final SpiLogger wrapped;
-
   private List<String> messages = new ArrayList<>();
-
   private boolean active;
 
   CaptureLogger(SpiLogger wrapped) {
