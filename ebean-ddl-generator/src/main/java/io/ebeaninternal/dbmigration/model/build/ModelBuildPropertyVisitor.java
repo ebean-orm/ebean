@@ -2,28 +2,11 @@ package io.ebeaninternal.dbmigration.model.build;
 
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.IndexSet;
-import io.ebeaninternal.dbmigration.model.MColumn;
-import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
-import io.ebeaninternal.dbmigration.model.MCompoundUniqueConstraint;
-import io.ebeaninternal.dbmigration.model.MIndex;
-import io.ebeaninternal.dbmigration.model.MTable;
+import io.ebeaninternal.dbmigration.model.*;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.deploy.visitor.BaseTablePropertyVisitor;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.IndexDefinition;
-import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.PropertyForeignKey;
-import io.ebeaninternal.server.deploy.TableJoin;
-import io.ebeaninternal.server.deploy.TableJoinColumn;
-import io.ebeaninternal.server.deploy.id.ImportedId;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 
 /**
  * Used as part of ModelBuildBeanVisitor and generally adds the MColumn to the associated
@@ -192,8 +175,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       throw new RuntimeException("No join columns for " + p.fullName());
     }
 
-    ImportedId importedId = p.importedId();
-
     List<MColumn> modelColumns = new ArrayList<>(columns.length);
 
     MCompoundForeignKey compoundKey = null;
@@ -209,7 +190,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     for (TableJoinColumn column : columns) {
 
       String dbCol = column.getLocalDbColumn();
-      BeanProperty importedProperty = importedId.findMatchImport(dbCol);
+      BeanProperty importedProperty = p.findMatchImport(dbCol);
       if (importedProperty == null) {
         throw new RuntimeException("Imported BeanProperty not found?");
       }
