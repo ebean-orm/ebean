@@ -10,7 +10,6 @@ import javax.persistence.OptimisticLockException;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -99,11 +98,11 @@ public class TestIUDVanilla extends BaseTestCase {
 
     e1.setDescription("bar");
     oldVersion = e1.getVersion();
-    assertThatThrownBy(e1::save).isInstanceOf(OptimisticLockException.class);
+    assertThrows(OptimisticLockException.class, e1::save);
     // after optimisticLockExecption, a restore of version is expected
     assertThat(e1.getVersion()).isEqualTo(oldVersion);
     // and subsequent saves must fail
-    assertThatThrownBy(e1::save).isInstanceOf(OptimisticLockException.class);
+    assertThrows(OptimisticLockException.class, e1::save);
   }
 
 }
