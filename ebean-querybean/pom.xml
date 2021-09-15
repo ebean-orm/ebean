@@ -93,7 +93,14 @@
 
   <build>
     <plugins>
-
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>
+            --add-opens io.ebean.querybean/org.querytest=io.ebean.core
+          </argLine>
+        </configuration>
+      </plugin>
       <!-- Enhancement -->
       <plugin>
         <groupId>io.repaint.maven</groupId>
@@ -103,18 +110,8 @@
         <configuration>
           <tiles>
             <tile>io.ebean.tile:enhancement:12.11.3</tile>
+            <tile>io.avaje.tile:moditech-module:1.0</tile>
           </tiles>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <archive>
-            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
         </configuration>
       </plugin>
 
