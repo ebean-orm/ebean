@@ -82,7 +82,6 @@ import java.util.ServiceLoader;
  */
 public class DatabaseConfig {
 
-
   /**
    * The Database name.
    */
@@ -2741,21 +2740,7 @@ public class DatabaseConfig {
     this.classLoadConfig = classLoadConfig;
   }
 
-  /**
-   * Return the service loader using the classLoader defined in ClassLoadConfig.
-   */
-  public <T> ServiceLoader<T> serviceLoad(Class<T> spiService) {
-    return ServiceLoader.load(spiService, classLoadConfig.getClassLoader());
-  }
 
-  /**
-   * Return the first service using the service loader (or null).
-   */
-  public <T> T service(Class<T> spiService) {
-    ServiceLoader<T> load = serviceLoad(spiService);
-    Iterator<T> serviceInstances = load.iterator();
-    return serviceInstances.hasNext() ? serviceInstances.next() : null;
-  }
 
   /**
    * Load settings from application.properties, application.yaml and other sources.
@@ -2794,7 +2779,7 @@ public class DatabaseConfig {
    */
   private List<AutoConfigure> autoConfiguration() {
     List<AutoConfigure> list = new ArrayList<>();
-    for (AutoConfigure autoConfigure : serviceLoad(AutoConfigure.class)) {
+    for (AutoConfigure autoConfigure : ServiceLoader.load(AutoConfigure.class)) {
       autoConfigure.preConfigure(this);
       list.add(autoConfigure);
     }
