@@ -233,18 +233,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public void depth(int diff) {
-  }
-
-  /**
-   * Return the current depth.
-   */
-  @Override
-  public int depth() {
-    return 0;
-  }
-
-  @Override
   public void markNotQueryOnly() {
   }
 

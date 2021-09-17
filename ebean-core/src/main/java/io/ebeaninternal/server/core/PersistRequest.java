@@ -50,6 +50,13 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     this.label = label;
   }
 
+  /**
+   * Reset the transaction depth back to 0.
+   */
+  public void resetDepth() {
+    transaction.depthReset();
+  }
+
   @Override
   public void addTimingBatch(long startNanos, int size) {
     // nothing by default

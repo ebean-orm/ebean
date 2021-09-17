@@ -1,11 +1,13 @@
 package org.tests.model.basic.relates;
 
 
-import java.util.UUID;
-
-import javax.persistence.*;
-
 import io.ebean.annotation.ChangeLog;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import java.util.UUID;
 
 /**
  * Relation entity
@@ -22,6 +24,9 @@ public class Relation2 {
   public Relation2(String name) {
     this.name = name;
   }
+
+  @ManyToOne
+  private Relation4 r4NoCascade;
 
   @ManyToOne
   private Relation3 noCascade;
@@ -60,5 +65,12 @@ public class Relation2 {
   public void setWithCascade(Relation3 withCascade) {
     this.withCascade = withCascade;
   }
-  
+
+  public Relation4 getR4NoCascade() {
+    return r4NoCascade;
+  }
+
+  public void setR4NoCascade(Relation4 r4NoCascade) {
+    this.r4NoCascade = r4NoCascade;
+  }
 }

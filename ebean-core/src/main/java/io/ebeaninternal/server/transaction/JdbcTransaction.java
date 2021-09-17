@@ -484,32 +484,26 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     return existingBean.equals(beanName);
   }
 
-  /**
-   * Return the depth of the current persist request plus the diff. This has the
-   * effect of changing the current depth and returning the new value. Pass
-   * diff=0 to return the current depth.
-   * <p>
-   * The depth of 0 is for the initial persist request. It is modified as the
-   * cascading of the save or delete traverses to the the associated Ones (-1)
-   * and associated Manys (+1).
-   * </p>
-   * <p>
-   * The depth is used to help the ordering of batched statements.
-   * </p>
-   *
-   * @param diff the amount to add or subtract from the depth.
-   */
   @Override
   public final void depth(int diff) {
     depth += diff;
   }
 
-  /**
-   * Return the current depth.
-   */
   @Override
   public final int depth() {
     return depth;
+  }
+
+  @Override
+  public final void depthDecrement() {
+    if (depth != 0) {
+      depth += -1;
+    }
+  }
+
+  @Override
+  public final void depthReset() {
+    depth = 0;
   }
 
   @Override
