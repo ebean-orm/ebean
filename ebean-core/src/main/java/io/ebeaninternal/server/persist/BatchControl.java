@@ -29,6 +29,8 @@ import java.util.List;
  */
 public final class BatchControl {
 
+  private static final Object DUMMY = new Object();
+
   /**
    * Used to sort queue entries by depth.
    */
@@ -50,7 +52,7 @@ public final class BatchControl {
    * Set of beans in this batch. This is used to ensure that a single bean instance is not included
    * in the batch twice (two separate insert requests etc).
    */
-  private final IdentityHashMap<Object, String> persistedBeans = new IdentityHashMap<>();
+  private final IdentityHashMap<Object, Object> persistedBeans = new IdentityHashMap<>();
 
   /**
    * Helper to determine statement ordering based on depth (and type).
@@ -179,22 +181,15 @@ public final class BatchControl {
    * Add the request to the batch and return true if we should flush.
    */
   private boolean addToBatch(PersistRequestBean<?> request) {
-    int depth = transaction.depth();
-    BeanDescriptor<?> desc = request.descriptor();
-    // batching by bean type AND depth
-    String key = desc.rootName() + ":" + depth;
-    
-    String alreadyInBatch = persistedBeans.put(request.entityBean(), key);
+    Object alreadyInBatch = persistedBeans.put(request.entityBean(), DUMMY);
     if (alreadyInBatch != null) {
       // special case where the same bean instance has already been
       // added to the batch (doesn't really occur with non-batching
       // as the bean gets changed from dirty to loaded earlier)
-      BatchedBeanHolder beanHolder = getBeanHolder(request, alreadyInBatch);
-      int ordering = depthOrder.orderingFor(depth);
-      return beanHolder.getOrder() > ordering;
+      return false;
     }
 
-    BatchedBeanHolder beanHolder = getBeanHolder(request, key);
+    BatchedBeanHolder beanHolder = getBeanHolder(request);
     int bufferSize = beanHolder.append(request);
 
     bufferMax = Math.max(bufferMax, bufferSize);
@@ -347,10 +342,12 @@ public final class BatchControl {
    * Return an entry for the given type description. The type description is
    * typically the bean class name (or table name for MapBeans).
    */
-  private BatchedBeanHolder getBeanHolder(PersistRequestBean<?> request, String key) {
+  private BatchedBeanHolder getBeanHolder(PersistRequestBean<?> request) {
 
     int depth = transaction.depth();
     BeanDescriptor<?> desc = request.descriptor();
+    // batching by bean type AND depth
+    String key = desc.rootName() + ":" + depth;
 
     BatchedBeanHolder batchBeanHolder = beanHoldMap.get(key);
     if (batchBeanHolder == null) {
