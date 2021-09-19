@@ -130,7 +130,7 @@ public interface SpiTransaction extends Transaction {
   Boolean getBatchGetGeneratedKeys();
 
   /**
-   * Modify and return the current 'depth' of the transaction.
+   * Modify the current 'depth' of the transaction.
    * <p>
    * As we cascade save or delete we traverse the object graph tree. Going up
    * to Assoc Ones the depth decreases and going down to Assoc Manys the depth
@@ -139,12 +139,31 @@ public interface SpiTransaction extends Transaction {
    * The depth is used for ordering batching statements. The lowest depth get
    * executed first during save.
    */
-  void depth(int diff);
+  default void depth(int diff) {
+    // do nothing
+  }
+
+  /**
+   * Decrement the depth BUT only if depth is greater than 0.
+   * Return the amount that depth should be incremented by (0 or 1).
+   */
+  default void depthDecrement() {
+    // do nothing
+  }
+
+  /**
+   * Reset the depth back to 0 - done at the end of top level insert and update.
+   */
+  default void depthReset() {
+    // do nothing
+  }
 
   /**
    * Return the current depth.
    */
-  int depth();
+  default int depth() {
+    return 0;
+  }
 
   /**
    * Return true if dirty beans are automatically persisted.

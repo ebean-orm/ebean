@@ -346,7 +346,6 @@ public final class BatchControl {
 
     int depth = transaction.depth();
     BeanDescriptor<?> desc = request.descriptor();
-
     // batching by bean type AND depth
     String key = desc.rootName() + ":" + depth;
 
