@@ -6,11 +6,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class GenKeySequence {
-  public final static String SEQUENCE_NAME = "SEQ";
+public class GenKeySeqA {
 
+  public final static String SEQUENCE_NAME = "GEN_KEY_A_SEQ_NAME";
+
+  /**
+   * {@link GeneratedValue#generator()} is not empty, but no {@code SequenceGenerator} is present.
+   * So the sequence is named like the generator: {@link #SEQUENCE_NAME}.
+   */
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_NAME")
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = SEQUENCE_NAME)
   private Long id;
 
   private String description;

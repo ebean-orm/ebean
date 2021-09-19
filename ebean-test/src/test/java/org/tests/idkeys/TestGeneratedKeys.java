@@ -8,36 +8,58 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.jupiter.api.Test;
 import org.tests.idkeys.db.GenKeyIdentity;
-import org.tests.idkeys.db.GenKeySequence;
+import org.tests.idkeys.db.GenKeySeqA;
+import org.tests.idkeys.db.GenKeySeqB;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 public class TestGeneratedKeys extends BaseTestCase {
 
   @Test
   @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
-  public void testSequence() throws SQLException {
+  public void testGenKeySeqA() throws SQLException {
+    assumeTrue(idType() == IdType.SEQUENCE);
     SpiEbeanServer server = spiEbeanServer();
-
-    if (idType() != IdType.SEQUENCE) {
-      // only run this test when SEQUENCE is being used
-      return;
-    }
 
     try (Transaction tx = server.beginTransaction()) {
 
-      long sequenceStart = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
+      long sequenceStart = readSequenceValue(tx, GenKeySeqA.SEQUENCE_NAME);
 
-      GenKeySequence al = new GenKeySequence();
+      GenKeySeqA al = new GenKeySeqA();
       al.setDescription("my description");
       server.save(al);
 
 
-      long sequenceCurrent = readSequenceValue(tx, GenKeySequence.SEQUENCE_NAME);
+      long sequenceCurrent = readSequenceValue(tx, GenKeySeqA.SEQUENCE_NAME);
+
+      assertNotNull(al.getId());
+      assertFalse(sequenceStart == sequenceCurrent);
+      assertEquals(sequenceStart + 20, sequenceCurrent);
+    }
+
+  }
+  
+  @Test
+  @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
+  public void testGenKeySeqB() throws SQLException {
+    assumeTrue(idType() == IdType.SEQUENCE);
+    SpiEbeanServer server = spiEbeanServer();
+
+    try (Transaction tx = server.beginTransaction()) {
+
+      long sequenceStart = readSequenceValue(tx, GenKeySeqB.SEQUENCE_NAME);
+
+      GenKeySeqB al = new GenKeySeqB();
+      al.setDescription("my description");
+      server.save(al);
+
+
+      long sequenceCurrent = readSequenceValue(tx, GenKeySeqB.SEQUENCE_NAME);
 
       assertNotNull(al.getId());
       assertFalse(sequenceStart == sequenceCurrent);
