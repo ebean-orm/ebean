@@ -2875,8 +2875,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     final EntityBeanIntercept ebi = bean._ebean_getIntercept();
     for (BeanPropertyAssocMany<?> many : propertiesManySave) {
       if (ebi.isLoadedProperty(many.propertyIndex())) {
-        final BeanCollection<?> value = (BeanCollection<?>) many.getValue(bean);
-        if (value != null && value.hasModifications()) {
+        final Object value = many.getValue(bean);
+        if (value instanceof BeanCollection && ((BeanCollection<?>)value).hasModifications() || value != null) {
           return true;
         }
       }

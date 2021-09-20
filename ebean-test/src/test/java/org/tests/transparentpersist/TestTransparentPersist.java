@@ -13,6 +13,7 @@ import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderShipment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -173,6 +174,38 @@ public class TestTransparentPersist extends BaseTestCase {
 
     DB.delete(checkOrder);
     DB.delete(Customer.class, checkOrder.getCustomer().getId());
+    DB.delete(Customer.class, c0.getId());
+  }
+
+  @Test
+  public void insertWithPersistCascadeInsert() {
+
+    // setup data
+    Customer c0 = new Customer();
+    c0.setName("firstCust");
+    DB.save(c0);
+
+    Integer orderId;
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setAutoPersistUpdates(true); // EXPERIMENTAL feature
+      Order order = new Order();
+      order.setStatus(Order.Status.NEW);
+      order.setCustomer(c0);
+      order.setShipments(new ArrayList<>());
+      DB.insert(order);
+      orderId = order.getId();
+      // cascade persist will insert this Shipment (even though it isn't in the persistence context)
+      OrderShipment osh0 = new OrderShipment();
+      order.addShipment(osh0);
+      transaction.commit();
+    }
+
+    Order checkOrder = DB.find(Order.class, orderId);
+
+    assertThat(checkOrder.getStatus()).isEqualTo(Order.Status.NEW);
+    assertThat(checkOrder.getShipments().size()).isEqualTo(1);
+
+    DB.delete(checkOrder);
     DB.delete(Customer.class, c0.getId());
   }
 
