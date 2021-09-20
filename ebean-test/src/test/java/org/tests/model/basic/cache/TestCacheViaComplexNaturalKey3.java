@@ -386,8 +386,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     loadSomeIntoCache();
 
     Pairs pairs = new Pairs("sku", "code")
-      .setConcatSeparator(":")
-      .setConcatSuffix("-foo")
+      .concatSeparator(":")
+      .concatSuffix("-foo")
       .add("2", 1000)
       .add("2", 1001)
       .add("3", 1000);

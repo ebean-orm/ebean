@@ -9,7 +9,9 @@ import io.ebeaninternal.server.query.SqlJoinType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -22,7 +24,7 @@ public final class ManyWhereJoins implements Serializable {
   private static final long serialVersionUID = -6490181101871795417L;
 
   private final TreeMap<String, PropertyJoin> joins = new TreeMap<>();
-  private List<String> formulaJoinProperties;
+  private Map<String, List<String>> formulaJoinProperties;
   private boolean aggregation;
   /**
    * 'Mode' indicating that joins added while this is true are required to be outer joins.
@@ -121,25 +123,25 @@ public final class ManyWhereJoins implements Serializable {
    * In findCount query found a formula property with a join clause so building a select clause
    * specifically for the findCount query.
    */
-  public void addFormulaWithJoin(String propertyName) {
+  public void addFormulaWithJoin(String prefix, String name) {
     if (formulaJoinProperties == null) {
-      formulaJoinProperties = new ArrayList<>();
+      formulaJoinProperties = new HashMap<>();
     }
-    formulaJoinProperties.add(propertyName);
+    formulaJoinProperties.computeIfAbsent(prefix, k -> new ArrayList<>()).add(name);
   }
 
   /**
    * Return true if the query select includes a formula with join.
    */
-  public boolean isFormulaWithJoin() {
-    return formulaJoinProperties != null;
+  public boolean isFormulaWithJoin(String prefix) {
+    return formulaJoinProperties != null && formulaJoinProperties.containsKey(prefix);
   }
 
   /**
    * Return the formula properties to build the select clause for a findCount query.
    */
-  public List<String> getFormulaJoinProperties() {
-    return formulaJoinProperties;
+  public List<String> getFormulaJoinProperties(String prefix) {
+    return formulaJoinProperties.get(prefix);
   }
 
   /**

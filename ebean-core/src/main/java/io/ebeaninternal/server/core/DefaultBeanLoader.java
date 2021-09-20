@@ -175,14 +175,12 @@ final class DefaultBeanLoader {
       // need a new PersistenceContext for REFRESH
       pc = null;
     }
-
     BeanDescriptor<?> desc = server.descriptor(bean.getClass());
     if (EntityType.EMBEDDED == desc.entityType()) {
       // lazy loading on an embedded bean property
       EntityBean embeddedOwner = (EntityBean) ebi.getEmbeddedOwner();
       refreshBeanInternal(embeddedOwner, mode, ebi.getEmbeddedOwnerIndex());
     }
-
     Object id = desc.getId(bean);
     if (pc == null) {
       // a reference with no existing persistenceContext
@@ -202,17 +200,16 @@ final class DefaultBeanLoader {
         }
       }
     }
-
     SpiQuery<?> query = server.createQuery(desc.type());
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     if (draft) {
       query.asDraft();
+    } else {
+      query.setIncludeSoftDeletes();
     }
-
     if (embeddedOwnerIndex > -1) {
       query.select(ebi.getProperty(embeddedOwnerIndex));
     }
-
     // don't collect AutoTune usage profiling information
     // as we just copy the data out of these fetched beans
     // and put the data into the original bean

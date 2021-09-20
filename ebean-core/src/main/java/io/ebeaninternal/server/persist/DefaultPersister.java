@@ -251,6 +251,7 @@ public final class DefaultPersister implements Persister {
       } else {
         update(request);
       }
+      request.resetDepth();
     }
 
     draftHandler.updateDrafts(transaction, mgr);
@@ -417,7 +418,7 @@ public final class DefaultPersister implements Persister {
       } else {
         update(req);
       }
-
+      req.resetDepth();
       req.commitTransIfRequired();
       req.flushBatchOnCascade();
 
@@ -455,6 +456,7 @@ public final class DefaultPersister implements Persister {
     try {
       req.initTransIfRequiredWithBatchCascade();
       insert(req);
+      req.resetDepth();
       req.commitTransIfRequired();
       req.flushBatchOnCascade();
 
@@ -1123,7 +1125,7 @@ public final class DefaultPersister implements Persister {
           && !prop.isReference(detailBean)
           && !request.isParent(detailBean)) {
           SpiTransaction t = request.transaction();
-          t.depth(-1);
+          t.depthDecrement();
           saveRecurse(detailBean, t, null, request.flags());
           t.depth(+1);
         }

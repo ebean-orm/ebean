@@ -9,7 +9,10 @@ import org.tests.model.basic.UTMaster;
 import javax.persistence.OptimisticLockException;
 import java.sql.Timestamp;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestIUDVanilla extends BaseTestCase {
 
@@ -79,4 +82,27 @@ public class TestIUDVanilla extends BaseTestCase {
     e0.setVersion(42);
     assertThrows(OptimisticLockException.class, () -> e0.update());
   }
+
+  @Test
+  public void testOptimisticLockException() {
+    UTMaster e0 = new UTMaster("optLock");
+    DB.save(e0);
+
+    e0 = DB.find(UTMaster.class).where().eq("name", "optLock").findOne();
+    UTMaster e1 = DB.find(UTMaster.class).where().eq("name", "optLock").findOne();
+
+    int oldVersion = e0.getVersion();
+    e0.setDescription("foo");
+    e0.save();
+    assertThat(e0.getVersion()).isGreaterThan(oldVersion);
+
+    e1.setDescription("bar");
+    oldVersion = e1.getVersion();
+    assertThrows(OptimisticLockException.class, e1::save);
+    // after optimisticLockExecption, a restore of version is expected
+    assertThat(e1.getVersion()).isEqualTo(oldVersion);
+    // and subsequent saves must fail
+    assertThrows(OptimisticLockException.class, e1::save);
+  }
+
 }

@@ -72,33 +72,27 @@ final class ExeOrmUpdate {
     SpiTransaction t = request.transaction();
 
     String sql = ormUpdate.getUpdateStatement();
-
     // convert bean and property names to table and
     // column names if required
     sql = translate(request, sql);
-
     BindParams bindParams = ormUpdate.getBindParams();
-
     // process named parameters if required
     sql = BindParamsParser.parse(bindParams, sql);
-
     ormUpdate.setGeneratedSql(sql);
 
     PreparedStatement pstmt;
     if (batchThisRequest) {
-      pstmt = pstmtFactory.getPstmtBatch(t, sql, request);
+      pstmt = pstmtFactory.pstmtBatch(t, sql, request);
     } else {
       if (t.isLogSql()) {
         t.logSql(sql);
       }
-      pstmt = pstmtFactory.getPstmt(t, sql, false);
+      pstmt = pstmtFactory.pstmt(t, sql, false);
     }
-
     String bindLog = null;
     if (!bindParams.isEmpty()) {
       bindLog = binder.bind(bindParams, pstmt, t.getInternalConnection());
     }
-
     request.setBindLog(bindLog);
     return pstmt;
   }

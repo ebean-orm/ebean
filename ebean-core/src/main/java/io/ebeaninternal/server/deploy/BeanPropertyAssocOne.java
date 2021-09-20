@@ -545,6 +545,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return importedId;
   }
 
+  /**
+   * Find and return a matching imported id property.
+   */
+  public BeanProperty findMatchImport(String dbCol) {
+    return importedId.findMatchImport(dbCol);
+  }
+
   private String deriveWhereParentIdSql(boolean inClause) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < exportedProperties.length; i++) {
@@ -606,11 +613,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
-  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (!isTransient && !primaryKeyExport) {
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
-        ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
+        ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
       }
     }
   }

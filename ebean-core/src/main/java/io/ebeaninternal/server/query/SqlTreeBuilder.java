@@ -10,6 +10,7 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
+import io.ebeaninternal.server.rawsql.SpiRawSql;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -255,6 +256,13 @@ public final class SqlTreeBuilder {
     }
     extraProps.forEach(props::add);
 
+    if (!rawSql && manyWhereJoins.isFormulaWithJoin(prefix)) {
+      for (String property : manyWhereJoins.getFormulaJoinProperties(prefix)) {
+        final STreeProperty beanProperty = desc.findPropertyFromPath(property);
+        myJoinList.add(new SqlTreeNodeFormulaWhereJoin(beanProperty, SqlJoinType.OUTER, null));
+      }
+    }
+
     SqlTreeNode selectNode = buildNode(prefix, prop, desc, myJoinList, props);
     if (joinList != null) {
       joinList.add(selectNode);
@@ -275,11 +283,11 @@ public final class SqlTreeBuilder {
       STreePropertyAssoc beanProperty = (STreePropertyAssoc) desc.findPropertyFromPath(joinProp.getProperty());
       SqlTreeNodeManyWhereJoin nodeJoin = new SqlTreeNodeManyWhereJoin(joinProp.getProperty(), beanProperty, joinProp.getSqlJoinType(), temporalMode);
       myJoinList.add(nodeJoin);
-    }
-    if (manyWhereJoins.isFormulaWithJoin()) {
-      for (String property : manyWhereJoins.getFormulaJoinProperties()) {
-        STreeProperty beanProperty = desc.findPropertyFromPath(property);
-        myJoinList.add(new SqlTreeNodeFormulaWhereJoin(beanProperty, SqlJoinType.OUTER));
+      if (manyWhereJoins.isFormulaWithJoin(joinProp.getProperty())) {
+        for (String property : manyWhereJoins.getFormulaJoinProperties(joinProp.getProperty())) {
+          STreeProperty beanProperty2 = desc.findPropertyFromPath(SplitName.add(joinProp.getProperty(), property));
+          myJoinList.add(new SqlTreeNodeFormulaWhereJoin(beanProperty2, SqlJoinType.OUTER, joinProp.getProperty()));
+        }
       }
     }
   }
@@ -348,7 +356,7 @@ public final class SqlTreeBuilder {
 
     // look for predicateIncludes that are not in selectIncludes and add
     // them as extra joins to the query
-    IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes, temporalMode);
+    IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes, manyWhereJoins, temporalMode);
     Collection<SqlTreeNodeExtraJoin> extraJoins = extraJoinDistill.getExtraJoinRootNodes();
     if (!extraJoins.isEmpty()) {
       // add extra joins required to support predicates
@@ -570,15 +578,17 @@ public final class SqlTreeBuilder {
     private final Set<String> selectIncludes;
     private final Set<String> predicateIncludes;
     private final SpiQuery.TemporalMode temporalMode;
+    private final ManyWhereJoins manyWhereJoins;
 
     private final Map<String, SqlTreeNodeExtraJoin> joinRegister = new HashMap<>();
     private final Map<String, SqlTreeNodeExtraJoin> rootRegister = new HashMap<>();
 
     private IncludesDistiller(STreeType desc, Set<String> selectIncludes,
-                              Set<String> predicateIncludes, SpiQuery.TemporalMode temporalMode) {
+                              Set<String> predicateIncludes, ManyWhereJoins manyWhereJoins, SpiQuery.TemporalMode temporalMode) {
       this.desc = desc;
       this.selectIncludes = selectIncludes;
       this.predicateIncludes = predicateIncludes;
+      this.manyWhereJoins = manyWhereJoins;
       this.temporalMode = temporalMode;
     }
 
@@ -609,6 +619,14 @@ public final class SqlTreeBuilder {
       SqlTreeNodeExtraJoin extraJoin = createJoinLeaf(includeProp);
       if (extraJoin != null) {
         // add the extra join...
+
+        // add many where joins
+        if (manyWhereJoins.isFormulaWithJoin(includeProp)) {
+          for (String property : manyWhereJoins.getFormulaJoinProperties(includeProp)) {
+            STreeProperty beanProperty = desc.findPropertyFromPath(SplitName.add(includeProp, property));
+            extraJoin.addChild(new SqlTreeNodeFormulaWhereJoin(beanProperty, SqlJoinType.OUTER, null));
+          }
+        }
 
         // find root of this extra join... linking back to the
         // parents (creating the tree) as it goes.

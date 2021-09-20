@@ -343,6 +343,16 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void depthDecrement() {
+    transaction.depthDecrement();
+  }
+
+  @Override
+  public void depthReset() {
+    transaction.depthReset();
+  }
+
+  @Override
   public int depth() {
     return transaction.depth();
   }
