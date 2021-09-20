@@ -68,18 +68,16 @@ final class ExeCallableSql {
 
     CallableStatement cstmt;
     if (batchThisRequest) {
-      cstmt = pstmtFactory.getCstmtBatch(t, logSql, sql, request);
+      cstmt = pstmtFactory.cstmtBatch(t, logSql, sql, request);
     } else {
       if (logSql) {
         t.logSql(TrimLogSql.trim(sql));
       }
-      cstmt = pstmtFactory.getCstmt(t, sql);
+      cstmt = pstmtFactory.cstmt(t, sql);
     }
-
     if (callableSql.getTimeout() > 0) {
       cstmt.setQueryTimeout(callableSql.getTimeout());
     }
-
     String bindLog = null;
     if (!bindParams.isEmpty()) {
       bindLog = binder.bind(bindParams, cstmt, t.getInternalConnection());

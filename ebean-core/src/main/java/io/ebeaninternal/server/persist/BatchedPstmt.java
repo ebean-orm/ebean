@@ -38,16 +38,11 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
    * The list of BatchPostExecute used to perform post processing.
    */
   private final List<BatchPostExecute> list = new ArrayList<>();
-
   private final String sql;
-
   private final SpiTransaction transaction;
-
   private long profileStart;
   private long timedStart;
-
   private int[] results;
-
   private List<InputStream> inputStreams;
 
   /**
@@ -75,14 +70,14 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
   /**
    * Return the sql
    */
-  public String getSql() {
+  public String sql() {
     return sql;
   }
 
   /**
    * Return the statement adding the postExecute task.
    */
-  public PreparedStatement getStatement(BatchPostExecute postExecute) throws SQLException {
+  public PreparedStatement statement(BatchPostExecute postExecute) throws SQLException {
     if (postExecute.isFlushQueue() && list.size() >= 20) {
       flushStatementBatch();
     }
@@ -191,7 +186,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
   /**
    * Return the execution results (row counts).
    */
-  public int[] getResults() {
+  public int[] results() {
     return results;
   }
 

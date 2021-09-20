@@ -101,7 +101,6 @@ public final class BatchControl {
    * Note that UpdateSql and CallableSql will ALWAYS flush first. This is due to
    * it already having been bound to a PreparedStatement where as the Beans go
    * through a 2 step process when they are flushed (delayed binding).
-   * </p>
    */
   public void setBatchFlushOnMixed(boolean flushBatchOnMixed) {
     this.batchFlushOnMixed = flushBatchOnMixed;
@@ -111,7 +110,6 @@ public final class BatchControl {
    * Set the size of batch execution.
    * <p>
    * The user can set this via the Transaction.
-   * </p>
    */
   public void setBatchSize(int batchSize) {
     if (batchSize > 1) {
@@ -123,7 +121,6 @@ public final class BatchControl {
    * Set whether or not to use getGeneratedKeys for this batch execution.
    * <p>
    * The user can set this via the transaction
-   * </p>
    */
   public void setGetGeneratedKeys(Boolean getGeneratedKeys) {
     if (getGeneratedKeys != null) {
@@ -147,7 +144,7 @@ public final class BatchControl {
       // execute the request immediately without batching
       return request.executeNow();
     }
-    if (!addBatch && pstmtHolder.getMaxSize() >= batchSize) {
+    if (!addBatch && pstmtHolder.maxSize() >= batchSize) {
       flush();
     }
     // for OrmUpdate, SqlUpdate, CallableSql there is no queue...
@@ -188,10 +185,8 @@ public final class BatchControl {
       // as the bean gets changed from dirty to loaded earlier)
       return false;
     }
-
-    BatchedBeanHolder beanHolder = getBeanHolder(request);
+    BatchedBeanHolder beanHolder = beanHolder(request);
     int bufferSize = beanHolder.append(request);
-
     bufferMax = Math.max(bufferMax, bufferSize);
     // flush if any buffer hits 10 times batch size
     return (bufferMax >= batchSize * 10);
@@ -200,7 +195,7 @@ public final class BatchControl {
   /**
    * Return the actual batch of PreparedStatements.
    */
-  public BatchedPstmtHolder getPstmtHolder() {
+  public BatchedPstmtHolder pstmtHolder() {
     return pstmtHolder;
   }
 
@@ -315,7 +310,7 @@ public final class BatchControl {
   private void executeAll() throws BatchedSqlException {
     do {
       // convert entry map to array for sorting
-      BatchedBeanHolder[] bsArray = getBeanHolderArray();
+      BatchedBeanHolder[] bsArray = beanHolderArray();
       Arrays.sort(bsArray, depthComparator);
       if (transaction.isLogSummary()) {
         transaction.logSummary("BatchControl flush " + Arrays.toString(bsArray));
@@ -342,13 +337,11 @@ public final class BatchControl {
    * Return an entry for the given type description. The type description is
    * typically the bean class name (or table name for MapBeans).
    */
-  private BatchedBeanHolder getBeanHolder(PersistRequestBean<?> request) {
-
+  private BatchedBeanHolder beanHolder(PersistRequestBean<?> request) {
     int depth = transaction.depth();
     BeanDescriptor<?> desc = request.descriptor();
     // batching by bean type AND depth
     String key = desc.rootName() + ":" + depth;
-
     BatchedBeanHolder batchBeanHolder = beanHoldMap.get(key);
     if (batchBeanHolder == null) {
       int ordering = depthOrder.orderingFor(depth);
@@ -368,7 +361,7 @@ public final class BatchControl {
   /**
    * Return the BatchedBeanHolder's ready for sorting and executing.
    */
-  private BatchedBeanHolder[] getBeanHolderArray() {
+  private BatchedBeanHolder[] beanHolderArray() {
     return beanHoldMap.values().toArray(new BatchedBeanHolder[0]);
   }
 

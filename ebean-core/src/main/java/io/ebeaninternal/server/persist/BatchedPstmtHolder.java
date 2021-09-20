@@ -35,15 +35,15 @@ public final class BatchedPstmtHolder {
    * Return the PreparedStatement if it has already been used in this Batch.
    * This will return null if no matching PreparedStatement is found.
    */
-  PreparedStatement getStmt(String stmtKey, BatchPostExecute postExecute) throws SQLException {
-    BatchedPstmt batchedPstmt = getBatchedPstmt(stmtKey);
-    return (batchedPstmt == null) ? null : batchedPstmt.getStatement(postExecute);
+  PreparedStatement stmt(String stmtKey, BatchPostExecute postExecute) throws SQLException {
+    BatchedPstmt batchedPstmt = batchedPstmt(stmtKey);
+    return (batchedPstmt == null) ? null : batchedPstmt.statement(postExecute);
   }
 
   /**
    * Return the BatchedPstmt that holds the batched statement.
    */
-  public BatchedPstmt getBatchedPstmt(String stmtKey) {
+  public BatchedPstmt batchedPstmt(String stmtKey) {
     BatchedPstmt bs = stmtMap.get(stmtKey);
     if (bs == null) {
       return null;
@@ -61,7 +61,7 @@ public final class BatchedPstmtHolder {
    * Return the size of the biggest batched statement.
    * Used to determine when to flush the batch.
    */
-  int getMaxSize() {
+  int maxSize() {
     return maxSize;
   }
 
@@ -70,7 +70,7 @@ public final class BatchedPstmtHolder {
    */
   public void addStmt(BatchedPstmt bs, BatchPostExecute postExecute) {
     bs.add(postExecute);
-    stmtMap.put(bs.getSql(), bs);
+    stmtMap.put(bs.sql(), bs);
   }
 
   /**
@@ -97,7 +97,7 @@ public final class BatchedPstmtHolder {
       throw new PersistenceException("No batched statement found for key " + key);
     }
     batchedPstmt.executeBatch(getGeneratedKeys);
-    return batchedPstmt.getResults();
+    return batchedPstmt.results();
   }
 
   /**
@@ -138,7 +138,7 @@ public final class BatchedPstmtHolder {
       try {
         bs.executeBatch(getGeneratedKeys);
       } catch (SQLException ex) {
-        throw new BatchedSqlException("Error when batch flush on sql: " + bs.getSql(), ex);
+        throw new BatchedSqlException("Error when batch flush on sql: " + bs.sql(), ex);
       }
     }
   }
