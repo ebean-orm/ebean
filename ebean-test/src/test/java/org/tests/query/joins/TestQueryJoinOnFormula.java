@@ -115,13 +115,18 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().isNotNull("order.shipments.order.totalAmount").query();
 
     shipQuery.findList();
-    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id "
-      + "from or_order_ship t0 "
-      + "join o_order u1 on u1.id = t0.order_id "
-      + "join or_order_ship u2 on u2.order_id = u1.id "
-      + "join o_order u3 on u3.id = u2.order_id  "
-      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bu3 on z_bu3.order_id = u3.id "
-      + "where z_bu3.total_amount is not null");
+    if (isPostgres()) {
+      assertThat(shipQuery.getGeneratedSql()).contains("select distinct on (t0.id) t0.id from or_order_ship t0");
+    } else {
+      assertThat(shipQuery.getGeneratedSql()).contains("select distinct t0.id from or_order_ship t0 ");
+    }
+    assertThat(shipQuery.getGeneratedSql()).contains(
+      "from or_order_ship t0 " +
+      "join o_order u1 on u1.id = t0.order_id " +
+      "join or_order_ship u2 on u2.order_id = u1.id " +
+      "join o_order u3 on u3.id = u2.order_id  " +
+      "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bu3 on z_bu3.order_id = u3.id " +
+      "where z_bu3.total_amount is not null");
   }
 
   @Test
