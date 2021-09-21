@@ -70,7 +70,7 @@ public final class CQueryPlanManager implements QueryPlanManager {
   }
 
   private List<MetaQueryPlan> collectPlans(QueryPlanRequest request) {
-    try (Connection connection = transactionManager.getQueryPlanConnection()) {
+    try (Connection connection = transactionManager.queryPlanConnection()) {
       CQueryPlanRequest req = new CQueryPlanRequest(connection, request, plans.keySet().iterator());
       while (req.hasNext()) {
         req.nextCapture();
