@@ -156,7 +156,7 @@ public final class InternalConfiguration {
     this.clockService = new ClockService(config.getClock());
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
-    this.docStoreFactory = initDocStoreFactory(config.service(DocStoreFactory.class));
+    this.docStoreFactory = initDocStoreFactory(service(DocStoreFactory.class));
     this.jsonFactory = config.getJsonFactory();
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
@@ -191,8 +191,12 @@ public final class InternalConfiguration {
     return new InternalConfigXmlMap(xmEbeans, config.getClassLoadConfig().getClassLoader());
   }
 
+  private <S> S service(Class<S> cls) {
+    return ServiceUtil.service(cls);
+  }
+
   private List<XmapEbean> readExternalMapping() {
-    final XmapService xmapService = config.service(XmapService.class);
+    final XmapService xmapService = service(XmapService.class);
     if (xmapService == null) {
       return Collections.emptyList();
     }
@@ -201,7 +205,7 @@ public final class InternalConfiguration {
 
   private SpiLogManager initLogManager() {
     // allow plugin - i.e. capture executed SQL for testing/asserts
-    SpiLoggerFactory loggerFactory = config.service(SpiLoggerFactory.class);
+    SpiLoggerFactory loggerFactory = service(SpiLoggerFactory.class);
     if (loggerFactory == null) {
       loggerFactory = new DLoggerFactory();
     }
@@ -336,7 +340,7 @@ public final class InternalConfiguration {
   }
 
   AutoTuneService createAutoTuneService(SpiEbeanServer server) {
-    final AutoTuneServiceProvider provider = config.service(AutoTuneServiceProvider.class);
+    final AutoTuneServiceProvider provider = service(AutoTuneServiceProvider.class);
     return provider == null ? new NoAutoTuneService() : provider.create(server, config);
   }
 
@@ -445,7 +449,7 @@ public final class InternalConfiguration {
     if (!profilingConfig.isEnabled()) {
       return new NoopProfileHandler();
     }
-    SpiProfileHandler handler = config.service(SpiProfileHandler.class);
+    SpiProfileHandler handler = service(SpiProfileHandler.class);
     if (handler == null) {
       handler = new DefaultProfileHandler(profilingConfig);
     }
@@ -533,7 +537,7 @@ public final class InternalConfiguration {
     }
     SlowQueryListener listener = config.getSlowQueryListener();
     if (listener == null) {
-      listener = config.service(SlowQueryListener.class);
+      listener = service(SlowQueryListener.class);
       if (listener == null) {
         listener = new DefaultSlowQueryListener();
       }
@@ -589,7 +593,7 @@ public final class InternalConfiguration {
     }
 
     ServerCacheFactory factory = serverCachePlugin.create(config, backgroundExecutor);
-    ServerCacheNotifyPlugin notifyPlugin = config.service(ServerCacheNotifyPlugin.class);
+    ServerCacheNotifyPlugin notifyPlugin = service(ServerCacheNotifyPlugin.class);
     if (notifyPlugin != null) {
       // plugin supplied so use that to send notifications
       cacheNotify = notifyPlugin.create(config);
@@ -644,7 +648,7 @@ public final class InternalConfiguration {
    * Return the DDL generator.
    */
   public SpiDdlGenerator initDdlGenerator(SpiEbeanServer server) {
-    final SpiDdlGeneratorProvider service = config.service(SpiDdlGeneratorProvider.class);
+    final SpiDdlGeneratorProvider service = service(SpiDdlGeneratorProvider.class);
     return service == null ? new NoopDdl() : service.generator(server);
   }
 
