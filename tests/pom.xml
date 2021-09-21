@@ -17,7 +17,7 @@
 
   <modules>
     <module>test-java16</module>
+    <module>test-kotlin</module>
   </modules>
 
 </project>
-
