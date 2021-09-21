@@ -111,28 +111,28 @@ public final class Pairs {
   /**
    * Return the first property name.
    */
-  public String getProperty0() {
+  public String property0() {
     return property0;
   }
 
   /**
    * Return the second property name.
    */
-  public String getProperty1() {
+  public String property1() {
     return property1;
   }
 
   /**
    * Return all the value pairs.
    */
-  public List<Entry> getEntries() {
+  public List<Entry> entries() {
     return Collections.unmodifiableList(entries);
   }
 
   /**
    * Return the separator character used with DB varchar concatenation to combine the 2 values.
    */
-  public String getConcatSeparator() {
+  public String concatSeparator() {
     return concatSeparator;
   }
 
@@ -155,7 +155,7 @@ public final class Pairs {
   /**
    * Return  a suffix used with DB varchar concatenation to combine the 2 values.
    */
-  public String getConcatSuffix() {
+  public String concatSuffix() {
     return concatSuffix;
   }
 
