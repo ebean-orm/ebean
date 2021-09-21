@@ -17,6 +17,7 @@ import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.GeoTypeProvider;
+import io.ebeaninternal.server.core.ServiceUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import org.joda.time.DateTime;
@@ -156,7 +157,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void loadGeoTypeBinder(DatabaseConfig config) {
-    final GeoTypeProvider provider = config.service(GeoTypeProvider.class);
+    final GeoTypeProvider provider = ServiceUtil.service(GeoTypeProvider.class);
     if (provider != null) {
       geoTypeBinder = provider.createBinder(config);
     }

@@ -106,6 +106,7 @@
         <configuration>
           <tiles>
             <tile>io.ebean.tile:enhancement:12.11.3</tile>
+            <tile>io.avaje.tile:moditech-module:1.0</tile>
           </tiles>
         </configuration>
       </plugin>

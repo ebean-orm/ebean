@@ -5,7 +5,9 @@ import io.avaje.classpath.scanner.ClassPathScannerFactory;
 import io.ebean.config.DatabaseConfig;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ServiceLoader;
 
 /**
  * Utility to finds and return the list of ClassPathScanner services.
@@ -17,7 +19,7 @@ public class ClassPathScanners {
    */
   public static List<ClassPathScanner> find(DatabaseConfig config) {
     List<ClassPathScanner> scanners = new ArrayList<>();
-    for (ClassPathScannerFactory factory : config.serviceLoad(ClassPathScannerFactory.class)) {
+    for (ClassPathScannerFactory factory : ServiceLoader.load(ClassPathScannerFactory.class)) {
       scanners.add(factory.createScanner(config.getClassLoadConfig().getClassLoader()));
     }
     return scanners;
