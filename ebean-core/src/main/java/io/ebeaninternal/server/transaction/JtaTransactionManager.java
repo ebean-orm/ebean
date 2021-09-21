@@ -54,7 +54,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
    * Return the current dataSource taking into account multi-tenancy.
    */
   private DataSource dataSource() {
-    return transactionManager.getDataSource();
+    return transactionManager.dataSource();
   }
 
   private TransactionSynchronizationRegistry getSyncRegistry() {
@@ -94,7 +94,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     }
 
     // check current Ebean transaction
-    SpiTransaction currentEbeanTransaction = scope.getInScope();
+    SpiTransaction currentEbeanTransaction = scope.inScope();
     if (currentEbeanTransaction != null) {
       // NOT expecting this so log WARNING
       String msg = "JTA Transaction - no current txn BUT using current Ebean one " + currentEbeanTransaction.getId();

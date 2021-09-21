@@ -20,17 +20,17 @@ public interface SpiTransactionManager {
   /**
    * Return the main DataSource.
    */
-  DataSource getDataSource();
+  DataSource dataSource();
 
   /**
    * Return the read only DataSource (if defined).
    */
-  DataSource getReadOnlyDataSource();
+  DataSource readOnlyDataSource();
 
   /**
    * Return the currently active transaction (can be null).
    */
-  SpiTransaction getActive();
+  SpiTransaction active();
 
   /**
    * Push an externally managed transaction into scope (e.g. Spring managed transaction).
@@ -60,6 +60,6 @@ public interface SpiTransactionManager {
   /**
    * Return a connection used for query plan collection.
    */
-  Connection getQueryPlanConnection() throws SQLException;
+  Connection queryPlanConnection() throws SQLException;
 
 }

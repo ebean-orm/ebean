@@ -23,7 +23,7 @@ public final class ExternalTransactionScopeManager extends DefaultTransactionSco
   }
 
   @Override
-  public SpiTransaction getActive() {
+  public SpiTransaction active() {
     return (SpiTransaction) externalManager.getCurrentTransaction();
   }
 

@@ -17,12 +17,12 @@ public class DefaultTransactionScopeManager extends TransactionScopeManager {
   }
 
   @Override
-  public final SpiTransaction getInScope() {
+  public final SpiTransaction inScope() {
     return local.get();
   }
 
   @Override
-  public SpiTransaction getActive() {
+  public SpiTransaction active() {
     SpiTransaction t = local.get();
     if (t == null || !t.isActive()) {
       return null;
