@@ -6,11 +6,6 @@ package io.ebean.config.dbplatform;
 public interface ExtraDbTypes {
 
   /**
-   * DB native UUID type (H2 and Postgres).
-   */
-  int UUID = 5010;
-
-  /**
    * Type to map Map content to Postgres HSTORE.
    */
   int HSTORE = 5000;
@@ -40,6 +35,12 @@ public interface ExtraDbTypes {
    */
   int JSONBlob = 5005;
 
+  int LOCALDATETIME = 5009;
+
+  /**
+   * DB native UUID type (H2 and Postgres).
+   */
+  int UUID = 5010;
   int INET = 5020;
   int CIDR = 5021;
 

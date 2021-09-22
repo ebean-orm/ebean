@@ -73,6 +73,7 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
       case TIMESTAMP:
       case TIME_WITH_TIMEZONE:
       case TIMESTAMP_WITH_TIMEZONE:
+      case ExtraDbTypes.LOCALDATETIME:
         return "timestamp";
       //case LONGVARCHAR:
       //case CLOB:

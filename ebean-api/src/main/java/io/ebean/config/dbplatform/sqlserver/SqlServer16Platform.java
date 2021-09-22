@@ -21,6 +21,8 @@ public class SqlServer16Platform extends SqlServerBasePlatform {
     dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
     dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("text"));
     dbTypeMap.put(DbType.CLOB, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.JSON, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.JSONB, new DbPlatformType("text"));
   }
 
 }
