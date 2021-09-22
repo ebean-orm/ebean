@@ -56,7 +56,6 @@ public final class CQueryPlanStats {
    * Return a Snapshot of the query execution statistics potentially resetting the internal counters.
    */
   Snapshot getSnapshot(boolean reset) {
-
     TimedMetricStats collect = timedMetric.collect(reset);
     Snapshot snapshot = new Snapshot(collected, queryPlan, collect);
     collected = true;

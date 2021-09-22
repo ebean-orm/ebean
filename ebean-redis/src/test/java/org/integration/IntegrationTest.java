@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class IntegrationTest {
 
   @Test
-  void mput() throws InterruptedException {
+  void mput_via_setIdIn() throws InterruptedException {
 
     ServerCache beanCache = DB.cacheManager().beanCache(RCust.class);
     beanCache.clear();
@@ -54,6 +54,49 @@ class IntegrationTest {
     // we will hit the cache again
     List<RCust> f2 = new QRCust()
       .setIdIn(ids.toArray())
+      .findList();
+    assertThat(f2).hasSize(3);
+    ServerCacheStatistics stats2 = beanCache.statistics(true);
+    assertThat(stats2.getHitCount()).isEqualTo(3);
+  }
+
+
+  @Test
+  void mput_via_propertyInExpression() throws InterruptedException {
+
+    ServerCache beanCache = DB.cacheManager().beanCache(RCust.class);
+    beanCache.clear();
+    beanCache.statistics(true);
+
+    List<RCust> people = new ArrayList<>();
+    for (String name : new String[]{"mpx0", "mpx1", "mpx2"}) {
+      people.add(new RCust(name));
+    }
+    DB.saveAll(people);
+    List<Long> ids = people.stream().map(RCust::getId).collect(Collectors.toList());
+
+    List<RCust> f0 = new QRCust()
+      .id.in(ids)
+      .findList();
+
+    assertThat(f0).hasSize(3);
+    ServerCacheStatistics stats0 = beanCache.statistics(true);
+    assertThat(stats0.getHitCount()).isEqualTo(0);
+
+    Thread.sleep(5);
+
+    // we will hit the cache this time
+    List<RCust> f1 = new QRCust()
+      .id.in(ids)
+      .findList();
+
+    assertThat(f1).hasSize(3);
+    ServerCacheStatistics stats1 = beanCache.statistics(true);
+    assertThat(stats1.getHitCount()).isEqualTo(3);
+
+    // we will hit the cache again
+    List<RCust> f2 = new QRCust()
+      .id.in(ids)
       .findList();
     assertThat(f2).hasSize(3);
     ServerCacheStatistics stats2 = beanCache.statistics(true);

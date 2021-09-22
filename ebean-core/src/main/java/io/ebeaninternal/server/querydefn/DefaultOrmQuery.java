@@ -14,9 +14,7 @@ import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-import io.ebeaninternal.server.expression.DefaultExpressionList;
-import io.ebeaninternal.server.expression.IdInExpression;
-import io.ebeaninternal.server.expression.SimpleExpression;
+import io.ebeaninternal.server.expression.*;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
@@ -631,6 +629,11 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
       SpiExpression singleExpression = underlyingList.get(0);
       if (singleExpression instanceof IdInExpression) {
         return new CacheIdLookupMany<>((IdInExpression) singleExpression);
+      } else if (singleExpression instanceof InExpression) {
+        InExpression in = (InExpression)singleExpression;
+        if (in.property().equals(beanDescriptor.idName())) {
+          return new CacheIdLookupMany<>(in);
+        }
       }
     }
     return null;
