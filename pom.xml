@@ -90,7 +90,7 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
-    <!-- <module>tests</module> -->
+    <module>tests</module>
   </modules>
 
 </project>

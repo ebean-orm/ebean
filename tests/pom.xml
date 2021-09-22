@@ -16,7 +16,9 @@
   <description>test modules</description>
 
   <modules>
-    <module>test-java16</module>
+    <!-- test-java16 REQUIRES JDK 16 to run -->
+<!--    <module>test-java16</module>-->
+    <!-- test-kotlin does NOT run with JDK 16!! -->
     <module>test-kotlin</module>
   </modules>
 
