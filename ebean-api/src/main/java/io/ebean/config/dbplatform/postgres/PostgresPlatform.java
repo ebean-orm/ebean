@@ -69,22 +69,19 @@ public class PostgresPlatform extends DatabasePlatform {
 
     DbPlatformType dbTypeText = new DbPlatformType("text", false);
     DbPlatformType dbBytea = new DbPlatformType("bytea", false);
-
     dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
     dbTypeMap.put(DbType.INET, new DbPlatformType("inet", false));
     dbTypeMap.put(DbType.CIDR, new DbPlatformType("cidr", false));
     dbTypeMap.put(DbType.HSTORE, new DbPlatformType("hstore", false));
     dbTypeMap.put(DbType.JSON, new DbPlatformType("json", false));
     dbTypeMap.put(DbType.JSONB, new DbPlatformType("jsonb", false));
-
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float"));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("timestamptz"));
-
+    dbTypeMap.put(DbType.LOCALDATETIME, new DbPlatformType("timestamp"));
     dbTypeMap.put(DbType.BINARY, dbBytea);
     dbTypeMap.put(DbType.VARBINARY, dbBytea);
-
     dbTypeMap.put(DbType.BLOB, dbBytea);
     dbTypeMap.put(DbType.CLOB, dbTypeText);
     dbTypeMap.put(DbType.LONGVARBINARY, dbBytea);
