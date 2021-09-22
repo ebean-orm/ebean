@@ -15,6 +15,7 @@ import io.ebean.core.type.ScalarType;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.GeoTypeProvider;
 import io.ebeaninternal.server.core.ServiceUtil;
@@ -25,7 +26,6 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.EnumType;
@@ -52,7 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class DefaultTypeManager implements TypeManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultTypeManager.class);
+  private static final Logger log = CoreLog.internal;
 
   private final ConcurrentHashMap<Class<?>, ScalarType<?>> typeMap;
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
@@ -192,7 +192,7 @@ public final class DefaultTypeManager implements TypeManager {
       ExtraTypeFactory plugin = iterator.next();
       List<? extends ScalarType<?>> types = plugin.createTypes(config, objectMapper);
       for (ScalarType<?> type : types) {
-        logger.debug("adding ScalarType {}", type.getClass());
+        log.debug("adding ScalarType {}", type.getClass());
         addCustomType(type);
       }
     }
@@ -231,10 +231,10 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void logAdd(ScalarType<?> scalarType) {
-    if (logger.isTraceEnabled()) {
+    if (log.isTraceEnabled()) {
       String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
       msg += " for [" + scalarType.getType().getName() + "]";
-      logger.trace(msg);
+      log.trace(msg);
     }
   }
 
@@ -647,7 +647,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
         addCustomType(scalarType);
       } catch (Exception e) {
-        logger.error("Error loading ScalarType [" + cls.getName() + "]", e);
+        log.error("Error loading ScalarType [" + cls.getName() + "]", e);
       }
     }
   }
@@ -681,10 +681,10 @@ public final class DefaultTypeManager implements TypeManager {
         }
         ScalarTypeConverter converter = foundType.getDeclaredConstructor().newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
-        logger.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
+        log.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
         add(stw);
       } catch (Exception e) {
-        logger.error("Error registering ScalarTypeConverter [" + foundType.getName() + "]", e);
+        log.error("Error registering ScalarTypeConverter [" + foundType.getName() + "]", e);
       }
     }
   }
@@ -705,10 +705,10 @@ public final class DefaultTypeManager implements TypeManager {
         }
         AttributeConverter converter = foundType.getDeclaredConstructor().newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
-        logger.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
+        log.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
         add(stw);
       } catch (Exception e) {
-        logger.error("Error registering AttributeConverter [" + foundType.getName() + "]", e);
+        log.error("Error registering AttributeConverter [" + foundType.getName() + "]", e);
       }
     }
   }
@@ -718,7 +718,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private void initialiseJacksonTypes(DatabaseConfig config) {
     if (objectMapper != null) {
-      logger.trace("Registering JsonNode type support");
+      log.trace("Registering JsonNode type support");
       ObjectMapper mapper = (ObjectMapper) objectMapper;
       jsonNodeClob = new ScalarTypeJsonNode.Clob(mapper);
       jsonNodeBlob = new ScalarTypeJsonNode.Blob(mapper);
@@ -777,7 +777,7 @@ public final class DefaultTypeManager implements TypeManager {
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
       // Joda classes are in the classpath so register the types
-      logger.debug("Registering Joda data types");
+      log.debug("Registering Joda data types");
       addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(jsonDateTime));
       addType(DateTime.class, new ScalarTypeJodaDateTime(jsonDateTime));
       addType(LocalDate.class, new ScalarTypeJodaLocalDate(jsonDate));
@@ -788,11 +788,11 @@ public final class DefaultTypeManager implements TypeManager {
       if ("normal".equalsIgnoreCase(jodaLocalTimeMode)) {
         // use the expected/normal local time zone
         addType(LocalTime.class, new ScalarTypeJodaLocalTime());
-        logger.debug("registered ScalarTypeJodaLocalTime");
+        log.debug("registered ScalarTypeJodaLocalTime");
       } else if ("utc".equalsIgnoreCase(jodaLocalTimeMode)) {
         // use the old UTC based
         addType(LocalTime.class, new ScalarTypeJodaLocalTimeUTC());
-        logger.debug("registered ScalarTypeJodaLocalTimeUTC");
+        log.debug("registered ScalarTypeJodaLocalTimeUTC");
       }
     }
   }

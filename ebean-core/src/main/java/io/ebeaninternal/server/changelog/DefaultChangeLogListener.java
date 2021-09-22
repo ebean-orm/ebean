@@ -6,6 +6,7 @@ import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
+import io.ebeaninternal.api.CoreLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,11 +17,6 @@ import java.util.Properties;
  * Simply logs the change sets in JSON form to logger named <code>io.ebean.ChangeLog</code>.
  */
 public final class DefaultChangeLogListener implements ChangeLogListener, Plugin {
-
-  /**
-   * The usual application specific logger.
-   */
-  private static final Logger logger = LoggerFactory.getLogger(DefaultChangeLogListener.class);
 
   /**
    * The named logger we send the change set payload to. Can be externally configured as desired.
@@ -36,9 +32,6 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
    * A bigger default buffer for bean inserts and updates (that have value pairs).
    */
   private int defaultBufferSize = 400;
-
-  public DefaultChangeLogListener() {
-  }
 
   /**
    * Configure the underlying JSON handler.
@@ -67,7 +60,6 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
 
   @Override
   public void log(ChangeSet changeSet) {
-
     for (BeanChange beanChange : changeSet.getChanges()) {
       // log each bean change as a separate log entry
       try {
@@ -75,7 +67,7 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
         jsonBuilder.writeBeanJson(writer, beanChange, changeSet);
         changeLog.info(writer.toString());
       } catch (Exception e) {
-        logger.error("Exception logging beanChange " + beanChange.toString(), e);
+        CoreLog.log.error("Exception logging beanChange " + beanChange, e);
       }
     }
   }
@@ -84,7 +76,6 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
    * Return a decent buffer size based on the bean change.
    */
   private int getBufferSize(BeanChange beanChange) {
-
     return ChangeType.DELETE == beanChange.getEvent() ? 250 : defaultBufferSize;
   }
 

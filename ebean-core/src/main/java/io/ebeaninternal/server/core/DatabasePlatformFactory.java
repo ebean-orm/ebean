@@ -20,10 +20,8 @@ import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.DbOffline;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -41,8 +39,6 @@ import java.sql.SQLException;
  */
 public class DatabasePlatformFactory {
 
-  private static final Logger logger = LoggerFactory.getLogger(DatabasePlatformFactory.class);
-
   /**
    * Create the appropriate database specific platform.
    */
@@ -50,7 +46,7 @@ public class DatabasePlatformFactory {
     try {
       String offlinePlatform = DbOffline.getPlatform();
       if (offlinePlatform != null) {
-        logger.info("offline platform [{}]", offlinePlatform);
+        CoreLog.log.info("offline platform [{}]", offlinePlatform);
         return byDatabaseName(offlinePlatform);
       }
       if (config.getDatabasePlatformName() != null) {
@@ -142,7 +138,7 @@ public class DatabasePlatformFactory {
     String dbProductName = metaData.getDatabaseProductName().toLowerCase();
     final int majorVersion = metaData.getDatabaseMajorVersion();
     final int minorVersion = metaData.getDatabaseMinorVersion();
-    logger.debug("platform for productName[{}] version[{}.{}]", dbProductName, majorVersion, minorVersion);
+    CoreLog.log.debug("platform for productName[{}] version[{}.{}]", dbProductName, majorVersion, minorVersion);
 
     if (dbProductName.contains("oracle")) {
       return oracleVersion(majorVersion);
@@ -201,7 +197,7 @@ public class DatabasePlatformFactory {
         }
       }
     } catch (SQLException e) {
-      logger.warn("Error running detection query on Postgres", e);
+      CoreLog.log.warn("Error running detection query on Postgres", e);
     }
     if (majorVersion <= 9) {
       return new Postgres9Platform();

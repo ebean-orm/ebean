@@ -1,10 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.event.BeanQueryAdapter;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -12,8 +11,6 @@ import java.util.List;
  * Default implementation for creating BeanControllers.
  */
 final class BeanQueryAdapterManager {
-
-  private static final Logger logger = LoggerFactory.getLogger(BeanQueryAdapterManager.class);
 
   private final List<BeanQueryAdapter> list;
 
@@ -31,7 +28,7 @@ final class BeanQueryAdapterManager {
   void addQueryAdapter(DeployBeanDescriptor<?> deployDesc) {
     for (BeanQueryAdapter c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        logger.debug("BeanQueryAdapter on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
+        CoreLog.internal.debug("BeanQueryAdapter on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addQueryAdapter(c);
       }
     }

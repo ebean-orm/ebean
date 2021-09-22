@@ -10,8 +10,6 @@ import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -29,14 +27,10 @@ import java.util.Map;
  */
 final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEventCodes {
 
-  private static final Logger logger = LoggerFactory.getLogger(ImplicitReadOnlyTransaction.class);
-
   private static final String illegalStateMessage = "Transaction is Inactive";
-
   private static final String notExpectedMessage = "Not expected on read only transaction";
 
   private final TransactionManager manager;
-
   private final boolean logSql;
   private final boolean logSummary;
 
@@ -55,13 +49,9 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * Holder of the objects fetched to ensure unique objects are used.
    */
   private SpiPersistenceContext persistenceContext;
-
   private Object tenantId;
-
   private Map<String, Object> userObjects;
-
   private final long startNanos;
-
   private ProfileLocation profileLocation;
 
   /**
@@ -501,7 +491,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     } catch (Exception ex) {
       // the connection pool will automatically remove the
       // connection if it does not pass the test
-      logger.error("Error closing connection", ex);
+      CoreLog.log.error("Error closing connection", ex);
     }
     connection = null;
     active = false;

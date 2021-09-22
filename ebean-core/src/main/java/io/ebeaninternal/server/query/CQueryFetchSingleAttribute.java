@@ -4,14 +4,13 @@ import io.ebean.CancelableQuery;
 import io.ebean.CountedValue;
 import io.ebean.core.type.ScalarDataReader;
 import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.type.RsetDataReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -25,8 +24,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * Base compiled query request for single attribute queries.
  */
 final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, CancelableQuery {
-
-  private static final Logger logger = LoggerFactory.getLogger(CQueryFetchSingleAttribute.class);
 
   private final CQueryPlan queryPlan;
   private final OrmQueryRequest<?> request;
@@ -158,7 +155,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
         dataReader = null;
       }
     } catch (SQLException e) {
-      logger.error("Error closing DataReader", e);
+      CoreLog.log.error("Error closing DataReader", e);
     }
     JdbcClose.close(pstmt);
     pstmt = null;

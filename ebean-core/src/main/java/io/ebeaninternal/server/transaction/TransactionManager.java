@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TransactionManager implements SpiTransactionManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
+  private static final Logger log = CoreLog.log;
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
   private final SpiServer server;
@@ -365,7 +365,7 @@ public class TransactionManager implements SpiTransactionManager {
         txnLogger.debug(msg);
       }
     } catch (Exception ex) {
-      logger.error("Error while notifying TransactionEventListener of rollback event", ex);
+      log.error("Error while notifying TransactionEventListener of rollback event", ex);
     }
   }
 
@@ -416,7 +416,7 @@ public class TransactionManager implements SpiTransactionManager {
       postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
     } catch (Exception ex) {
-      logger.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
+      log.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
     }
   }
 

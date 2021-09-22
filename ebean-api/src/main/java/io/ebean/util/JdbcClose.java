@@ -13,7 +13,7 @@ import java.sql.Statement;
  */
 public class JdbcClose {
 
-  private static final Logger logger = LoggerFactory.getLogger(JdbcClose.class);
+  private static final Logger log = LoggerFactory.getLogger("io.ebean");
 
   /**
    * Close the resultSet logging if an error occurs.
@@ -24,7 +24,7 @@ public class JdbcClose {
         statement.close();
       }
     } catch (SQLException e) {
-      logger.warn("Error closing statement", e);
+      log.warn("Error closing statement", e);
     }
   }
 
@@ -37,7 +37,7 @@ public class JdbcClose {
         resultSet.close();
       }
     } catch (SQLException e) {
-      logger.warn("Error closing resultSet", e);
+      log.warn("Error closing resultSet", e);
     }
   }
 
@@ -50,7 +50,7 @@ public class JdbcClose {
         connection.close();
       }
     } catch (SQLException e) {
-      logger.warn("Error closing connection", e);
+      log.warn("Error closing connection", e);
     }
   }
 
@@ -63,7 +63,7 @@ public class JdbcClose {
         connection.rollback();
       }
     } catch (SQLException e) {
-      logger.warn("Error on connection rollback", e);
+      log.warn("Error on connection rollback", e);
     }
   }
 
@@ -76,7 +76,7 @@ public class JdbcClose {
         stmt.cancel();
       }
     } catch (SQLException e) {
-      logger.warn("Error on cancelling statement", e);
+      log.warn("Error on cancelling statement", e);
     }
   }
 }

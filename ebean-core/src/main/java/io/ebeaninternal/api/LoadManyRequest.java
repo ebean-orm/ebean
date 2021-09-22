@@ -8,7 +8,6 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,7 @@ import java.util.List;
  */
 public final class LoadManyRequest extends LoadRequest {
 
-  private static final Logger logger = LoggerFactory.getLogger(LoadManyRequest.class);
+  private static final Logger log = CoreLog.log;
 
   private final List<BeanCollection<?>> batch;
   private final LoadManyBuffer loadContext;
@@ -114,10 +113,10 @@ public final class LoadManyRequest extends LoadRequest {
     // in the +query or +lazy load due to no rows (predicates)
     for (BeanCollection<?> bc : batch) {
       if (bc.checkEmptyLazyLoad()) {
-        if (logger.isDebugEnabled()) {
+        if (log.isDebugEnabled()) {
           EntityBean ownerBean = bc.getOwnerBean();
           Object parentId = desc.getId(ownerBean);
-          logger.debug("BeanCollection after lazy load was empty. type:" + ownerBean.getClass().getName() + " id:" + parentId + " owner:" + ownerBean);
+          log.debug("BeanCollection after lazy load was empty. type:" + ownerBean.getClass().getName() + " id:" + parentId + " owner:" + ownerBean);
         }
       } else if (loadCache && many.isUseCache()) {
         desc.cacheManyPropPut(many, bc, desc.getId(bc.getOwnerBean()));

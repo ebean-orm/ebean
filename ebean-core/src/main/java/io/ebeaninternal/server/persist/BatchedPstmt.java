@@ -1,9 +1,8 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiTransaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,8 +20,6 @@ import java.util.List;
  * </p>
  */
 public final class BatchedPstmt implements SpiProfileTransactionEvent {
-
-  private static final Logger log = LoggerFactory.getLogger(BatchedPstmt.class);
 
   /**
    * The underlying statement.
@@ -144,7 +141,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
       try {
         pstmt.close();
       } catch (SQLException e) {
-        log.warn("Error closing statement", e);
+        CoreLog.log.warn("BatchedPstmt Error closing statement", e);
       } finally {
         pstmt = null;
       }
@@ -208,7 +205,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
         try {
           inputStream.close();
         } catch (IOException e) {
-          log.warn("Error closing inputStream ", e);
+          CoreLog.log.warn("BatchedPstmt Error closing inputStream ", e);
         }
       }
       inputStreams = null;

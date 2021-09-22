@@ -14,7 +14,7 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 
 public class PlatformAutoConfig {
 
-  private static final Logger log = LoggerFactory.getLogger(PlatformAutoConfig.class);
+  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
 
   /**
    * Known platforms we can setup locally or via docker container.

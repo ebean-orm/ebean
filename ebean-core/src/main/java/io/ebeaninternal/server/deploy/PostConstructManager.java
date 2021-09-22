@@ -1,10 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.event.BeanPostConstructListener;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -12,8 +11,6 @@ import java.util.List;
  * Default implementation for creating BeanControllers.
  */
 final class PostConstructManager {
-
-  private static final Logger logger = LoggerFactory.getLogger(PostConstructManager.class);
 
   private final List<BeanPostConstructListener> list;
 
@@ -31,7 +28,7 @@ final class PostConstructManager {
   void addPostConstructListeners(DeployBeanDescriptor<?> deployDesc) {
     for (BeanPostConstructListener c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        logger.debug("BeanPostLoad on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
+        CoreLog.log.debug("BeanPostLoad on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addPostConstructListener(c);
       }
     }

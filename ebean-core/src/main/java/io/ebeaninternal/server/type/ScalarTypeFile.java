@@ -6,19 +6,9 @@ import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.text.TextException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.ebeaninternal.api.CoreLog;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -26,8 +16,6 @@ import java.sql.Types;
  * ScalarType for streaming between a File and the database.
  */
 final class ScalarTypeFile extends ScalarTypeBase<File> {
-
-  private static final Logger logger = LoggerFactory.getLogger(ScalarTypeFile.class);
 
   private final String prefix;
   private final String suffix;
@@ -191,14 +179,14 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
         try {
           output.close();
         } catch (IOException e) {
-          logger.error("Error when closing outputstream", e);
+          CoreLog.log.error("Error when closing outputstream", e);
         }
       }
       if (input != null) {
         try {
           input.close();
         } catch (IOException e) {
-          logger.error("Error when closing inputstream ", e);
+          CoreLog.log.error("Error when closing inputstream ", e);
         }
       }
     }

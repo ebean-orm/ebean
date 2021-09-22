@@ -3,6 +3,7 @@ package io.ebeaninternal.server.persist;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanCollectionUtil;
@@ -10,8 +11,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.IntersectionRow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
@@ -26,8 +25,6 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
 public final class SaveManyBeans extends SaveManyBase {
-
-  private static final Logger log = LoggerFactory.getLogger(SaveManyBeans.class);
 
   private final boolean cascade;
   private final boolean publish;
@@ -317,7 +314,7 @@ public final class SaveManyBeans extends SaveManyBase {
           if (transaction.isLogSummary()) {
             transaction.logSummary(m);
           }
-          log.warn(m);
+          CoreLog.log.warn(m);
         } else {
           if (!many.hasImportedId(otherBean)) {
             throw new PersistenceException("ManyToMany bean " + otherBean + " does not have an Id value.");

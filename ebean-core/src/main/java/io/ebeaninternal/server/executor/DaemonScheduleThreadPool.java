@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.executor;
 
+import io.ebeaninternal.api.CoreLog;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor {
 
-  private static final Logger logger = LoggerFactory.getLogger(DaemonScheduleThreadPool.class);
+  private static final Logger log = CoreLog.log;
 
   private final ReentrantLock lock = new ReentrantLock();
   private final String namePrefix;
@@ -38,19 +38,19 @@ public final class DaemonScheduleThreadPool extends ScheduledThreadPoolExecutor 
     lock.lock();
     try {
       if (super.isShutdown()) {
-        logger.debug("Already shutdown {}", namePrefix);
+        log.debug("Already shutdown threadPool {}", namePrefix);
         return;
       }
       try {
-        logger.trace("Shutting down {} ...", namePrefix);
+        log.trace("shutting down threadPool {}", namePrefix);
         super.shutdown();
         if (!super.awaitTermination(shutdownWaitSeconds, TimeUnit.SECONDS)) {
-          logger.info("Shutdown wait timeout exceeded. Terminating running threads for {}", namePrefix);
+          log.info("Shutdown wait timeout exceeded. Terminating running threads for {}", namePrefix);
           super.shutdownNow();
         }
-        logger.debug("Shutdown complete for {}", namePrefix);
+        log.trace("shutdown complete for threadPool {}", namePrefix);
       } catch (Exception e) {
-        logger.error("Error during shutdown of " + namePrefix, e);
+        log.error("Error during shutdown of threadPool " + namePrefix, e);
         e.printStackTrace();
       }
     } finally {

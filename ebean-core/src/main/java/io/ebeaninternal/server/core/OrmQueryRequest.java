@@ -1,11 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.CacheMode;
-import io.ebean.CancelableQuery;
-import io.ebean.OrderBy;
-import io.ebean.PersistenceContextScope;
-import io.ebean.QueryIterator;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
@@ -16,39 +11,17 @@ import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.text.json.JsonReadOptions;
-import io.ebeaninternal.api.BeanCacheResult;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.CacheIdLookup;
-import io.ebeaninternal.api.HashQuery;
-import io.ebeaninternal.api.LoadContext;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.NaturalKeySet;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
-import io.ebeaninternal.api.SpiQuerySecondary;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.DeployParser;
-import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -56,8 +29,6 @@ import java.util.function.Predicate;
  * Wraps the objects involved in executing a Query.
  */
 public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQueryRequest<T> {
-
-  private static final Logger log = LoggerFactory.getLogger(OrmQueryRequest.class);
 
   private final BeanDescriptor<T> beanDescriptor;
   private final OrmQueryEngine queryEngine;
@@ -277,7 +248,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means
         // that the connection is broken (and the dataSource and db will cleanup)
-        log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
+        CoreLog.log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
       }
     }
   }

@@ -2,8 +2,6 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -20,12 +18,8 @@ import java.sql.SQLException;
  */
 public class SimpleSequenceIdGenerator implements PlatformIdGenerator {
 
-  private static final Logger logger = LoggerFactory.getLogger(SimpleSequenceIdGenerator.class);
-
   private final String sql;
-
   private final DataSource dataSource;
-
   private final String seqName;
 
   /**

@@ -63,26 +63,8 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import io.ebeaninternal.api.ExtraMetrics;
-import io.ebeaninternal.api.LoadBeanRequest;
-import io.ebeaninternal.api.LoadManyRequest;
-import io.ebeaninternal.api.QueryPlanManager;
-import io.ebeaninternal.api.ScopedTransaction;
-import io.ebeaninternal.api.SpiBackgroundExecutor;
-import io.ebeaninternal.api.SpiDdlGenerator;
-import io.ebeaninternal.api.SpiDtoQuery;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiJsonContext;
-import io.ebeaninternal.api.SpiLogManager;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
-import io.ebeaninternal.api.SpiQueryBindCapture;
-import io.ebeaninternal.api.SpiQueryPlan;
-import io.ebeaninternal.api.SpiSqlQuery;
-import io.ebeaninternal.api.SpiSqlUpdate;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiTransactionManager;
-import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.cache.RemoteCacheEvent;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
@@ -118,7 +100,6 @@ import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.persistence.NonUniqueResultException;
@@ -146,7 +127,7 @@ import static java.util.stream.StreamSupport.stream;
  */
 public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
+  private static final Logger log = CoreLog.internal;
 
   private final ReentrantLock lock = new ReentrantLock();
   private final DatabaseConfig config;
@@ -400,7 +381,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (config.isQueryPlanCapture()) {
       long secs = config.getQueryPlanCapturePeriodSecs();
       if (secs > 10) {
-        logger.info("capture query plan enabled, every {}secs", secs);
+        log.info("capture query plan enabled, every {}secs", secs);
         backgroundExecutor.scheduleWithFixedDelay(this::collectQueryPlans, secs, secs, TimeUnit.SECONDS);
       }
     }
@@ -448,7 +429,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Shutdown the services like threads and DataSource.
    */
   private void shutdownInternal(boolean shutdownDataSource, boolean deregisterDriver) {
-    logger.debug("Shutting down instance:{}", serverName);
+    log.trace("shutting down instance {}", serverName);
     if (shutdown) {
       // already shutdown
       return;
@@ -477,7 +458,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       try {
         plugin.shutdown();
       } catch (Exception e) {
-        logger.error("Error when shutting down plugin", e);
+        log.error("Error when shutting down plugin", e);
       }
     }
   }
@@ -2193,7 +2174,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
             try {
               serverCacheManager.clearLocal(Class.forName(cache));
             } catch (Exception e) {
-              logger.error("Error clearing local cache for type " + cache, e);
+              log.error("Error clearing local cache for type " + cache, e);
             }
           }
         }

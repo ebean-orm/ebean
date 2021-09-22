@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.PropertyJoin;
 import io.ebeaninternal.api.SpiQuery;
@@ -10,9 +11,7 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
-import io.ebeaninternal.server.rawsql.SpiRawSql;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +27,7 @@ import java.util.Set;
  */
 public final class SqlTreeBuilder {
 
-  private static final Logger logger = LoggerFactory.getLogger(SqlTreeBuilder.class);
+  private static final Logger log = CoreLog.internal;
 
   private final SpiQuery<?> query;
   private final STreeType desc;
@@ -384,7 +383,7 @@ public final class SqlTreeBuilder {
   private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName, String path) {
     STreeProperty p = desc.findPropertyWithDynamic(propName, path);
     if (p == null) {
-      logger.error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
+      log.error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
       return;
     } else if (p instanceof STreePropertyAssoc && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
@@ -419,13 +418,13 @@ public final class SqlTreeBuilder {
           if (p != null) {
             selectProps.add(p);
           } else {
-            logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+            log.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
           }
         } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.name()))) {
           // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
         } else {
-          logger.error("property [" + p.fullName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
+          log.error("property [" + p.fullName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
         }
       }
 
@@ -434,7 +433,7 @@ public final class SqlTreeBuilder {
       // sub class hierarchy if required
       STreeProperty p = desc.findPropertyWithDynamic(propName, queryProps.getPath());
       if (p == null) {
-        logger.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+        log.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
         p = desc.findProperty("id");
         selectProps.add(p);
 
@@ -534,8 +533,8 @@ public final class SqlTreeBuilder {
     if (queryDetail.includesPath(propName)) {
       if (manyProperty != null) {
         // only one many associated allowed to be included in fetch
-        if (logger.isDebugEnabled()) {
-          logger.debug("Not joining [" + propName + "] as already joined to a Many[" + manyProperty + "].");
+        if (log.isDebugEnabled()) {
+          log.debug("Not joining [" + propName + "] as already joined to a Many[" + manyProperty + "].");
         }
         return false;
       }
