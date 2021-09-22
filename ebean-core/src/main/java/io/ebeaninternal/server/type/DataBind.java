@@ -1,9 +1,8 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.DataBinder;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,8 +21,6 @@ import java.util.Calendar;
 import java.util.List;
 
 public class DataBind implements DataBinder {
-
-  private static final Logger log = LoggerFactory.getLogger(DataBind.class);
 
   private final DataTimeZone dataTimeZone;
   private final PreparedStatement pstmt;
@@ -112,7 +109,7 @@ public class DataBind implements DataBinder {
         try {
           inputStream.close();
         } catch (IOException e) {
-          log.warn("Error closing InputStream that was bound to PreparedStatement", e);
+          CoreLog.log.warn("Error closing InputStream that was bound to PreparedStatement", e);
         }
       }
       inputStreams = null;

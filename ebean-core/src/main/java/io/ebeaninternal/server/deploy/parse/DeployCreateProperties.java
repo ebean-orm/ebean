@@ -1,32 +1,18 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.Model;
-import io.ebean.annotation.DbArray;
-import io.ebean.annotation.DbJson;
-import io.ebean.annotation.DbJsonB;
-import io.ebean.annotation.DbMap;
-import io.ebean.annotation.UnmappedJson;
+import io.ebean.annotation.*;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.AnnotationUtil;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.deploy.DetermineManyType;
 import io.ebeaninternal.server.deploy.ManyType;
-import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
-import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.meta.DeployBeanPropertySimpleCollection;
+import io.ebeaninternal.server.deploy.meta.*;
 import io.ebeaninternal.server.type.TypeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import javax.persistence.ManyToOne;
 import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 
 /**
  * Create the properties for a bean.
@@ -36,8 +22,6 @@ import java.lang.reflect.WildcardType;
  * </p>
  */
 public final class DeployCreateProperties {
-
-  private static final Logger logger = LoggerFactory.getLogger(DeployCreateProperties.class);
 
   private final DetermineManyType determineManyType;
   private final TypeManager typeManager;
@@ -101,7 +85,7 @@ public final class DeployCreateProperties {
             if (replaced != null && !replaced.isTransient()) {
               String msg = "Huh??? property " + prop.getFullBeanName() + " being defined twice";
               msg += " but replaced property was not transient? This is not expected?";
-              logger.warn(msg);
+              CoreLog.log.warn(msg);
             }
           }
         }
@@ -128,7 +112,7 @@ public final class DeployCreateProperties {
         return new DeployBeanPropertySimpleCollection(desc, targetType, manyType);
       }
     } catch (NullPointerException e) {
-      logger.debug("expected non-scalar type {}", e.getMessage());
+      CoreLog.internal.debug("expected non-scalar type {}", e.getMessage());
     }
     return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
   }
@@ -149,7 +133,7 @@ public final class DeployCreateProperties {
           // not supporting this field (generic type used)
           return null;
         }
-        logger.warn("Could not find parameter type (via reflection) on " + desc.getFullName() + " " + field.getName());
+        CoreLog.internal.warn("Could not find parameter type (via reflection) on " + desc.getFullName() + " " + field.getName());
       }
       return createManyType(desc, targetType, manyType);
     }
@@ -168,7 +152,7 @@ public final class DeployCreateProperties {
       return new DeployBeanPropertyAssocOne(desc, propertyType);
 
     } catch (Exception e) {
-      logger.error("Error with " + desc + " field:" + field.getName(), e);
+      CoreLog.log.error("Error with " + desc + " field:" + field.getName(), e);
       return null;
     }
   }

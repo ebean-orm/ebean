@@ -11,10 +11,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.plugin.PropertyAssocMany;
 import io.ebean.text.PathProperties;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiSqlUpdate;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.id.ImportedId;
@@ -23,24 +20,16 @@ import io.ebeaninternal.server.el.ElPropertyChainBuilder;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.query.SqlBeanLoad;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Property mapped to a List Set or Map.
  */
 public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements STreePropertyAssocMany, PropertyAssocMany {
-
-  private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssocMany.class);
 
   private final BeanPropertyAssocManyJsonHelp jsonHelp;
   /**
@@ -664,7 +653,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         }
       } catch (PersistenceException e) {
         // not found as individual scalar properties
-        logger.error("Could not find a exported property?", e);
+        CoreLog.log.error("Could not find a exported property?", e);
       }
     } else {
       if (idProp != null) {
@@ -959,7 +948,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         setValue(bean, collection);
       }
     } catch (Exception e) {
-      logger.error("Error setting value from L2 cache", e);
+      CoreLog.log.error("Error setting value from L2 cache", e);
     }
   }
 
@@ -972,7 +961,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       }
       return jsonWriteCollection(collection);
     } catch (Exception e) {
-      logger.error("Error building value element collection json for L2 cache", e);
+      CoreLog.log.error("Error building value element collection json for L2 cache", e);
       return null;
     }
   }

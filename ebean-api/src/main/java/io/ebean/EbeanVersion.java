@@ -14,10 +14,9 @@ import java.util.Properties;
  */
 public class EbeanVersion {
 
-  private static final Logger logger = LoggerFactory.getLogger(EbeanVersion.class);
+  private static final Logger log = LoggerFactory.getLogger("io.ebean");
 
   private static String version = "unknown";
-
   static {
     try {
       Properties prop = new Properties();
@@ -28,9 +27,9 @@ public class EbeanVersion {
           version = prop.getProperty("version");
         }
       }
-      logger.info("ebean version: {}", version);
+      log.info("ebean version: {}", version);
     } catch (IOException e) {
-      logger.warn("Could not determine ebean version: {}", e.getMessage());
+      log.warn("Could not determine ebean version: {}", e.getMessage());
     }
   }
 

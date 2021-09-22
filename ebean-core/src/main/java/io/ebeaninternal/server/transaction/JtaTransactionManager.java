@@ -2,9 +2,9 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.config.ExternalTransactionManager;
 import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiTransaction;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -20,15 +20,10 @@ import javax.transaction.UserTransaction;
  */
 public final class JtaTransactionManager implements ExternalTransactionManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(JtaTransactionManager.class);
-
+  private static final Logger log = CoreLog.internal;
   private static final String EBEAN_TXN_RESOURCE = "EBEAN_TXN_RESOURCE";
 
-  /**
-   * The Ebean transaction manager.
-   */
   private TransactionManager transactionManager;
-
   private TransactionScopeManager scope;
 
   /**
@@ -97,16 +92,15 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     SpiTransaction currentEbeanTransaction = scope.inScope();
     if (currentEbeanTransaction != null) {
       // NOT expecting this so log WARNING
-      String msg = "JTA Transaction - no current txn BUT using current Ebean one " + currentEbeanTransaction.getId();
-      logger.warn(msg);
+      log.warn("JTA Transaction - no current txn BUT using current Ebean one {}", currentEbeanTransaction.getId());
       return currentEbeanTransaction;
     }
 
     UserTransaction ut = getUserTransaction();
     if (ut == null) {
       // no current JTA transaction
-      if (logger.isDebugEnabled()) {
-        logger.debug("JTA Transaction - no current txn");
+      if (log.isDebugEnabled()) {
+        log.debug("JTA Transaction - no current txn");
       }
       return null;
     }
@@ -197,8 +191,8 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     public void afterCompletion(int status) {
       switch (status) {
         case Status.STATUS_COMMITTED:
-          if (logger.isDebugEnabled()) {
-            logger.debug("Jta Txn [" + transaction.getId() + "] committed");
+          if (log.isDebugEnabled()) {
+            log.debug("Jta Txn [" + transaction.getId() + "] committed");
           }
           transaction.postCommit();
           // Remove this transaction object as it is completed
@@ -206,8 +200,8 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
           break;
 
         case Status.STATUS_ROLLEDBACK:
-          if (logger.isDebugEnabled()) {
-            logger.debug("Jta Txn [" + transaction.getId() + "] rollback");
+          if (log.isDebugEnabled()) {
+            log.debug("Jta Txn [" + transaction.getId() + "] rollback");
           }
           transaction.postRollback(null);
           // Remove this transaction object as it is completed
@@ -215,8 +209,8 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
           break;
 
         default:
-          if (logger.isDebugEnabled()) {
-            logger.debug("Jta Txn [" + transaction.getId() + "] status:" + status);
+          if (log.isDebugEnabled()) {
+            log.debug("Jta Txn [" + transaction.getId() + "] status:" + status);
           }
       }
 

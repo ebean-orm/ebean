@@ -7,6 +7,7 @@ import io.ebean.bean.*;
 import io.ebean.core.type.DataReader;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.util.JdbcClose;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
@@ -15,8 +16,6 @@ import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.lang.ref.WeakReference;
@@ -38,8 +37,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * the key object used in reading the flat resultSet back into Objects.
  */
 public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfileTransactionEvent {
-
-  private static final Logger logger = LoggerFactory.getLogger(CQuery.class);
 
   private static final CQueryCollectionAddNoop NOOP_ADD = new CQueryCollectionAddNoop();
 
@@ -351,7 +348,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         auditIterateLogMessage();
       }
     } catch (Throwable e) {
-      logger.error("Error logging read audit logs", e);
+      CoreLog.log.error("Error logging read audit logs", e);
     }
     try {
       if (dataReader != null) {
@@ -359,7 +356,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         dataReader = null;
       }
     } catch (SQLException e) {
-      logger.error("Error closing dataReader", e);
+      CoreLog.log.error("Error closing dataReader", e);
     }
     JdbcClose.close(pstmt);
     pstmt = null;
@@ -556,7 +553,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       }
       getTransaction().profileEvent(this);
     } catch (Exception e) {
-      logger.error("Error updating execution statistics", e);
+      CoreLog.log.error("Error updating execution statistics", e);
     }
   }
 

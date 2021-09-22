@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 public class H2HistoryTrigger implements Trigger {
 
-  private static final Logger logger = LoggerFactory.getLogger(H2HistoryTrigger.class);
+  private static final Logger log = LoggerFactory.getLogger(H2HistoryTrigger.class);
 
   /**
    * Hardcoding the column and history table suffix for now. Not sure how to get that
@@ -69,7 +69,7 @@ public class H2HistoryTrigger implements Trigger {
     insertSql.append(");");
 
     this.insertHistorySql = insertSql.toString();
-    logger.debug("History table insert sql: {}", insertHistorySql);
+    log.debug("History table insert sql: {}", insertHistorySql);
   }
 
   @Override
@@ -82,8 +82,8 @@ public class H2HistoryTrigger implements Trigger {
         // update event. Set the effective start timestamp to now.
         newRow[effectStartPosition] = now;
       }
-      if (logger.isDebugEnabled()) {
-        logger.debug("History insert: {}", Arrays.toString(oldRow));
+      if (log.isTraceEnabled()) {
+        log.trace("History insert: {}", Arrays.toString(oldRow));
       }
       insertIntoHistory(connection, oldRow);
     }

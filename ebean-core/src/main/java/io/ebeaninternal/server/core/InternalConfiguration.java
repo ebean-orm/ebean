@@ -3,12 +3,7 @@ package io.ebeaninternal.server.core;
 import com.fasterxml.jackson.core.JsonFactory;
 import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
-import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheManager;
-import io.ebean.cache.ServerCacheNotify;
-import io.ebean.cache.ServerCacheNotifyPlugin;
-import io.ebean.cache.ServerCacheOptions;
-import io.ebean.cache.ServerCachePlugin;
+import io.ebean.cache.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ProfilingConfig;
@@ -22,36 +17,17 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
-import io.ebeaninternal.api.DbOffline;
-import io.ebeaninternal.api.ExtraMetrics;
-import io.ebeaninternal.api.QueryPlanManager;
-import io.ebeaninternal.api.SpiBackgroundExecutor;
-import io.ebeaninternal.api.SpiDdlGenerator;
-import io.ebeaninternal.api.SpiDdlGeneratorProvider;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiJsonContext;
-import io.ebeaninternal.api.SpiLogManager;
-import io.ebeaninternal.api.SpiLogger;
-import io.ebeaninternal.api.SpiLoggerFactory;
-import io.ebeaninternal.api.SpiProfileHandler;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.AutoTuneServiceProvider;
 import io.ebeaninternal.server.autotune.NoAutoTuneService;
-import io.ebeaninternal.server.cache.CacheManagerOptions;
-import io.ebeaninternal.server.cache.DefaultCacheAdapter;
-import io.ebeaninternal.server.cache.DefaultServerCacheManager;
-import io.ebeaninternal.server.cache.DefaultServerCachePlugin;
-import io.ebeaninternal.server.cache.SpiCacheManager;
+import io.ebeaninternal.server.cache.*;
 import io.ebeaninternal.server.changelog.DefaultChangeLogListener;
 import io.ebeaninternal.server.changelog.DefaultChangeLogPrepare;
 import io.ebeaninternal.server.changelog.DefaultChangeLogRegister;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.core.timezone.DataTimeZone;
-import io.ebeaninternal.server.core.timezone.MySqlDataTimeZone;
-import io.ebeaninternal.server.core.timezone.NoDataTimeZone;
-import io.ebeaninternal.server.core.timezone.OracleDataTimeZone;
-import io.ebeaninternal.server.core.timezone.SimpleDataTimeZone;
+import io.ebeaninternal.server.core.timezone.*;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
@@ -67,30 +43,11 @@ import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.DefaultPersister;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
-import io.ebeaninternal.server.query.CQueryEngine;
-import io.ebeaninternal.server.query.CQueryPlanManager;
-import io.ebeaninternal.server.query.DefaultOrmQueryEngine;
-import io.ebeaninternal.server.query.DefaultRelationalQueryEngine;
-import io.ebeaninternal.server.query.DtoQueryEngine;
-import io.ebeaninternal.server.query.QueryPlanLogger;
-import io.ebeaninternal.server.query.QueryPlanLoggerExplain;
-import io.ebeaninternal.server.query.QueryPlanLoggerOracle;
-import io.ebeaninternal.server.query.QueryPlanLoggerPostgres;
-import io.ebeaninternal.server.query.QueryPlanLoggerSqlServer;
+import io.ebeaninternal.server.query.*;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import io.ebeaninternal.server.text.json.DJsonContext;
-import io.ebeaninternal.server.transaction.DataSourceSupplier;
-import io.ebeaninternal.server.transaction.DefaultProfileHandler;
-import io.ebeaninternal.server.transaction.DefaultTransactionScopeManager;
-import io.ebeaninternal.server.transaction.DocStoreTransactionManager;
-import io.ebeaninternal.server.transaction.ExternalTransactionScopeManager;
-import io.ebeaninternal.server.transaction.JtaTransactionManager;
-import io.ebeaninternal.server.transaction.NoopProfileHandler;
-import io.ebeaninternal.server.transaction.TableModState;
-import io.ebeaninternal.server.transaction.TransactionManager;
-import io.ebeaninternal.server.transaction.TransactionManagerOptions;
-import io.ebeaninternal.server.transaction.TransactionScopeManager;
+import io.ebeaninternal.server.transaction.*;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.TypeManager;
 import io.ebeaninternal.xmapping.api.XmapEbean;
@@ -100,14 +57,8 @@ import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * Used to extend the DatabaseConfig with additional objects used to configure and
@@ -115,7 +66,7 @@ import java.util.ServiceLoader;
  */
 public final class InternalConfiguration {
 
-  private static final Logger logger = LoggerFactory.getLogger(InternalConfiguration.class);
+  private static final Logger log = CoreLog.internal;
 
   private final TableModState tableModState;
   private final boolean online;
@@ -482,7 +433,7 @@ public final class InternalConfiguration {
       externalTransactionManager = new JtaTransactionManager();
     }
     if (externalTransactionManager != null) {
-      logger.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
+      log.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
       return new ExternalTransactionScopeManager(externalTransactionManager);
     } else {
       return new DefaultTransactionScopeManager();
@@ -572,7 +523,7 @@ public final class InternalConfiguration {
       if (iterator.hasNext()) {
         // use the cacheFactory (via classpath service loader)
         plugin = iterator.next();
-        logger.debug("using ServerCacheFactory {}", plugin.getClass());
+        log.debug("using ServerCacheFactory {}", plugin.getClass());
       } else {
         // use the built in default l2 caching which is local cache based
         localL2Caching = true;

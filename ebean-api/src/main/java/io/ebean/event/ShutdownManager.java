@@ -20,18 +20,13 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class ShutdownManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(ShutdownManager.class);
-
+  private static final Logger log = LoggerFactory.getLogger("io.ebean");
   private static final ReentrantLock lock = new ReentrantLock();
-
   private static final List<Database> databases = new ArrayList<>();
-
   private static final ShutdownHook shutdownHook = new ShutdownHook();
 
   private static boolean stopping;
-
   private static SpiContainer container;
-
   static {
     // Register the Shutdown hook
     registerShutdownHook();
@@ -125,8 +120,8 @@ public final class ShutdownManager {
         // Already run shutdown...
         return;
       }
-      if (logger.isDebugEnabled()) {
-        logger.debug("Shutting down");
+      if (log.isDebugEnabled()) {
+        log.debug("Ebean shutting down");
       }
       stopping = true;
       deregisterShutdownHook();
@@ -138,7 +133,7 @@ public final class ShutdownManager {
           Runnable r = (Runnable) ClassUtil.newInstance(shutdownRunner);
           r.run();
         } catch (Exception e) {
-          logger.error("Error running custom shutdown runnable", e);
+          log.error("Error running custom shutdown runnable", e);
         }
       }
 
@@ -152,7 +147,7 @@ public final class ShutdownManager {
         try {
           server.shutdown();
         } catch (Exception ex) {
-          logger.error("Error executing shutdown runnable", ex);
+          log.error("Error executing shutdown runnable", ex);
           ex.printStackTrace();
         }
       }
@@ -170,10 +165,10 @@ public final class ShutdownManager {
     while (drivers.hasMoreElements()) {
       Driver driver = drivers.nextElement();
       try {
-        logger.info("De-registering jdbc driver: " + driver);
+        log.info("De-registering jdbc driver: " + driver);
         DriverManager.deregisterDriver(driver);
       } catch (SQLException e) {
-        logger.error("Error de-registering driver " + driver, e);
+        log.error("Error de-registering driver " + driver, e);
       }
     }
   }

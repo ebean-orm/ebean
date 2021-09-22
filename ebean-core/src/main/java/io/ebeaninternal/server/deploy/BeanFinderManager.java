@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.event.BeanFindController;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
  */
 final class BeanFinderManager {
 
-  private final Logger logger = LoggerFactory.getLogger(BeanFinderManager.class);
+  private static final Logger log = CoreLog.internal;
 
   private final List<BeanFindController> list;
 
@@ -31,7 +31,7 @@ final class BeanFinderManager {
   void addFindControllers(DeployBeanDescriptor<?> deployDesc) {
     for (BeanFindController c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        logger.debug("BeanFindController on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
+        log.debug("BeanFindController on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.setBeanFinder(c);
       }
     }

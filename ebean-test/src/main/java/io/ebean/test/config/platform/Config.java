@@ -13,7 +13,7 @@ import java.util.Properties;
  */
 class Config {
 
-  private static final Logger log = LoggerFactory.getLogger(Config.class);
+  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
 
   /**
    * Common optional docker parameters that we just transfer to docker properties.

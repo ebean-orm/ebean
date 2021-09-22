@@ -2,6 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.OrderBy;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -15,8 +16,6 @@ import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,8 +38,6 @@ import java.util.Set;
  * </p>
  */
 public final class CQueryPredicates {
-
-  private static final Logger logger = LoggerFactory.getLogger(CQueryPredicates.class);
 
   private final Binder binder;
   private final OrmQueryRequest<?> request;
@@ -375,7 +372,7 @@ public final class CQueryPredicates {
         msg += " must come before the many property [" + manyProp.name() + "] in the orderBy.";
         msg += " Ebean has automatically modified the orderBy clause to do this.";
 
-        logger.warn(msg);
+        CoreLog.log.warn(msg);
       }
 
       // the id needs to come before the manyPropName
