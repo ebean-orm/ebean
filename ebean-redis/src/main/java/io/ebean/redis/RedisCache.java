@@ -8,6 +8,7 @@ import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
+import io.ebean.metric.TimedMetricStats;
 import io.ebean.redis.encode.Encode;
 import io.ebean.redis.encode.EncodePrefixKey;
 import org.slf4j.Logger;
@@ -188,6 +189,7 @@ final class RedisCache implements ServerCache {
             multi.set(key(entry.getKey()), value(entry.getValue()), expiration);
           }
         }
+        multi.exec();
       }
       metricPutAll.addSinceNanos(start);
     } catch (Exception e) {
@@ -285,9 +287,13 @@ final class RedisCache implements ServerCache {
     cacheStats.setCacheName(cacheKey);
     cacheStats.setHitCount(hitCount.get(reset));
     cacheStats.setMissCount(missCount.get(reset));
-    cacheStats.setPutCount(metricPut.collect(reset).count());
-    cacheStats.setRemoveCount(metricRemove.collect(reset).count());
-    cacheStats.setClearCount(metricClear.collect(reset).count());
+    cacheStats.setPutCount(count(metricPut.collect(reset)));
+    cacheStats.setRemoveCount(count(metricRemove.collect(reset)));
+    cacheStats.setClearCount(count(metricClear.collect(reset)));
     return cacheStats;
+  }
+
+  private long count(TimedMetricStats stats) {
+    return stats == null ? 0 : stats.count();
   }
 }

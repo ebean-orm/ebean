@@ -1,20 +1,67 @@
 package org.integration;
 
 import io.ebean.DB;
+import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheStatistics;
 import org.domain.Person;
+import org.domain.RCust;
 import org.domain.query.QPerson;
+import org.domain.query.QRCust;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IntegrationTest {
+class IntegrationTest {
 
   @Test
-  public void test() throws InterruptedException {
+  void mput() throws InterruptedException {
+
+    ServerCache beanCache = DB.cacheManager().beanCache(RCust.class);
+    beanCache.clear();
+    beanCache.statistics(true);
+
+    List<RCust> people = new ArrayList<>();
+    for (String name : new String[]{"mp0", "mp1", "mp2"}) {
+      people.add(new RCust(name));
+    }
+    DB.saveAll(people);
+    List<Long> ids = people.stream().map(RCust::getId).collect(Collectors.toList());
+
+    List<RCust> f0 = new QRCust()
+      .setIdIn(ids.toArray())
+      .findList();
+
+    assertThat(f0).hasSize(3);
+    ServerCacheStatistics stats0 = beanCache.statistics(true);
+    assertThat(stats0.getHitCount()).isEqualTo(0);
+
+    Thread.sleep(5);
+
+    // we will hit the cache this time
+    List<RCust> f1 = new QRCust()
+      .setIdIn(ids.toArray())
+      .findList();
+
+    assertThat(f1).hasSize(3);
+    ServerCacheStatistics stats1 = beanCache.statistics(true);
+    assertThat(stats1.getHitCount()).isEqualTo(3);
+
+    // we will hit the cache again
+    List<RCust> f2 = new QRCust()
+      .setIdIn(ids.toArray())
+      .findList();
+    assertThat(f2).hasSize(3);
+    ServerCacheStatistics stats2 = beanCache.statistics(true);
+    assertThat(stats2.getHitCount()).isEqualTo(3);
+  }
+
+  @Test
+  void test() throws InterruptedException {
 
     insertSomePeople();
 
