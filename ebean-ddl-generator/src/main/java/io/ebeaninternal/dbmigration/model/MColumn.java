@@ -15,6 +15,8 @@ import java.util.Objects;
  */
 public class MColumn {
 
+  private static final String LOCALDATETIME = "localdatetime";
+  private static final String TIMESTAMP = "timestamp";
   private String name;
   private String type;
   private String checkConstraint;
@@ -377,7 +379,7 @@ public class MColumn {
       getAlterColumn(tableName, tableWithHistory).setHistoryExclude(newColumn.historyExclude);
     }
 
-    if (different(type, newColumn.type)) {
+    if (different(type, newColumn.type) && !localDateTime(type, newColumn.type)) {
       changeBaseAttribute = true;
       getAlterColumn(tableName, tableWithHistory).setType(newColumn.type);
     }
@@ -463,6 +465,13 @@ public class MColumn {
         alterColumn.setCurrentNotnull(notnull);
       }
     }
+  }
+
+  /**
+   * Ignore the case of new type LocalDateTime which was historically mapped to Timestamp.
+   */
+  boolean localDateTime(String type, String newType) {
+    return LOCALDATETIME.equalsIgnoreCase(newType) && TIMESTAMP.equalsIgnoreCase(type);
   }
 
   public void setDbMigrationInfos(List<DbMigrationInfo> dbMigrationInfos) {
