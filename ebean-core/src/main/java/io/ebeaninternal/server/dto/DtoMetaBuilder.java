@@ -68,8 +68,7 @@ final class DtoMetaBuilder {
   }
 
   private void readConstructors() {
-    Constructor<?>[] constructors = dtoType.getConstructors();
-    for (Constructor<?> constructor : constructors) {
+    for (Constructor<?> constructor : dtoType.getConstructors()) {
       try {
         constructorList.add(new DtoMetaConstructor(typeManager, constructor, dtoType));
       } catch (Exception e) {

@@ -24,10 +24,8 @@ final class DtoMeta {
       propMap.put(property.getName().toUpperCase(), property);
     }
     int maxArg = 0;
-
     DtoMetaConstructor defaultConstructor = null;
     DtoMetaConstructor maxArgConstructor = null;
-
     for (DtoMetaConstructor constructor : constructors) {
       int args = constructor.getArgCount();
       constructorMap.put(args, constructor);
@@ -56,7 +54,6 @@ final class DtoMeta {
     if (defaultConstructor != null) {
       return matchSetters(request);
     }
-
     String msg = "Unable to map the resultSet columns " + Arrays.toString(cols)
       + " to the bean type ["+dtoType+"] as the number of columns in the resultSet is less than the constructor"
       + " (and that there is no default constructor) ?";
