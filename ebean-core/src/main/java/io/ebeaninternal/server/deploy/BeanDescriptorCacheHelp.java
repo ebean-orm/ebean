@@ -349,12 +349,13 @@ final class BeanDescriptorCacheHelp<T> {
     for (Object id : ids) {
       keys.add(desc.cacheKey(id));
     }
-
+    if (ids.isEmpty()) {
+      return new BeanCacheResult<>();
+    }
     Map<Object, Object> beanDataMap = beanCache.getAll(keys);
     if (beanLog.isTraceEnabled()) {
       beanLog.trace("   MGET {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
     }
-
     BeanCacheResult<T> result = new BeanCacheResult<>();
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();

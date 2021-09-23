@@ -117,6 +117,9 @@ final class RedisCache implements ServerCache {
 
   @Override
   public Map<Object, Object> getAll(Set<Object> keys) {
+    if (keys.isEmpty()) {
+      return Collections.emptyMap();
+    }
     long start = System.nanoTime();
     Map<Object, Object> map = new LinkedHashMap<>();
     List<Object> keyList = new ArrayList<>(keys);

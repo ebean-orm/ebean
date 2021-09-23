@@ -11,12 +11,29 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IntegrationTest {
+
+  @Test
+  void mget_when_emptyCollectionOfIds() {
+
+    List<RCust> f0 = new QRCust()
+      .setIdIn(Collections.emptyList())
+      .findList();
+
+    assertThat(f0).isEmpty();
+
+    List<RCust> f1 = new QRCust()
+      .id.in(Collections.emptyList())
+      .findList();
+
+    assertThat(f1).isEmpty();
+  }
 
   @Test
   void mput_via_setIdIn() throws InterruptedException {
@@ -187,8 +204,8 @@ class IntegrationTest {
 
   private List<Person> nameStartsWith(String pattern) {
     return new QPerson()
-        .name.istartsWith(pattern)
-        .setUseQueryCache(true)
-        .findList();
+      .name.istartsWith(pattern)
+      .setUseQueryCache(true)
+      .findList();
   }
 }
