@@ -651,7 +651,7 @@ final class CQueryBuilder {
           // strip the table alias for use in update statement
           idSql = idSql.replace("t0.", "");
         }
-        sb.append(idSql).append(" ");
+        sb.append(idSql);
         hasWhere = true;
       }
     }
