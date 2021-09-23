@@ -33,7 +33,7 @@ class IntegrationTest {
     List<Long> ids = people.stream().map(RCust::getId).collect(Collectors.toList());
 
     List<RCust> f0 = new QRCust()
-      .setIdIn(ids.toArray())
+      .setIdIn(ids) // using collection argument
       .findList();
 
     assertThat(f0).hasSize(3);
@@ -44,7 +44,7 @@ class IntegrationTest {
 
     // we will hit the cache this time
     List<RCust> f1 = new QRCust()
-      .setIdIn(ids.toArray())
+      .setIdIn(ids.toArray()) // using varargs argument
       .findList();
 
     assertThat(f1).hasSize(3);
@@ -53,7 +53,7 @@ class IntegrationTest {
 
     // we will hit the cache again
     List<RCust> f2 = new QRCust()
-      .setIdIn(ids.toArray())
+      .setIdIn(ids) // using collection argument
       .findList();
     assertThat(f2).hasSize(3);
     ServerCacheStatistics stats2 = beanCache.statistics(true);
@@ -96,7 +96,7 @@ class IntegrationTest {
 
     // we will hit the cache again
     List<RCust> f2 = new QRCust()
-      .id.in(ids)
+      .id.isIn(ids)
       .findList();
     assertThat(f2).hasSize(3);
     ServerCacheStatistics stats2 = beanCache.statistics(true);

@@ -233,8 +233,16 @@ public class QCustomerTest {
   @Test
   public void testIdIn() {
 
+    List<Integer> ids = new ArrayList<>();
+    ids.add(1);
+    ids.add(2);
+
     new QCustomer()
-      .setIdIn("1", "2")
+      .setIdIn(ids) // collection argument
+      .findList();
+
+    new QCustomer()
+      .setIdIn("1", "2") // varargs argument
       .findList();
 
     new QCustomer()
