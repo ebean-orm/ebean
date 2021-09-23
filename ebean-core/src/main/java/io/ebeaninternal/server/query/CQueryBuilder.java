@@ -583,7 +583,7 @@ final class CQueryBuilder {
           final OrderBy<?> orderBy = query.getOrderBy();
           if (orderBy != null && orderBy.supportsSelect()) {
             String trimmed = DbOrderByTrim.trim(dbOrderBy);
-            if (query.isSingleAttribute() && trimmed.equals(select.getSelectSql())) {
+            if (query.isSingleAttribute() && select.getSelectSql().startsWith(trimmed)) {
               // NOP, already in SQL
               // TODO: what to do if we select("id").orderBy("prop,id")?
               // Can we live with a query like "select t0.id, t0.prop, t0.id from"
