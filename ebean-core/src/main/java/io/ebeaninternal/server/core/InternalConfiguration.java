@@ -600,13 +600,20 @@ public final class InternalConfiguration {
    */
   public SpiDdlGenerator initDdlGenerator(SpiEbeanServer server) {
     final SpiDdlGeneratorProvider service = service(SpiDdlGeneratorProvider.class);
-    return service == null ? new NoopDdl() : service.generator(server);
+    return service == null ? new NoopDdl(server.config().isDdlRun()) : service.generator(server);
   }
 
   private static class NoopDdl implements SpiDdlGenerator {
+    private final boolean ddlRun;
+    NoopDdl(boolean ddlRun) {
+      this.ddlRun = ddlRun;
+    }
+
     @Override
     public void execute(boolean online) {
-      // do nothing
+      if (online && ddlRun) {
+        CoreLog.log.error("Configured to run DDL but ebean-ddl-generator is not in the classpath");
+      }
     }
   }
 }
