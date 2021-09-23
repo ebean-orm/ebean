@@ -408,9 +408,9 @@ final class CQueryBuilder {
       int cols = 1 + metaData.getColumnCount();
       List<String> propertyNames = new ArrayList<>(cols - 1);
       for (int i = 1; i < cols; i++) {
-        String schemaName = metaData.getSchemaName(i).toLowerCase();
-        String tableName = metaData.getTableName(i).toLowerCase();
-        String columnName = metaData.getColumnName(i).toLowerCase();
+        String schemaName = lower(metaData.getSchemaName(i));
+        String tableName = lower(metaData.getTableName(i));
+        String columnName = lower(metaData.getColumnName(i));
         String path = desc.findBeanPath(schemaName, tableName, columnName);
         if (path != null) {
           propertyNames.add(path);
@@ -424,6 +424,10 @@ final class CQueryBuilder {
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private String lower(String value) {
+    return value == null ? "" : value.toLowerCase();
   }
 
   private SqlTree createRawSqlSqlTree(OrmQueryRequest<?> request, CQueryPredicates predicates) {
