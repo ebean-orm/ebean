@@ -25,7 +25,7 @@ public class PlatformCondition implements ExecutionCondition {
       }
       IgnorePlatform ignore = annotatedElement.getAnnotation(IgnorePlatform.class);
       if (ignore != null && platformMath(ignore.value())) {
-        return ConditionEvaluationResult.disabled("@ForPlatform");
+        return ConditionEvaluationResult.disabled("@IgnorePlatform");
       }
     }
     return ENABLED;

@@ -4,6 +4,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
 import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.test.LoggedSql;
@@ -55,6 +56,7 @@ public class TestEncrypt extends BaseTestCase {
     assertThat(loggedSql.get(1)).contains("left join e_basicenc t1 on t1.id = t0.other_id");
   }
 
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   public void asDto() {
     DB.find(EBasicEncrypt.class).delete();

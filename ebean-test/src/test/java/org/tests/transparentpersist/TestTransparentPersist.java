@@ -248,12 +248,12 @@ public class TestTransparentPersist extends BaseTestCase {
     assertThat(checkOrder.getShipments().size()).isEqualTo(1);
 
     assertThat(sql).hasSize(10);
-    assertThat(sql.get(0)).contains("select t0.id, t0.status, t0.order_date");
+    assertSql(sql.get(0)).contains("select t0.id, t0.status, t0.order_date");
     assertThat(sql.get(1)).contains("insert into o_customer");
     assertThat(sql.get(2)).contains(" -- bind(");
     assertThat(sql.get(3)).contains("update o_order set updtime=?, kcustomer_id=? where id=? and updtime=?");
     assertThat(sql.get(4)).contains(" -- bind(");
-    assertThat(sql.get(5)).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship");
+    assertSql(sql.get(5)).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship");
     assertThat(sql.get(6)).contains("delete from or_order_ship");
     assertThat(sql.get(7)).contains(" -- bind(");
     assertThat(sql.get(8)).contains("insert into or_order_ship");

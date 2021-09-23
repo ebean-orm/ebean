@@ -28,7 +28,7 @@ public class ForTestsBeforeAfterTest extends BaseTestCase {
     assertThat(getCount()).isEqualTo(0);
   }
 
-  @IgnorePlatform(Platform.SQLSERVER)
+  @IgnorePlatform({Platform.SQLSERVER, Platform.ORACLE})
   @Test
   public void createRollbackAll() {
     doInsert();

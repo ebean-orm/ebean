@@ -81,7 +81,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .order().asc("order.totalAmount");
 
     shipQuery.findList();
-    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
+    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
       + "from or_order_ship t0 "
       + "left join o_order t1 on t1.id = t0.order_id  "
       + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
@@ -98,7 +98,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().isNotNull("order.totalAmount").query();
 
     shipQuery.findList();
-    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
+    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
       + "from or_order_ship t0 "
       + "left join o_order t1 on t1.id = t0.order_id  "
       + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
@@ -118,7 +118,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     if (isPostgres()) {
       assertThat(shipQuery.getGeneratedSql()).contains("select distinct on (t0.id) t0.id from or_order_ship t0");
     } else {
-      assertThat(shipQuery.getGeneratedSql()).contains("select distinct t0.id from or_order_ship t0 ");
+      assertSql(shipQuery.getGeneratedSql()).contains("select distinct t0.id from or_order_ship t0 ");
     }
     assertThat(shipQuery.getGeneratedSql()).contains(
       "from or_order_ship t0 " +
@@ -139,7 +139,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .order().asc("order.totalAmount");
 
     shipQuery.findList();
-    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "
+    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "
       + "from or_order_ship t0 "
       + "left join o_order t1 on t1.id = t0.order_id  "
       + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
@@ -156,7 +156,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().isNotNull("order.totalAmount").query();
 
     shipQuery.findList();
-    assertThat(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "
+    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "
       + "from or_order_ship t0 "
       + "left join o_order t1 on t1.id = t0.order_id  "
       + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "

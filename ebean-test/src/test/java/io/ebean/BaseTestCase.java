@@ -143,7 +143,7 @@ public abstract class BaseTestCase {
   }
 
   protected String trimSql(String sql) {
-    if (sql.contains(" c0,") || sql.contains(" c0 ") || sql.contains(" c1,") || sql.contains(" c1 ")) {
+    if (sql.contains(" c0 from ") || sql.contains(" c0,") || sql.contains(" c0 ") || sql.contains(" c1,") || sql.contains(" c1 ")) {
       // for oracle we include column alias so lets remove those
       return trimSql(sql, 10);
     }

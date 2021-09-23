@@ -36,7 +36,7 @@ public class ForTestsTest extends BaseTestCase {
     assertThat(transaction).isNull();
   }
 
-  @IgnorePlatform(Platform.SQLSERVER)
+  @IgnorePlatform({Platform.SQLSERVER, Platform.ORACLE})
   @Test
   public void rollbackTransactions() {
 
