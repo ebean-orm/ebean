@@ -1,6 +1,9 @@
 package org.etest;
 
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebean.test.ForTests;
 import org.junit.jupiter.api.AfterEach;
@@ -10,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class ForTestsBeforeAfterTest {
+public class ForTestsBeforeAfterTest extends BaseTestCase {
 
   private ForTests.RollbackAll rollbackAll;
 
@@ -25,10 +28,9 @@ public class ForTestsBeforeAfterTest {
     assertThat(getCount()).isEqualTo(0);
   }
 
-
+  @IgnorePlatform(Platform.SQLSERVER)
   @Test
   public void createRollbackAll() {
-
     doInsert();
     assertThat(getCount()).isEqualTo(1);
   }

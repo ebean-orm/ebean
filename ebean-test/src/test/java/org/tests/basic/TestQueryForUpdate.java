@@ -66,8 +66,11 @@ public class TestQueryForUpdate extends BaseTestCase {
       List<String> sql = LoggedSql.stop();
       assertThat(sql).hasSize(2);
       assertThat(sql.get(0)).contains("from o_order");
-      assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
-
+      if (isSqlServer()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 with (updlock) where t0.id = ?");
+      } else {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
+      }
       transaction.commit();
     }
   }
@@ -98,8 +101,11 @@ public class TestQueryForUpdate extends BaseTestCase {
       List<String> sql = LoggedSql.stop();
       assertThat(sql).hasSize(2);
       assertThat(sql.get(0)).contains("from o_order");
-      assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
-
+      if (isSqlServer()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 with (updlock,nowait) where t0.id = ?");
+      } else {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
+      }
       transaction.commit();
     }
   }
