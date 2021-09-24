@@ -6,6 +6,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -18,6 +19,7 @@ public class Processor extends AbstractProcessor implements Constants {
   private static final String KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated";
 
   private ProcessingContext processingContext;
+  private SimpleModuleInfoWriter moduleWriter;
 
   public Processor() {
   }
@@ -55,11 +57,11 @@ public class Processor extends AbstractProcessor implements Constants {
 
   @Override
   public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-
     processingContext.readModuleInfo();
     int count = processEntities(roundEnv);
     processOthers(roundEnv);
     final int loaded = processingContext.complete();
+    initModuleInfoBean();
     if (roundEnv.processingOver()) {
       writeModuleInfoBean();
     }
@@ -96,12 +98,27 @@ public class Processor extends AbstractProcessor implements Constants {
     }
   }
 
+  private void initModuleInfoBean() {
+    try {
+      if (moduleWriter == null) {
+        moduleWriter = new SimpleModuleInfoWriter(processingContext);
+      }
+    } catch (Throwable e) {
+      e.printStackTrace();
+      processingContext.logError(null, "Failed to initialise ModuleInfoLoader error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+    }
+  }
+
   private void writeModuleInfoBean() {
     try {
-      SimpleModuleInfoWriter writer = new SimpleModuleInfoWriter(processingContext);
-      writer.write();
+      if (moduleWriter == null) {
+        processingContext.logError(null, "ModuleInfoLoader was not initialised and not written");
+      } else {
+        moduleWriter.write();
+      }
     } catch (Throwable e) {
-      processingContext.logError(null, "Failed to write ModuleInfoLoader " + e.getMessage());
+      e.printStackTrace();
+      processingContext.logError(null, "Failed to write ModuleInfoLoader error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
 
