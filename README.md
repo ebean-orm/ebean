@@ -36,7 +36,7 @@ Post questions or issues to the Ebean google group - https://groups.google.com/f
 Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
 
-## Maven cental links:
+## Maven central links:
 [Maven central - ebean](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.ebean%22%20AND%20a%3A%22ebean%22 "maven central ebean")
 
 [Maven central - all related projects](http://search.maven.org/#search%7Cga%7C1%7Cebean "maven central all related projects")
