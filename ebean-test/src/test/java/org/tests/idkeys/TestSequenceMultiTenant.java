@@ -10,7 +10,7 @@ import javax.sql.DataSource;
 
 import org.junit.jupiter.api.Test;
 import org.multitenant.partition.UserContext;
-import org.tests.idkeys.db.GenKeySequence;
+import org.tests.idkeys.db.GenKeySeqA;
 
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
@@ -34,14 +34,14 @@ public class TestSequenceMultiTenant {
     Database db = setupDb();
 
     UserContext.set("4711", "1");
-    assertEquals(1L, db.nextId(GenKeySequence.class));
-    assertEquals(2L, db.nextId(GenKeySequence.class));
+    assertEquals(1L, db.nextId(GenKeySeqA.class));
+    assertEquals(2L, db.nextId(GenKeySeqA.class));
 
     UserContext.set("5711", "2");
-    assertEquals(1L, db.nextId(GenKeySequence.class));
+    assertEquals(1L, db.nextId(GenKeySeqA.class));
 
     UserContext.set("4711", "1");
-    assertEquals(3L, db.nextId(GenKeySequence.class));
+    assertEquals(3L, db.nextId(GenKeySeqA.class));
 
   }
 
@@ -87,7 +87,7 @@ public class TestSequenceMultiTenant {
       }
     });
 
-    config.getClasses().add(GenKeySequence.class);
+    config.getClasses().add(GenKeySeqA.class);
 
     return DatabaseFactory.create(config);
   }
@@ -105,14 +105,14 @@ public class TestSequenceMultiTenant {
     Database db = setupSchema();
 
     UserContext.set("4711", "1");
-    assertEquals(1L, db.nextId(GenKeySequence.class));
-    assertEquals(2L, db.nextId(GenKeySequence.class));
+    assertEquals(1L, db.nextId(GenKeySeqA.class));
+    assertEquals(2L, db.nextId(GenKeySeqA.class));
 
     UserContext.set("5711", "2");
-    assertEquals(1L, db.nextId(GenKeySequence.class));
+    assertEquals(1L, db.nextId(GenKeySeqA.class));
 
     UserContext.set("4711", "1");
-    assertEquals(3L, db.nextId(GenKeySequence.class));
+    assertEquals(3L, db.nextId(GenKeySeqA.class));
   }
 
   private Database setupSchema() {
@@ -140,7 +140,7 @@ public class TestSequenceMultiTenant {
       }
     });
 
-    config.getClasses().add(GenKeySequence.class);
+    config.getClasses().add(GenKeySeqA.class);
 
     return DatabaseFactory.create(config);
   }
@@ -159,7 +159,7 @@ public class TestSequenceMultiTenant {
         "jdbc:h2:mem:h2multitenantseq;DB_CLOSE_ON_EXIT=FALSE;INIT=CREATE SCHEMA IF NOT EXISTS "
             + schema + "\\;SET SCHEMA " + schema);
 
-    config.getClasses().add(GenKeySequence.class);
+    config.getClasses().add(GenKeySeqA.class);
 
     DatabaseFactory.create(config).shutdown();
   }
