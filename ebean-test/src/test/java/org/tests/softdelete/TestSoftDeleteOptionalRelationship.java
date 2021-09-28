@@ -59,7 +59,7 @@ public class TestSoftDeleteOptionalRelationship extends BaseTestCase {
 
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    if (isSqlServer() || isMySql() || isMariaDB()) {
+    if (isSqlServer() || isMySql() || isMariaDB() || isOracle()) {
       assertThat(sql.get(0)).contains("left join esoft_del_z t1 on t1.id = t0.organization_id and t1.deleted = 0 where");
     } else {
       assertThat(sql.get(0)).contains("left join esoft_del_z t1 on t1.id = t0.organization_id and t1.deleted = false where");

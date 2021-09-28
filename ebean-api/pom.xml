@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.11.5-SNAPSHOT</version>
+    <version>12.12.1-SNAPSHOT</version>
   </parent>
 
   <name>ebean api</name>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
     </dependency>
 
     <!--
@@ -116,16 +116,16 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.5</version>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>2.24</version>
+        <extensions>true</extensions>
         <configuration>
-          <archive>
-            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
+          <tiles>
+            <tile>io.avaje.tile:moditech-module:1.0</tile>
+          </tiles>
         </configuration>
       </plugin>
     </plugins>
   </build>
-
 </project>

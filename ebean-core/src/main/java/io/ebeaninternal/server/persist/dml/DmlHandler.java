@@ -1,15 +1,14 @@
 package io.ebeaninternal.server.persist.dml;
 
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
 import io.ebeaninternal.server.type.DataBind;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.ebeaninternal.server.util.Str;
 
 import javax.persistence.OptimisticLockException;
 import java.sql.Connection;
@@ -20,8 +19,6 @@ import java.sql.SQLException;
  * Base class for Handler implementations.
  */
 public abstract class DmlHandler implements PersistHandler, BindableRequest {
-
-  private static final Logger logger = LoggerFactory.getLogger(DmlHandler.class);
 
   private static final int[] GENERATED_KEY_COLUMNS = new int[]{1};
   private static final short BATCHED_FIRST = 1;
@@ -126,7 +123,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
         dataBind.close();
       }
     } catch (SQLException ex) {
-      logger.error(null, ex);
+      CoreLog.log.error(null, ex);
     }
   }
 
@@ -249,11 +246,11 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Return a prepared statement taking into account batch requirements.
    */
   PreparedStatement getPstmtBatch(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
-    BatchedPstmtHolder batch = t.getBatchControl().getPstmtHolder();
-    batchedPstmt = batch.getBatchedPstmt(sql);
+    BatchedPstmtHolder batch = t.getBatchControl().pstmtHolder();
+    batchedPstmt = batch.batchedPstmt(sql);
     if (batchedPstmt != null) {
       batchedStatus = batchedPstmt.isEmpty() ? BATCHED_FIRST : BATCHED;
-      return batchedPstmt.getStatement(request);
+      return batchedPstmt.statement(request);
     }
     batchedStatus = BATCHED_FIRST;
     PreparedStatement stmt = getPstmt(t, sql, genKeys);

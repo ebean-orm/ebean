@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
@@ -41,13 +42,13 @@ public final class QueryPlanLoggerSqlServer extends QueryPlanLogger {
         return createPlan(plan, bind.toString(), xml);
 
       } catch (SQLException e) {
-        queryPlanLog.error("Could not log query plan", e);
+        CoreLog.log.warn("Could not log query plan", e);
         return null;
       } finally {
         stmt.execute("set statistics xml off");
       }
     } catch (SQLException e) {
-      queryPlanLog.error("Could not log query plan", e);
+      CoreLog.log.warn("Could not log query plan", e);
       return null;
     }
   }

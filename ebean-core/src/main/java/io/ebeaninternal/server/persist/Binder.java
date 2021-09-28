@@ -4,27 +4,16 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
-import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.GeoTypeBinder;
-import io.ebeaninternal.server.type.PostgresHelper;
-import io.ebeaninternal.server.type.RsetDataReader;
-import io.ebeaninternal.server.type.TypeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.ebeaninternal.server.type.*;
 
 import javax.persistence.PersistenceException;
 import java.math.BigDecimal;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.ArrayList;
+import java.sql.*;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,8 +21,6 @@ import java.util.List;
  * Binds bean values to a PreparedStatement.
  */
 public final class Binder {
-
-  private static final Logger logger = LoggerFactory.getLogger(Binder.class);
 
   private final TypeManager typeManager;
   private final int asOfBindCount;
@@ -141,7 +128,7 @@ public final class Binder {
       }
 
     } catch (SQLException ex) {
-      logger.warn("error binding parameter [{}][{}]", (dataBind.currentPos() - 1), value);
+      CoreLog.log.warn("error binding parameter [{}][{}]", (dataBind.currentPos() - 1), value);
       throw ex;
     }
   }
@@ -303,6 +290,7 @@ public final class Binder {
           break;
 
         case java.sql.Types.TIMESTAMP:
+        case DbPlatformType.LOCALDATETIME:
           b.setTimestamp((java.sql.Timestamp) data);
           break;
 

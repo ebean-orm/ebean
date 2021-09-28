@@ -311,15 +311,6 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void depth(int diff) {
-  }
-
-  @Override
-  public int depth() {
-    return 0;
-  }
-
-  @Override
   public boolean isExplicit() {
     return false;
   }

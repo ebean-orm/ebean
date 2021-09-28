@@ -15,6 +15,7 @@ import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonReader;
@@ -38,8 +39,6 @@ import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 import io.ebeanservice.docstore.api.support.DocStructure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.persistence.PersistenceException;
@@ -58,8 +57,6 @@ import java.util.Set;
  * as database column mapping information.
  */
 public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
-
-  private static final Logger logger = LoggerFactory.getLogger(BeanProperty.class);
 
   private static final String ENC_PREFIX = " " + EncryptAlias.PREFIX;
 
@@ -455,9 +452,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * operation except for a OneToOne exported.
    */
   @Override
-  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
+  public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (formula && sqlFormulaJoin != null) {
-      ctx.appendFormulaJoin(sqlFormulaJoin, joinType);
+      ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
     } else if (secondaryTableJoin != null) {
       String relativePrefix = ctx.getRelativePrefix(secondaryTableJoinPrefix);
       secondaryTableJoin.addJoin(joinType, relativePrefix, ctx);
@@ -1412,7 +1409,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
           objValue = null;
           String msg = "Error trying to use Jackson ObjectMapper to read transient property "
             + fullName() + " - consider marking this property with @JsonIgnore";
-          logger.error(msg, e);
+          CoreLog.log.error(msg, e);
         }
       }
       if (jsonDeserialize) {

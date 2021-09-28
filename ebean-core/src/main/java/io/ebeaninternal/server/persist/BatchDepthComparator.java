@@ -18,8 +18,7 @@ final class BatchDepthComparator implements Comparator<BatchedBeanHolder>, Seria
 
   @Override
   public int compare(BatchedBeanHolder b1, BatchedBeanHolder b2) {
-
-    return Integer.compare(b1.getOrder(), b2.getOrder());
+    return Integer.compare(b1.order(), b2.order());
   }
 
 }

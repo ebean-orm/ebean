@@ -1,9 +1,8 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
 import io.ebeaninternal.api.SpiTransaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,8 +21,6 @@ import java.util.List;
  */
 public final class BatchedPstmt implements SpiProfileTransactionEvent {
 
-  private static final Logger log = LoggerFactory.getLogger(BatchedPstmt.class);
-
   /**
    * The underlying statement.
    */
@@ -38,16 +35,11 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
    * The list of BatchPostExecute used to perform post processing.
    */
   private final List<BatchPostExecute> list = new ArrayList<>();
-
   private final String sql;
-
   private final SpiTransaction transaction;
-
   private long profileStart;
   private long timedStart;
-
   private int[] results;
-
   private List<InputStream> inputStreams;
 
   /**
@@ -75,14 +67,14 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
   /**
    * Return the sql
    */
-  public String getSql() {
+  public String sql() {
     return sql;
   }
 
   /**
    * Return the statement adding the postExecute task.
    */
-  public PreparedStatement getStatement(BatchPostExecute postExecute) throws SQLException {
+  public PreparedStatement statement(BatchPostExecute postExecute) throws SQLException {
     if (postExecute.isFlushQueue() && list.size() >= 20) {
       flushStatementBatch();
     }
@@ -149,7 +141,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
       try {
         pstmt.close();
       } catch (SQLException e) {
-        log.warn("Error closing statement", e);
+        CoreLog.log.warn("BatchedPstmt Error closing statement", e);
       } finally {
         pstmt = null;
       }
@@ -191,7 +183,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
   /**
    * Return the execution results (row counts).
    */
-  public int[] getResults() {
+  public int[] results() {
     return results;
   }
 
@@ -213,7 +205,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
         try {
           inputStream.close();
         } catch (IOException e) {
-          log.warn("Error closing inputStream ", e);
+          CoreLog.log.warn("BatchedPstmt Error closing inputStream ", e);
         }
       }
       inputStreams = null;

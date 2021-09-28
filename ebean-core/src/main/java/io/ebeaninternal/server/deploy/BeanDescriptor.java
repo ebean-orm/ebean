@@ -1,16 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.SqlUpdate;
-import io.ebean.Transaction;
-import io.ebean.ValuePair;
+import io.ebean.*;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.EntityBean;
-import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.PersistenceContext;
-import io.ebean.bean.SingleBeanLoader;
+import io.ebean.bean.*;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKey;
@@ -18,12 +10,7 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
-import io.ebean.event.BeanFindController;
-import io.ebean.event.BeanPersistController;
-import io.ebean.event.BeanPersistListener;
-import io.ebean.event.BeanPostConstructListener;
-import io.ebean.event.BeanPostLoad;
-import io.ebean.event.BeanQueryAdapter;
+import io.ebean.event.*;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeType;
@@ -45,32 +32,15 @@ import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.cache.CachedManyIds;
-import io.ebeaninternal.server.core.CacheOptions;
-import io.ebeaninternal.server.core.DefaultSqlUpdate;
-import io.ebeaninternal.server.core.InternString;
-import io.ebeaninternal.server.core.PersistRequest;
-import io.ebeaninternal.server.core.PersistRequestBean;
+import io.ebeaninternal.server.core.*;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.id.IdBinderSimple;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
-import io.ebeaninternal.server.el.ElComparator;
-import io.ebeaninternal.server.el.ElComparatorCompound;
-import io.ebeaninternal.server.el.ElComparatorNoop;
-import io.ebeaninternal.server.el.ElComparatorProperty;
-import io.ebeaninternal.server.el.ElPropertyChainBuilder;
-import io.ebeaninternal.server.el.ElPropertyDeploy;
-import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.el.*;
 import io.ebeaninternal.server.persist.DeleteMode;
-import io.ebeaninternal.server.query.CQueryPlan;
-import io.ebeaninternal.server.query.ExtraJoin;
-import io.ebeaninternal.server.query.STreeProperty;
-import io.ebeaninternal.server.query.STreePropertyAssoc;
-import io.ebeaninternal.server.query.STreePropertyAssocMany;
-import io.ebeaninternal.server.query.STreePropertyAssocOne;
-import io.ebeaninternal.server.query.STreeType;
-import io.ebeaninternal.server.query.SqlBeanLoad;
+import io.ebeaninternal.server.query.*;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
@@ -85,7 +55,6 @@ import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.persistence.PersistenceException;
@@ -94,14 +63,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -113,7 +75,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
  */
 public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
-  private static final Logger logger = LoggerFactory.getLogger(BeanDescriptor.class);
+  private static final Logger log = CoreLog.internal;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -511,8 +473,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * as they are used to get the imported and exported properties.
    */
   void initialiseId(BeanDescriptorInitContext initContext) {
-    if (logger.isTraceEnabled()) {
-      logger.trace("BeanDescriptor initialise " + fullName);
+    if (log.isTraceEnabled()) {
+      log.trace("BeanDescriptor initialise " + fullName);
     }
     if (draftable) {
       initContext.addDraft(baseTable, draftTable);
@@ -812,7 +774,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       changeJson.flush();
       return beanChange(ChangeType.UPDATE, request.beanId(), changeJson.newJson(), changeJson.oldJson());
     } catch (RuntimeException e) {
-      logger.error("Failed to write ChangeLog entry for update", e);
+      log.error("Failed to write ChangeLog entry for update", e);
       return null;
     }
   }
@@ -828,7 +790,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       jsonWriter.flush();
       return beanChange(ChangeType.INSERT, request.beanId(), writer.toString(), null);
     } catch (IOException e) {
-      logger.error("Failed to write ChangeLog entry for insert", e);
+      log.error("Failed to write ChangeLog entry for insert", e);
       return null;
     }
   }
@@ -2303,11 +2265,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private ElComparator<T> createPropertyComparator(SortByClause.Property sortProp) {
     ElPropertyValue elGetValue = elGetValue(sortProp.getName());
     if (elGetValue == null) {
-      logger.error("Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
+      log.error("Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
       return new ElComparatorNoop<>();
     }
     if (elGetValue.isAssocMany()) {
-      logger.error("Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
+      log.error("Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
       return new ElComparatorNoop<>();
     }
     Boolean nullsHigh = sortProp.getNullsHigh();
@@ -2776,7 +2738,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void markAsDeleted(EntityBean bean) {
     if (softDeleteProperty == null) {
       Object id = getId(bean);
-      logger.info("(Lazy) loading unsuccessful for type:{} id:{} - expecting when bean has been deleted", name(), id);
+      log.info("(Lazy) loading unsuccessful for type:{} id:{} - expecting when bean has been deleted", name(), id);
       bean._ebean_getIntercept().setLazyLoadFailure(id);
     } else {
       softDeleteValue(bean);
@@ -2875,8 +2837,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     final EntityBeanIntercept ebi = bean._ebean_getIntercept();
     for (BeanPropertyAssocMany<?> many : propertiesManySave) {
       if (ebi.isLoadedProperty(many.propertyIndex())) {
-        final BeanCollection<?> value = (BeanCollection<?>) many.getValue(bean);
-        if (value != null && value.hasModifications()) {
+        final Object value = many.getValue(bean);
+        if (value instanceof BeanCollection && ((BeanCollection<?>)value).hasModifications() || value != null) {
           return true;
         }
       }

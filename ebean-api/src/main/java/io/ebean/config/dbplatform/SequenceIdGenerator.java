@@ -24,23 +24,14 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
-  protected static final Logger logger = LoggerFactory.getLogger("io.ebean.SEQ");
+  protected static final Logger log = LoggerFactory.getLogger("io.ebean.SEQ");
 
   private final ReentrantLock lock = new ReentrantLock();
-
-  /**
-   * The actual sequence name.
-   */
   protected final String seqName;
-
   protected final DataSource dataSource;
-
   protected final BackgroundExecutor backgroundExecutor;
-
   protected final NavigableSet<Long> idList = new TreeSet<>();
-
   protected final int allocationSize;
-
   protected AtomicBoolean currentlyBackgroundLoading = new AtomicBoolean(false);
 
   /**
@@ -129,7 +120,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   protected void loadInBackground(final int requestSize) {
     if (currentlyBackgroundLoading.get()) {
       // skip as already background loading
-      logger.debug("... skip background sequence load (another load in progress)");
+      log.debug("... skip background sequence load (another load in progress)");
       return;
     }
     currentlyBackgroundLoading.set(true);
@@ -161,8 +152,8 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
       resultSet = statement.executeQuery();
 
       List<Long> newIds = readIds(resultSet, requestSize);
-      if (logger.isTraceEnabled()) {
-        logger.trace("seq:{} loaded:{} sql:{}", seqName, newIds.size(), sql);
+      if (log.isTraceEnabled()) {
+        log.trace("seq:{} loaded:{} sql:{}", seqName, newIds.size(), sql);
       }
       if (newIds.isEmpty()) {
         throw new PersistenceException("Always expecting more than 1 row from " + sql);
@@ -173,7 +164,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     } catch (SQLException e) {
       if (e.getMessage().contains("Database is already closed")) {
         String msg = "Error getting SEQ when DB shutting down " + e.getMessage();
-        logger.error(msg);
+        log.error(msg);
         System.out.println(msg);
         return Collections.emptyList();
       } else {

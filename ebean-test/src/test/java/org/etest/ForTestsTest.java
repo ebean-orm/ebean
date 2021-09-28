@@ -1,14 +1,17 @@
 package org.etest;
 
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebean.test.ForTests;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ForTestsTest {
+public class ForTestsTest extends BaseTestCase {
 
   @Test
   public void noTransactional_expect_noTransactionEnterExitCalled() {
@@ -33,6 +36,7 @@ public class ForTestsTest {
     assertThat(transaction).isNull();
   }
 
+  @IgnorePlatform({Platform.SQLSERVER, Platform.ORACLE})
   @Test
   public void rollbackTransactions() {
 

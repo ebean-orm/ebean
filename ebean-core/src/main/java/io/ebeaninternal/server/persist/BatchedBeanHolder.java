@@ -64,7 +64,7 @@ final class BatchedBeanHolder {
   /**
    * Return the depth.
    */
-  public int getOrder() {
+  public int order() {
     return order;
   }
 

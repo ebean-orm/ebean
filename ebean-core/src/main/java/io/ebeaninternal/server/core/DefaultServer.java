@@ -63,26 +63,8 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
-import io.ebeaninternal.api.ExtraMetrics;
-import io.ebeaninternal.api.LoadBeanRequest;
-import io.ebeaninternal.api.LoadManyRequest;
-import io.ebeaninternal.api.QueryPlanManager;
-import io.ebeaninternal.api.ScopedTransaction;
-import io.ebeaninternal.api.SpiBackgroundExecutor;
-import io.ebeaninternal.api.SpiDdlGenerator;
-import io.ebeaninternal.api.SpiDtoQuery;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiJsonContext;
-import io.ebeaninternal.api.SpiLogManager;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
-import io.ebeaninternal.api.SpiQueryBindCapture;
-import io.ebeaninternal.api.SpiQueryPlan;
-import io.ebeaninternal.api.SpiSqlQuery;
-import io.ebeaninternal.api.SpiSqlUpdate;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiTransactionManager;
-import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.cache.RemoteCacheEvent;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
@@ -118,7 +100,6 @@ import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.persistence.NonUniqueResultException;
@@ -146,7 +127,7 @@ import static java.util.stream.StreamSupport.stream;
  */
 public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultServer.class);
+  private static final Logger log = CoreLog.internal;
 
   private final ReentrantLock lock = new ReentrantLock();
   private final DatabaseConfig config;
@@ -347,12 +328,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public DataSource dataSource() {
-    return transactionManager.getDataSource();
+    return transactionManager.dataSource();
   }
 
   @Override
   public DataSource readOnlyDataSource() {
-    return transactionManager.getReadOnlyDataSource();
+    return transactionManager.readOnlyDataSource();
   }
 
   @Override
@@ -380,7 +361,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   public void start() {
     if (config.isRunMigration() && TenantMode.DB != config.getTenantMode()) {
-      final AutoMigrationRunner migrationRunner = config.service(AutoMigrationRunner.class);
+      final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
       if (migrationRunner == null) {
         throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
       }
@@ -388,6 +369,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       if (dbSchema != null) {
         migrationRunner.setDefaultDbSchema(dbSchema);
       }
+      migrationRunner.setName(config.getName());
       migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
       migrationRunner.loadProperties(config.getProperties());
       migrationRunner.run(config.getDataSource());
@@ -399,7 +381,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (config.isQueryPlanCapture()) {
       long secs = config.getQueryPlanCapturePeriodSecs();
       if (secs > 10) {
-        logger.info("capture query plan enabled, every {}secs", secs);
+        log.info("capture query plan enabled, every {}secs", secs);
         backgroundExecutor.scheduleWithFixedDelay(this::collectQueryPlans, secs, secs, TimeUnit.SECONDS);
       }
     }
@@ -447,7 +429,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Shutdown the services like threads and DataSource.
    */
   private void shutdownInternal(boolean shutdownDataSource, boolean deregisterDriver) {
-    logger.debug("Shutting down instance:{}", serverName);
+    log.trace("shutting down instance {}", serverName);
     if (shutdown) {
       // already shutdown
       return;
@@ -476,7 +458,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       try {
         plugin.shutdown();
       } catch (Exception e) {
-        logger.error("Error when shutting down plugin", e);
+        log.error("Error when shutting down plugin", e);
       }
     }
   }
@@ -685,7 +667,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     BeanDescriptor desc = descriptor(type);
     id = desc.convertId(id);
     PersistenceContext pc = null;
-    SpiTransaction t = transactionManager.getActive();
+    SpiTransaction t = transactionManager.active();
     if (t != null) {
       pc = t.getPersistenceContext();
       Object existing = desc.contextGet(pc, id);
@@ -786,7 +768,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SpiTransaction currentServerTransaction() {
-    return transactionManager.getActive();
+    return transactionManager.active();
   }
 
   @Override
@@ -815,7 +797,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public Transaction currentTransaction() {
-    return transactionManager.getActive();
+    return transactionManager.active();
   }
 
   @Override
@@ -835,7 +817,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void endTransaction() {
-    Transaction transaction = transactionManager.getInScope();
+    Transaction transaction = transactionManager.inScope();
     if (transaction != null) {
       transaction.end();
     }
@@ -1296,7 +1278,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> boolean exists(Query<T> ormQuery, Transaction transaction) {
     Query<T> ormQueryCopy = ormQuery.copy().setMaxRows(1);
-    SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, ormQueryCopy, transaction);
+    SpiOrmQueryRequest<?> request = createQueryRequest(Type.EXISTS, ormQueryCopy, transaction);
+    List<Object> ids = request.getFromQueryCache();
+    if (ids != null) {
+      return !ids.isEmpty();
+    }
+
     try {
       request.initTransIfRequired();
       return !request.findIds().isEmpty();
@@ -2187,7 +2174,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
             try {
               serverCacheManager.clearLocal(Class.forName(cache));
             } catch (Exception e) {
-              logger.error("Error clearing local cache for type " + cache, e);
+              log.error("Error clearing local cache for type " + cache, e);
             }
           }
         }
@@ -2216,7 +2203,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (t != null) {
       return new ObtainedTransaction((SpiTransaction) t);
     }
-    SpiTransaction trans = transactionManager.getActive();
+    SpiTransaction trans = transactionManager.active();
     if (trans != null) {
       return new ObtainedTransaction(trans);
     }

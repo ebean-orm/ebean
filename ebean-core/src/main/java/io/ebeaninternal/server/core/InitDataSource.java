@@ -124,7 +124,7 @@ final class InitDataSource {
    * Attach DataSourceAlert via service loader if present.
    */
   private void attachAlert(DataSourceConfig dsConfig) {
-    DataSourceAlertFactory alertFactory = config.service(DataSourceAlertFactory.class);
+    DataSourceAlertFactory alertFactory = ServiceUtil.service(DataSourceAlertFactory.class);
     if (alertFactory != null) {
       dsConfig.setAlert(alertFactory.createAlert());
     }

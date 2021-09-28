@@ -86,23 +86,19 @@ final class ExeUpdateSql {
 
     PreparedStatement pstmt;
     if (batchThisRequest) {
-      pstmt = pstmtFactory.getPstmtBatch(t, sql, request);
+      pstmt = pstmtFactory.pstmtBatch(t, sql, request);
     } else {
-      pstmt = pstmtFactory.getPstmt(t, sql, request.isGetGeneratedKeys());
+      pstmt = pstmtFactory.pstmt(t, sql, request.isGetGeneratedKeys());
     }
-
     if (updateSql.getTimeout() > 0) {
       pstmt.setQueryTimeout(updateSql.getTimeout());
     }
-
     String bindLog = null;
     if (!bindParams.isEmpty()) {
       bindLog = binder.bind(bindParams, pstmt, t.getInternalConnection());
     }
-
     request.setBindLog(bindLog);
     updateSql.setGeneratedSql(sql);
-
     if (batchThisRequest) {
       request.logSqlBatchBind();
     }

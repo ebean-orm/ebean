@@ -577,7 +577,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     if (nodeBeanProp != null && nodeBeanProp.isFormula()) {
       // add joins for formula beans
-      nodeBeanProp.appendFrom(ctx, joinType);
+      nodeBeanProp.appendFrom(ctx, joinType, null);
     }
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
@@ -589,7 +589,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
     for (STreeProperty property : properties) {
       // usually nothing... except for 1-1 Exported
-      property.appendFrom(ctx, joinType);
+      property.appendFrom(ctx, joinType, null);
     }
 
     for (SqlTreeNode child : children) {

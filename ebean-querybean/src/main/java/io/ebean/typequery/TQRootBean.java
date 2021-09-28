@@ -811,12 +811,28 @@ public abstract class TQRootBean<T, R> {
    *     .setIdIn(42, 43, 44)
    *     .findList();
    *
-   * // the order details were eagerly fetched
-   * List<OrderDetail> details = order.getDetails();
-   *
    * }</pre>
    */
   public R setIdIn(Object... ids) {
+    query.where().idIn(ids);
+    return root;
+  }
+
+  /**
+   * Set a collection of Id values to match.
+   * <p>
+   * <pre>{@code
+   *
+   * Collection<?> ids = ...
+   *
+   * List<Order> orders =
+   *   new QOrder()
+   *     .setIdIn(ids)
+   *     .findList();
+   *
+   * }</pre>
+   */
+  public R setIdIn(Collection<?> ids) {
     query.where().idIn(ids);
     return root;
   }

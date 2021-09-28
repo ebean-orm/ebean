@@ -6,6 +6,7 @@ import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.text.json.EJson;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import io.ebeaninternal.api.CoreLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,6 @@ import java.util.Map;
  */
 public class DefaultReadAuditLogger implements ReadAuditLogger {
 
-  private static final Logger appLogger = LoggerFactory.getLogger(DefaultReadAuditLogger.class);
   private static final Logger queryLogger = LoggerFactory.getLogger("io.ebean.ReadAuditQuery");
   private static final Logger auditLogger = LoggerFactory.getLogger("io.ebean.ReadAudit");
 
@@ -50,7 +50,7 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       gen.flush();
       queryLogger.info(writer.toString());
     } catch (IOException e) {
-      appLogger.error("Error writing Read audit event", e);
+      CoreLog.log.error("Error writing Read audit event", e);
     }
   }
 
@@ -77,7 +77,7 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       writeDetails(gen, event);
       auditLogger.info(writer.toString());
     } catch (IOException e) {
-      appLogger.error("Error writing Read audit event", e);
+      CoreLog.log.error("Error writing Read audit event", e);
     }
   }
 

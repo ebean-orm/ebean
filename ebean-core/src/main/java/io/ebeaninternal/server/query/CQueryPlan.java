@@ -6,21 +6,15 @@ import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarDataReader;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiQueryBindCapture;
-import io.ebeaninternal.api.SpiQueryPlan;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
-import io.ebeaninternal.server.util.Md5;
-import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.type.DataBindCapture;
 import io.ebeaninternal.server.type.RsetDataReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.ebeaninternal.server.util.Md5;
+import io.ebeaninternal.server.util.Str;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -48,8 +42,6 @@ import java.util.Set;
  * </p>
  */
 public class CQueryPlan implements SpiQueryPlan {
-
-  private static final Logger logger = LoggerFactory.getLogger(CQueryPlan.class);
 
   static final String RESULT_SET_BASED_RAW_SQL = "--ResultSetBasedRawSql";
 
@@ -320,7 +312,7 @@ public class CQueryPlan implements SpiQueryPlan {
       predicates.bind(capture);
       bindCapture.setBind(capture.bindCapture(), executionTimeMicros, startNanos);
     } catch (SQLException e) {
-      logger.error("Error capturing bind values", e);
+      CoreLog.log.error("Error capturing bind values", e);
     }
   }
 }

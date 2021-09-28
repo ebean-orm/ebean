@@ -1,10 +1,5 @@
 package io.ebean.config;
 
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Enumeration;
-
 /**
  * Helper to find classes taking into account the context class loader.
  */
@@ -77,20 +72,12 @@ public class ClassLoadConfig {
    * Return a new instance of the class using the default constructor.
    */
   public Object newInstance(String className) {
-
     try {
       Class<?> cls = forName(className);
-      return cls.newInstance();
+      return cls.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalArgumentException("Error constructing " + className, e);
     }
-  }
-
-  /**
-   * Return the resources for the given name.
-   */
-  public Enumeration<URL> getResources(String name) throws IOException {
-    return context.getResources(name);
   }
 
   /**
@@ -129,9 +116,7 @@ public class ClassLoadConfig {
      * Optional - if set only use this classLoader (no fallback).
      */
     protected final ClassLoader preferredLoader;
-
     protected final ClassLoader contextLoader;
-
     protected final ClassLoader callerLoader;
 
     ClassLoaderContext(ClassLoader preferredLoader) {
@@ -145,15 +130,7 @@ public class ClassLoadConfig {
       return (loader != null) ? loader : callerLoader;
     }
 
-    Enumeration<URL> getResources(String name) throws IOException {
-      if (preferredLoader != null) {
-        return preferredLoader.getResources(name);
-      }
-      return contextLoader().getResources(name);
-    }
-
     Class<?> forName(String name) throws ClassNotFoundException {
-
       if (preferredLoader != null) {
         // only use the explicitly set classLoader
         return classForName(name, preferredLoader);

@@ -5,7 +5,6 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.server.persist.platform.MultiValueBind;
 
 import java.io.IOException;
 
@@ -211,7 +210,7 @@ public class SqlServerDdl extends PlatformDdl {
   }
 
   /**
-   * This writes the multi value datatypes needed for {@link MultiValueBind}
+   * This writes the multi value datatypes needed for MultiValueBind.
    */
   @Override
   public void generateProlog(DdlWrite write) throws IOException {

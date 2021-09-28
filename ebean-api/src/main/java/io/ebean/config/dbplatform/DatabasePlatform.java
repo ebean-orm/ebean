@@ -25,7 +25,7 @@ import java.sql.Types;
  */
 public class DatabasePlatform {
 
-  private static final Logger logger = LoggerFactory.getLogger(DatabasePlatform.class);
+  private static final Logger log = LoggerFactory.getLogger("io.ebean");
 
   /**
    * Behavior used when ending a query only transaction (at read committed isolation level).
@@ -640,7 +640,7 @@ public class DatabasePlatform {
         if (dbName.charAt(dbName.length() - 1) == BACK_TICK) {
           return openQuote + dbName.substring(1, dbName.length() - 1) + closeQuote;
         } else {
-          logger.error("Missing backquote on [" + dbName + "]");
+          log.error("Missing backquote on [" + dbName + "]");
         }
       } else if (allQuotedIdentifiers) {
         return openQuote + dbName + closeQuote;
@@ -694,7 +694,7 @@ public class DatabasePlatform {
 
   protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
     // silently assume the database does not support the "for update" clause.
-    logger.info("it seems your database does not support the 'for update' clause");
+    log.info("it seems your database does not support the 'for update' clause");
     return sql;
   }
 
@@ -728,7 +728,7 @@ public class DatabasePlatform {
     if (!schemaExists(dbSchema, connection)) {
       Statement query = connection.createStatement();
       try {
-        logger.info("create schema:{}", dbSchema);
+        log.debug("create schema:{}", dbSchema);
         query.executeUpdate("create schema " + dbSchema);
       } finally {
         JdbcClose.close(query);
@@ -758,7 +758,6 @@ public class DatabasePlatform {
    * Return true if the table exists.
    */
   public boolean tableExists(Connection connection, String catalog, String schema, String table) throws SQLException {
-
     DatabaseMetaData metaData = connection.getMetaData();
     ResultSet tables = metaData.getTables(catalog, schema, table, null);
     try {

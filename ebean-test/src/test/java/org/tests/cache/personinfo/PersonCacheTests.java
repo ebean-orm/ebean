@@ -21,15 +21,12 @@ public class PersonCacheTests {
 
   private final List<Object> ids = Arrays.asList("E001", "E002", "E003");
 
-  private ServerCache beanCacheInfo = DB.getDefault().cacheManager().beanCache(PersonCacheInfo.class);
-  private ServerCache beanCacheEmail = DB.getDefault().cacheManager().beanCache(PersonCacheEmail.class);
-
-  private ServerCacheRegion region = DB.getDefault().cacheManager().region("email");
+  private final ServerCache beanCacheInfo = DB.getDefault().cacheManager().beanCache(PersonCacheInfo.class);
+  private final ServerCache beanCacheEmail = DB.getDefault().cacheManager().beanCache(PersonCacheEmail.class);
+  private final ServerCacheRegion region = DB.getDefault().cacheManager().region("email");
 
   private void insert(int id, String email) {
-
     PersonCacheInfo person = new PersonCacheInfo("P00" + id, "P00" + id);
-
     PersonCacheEmail personEmail = new PersonCacheEmail("E00" + id, email);
     personEmail.setPersonInfo(person);
 
@@ -38,7 +35,6 @@ public class PersonCacheTests {
   }
 
   private void addTestData() {
-
     insert(1, "testA");
     insert(2, "testB");
     insert(3, "testC");

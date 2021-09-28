@@ -12,10 +12,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanPersistController;
 import io.ebean.meta.MetricVisitor;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiSqlUpdate;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.SpiUpdate;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequest.Type;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -58,8 +55,7 @@ import java.util.Set;
 public final class DefaultPersister implements Persister {
 
   private static final Logger PUB = LoggerFactory.getLogger("io.ebean.PUB");
-
-  private static final Logger logger = LoggerFactory.getLogger(DefaultPersister.class);
+  private static final Logger log = CoreLog.internal;
 
   /**
    * Actually does the persisting work.
@@ -251,6 +247,7 @@ public final class DefaultPersister implements Persister {
       } else {
         update(request);
       }
+      request.resetDepth();
     }
 
     draftHandler.updateDrafts(transaction, mgr);
@@ -417,7 +414,7 @@ public final class DefaultPersister implements Persister {
       } else {
         update(req);
       }
-
+      req.resetDepth();
       req.commitTransIfRequired();
       req.flushBatchOnCascade();
 
@@ -455,6 +452,7 @@ public final class DefaultPersister implements Persister {
     try {
       req.initTransIfRequiredWithBatchCascade();
       insert(req);
+      req.resetDepth();
       req.commitTransIfRequired();
       req.flushBatchOnCascade();
 
@@ -537,8 +535,8 @@ public final class DefaultPersister implements Persister {
       if (request.isDirty()) {
         request.executeOrQueue();
 
-      } else if (logger.isDebugEnabled()) {
-        logger.debug("Update skipped as bean is unchanged: {}", request.bean());
+      } else if (log.isDebugEnabled()) {
+        log.debug("Update skipped as bean is unchanged: {}", request.bean());
       }
 
       if (request.isPersistCascade()) {
@@ -585,16 +583,14 @@ public final class DefaultPersister implements Persister {
    * A common transaction is used across both requests.
    */
   private int deleteRequest(PersistRequestBean<?> req, PersistRequestBean<?> draftReq) {
-
     if (req.isRegisteredForDeleteBean()) {
       // skip deleting bean. Used where cascade is on
       // both sides of a relationship
-      if (logger.isDebugEnabled()) {
-        logger.debug("skipping delete on alreadyRegistered " + req.bean());
+      if (log.isDebugEnabled()) {
+        log.debug("skipping delete on alreadyRegistered {}", req.bean());
       }
       return 0;
     }
-
     try {
       req.initTransIfRequiredWithBatchCascade();
       int rows = delete(req);
@@ -1123,7 +1119,7 @@ public final class DefaultPersister implements Persister {
           && !prop.isReference(detailBean)
           && !request.isParent(detailBean)) {
           SpiTransaction t = request.transaction();
-          t.depth(-1);
+          t.depthDecrement();
           saveRecurse(detailBean, t, null, request.flags());
           t.depth(+1);
         }

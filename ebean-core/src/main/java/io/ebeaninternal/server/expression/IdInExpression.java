@@ -20,7 +20,7 @@ import java.util.Set;
 /**
  * In a collection of Id values.
  */
-public final class IdInExpression extends NonPrepareExpression {
+public final class IdInExpression extends NonPrepareExpression implements IdInCommon {
 
   private final List<Object> idCollection;
   private boolean multiValueIdSupported;
@@ -29,16 +29,12 @@ public final class IdInExpression extends NonPrepareExpression {
     this.idCollection = new ArrayList<>(idCollection);
   }
 
-  /**
-   * Return the ids this expression is looking to fetch.
-   */
+  @Override
   public Collection<Object> idValues() {
     return idCollection;
   }
 
-  /**
-   * Remove Ids that where obtained from l2 cache. Don't fetch these from DB.
-   */
+  @Override
   public int removeIds(Set<Object> hitIds) {
     idCollection.removeAll(hitIds);
     return idCollection.size();

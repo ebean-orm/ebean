@@ -5,21 +5,15 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.IdGenerator;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.core.type.ScalarType;
-import io.ebean.event.BeanFindController;
-import io.ebean.event.BeanPersistController;
-import io.ebean.event.BeanPersistListener;
-import io.ebean.event.BeanPostConstructListener;
-import io.ebean.event.BeanPostLoad;
-import io.ebean.event.BeanQueryAdapter;
-import io.ebean.event.ServerConfigStartup;
+import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.util.AnnotationUtil;
+import io.ebeaninternal.api.CoreLog;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Embeddable;
@@ -37,7 +31,7 @@ import java.util.function.Predicate;
  */
 public class BootupClasses implements Predicate<Class<?>> {
 
-  private static final Logger logger = LoggerFactory.getLogger(BootupClasses.class);
+  private static final Logger log = CoreLog.internal;
 
   private final List<Class<?>> embeddableList = new ArrayList<>();
   private final List<Class<?>> entityList = new ArrayList<>();
@@ -211,13 +205,13 @@ public class BootupClasses implements Predicate<Class<?>> {
     try {
       return cls.getConstructor().newInstance();
     } catch (NoSuchMethodException e) {
-      logger.debug("Ignore/expected - no default constructor: " +e.getMessage());
+      log.debug("Ignore/expected - no default constructor: " +e.getMessage());
       return null;
 
     } catch (Exception e) {
       if (logOnException) {
         // not expected but we log and carry on
-        logger.error("Error creating " + cls, e);
+        log.error("Error creating " + cls, e);
         return null;
 
       } else {

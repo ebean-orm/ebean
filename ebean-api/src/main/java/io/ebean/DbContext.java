@@ -15,8 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 final class DbContext {
 
-  private static final Logger logger = LoggerFactory.getLogger(DbContext.class);
-
+  private static final Logger log = LoggerFactory.getLogger("io.ebean");
   static {
     EbeanVersion.getVersion();
   }
@@ -39,7 +38,6 @@ final class DbContext {
       if (!DbPrimary.isSkip()) {
         // look to see if there is a default server defined
         String defaultName = DbPrimary.getDefaultServerName();
-        logger.debug("defaultName:{}", defaultName);
         if (defaultName != null && !defaultName.trim().isEmpty()) {
           defaultDatabase = getWithCreate(defaultName.trim());
         }
@@ -54,7 +52,7 @@ final class DbContext {
       throw new DataSourceConfigurationException(msg, e);
 
     } catch (Throwable e) {
-      logger.error("Error trying to create the default Database", e);
+      log.error("Error trying to create the default Database", e);
       throw new RuntimeException(e);
     }
   }

@@ -44,7 +44,6 @@ import io.ebeaninternal.xmapping.api.XmapRawSql;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreFactory;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
@@ -61,7 +60,7 @@ import java.util.concurrent.TimeUnit;
  */
 public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTypeManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorManager.class);
+  private static final Logger log = CoreLog.internal;
 
   private static final BeanDescComparator beanDescComparator = new BeanDescComparator();
   public static final String JAVA_LANG_RECORD = "java.lang.Record";
@@ -312,7 +311,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     } catch (BeanNotEnhancedException e) {
       throw e;
     } catch (RuntimeException e) {
-      logger.error("Error in deployment", e);
+      log.error("Error in deployment", e);
       throw e;
     }
   }
@@ -335,13 +334,13 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     try {
       entityClass = Class.forName(entityClassName, false, classLoader);
     } catch (Exception e) {
-      logger.error("Could not load entity bean class " + entityClassName + " for ebean.xml entry");
+      log.error("Could not load entity bean class " + entityClassName + " for ebean.xml entry");
       return;
     }
 
     DeployBeanInfo<?> info = deployInfoMap.get(entityClass);
     if (info == null) {
-      logger.error("No entity bean for ebean.xml entry " + entityClassName);
+      log.error("No entity bean for ebean.xml entry " + entityClassName);
 
     } else {
       for (XmapRawSql sql : entityDeploy.getRawSql()) {
@@ -582,11 +581,11 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     int pc = postConstructManager.getRegisterCount();
     int lc = persistListenerManager.getRegisterCount();
     int fc = beanFinderManager.getRegisterCount();
-    logger.debug("BeanPersistControllers[{}] BeanFinders[{}] BeanPersistListeners[{}] BeanQueryAdapters[{}] BeanPostLoaders[{}] BeanPostConstructors[{}]", cc, fc, lc, qa, pl, pc);
+    log.debug("BeanPersistControllers[{}] BeanFinders[{}] BeanPersistListeners[{}] BeanQueryAdapters[{}] BeanPostLoaders[{}] BeanPostConstructors[{}]", cc, fc, lc, qa, pl, pc);
   }
 
   private void logStatus() {
-    logger.debug("Entities[{}]", entityBeanCount);
+    log.debug("Entities[{}]", entityBeanCount);
   }
 
   /**
@@ -852,7 +851,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
             String m = "Implicitly found mappedBy for " + targetDesc + "." + prop;
             m += " by searching for [" + searchName + "] against " + matchSet;
-            logger.debug(m);
+            log.debug(m);
 
             return true;
           }
@@ -1211,12 +1210,12 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     final DeployIdentityMode identityMode = desc.getIdentityMode();
     if (identityMode.isSequence() && !dbIdentity.isSupportsSequence()) {
       // explicit sequence but not supported by the DatabasePlatform
-      logger.info("Explicit sequence on " + desc.getFullName() + " but not supported by DB Platform - ignored");
+      log.info("Explicit sequence on " + desc.getFullName() + " but not supported by DB Platform - ignored");
       identityMode.setIdType(IdType.AUTO);
     }
     if (identityMode.isIdentity() && !dbIdentity.isSupportsIdentity()) {
       // explicit identity but not supported by the DatabasePlatform
-      logger.info("Explicit Identity on " + desc.getFullName() + " but not supported by DB Platform - ignored");
+      log.info("Explicit Identity on " + desc.getFullName() + " but not supported by DB Platform - ignored");
       identityMode.setIdType(IdType.AUTO);
     }
 

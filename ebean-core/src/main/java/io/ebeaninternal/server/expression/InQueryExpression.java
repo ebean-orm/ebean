@@ -65,8 +65,7 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
    * Compile/build the sub query.
    */
   private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
-
-    SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.getEbeanServer();
+    SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.database();
     return ebeanServer.compileQuery(Type.SQ_IN, subQuery, queryRequest.transaction());
   }
 

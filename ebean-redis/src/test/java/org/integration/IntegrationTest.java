@@ -1,20 +1,127 @@
 package org.integration;
 
 import io.ebean.DB;
+import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheStatistics;
 import org.domain.Person;
+import org.domain.RCust;
 import org.domain.query.QPerson;
+import org.domain.query.QRCust;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class IntegrationTest {
+class IntegrationTest {
 
   @Test
-  public void test() throws InterruptedException {
+  void mget_when_emptyCollectionOfIds() {
+
+    List<RCust> f0 = new QRCust()
+      .setIdIn(Collections.emptyList())
+      .findList();
+
+    assertThat(f0).isEmpty();
+
+    List<RCust> f1 = new QRCust()
+      .id.in(Collections.emptyList())
+      .findList();
+
+    assertThat(f1).isEmpty();
+  }
+
+  @Test
+  void mput_via_setIdIn() throws InterruptedException {
+
+    ServerCache beanCache = DB.cacheManager().beanCache(RCust.class);
+    beanCache.clear();
+    beanCache.statistics(true);
+
+    List<RCust> people = new ArrayList<>();
+    for (String name : new String[]{"mp0", "mp1", "mp2"}) {
+      people.add(new RCust(name));
+    }
+    DB.saveAll(people);
+    List<Long> ids = people.stream().map(RCust::getId).collect(Collectors.toList());
+
+    List<RCust> f0 = new QRCust()
+      .setIdIn(ids) // using collection argument
+      .findList();
+
+    assertThat(f0).hasSize(3);
+    ServerCacheStatistics stats0 = beanCache.statistics(true);
+    assertThat(stats0.getHitCount()).isEqualTo(0);
+
+    Thread.sleep(5);
+
+    // we will hit the cache this time
+    List<RCust> f1 = new QRCust()
+      .setIdIn(ids.toArray()) // using varargs argument
+      .findList();
+
+    assertThat(f1).hasSize(3);
+    ServerCacheStatistics stats1 = beanCache.statistics(true);
+    assertThat(stats1.getHitCount()).isEqualTo(3);
+
+    // we will hit the cache again
+    List<RCust> f2 = new QRCust()
+      .setIdIn(ids) // using collection argument
+      .findList();
+    assertThat(f2).hasSize(3);
+    ServerCacheStatistics stats2 = beanCache.statistics(true);
+    assertThat(stats2.getHitCount()).isEqualTo(3);
+  }
+
+
+  @Test
+  void mput_via_propertyInExpression() throws InterruptedException {
+
+    ServerCache beanCache = DB.cacheManager().beanCache(RCust.class);
+    beanCache.clear();
+    beanCache.statistics(true);
+
+    List<RCust> people = new ArrayList<>();
+    for (String name : new String[]{"mpx0", "mpx1", "mpx2"}) {
+      people.add(new RCust(name));
+    }
+    DB.saveAll(people);
+    List<Long> ids = people.stream().map(RCust::getId).collect(Collectors.toList());
+
+    List<RCust> f0 = new QRCust()
+      .id.in(ids)
+      .findList();
+
+    assertThat(f0).hasSize(3);
+    ServerCacheStatistics stats0 = beanCache.statistics(true);
+    assertThat(stats0.getHitCount()).isEqualTo(0);
+
+    Thread.sleep(5);
+
+    // we will hit the cache this time
+    List<RCust> f1 = new QRCust()
+      .id.in(ids)
+      .findList();
+
+    assertThat(f1).hasSize(3);
+    ServerCacheStatistics stats1 = beanCache.statistics(true);
+    assertThat(stats1.getHitCount()).isEqualTo(3);
+
+    // we will hit the cache again
+    List<RCust> f2 = new QRCust()
+      .id.isIn(ids)
+      .findList();
+    assertThat(f2).hasSize(3);
+    ServerCacheStatistics stats2 = beanCache.statistics(true);
+    assertThat(stats2.getHitCount()).isEqualTo(3);
+  }
+
+  @Test
+  void test() throws InterruptedException {
 
     insertSomePeople();
 
@@ -97,8 +204,8 @@ public class IntegrationTest {
 
   private List<Person> nameStartsWith(String pattern) {
     return new QPerson()
-        .name.istartsWith(pattern)
-        .setUseQueryCache(true)
-        .findList();
+      .name.istartsWith(pattern)
+      .setUseQueryCache(true)
+      .findList();
   }
 }

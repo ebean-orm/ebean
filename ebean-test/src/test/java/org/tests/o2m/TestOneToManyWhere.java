@@ -35,7 +35,7 @@ public class TestOneToManyWhere extends BaseTestCase {
     el.getChildrenWithWhere().size(); // trigger Lazy load
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id, t0.name from om_basic_parent");
+    assertSql(sql.get(0)).contains("select t0.id, t0.name from om_basic_parent");
     assertThat(sql.get(1)).contains("where 'om_basic_parent' = t0.name");
     DB.delete(el);
   }

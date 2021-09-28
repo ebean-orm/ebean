@@ -23,6 +23,7 @@ public class TestWhereIn extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Country> query = DB.find(Country.class)
+      .setUseCache(false)
       .where().in("code", "NZ", "AU")
       .query();
 
@@ -100,6 +101,7 @@ public class TestWhereIn extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Country> query = DB.find(Country.class)
+      .setUseCache(false)
       .where().in("code", new ArrayList<>()).query();
 
     query.findList();
@@ -112,6 +114,7 @@ public class TestWhereIn extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Country> query = DB.find(Country.class)
+      .setUseCache(false)
       .where().in("code", (Collection)null).query();
 
     query.findList();
@@ -124,6 +127,7 @@ public class TestWhereIn extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Country> query = DB.find(Country.class)
+      .setUseCache(false)
       .where().notIn("code", new ArrayList<>()).query();
 
     query.findList();
@@ -136,6 +140,7 @@ public class TestWhereIn extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Country> query = DB.find(Country.class)
+      .setUseCache(false)
       .where().notIn("code", (Collection)null).query();
 
     query.findList();

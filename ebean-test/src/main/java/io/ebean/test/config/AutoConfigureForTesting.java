@@ -20,7 +20,7 @@ import java.util.Properties;
  */
 public class AutoConfigureForTesting implements AutoConfigure {
 
-  private static final Logger log = LoggerFactory.getLogger(AutoConfigureForTesting.class);
+  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
 
   /**
    * System property that can override the platform.  mvn clean test -Ddb=sqlserver

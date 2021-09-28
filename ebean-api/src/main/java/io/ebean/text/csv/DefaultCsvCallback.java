@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultCsvCallback<T> implements CsvCallback<T> {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultCsvCallback.class);
+  private static final Logger log = LoggerFactory.getLogger(DefaultCsvCallback.class);
 
   /**
    * The transaction to use (if not using CsvCallback).
@@ -124,13 +124,11 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
    */
   @Override
   public void processBean(int row, String[] line, T bean) {
-
     // assumes single bean or Cascade.PERSIST will save any
     // related beans (e.g. customer -> customer.billingAddress
     server.save(bean, transaction);
-
     if (logInfoFrequency > 0 && (row % logInfoFrequency == 0)) {
-      logger.info("processed " + row + " rows");
+      log.debug("processed {} rows", row);
     }
   }
 
@@ -139,11 +137,9 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
    */
   @Override
   public void end(int row) {
-
     commitTransactionIfCreated();
-
     exeTime = System.currentTimeMillis() - startTime;
-    logger.info("Csv finished, rows[" + row + "] exeMillis[" + exeTime + "]");
+    log.info("Csv finished, rows[{}] exeMillis[{}]", row, exeTime);
   }
 
   /**
@@ -159,23 +155,20 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
    * and batch size.
    */
   protected void initTransactionIfRequired() {
-
     transaction = server.currentTransaction();
     if (transaction == null || !transaction.isActive()) {
-
       transaction = server.beginTransaction();
       createdTransaction = true;
       if (persistBatchSize > 1) {
-        logger.info("Creating transaction, batchSize[" + persistBatchSize + "]");
+        log.debug("Creating transaction, batchSize[{}]", persistBatchSize);
         transaction.setBatchMode(true);
         transaction.setBatchSize(persistBatchSize);
         transaction.setGetGeneratedKeys(false);
-
       } else {
         // explicitly turn off JDBC batching in case
         // is has been turned on globally
         transaction.setBatchMode(false);
-        logger.info("Creating transaction with no JDBC batching");
+        log.debug("Creating transaction with no JDBC batching");
       }
     }
   }
@@ -187,7 +180,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
   protected void commitTransactionIfCreated() {
     if (createdTransaction) {
       transaction.commit();
-      logger.info("Committed transaction");
+      log.debug("Committed transaction");
     }
   }
 
@@ -198,7 +191,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
   protected void rollbackTransactionIfCreated(Throwable e) {
     if (createdTransaction) {
       transaction.rollback(e);
-      logger.info("Rolled back transaction");
+      log.debug("Rolled back transaction");
     }
   }
 

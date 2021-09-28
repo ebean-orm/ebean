@@ -16,7 +16,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestQueryCache extends BaseTestCase {
 
@@ -126,11 +129,48 @@ public class TestQueryCache extends BaseTestCase {
     // and now, ensure that we hit the database
     LoggedSql.start();
     int count2 = DB.find(EColAB.class)
-        .setUseQueryCache(CacheMode.OFF)
-        .where()
-        .eq("columnB", "count")
-        .findCount();
+      .setUseQueryCache(CacheMode.OFF)
+      .where()
+      .eq("columnB", "count")
+      .findCount();
     assertThat(count2).isEqualTo(count1);
+    sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+  }
+
+  @Test
+  public void exists() {
+
+    new EColAB("06", "exists").save();
+    new EColAB("07", "exists").save();
+
+    LoggedSql.start();
+
+    boolean exists0 = DB.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "exists")
+      .exists();
+
+    boolean exists1 = DB.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "exists")
+      .exists();
+
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(exists0).isEqualTo(exists1);
+    assertThat(sql).hasSize(1);
+
+    // and now, ensure that we hit the database
+    LoggedSql.start();
+    boolean exists2 = DB.find(EColAB.class)
+      .setUseQueryCache(CacheMode.OFF)
+      .where()
+      .eq("columnB", "exists")
+      .exists();
+    assertThat(exists2).isEqualTo(exists1);
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
   }

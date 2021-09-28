@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.core.bootup;
 
 import io.ebean.util.StringHelper;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.util.UrlHelper;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,10 +20,9 @@ import java.util.jar.Manifest;
  */
 class ManifestReader {
 
-  private static final Logger logger = LoggerFactory.getLogger(ManifestReader.class);
+  private static final Logger log = CoreLog.internal;
 
   private final Set<String> packageSet = new HashSet<>();
-
   private final ClassLoader classLoader;
 
   /**
@@ -65,7 +64,7 @@ class ManifestReader {
         }
       }
     } catch (IOException e) {
-      logger.warn("Error reading " + resourcePath + " manifest resources", e);
+      log.warn("Error reading " + resourcePath + " manifest resources", e);
     }
     return packageSet;
   }

@@ -70,7 +70,6 @@ public class DbPlatformTypeMapping {
    * Load the standard types. These can be overridden by DB specific platform.
    */
   private void loadDefaults(boolean logicalTypes) {
-
     put(DbType.BOOLEAN, BOOLEAN_LOGICAL);
     put(DbType.BIT);
     put(DbType.INTEGER);
@@ -88,7 +87,6 @@ public class DbPlatformTypeMapping {
     put(DbType.LONGVARCHAR);
     // most commonly real maps to db float
     put(DbType.REAL, new DbPlatformType("float"));
-
     put(DbType.POINT, POINT);
     put(DbType.POLYGON, POLYGON);
     put(DbType.LINESTRING, LINESTRING);
@@ -103,7 +101,7 @@ public class DbPlatformTypeMapping {
       put(DbType.VARBINARY, new DbPlatformType("varbinary"));
       put(DbType.BINARY, new DbPlatformType("binary"));
       put(DbType.CHAR, new DbPlatformType("char"));
-
+      put(DbType.LOCALDATETIME, new DbPlatformType("localdatetime", false));
       put(DbType.HSTORE, new DbPlatformType("hstore", false));
       put(DbType.JSON, new DbPlatformType("json", false));
       put(DbType.JSONB, new DbPlatformType("jsonb", false));
@@ -120,7 +118,7 @@ public class DbPlatformTypeMapping {
       put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
       put(DbType.BINARY, new DbPlatformType("binary", 255));
       put(DbType.CHAR, new DbPlatformType("char", 1));
-
+      put(DbType.LOCALDATETIME, DbType.TIMESTAMP.createPlatformType());
       put(DbType.JSON, JSON_CLOB_PLACEHOLDER); // Postgres maps this to JSON
       put(DbType.JSONB, JSON_CLOB_PLACEHOLDER); // Postgres maps this to JSONB
       put(DbType.JSONCLOB, JSON_CLOB_PLACEHOLDER);
@@ -137,7 +135,6 @@ public class DbPlatformTypeMapping {
    * Lookup the platform specific DbType given the standard sql type name.
    */
   public DbPlatformType lookup(String name, boolean withScale) {
-
     DbType type = lookup.byName(name);
     if (type == null) {
       throw new IllegalArgumentException("Unknown type [" + name + "] - not standard sql type");
@@ -160,7 +157,6 @@ public class DbPlatformTypeMapping {
   }
 
   private DbPlatformType getJsonType(DbType type, boolean withScale) {
-
     DbPlatformType dbType = get(type);
     if (dbType == JSON_CLOB_PLACEHOLDER) {
       // if we have scale that implies this maps to varchar

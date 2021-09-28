@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.11.5-SNAPSHOT</version>
+    <version>12.12.1-SNAPSHOT</version>
   </parent>
 
   <name>querybean generator</name>
@@ -33,6 +33,17 @@
           <target>1.8</target>
           <!-- Turn off annotation processing for building -->
           <compilerArgument>-proc:none</compilerArgument>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>2.24</version>
+        <extensions>true</extensions>
+        <configuration>
+          <tiles>
+            <tile>io.avaje.tile:moditech-module:1.0</tile>
+          </tiles>
         </configuration>
       </plugin>
     </plugins>

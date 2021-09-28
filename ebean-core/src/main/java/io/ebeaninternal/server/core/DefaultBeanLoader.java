@@ -7,18 +7,13 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
-import io.ebeaninternal.api.LoadBeanRequest;
-import io.ebeaninternal.api.LoadManyRequest;
-import io.ebeaninternal.api.LoadRequest;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Mode;
-import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
@@ -28,7 +23,7 @@ import java.util.List;
  */
 final class DefaultBeanLoader {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultBeanLoader.class);
+  private static final Logger log = CoreLog.internal;
 
   private final DefaultServer server;
   private final boolean onIterateUseExtraTxn;
@@ -113,8 +108,8 @@ final class DefaultBeanLoader {
     server.findOne(query, t);
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
+        if (log.isDebugEnabled()) {
+          log.debug("BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
         }
       } else if (useManyIdCache) {
         parentDesc.cacheManyPropPut(many, beanCollection, parentId);
@@ -175,14 +170,12 @@ final class DefaultBeanLoader {
       // need a new PersistenceContext for REFRESH
       pc = null;
     }
-
     BeanDescriptor<?> desc = server.descriptor(bean.getClass());
     if (EntityType.EMBEDDED == desc.entityType()) {
       // lazy loading on an embedded bean property
       EntityBean embeddedOwner = (EntityBean) ebi.getEmbeddedOwner();
       refreshBeanInternal(embeddedOwner, mode, ebi.getEmbeddedOwnerIndex());
     }
-
     Object id = desc.getId(bean);
     if (pc == null) {
       // a reference with no existing persistenceContext
@@ -202,17 +195,16 @@ final class DefaultBeanLoader {
         }
       }
     }
-
     SpiQuery<?> query = server.createQuery(desc.type());
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     if (draft) {
       query.asDraft();
+    } else {
+      query.setIncludeSoftDeletes();
     }
-
     if (embeddedOwnerIndex > -1) {
       query.select(ebi.getProperty(embeddedOwnerIndex));
     }
-
     // don't collect AutoTune usage profiling information
     // as we just copy the data out of these fetched beans
     // and put the data into the original bean

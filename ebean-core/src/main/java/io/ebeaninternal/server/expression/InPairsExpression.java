@@ -24,14 +24,14 @@ final class InPairsExpression extends AbstractExpression {
   private List<Object> concatBindValues;
 
   InPairsExpression(Pairs pairs, boolean not) {
-    super(pairs.getProperty0());
-    this.property0 = pairs.getProperty0();
-    this.property1 = pairs.getProperty1();
+    super(pairs.property0());
+    this.property0 = pairs.property0();
+    this.property1 = pairs.property1();
     // the entries might be modified on cache hit.
-    this.entries = pairs.getEntries();
+    this.entries = pairs.entries();
     this.not = not;
-    this.separator = pairs.getConcatSeparator();
-    this.suffix = pairs.getConcatSuffix();
+    this.separator = pairs.concatSeparator();
+    this.suffix = pairs.concatSuffix();
   }
 
   @Override

@@ -361,7 +361,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
 
-    assertThat(pairs.getEntries()).hasSize(3);
+    assertThat(pairs.entries()).hasSize(3);
 
     assertThat(list).hasSize(3);
     assertNaturalKeyHitMiss(1, 2);
@@ -386,8 +386,8 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     loadSomeIntoCache();
 
     Pairs pairs = new Pairs("sku", "code")
-      .setConcatSeparator(":")
-      .setConcatSuffix("-foo")
+      .concatSeparator(":")
+      .concatSuffix("-foo")
       .add("2", 1000)
       .add("2", 1001)
       .add("3", 1000);
@@ -404,7 +404,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
 
-    assertThat(pairs.getEntries()).hasSize(3);
+    assertThat(pairs.entries()).hasSize(3);
 
     assertThat(list).hasSize(3);
     assertNaturalKeyHitMiss(1, 2);

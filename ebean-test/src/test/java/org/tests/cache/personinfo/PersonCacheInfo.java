@@ -1,6 +1,7 @@
 package org.tests.cache.personinfo;
 
 import io.ebean.annotation.Cache;
+import io.ebean.annotation.SoftDelete;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,6 +16,9 @@ public class PersonCacheInfo {
   private String personId;
 
   private String name;
+
+  @SoftDelete
+  boolean deleted;
 
   public PersonCacheInfo(String personId, String name) {
     this.personId = personId;
@@ -35,5 +39,14 @@ public class PersonCacheInfo {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+  public boolean deleted() {
+    return deleted;
+  }
+
+  public PersonCacheInfo deleted(boolean deleted) {
+    this.deleted = deleted;
+    return this;
   }
 }
