@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.12.1-SNAPSHOT</version>
+  <version>12.12.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -46,7 +46,7 @@
     <ebean-test-docker.version>4.2</ebean-test-docker.version>
     <ebean-datasource.version>7.3</ebean-datasource.version>
     <ebean-agent.version>12.12.0</ebean-agent.version>
-    <ebean-maven-plugin.version>12.12.0</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>12.12.1</ebean-maven-plugin.version>
   </properties>
 
   <dependencies>
