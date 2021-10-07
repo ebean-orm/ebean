@@ -199,23 +199,23 @@ public class DefaultPersistenceContextTest {
     final PersistenceContext pcIterate = initialPc.forIterate();
     assertFalse(pcIterate.resetLimit());
 
-    // added 900 NEW contact beans
-    addContacts(pcIterate, 2000, 900);
-    assertThat(pcIterate.size(Contact.class)).isEqualTo(1910);
+    // added 90 NEW contact beans
+    addContacts(pcIterate, 2000, 90);
+    assertThat(pcIterate.size(Contact.class)).isEqualTo(1100);
     assertFalse(pcIterate.resetLimit());
 
-    // boundary, added 1000 NEW contact beans (still false)
-    addContacts(pcIterate, 3000, 100);
+    // boundary, added 9 NEW contact beans (still false)
+    addContacts(pcIterate, 3000, 9);
     assertFalse(pcIterate.resetLimit());
 
     addContacts(pcIterate, 4000, 1);
-    addProducts(pcIterate, 1, 100);
-    // ACT - over 1000 added beans boundary for contacts so returns true
+    addProducts(pcIterate, 1, 10);
+    // ACT - over 100 added beans boundary for contacts so returns true
     assertTrue(pcIterate.resetLimit());
 
-    assertThat(pcIterate.size(Contact.class)).isEqualTo(2011);
+    assertThat(pcIterate.size(Contact.class)).isEqualTo(1110);
     assertThat(pcIterate.size(Customer.class)).isEqualTo(100);
-    assertThat(pcIterate.size(Product.class)).isEqualTo(100);
+    assertThat(pcIterate.size(Product.class)).isEqualTo(10);
 
     // ACT - obtain new PC forIterateReset
     PersistenceContext pcReset = pcIterate.forIterateReset();

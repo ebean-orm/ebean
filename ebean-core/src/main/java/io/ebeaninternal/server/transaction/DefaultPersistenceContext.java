@@ -273,10 +273,10 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     }
 
     /**
-     * Return true if grown above the reset limit size of 1000.
+     * Return true if grown above the reset limit size of 100.
      */
     private boolean resetLimit() {
-      return map.size() > 1000;
+      return map.size() >= 100;
     }
 
     @Override
