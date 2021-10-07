@@ -2,10 +2,14 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
+
+import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -78,4 +82,36 @@ public class TestPersistenceContext extends BaseTestCase {
     }
   }
 
+  @Disabled
+  @Test
+  void findWithGcTest() {
+    for (int j = 0; j < 20; j++) {
+      for (int i = 0; i < 500; i++) {
+        Customer c = new Customer();
+        c.setName("Customer #" + i);
+        DB.save(c);
+      }
+      int customerCount = DB.find(Customer.class).findCount();
+      AtomicInteger count = new AtomicInteger(customerCount);
+
+      WeakHashMap<Customer, Integer> customers = new WeakHashMap<>();
+
+      DB.find(Customer.class).fetch("orders").findEach(customer -> {
+        customers.put(customer, customer.getId());
+        if (count.decrementAndGet() == 0) {
+          // Trigger garbage collection on last iteration and check if beans disappear from memory
+          System.gc();
+          try {
+            Thread.sleep(100);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            e.printStackTrace();
+          }
+          customers.size(); // expunge stale entries
+          System.out.println("Total instances: " + customerCount + ", instances left in memory: " + customers.size());
+        }
+      });
+    }
+
+  }
 }

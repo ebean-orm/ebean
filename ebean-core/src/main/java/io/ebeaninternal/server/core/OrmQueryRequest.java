@@ -202,14 +202,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
-   * Add the bean to the persistence context.
-   */
-  public void persistenceContextAdd(EntityBean bean) {
-    Object id = beanDescriptor.getId(bean);
-    beanDescriptor.contextPut(persistenceContext, id, bean);
-  }
-
-  /**
    * This will create a local (readOnly) transaction if no current transaction
    * exists.
    * <p>
