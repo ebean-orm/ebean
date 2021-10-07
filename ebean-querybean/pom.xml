@@ -93,14 +93,6 @@
 
   <build>
     <plugins>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>
-            --add-opens io.ebean.querybean/org.querytest=io.ebean.core
-          </argLine>
-        </configuration>
-      </plugin>
       <!-- Enhancement -->
       <plugin>
         <groupId>io.repaint.maven</groupId>
