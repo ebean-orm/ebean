@@ -71,10 +71,6 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
 
     Mockito.doReturn(config.getDataSource()).when(dataSourceProvider).dataSource(tenant);
 
-    // When TenantMode.DB we don't really want to run DDL
-    // and we want to explicitly specify the Database platform
-    //config.setDdlGenerate(false);
-    //config.setDdlRun(false);
     config.setDatabasePlatform(new PostgresPlatform());
 
     final Database database = DatabaseFactory.create(config);
