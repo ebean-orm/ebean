@@ -1715,6 +1715,12 @@ public interface Database {
   <T> Set<String> validateQuery(Query<T> query);
 
   /**
+   * Runs the DbMigration or DDL manually. This is normally executed on startup, as long as
+   * serverConfig.initDatabase is set to true.
+   */
+  void initDatabase(boolean online);
+
+  /**
    * Load and lock the bean using {@code select for update}.
    * <p>
    * This should be executed inside a transaction and results in the bean being loaded or

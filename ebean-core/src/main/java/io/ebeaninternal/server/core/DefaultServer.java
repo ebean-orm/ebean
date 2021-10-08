@@ -168,6 +168,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final long slowQueryMicros;
   private final SlowQueryListener slowQueryListener;
   private final boolean disableL2Cache;
+  private final boolean initDatabase;
   private boolean shutdown;
 
   /**
@@ -215,6 +216,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = config.initDdlGenerator(this);
     this.scriptRunner = new DScriptRunner(this);
+    this.initDatabase = !config.getConfig().skipInitDatabase();
 
     configureServerPlugins();
     // Register with the JVM Shutdown hook
@@ -239,13 +241,21 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Override
+  public void initDatabase(boolean online) {
+    if (!config.isDocStoreOnly()) {
+      ddlGenerator.execute(online);
+    }
+  }
+
   /**
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
-    if (!config.isDocStoreOnly()) {
-      ddlGenerator.execute(online);
+    if (initDatabase) {
+      initDatabase(online);
     }
+
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }

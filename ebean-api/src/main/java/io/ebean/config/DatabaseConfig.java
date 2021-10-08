@@ -2,15 +2,30 @@ package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import io.avaje.config.Config;
-import io.ebean.*;
-import io.ebean.annotation.*;
+import io.ebean.DatabaseFactory;
+import io.ebean.EbeanVersion;
+import io.ebean.PersistenceContextScope;
+import io.ebean.Query;
+import io.ebean.Transaction;
+import io.ebean.annotation.DbJson;
+import io.ebean.annotation.Encrypted;
+import io.ebean.annotation.MutationDetection;
+import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.datasource.DataSourceConfig;
-import io.ebean.event.*;
+import io.ebean.event.BeanFindController;
+import io.ebean.event.BeanPersistController;
+import io.ebean.event.BeanPersistListener;
+import io.ebean.event.BeanPostConstructListener;
+import io.ebean.event.BeanPostLoad;
+import io.ebean.event.BeanQueryAdapter;
+import io.ebean.event.BulkTableEventListener;
+import io.ebean.event.ServerConfigStartup;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -23,7 +38,13 @@ import javax.sql.DataSource;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.ServiceLoader;
 
 /**
  * The configuration used for creating a Database.
@@ -300,7 +321,9 @@ public class DatabaseConfig {
    */
   private ExternalTransactionManager externalTransactionManager;
 
-  private boolean skipDataSourceCheck;
+  private boolean skipDataSourceCheck = false;
+
+  private boolean skipInitDatabase = false;
 
   /**
    * The data source (if programmatically provided).
@@ -1632,6 +1655,14 @@ public class DatabaseConfig {
     this.skipDataSourceCheck = skipDataSourceCheck;
   }
 
+  public boolean skipInitDatabase() {
+    return skipInitDatabase;
+  }
+
+  public void setSkipInitDatabase(final boolean skipInitDatabase) {
+    this.skipInitDatabase = skipInitDatabase;
+  }
+
   /**
    * Return the DataSource.
    */
@@ -2707,7 +2738,6 @@ public class DatabaseConfig {
   }
 
 
-
   /**
    * Load settings from application.properties, application.yaml and other sources.
    * <p>
@@ -2900,6 +2930,7 @@ public class DatabaseConfig {
     jsonMutationDetection = p.getEnum(MutationDetection.class, "jsonMutationDetection", jsonMutationDetection);
 
     skipDataSourceCheck = p.getBoolean("skipDataSourceCheck", skipDataSourceCheck);
+    skipInitDatabase = p.getBoolean("skipInitDatabase", skipInitDatabase);
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
