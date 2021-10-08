@@ -2,30 +2,15 @@ package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import io.avaje.config.Config;
-import io.ebean.DatabaseFactory;
-import io.ebean.EbeanVersion;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.Transaction;
-import io.ebean.annotation.DbJson;
-import io.ebean.annotation.Encrypted;
-import io.ebean.annotation.MutationDetection;
-import io.ebean.annotation.PersistBatch;
-import io.ebean.annotation.Platform;
+import io.ebean.*;
+import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.datasource.DataSourceConfig;
-import io.ebean.event.BeanFindController;
-import io.ebean.event.BeanPersistController;
-import io.ebean.event.BeanPersistListener;
-import io.ebean.event.BeanPostConstructListener;
-import io.ebean.event.BeanPostLoad;
-import io.ebean.event.BeanQueryAdapter;
-import io.ebean.event.BulkTableEventListener;
-import io.ebean.event.ServerConfigStartup;
+import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -38,13 +23,7 @@ import javax.sql.DataSource;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * The configuration used for creating a Database.
