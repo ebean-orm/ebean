@@ -14,7 +14,7 @@ public interface SpiJsonReader {
 
   PersistenceContext getPersistenceContext();
 
-  SpiJsonReader forJson(JsonParser moreJson, boolean resetContext);
+  SpiJsonReader forJson(JsonParser moreJson);
 
   <T> void persistenceContextPut(Object beanId, T currentBean);
 
