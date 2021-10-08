@@ -584,6 +584,11 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
+  public void initDatabase(final boolean online) {
+
+  }
+
+  @Override
   public void truncate(String... tables) {
 
   }
