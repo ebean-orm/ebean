@@ -60,7 +60,6 @@ public final class BindParamsParser {
    * </p>
    */
   private String parseSql() {
-
     if (params.isSameBindHash()) {
       String preparedSql = params.getPreparedSql();
       if (preparedSql != null && !preparedSql.isEmpty()) {
@@ -68,110 +67,119 @@ public final class BindParamsParser {
         return preparedSql;
       }
     }
-
-    String preparedSql;
-    if (params.requiresNamedParamsPrepare()) {
-      // convert named parameters into ordered list
-      OrderedList orderedList = params.createOrderedList();
-      parseNamedParams(orderedList);
-      preparedSql = orderedList.getPreparedSql();
-    } else {
-      preparedSql = sql;
-    }
+    String preparedSql = prepareSql();
     params.setPreparedSql(preparedSql);
     params.updateHash();
     return preparedSql;
+  }
+
+  private String prepareSql() {
+    if (!params.requiresNamedParamsPrepare()) {
+      return sql;
+    } else {
+      // convert named parameters into ordered list
+      OrderedList orderedList = params.createOrderedList();
+      parseNamedParams(orderedList);
+      return orderedList.getPreparedSql();
+    }
   }
 
   /**
    * Named parameters need to be parsed and replaced with ?.
    */
   private void parseNamedParams(OrderedList orderedList) {
-
     parseNamedParams(0, orderedList);
   }
 
   private void parseNamedParams(int startPos, OrderedList orderedList) {
-
     if (sql == null) {
       throw new PersistenceException("query does not contain any named bind parameters?");
     }
     if (startPos > sql.length()) {
       return;
     }
-
-    // search for quotes and named params... in order...
+    // search for quotes and named params in order
     int beginQuotePos = sql.indexOf(quote, startPos);
     int nameParamStart = findNameStart(sql, startPos);
     if (beginQuotePos > 0 && beginQuotePos < nameParamStart) {
-      // the quote precedes the named parameter...
-      // find and add up to the end quote
-      int endQuotePos = sql.indexOf(quote, beginQuotePos + 1);
-      String sub = sql.substring(startPos, endQuotePos + 1);
-      orderedList.appendSql(sub);
-
-      // start again after the end quote
-      parseNamedParams(endQuotePos + 1, orderedList);
+      addNamedParam(startPos, orderedList, beginQuotePos);
 
     } else {
       if (nameParamStart < 0) {
         // no more params, add the rest
-        String sub = sql.substring(startPos, sql.length());
-        orderedList.appendSql(sub);
+        orderedList.appendSql(sql.substring(startPos));
 
       } else {
         // find the end of the parameter name
-        int endOfParam = nameParamStart + 1;
-        do {
-          char c = sql.charAt(endOfParam);
-          if (c != '_' && !Character.isLetterOrDigit(c)) {
-            break;
-          }
-          endOfParam++;
-        } while (endOfParam < sql.length());
-
+        int endOfParam = findEndOfParam(nameParamStart);
         // add the named parameter value to bindList
         String paramName = sql.substring(nameParamStart + 1, endOfParam);
+        Param param = extractNamedParam(paramName);
 
-        Param param;
-        if (paramName.startsWith(ENCRYPTKEY_PREFIX)) {
-          param = addEncryptKeyParam(paramName);
-        } else {
-          param = params.getParameter(paramName);
-        }
-
-        if (param == null) {
-          String msg = "Bind value is not set or null for [" + paramName + "] in [" + sql + "]";
-          throw new PersistenceException(msg);
-        }
-
-        String sub = sql.substring(startPos, nameParamStart);
-        orderedList.appendSql(sub);
-
-        // check if inValue is a Collection type...
+        orderedList.appendSql(sql.substring(startPos, nameParamStart));
         Object inValue = param.getInValue();
         if (inValue instanceof Collection<?>) {
-          // Chop up Collection parameter into a number
-          // of individual parameters
-          Collection<?> collection = (Collection<?>) inValue;
-          for (int c = 0; c < collection.size(); c++) {
-            if (c > 0) {
-              orderedList.appendSql(",");
-            }
-            orderedList.appendSql("?");
-          }
-          orderedList.add(param);
-
+          addCollectionParams(orderedList, param, (Collection<?>) inValue);
         } else {
-          // its a normal scalar value parameter...
-          orderedList.add(param);
-          orderedList.appendSql("?");
+          addScalarParam(orderedList, param);
         }
-
         // continue on after the end of the parameter
         parseNamedParams(endOfParam, orderedList);
       }
     }
+  }
+
+  private void addScalarParam(OrderedList orderedList, Param param) {
+    orderedList.add(param);
+    orderedList.appendSql("?");
+  }
+
+  private Param extractNamedParam(String paramName) {
+    Param param;
+    if (paramName.startsWith(ENCRYPTKEY_PREFIX)) {
+      param = addEncryptKeyParam(paramName);
+    } else {
+      param = params.getParameter(paramName);
+    }
+    if (param == null) {
+      throw new PersistenceException("Bind value is not set or null for [" + paramName + "] in [" + sql + "]");
+    }
+    return param;
+  }
+
+  private int findEndOfParam(int nameParamStart) {
+    int endOfParam = nameParamStart + 1;
+    do {
+      char c = sql.charAt(endOfParam);
+      if (c != '_' && !Character.isLetterOrDigit(c)) {
+        break;
+      }
+      endOfParam++;
+    } while (endOfParam < sql.length());
+    return endOfParam;
+  }
+
+  private void addNamedParam(int startPos, OrderedList orderedList, int beginQuotePos) {
+    // the quote precedes the named parameter...
+    // find and add up to the end quote
+    int endQuotePos = sql.indexOf(quote, beginQuotePos + 1);
+    String sub = sql.substring(startPos, endQuotePos + 1);
+    orderedList.appendSql(sub);
+
+    // start again after the end quote
+    parseNamedParams(endQuotePos + 1, orderedList);
+  }
+
+  private void addCollectionParams(OrderedList orderedList, Param param, Collection<?> inValue) {
+    // Chop up Collection parameter into a number of individual parameters
+    Collection<?> collection = inValue;
+    for (int c = 0; c < collection.size(); c++) {
+      if (c > 0) {
+        orderedList.appendSql(",");
+      }
+      orderedList.appendSql("?");
+    }
+    orderedList.add(param);
   }
 
   /**
@@ -198,15 +206,11 @@ public final class BindParamsParser {
    * Add an encryption key bind parameter.
    */
   private Param addEncryptKeyParam(String keyNamedParam) {
-
     int pos = keyNamedParam.indexOf(ENCRYPTKEY_GAP, ENCRYPTKEY_PREFIX_LEN);
-
     String tableName = keyNamedParam.substring(ENCRYPTKEY_PREFIX_LEN, pos);
     String columnName = keyNamedParam.substring(pos + ENCRYPTKEY_GAP_LEN);
-
     EncryptKey key = beanDescriptor.encryptKey(tableName, columnName);
     String strKey = key.getStringValue();
-
     return params.setEncryptionKey(keyNamedParam, strKey);
   }
 

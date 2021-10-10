@@ -35,7 +35,6 @@ public class TestUpdate extends BaseTestCase {
 
   @Test
   public void testNormal() {
-
     for (int i = 1; i <= 3; i++) {
       Update<Customer> update = DB.createUpdate(Customer.class,
         "update customer set smallnote = :smallnote where name in (:name)");
@@ -47,7 +46,6 @@ public class TestUpdate extends BaseTestCase {
 
   @Test
   public void testReuse() {
-
     Update<Customer> update = DB.createUpdate(Customer.class,
       "update customer set smallnote = :smallnote where name in (:name)");
     for (int i = 1; i <= 3; i++) {
@@ -59,7 +57,6 @@ public class TestUpdate extends BaseTestCase {
 
   @Test
   public void testReuseNoArray() {
-
     Update<Customer> update = DB.createUpdate(Customer.class,
       "update customer set smallnote = :smallnote where name = :name");
     for (int i = 1; i <= 3; i++) {
