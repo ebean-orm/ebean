@@ -93,7 +93,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     lock.lock();
     try {
       putCount++;
-      getClassContext(rootType).put(id, bean);
+      classContext(rootType).put(id, bean);
     } finally {
       lock.unlock();
     }
@@ -104,7 +104,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     lock.lock();
     try {
       putCount++;
-      return getClassContext(rootType).putIfAbsent(id, bean);
+      return classContext(rootType).putIfAbsent(id, bean);
     } finally {
       lock.unlock();
     }
@@ -117,7 +117,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   public Object get(Class<?> rootType, Object id) {
     lock.lock();
     try {
-      return getClassContext(rootType).get(id);
+      return classContext(rootType).get(id);
     } finally {
       lock.unlock();
     }
@@ -127,7 +127,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   public WithOption getWithOption(Class<?> rootType, Object id) {
     lock.lock();
     try {
-      return getClassContext(rootType).getWithOption(id);
+      return classContext(rootType).getWithOption(id);
     } finally {
       lock.unlock();
     }
@@ -223,7 +223,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     }
   }
 
-  private ClassContext getClassContext(Class<?> rootType) {
+  private ClassContext classContext(Class<?> rootType) {
     return typeCache.computeIfAbsent(rootType, k -> new ClassContext(rootType));
   }
 
