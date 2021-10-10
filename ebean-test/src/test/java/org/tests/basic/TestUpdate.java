@@ -7,6 +7,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.Arrays;
 
@@ -21,6 +22,7 @@ public class TestUpdate extends BaseTestCase {
 
   @BeforeEach
   public void createCustomers() {
+    ResetBasicData.reset();
     for (int i = 1; i <= 3; i++) {
       Customer cust = new Customer();
       cust.setName("testUpdate" + i);
