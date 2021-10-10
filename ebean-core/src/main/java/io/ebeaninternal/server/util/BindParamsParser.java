@@ -79,6 +79,7 @@ public final class BindParamsParser {
       preparedSql = sql;
     }
     params.setPreparedSql(preparedSql);
+    params.updateHash();
     return preparedSql;
   }
 
@@ -151,18 +152,15 @@ public final class BindParamsParser {
         Object inValue = param.getInValue();
         if (inValue instanceof Collection<?>) {
           // Chop up Collection parameter into a number
-          // of individual parameters and add each one individually
+          // of individual parameters
           Collection<?> collection = (Collection<?>) inValue;
-          int c = 0;
-          for (Object elVal : collection) {
-            if (++c > 1) {
+          for (int c = 0; c < collection.size(); c++) {
+            if (c > 0) {
               orderedList.appendSql(",");
             }
             orderedList.appendSql("?");
-            BindParams.Param elParam = new BindParams.Param();
-            elParam.setInValue(elVal);
-            orderedList.add(elParam);
           }
+          orderedList.add(param);
 
         } else {
           // its a normal scalar value parameter...

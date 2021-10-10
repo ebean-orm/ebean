@@ -285,12 +285,17 @@ public final class BindParams implements Serializable {
    */
   public boolean isSameBindHash() {
     if (bindHash == null) {
-      bindHash = calcQueryPlanHash();
       return false;
     }
-    String oldPlan = bindHash;
+    String newHash = calcQueryPlanHash();
+    return bindHash.equals(newHash);
+  }
+
+  /**
+   * Updates the hash.
+   */
+  public void updateHash() {
     bindHash = calcQueryPlanHash();
-    return bindHash.equals(oldPlan);
   }
 
   /**
