@@ -4,29 +4,12 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.12.2</version>
+    <version>12.12.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-core-type</artifactId>
-  <name>ebean core type</name>
-  <description>ebean scalar types api</description>
-
-  <dependencies>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-api</artifactId>
-      <version>12.12.2</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <optional>true</optional>
-    </dependency>
-
-  </dependencies>
+  <name>ebean external mapping api</name>
+  <description>API for mapping external named queries</description>
+  <artifactId>ebean-externalmapping-api</artifactId>
 
   <build>
     <plugins>
@@ -43,4 +26,5 @@
       </plugin>
     </plugins>
   </build>
+
 </project>

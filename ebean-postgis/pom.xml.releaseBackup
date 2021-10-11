@@ -4,12 +4,18 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.12.2</version>
+    <version>12.12.2-SNAPSHOT</version>
   </parent>
 
-  <name>ebean querybean</name>
-  <description>Ebean querybean support</description>
-  <artifactId>ebean-querybean</artifactId>
+  <name>ebean postgis</name>
+  <description>ebean postgis module</description>
+  <url>https://ebean.io/</url>
+
+  <artifactId>ebean-postgis</artifactId>
+
+  <properties>
+    <postgis.jdbc.version>2.2.1</postgis.jdbc.version>
+  </properties>
 
   <dependencies>
 
@@ -17,36 +23,47 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.12.2</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <!--
-    Class retention Nonnull and Nullable annotations
-    to assist with IDE auto-completion with Ebean API
-    -->
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>avaje-jsr305</artifactId>
-      <version>1.1</version>
+      <version>12.12.2-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>1.6</version>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
 
     <dependency>
-      <groupId>javax.validation</groupId>
-      <artifactId>validation-api</artifactId>
-      <version>2.0.1.Final</version>
-      <optional>true</optional>
+      <groupId>net.postgis</groupId>
+      <artifactId>postgis-jdbc</artifactId>
+      <version>[${postgis.jdbc.version}]</version>
     </dependency>
 
-    <!-- test dependencies -->
+    <!-- expected to be provided -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.8</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- expected to be provided -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.30</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- optionally use geolatte-geom -->
+    <dependency>
+      <groupId>org.geolatte</groupId>
+      <artifactId>geolatte-geom</artifactId>
+      <version>1.0.6</version>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
@@ -56,29 +73,8 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.12.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>querybean-generator</artifactId>
-      <version>12.12.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.12.2</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.0</version>
+      <version>12.12.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -89,11 +85,19 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>junit</artifactId>
+      <version>1.0</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Enhancement -->
+
+      <!-- for testing -->
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
@@ -108,6 +112,7 @@
       </plugin>
 
     </plugins>
+
   </build>
 
 </project>
