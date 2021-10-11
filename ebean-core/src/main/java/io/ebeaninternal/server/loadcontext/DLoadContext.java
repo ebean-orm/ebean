@@ -57,7 +57,7 @@ public final class DLoadContext implements LoadContext {
   private final ProfileLocation profileLocation;
   private final ProfilingListener profilingListener;
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
-  private PersistenceContext persistenceContext;
+  private final PersistenceContext persistenceContext;
   private List<OrmQueryProperties> secQuery;
   private Object tenantId;
 
@@ -249,19 +249,6 @@ public final class DLoadContext implements LoadContext {
   @Override
   public PersistenceContext getPersistenceContext() {
     return persistenceContext;
-  }
-
-  @Override
-  public void resetPersistenceContext(PersistenceContext persistenceContext) {
-    this.persistenceContext = persistenceContext;
-    // clear the load contexts for beans and beanCollections
-    for (DLoadBeanContext beanContext : beanMap.values()) {
-      beanContext.clear();
-    }
-    for (DLoadManyContext manyContext : manyMap.values()) {
-      manyContext.clear();
-    }
-    this.rootBeanContext.clear();
   }
 
   @Override
