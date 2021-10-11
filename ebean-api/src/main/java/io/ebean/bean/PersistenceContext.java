@@ -60,10 +60,15 @@ public interface PersistenceContext {
   int size(Class<?> rootType);
 
   /**
-   * Return a copy of the Persistence context to use for large query iteration.
+   * Signalizes the PersistenceContext, the begin for large query iteration.
    */
-  PersistenceContext forIterate();
+  void beginIterate();
 
+  /**
+   * Signalizes the PersistenceContext, the end for large query iteration.
+   */
+  void endIterate();
+  
   /**
    * Wrapper on a bean to also indicate if a bean has been deleted.
    * <p>
