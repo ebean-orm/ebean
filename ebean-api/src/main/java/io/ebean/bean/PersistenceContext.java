@@ -65,17 +65,6 @@ public interface PersistenceContext {
   PersistenceContext forIterate();
 
   /**
-   * Return a new Persistence context during iteration of large query result.
-   */
-  PersistenceContext forIterateReset();
-
-  /**
-   * Return true if the persistence context has grown and hit the 'reset limit'
-   * during large query iteration.
-   */
-  boolean resetLimit();
-
-  /**
    * Wrapper on a bean to also indicate if a bean has been deleted.
    * <p>
    * If a bean has been deleted then for the same persistence context is should

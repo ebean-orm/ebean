@@ -264,20 +264,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
-   * For iterate queries reset the persistenceContext and loadContext.
-   */
-  public void flushPersistenceContextOnIterate() {
-    if (persistenceContext.resetLimit()) {
-      persistenceContext = persistenceContext.forIterateReset();
-      loadContext.resetPersistenceContext(persistenceContext);
-      if (jsonRead != null) {
-        jsonRead.setPersistenceContext(persistenceContext);
-        jsonRead.setLoadContext(loadContext);
-      }
-    }
-  }
-
-  /**
    * Get the TransactionContext either explicitly set on the query or
    * transaction scoped.
    */
