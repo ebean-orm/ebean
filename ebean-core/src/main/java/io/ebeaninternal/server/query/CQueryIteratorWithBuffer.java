@@ -35,8 +35,6 @@ final class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
     try {
       if (buffer.isEmpty() && moreToLoad) {
         // load buffer
-        request.flushPersistenceContextOnIterate();
-
         int i = -1;
         while (moreToLoad && ++i < bufferSize) {
           if (cquery.hasNext()) {
