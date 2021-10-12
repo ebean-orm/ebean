@@ -2,11 +2,9 @@ package org.tests.basic;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiPersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
-
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -17,33 +15,25 @@ import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class TestPersistenceContext extends BaseTestCase {
+class TestPersistenceContext extends BaseTestCase {
 
   @Test
-  public void test() {
-
+  void test() {
     ResetBasicData.reset();
 
-    // implicit transaction with its own
-    // persistence context
+    // implicit transaction with its own persistence context
     Order oBefore = DB.find(Order.class, 1);
-
-    Order order = null;
-
     // start a persistence context
     DB.beginTransaction();
+
+    Order order;
     try {
-
       order = DB.find(Order.class, 1);
-
-      // not the same instance ...as a different
-      // persistence context
-      assertTrue(order != oBefore);
-
+      // not the same instance ...as a different persistence context
+      assertNotSame(order, oBefore);
 
       // finds an existing bean in the persistence context
       // ... so doesn't even execute a query
@@ -51,19 +41,17 @@ public class TestPersistenceContext extends BaseTestCase {
       Order o3 = DB.reference(Order.class, 1);
 
       // all the same instance
-      assertTrue(order == o2);
-      assertTrue(order == o3);
+      assertSame(order, o2);
+      assertSame(order, o3);
 
     } finally {
       DB.endTransaction();
     }
 
-    // implicit transaction with its own
-    // persistence context
+    // implicit transaction with its own persistence context
     Order oAfter = DB.find(Order.class, 1);
-
-    assertTrue(oAfter != oBefore);
-    assertTrue(oAfter != order);
+    assertNotSame(oAfter, oBefore);
+    assertNotSame(oAfter, order);
 
     // start a persistence context
     DB.beginTransaction();
@@ -76,13 +64,16 @@ public class TestPersistenceContext extends BaseTestCase {
         .setUseCache(false)
         .setId(id)
         .findOne();
+      assert customer != null;
 
       System.gc();
       Order order2 = DB.find(Order.class, orderId);
+      assert order2 != null;
       Customer customer2 = order2.getCustomer();
+      assert customer2 != null;
 
       assertEquals(customer.getId(), customer2.getId());
-      assertTrue(customer == customer2);
+      assertSame(customer, customer2);
 
     } finally {
       DB.endTransaction();
@@ -120,11 +111,10 @@ public class TestPersistenceContext extends BaseTestCase {
       });
     }
   }
-  
+
   @Disabled // run manually
   @Test
-  void testPcScopes() throws InterruptedException {
-
+  void testPcScopes_with_weakReferences() throws InterruptedException {
     for (int i = 0; i < 5000; i++) {
       Customer c = new Customer();
       c.setName("Customer #" + i);
@@ -141,12 +131,15 @@ public class TestPersistenceContext extends BaseTestCase {
         c.setSmallnote("one of the first 100");
       }
 
+      // use lastBean to hold onto a weak reference bean
       Customer[] lastBean = new Customer[1];
+      // findEach switches on use of weak reference in persistence context
       DB.find(Customer.class).setLazyLoadBatchSize(1).findEach(customer -> {
         if (customer.getId() <= 100) {
           assertEquals("one of the first 100", customer.getSmallnote());
           // nested finds
-          DB.find(Order.class).where().eq("customer", customer).findEach(20, consumer->{});
+          DB.find(Order.class).where().eq("customer", customer).findEach(20, consumer -> {
+          });
         } else {
           assertNotEquals("one of the first 100", customer.getSmallnote());
         }
@@ -154,30 +147,33 @@ public class TestPersistenceContext extends BaseTestCase {
       });
 
       SpiPersistenceContext pc = ((SpiTransaction) txn).getPersistenceContext();
-      System.out.println(pc.toString()); // Customer=size:5000 (4900 weak), Order=size:100 (100 weak)
-        
+      // the first 100 customers using strong references
+      assertThat(pc.toString()).contains("Customer=size:5000 (4900 weak)");
+      assertThat(pc.toString()).contains("Order=size:100 (100 weak)");
+
       System.gc();
       Thread.sleep(100);
       pc.get(Customer.class, 1); // trigger expungeStaleEntries
-      pc.get(Order.class, 1); // Checkme: Would it be a problem, that every classContext has its own queue
-      System.out.println(pc.toString()); // Customer=size:101 (1 weak), no orders
+      // pc.get(Order.class, 1);
+      assertThat(pc.toString()).contains("Customer=size:101 (1 weak)");
+      assertThat(pc.toString()).contains("Order=size:0 (0 weak)");
 
       first100 = DB.find(Customer.class).where().le("id", 100).findList();
       for (Customer c : first100) {
         assertEquals("one of the first 100", c.getSmallnote());
       }
       Customer lastBeanFromDb = DB.find(Customer.class).setId(lastBean[0].getId()).findOne();
-      assertTrue(lastBeanFromDb == lastBean[0]);
-      
+      assertSame(lastBeanFromDb, lastBean[0]);
+
       // read 200
-     DB.find(Customer.class).where().le("id", 200).findList();
-      System.out.println(pc.toString()); // Customer=size:201 (1 weak)
-      
-      lastBean[0] = null;
+      DB.find(Customer.class).where().le("id", 200).findList();
+      assertThat(pc.toString()).contains("Customer=size:201 (1 weak)");
+
+      lastBean[0] = null; // allow GC on this one
       lastBeanFromDb = null;
       System.gc();
       Thread.sleep(100);
-      System.out.println(pc.toString()); // Customer=size:200 (0 weak)
+      assertThat(pc.toString()).contains("Customer=size:200 (0 weak)");
     }
   }
 }

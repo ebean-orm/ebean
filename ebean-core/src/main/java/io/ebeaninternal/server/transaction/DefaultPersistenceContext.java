@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.bean.EntityBean;
-import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiBeanType;
 import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiPersistenceContext;
@@ -30,7 +29,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
 
   private final HashMap<Class<?>, ClassContext> typeCache = new HashMap<>();
   private final ReentrantLock lock = new ReentrantLock();
-  private final ReferenceQueue<Object> queue = new ReferenceQueue<Object>();
+  private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
   /**
    * When we are inside an iterate loop, we will add only WeakReferences. This
@@ -66,9 +65,6 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     }
   }
 
-  /**
-   * Set an object into the PersistenceContext.
-   */
   @Override
   public void put(Class<?> rootType, Object id, Object bean) {
     lock.lock();
@@ -116,9 +112,6 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     }
   }
 
-  /**
-   * Return the number of beans of the given type in the persistence context.
-   */
   @Override
   public int size(Class<?> rootType) {
     lock.lock();
@@ -131,9 +124,6 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     }
   }
 
-  /**
-   * Clear the PersistenceContext.
-   */
   @Override
   public void clear() {
     lock.lock();
@@ -210,10 +200,10 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   private void expungeStaleEntries() {
     Reference<?> ref;
     while ((ref = queue.poll()) != null) {
-      ((BeanRef)ref).expunge();
+      ((BeanRef) ref).expunge();
     }
   }
-  
+
   @Override
   public String toString() {
     lock.lock();
@@ -228,17 +218,15 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   private ClassContext classContext(Class<?> rootType) {
     return typeCache.computeIfAbsent(rootType, k -> new ClassContext(k, queue));
   }
-  
+
   private static class ClassContext {
 
     private final Map<Object, Object> map = new HashMap<>();
     private final Class<?> rootType;
     private final ReferenceQueue<Object> queue;
     private Set<Object> deleteSet;
-    
     private boolean useReferences;
     private int weakCount;
-
 
     private ClassContext(Class<?> rootType, ReferenceQueue<Object> queue) {
       this.rootType = rootType;
@@ -249,11 +237,10 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
      * When called with "true", initialize referenceQueue and store BeanRefs instead
      * of real object references.
      */
-    public ClassContext useReferences(boolean useReferences) {
+    private ClassContext useReferences(boolean useReferences) {
       this.useReferences = useReferences;
       return this;
     }
-
 
     @Override
     public String toString() {
@@ -263,7 +250,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     private Object get(Object id) {
       Object ret = map.get(id);
       if (ret instanceof BeanRef) {
-        return ((BeanRef)ret).get();
+        return ((BeanRef) ret).get();
       } else {
         return ret;
       }
@@ -291,7 +278,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     private void put(Object id, Object b) {
       if (useReferences) {
         weakCount++;
-        map.put(id, new BeanRef(this, id, b,  queue));
+        map.put(id, new BeanRef(this, id, b, queue));
       } else {
         map.put(id, b);
       }
@@ -327,7 +314,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     void dirtyBeans(SpiBeanTypeManager manager, List<Object> list) {
       final SpiBeanType beanType = manager.beanType(rootType);
       for (Object value : map.values()) {
-        if (queue != null && value instanceof BeanRef) {
+        if (value instanceof BeanRef) {
           value = ((BeanRef) value).get();
           if (value == null) continue;
         }

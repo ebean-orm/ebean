@@ -2,7 +2,6 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.*;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
