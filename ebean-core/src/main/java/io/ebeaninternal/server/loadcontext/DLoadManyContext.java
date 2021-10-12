@@ -48,7 +48,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
   /**
    * Reset the buffers for a query iterator reset.
    */
-  public void clear() {
+  private void clear() {
     if (bufferList != null) {
       bufferList.clear();
     }

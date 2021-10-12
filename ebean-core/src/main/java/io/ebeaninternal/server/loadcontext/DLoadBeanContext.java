@@ -46,7 +46,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
   /**
    * Reset the buffers after a query iterator reset.
    */
-  public void clear() {
+  private void clear() {
     if (bufferList != null) {
       bufferList.clear();
     }

@@ -145,24 +145,24 @@ class DefaultPersistenceContextTest {
   }
 
   @Test
-  void forIterate() {
+  void beginIterate() {
     final DefaultPersistenceContext pc = pcWith42();
     final Object origCustomer42 = pc.get(Customer.class, 42);
 
     // act
-    final PersistenceContext pcIterate = pc.forIterate();
-    assertThat(pc).isNotSameAs(pcIterate);
-    assertThat(pcIterate.size(Customer.class)).isEqualTo(1);
+    pc.beginIterate();
+    assertThat(pc.size(Customer.class)).isEqualTo(1);
 
     // assert same instance (bean effectively transferred to iterator persistence context
-    final Object customer42 = pcIterate.get(Customer.class, 42);
+    final Object customer42 = pc.get(Customer.class, 42);
     assertThat(customer42).isSameAs(origCustomer42);
-    final PersistenceContext.WithOption option = pcIterate.getWithOption(Customer.class, 42);
+    final PersistenceContext.WithOption option = pc.getWithOption(Customer.class, 42);
     assertThat(option.getBean()).isSameAs(origCustomer42);
+    pc.endIterate();
   }
 
   @Test
-  void forIterate_many() {
+  void beginIterate_many() throws InterruptedException {
     DefaultPersistenceContext pc = new DefaultPersistenceContext();
     addCustomers(pc, 1, 100);
     addContacts(pc, 1, 1010);
@@ -170,9 +170,22 @@ class DefaultPersistenceContextTest {
     assertThat(pc.size(Contact.class)).isEqualTo(1010);
 
     // act
-    final PersistenceContext pcIterate = pc.forIterate();
-    assertThat(pcIterate.size(Customer.class)).isEqualTo(100);
-    assertThat(pcIterate.size(Contact.class)).isEqualTo(1010);
+    pc.beginIterate();
+    assertThat(pc.size(Customer.class)).isEqualTo(100);
+    assertThat(pc.size(Contact.class)).isEqualTo(1010);
+    
+    addCustomers(pc, 200, 100);
+    addContacts(pc, 2000, 1010);
+    
+    assertThat(pc.size(Customer.class)).isEqualTo(200);
+    assertThat(pc.size(Contact.class)).isEqualTo(2020);
+    pc.endIterate();
+    
+    System.gc();
+    Thread.sleep(50); // give the GC some time
+    
+    assertThat(pc.size(Customer.class)).isEqualTo(100);
+    assertThat(pc.size(Contact.class)).isEqualTo(1010);
   }
 
   @Test

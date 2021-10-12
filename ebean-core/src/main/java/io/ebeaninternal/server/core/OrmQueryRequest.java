@@ -225,6 +225,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       createdTransaction = true;
     }
     persistenceContext = persistenceContext(query, transaction);
+    if (Type.ITERATE == query.getType()) {
+      persistenceContext.beginIterate();
+    }
     loadContext = new DLoadContext(this, secondaryQueries);
   }
 
@@ -233,6 +236,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void rollbackTransIfRequired() {
+    if (Type.ITERATE == query.getType()) {
+      persistenceContext.endIterate();
+    }
     if (createdTransaction) {
       try {
         transaction.end();
@@ -278,11 +284,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (scope == PersistenceContextScope.QUERY || t == null) {
       return new DefaultPersistenceContext();
     }
-    if (Type.ITERATE == query.getType()) {
-      return t.getPersistenceContext().forIterate();
-    } else {
-      return t.getPersistenceContext();
-    }
+    return t.getPersistenceContext();
   }
 
   /**
@@ -292,6 +294,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void endTransIfRequired() {
+    if (Type.ITERATE == query.getType()) {
+      persistenceContext.endIterate();
+    }
     if (createdTransaction && transaction.isActive()) {
       transaction.commit();
       if (query.getType().isUpdate()) {
