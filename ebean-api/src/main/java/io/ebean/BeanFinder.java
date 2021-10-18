@@ -97,7 +97,6 @@ public abstract class BeanFinder<I,T> {
   /**
    * Find an entity by ID returning an Optional.
    */
-  @Nullable
   public Optional<T> findByIdOrEmpty(I id) {
     return db().find(type).setId(id).findOneOrEmpty();
   }

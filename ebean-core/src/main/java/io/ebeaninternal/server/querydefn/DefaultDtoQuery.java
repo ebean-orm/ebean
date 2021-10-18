@@ -12,6 +12,7 @@ import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -114,6 +115,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     return server.findDtoList(this);
   }
 
+  @Nullable
   @Override
   public T findOne() {
     return server.findDtoOne(this);

@@ -16,6 +16,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -257,6 +258,7 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
   /**
    * DTO findOne query.
    */
+  @Nullable
   <T> T findDtoOne(SpiDtoQuery<T> query);
 
   /**

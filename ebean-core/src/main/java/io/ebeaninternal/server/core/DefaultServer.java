@@ -102,6 +102,7 @@ import io.ebeanservice.docstore.api.DocStoreIntegration;
 import org.slf4j.Logger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -497,7 +498,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return new DefaultBeanState((EntityBean) bean);
     }
     // Not an entity bean
-    return null;
+    return null; // throw new IllegalArgumentException("Bean is not an entity bean");
   }
 
   /**
@@ -1087,6 +1088,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Try to get the object out of the persistence context.
    */
+  @Nullable
   @SuppressWarnings("unchecked")
   private <T> T findIdCheckPersistenceContextAndCache(Transaction transaction, SpiQuery<T> query, Object id) {
     SpiTransaction t = (SpiTransaction) transaction;
@@ -1164,6 +1166,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return Optional.ofNullable(findOne(query, transaction));
   }
 
+  @Nullable
   @Override
   public <T> T findOne(Query<T> query, Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
@@ -1179,6 +1182,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return extractUnique(list);
   }
 
+  @Nullable
   private <T> T extractUnique(List<T> list) {
     if (list.isEmpty()) {
       return null;
@@ -1514,6 +1518,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nullable
   @Override
   public SqlRow findOne(SqlQuery query, Transaction t) {
     // no findId() method for SqlQuery...
@@ -1657,6 +1662,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  @Nullable
   @Override
   public <T> T findDtoOne(SpiDtoQuery<T> query) {
     DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
