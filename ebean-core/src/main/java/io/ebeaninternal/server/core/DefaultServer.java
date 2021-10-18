@@ -566,7 +566,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public Map<String, ValuePair> diff(Object a, Object b) {
     if (a == null) {
-      return null;
+      return Collections.emptyMap();
     }
     BeanDescriptor<?> desc = descriptor(a.getClass());
     return DiffHelp.diff(a, b, desc);
