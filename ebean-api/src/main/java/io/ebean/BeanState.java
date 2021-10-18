@@ -138,7 +138,6 @@ public interface BeanState {
   /**
    * Returns a map with load errors.
    */
-  @Nullable
   Map<String, Exception> loadErrors();
 
   /**

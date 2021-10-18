@@ -9,11 +9,7 @@ import javax.persistence.PersistenceException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -1164,7 +1160,7 @@ public final class EntityBeanIntercept implements Serializable {
    */
   public Map<String, Exception> getLoadErrors() {
     if (loadErrors == null) {
-      return null;
+      return Collections.emptyMap();
     }
     Map<String, Exception> ret = null;
     int len = getPropertyLength();

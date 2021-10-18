@@ -497,8 +497,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (bean instanceof EntityBean) {
       return new DefaultBeanState((EntityBean) bean);
     }
-    // Not an entity bean
-    return null; // throw new IllegalArgumentException("Bean is not an entity bean");
+    throw new IllegalArgumentException("Bean is not an entity bean");
   }
 
   /**
