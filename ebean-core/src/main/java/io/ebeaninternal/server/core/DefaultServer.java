@@ -2302,6 +2302,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
+  @Nullable
   private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, Transaction transaction) {
     BeanProperty idProperty = beanDesc.idProperty();
     Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);

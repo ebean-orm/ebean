@@ -1236,6 +1236,7 @@ public interface Database {
    * @param id          the bean id value
    * @param transaction the transaction to use (can be null)
    */
+  @Nullable
   <T> T find(Class<T> beanType, Object id, Transaction transaction);
 
   /**
