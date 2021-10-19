@@ -15,7 +15,6 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -267,7 +266,6 @@ public class TDSpiServer implements SpiServer {
     return null;
   }
 
-  @Nonnull
   @Override
   public <T> T reference(Class<T> beanType, Object id) {
     return null;
@@ -413,13 +411,11 @@ public class TDSpiServer implements SpiServer {
     return 0;
   }
 
-  @Nonnull
   @Override
   public Set<Property> checkUniqueness(Object bean) {
     return null;
   }
 
-  @Nonnull
   @Override
   public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     return null;

@@ -40,7 +40,6 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 import io.ebeanservice.docstore.api.support.DocStructure;
 
-import javax.annotation.Nonnull;
 import javax.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -813,7 +812,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the name of the property.
    */
   @Override
-  @Nonnull
   public String name() {
     return name;
   }
@@ -1299,7 +1297,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the property type.
    */
   @Override
-  @Nonnull
   public Class<?> type() {
     return propertyType;
   }

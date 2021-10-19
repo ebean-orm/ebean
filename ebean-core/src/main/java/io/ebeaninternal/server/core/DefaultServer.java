@@ -101,7 +101,6 @@ import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import org.slf4j.Logger;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
@@ -1159,7 +1158,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   public <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction) {
     return Optional.ofNullable(findOne(query, transaction));
@@ -1192,7 +1190,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <T> Set<T> findSet(Query<T> query, Transaction t) {
@@ -1209,7 +1206,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <K, T> Map<K, T> findMap(Query<T> query, Transaction t) {
@@ -1231,7 +1227,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   @SuppressWarnings("unchecked")
   public <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction t) {
@@ -1295,7 +1290,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   public <A, T> List<A> findIds(Query<T> query, Transaction t) {
     return findIdsWithCopy(((SpiQuery<T>) query).copy(), t);
@@ -1356,7 +1350,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   public <T> FutureRowCount<T> findFutureCount(Query<T> q, Transaction t) {
     SpiQuery<T> copy = ((SpiQuery<T>) q).copy();
@@ -1367,7 +1360,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return queryFuture;
   }
 
-  @Nonnull
   @Override
   public <T> FutureIds<T> findFutureIds(Query<T> query, Transaction t) {
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
@@ -1378,7 +1370,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return queryFuture;
   }
 
-  @Nonnull
   @Override
   public <T> FutureList<T> findFutureList(Query<T> query, Transaction t) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query.copy();
@@ -1396,7 +1387,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return queryFuture;
   }
 
-  @Nonnull
   @Override
   public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
@@ -1410,7 +1400,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return new LimitOffsetPagedList<>(this, spiQuery);
   }
 
-  @Nonnull
   @Override
   public <T> QueryIterator<T> findIterate(Query<T> query, Transaction t) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, t);
@@ -1423,13 +1412,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
     return findStream(query, transaction);
   }
 
-  @Nonnull
   @Override
   public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
     return toStream(findIterate(query, transaction));
@@ -1475,7 +1462,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // no try finally - findEachWhile guarantee's cleanup of the transaction if required
   }
 
-  @Nonnull
   @Override
   public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, transaction);
@@ -1487,7 +1473,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   public <T> List<T> findList(Query<T> query, Transaction t) {
     return findList(query, t, false);
@@ -1548,7 +1533,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  @Nonnull
   @Override
   public List<SqlRow> findList(SqlQuery query, Transaction t) {
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, t);
@@ -2271,7 +2255,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return checkUniqueness(bean, null);
   }
 
-  @Nonnull
   @Override
   public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     EntityBean entityBean = checkEntityBean(bean);

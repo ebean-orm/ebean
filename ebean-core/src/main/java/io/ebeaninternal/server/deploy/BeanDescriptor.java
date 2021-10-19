@@ -56,7 +56,6 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 import org.slf4j.Logger;
 
-import javax.annotation.Nonnull;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -1961,7 +1960,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the class type this BeanDescriptor describes.
    */
   @Override
-  @Nonnull
   public Class<T> type() {
     return beanType;
   }
@@ -1973,7 +1971,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * instead.
    */
   @Override
-  @Nonnull
   public String fullName() {
     return fullName;
   }
@@ -1982,7 +1979,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the short name of the entity bean.
    */
   @Override
-  @Nonnull
   public String name() {
     return name;
   }
@@ -2936,7 +2932,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   @Override
-  @Nonnull
   public Collection<? extends Property> allProperties() {
     return propertiesAll();
   }

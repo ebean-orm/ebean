@@ -1,6 +1,5 @@
 package org.tests.query.cache;
 
-import javax.annotation.Nonnull;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +16,6 @@ public class Contract {
 	private List<Position> positions;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "container", fetch = FetchType.LAZY)
-	@Nonnull
 	private List<AclContainerRelation> aclEntries = new ArrayList<>();
 
 	public Long getId() {

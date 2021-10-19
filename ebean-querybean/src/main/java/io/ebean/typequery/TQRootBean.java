@@ -28,7 +28,6 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -177,7 +176,6 @@ public abstract class TQRootBean<T, R> {
    * the find methods available on this 'root query bean' instance like findList().
    * </p>
    */
-  @Nonnull
   public Query<T> query() {
     return query;
   }
@@ -1621,7 +1619,6 @@ public abstract class TQRootBean<T, R> {
   /**
    * Execute the query returning an optional bean.
    */
-  @Nonnull
   public Optional<T> findOneOrEmpty() {
     return query.findOneOrEmpty();
   }
@@ -1643,7 +1640,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @see Query#findList()
    */
-  @Nonnull
   public List<T> findList() {
     return query.findList();
   }
@@ -1667,7 +1663,6 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  @Nonnull
   public Stream<T> findStream() {
     return query.findStream();
   }
@@ -1697,7 +1692,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @see Query#findSet()
    */
-  @Nonnull
   public Set<T> findSet() {
     return query.findSet();
   }
@@ -1710,7 +1704,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @see Query#findIds()
    */
-  @Nonnull
   public <A> List<A> findIds() {
     return query.findIds();
   }
@@ -1736,7 +1729,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @see Query#findMap()
    */
-  @Nonnull
   public <K> Map<K, T> findMap() {
     return query.findMap();
   }
@@ -1777,7 +1769,6 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  @Nonnull
   public QueryIterator<T> findIterate() {
     return query.findIterate();
   }
@@ -1798,7 +1789,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @return the list of values for the selected property
    */
-  @Nonnull
   public <A> List<A> findSingleAttributeList() {
     return query.findSingleAttributeList();
   }
@@ -1913,7 +1903,6 @@ public abstract class TQRootBean<T, R> {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
-  @Nonnull
   public List<Version<T>> findVersions() {
     return query.findVersions();
   }
@@ -1925,7 +1914,6 @@ public abstract class TQRootBean<T, R> {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
-  @Nonnull
   public List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end) {
     return query.findVersionsBetween(start, end);
   }
@@ -1936,7 +1924,6 @@ public abstract class TQRootBean<T, R> {
    * This is the number of 'top level' or 'root level' entities.
    * </p>
    */
-  @Nonnull
   public int findCount() {
     return query.findCount();
   }
@@ -1951,7 +1938,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @return a Future object for the row count query
    */
-  @Nonnull
   public FutureRowCount<T> findFutureCount() {
     return query.findFutureCount();
   }
@@ -1966,7 +1952,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @return a Future object for the list of Id's
    */
-  @Nonnull
   public FutureIds<T> findFutureIds() {
     return query.findFutureIds();
   }
@@ -1980,7 +1965,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @return a Future object for the list result of the query
    */
-  @Nonnull
   public FutureList<T> findFutureList() {
     return query.findFutureList();
   }
@@ -2014,7 +1998,6 @@ public abstract class TQRootBean<T, R> {
    *
    * @return The PagedList
    */
-  @Nonnull
   public PagedList<T> findPagedList() {
     return query.findPagedList();
   }
@@ -2047,7 +2030,6 @@ public abstract class TQRootBean<T, R> {
   /**
    * Return the type of beans being queried.
    */
-  @Nonnull
   public Class<T> getBeanType() {
     return query.getBeanType();
   }
@@ -2055,7 +2037,6 @@ public abstract class TQRootBean<T, R> {
   /**
    * Return the expression list that has been built for this query.
    */
-  @Nonnull
   public ExpressionList<T> getExpressionList() {
     return query.where();
   }
