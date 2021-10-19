@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +42,6 @@ public interface DtoQuery<T> extends CancelableQuery {
   /**
    * Execute the query returning a list.
    */
-  @Nonnull
   List<T> findList();
 
   /**
@@ -53,7 +51,6 @@ public interface DtoQuery<T> extends CancelableQuery {
    * resultSet and potentially connection and MUST be closed. We should use
    * QueryIterator in a <em>try with resource block</em>.
    */
-  @Nonnull
   QueryIterator<T> findIterate();
 
   /**
@@ -63,7 +60,6 @@ public interface DtoQuery<T> extends CancelableQuery {
    * resultSet and potentially connection and MUST be closed. We should use
    * the Stream in a <em>try with resource block</em>.
    */
-  @Nonnull
   Stream<T> findStream();
 
   /**
@@ -105,7 +101,6 @@ public interface DtoQuery<T> extends CancelableQuery {
   /**
    * Execute the query returning an optional bean.
    */
-  @Nonnull
   Optional<T> findOneOrEmpty();
 
   /**

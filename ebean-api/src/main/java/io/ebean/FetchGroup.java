@@ -2,8 +2,6 @@ package io.ebean;
 
 import io.ebean.service.SpiFetchGroupQuery;
 
-import javax.annotation.Nonnull;
-
 /**
  * Defines what part of the object graph to load (select and fetch clauses).
  * <p>
@@ -83,7 +81,6 @@ public interface FetchGroup<T> {
    *
    * @return The FetchGroup with the given select clause
    */
-  @Nonnull
   static <T> FetchGroup<T> of(Class<T> cls, String select) {
     return XServiceProvider.fetchGroupOf(cls, select);
   }
@@ -108,7 +105,6 @@ public interface FetchGroup<T> {
    *
    * @return The FetchGroupBuilder with the given select clause which we will add fetch clauses to
    */
-  @Nonnull
   static <T> FetchGroupBuilder<T> of(Class<T> cls) {
     return XServiceProvider.fetchGroupOf(cls);
   }

@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -139,7 +138,6 @@ public class Finder<I, T> {
    * <p>
    * Equivalent to {@link Database#reference(Class, Object)}
    */
-  @Nonnull
   public T ref(I id) {
     return db().reference(type, id);
   }
@@ -166,7 +164,6 @@ public class Finder<I, T> {
   /**
    * Retrieves all entities of the given type.
    */
-  @Nonnull
   public List<T> all() {
     return query().findList();
   }

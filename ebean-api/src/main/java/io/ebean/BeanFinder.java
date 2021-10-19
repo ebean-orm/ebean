@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
@@ -81,7 +80,6 @@ public abstract class BeanFinder<I,T> {
    * <p>
    * Equivalent to {@link Database#reference(Class, Object)}
    */
-  @Nonnull
   public T ref(I id) {
     return db().reference(type, id);
   }
@@ -111,7 +109,6 @@ public abstract class BeanFinder<I,T> {
   /**
    * Retrieves all entities of the given type.
    */
-  @Nonnull
   public List<T> findAll() {
     return query().findList();
   }

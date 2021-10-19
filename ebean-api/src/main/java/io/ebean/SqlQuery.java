@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -42,7 +41,6 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   /**
    * Execute the query returning a list.
    */
-  @Nonnull
   List<SqlRow> findList();
 
   /**
@@ -119,7 +117,6 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   /**
    * Execute the query returning an optional row.
    */
-  @Nonnull
   Optional<SqlRow> findOneOrEmpty();
 
   /**

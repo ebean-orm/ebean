@@ -10,7 +10,6 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -949,7 +948,6 @@ public interface Database {
    * @param beanType the type of entity bean
    * @param id       the id value
    */
-  @Nonnull
   <T> T reference(Class<T> beanType, Object id);
 
   /**
@@ -1295,13 +1293,11 @@ public interface Database {
    * @param bean The entity bean to check uniqueness on
    * @return a set of Properties if constraint validation was detected or empty list.
    */
-  @Nonnull
   Set<Property> checkUniqueness(Object bean);
 
   /**
    * Same as {@link #checkUniqueness(Object)}. but with given transaction.
    */
-  @Nonnull
   Set<Property> checkUniqueness(Object bean, Transaction transaction);
 
   /**
