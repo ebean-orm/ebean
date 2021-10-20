@@ -663,9 +663,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <T> T reference(Class<T> type, Object id) {
-    if (id == null) {
-      throw new NullPointerException("The id is null");
-    }
+    Objects.requireNonNull(id);
     BeanDescriptor desc = descriptor(type);
     id = desc.convertId(id);
     PersistenceContext pc = null;
@@ -835,12 +833,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   @SuppressWarnings("unchecked")
   public <T> void sort(List<T> list, String sortByClause) {
-    if (list == null) {
-      throw new NullPointerException("list is null");
-    }
-    if (sortByClause == null) {
-      throw new NullPointerException("sortByClause is null");
-    }
+    Objects.requireNonNull(list);
+    Objects.requireNonNull(sortByClause);
     if (list.isEmpty()) {
       // don't need to sort an empty list
       return;
@@ -1045,9 +1039,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> T find(Class<T> beanType, Object id, @Nullable Transaction t) {
-    if (id == null) {
-      throw new NullPointerException("The id is null");
-    }
+    Objects.requireNonNull(id);
     Query<T> query = createQuery(beanType).setId(id);
     return findId(query, t);
   }
@@ -1774,7 +1766,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> T publish(Class<T> beanType, Object id, Transaction transaction) {
+  public <T> T publish(Class<T> beanType, Object id, @Nullable Transaction transaction) {
     Query<T> query = find(beanType).setId(id);
     List<T> liveBeans = publish(query, transaction);
     return (liveBeans.size() == 1) ? liveBeans.get(0) : null;
@@ -1786,7 +1778,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> T draftRestore(Class<T> beanType, Object id, Transaction transaction) {
+  public <T> T draftRestore(Class<T> beanType, Object id, @Nullable Transaction transaction) {
     Query<T> query = find(beanType).setId(id);
     List<T> beans = draftRestore(query, transaction);
     return (beans.size() == 1) ? beans.get(0) : null;
@@ -1803,9 +1795,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private EntityBean checkEntityBean(Object bean) {
-    if (bean == null) {
-      throw new IllegalArgumentException("The bean is null?");
-    }
+    Objects.requireNonNull(bean);
     if (!(bean instanceof EntityBean)) {
       throw new IllegalArgumentException("Was expecting an EntityBean but got a " + bean.getClass());
     }
