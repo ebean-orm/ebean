@@ -72,12 +72,12 @@ public class TestTransactionCallback extends BaseTestCase {
 
   @Test
   public void test_noActiveTransaction() {
-    assertThrows(NullPointerException.class, () -> DB.register(new MyCallback()));
+    assertThrows(PersistenceException.class, () -> DB.register(new MyCallback()));
   }
 
   @Test
   public void test_noActiveTransaction_withDatabase() {
-    assertThrows(NullPointerException.class, () -> DB.getDefault().register(new MyCallback()));
+    assertThrows(PersistenceException.class, () -> DB.getDefault().register(new MyCallback()));
   }
 
   class MyCallback extends TransactionCallbackAdapter {
