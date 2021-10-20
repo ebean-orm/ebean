@@ -1711,6 +1711,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return executeInTrans((txn) -> persister.publish(query, txn), transaction);
   }
 
+  @Nullable
   @Override
   public <T> T publish(Class<T> beanType, Object id) {
     return publish(beanType, id, null);
@@ -1721,6 +1722,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return publish(query, null);
   }
 
+  @Nullable
   @Override
   public <T> T publish(Class<T> beanType, Object id, @Nullable Transaction transaction) {
     Query<T> query = find(beanType).setId(id);
@@ -1733,6 +1735,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return executeInTrans((txn) -> persister.draftRestore(query, txn), transaction);
   }
 
+  @Nullable
   @Override
   public <T> T draftRestore(Class<T> beanType, Object id, @Nullable Transaction transaction) {
     Query<T> query = find(beanType).setId(id);
@@ -1740,6 +1743,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return (beans.size() == 1) ? beans.get(0) : null;
   }
 
+  @Nullable
   @Override
   public <T> T draftRestore(Class<T> beanType, Object id) {
     return draftRestore(beanType, id, null);

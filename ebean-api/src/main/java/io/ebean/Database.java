@@ -576,8 +576,8 @@ public interface Database {
   <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery);
 
   /**
-   * Look to execute a native sql query that does not returns beans but instead
-   * returns SqlRow or direct access to ResultSet (see {@link SqlQuery#findList(RowMapper)}.
+   * Look to execute a native sql query that does not return beans but instead
+   * returns SqlRow or direct access to ResultSet.
    *
    * <p>
    * Refer to {@link DtoQuery} for native sql queries returning DTO beans.
@@ -1613,6 +1613,7 @@ public interface Database {
    * @param id          the id of the entity bean
    * @param transaction the transaction the publish process should use (can be null)
    */
+  @Nullable
   <T> T publish(Class<T> beanType, Object id, Transaction transaction);
 
   /**
@@ -1626,6 +1627,7 @@ public interface Database {
    * @param beanType the type of the entity bean
    * @param id       the id of the entity bean
    */
+  @Nullable
   <T> T publish(Class<T> beanType, Object id);
 
   /**
@@ -1664,6 +1666,7 @@ public interface Database {
    * @param id          the id of the entity bean to restore
    * @param transaction the transaction the restore process should use (can be null)
    */
+  @Nullable
   <T> T draftRestore(Class<T> beanType, Object id, Transaction transaction);
 
   /**
@@ -1677,6 +1680,7 @@ public interface Database {
    * @param beanType the type of the entity bean
    * @param id       the id of the entity bean to restore
    */
+  @Nullable
   <T> T draftRestore(Class<T> beanType, Object id);
 
   /**
