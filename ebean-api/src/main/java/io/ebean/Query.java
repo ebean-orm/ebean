@@ -1,6 +1,7 @@
 package io.ebean;
 
-import javax.annotation.Nullable;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import javax.persistence.NonUniqueResultException;
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -176,6 +177,7 @@ import java.util.stream.Stream;
  *
  * @param <T> the type of Entity bean this query will fetch.
  */
+@NonNullApi
 public interface Query<T> extends CancelableQuery {
 
   /**

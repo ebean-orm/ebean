@@ -1,12 +1,12 @@
 package io.ebean;
 
+import io.avaje.lang.Nullable;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
-import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;

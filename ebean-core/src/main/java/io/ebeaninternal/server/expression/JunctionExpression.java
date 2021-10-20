@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.expression;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.DtoQuery;
@@ -48,6 +50,7 @@ import java.util.function.Predicate;
 /**
  * Junction implementation.
  */
+@NonNullApi
 final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
   DefaultExpressionList<T> exprList;
@@ -476,6 +479,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
     return exprList.findSet();
   }
 
+  @Nullable
   @Override
   public T findOne() {
     return exprList.findOne();

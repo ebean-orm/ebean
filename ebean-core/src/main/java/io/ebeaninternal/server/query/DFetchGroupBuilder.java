@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.avaje.lang.NonNullApi;
 import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
 import io.ebean.FetchGroupBuilder;
@@ -9,14 +10,12 @@ import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 /**
  * Default implementation of the FetchGroupBuilder.
  */
+@NonNullApi
 final class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
 
   private static final FetchConfig DEFAULT_FETCH = FetchConfig.ofDefault();
-
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
-
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
-
   private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private final OrmQueryDetail detail;
@@ -38,22 +37,22 @@ final class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
   }
 
   @Override
-  public FetchGroupBuilder<T> fetch(String path, FetchGroup nestedGroup) {
+  public FetchGroupBuilder<T> fetch(String path, FetchGroup<?> nestedGroup) {
     return fetchNested(path, nestedGroup, DEFAULT_FETCH);
   }
 
   @Override
-  public FetchGroupBuilder<T> fetchQuery(String path, FetchGroup nestedGroup) {
+  public FetchGroupBuilder<T> fetchQuery(String path, FetchGroup<?> nestedGroup) {
     return fetchNested(path, nestedGroup, FETCH_QUERY);
   }
 
   @Override
-  public FetchGroupBuilder<T> fetchLazy(String path, FetchGroup nestedGroup) {
+  public FetchGroupBuilder<T> fetchLazy(String path, FetchGroup<?> nestedGroup) {
     return fetchNested(path, nestedGroup, FETCH_LAZY);
   }
 
-  private FetchGroupBuilder<T> fetchNested(String path, FetchGroup nestedGroup, FetchConfig fetchConfig) {
-    OrmQueryDetail nestedDetail = ((SpiFetchGroup) nestedGroup).underlying();
+  private FetchGroupBuilder<T> fetchNested(String path, FetchGroup<?> nestedGroup, FetchConfig fetchConfig) {
+    OrmQueryDetail nestedDetail = ((SpiFetchGroup<?>) nestedGroup).underlying();
     detail.addNested(path, nestedDetail, fetchConfig);
     return this;
   }

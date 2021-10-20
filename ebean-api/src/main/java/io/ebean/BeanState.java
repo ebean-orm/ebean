@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 

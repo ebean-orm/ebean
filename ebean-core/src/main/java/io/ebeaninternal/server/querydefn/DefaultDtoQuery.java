@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.avaje.lang.NonNullApi;
 import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
 import io.ebean.QueryIterator;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 /**
  * Default implementation of DtoQuery.
  */
+@NonNullApi
 public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQuery<T> {
 
   private final SpiEbeanServer server;
@@ -208,6 +210,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     return label;
   }
 
+  @Nullable
   @Override
   public String getPlanLabel() {
     if (label != null) {

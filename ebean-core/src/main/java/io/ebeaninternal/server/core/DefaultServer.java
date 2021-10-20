@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.core;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.AutoTune;
 import io.ebean.BackgroundExecutor;
 import io.ebean.BeanState;
@@ -101,7 +103,6 @@ import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import org.slf4j.Logger;
 
-import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -125,6 +126,7 @@ import static java.util.stream.StreamSupport.stream;
 /**
  * The default server side implementation of EbeanServer.
  */
+@NonNullApi
 public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final Logger log = CoreLog.internal;
@@ -271,6 +273,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return lazyLoadBatchSize;
   }
 
+  @Nullable
   @Override
   public Object currentTenantId() {
     return currentTenantProvider == null ? null : currentTenantProvider.currentId();
@@ -563,7 +566,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Map<String, ValuePair> diff(Object a, Object b) {
+  public Map<String, ValuePair> diff(@Nullable Object a, Object b) {
     if (a == null) {
       return Collections.emptyMap();
     }
@@ -617,7 +620,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  private void executeSql(Connection connection, String sql) throws SQLException {
+  private void executeSql(Connection connection, @Nullable String sql) throws SQLException {
     if (sql != null) {
       try (PreparedStatement stmt = connection.prepareStatement(sql)) {
         transactionManager.log().sql().debug(sql);
@@ -723,7 +726,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> T executeCall(TxScope scope, Callable<T> c) {
+  public <T> T executeCall(@Nullable TxScope scope, Callable<T> c) {
     ScopedTransaction scopeTrans = transactionManager.beginScopedTransaction(scope);
     try {
       return c.call();
@@ -742,7 +745,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void execute(TxScope scope, Runnable r) {
+  public void execute(@Nullable TxScope scope, Runnable r) {
     ScopedTransaction t = transactionManager.beginScopedTransaction(scope);
     try {
       r.run();
@@ -765,6 +768,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     transactionManager.exitScopedTransaction(returnOrThrowable, opCode);
   }
 
+  @Nullable
   @Override
   public SpiTransaction currentServerTransaction() {
     return transactionManager.active();
@@ -894,7 +898,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void merge(Object bean, MergeOptions options, Transaction transaction) {
+  public void merge(Object bean, MergeOptions options, @Nullable Transaction transaction) {
     BeanDescriptor<?> desc = descriptor(bean.getClass());
     if (desc == null) {
       throw new PersistenceException(bean.getClass().getName() + " is NOT an Entity Bean registered with this server?");
@@ -1040,7 +1044,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Find a bean using its unique id.
    */
   @Override
-  public <T> T find(Class<T> beanType, Object id, Transaction t) {
+  public <T> T find(Class<T> beanType, Object id, @Nullable Transaction t) {
     if (id == null) {
       throw new NullPointerException("The id is null");
     }
@@ -1048,20 +1052,20 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return findId(query, t);
   }
 
-  <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, Transaction t) {
+  <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, @Nullable Transaction t) {
     SpiOrmQueryRequest<T> request = buildQueryRequest(type, query, t);
     request.prepareQuery();
     return request;
   }
 
-  <T> SpiOrmQueryRequest<T> buildQueryRequest(Type type, Query<T> query, Transaction t) {
+  <T> SpiOrmQueryRequest<T> buildQueryRequest(Type type, Query<T> query, @Nullable Transaction t) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(type);
     spiQuery.checkNamedParameters();
     return buildQueryRequest(spiQuery, t);
   }
 
-  private <T> SpiOrmQueryRequest<T> buildQueryRequest(SpiQuery<T> query, Transaction t) {
+  private <T> SpiOrmQueryRequest<T> buildQueryRequest(SpiQuery<T> query, @Nullable Transaction t) {
     if (t == null) {
       t = currentServerTransaction();
     }
@@ -1088,7 +1092,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Nullable
   @SuppressWarnings("unchecked")
-  private <T> T findIdCheckPersistenceContextAndCache(Transaction transaction, SpiQuery<T> query, Object id) {
+  private <T> T findIdCheckPersistenceContextAndCache(@Nullable Transaction transaction, SpiQuery<T> query, Object id) {
     SpiTransaction t = (SpiTransaction) transaction;
     if (t == null) {
       t = currentServerTransaction();
@@ -1133,8 +1137,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return (scope != null) ? scope : defaultPersistenceContextScope;
   }
 
+  @Nullable
   @SuppressWarnings("unchecked")
-  private <T> T findId(Query<T> query, Transaction t) {
+  private <T> T findId(Query<T> query, @Nullable Transaction t) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(Type.BEAN);
     if (SpiQuery.Mode.NORMAL == spiQuery.getMode() && !spiQuery.isForceHitDatabase()) {
@@ -1165,7 +1170,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Nullable
   @Override
-  public <T> T findOne(Query<T> query, Transaction transaction) {
+  public <T> T findOne(Query<T> query, @Nullable Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     if (spiQuery.isFindById()) {
       // actually a find by Id query
@@ -1208,7 +1213,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public <K, T> Map<K, T> findMap(Query<T> query, Transaction t) {
+  public <K, T> Map<K, T> findMap(Query<T> query, @Nullable Transaction t) {
     SpiOrmQueryRequest request = createQueryRequest(Type.MAP, query, t);
     request.resetBeanCacheAutoMode(false);
     if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
@@ -1244,7 +1249,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> int findCount(Query<T> query, Transaction t) {
+  public <T> int findCount(Query<T> query, @Nullable Transaction t) {
     SpiQuery<T> spiQuery = ((SpiQuery<T>) query);
     if (!spiQuery.isDistinct()) {
       spiQuery = spiQuery.copy();
@@ -1253,7 +1258,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> int findCountWithCopy(Query<T> query, Transaction t) {
+  public <T> int findCountWithCopy(Query<T> query, @Nullable Transaction t) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.COUNT, query, t);
     Integer result = request.getFromQueryCache();
     if (result != null) {
@@ -1463,7 +1468,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction) {
+  public <T> List<Version<T>> findVersions(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.LIST, query, transaction);
     try {
       request.initTransIfRequired();
@@ -1479,7 +1484,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> List<T> findList(Query<T> query, Transaction t, boolean findOne) {
+  private <T> List<T> findList(Query<T> query, @Nullable Transaction t, boolean findOne) {
     SpiOrmQueryRequest<T> request = buildQueryRequest(Type.LIST, query, t);
     request.resetBeanCacheAutoMode(findOne);
     if ((t == null || !t.isSkipCache()) && request.getFromBeanCache()) {
@@ -1669,7 +1674,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Save the bean with an explicit transaction.
    */
   @Override
-  public void save(Object bean, Transaction t) {
+  public void save(Object bean, @Nullable Transaction t) {
     persister.save(checkEntityBean(bean), t);
   }
 
@@ -1688,7 +1693,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void update(Object bean, Transaction t) {
+  public void update(Object bean, @Nullable Transaction t) {
     persister.update(checkEntityBean(bean), t);
   }
 
@@ -1701,7 +1706,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Update all beans in the collection with an explicit transaction.
    */
   @Override
-  public void updateAll(Collection<?> beans, Transaction transaction) {
+  public void updateAll(@Nullable Collection<?> beans, @Nullable Transaction transaction) {
     if (beans == null || beans.isEmpty()) {
       return;
     }
@@ -1725,7 +1730,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Insert the bean with a transaction.
    */
   @Override
-  public void insert(Object bean, Transaction t) {
+  public void insert(Object bean, @Nullable Transaction t) {
     persister.insert(checkEntityBean(bean), t);
   }
 
@@ -1741,7 +1746,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Insert all beans in the collection with a transaction.
    */
   @Override
-  public void insertAll(Collection<?> beans, Transaction transaction) {
+  public void insertAll(@Nullable Collection<?> beans, @Nullable Transaction transaction) {
     if (beans == null || beans.isEmpty()) {
       return;
     }
@@ -1754,7 +1759,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> List<T> publish(Query<T> query, Transaction transaction) {
+  public <T> List<T> publish(Query<T> query, @Nullable Transaction transaction) {
     return executeInTrans((txn) -> persister.publish(query, txn), transaction);
   }
 
@@ -1776,7 +1781,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
+  public <T> List<T> draftRestore(Query<T> query, @Nullable Transaction transaction) {
     return executeInTrans((txn) -> persister.draftRestore(query, txn), transaction);
   }
 
@@ -1825,7 +1830,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Save all beans in the iterator with an explicit transaction.
    */
-  private int saveAllInternal(Collection<?> beans, Transaction transaction) {
+  private int saveAllInternal(@Nullable Collection<?> beans, @Nullable Transaction transaction) {
     if (beans == null || beans.isEmpty()) {
       return 0;
     }
@@ -1847,7 +1852,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int delete(Class<?> beanType, Object id, Transaction transaction) {
+  public int delete(Class<?> beanType, Object id, @Nullable Transaction transaction) {
     return delete(beanType, id, transaction, false);
   }
 
@@ -1857,11 +1862,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int deletePermanent(Class<?> beanType, Object id, Transaction transaction) {
+  public int deletePermanent(Class<?> beanType, Object id, @Nullable Transaction transaction) {
     return delete(beanType, id, transaction, true);
   }
 
-  private int delete(Class<?> beanType, Object id, Transaction transaction, boolean permanent) {
+  private int delete(Class<?> beanType, Object id, @Nullable Transaction transaction, boolean permanent) {
     return executeInTrans((txn) -> persister.delete(beanType, id, txn, permanent), transaction);
   }
 
@@ -1871,7 +1876,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int deleteAll(Class<?> beanType, Collection<?> ids, Transaction t) {
+  public int deleteAll(Class<?> beanType, Collection<?> ids, @Nullable Transaction t) {
     return deleteAll(beanType, ids, t, false);
   }
 
@@ -1881,11 +1886,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction t) {
+  public int deleteAllPermanent(Class<?> beanType, Collection<?> ids, @Nullable Transaction t) {
     return deleteAll(beanType, ids, t, true);
   }
 
-  private int deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction, boolean permanent) {
+  private int deleteAll(Class<?> beanType, Collection<?> ids, @Nullable Transaction transaction, boolean permanent) {
     return executeInTrans((txn) -> persister.deleteMany(beanType, ids, txn, permanent), transaction);
   }
 
@@ -1901,7 +1906,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Delete the bean with the explicit transaction.
    */
   @Override
-  public boolean delete(Object bean, Transaction t) throws OptimisticLockException {
+  public boolean delete(Object bean, @Nullable Transaction t) throws OptimisticLockException {
     // this should really return an int where -1 means jdbc batch/unknown
     return persister.delete(checkEntityBean(bean), t, false) != 0;
   }
@@ -1912,7 +1917,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public boolean deletePermanent(Object bean, Transaction t) throws OptimisticLockException {
+  public boolean deletePermanent(Object bean, @Nullable Transaction t) throws OptimisticLockException {
     // this should really return an int where -1 means jdbc batch/unknown
     return persister.delete(checkEntityBean(bean), t, true) != 0;
   }
@@ -1923,7 +1928,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int deleteAllPermanent(Collection<?> beans, Transaction t) {
+  public int deleteAllPermanent(Collection<?> beans, @Nullable Transaction t) {
     return deleteAllInternal(beans, t, true);
   }
 
@@ -1939,14 +1944,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Delete all the beans in the collection.
    */
   @Override
-  public int deleteAll(Collection<?> beans, Transaction t) {
+  public int deleteAll(Collection<?> beans, @Nullable Transaction t) {
     return deleteAllInternal(beans, t, false);
   }
 
   /**
    * Delete all the beans in the iterator with an explicit transaction.
    */
-  private int deleteAllInternal(Collection<?> beans, Transaction transaction, boolean permanent) {
+  private int deleteAllInternal(@Nullable Collection<?> beans, @Nullable Transaction transaction, boolean permanent) {
     if (beans == null || beans.isEmpty()) {
       return 0;
     }
@@ -1966,7 +1971,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Execute the CallableSql with an explicit transaction.
    */
   @Override
-  public int execute(CallableSql callSql, Transaction t) {
+  public int execute(CallableSql callSql, @Nullable Transaction t) {
     return persister.executeCallable(callSql, t);
   }
 
@@ -1982,7 +1987,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Execute the updateSql with an explicit transaction.
    */
   @Override
-  public int execute(SqlUpdate updSql, Transaction t) {
+  public int execute(SqlUpdate updSql, @Nullable Transaction t) {
     return persister.executeSqlUpdate(updSql, t);
   }
 
@@ -1992,12 +1997,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void addBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
+  public void addBatch(SpiSqlUpdate sqlUpdate, @Nullable SpiTransaction transaction) {
     persister.addBatch(sqlUpdate, transaction);
   }
 
   @Override
-  public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
+  public int[] executeBatch(SpiSqlUpdate sqlUpdate, @Nullable SpiTransaction transaction) {
     return persister.executeBatch(sqlUpdate, transaction);
   }
 
@@ -2013,7 +2018,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Execute the updateSql with an explicit transaction.
    */
   @Override
-  public int execute(Update<?> update, Transaction t) {
+  public int execute(Update<?> update, @Nullable Transaction t) {
     return persister.executeOrmUpdate(update, t);
   }
 
@@ -2171,7 +2176,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
-  private <P> P executeInTrans(Function<SpiTransaction, P> fun, Transaction t) {
+  private <P> P executeInTrans(Function<SpiTransaction, P> fun, @Nullable Transaction t) {
     ObtainedTransaction wrap = initTransIfRequired(t);
     try {
       P result = fun.apply(wrap.transaction());
@@ -2188,7 +2193,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Create a transaction if one is not currently active.
    */
-  ObtainedTransaction initTransIfRequired(Transaction t) {
+  ObtainedTransaction initTransIfRequired(@Nullable Transaction t) {
     if (t != null) {
       return new ObtainedTransaction((SpiTransaction) t);
     }
@@ -2256,7 +2261,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+  public Set<Property> checkUniqueness(Object bean, @Nullable Transaction transaction) {
     EntityBean entityBean = checkEntityBean(bean);
     BeanDescriptor<?> beanDesc = descriptor(entityBean.getClass());
     BeanProperty idProperty = beanDesc.idProperty();
@@ -2286,7 +2291,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
   @Nullable
-  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, Transaction transaction) {
+  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, @Nullable Transaction transaction) {
     BeanProperty idProperty = beanDesc.idProperty();
     Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
     ExpressionList<?> exprList = query.where();

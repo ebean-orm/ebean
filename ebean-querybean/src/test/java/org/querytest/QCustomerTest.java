@@ -1,19 +1,9 @@
 package org.querytest;
 
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.PagedList;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebean.annotation.Transactional;
 import io.ebean.types.Inet;
-import org.example.domain.ACat;
-import org.example.domain.ADog;
-import org.example.domain.Address;
-import org.example.domain.Animal;
-import org.example.domain.Country;
-import org.example.domain.Customer;
+import org.example.domain.*;
 import org.example.domain.otherpackage.PhoneNumber;
 import org.example.domain.otherpackage.ValidEmail;
 import org.example.domain.query.QAnimal;
@@ -26,15 +16,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -155,23 +137,21 @@ public class QCustomerTest {
     assertThat(ids).isNotEmpty();
 
 
-    Map<List, Customer> map = new QCustomer()
+    Map<Long, Customer> map = new QCustomer()
       .status.equalTo(Customer.Status.GOOD)
       .findMap();
 
     assertThat(map.size()).isEqualTo(ids.size());
 
-    QueryIterator<Customer> iterate = new QCustomer()
-      .status.equalTo(Customer.Status.GOOD)
-      .findIterate();
+    try (QueryIterator<Customer> iterate =
+           new QCustomer()
+             .status.equalTo(Customer.Status.GOOD)
+             .findIterate()) {
 
-    try {
       while (iterate.hasNext()) {
         Customer customer = iterate.next();
         assertThat(customer.getName()).isNotNull();
       }
-    } finally {
-      iterate.close();
     }
   }
 

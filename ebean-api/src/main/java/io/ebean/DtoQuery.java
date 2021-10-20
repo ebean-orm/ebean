@@ -1,6 +1,7 @@
 package io.ebean;
 
-import javax.annotation.Nullable;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -37,6 +38,7 @@ import java.util.stream.Stream;
  *
  * }</pre>
  */
+@NonNullApi
 public interface DtoQuery<T> extends CancelableQuery {
 
   /**

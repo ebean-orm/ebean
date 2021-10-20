@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.avaje.lang.NonNullApi;
 import io.ebean.*;
 import io.ebean.OrderBy.Property;
 import io.ebean.bean.CallOrigin;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 /**
  * Default implementation of an Object Relational query.
  */
+@NonNullApi
 public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";

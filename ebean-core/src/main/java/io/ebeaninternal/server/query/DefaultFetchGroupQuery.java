@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.Database;
@@ -29,7 +31,6 @@ import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 
-import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
@@ -43,6 +44,7 @@ import java.util.stream.Stream;
 /**
  * Implementation of FetchGroup query for use to create FetchGroup via query beans.
  */
+@NonNullApi
 final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
@@ -64,6 +66,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
     return this;
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public Query<T> select(FetchGroup fetchGroup) {
     this.detail = ((SpiFetchGroup) fetchGroup).detail();
@@ -116,7 +119,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public Query<T> fetch(String property, String columns, FetchConfig config) {
+  public Query<T> fetch(String property, @Nullable String columns, @Nullable FetchConfig config) {
     detail.fetch(property, columns, config);
     return this;
   }

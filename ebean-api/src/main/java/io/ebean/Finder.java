@@ -1,6 +1,7 @@
 package io.ebean;
 
-import javax.annotation.Nullable;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import java.util.List;
 
 /**
@@ -54,6 +55,7 @@ import java.util.List;
  * }</pre>
  *
  */
+@NonNullApi
 public class Finder<I, T> {
 
   /**

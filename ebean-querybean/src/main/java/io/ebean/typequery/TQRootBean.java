@@ -1,24 +1,8 @@
 package io.ebean.typequery;
 
-import io.ebean.CacheMode;
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.DtoQuery;
-import io.ebean.ExpressionList;
-import io.ebean.FetchConfig;
-import io.ebean.FetchGroup;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.ProfileLocation;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.RawSql;
-import io.ebean.Transaction;
-import io.ebean.UpdateQuery;
-import io.ebean.Version;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
+import io.ebean.*;
 import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
@@ -28,15 +12,9 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
-import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -80,6 +58,7 @@ import java.util.stream.Stream;
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
  * @param <R> the specific root query bean type (e.g. QCustomer)
  */
+@NonNullApi
 public abstract class TQRootBean<T, R> {
 
   /**
