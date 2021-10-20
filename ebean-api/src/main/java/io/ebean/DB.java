@@ -1,12 +1,13 @@
 package io.ebean;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
-import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;
@@ -59,6 +60,7 @@ import java.util.concurrent.Callable;
  *
  * }</pre>
  */
+@NonNullApi
 public final class DB {
 
   private static final DbContext context = DbContext.getInstance();
@@ -527,7 +529,7 @@ public final class DB {
   }
 
   /**
-   * Same as {@link #checkUniqueness(Object)}. but with given transaction.
+   * Same as {@link #checkUniqueness(Object)} but with given transaction.
    */
   public static Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     return getDefault().checkUniqueness(bean, transaction);
@@ -848,7 +850,6 @@ public final class DB {
    * }</pre>
    */
   public static <T> Update<T> createUpdate(Class<T> beanType, String ormUpdate) {
-
     return getDefault().createUpdate(beanType, ormUpdate);
   }
 
@@ -856,7 +857,6 @@ public final class DB {
    * Create a CsvReader for a given beanType.
    */
   public static <T> CsvReader<T> createCsvReader(Class<T> beanType) {
-
     return getDefault().createCsvReader(beanType);
   }
 
@@ -894,7 +894,6 @@ public final class DB {
    * @return A ORM Query for this beanType
    */
   public static <T> Query<T> createQuery(Class<T> beanType) {
-
     return getDefault().createQuery(beanType);
   }
 
@@ -932,7 +931,6 @@ public final class DB {
    * @return The query with expressions defined as per the parsed query statement
    */
   public static <T> Query<T> createQuery(Class<T> beanType, String eql) {
-
     return getDefault().createQuery(beanType, eql);
   }
 
@@ -948,7 +946,6 @@ public final class DB {
    * @return A ORM Query object for this beanType
    */
   public static <T> Query<T> find(Class<T> beanType) {
-
     return getDefault().find(beanType);
   }
 
@@ -1026,77 +1023,6 @@ public final class DB {
   public static <T> Filter<T> filter(Class<T> beanType) {
     return getDefault().filter(beanType);
   }
-
-//  /**
-//   * Execute a Sql Update Delete or Insert statement. This returns the number of
-//   * rows that where updated, deleted or inserted. If is executed in batch then
-//   * this returns -1. You can get the actual rowCount after commit() from
-//   * updateSql.getRowCount().
-//   * <p>
-//   * If you wish to execute a Sql Select natively then you should use the
-//   * FindByNativeSql object.
-//   * </p>
-//   * <p>
-//   * Note that the table modification information is automatically deduced and
-//   * you do not need to call the DB.externalModification() method when you
-//   * use this method.
-//   * </p>
-//   * <p>
-//   * Example:
-//   * </p>
-//   * <pre>{@code
-//   *
-//   *   // example that uses 'named' parameters
-//   *   String s = "UPDATE f_topic set post_count = :count where id = :id"
-//   *
-//   *   SqlUpdate update = DB.createSqlUpdate(s);
-//   *
-//   *   update.setParameter("id", 1);
-//   *   update.setParameter("count", 50);
-//   *
-//   *   int modifiedCount = DB.execute(update);
-//   *
-//   *   String msg = "There where " + modifiedCount + "rows updated";
-//   *
-//   * }</pre>
-//   *
-//   * @param sqlUpdate the update sql potentially with bind values
-//   * @return the number of rows updated or deleted. -1 if executed in batch.
-//   * @see SqlUpdate
-//   * @see CallableSql
-//   * @see DB#execute(CallableSql)
-//   */
-//  public static int execute(SqlUpdate sqlUpdate) {
-//    return defaultDatabase().execute(sqlUpdate);
-//  }
-//
-//  /**
-//   * For making calls to stored procedures.
-//   * <p>
-//   * Example:
-//   * </p>
-//   * <pre>{@code
-//   *
-//   *   String sql = "{call sp_order_modify(?,?,?)}";
-//   *
-//   *   CallableSql cs = DB.createCallableSql(sql);
-//   *   cs.setParameter(1, 27);
-//   *   cs.setParameter(2, "SHIPPED");
-//   *   cs.registerOut(3, Types.INTEGER);
-//   *
-//   *   DB.execute(cs);
-//   *
-//   *   // read the out parameter
-//   *   Integer returnValue = (Integer) cs.getObject(3);
-//   *
-//   * }</pre>
-//   *
-//   * @see CallableSql
-//   * @see Ebean#execute(SqlUpdate)
-//   */
-//  public static int execute(CallableSql callableSql) {
-//    return defaultDatabase().execute(callableSql);
-//  }
 
   /**
    * Execute a TxRunnable in a Transaction with an explicit scope.

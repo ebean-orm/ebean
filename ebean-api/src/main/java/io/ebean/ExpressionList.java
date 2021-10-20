@@ -1,20 +1,13 @@
 package io.ebean;
 
-import io.ebean.search.Match;
-import io.ebean.search.MultiMatch;
-import io.ebean.search.TextCommonTerms;
-import io.ebean.search.TextQueryString;
-import io.ebean.search.TextSimple;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
+import io.ebean.search.*;
 
-import javax.annotation.Nullable;
 import javax.persistence.NonUniqueResultException;
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -38,6 +31,7 @@ import java.util.function.Predicate;
  *
  * @see Query#where()
  */
+@NonNullApi
 public interface ExpressionList<T> {
 
   /**

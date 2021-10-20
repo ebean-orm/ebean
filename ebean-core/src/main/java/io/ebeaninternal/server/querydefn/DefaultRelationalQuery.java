@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
 import io.ebean.SqlQuery;
@@ -17,6 +19,7 @@ import java.util.function.Predicate;
 /**
  * Default implementation of SQuery - SQL Query.
  */
+@NonNullApi
 public final class DefaultRelationalQuery extends AbstractQuery implements SpiSqlQuery {
 
   private static final long serialVersionUID = -1098305779779591068L;
@@ -263,6 +266,7 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
       this.mapper = mapper;
     }
 
+    @Nullable
     @Override
     public T findOne() {
       return mapperFindOne(mapper);

@@ -1,6 +1,7 @@
 package io.ebean;
 
-import javax.annotation.Nullable;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,10 +27,10 @@ import java.util.Optional;
  * @param <I> The ID type
  * @param <T> The Bean type
  */
+@NonNullApi
 public abstract class BeanFinder<I,T> {
 
   protected final Database server;
-
   protected final Class<T> type;
 
   /**

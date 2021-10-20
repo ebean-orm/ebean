@@ -1,6 +1,7 @@
 package io.ebean;
 
-import javax.annotation.Nullable;
+import io.avaje.lang.Nullable;
+
 import javax.persistence.NonUniqueResultException;
 import java.time.Clock;
 import java.util.List;

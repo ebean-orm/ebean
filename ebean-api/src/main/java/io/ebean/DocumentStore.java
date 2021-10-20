@@ -1,9 +1,10 @@
 package io.ebean;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.docstore.DocQueryContext;
 import io.ebean.docstore.RawDoc;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.function.Predicate;
 /**
  * Document storage operations.
  */
+@NonNullApi
 public interface DocumentStore {
 
   /**

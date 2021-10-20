@@ -1,5 +1,7 @@
 package io.ebean;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
@@ -10,7 +12,6 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
-import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -91,6 +92,7 @@ import java.util.concurrent.Callable;
  * @see DatabaseFactory
  * @see DatabaseConfig
  */
+@NonNullApi
 public interface Database {
 
   /**

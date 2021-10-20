@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.executor;
 
+import io.avaje.lang.NonNullApi;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 import org.slf4j.MDC;
 
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * The default implementation of the BackgroundExecutor.
  */
+@NonNullApi
 public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   private final ScheduledExecutorService executor;
