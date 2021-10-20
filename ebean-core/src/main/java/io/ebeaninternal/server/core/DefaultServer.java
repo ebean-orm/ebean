@@ -691,7 +691,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void register(TransactionCallback transactionCallback) {
-    Transaction transaction = currentTransaction();
+    Transaction transaction = transactionManager.active();
     if (transaction == null) {
       throw new PersistenceException("Not currently active transaction when trying to register transactionCallback");
     }
