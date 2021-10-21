@@ -15,6 +15,10 @@
   <name>tests</name>
   <description>test modules</description>
 
+  <properties>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
   <modules>
     <!-- test-java16 REQUIRES JDK 16 to run -->
 <!--    <module>test-java16</module>-->

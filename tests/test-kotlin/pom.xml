@@ -21,6 +21,7 @@
     <ebean-maven-plugin.version>12.12.1</ebean-maven-plugin.version>
     <kotlin.version>1.5.31</kotlin.version>
     <jackson.version>2.12.1</jackson.version>
+    <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
   <dependencies>
