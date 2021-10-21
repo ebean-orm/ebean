@@ -349,10 +349,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
           builder = RawSqlBuilder.unparsed(sql.getQuery());
         }
 
-        for (Map.Entry<String,String> columnMapping : sql.getColumnMapping().entrySet()) {
+        for (Map.Entry<String, String> columnMapping : sql.getColumnMapping().entrySet()) {
           builder.columnMapping(columnMapping.getKey(), columnMapping.getValue());
         }
-        for (Map.Entry<String,String> aliasMapping : sql.getAliasMapping().entrySet()) {
+        for (Map.Entry<String, String> aliasMapping : sql.getAliasMapping().entrySet()) {
           builder.tableAliasMapping(aliasMapping.getKey(), aliasMapping.getValue());
         }
         info.addRawSql(sql.getName(), builder.create());
@@ -410,7 +410,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   @Override
   public boolean isTableManaged(String tableName) {
     return tableToDescMap.get(tableName.toLowerCase()) != null
-        || tableToViewDescMap.get(tableName.toLowerCase()) != null;
+      || tableToViewDescMap.get(tableName.toLowerCase()) != null;
   }
 
   /**
@@ -618,7 +618,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
       deployInfoMap.put(entityClass, info);
       Class<?> embeddedIdType = info.getEmbeddedIdType();
-      if (embeddedIdType != null){
+      if (embeddedIdType != null) {
         embeddedIdTypes.add(embeddedIdType);
       }
     }
@@ -788,8 +788,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     Class<?> targetType = prop.getTargetType();
     DeployBeanInfo<?> info = deployInfoMap.get(targetType);
     if (info == null) {
-      String msg = "Can not find descriptor [" + targetType + "] for " + prop.getFullBeanName();
-      throw new PersistenceException(msg);
+      throw new PersistenceException("Can not find descriptor [" + targetType + "] for " + prop.getFullBeanName());
     }
     return info.getDescriptor();
   }
@@ -901,21 +900,17 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     Class<?> owningType = oneToMany.getOwningType();
     if (!oneToMany.getCascadeInfo().isSave()) {
       // The property MUST have persist cascading so that inserts work.
-
       Class<?> targetType = oneToMany.getTargetType();
       String msg = "Error on " + oneToMany.getFullBeanName() + ". @OneToMany MUST have ";
       msg += "Cascade.PERSIST or Cascade.ALL because this is a unidirectional ";
       msg += "relationship. That is, there is no property of type " + owningType + " on " + targetType;
-
       throw new PersistenceException(msg);
     }
 
     // mark this property as unidirectional
     oneToMany.setUnidirectional();
-
     // specify table and table alias...
     BeanTable beanTable = beanTable(owningType);
-
     // define the TableJoin
     DeployTableJoin oneToManyJoin = oneToMany.getTableJoin();
     if (!oneToManyJoin.hasJoinColumns()) {
@@ -951,27 +946,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     String mappedBy = prop.getMappedBy();
     // get the mappedBy property
     DeployBeanDescriptor<?> targetDesc = targetDescriptor(prop);
-    DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
-    if (mappedProp == null) {
-      String m = "Error on " + prop.getFullBeanName();
-      m += "  Can not find mappedBy property [" + targetDesc + "." + mappedBy + "] ";
-      throw new PersistenceException(m);
-    }
-
-    if (!(mappedProp instanceof DeployBeanPropertyAssocOne<?>)) {
-      String m = "Error on " + prop.getFullBeanName();
-      m += ". mappedBy property [" + targetDesc + "." + mappedBy + "]is not a OneToOne?";
-      throw new PersistenceException(m);
-    }
-
-    DeployBeanPropertyAssocOne<?> mappedAssocOne = (DeployBeanPropertyAssocOne<?>) mappedProp;
-
-    if (!mappedAssocOne.isOneToOne()) {
-      String m = "Error on " + prop.getFullBeanName();
-      m += ". mappedBy property [" + targetDesc + "." + mappedBy + "]is not a OneToOne?";
-      throw new PersistenceException(m);
-    }
-
+    DeployBeanPropertyAssocOne<?> mappedAssocOne = mappedOneToOne(prop, mappedBy, targetDesc);
     DeployTableJoin tableJoin = prop.getTableJoin();
     if (!tableJoin.hasJoinColumns()) {
       // define Join as the inverse of the mappedBy property
@@ -985,6 +960,21 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       prop.setPrimaryKeyExport();
       addPrimaryKeyJoin(prop);
     }
+  }
+
+  private DeployBeanPropertyAssocOne<?> mappedOneToOne(DeployBeanPropertyAssocOne<?> prop, String mappedBy, DeployBeanDescriptor<?> targetDesc) {
+    DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
+    if (mappedProp == null) {
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + " Can not find mappedBy property [" + targetDesc + "." + mappedBy + "]");
+    }
+    if (!(mappedProp instanceof DeployBeanPropertyAssocOne<?>)) {
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + targetDesc + "." + mappedBy + "]is not a OneToOne?");
+    }
+    DeployBeanPropertyAssocOne<?> mappedAssocOne = (DeployBeanPropertyAssocOne<?>) mappedProp;
+    if (!mappedAssocOne.isOneToOne()) {
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + targetDesc + "." + mappedBy + "]is not a OneToOne?");
+    }
+    return mappedAssocOne;
   }
 
   private void checkUniDirectionalPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
@@ -1008,7 +998,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       return;
     }
     DeployBeanDescriptor<?> targetDesc = targetDescriptor(prop);
-
     if (targetDesc.isDraftableElement()) {
       // automatically turning on orphan removal and CascadeType.ALL
       prop.setModifyListenMode(BeanCollection.ModifyListenMode.REMOVALS);
@@ -1040,23 +1029,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     String mappedBy = prop.getMappedBy();
 
     // get the mappedBy property
-    DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
-    if (mappedProp == null) {
-      String m = "Error on " + prop.getFullBeanName();
-      m += "  Can not find mappedBy property [" + mappedBy + "] ";
-      m += "in [" + targetDesc + "]";
-      throw new PersistenceException(m);
-    }
-
-    if (!(mappedProp instanceof DeployBeanPropertyAssocOne<?>)) {
-      String m = "Error on " + prop.getFullBeanName();
-      m += ". mappedBy property [" + mappedBy + "]is not a ManyToOne?";
-      m += "in [" + targetDesc + "]";
-      throw new PersistenceException(m);
-    }
-
-    DeployBeanPropertyAssocOne<?> mappedAssocOne = (DeployBeanPropertyAssocOne<?>) mappedProp;
-
+    DeployBeanPropertyAssocOne<?> mappedAssocOne = mappedManyToOne(prop, targetDesc, mappedBy);
     DeployTableJoin tableJoin = prop.getTableJoin();
     if (!tableJoin.hasJoinColumns()) {
       // define Join as the inverse of the mappedBy property
@@ -1079,6 +1052,17 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     }
   }
 
+  private DeployBeanPropertyAssocOne<?> mappedManyToOne(DeployBeanPropertyAssocMany<?> prop, DeployBeanDescriptor<?> targetDesc, String mappedBy) {
+    DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
+    if (mappedProp == null) {
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + "  Can not find mappedBy property [" + mappedBy + "] " + "in [" + targetDesc + "]");
+    }
+    if (!(mappedProp instanceof DeployBeanPropertyAssocOne<?>)) {
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + mappedBy + "]is not a ManyToOne?" + "in [" + targetDesc + "]");
+    }
+    return (DeployBeanPropertyAssocOne<?>) mappedProp;
+  }
+
   /**
    * For mappedBy copy the joins from the other side.
    */
@@ -1094,33 +1078,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
     // get the mappedBy property
     DeployBeanDescriptor<?> targetDesc = targetDescriptor(prop);
-    DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
-
-    if (mappedProp == null) {
-      String m = "Error on " + prop.getFullBeanName();
-      m += "  Can not find mappedBy property [" + mappedBy + "] ";
-      m += "in [" + targetDesc + "]";
-      throw new PersistenceException(m);
-    }
-
-    if (!(mappedProp instanceof DeployBeanPropertyAssocMany<?>)) {
-      String m = "Error on " + prop.getFullBeanName();
-      m += ". mappedBy property [" + targetDesc + "." + mappedBy + "] is not a ManyToMany?";
-      throw new PersistenceException(m);
-    }
-
-    DeployBeanPropertyAssocMany<?> mappedAssocMany = (DeployBeanPropertyAssocMany<?>) mappedProp;
-
-    if (!mappedAssocMany.isManyToMany()) {
-      String m = "Error on " + prop.getFullBeanName();
-      m += ". mappedBy property [" + targetDesc + "." + mappedBy + "] is not a ManyToMany?";
-      throw new PersistenceException(m);
-    }
+    DeployBeanPropertyAssocMany<?> mappedAssocMany = mappedManyToMany(prop, mappedBy, targetDesc);
 
     // define the relationships/joins on this side as the
     // reverse of the other mappedBy side ...
-
-    // DeployTableJoin mappedJoin = mappedAssocMany.getTableJoin();
     DeployTableJoin mappedIntJoin = mappedAssocMany.getIntersectionJoin();
     DeployTableJoin mappendInverseJoin = mappedAssocMany.getInverseJoin();
 
@@ -1140,6 +1101,22 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     if (targetDesc.isDraftable()) {
       prop.setIntersectionDraftTable();
     }
+  }
+
+  private DeployBeanPropertyAssocMany<?> mappedManyToMany(DeployBeanPropertyAssocMany<?> prop, String mappedBy, DeployBeanDescriptor<?> targetDesc) {
+    DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
+    if (mappedProp == null) {
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + "  Can not find mappedBy property [" + mappedBy + "] " + "in [" + targetDesc + "]");
+    }
+    if (!(mappedProp instanceof DeployBeanPropertyAssocMany<?>)) {
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + targetDesc + "." + mappedBy + "] is not a ManyToMany?");
+    }
+
+    DeployBeanPropertyAssocMany<?> mappedAssocMany = (DeployBeanPropertyAssocMany<?>) mappedProp;
+    if (!mappedAssocMany.isManyToMany()) {
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + targetDesc + "." + mappedBy + "] is not a ManyToMany?");
+    }
+    return mappedAssocMany;
   }
 
   private <T> void setBeanControllerFinderListener(DeployBeanDescriptor<T> descriptor) {

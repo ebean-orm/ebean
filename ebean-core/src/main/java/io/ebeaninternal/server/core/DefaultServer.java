@@ -1238,7 +1238,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (ids != null) {
       return !ids.isEmpty();
     }
-
     try {
       request.initTransIfRequired();
       return !request.findIds().isEmpty();
