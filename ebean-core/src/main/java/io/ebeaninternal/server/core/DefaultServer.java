@@ -147,7 +147,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DtoQueryEngine dtoQueryEngine;
   private final ServerCacheManager serverCacheManager;
   private final DtoBeanManager dtoBeanManager;
-  private final BeanDescriptorManager beanDescriptorManager;
+  private final BeanDescriptorManager descriptorManager;
   private final AutoTuneService autoTuneService;
   private final ReadAuditPrepare readAuditPrepare;
   private final ReadAuditLogger readAuditLogger;
@@ -193,8 +193,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.currentTenantProvider = this.config.getCurrentTenantProvider();
     this.slowQueryMicros = config.getSlowQueryMicros();
     this.slowQueryListener = config.getSlowQueryListener();
-    this.beanDescriptorManager = config.getBeanDescriptorManager();
-    beanDescriptorManager.setEbeanServer(this);
+    this.descriptorManager = config.getBeanDescriptorManager();
+    descriptorManager.setEbeanServer(this);
     this.updateAllPropertiesInBatch = this.config.isUpdateAllPropertiesInBatch();
     this.callStackFactory = initCallStackFactory(this.config);
     this.persister = config.createPersister(this);
@@ -675,11 +675,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         return (T) existing;
       }
     }
-
     InheritInfo inheritInfo = desc.inheritInfo();
     if (inheritInfo == null || inheritInfo.isConcrete()) {
       return (T) desc.contextRef(pc, null, false, id);
     }
+    return referenceFindOne(type, id, desc);
+  }
+
+  private <T> T referenceFindOne(Class<T> type, Object id, BeanDescriptor<?> desc) {
     BeanProperty idProp = desc.idProperty();
     if (idProp == null) {
       throw new PersistenceException("No ID properties for this type? " + desc);
@@ -1226,8 +1229,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public boolean exists(Class<?> beanType, Object beanId, Transaction transaction) {
-    List<Object> ids = findIds(find(beanType).setId(beanId), transaction);
-    return !ids.isEmpty();
+    return !findIdsWithCopy(find(beanType).setId(beanId), transaction).isEmpty();
   }
 
   @Override
@@ -1333,7 +1335,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // FutureList query always run in it's own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
     if (!spiQuery.isDisableReadAudit()) {
-      BeanDescriptor<T> desc = beanDescriptorManager.descriptor(spiQuery.getBeanType());
+      BeanDescriptor<T> desc = descriptorManager.descriptor(spiQuery.getBeanType());
       desc.readAuditFutureList(spiQuery);
     }
     // Create a new transaction solely to execute the findList() at some future time
@@ -1984,7 +1986,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public List<BeanDescriptor<?>> descriptors() {
-    return beanDescriptorManager.descriptorList();
+    return descriptorManager.descriptorList();
   }
 
   /**
@@ -1996,13 +1998,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   public void register(BeanPersistController controller) {
-    for (BeanDescriptor<?> desc : beanDescriptorManager.descriptorList()) {
+    for (BeanDescriptor<?> desc : descriptorManager.descriptorList()) {
       desc.register(controller);
     }
   }
 
   public void deregister(BeanPersistController controller) {
-    for (BeanDescriptor<?> desc : beanDescriptorManager.descriptorList()) {
+    for (BeanDescriptor<?> desc : descriptorManager.descriptorList()) {
       desc.deregister(controller);
     }
   }
@@ -2010,7 +2012,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public boolean isSupportedType(java.lang.reflect.Type genericType) {
     TypeInfo typeInfo = ParamTypeHelper.getTypeInfo(genericType);
-    return typeInfo != null && beanDescriptorManager.descriptor(typeInfo.getBeanType()) != null;
+    return typeInfo != null && descriptorManager.descriptor(typeInfo.getBeanType()) != null;
   }
 
   @Override
@@ -2026,7 +2028,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private  <T> BeanDescriptor<T> desc(Class<T> beanClass) {
-    BeanDescriptor<T> desc = beanDescriptorManager.descriptor(beanClass);
+    BeanDescriptor<T> desc = descriptorManager.descriptor(beanClass);
     if (desc == null) {
       throw new PersistenceException(beanClass.getName() + " is NOT an Entity Bean registered with this server?");
     }
@@ -2038,7 +2040,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> BeanDescriptor<T> descriptor(Class<T> beanClass) {
-    return beanDescriptorManager.descriptor(beanClass);
+    return descriptorManager.descriptor(beanClass);
   }
 
   /**
@@ -2046,7 +2048,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public List<BeanDescriptor<?>> descriptors(String tableName) {
-    return beanDescriptorManager.descriptors(tableName);
+    return descriptorManager.descriptors(tableName);
   }
 
   /**
@@ -2062,7 +2064,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public List<? extends BeanType<?>> beanTypes(String tableName) {
-    return beanDescriptorManager.beanTypes(tableName);
+    return descriptorManager.beanTypes(tableName);
   }
 
   @Override
@@ -2072,7 +2074,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public BeanDescriptor<?> descriptorByQueueId(String queueId) {
-    return beanDescriptorManager.descriptorByQueueId(queueId);
+    return descriptorManager.descriptorByQueueId(queueId);
   }
 
   /**
@@ -2088,7 +2090,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public BeanDescriptor<?> descriptorById(String beanClassName) {
-    return beanDescriptorManager.descriptorByClassName(beanClassName);
+    return descriptorManager.descriptorByClassName(beanClassName);
   }
 
   /**
@@ -2273,7 +2275,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       serverCacheManager.visitMetrics(visitor);
     }
     if (visitor.collectQueryMetrics()) {
-      beanDescriptorManager.visitMetrics(visitor);
+      descriptorManager.visitMetrics(visitor);
       dtoBeanManager.visitMetrics(visitor);
       relationalQueryEngine.visitMetrics(visitor);
       persister.visitMetrics(visitor);
@@ -2291,7 +2293,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (initRequest.isAll()) {
       queryPlanManager.setDefaultThreshold(initRequest.thresholdMicros());
     }
-    return beanDescriptorManager.queryPlanInit(initRequest);
+    return descriptorManager.queryPlanInit(initRequest);
   }
 
   List<MetaQueryPlan> queryPlanCollectNow(QueryPlanRequest request) {
