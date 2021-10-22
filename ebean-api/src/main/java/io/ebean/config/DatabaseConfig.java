@@ -16,6 +16,7 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.plugin.CustomDeployParser;
 import io.ebean.util.StringHelper;
 
 import javax.persistence.EnumType;
@@ -389,6 +390,7 @@ public class DatabaseConfig {
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
   private final List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<>();
   private final List<ServerConfigStartup> configStartupListeners = new ArrayList<>();
+  private final List<CustomDeployParser> customDeployParsers = new ArrayList<>();
 
   /**
    * By default inserts are included in the change log.
@@ -2672,6 +2674,17 @@ public class DatabaseConfig {
    */
   public List<ServerConfigStartup> getServerConfigStartupListeners() {
     return configStartupListeners;
+  }
+
+  /**
+   * Add a CustomDeployParser.
+   */
+  public void addCustomDeployParser(CustomDeployParser customDeployParser) {
+    customDeployParsers.add(customDeployParser);
+  }
+
+  public List<CustomDeployParser> getCustomDeployParsers() {
+    return customDeployParsers;
   }
 
   /**

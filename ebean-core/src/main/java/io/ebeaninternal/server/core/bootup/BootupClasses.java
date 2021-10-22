@@ -11,6 +11,7 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.plugin.CustomDeployParser;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ public class BootupClasses implements Predicate<Class<?>> {
   private final List<Class<? extends BeanPersistListener>> beanPersistListenerCandidates = new ArrayList<>();
   private final List<Class<? extends BeanQueryAdapter>> beanQueryAdapterCandidates = new ArrayList<>();
   private final List<Class<? extends ServerConfigStartup>> serverConfigStartupCandidates = new ArrayList<>();
+  private final List<Class<? extends CustomDeployParser>> customDeployParserCandidates = new ArrayList<>();
 
   private final List<IdGenerator> idGeneratorInstances = new ArrayList<>();
   private final List<BeanPersistController> beanPersistControllerInstances = new ArrayList<>();
@@ -60,6 +62,7 @@ public class BootupClasses implements Predicate<Class<?>> {
   private final List<BeanPersistListener> beanPersistListenerInstances = new ArrayList<>();
   private final List<BeanQueryAdapter> beanQueryAdapterInstances = new ArrayList<>();
   private final List<ServerConfigStartup> serverConfigStartupInstances = new ArrayList<>();
+  private final List<CustomDeployParser> customDeployParserInstances = new ArrayList<>();
 
   // single objects
   private Class<? extends ChangeLogPrepare> changeLogPrepareClass;
@@ -167,6 +170,10 @@ public class BootupClasses implements Predicate<Class<?>> {
 
   public void addServerConfigStartup(List<ServerConfigStartup> startupInstances) {
     add(startupInstances, serverConfigStartupInstances, serverConfigStartupCandidates);
+  }
+
+  public void addCustomDeployParser(List<CustomDeployParser> customDeployParser) {
+    add(customDeployParser, customDeployParserInstances, customDeployParserCandidates);
   }
 
   public void addChangeLogInstances(DatabaseConfig config) {
@@ -285,6 +292,10 @@ public class BootupClasses implements Predicate<Class<?>> {
     return createAdd(beanQueryAdapterInstances, beanQueryAdapterCandidates);
   }
 
+  public List<CustomDeployParser> getCustomDeployParsers() {
+    return createAdd(customDeployParserInstances, customDeployParserCandidates);
+  }
+
   /**
    * Return the list of Embeddable classes.
    */
@@ -401,6 +412,11 @@ public class BootupClasses implements Predicate<Class<?>> {
 
     if (ServerConfigStartup.class.isAssignableFrom(cls)) {
       serverConfigStartupCandidates.add((Class<? extends ServerConfigStartup>) cls);
+      interesting = true;
+    }
+
+    if (CustomDeployParser.class.isAssignableFrom(cls)) {
+      customDeployParserCandidates.add((Class<? extends CustomDeployParser>) cls);
       interesting = true;
     }
 

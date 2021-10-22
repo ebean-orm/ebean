@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import io.ebean.plugin.DeployBeanPropertyAssocMeta;
 import io.ebeaninternal.server.deploy.BeanCascadeInfo;
 import io.ebeaninternal.server.deploy.BeanTable;
 import io.ebeaninternal.server.deploy.PropertyForeignKey;
@@ -7,7 +8,7 @@ import io.ebeaninternal.server.deploy.PropertyForeignKey;
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
  */
-public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
+public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty implements DeployBeanPropertyAssocMeta {
 
   /**
    * The type of the joined bean.
@@ -129,6 +130,7 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
    * this 'master' bean.
    * </p>
    */
+  @Override
   public String getMappedBy() {
     return mappedBy;
   }
@@ -172,5 +174,10 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
   @SuppressWarnings("unchecked")
   public void setTargetType(Class<?> targetType) {
     this.targetType = (Class<T>)targetType;
+  }
+
+  @Override
+  public String getBaseTable() {
+    return getBeanTable().getBaseTable();
   }
 }
