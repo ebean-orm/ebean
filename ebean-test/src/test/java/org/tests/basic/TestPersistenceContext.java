@@ -7,10 +7,12 @@ import io.ebeaninternal.api.SpiPersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.ContactNote;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -20,6 +22,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestPersistenceContext extends BaseTestCase {
 
+  
+  @Test
+  void testReload() {
+    ResetBasicData.reset();
+    try (Transaction txn = DB.beginTransaction()) {
+      List<ContactNote> notes = new ArrayList<>();
+      DB.find(ContactNote.class).findEach(notes::add);
+      notes.get(0).setTitle("FooBar");
+      DB.find(ContactNote.class).findList();
+      assertThat(notes.get(0).getTitle()).isEqualTo("FooBar");
+    }
+  }
+  
   @Test
   void test() {
     ResetBasicData.reset();

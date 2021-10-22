@@ -268,9 +268,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
         contextBean = localBean;
       } else {
         // bean already exists in persistenceContext
-        if (isLoadContextBeanNeeded(queryMode, contextBean)) {
-          // refresh it anyway (lazy loading for example)
+        
+        if (queryMode.isLoadContextBean()) {
+          // if explicitly set loadContextBean to true, then reload
           localBean = contextBean;
+        } else if (!contextBean._ebean_getIntercept().isFullyLoadedBean()) {
+          // reload if contextBean is partial object
+          localBean = contextBean;
+          // and switch to lazyLoad query mode in order not to overwrite
+          // existing properties in SqlBeanLoad::load
+          queryMode = Mode.LAZYLOAD_BEAN;
         } else {
           // ignore the DB data...
           localBean = null;
@@ -683,14 +690,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
     return "SqlTreeNodeBean: " + desc;
   }
 
-  private boolean isLoadContextBeanNeeded(Mode queryMode, EntityBean contextBean) {
-    // if explicitly set loadContextBean to true, then reload
-    if (queryMode.isLoadContextBean()) {
-      return true;
-    }
-    // reload if contextBean is partial object
-    return !contextBean._ebean_getIntercept().isFullyLoadedBean();
-  }
 
   @Override
   public boolean hasMany() {
