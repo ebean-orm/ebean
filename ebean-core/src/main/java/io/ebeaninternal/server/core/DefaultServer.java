@@ -54,6 +54,7 @@ import io.ebean.config.QueryPlanCapture;
 import io.ebean.config.QueryPlanListener;
 import io.ebean.config.SlowQueryEvent;
 import io.ebean.config.SlowQueryListener;
+import io.ebean.config.TempFileProvider;
 import io.ebean.config.TenantMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
@@ -143,6 +144,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final String serverName;
   private final DatabasePlatform databasePlatform;
   private final TransactionManager transactionManager;
+  private final TempFileProvider tempFileProvider;
   private final QueryPlanManager queryPlanManager;
   private final ExtraMetrics extraMetrics;
   private final DataTimeZone dataTimeZone;
@@ -223,6 +225,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.queryPlanManager = config.initQueryPlanManager(transactionManager);
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverPlugins = config.getPlugins();
+    this.tempFileProvider = config.getConfig().getTempFileProvider();
     this.ddlGenerator = config.initDdlGenerator(this);
     this.scriptRunner = new DScriptRunner(this);
     this.initDatabase = !config.getConfig().skipInitDatabase();
@@ -460,6 +463,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     backgroundExecutor.shutdown();
     // shutdown DataSource (if its an Ebean one)
     transactionManager.shutdown(shutdownDataSource, deregisterDriver);
+
+    tempFileProvider.shutdown();
     dumpMetrics();
     shutdown = true;
     if (shutdownDataSource) {

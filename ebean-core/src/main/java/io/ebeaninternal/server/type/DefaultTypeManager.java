@@ -61,7 +61,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final DefaultTypeFactory extraTypeFactory;
 
   private final ScalarType<?> hstoreType = new ScalarTypePostgresHstore();
-  private final ScalarTypeFile fileType = new ScalarTypeFile();
+  private final ScalarTypeFile fileType;
   private final ScalarType<?> charType = new ScalarTypeChar();
   private final ScalarType<?> charArrayType = new ScalarTypeCharArray();
   private final ScalarType<?> longVarcharType = new ScalarTypeLongVarchar();
@@ -141,6 +141,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
     this.defaultEnumType = config.getDefaultEnumType();
+    this.fileType = new ScalarTypeFile(config.getTempFileProvider());
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);

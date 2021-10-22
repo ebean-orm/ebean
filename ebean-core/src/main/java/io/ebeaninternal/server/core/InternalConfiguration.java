@@ -8,6 +8,7 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ProfilingConfig;
 import io.ebean.config.SlowQueryListener;
+import io.ebean.config.TempFileProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.event.changelog.ChangeLogListener;
@@ -75,6 +76,7 @@ public final class InternalConfiguration {
   private final DatabasePlatform databasePlatform;
   private final DeployInherit deployInherit;
   private final TypeManager typeManager;
+  private final TempFileProvider tempFileProvider;
   private final DtoBeanManager dtoBeanManager;
   private final ClockService clockService;
   private final DataTimeZone dataTimeZone;
@@ -115,6 +117,7 @@ public final class InternalConfiguration {
     this.databasePlatform = config.getDatabasePlatform();
     this.expressionFactory = initExpressionFactory(config);
     this.typeManager = new DefaultTypeManager(config, bootupClasses);
+    this.tempFileProvider = config.getTempFileProvider();
     this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
     this.deployInherit = new DeployInherit(bootupClasses);
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
@@ -509,6 +512,10 @@ public final class InternalConfiguration {
 
   SpiLogManager getLogManager() {
     return logManager;
+  }
+
+  public TempFileProvider getTempFileProvider() {
+    return tempFileProvider;
   }
 
   private ServerCachePlugin initServerCachePlugin() {
