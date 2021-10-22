@@ -1014,7 +1014,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Return the bean Field associated with this property.
    */
-  private Field field() {
+  public Field field() {
     return field;
   }
 
