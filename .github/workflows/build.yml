@@ -15,10 +15,10 @@ jobs:
       matrix:
         java_version: [8]
         os: [ubuntu-latest]
-        
+
     steps:
     - uses: actions/checkout@v2
-    - name: Set up JDK 11
+    - name: Set up Java
       uses: actions/setup-java@v2
       with:
         java-version: ${{ matrix.java_version }}
