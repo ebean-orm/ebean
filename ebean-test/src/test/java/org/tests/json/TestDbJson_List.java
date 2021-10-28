@@ -2,8 +2,13 @@ package org.tests.json;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
+import io.ebean.ValuePair;
 import io.ebean.annotation.ForPlatform;
+import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.Platform;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.test.LoggedSql;
 import io.ebean.text.TextException;
 import org.junit.jupiter.api.Test;
@@ -11,10 +16,18 @@ import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.PlainBean;
 
 import javax.persistence.PersistenceException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestDbJson_List extends BaseTestCase {
 
@@ -230,5 +243,43 @@ public class TestDbJson_List extends BaseTestCase {
     assertThat(bean.getFlags()).isEmpty();
     assertThat(bean.getTags()).isEmpty();
     assertThat(bean.getBeanMap()).isEmpty();
+  }
+
+  @Test
+  @ForPlatform(Platform.H2)
+  public void testDirtyValues() {
+    DatabaseConfig config = new DatabaseConfig();
+    config.loadFromProperties();
+    config.setDefaultServer(true);
+    config.setRegister(true);
+    config.setDdlRun(false);
+    config.setJsonMutationDetection(MutationDetection.SOURCE);
+    Database db = DatabaseFactory.create(config);
+    try {
+      assertThat(db).isNotNull();
+
+      EBasicJsonList bean = new EBasicJsonList();
+      bean.getTags().add("aa");
+      bean.getTags().add("bb");
+
+      db.save(bean);
+      bean = db.find(EBasicJsonList.class, bean.getId());
+
+      bean.getTags().add("cc");
+      final Map<String, ValuePair> dirtyValues = db.beanState(bean).dirtyValues();
+      assertThat(dirtyValues).containsOnlyKeys("tags");
+
+      final ValuePair diff = dirtyValues.get("tags");
+      assertThat(diff.getOldValue()).isInstanceOf(List.class).asList()
+        .containsExactly("aa", "bb");
+      assertThat(diff.getNewValue()).isInstanceOf(List.class).asList()
+        .containsExactly("aa", "bb", "cc");
+    } finally {
+      if (db != null) {
+        db.shutdown();
+      }
+    }
+
+
   }
 }
