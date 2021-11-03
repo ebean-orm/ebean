@@ -191,4 +191,30 @@ class TestPersistenceContext extends BaseTestCase {
       assertThat(pc.toString()).contains("Customer=size:200 (0 weak)");
     }
   }
+  
+  @Disabled // run manually
+  @Test
+  void testPcScopes_with_findEachFindList() throws InterruptedException {
+    for (int i = 0; i < 5000; i++) {
+      Customer c = new Customer();
+      c.setName("Customer #" + i);
+      DB.save(c);
+      Order o = new Order();
+      o.setCustomer(c);
+      DB.save(o);
+    }
+    
+    for (int i = 0; i < 1000; i++) {
+      try (Transaction txn = DB.beginTransaction()) {
+        List<Customer> customers = new ArrayList<>();
+        DB.find(Customer.class).select("id").findEach(customers::add);
+        SpiPersistenceContext pc = ((SpiTransaction) txn).getPersistenceContext();
+        assertThat(pc.toString()).contains("Customer=size:5000 (5000 weak)");
+        customers.clear();
+        customers = DB.find(Customer.class).select("id").findList();
+        
+        assertThat(pc.toString()).contains("Customer=size:5000"); // We expect ALWAYS 5000 entries in the PC
+      }
+    }
+  }
 }
