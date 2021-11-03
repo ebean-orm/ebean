@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestPersistenceContext extends BaseTestCase {
 
-  
   @Test
   void testReload() {
     ResetBasicData.reset();
@@ -34,7 +33,7 @@ class TestPersistenceContext extends BaseTestCase {
       assertThat(notes.get(0).getTitle()).isEqualTo("FooBar");
     }
   }
-  
+
   @Test
   void test() {
     ResetBasicData.reset();
@@ -191,10 +190,10 @@ class TestPersistenceContext extends BaseTestCase {
       assertThat(pc.toString()).contains("Customer=size:200 (0 weak)");
     }
   }
-  
+
   @Disabled // run manually
   @Test
-  void testPcScopes_with_findEachFindList() throws InterruptedException {
+  void testPcScopes_with_findEachFindList() {
     for (int i = 0; i < 5000; i++) {
       Customer c = new Customer();
       c.setName("Customer #" + i);
@@ -203,7 +202,7 @@ class TestPersistenceContext extends BaseTestCase {
       o.setCustomer(c);
       DB.save(o);
     }
-    
+
     for (int i = 0; i < 1000; i++) {
       try (Transaction txn = DB.beginTransaction()) {
         List<Customer> customers = new ArrayList<>();
@@ -212,7 +211,7 @@ class TestPersistenceContext extends BaseTestCase {
         assertThat(pc.toString()).contains("Customer=size:5000 (5000 weak)");
         customers.clear();
         customers = DB.find(Customer.class).select("id").findList();
-        
+
         assertThat(pc.toString()).contains("Customer=size:5000"); // We expect ALWAYS 5000 entries in the PC
       }
     }

@@ -275,20 +275,17 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
       return null;
     }
 
-    private void put(Object id, Object b) {
+    private void put(Object id, Object bean) {
       Object existing;
       if (useReferences) {
         weakCount++;
-        existing = map.put(id, new BeanRef(this, id, b, queue));
+        existing = map.put(id, new BeanRef(this, id, bean, queue));
       } else {
-        existing = map.put(id, b);
+        existing = map.put(id, bean);
       }
-      // when existing BeanRef is replaced, it must not be processed by the queue.
-      // Removing from queue is not possible, so we set it to "dead" and skip 
-      // this reference in expunge. This prevents us from removing wrong keys.
-      
       if (existing instanceof BeanRef) {
-        ((BeanRef) existing).setDead();
+        // when a BeanRef is replaced, its expunge() must NOT remove an entry
+        ((BeanRef) existing).setReplaced();
         weakCount--;
       }
     }
@@ -339,7 +336,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
 
     private final ClassContext classContext;
     private final Object key;
-    private boolean alive = true;
+    private boolean replaced;
 
     private BeanRef(ClassContext classContext, Object key, Object referent, ReferenceQueue<? super Object> q) {
       super(referent, q);
@@ -347,12 +344,12 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
       this.key = key;
     }
 
-    private void setDead() {
-      alive = false;
+    private void setReplaced() {
+      replaced = true;
     }
 
     private void expunge() {
-      if (alive) {
+      if (!replaced) {
         classContext.remove(key);
       }
     }
