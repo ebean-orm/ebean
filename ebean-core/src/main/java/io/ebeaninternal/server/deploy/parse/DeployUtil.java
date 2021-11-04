@@ -205,7 +205,7 @@ public final class DeployUtil {
 
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength, MutationDetection mutationDetection) {
     prop.setDbType(dbType);
-    prop.setMutationDetection(mutationDetection == MutationDetection.DEFAULT ? defaultJsonMutationDetection : mutationDetection);
+    prop.setMutationDetection(defaultJsonMutationDetection != MutationDetection.HASH ? defaultJsonMutationDetection : mutationDetection);
     ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for JSON property [" + prop + "] [" + dbType + "]");
