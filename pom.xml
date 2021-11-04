@@ -17,7 +17,7 @@
   <url>https://ebean.io/</url>
 
   <scm>
-    <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
+    <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
 
@@ -48,6 +48,19 @@
     <ebean-agent.version>12.12.3-FOC1-SNAPSHOT</ebean-agent.version>
     <ebean-maven-plugin.version>12.12.3-FOC1-SNAPSHOT</ebean-maven-plugin.version>
   </properties>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <dependencies>
 
@@ -92,6 +105,41 @@
     <module>ebean-redis</module>
 <!--    <module>tests</module>-->
   </modules>
+
+  <repositories>
+    <repository>
+      <id>foconis-release</id>
+      <url>https://mvnrepo.foconis.de/repository/release/</url>
+    </repository>
+    <repository>
+      <id>foconis-snapshot</id>
+      <url>https://mvnrepo.foconis.de/repository/snapshot/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>foconis-release</id>
+      <url>https://mvnrepo.foconis.de/repository/release/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>foconis-snapshot</id>
+      <url>https://mvnrepo.foconis.de/repository/snapshot/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <distributionManagement>
+    <repository>
+      <id>foconis-release</id>
+      <name>FOCONIS Release Repository</name>
+      <url>https://mvnrepo.foconis.de/repository/release/</url>
+    </repository>
+    <snapshotRepository>
+      <id>foconis-snapshot</id>
+      <name>FOCONIS Snapshot Repository</name>
+      <url>https://mvnrepo.foconis.de/repository/snapshot/</url>
+    </snapshotRepository>
+  </distributionManagement>
 
 </project>
 
