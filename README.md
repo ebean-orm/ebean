@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/ebean-orm/ebean.svg?branch=master)](https://travis-ci.org/ebean-orm/ebean)
+[![Build](https://github.com/ebean-orm/ebean/actions/workflows/build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/build.yml)
 [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
 
 # Sponsors
