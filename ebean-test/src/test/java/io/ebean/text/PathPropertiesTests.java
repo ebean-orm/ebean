@@ -223,8 +223,8 @@ public class PathPropertiesTests extends BaseTestCase {
     Query<Customer> query = DB.find(Customer.class).apply(root);
     query.findList();
     List<String> sql = LoggedSql.stop();
-	assertThat(sql).hasSize(1);
-	assertThat(sql.get(0)).contains("select t0.status, t0.name, t0.smallnote, t0.anniversary, t0.id, t1.id, t1.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id");
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.id, t0.status, t0.name, t0.smallnote, t0.anniversary, t0.cretime, t0.updtime, t0.version, t0.shipping_address_id, t1.id, t1.line_1 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id;");
   }
 
 }
