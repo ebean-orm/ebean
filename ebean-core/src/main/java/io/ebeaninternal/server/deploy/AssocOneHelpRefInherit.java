@@ -31,10 +31,17 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
   Object read(DbReadContext ctx) throws SQLException {
     // read discriminator to determine the type
     InheritInfo rowInheritInfo = inherit.readType(ctx);
+    BeanDescriptor<?> desc;
     if (rowInheritInfo == null) {
-      // ignore the id property
-      property.targetIdBinder.loadIgnore(ctx);
-      return null;
+      if(!inherit.hasChildren()) {
+        desc = inherit.desc();
+      } else {
+        // ignore the id property
+        property.targetIdBinder.loadIgnore(ctx);
+        return null;
+      }
+    } else {
+      desc = rowInheritInfo.desc();
     }
     Object id = property.targetIdBinder.read(ctx);
     if (id == null) {
@@ -42,7 +49,6 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
     }
     // check transaction context to see if it already exists
     PersistenceContext pc = ctx.getPersistenceContext();
-    BeanDescriptor<?> desc = rowInheritInfo.desc();
     Object existing = desc.contextGet(pc, id);
     if (existing != null) {
       return existing;
