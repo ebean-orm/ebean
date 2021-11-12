@@ -152,6 +152,9 @@ final class BeanDescriptorJsonHelp<T> {
     }
     if (contextBean == null) {
       readJson.beanVisitor(bean, unmappedProperties);
+      if (!isNullOrZero(id)) {
+        desc.setReferenceIfIdOnly(bean._ebean_getIntercept());
+      }
     }
     if (path != null) {
       readJson.popPath();
