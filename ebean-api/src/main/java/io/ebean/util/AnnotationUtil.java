@@ -2,6 +2,7 @@ package io.ebean.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -70,6 +71,14 @@ public class AnnotationUtil {
    */
   public static <A extends Annotation> boolean typeHas(Class<?> clazz, Class<A> annotation) {
     return typeGet(clazz, annotation) != null;
+  }
+
+  public static boolean metaHas(AnnotatedElement element, Class<?> annotationType) {
+    return !metaFindAll(element, annotationType).isEmpty();
+  }
+
+  public static Set<Annotation> metaFindAll(AnnotatedElement element, Class<?> annotationType) {
+    return metaFindAllFor(element, Collections.singleton(annotationType));
   }
 
   /**
