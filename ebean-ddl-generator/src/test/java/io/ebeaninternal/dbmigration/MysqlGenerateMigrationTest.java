@@ -5,6 +5,8 @@ import io.ebean.DatabaseFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.PlatformConfig;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -20,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Jonas P&ouml;hler, FOCONIS AG
  */
+@Disabled("build success depends on test order")
 public class MysqlGenerateMigrationTest {
 
   @Test
