@@ -570,7 +570,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   private ElPropertyValue mapProperty() {
-    ElPropertyValue property = beanDescriptor.elGetValue(query.getMapKey());
+    ElPropertyValue property;
+    if (query.getMapKey() == null) {
+      property = beanDescriptor.idProperty();
+    } else {
+      property = beanDescriptor.elGetValue(query.getMapKey());
+    }
     if (property == null) {
       throw new IllegalStateException("Unknown map key property " + query.getMapKey());
     }
