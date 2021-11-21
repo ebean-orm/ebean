@@ -2,6 +2,7 @@ package io.ebean.util;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -57,10 +58,8 @@ public class AnnotationUtil {
 
   private static <A extends Annotation> void typeGetAllCollect(Class<?> clazz, Class<A> annotationType, Set<A> result) {
     while (clazz != null && clazz != Object.class) {
-      final A val = clazz.getAnnotation(annotationType);
-      if (val != null) {
-        result.add(val);
-      }
+      final A[] annotations = clazz.getAnnotationsByType(annotationType);
+      Collections.addAll(result, annotations);
       clazz = clazz.getSuperclass();
     }
   }
