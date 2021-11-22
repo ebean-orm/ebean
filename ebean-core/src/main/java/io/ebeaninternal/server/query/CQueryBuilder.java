@@ -736,6 +736,8 @@ final class CQueryBuilder {
           return " order by count(*) desc, r1.attribute_";
         case COUNT_DESC_ATTR_DESC:
           return " order by count(*) desc, r1.attribute_ desc";
+        case NO_ORDERING:
+          return "";
         default:
           throw new IllegalArgumentException("Illegal enum: " + orderBy);
       }
