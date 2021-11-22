@@ -32,16 +32,14 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
     // read discriminator to determine the type
     InheritInfo rowInheritInfo = inherit.readType(ctx);
     BeanDescriptor<?> desc;
-    if (rowInheritInfo == null) {
-      if(!inherit.hasChildren()) {
-        desc = inherit.desc();
-      } else {
-        // ignore the id property
-        property.targetIdBinder.loadIgnore(ctx);
-        return null;
-      }
-    } else {
+    if (rowInheritInfo != null) {
       desc = rowInheritInfo.desc();
+    } else if (!inherit.hasChildren()) {
+      desc = inherit.desc();
+    } else {
+      // ignore the id property
+      property.targetIdBinder.loadIgnore(ctx);
+      return null;
     }
     Object id = property.targetIdBinder.read(ctx);
     if (id == null) {
