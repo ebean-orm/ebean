@@ -3038,10 +3038,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return ebi.isReference() || referenceIdPropertyOnly(ebi);
   }
 
-  boolean hasIdPropertyOnly(EntityBeanIntercept ebi) {
-    return propertiesBaseScalar.length > 0 && ebi.hasIdOnly(idPropertyIndex);
-  }
-
   public boolean referenceIdPropertyOnly(EntityBeanIntercept ebi) {
     return idOnlyReference && ebi.hasIdOnly(idPropertyIndex);
   }
@@ -3060,7 +3056,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   void setReferenceIfIdOnly(EntityBeanIntercept ebi) {
-    if (hasIdPropertyOnly(ebi)) {
+    if (referenceIdPropertyOnly(ebi)) {
       ebi.setReference(idPropertyIndex);
     }
   }
