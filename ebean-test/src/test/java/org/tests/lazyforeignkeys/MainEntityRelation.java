@@ -3,6 +3,9 @@ package org.tests.lazyforeignkeys;
 import io.ebean.annotation.DbForeignKey;
 
 import javax.persistence.*;
+
+import org.tests.model.basic.Cat;
+
 import java.util.UUID;
 
 
@@ -22,6 +25,11 @@ public class MainEntityRelation {
   @JoinColumn(name = "id2")
   @DbForeignKey(noConstraint = true)
   private MainEntity entity2;
+  
+  @ManyToOne
+  @JoinColumn(name = "cat_id")
+  @DbForeignKey(noConstraint = true)
+  private Cat cat;
 
   private String attr1;
 
@@ -39,6 +47,14 @@ public class MainEntityRelation {
 
   public void setEntity2(MainEntity entity2) {
     this.entity2 = entity2;
+  }
+
+  public Cat getCat() {
+    return cat;
+  }
+
+  public void setCat(Cat cat) {
+    this.cat = cat;
   }
 
   public String getAttr1() {

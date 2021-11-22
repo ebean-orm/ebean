@@ -8,6 +8,7 @@ import io.ebean.text.PathProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Cat;
 
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class TestLazyForeignKeys extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
-    assertSql(sql.get(0)).contains("select t0.id, t0.attr1, t0.id1, t0.id2 from main_entity_relation");
+    assertSql(sql.get(0)).contains("select t0.id, t0.attr1, t0.id1, t0.id2, t1.species, t0.cat_id from main_entity_relation t0 left join animal t1 on t1.id = t0.cat_id");
     if (isSqlServer() || isOracle()) {
       assertSql(sql.get(1)).contains("select t0.id, t0.attr1, t0.attr2, CASE WHEN t0.id is null THEN 1 ELSE 0 END from main_entity t0");
     } else {
@@ -85,5 +86,18 @@ public class TestLazyForeignKeys extends BaseTestCase {
     assertEquals("attr1", rel1.getEntity1().getAttr1());
     assertFalse(rel1.getEntity1().isDeleted());
     assertTrue(rel1.getEntity2().isDeleted());
+  }
+  
+  @Test
+  public void testGetWithDbForeignKey() {
+    MainEntityRelation relation = DB.find(MainEntityRelation.class).findOne();
+    Cat cat = new Cat();
+    cat.setId(123L);
+    relation.setCat(cat);
+    DB.save(relation);
+    
+    relation = DB.find(MainEntityRelation.class).findOne();
+    
+    assertNotNull(relation.getCat());
   }
 }
