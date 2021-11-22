@@ -36,7 +36,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private final Boolean readOnly;
   private LoadContext loadContext;
   private PersistenceContext persistenceContext;
-  private JsonReadOptions jsonRead;
   private HashQuery cacheKey;
   private CQueryPlanKey queryPlanKey;
   private SpiQuerySecondary secondaryQueries;
@@ -259,7 +258,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (query.getPersistenceContext() == null) {
       query.setPersistenceContext(persistenceContext);
     }
-    jsonRead = new JsonReadOptions();
+    JsonReadOptions jsonRead = new JsonReadOptions();
     jsonRead.setPersistenceContext(persistenceContext);
     if (!query.isDisableLazyLoading()) {
       loadContext = new DLoadContext(this, secondaryQueries);
@@ -534,7 +533,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   @SuppressWarnings({"rawtypes"})
   private void mergeCacheHitsToMap(BeanCollection<T> result) {
-    BeanMap map = (BeanMap)result;
+    BeanMap map = (BeanMap) result;
     ElPropertyValue property = mapProperty();
     for (T bean : cacheBeans) {
       map.internalPut(property.pathGet(bean), bean);
@@ -562,22 +561,18 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   @SuppressWarnings("unchecked")
   private <K> Map<K, T> cacheBeansToMap() {
     ElPropertyValue property = mapProperty();
-    Map<K,T> map = new LinkedHashMap<>();
+    Map<K, T> map = new LinkedHashMap<>();
     for (T bean : cacheBeans) {
-      map.put((K)property.pathGet(bean), bean);
+      map.put((K) property.pathGet(bean), bean);
     }
     return map;
   }
 
   private ElPropertyValue mapProperty() {
-    ElPropertyValue property;
-    if (query.getMapKey() == null) {
-      property = beanDescriptor.idProperty();
-    } else {
-      property = beanDescriptor.elGetValue(query.getMapKey());
-    }
+    final String key = query.getMapKey();
+    final ElPropertyValue property = key == null ? beanDescriptor.idProperty() : beanDescriptor.elGetValue(key);
     if (property == null) {
-      throw new IllegalStateException("Unknown map key property " + query.getMapKey());
+      throw new IllegalStateException("Unknown map key property " + key);
     }
     return property;
   }
@@ -639,7 +634,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (cached != null && isAuditReads() && readAuditQueryType()) {
       if (cached instanceof BeanCollection) {
         // raw sql can't use L2 cache so normal queries only in here
-        Collection<T> actualDetails = ((BeanCollection<T>)cached).getActualDetails();
+        Collection<T> actualDetails = ((BeanCollection<T>) cached).getActualDetails();
         List<Object> ids = new ArrayList<>(actualDetails.size());
         for (T bean : actualDetails) {
           ids.add(beanDescriptor.idForJson(bean));
@@ -650,13 +645,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (Boolean.FALSE.equals(query.isReadOnly())) {
       // return shallow copies if readonly is explicitly set to false
       if (cached instanceof BeanCollection) {
-        cached = ((BeanCollection<?>)cached).getShallowCopy();
+        cached = ((BeanCollection<?>) cached).getShallowCopy();
       } else if (cached instanceof List) {
-        cached = new CopyOnFirstWriteList<>((List<?>)cached);
+        cached = new CopyOnFirstWriteList<>((List<?>) cached);
       } else if (cached instanceof Set) {
-        cached = new LinkedHashSet<>((Set<?>)cached);
+        cached = new LinkedHashSet<>((Set<?>) cached);
       } else if (cached instanceof Map) {
-        cached = new LinkedHashMap<>((Map<?,?>)cached);
+        cached = new LinkedHashMap<>((Map<?, ?>) cached);
       }
     }
     return cached;
