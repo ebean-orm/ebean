@@ -24,7 +24,7 @@ final class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   @Override
   public LocalDate convertFromMillis(long systemTimeMillis) {
-    return new LocalDate(systemTimeMillis);
+    return new LocalDate(systemTimeMillis, DateTimeZone.UTC);
   }
 
   @Override
