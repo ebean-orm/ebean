@@ -68,6 +68,12 @@ abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
    */
   protected abstract String toJsonNanos(T value);
 
+  protected T fromJsonNanos(long seconds, int nanoseconds) {
+    Timestamp ts = new Timestamp(seconds * 1000);
+    ts.setNanos(nanoseconds);
+    return convertFromTimestamp(ts);
+  }
+  
   /**
    * Convert the value to ISO8601 format.
    */
@@ -109,15 +115,20 @@ abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser parser) throws IOException {
+  public final T jsonRead(JsonParser parser) throws IOException {
     switch (parser.getCurrentToken()) {
       case VALUE_NUMBER_INT: {
         return convertFromMillis(parser.getLongValue());
       }
       case VALUE_NUMBER_FLOAT: {
         BigDecimal value = parser.getDecimalValue();
-        Timestamp timestamp = DecimalUtils.toTimestamp(value);
-        return convertFromTimestamp(timestamp);
+        long seconds = value.longValue();
+        int nanoseconds = DecimalUtils.extractNanosecondDecimal(value, seconds);
+        if (nanoseconds < 0) { // to support dates < 1970-01-01
+          seconds --;
+          nanoseconds += 1_000_000_000;
+        }
+        return fromJsonNanos(seconds, nanoseconds);
       }
       default: {
         return fromJsonISO8601(parser.getText());
@@ -126,7 +137,7 @@ abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, T value) throws IOException {
+  public final void jsonWrite(JsonGenerator writer, T value) throws IOException {
     switch (mode) {
       case ISO8601: {
         writer.writeString(toJsonISO8601(value));

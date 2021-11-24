@@ -8,8 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarTypeLocalDateTimeTest {
@@ -28,7 +31,8 @@ public class ScalarTypeLocalDateTimeTest {
 
     long now = System.currentTimeMillis();
     long toMillis = type.convertToMillis(LocalDateTime.now());
-    assertTrue(toMillis - now < 30);
+    now += TimeZone.getDefault().getOffset(now);
+    assertThat(toMillis).isCloseTo(now, within(30L));
   }
 
   @Test

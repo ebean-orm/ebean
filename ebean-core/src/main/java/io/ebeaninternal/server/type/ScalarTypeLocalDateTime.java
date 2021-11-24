@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 /**
  * ScalarType for java.sql.Timestamp.
@@ -22,17 +23,22 @@ final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime
 
   @Override
   public LocalDateTime convertFromMillis(long systemTimeMillis) {
-    return new Timestamp(systemTimeMillis).toLocalDateTime();
+    return LocalDateTime.ofEpochSecond(systemTimeMillis / 1000, (int) (systemTimeMillis % 1000) * 1_000_000, ZoneOffset.UTC);
   }
 
   @Override
   public long convertToMillis(LocalDateTime value) {
-    return Timestamp.valueOf(value).getTime();
+    return value.toEpochSecond(ZoneOffset.UTC) * 1000 + value.getNano() / 1_000_000;
   }
 
   @Override
   protected String toJsonNanos(LocalDateTime value) {
-    return value.toString();
+    return toJsonNanos(value.toEpochSecond(ZoneOffset.UTC), value.getNano());
+  }
+  
+  @Override
+  protected LocalDateTime fromJsonNanos(long seconds, int nanoseconds) {
+    return LocalDateTime.ofEpochSecond(seconds, nanoseconds, ZoneOffset.UTC);
   }
 
   @Override
@@ -43,16 +49,6 @@ final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime
   @Override
   protected LocalDateTime fromJsonISO8601(String value) {
     return LocalDateTime.parse(value);
-  }
-
-  @Override
-  public LocalDateTime jsonRead(JsonParser parser) throws IOException {
-    return LocalDateTime.parse(parser.getText());
-  }
-
-  @Override
-  public void jsonWrite(JsonGenerator writer, LocalDateTime value) throws IOException {
-    writer.writeString(value.toString());
   }
 
   @Override
@@ -72,7 +68,7 @@ final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime
 
   @Override
   public LocalDateTime convertFromInstant(Instant ts) {
-    return LocalDateTime.ofInstant(ts, ZoneId.systemDefault());
+    return LocalDateTime.ofInstant(ts, ZoneOffset.UTC);
   }
 
   @Override
