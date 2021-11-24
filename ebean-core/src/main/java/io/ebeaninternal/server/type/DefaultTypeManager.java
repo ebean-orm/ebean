@@ -43,6 +43,7 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -269,8 +270,11 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private ScalarType<?> checkInterfaceTypes(Class<?> type) {
-    if (java.nio.file.Path.class.isAssignableFrom(type)) {
-      return typeMap.get(java.nio.file.Path.class);
+    for (Entry<Class<?>, ScalarType<?>> entry : typeMap.entrySet()) {
+      if (entry.getKey().isAssignableFrom(type)) {
+        typeMap.put(type, entry.getValue());
+        return entry.getValue();
+      }
     }
     return null;
   }
