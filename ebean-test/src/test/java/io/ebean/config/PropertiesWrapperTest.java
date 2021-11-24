@@ -52,28 +52,29 @@ public class PropertiesWrapperTest {
 
     String home = System.getProperty("user.home");
     String tmpDir = System.getProperty("java.io.tmpdir");
+    String fileSeparator = System.getProperty("file.separator");
 
     Properties properties = new Properties();
     properties.put("someBasic", "hello");
     properties.put("someInt", "42");
     properties.put("someDouble", "5.5");
-    properties.put("somePath", "${HOME}/hello");
-    properties.put("someSystemProp", "/aaa/${java.io.tmpdir}/bbb");
+    properties.put("somePath", "${user.home}" + fileSeparator + "hello");
+    properties.put("someSystemProp", fileSeparator + "aaa" + fileSeparator + "${java.io.tmpdir}" + fileSeparator + "bbb");
 
     Properties evalCopy = Config.asConfiguration().eval(properties);
     PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", evalCopy, null);
 
     assertEquals(42, pw.getInt("someInt", 99));
     assertEquals(Double.valueOf(5.5D), (Double.valueOf(pw.getDouble("someDouble", 99.9D))));
-    assertEquals(home + "/hello", pw.get("somePath", null));
-    assertEquals("/aaa/" + tmpDir + "/bbb", pw.get("someSystemProp"));
+    assertEquals(home + fileSeparator + "hello", pw.get("somePath", null));
+    assertEquals(fileSeparator + "aaa" + fileSeparator + tmpDir + fileSeparator + "bbb", pw.get("someSystemProp"));
 
     pw = new PropertiesWrapper(evalCopy, null);
 
     assertEquals(42, pw.getInt("someInt", 99));
     assertEquals(Double.valueOf(5.5D), (Double.valueOf(pw.getDouble("someDouble", 99.9D))));
-    assertEquals(home + "/hello", pw.get("somePath", null));
-    assertEquals("/aaa/" + tmpDir + "/bbb", pw.get("someSystemProp"));
+    assertEquals(home + fileSeparator + "hello", pw.get("somePath", null));
+    assertEquals(fileSeparator + "aaa" + fileSeparator + tmpDir + fileSeparator + "bbb", pw.get("someSystemProp"));
   }
 
 }
