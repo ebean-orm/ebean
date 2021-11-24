@@ -72,6 +72,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TimeZone;
@@ -306,8 +307,11 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private ScalarType<?> checkInterfaceTypes(Class<?> type) {
-    if (java.nio.file.Path.class.isAssignableFrom(type)) {
-      return typeMap.get(java.nio.file.Path.class);
+    for (Entry<Class<?>, ScalarType<?>> entry : typeMap.entrySet()) {
+      if (entry.getKey().isAssignableFrom(type)) {
+        typeMap.put(type, entry.getValue());
+        return entry.getValue();
+      }
     }
     return null;
   }
