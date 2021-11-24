@@ -117,7 +117,7 @@ public interface DataBinder {
   /**
    * Bind a timestamp value.
    */
-  void setTimestamp(Timestamp value) throws SQLException;
+  void setTimestamp(Timestamp value, boolean isLocal) throws SQLException;
 
   /**
    * Bind a time value.

@@ -294,8 +294,11 @@ public final class Binder {
           break;
 
         case java.sql.Types.TIMESTAMP:
+          b.setTimestamp((java.sql.Timestamp) data, false);
+          break;
+          
         case DbPlatformType.LOCALDATETIME:
-          b.setTimestamp((java.sql.Timestamp) data);
+          b.setTimestamp((java.sql.Timestamp) data, true);
           break;
 
         case java.sql.Types.BINARY:

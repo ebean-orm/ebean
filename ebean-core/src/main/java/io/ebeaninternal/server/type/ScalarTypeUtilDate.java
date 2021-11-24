@@ -21,7 +21,7 @@ final class ScalarTypeUtilDate {
   static final class TimestampType extends ScalarTypeBaseDateTime<java.util.Date> {
 
     TimestampType(JsonConfig.DateTime mode) {
-      super(mode, java.util.Date.class, false, Types.TIMESTAMP);
+      super(mode, java.util.Date.class, false, Types.TIMESTAMP, false);
     }
 
     @Override
@@ -41,7 +41,7 @@ final class ScalarTypeUtilDate {
 
     @Override
     public java.util.Date read(DataReader reader) throws SQLException {
-      Timestamp timestamp = reader.getTimestamp();
+      Timestamp timestamp = reader.getTimestamp(isLocal);
       if (timestamp == null) {
         return null;
       } else {
@@ -54,7 +54,7 @@ final class ScalarTypeUtilDate {
       if (value == null) {
         binder.setNull(Types.TIMESTAMP);
       } else {
-        binder.setTimestamp(new Timestamp(value.getTime()));
+        binder.setTimestamp(new Timestamp(value.getTime()), isLocal);
       }
     }
 

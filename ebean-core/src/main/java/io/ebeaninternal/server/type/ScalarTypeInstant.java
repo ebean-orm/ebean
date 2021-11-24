@@ -12,7 +12,7 @@ import java.time.Instant;
 final class ScalarTypeInstant extends ScalarTypeBaseDateTime<Instant> {
 
   ScalarTypeInstant(JsonConfig.DateTime mode) {
-    super(mode, Instant.class, false, Types.TIMESTAMP);
+    super(mode, Instant.class, false, Types.TIMESTAMP, false);
   }
 
   @Override

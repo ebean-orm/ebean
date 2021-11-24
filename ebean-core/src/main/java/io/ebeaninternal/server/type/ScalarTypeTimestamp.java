@@ -18,7 +18,7 @@ import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 final class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 
   ScalarTypeTimestamp(JsonConfig.DateTime mode) {
-    super(mode, Timestamp.class, true, Types.TIMESTAMP);
+    super(mode, Timestamp.class, true, Types.TIMESTAMP, false);
   }
 
   @Override
@@ -61,13 +61,13 @@ final class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
     if (value == null) {
       binder.setNull(Types.TIMESTAMP);
     } else {
-      binder.setTimestamp(value);
+      binder.setTimestamp(value, isLocal);
     }
   }
 
   @Override
   public Timestamp read(DataReader reader) throws SQLException {
-    return reader.getTimestamp();
+    return reader.getTimestamp(isLocal);
   }
 
   @Override

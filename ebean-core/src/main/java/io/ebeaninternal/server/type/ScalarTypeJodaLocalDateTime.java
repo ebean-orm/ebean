@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
+import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 import org.joda.time.LocalDateTime;
 
@@ -14,7 +15,7 @@ import java.time.Instant;
 final class ScalarTypeJodaLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime> {
 
   ScalarTypeJodaLocalDateTime(JsonConfig.DateTime mode) {
-    super(mode, LocalDateTime.class, false, Types.TIMESTAMP);
+    super(mode, LocalDateTime.class, false, DbPlatformType.LOCALDATETIME, true);
   }
 
   @Override

@@ -16,7 +16,7 @@ final class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTime
   private final ZoneId zoneId;
 
   ScalarTypeZonedDateTime(JsonConfig.DateTime mode, ZoneId zoneId) {
-    super(mode, ZonedDateTime.class, false, Types.TIMESTAMP);
+    super(mode, ZonedDateTime.class, false, Types.TIMESTAMP, false);
     this.zoneId = zoneId;
   }
 

@@ -51,8 +51,8 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean implements SqlTreeRoot {
   public <T> Version<T> loadVersion(DbReadContext ctx) throws SQLException {
     // read the sys period lower and upper bounds
     // these are always the first 2 columns in the resultSet
-    Timestamp start = ctx.getDataReader().getTimestamp();
-    Timestamp end = ctx.getDataReader().getTimestamp();
+    Timestamp start = ctx.getDataReader().getTimestamp(false);
+    Timestamp end = ctx.getDataReader().getTimestamp(false);
     T bean = (T) load(ctx, null, null);
     return new Version<>(bean, start, end);
   }

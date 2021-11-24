@@ -14,7 +14,7 @@ import java.time.Instant;
 final class ScalarTypeJodaDateTime extends ScalarTypeBaseDateTime<DateTime> {
 
   ScalarTypeJodaDateTime(JsonConfig.DateTime mode) {
-    super(mode, DateTime.class, false, Types.TIMESTAMP);
+    super(mode, DateTime.class, false, Types.TIMESTAMP, false);
   }
 
   @Override

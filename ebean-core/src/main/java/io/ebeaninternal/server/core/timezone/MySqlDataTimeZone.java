@@ -19,7 +19,7 @@ public class MySqlDataTimeZone implements DataTimeZone {
   }
 
   @Override
-  public Calendar getDateTimeZone() {
+  public Calendar getLocalTimeZone() {
     return zone;
   }
 }

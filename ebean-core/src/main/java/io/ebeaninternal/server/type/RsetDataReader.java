@@ -102,7 +102,7 @@ public class RsetDataReader implements DataReader {
 
   @Override
   public Date getDate() throws SQLException {
-    Calendar cal = dataTimeZone.getDateTimeZone();
+    Calendar cal = dataTimeZone.getLocalTimeZone();
     if (cal != null) {
       return rset.getDate(pos(), cal);
     } else {
@@ -151,7 +151,7 @@ public class RsetDataReader implements DataReader {
 
   @Override
   public Time getTime() throws SQLException {
-    Calendar cal = dataTimeZone.getTimeZone();
+    Calendar cal = dataTimeZone.getLocalTimeZone();
     if (cal != null) {
       return rset.getTime(pos(), cal);
     } else {
@@ -160,8 +160,8 @@ public class RsetDataReader implements DataReader {
   }
 
   @Override
-  public Timestamp getTimestamp() throws SQLException {
-    Calendar cal = dataTimeZone.getTimeZone();
+  public Timestamp getTimestamp(boolean isLocal) throws SQLException {
+    Calendar cal = isLocal ? dataTimeZone.getLocalTimeZone() : dataTimeZone.getTimeZone();
     if (cal != null) {
       return rset.getTimestamp(pos(), cal);
     } else {

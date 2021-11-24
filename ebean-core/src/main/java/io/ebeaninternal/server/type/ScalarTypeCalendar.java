@@ -19,7 +19,7 @@ import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
 final class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
 
   ScalarTypeCalendar(JsonConfig.DateTime mode, int jdbcType) {
-    super(mode, Calendar.class, false, jdbcType);
+    super(mode, Calendar.class, false, jdbcType, false);
   }
 
   @Override
@@ -29,7 +29,7 @@ final class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
     } else {
       if (jdbcType == Types.TIMESTAMP) {
         Timestamp timestamp = new Timestamp(value.getTimeInMillis());
-        binder.setTimestamp(timestamp);
+        binder.setTimestamp(timestamp, isLocal);
       } else {
         Date d = new Date(value.getTimeInMillis());
         binder.setDate(d);

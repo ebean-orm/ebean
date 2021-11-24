@@ -24,10 +24,12 @@ import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.parseIso;
 abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
 
   protected final JsonConfig.DateTime mode;
+  protected final boolean isLocal;
 
-  ScalarTypeBaseDateTime(JsonConfig.DateTime mode, Class<T> type, boolean jdbcNative, int jdbcType) {
+  ScalarTypeBaseDateTime(JsonConfig.DateTime mode, Class<T> type, boolean jdbcNative, int jdbcType, boolean isLocal) {
     super(type, jdbcNative, jdbcType);
     this.mode = mode;
+    this.isLocal = isLocal;
   }
 
   @Override
@@ -77,19 +79,21 @@ abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   protected T fromJsonISO8601(String value) {
     return convertFromInstant(parseIso(value));
   }
+  
+
 
   @Override
   public void bind(DataBinder binder, T value) throws SQLException {
     if (value == null) {
       binder.setNull(Types.TIMESTAMP);
     } else {
-      binder.setTimestamp(convertToTimestamp(value));
+      binder.setTimestamp(convertToTimestamp(value), isLocal);
     }
   }
 
   @Override
   public T read(DataReader reader) throws SQLException {
-    Timestamp ts = reader.getTimestamp();
+    Timestamp ts = reader.getTimestamp(isLocal);
     if (ts == null) {
       return null;
     } else {

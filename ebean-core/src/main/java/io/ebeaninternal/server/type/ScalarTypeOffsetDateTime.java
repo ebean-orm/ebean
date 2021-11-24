@@ -18,7 +18,7 @@ final class ScalarTypeOffsetDateTime extends ScalarTypeBaseDateTime<OffsetDateTi
   private final ZoneId zoneId;
 
   ScalarTypeOffsetDateTime(JsonConfig.DateTime mode, ZoneId zoneId) {
-    super(mode, OffsetDateTime.class, false, Types.TIMESTAMP);
+    super(mode, OffsetDateTime.class, false, Types.TIMESTAMP, false);
     this.zoneId = zoneId;
   }
 

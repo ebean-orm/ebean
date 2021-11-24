@@ -39,7 +39,7 @@ public interface DataReader {
 
   java.sql.Time getTime() throws SQLException;
 
-  java.sql.Timestamp getTimestamp() throws SQLException;
+  java.sql.Timestamp getTimestamp(boolean isLocal) throws SQLException;
 
   BigDecimal getBigDecimal() throws SQLException;
 

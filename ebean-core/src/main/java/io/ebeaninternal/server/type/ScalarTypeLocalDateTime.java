@@ -17,7 +17,7 @@ import java.time.ZoneId;
 final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime> {
 
   ScalarTypeLocalDateTime(JsonConfig.DateTime mode) {
-    super(mode, LocalDateTime.class, false, ExtraDbTypes.LOCALDATETIME);
+    super(mode, LocalDateTime.class, false, ExtraDbTypes.LOCALDATETIME, true);
   }
 
   @Override
