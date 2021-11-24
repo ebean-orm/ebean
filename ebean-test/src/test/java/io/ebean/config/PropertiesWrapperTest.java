@@ -50,7 +50,7 @@ public class PropertiesWrapperTest {
   @Test
   public void testGetProperties() {
 
-    String home = System.getenv("HOME");
+    String home = System.getProperty("user.home");
     String tmpDir = System.getProperty("java.io.tmpdir");
 
     Properties properties = new Properties();
