@@ -59,9 +59,8 @@ abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   @Override
   public String formatValue(T t) {
-    Date date = convertToDate(t);
     // format all dates into epoch millis
-    long epochMillis = date.getTime();
+    long epochMillis = convertToMillis(t);
     return Long.toString(epochMillis);
   }
 
@@ -69,7 +68,7 @@ abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   public T parse(String value) {
     try {
       long epochMillis = Long.parseLong(value);
-      return convertFromDate(new Date(epochMillis));
+      return convertFromMillis(epochMillis);
     } catch (NumberFormatException e) {
       Date date = Date.valueOf(value);
       return convertFromDate(date);

@@ -4,8 +4,8 @@ import io.ebean.config.JsonConfig;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -26,7 +26,15 @@ final class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   @Override
   public LocalDate convertFromMillis(long systemTimeMillis) {
-    return new Timestamp(systemTimeMillis).toLocalDateTime().toLocalDate();
+    // java 9: 
+    // return LocalDate.ofInstant(Instant.ofEpochMilli(systemTimeMillis), ZoneOffset.UTC);
+    
+    // java 8:
+    Instant instant = Instant.ofEpochMilli(systemTimeMillis);
+    ZoneOffset offset = ZoneOffset.UTC.getRules().getOffset(instant);
+    long localSecond = instant.getEpochSecond() + offset.getTotalSeconds();
+    long localEpochDay = Math.floorDiv(localSecond, 86400);
+    return LocalDate.ofEpochDay(localEpochDay);
   }
 
   @Override
