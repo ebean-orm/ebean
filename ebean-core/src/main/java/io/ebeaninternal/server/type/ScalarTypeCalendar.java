@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.Calendar;
 
 import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
+import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.parseIso;
 
 /**
  * ScalarType for java.util.Calendar.
@@ -60,7 +61,8 @@ final class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
 
   @Override
   protected String toJsonNanos(Calendar value) {
-    return String.valueOf(value.getTime());
+    Instant i = value.toInstant();
+    return toJsonNanos(i.getEpochSecond(), i.getNano());
   }
 
   @Override
