@@ -8,7 +8,6 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Instant;
 
 /**

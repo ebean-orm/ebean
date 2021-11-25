@@ -15,6 +15,9 @@ final class IsoJsonDateTimeParser {
     return Instant.parse(jsonDateTime);
   }
 
+  /**
+   * Formats the instant with milliseconds precision.
+   */
   static String formatIso(Instant value) {
     return ISO_MILLIS.format(value);
   }
