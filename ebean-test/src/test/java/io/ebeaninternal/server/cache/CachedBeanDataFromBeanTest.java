@@ -12,6 +12,7 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +27,8 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
 
     BeanDescriptor<Customer> desc = server.descriptor(Customer.class);
 
-    Date largeDate = new Date(9223372036825200000L);
+    
+    Date largeDate = Date.valueOf(LocalDate.of(292278994, 8, 17));
 
     Customer customer = new Customer();
     customer.setId(42);
@@ -44,7 +46,8 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
     assertEquals(cacheData.getData("id"), "42");
     assertEquals(cacheData.getData("name"), "Rob");
     assertEquals(cacheData.getData("billingAddress"), "12");
-    assertEquals(cacheData.getData("anniversary"), "9223372036825200000");
+    assertEquals(cacheData.getData("anniversary"), "9223372036828800000");
+    assertEquals(9223372036828800000L % 86400000, 0); // is gmt based millis
   }
 
 
