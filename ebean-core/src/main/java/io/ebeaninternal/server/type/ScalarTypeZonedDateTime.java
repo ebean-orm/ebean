@@ -31,6 +31,11 @@ final class ScalarTypeZonedDateTime extends ScalarTypeBaseDateTime<ZonedDateTime
   }
 
   @Override
+  protected ZonedDateTime fromJsonISO8601(String value) {
+    return convertFromInstant(Instant.parse(value));
+  }
+
+  @Override
   public long convertToMillis(ZonedDateTime value) {
     return value.toInstant().toEpochMilli();
   }
