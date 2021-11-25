@@ -29,7 +29,7 @@ final class ScalarTypeJodaDateTime extends ScalarTypeBaseDateTime<DateTime> {
 
   @Override
   protected String toJsonISO8601(DateTime value) {
-    return value.toString();
+    return value.toInstant().toString();
   }
 
   @Override
