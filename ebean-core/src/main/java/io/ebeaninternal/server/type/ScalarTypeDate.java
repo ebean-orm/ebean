@@ -8,6 +8,10 @@ import io.ebeaninternal.server.core.BasicTypeConverter;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 /**
  * ScalarType for java.sql.Date.
@@ -25,7 +29,12 @@ final class ScalarTypeDate extends ScalarTypeBaseDate<java.sql.Date> {
 
   @Override
   public long convertToMillis(Date value) {
-    return value.getTime();
+    return value.toLocalDate().toEpochDay() * 86400000L; // return a GMT aligned millis value
+  }
+  @Override
+  public Date convertFromMillis(long systemTimeMillis) {
+    LocalDate ld = LocalDate.ofEpochDay(systemTimeMillis / 86400000L);
+    return Date.valueOf(ld);
   }
 
   @Override
