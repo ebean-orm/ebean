@@ -27,7 +27,8 @@ public class DatabaseConfigTest {
   @Test
   public void evalPropertiesInput() {
 
-    String home = System.getenv("HOME");
+    String home = System.getProperty("user.home");
+    String fileSeparator = System.getProperty("file.separator");
 
     Properties props = new Properties();
     props.setProperty("ddl.initSql", "${user.home}" + fileSeparator + "initSql");
