@@ -187,7 +187,10 @@
 
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
-      <artifactId>ojdbc10</artifactId>
+      <!-- Note: Using ojdbc10 here will affect loading other drivers on jdk8, 
+        because the driverManager will stop on first load error and stops loading 
+        other drivers -->
+      <artifactId>ojdbc8</artifactId>
       <version>19.12.0.0</version>
       <scope>test</scope>
     </dependency>
