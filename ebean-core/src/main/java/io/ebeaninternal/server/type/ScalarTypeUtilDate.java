@@ -26,13 +26,17 @@ final class ScalarTypeUtilDate {
 
     @Override
     protected String toJsonNanos(Date value) {
-      return String.valueOf(value.getTime());
+      return toJsonNanos(value.getTime()); 
     }
 
     @Override
     protected String toJsonISO8601(Date value) {
       return formatIso(value.toInstant());
     }
+    
+    protected Date fromJsonISO8601(String value) {
+      return convertFromInstant(Instant.parse(value));
+    };
 
     @Override
     public long convertToMillis(Date value) {

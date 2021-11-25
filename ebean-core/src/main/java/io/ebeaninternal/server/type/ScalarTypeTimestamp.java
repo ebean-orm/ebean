@@ -21,7 +21,7 @@ final class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 
   @Override
   protected String toJsonNanos(Timestamp value) {
-    return String.valueOf(value.getTime());
+    return toJsonNanos(value.getTime()/1000, value.getNanos());
   }
 
   @Override
