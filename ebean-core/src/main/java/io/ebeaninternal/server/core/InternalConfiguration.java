@@ -451,7 +451,9 @@ public final class InternalConfiguration {
       }
       return new NoDataTimeZone();
     }
-    if (getPlatform().base() == Platform.ORACLE) {
+    if (isMySql(getPlatform())) {
+      return new MySqlDataTimeZone(tz);
+    } else if (getPlatform().base() == Platform.ORACLE) {
       return new OracleDataTimeZone(tz);
     } else {
       return new SimpleDataTimeZone(tz);
@@ -459,7 +461,7 @@ public final class InternalConfiguration {
   }
 
   private boolean isMySql(Platform platform) {
-    return platform.base() == Platform.MYSQL;
+    return platform.base() == Platform.MYSQL || platform.base() == Platform.MARIADB ;
   }
 
   public DataTimeZone getDataTimeZone() {

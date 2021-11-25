@@ -43,7 +43,7 @@ import io.ebean.util.CamelCaseHelper;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 @TestInstance(Lifecycle.PER_CLASS)
-@Disabled
+//@Disabled
 public class DatesAndTimesTest {
  
 
