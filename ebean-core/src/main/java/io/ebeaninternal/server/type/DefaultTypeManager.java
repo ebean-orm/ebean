@@ -591,8 +591,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
-    Enum<?>[] enumConstants = enumType.getEnumConstants();
-    for (Enum<?> enumConstant : enumConstants) {
+    for (Enum<?> enumConstant : enumType.getEnumConstants()) {
       try {
         Object value = method.invoke(enumConstant);
         nameValueMap.put(enumConstant.name(), value.toString());
