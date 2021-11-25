@@ -113,6 +113,10 @@ abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   protected String toJsonNanos(long epochSecs, int nanos) {
     return DecimalUtils.toDecimal(epochSecs, nanos);
   }
+  
+  protected String toJsonNanos(long millis) {
+    return DecimalUtils.toDecimal(millis / 1000, (int) (millis % 1000) * 1_000_000);
+  }
 
   @Override
   public final T jsonRead(JsonParser parser) throws IOException {
