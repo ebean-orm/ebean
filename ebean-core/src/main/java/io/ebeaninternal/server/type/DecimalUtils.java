@@ -72,10 +72,20 @@ final class DecimalUtils {
   }
 
   static String toDecimal(long seconds, int nanoseconds) {
+    assert nanoseconds >= 0;
+    boolean negative = seconds < 0;
+    if (nanoseconds > 0 && negative) {
+      seconds++; // to support dates < 1970-01-01
+      nanoseconds = 1_000_000_000 - nanoseconds;
+    }
     StringBuilder string = new StringBuilder(Integer.toString(nanoseconds));
     if (string.length() < 9)
       string.insert(0, ZEROES, 0, 9 - string.length());
-    return seconds + "." + string;
+    if (negative && seconds == 0) {
+      return "-0." + string;
+    } else {
+      return seconds + "." + string;
+    }
   }
 
   static int extractNanosecondDecimal(BigDecimal value, long integer) {
