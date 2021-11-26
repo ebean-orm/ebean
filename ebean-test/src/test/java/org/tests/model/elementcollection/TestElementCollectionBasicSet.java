@@ -10,11 +10,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestElementCollectionBasicSet extends BaseTestCase {
+class TestElementCollectionBasicSet extends BaseTestCase {
 
   @Test
-  public void test() {
-
+  void test() {
     LoggedSql.start();
 
     EcsPerson person = new EcsPerson("Fiona021");
@@ -172,8 +171,7 @@ public class TestElementCollectionBasicSet extends BaseTestCase {
   }
 
   @Test
-  public void json() {
-
+  void json() {
     EcsPerson person = new EcsPerson("Fiona021");
     person.getPhoneNumbers().add("021 1234");
     person.getPhoneNumbers().add("021 4321");
