@@ -54,4 +54,10 @@ class JsonTrimTest {
     final String trimmed = JsonTrim.trim("{\"name\":  \"one\nfoo\nbar\\bazz\tboo\",\t \t \n \"along\": 1}");
     assertThat(trimmed).isEqualTo("{\"name\":\"one\nfoo\nbar\\bazz\tboo\",\"along\":1}");
   }
+
+  @Test
+  void trim_escaped() {
+    final String trimmed = JsonTrim.trim(" \t \n {\"a\": \n \"\\t1\\t2\\n3\\\\\",\t \n \"b\": \"\\t1\\t2\\n3\\\\\" , \t \n \"c\": \"\\t1\\t2\\n3\\\\\" \t \n }");
+    assertThat(trimmed).isEqualTo("{\"a\":\"\\t1\\t2\\n3\\\\\",\"b\":\"\\t1\\t2\\n3\\\\\",\"c\":\"\\t1\\t2\\n3\\\\\"}");
+  }
 }
