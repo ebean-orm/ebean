@@ -1,5 +1,7 @@
 package io.ebean;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
@@ -10,8 +12,6 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -92,6 +92,7 @@ import java.util.concurrent.Callable;
  * @see DatabaseFactory
  * @see DatabaseConfig
  */
+@NonNullApi
 public interface Database {
 
   /**
@@ -575,8 +576,8 @@ public interface Database {
   <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery);
 
   /**
-   * Look to execute a native sql query that does not returns beans but instead
-   * returns SqlRow or direct access to ResultSet (see {@link SqlQuery#findList(RowMapper)}.
+   * Look to execute a native sql query that does not return beans but instead
+   * returns SqlRow or direct access to ResultSet.
    *
    * <p>
    * Refer to {@link DtoQuery} for native sql queries returning DTO beans.
@@ -949,7 +950,6 @@ public interface Database {
    * @param beanType the type of entity bean
    * @param id       the id value
    */
-  @Nonnull
   <T> T reference(Class<T> beanType, Object id);
 
   /**
@@ -1236,6 +1236,7 @@ public interface Database {
    * @param id          the bean id value
    * @param transaction the transaction to use (can be null)
    */
+  @Nullable
   <T> T find(Class<T> beanType, Object id, Transaction transaction);
 
   /**
@@ -1294,13 +1295,11 @@ public interface Database {
    * @param bean The entity bean to check uniqueness on
    * @return a set of Properties if constraint validation was detected or empty list.
    */
-  @Nonnull
   Set<Property> checkUniqueness(Object bean);
 
   /**
    * Same as {@link #checkUniqueness(Object)}. but with given transaction.
    */
-  @Nonnull
   Set<Property> checkUniqueness(Object bean, Transaction transaction);
 
   /**
@@ -1614,6 +1613,7 @@ public interface Database {
    * @param id          the id of the entity bean
    * @param transaction the transaction the publish process should use (can be null)
    */
+  @Nullable
   <T> T publish(Class<T> beanType, Object id, Transaction transaction);
 
   /**
@@ -1627,6 +1627,7 @@ public interface Database {
    * @param beanType the type of the entity bean
    * @param id       the id of the entity bean
    */
+  @Nullable
   <T> T publish(Class<T> beanType, Object id);
 
   /**
@@ -1665,6 +1666,7 @@ public interface Database {
    * @param id          the id of the entity bean to restore
    * @param transaction the transaction the restore process should use (can be null)
    */
+  @Nullable
   <T> T draftRestore(Class<T> beanType, Object id, Transaction transaction);
 
   /**
@@ -1678,6 +1680,7 @@ public interface Database {
    * @param beanType the type of the entity bean
    * @param id       the id of the entity bean to restore
    */
+  @Nullable
   <T> T draftRestore(Class<T> beanType, Object id);
 
   /**

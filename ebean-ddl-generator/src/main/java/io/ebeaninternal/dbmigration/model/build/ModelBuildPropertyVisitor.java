@@ -203,10 +203,10 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       if (columns.length == 1) {
         if (p.hasForeignKeyConstraint() && !importedProperty.descriptor().suppressForeignKey()) {
           // single references column (put it on the column)
-          String refTable = importedProperty.descriptor().getBaseTable();
+          String refTable = importedProperty.descriptor().baseTable();
           if (refTable == null) {
             // odd case where an EmbeddedId only has 1 property
-            refTable = p.targetDescriptor().getBaseTable();
+            refTable = p.targetDescriptor().baseTable();
           }
           col.setReferences(refTable + "." + refColumn);
           col.setForeignKeyName(foreignKeyConstraintName(col.getName()));

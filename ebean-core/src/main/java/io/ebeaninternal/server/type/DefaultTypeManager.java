@@ -251,6 +251,18 @@ public final class DefaultTypeManager implements TypeManager {
     return nativeMap.get(jdbcType);
   }
 
+  @Override
+  public ScalarType<?> getScalarType(Type propertyType, Class<?> propertyClass) {
+    if (propertyType instanceof ParameterizedType) {
+      ParameterizedType pt = (ParameterizedType)propertyType;
+      Type rawType = pt.getRawType();
+      if (List.class == rawType || Set.class == rawType) {
+        return getArrayScalarType((Class<?>)rawType, propertyType, true);
+      }
+    }
+    return getScalarType(propertyClass);
+  }
+
   /**
    * This can return null if no matching ScalarType is found.
    */
@@ -286,7 +298,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType, boolean nullable) {
+  public ScalarType<?> getArrayScalarType(Class<?> type, Type genericType, boolean nullable) {
     Type valueType = getValueType(genericType);
     if (type.equals(List.class)) {
       return getArrayScalarTypeList(valueType, nullable);
@@ -591,8 +603,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
-    Enum<?>[] enumConstants = enumType.getEnumConstants();
-    for (Enum<?> enumConstant : enumConstants) {
+    for (Enum<?> enumConstant : enumType.getEnumConstants()) {
       try {
         Object value = method.invoke(enumConstant);
         nameValueMap.put(enumConstant.name(), value.toString());

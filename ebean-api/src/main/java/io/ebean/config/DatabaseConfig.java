@@ -1547,6 +1547,9 @@ public class DatabaseConfig {
 
   /**
    * Set to true if all DB column and table names should use quoted identifiers.
+   * <p>
+   * For Postgres pgjdbc version 42.3.0 should be used with datasource property
+   * <em>quoteReturningIdentifiers</em> set to <em>false</em> (refer #2303).
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
     platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);

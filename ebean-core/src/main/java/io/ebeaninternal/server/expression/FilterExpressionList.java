@@ -1,23 +1,15 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.Junction;
-import io.ebean.OrderBy;
-import io.ebean.Query;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
+import io.ebean.*;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 
 import javax.persistence.PersistenceException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
+@NonNullApi
 public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
   private static final String notAllowedMessage = "This method is not allowed on a filter";
@@ -92,6 +84,7 @@ public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
     return rootQuery.findSet();
   }
 
+  @Nullable
   @Override
   public T findOne() {
     return rootQuery.findOne();

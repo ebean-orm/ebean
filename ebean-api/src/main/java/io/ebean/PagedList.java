@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -116,13 +115,11 @@ public interface PagedList<T> {
    *
    * }</pre>
    */
-  @Nonnull
   Future<Integer> getFutureCount();
 
   /**
    * Return the list of entities for this page.
    */
-  @Nonnull
   List<T> getList();
 
   /**

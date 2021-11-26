@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -25,13 +24,11 @@ public class EmptyPagedList<T> implements PagedList<T> {
     // do nothing
   }
 
-  @Nonnull
   @Override
   public Future<Integer> getFutureCount() {
     return null;
   }
 
-  @Nonnull
   @Override
   public List<T> getList() {
     return Collections.emptyList();

@@ -16,9 +16,10 @@ import java.sql.Timestamp;
 import java.util.Map;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestDiffHelpSimple extends BaseTestCase {
+class TestDiffHelpSimple extends BaseTestCase {
 
   long firstTime = System.currentTimeMillis() - 10000;
   long secondTime = System.currentTimeMillis();
@@ -26,7 +27,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
   Database server;
   BeanDescriptor<Order> orderDesc;
 
-  public TestDiffHelpSimple() {
+  TestDiffHelpSimple() {
     server = DB.getDefault();
     SpiEbeanServer spiServer = (SpiEbeanServer) server;
     orderDesc = spiServer.descriptor(Order.class);
@@ -44,9 +45,12 @@ public class TestDiffHelpSimple extends BaseTestCase {
   }
 
   @Test
-  public void testBasicChanges() {
+  void diffWhenNull_expect_empty() {
+    assertThat(DB.diff(null, null)).isEmpty();
+  }
 
-
+  @Test
+  void testBasicChanges() {
     Order order1 = createBaseOrder(server);
 
     Order order2 = new Order();
@@ -70,9 +74,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
   }
 
   @Test
-  public void testBasicChanges_given_flatMode() {
-
-
+  void testBasicChanges_given_flatMode() {
     Order order1 = createBaseOrder(server);
 
     Order order2 = new Order();
@@ -98,8 +100,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
   }
 
   @Test
-  public void testIdIgnored() {
-
+  void testIdIgnored() {
     Order order1 = createBaseOrder(server);
     Order order2 = createBaseOrder(server);
     order2.setId(14);
@@ -110,8 +111,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
   }
 
   @Test
-  public void testSecondValueNull() {
-
+  void testSecondValueNull() {
     Order order1 = createBaseOrder(server);
 
     Order order2 = createBaseOrder(server);
@@ -134,10 +134,8 @@ public class TestDiffHelpSimple extends BaseTestCase {
     assertNull(shipDatePair.getOldValue());
   }
 
-
   @Test
-  public void testFirstValueNull() {
-
+  void testFirstValueNull() {
     Order order1 = createBaseOrder(server);
     order1.setShipDate(null);
 
@@ -157,8 +155,7 @@ public class TestDiffHelpSimple extends BaseTestCase {
   }
 
   @Test
-  public void testBothNull() {
-
+  void testBothNull() {
     Order order1 = createBaseOrder(server);
     order1.setShipDate(null);
 

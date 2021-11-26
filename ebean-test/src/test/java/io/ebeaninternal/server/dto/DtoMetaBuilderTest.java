@@ -34,8 +34,10 @@ public class DtoMetaBuilderTest {
     Map<String, Method> methods = getIncludedMethodsFor(D0.class);
 
     assertThat(methods).hasSize(2);
-    assertThat(DtoMetaBuilder.propertyType(methods.get("setName"))).isEqualTo(String.class);
-    assertThat(DtoMetaBuilder.propertyType(methods.get("setId"))).isEqualTo(long.class);
+    assertThat(DtoMetaProperty.propertyClass(methods.get("setName"))).isEqualTo(String.class);
+    assertThat(DtoMetaProperty.propertyClass(methods.get("setId"))).isEqualTo(long.class);
+    assertThat(DtoMetaProperty.propertyType(methods.get("setName"))).isEqualTo(String.class);
+    assertThat(DtoMetaProperty.propertyType(methods.get("setId"))).isEqualTo(long.class);
   }
 
   @Test

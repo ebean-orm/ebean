@@ -1,11 +1,13 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.bean.EntityBean;
-import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiBeanType;
 import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiPersistenceContext;
 
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -25,14 +27,16 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class DefaultPersistenceContext implements SpiPersistenceContext {
 
-  /**
-   * Map used hold caches. One cache per bean type.
-   */
   private final HashMap<Class<?>, ClassContext> typeCache = new HashMap<>();
-
   private final ReentrantLock lock = new ReentrantLock();
+  private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
-  private int putCount;
+  /**
+   * When we are inside an iterate loop, we will add only WeakReferences. This
+   * allows the JVM GC to collect beans, which are not referenced elsewhere. In
+   * normal operation, we will use hard references, to avoid performance impact
+   */
+  private int iterateDepth;
 
   /**
    * Create a new PersistenceContext.
@@ -40,60 +44,33 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   public DefaultPersistenceContext() {
   }
 
-  /**
-   * Create as a shallow copy with initial or types that have not been added to.
-   */
-  private DefaultPersistenceContext(DefaultPersistenceContext parent, boolean initial) {
-    for (Map.Entry<Class<?>, ClassContext> entry : parent.typeCache.entrySet()) {
-      typeCache.put(entry.getKey(), entry.getValue().copy(initial));
-    }
-  }
-
-  /**
-   * Return the initial shallow copy with each ClassContext noting it's initialSize (to detect additions).
-   */
   @Override
-  public PersistenceContext forIterate() {
-    return new DefaultPersistenceContext(this, true);
-  }
-
-  /**
-   * Return a shallow copy including each ClassContext that has had no additions (still at initialSize).
-   */
-  @Override
-  public PersistenceContext forIterateReset() {
-    return new DefaultPersistenceContext(this, false);
-  }
-
-  @Override
-  public boolean resetLimit() {
+  public void beginIterate() {
     lock.lock();
     try {
-      if (putCount < 100) {
-        return false;
-      }
-      putCount = 0;
-      for (ClassContext value : typeCache.values()) {
-        if (value.resetLimit()) {
-          return true;
-        }
-      }
-      // checking after another 100 puts
-      return false;
+      iterateDepth++;
     } finally {
       lock.unlock();
     }
   }
 
-  /**
-   * Set an object into the PersistenceContext.
-   */
+  @Override
+  public void endIterate() {
+    lock.lock();
+    try {
+      iterateDepth--;
+      expungeStaleEntries(); // when leaving the iterator, cleanup.
+    } finally {
+      lock.unlock();
+    }
+  }
+
   @Override
   public void put(Class<?> rootType, Object id, Object bean) {
     lock.lock();
     try {
-      putCount++;
-      getClassContext(rootType).put(id, bean);
+      expungeStaleEntries();
+      classContext(rootType).useReferences(iterateDepth > 0).put(id, bean);
     } finally {
       lock.unlock();
     }
@@ -103,8 +80,8 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   public Object putIfAbsent(Class<?> rootType, Object id, Object bean) {
     lock.lock();
     try {
-      putCount++;
-      return getClassContext(rootType).putIfAbsent(id, bean);
+      expungeStaleEntries();
+      return classContext(rootType).useReferences(iterateDepth > 0).putIfAbsent(id, bean);
     } finally {
       lock.unlock();
     }
@@ -117,7 +94,8 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   public Object get(Class<?> rootType, Object id) {
     lock.lock();
     try {
-      return getClassContext(rootType).get(id);
+      expungeStaleEntries();
+      return classContext(rootType).get(id);
     } finally {
       lock.unlock();
     }
@@ -127,19 +105,18 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   public WithOption getWithOption(Class<?> rootType, Object id) {
     lock.lock();
     try {
-      return getClassContext(rootType).getWithOption(id);
+      expungeStaleEntries();
+      return classContext(rootType).getWithOption(id);
     } finally {
       lock.unlock();
     }
   }
 
-  /**
-   * Return the number of beans of the given type in the persistence context.
-   */
   @Override
   public int size(Class<?> rootType) {
     lock.lock();
     try {
+      expungeStaleEntries();
       ClassContext classMap = typeCache.get(rootType);
       return classMap == null ? 0 : classMap.size();
     } finally {
@@ -147,14 +124,12 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     }
   }
 
-  /**
-   * Clear the PersistenceContext.
-   */
   @Override
   public void clear() {
     lock.lock();
     try {
       typeCache.clear();
+      expungeStaleEntries();
     } finally {
       lock.unlock();
     }
@@ -168,6 +143,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
       if (classMap != null) {
         classMap.clear();
       }
+      expungeStaleEntries();
     } finally {
       lock.unlock();
     }
@@ -181,6 +157,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
       if (classMap != null && id != null) {
         classMap.deleted(id);
       }
+      expungeStaleEntries();
     } finally {
       lock.unlock();
     }
@@ -194,6 +171,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
       if (classMap != null && id != null) {
         classMap.remove(id);
       }
+      expungeStaleEntries();
     } finally {
       lock.unlock();
     }
@@ -203,6 +181,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
   public List<Object> dirtyBeans(SpiBeanTypeManager manager) {
     lock.lock();
     try {
+      expungeStaleEntries();
       List<Object> list = new ArrayList<>();
       for (ClassContext classContext : typeCache.values()) {
         classContext.dirtyBeans(manager, list);
@@ -213,80 +192,68 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     }
   }
 
+  /**
+   * When there is a queue, poll it to remove stale entries from the map. Note:
+   * This is always done AFTER <code>useReferences</code> was called with
+   * <code>true</code>. Polling an empty queue has no performance impact.
+   */
+  private void expungeStaleEntries() {
+    Reference<?> ref;
+    while ((ref = queue.poll()) != null) {
+      ((BeanRef) ref).expunge();
+    }
+  }
+
   @Override
   public String toString() {
     lock.lock();
     try {
+      expungeStaleEntries();
       return typeCache.toString();
     } finally {
       lock.unlock();
     }
   }
 
-  private ClassContext getClassContext(Class<?> rootType) {
-    return typeCache.computeIfAbsent(rootType, k -> new ClassContext(rootType));
+  private ClassContext classContext(Class<?> rootType) {
+    return typeCache.computeIfAbsent(rootType, k -> new ClassContext(k, queue));
   }
 
   private static class ClassContext {
 
     private final Map<Object, Object> map = new HashMap<>();
     private final Class<?> rootType;
+    private final ReferenceQueue<Object> queue;
     private Set<Object> deleteSet;
-    private int initialSize;
-    private ClassContext parent;
+    private boolean useReferences;
+    private int weakCount;
 
-    private ClassContext(Class<?> rootType) {
+    private ClassContext(Class<?> rootType, ReferenceQueue<Object> queue) {
       this.rootType = rootType;
+      this.queue = queue;
     }
 
     /**
-     * Create as a shallow copy.
+     * When called with "true", initialize referenceQueue and store BeanRefs instead
+     * of real object references.
      */
-    private ClassContext(ClassContext source, boolean initial) {
-      this.rootType = source.rootType;
-      if (initial || source.isTransfer()) {
-        parent = source.transferParent();
-        initialSize = parent.size();
-        if (source.deleteSet != null) {
-          deleteSet = new HashSet<>(source.deleteSet);
-        }
-      }
-    }
-
-    /**
-     * True if this should be transferred to a new iterator persistence context.
-     */
-    private boolean isTransfer() {
-      // map not added to and has some original/parent beans
-      return map.isEmpty() && initialSize > 0;
-    }
-
-    private ClassContext transferParent() {
-      return (parent != null) ? parent : this;
-    }
-
-    /**
-     * Return a shallow copy if initial copy or it has not grown (still at initialSize).
-     */
-    private ClassContext copy(boolean initial) {
-      return new ClassContext(this, initial);
-    }
-
-    /**
-     * Return true if grown above the reset limit size of 1000.
-     */
-    private boolean resetLimit() {
-      return map.size() > 1000;
+    private ClassContext useReferences(boolean useReferences) {
+      this.useReferences = useReferences;
+      return this;
     }
 
     @Override
     public String toString() {
-      return "size:" + map.size();
+      return "size:" + map.size() + " (" + weakCount + " weak)";
     }
 
     private Object get(Object id) {
-      Object bean = (parent == null) ? null : parent.get(id);
-      return bean != null ? bean : map.get(id);
+      Object ret = map.get(id);
+      if (ret instanceof BeanRef) {
+        return ((BeanRef) ret).get();
+      } else {
+        return ret;
+      }
     }
 
     private WithOption getWithOption(Object id) {
@@ -304,24 +271,39 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
         return existingValue;
       }
       // put the new value and return null indicating the put was successful
-      map.put(id, bean);
+      put(id, bean);
       return null;
     }
 
-    private void put(Object id, Object b) {
-      map.put(id, b);
+    private void put(Object id, Object bean) {
+      Object existing;
+      if (useReferences) {
+        weakCount++;
+        existing = map.put(id, new BeanRef(this, id, bean, queue));
+      } else {
+        existing = map.put(id, bean);
+      }
+      if (existing instanceof BeanRef) {
+        // when a BeanRef is replaced, its expunge() must NOT remove an entry
+        ((BeanRef) existing).setReplaced();
+        weakCount--;
+      }
     }
 
     private int size() {
-      return map.size() + initialSize;
+      return map.size();
     }
 
     private void clear() {
       map.clear();
+      weakCount = 0;
     }
 
     private void remove(Object id) {
-      map.remove(id);
+      Object ret = map.remove(id);
+      if (ret instanceof BeanRef) {
+        weakCount--;
+      }
     }
 
     private void deleted(Object id) {
@@ -329,7 +311,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
         deleteSet = new HashSet<>();
       }
       deleteSet.add(id);
-      map.remove(id);
+      remove(id);
     }
 
     /**
@@ -338,6 +320,10 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     void dirtyBeans(SpiBeanTypeManager manager, List<Object> list) {
       final SpiBeanType beanType = manager.beanType(rootType);
       for (Object value : map.values()) {
+        if (value instanceof BeanRef) {
+          value = ((BeanRef) value).get();
+          if (value == null) continue;
+        }
         EntityBean bean = (EntityBean) value;
         if (bean._ebean_getIntercept().isDirty() || beanType.isToManyDirty(bean)) {
           list.add(value);
@@ -346,4 +332,27 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     }
   }
 
+  private static class BeanRef extends WeakReference<Object> {
+
+    private final ClassContext classContext;
+    private final Object key;
+    private boolean replaced;
+
+    private BeanRef(ClassContext classContext, Object key, Object referent, ReferenceQueue<? super Object> q) {
+      super(referent, q);
+      this.classContext = classContext;
+      this.key = key;
+    }
+
+    private void setReplaced() {
+      replaced = true;
+    }
+
+    private void expunge() {
+      if (!replaced) {
+        classContext.remove(key);
+      }
+    }
+
+  }
 }

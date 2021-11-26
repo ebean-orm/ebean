@@ -1,7 +1,9 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -38,12 +40,12 @@ import java.util.stream.Stream;
  *
  * }</pre>
  */
+@NonNullApi
 public interface DtoQuery<T> extends CancelableQuery {
 
   /**
    * Execute the query returning a list.
    */
-  @Nonnull
   List<T> findList();
 
   /**
@@ -53,7 +55,6 @@ public interface DtoQuery<T> extends CancelableQuery {
    * resultSet and potentially connection and MUST be closed. We should use
    * QueryIterator in a <em>try with resource block</em>.
    */
-  @Nonnull
   QueryIterator<T> findIterate();
 
   /**
@@ -63,7 +64,6 @@ public interface DtoQuery<T> extends CancelableQuery {
    * resultSet and potentially connection and MUST be closed. We should use
    * the Stream in a <em>try with resource block</em>.
    */
-  @Nonnull
   Stream<T> findStream();
 
   /**
@@ -105,7 +105,6 @@ public interface DtoQuery<T> extends CancelableQuery {
   /**
    * Execute the query returning an optional bean.
    */
-  @Nonnull
   Optional<T> findOneOrEmpty();
 
   /**
@@ -129,6 +128,13 @@ public interface DtoQuery<T> extends CancelableQuery {
    * Bind the named parameter.
    */
   DtoQuery<T> setParameter(String name, Object value);
+
+  /**
+   * Bind the named multi-value array parameter which we would use with Postgres ANY.
+   * <p>
+   * For Postgres this binds an ARRAY rather than expands into multiple bind values.
+   */
+  DtoQuery<T> setArrayParameter(String name, Collection<?> values);
 
   /**
    * Bind the parameter by its index position (1 based like JDBC).

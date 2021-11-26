@@ -12,17 +12,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestOneToManyCorrectGrouping extends BaseTestCase {
+class TestOneToManyCorrectGrouping extends BaseTestCase {
 
-  public static final int EXPECTED_ITERATIONS = 2;
+  static final int EXPECTED_ITERATIONS = 4;
 
   @Test
-  public void test() {
-
+  void test() {
     ResetBasicData.reset();
     Query<Customer> customerQuery = DB.find(Customer.class)
       .fetch("orders")
-      .where().le("id", 2)
+      .where().le("id", 4)
       .query();
 
     final AtomicInteger count = new AtomicInteger();
