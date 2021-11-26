@@ -2,6 +2,8 @@ package io.ebean;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
+
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -126,6 +128,13 @@ public interface DtoQuery<T> extends CancelableQuery {
    * Bind the named parameter.
    */
   DtoQuery<T> setParameter(String name, Object value);
+
+  /**
+   * Bind the named multi-value array parameter which we would use with Postgres ANY.
+   * <p>
+   * For Postgres this binds an ARRAY rather than expands into multiple bind values.
+   */
+  DtoQuery<T> setArrayParameter(String name, Collection<?> values);
 
   /**
    * Bind the parameter by its index position (1 based like JDBC).

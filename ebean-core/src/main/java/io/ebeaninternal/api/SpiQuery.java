@@ -24,6 +24,7 @@ import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -398,6 +399,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   void addSoftDeletePredicate(String softDeletePredicate);
 
   List<String> getSoftDeletePredicates();
+
+  /**
+   * Bind the named multi-value array parameter which we would use with Postgres ANY.
+   */
+  void setArrayParameter(String name, Collection<?> values);
 
   /**
    * Return a copy of the query.

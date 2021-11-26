@@ -1,5 +1,7 @@
 package io.ebean;
 
+import java.util.Collection;
+
 /**
  * A SqlUpdate for executing insert update or delete statements.
  * <p>
@@ -323,6 +325,13 @@ public interface SqlUpdate {
    * Set a named parameter value.
    */
   SqlUpdate setParameter(String name, Object param);
+
+  /**
+   * Bind the named multi-value array parameter which we would use with Postgres ANY.
+   * <p>
+   * For Postgres this binds an ARRAY rather than expands into multiple bind values.
+   */
+  SqlUpdate setArrayParameter(String name, Collection<?> values);
 
   /**
    * Set a named parameter that has a null value. Exactly the same as

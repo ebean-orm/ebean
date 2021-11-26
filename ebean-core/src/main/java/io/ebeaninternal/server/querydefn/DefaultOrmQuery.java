@@ -1587,6 +1587,17 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
+  public void setArrayParameter(String name, Collection<?> values) {
+    if (namedParams != null) {
+      throw new IllegalStateException("setArrayParameter() not supported when EQL parsed query");
+    }
+    if (bindParams == null) {
+      bindParams = new BindParams();
+    }
+    bindParams.setArrayParameter(name, values);
+  }
+
+  @Override
   public boolean checkPagingOrderBy() {
     return orderById && !useDocStore;
   }

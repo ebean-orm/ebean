@@ -251,6 +251,18 @@ public final class DefaultTypeManager implements TypeManager {
     return nativeMap.get(jdbcType);
   }
 
+  @Override
+  public ScalarType<?> getScalarType(Type propertyType, Class<?> propertyClass) {
+    if (propertyType instanceof ParameterizedType) {
+      ParameterizedType pt = (ParameterizedType)propertyType;
+      Type rawType = pt.getRawType();
+      if (List.class == rawType || Set.class == rawType) {
+        return getArrayScalarType((Class<?>)rawType, null, propertyType, true);
+      }
+    }
+    return getScalarType(propertyClass);
+  }
+
   /**
    * This can return null if no matching ScalarType is found.
    */
