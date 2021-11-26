@@ -8,6 +8,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.sql.SQLException;
 
 final class DtoMetaProperty implements DtoReadSet {
@@ -19,16 +20,28 @@ final class DtoMetaProperty implements DtoReadSet {
   private final MethodHandle setter;
   private final ScalarType<?> scalarType;
 
-  DtoMetaProperty(TypeManager typeManager, Class<?> dtoType, Method writeMethod, String name, Class<?> propertyType) throws IllegalAccessException, NoSuchMethodException {
+  DtoMetaProperty(TypeManager typeManager, Class<?> dtoType, Method writeMethod, String name) throws IllegalAccessException, NoSuchMethodException {
     this.dtoType = dtoType;
     this.name = name;
     if (writeMethod != null) {
-      this.setter = LOOKUP.findVirtual(dtoType, writeMethod.getName(), MethodType.methodType(void.class, propertyType));
-      this.scalarType = typeManager.getScalarType(propertyType);
+      this.setter = lookupMethodHandle(dtoType, writeMethod);
+      this.scalarType = typeManager.getScalarType(propertyType(writeMethod), propertyClass(writeMethod));
     } else {
       this.scalarType = null;
       this.setter = null;
     }
+  }
+
+  private static MethodHandle lookupMethodHandle(Class<?> dtoType, Method method) throws NoSuchMethodException, IllegalAccessException {
+    return LOOKUP.findVirtual(dtoType, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()));
+  }
+
+  static Type propertyType(Method method) {
+    return method.getParameters()[0].getParameterizedType();
+  }
+
+  static Class<?> propertyClass(Method method) {
+    return method.getParameterTypes()[0];
   }
 
   String getName() {
