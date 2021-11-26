@@ -257,7 +257,7 @@ public final class DefaultTypeManager implements TypeManager {
       ParameterizedType pt = (ParameterizedType)propertyType;
       Type rawType = pt.getRawType();
       if (List.class == rawType || Set.class == rawType) {
-        return getArrayScalarType((Class<?>)rawType, null, propertyType, true);
+        return getArrayScalarType((Class<?>)rawType, propertyType, true);
       }
     }
     return getScalarType(propertyClass);
@@ -298,7 +298,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType, boolean nullable) {
+  public ScalarType<?> getArrayScalarType(Class<?> type, Type genericType, boolean nullable) {
     Type valueType = getValueType(genericType);
     if (type.equals(List.class)) {
       return getArrayScalarTypeList(valueType, nullable);
