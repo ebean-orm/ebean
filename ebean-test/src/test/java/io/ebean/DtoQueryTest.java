@@ -208,19 +208,33 @@ public class DtoQueryTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    LoggedSql.start();
     List<Integer> ids = Arrays.asList(1, 2);
 
-    List<DCust> list = server().findDto(DCust.class, "select id, name from o_customer where id = any(?)")
+    List<DCust> list = DB.findDto(DCust.class, "select id, name from o_customer where id = any(?)")
       .setParameter(ids)
       .findList();
 
     assertThat(list).isNotEmpty();
 
-    list = server().findDto(DCust.class, "select id, name from o_customer where id in (:idList)")
+    List<DCust> list1 = DB.findDto(DCust.class, "select id, name from o_customer where id in (:idList)")
       .setParameter("idList", ids)
       .findList();
 
-    assertThat(list).isNotEmpty();
+    assertThat(list1).isNotEmpty();
+
+
+    List<DCust> list2 = DB.findDto(DCust.class, "select id, name from o_customer where id = any(:idList)")
+      .setArrayParameter("idList", ids)
+      .findList();
+
+    assertThat(list2).isNotEmpty();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).contains(" id = any(?)");
+    assertThat(sql.get(1)).contains(" id in (?,?)");
+    assertThat(sql.get(2)).contains(" id = any(?)");
   }
 
   @ForPlatform(Platform.POSTGRES)

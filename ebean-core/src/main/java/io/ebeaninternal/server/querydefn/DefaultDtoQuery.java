@@ -14,6 +14,7 @@ import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -144,6 +145,16 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
       ormQuery.setParameter(paramName, value);
     } else {
       bindParams.setParameter(paramName, value);
+    }
+    return this;
+  }
+
+  @Override
+  public DtoQuery<T> setArrayParameter(String paramName, Collection<?> values) {
+    if (ormQuery != null) {
+      ormQuery.setArrayParameter(paramName, values);
+    } else {
+      bindParams.setArrayParameter(paramName, values);
     }
     return this;
   }

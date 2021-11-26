@@ -335,7 +335,7 @@ public class TestDbArray_basic extends BaseTestCase {
     // javax.persistence.PersistenceException:
     // ERROR: syntax error at or near "$2"
     SqlUpdate update2 = DB.sqlUpdate("UPDATE earray_bean SET phone_numbers = :pns")
-      .setParameter("pns", phNumbers);
+      .setArrayParameter("pns", phNumbers);
     update2.execute();
 
     found = DB.find(EArrayBean.class, bean.getId());
