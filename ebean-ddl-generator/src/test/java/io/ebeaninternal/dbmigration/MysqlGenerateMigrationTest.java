@@ -6,6 +6,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.PlatformConfig;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Jonas P&ouml;hler, FOCONIS AG
  */
-@Disabled("build success depends on test order")
 public class MysqlGenerateMigrationTest {
+
+  @AfterEach
+  public void resetPendingDropsProperty() {
+    System.clearProperty("ddl.migration.pendingDropsFor");
+  }
 
   @Test
   public void testMysqlStoredProcedures() throws Exception {
