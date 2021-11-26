@@ -23,6 +23,11 @@ abstract class BeanDescriptorElement<T> extends BeanDescriptor<T> {
     this.elementHelp = elementHelp;
   }
 
+  @Override
+  String initIdSelect() {
+    return null;
+  }
+
   private String shortName(String name) {
     int pos = name.lastIndexOf('.');
     if (pos > 1) {

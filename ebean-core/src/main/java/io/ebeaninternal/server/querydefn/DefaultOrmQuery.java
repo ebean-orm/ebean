@@ -586,9 +586,9 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
    */
   @Override
   public void setSelectId() {
-    // clear select and fetch joins..
+    // clear select and fetch joins
     detail.clear();
-    select(beanDescriptor.idBinder().getIdProperty());
+    select(beanDescriptor.idSelect());
   }
 
   @Override
