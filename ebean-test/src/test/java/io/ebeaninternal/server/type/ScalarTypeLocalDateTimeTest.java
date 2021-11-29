@@ -123,4 +123,15 @@ public class ScalarTypeLocalDateTimeTest {
     LocalDateTime value = typeIso.fromJsonISO8601(asJson);
     assertThat(localDateTime).isEqualToIgnoringNanos(value);
   }
+  
+  @Test
+  public void testParseEbean11() {
+
+    ScalarTypeLocalDateTime typeDefault = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
+
+    LocalDateTime fromMillis = typeDefault.parse("1517627106000");
+    LocalDateTime fromIso= typeDefault.parse("2018-02-03T04:05:06");
+    
+    assertThat(fromMillis).isEqualToIgnoringNanos(fromIso);
+  }
 }
