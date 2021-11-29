@@ -83,8 +83,6 @@ public class DatesAndTimesTest {
   }
   
   private void restartServer(String javaTimeZone, String dbTimeZone) {
-    DataSource existingDs = db.dataSource();
-    DataSource existingRoDs = db.readOnlyDataSource();
     db.shutdown(false, false);
     if (javaTimeZone != null) {
       setJavaTimeZone(TimeZone.getTimeZone(javaTimeZone));
