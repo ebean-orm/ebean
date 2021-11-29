@@ -28,7 +28,7 @@ final class ScalarTypeTimestamp extends ScalarTypeBaseDateTime<Timestamp> {
 
   @Override
   protected String toJsonISO8601(Timestamp value) {
-    return formatIso(value.toInstant());
+    return value.toInstant().toString();
   }
 
   @Override

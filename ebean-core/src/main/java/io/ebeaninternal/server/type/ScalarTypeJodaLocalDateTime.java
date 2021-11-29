@@ -26,6 +26,11 @@ final class ScalarTypeJodaLocalDateTime extends ScalarTypeBaseDateTime<LocalDate
   protected String toJsonISO8601(LocalDateTime value) {
     return value.toString();
   }
+  
+  @Override
+  protected LocalDateTime fromJsonISO8601(String value) {
+    return LocalDateTime.parse(value);
+  }
 
   @Override
   public long convertToMillis(LocalDateTime value) {
