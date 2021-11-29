@@ -78,7 +78,7 @@ public class DatesAndTimesTest {
   public void shutdown() {
     if (db != null) {
       db.find(MDateTime.class).delete();
-      db.shutdown();
+      db.shutdown(false, false);
     }
   }
   
