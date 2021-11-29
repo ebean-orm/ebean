@@ -28,11 +28,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.tests.model.basic.MDateTime;
 
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
+import io.ebean.PlatformCondition;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.ExpressionPath;
@@ -43,6 +47,7 @@ import io.ebean.util.CamelCaseHelper;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 @TestInstance(Lifecycle.PER_CLASS)
+@ExtendWith(PlatformCondition.class)
 public class DatesAndTimesTest {
  
   private Database db;
@@ -250,6 +255,7 @@ public class DatesAndTimesTest {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testCalendar() {
 
     restartServer("GMT", "GMT");
@@ -304,6 +310,7 @@ public class DatesAndTimesTest {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testInstant() {
 
     // Test with DST and no DST date (in germany)
@@ -329,6 +336,7 @@ public class DatesAndTimesTest {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testJodaDateTime() {
 
     // Test with DST and no DST date (in germany)
@@ -384,6 +392,7 @@ public class DatesAndTimesTest {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testJodaLocalDateTime() {
 
     // Test with DST and no DST date (in germany)
@@ -517,6 +526,7 @@ public class DatesAndTimesTest {
   }
   
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testTimestamp() {
     restartServer("PST", "PST"); // java & db in same TZ
     doTest("propTimestamp", new Timestamp(2021 - 1900, 11 - 1, 21, 5, 15, 15, 0), "2021-11-21 05:15:15");
@@ -552,6 +562,7 @@ public class DatesAndTimesTest {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testUtilDate() {
     restartServer("PST", "PST"); // java & db in same TZ
     doTest("utilDate", new java.util.Date(2021 - 1900, 11 - 1, 21, 5, 15, 15), "2021-11-21 05:15:15");
@@ -587,6 +598,7 @@ public class DatesAndTimesTest {
   }
   
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testOffsetDateTime() {
 
     restartServer("PST", "PST"); // be in the same TZ
@@ -605,6 +617,7 @@ public class DatesAndTimesTest {
   }
 
   @Test
+  @IgnorePlatform(Platform.POSTGRES)
   public void testZonedDateTime() {
 
     restartServer("PST", "PST"); // be in the same TZ
