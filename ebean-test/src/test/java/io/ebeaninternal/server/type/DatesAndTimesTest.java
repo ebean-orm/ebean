@@ -30,6 +30,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.tests.model.basic.MDateTime;
 
+import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
@@ -44,9 +45,6 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 @TestInstance(Lifecycle.PER_CLASS)
 public class DatesAndTimesTest {
  
-
-  String platform="h2";
-  
   private Database db;
   private TimeZone tz;
   private DatabaseConfig config;
@@ -61,7 +59,7 @@ public class DatesAndTimesTest {
     softly = new SoftAssertions();
     tz = TimeZone.getDefault();
     if (db == null) {
-      db = createServer("GMT", null, null); // test uses GMT database
+      db = createServer("GMT"); // test uses GMT database
     } else {
       restartServer(null, "GMT");
     }
@@ -91,7 +89,7 @@ public class DatesAndTimesTest {
     if (javaTimeZone != null) {
       setJavaTimeZone(TimeZone.getTimeZone(javaTimeZone));
     }
-    db = createServer(dbTimeZone, existingDs, existingRoDs);
+    db = createServer(dbTimeZone);
   }
 
   private void setJavaTimeZone(TimeZone newTz) {
@@ -100,15 +98,17 @@ public class DatesAndTimesTest {
     org.h2.util.DateTimeUtils.resetCalendar();
   }
   
-  private Database createServer(String dbTimeZone, DataSource existingDs, DataSource existingRoDs) {
-
+  private Database createServer(String dbTimeZone) {
+    
+    // we create a clone for the current default server
     config = new DatabaseConfig();
-    config.setName(platform);
+    config.setName(DB.getDefault().name());
     config.loadFromProperties();
-    config.setDdlGenerate(existingDs == null );
-    config.setDdlRun(existingDs == null);
-    config.setReadOnlyDataSource(existingDs);
+    config.setDataSource(DB.getDefault().dataSource());
+    config.setReadOnlyDataSource(DB.getDefault().readOnlyDataSource());
     config.setDdlExtra(false);
+    config.setDdlGenerate(false);
+    config.setDdlRun(false);
     config.setDefaultServer(false);
     config.setRegister(false);
     config.setChangeLogAsync(false);
@@ -116,7 +116,6 @@ public class DatesAndTimesTest {
     
     config.setDumpMetricsOnShutdown(false);
     config.setDataTimeZone(dbTimeZone);
-    config.setDataSource(existingDs);
     reconfigure(config);
 
     return DatabaseFactory.create(config);
