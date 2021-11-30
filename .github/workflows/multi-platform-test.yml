@@ -1,5 +1,5 @@
 
-name: Build
+name: Multi-platform Test
 
 on: [workflow_dispatch]
 
