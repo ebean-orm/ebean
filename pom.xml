@@ -90,8 +90,23 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
-<!--    <module>tests</module>-->
+
   </modules>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+    </profile>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>tests</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>
 
