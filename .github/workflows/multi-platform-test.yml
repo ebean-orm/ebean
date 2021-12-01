@@ -37,5 +37,8 @@ jobs:
       run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
     - name: mysql test
       run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties
-
+    - name: sqlserver 2019 test
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver.properties
+    - name: sqlserver 2017 test
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
 
