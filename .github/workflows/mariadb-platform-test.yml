@@ -1,5 +1,5 @@
 
-name: Multi-database platform test
+name: MariaDB platform test
 
 on: [workflow_dispatch]
 
@@ -31,15 +31,5 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: h2
-      run: mvn clean test
-    - name: postgres
-      run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
-    - name: mysql
-      run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties
-    - name: sqlserver 2019 latest
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver.properties
-#    - name: sqlserver 2017 latest
-#      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
-#    - name: mariadb 10.6
-#      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
+    - name: mariadb 10.6
+      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
