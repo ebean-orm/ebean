@@ -1,5 +1,5 @@
 
-name: SqlServer platform test
+name: SqlServer 2017 latest
 
 on: [workflow_dispatch]
 

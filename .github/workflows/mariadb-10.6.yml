@@ -1,5 +1,5 @@
 
-name: MariaDB platform test
+name: MariaDB 10.6
 
 on: [workflow_dispatch]
 
