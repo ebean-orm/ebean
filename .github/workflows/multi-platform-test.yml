@@ -1,5 +1,5 @@
 
-name: Multi-platform Test
+name: Multi database platform test
 
 on: [workflow_dispatch]
 
