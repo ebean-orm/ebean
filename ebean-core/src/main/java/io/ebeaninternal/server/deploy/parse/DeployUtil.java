@@ -48,6 +48,7 @@ public final class DeployUtil {
   private final EncryptKeyManager encryptKeyManager;
   private final Encryptor bytesEncryptor;
   private final boolean useValidationNotNull;
+  private final MutationDetection defaultJsonMutationDetection;
 
   public DeployUtil(TypeManager typeMgr, DatabaseConfig config) {
     this.typeManager = typeMgr;
@@ -58,6 +59,7 @@ public final class DeployUtil {
     Encryptor be = config.getEncryptor();
     this.bytesEncryptor = be != null ? be : new SimpleAesEncryptor();
     this.useValidationNotNull = config.isUseValidationNotNull();
+    this.defaultJsonMutationDetection = config.getJsonMutationDetection();
   }
 
   public TypeManager getTypeManager() {
@@ -203,7 +205,7 @@ public final class DeployUtil {
 
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength, MutationDetection mutationDetection) {
     prop.setDbType(dbType);
-    prop.setMutationDetection(mutationDetection);
+    prop.setMutationDetection(mutationDetection == MutationDetection.DEFAULT ? defaultJsonMutationDetection : mutationDetection);
     ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for JSON property [" + prop + "] [" + dbType + "]");

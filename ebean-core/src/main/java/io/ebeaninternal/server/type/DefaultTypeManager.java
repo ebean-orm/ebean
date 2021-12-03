@@ -123,6 +123,8 @@ public final class DefaultTypeManager implements TypeManager {
   private final PlatformArrayTypeFactory arrayTypeSetFactory;
   private GeoTypeBinder geoTypeBinder;
 
+  private final MutationDetection defaultJsonMutationDetection;
+
   /**
    * Create the DefaultTypeManager.
    */
@@ -141,6 +143,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
     this.defaultEnumType = config.getDefaultEnumType();
+    this.defaultJsonMutationDetection = config.getJsonMutationDetection();
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
@@ -361,7 +364,7 @@ public final class DefaultTypeManager implements TypeManager {
         return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
       }
     }
-    if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
+    if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.HASH) {
       if (type.equals(JsonNode.class)) {
         switch (dbType) {
           case Types.VARCHAR:

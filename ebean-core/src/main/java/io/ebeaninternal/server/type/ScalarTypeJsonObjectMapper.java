@@ -33,18 +33,17 @@ final class ScalarTypeJsonObjectMapper {
   static ScalarType<?> createTypeFor(TypeJsonManager jsonManager, DeployBeanProperty prop, int dbType, DocPropertyType docType) {
     AnnotatedField field = (AnnotatedField) prop.getJacksonField();
     MutationDetection mode = prop.getMutationDetection();
-    if (mode == MutationDetection.NONE) {
-      return new NoMutationDetection(jsonManager, field, dbType, docType);
-    } else if (mode != MutationDetection.DEFAULT) {
-      return new GenericObject(jsonManager, field, dbType, docType);
+
+    switch (mode) {
+      case NONE:
+        return new NoMutationDetection(jsonManager, field, dbType, docType);
+      case HASH:
+      case SOURCE:
+        return new GenericObject(jsonManager, field, dbType, docType);
+      case DEFAULT:
+      default:
+        throw new IllegalArgumentException("Could not determine default MutationDetection type");
     }
-    // using the global default MutationDetection mode (defaults to HASH)
-    final MutationDetection defaultMode = jsonManager.mutationDetection();
-    prop.setMutationDetection(defaultMode);
-    if (MutationDetection.NONE == defaultMode) {
-      return new NoMutationDetection(jsonManager, field, dbType, docType);
-    }
-    return new GenericObject(jsonManager, field, dbType, docType);
   }
 
   /**

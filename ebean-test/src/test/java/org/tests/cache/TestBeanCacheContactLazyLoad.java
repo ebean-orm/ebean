@@ -3,6 +3,7 @@ package org.tests.cache;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -17,6 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Test class testing a wrong behaviour of the bean cache.
  */
 public class TestBeanCacheContactLazyLoad extends BaseTestCase {
+
+  @AfterEach
+  public void afterEach() {
+    DB.find(Customer.class).where().eq("name", "Customer").delete();
+  }
 
   /**
    * This test shows a wrong behaviour of the bean cache up to at least Ebean 12.4.*:

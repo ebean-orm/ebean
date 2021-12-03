@@ -6,6 +6,7 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebeaninternal.api.SpiTransaction;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -15,6 +16,10 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestExecuteComplete extends BaseTestCase {
 
+  @AfterEach
+  public void afterEach() {
+    DB.find(Customer.class).where().eq("name", "Roland").delete();
+  }
 
   @ForPlatform(Platform.H2)
   @Test
