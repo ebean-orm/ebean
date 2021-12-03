@@ -269,7 +269,6 @@ public class DeployBeanProperty {
   }
 
   public void setMutationDetection(MutationDetection dirtyDetection) {
-    assert dirtyDetection != MutationDetection.DEFAULT; // This has to be determined beforehand
     this.mutationDetection = dirtyDetection;
   }
 
