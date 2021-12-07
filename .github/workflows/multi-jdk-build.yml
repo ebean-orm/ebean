@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: [8, 11, 17]
+        java_version: [8.0.192, 8, 11.0.3, 11, 17]
         os: [ubuntu-latest]
 
     steps:
@@ -25,7 +25,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: ${{ matrix.java_version }}
-        distribution: 'adopt'
+        distribution: 'zulu'
     - name: Maven cache
       uses: actions/cache@v2
       env:
