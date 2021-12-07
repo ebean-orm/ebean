@@ -15,7 +15,7 @@ public class BasicProfileLocationTest {
     String javaVersion = System.getProperty("java.version");
     assertThat(loc.obtain()).isTrue();
     if (javaVersion.startsWith("1.8")) {
-      assertThat(loc.fullLocation()).endsWith("jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method:12)");
+      assertThat(loc.fullLocation()).endsWith("invoke0(Native Method:12)");
       assertThat(loc.location()).isEqualTo("sun.reflect.NativeMethodAccessorImpl.invoke0");
       assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");
     } else if (javaVersion.startsWith("18")){
