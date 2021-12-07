@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <relativePath>../../../</relativePath>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
     <version>2.3</version>
+    <relativePath/>
   </parent>
 
   <name>test-kotlin</name>
