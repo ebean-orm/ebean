@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BasicProfileLocationTest {
+class BasicProfileLocationTest {
 
   @Test
-  public void obtain() {
+  void obtain() {
 
     DProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric("junk"));
 
@@ -30,7 +30,7 @@ public class BasicProfileLocationTest {
   }
 
   @Test
-  public void basic_trimPackage() {
+  void basic_trimPackage() {
 
     BasicProfileLocation loc = new BasicProfileLocation("com.foo.Bar.all");
     assertThat(loc.obtain()).isFalse();
@@ -40,7 +40,7 @@ public class BasicProfileLocationTest {
   }
 
   @Test
-  public void basic_trimSinglePackage() {
+  void basic_trimSinglePackage() {
 
     BasicProfileLocation loc = new BasicProfileLocation("foo.Bar.all");
     assertThat(loc.obtain()).isFalse();
