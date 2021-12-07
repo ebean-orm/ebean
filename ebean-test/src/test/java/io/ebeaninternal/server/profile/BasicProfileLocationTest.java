@@ -12,14 +12,21 @@ public class BasicProfileLocationTest {
 
     DProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric("junk"));
 
+    String javaVersion = System.getProperty("java.version");
     assertThat(loc.obtain()).isTrue();
-    assertThat(loc.fullLocation()).endsWith(":12)");
-    if (System.getProperty("java.version").startsWith("1.8")) {
+    if (javaVersion.startsWith("1.8")) {
+      assertThat(loc.fullLocation()).endsWith("jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method:12)");
       assertThat(loc.location()).isEqualTo("sun.reflect.NativeMethodAccessorImpl.invoke0");
+      assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");
+    } else if (javaVersion.startsWith("18")){
+      assertThat(loc.fullLocation()).endsWith("jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)");
+      assertThat(loc.location()).isEqualTo("java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke");
+      assertThat(loc.label()).isEqualTo("DirectMethodHandleAccessor.invoke");
     } else {
+      assertThat(loc.fullLocation()).endsWith("jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method:12)");
       assertThat(loc.location()).isEqualTo("java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0");
+      assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");
     }
-    assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");
   }
 
   @Test
