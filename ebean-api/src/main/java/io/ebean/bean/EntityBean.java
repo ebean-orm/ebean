@@ -112,6 +112,6 @@ public interface EntityBean extends Serializable {
   /**
    * Recalcs the bean. This is invoked by PersistRequestBean.
    */
-  default void _ebean_onPersistTrigger() {};
+  default void _ebean_onPersistTrigger(String profileEventId) {};
 
 }
