@@ -1,5 +1,6 @@
 package io.ebeanservice.docstore.none;
 
+import io.avaje.lang.NonNullApi;
 import io.ebean.DocStoreQueueEntry;
 import io.ebean.DocumentStore;
 import io.ebean.PagedList;
@@ -16,6 +17,7 @@ import java.util.function.Predicate;
 /**
  * DocumentStore that barfs it is used.
  */
+@NonNullApi
 public final class NoneDocStore implements DocumentStore {
 
   public static IllegalStateException implementationNotInClassPath() {

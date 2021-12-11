@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.avaje.lang.NonNullApi;
 import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
 import io.ebean.QueryIterator;
@@ -12,6 +13,8 @@ import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
 
+import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -21,6 +24,7 @@ import java.util.stream.Stream;
 /**
  * Default implementation of DtoQuery.
  */
+@NonNullApi
 public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQuery<T> {
 
   private final SpiEbeanServer server;
@@ -114,6 +118,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     return server.findDtoList(this);
   }
 
+  @Nullable
   @Override
   public T findOne() {
     return server.findDtoOne(this);
@@ -140,6 +145,16 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
       ormQuery.setParameter(paramName, value);
     } else {
       bindParams.setParameter(paramName, value);
+    }
+    return this;
+  }
+
+  @Override
+  public DtoQuery<T> setArrayParameter(String paramName, Collection<?> values) {
+    if (ormQuery != null) {
+      ormQuery.setArrayParameter(paramName, values);
+    } else {
+      bindParams.setArrayParameter(paramName, values);
     }
     return this;
   }
@@ -206,6 +221,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     return label;
   }
 
+  @Nullable
   @Override
   public String getPlanLabel() {
     if (label != null) {

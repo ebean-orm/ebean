@@ -37,7 +37,11 @@ final class OrmQueryPropertiesParser {
     if (rawProperties.equals("*")) {
       return ALL;
     }
-    return new Response(false, splitRawSelect(rawProperties));
+    final Set<String> included = splitRawSelect(rawProperties);
+    if (included.contains("*")) {
+      return ALL;
+    }
+    return new Response(false, included);
   }
 
   /**

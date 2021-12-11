@@ -48,6 +48,13 @@ public interface TypeManager {
   ScalarType<?> getScalarType(Class<?> type, int jdbcType);
 
   /**
+   * Find and return the ScalarType taking into account the property type with generics.
+   * <p>
+   * For example Array based ScalarType for types like {@code List<String>}.
+   */
+  ScalarType<?> getScalarType(Type propertyType, Class<?> type);
+
+  /**
    * Create a ScalarType for an Enum using a mapping (rather than JPA Ordinal
    * or String which has limitations).
    */
@@ -64,7 +71,7 @@ public interface TypeManager {
   /**
    * Return the ScalarType used to handle DB ARRAY.
    */
-  ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType, boolean nullable);
+  ScalarType<?> getArrayScalarType(Class<?> type, Type genericType, boolean nullable);
 
   /**
    * Return the ScalarType used to handle HSTORE (Map<String,String>).

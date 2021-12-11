@@ -1,0 +1,39 @@
+
+name: JDK 18-ea
+
+on:
+  workflow_dispatch:
+#  schedule:
+#    - cron: '30 6 * * *'
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        java_version: [18-ea]
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: ${{ matrix.java_version }}
+        distribution: 'zulu'
+    - name: Maven cache
+      uses: actions/cache@v2
+      env:
+        cache-name: maven-cache
+      with:
+        path:
+          ~/.m2
+        key: build-${{ env.cache-name }}
+    - name: Build with Maven
+      run: mvn package
+

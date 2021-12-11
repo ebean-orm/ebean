@@ -1,7 +1,5 @@
 package io.ebean.plugin;
 
-import javax.annotation.Nonnull;
-
 /**
  * Property of a entity bean that can be read.
  */
@@ -10,7 +8,6 @@ public interface Property {
   /**
    * Return the name of the property.
    */
-  @Nonnull
   String name();
 
   /**
@@ -24,7 +21,6 @@ public interface Property {
   /**
    * Return the type of the property.
    */
-  @Nonnull
   Class<?> type();
 
   /**

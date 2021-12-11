@@ -90,7 +90,7 @@ final class BeanDescriptorJsonHelp<T> {
       return null;
     }
     JsonParser newParser = node.traverse();
-    SpiJsonReader newReader = jsonRead.forJson(newParser, false);
+    SpiJsonReader newReader = jsonRead.forJson(newParser);
 
     // check for the discriminator value to determine the correct sub type
     String discColumn = inheritInfo.getRoot().getDiscriminatorColumn();
@@ -152,6 +152,9 @@ final class BeanDescriptorJsonHelp<T> {
     }
     if (contextBean == null) {
       readJson.beanVisitor(bean, unmappedProperties);
+      if (!isNullOrZero(id)) {
+        desc.setReferenceIfIdOnly(bean._ebean_getIntercept());
+      }
     }
     if (path != null) {
       readJson.popPath();

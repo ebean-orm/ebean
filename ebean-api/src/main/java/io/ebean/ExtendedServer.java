@@ -1,7 +1,7 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import io.avaje.lang.Nullable;
+
 import javax.persistence.NonUniqueResultException;
 import java.time.Clock;
 import java.util.List;
@@ -82,7 +82,6 @@ public interface ExtendedServer {
    *
    * @see Query#findIds()
    */
-  @Nonnull
   <A, T> List<A> findIds(Query<T> query, Transaction transaction);
 
   /**
@@ -100,7 +99,6 @@ public interface ExtendedServer {
    * @see Query#findEach(Consumer)
    * @see Query#findEachWhile(Predicate)
    */
-  @Nonnull
   <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
 
   /**
@@ -112,7 +110,6 @@ public interface ExtendedServer {
    * Note that the stream needs to be closed so use with try with resources.
    * </p>
    */
-  @Nonnull
   <T> Stream<T> findStream(Query<T> query, Transaction transaction);
 
   /**
@@ -125,7 +122,6 @@ public interface ExtendedServer {
    * <p>
    * Note that the stream needs to be closed so use with try with resources.
    */
-  @Nonnull
   @Deprecated
   <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction);
 
@@ -210,7 +206,6 @@ public interface ExtendedServer {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
-  @Nonnull
   <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction);
 
   /**
@@ -235,7 +230,6 @@ public interface ExtendedServer {
    * @return the list of fetched beans.
    * @see Query#findList()
    */
-  @Nonnull
   <T> List<T> findList(Query<T> query, Transaction transaction);
 
   /**
@@ -251,7 +245,6 @@ public interface ExtendedServer {
    * @return a Future object for the row count query
    * @see Query#findFutureCount()
    */
-  @Nonnull
   <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction);
 
   /**
@@ -267,7 +260,6 @@ public interface ExtendedServer {
    * @return a Future object for the list of Id's
    * @see Query#findFutureIds()
    */
-  @Nonnull
   <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
 
   /**
@@ -284,7 +276,6 @@ public interface ExtendedServer {
    * @return a Future object for the list result of the query
    * @see Query#findFutureList()
    */
-  @Nonnull
   <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
 
   /**
@@ -316,7 +307,6 @@ public interface ExtendedServer {
    * @return The PagedList
    * @see Query#findPagedList()
    */
-  @Nonnull
   <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction);
 
   /**
@@ -341,7 +331,6 @@ public interface ExtendedServer {
    * @return the set of fetched beans.
    * @see Query#findSet()
    */
-  @Nonnull
   <T> Set<T> findSet(Query<T> query, Transaction transaction);
 
   /**
@@ -358,7 +347,6 @@ public interface ExtendedServer {
    * @return the map of fetched beans.
    * @see Query#findMap()
    */
-  @Nonnull
   <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction);
 
   /**
@@ -391,7 +379,6 @@ public interface ExtendedServer {
    * @return the list of values for the selected property
    * @see Query#findSingleAttributeList()
    */
-  @Nonnull
   <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction);
 
   /**
@@ -419,7 +406,6 @@ public interface ExtendedServer {
   /**
    * Similar to findOne() but returns an Optional (rather than nullable).
    */
-  @Nonnull
   <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction);
 
   /**
@@ -463,7 +449,6 @@ public interface ExtendedServer {
    * @return the list of fetched MapBean.
    * @see SqlQuery#findList()
    */
-  @Nonnull
   List<SqlRow> findList(SqlQuery query, Transaction transaction);
 
   /**

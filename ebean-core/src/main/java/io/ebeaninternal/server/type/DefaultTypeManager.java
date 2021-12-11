@@ -251,6 +251,18 @@ public final class DefaultTypeManager implements TypeManager {
     return nativeMap.get(jdbcType);
   }
 
+  @Override
+  public ScalarType<?> getScalarType(Type propertyType, Class<?> propertyClass) {
+    if (propertyType instanceof ParameterizedType) {
+      ParameterizedType pt = (ParameterizedType)propertyType;
+      Type rawType = pt.getRawType();
+      if (List.class == rawType || Set.class == rawType) {
+        return getArrayScalarType((Class<?>)rawType, propertyType, true);
+      }
+    }
+    return getScalarType(propertyClass);
+  }
+
   /**
    * This can return null if no matching ScalarType is found.
    */
@@ -286,7 +298,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getArrayScalarType(Class<?> type, DbArray dbArray, Type genericType, boolean nullable) {
+  public ScalarType<?> getArrayScalarType(Class<?> type, Type genericType, boolean nullable) {
     Type valueType = getValueType(genericType);
     if (type.equals(List.class)) {
       return getArrayScalarTypeList(valueType, nullable);
@@ -325,11 +337,10 @@ public final class DefaultTypeManager implements TypeManager {
     Type genericType = prop.getGenericType();
     boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
 
-    boolean keepSource = prop.getMutationDetection() == MutationDetection.SOURCE;
     if (type.equals(List.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable(), keepSource);
+        return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable(), jsonManager.keepSource(prop));
       } else {
         return createJsonObjectMapperType(prop, dbType, docType);
       }
@@ -337,14 +348,14 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(Set.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable(), keepSource);
+        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable(), jsonManager.keepSource(prop));
       } else {
         return createJsonObjectMapperType(prop, dbType, docType);
       }
     }
     if (type.equals(Map.class)) {
       if (!hasJacksonAnnotations && isMapValueTypeObject(genericType)) {
-        return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource);
+        return ScalarTypeJsonMap.typeFor(postgres, dbType, jsonManager.keepSource(prop));
       } else {
         return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
       }
@@ -591,8 +602,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
-    Enum<?>[] enumConstants = enumType.getEnumConstants();
-    for (Enum<?> enumConstant : enumConstants) {
+    for (Enum<?> enumConstant : enumType.getEnumConstants()) {
       try {
         Object value = method.invoke(enumConstant);
         nameValueMap.put(enumConstant.name(), value.toString());

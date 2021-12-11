@@ -416,7 +416,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     } else {
       // nextBean set to previously read currentBean
       nextBean = currentBean;
-      request.persistenceContextAdd(nextBean);
       // check the current row we have just moved to
       if (checkForDifferentBean()) {
         return true;

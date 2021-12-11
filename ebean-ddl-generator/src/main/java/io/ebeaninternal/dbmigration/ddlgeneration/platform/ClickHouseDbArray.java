@@ -14,6 +14,7 @@ class ClickHouseDbArray {
     mapping.put("varchar[]", "Array(String)");
     mapping.put("integer[]", "Array(UInt32)");
     mapping.put("bigint[]", "Array(UInt64)");
+    mapping.put("float[]", "Array(Float32)");
   }
 
   /**
@@ -21,6 +22,10 @@ class ClickHouseDbArray {
    */
   static String logicalToNative(String logicalArrayType) {
     int colonPos = logicalArrayType.indexOf(':');
+    int bracketPos = logicalArrayType.indexOf('(');
+    if (bracketPos > -1 && (bracketPos < colonPos || colonPos == -1)) {
+      colonPos = bracketPos;
+    }
     if (colonPos > -1) {
       logicalArrayType = logicalArrayType.substring(0, colonPos);
     }

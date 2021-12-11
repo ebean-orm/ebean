@@ -50,22 +50,14 @@ public final class ReadJson implements SpiJsonReader {
   /**
    * Construct when transferring load context, persistence context, object mapper etc to a new ReadJson instance.
    */
-  private ReadJson(JsonParser moreJson, ReadJson source, boolean resetContext) {
+  private ReadJson(JsonParser moreJson, ReadJson source) {
     this.parser = moreJson;
     this.rootDesc = source.rootDesc;
     this.pathStack = source.pathStack;
     this.visitorMap = source.visitorMap;
     this.objectMapper = source.objectMapper;
-    if (resetContext) {
-      this.persistenceContext = new DefaultPersistenceContext();
-      this.loadContext = source.loadContext;
-      if (loadContext != null) {
-        loadContext.resetPersistenceContext(persistenceContext);
-      }
-    } else {
-      this.persistenceContext = source.persistenceContext;
-      this.loadContext = source.loadContext;
-    }
+    this.persistenceContext = source.persistenceContext;
+    this.loadContext = source.loadContext;
   }
 
   private LoadContext initLoadContext(BeanDescriptor<?> desc, JsonReadOptions readOptions) {
@@ -96,8 +88,8 @@ public final class ReadJson implements SpiJsonReader {
    * Return a new instance of ReadJson using the existing context but with a new JsonParser.
    */
   @Override
-  public SpiJsonReader forJson(JsonParser moreJson, boolean resetContext) {
-    return new ReadJson(moreJson, this, resetContext);
+  public SpiJsonReader forJson(JsonParser moreJson) {
+    return new ReadJson(moreJson, this);
   }
 
   /**

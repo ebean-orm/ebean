@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.Database;
@@ -29,8 +31,6 @@ import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
@@ -44,6 +44,7 @@ import java.util.stream.Stream;
 /**
  * Implementation of FetchGroup query for use to create FetchGroup via query beans.
  */
+@NonNullApi
 final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
@@ -65,6 +66,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
     return this;
   }
 
+  @SuppressWarnings("rawtypes")
   @Override
   public Query<T> select(FetchGroup fetchGroup) {
     this.detail = ((SpiFetchGroup) fetchGroup).detail();
@@ -117,7 +119,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public Query<T> fetch(String property, String columns, FetchConfig config) {
+  public Query<T> fetch(String property, @Nullable String columns, @Nullable FetchConfig config) {
     detail.fetch(property, columns, config);
     return this;
   }
@@ -234,25 +236,21 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public <A> List<A> findIds() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public QueryIterator<T> findIterate() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public Stream<T> findStream() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public Stream<T> findLargeStream() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
@@ -273,25 +271,21 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public List<T> findList() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public Set<T> findSet() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public <K> Map<K, T> findMap() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public <A> List<A> findSingleAttributeList() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
@@ -318,19 +312,16 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public Optional<T> findOneOrEmpty() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public List<Version<T>> findVersions() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
@@ -361,25 +352,21 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public FutureRowCount<T> findFutureCount() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public FutureIds<T> findFutureIds() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public FutureList<T> findFutureList() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
-  @Nonnull
   @Override
   public PagedList<T> findPagedList() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");

@@ -15,6 +15,7 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -99,8 +100,9 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
   }
 
   class TDEbeanServer extends TDSpiEbeanServer {
+    @Nonnull
     @Override
-    public BeanDescriptor<?> descriptorById(String descriptorId) {
+    public BeanDescriptor<?> descriptorById(@Nonnull String descriptorId) {
       return customerBeanDescriptor;
     }
   }

@@ -26,7 +26,6 @@ final class CQueryIteratorSimple<T> implements QueryIterator<T> {
   public boolean hasNext() {
     boolean ret = false;
     try {
-      request.flushPersistenceContextOnIterate();
       ret = cquery.hasNext();
       return ret;
     } catch (SQLException e) {

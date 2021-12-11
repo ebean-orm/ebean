@@ -224,6 +224,15 @@ public final class BindParams implements Serializable {
   }
 
   /**
+   * Set a named In parameter that is multi-valued.
+   */
+  public Param setArrayParameter(String name, Collection<?> value) {
+    Param p = getParam(name);
+    p.setInValue(new MultiValueWrapper(value));
+    return p;
+  }
+
+  /**
    * Set an encryption key as a bind value.
    * <p>
    * Needs special treatment as the value should not be included in a log.
@@ -285,12 +294,17 @@ public final class BindParams implements Serializable {
    */
   public boolean isSameBindHash() {
     if (bindHash == null) {
-      bindHash = calcQueryPlanHash();
       return false;
     }
-    String oldPlan = bindHash;
+    String newHash = calcQueryPlanHash();
+    return bindHash.equals(newHash);
+  }
+
+  /**
+   * Updates the hash.
+   */
+  public void updateHash() {
     bindHash = calcQueryPlanHash();
-    return bindHash.equals(oldPlan);
   }
 
   /**

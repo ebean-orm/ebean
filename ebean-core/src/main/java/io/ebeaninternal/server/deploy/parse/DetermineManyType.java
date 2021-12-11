@@ -1,4 +1,6 @@
-package io.ebeaninternal.server.deploy;
+package io.ebeaninternal.server.deploy.parse;
+
+import io.ebeaninternal.server.deploy.ManyType;
 
 import java.util.List;
 import java.util.Map;
@@ -7,9 +9,9 @@ import java.util.Set;
 /**
  * Determine the Many Type for a property.
  */
-public final class DetermineManyType {
+final class DetermineManyType {
 
-  public ManyType getManyType(Class<?> type) {
+  ManyType getManyType(Class<?> type) {
     if (type.equals(List.class)) {
       return ManyType.LIST;
     }

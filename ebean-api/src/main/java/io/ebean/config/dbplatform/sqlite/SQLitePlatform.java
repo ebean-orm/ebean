@@ -24,6 +24,7 @@ public class SQLitePlatform extends DatabasePlatform {
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("CURRENT_TIMESTAMP");
+    this.supportsResultSetConcurrencyModeUpdatable = false;
 
     dbTypeMap.put(DbType.BIT, new DbPlatformType("int"));
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("int"));
