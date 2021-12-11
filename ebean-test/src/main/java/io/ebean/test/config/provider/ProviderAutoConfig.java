@@ -14,7 +14,7 @@ import java.util.Properties;
  */
 public class ProviderAutoConfig {
 
-  private static final Logger log = LoggerFactory.getLogger(ProviderAutoConfig.class);
+  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
 
   private final DatabaseConfig config;
   private final Properties properties;
@@ -56,23 +56,29 @@ public class ProviderAutoConfig {
   String msg(int providerSetFlag) {
     String msg = msgProvider(providerSetFlag);
     String usage = msgUsage(providerSetFlag);
-    return "for testing purposes "+msg+" has been configured. Use io.ebean.test.UserContext to "+usage+" in tests.";
+    return "For testing purposes " + msg + " has been configured. Use io.ebean.test.UserContext to " + usage + " in tests.";
   }
 
   private String msgProvider(int providerSetFlag) {
     switch (providerSetFlag) {
-      case 1: return "a current user provider";
-      case 2: return "a current tenant provider";
-      case 3: return "a current user and tenant provider";
+      case 1:
+        return "a current user provider";
+      case 2:
+        return "a current tenant provider";
+      case 3:
+        return "a current user and tenant provider";
     }
     return "[unexpected??]";
   }
 
   private String msgUsage(int providerSetFlag) {
     switch (providerSetFlag) {
-      case 1: return "set current user";
-      case 2: return "set current tenant";
-      case 3: return "set current user and tenant";
+      case 1:
+        return "set current user";
+      case 2:
+        return "set current tenant";
+      case 3:
+        return "set current user and tenant";
     }
     return "[unexpected??]";
   }

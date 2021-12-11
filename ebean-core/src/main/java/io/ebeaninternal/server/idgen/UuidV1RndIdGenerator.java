@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
-  protected static final Logger logger = LoggerFactory.getLogger("io.ebean.IDGEN");
+  protected static final Logger log = LoggerFactory.getLogger("io.ebean.IDGEN");
 
   // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
   protected static final long UUID_EPOCH_OFFSET = 0x01B21DD213814000L;
@@ -106,7 +106,7 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
         delta = current - last;
         if (delta < -10000 * 20000) {
-          logger.info("Clock skew of {} ms detected", delta / -10000);
+          log.info("Clock skew of {} ms detected", delta / -10000);
           // The clock was adjusted back about 2 seconds, or we were generating a lot of ids too fast
           // if so, we try to set the current as last and also increment the clockSeq.
           lock.lock();

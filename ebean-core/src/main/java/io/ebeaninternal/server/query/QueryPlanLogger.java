@@ -3,16 +3,12 @@ package io.ebeaninternal.server.query;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class QueryPlanLogger {
-
-  static final Logger queryPlanLog = LoggerFactory.getLogger(QueryPlanLogger.class);
 
   abstract SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind);
 

@@ -1,0 +1,45 @@
+
+name: Multi-database platform test
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        java_version: [11]
+        os: [ubuntu-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Java
+      uses: actions/setup-java@v2
+      with:
+        java-version: ${{ matrix.java_version }}
+        distribution: 'adopt'
+    - name: Maven cache
+      uses: actions/cache@v2
+      env:
+        cache-name: maven-cache
+      with:
+        path:
+          ~/.m2
+        key: build-${{ env.cache-name }}
+    - name: h2
+      run: mvn clean test
+    - name: postgres
+      run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
+    - name: mysql
+      run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties
+    - name: sqlserver 2019
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties
+    - name: sqlserver 2017
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
+    - name: mariadb
+      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties

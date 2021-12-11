@@ -4,15 +4,11 @@ import io.ebean.ProfileLocation;
 import io.ebean.config.ProfilingConfig;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiProfileHandler;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -23,13 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.MILLI_OF_SECOND;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
-import static java.time.temporal.ChronoField.YEAR;
+import static java.time.temporal.ChronoField.*;
 
 /**
  * Default profile handler.
@@ -40,10 +30,8 @@ import static java.time.temporal.ChronoField.YEAR;
  */
 public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
-  private static final Logger log = LoggerFactory.getLogger(DefaultProfileHandler.class);
-
+  private static final Logger log = CoreLog.internal;
   private static final DateTimeFormatter DTF;
-
   static {
     DTF = new DateTimeFormatterBuilder()
       .parseCaseInsensitive()
@@ -63,28 +51,18 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
    * Low contention choice.
    */
   private final Queue<TransactionProfile> queue = new ConcurrentLinkedQueue<>();
-
   private final ExecutorService executor;
-
   private final ReentrantLock lock = new ReentrantLock();
-
   private final File dir;
-
   private final long minMicros;
-
   private final long profilesPerFile;
-
   private final boolean verbose;
-
   private volatile boolean shutdown;
-
   private long profileCounter;
-
   /**
    * Slow down polling of transaction profiling queue.
    */
   private int sleepBackoff;
-
   private Writer out;
 
   public DefaultProfileHandler(ProfilingConfig config) {

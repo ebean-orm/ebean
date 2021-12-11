@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.11.6-SNAPSHOT</version>
+    <version>12.13.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -15,7 +15,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-parent-12.11.4</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>classpath-scanner</artifactId>
-      <version>6.1</version>
+      <version>6.2</version>
     </dependency>
 
     <dependency>
@@ -41,19 +41,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.11.6-SNAPSHOT</version>
+      <version>12.13.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>12.11.6-SNAPSHOT</version>
+      <version>12.13.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>12.11.6-SNAPSHOT</version>
+      <version>12.13.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -136,7 +136,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.2.20</version>
+      <version>42.2.24</version>
       <optional>true</optional>
     </dependency>
 
@@ -209,17 +209,6 @@
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <archive>
-            <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.1.1</version>
         <configuration>
@@ -237,6 +226,18 @@
             </goals>
           </execution>
         </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>2.24</version>
+        <extensions>true</extensions>
+        <configuration>
+          <tiles>
+            <tile>io.avaje.tile:moditech-module:1.0</tile>
+          </tiles>
+        </configuration>
       </plugin>
 
     </plugins>

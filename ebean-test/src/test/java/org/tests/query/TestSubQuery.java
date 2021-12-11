@@ -72,7 +72,7 @@ public class TestSubQuery extends BaseTestCase {
     if (isPostgres()) {
       assertThat(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id = any(?)");
     } else {
-      assertThat(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id in (?)");
+      assertSql(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id in (?)");
     }
 
     Query<Order> query = DB.find(Order.class).select("shipDate").where().isIn("id", sq).query();
@@ -81,7 +81,7 @@ public class TestSubQuery extends BaseTestCase {
     if (isPostgres()) {
       assertThat(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
     } else {
-      assertThat(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
+      assertSql(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + trimSql(debugSq.getGeneratedSql()) + ")");
     }
   }
 
@@ -101,8 +101,8 @@ public class TestSubQuery extends BaseTestCase {
 
     Query<Order> query = DB.find(Order.class).select("status").where().isIn("shipDate", sq).query();
     query.findSingleAttribute();
-    assertThat(query.getGeneratedSql())
-        .isEqualTo("select t0.status from o_order t0 where  (t0.ship_date) in (" + debugSq.getGeneratedSql() + ")");
+    assertSql(query.getGeneratedSql())
+        .isEqualTo("select t0.status from o_order t0 where  (t0.ship_date) in (" + trimSql(debugSq.getGeneratedSql()) + ")");
   }
 
   /**
@@ -120,13 +120,13 @@ public class TestSubQuery extends BaseTestCase {
     // execute the subQuery as copy (generatedSQL must be part of original query)
     Query<OrderDetail> debugSq = sq.copy();
     debugSq.findSingleAttribute();
-    assertThat(debugSq.getGeneratedSql()).contains("select t2.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id left join or_order_ship t2");
+    assertSql(debugSq.getGeneratedSql()).contains("select t2.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id left join or_order_ship t2");
 
     Query<OrderShipment> query = DB.find(OrderShipment.class).select("shipTime").where().isIn("id", sq).query();
     query.findSingleAttribute();
 
-    assertThat(query.getGeneratedSql())
-        .isEqualTo("select t0.ship_time from or_order_ship t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
+    assertSql(query.getGeneratedSql())
+        .isEqualTo("select t0.ship_time from or_order_ship t0 where  (t0.id) in (" + trimSql(debugSq.getGeneratedSql()) + ")");
   }
 
   public void testCompositeKey() {

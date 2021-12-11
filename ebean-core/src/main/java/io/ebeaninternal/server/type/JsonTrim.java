@@ -19,8 +19,13 @@ final class JsonTrim {
     for (int i = 0; i < len; i++) {
       char c = json.charAt(i);
       if (c == '\"') {
-        if (!escaped) quoted = !quoted;
-        else escaped = false;
+        if (!escaped) {
+          quoted = !quoted;
+        } else {
+          escaped = false;
+        }
+      } else if (escaped) {
+        escaped = false;
       } else if (quoted && c == '\\') {
         escaped = true;
       }

@@ -37,14 +37,6 @@ public interface LoadContext {
   PersistenceContext getPersistenceContext();
 
   /**
-   * Set the persistence context used by this query and future lazy loading.
-   * <p>
-   * Used by query iterator when processing large result sets.
-   * </p>
-   */
-  void resetPersistenceContext(PersistenceContext persistenceContext);
-
-  /**
    * Register a Bean for lazy loading.
    */
   void register(String path, EntityBeanIntercept ebi);

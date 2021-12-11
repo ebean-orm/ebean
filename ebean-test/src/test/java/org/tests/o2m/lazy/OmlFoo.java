@@ -15,7 +15,12 @@ public class OmlFoo {
   private OmlBar bar;
 
   @OneToMany(mappedBy = "foo", cascade = CascadeType.ALL)
-  private List<OmlBaz> bazList = new ArrayList<OmlBaz>();
+  private List<OmlBaz> bazList = new ArrayList<>();
+
+  public OmlFoo(OmlBaz baz) {
+    bazList.add(baz);
+    baz.setFoo(this);
+  }
 
   public Long getId() {
     return id;

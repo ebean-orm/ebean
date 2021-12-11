@@ -4,23 +4,36 @@ import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+class MColumnTest {
 
-public class MColumnTest {
+  private final MTable table = new MTable("tab");
 
-  MTable table = new MTable("tab");
-
-  MColumn basic() {
+  private MColumn basic() {
     return new MColumn("col", "integer");
   }
 
-  ModelDiff diff() {
+  private ModelDiff diff() {
     return new ModelDiff();
   }
 
   @Test
-  public void noDiff() throws Exception {
+  void localDateTime() {
+    assertTrue(basic().localDateTime("timestamp", "localdatetime"));
+  }
 
+  @Test
+  void localDateTime_when_not() {
+    assertFalse(basic().localDateTime("other", "localdatetime"));
+    assertFalse(basic().localDateTime("timestamp", "other"));
+    assertFalse(basic().localDateTime("localdatetime", "timestamp"));
+    assertFalse(basic().localDateTime("timestamp2", "localdatetime"));
+  }
+
+  @Test
+  void noDiff(){
     ModelDiff diff = diff();
     basic().compare(diff, table, basic());
 
@@ -29,8 +42,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffType() throws Exception {
-
+  void diffType() {
     ModelDiff diff = diff();
     basic().compare(diff, table, new MColumn("col", "integer(8)"));
 
@@ -40,8 +52,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffNotNull() throws Exception {
-
+  void diffNotNull() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setNotnull(true);
@@ -58,8 +69,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffNull() throws Exception {
-
+  void diffNull() {
     ModelDiff diff = diff();
 
     MColumn newCol = basic();
@@ -76,8 +86,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void applyNotNull_expect_notNull() throws Exception {
-
+  void applyNotNull_expect_notNull() {
     MColumn newCol = basic();
     newCol.setNotnull(true);
 
@@ -89,8 +98,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffCheckAdd() throws Exception {
-
+  void diffCheckAdd() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setCheckConstraint("abc");
@@ -102,8 +110,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffCheckRemove() throws Exception {
-
+  void diffCheckRemove() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();
@@ -117,8 +124,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffCheckChange() throws Exception {
-
+  void diffCheckChange() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setCheckConstraint("abc");
@@ -133,8 +139,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffDefaultValueAdd() throws Exception {
-
+  void diffDefaultValueAdd() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setDefaultValue("abc");
@@ -145,8 +150,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffDefaultValueRemove() throws Exception {
-
+  void diffDefaultValueRemove() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();
@@ -158,8 +162,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffDefaultValueChange() throws Exception {
-
+  void diffDefaultValueChange() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setDefaultValue("abc");
@@ -172,8 +175,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffReferencesAdd() throws Exception {
-
+  void diffReferencesAdd() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setReferences("abc");
@@ -184,10 +186,8 @@ public class MColumnTest {
     assertThat(getAlterColumn(diff).getDropForeignKey()).isNull();
   }
 
-
   @Test
-  public void diffReferencesRemove() throws Exception {
-
+  void diffReferencesRemove() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();
@@ -206,8 +206,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffReferencesChange() throws Exception {
-
+  void diffReferencesChange() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setReferences("ab");
@@ -231,8 +230,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffUniqueAdd() throws Exception {
-
+  void diffUniqueAdd() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setUnique("uq_one");
@@ -243,8 +241,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffUniqueRemove() throws Exception {
-
+  void diffUniqueRemove() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();
@@ -256,8 +253,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffUniqueOneToOneAdd() throws Exception {
-
+  void diffUniqueOneToOneAdd() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setUniqueOneToOne("uq_new");
@@ -271,8 +267,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffUniqueOneToOneRemove() throws Exception {
-
+  void diffUniqueOneToOneRemove() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();
@@ -284,8 +279,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffHistoryExcludeAdd() throws Exception {
-
+  void diffHistoryExcludeAdd() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     newCol.setHistoryExclude(true);
@@ -296,8 +290,7 @@ public class MColumnTest {
   }
 
   @Test
-  public void diffHistoryExcludeRemove() throws Exception {
-
+  void diffHistoryExcludeRemove() {
     ModelDiff diff = diff();
     MColumn newCol = basic();
     MColumn oldCol = basic();

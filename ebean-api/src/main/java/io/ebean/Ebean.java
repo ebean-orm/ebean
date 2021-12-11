@@ -1,13 +1,12 @@
 package io.ebean;
 
+import io.avaje.lang.Nullable;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.plugin.Property;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.util.Collection;
@@ -506,7 +505,6 @@ public final class Ebean {
    * @param bean The entity bean to check uniqueness on
    * @return a set of Properties if constraint validation was detected or empty list.
    */
-  @Nonnull
   public static Set<Property> checkUniqueness(Object bean) {
     return getDefault().checkUniqueness(bean);
   }
@@ -514,7 +512,6 @@ public final class Ebean {
   /**
    * Same as {@link #checkUniqueness(Object)}. but with given transaction.
    */
-  @Nonnull
   public static Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     return getDefault().checkUniqueness(bean, transaction);
   }

@@ -1,5 +1,7 @@
 package io.ebean;
 
+import io.avaje.lang.NonNullApi;
+
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -18,6 +20,7 @@ import java.util.concurrent.TimeUnit;
  * This also propagates MDC context from the current thread to the
  * background task if defined.
  */
+@NonNullApi
 public interface BackgroundExecutor {
 
   /**

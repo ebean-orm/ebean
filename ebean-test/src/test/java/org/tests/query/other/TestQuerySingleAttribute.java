@@ -646,6 +646,14 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list1.toString()).isEqualTo("[1: Tracy, 3: Jim1, 1: Jack, 3: Fred1, 1: Fiona, 3: Bugs1]");
+    
+    query = DB.find(Contact.class).select("firstName");
+    list1 = query
+      .setCountDistinct(CountDistinctOrder.NO_ORDERING)
+      .findSingleAttributeList();
+    assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
+        + "select t0.first_name as attribute_ from contact t0");
 
     query = DB.find(Contact.class).select("firstName");
     list1 = query
@@ -708,7 +716,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
 
     if (isOracle()) {
-      assertSql(query).contains("select r1.attribute_, count(*) from (select t2.line_1 as attribute_ from contact t0 join o_customer t1 on t1.id = t0.customer_id  left join o_address t2 on t2.id = t1.billing_address_id where t2.line_1 is not null) r1 group by r1.attribute_ order by r1.attribute_ desc offset 1 rows fetch next 2 rows only");
+      assertSql(query).contains("select r1.attribute_, count(*) from (select t2.line_1 as attribute_ from contact t0 join o_customer t1 on t1.id = t0.customer_id left join o_address t2 on t2.id = t1.billing_address_id where t2.line_1 is not null) r1 group by r1.attribute_ order by r1.attribute_ desc offset 1 rows fetch next 2 rows only");
     } else {
       assertSql(query).contains("select r1.attribute_, count(*) from ("
         + "select t2.line_1 as attribute_ from contact t0 "

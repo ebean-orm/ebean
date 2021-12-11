@@ -14,7 +14,7 @@ import static java.util.concurrent.CompletableFuture.runAsync;
 
 public class PlatformAutoConfig {
 
-  private static final Logger log = LoggerFactory.getLogger(PlatformAutoConfig.class);
+  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
 
   /**
    * Known platforms we can setup locally or via docker container.
@@ -34,6 +34,7 @@ public class PlatformAutoConfig {
     KNOWN_PLATFORMS.put("clickhouse", new ClickHouseSetup());
     KNOWN_PLATFORMS.put("cockroach", new CockroachSetup());
     KNOWN_PLATFORMS.put("hana", new HanaSetup());
+    KNOWN_PLATFORMS.put("db2", new Db2Setup());
   }
 
   private final DatabaseConfig config;

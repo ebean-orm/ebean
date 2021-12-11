@@ -2,6 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.OrderBy;
 import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -15,8 +16,6 @@ import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -39,8 +38,6 @@ import java.util.Set;
  * </p>
  */
 public final class CQueryPredicates {
-
-  private static final Logger logger = LoggerFactory.getLogger(CQueryPredicates.class);
 
   private final Binder binder;
   private final OrmQueryRequest<?> request;
@@ -98,13 +95,11 @@ public final class CQueryPredicates {
   }
 
   public String bind(DataBind dataBind) throws SQLException {
-
     OrmUpdateProperties updateProperties = query.getUpdateProperties();
     if (updateProperties != null) {
       // bind the update set clause
       updateProperties.bind(binder, dataBind);
     }
-
     if (query.isVersionsBetween() && binder.isAsOfStandardsBased()) {
       // sql2011 based versions between timestamp syntax
       Timestamp start = query.getVersionStart();
@@ -114,7 +109,6 @@ public final class CQueryPredicates {
       binder.bindObject(dataBind, end);
       dataBind.append(", ");
     }
-
     CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
       int asOfTableCount = queryPlan.getAsOfTableCount();
@@ -129,31 +123,25 @@ public final class CQueryPredicates {
         dataBind.append(", ");
       }
     }
-
     if (idValue != null) {
       // this is a find by id type query...
       request.descriptor().bindId(dataBind, idValue);
       dataBind.append(idValue);
       dataBind.append(", ");
     }
-
     if (bindParams != null) {
       // bind named and positioned parameters...
       binder.bind(bindParams, dataBind, dataBind.log());
     }
-
     if (where != null) {
       where.bind(dataBind);
     }
-
     if (filterMany != null) {
       filterMany.bind(dataBind);
     }
-
     if (having != null) {
       having.bind(dataBind);
     }
-
     return dataBind.log().toString();
   }
 
@@ -178,7 +166,6 @@ public final class CQueryPredicates {
    * Convert named parameters into an OrderedList.
    */
   private void buildBindWhereRawSql(boolean buildSql) {
-
     if (!buildSql && bindParams != null && bindParams.requiresNamedParamsPrepare()) {
       if (query.isNativeSql()) {
         // convert named params into positioned params
@@ -197,7 +184,6 @@ public final class CQueryPredicates {
   }
 
   public void prepare(boolean buildSql) {
-
     DeployParser deployParser = request.createDeployParser();
     buildUpdateClause(buildSql, deployParser);
     buildBindWhereRawSql(buildSql);
@@ -209,7 +195,6 @@ public final class CQueryPredicates {
         whereExprSql = where.buildSql();
       }
     }
-
     BeanPropertyAssocMany<?> manyProperty = request.determineMany();
     if (manyProperty != null) {
       OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.name(), false);
@@ -221,7 +206,6 @@ public final class CQueryPredicates {
         }
       }
     }
-
     // having expression
     SpiExpressionList<?> havingExpr = query.getHavingExpressions();
     if (havingExpr != null) {
@@ -230,11 +214,9 @@ public final class CQueryPredicates {
         havingExprSql = having.buildSql();
       }
     }
-
     if (buildSql) {
       parsePropertiesToDbColumns(deployParser);
     }
-
   }
 
   /**
@@ -242,20 +224,16 @@ public final class CQueryPredicates {
    * clauses etc.
    */
   private void parsePropertiesToDbColumns(DeployParser deployParser) {
-
     // order by is dependent on the manyProperty (if there is one)
     String logicalOrderBy = deriveOrderByWithMany(request.manyProperty());
     if (logicalOrderBy != null) {
       dbOrderBy = deployParser.parse(logicalOrderBy);
     }
-
     // create a copy of the includes required to support the orderBy
     orderByIncludes = new HashSet<>(deployParser.getIncludes());
-
     dbWhere = deriveWhere(deployParser);
     dbFilterMany = deriveFilterMany(deployParser);
     dbHaving = deriveHaving(deployParser);
-
     // all includes including ones for manyWhere clause
     predicateIncludes = deployParser.getIncludes();
   }
@@ -307,7 +285,6 @@ public final class CQueryPredicates {
   }
 
   private String parseOrderBy() {
-
     OrderBy<?> orderBy = query.getOrderBy();
     if (orderBy == null) {
       return null;
@@ -320,42 +297,32 @@ public final class CQueryPredicates {
    * appropriate.
    */
   private String deriveOrderByWithMany(BeanPropertyAssocMany<?> manyProp) {
-
     if (manyProp == null) {
       return parseOrderBy();
     }
-
     String orderBy = parseOrderBy();
-
     BeanDescriptor<?> desc = request.descriptor();
     String orderById = desc.defaultOrderBy();
-
     if (orderBy == null) {
       orderBy = orderById;
     }
-
     // check for default ordering on the many property...
     String manyOrderBy = manyProp.fetchOrderBy();
     if (manyOrderBy != null) {
       orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.name(), manyOrderBy);
     }
-
     if (request.isFindById()) {
       // only one master bean so should be fine...
       return orderBy;
     }
-
     if (orderBy.startsWith(orderById)) {
       return orderBy;
     }
-
     // more than one top level row may be returned so
     // we need to make sure their is an order by on the
     // top level first (to ensure master/detail construction).
-
     int manyPos = orderBy.indexOf(manyProp.name());
     int idPos = orderBy.indexOf(" " + orderById);
-
     if (manyPos == -1) {
       // no ordering of the many
       if (idPos == -1) {
@@ -366,7 +333,6 @@ public final class CQueryPredicates {
       // orderById is already in the order by clause
       return orderBy;
     }
-
     if (idPos <= -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
@@ -374,14 +340,11 @@ public final class CQueryPredicates {
         msg += "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById + "]";
         msg += " must come before the many property [" + manyProp.name() + "] in the orderBy.";
         msg += " Ebean has automatically modified the orderBy clause to do this.";
-
-        logger.warn(msg);
+        CoreLog.log.warn(msg);
       }
-
       // the id needs to come before the manyPropName
       orderBy = orderBy.substring(0, manyPos) + orderById + ", " + orderBy.substring(manyPos);
     }
-
     return orderBy;
   }
 
@@ -442,7 +405,6 @@ public final class CQueryPredicates {
   }
 
   String getLogWhereSql() {
-
     if (dbWhere == null && dbFilterMany == null) {
       return "";
     }

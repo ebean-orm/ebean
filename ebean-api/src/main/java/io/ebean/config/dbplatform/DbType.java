@@ -34,6 +34,7 @@ public enum DbType {
 
   ARRAY(Types.ARRAY),
 
+  LOCALDATETIME(ExtraDbTypes.LOCALDATETIME),
   UUID(ExtraDbTypes.UUID),
   INET(ExtraDbTypes.INET),
   CIDR(ExtraDbTypes.CIDR),

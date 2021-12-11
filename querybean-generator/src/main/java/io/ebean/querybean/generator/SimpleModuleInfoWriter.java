@@ -18,14 +18,16 @@ class SimpleModuleInfoWriter {
   private final String factoryPackage;
   private final String factoryShortName;
   private final String factoryFullName;
+  private final JavaFileObject javaFileObject;
 
   private Append writer;
 
-  SimpleModuleInfoWriter(ProcessingContext processingContext) {
+  SimpleModuleInfoWriter(ProcessingContext processingContext) throws IOException {
     this.processingContext = processingContext;
     this.factoryPackage = processingContext.getFactoryPackage();
     this.factoryShortName = "_Ebean$ModuleInfo";
     this.factoryFullName = factoryPackage + "." + factoryShortName;
+    this.javaFileObject = processingContext.createWriter(factoryFullName);
   }
 
   void write() throws IOException {
@@ -208,7 +210,6 @@ class SimpleModuleInfoWriter {
   }
 
   private Writer createFileWriter() throws IOException {
-    JavaFileObject jfo = processingContext.createWriter(factoryFullName);
-    return jfo.openWriter();
+    return javaFileObject.openWriter();
   }
 }

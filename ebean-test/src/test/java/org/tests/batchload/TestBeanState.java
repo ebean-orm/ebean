@@ -16,11 +16,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class TestBeanState extends BaseTestCase {
+class TestBeanState extends BaseTestCase {
 
   @Test
-  public void test() {
+  void invalid() {
+    assertThrows(IllegalArgumentException.class, () -> DB.beanState(new Object()));
+  }
 
+  @Test
+  void loadErrors_when_empty() {
+    ResetBasicData.reset();
+    Customer one = DB.find(Customer.class).setMaxRows(1).findOne();
+    BeanState beanState = DB.beanState(one);
+
+    assertThat(beanState.loadErrors()).isEmpty();
+  }
+
+  @Test
+  void test() {
     ResetBasicData.reset();
 
     List<Customer> custs = DB.find(Customer.class).findList();
@@ -55,8 +68,7 @@ public class TestBeanState extends BaseTestCase {
   }
 
   @Test
-  public void setDisableLazyLoad_expect_lazyLoadingDisabled() {
-
+  void setDisableLazyLoad_expect_lazyLoadingDisabled() {
     ResetBasicData.reset();
 
     List<Customer> custs = DB.find(Customer.class).order("id").findList();
@@ -73,8 +85,7 @@ public class TestBeanState extends BaseTestCase {
   }
 
   @Test
-  public void getChangedProps_when_setManyProperty() {
-
+  void changedProps_when_setManyProperty() {
     ResetBasicData.reset();
 
     Customer customer = DB.find(Customer.class).order("id").setMaxRows(1).findOne();
@@ -87,8 +98,7 @@ public class TestBeanState extends BaseTestCase {
   }
 
   @Test
-  public void getChangedProps_when_setManyProperty_onNewBean() {
-
+  void changedProps_when_setManyProperty_onNewBean() {
     Customer customer = new Customer();
 
     BeanState beanState = DB.beanState(customer);
@@ -107,7 +117,7 @@ public class TestBeanState extends BaseTestCase {
   }
 
   @Test
-  public void readOnly_when_setManyProperty() {
+  void readOnly_when_setManyProperty() {
     Customer customer = new Customer();
     customer.setContacts(new ArrayList<>());
 
@@ -120,7 +130,7 @@ public class TestBeanState extends BaseTestCase {
   }
 
   @Test
-  public void readOnly_when_setProperty() {
+  void readOnly_when_setProperty() {
     Customer customer = new Customer();
     customer.setName("a");
 

@@ -14,13 +14,12 @@ import io.ebean.annotation.ReadAudit;
 import io.ebean.annotation.StorageEngine;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
@@ -37,8 +36,6 @@ import static io.ebean.util.AnnotationUtil.typeGet;
  * Read the class level deployment annotations.
  */
 final class AnnotationClass extends AnnotationParser {
-
-  private static final Logger logger = LoggerFactory.getLogger(AnnotationClass.class);
 
   private final String asOfViewSuffix;
   private final String versionsBetweenSuffix;
@@ -66,7 +63,7 @@ final class AnnotationClass extends AnnotationParser {
       Column column = override.column();
       DeployBeanProperty beanProperty = descriptor.getBeanProperty(propertyName);
       if (beanProperty == null) {
-        logger.error("AttributeOverride property [" + propertyName + "] not found on " + descriptor.getFullName());
+        CoreLog.log.error("AttributeOverride property [" + propertyName + "] not found on " + descriptor.getFullName());
       } else {
         readColumn(column, beanProperty);
       }

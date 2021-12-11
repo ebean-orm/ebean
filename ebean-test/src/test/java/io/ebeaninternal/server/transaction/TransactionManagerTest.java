@@ -30,7 +30,7 @@ public class TransactionManagerTest extends BaseTestCase {
 
     SpiTransactionManager transactionManager = server.transactionManager();
 
-    DataSource dataSource = transactionManager.getDataSource();
+    DataSource dataSource = transactionManager.dataSource();
     Connection connection = dataSource.getConnection();
     try {
       SpiTransaction externalTxn = new ExternalJdbcTransaction("external0", true, connection, null);

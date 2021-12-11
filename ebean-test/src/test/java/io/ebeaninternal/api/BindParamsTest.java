@@ -19,17 +19,19 @@ public class BindParamsTest {
     BindParams.Param param = bindParams.getParameter("ids");
     assertEquals(3, param.queryBindCount());
     assertFalse(bindParams.isSameBindHash());
+    bindParams.updateHash();
 
     List<String> ids2 = Arrays.asList("1", "2", "3", "4");
     bindParams.setParameter("ids", ids2);
     assertEquals(4, param.queryBindCount());
     assertFalse(bindParams.isSameBindHash());
+    bindParams.updateHash();
 
     List<String> ids3 = Arrays.asList("2", "99", "44");
     bindParams.setParameter("ids", ids3);
     assertEquals(3, param.queryBindCount());
     assertFalse(bindParams.isSameBindHash());
-
+    bindParams.updateHash();
 
     List<String> ids4 = Arrays.asList("4545", "3499", "3444");
     bindParams.setParameter("ids", ids4);

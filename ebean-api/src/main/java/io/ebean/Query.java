@@ -1,7 +1,7 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import javax.persistence.NonUniqueResultException;
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -177,6 +177,7 @@ import java.util.stream.Stream;
  *
  * @param <T> the type of Entity bean this query will fetch.
  */
+@NonNullApi
 public interface Query<T> extends CancelableQuery {
 
   /**
@@ -689,7 +690,6 @@ public interface Query<T> extends CancelableQuery {
    * This query will execute against the Database that was used to create it.
    * </p>
    */
-  @Nonnull
   <A> List<A> findIds();
 
   /**
@@ -727,7 +727,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * }</pre>
    */
-  @Nonnull
   QueryIterator<T> findIterate();
 
   /**
@@ -749,7 +748,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * }</pre>
    */
-  @Nonnull
   Stream<T> findStream();
 
   /**
@@ -772,7 +770,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * }</pre>
    */
-  @Nonnull
   @Deprecated
   Stream<T> findLargeStream();
 
@@ -882,7 +879,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * }</pre>
    */
-  @Nonnull
   List<T> findList();
 
   /**
@@ -898,7 +894,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * }</pre>
    */
-  @Nonnull
   Set<T> findSet();
 
   /**
@@ -918,7 +913,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * }</pre>
    */
-  @Nonnull
   <K> Map<K, T> findMap();
 
   /**
@@ -951,7 +945,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * @return the list of values for the selected property
    */
-  @Nonnull
   <A> List<A> findSingleAttributeList();
 
   /**
@@ -1049,7 +1042,6 @@ public interface Query<T> extends CancelableQuery {
   /**
    * Execute the query returning an optional bean.
    */
-  @Nonnull
   Optional<T> findOneOrEmpty();
 
   /**
@@ -1064,7 +1056,6 @@ public interface Query<T> extends CancelableQuery {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
-  @Nonnull
   List<Version<T>> findVersions();
 
   /**
@@ -1074,7 +1065,6 @@ public interface Query<T> extends CancelableQuery {
    * It will execute the query against the history returning the versions of the bean.
    * </p>
    */
-  @Nonnull
   List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end);
 
   /**
@@ -1132,7 +1122,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * @return a Future object for the row count query
    */
-  @Nonnull
   FutureRowCount<T> findFutureCount();
 
   /**
@@ -1145,7 +1134,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * @return a Future object for the list of Id's
    */
-  @Nonnull
   FutureIds<T> findFutureIds();
 
   /**
@@ -1157,7 +1145,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * @return a Future object for the list result of the query
    */
-  @Nonnull
   FutureList<T> findFutureList();
 
   /**
@@ -1187,7 +1174,6 @@ public interface Query<T> extends CancelableQuery {
    *
    * @return The PagedList
    */
-  @Nonnull
   PagedList<T> findPagedList();
 
   /**

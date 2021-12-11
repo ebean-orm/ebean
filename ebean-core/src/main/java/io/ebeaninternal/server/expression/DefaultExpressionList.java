@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.expression;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.DtoQuery;
@@ -51,6 +53,7 @@ import java.util.function.Predicate;
 /**
  * Default implementation of ExpressionList.
  */
+@NonNullApi
 public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private static final String AND = " and ";
@@ -469,6 +472,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return query.exists();
   }
 
+  @Nullable
   @Override
   public T findOne() {
     return query.findOne();

@@ -113,9 +113,9 @@ public interface Junction<T> extends Expression, ExpressionList<T> {
      */
     SHOULD("should", "", true);
 
-    private String prefix;
-    private String literal;
-    private boolean text;
+    private final String prefix;
+    private final String literal;
+    private final boolean text;
 
     Type(String literal, String prefix, boolean text) {
       this.literal = literal;

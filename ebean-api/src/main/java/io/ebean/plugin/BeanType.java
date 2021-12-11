@@ -8,7 +8,6 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -21,7 +20,6 @@ public interface BeanType<T> {
   /**
    * Return the short name of the bean type.
    */
-  @Nonnull
   String name();
 
   /**
@@ -35,7 +33,6 @@ public interface BeanType<T> {
   /**
    * Return the full name of the bean type.
    */
-  @Nonnull
   String fullName();
 
   /**
@@ -49,7 +46,6 @@ public interface BeanType<T> {
   /**
    * Return the class type this BeanDescriptor describes.
    */
-  @Nonnull
   Class<T> type();
 
   /**
@@ -76,7 +72,6 @@ public interface BeanType<T> {
   /**
    * Return all the properties for this bean type.
    */
-  @Nonnull
   Collection<? extends Property> allProperties();
 
   /**

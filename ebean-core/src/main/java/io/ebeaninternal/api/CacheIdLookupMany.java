@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.ebeaninternal.server.expression.IdInExpression;
+import io.ebeaninternal.server.expression.IdInCommon;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -13,10 +13,10 @@ import java.util.Set;
  */
 public final class CacheIdLookupMany<T> implements CacheIdLookup<T> {
 
-  private final IdInExpression idInExpression;
+  private final IdInCommon idInExpression;
   private int remaining;
 
-  public CacheIdLookupMany(IdInExpression idInExpression) {
+  public CacheIdLookupMany(IdInCommon idInExpression) {
     this.idInExpression = idInExpression;
   }
 
@@ -34,15 +34,12 @@ public final class CacheIdLookupMany<T> implements CacheIdLookup<T> {
    */
   @Override
   public List<T> removeHits(BeanCacheResult<T> cacheResult) {
-
     Set<Object> hitIds = new HashSet<>();
     List<T> beans = new ArrayList<>(hitIds.size());
-
     for (BeanCacheResult.Entry<T> hit : cacheResult.hits()) {
       hitIds.add(hit.getKey());
       beans.add(hit.getBean());
     }
-
     this.remaining = idInExpression.removeIds(hitIds);
     return beans;
   }

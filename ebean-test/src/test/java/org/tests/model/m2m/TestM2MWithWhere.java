@@ -24,26 +24,26 @@ public class TestM2MWithWhere extends BaseTestCase {
 
 
     List<MnyNode> result = DB.find(MnyNode.class).where().eq("allRelations", node).findList();
-    assertThat(result).extracting(MnyNode::getId).containsExactly(1, 2, 3, 4, 5);
+    assertThat(result).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 2, 3, 4, 5);
 
     result = DB.find(MnyNode.class).where().eq("allReverseRelations", node).findList();
-    assertThat(result).extracting(MnyNode::getId).containsExactly(1, 2, 3, 4, 5);
+    assertThat(result).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 2, 3, 4, 5);
 
     result = DB.find(MnyNode.class).where().eq("bit1Relations", node).findList();
     assertThat(result).isEmpty(); // -> to = 1 column: 2 0 2 0 2
 
     result = DB.find(MnyNode.class).where().eq("bit2Relations", node).findList();
-    assertThat(result).extracting(MnyNode::getId).containsExactly(1, 3, 5);
+    assertThat(result).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 3, 5);
 
     result = DB.find(MnyNode.class).where().eq("bit1ReverseRelations", node).findList();
     // -> from = 1 column: 2 1 3 1 3
-    assertThat(result).extracting(MnyNode::getId).containsExactly(2, 3, 4, 5);
+    assertThat(result).extracting(MnyNode::getId).containsExactlyInAnyOrder(2, 3, 4, 5);
 
     result = DB.find(MnyNode.class).where().eq("bit2ReverseRelations", node).findList();
-    assertThat(result).hasSize(3).extracting(MnyNode::getId).containsExactly(1, 3, 5);
+    assertThat(result).hasSize(3).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 3, 5);
 
     result = DB.find(MnyNode.class).where().eq("bit2ReverseRelations", node).findList();
-    assertThat(result).hasSize(3).extracting(MnyNode::getId).containsExactly(1, 3, 5);
+    assertThat(result).hasSize(3).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 3, 5);
   }
 
   @Test
@@ -51,18 +51,18 @@ public class TestM2MWithWhere extends BaseTestCase {
     createTestData();
     MnyNode node = DB.find(MnyNode.class, 3);
 
-    assertThat(node.getAllRelations()).extracting(MnyNode::getId).containsExactly(1, 2, 3, 4, 5);
+    assertThat(node.getAllRelations()).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 2, 3, 4, 5);
 
-    assertThat(node.getAllReverseRelations()).extracting(MnyNode::getId).containsExactly(1, 2, 3, 4, 5);
+    assertThat(node.getAllReverseRelations()).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 2, 3, 4, 5);
 
-    assertThat(node.getBit1Relations()).extracting(MnyNode::getId).containsExactly(4, 5);
+    assertThat(node.getBit1Relations()).extracting(MnyNode::getId).containsExactlyInAnyOrder(4, 5);
 
-    assertThat(node.getBit1ReverseRelations()).extracting(MnyNode::getId).containsExactly(1, 2);
+    assertThat(node.getBit1ReverseRelations()).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 2);
 
-    assertThat(node.getBit2Relations()).extracting(MnyNode::getId).containsExactly(1, 3, 5);
+    assertThat(node.getBit2Relations()).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 3, 5);
 
     LoggedSql.start();
-    assertThat(node.getBit2ReverseRelations()).extracting(MnyNode::getId).containsExactly(1, 3, 5);
+    assertThat(node.getBit2ReverseRelations()).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 3, 5);
     List<String> sqls = LoggedSql.stop();
     assertThat(sqls).hasSize(1); // lazy load
 
@@ -77,8 +77,8 @@ public class TestM2MWithWhere extends BaseTestCase {
 
     // no lazyLoad expected
     LoggedSql.start();
-    assertThat(node.getBit1Relations()).extracting(MnyNode::getId).containsExactly(4, 5);
-    assertThat(node.getBit1ReverseRelations()).extracting(MnyNode::getId).containsExactly(1, 2);
+    assertThat(node.getBit1Relations()).extracting(MnyNode::getId).containsExactlyInAnyOrder(4, 5);
+    assertThat(node.getBit1ReverseRelations()).extracting(MnyNode::getId).containsExactlyInAnyOrder(1, 2);
     sqls = LoggedSql.stop();
     assertThat(sqls).hasSize(0);
 
@@ -148,7 +148,7 @@ public class TestM2MWithWhere extends BaseTestCase {
     el.getWithDbTableName().size(); // trigger Lazy load
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id, t0.name from mny_node");
+    assertSql(sql.get(0)).contains("select t0.id, t0.name from mny_node");
     assertThat(sql.get(1)).contains("where 'mny_node' = t0.name");
     DB.delete(el);
   }

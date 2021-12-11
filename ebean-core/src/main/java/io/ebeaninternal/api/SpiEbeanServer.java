@@ -16,6 +16,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -141,7 +142,7 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
   /**
    * Compile a query.
    */
-  <T> CQuery<T> compileQuery(Type type, Query<T> query, Transaction t);
+  <T> CQuery<T> compileQuery(Type type, Query<T> query, Transaction transaction);
 
   /**
    * Execute the findId's query but without copying the query.
@@ -150,12 +151,12 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
    * the query has finished (if executing in a background thread).
    * </p>
    */
-  <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction t);
+  <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction transaction);
 
   /**
    * Execute the findCount query but without copying the query.
    */
-  <T> int findCountWithCopy(Query<T> query, Transaction t);
+  <T> int findCountWithCopy(Query<T> query, Transaction transaction);
 
   /**
    * Load a batch of Associated One Beans.
@@ -257,6 +258,7 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
   /**
    * DTO findOne query.
    */
+  @Nullable
   <T> T findDtoOne(SpiDtoQuery<T> query);
 
   /**

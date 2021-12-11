@@ -1,6 +1,5 @@
 package io.ebean;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 
@@ -138,7 +137,6 @@ public interface BeanState {
   /**
    * Returns a map with load errors.
    */
-  @Nullable
   Map<String, Exception> loadErrors();
 
   /**

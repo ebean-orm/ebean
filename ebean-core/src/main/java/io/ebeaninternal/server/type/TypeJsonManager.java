@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.ModifyAwareType;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 final class TypeJsonManager {
 
@@ -23,6 +24,17 @@ final class TypeJsonManager {
 
   ObjectMapper objectMapper() {
     return objectMapper;
+  }
+
+  boolean keepSource(DeployBeanProperty prop) {
+    if (prop.getMutationDetection() == MutationDetection.SOURCE) {
+      return true;
+    } else if (prop.getMutationDetection() == MutationDetection.DEFAULT) {
+      prop.setMutationDetection(mutationDetection);
+      return mutationDetection == MutationDetection.SOURCE;
+    } else {
+      return false;
+    }
   }
 
   String postgresType(int dbType) {

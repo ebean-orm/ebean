@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.11.6-SNAPSHOT</version>
+  <version>12.13.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -18,7 +18,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-parent-12.11.4</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <licenses>
@@ -38,15 +38,15 @@
   </developers>
 
   <properties>
-    <nexus.staging.autoReleaseAfterClose>true</nexus.staging.autoReleaseAfterClose>
+    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.12.1</jackson.version>
     <ebean-ddl-runner.version>1.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.1</ebean-migration-auto.version>
-    <ebean-migration.version>12.11.2</ebean-migration.version>
+    <ebean-migration.version>12.12.1</ebean-migration.version>
     <ebean-test-docker.version>4.2</ebean-test-docker.version>
-    <ebean-datasource.version>7.2</ebean-datasource.version>
-    <ebean-agent.version>12.11.5</ebean-agent.version>
-    <ebean-maven-plugin.version>12.11.5</ebean-maven-plugin.version>
+    <ebean-datasource.version>7.3</ebean-datasource.version>
+    <ebean-agent.version>12.13.0</ebean-agent.version>
+    <ebean-maven-plugin.version>12.13.0</ebean-maven-plugin.version>
   </properties>
 
   <dependencies>
@@ -90,8 +90,25 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
-    <!-- <module>tests</module> -->
+<!--    <module>ebean-kotlin</module>-->
+
   </modules>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+    </profile>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>ebean-kotlin</module>
+        <module>tests</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>
 

@@ -10,13 +10,9 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-final class InExpression extends AbstractExpression {
+public final class InExpression extends AbstractExpression implements IdInCommon {
 
   private final boolean not;
 
@@ -47,6 +43,24 @@ final class InExpression extends AbstractExpression {
     this.sourceValues = Arrays.asList(array);
     this.not = not;
     this.empty = false;
+  }
+
+  public String property() {
+    return propName;
+  }
+
+  @Override
+  public Collection<?> idValues() {
+    if (bindValues == null) {
+      bindValues = new ArrayList<>(sourceValues);
+    }
+    return bindValues;
+  }
+
+  @Override
+  public int removeIds(Set<Object> hitIds) {
+    bindValues.removeAll(hitIds);
+    return bindValues.size();
   }
 
   private List<Object> values() {

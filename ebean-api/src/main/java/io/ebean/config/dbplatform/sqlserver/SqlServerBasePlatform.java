@@ -57,7 +57,6 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("SYSUTCDATETIME()");
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
-
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("numeric", 19));
     dbTypeMap.put(DbType.REAL, new DbPlatformType("float(16)"));
@@ -67,16 +66,14 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DATE, new DbPlatformType("date"));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("time"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));
-
+    dbTypeMap.put(DbType.LOCALDATETIME, new DbPlatformType("datetime2"));
     // UTF8 aware types - overwritten in SqlServer16 platform
     dbTypeMap.put(DbType.CHAR, new DbPlatformType("nchar", 1));
     dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255));
     dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
     dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-
     dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
     dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-
     dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
     dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
   }

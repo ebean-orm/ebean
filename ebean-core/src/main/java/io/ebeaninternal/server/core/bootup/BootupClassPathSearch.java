@@ -2,9 +2,9 @@ package io.ebeaninternal.server.core.bootup;
 
 import io.avaje.classpath.scanner.ClassPathScanner;
 import io.ebean.config.DatabaseConfig;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.ClassPathScanners;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Set;
@@ -14,10 +14,9 @@ import java.util.Set;
  */
 public class BootupClassPathSearch {
 
-  private static final Logger logger = LoggerFactory.getLogger(BootupClassPathSearch.class);
+  private static final Logger log = CoreLog.internal;
 
   private final List<String> packages;
-
   private final List<ClassPathScanner> scanners;
 
   /**
@@ -60,7 +59,7 @@ public class BootupClassPathSearch {
       }
 
       long searchTime = System.currentTimeMillis() - st;
-      logger.debug("Classpath search entities[{}] searchTime[{}] in packages[{}]", bc.getEntities().size(), searchTime, packages);
+      log.debug("Classpath search entities[{}] searchTime[{}] in packages[{}]", bc.getEntities().size(), searchTime, packages);
       return bc;
 
     } catch (Exception ex) {

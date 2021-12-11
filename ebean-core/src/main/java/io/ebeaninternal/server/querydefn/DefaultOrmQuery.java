@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.avaje.lang.NonNullApi;
 import io.ebean.*;
 import io.ebean.OrderBy.Property;
 import io.ebean.bean.CallOrigin;
@@ -14,9 +15,7 @@ import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-import io.ebeaninternal.server.expression.DefaultExpressionList;
-import io.ebeaninternal.server.expression.IdInExpression;
-import io.ebeaninternal.server.expression.SimpleExpression;
+import io.ebeaninternal.server.expression.*;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
@@ -32,6 +31,7 @@ import java.util.stream.Stream;
 /**
  * Default implementation of an Object Relational query.
  */
+@NonNullApi
 public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";
@@ -586,9 +586,9 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
    */
   @Override
   public void setSelectId() {
-    // clear select and fetch joins..
+    // clear select and fetch joins
     detail.clear();
-    select(beanDescriptor.idBinder().getIdProperty());
+    select(beanDescriptor.idSelect());
   }
 
   @Override
@@ -631,6 +631,11 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
       SpiExpression singleExpression = underlyingList.get(0);
       if (singleExpression instanceof IdInExpression) {
         return new CacheIdLookupMany<>((IdInExpression) singleExpression);
+      } else if (singleExpression instanceof InExpression) {
+        InExpression in = (InExpression)singleExpression;
+        if (in.property().equals(beanDescriptor.idName())) {
+          return new CacheIdLookupMany<>(in);
+        }
       }
     }
     return null;
@@ -1579,6 +1584,17 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
     }
     bindParams.setParameter(name, value);
     return this;
+  }
+
+  @Override
+  public void setArrayParameter(String name, Collection<?> values) {
+    if (namedParams != null) {
+      throw new IllegalStateException("setArrayParameter() not supported when EQL parsed query");
+    }
+    if (bindParams == null) {
+      bindParams = new BindParams();
+    }
+    bindParams.setArrayParameter(name, values);
   }
 
   @Override

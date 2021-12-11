@@ -47,7 +47,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TransactionManager implements SpiTransactionManager {
 
-  private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
+  private static final Logger log = CoreLog.log;
   private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
 
   private final SpiServer server;
@@ -181,22 +181,22 @@ public class TransactionManager implements SpiTransactionManager {
    * Return the current active transaction.
    */
   @Override
-  public final SpiTransaction getActive() {
-    return scopeManager.getActive();
+  public final SpiTransaction active() {
+    return scopeManager.active();
   }
 
   /**
    * Return the current active transaction as a scoped transaction.
    */
-  private ScopedTransaction getActiveScoped() {
-    return (ScopedTransaction) scopeManager.getActive();
+  private ScopedTransaction activeScoped() {
+    return (ScopedTransaction) scopeManager.active();
   }
 
   /**
    * Return the current transaction from thread local scope. Note that it may be inactive.
    */
-  public final SpiTransaction getInScope() {
-    return scopeManager.getInScope();
+  public final SpiTransaction inScope() {
+    return scopeManager.inScope();
   }
 
   /**
@@ -231,11 +231,11 @@ public class TransactionManager implements SpiTransactionManager {
     return skipCacheAfterWrite;
   }
 
-  public final BeanDescriptorManager getBeanDescriptorManager() {
+  public final BeanDescriptorManager descriptorManager() {
     return beanDescriptorManager;
   }
 
-  final BulkEventListenerMap getBulkEventListenerMap() {
+  final BulkEventListenerMap bulkEventListenerMap() {
     return bulkEventListenerMap;
   }
 
@@ -271,29 +271,29 @@ public class TransactionManager implements SpiTransactionManager {
     return dbPlatformOnQueryOnly == null ? OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
   }
 
-  public final String getServerName() {
+  public final String name() {
     return serverName;
   }
 
   @Override
-  public final Connection getQueryPlanConnection() throws SQLException {
+  public final Connection queryPlanConnection() throws SQLException {
     return dataSourceSupplier.getConnection(null);
   }
 
   @Override
-  public final DataSource getDataSource() {
+  public final DataSource dataSource() {
     return dataSourceSupplier.getDataSource();
   }
 
   @Override
-  public final DataSource getReadOnlyDataSource() {
+  public final DataSource readOnlyDataSource() {
     return dataSourceSupplier.getReadOnlyDataSource();
   }
 
   /**
    * Defines the type of behavior to use when closing a transaction that was used to query data only.
    */
-  final OnQueryOnly getOnQueryOnly() {
+  final OnQueryOnly onQueryOnly() {
     return onQueryOnly;
   }
 
@@ -365,7 +365,7 @@ public class TransactionManager implements SpiTransactionManager {
         txnLogger.debug(msg);
       }
     } catch (Exception ex) {
-      logger.error("Error while notifying TransactionEventListener of rollback event", ex);
+      log.error("Error while notifying TransactionEventListener of rollback event", ex);
     }
   }
 
@@ -416,12 +416,12 @@ public class TransactionManager implements SpiTransactionManager {
       postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
     } catch (Exception ex) {
-      logger.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
+      log.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
     }
   }
 
   public final void externalModification(TransactionEventTable tableEvent) {
-    SpiTransaction t = getActive();
+    SpiTransaction t = active();
     if (t != null) {
       t.getEvent().add(tableEvent);
     } else {
@@ -558,7 +558,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Exit a scoped transaction (that can be inactive - already committed etc).
    */
   public final void exitScopedTransaction(Object returnOrThrowable, int opCode) {
-    SpiTransaction st = getInScope();
+    SpiTransaction st = inScope();
     if (st instanceof ScopedTransaction) {
       // can be null for Supports as that can start as a 'No Transaction' and then
       // effectively be replaced by transactions inside the scope
@@ -588,7 +588,7 @@ public class TransactionManager implements SpiTransactionManager {
    */
   public final ScopedTransaction beginScopedTransaction(TxScope txScope) {
     txScope = initTxScope(txScope);
-    ScopedTransaction txnContainer = getActiveScoped();
+    ScopedTransaction txnContainer = activeScoped();
 
     boolean setToScope;
     boolean nestedSavepoint;

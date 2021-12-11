@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -24,8 +25,6 @@ import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.support.DocStructure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.util.ArrayList;
@@ -35,8 +34,6 @@ import java.util.List;
  * Abstract base for properties mapped to an associated bean, list, set or map.
  */
 public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STreePropertyAssoc {
-
-  private static final Logger logger = LoggerFactory.getLogger(BeanPropertyAssoc.class);
 
   /**
    * The descriptor of the target. This MUST be initialised after construction
@@ -435,8 +432,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     if (!idProp.isEmbedded()) {
       // simple single scalar id
       if (cols.length != 1) {
-        String msg = "No Imported Id column for [" + idProp + "] in table [" + join.getTable() + "]";
-        logger.error(msg);
+        CoreLog.log.error("No Imported Id column for [" + idProp + "] in table [" + join.getTable() + "]");
         return null;
       } else {
         BeanProperty[] idProps = {idProp};

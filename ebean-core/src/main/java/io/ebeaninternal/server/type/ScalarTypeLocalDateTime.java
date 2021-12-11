@@ -3,10 +3,10 @@ package io.ebeaninternal.server.type;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.JsonConfig;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -17,7 +17,7 @@ import java.time.ZoneId;
 final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime> {
 
   ScalarTypeLocalDateTime(JsonConfig.DateTime mode) {
-    super(mode, LocalDateTime.class, false, Types.TIMESTAMP);
+    super(mode, LocalDateTime.class, false, ExtraDbTypes.LOCALDATETIME);
   }
 
   @Override

@@ -36,7 +36,7 @@ public final class IdBinderSimple implements IdBinder {
     this.idProperty = idProperty;
     this.scalarType = idProperty.scalarType();
     this.expectedType = idProperty.type();
-    bindIdSql = InternString.intern(idProperty.dbColumn() + " = ? ");
+    bindIdSql = InternString.intern(idProperty.dbColumn() + " = ?");
     this.multiValueBind = multiValueBind;
   }
 

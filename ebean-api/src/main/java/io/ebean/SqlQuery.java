@@ -1,7 +1,7 @@
 package io.ebean;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,12 +37,12 @@ import java.util.function.Predicate;
  *
  * }</pre>
  */
+@NonNullApi
 public interface SqlQuery extends Serializable, CancelableQuery {
 
   /**
    * Execute the query returning a list.
    */
-  @Nonnull
   List<SqlRow> findList();
 
   /**
@@ -119,7 +119,6 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   /**
    * Execute the query returning an optional row.
    */
-  @Nonnull
   Optional<SqlRow> findOneOrEmpty();
 
   /**
@@ -354,6 +353,7 @@ public interface SqlQuery extends Serializable, CancelableQuery {
     /**
      * Return the single value.
      */
+    @Nullable
     T findOne();
 
     /**

@@ -10,5 +10,6 @@ public class MySql55Platform extends BaseMySqlPlatform {
     super();
     this.platform = Platform.MYSQL55;
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime"));
+    dbTypeMap.put(DbType.LOCALDATETIME, new DbPlatformType("datetime"));
   }
 }

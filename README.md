@@ -1,5 +1,13 @@
-[![Build Status](https://travis-ci.org/ebean-orm/ebean.svg?branch=master)](https://travis-ci.org/ebean-orm/ebean)
+[![Build](https://github.com/ebean-orm/ebean/actions/workflows/build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/build.yml)
 [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ebean-orm/ebean/blob/master/LICENSE)
+[![Multi-JDK Build](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml)
+[![JDK 18-ea](https://github.com/ebean-orm/ebean/actions/workflows/jdk-18-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-18-ea.yml)
+
+[![Postgres](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml)
+[![MySql](https://github.com/ebean-orm/ebean/actions/workflows/mysql.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mysql.yml)
+[![MariaDB](https://github.com/ebean-orm/ebean/actions/workflows/mariadb-10.6.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mariadb-10.6.yml)
+[![SqlServer](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver-2017-latest.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver-2017-latest.yml)
 
 # Sponsors
 <table>
@@ -36,7 +44,7 @@ Post questions or issues to the Ebean google group - https://groups.google.com/f
 Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
 
-## Maven cental links:
+## Maven central links:
 [Maven central - ebean](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.ebean%22%20AND%20a%3A%22ebean%22 "maven central ebean")
 
 [Maven central - all related projects](http://search.maven.org/#search%7Cga%7C1%7Cebean "maven central all related projects")

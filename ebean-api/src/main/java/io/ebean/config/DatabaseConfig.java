@@ -2,11 +2,7 @@ package io.ebean.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import io.avaje.config.Config;
-import io.ebean.DatabaseFactory;
-import io.ebean.EbeanVersion;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -14,14 +10,7 @@ import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.datasource.DataSourceConfig;
-import io.ebean.event.BeanFindController;
-import io.ebean.event.BeanPersistController;
-import io.ebean.event.BeanPersistListener;
-import io.ebean.event.BeanPostConstructListener;
-import io.ebean.event.BeanPostLoad;
-import io.ebean.event.BeanQueryAdapter;
-import io.ebean.event.BulkTableEventListener;
-import io.ebean.event.ServerConfigStartup;
+import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
@@ -34,14 +23,7 @@ import javax.sql.DataSource;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * The configuration used for creating a Database.
@@ -81,7 +63,6 @@ import java.util.ServiceLoader;
  * @see DatabaseFactory
  */
 public class DatabaseConfig {
-
 
   /**
    * The Database name.
@@ -402,8 +383,8 @@ public class DatabaseConfig {
   private List<BeanPostConstructListener> postConstructListeners = new ArrayList<>();
   private List<BeanPersistListener> persistListeners = new ArrayList<>();
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
-  private List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<>();
-  private List<ServerConfigStartup> configStartupListeners = new ArrayList<>();
+  private final List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<>();
+  private final List<ServerConfigStartup> configStartupListeners = new ArrayList<>();
 
   /**
    * By default inserts are included in the change log.
@@ -411,42 +392,26 @@ public class DatabaseConfig {
   private boolean changeLogIncludeInserts = true;
 
   private ChangeLogPrepare changeLogPrepare;
-
   private ChangeLogListener changeLogListener;
-
   private ChangeLogRegister changeLogRegister;
-
   private boolean changeLogAsync = true;
-
   private ReadAuditLogger readAuditLogger;
-
   private ReadAuditPrepare readAuditPrepare;
-
   private EncryptKeyManager encryptKeyManager;
-
   private EncryptDeployManager encryptDeployManager;
-
   private Encryptor encryptor;
-
-  private boolean dbOffline;
-
   private DbEncrypt dbEncrypt;
-
+  private boolean dbOffline;
   private ServerCachePlugin serverCachePlugin;
 
   /**
    * The default PersistenceContextScope used if one is not explicitly set on a query.
    */
   private PersistenceContextScope persistenceContextScope = PersistenceContextScope.TRANSACTION;
-
   private JsonFactory jsonFactory;
-
   private boolean localTimeWithNanos;
-
   private boolean durationWithNanos;
-
   private int maxCallStack = 5;
-
   private boolean transactionRollbackOnChecked = true;
 
   // configuration for the background executor service (thread pool)
@@ -1582,6 +1547,9 @@ public class DatabaseConfig {
 
   /**
    * Set to true if all DB column and table names should use quoted identifiers.
+   * <p>
+   * For Postgres pgjdbc version 42.3.0 should be used with datasource property
+   * <em>quoteReturningIdentifiers</em> set to <em>false</em> (refer #2303).
    */
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
     platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
@@ -2741,21 +2709,7 @@ public class DatabaseConfig {
     this.classLoadConfig = classLoadConfig;
   }
 
-  /**
-   * Return the service loader using the classLoader defined in ClassLoadConfig.
-   */
-  public <T> ServiceLoader<T> serviceLoad(Class<T> spiService) {
-    return ServiceLoader.load(spiService, classLoadConfig.getClassLoader());
-  }
 
-  /**
-   * Return the first service using the service loader (or null).
-   */
-  public <T> T service(Class<T> spiService) {
-    ServiceLoader<T> load = serviceLoad(spiService);
-    Iterator<T> serviceInstances = load.iterator();
-    return serviceInstances.hasNext() ? serviceInstances.next() : null;
-  }
 
   /**
    * Load settings from application.properties, application.yaml and other sources.
@@ -2794,7 +2748,7 @@ public class DatabaseConfig {
    */
   private List<AutoConfigure> autoConfiguration() {
     List<AutoConfigure> list = new ArrayList<>();
-    for (AutoConfigure autoConfigure : serviceLoad(AutoConfigure.class)) {
+    for (AutoConfigure autoConfigure : ServiceLoader.load(AutoConfigure.class)) {
       autoConfigure.preConfigure(this);
       list.add(autoConfigure);
     }

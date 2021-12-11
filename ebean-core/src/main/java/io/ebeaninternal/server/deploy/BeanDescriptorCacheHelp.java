@@ -6,17 +6,9 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.cache.ServerCache;
-import io.ebeaninternal.api.BeanCacheResult;
-import io.ebeaninternal.api.SpiCacheControl;
-import io.ebeaninternal.api.SpiCacheRegion;
-import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
-import io.ebeaninternal.server.cache.CacheChangeSet;
-import io.ebeaninternal.server.cache.CachedBeanData;
-import io.ebeaninternal.server.cache.CachedBeanDataFromBean;
-import io.ebeaninternal.server.cache.CachedBeanDataToBean;
-import io.ebeaninternal.server.cache.CachedManyIds;
-import io.ebeaninternal.server.cache.SpiCacheManager;
+import io.ebeaninternal.server.cache.*;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -25,15 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Helper for BeanDescriptor that manages the bean, query and collection caches.
@@ -42,7 +26,7 @@ import java.util.Set;
  */
 final class BeanDescriptorCacheHelp<T> {
 
-  private static final Logger logger = LoggerFactory.getLogger(BeanDescriptorCacheHelp.class);
+  private static final Logger log = CoreLog.internal;
 
   private static final Logger queryLog = LoggerFactory.getLogger("io.ebean.cache.QUERY");
   private static final Logger beanLog = LoggerFactory.getLogger("io.ebean.cache.BEAN");
@@ -120,10 +104,10 @@ final class BeanDescriptorCacheHelp<T> {
   void deriveNotifyFlags() {
     cacheNotifyOnAll = (invalidateQueryCache || beanCache != null || queryCache != null);
     cacheNotifyOnDelete = !cacheNotifyOnAll && isNotifyOnDeletes();
-    if (logger.isDebugEnabled()) {
+    if (log.isDebugEnabled()) {
       if (cacheNotifyOnAll || cacheNotifyOnDelete) {
         String notifyMode = cacheNotifyOnAll ? "All" : "Delete";
-        logger.debug("l2 caching on {} - beanCaching:{} queryCaching:{} notifyMode:{} ",
+        log.debug("l2 caching on {} - beanCaching:{} queryCaching:{} notifyMode:{} ",
           desc.fullName(), isBeanCaching(), isQueryCaching(), notifyMode);
       }
     }
@@ -324,7 +308,7 @@ final class BeanDescriptorCacheHelp<T> {
           }
           beanCache.put(parentId, newData);
         } catch (IOException e) {
-          logger.error("Error updating L2 cache", e);
+          log.error("Error updating L2 cache", e);
         }
       }
     } else {
@@ -365,12 +349,13 @@ final class BeanDescriptorCacheHelp<T> {
     for (Object id : ids) {
       keys.add(desc.cacheKey(id));
     }
-
+    if (ids.isEmpty()) {
+      return new BeanCacheResult<>();
+    }
     Map<Object, Object> beanDataMap = beanCache.getAll(keys);
     if (beanLog.isTraceEnabled()) {
       beanLog.trace("   MGET {}({}) - hits:{}", cacheName, ids, beanDataMap.keySet());
     }
-
     BeanCacheResult<T> result = new BeanCacheResult<>();
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();

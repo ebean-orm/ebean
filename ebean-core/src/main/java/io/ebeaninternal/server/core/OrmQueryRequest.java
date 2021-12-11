@@ -1,13 +1,7 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.CacheMode;
-import io.ebean.CancelableQuery;
-import io.ebean.OrderBy;
-import io.ebean.PersistenceContextScope;
-import io.ebean.QueryIterator;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.bean.BeanCollection;
-import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
@@ -16,39 +10,17 @@ import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.text.json.JsonReadOptions;
-import io.ebeaninternal.api.BeanCacheResult;
-import io.ebeaninternal.api.CQueryPlanKey;
-import io.ebeaninternal.api.CacheIdLookup;
-import io.ebeaninternal.api.HashQuery;
-import io.ebeaninternal.api.LoadContext;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.NaturalKeySet;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
-import io.ebeaninternal.api.SpiQuerySecondary;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.DeployParser;
-import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -57,8 +29,6 @@ import java.util.function.Predicate;
  */
 public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQueryRequest<T> {
 
-  private static final Logger log = LoggerFactory.getLogger(OrmQueryRequest.class);
-
   private final BeanDescriptor<T> beanDescriptor;
   private final OrmQueryEngine queryEngine;
   private final SpiQuery<T> query;
@@ -66,7 +36,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private final Boolean readOnly;
   private LoadContext loadContext;
   private PersistenceContext persistenceContext;
-  private JsonReadOptions jsonRead;
   private HashQuery cacheKey;
   private CQueryPlanKey queryPlanKey;
   private SpiQuerySecondary secondaryQueries;
@@ -231,14 +200,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
-   * Add the bean to the persistence context.
-   */
-  public void persistenceContextAdd(EntityBean bean) {
-    Object id = beanDescriptor.getId(bean);
-    beanDescriptor.contextPut(persistenceContext, id, bean);
-  }
-
-  /**
    * This will create a local (readOnly) transaction if no current transaction
    * exists.
    * <p>
@@ -262,6 +223,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       createdTransaction = true;
     }
     persistenceContext = persistenceContext(query, transaction);
+    if (Type.ITERATE == query.getType()) {
+      persistenceContext.beginIterate();
+    }
     loadContext = new DLoadContext(this, secondaryQueries);
   }
 
@@ -270,6 +234,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void rollbackTransIfRequired() {
+    if (Type.ITERATE == query.getType()) {
+      persistenceContext.endIterate();
+    }
     if (createdTransaction) {
       try {
         transaction.end();
@@ -277,7 +244,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means
         // that the connection is broken (and the dataSource and db will cleanup)
-        log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
+        CoreLog.log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
       }
     }
   }
@@ -291,27 +258,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (query.getPersistenceContext() == null) {
       query.setPersistenceContext(persistenceContext);
     }
-    jsonRead = new JsonReadOptions();
+    JsonReadOptions jsonRead = new JsonReadOptions();
     jsonRead.setPersistenceContext(persistenceContext);
     if (!query.isDisableLazyLoading()) {
       loadContext = new DLoadContext(this, secondaryQueries);
       jsonRead.setLoadContext(loadContext);
     }
     return jsonRead;
-  }
-
-  /**
-   * For iterate queries reset the persistenceContext and loadContext.
-   */
-  public void flushPersistenceContextOnIterate() {
-    if (persistenceContext.resetLimit()) {
-      persistenceContext = persistenceContext.forIterateReset();
-      loadContext.resetPersistenceContext(persistenceContext);
-      if (jsonRead != null) {
-        jsonRead.setPersistenceContext(persistenceContext);
-        jsonRead.setLoadContext(loadContext);
-      }
-    }
   }
 
   /**
@@ -329,11 +282,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (scope == PersistenceContextScope.QUERY || t == null) {
       return new DefaultPersistenceContext();
     }
-    if (Type.ITERATE == query.getType()) {
-      return t.getPersistenceContext().forIterate();
-    } else {
-      return t.getPersistenceContext();
-    }
+    return t.getPersistenceContext();
   }
 
   /**
@@ -343,6 +292,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void endTransIfRequired() {
+    if (Type.ITERATE == query.getType()) {
+      persistenceContext.endIterate();
+    }
     if (createdTransaction && transaction.isActive()) {
       transaction.commit();
       if (query.getType().isUpdate()) {
@@ -581,7 +533,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   @SuppressWarnings({"rawtypes"})
   private void mergeCacheHitsToMap(BeanCollection<T> result) {
-    BeanMap map = (BeanMap)result;
+    BeanMap map = (BeanMap) result;
     ElPropertyValue property = mapProperty();
     for (T bean : cacheBeans) {
       map.internalPut(property.pathGet(bean), bean);
@@ -609,17 +561,18 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   @SuppressWarnings("unchecked")
   private <K> Map<K, T> cacheBeansToMap() {
     ElPropertyValue property = mapProperty();
-    Map<K,T> map = new LinkedHashMap<>();
+    Map<K, T> map = new LinkedHashMap<>();
     for (T bean : cacheBeans) {
-      map.put((K)property.pathGet(bean), bean);
+      map.put((K) property.pathGet(bean), bean);
     }
     return map;
   }
 
   private ElPropertyValue mapProperty() {
-    ElPropertyValue property = beanDescriptor.elGetValue(query.getMapKey());
+    final String key = query.getMapKey();
+    final ElPropertyValue property = key == null ? beanDescriptor.idProperty() : beanDescriptor.elGetValue(key);
     if (property == null) {
-      throw new IllegalStateException("Unknown map key property "+query.getMapKey());
+      throw new IllegalStateException("Unknown map key property " + key);
     }
     return property;
   }
@@ -681,7 +634,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (cached != null && isAuditReads() && readAuditQueryType()) {
       if (cached instanceof BeanCollection) {
         // raw sql can't use L2 cache so normal queries only in here
-        Collection<T> actualDetails = ((BeanCollection<T>)cached).getActualDetails();
+        Collection<T> actualDetails = ((BeanCollection<T>) cached).getActualDetails();
         List<Object> ids = new ArrayList<>(actualDetails.size());
         for (T bean : actualDetails) {
           ids.add(beanDescriptor.idForJson(bean));
@@ -692,13 +645,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (Boolean.FALSE.equals(query.isReadOnly())) {
       // return shallow copies if readonly is explicitly set to false
       if (cached instanceof BeanCollection) {
-        cached = ((BeanCollection<?>)cached).getShallowCopy();
+        cached = ((BeanCollection<?>) cached).getShallowCopy();
       } else if (cached instanceof List) {
-        cached = new CopyOnFirstWriteList<>((List<?>)cached);
+        cached = new CopyOnFirstWriteList<>((List<?>) cached);
       } else if (cached instanceof Set) {
-        cached = new LinkedHashSet<>((Set<?>)cached);
+        cached = new LinkedHashSet<>((Set<?>) cached);
       } else if (cached instanceof Map) {
-        cached = new LinkedHashMap<>((Map<?,?>)cached);
+        cached = new LinkedHashMap<>((Map<?, ?>) cached);
       }
     }
     return cached;

@@ -136,7 +136,7 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
     }
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "rawtypes"})
   private List<Object> toList(Object value) {
     if (value == null) return null;
     if (value instanceof List) {

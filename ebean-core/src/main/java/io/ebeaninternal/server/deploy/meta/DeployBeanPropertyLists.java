@@ -1,12 +1,11 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarTypeString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -16,8 +15,6 @@ import java.util.List;
  * Helper object to classify BeanProperties into appropriate lists.
  */
 public final class DeployBeanPropertyLists {
-
-  private static final Logger logger = LoggerFactory.getLogger(DeployBeanPropertyLists.class);
 
   private static final NoopSetter NOOP_SETTER = new NoopSetter();
 
@@ -225,7 +222,7 @@ public final class DeployBeanPropertyLists {
           if (versionProperty == null) {
             versionProperty = prop;
           } else {
-            logger.warn("Multiple @Version properties - property " + prop.fullName() + " not treated as a version property");
+            CoreLog.internal.warn("Multiple @Version properties - property " + prop.fullName() + " not treated as a version property");
           }
         } else if (prop.isDraftDirty()) {
           draftDirty = prop;

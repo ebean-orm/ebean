@@ -1,18 +1,15 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.EbeanServer;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Base class for find and persist requests.
  */
 public abstract class BeanRequest {
-
-  static final Logger log = LoggerFactory.getLogger(BeanRequest.class);
 
   protected final SpiEbeanServer server;
   protected SpiTransaction transaction;
@@ -64,7 +61,7 @@ public abstract class BeanRequest {
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means
         // that the connection is broken (and the dataSource and db will cleanup)
-        log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
+        CoreLog.log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
       }
     }
   }

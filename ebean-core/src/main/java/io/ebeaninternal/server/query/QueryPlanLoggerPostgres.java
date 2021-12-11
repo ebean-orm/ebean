@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
@@ -23,7 +24,7 @@ public final class QueryPlanLoggerPostgres extends QueryPlanLogger {
         return readQueryPlanBasic(plan, bind, rset);
       }
     } catch (SQLException e) {
-      queryPlanLog.error("Could not log query plan: " + explain, e);
+      CoreLog.log.warn("Could not log query plan: " + explain, e);
       return null;
     }
   }

@@ -243,11 +243,11 @@ public class ModelBuildContext {
      */
     public FkeyBuilder addForeignKey(BeanDescriptor<?> desc, TableJoin tableJoin, boolean direction) {
 
-      String baseTable = ctx.normaliseTable(desc.getBaseTable());
+      String baseTable = ctx.normaliseTable(desc.baseTable());
       String fkName = ctx.foreignKeyConstraintName(tableName, baseTable, count.incrementAndGet());
       String fkIndex = ctx.foreignKeyIndexName(tableName, baseTable, count.get());
 
-      MCompoundForeignKey foreignKey = new MCompoundForeignKey(fkName, desc.getBaseTable(), fkIndex);
+      MCompoundForeignKey foreignKey = new MCompoundForeignKey(fkName, desc.baseTable(), fkIndex);
 
       for (TableJoinColumn column : tableJoin.columns()) {
         String localCol = direction ? column.getForeignDbColumn() : column.getLocalDbColumn();

@@ -16,6 +16,7 @@ import java.util.Set;
 public class Processor extends AbstractProcessor implements Constants {
 
   private ProcessingContext processingContext;
+  private SimpleModuleInfoWriter moduleWriter;
 
   public Processor() {
   }
@@ -48,6 +49,7 @@ public class Processor extends AbstractProcessor implements Constants {
     int count = processEntities(roundEnv);
     processOthers(roundEnv);
     final int loaded = processingContext.complete();
+    initModuleInfoBean();
     if (roundEnv.processingOver()) {
       writeModuleInfoBean();
     }
@@ -84,10 +86,24 @@ public class Processor extends AbstractProcessor implements Constants {
     }
   }
 
+  private void initModuleInfoBean() {
+    try {
+      if (moduleWriter == null) {
+        moduleWriter = new SimpleModuleInfoWriter(processingContext);
+      }
+    } catch (Throwable e) {
+      e.printStackTrace();
+      processingContext.logError(null, "Failed to initialise ModuleInfoLoader error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+    }
+  }
+
   private void writeModuleInfoBean() {
     try {
-      SimpleModuleInfoWriter writer = new SimpleModuleInfoWriter(processingContext);
-      writer.write();
+      if (moduleWriter == null) {
+        processingContext.logError(null, "ModuleInfoLoader was not initialised and not written");
+      } else {
+        moduleWriter.write();
+      }
     } catch (Throwable e) {
       e.printStackTrace();
       processingContext.logError(null, "Failed to write ModuleInfoLoader error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));

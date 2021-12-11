@@ -1,8 +1,7 @@
 package io.ebeaninternal.server.dto;
 
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.type.TypeManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -16,8 +15,6 @@ import java.util.List;
  * Use TypeManager to map bean property types to ScalarTypes.
  */
 final class DtoMetaBuilder {
-
-  private static final Logger log = LoggerFactory.getLogger(DtoMetaBuilder.class);
 
   private final TypeManager typeManager;
   private final Class<?> dtoType;
@@ -40,17 +37,12 @@ final class DtoMetaBuilder {
       if (includeMethod(method)) {
         try {
           final String name = propertyName(method.getName());
-          final Class<?> propertyType = propertyType(method);
-          properties.add(new DtoMetaProperty(typeManager, dtoType, method, name, propertyType));
+          properties.add(new DtoMetaProperty(typeManager, dtoType, method, name));
         } catch (Exception e) {
-          log.debug("exclude on " + dtoType + " method " + method, e);
+          CoreLog.log.debug("exclude on " + dtoType + " method " + method, e);
         }
       }
     }
-  }
-
-  static Class<?> propertyType(Method method) {
-    return method.getParameterTypes()[0];
   }
 
   static String propertyName(String methodName) {
@@ -71,13 +63,12 @@ final class DtoMetaBuilder {
   }
 
   private void readConstructors() {
-    Constructor<?>[] constructors = dtoType.getConstructors();
-    for (Constructor<?> constructor : constructors) {
+    for (Constructor<?> constructor : dtoType.getConstructors()) {
       try {
         constructorList.add(new DtoMetaConstructor(typeManager, constructor, dtoType));
       } catch (Exception e) {
         // we don't want that constructor
-        log.debug("exclude on " + dtoType + " constructor " + constructor, e);
+        CoreLog.log.debug("exclude on " + dtoType + " constructor " + constructor, e);
       }
     }
   }
