@@ -26,13 +26,13 @@ import io.ebean.config.dbplatform.h2.H2Platform;
 /**
  * Tests sequences for multiple tenants.
  */
-public class TestSequenceMultiTenant {
+class TestSequenceMultiTenant {
 
   /**
    * Tests sequences using multi tenancy per database
    */
   @Test
-  public void test_multi_tenant_db_sequences() {
+  void test_multi_tenant_db_sequences() {
 
     Database db = setupDb();
 
@@ -99,7 +99,7 @@ public class TestSequenceMultiTenant {
    * Tests sequences using multi tenancy per schema
    */
   @Test
-  public void test_multi_tenant_schema_sequences() throws SQLException {
+  void test_multi_tenant_schema_sequences() throws SQLException {
     createDDl("PUBLIC");
     createDDl("TENANT_SCHEMA_1");
     createDDl("TENANT_SCHEMA_2");
@@ -109,6 +109,7 @@ public class TestSequenceMultiTenant {
     Connection connection = db.dataSource().getConnection();
     
     // debugging schemas
+    // see org.h2.jdbc.JdbcDatabaseMetaData.getSchemas()
     ResultSet rs = connection.getMetaData().getSchemas();
     String[] schemaData = new String[4];
     int schemaCnt = 0;
