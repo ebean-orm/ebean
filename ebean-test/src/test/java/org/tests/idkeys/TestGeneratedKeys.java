@@ -73,7 +73,7 @@ public class TestGeneratedKeys extends BaseTestCase {
 
   private long readSequenceValue(Transaction tx, String sequence) throws SQLException {
     String sql;
-    switch (spiEbeanServer().getDatabasePlatform().getPlatform().base()) {
+    switch (spiEbeanServer().databasePlatform().getPlatform().base()) {
       case H2 :
         sql = "select currval('" + sequence + "')";
         break;
@@ -92,11 +92,11 @@ public class TestGeneratedKeys extends BaseTestCase {
         
       default :
         throw new UnsupportedOperationException("reading sequence value from "
-            + spiEbeanServer().getDatabasePlatform().getPlatform()
+            + spiEbeanServer().databasePlatform().getPlatform()
             + " is not supported.");
 
     }
-    try (Statement stm = tx.getConnection().createStatement()) {
+    try (Statement stm = tx.connection().createStatement()) {
       ResultSet rs = stm.executeQuery(sql);
       rs.next();
       return rs.getLong(1);
