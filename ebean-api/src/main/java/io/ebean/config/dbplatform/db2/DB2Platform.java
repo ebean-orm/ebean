@@ -22,8 +22,8 @@ public class DB2Platform extends DatabasePlatform {
     this.platform = Platform.DB2;
     // Note: DB2 (at least LUW supports length up to 128)
     // TOOD: Check if we need to introduce a new platform (DB2_LUW_11 ?)
-    this.maxTableNameLength = 128;
-    this.maxConstraintNameLength = 128;
+    this.maxTableNameLength = 18;
+    this.maxConstraintNameLength = 18;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.sqlLimiter = new Db2SqlLimiter();
 
