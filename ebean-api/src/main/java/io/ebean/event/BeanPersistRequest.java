@@ -44,6 +44,12 @@ public interface BeanPersistRequest<T> {
   }
 
   /**
+   * Return true if this request is due to cascading persist.
+   * False implies this is a "top level" request.
+   */
+  boolean isCascade();
+
+  /**
    * For an update or delete of a partially populated bean this is the set of
    * loaded properties and otherwise returns null.
    */
