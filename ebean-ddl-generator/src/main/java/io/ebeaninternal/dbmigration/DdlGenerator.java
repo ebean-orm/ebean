@@ -41,7 +41,6 @@ public class DdlGenerator implements SpiDdlGenerator {
   private final SpiEbeanServer server;
 
   private final boolean generateDdl;
-  private final boolean runDdl;
   private final boolean extraDdl;
   private final boolean createOnly;
   private final boolean jaxbPresent;
@@ -67,14 +66,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     final DatabasePlatform databasePlatform = server.databasePlatform();
     this.platform = databasePlatform.getPlatform();
     this.platformName = platform.base().name();
-    if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
-      log.warn("DDL can't be run on startup with TenantMode " + config.getTenantMode());
-      this.runDdl = false;
-      this.ddlAutoCommit = false;
-    } else {
-      this.runDdl = config.isDdlRun();
-      this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
-    }
+    this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
     this.scriptTransform = createScriptTransform(config);
     this.baseDir = initBaseDir();
   }
@@ -89,18 +81,11 @@ public class DdlGenerator implements SpiDdlGenerator {
     return new File(".");
   }
 
-  @Override
-  public void execute(boolean online) {
-    generateDdl();
-    if (online) {
-      runDdl();
-    }
-  }
-
   /**
    * Generate the DDL drop and create scripts if the properties have been set.
    */
-  protected void generateDdl() {
+  @Override
+  public void generateDdl() {
     if (generateDdl) {
       if (!createOnly) {
         writeDrop(getDropFileName());
@@ -112,16 +97,15 @@ public class DdlGenerator implements SpiDdlGenerator {
   /**
    * Run the DDL drop and DDL create scripts if properties have been set.
    */
-  protected void runDdl() {
-    if (runDdl) {
-      Connection connection = null;
-      try {
-        connection = obtainConnection();
-        runDdlWith(connection);
-      } finally {
-        JdbcClose.rollback(connection);
-        JdbcClose.close(connection);
-      }
+  @Override  
+  public void runDdl() {
+    Connection connection = null;
+    try {
+      connection = obtainConnection();
+      runDdlWith(connection);
+    } finally {
+      JdbcClose.rollback(connection);
+      JdbcClose.close(connection);
     }
   }
 
