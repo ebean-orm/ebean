@@ -2,12 +2,30 @@ package io.ebeaninternal.dbmigration;
 
 import io.ebean.DB;
 import io.ebean.Database;
+import io.ebean.PersistenceContextScope;
+import io.ebean.annotation.MutationDetection;
+import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
+import io.ebean.cache.ServerCachePlugin;
+import io.ebean.config.AutoTuneConfig;
+import io.ebean.config.ClassLoadConfig;
+import io.ebean.config.CurrentTenantProvider;
+import io.ebean.config.CurrentUserProvider;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
+import io.ebean.config.DocStoreConfig;
+import io.ebean.config.EncryptDeployManager;
+import io.ebean.config.EncryptKeyManager;
+import io.ebean.config.Encryptor;
+import io.ebean.config.JsonConfig;
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.PropertiesWrapper;
+import io.ebean.config.TenantCatalogProvider;
+import io.ebean.config.TenantMode;
+import io.ebean.config.TenantSchemaProvider;
+import io.ebean.config.DatabaseConfig.UuidVersion;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
@@ -26,7 +44,9 @@ import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.datasource.DataSourceConfig;
 import io.ebean.dbmigration.DbMigration;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
@@ -51,6 +71,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import javax.persistence.EnumType;
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 
@@ -81,7 +103,7 @@ public class DefaultDbMigration implements DbMigration {
   private static final String initialVersion = "1.0";
   private static final String GENERATED_COMMENT = "THIS IS A GENERATED FILE - DO NOT MODIFY";
 
-  protected final boolean online;
+  protected boolean online;
   private boolean logToSystemOut = true;
   protected SpiEbeanServer server;
   protected String pathToResources = "src/main/resources";
@@ -96,8 +118,10 @@ public class DefaultDbMigration implements DbMigration {
   protected List<Pair> platforms = new ArrayList<>();
   protected DatabaseConfig databaseConfig;
   protected DbConstraintNaming constraintNaming;
+  @Deprecated
   protected Boolean strictMode;
-  protected Boolean includeGeneratedFileComment;
+  protected boolean includeGeneratedFileComment;
+  @Deprecated
   protected String header;
   protected String applyPrefix = "";
   protected String version;
@@ -139,12 +163,66 @@ public class DefaultDbMigration implements DbMigration {
     if (constraintNaming == null) {
       this.constraintNaming = databaseConfig.getConstraintNaming();
     }
+    if (databasePlatform == null) {
+      this.databasePlatform = databaseConfig.getDatabasePlatform();
+    }
     Properties properties = config.getProperties();
     if (properties != null) {
-      PropertiesWrapper props = new PropertiesWrapper("ebean", config.getName(), properties, null);
+      PropertiesWrapper props = new PropertiesWrapper("ebean", config.getName(), properties, config.getClassLoadConfig());
       migrationPath = props.get("migration.migrationPath", migrationPath);
       migrationInitPath = props.get("migration.migrationInitPath", migrationInitPath);
       pathToResources = props.get("migration.pathToResources", pathToResources);
+      addForeignKeySkipCheck = props.getBoolean("migration.addForeignKeySkipCheck", addForeignKeySkipCheck);
+      applyPrefix = props.get("migration.applyPrefix",applyPrefix);
+      databasePlatform = props.createInstance(DatabasePlatform.class, "migration.databasePlatform", databasePlatform);
+      generatePendingDrop = props.get("migration.generatePendingDrop", generatePendingDrop);
+      includeBuiltInPartitioning = props.getBoolean("migration.includeBuiltInPartitioning", includeBuiltInPartitioning);
+      includeGeneratedFileComment = props.getBoolean("migration.includeGeneratedFileComment", includeGeneratedFileComment);
+      includeIndex = props.getBoolean("migration.includeIndex", includeIndex);
+      lockTimeoutSeconds = props.getInt("migration.lockTimeoutSeconds", lockTimeoutSeconds);
+      logToSystemOut = props.getBoolean("migration.logToSystemOut", logToSystemOut);
+      modelPath  = props.get("migration.modelPath", modelPath);
+      modelSuffix = props.get("migration.modelSuffix", modelSuffix);
+      name  = props.get("migration.name", name);
+      online = props.getBoolean("migration.online", online);
+      vanillaPlatform = props.getBoolean("migration.vanillaPlatform", vanillaPlatform);
+      version = props.get("migration.version", version);
+      // header & strictMode must be configured at DatabaseConfig level
+      parsePlatforms(props.get("migration.platforms"), config.getClassLoadConfig());
+    }
+  }
+
+  protected void parsePlatforms(String platforms, ClassLoadConfig loader) {
+    if (platforms == null || platforms.isEmpty()) {
+      return;
+    }
+    String[] tmp = StringHelper.splitNames(platforms);
+    for (String plat : tmp) {
+      int pos = plat.indexOf('=');
+      String platformName;
+      String prefix;
+      if (pos == -1) {
+        prefix = null;
+        platformName = plat;
+      } else {
+        platformName = plat.substring(0, pos);
+        prefix = plat.substring(pos + 1);
+      }
+      if (platformName.indexOf('.') == -1) {
+        // parse platform as enum value
+        Platform platform = Enum.valueOf(Platform.class, platformName.toUpperCase());
+        if (prefix == null) {
+          prefix = platform.base().name().toLowerCase();
+        }
+        addPlatform(platform, prefix);
+      } else {
+        // parse platform as class
+        DatabasePlatform dbPlatform = (DatabasePlatform) loader.newInstance(platformName);
+        if (prefix == null) {
+          prefix = dbPlatform.getPlatform().base().name().toLowerCase();
+        }
+        addDatabasePlatform(dbPlatform, prefix);
+      }
     }
   }
 
@@ -668,7 +746,7 @@ public class DefaultDbMigration implements DbMigration {
     if (file.exists()) {
       return false;
     }
-    String comment = Boolean.TRUE.equals(includeGeneratedFileComment) ? GENERATED_COMMENT : null;
+    String comment = includeGeneratedFileComment ? GENERATED_COMMENT : null;
     MigrationXmlWriter xmlWriter = new MigrationXmlWriter(comment);
     xmlWriter.write(dbMigration, file);
     return true;
@@ -686,6 +764,7 @@ public class DefaultDbMigration implements DbMigration {
       databasePlatform = server.databasePlatform();
     }
     if (databaseConfig != null) {
+      // FIXME: Copy header and StrictMode to databaseConfig
       if (strictMode != null) {
         databaseConfig.setDdlStrictMode(strictMode);
       }
