@@ -617,8 +617,13 @@ public final class InternalConfiguration {
     }
 
     @Override
-    public void execute(boolean online) {
-      if (online && ddlRun) {
+    public void generateDdl() {
+      // do nothing
+    }
+    
+    @Override
+    public void runDdl() {
+      if (ddlRun) {
         CoreLog.log.error("Configured to run DDL but ebean-ddl-generator is not in the classpath (or ebean-test in the test classpath?)");
       }
     }

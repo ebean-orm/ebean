@@ -1741,4 +1741,26 @@ public interface Database {
    */
   void truncate(Class<?>... tables);
 
+  /**
+   * Runs the DDL manually. Can be used, if database is offline or if you use a
+   * TenantMode that does not support DDL run on startup.
+   * <p>
+   * Note: runDdl is normally executed at startup automatically, if
+   * <code>ebean.db.runDdl=true</code> is set. Calling this method, will not check
+   * that flag.
+   * </p>
+   */
+  void runDdl();
+
+  /**
+   * Runs the migration manually. Can be used, if database is offline or if you use a
+   * TenantMode that does not support DDL run on startup.
+   * <p>
+   * Note: runDdl is normally executed at startup automatically, if
+   * <code>ebean.db.migration.run=true</code> is set. Calling this method, will not check
+   * that flag.
+   * </p>
+   **/
+  void runMigration();
+
 }

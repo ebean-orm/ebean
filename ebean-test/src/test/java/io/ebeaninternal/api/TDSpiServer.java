@@ -642,4 +642,14 @@ public class TDSpiServer implements SpiServer {
   public void loadBean(EntityBeanIntercept ebi) {
 
   }
+
+  @Override
+  public void runDdl() {
+
+  }
+
+  @Override
+  public void runMigration() {
+
+  }
 }
