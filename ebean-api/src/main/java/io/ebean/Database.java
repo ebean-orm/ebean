@@ -1746,7 +1746,7 @@ public interface Database {
    * TenantMode that does not support DDL run on startup.
    * <p>
    * Note: runDdl is normally executed at startup automatically, if
-   * <code>ebean.db.runDdl=true</code> is set. Calling this method, will not check
+   * <code>ebean.db.ddl.run=true</code> is set. Calling this method, will not check
    * that flag.
    * </p>
    */
