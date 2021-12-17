@@ -387,6 +387,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       if (config.isRunMigration()) {
         runMigration();
       }
+    } else if (config.isDdlRun() || config.isRunMigration()) {
+      log.warn("There was a request to run DDL or migration, but this is currently not possible, as the database is not available");
     }
     startQueryPlanCapture();
   }
