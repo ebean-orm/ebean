@@ -41,42 +41,13 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
-import java.net.InetAddress;
-import java.net.URI;
-import java.net.URL;
+import java.net.*;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.Month;
-import java.time.MonthDay;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Year;
-import java.time.YearMonth;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Currency;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -157,8 +128,6 @@ public final class DefaultTypeManager implements TypeManager {
   private final PlatformArrayTypeFactory arrayTypeSetFactory;
   private GeoTypeBinder geoTypeBinder;
 
-  private final MutationDetection defaultJsonMutationDetection;
-
   /**
    * Create the DefaultTypeManager.
    */
@@ -178,7 +147,6 @@ public final class DefaultTypeManager implements TypeManager {
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
     this.defaultEnumType = config.getDefaultEnumType();
     this.fileType = new ScalarTypeFile(config.getTempFileProvider());
-    this.defaultJsonMutationDetection = config.getJsonMutationDetection();
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
