@@ -44,7 +44,11 @@ public class WeakRefTempFileProvider implements TempFileProvider {
     }
 
     boolean delete(boolean shutdown) {
-      if (new File(path).delete()) {
+      File file = new File(path);
+      if (!file.exists()) {
+        logger.trace("already deleted {}", path);
+        return true;
+      } else if (file.delete()) {
         logger.trace("deleted {}", path);
         return true;
       } else {
