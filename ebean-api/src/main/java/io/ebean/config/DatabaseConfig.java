@@ -301,9 +301,7 @@ public class DatabaseConfig {
    */
   private ExternalTransactionManager externalTransactionManager;
 
-  private boolean skipDataSourceCheck = false;
-
-  private boolean skipInitDatabase = false;
+  private boolean skipDataSourceCheck;
 
   /**
    * The data source (if programmatically provided).
@@ -1649,14 +1647,6 @@ public class DatabaseConfig {
     this.skipDataSourceCheck = skipDataSourceCheck;
   }
 
-  public boolean skipInitDatabase() {
-    return skipInitDatabase;
-  }
-
-  public void setSkipInitDatabase(final boolean skipInitDatabase) {
-    this.skipInitDatabase = skipInitDatabase;
-  }
-
   /**
    * Return the DataSource.
    */
@@ -2743,6 +2733,7 @@ public class DatabaseConfig {
   }
 
 
+
   /**
    * Load settings from application.properties, application.yaml and other sources.
    * <p>
@@ -2935,7 +2926,6 @@ public class DatabaseConfig {
     jsonMutationDetection = p.getEnum(MutationDetection.class, "jsonMutationDetection", jsonMutationDetection);
 
     skipDataSourceCheck = p.getBoolean("skipDataSourceCheck", skipDataSourceCheck);
-    skipInitDatabase = p.getBoolean("skipInitDatabase", skipInitDatabase);
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);
