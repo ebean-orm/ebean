@@ -213,6 +213,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return beanDescriptor.docStoreMode(type, txnMode);
   }
 
+  @Override
+  public boolean isCascade() {
+    return Flags.isRecurse(flags);
+  }
+
   /**
    * Return true if the draftDirty property should be set to true for this request.
    */

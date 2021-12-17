@@ -378,7 +378,7 @@ public class PlatformConfig {
     BINARY(false, true, false),
 
     /**
-     * Store using DB BINARY(16).
+     * Store using DB BINARY(16) with optimized packing.
      */
     BINARY_OPTIMIZED(false, true, true);
 
