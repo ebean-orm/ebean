@@ -37,17 +37,12 @@ final class DtoMetaBuilder {
       if (includeMethod(method)) {
         try {
           final String name = propertyName(method.getName());
-          final Class<?> propertyType = propertyType(method);
-          properties.add(new DtoMetaProperty(typeManager, dtoType, method, name, propertyType));
+          properties.add(new DtoMetaProperty(typeManager, dtoType, method, name));
         } catch (Exception e) {
           CoreLog.log.debug("exclude on " + dtoType + " method " + method, e);
         }
       }
     }
-  }
-
-  static Class<?> propertyType(Method method) {
-    return method.getParameterTypes()[0];
   }
 
   static String propertyName(String methodName) {

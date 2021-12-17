@@ -7,9 +7,10 @@
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
     <version>2.3</version>
+    <relativePath/>
   </parent>
 
-  <name>kotlin test</name>
+  <name>test-kotlin</name>
   <description>Kotlin specific tests</description>
   <artifactId>test-kotlin</artifactId>
   <version>1.0</version>
@@ -19,7 +20,7 @@
     <maven.compiler.target>11</maven.compiler.target>
 
     <ebean-maven-plugin.version>12.13.0</ebean-maven-plugin.version>
-    <kotlin.version>1.5.31</kotlin.version>
+    <kotlin.version>1.6.0</kotlin.version>
     <jackson.version>2.12.1</jackson.version>
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
@@ -35,14 +36,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.13.0-SNAPSHOT</version>
+      <version>12.13.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.13.0-SNAPSHOT</version>
+      <version>12.13.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 

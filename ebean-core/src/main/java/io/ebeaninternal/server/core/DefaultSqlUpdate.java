@@ -332,6 +332,12 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
+  public SqlUpdate setArrayParameter(String name, Collection<?> values) {
+    bindParams.setArrayParameter(name, values);
+    return this;
+  }
+
+  @Override
   public SqlUpdate setNull(String name, int jdbcType) {
     bindParams.setNullParameter(name, jdbcType);
     return this;

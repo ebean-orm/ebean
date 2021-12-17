@@ -1,9 +1,6 @@
 package org.tests.model.array;
 
-import io.ebean.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Query;
-import io.ebean.SqlRow;
+import io.ebean.*;
 import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
@@ -271,5 +268,124 @@ public class TestDbArray_basic extends BaseTestCase {
     EArrayBean found = DB.find(EArrayBean.class, bean.getId());
     assertThat(found.getUids()).hasSameElementsAs(uids);
     assertThat(found.getStatuses()).hasSameElementsAs(statuses);
+  }
+
+  @Test
+  @ForPlatform(Platform.POSTGRES)
+  public void asDto_withArray() {
+    DB.find(EArrayBean.class).delete();
+    bean.setName("array in dto test");
+
+    List<String> phNumbers = bean.getPhoneNumbers();
+    phNumbers.add("4321");
+    phNumbers.add("9823");
+    List<Double> doubs = bean.getDoubs();
+    doubs.add(1.23);
+    doubs.add(4.56);
+    DB.save(bean);
+    // Data is saved correctly
+
+    LoggedSql.start();
+    DtoQuery<EArrayBeanDto> query = DB.find(EArrayBean.class)
+      // Interestingly writing `select("id,name,phone_numbers,doubs")`
+      //   generates `select t0.id, t0.name, t0.id, t0.doubs`
+      //   surprisingly changing unknown property to id
+      .select("id,name,phoneNumbers,doubs")
+      .asDto(EArrayBeanDto.class)
+      // Shouldn't be necessary
+      // But without it I see error
+      //  Unable to map DB column phone_numbers to a property with a setter method on class org.tests.model.array.TestDbArray_basic$EArrayBeanDto
+      .setRelaxedMode();
+
+    List<EArrayBeanDto> dtos = query.findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.phone_numbers, t0.doubs");
+
+    for (EArrayBeanDto dto : dtos) {
+      assertThat(dto.id).isNotNull();
+      assertThat(dto.name).isNotNull();
+      // Failure: null
+      assertThat(dto.phoneNumbers).isNotNull();
+      // Failure: null
+      assertThat(dto.doubs).isNotNull();
+    }
+  }
+
+  @Test
+  @ForPlatform(Platform.POSTGRES)
+  public void sqlUpdate_withArray() {
+    DB.find(EArrayBean.class).delete();
+    bean.setName("array in sql update test");
+    DB.save(bean);
+    // Data is saved correctly
+    List<String> phNumbers = new ArrayList<>();
+    phNumbers.add("4321");
+    phNumbers.add("9823");
+
+    LoggedSql.start();
+
+    // Positional param works
+    SqlUpdate update1 = DB.sqlUpdate("UPDATE earray_bean SET phone_numbers = ?")
+      .setParameter(1, phNumbers);
+    update1.execute();
+    System.out.println("done");
+
+    // Named param fails with
+    // javax.persistence.PersistenceException:
+    // ERROR: syntax error at or near "$2"
+    SqlUpdate update2 = DB.sqlUpdate("UPDATE earray_bean SET phone_numbers = :pns")
+      .setArrayParameter("pns", phNumbers);
+    update2.execute();
+
+    found = DB.find(EArrayBean.class, bean.getId());
+    System.out.println(found);
+    assertEquals("array in sql update test", found.getName());
+    assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
+  }
+
+  public static class EArrayBeanDto {
+
+    Integer id;
+    List<String> phoneNumbers;
+    List<Double> doubs;
+    String name;
+
+    @Override
+    public String toString() {
+      return "id:" + id + " name:" + name + " phoneNumbers:" + phoneNumbers + " doubs:" + doubs;
+    }
+
+    public Integer getId() {
+      return id;
+    }
+
+    public void setId(Integer id) {
+      this.id = id;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public List<String> getPhoneNumbers() {
+      return phoneNumbers;
+    }
+
+    public void setPhoneNumbers(List<String> phoneNumbers) {
+      this.phoneNumbers = phoneNumbers;
+    }
+
+    public List<Double> getDoubs() {
+      return doubs;
+    }
+
+    public void setDoubs(List<Double> doubs) {
+      this.doubs = doubs;
+    }
   }
 }

@@ -5,7 +5,6 @@ import io.ebean.annotation.*;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
-import io.ebeaninternal.server.deploy.DetermineManyType;
 import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.meta.*;
 import io.ebeaninternal.server.type.TypeManager;

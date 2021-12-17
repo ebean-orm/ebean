@@ -2,10 +2,15 @@ package org.tests.model.basic;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+
+import static javax.persistence.CascadeType.PERSIST;
 
 @Entity
-public class TWithPreInsert {
+public class TWithPreInsert implements TWithPreInsertCommon {
 
   @Id
   private Integer id;
@@ -14,6 +19,14 @@ public class TWithPreInsert {
   private String name;
 
   private String title;
+
+  @OneToMany(cascade = PERSIST)
+  private List<TWithPreInsertChild> children = new ArrayList<>();
+
+  /**
+   * For testing what happened in persist controller.
+   */
+  transient int requestCascadeState;
 
   public Integer getId() {
     return id;
@@ -39,4 +52,15 @@ public class TWithPreInsert {
     this.title = title;
   }
 
+  public List<TWithPreInsertChild> children() {
+    return children;
+  }
+
+  public int requestCascadeState() {
+    return requestCascadeState;
+  }
+
+  public void requestCascadeState(int requestCascadeState) {
+    this.requestCascadeState = requestCascadeState;
+  }
 }

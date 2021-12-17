@@ -5,6 +5,7 @@
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
     <version>2.3</version>
+    <relativePath/>
   </parent>
 
   <groupId>io.ebean</groupId>
@@ -19,11 +20,25 @@
     <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
-  <modules>
-    <!-- test-java16 REQUIRES JDK 16 to run -->
-<!--    <module>test-java16</module>-->
-    <!-- test-kotlin does NOT run with JDK 16!! -->
-    <module>test-kotlin</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>jdk16plus</id>
+      <activation>
+        <jdk>[16,20]</jdk>
+      </activation>
+      <modules>
+        <module>test-java16</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>jdk15less</id>
+      <activation>
+        <jdk>[8,15]</jdk>
+      </activation>
+      <modules>
+        <module>test-kotlin</module>
+      </modules>
+    </profile>
+  </profiles>
 
 </project>

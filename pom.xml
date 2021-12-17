@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.13.1-FOC6-SNAPSHOT</version>
+  <version>12.13.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -108,8 +108,25 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
-<!--    <module>tests</module>-->
+<!--    <module>ebean-kotlin</module>-->
+
   </modules>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+    </profile>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>ebean-kotlin</module>
+        <module>tests</module>
+      </modules>
+    </profile>
+  </profiles>
 
   <repositories>
     <repository>
