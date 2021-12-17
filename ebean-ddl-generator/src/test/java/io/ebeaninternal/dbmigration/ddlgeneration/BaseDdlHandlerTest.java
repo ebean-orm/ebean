@@ -107,7 +107,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     h2Handler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety array;\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety varchar array;\n\n");
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
@@ -127,7 +127,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     h2Handler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer array;\n\n");
+    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer integer array;\n\n");
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());

@@ -6,6 +6,7 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Inheritance;
 import java.util.LinkedHashMap;
@@ -105,8 +106,11 @@ public final class DeployInherit {
     if (da != null) {
       // lowercase the discriminator column for RawSql and JSON
       info.setColumnName(da.name().toLowerCase());
-      info.setColumnType(da.discriminatorType());
-      info.setColumnLength(da.length());
+      DiscriminatorType discriminatorType = da.discriminatorType();
+      info.setColumnType(discriminatorType);
+      if (discriminatorType == DiscriminatorType.STRING) {
+        info.setColumnLength(da.length());
+      }
       info.setColumnDefn(da.columnDefinition());
     }
     if (!info.isAbstract()) {

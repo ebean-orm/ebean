@@ -22,6 +22,12 @@ public class H2Ddl extends PlatformDdl {
 
   @Override
   protected String convertArrayType(String logicalArrayType) {
-    return "array";
+    int pos = logicalArrayType.indexOf('[');
+    if (pos == -1) {
+      return logicalArrayType;
+    } else {
+      // trim of the fallback varchar length
+      return logicalArrayType.substring(0, pos) + " array";
+    }
   }
 }

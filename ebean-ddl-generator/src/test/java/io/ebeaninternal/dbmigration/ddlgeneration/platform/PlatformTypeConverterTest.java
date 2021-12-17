@@ -61,7 +61,7 @@ public class PlatformTypeConverterTest {
     assertThat(converter.convert("clob")).isEqualTo("clob");
     assertThat(converter.convert("blob")).isEqualTo("blob");
     assertThat(converter.convert("tinyint")).isEqualTo("tinyint");
-    assertThat(converter.convert("integer(8)")).isEqualTo("integer(8)");
+    assertThat(converter.convert("integer(8)")).isEqualTo("integer");
     assertThat(converter.convert("funky")).isEqualTo("funky"); // unknown
   }
 
