@@ -13,7 +13,7 @@ class SqlServerSetup implements PlatformSetup {
     config.setDefaultPort(1433);
     config.setUsernameDefault();
     config.setPassword("SqlS3rv#r");
-    config.setUrl("jdbc:sqlserver://localhost:${port};databaseName=${databaseName}");
+    config.setUrl("jdbc:sqlserver://localhost:${port};databaseName=${databaseName};sendTimeAsDateTime=false");
     config.setDriver("com.microsoft.sqlserver.jdbc.SQLServerDriver");
     config.datasourceDefaults();
 
