@@ -7,7 +7,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static javax.persistence.CascadeType.PERSIST;
+import static javax.persistence.CascadeType.ALL;
 
 @Entity
 public class TWithPreInsert implements TWithPreInsertCommon {
@@ -20,7 +20,7 @@ public class TWithPreInsert implements TWithPreInsertCommon {
 
   private String title;
 
-  @OneToMany(cascade = PERSIST)
+  @OneToMany(cascade = ALL)
   private List<TWithPreInsertChild> children = new ArrayList<>();
 
   /**
