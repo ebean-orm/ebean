@@ -164,6 +164,8 @@ public class DatabasePlatformFactory {
       return new SQLitePlatform();
     } else if (dbProductName.contains("db2")) {
       return new DB2Platform();
+    } else if (dbProductName.contains("db2fori")) {
+      return new DB2ForIPlatform();
     } else if (dbProductName.contains("sql anywhere")) {
       return new SqlAnywherePlatform();
     } else if (dbProductName.contains("hdb")) {

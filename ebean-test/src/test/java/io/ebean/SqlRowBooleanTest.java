@@ -14,7 +14,7 @@ public class SqlRowBooleanTest extends BaseTestCase {
       sqlQuery = DB.sqlQuery("SELECT 1 AS ISNT_NULL");
     } else if (isOracle() || isNuoDb()) {
       sqlQuery = DB.sqlQuery("SELECT 1 AS ISNT_NULL from dual");
-    } else if (isDb2()) {
+    } else if (isDb2() || isDb2ForI()) {
       sqlQuery = DB.sqlQuery("SELECT 1 AS ISNT_NULL from SYSIBM.SYSDUMMY1");
     } else if (isHana()) {
       sqlQuery = DB.sqlQuery("SELECT 1 AS ISNT_NULL from sys.dummy");

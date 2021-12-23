@@ -195,6 +195,10 @@ public abstract class BaseTestCase {
     return Platform.DB2 == platform();
   }
 
+  public boolean isDb2ForI() {
+    return Platform.DB2FORI == platform();
+  }
+
   public boolean isPostgres() {
     return Platform.POSTGRES == platform().base();
   }

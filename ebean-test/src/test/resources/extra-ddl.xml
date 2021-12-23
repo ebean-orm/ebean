@@ -5,7 +5,7 @@
       drop view order_agg_vw if exists;
   </ddl-script>
 
-  <ddl-script name="order views" platforms="db2,h2,postgres,oracle,mysql,mariadb,nuodb">
+  <ddl-script name="order views" platforms="db2,db2fori,h2,postgres,oracle,mysql,mariadb,nuodb">
     create or replace view order_agg_vw as
     select d.order_id, sum(d.order_qty * d.unit_price) as order_total,
            sum(d.ship_qty * d.unit_price) as ship_total

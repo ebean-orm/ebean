@@ -30,7 +30,6 @@ module io.ebean.api {
   exports io.ebean.config.dbplatform.clickhouse;
   exports io.ebean.config.dbplatform.h2;
   exports io.ebean.config.dbplatform.db2;
-  exports io.ebean.config.dbplatform.db2fori;
   exports io.ebean.config.dbplatform.cockroach;
   exports io.ebean.config.dbplatform.hana;
   exports io.ebean.config.dbplatform.hsqldb;

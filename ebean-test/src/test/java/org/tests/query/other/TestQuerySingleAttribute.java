@@ -646,7 +646,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     //assertThat(list1.toString()).isEqualTo("[1: Tracy, 3: Jim1, 1: Jack, 3: Fred1, 1: Fiona, 3: Bugs1]");
-    
+
     query = DB.find(Contact.class).select("firstName");
     list1 = query
       .setCountDistinct(CountDistinctOrder.NO_ORDERING)
@@ -727,7 +727,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     }
     if (isSqlServer()) {
       assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
-    } else if (isDb2()) {
+    } else if (isDb2() || isDb2ForI()) {
       assertSql(query).endsWith("FETCH FIRST 2 ROWS ONLY");
     } else if (isOracle()) {
       assertSql(query).contains(" offset 1 rows fetch next 2 rows only");
