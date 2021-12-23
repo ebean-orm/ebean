@@ -49,7 +49,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>7.3</version>
+      <version>7.4</version>
     </dependency>
 
     <dependency>

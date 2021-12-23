@@ -5,6 +5,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
+import io.ebean.config.dbplatform.db2.DB2ForIPlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
@@ -104,6 +105,9 @@ public class DatabasePlatformFactory {
     }
     if (dbName.equals("db2")) {
       return new DB2Platform();
+    }
+    if (dbName.equals("db2fori")) {
+      return new DB2ForIPlatform();
     }
     if (dbName.equals("clickhouse")) {
       return new ClickHousePlatform();

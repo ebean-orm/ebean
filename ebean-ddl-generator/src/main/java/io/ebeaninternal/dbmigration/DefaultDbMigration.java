@@ -10,6 +10,7 @@ import io.ebean.config.PropertiesWrapper;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
+import io.ebean.config.dbplatform.db2.DB2ForIPlatform;
 import io.ebean.config.dbplatform.db2.DB2Platform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
@@ -824,6 +825,8 @@ public class DefaultDbMigration implements DbMigration {
         throw new IllegalArgumentException("Please choose the more specific SQLSERVER16 or SQLSERVER17 platform. Refer to issue #1340 for details");
       case DB2:
         return new DB2Platform();
+      case DB2FORI:
+        return new DB2ForIPlatform();
       case SQLITE:
         return new SQLitePlatform();
       case HANA:
