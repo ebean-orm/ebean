@@ -71,6 +71,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.StringJoiner;
 
 import javax.persistence.EnumType;
 
@@ -131,6 +132,8 @@ public class DefaultDbMigration implements DbMigration {
   private int lockTimeoutSeconds;
   protected boolean includeBuiltInPartitioning = true;
   protected boolean includeIndex;
+  protected boolean generate = true;
+  protected boolean generateInit = false;
 
   /**
    * Create for offline migration generation.
@@ -187,6 +190,8 @@ public class DefaultDbMigration implements DbMigration {
       online = props.getBoolean("migration.online", online);
       vanillaPlatform = props.getBoolean("migration.vanillaPlatform", vanillaPlatform);
       version = props.get("migration.version", version);
+      generate = props.getBoolean("migration.generate", generate);
+      generateInit = props.getBoolean("migration.generateInit", generateInit);
       // header & strictMode must be configured at DatabaseConfig level
       parsePlatforms(props.get("migration.platforms"), config.getClassLoadConfig());
     }
@@ -413,7 +418,18 @@ public class DefaultDbMigration implements DbMigration {
       }
 
       String pendingVersion = generatePendingDrop();
-      if (pendingVersion != null) {
+      if ("auto".equals(pendingVersion)) {
+        StringJoiner sj = new StringJoiner(",");
+        String diff = generateDiff(request);
+        if (diff != null) {
+          sj.add(diff);
+          request = createRequest(initMigration);
+        }
+        for (String pendingDrop : request.getPendingDrops()) {
+          sj.add(generatePendingDrop(request, pendingDrop));
+        }
+        return sj.toString();
+      } else if (pendingVersion != null) {
         return generatePendingDrop(request, pendingVersion);
       } else {
         return generateDiff(request);
@@ -650,6 +666,9 @@ public class DefaultDbMigration implements DbMigration {
       logError("migration already exists, not generating DDL");
       return null;
     } else {
+      if (request.initMigration) {
+        FIXME: Hier sollten wir dann die vorhandenen löschen
+      }
       if (!platforms.isEmpty()) {
         writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir);
 
