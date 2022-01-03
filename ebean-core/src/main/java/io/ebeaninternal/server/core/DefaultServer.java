@@ -161,7 +161,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final ReadAuditLogger readAuditLogger;
   private final CQueryEngine cqueryEngine;
   private final List<Plugin> serverPlugins;
-  private final SpiDdlGenerator ddlGenerator;
   private final ScriptRunner scriptRunner;
   private final ExpressionFactory expressionFactory;
   private final SpiBackgroundExecutor backgroundExecutor;
@@ -224,7 +223,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.metaInfoManager = new DefaultMetaInfoManager(this);
     this.serverPlugins = config.getPlugins();
     this.tempFileProvider = config.getConfig().getTempFileProvider();
-    this.ddlGenerator = config.initDdlGenerator(this);
     this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
@@ -254,9 +252,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
-    if (!config.isDocStoreOnly()) {
-      ddlGenerator.generateDdl();
-    }
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }
@@ -386,8 +381,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
       migrationRunner.loadProperties(config.getProperties());
       migrationRunner.run(config.getDataSource());
-    } else if (config.isDdlRun()) {
-      ddlGenerator.runDdl();
+    }
+    for (Plugin plugin : serverPlugins) {
+      plugin.start();
     }
   }
 

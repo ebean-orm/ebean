@@ -601,31 +601,4 @@ public final class InternalConfiguration {
         return new QueryPlanLoggerExplain();
     }
   }
-
-  /**
-   * Return the DDL generator.
-   */
-  public SpiDdlGenerator initDdlGenerator(SpiEbeanServer server) {
-    final SpiDdlGeneratorProvider service = service(SpiDdlGeneratorProvider.class);
-    return service == null ? new NoopDdl(server.config().isDdlRun()) : service.generator(server);
-  }
-
-  private static class NoopDdl implements SpiDdlGenerator {
-    private final boolean ddlRun;
-    NoopDdl(boolean ddlRun) {
-      this.ddlRun = ddlRun;
-    }
-
-    @Override
-    public void generateDdl() {
-      // do nothing
-    }
-    
-    @Override
-    public void runDdl() {
-      if (ddlRun) {
-        CoreLog.log.error("Configured to run DDL but ebean-ddl-generator is not in the classpath (or ebean-test in the test classpath?)");
-      }
-    }
-  }
 }
