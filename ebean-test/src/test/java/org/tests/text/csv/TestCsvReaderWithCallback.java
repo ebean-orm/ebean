@@ -10,6 +10,7 @@ import org.tests.model.basic.Customer;
 import java.io.File;
 import java.io.FileReader;
 import java.net.URL;
+import java.util.Locale;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,7 +33,7 @@ public class TestCsvReaderWithCallback extends TransactionalTestCase {
     // csvReader.addProperty("id");
     csvReader.addProperty("status");
     csvReader.addProperty("name");
-    csvReader.addDateTime("anniversary", "dd-MMM-yyyy");
+    csvReader.addDateTime("anniversary", "dd-MMM-yyyy", Locale.ENGLISH);
     csvReader.addProperty("billingAddress.line1");
     csvReader.addProperty("billingAddress.city");
     // processor.addReference("billingAddress.country.code");

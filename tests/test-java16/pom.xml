@@ -20,19 +20,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>12.13.2-SNAPSHOT</version>
+      <version>12.14.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.9</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.13.2-SNAPSHOT</version>
+      <version>12.14.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -58,7 +58,7 @@
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>12.13.2-SNAPSHOT</version>
+              <version>12.14.1-SNAPSHOT</version>
             </path>
           </annotationProcessorPaths>
         </configuration>

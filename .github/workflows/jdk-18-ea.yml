@@ -3,8 +3,8 @@ name: JDK 18-ea
 
 on:
   workflow_dispatch:
-#  schedule:
-#    - cron: '30 6 * * *'
+  schedule:
+    - cron: '30 6 * * 1,3,5'
 
 jobs:
   build:
