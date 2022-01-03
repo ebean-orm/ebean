@@ -71,14 +71,6 @@ public class AnnotationUtil {
     return typeGet(clazz, annotation) != null;
   }
 
-  public static boolean metaHas(AnnotatedElement element, Class<?> annotationType) {
-    return !metaFindAll(element, annotationType).isEmpty();
-  }
-
-  public static Set<Annotation> metaFindAll(AnnotatedElement element, Class<?> annotationType) {
-    return metaFindAllFor(element, Collections.singleton(annotationType));
-  }
-
   /**
    * Check if an element is annotated with an annotation of given type searching meta-annotations.
    */

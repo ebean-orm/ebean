@@ -55,8 +55,7 @@ public class TestServerOffline {
 
     public synchronized void initDatabase() {
       if (!initialized) {
-        server.runDdl();
-        server.runMigration();
+        server.start();
         initialized = true;
       }
     }
@@ -78,11 +77,11 @@ public class TestServerOffline {
 
       Properties props = props(url);
 
-      // to bring up ebean without a database, we must disable varous things
+      // to bring up ebean without a database, we must disable various things
       // that happen on startup
       props.setProperty("datasource.h2_offline.failOnStart", "false");
       props.setProperty("ebean.h2_offline.skipDataSourceCheck", "true");
-      props.setProperty("ebean.h2_offline.ddl.run", "false");
+      props.setProperty("ebean.h2_offline.skipStart", "true");
       DatabaseConfig config = config(props);
 
       LazyDatasourceInitializer alert = new LazyDatasourceInitializer() ;
