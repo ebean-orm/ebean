@@ -333,6 +333,13 @@ public final class DefaultPersister implements Persister {
    * Recursively delete the bean. This calls back to the EbeanServer.
    */
   private int deleteRecurse(EntityBean detailBean, Transaction t, DeleteMode deleteMode) {
+    return deleteRequest(createDeleteCascade(detailBean, t, deleteMode.persistType()));
+  }
+
+  /**
+   * Delete without being a cascade.
+   */
+  private int delete(EntityBean detailBean, Transaction t, DeleteMode deleteMode) {
     return deleteRequest(createDeleteRequest(detailBean, t, deleteMode.persistType()));
   }
 
@@ -560,7 +567,7 @@ public final class DefaultPersister implements Persister {
     }
   }
 
-  private void deleteList(List<?> beanList, SpiTransaction t, DeleteMode deleteMode, boolean children) {
+  private void deleteCascade(List<?> beanList, SpiTransaction t, DeleteMode deleteMode, boolean children) {
     if (children) {
       t.depth(-1);
       t.checkBatchEscalationOnCollection();
@@ -604,7 +611,7 @@ public final class DefaultPersister implements Persister {
     for (Object id : ids) {
       EntityBean bean = descriptor.createEntityBean();
       descriptor.convertSetId(id, bean);
-      int rowCount = deleteRecurse(bean, transaction, deleteMode);
+      int rowCount = delete(bean, transaction, deleteMode);
       if (rowCount == -1) {
         total = -1;
       } else if (total != -1) {
@@ -656,7 +663,7 @@ public final class DefaultPersister implements Persister {
             t.logSummary("-- DeleteById of " + descriptor.name() + " ids[" + idList + "] requires fetch of foreign key values");
           }
           List<?> beanList = server.findList(q, t);
-          deleteList(beanList, t, deleteMode, false);
+          deleteCascade(beanList, t, deleteMode, false);
           return beanList.size();
 
         } else {
@@ -994,6 +1001,8 @@ public final class DefaultPersister implements Persister {
           executeSqlUpdate(sqlDelete, t);
 
         } else {
+          // TODO: Review first checking if many property is loaded and using the loaded beans
+          // ... and only using findIdsByParentId() when the many property isn't loaded
           // Delete recurse using the Id values of the children
           Object parentId = desc.getId(parentBean);
           List<Object> idsByParentId = many.findIdsByParentId(parentId, null, t, excludeDetailIds, deleteMode.isHard());
@@ -1017,7 +1026,7 @@ public final class DefaultPersister implements Persister {
       for (Object id : childIds) {
         refList.add(targetDesc.createReference(id, null));
       }
-      deleteList(refList, t, deleteMode, true);
+      deleteCascade(refList, t, deleteMode, true);
     } else {
       // perform delete by statement if possible
       delete(targetDesc, null, childIds, t, deleteMode);
@@ -1157,6 +1166,10 @@ public final class DefaultPersister implements Persister {
     return createDeleteRequest(bean, t, type, Flags.ZERO);
   }
 
+  private <T> PersistRequestBean<T> createDeleteCascade(EntityBean bean, Transaction t, Type type) {
+    return createDeleteRequest(bean, t, type, Flags.RECURSE);
+  }
+
   @SuppressWarnings({"unchecked"})
   private <T> PersistRequestBean<T> createDeleteRequest(Object bean, Transaction t, PersistRequest.Type type, int flags) {
     BeanManager<T> mgr = beanManager(bean.getClass());
@@ -1167,7 +1180,7 @@ public final class DefaultPersister implements Persister {
       type = Type.DELETE_SOFT;
     }
 
-    PersistRequestBean<T> request =  new PersistRequestBean<>(server, (T)bean, null, mgr, (SpiTransaction) t, persistExecute, type, flags);
+    PersistRequestBean<T> request = new PersistRequestBean<>(server, (T) bean, null, mgr, (SpiTransaction) t, persistExecute, type, flags);
     request.initForSoftDelete();
     return request;
   }
@@ -1186,7 +1199,7 @@ public final class DefaultPersister implements Persister {
    */
   @SuppressWarnings("unchecked")
   private <T> BeanManager<T> beanManager(Class<?> cls) {
-    BeanManager<T> mgr = (BeanManager<T>)beanDescriptorManager.beanManager(cls);
+    BeanManager<T> mgr = (BeanManager<T>) beanDescriptorManager.beanManager(cls);
     if (mgr == null) {
       throw new PersistenceException(errNotRegistered(cls));
     }
