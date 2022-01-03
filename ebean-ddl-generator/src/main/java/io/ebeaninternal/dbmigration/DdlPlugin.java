@@ -5,8 +5,9 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.ddlrunner.DdlRunner;
 import io.ebean.ddlrunner.ScriptTransform;
+import io.ebean.plugin.Plugin;
+import io.ebean.plugin.SpiServer;
 import io.ebean.util.JdbcClose;
-import io.ebeaninternal.api.SpiDdlGenerator;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.dbmigration.model.MTable;
@@ -33,43 +34,82 @@ import java.sql.SQLException;
  * Typically the "Create All" DDL is executed for running tests etc and has nothing to do
  * with DB Migration (diff based) DDL.
  */
-public class DdlGenerator implements SpiDdlGenerator {
+public class DdlPlugin implements Plugin {
 
-  private static final Logger log = LoggerFactory.getLogger(DdlGenerator.class);
+  private static final Logger log = LoggerFactory.getLogger(DdlPlugin.class);
   private static final String[] BUILD_DIRS = {"target", "build"};
 
-  private final SpiEbeanServer server;
+  private SpiEbeanServer server;
 
-  private final boolean generateDdl;
-  private final boolean extraDdl;
-  private final boolean createOnly;
-  private final boolean jaxbPresent;
-  private final boolean ddlAutoCommit;
-  private final String dbSchema;
-  private final ScriptTransform scriptTransform;
-  private final Platform platform;
-  private final String platformName;
+  private boolean generateDdl;
+  private boolean runDdl;
+  private boolean extraDdl;
+  private boolean createOnly;
+  private boolean jaxbPresent;
+  private boolean ddlAutoCommit;
+  private String dbSchema;
+  private ScriptTransform scriptTransform;
+  private Platform platform;
+  private String platformName;
 
   private CurrentModel currentModel;
   private String dropAllContent;
   private String createAllContent;
-  private final File baseDir;
-
-  public DdlGenerator(SpiEbeanServer server) {
-    this.server = server;
+  private File baseDir;
+  
+  @Override
+  public void configure(SpiServer server) {
+    this.server = (SpiEbeanServer) server;
     final DatabaseConfig config = server.config();
-    this.jaxbPresent = Detect.isJAXBPresent(config);
     this.generateDdl = config.isDdlGenerate();
-    this.extraDdl = config.isDdlExtra();
-    this.createOnly = config.isDdlCreateOnly();
-    this.dbSchema = config.getDbSchema();
-    final DatabasePlatform databasePlatform = server.databasePlatform();
-    this.platform = databasePlatform.getPlatform();
-    this.platformName = platform.base().name();
-    this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
-    this.scriptTransform = createScriptTransform(config);
-    this.baseDir = initBaseDir();
+    this.runDdl = config.isDdlRun() && !config.isDocStoreOnly();
+    if (generateDdl || runDdl) {
+      this.jaxbPresent = Detect.isJAXBPresent(config);
+      this.extraDdl = config.isDdlExtra();
+      this.createOnly = config.isDdlCreateOnly();
+      this.dbSchema = config.getDbSchema();
+      final DatabasePlatform databasePlatform = server.databasePlatform();
+      this.platform = databasePlatform.getPlatform();
+      this.platformName = platform.base().name();
+      this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
+      this.scriptTransform = createScriptTransform(config);
+      this.baseDir = initBaseDir();
+    }   
   }
+
+  /**
+   * Generate the DDL drop and create scripts if the properties have been set.
+   */
+  @Override
+  public void online(boolean online) {
+    if (generateDdl) {
+      if (!createOnly) {
+        writeDrop(getDropFileName());
+      }
+      writeCreate(getCreateFileName());
+    }
+  }
+  
+  /**
+   * Run the DDL drop and DDL create scripts if properties have been set.
+   */
+  @Override
+  public void start() {
+    if (runDdl) {
+      Connection connection = null;
+      try {
+        connection = obtainConnection();
+        runDdlWith(connection);
+      } finally {
+        JdbcClose.rollback(connection);
+        JdbcClose.close(connection);
+      }
+    }
+  }
+
+  @Override
+  public void shutdown() {}
+
 
   private File initBaseDir() {
     for (String buildDir : BUILD_DIRS) {
@@ -79,34 +119,6 @@ public class DdlGenerator implements SpiDdlGenerator {
       }
     }
     return new File(".");
-  }
-
-  /**
-   * Generate the DDL drop and create scripts if the properties have been set.
-   */
-  @Override
-  public void generateDdl() {
-    if (generateDdl) {
-      if (!createOnly) {
-        writeDrop(getDropFileName());
-      }
-      writeCreate(getCreateFileName());
-    }
-  }
-
-  /**
-   * Run the DDL drop and DDL create scripts if properties have been set.
-   */
-  @Override  
-  public void runDdl() {
-    Connection connection = null;
-    try {
-      connection = obtainConnection();
-      runDdlWith(connection);
-    } finally {
-      JdbcClose.rollback(connection);
-      JdbcClose.close(connection);
-    }
   }
 
   private void runDdlWith(Connection connection) {
