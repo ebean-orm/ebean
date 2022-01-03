@@ -134,6 +134,7 @@ public class DefaultDbMigration implements DbMigration {
   protected boolean includeIndex;
   protected boolean generate = true;
   protected boolean generateInit = false;
+  private boolean keepLastInit = true;
 
   /**
    * Create for offline migration generation.
@@ -428,7 +429,7 @@ public class DefaultDbMigration implements DbMigration {
         for (String pendingDrop : request.getPendingDrops()) {
           sj.add(generatePendingDrop(request, pendingDrop));
         }
-        return sj.toString();
+        return sj.length() == 0 ? null : sj.toString();
       } else if (pendingVersion != null) {
         return generatePendingDrop(request, pendingVersion);
       } else {
@@ -666,11 +667,8 @@ public class DefaultDbMigration implements DbMigration {
       logError("migration already exists, not generating DDL");
       return null;
     } else {
-      if (request.initMigration) {
-        FIXME: Hier sollten wir dann die vorhandenen löschen
-      }
       if (!platforms.isEmpty()) {
-        writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir);
+        writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir, request.initMigration && keepLastInit);
 
       } else if (databasePlatform != null) {
         // writer needs the current model to provide table/column details for
@@ -742,12 +740,17 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Write any extra platform ddl.
    */
-  private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
+  private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath, boolean clear) throws IOException {
     DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
     for (Pair pair : platforms) {
       DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
       PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
+      if (clear) {
+        for (File existing : subPath.listFiles()) {
+          existing.delete();
+        }
+      }
       platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
     }
   }

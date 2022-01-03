@@ -2,12 +2,16 @@ package io.ebeaninternal.dbmigration;
 
 import java.io.IOException;
 
+import io.ebean.config.DatabaseConfig;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
 
 public class DbMigrationPlugin implements Plugin {
 
   private DefaultDbMigration dbMigration;
+
+  private static String lastMigration;
+  private static String lastInit;
 
   @Override
   public void configure(SpiServer server) {
@@ -18,11 +22,16 @@ public class DbMigrationPlugin implements Plugin {
   @Override
   public void online(boolean online) {
     try {
+      lastInit = null;
+      lastMigration = null;
       if (dbMigration.generate) {
-        dbMigration.generateMigration();
+        String tmp = lastMigration = dbMigration.generateMigration();
+        if (tmp == null) {
+          return;
+        }
       }
       if (dbMigration.generateInit) {
-        dbMigration.generateInitMigration();
+        lastInit = dbMigration.generateInitMigration();
       }
     } catch (IOException e) {
       throw new RuntimeException("Error while generating migration");
@@ -34,4 +43,11 @@ public class DbMigrationPlugin implements Plugin {
     dbMigration = null;
   }
 
+  public static String getLastInit() {
+    return lastInit;
+  }
+  
+  public static String getLastMigration() {
+    return lastMigration;
+  }
 }
