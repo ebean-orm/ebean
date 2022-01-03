@@ -301,6 +301,11 @@ public class DatabaseConfig {
   private ExternalTransactionManager externalTransactionManager;
 
   private boolean skipDataSourceCheck;
+  
+  /**
+   * Skip server start (i.e. run DDL/migration on creation).
+   */
+  private boolean skipStart;
 
   /**
    * The data source (if programmatically provided).
@@ -1634,6 +1639,20 @@ public class DatabaseConfig {
   public void setSkipDataSourceCheck(boolean skipDataSourceCheck) {
     this.skipDataSourceCheck = skipDataSourceCheck;
   }
+  
+  /**
+   * Return true if the server start should be skipped.
+   */
+  public boolean skipStart() {
+    return skipStart;
+  }
+
+  /**
+   * Set to true to skip the server start.
+   */
+  public void setSkipStart(boolean skipStart) {
+    this.skipStart = skipStart;
+  }
 
   /**
    * Return the DataSource.
@@ -2903,6 +2922,7 @@ public class DatabaseConfig {
     jsonMutationDetection = p.getEnum(MutationDetection.class, "jsonMutationDetection", jsonMutationDetection);
 
     skipDataSourceCheck = p.getBoolean("skipDataSourceCheck", skipDataSourceCheck);
+    skipStart = p.getBoolean("skipStart", skipStart);
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);

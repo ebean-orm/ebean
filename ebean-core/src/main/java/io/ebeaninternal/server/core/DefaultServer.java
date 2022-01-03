@@ -357,54 +357,28 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       encryptKeyManager.initialise();
     }
     serverCacheManager.enabledRegions(config.getEnabledL2Regions());
-  }
-
-
-  /**
-   * Start any services after registering with the ClusterManager.
-   */
-  public void start() {
-
-    // check, if DB is available to run DDL and migration
-    boolean dbAvailable = !config.isDocStoreOnly() 
-        && !config.isDbOffline() 
-        && config.getDataSource() != null
-        && config.getTenantMode().isDdlEnabled();
-
-    if (dbAvailable) {
-      if (config.isDdlRun()) {
-        runDdl();
-      }
-      if (config.isRunMigration()) {
-        runMigration();
-      }
-    } else if (config.isDdlRun() || config.isRunMigration()) {
-      log.warn("There was a request to run DDL or migration, but this is currently not possible, as the database is not available");
-    }
     startQueryPlanCapture();
   }
 
+  
   @Override
-  public void runDdl() {
-    ddlGenerator.runDdl();
-  }
-
-  @Override
-  public void runMigration() {
-    final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
-    if (migrationRunner == null) {
-      throw new IllegalStateException(
-          "No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
+  public void start() {
+    if (config.isRunMigration()) {
+      final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
+      if (migrationRunner == null) {
+        throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
+      }
+      final String dbSchema = config.getDbSchema();
+      if (dbSchema != null) {
+        migrationRunner.setDefaultDbSchema(dbSchema);
+      }
+      migrationRunner.setName(config.getName());
+      migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
+      migrationRunner.loadProperties(config.getProperties());
+      migrationRunner.run(config.getDataSource());
+    } else if (config.isDdlRun()) {
+      ddlGenerator.runDdl();
     }
-
-    final String dbSchema = config.getDbSchema();
-    if (dbSchema != null) {
-      migrationRunner.setDefaultDbSchema(dbSchema);
-    }
-    migrationRunner.setName(config.getName());
-    migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
-    migrationRunner.loadProperties(config.getProperties());
-    migrationRunner.run(dataSource());
   }
 
   private void startQueryPlanCapture() {
