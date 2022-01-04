@@ -7,18 +7,39 @@
     <version>12.14.1-FOC1-SNAPSHOT</version>
   </parent>
 
-  <name>ebean ddl generation</name>
-  <description>DDL and DB Migration generation</description>
-  <artifactId>ebean-ddl-generator</artifactId>
+  <name>ebean dbmigration runner</name>
+  <description>DB Migration runner plugin</description>
+  <artifactId>ebean-dbmigration-runner</artifactId>
 
   <dependencies>
 
-    <dependency>
+<!--     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-runner</artifactId>
       <version>1.2</version>
-    </dependency>
+    </dependency> -->
 
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-migration-auto</artifactId>
+      <version>1.1</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-core</artifactId>
+      <version>12.14.1-FOC1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-migration</artifactId>
+      <version>12.12.1</version>
+    </dependency>
+    
+    <!-- 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
@@ -32,14 +53,9 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-core</artifactId>
-      <version>12.14.1-FOC1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
 
-    <!-- needed for java 11+ -->
+
+    needed for java 11+
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
@@ -47,7 +63,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- test dependencies -->
+    test dependencies
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
@@ -55,13 +71,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-dbmigration-runner</artifactId>
-      <version>12.14.1-FOC1-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-    
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
@@ -74,7 +83,7 @@
       <artifactId>validation-api</artifactId>
       <version>2.0.1.Final</version>
       <scope>test</scope>
-    </dependency>
+    </dependency> -->
 
   </dependencies>
 

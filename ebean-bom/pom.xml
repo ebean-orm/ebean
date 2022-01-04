@@ -94,6 +94,12 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>ebean-dbmigration-runner</artifactId>
+        <version>12.14.1-FOC1-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-ddl-generator</artifactId>
         <version>12.14.1-FOC1-SNAPSHOT</version>
       </dependency>

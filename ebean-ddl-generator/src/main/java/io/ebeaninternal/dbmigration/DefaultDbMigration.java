@@ -132,7 +132,7 @@ public class DefaultDbMigration implements DbMigration {
   private int lockTimeoutSeconds;
   protected boolean includeBuiltInPartitioning = true;
   protected boolean includeIndex;
-  protected boolean generate = true;
+  protected boolean generate = false;
   protected boolean generateInit = false;
   private boolean keepLastInit = true;
 

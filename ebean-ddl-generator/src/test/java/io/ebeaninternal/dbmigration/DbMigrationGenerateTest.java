@@ -1,8 +1,6 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.Database;
 import io.ebean.DatabaseFactory;
-import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -16,7 +14,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 /**
@@ -45,14 +42,7 @@ public class DbMigrationGenerateTest {
     config.loadFromProperties();
     config.setRegister(false);
     config.setDefaultServer(false);
-    config.getProperties().put("ebean.hana.generateUniqueDdl", "true"); // need to generate unique statements to prevent them from being filtered out as duplicates by the DdlRunner
-
-
     config.getProperties().put("ebean.migrationtest.migration.pathToResources", pathToResources);
-    config.getProperties().put("ebean.migrationtest.migration.includeIndex", "true");
-    config.getProperties().put("ebean.migrationtest.migration.generateInit", "true");
-    config.getProperties().put("ebean.migrationtest.migration.generatePendingDrop", "auto");
-    config.getProperties().put("ebean.migrationtest.migration.platforms", "db2,h2,hsqldb,mysql,mysql55=mysql55,postgres,oracle,sqlite,sqlserver17=sqlserver17,hana");
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
 
     // First, we clean up the output-directory

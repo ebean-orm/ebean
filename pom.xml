@@ -99,6 +99,7 @@
     <module>ebean-core-type</module>
     <module>ebean-core</module>
     <module>ebean-ddl-generator</module>
+    <module>ebean-dbmigration-runner</module>
     <module>ebean-autotune</module>
     <module>ebean-externalmapping-api</module>
     <module>ebean-externalmapping-xml</module>
