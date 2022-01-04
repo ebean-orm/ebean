@@ -2,10 +2,13 @@ package io.ebeaninternal.dbmigration;
 
 import java.io.IOException;
 
-import io.ebean.config.DatabaseConfig;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
 
+/**
+ * Plugin to generate db-migration scripts automatically.
+ * @author Roland Praml, FOCONIS AG
+  */
 public class DbMigrationPlugin implements Plugin {
 
   private DefaultDbMigration dbMigration;

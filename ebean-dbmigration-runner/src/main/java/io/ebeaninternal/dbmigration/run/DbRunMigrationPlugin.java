@@ -43,6 +43,8 @@ public class DbRunMigrationPlugin implements Plugin {
 
   @Override
   public void start() {
-    migrationRunner.run(server.dataSource());
+    if (migrationRunner != null) {
+      migrationRunner.run(server.dataSource());
+    }
   }
 }

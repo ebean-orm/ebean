@@ -2,8 +2,8 @@ open module io.ebean.ddl.generator {
 
   exports io.ebean.dbmigration;
 
-  provides io.ebean.dbmigration.DbMigration with io.ebeaninternal.dbmigration.DefaultDbMigration;
-  provides io.ebeaninternal.api.SpiDdlGeneratorProvider with io.ebeaninternal.dbmigration.DdlGeneratorProvider;
+  provides io.ebean.plugin.Plugin with io.ebeaninternal.dbmigration.DbMigrationPlugin;
+  provides io.ebean.plugin.Plugin with io.ebeaninternal.dbmigration.DdlPlugin;
 
   requires transitive io.ebean.ddl.runner;
   requires transitive io.ebean.core;
