@@ -25,6 +25,8 @@ public final class DbExpressionHandlerFactory {
       case ORACLE:
       case ORACLE11:
         return new OracleDbExpression();
+      case DB2:
+        return new Db2DbExpression();
       case SQLSERVER16:
       case SQLSERVER17:
       case SQLSERVER:
