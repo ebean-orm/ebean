@@ -250,8 +250,7 @@ public final class DefaultTypeManager implements TypeManager {
   @Override
   public ScalarType<?> getScalarType(Class<?> type) {
     ScalarType<?> found = typeMap.get(type);
-    if (found == null || found == ScalarTypeNotFound.INSTANCE) {
-      found = null;
+    if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
         throw new IllegalStateException(
           "ScalarType of Joda LocalTime not defined. You need to set DatabaseConfig.jodaLocalTimeMode to"
@@ -259,19 +258,19 @@ public final class DefaultTypeManager implements TypeManager {
       }
       found = checkInheritedTypes(type);
     }
-    return found;
+    return found != ScalarTypeNotFound.INSTANCE ? found : null; // Do not return ScalarTypeNotFound, otherwise checks will fail
   }
 
   /**
    * Checks the typeMap for inherited types.
-   * 
-   * If <code>type</code> is a <code>GregorianCalendar</code>, then this method
+   *
+   * If e.g. <code>type</code> is a <code>GregorianCalendar</code>, then this method
    * will check the class hierarchy and will probably return a
    * <code>ScalarTypeCalendar</code> To speed up a second lookup, it will write
    * back the found scalarType to typeMap.
-   * 
-   * @param type
-   * @return
+   *
+   * @param type the for which to search for a <code>ScalarType</code>
+   * @return either a valid <code>ScalarType</code> if one could be found or {@link ScalarTypeNotFound#INSTANCE} if not
    */
   private ScalarType<?> checkInheritedTypes(Class<?> type) {
     // first step loop through inheritance chain
@@ -282,18 +281,18 @@ public final class DefaultTypeManager implements TypeManager {
         typeMap.put(type, found); // store type for next lookup
         return found;
       }
+      // second step - loop through interfaces of this type
+      for (Class<?> iface: parent.getInterfaces()) {
+        found = checkInheritedTypes(iface);
+        if (found != null && found != ScalarTypeNotFound.INSTANCE) {
+          typeMap.put(type, found); // store type for next lookup
+          return found;
+        }
+      }
       parent = parent.getSuperclass();
     }
-    // second step - loop through interface chain
-    for (Class<?> iface: type.getInterfaces()) {
-      ScalarType<?> found = checkInheritedTypes(iface);
-      if (found != null && found != ScalarTypeNotFound.INSTANCE) {
-        typeMap.put(type, found); // store type for next lookup
-        return found;
-      }
-    }
     typeMap.put(type, ScalarTypeNotFound.INSTANCE);
-    return null; // no success
+    return ScalarTypeNotFound.INSTANCE; // no success
   }
 
   @Override
@@ -399,7 +398,7 @@ public final class DefaultTypeManager implements TypeManager {
   private DocPropertyType getDocType(Type genericType) {
     if (genericType instanceof Class<?>) {
       ScalarType<?> found = getScalarType((Class<?>)genericType);
-      if (found != null && found != ScalarTypeNotFound.INSTANCE) {
+      if (found != null) {
         return found.getDocType();
       }
     }
