@@ -19,7 +19,7 @@ public class DB2SequenceIdGenerator extends SequenceBatchIdGenerator {
   public DB2SequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
     super(be, ds, seqName, batchSize);
     this.baseSql = "values nextval for " + seqName;
-    this.unionBaseSql = " union " + baseSql;
+    this.unionBaseSql = ", nextval for " + seqName;
   }
 
   @Override
