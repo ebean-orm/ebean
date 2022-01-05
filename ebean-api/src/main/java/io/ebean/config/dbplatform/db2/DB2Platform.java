@@ -26,6 +26,7 @@ public class DB2Platform extends DatabasePlatform {
     this.maxTableNameLength = 128;
     this.maxConstraintNameLength = 128;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
+    this.likeClauseRaw = "like ?";
     this.sqlLimiter = new Db2SqlLimiter();
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
