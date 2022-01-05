@@ -185,7 +185,15 @@ final class InsertMeta {
   }
 
   private String defaultValues() {
-    return platform.base() == MYSQL || platform.base() == MARIADB ? " values (default)" : " default values";
+    switch (platform.base()) {
+    case MYSQL:
+    case MARIADB:
+      return " values (default)";
+    case DB2:
+      return " (" + id.getIdentityColumn() + ") values (default)";
+    default:
+      return " default values";
+    }
   }
 
   /**
