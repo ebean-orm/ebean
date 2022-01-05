@@ -477,6 +477,19 @@ public final class DB {
   public static int saveAll(Object... beans) throws OptimisticLockException {
     return getDefault().saveAll(beans);
   }
+  
+  /**
+   * This will visit all beans in the persist graph on a given object
+   * <code>start</code>. It will call the visitor for each dirty bean that would
+   * be saved with {@link #save(Object)} or {@link #saveAll(Collection)}. You can
+   * use this method to implement custom validations.
+   * 
+   * @param start   could be a bean, a list of beans or a map of beans.
+   * @param visitor the visitor
+   */
+  public static void visitSave(Object start, PersistVisitor visitor) {
+    getDefault().visitSave(start, visitor);
+  }
 
   /**
    * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
