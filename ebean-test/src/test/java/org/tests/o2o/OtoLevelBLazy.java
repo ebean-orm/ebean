@@ -23,7 +23,7 @@ public class OtoLevelBLazy {
   private OtoLevelALazy a;
 
   @Lob
-  private String blob;
+  private String blb;
 
   public OtoLevelBLazy(String name) {
     this.name = name;
@@ -62,15 +62,15 @@ public class OtoLevelBLazy {
   }
 
   protected void recalc() {
-    this.getBlob();
+    this.getBlb();
   }
 
-  public String getBlob() {
-    return blob;
+  public String getBlb() {
+    return blb;
   }
 
-  public void setBlob(String blob) {
-    this.blob = blob;
+  public void setBlb(String blb) {
+    this.blb = blb;
   }
 
 }
