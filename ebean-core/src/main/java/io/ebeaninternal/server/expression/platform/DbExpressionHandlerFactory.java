@@ -24,6 +24,8 @@ public final class DbExpressionHandlerFactory {
         return new MySqlDbExpression();
       case ORACLE:
         return new OracleDbExpression();
+      case DB2:
+        return new Db2DbExpression();
       case SQLSERVER:
         return new SqlServerDbExpression();
       case HANA:
