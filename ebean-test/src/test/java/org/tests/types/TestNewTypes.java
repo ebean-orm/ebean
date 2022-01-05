@@ -11,7 +11,6 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.time.*;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -107,7 +106,8 @@ public class TestNewTypes extends BaseTestCase {
     list = DB.find(SomeNewTypesBean.class).where().eq("duration", Duration.ofMinutes(5)).findList();
     assertThat(list).isNotEmpty();
 
-    list = DB.find(SomeNewTypesBean.class).where().le("calendar", GregorianCalendar.getInstance()).findList();
+    // Calendar.getInstance() returns an implementation, which then has to be remapped to ScalarTypeCalendar
+    list = DB.find(SomeNewTypesBean.class).where().le("calendar", Calendar.getInstance()).findList();
     assertThat(list).isNotEmpty();
 
     SomeNewTypesBean fetched = DB.find(SomeNewTypesBean.class, bean.getId());
