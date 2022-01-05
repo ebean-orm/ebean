@@ -181,6 +181,8 @@ final class InsertMeta {
       case MARIADB:
       case ORACLE:
         return " values (default)";
+      case DB2:
+        return " (" + id.getIdentityColumn() + ") values (default)";
       default:
         return " default values";
     }
