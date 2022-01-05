@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.13.2-SNAPSHOT</version>
+    <version>12.14.1-SNAPSHOT</version>
   </parent>
 
   <name>ebean external mapping api</name>

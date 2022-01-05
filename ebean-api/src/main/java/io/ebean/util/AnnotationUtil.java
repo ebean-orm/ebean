@@ -72,6 +72,20 @@ public class AnnotationUtil {
   }
 
   /**
+   * Check if an element is annotated with an annotation of given type searching meta-annotations.
+   */
+  public static boolean metaHas(AnnotatedElement element, Class<?> annotationType) {
+    return !metaFindAll(element, annotationType).isEmpty();
+  }
+
+  /**
+   * Find all the annotations of a given type searching meta-annotations.
+   */
+  public static Set<Annotation> metaFindAll(AnnotatedElement element, Class<?> annotationType) {
+    return metaFindAllFor(element, Collections.singleton(annotationType));
+  }
+
+  /**
    * Find all the annotations for the filter searching meta-annotations.
    */
   public static Set<Annotation> metaFindAllFor(AnnotatedElement element, Set<Class<?>> filter) {

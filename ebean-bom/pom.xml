@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.13.2-SNAPSHOT</version>
+    <version>12.14.1-SNAPSHOT</version>
   </parent>
 
   <name>ebean bom</name>
@@ -71,88 +71,88 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-api</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-core</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-core-type</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-ddl-generator</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-externalmapping-api</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-externalmapping-xml</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-autotune</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-querybean</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>querybean-generator</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
         <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>kotlin-querybean-generator</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
         <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-test</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-postgis</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-redis</artifactId>
-        <version>12.13.2-SNAPSHOT</version>
+        <version>12.14.1-SNAPSHOT</version>
       </dependency>
 
     </dependencies>

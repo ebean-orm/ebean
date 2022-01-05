@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.13.2-SNAPSHOT</version>
+    <version>12.14.1-SNAPSHOT</version>
   </parent>
 
   <name>ebean test</name>
@@ -29,14 +29,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.13.2-SNAPSHOT</version>
+      <version>12.14.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>12.13.2-SNAPSHOT</version>
+      <version>12.14.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -187,8 +187,8 @@
 
     <dependency>
       <groupId>com.oracle.database.jdbc</groupId>
-      <!-- Note: Using ojdbc10 here will affect loading other drivers on jdk8, 
-        because the driverManager will stop on first load error and stops loading 
+      <!-- Note: Using ojdbc10 here will affect loading other drivers on jdk8,
+        because the driverManager will stop on first load error and stops loading
         other drivers -->
       <artifactId>ojdbc8</artifactId>
       <version>19.12.0.0</version>
@@ -226,7 +226,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.9</version>
       <scope>test</scope>
     </dependency>
 

@@ -5,6 +5,7 @@
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
     <version>2.3</version>
+    <relativePath/>
   </parent>
 
   <groupId>io.ebean</groupId>

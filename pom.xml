@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
-    <version>3.2</version>
+    <version>3.3</version>
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>12.13.2-SNAPSHOT</version>
+  <version>12.14.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+      <version>1.2.9</version>
       <scope>test</scope>
     </dependency>
 
@@ -90,6 +90,7 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
+<!--    <module>ebean-kotlin</module>-->
 
   </modules>
 
@@ -103,6 +104,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>ebean-kotlin</module>
         <module>tests</module>
       </modules>
     </profile>

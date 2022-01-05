@@ -14,6 +14,8 @@ import org.tests.idkeys.db.GenKeySeqB;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -24,6 +26,7 @@ public class TestGeneratedKeys extends BaseTestCase {
   @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
   public void testGenKeySeqA() throws SQLException {
     assumeTrue(idType() == IdType.SEQUENCE);
+    
     SpiEbeanServer server = spiEbeanServer();
 
     try (Transaction tx = server.beginTransaction()) {
@@ -69,20 +72,34 @@ public class TestGeneratedKeys extends BaseTestCase {
   }
 
   private long readSequenceValue(Transaction tx, String sequence) throws SQLException {
-    Statement stm = null;
-    try {
-      stm = tx.connection().createStatement();
-      ResultSet rs = stm.executeQuery("select currval('" + sequence + "')");
-      rs.next();
+    String sql;
+    switch (spiEbeanServer().databasePlatform().getPlatform().base()) {
+      case H2 :
+        sql = "select currval('" + sequence + "')";
+        break;
 
+      case DB2 :
+        sql = "values previous value for " + sequence;
+
+        break;
+      case SQLSERVER :
+        sql = "select current_value from sys.sequences where name = '" + sequence + "'";
+        break;
+
+      case MARIADB :
+        throw new UnsupportedOperationException("reading sequence value outside of the current connection is not supported. "
+            + "See https://mariadb.com/kb/en/previous-value-for-sequence_name/#description");
+        
+      default :
+        throw new UnsupportedOperationException("reading sequence value from "
+            + spiEbeanServer().databasePlatform().getPlatform()
+            + " is not supported.");
+
+    }
+    try (Statement stm = tx.connection().createStatement()) {
+      ResultSet rs = stm.executeQuery(sql);
+      rs.next();
       return rs.getLong(1);
-    } finally {
-      if (stm != null) {
-        try {
-          stm.close();
-        } catch (SQLException e) {
-        }
-      }
     }
   }
 
@@ -107,6 +124,26 @@ public class TestGeneratedKeys extends BaseTestCase {
       tx.commit();
 
       assertNotNull(al.getId());
+    }
+  }
+  
+  @Test
+  @ForPlatform({Platform.H2, Platform.MARIADB, Platform.SQLSERVER, Platform.DB2})
+  public void testGeneratedKeys() throws SQLException {
+    assumeTrue(idType() == IdType.SEQUENCE);
+
+    SpiEbeanServer server = spiEbeanServer();
+    List<Long> idList = new ArrayList<>(52);
+
+    try (Transaction tx = server.beginTransaction()) {
+      // bigger than increment
+      for (int i = 1; i < 52; i++) {
+        GenKeySeqA gks = new GenKeySeqA();
+        gks.setDescription("my description " + i);
+        server.save(gks);
+        assertFalse(idList.contains(gks.getId()));
+        idList.add(gks.getId());
+      }
     }
   }
 
