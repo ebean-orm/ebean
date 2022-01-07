@@ -47,7 +47,6 @@ public class DB2Platform extends DatabasePlatform {
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("bigint", false));
     dbTypeMap.put(DbType.REAL, new DbPlatformType("real"));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("decimal", 16, 3));
-    persistBatchOnCascade = PersistBatch.NONE;
   }
 
   /**
