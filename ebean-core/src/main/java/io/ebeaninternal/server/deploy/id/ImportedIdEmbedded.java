@@ -85,6 +85,9 @@ public final class ImportedIdEmbedded implements ImportedId {
     for (ImportedIdSimple anImported : imported) {
       if (anImported.owner.isUpdateable()) {
         Object scalarValue = anImported.foreignProperty.getValue(embedded);
+        if (scalarValue == null) {
+          return -1; // could not bind
+        }
         update.setParameter(pos++, scalarValue);
       }
     }

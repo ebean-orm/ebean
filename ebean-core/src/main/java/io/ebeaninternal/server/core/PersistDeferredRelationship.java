@@ -40,6 +40,9 @@ public final class PersistDeferredRelationship {
 
     // bind the set clause for the importedId
     int pos = importedId.bind(1, sqlUpdate, assocBean);
+    if (pos == -1) {
+      return; // could not bind: TODO: should we log/throw an error?
+    }
     // bind the where clause for the bean
     Object[] idValues = beanDescriptor.idBinder().getIdValues(bean);
     for (int j = 0; j < idValues.length; j++) {
