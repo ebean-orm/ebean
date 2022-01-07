@@ -241,7 +241,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({Platform.HANA, Platform.DB2}))
+  @ForPlatform({Platform.HANA, Platform.DB2})
   public void where_or1_hana() {
 
     Query<Customer> query = parse("where name = 'Rob' or (status = 'N' and smallnote is null)");
@@ -251,7 +251,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  @IgnorePlatform({Platform.HANA, Platform.DB2})) // The HANA & DB2 JDBC driver checks the field length on binding and rejects 'NEW'
+  @IgnorePlatform({Platform.HANA, Platform.DB2}) // The HANA & DB2 JDBC driver checks the field length on binding and rejects 'NEW'
   public void where_or2() {
 
     Query<Customer> query = parse("where (name = 'Rob' or status = 'NEW') and smallnote is null");
