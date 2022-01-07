@@ -314,7 +314,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select distinct top 100 t0.id from o_customer t0");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 fetch next 100 rows only");
     } else {
       assertThat(sqlOf(query)).contains("select distinct t0.id from o_customer t0 limit 100");
@@ -393,7 +393,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<String> ids = query.findSingleAttributeList();
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 t0.id from o_customer t0");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertThat(sqlOf(query)).contains("fetch next 100 rows only");
     } else {
       assertThat(sqlOf(query)).contains("select t0.id from o_customer t0 limit 100");
@@ -727,9 +727,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     }
     if (isSqlServer()) {
       assertThat(sqlOf(query)).endsWith(" fetch next 2 rows only");
-    } else if (isDb2()) {
-      assertSql(query).endsWith("FETCH FIRST 2 ROWS ONLY");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains(" offset 1 rows fetch next 2 rows only");
     } else {
       assertThat(sqlOf(query)).endsWith(" limit 2 offset 1");

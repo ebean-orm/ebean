@@ -15,10 +15,13 @@ public class Db2SqlLimiter implements SqlLimiter {
       sb.append("distinct ");
     }
     sb.append(request.getDbSql());
-
+    int firstRow = request.getFirstRow();
+    if (firstRow > 0) {
+      sb.append(" offset ").append(firstRow).append(" rows");
+    }
     int maxRows = request.getMaxRows();
     if (maxRows > 0) {
-      sb.append(" ").append(NEW_LINE).append("FETCH FIRST ").append(maxRows).append(" ROWS ONLY");
+      sb.append(" fetch next ").append(maxRows).append(" rows only");
     }
 
     String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
