@@ -247,7 +247,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where name = 'Rob' or (status = 'N' and smallnote is null)");
     query.findList();
 
-    assertSql(query).contains("where (t0.name = ?  or (t0.status = ?  and t0.smallnote is null ) )");
+    assertSql(query).contains("where (t0.name = ? or (t0.status = ? and t0.smallnote is null))");
   }
 
   @Test
@@ -267,7 +267,7 @@ public class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where (name = 'Rob' or status = 'N') and smallnote is null");
     query.findList();
 
-    assertSql(query).contains("where ((t0.name = ?  or t0.status = ? )  and t0.smallnote is null )");
+    assertSql(query).contains("where ((t0.name = ? or t0.status = ?) and t0.smallnote is null)");
   }
 
   @Test
@@ -293,15 +293,15 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'N')");
     query.findList();
-    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
 
     query = parse("where not ((name = 'Rob' and status = 'N'))");
     query.findList();
-    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
 
     query = parse("where not (((name = 'Rob') and (status = 'N')))");
     query.findList();
-    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
   }
 
   @Test
