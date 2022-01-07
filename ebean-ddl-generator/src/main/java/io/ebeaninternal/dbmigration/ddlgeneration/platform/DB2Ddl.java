@@ -22,10 +22,22 @@ public class DB2Ddl extends PlatformDdl {
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
     if (nullableColumns == null || nullableColumns.length == 0) {
       return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
-    } else {
-      // Hmm: Complex workaround: https://www.ibm.com/developerworks/mydeveloperworks/blogs/SQLTips4DB2LUW/entry/unique_where_not_null_indexes26?lang=en
-      return "-- NOT SUPPORTED " + super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
+    }     
+
+    if (uqName == null) {
+      throw new NullPointerException();
     }
+    StringBuilder sb = new StringBuilder("create unique index ");
+    sb.append(uqName).append(" on ").append(tableName).append('(');
+
+    for (int i = 0; i < columns.length; i++) {
+      if (i > 0) {
+        sb.append(",");
+      }
+      sb.append(columns[i]);
+    }
+    sb.append(") exclude null keys");
+    return sb.toString();
   }
 
   @Override
