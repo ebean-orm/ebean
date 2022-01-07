@@ -607,6 +607,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     try (Connection connection = dataSource().getConnection()) {
       for (String table : tables) {
         executeSql(connection, databasePlatform.truncateStatement(table));
+        if (databasePlatform.getPlatform().base() == Platform.DB2) {
+          // DB2 requires commit after each truncate statement
+          connection.commit();
+        }
       }
       connection.commit();
     } catch (SQLException e) {
