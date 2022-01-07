@@ -3,6 +3,8 @@ package org.tests.model.m2m;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -123,6 +125,11 @@ public class TestM2MWithWhere extends BaseTestCase {
     // System.out.println(sb); dump the table
   }
 
+  @AfterEach
+  void deleteTestData() {
+    DB.find(MnyEdge.class).delete();
+    DB.find(MnyNode.class).delete();
+  }
 
   @Test
   public void testWithDbTableName() {
