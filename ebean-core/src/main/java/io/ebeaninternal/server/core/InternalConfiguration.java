@@ -597,6 +597,8 @@ public final class InternalConfiguration {
         return new QueryPlanLoggerSqlServer();
       case ORACLE:
         return new QueryPlanLoggerOracle();
+      case DB2:
+        return new QueryPlanLoggerDb2();
       default:
         return new QueryPlanLoggerExplain();
     }
