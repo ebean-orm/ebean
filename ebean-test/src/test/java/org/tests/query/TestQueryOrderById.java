@@ -18,7 +18,7 @@ public class TestQueryOrderById extends BaseTestCase {
       .setMaxRows(5);
 
     query.findList();
-    if (isSqlServer()) {
+    if (isSqlServer() || isDb2()) {
       assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
     } else if (!isOracle()) {
       assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
@@ -35,7 +35,7 @@ public class TestQueryOrderById extends BaseTestCase {
       .orderById(true);
 
     query.findList();
-    if (isSqlServer()) {
+    if (isSqlServer() || isDb2()) {
       assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
     } else if (!isOracle()) {
       assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id limit 5 offset 1");
