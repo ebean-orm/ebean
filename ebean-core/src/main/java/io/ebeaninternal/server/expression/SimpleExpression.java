@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
-import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
@@ -91,11 +90,9 @@ public final class SimpleExpression extends AbstractValueExpression {
         request.addBindEncryptKey(bindVal);
         return;
       }
-      ScalarType<?> st = prop.beanProperty().scalarType();
-      request.addBindValue(st.toJdbcType(st.toBeanType(value())));
-    } else {
-      request.addBindValue(value());
     }
+
+    request.addBindValue(value());
   }
 
   @Override
