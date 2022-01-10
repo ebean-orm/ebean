@@ -5,12 +5,12 @@
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
     <version>2.3</version>
-    <relativePath/>
+    <relativePath />
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>tests</artifactId>
-  <version>1.0</version>
+  <version>12.14.1-FOC1</version>
   <packaging>pom</packaging>
 
   <name>tests</name>
@@ -41,4 +41,8 @@
     </profile>
   </profiles>
 
+
+  <scm>
+    <tag>ebean-parent-12.14.1-FOC1</tag>
+  </scm>
 </project>
