@@ -4,11 +4,13 @@ import io.ebean.ProfileLocation;
 import io.ebean.config.ProfilingConfig;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
+import io.ebean.util.IOUtils;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiProfileHandler;
 import org.slf4j.Logger;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -123,7 +125,7 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
       try {
         String now = DTF.format(LocalDateTime.now());
         File file = new File(dir, "txprofile-" + now + ".tprofile");
-        out = new BufferedWriter(new FileWriter(file));
+        out = IOUtils.newWriter(file);
       } catch (IOException e) {
         log.error("Not expected", e);
       }

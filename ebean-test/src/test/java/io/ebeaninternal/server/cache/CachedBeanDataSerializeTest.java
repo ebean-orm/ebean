@@ -11,6 +11,7 @@ import org.tests.model.basic.ResetBasicData;
 import org.tests.model.basic.TBytesOnly;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -94,7 +95,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
 
     TBytesOnly bean = new TBytesOnly();
     bean.setId(42);
-    bean.setContent(stringContent.getBytes("UTF-8"));
+    bean.setContent(stringContent.getBytes(StandardCharsets.UTF_8));
 
     BeanDescriptor<TBytesOnly> desc = getBeanDescriptor(TBytesOnly.class);
     CachedBeanData extract = CachedBeanDataFromBean.extract(desc, (EntityBean) bean);

@@ -32,7 +32,7 @@ public final class SimpleAesEncryptor implements Encryptor {
   }
 
   private IvParameterSpec getIvParameterSpec(String initialVector) {
-    return new IvParameterSpec(initialVector.getBytes());
+    return new IvParameterSpec(initialVector.getBytes(StandardCharsets.UTF_8));
   }
 
   @Override

@@ -8,6 +8,7 @@ import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
+import io.ebean.util.IOUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -75,14 +76,14 @@ abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
       try {
         if (keepSource) {
           StringWriter jsonBuffer = new StringWriter();
-          try (InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+          try (Reader streamReader = IOUtils.newReader(is)) {
             transferTo(streamReader, jsonBuffer);
           }
           String rawJson = jsonBuffer.toString();
           reader.pushJson(rawJson);
           return parse(rawJson);
         } else {
-          try (InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+          try (Reader streamReader = IOUtils.newReader(is)) {
             return parse(streamReader);
           }
         }
