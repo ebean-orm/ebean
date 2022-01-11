@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.model;
 
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.util.IOUtils;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -14,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
@@ -70,16 +70,16 @@ public class PlatformDdlWriter {
    */
   protected void writePlatformDdl(DdlWrite write, File resourcePath, String fullVersion) throws IOException {
     if (!write.isApplyEmpty()) {
-      try (FileWriter applyWriter = createWriter(resourcePath, fullVersion, ".sql")) {
+      try (Writer applyWriter = createWriter(resourcePath, fullVersion, ".sql")) {
         writeApplyDdl(applyWriter, write);
         applyWriter.flush();
       }
     }
   }
 
-  protected FileWriter createWriter(File path, String fullVersion, String suffix) throws IOException {
+  protected Writer createWriter(File path, String fullVersion, String suffix) throws IOException {
     File applyFile = new File(path, fullVersion + suffix);
-    return new FileWriter(applyFile);
+    return IOUtils.newWriter(applyFile);
   }
 
   /**

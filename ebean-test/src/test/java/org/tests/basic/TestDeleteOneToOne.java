@@ -8,13 +8,15 @@ import org.tests.model.basic.PersistentFileContent;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.nio.charset.StandardCharsets;
+
 public class TestDeleteOneToOne extends BaseTestCase {
 
   @Test
   public void testCreateDeletePersistentFile() {
 
     PersistentFile persistentFile = new PersistentFile("test.txt", new PersistentFileContent(
-      "test".getBytes()));
+      "test".getBytes(StandardCharsets.UTF_8)));
 
     DB.save(persistentFile);
     Integer id = persistentFile.getId();

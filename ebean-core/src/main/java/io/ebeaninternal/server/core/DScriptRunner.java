@@ -3,13 +3,13 @@ package io.ebeaninternal.server.core;
 import io.ebean.ScriptRunner;
 import io.ebean.ddlrunner.DdlRunner;
 import io.ebean.ddlrunner.ScriptTransform;
+import io.ebean.util.IOUtils;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.util.UrlHelper;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
 import java.net.URL;
@@ -66,8 +66,9 @@ final class DScriptRunner implements ScriptRunner {
       throw new IllegalArgumentException("resource is null?");
     }
 
-    try (InputStream inputStream = UrlHelper.openNoCache(resource)) {
-      return readContent(new InputStreamReader(inputStream));
+    try (InputStream inputStream = UrlHelper.openNoCache(resource);
+        Reader reader = IOUtils.newReader(inputStream)) {
+      return readContent(reader);
 
     } catch (IOException e) {
       throw new PersistenceException("Failed to read script content", e);

@@ -8,12 +8,14 @@ import org.tests.model.basic.PFileContent;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.nio.charset.StandardCharsets;
+
 public class TestDeleteImportedPartial extends BaseTestCase {
 
   @Test
   public void test() {
 
-    PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
+    PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes(StandardCharsets.UTF_8)));
 
     DB.save(persistentFile);
     Integer id = persistentFile.getId();

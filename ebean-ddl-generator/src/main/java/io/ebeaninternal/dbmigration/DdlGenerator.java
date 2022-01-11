@@ -5,6 +5,7 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.ddlrunner.DdlRunner;
 import io.ebean.ddlrunner.ScriptTransform;
+import io.ebean.util.IOUtils;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiDdlGenerator;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -17,13 +18,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
 import java.io.Reader;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -268,7 +267,7 @@ public class DdlGenerator implements SpiDdlGenerator {
         if (is == null) {
           log.warn("sql script {} was not found as a resource", sqlScript);
         } else {
-          String content = readContent(new InputStreamReader(is));
+          String content = readContent(IOUtils.newReader(is)); // 'is' is closed
           runScript(connection, false, content, sqlScript);
         }
       }
@@ -337,7 +336,7 @@ public class DdlGenerator implements SpiDdlGenerator {
 
   protected void writeFile(String fileName, String fileContent) throws IOException {
     File f = new File(baseDir, fileName);
-    try (FileWriter fw = new FileWriter(f)) {
+    try (Writer fw = IOUtils.newWriter(f)) {
       fw.write(fileContent);
       fw.flush();
     }
@@ -348,7 +347,9 @@ public class DdlGenerator implements SpiDdlGenerator {
     if (!f.exists()) {
       return null;
     }
-    return readContent(new FileReader(f));
+    try (Reader reader = IOUtils.newReader(f)) {
+      return readContent(reader);
+    }
   }
 
   protected String readContent(Reader reader) throws IOException {

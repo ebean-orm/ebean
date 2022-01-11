@@ -18,7 +18,7 @@ import java.util.Locale;
  * try {
  *   File f = new File("src/test/resources/test1.csv");
  *
- *   FileReader reader = new FileReader(f);
+ *   FileReader reader = new FileReader(f, encoding);
  *
  *   CsvReader<Customer> csvReader = DB.createCsvReader(Customer.class);
  *
