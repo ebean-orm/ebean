@@ -8,12 +8,12 @@ import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.text.TextException;
+import io.ebean.util.IOUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
@@ -68,7 +68,7 @@ abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
       if (is == null) {
         return null;
       }
-      try (InputStreamReader reader = new InputStreamReader(is)) {
+      try (Reader reader = IOUtils.newReader(is)) {
         return parse(reader);
       } catch (IOException e) {
         throw new SQLException("Error reading Blob stream from DB", e);

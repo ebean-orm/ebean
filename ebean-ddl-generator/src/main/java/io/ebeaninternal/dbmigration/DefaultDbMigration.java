@@ -1,8 +1,22 @@
 package io.ebeaninternal.dbmigration;
 
+import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringJoiner;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.Platform;
+import io.ebean.config.ClassLoadConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.PlatformConfig;
@@ -27,6 +41,8 @@ import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebean.dbmigration.DbMigration;
+import io.ebean.util.IOUtils;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
@@ -42,17 +58,6 @@ import io.ebeaninternal.dbmigration.model.PlatformDdlWriter;
 import io.ebeaninternal.extraddl.model.DdlScript;
 import io.ebeaninternal.extraddl.model.ExtraDdl;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 
 /**
  * Generates DB Migration xml and sql scripts.
@@ -417,7 +422,7 @@ public class DefaultDbMigration implements DbMigration {
     String fullName = repeatableMigrationName(script.isInit(), script.getName());
     logger.debug("writing repeatable script {}", fullName);
     File file = new File(migrationDir, fullName);
-    try (FileWriter writer = new FileWriter(file)) {
+    try (Writer writer = IOUtils.newWriter(file)) {
       writer.write(script.getValue());
       writer.flush();
     }

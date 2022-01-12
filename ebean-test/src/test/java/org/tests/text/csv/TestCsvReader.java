@@ -3,27 +3,25 @@ package org.tests.text.csv;
 import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 import io.ebean.text.csv.CsvReader;
+import io.ebean.util.IOUtils;
+
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.Reader;
 import java.net.URL;
 import java.util.Locale;
 
 public class TestCsvReader extends TransactionalTestCase {
 
   @Test
-  public void test() {
+  public void test() throws Exception {
 
     ResetBasicData.reset();
 
-    try {
-      URL resource = TestCsvReaderWithCallback.class.getResource("/test1.csv");
-      File f = new File(resource.getFile());
-
-      FileReader reader = new FileReader(f);
+    URL resource = TestCsvReaderWithCallback.class.getResource("/test1.csv");
+    try (Reader reader =  IOUtils.newReader(resource.openStream())){
 
       CsvReader<Customer> csvReader = DB.getDefault().createCsvReader(Customer.class);
 
@@ -39,9 +37,7 @@ public class TestCsvReader extends TransactionalTestCase {
       csvReader.addProperty("billingAddress.country.code");
 
       csvReader.process(reader);
-
-    } catch (Exception e) {
-      throw new RuntimeException(e);
+  
     }
   }
 

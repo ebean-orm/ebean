@@ -4,23 +4,21 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.ModifyAwareType;
 import io.ebean.text.json.EJson;
+import io.ebean.util.IOUtils;
 import io.ebeaninternal.json.ModifyAwareMap;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EJsonTests {
-
-  private static final Logger log = LoggerFactory.getLogger(EJsonTests.class);
 
   @Test
   public void test_map_simple() throws IOException {
@@ -46,15 +44,13 @@ public class EJsonTests {
   public void write_withWriter_expect_writerNotClosed() throws IOException {
 
     File temp = Files.createTempFile("some", ".json").toFile();
-    FileWriter writer = new FileWriter(temp);
-    Map<String,Object> map = new LinkedHashMap<>();
-    map.put("foo", "bar");
-    EJson.write(map, writer);
-    writer.write("The end.");
-    writer.flush();
-    writer.close();
-
-    log.info("write to file {}", temp.getAbsolutePath());
+    try (Writer writer = IOUtils.newWriter(temp)) {
+      Map<String, Object> map = new LinkedHashMap<>();
+      map.put("foo", "bar");
+      EJson.write(map, writer);
+      writer.write("The end.");
+    }
+    assertThat(temp).hasContent("{\"foo\":\"bar\"}The end.");
   }
 
   @Test
