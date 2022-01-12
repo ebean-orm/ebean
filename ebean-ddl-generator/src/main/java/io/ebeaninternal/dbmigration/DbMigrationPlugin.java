@@ -37,7 +37,7 @@ public class DbMigrationPlugin implements Plugin {
         lastInit = dbMigration.generateInitMigration();
       }
     } catch (IOException e) {
-      throw new RuntimeException("Error while generating migration");
+      throw new RuntimeException("Error while generating migration", e);
     }
   }
 

@@ -13,6 +13,7 @@ import java.util.StringJoiner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.avaje.classpath.scanner.core.Location;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.Platform;
@@ -863,7 +864,8 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   private String migrationPath(boolean initMigration) {
-    return initMigration ? migrationInitPath : migrationPath;
+    // remove classpath: or filesystem: prefix
+    return new Location(initMigration ? migrationInitPath : migrationPath).path();
   }
 
   /**
