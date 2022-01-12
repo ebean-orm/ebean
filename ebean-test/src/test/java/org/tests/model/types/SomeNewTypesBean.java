@@ -7,6 +7,7 @@ import javax.persistence.Version;
 import java.nio.file.Path;
 import java.sql.Date;
 import java.time.*;
+import java.util.Calendar;
 
 @Entity
 public class SomeNewTypesBean {
@@ -57,6 +58,8 @@ public class SomeNewTypesBean {
   Period period;
 
   Duration duration;
+
+  Calendar calendar;
 
   public Long getId() {
     return id;
@@ -216,5 +219,13 @@ public class SomeNewTypesBean {
 
   public void setDuration(Duration duration) {
     this.duration = duration;
+  }
+
+  public Calendar getCalendar() {
+    return calendar;
+  }
+
+  public void setCalendar(final Calendar calendar) {
+    this.calendar = calendar;
   }
 }
