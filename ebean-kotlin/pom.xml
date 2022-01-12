@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.14.1-FOC3-SNAPSHOT</version>
+    <version>12.14.1-FOC3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.14.1-FOC3-SNAPSHOT</version>
+      <version>12.14.1-FOC3</version>
       <scope>provided</scope>
     </dependency>
 
@@ -49,7 +49,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.14.1-FOC3-SNAPSHOT</version>
+      <version>12.14.1-FOC3</version>
       <scope>test</scope>
     </dependency>
 
