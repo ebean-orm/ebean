@@ -201,7 +201,7 @@ public class DefaultDbMigration implements DbMigration {
         // parse platform as enum value
         Platform platform = Enum.valueOf(Platform.class, platformName.toUpperCase());
         if (prefix == null) {
-          prefix = platform.base().name().toLowerCase();
+          prefix = platform.name().toLowerCase();
         }
         addPlatform(platform, prefix);
       } else {
@@ -846,15 +846,20 @@ public class DefaultDbMigration implements DbMigration {
    * Return the file path to write the xml and sql to.
    */
   File migrationDirectory(boolean initMigration) {
-    // path to src/main/resources in typical maven project
-    File resourceRootDir = new File(pathToResources);
-    if (!resourceRootDir.exists()) {
-      String msg = String.format("Error - path to resources %s does not exist. Absolute path is %s", pathToResources, resourceRootDir.getAbsolutePath());
-      throw new UnknownResourcePathException(msg);
-    }
-    String resourcePath = migrationPath(initMigration);
+    Location resourcePath = migrationPath(initMigration);
     // expect to be a path to something like - src/main/resources/dbmigration
-    File path = new File(resourceRootDir, resourcePath);
+    File path;
+    if (resourcePath.isClassPath()) {
+      // path to src/main/resources in typical maven project
+      File resourceRootDir = new File(pathToResources);
+      if (!resourceRootDir.exists()) {
+        String msg = String.format("Error - path to resources %s does not exist. Absolute path is %s", pathToResources, resourceRootDir.getAbsolutePath());
+        throw new UnknownResourcePathException(msg);
+      }
+      path = new File(resourceRootDir, resourcePath.path());
+    } else {
+      path = new File(resourcePath.path());
+    }
     if (!path.exists()) {
       if (!path.mkdirs()) {
         logInfo("Warning - Unable to ensure migration directory exists at %s", path.getAbsolutePath());
@@ -863,9 +868,9 @@ public class DefaultDbMigration implements DbMigration {
     return path;
   }
 
-  private String migrationPath(boolean initMigration) {
+  private Location migrationPath(boolean initMigration) {
     // remove classpath: or filesystem: prefix
-    return new Location(initMigration ? migrationInitPath : migrationPath).path();
+    return new Location(initMigration ? migrationInitPath : migrationPath);
   }
 
   /**
