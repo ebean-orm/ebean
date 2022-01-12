@@ -67,7 +67,7 @@ final class DScriptRunner implements ScriptRunner {
     }
 
     try (InputStream inputStream = UrlHelper.openNoCache(resource);
-        Reader reader = IOUtils.newReader(inputStream)) {
+      Reader reader = IOUtils.newReader(inputStream)) {
       return readContent(reader);
 
     } catch (IOException e) {
