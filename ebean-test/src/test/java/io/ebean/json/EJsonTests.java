@@ -45,7 +45,6 @@ public class EJsonTests {
 
     File temp = Files.createTempFile("some", ".json").toFile();
     try (Writer writer = IOUtils.newWriter(temp)) {
-
       Map<String, Object> map = new LinkedHashMap<>();
       map.put("foo", "bar");
       EJson.write(map, writer);

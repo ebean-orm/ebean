@@ -15,6 +15,8 @@ import org.tests.model.ivo.converter.MoneyTypeConverter;
 import javax.persistence.EnumType;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -29,7 +31,6 @@ public class TestTypeManager extends BaseTestCase {
     DefaultTypeManager typeManager = createTypeManager();
 
     ScalarType<?> type = typeManager.createEnumScalarType(MyEnum.class, null);
-    typeManager.addEnumType(type, MyEnum.class);
 
     Object val = type.read(new DummyDataReader("A"));
     assertThat(val).isEqualTo(MyEnum.Aval);
@@ -131,6 +132,13 @@ public class TestTypeManager extends BaseTestCase {
     return new DefaultTypeManager(config, bootupClasses);
   }
 
+  @Test
+  public void testCalendar() throws SQLException {
+
+    DefaultTypeManager typeManager = createTypeManager();
+    ScalarType<?> typeB = typeManager.getScalarType(GregorianCalendar.class);
+    assertThat(typeB).isInstanceOf(ScalarTypeCalendar.class);
+  }
   /**
    * Test double DataReader implementation.
    */
