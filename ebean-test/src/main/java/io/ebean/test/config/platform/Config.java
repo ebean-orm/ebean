@@ -4,8 +4,8 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -26,7 +26,6 @@ class Config {
   private final String db;
   private final String platform;
   private String dockerPlatform;
-
   private String databaseName;
 
   private final Properties properties;
@@ -231,9 +230,28 @@ class Config {
 
   void setUrl(String urlPattern) {
     String val = getPlatformKey("url", urlPattern);
+    val = val.replace("${host}", host());
     val = val.replace("${port}", String.valueOf(port));
     val = val.replace("${databaseName}", databaseName);
     this.url = val;
+  }
+
+  String host() {
+    String defaultHost = isInDocker() ? dockerHost() : "localhost";
+    return getPlatformKey("host", defaultHost);
+  }
+
+  static String dockerHost() {
+    String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+    if (os.contains("mac") || os.contains("darwin") || os.contains("win")) {
+      return "host.docker.internal";
+    } else {
+      return "172.17.0.1";
+    }
+  }
+
+  boolean isInDocker() {
+    return new File("/.dockerenv").exists();
   }
 
   /**

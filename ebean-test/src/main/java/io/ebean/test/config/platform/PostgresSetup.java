@@ -13,7 +13,7 @@ class PostgresSetup implements PlatformSetup {
     config.setDefaultPort(defaultPort);
     config.setUsernameDefault();
     config.setPasswordDefault();
-    config.setUrl("jdbc:postgresql://localhost:${port}/${databaseName}");
+    config.setUrl("jdbc:postgresql://${host}:${port}/${databaseName}");
 
     String schema = config.getSchema();
     if (schema != null && !schema.equals(config.getUsername())) {
@@ -44,7 +44,7 @@ class PostgresSetup implements PlatformSetup {
     config.setDefaultPort(defaultPort);
     config.setExtraUsernameDefault();
     config.setExtraDbPasswordDefault();
-    config.setUrl("jdbc:postgresql://localhost:${port}/${databaseName}");
+    config.setUrl("jdbc:postgresql://${host}:${port}/${databaseName}");
     config.setDriver("org.postgresql.Driver");
     config.extraDatasourceDefaults();
   }
