@@ -26,7 +26,7 @@ public class DbRunMigrationPlugin implements Plugin {
         migrationRunner.setDefaultDbSchema(dbSchema);
       }
       migrationRunner.setName(config.getName());
-      migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().name().toLowerCase());
+      migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
       migrationRunner.loadProperties(config.getProperties());
     }
   }
