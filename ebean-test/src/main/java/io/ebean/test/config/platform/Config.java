@@ -4,8 +4,8 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.File;
+import java.util.Locale;
 import java.util.Properties;
 
 /**
@@ -26,11 +26,9 @@ class Config {
   private final String db;
   private final String platform;
   private String dockerPlatform;
-
   private String databaseName;
 
   private final Properties properties;
-
   private int port;
 
   private String url;
@@ -38,12 +36,10 @@ class Config {
   private String schema;
   private String username;
   private String password;
-
   private final DatabaseConfig config;
-
   private boolean containerDropCreate;
-
   private final Properties dockerProperties = new Properties();
+  private final DockerHost dockerHost = new DockerHost();
 
   Config(String db, String platform, String databaseName, DatabaseConfig config) {
     this.db = db;
@@ -231,9 +227,15 @@ class Config {
 
   void setUrl(String urlPattern) {
     String val = getPlatformKey("url", urlPattern);
+    val = val.replace("${host}", host());
     val = val.replace("${port}", String.valueOf(port));
     val = val.replace("${databaseName}", databaseName);
     this.url = val;
+  }
+
+  String host() {
+    String explicitDockerHost = getKey("dockerHost", null);
+    return getKey("host", dockerHost.dockerHost(explicitDockerHost));
   }
 
   /**
@@ -322,7 +324,6 @@ class Config {
   void setDockerVersion(String version) {
     String val = getPlatformKey("version", version);
     dockerProperties.setProperty(dockerKey("version"), val);
-
     if (containerDropCreate) {
       dockerProperties.setProperty(dockerKey("startMode"), "dropCreate");
     }
@@ -369,7 +370,10 @@ class Config {
   }
 
   private void initDockerProperties() {
-
+    if (dockerHost.runningInDocker()) {
+      // tell ebean-docker-test we are not using localhost (for jdbc DB setup commands)
+      dockerProperties.setProperty(dockerKey("host"), dockerHost.dockerHost());
+    }
     dockerProperties.setProperty(dockerKey("port"), String.valueOf(port));
     dockerProperties.setProperty(dockerKey("dbName"), databaseName);
     if (schema != null) {
