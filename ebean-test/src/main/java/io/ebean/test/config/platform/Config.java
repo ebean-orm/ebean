@@ -29,7 +29,6 @@ class Config {
   private String databaseName;
 
   private final Properties properties;
-
   private int port;
 
   private String url;
@@ -37,12 +36,10 @@ class Config {
   private String schema;
   private String username;
   private String password;
-
   private final DatabaseConfig config;
-
   private boolean containerDropCreate;
-
   private final Properties dockerProperties = new Properties();
+  private final DockerHost dockerHost = new DockerHost();
 
   Config(String db, String platform, String databaseName, DatabaseConfig config) {
     this.db = db;
@@ -237,21 +234,8 @@ class Config {
   }
 
   String host() {
-    String defaultHost = isInDocker() ? dockerHost() : "localhost";
-    return getPlatformKey("host", defaultHost);
-  }
-
-  static String dockerHost() {
-    String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-    if (os.contains("mac") || os.contains("darwin") || os.contains("win")) {
-      return "host.docker.internal";
-    } else {
-      return "172.17.0.1";
-    }
-  }
-
-  boolean isInDocker() {
-    return new File("/.dockerenv").exists();
+    String explicitDockerHost = getKey("dockerHost", null);
+    return getKey("host", dockerHost.dockerHost(explicitDockerHost));
   }
 
   /**
@@ -340,7 +324,6 @@ class Config {
   void setDockerVersion(String version) {
     String val = getPlatformKey("version", version);
     dockerProperties.setProperty(dockerKey("version"), val);
-
     if (containerDropCreate) {
       dockerProperties.setProperty(dockerKey("startMode"), "dropCreate");
     }
@@ -387,7 +370,10 @@ class Config {
   }
 
   private void initDockerProperties() {
-
+    if (dockerHost.runningInDocker()) {
+      // tell ebean-docker-test we are not using localhost (for jdbc DB setup commands)
+      dockerProperties.setProperty(dockerKey("host"), dockerHost.dockerHost());
+    }
     dockerProperties.setProperty(dockerKey("port"), String.valueOf(port));
     dockerProperties.setProperty(dockerKey("dbName"), databaseName);
     if (schema != null) {
