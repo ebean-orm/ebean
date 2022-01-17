@@ -34,11 +34,9 @@ public class OraclePlatform extends DatabasePlatform {
     dbIdentity.setSupportsSequence(true);
     dbIdentity.setSupportsIdentity(true);
     dbIdentity.setSupportsGetGeneratedKeys(true);
-
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("current_timestamp");
-
     this.treatEmptyStringsAsNull = true;
     this.likeClauseRaw = "like ?";
 
@@ -55,7 +53,6 @@ public class OraclePlatform extends DatabasePlatform {
 
     booleanDbType = Types.INTEGER;
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("number(1)"));
-
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("number", 10));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("number", 19));
     dbTypeMap.put(DbType.REAL, new DbPlatformType("number", 19, 4));
@@ -64,12 +61,10 @@ public class OraclePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("number", 3));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("number", 16, 3));
     dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar2", 255));
-
     dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("blob"));
     dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("clob"));
     dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("raw", 255));
     dbTypeMap.put(DbType.BINARY, new DbPlatformType("raw", 255));
-
     dbTypeMap.put(DbType.TIME, new DbPlatformType("timestamp"));
   }
 
