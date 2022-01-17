@@ -10,11 +10,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestElementCollectionEmbeddedListCache2 extends BaseTestCase {
+class TestElementCollectionEmbeddedListCache2 extends BaseTestCase {
 
-  @Disabled
   @Test
-  public void test() {
+  void test() {
 
     EcblPerson2 person = new EcblPerson2();
     person.setName("CacheL");
