@@ -26,7 +26,7 @@ public class TestDefaults extends BaseTestCase {
     final List<String> current = LoggedSql.collect();
 
     assertThat(current).isNotEmpty();
-    if (isMySql() || isMariaDB()) {
+    if (isMySql() || isMariaDB() || isOracle()) {
       assertThat(current.get(0)).contains("insert into defaults_model_draft values (default);");
     } else if (isSqlServer()) {
       assertThat(current.get(0)).contains("insert into defaults_model_draft (id) values (?)");
