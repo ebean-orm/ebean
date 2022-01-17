@@ -13,6 +13,7 @@ import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
 import io.ebean.config.dbplatform.oracle.Oracle11Platform;
+import io.ebean.config.dbplatform.oracle.Oracle12Platform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;
 import io.ebean.config.dbplatform.postgres.Postgres9Platform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
@@ -25,11 +26,7 @@ import io.ebeaninternal.api.DbOffline;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * Create a DatabasePlatform from the configuration.
@@ -86,6 +83,9 @@ public class DatabasePlatformFactory {
     }
     if (dbName.equals("oracle11") || dbName.equals("oracle10") || dbName.equals("oracle9")) {
       return new Oracle11Platform();
+    }
+    if (dbName.equals("oracle12")) {
+      return new Oracle12Platform();
     }
     if (dbName.equals("oracle")) {
       return new OraclePlatform();
@@ -173,7 +173,13 @@ public class DatabasePlatformFactory {
   }
 
   private DatabasePlatform oracleVersion(int majorVersion) {
-    return majorVersion < 12 ? new Oracle11Platform() : new OraclePlatform();
+    if (majorVersion < 12) {
+      return new Oracle11Platform();
+    }
+    if (majorVersion < 13) {
+      return new Oracle12Platform();
+    }
+    return new OraclePlatform();
   }
 
   private DatabasePlatform mysqlVersion(int majorVersion, int minorVersion) {
