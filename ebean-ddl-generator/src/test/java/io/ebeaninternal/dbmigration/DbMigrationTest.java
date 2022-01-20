@@ -108,7 +108,7 @@ public class DbMigrationTest extends BaseTestCase {
 
     // Oracle caches the statement and does not detect schema change. It fails with
     // an ORA-01007
-    if (isOracle()) {
+    if (isOracle() || isDB2()) {
       result = server().sqlQuery("select * from migtest_e_basic order by id,id").findList();
     } else {
       result = server().sqlQuery("select * from migtest_e_basic order by id").findList();

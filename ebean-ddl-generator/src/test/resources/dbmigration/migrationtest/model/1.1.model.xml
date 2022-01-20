@@ -16,6 +16,10 @@
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="'A'" notnull="true" currentNotnull="false" checkConstraint="check ( status in ('N','A','I','?'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="status2" tableName="migtest_e_basic" type="varchar(127)" currentType="varchar(1)" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true" dropCheckConstraint="ck_migtest_e_basic_status2"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
+            <before platforms="db2">
+                <ddl>-- db2 does not support parial null indices :( - so we have to clean</ddl>
+                <ddl>update ${table} set status = 'N' where id = 1</ddl>
+            </before>
             <before>
                 <ddl>-- rename all collisions</ddl>
             </before>

@@ -35,9 +35,11 @@ import io.ebeaninternal.server.deploy.IdentityMode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static io.ebean.util.StringHelper.replace;
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
@@ -87,7 +89,11 @@ public class BaseTableDdl implements TableDdl {
    * columns have been added, removed, included or excluded.
    */
   protected final Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<>();
-
+  
+  private final Set<String> needsReorg = new HashSet<>();
+  
+  private int reorgCount;
+  
   private final boolean strictMode;
 
   private final HistorySupport historySupport;
@@ -144,25 +150,28 @@ public class BaseTableDdl implements TableDdl {
     void writeBefore(DdlBuffer buffer) throws IOException {
       if (!before.isEmpty()) {
         buffer.end();
+        flushReorgTables(buffer);
+        if (withHistory) {
+          buffer.append("-- NOTE: table has @History - special migration may be necessary").newLine();
+        }
+        for (String ddlScript : before) {
+          buffer.appendStatement(translate(ddlScript, tableName, columnName, defaultValue));
+        }
       }
 
-      if (!before.isEmpty() && withHistory) {
-        buffer.append("-- NOTE: table has @History - special migration may be necessary").newLine();
-      }
-      for (String ddlScript : before) {
-        buffer.appendStatement(translate(ddlScript, tableName, columnName, defaultValue));
-      }
     }
 
     void writeAfter(DdlBuffer buffer) throws IOException {
-      if (!after.isEmpty() && withHistory) {
-        buffer.append("-- NOTE: table has @History - special migration may be necessary").newLine();
-      }
-      // here we run post migration scripts
-      for (String ddlScript : after) {
-        buffer.appendStatement(translate(ddlScript, tableName, columnName, defaultValue));
-      }
       if (!after.isEmpty()) {
+        if (withHistory) {
+          buffer.append("-- NOTE: table has @History - special migration may be necessary").newLine();
+        }
+        flushReorgTables(buffer);
+        
+        // here we run post migration scripts
+        for (String ddlScript : after) {
+          buffer.appendStatement(translate(ddlScript, tableName, columnName, defaultValue));
+        }
         buffer.end();
       }
     }
@@ -577,6 +586,7 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, CreateIndex index) throws IOException {
     if (platformInclude(index.getPlatforms())) {
+      flushReorgTables(writer.apply());
       writer.apply().appendStatement(platformDdl.createIndex(new WriteCreateIndex(index)));
       writer.dropAll().appendStatement(platformDdl.dropIndex(index.getIndexName(), index.getTableName(), Boolean.TRUE.equals(index.isConcurrent())));
     }
@@ -585,6 +595,7 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, DropIndex dropIndex) throws IOException {
     if (platformInclude(dropIndex.getPlatforms())) {
+      flushReorgTables(writer.apply());
       writer.apply().appendStatement(platformDdl.dropIndex(dropIndex.getIndexName(), dropIndex.getTableName(), Boolean.TRUE.equals(dropIndex.isConcurrent())));
     }
   }
@@ -596,6 +607,7 @@ public class BaseTableDdl implements TableDdl {
         writer.apply().appendStatement(platformDdl.alterTableDropUniqueConstraint(constraint.getTableName(), constraint.getConstraintName()));
 
       } else {
+        flushReorgTables(writer.apply());
         String[] cols = split(constraint.getColumnNames());
         String[] nullableColumns = split(constraint.getNullableColumns());
         writer.apply().appendStatement(platformDdl.alterTableAddUniqueConstraint(constraint.getTableName(), constraint.getConstraintName(), cols, nullableColumns));
@@ -648,6 +660,7 @@ public class BaseTableDdl implements TableDdl {
       platformDdl.unlockTables(write.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
     }
     platformDdl.generateEpilog(write);
+    flushReorgTables(write.apply());
   }
 
   @Override
@@ -838,11 +851,13 @@ public class BaseTableDdl implements TableDdl {
 
   protected void alterColumnNotnull(DdlWrite writer, AlterColumn alter) throws IOException {
     writer.apply().appendStatement(platformDdl.alterColumnNotnull(alter.getTableName(), alter.getColumnName(), alter.isNotnull()));
+    needsReorg.add(alter.getTableName());
   }
 
   protected void alterColumnType(DdlWrite writer, AlterColumn alter) throws IOException {
     String ddl = platformDdl.alterColumnType(alter.getTableName(), alter.getColumnName(), alter.getType());
     if (hasValue(ddl)) {
+      needsReorg.add(alter.getTableName());
       writer.apply().appendStatement(ddl);
       if (isTrue(alter.isWithHistory()) && historySupport == HistorySupport.TRIGGER_BASED) {
         regenerateHistoryTriggers(alter.getTableName(), HistoryTableUpdate.Change.ALTER, alter.getColumnName());
@@ -884,6 +899,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
     platformDdl.alterTableDropColumn(buffer, tableName, columnName);
+    needsReorg.add(tableName);
   }
 
   protected void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, boolean withHistory) throws IOException {
@@ -901,6 +917,13 @@ public class BaseTableDdl implements TableDdl {
     if (!onHistoryTable) {
       help.writeAfter(buffer);
     }
+  }
+
+  protected void flushReorgTables(DdlBuffer buffer) throws IOException {
+    for (String table : needsReorg) {
+      buffer.appendStatement(platformDdl.reorgTable(table, ++reorgCount));
+    }
+    needsReorg.clear();
   }
 
   protected boolean isFalse(Boolean value) {

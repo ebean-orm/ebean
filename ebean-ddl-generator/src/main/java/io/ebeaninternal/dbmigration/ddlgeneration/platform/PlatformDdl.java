@@ -307,7 +307,7 @@ public class PlatformDdl {
    * Return the drop foreign key clause.
    */
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + alterTableIfExists + tableName + " " + dropConstraintIfExists + " " + maxConstraintName(fkName);
+    return "alter table " + alterTableIfExists + lowerTableName(tableName) + " " + dropConstraintIfExists + " " + maxConstraintName(fkName);
   }
 
   /**
@@ -772,4 +772,15 @@ public class PlatformDdl {
   public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
     // only supported by postgres initially
   }
+
+  /**
+   * Returns a statement to reorganize the table. This is required mainly for DB2.
+   * 
+   * @param table   the table name
+   * @param counter to make statements unique.
+   */
+  public String reorgTable(String table, int counter) {
+    return null;
+  }
+
 }

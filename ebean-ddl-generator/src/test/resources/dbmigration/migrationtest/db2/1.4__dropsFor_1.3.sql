@@ -29,6 +29,19 @@ alter table migtest_e_softdelete drop column deleted;
 alter table migtest_oto_child drop column master_id;
 
 drop table migtest_e_user;
-drop sequence migtest_e_user_seq;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and seqname = 'MIGTEST_E_USER_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_user_seq';
+  execute stmt;
+end if;
+end$$;
 drop table migtest_mtm_c_migtest_mtm_m;
 drop table migtest_mtm_m_migtest_mtm_c;
+call sysproc.admin_cmd('reorg table migtest_e_history2') /* reorg #1 */;
+call sysproc.admin_cmd('reorg table migtest_e_softdelete') /* reorg #2 */;
+call sysproc.admin_cmd('reorg table migtest_oto_child') /* reorg #3 */;
+call sysproc.admin_cmd('reorg table migtest_ckey_parent') /* reorg #4 */;
+call sysproc.admin_cmd('reorg table migtest_e_history5') /* reorg #5 */;
+call sysproc.admin_cmd('reorg table migtest_ckey_detail') /* reorg #6 */;
+call sysproc.admin_cmd('reorg table migtest_e_basic') /* reorg #7 */;

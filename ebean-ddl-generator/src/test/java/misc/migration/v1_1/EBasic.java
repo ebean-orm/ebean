@@ -5,6 +5,7 @@ import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
+import io.ebean.annotation.Platform;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -59,10 +60,11 @@ public class EBasic {
   @Size(max=127)
   String name;
 
-
+  @DbMigration(preAlter = { "-- db2 does not support parial null indices :( - so we have to clean",
+      "update ${table} set status = 'N' where id = 1" }, platforms = Platform.DB2)
   @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)
-  @Size(max=127)
+  @Size(max = 127)
   String description;
 
   //@NotNull

@@ -51,6 +51,10 @@ public abstract class BaseTestCase {
   public boolean isSqlServer() {
     return Platform.SQLSERVER == platform();
   }
+  
+  public boolean isDB2() {
+    return Platform.DB2 == platform();
+  }
 
   public boolean isH2() {
     return Platform.H2 == platform();
