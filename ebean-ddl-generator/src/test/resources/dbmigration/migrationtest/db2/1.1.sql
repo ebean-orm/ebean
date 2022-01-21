@@ -67,7 +67,6 @@ alter table migtest_e_basic alter column status2 drop not null;
 call sysproc.admin_cmd('reorg table migtest_e_basic') /* reorg #1 */;
 -- db2 does not support parial null indices :( - so we have to clean;
 update migtest_e_basic set status = 'N' where id = 1;
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_description on migtest_e_basic(description) exclude null keys;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
@@ -111,13 +110,9 @@ if exists (select indname from syscat.indexes where indschema = current_schema a
   execute stmt;
 end if;
 end$$;
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_status_indextest1 on migtest_e_basic(status,indextest1) exclude null keys;
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_name on migtest_e_basic(name) exclude null keys;
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) exclude null keys;
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) exclude null keys;
 delimiter $$
 begin

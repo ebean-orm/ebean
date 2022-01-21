@@ -5,7 +5,6 @@ create table migtest_e_ref (
   name                          varchar(127) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
--- alterTableAddUniqueConstraint 
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 
 delimiter $$
@@ -156,9 +155,7 @@ if exists (select indname from syscat.indexes where indschema = current_schema a
 end if;
 end$$;
 call sysproc.admin_cmd('reorg table migtest_e_basic') /* reorg #3 */;
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) exclude null keys;
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) exclude null keys;
 delimiter $$
 begin

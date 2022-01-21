@@ -75,9 +75,7 @@ create table migtest_e_basic (
   constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I')),
   constraint pk_migtest_e_basic primary key (id)
 );
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) exclude null keys;
--- alterTableAddUniqueConstraint 
 create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) exclude null keys;
 
 create table migtest_e_enum (
@@ -131,7 +129,6 @@ create table migtest_e_ref (
   name                          varchar(127) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
--- alterTableAddUniqueConstraint 
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 
 create table migtest_e_softdelete (

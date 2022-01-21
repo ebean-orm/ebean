@@ -28,6 +28,11 @@ public interface STreeProperty extends ScalarDataReader<Object> {
    * Return true if the property is the Id.
    */
   boolean isId();
+  
+  /**
+   * Returns true, if this is a lob property.
+   */
+  boolean isDbLob();
 
   /**
    * Return true if the property is an embedded type.

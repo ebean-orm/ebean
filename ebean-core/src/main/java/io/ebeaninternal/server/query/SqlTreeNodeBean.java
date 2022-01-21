@@ -4,7 +4,9 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
+import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarDataReader;
+import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
@@ -15,6 +17,7 @@ import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,8 +39,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Set to true if this is a partial object fetch.
    */
-  private final boolean partialObject;
-  private final STreeProperty[] properties;
+  private boolean partialObject;
+  private STreeProperty[] properties;
   /**
    * Extra where clause added by Where annotation on associated many.
    */
@@ -695,6 +698,34 @@ class SqlTreeNodeBean implements SqlTreeNode {
   public boolean hasMany() {
     for (SqlTreeNode child : children) {
       if (child.hasMany()) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+  @Override
+  public void unselectLobs() {
+    if (children != null) {
+      for (SqlTreeNode child : children) {
+        child.unselectLobs();
+      }
+    }
+    if (hasLob()) {
+      List<STreeProperty> lst = new ArrayList<>();
+      for (STreeProperty prop : properties) {
+        if (!prop.isDbLob()) {
+          lst.add(prop);
+        }
+      }
+      properties = lst.toArray(new STreeProperty[0]);
+      partialObject = true;
+    }
+  }
+  
+  private boolean hasLob() {
+    for (STreeProperty prop : properties) {
+      if (prop.isDbLob()) {
         return true;
       }
     }
