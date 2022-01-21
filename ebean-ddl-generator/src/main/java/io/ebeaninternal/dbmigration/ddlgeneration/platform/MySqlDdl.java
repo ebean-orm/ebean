@@ -18,12 +18,15 @@ public class MySqlDdl extends PlatformDdl {
   // this flag is for compatibility. Use it with care.
   private static final boolean USE_CHECK_CONSTRAINT = Boolean.getBoolean("ebean.mysql.useCheckConstraint");
 
+  private final boolean useMigrationStoredProcedures;
+
   public MySqlDdl(DatabasePlatform platform) {
     super(platform);
     this.alterColumn = "modify";
     this.dropUniqueConstraint = "drop index";
     this.historyDdl = new MySqlHistoryDdl();
     this.inlineComments = true;
+    this.useMigrationStoredProcedures = platform.isUseMigrationStoredProcedures();
   }
 
   /**
@@ -32,6 +35,15 @@ public class MySqlDdl extends PlatformDdl {
   @Override
   public String dropIndex(String indexName, String tableName, boolean concurrent) {
     return "drop index " + maxConstraintName(indexName) + " on " + tableName;
+  }
+
+  @Override
+  public void alterTableDropColumn(final DdlBuffer buffer, final String tableName, final String columnName) throws IOException {
+    if (this.useMigrationStoredProcedures) {
+      buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
+    } else {
+      super.alterTableDropColumn(buffer, tableName, columnName);
+    }
   }
 
   /**
