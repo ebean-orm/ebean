@@ -212,7 +212,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     if (extraDdl && jaxbPresent) {
       if (currentModel().isTablePartitioning()) {
         String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(platform);
-        if (extraPartitioning != null && !extraPartitioning.isEmpty()  && useMigrationStoredProcedures) {
+        if (extraPartitioning != null && !extraPartitioning.isEmpty()) {
           runScript(connection, false, extraPartitioning, "builtin-partitioning-ddl");
         }
       }
