@@ -92,4 +92,9 @@ interface SqlTreeNode {
    * Add dependent tables to the given set.
    */
   void dependentTables(Set<String> tables);
+
+  /**
+   * Unselect lobs (for distinct queries on DB2 and Oracle).
+   */
+  default void unselectLobs() {};
 }

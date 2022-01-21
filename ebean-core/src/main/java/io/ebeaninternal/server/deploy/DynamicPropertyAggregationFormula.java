@@ -62,4 +62,9 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
     ctx.appendParseSelect(parsedFormula, alias);
   }
 
+  @Override
+  public boolean isDbLob() {
+    return false;
+  }
+
 }

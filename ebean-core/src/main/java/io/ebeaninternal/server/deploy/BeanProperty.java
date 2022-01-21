@@ -1160,7 +1160,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public boolean isLob() {
     return lob;
   }
-
+  
+  public boolean isDbLob() {
+    return lob || dbType == DbPlatformType.JSON && dbLength == 0;
+  }
+  
   public static boolean isLobType(int type) {
     switch (type) {
       case Types.CLOB:
