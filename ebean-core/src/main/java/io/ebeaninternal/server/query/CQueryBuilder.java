@@ -760,6 +760,10 @@ final class CQueryBuilder {
     return dbPlatform.isPlatform(Platform.POSTGRES);
   }
 
+  boolean isPlatformDistinctNoLobs() {
+    return dbPlatform.isPlatform(Platform.DB2); // CHECKME: Also oracle?
+  }
+
   /**
    * Return the 'for update' FROM hint (sql server).
    */
