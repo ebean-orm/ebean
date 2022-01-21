@@ -397,19 +397,25 @@ public class DefaultDbMigration implements DbMigration {
   private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform, boolean tablePartitioning) throws IOException {
     if (dbPlatform != null) {
       if (tablePartitioning && includeBuiltInPartitioning) {
-        generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltinTablePartitioning());
+        generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltinTablePartitioning(), true);
       }
-      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin());
-      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.read());
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin(), true);
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.read(), false);
     }
   }
 
-  private void generateExtraDdlFor(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl) throws IOException {
+  private void generateExtraDdlFor(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl, boolean isBuiltin) throws IOException {
     if (extraDdl != null) {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
         if (!script.isDrop() && matchPlatform(dbPlatform.getPlatform(), script.getPlatforms())) {
-          writeExtraDdl(migrationDir, script);
+          if (script.isInit()) {
+            if (!isBuiltin || dbPlatform.isUseMigrationStoredProcedures()) {
+              writeExtraDdl(migrationDir, script);
+            }
+          } else {
+            writeExtraDdl(migrationDir, script);
+          }
         }
       }
     }
