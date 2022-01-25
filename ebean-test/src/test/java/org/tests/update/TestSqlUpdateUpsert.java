@@ -39,7 +39,7 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
       .setParameter("online", false);
 
     Object key2 = sqlUpdate2.executeGetKey();
-    assertThat(key2).isNull();
+    assertThat(key2).isEqualTo(key);
 
 
     EPersonOnline found2 = DB.find(EPersonOnline.class).where().eq("email", email).findOne();
