@@ -1,7 +1,10 @@
 
 name: SqlServer 2017 latest
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '10 7 * * 2,5'
 
 jobs:
   build:

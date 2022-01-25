@@ -1,7 +1,10 @@
 
 name: MariaDB 10.6
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '10 7 * * 1,4'
 
 jobs:
   build:

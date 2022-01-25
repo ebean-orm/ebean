@@ -8,16 +8,18 @@ import org.tests.model.basic.PFileContent;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 
+import java.nio.charset.StandardCharsets;
+
 public class TestDeleteOneToOneMultiple extends BaseTestCase {
 
   @Test
   public void testCreateDeletePersistentFile() {
 
-    PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
+    PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes(StandardCharsets.UTF_8)));
 //    PFile persistentFile = new PFile();
 //    persistentFile.setName("test.txt");
 //    PFileContent content = new PFileContent();
-//    content.setContent("test".getBytes());
+//    content.setContent("test".getBytes(StandardCharsets.UTF_8));
 //    persistentFile.setFileContent(content);
 
     DB.save(persistentFile);

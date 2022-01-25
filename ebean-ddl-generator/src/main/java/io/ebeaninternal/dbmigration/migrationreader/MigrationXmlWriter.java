@@ -1,14 +1,15 @@
 package io.ebeaninternal.dbmigration.migrationreader;
 
 
+import io.ebean.util.IOUtils;
 import io.ebeaninternal.dbmigration.migration.Migration;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 
 /**
  * Simple writer for output of the Migration/ChangeSet as an XML document.
@@ -26,7 +27,7 @@ public class MigrationXmlWriter {
    */
   public void write(Migration migration, File file) {
 
-    try (FileWriter writer = new FileWriter(file)) {
+    try (Writer writer = IOUtils.newWriter(file)) {
 
       writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
       if (comment != null) {

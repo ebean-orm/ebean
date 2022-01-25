@@ -4,7 +4,12 @@ import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
 import org.tests.model.basic.TWithPreInsertCommon;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TWithPreInsertPersistAdapter extends BeanPersistAdapter {
+
+  public static List<String> cascadeDelete = new ArrayList<>();
 
   @Override
   public boolean isRegisterFor(Class<?> cls) {
@@ -32,4 +37,14 @@ public class TWithPreInsertPersistAdapter extends BeanPersistAdapter {
     return super.preUpdate(request);
   }
 
+  @Override
+  public boolean preDelete(BeanPersistRequest<?> request) {
+    TWithPreInsertCommon bean = (TWithPreInsertCommon) request.bean();
+    if (request.isCascade()) {
+      cascadeDelete.add(bean.getClass() + ":" + bean.getId());
+    } else {
+      bean.requestCascadeState(22);
+    }
+    return true;
+  }
 }

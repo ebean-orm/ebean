@@ -12,14 +12,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ParentQueryTest extends BaseTestCase {
+class ParentQueryTest extends BaseTestCase {
 
   @Test
-  public void QueryParentCollectionFetch() {
-
+  void queryParentCollectionFetch() {
     List<Data> exampleData = new ArrayList<>();
     exampleData.add(new Data(0));
     exampleData.add(new Data(1));
@@ -40,7 +38,7 @@ public class ParentQueryTest extends BaseTestCase {
     List<Parent> partial = DB.find(Parent.class).where().ge("val", 1001).findList();
     assertNotNull(partial.get(0).getData());
     assertThat(partial.get(0).getMore()).startsWith("PQT-");
-    assertEquals(partial.get(0).getData().get(0).getVal().intValue(), 0);
+    assertThat(partial.get(0).getData()).hasSize(3);
   }
 
 }

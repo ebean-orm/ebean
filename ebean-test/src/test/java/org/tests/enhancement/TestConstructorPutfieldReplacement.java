@@ -9,12 +9,14 @@ import org.tests.model.basic.PFileContent;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.nio.charset.StandardCharsets;
+
 public class TestConstructorPutfieldReplacement extends BaseTestCase {
 
   @Test
   public void test() {
 
-    PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes()));
+    PFile persistentFile = new PFile("test.txt", new PFileContent("test".getBytes(StandardCharsets.UTF_8)));
 
     EntityBean eb = (EntityBean) persistentFile;
     EntityBeanIntercept ebi = eb._ebean_getIntercept();

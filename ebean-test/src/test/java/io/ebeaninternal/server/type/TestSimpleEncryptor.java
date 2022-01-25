@@ -5,6 +5,7 @@ import io.ebean.config.EncryptKey;
 import org.junit.jupiter.api.Test;
 import org.tests.basic.encrypt.BasicEncryptKey;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +20,7 @@ public class TestSimpleEncryptor extends BaseTestCase {
 
     EncryptKey key = new BasicEncryptKey("hello");
 
-    byte[] data = "test123".getBytes();
+    byte[] data = "test123".getBytes(StandardCharsets.UTF_8);
 
     byte[] ecData = e.encrypt(data, key);
 

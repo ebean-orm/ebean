@@ -2,10 +2,11 @@ package io.ebeaninternal.dbmigration;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.migration.MigrationVersion;
+import io.ebean.util.IOUtils;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,17 +51,17 @@ class IndexMigration {
 
   private void generateIndex() throws IOException {
     Collections.sort(all);
-    FileWriter writer = new FileWriter(indexFile);
-    for (Entry entry : all) {
-      writeChecksumPadded(writer, entry.checksum);
-      writer.write(entry.fileName);
+    try (Writer writer = IOUtils.newWriter(indexFile)) {
+      for (Entry entry : all) {
+        writeChecksumPadded(writer, entry.checksum);
+        writer.write(entry.fileName);
+        writer.write(eol);
+      }
       writer.write(eol);
     }
-    writer.write(eol);
-    writer.close();
   }
 
-  private void writeChecksumPadded(FileWriter writer, int checksum) throws IOException {
+  private void writeChecksumPadded(Writer writer, int checksum) throws IOException {
     final String asStr = String.valueOf(checksum);
     writer.write(asStr);
     writer.write(',');

@@ -27,16 +27,17 @@ public class DatabaseConfigTest {
   @Test
   public void evalPropertiesInput() {
 
-    String home = System.getenv("HOME");
+    String home = System.getProperty("user.home");
+    String fileSeparator = System.getProperty("file.separator");
 
     Properties props = new Properties();
-    props.setProperty("ddl.initSql", "${HOME}/initSql");
+    props.setProperty("ddl.initSql", "${user.home}" + fileSeparator + "initSql");
 
     DatabaseConfig config = new DatabaseConfig();
     config.loadFromProperties(props);
 
     String ddlInitSql = config.getDdlInitSql();
-    assertThat(ddlInitSql).isEqualTo(home+"/initSql");
+    assertThat(ddlInitSql).isEqualTo(home + fileSeparator + "initSql");
   }
 
   @Test

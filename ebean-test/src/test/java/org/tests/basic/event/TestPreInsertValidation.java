@@ -6,6 +6,7 @@ import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TWithPreInsert;
 import org.tests.model.basic.TWithPreInsertChild;
+import org.tests.model.basic.event.TWithPreInsertPersistAdapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -27,6 +28,7 @@ class TestPreInsertValidation extends BaseTestCase {
     assertThat(e.requestCascadeState()).isEqualTo(2);
 
     TWithPreInsert e1 = DB.find(TWithPreInsert.class, e.getId());
+    assert e1 != null;
 
     e1.setTitle("Missus");
     DB.save(e1);
@@ -54,11 +56,21 @@ class TestPreInsertValidation extends BaseTestCase {
     assert e1 != null;
 
     e1.setTitle("ParentCascading-changed");
-    e1.children().get(0).setName("Child0-changed");
+    TWithPreInsertChild childBean = e1.children().get(0);
+    childBean.setName("Child0-changed");
     DB.save(e1);
 
     assertThat(e1.requestCascadeState()).isEqualTo(12);
-    assertThat(e1.children().get(0).requestCascadeState()).isEqualTo(11);
+    assertThat(childBean.requestCascadeState()).isEqualTo(11);
+
+    DB.delete(e1);
+
+    assertThat(e1.requestCascadeState()).isEqualTo(22);
+
+    // assert that isCascade() was true for the child bean
+    assertThat(TWithPreInsertPersistAdapter.cascadeDelete).hasSize(1);
+    String deleteCascade = TWithPreInsertPersistAdapter.cascadeDelete.get(0);
+    assertThat(deleteCascade).isEqualTo("class org.tests.model.basic.TWithPreInsertChild:1");
   }
 
   @Test
