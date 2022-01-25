@@ -1,13 +1,8 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Version;
-import io.ebean.bean.EntityBean;
-import io.ebean.core.type.ScalarDataReader;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
@@ -65,23 +60,9 @@ interface SqlTreeNode {
   void addSoftDeletePredicate(SpiQuery<?> query);
 
   /**
-   * Load the appropriate information from the SqlSelectReader.
-   * <p>
-   * At a high level this actually controls the reading of the data from the
-   * jdbc resultSet and putting it into the bean etc.
-   * </p>
-   */
-  EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean contextBean) throws SQLException;
-
-  /**
    * Return true if the query has a many join.
    */
   boolean hasMany();
-
-  /**
-   * Return the reader for the single attribute query.
-   */
-  ScalarDataReader<?> getSingleAttributeReader();
 
   /**
    * Return true if the query is known to only have a single property selected.
@@ -92,4 +73,9 @@ interface SqlTreeNode {
    * Add dependent tables to the given set.
    */
   void dependentTables(Set<String> tables);
+
+  /**
+   * Create the loader for this node.
+   */
+  SqlTreeLoad createLoad();
 }
