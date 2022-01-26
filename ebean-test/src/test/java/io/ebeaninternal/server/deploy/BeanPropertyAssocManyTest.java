@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
@@ -66,11 +67,13 @@ public class BeanPropertyAssocManyTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Object> customerIds = new ArrayList<>();
-    customerIds.add(1L);
-    customerIds.add(2L);
+    List<Long> ids = DB.find(Customer.class).orderBy("id").setMaxRows(2).findIds();
 
-    List<Object> contactIdsForOne = contacts().findIdsByParentId(1L, null, null, null, true);
+    List<Object> customerIds = new ArrayList<>();
+    customerIds.add(ids.get(0));
+    customerIds.add(ids.get(1));
+
+    List<Object> contactIdsForOne = contacts().findIdsByParentId(ids.get(0), null, null, null, true);
 
     List<Object> contactIdsForMultiple = contacts().findIdsByParentId(null, customerIds, null, null, true);
 

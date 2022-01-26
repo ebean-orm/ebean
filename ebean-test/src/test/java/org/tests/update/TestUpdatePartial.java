@@ -3,13 +3,20 @@ package org.tests.update;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestUpdatePartial extends BaseTestCase {
+
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
 
   @Test
   public void test() {

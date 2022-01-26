@@ -8,6 +8,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -22,6 +23,7 @@ public class TestBatchSaveWithGetBeanId extends BaseTestCase {
   @Test
   @IgnorePlatform(Platform.HANA) // HANA doesn't support insert batching
   public void test() {
+    ResetBasicData.reset();
 
     Database server = DB.getDefault();
     Customer model = new Customer();
