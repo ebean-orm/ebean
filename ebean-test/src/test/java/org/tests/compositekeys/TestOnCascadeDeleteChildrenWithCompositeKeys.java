@@ -1,8 +1,11 @@
 package org.tests.compositekeys;
 
 import io.ebean.BaseTestCase;
+import io.ebean.CountDistinctOrder;
 import io.ebean.DB;
+import io.ebean.Query;
 import io.ebean.annotation.Identity;
+import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -81,6 +85,44 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
 
     beanProperty.findIdsByParentId(null, ids, null, null, true);
     beanProperty.findIdsByParentId(1L, null, null, null, true);
+  }
+  
+  /**
+   * Test makes select and a select distinct of entities with composite keys.
+   */
+  @Test
+  public void testSelectDistinctCountWithCompositeKey() {
+
+    // first query with a simple findList
+    Query<UserRole> query1 = DB.find(UserRole.class);
+    query1.findList();
+
+    assertThat(query1.getGeneratedSql()).contains("select t0.user_id, t0.role_id, t0.user_id, t0.role_id from em_user_role t0");
+
+    // second query with count distinct
+    query1 = DB.find(UserRole.class);
+    query1.select("");
+    query1.fetch("user", "name");
+    query1.setDistinct(true).setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC).setMaxRows(20);
+    query1.findSingleAttributeList();
+
+    if (isH2() || isMariaDB() || isPostgres()) {
+      assertThat(query1.getGeneratedSql()).contains("select distinct r1.attribute_, count(*) from "
+          + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
+          + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
+          + "group by r1.attribute_ order by count(*) desc, r1.attribute_ limit 20");
+    } else if (isDb2()) {
+      assertThat(query1.getGeneratedSql()).contains("select distinct r1.attribute_, count(*) from "
+          + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
+          + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
+          + "group by r1.attribute_ order by count(*) desc, r1.attribute_ fetch next 20 rows only");
+    } else if (isSqlServer()) {
+      assertThat(query1.getGeneratedSql()).contains("select distinct top 20 r1.attribute_, count(*) "
+          + "from (select distinct t0.user_id, t0.role_id, t1.name as attribute_ from em_user_role t0 "
+          + "join em_user t1 on t1.id = t0.user_id) r1 group by r1.attribute_ order by count(*) desc, r1.attribute_");
+    } else {
+      // no Oracle test yet
+    }
   }
 
   @Identity(generated = BY_DEFAULT)
