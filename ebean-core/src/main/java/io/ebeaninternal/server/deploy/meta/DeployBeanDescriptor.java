@@ -775,7 +775,7 @@ public class DeployBeanDescriptor<T> {
       this.identityMode.setIdType(IdType.EXTERNAL);
       switch (config.getUuidVersion()) {
         case VERSION1:
-          this.idGenerator = UuidV1IdGenerator.getInstance(config.getUuidStateFile());
+          this.idGenerator = UuidV1IdGenerator.getInstance(config.getUuidStateFile(), config.getUuidNodeId());
           break;
         case VERSION1RND:
           this.idGenerator = UuidV1RndIdGenerator.INSTANCE;
