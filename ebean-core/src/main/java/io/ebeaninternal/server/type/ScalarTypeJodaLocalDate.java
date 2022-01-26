@@ -14,7 +14,7 @@ import java.sql.Types;
 /**
  * ScalarType for Joda LocalDate. This maps to a JDBC Date.
  */
-final class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
+class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
 
   ScalarTypeJodaLocalDate(JsonConfig.Date mode) {
     super(mode, LocalDate.class, false, Types.DATE);
@@ -60,20 +60,5 @@ final class ScalarTypeJodaLocalDate extends ScalarTypeBaseDate<LocalDate> {
       return LocalDate.fromDateFields((java.util.Date) value);
     }
     return (LocalDate) value;
-  }
-
-  @Override
-  public void bind(DataBinder binder, LocalDate value) throws SQLException {
-    if (value == null) {
-      binder.setNull(Types.DATE);
-    } else {
-      binder.setObject(java.time.LocalDate.of(value.getYear(), value.getMonthOfYear(), value.getDayOfMonth()));
-    }
-  }
-
-  @Override
-  public LocalDate read(DataReader reader) throws SQLException {
-    java.time.LocalDate jtDate = reader.getObject(java.time.LocalDate.class);
-    return jtDate == null ? null : new org.joda.time.LocalDate(jtDate.getYear(), jtDate.getMonthValue(), jtDate.getDayOfMonth());
   }
 }

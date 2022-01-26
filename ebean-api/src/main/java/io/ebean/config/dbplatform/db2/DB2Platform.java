@@ -25,6 +25,7 @@ public class DB2Platform extends DatabasePlatform {
     // FIXME: This differs to original ebean branch, but is required run tests.
     this.maxTableNameLength = 128;
     this.maxConstraintNameLength = 128;
+    this.supportsNativeJavaTime = false;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.likeClauseRaw = "like ?";
     this.sqlLimiter = new Db2SqlLimiter();
