@@ -53,6 +53,7 @@ public final class SqlTreeBuilder {
   private final SpiQuery.TemporalMode temporalMode;
   private SqlTreeNode rootNode;
   private boolean sqlDistinct;
+  private final boolean distinctNoLobs;
 
   /**
    * Construct for RawSql query.
@@ -65,6 +66,7 @@ public final class SqlTreeBuilder {
     this.query = null;
     this.subQuery = false;
     this.distinctOnPlatform = false;
+    this.distinctNoLobs = false;
     this.queryDetail = queryDetail;
     this.predicates = predicates;
     this.temporalMode = SpiQuery.TemporalMode.CURRENT;
@@ -97,6 +99,7 @@ public final class SqlTreeBuilder {
     this.predicates = predicates;
     this.alias = new SqlTreeAlias(request.baseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
+    this.distinctNoLobs = builder.isPlatformDistinctNoLobs();
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.getHistorySupport(query);
     CQueryDraftSupport draftSupport = builder.getDraftSupport(query);
@@ -265,6 +268,9 @@ public final class SqlTreeBuilder {
     SqlTreeNode selectNode = buildNode(prefix, prop, desc, myJoinList, props);
     if (joinList != null) {
       joinList.add(selectNode);
+    }
+    if (sqlDistinct && distinctNoLobs) {
+      selectNode.unselectLobs();
     }
     return selectNode;
   }

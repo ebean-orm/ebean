@@ -78,4 +78,6 @@ interface SqlTreeNode {
    * Create the loader for this node.
    */
   SqlTreeLoad createLoad();
+  
+  default void unselectLobs() {};
 }
