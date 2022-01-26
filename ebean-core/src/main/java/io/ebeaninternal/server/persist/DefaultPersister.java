@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.persist;
 
 import io.ebean.*;
+import io.ebean.annotation.Platform;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.EntityBean;
@@ -644,11 +645,25 @@ public final class DefaultPersister implements Persister {
     DeleteMode deleteMode = (permanent || !descriptor.isSoftDelete()) ? DeleteMode.HARD : DeleteMode.SOFT;
     return delete(descriptor, null, idList, transaction, deleteMode);
   }
-
+  
   /**
    * Delete by Id or a List of Id's.
    */
   private int delete(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
+    int rows = 0;
+    if (server.databasePlatform().isPlatform(Platform.SQLSERVER)) {
+      // SqlServer has a 2100 parameter limit, so delete max 2000 ids at once
+      // this gives space up to 100 more query parameters.
+      while (idList != null && idList.size() > 2000) {
+        rows += deleteBatch(descriptor, id, idList.subList(0, 2000), transaction, deleteMode);
+        idList = idList.subList(2000, idList.size());
+      }
+    }
+    rows += deleteBatch(descriptor, id, idList, transaction, deleteMode);
+    return rows;
+  }
+
+  private int deleteBatch(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
     SpiTransaction t = (SpiTransaction) transaction;
     if (t.isPersistCascade()) {
       BeanPropertyAssocOne<?>[] propImportDelete = descriptor.propertiesOneImportedDelete();
