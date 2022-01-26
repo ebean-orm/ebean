@@ -23,14 +23,14 @@ jobs:
       with:
         java-version: ${{ matrix.java_version }}
         distribution: 'zulu'
-    - name: Maven cache
-      uses: actions/cache@v2
-      env:
-        cache-name: maven-cache
-      with:
-        path:
-          ~/.m2
-        key: build-${{ env.cache-name }}
+#    - name: Maven cache
+#      uses: actions/cache@v2
+#      env:
+#        cache-name: maven-cache
+#      with:
+#        path:
+#          ~/.m2
+#        key: build-${{ env.cache-name }}
     - name: Build with Maven
-      run: mvn package
+      run: mvn clean package
 
