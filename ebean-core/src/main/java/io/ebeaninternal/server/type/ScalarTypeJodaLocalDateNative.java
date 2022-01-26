@@ -1,15 +1,13 @@
 package io.ebeaninternal.server.type;
 
+import java.sql.SQLException;
+import java.sql.Types;
+
+import org.joda.time.LocalDate;
+
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
-import io.ebeaninternal.server.core.BasicTypeConverter;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDate;
-
-import java.sql.Date;
-import java.sql.SQLException;
-import java.sql.Types;
 
 /**
  * ScalarType for Joda LocalDate. This maps to a LocalDate. Not all drivers/platforms may support this.
