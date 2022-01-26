@@ -378,6 +378,33 @@ public class DatabaseConfig {
   private String uuidStateFile;
 
   /**
+   * The node id (=mac address) for Version 1 UUIDs. There are several options:
+   * <ul>
+   * <li><code>null</code> (default) The generator tries to get the hardwarwe MAC
+   * address. If this fails, it will fall back to 'generate' mode.</li>
+   * <li><code>"generate"</code> Hardware detection is skipped. It generates a
+   * random identifier and tries to persist this to the state file. This nodeId
+   * will be reused on next start. If persisting to the state file will fail also,
+   * it will fall back to 'random' mode.<br>
+   * This mode is good, if the MAC address is not reliable, e.g. if you run
+   * multiple ebean instances on the same machine.</li>
+   * <li><code>"random"</code> In this mode, a random node id is generated on each
+   * start. No stateFile is used. it will generate a new nodeId on each
+   * application start.<br>
+   * This mode is good, if you have no write access to save the state file.</li>
+   * <li><code>"xx-xx-xx-xx-xx-xx"</code> When an explicit nodeId is specified,
+   * this one is used.</li>
+   * </ul>
+   * Note: It is possible that multiple servers are sharing the same state file as
+   * long as they are in the <b>same</b> JVM/ClassLoader scope. In this case it is
+   * recommended to use the same uuidNodeId configuration.
+   * 
+   * If you have multiple servers in different JVMs, do <b>not</b> share the state
+   * files!
+   */
+  private String uuidNodeId;
+  
+  /**
    * The clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
    */
   private Clock clock = Clock.systemUTC();
@@ -2050,6 +2077,20 @@ public class DatabaseConfig {
   public void setUuidStateFile(String uuidStateFile) {
     this.uuidStateFile = uuidStateFile;
   }
+  
+  /**
+   * Returns the V1-UUID-NodeId 
+   */
+  public String getUuidNodeId() {
+    return uuidNodeId;
+  }
+  
+  /**
+   * Sets the V1-UUID-NodeId.
+   */
+  public void setUuidNodeId(String uuidNodeId) {
+    this.uuidNodeId = uuidNodeId;
+  }
 
   /**
    * Return true if LocalTime should be persisted with nanos precision.
@@ -2930,6 +2971,7 @@ public class DatabaseConfig {
 
     uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
     uuidStateFile = p.get("uuidStateFile", uuidStateFile);
+    uuidNodeId = p.get("uuidNodeId", uuidNodeId);
 
     localTimeWithNanos = p.getBoolean("localTimeWithNanos", localTimeWithNanos);
     jodaLocalTimeMode = p.get("jodaLocalTimeMode", jodaLocalTimeMode);
