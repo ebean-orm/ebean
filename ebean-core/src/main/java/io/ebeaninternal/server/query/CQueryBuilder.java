@@ -568,8 +568,16 @@ final class CQueryBuilder {
         if (countSingleAttribute) {
           sb.append("r1.attribute_, count(*) from (select ");
           if (distinct) {
-            sb.append("distinct t0.");
-            sb.append(request.descriptor().idProperty().dbColumn()).append(", ");
+            sb.append("distinct ");
+            BeanProperty idProp = request.descriptor().idProperty();
+            if (idProp.isEmbedded()) {
+              BeanProperty[] props = ((BeanPropertyAssocOne<?>) idProp).properties();
+              for (BeanProperty prop : props) {
+                sb.append("t0.").append(prop.dbColumn()).append(", ");
+              }
+            } else {
+              sb.append("t0.").append(idProp.dbColumn()).append(", ");
+            }
           }
           sb.append(select.getSelectSql()).append(" as attribute_");
         } else {
