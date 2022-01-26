@@ -26,8 +26,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
   /**
    * Set to true if this is a partial object fetch.
    */
-  final boolean partialObject;
-  final STreeProperty[] properties;
+  boolean partialObject;
+  STreeProperty[] properties;
   /**
    * Extra where clause added by Where annotation on associated many.
    */
@@ -394,6 +394,35 @@ class SqlTreeNodeBean implements SqlTreeNode {
   public boolean hasMany() {
     for (SqlTreeNode child : children) {
       if (child.hasMany()) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
+
+  @Override
+  public void unselectLobs() {
+    if (children != null) {
+      for (SqlTreeNode child : children) {
+        child.unselectLobs();
+      }
+    }
+    if (hasLob()) {
+      List<STreeProperty> lst = new ArrayList<>();
+      for (STreeProperty prop : properties) {
+        if (!prop.isDbLob()) {
+          lst.add(prop);
+        }
+      }
+      properties = lst.toArray(new STreeProperty[0]);
+      partialObject = true;
+    }
+  }
+
+  private boolean hasLob() {
+    for (STreeProperty prop : properties) {
+      if (prop.isDbLob()) {
         return true;
       }
     }
