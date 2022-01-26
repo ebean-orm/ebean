@@ -22,7 +22,8 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: ${{ matrix.java_version }}
-        distribution: 'zulu'
+#        distribution: 'zulu'
+        distribution: 'adopt'
 #    - name: Maven cache
 #      uses: actions/cache@v2
 #      env:
@@ -32,5 +33,5 @@ jobs:
 #          ~/.m2
 #        key: build-${{ env.cache-name }}
     - name: Build with Maven
-      run: mvn clean package
+      run: mvn --batch-mode clean package
 
