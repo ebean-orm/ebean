@@ -22,20 +22,19 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: ${{ matrix.java_version }}
-#        distribution: 'zulu'
-        distribution: 'adopt'
-#    - name: Maven cache
-#      uses: actions/cache@v2
-#      env:
-#        cache-name: maven-cache
-#      with:
-#        path:
-#          ~/.m2
-#        key: build-${{ env.cache-name }}
+        distribution: 'zulu'
+    - name: Maven cache
+      uses: actions/cache@v2
+      env:
+        cache-name: maven-cache
+      with:
+        path:
+          ~/.m2
+        key: build-${{ env.cache-name }}
     - name: Maven version
       run: mvn --version
-    - name: Maven single test
-      run: mvn --batch-mode clean verify -Dtest="io.ebeaninternal.server.core.DefaultServer_getReferenceTest" -DfailIfNoTests=false
+#    - name: Maven single test
+#      run: mvn --batch-mode clean verify -Dtest="io.ebeaninternal.server.core.DefaultServer_getReferenceTest" -DfailIfNoTests=false
     - name: Build with Maven
-      run: mvn --batch-mode clean verify
+      run: mvn clean package
 
