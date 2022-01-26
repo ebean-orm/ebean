@@ -1,16 +1,16 @@
 package io.ebean.config.dbplatform.db2;
 
+import java.sql.Types;
+
+import javax.sql.DataSource;
+
 import io.ebean.BackgroundExecutor;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
-
-import javax.sql.DataSource;
-import java.sql.Types;
 
 /**
  * DB2 specific platform.
