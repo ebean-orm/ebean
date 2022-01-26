@@ -49,6 +49,3 @@ Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
 [Maven central - all related projects](http://search.maven.org/#search%7Cga%7C1%7Cebean "maven central all related projects")
 
-## Other versions
-* [![Maven Central : ebean-agent](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-agent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-agent) - ebean-agent
-* [![Maven Central : ebean-maven-plugin](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-maven-plugin) - ebean-maven-plugin
