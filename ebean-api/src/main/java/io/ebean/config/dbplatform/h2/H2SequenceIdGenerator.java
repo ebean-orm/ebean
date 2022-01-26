@@ -18,13 +18,12 @@ public class H2SequenceIdGenerator extends SequenceBatchIdGenerator {
    */
   public H2SequenceIdGenerator(BackgroundExecutor be, DataSource ds, String seqName, int batchSize) {
     super(be, ds, seqName, batchSize);
-    this.baseSql = "select " + seqName + ".nextval";
+    this.baseSql = "select nextval('" + seqName + "')";
     this.unionBaseSql = " union " + baseSql;
   }
 
   @Override
   public String getSql(int batchSize) {
-
     StringBuilder sb = new StringBuilder();
     sb.append(baseSql);
     for (int i = 1; i < batchSize; i++) {

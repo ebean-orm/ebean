@@ -189,7 +189,12 @@ final class ScalarTypeEnumStandard {
       if (dbValue == null || dbValue instanceof Enum<?>) {
         return dbValue;
       }
-      int ordinal = (Integer) dbValue;
+      int ordinal;
+      if (dbValue instanceof Integer) {
+        ordinal = (Integer) dbValue;
+      } else {
+        ordinal = Integer.parseInt(dbValue.toString());
+      }
       if (ordinal < 0 || ordinal >= enumArray.length) {
         String m = "Unexpected ordinal [" + ordinal + "] out of range [" + enumArray.length + "]";
         throw new IllegalStateException(m);

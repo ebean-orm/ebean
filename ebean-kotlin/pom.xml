@@ -12,7 +12,7 @@
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <ebean-maven-plugin.version>12.13.0</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>12.14.1</ebean-maven-plugin.version>
     <kotlin.version>1.6.0</kotlin.version>
   </properties>
 

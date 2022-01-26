@@ -20,7 +20,7 @@ class HanaSetup implements PlatformSetup {
     config.setUsername("SYSTEM");
     config.setPassword("HXEHana1");
     config.setDatabaseName("HXE");
-    config.setUrl("jdbc:sap://localhost:${port}/?databaseName=${databaseName}");
+    config.setUrl("jdbc:sap://${host}:${port}/?databaseName=${databaseName}");
     String schema = config.getSchema();
     if (schema != null && !schema.equals(config.getUsername())) {
       config.urlAppend("&currentSchema=" + schema);

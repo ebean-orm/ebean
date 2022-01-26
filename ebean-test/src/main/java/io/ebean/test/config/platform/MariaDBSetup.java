@@ -13,7 +13,7 @@ class MariaDBSetup implements PlatformSetup {
     config.setDefaultPort(defaultPort);
     config.setUsernameDefault();
     config.setPasswordDefault();
-    config.setUrl("jdbc:mariadb://localhost:${port}/${databaseName}?useLegacyDatetimeCode=false");
+    config.setUrl("jdbc:mariadb://${host}:${port}/${databaseName}?useLegacyDatetimeCode=false");
     config.datasourceDefaults();
 
     return dockerProperties(config);

@@ -24,8 +24,8 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
     ResetBasicData.reset();
 
     DB.execute(() -> {
-      Customer loaded = DB.find(Customer.class, 1);
-      Customer reference = DB.reference(Customer.class, 1);
+      Customer loaded = DB.find(Customer.class).where().eq("name", "Rob").findOne();
+      Customer reference = DB.reference(Customer.class, loaded.getId());
       assertThat(loaded).isSameAs(reference);
     });
   }

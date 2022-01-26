@@ -33,7 +33,7 @@ public class MnyNode {
     joinColumns = @JoinColumn(name = "from_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "to_id", referencedColumnName = "id"))
   @Where(clause = "${mta}.flags & 1 != 0")
-  @Where(clause = "BITAND(${mta}.flags, 1) != 0", platforms = Platform.H2)
+  @Where(clause = "BITAND(${mta}.flags, 1) != 0", platforms = {Platform.H2, Platform.ORACLE})
   List<MnyNode> bit1Relations;
 
   @ManyToMany
@@ -41,7 +41,7 @@ public class MnyNode {
     joinColumns = @JoinColumn(name = "to_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "from_id", referencedColumnName = "id"))
   @Where(clause = "${mta}.flags & 1 != 0")
-  @Where(clause = "BITAND(${mta}.flags, 1) != 0", platforms = Platform.H2)
+  @Where(clause = "BITAND(${mta}.flags, 1) != 0", platforms = {Platform.H2, Platform.ORACLE})
   List<MnyNode> bit1ReverseRelations;
 
   @ManyToMany
@@ -49,7 +49,7 @@ public class MnyNode {
     joinColumns = @JoinColumn(name = "from_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "to_id", referencedColumnName = "id"))
   @Where(clause = "${mta}.flags & 2 != 0")
-  @Where(clause = "BITAND(${mta}.flags, 2) != 0", platforms = Platform.H2)
+  @Where(clause = "BITAND(${mta}.flags, 2) != 0", platforms = {Platform.H2, Platform.ORACLE})
   List<MnyNode> bit2Relations;
 
   @ManyToMany
@@ -57,7 +57,7 @@ public class MnyNode {
     joinColumns = @JoinColumn(name = "to_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "from_id", referencedColumnName = "id"))
   @Where(clause = "${mta}.flags & 2 != 0")
-  @Where(clause = "BITAND(${mta}.flags, 2) != 0", platforms = Platform.H2)
+  @Where(clause = "BITAND(${mta}.flags, 2) != 0", platforms = {Platform.H2, Platform.ORACLE})
   List<MnyNode> bit2ReverseRelations;
 
   @ManyToMany

@@ -110,7 +110,7 @@ final class CQueryBuilder {
       sql = buildUpdateSql(request, rootTableAlias, predicates, sqlTree);
     }
     // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree, predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryUpdate(request, predicates, queryPlan);
   }
@@ -197,7 +197,7 @@ final class CQueryBuilder {
     SqlTree sqlTree = createSqlTree(request, predicates);
     SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
 
-    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree, predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree.plan(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
   }
@@ -288,7 +288,7 @@ final class CQueryBuilder {
       }
     }
     // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree, predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.getLogWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryRowCount(queryPlan, request, predicates);
   }
@@ -343,7 +343,7 @@ final class CQueryBuilder {
     if (rawSql) {
       queryPlan = new CQueryPlanRawSql(request, res, sqlTree, predicates.getLogWhereSql());
     } else {
-      queryPlan = new CQueryPlan(request, res, sqlTree, false, predicates.getLogWhereSql());
+      queryPlan = new CQueryPlan(request, res, sqlTree.plan(), false, predicates.getLogWhereSql());
     }
     BeanDescriptor<T> desc = request.descriptor();
     if (desc.isReadAuditing()) {

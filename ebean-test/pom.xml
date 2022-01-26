@@ -16,7 +16,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.30</version>
+      <version>1.7.32</version>
       <scope>provided</scope>
     </dependency>
 
@@ -56,7 +56,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test-docker</artifactId>
-      <version>4.3</version>
+      <version>4.4</version>
     </dependency>
 
     <dependency>
@@ -76,7 +76,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>1.4.199</version>
+      <version>${h2database.version}</version>
     </dependency>
 
     <!-- Test dependencies -->
@@ -249,7 +249,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:12.11.3</tile>
+            <tile>io.ebean.tile:enhancement:12.14.1</tile>
             <tile>io.avaje.tile:moditech-module:1.0</tile>
           </tiles>
         </configuration>

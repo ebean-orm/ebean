@@ -56,6 +56,10 @@ final class SqlTree {
     this.noJoins = !includeJoins;
   }
 
+  SqlTreePlan plan() {
+    return new SqlTreePlan(rootNode.createLoad(), manyProperty, encryptedProps, dependentTables());
+  }
+
   /**
    * Return true if the query mandates SQL Distinct due to ToMany inclusion.
    */
@@ -123,20 +127,12 @@ final class SqlTree {
     return inheritanceWhereSql;
   }
 
-  SqlTreeRoot getRootNode() {
-    return (SqlTreeRoot)rootNode;
-  }
-
   /**
    * Return the property that is associated with the many. There can only be one
    * per SqlSelect. This can be null.
    */
   STreePropertyAssocMany getManyProperty() {
     return manyProperty;
-  }
-
-  STreeProperty[] getEncryptedProps() {
-    return encryptedProps;
   }
 
   /**
@@ -153,7 +149,7 @@ final class SqlTree {
   /**
    * Return the tables that are joined in this query.
    */
-  Set<String> dependentTables() {
+  private Set<String> dependentTables() {
     Set<String> tables = new LinkedHashSet<>();
     rootNode.dependentTables(tables);
     return tables;

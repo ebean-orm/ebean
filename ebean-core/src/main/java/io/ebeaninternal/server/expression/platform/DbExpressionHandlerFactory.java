@@ -10,20 +10,17 @@ public final class DbExpressionHandlerFactory {
    * Create and return the appropriate platform specific handing of expressions.
    */
   public static DbExpressionHandler from(DatabasePlatform databasePlatform) {
-    Platform platform = databasePlatform.getPlatform();
+    Platform platform = databasePlatform.getPlatform().base();
     switch (platform) {
       case H2:
         return new H2DbExpression();
       case POSTGRES:
-      case POSTGRES9:
         return new PostgresDbExpression();
       case MARIADB:
         return new MariaDbExpression();
-      case MYSQL55:
       case MYSQL:
         return new MySqlDbExpression();
       case ORACLE:
-      case ORACLE11:
         return new OracleDbExpression();
       case DB2:
         return new Db2DbExpression();

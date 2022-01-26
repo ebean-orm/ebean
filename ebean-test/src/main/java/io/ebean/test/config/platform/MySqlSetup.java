@@ -13,7 +13,7 @@ class MySqlSetup implements PlatformSetup {
     config.setDefaultPort(defaultPort);
     config.setUsernameDefault();
     config.setPasswordDefault();
-    config.setUrl("jdbc:mysql://localhost:${port}/${databaseName}");
+    config.setUrl("jdbc:mysql://${host}:${port}/${databaseName}");
     config.setDriver(defaultDriver());
     config.datasourceDefaults();
 

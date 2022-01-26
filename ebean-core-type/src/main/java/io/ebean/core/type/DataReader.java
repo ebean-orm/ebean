@@ -47,6 +47,8 @@ public interface DataReader {
 
   Object getObject() throws SQLException;
 
+  <T> T getObject(Class<T> cls) throws SQLException;
+
   InputStream getBinaryStream() throws SQLException;
 
   /**

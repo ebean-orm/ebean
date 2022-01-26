@@ -11,7 +11,7 @@ class CockroachSetup implements PlatformSetup {
     config.setDefaultPort(26257);
     config.setUsername("root");
     config.setPassword("");
-    config.setUrl("jdbc:postgresql://localhost:${port}/${databaseName}?sslmode=disable");
+    config.setUrl("jdbc:postgresql://${host}:${port}/${databaseName}?sslmode=disable");
     config.setDriver("org.postgresql.Driver");
     config.datasourceDefaults();
 

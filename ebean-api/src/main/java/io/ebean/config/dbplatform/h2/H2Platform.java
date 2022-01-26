@@ -39,6 +39,7 @@ public class H2Platform extends DatabasePlatform {
     this.dbIdentity.setSupportsIdentity(true);
 
     dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
+    dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
   }
 
   /**

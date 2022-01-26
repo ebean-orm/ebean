@@ -13,11 +13,8 @@ import io.ebeaninternal.server.persist.dmlbind.BindableList;
 
 import java.sql.SQLException;
 
-import static io.ebean.annotation.Platform.MARIADB;
-import static io.ebean.annotation.Platform.MYSQL;
-
 /**
- * Meta data for insert handler. The meta data is for a particular bean type. It
+ * Metadata for insert handler. The metadata is for a particular bean type. It
  * is considered immutable and is thread safe.
  */
 final class InsertMeta {
@@ -153,31 +150,25 @@ final class InsertMeta {
   private String genSql(boolean nullId, String table, boolean draftTable) {
     GenerateDmlRequest request = new GenerateDmlRequest();
     request.setInsertSetMode();
-
     request.append("insert into ").append(table);
     if (nullId && noColumnsForInsert(draftTable)) {
       return request.append(defaultValues()).toString();
     }
-
     request.append(" (");
     if (!nullId) {
       id.dmlAppend(request);
     }
-
     if (shadowFKey != null) {
       shadowFKey.dmlAppend(request);
     }
-
     if (discriminator != null) {
       discriminator.dmlAppend(request);
     }
-
     if (draftTable) {
       all.dmlAppend(request);
     } else {
       allExcludeDraftOnly.dmlAppend(request);
     }
-
     request.append(") values (");
     request.append(request.getInsertBindBuffer());
     request.append(")");
@@ -186,13 +177,14 @@ final class InsertMeta {
 
   private String defaultValues() {
     switch (platform.base()) {
-    case MYSQL:
-    case MARIADB:
-      return " values (default)";
-    case DB2:
-      return " (" + id.getIdentityColumn() + ") values (default)";
-    default:
-      return " default values";
+      case MYSQL:
+      case MARIADB:
+      case ORACLE:
+        return " values (default)";
+      case DB2:
+        return " (" + id.getIdentityColumn() + ") values (default)";
+      default:
+        return " default values";
     }
   }
 
