@@ -15,6 +15,7 @@ import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -54,6 +55,15 @@ public class DatabasePlatform {
   protected boolean supportsSavepointId = true;
 
   protected boolean useMigrationStoredProcedures = false;
+  
+  /**
+   * Can we use native java time API objects in
+   * {@link ResultSet#getObject(int, Class)} and
+   * {@link PreparedStatement#setObject(int, Object)}.
+   * 
+   * Not all drivers (DB2 e.g.) will support this.
+   */
+  protected boolean supportsNativeJavaTime = true;
 
   /**
    * The behaviour used when ending a read only transaction at read committed isolation level.
@@ -826,5 +836,9 @@ public class DatabasePlatform {
 
   protected void escapeLikeCharacter(char ch, StringBuilder sb) {
     sb.append(likeEscapeChar).append(ch);
+  }
+
+  public boolean supportsNativeJavaTime() {
+    return supportsNativeJavaTime;
   }
 }

@@ -755,7 +755,11 @@ public final class DefaultTypeManager implements TypeManager {
 
     typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
     addType(java.time.Period.class, new ScalarTypePeriod());
-    addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
+    if (config.getDatabasePlatform().supportsNativeJavaTime()) {
+      addType(java.time.LocalDate.class, new ScalarTypeLocalDateNative(jsonDate));
+    } else {
+      addType(java.time.LocalDate.class, new ScalarTypeLocalDate(jsonDate));
+    }
     addType(java.time.LocalDateTime.class, new ScalarTypeLocalDateTime(jsonDateTime));
     addType(OffsetDateTime.class, new ScalarTypeOffsetDateTime(jsonDateTime, zoneId));
     addType(ZonedDateTime.class, new ScalarTypeZonedDateTime(jsonDateTime, zoneId));
@@ -795,7 +799,11 @@ public final class DefaultTypeManager implements TypeManager {
       log.debug("Registering Joda data types");
       addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(jsonDateTime));
       addType(DateTime.class, new ScalarTypeJodaDateTime(jsonDateTime));
-      addType(LocalDate.class, new ScalarTypeJodaLocalDate(jsonDate));
+      if (config.getDatabasePlatform().supportsNativeJavaTime()) {
+        addType(LocalDate.class, new ScalarTypeJodaLocalDateNative(jsonDate));
+      } else {
+        addType(LocalDate.class, new ScalarTypeJodaLocalDate(jsonDate));
+      }
       addType(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight(jsonDate));
       addType(org.joda.time.Period.class, new ScalarTypeJodaPeriod());
 

@@ -24,6 +24,7 @@ public class DB2Platform extends DatabasePlatform {
     // TOOD: Check if we need to introduce a new platform (DB2_LUW_11 ?)
     this.maxTableNameLength = 18;
     this.maxConstraintNameLength = 18;
+    this.supportsNativeJavaTime = false;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.sqlLimiter = new Db2SqlLimiter();
 
