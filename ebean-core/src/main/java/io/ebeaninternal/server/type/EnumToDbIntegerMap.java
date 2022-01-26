@@ -35,6 +35,14 @@ final class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
   }
 
   @Override
+  public Object getBeanValue(Object dbValue) {
+    if (dbValue instanceof String) {
+      return super.getBeanValue(Integer.parseInt(dbValue.toString()));
+    }
+    return super.getBeanValue(dbValue);
+  }
+
+  @Override
   public EnumToDbIntegerMap add(Object beanValue, String stringDbValue, String name) {
     try {
       Integer value = Integer.valueOf(stringDbValue);

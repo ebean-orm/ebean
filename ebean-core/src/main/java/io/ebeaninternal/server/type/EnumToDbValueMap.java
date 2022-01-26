@@ -116,7 +116,8 @@ abstract class EnumToDbValueMap<T> {
   /**
    * Return the Bean value given the DB value.
    */
-  public Object getBeanValue(T dbValue) {
+  @SuppressWarnings("SuspiciousMethodCalls")
+  public Object getBeanValue(Object dbValue) {
     if (dbValue == null) {
       return null;
     }
@@ -125,8 +126,7 @@ abstract class EnumToDbValueMap<T> {
       beanValue = nameMap.get(dbValue);
     }
     if (beanValue == null && !allowNulls) {
-      String msg = "Bean value for " + dbValue + " not found in " + valueMap;
-      throw new IllegalArgumentException(msg);
+      throw new IllegalArgumentException("Bean value for " + dbValue + " not found in " + valueMap);
     }
     return beanValue;
   }

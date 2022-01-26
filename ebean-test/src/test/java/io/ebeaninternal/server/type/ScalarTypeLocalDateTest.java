@@ -48,6 +48,14 @@ public class ScalarTypeLocalDateTest {
   }
 
   @Test
+  public void olderDates_ToFromJdbcType() {
+    LocalDate localDate = LocalDate.of(1850,12,1);
+    Object o = type.toJdbcType(localDate);
+    LocalDate localDate1 = type.toBeanType(o);
+    assertThat(localDate1).isEqualTo(localDate);
+  }
+
+  @Test
   public void testToBeanType() {
 
     LocalDate localDate = LocalDate.now();

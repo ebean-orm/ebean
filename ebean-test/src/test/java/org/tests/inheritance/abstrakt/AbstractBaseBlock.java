@@ -3,7 +3,7 @@ package org.tests.inheritance.abstrakt;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "block")
+@Table(name = "blockt")
 @Inheritance
 @DiscriminatorColumn(name = "case_type", discriminatorType = DiscriminatorType.INTEGER)
 public abstract class AbstractBaseBlock {

@@ -74,6 +74,11 @@ public class RsetDataReader implements DataReader {
   }
 
   @Override
+  public <T> T getObject(Class<T> cls) throws SQLException {
+    return rset.getObject(pos(), cls);
+  }
+
+  @Override
   public BigDecimal getBigDecimal() throws SQLException {
     return rset.getBigDecimal(pos());
   }

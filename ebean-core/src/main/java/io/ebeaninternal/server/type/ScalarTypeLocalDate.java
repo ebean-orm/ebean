@@ -1,9 +1,12 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.DataReader;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDate;
@@ -59,6 +62,20 @@ final class ScalarTypeLocalDate extends ScalarTypeBaseDate<LocalDate> {
       return ((java.sql.Date) value).toLocalDate();
     }
     return (LocalDate) value;
+  }
+
+  @Override
+  public void bind(DataBinder binder, LocalDate value) throws SQLException {
+    if (value == null) {
+      binder.setNull(Types.DATE);
+    } else {
+      binder.setObject(value);
+    }
+  }
+
+  @Override
+  public LocalDate read(DataReader reader) throws SQLException {
+    return reader.getObject(LocalDate.class);
   }
 
 }

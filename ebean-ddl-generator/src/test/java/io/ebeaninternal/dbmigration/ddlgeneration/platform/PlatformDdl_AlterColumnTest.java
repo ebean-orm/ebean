@@ -57,10 +57,10 @@ public class PlatformDdl_AlterColumnTest {
 
   @Test
   public void convertArrayType_h2() {
-    assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("array");
-    assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("array");
-    assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("array");
-    assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("array");
+    assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("varchar array");
+    assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("integer array");
+    assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("varchar array");
+    assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("integer array");
   }
 
   @Test
