@@ -3,11 +3,13 @@ package org.tests.update;
 import io.ebean.DB;
 import io.ebean.TransactionalTestCase;
 import io.ebean.test.LoggedSql;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
+import org.tests.model.basic.ResetBasicData;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.*;
@@ -16,6 +18,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestStatelessUpdate extends TransactionalTestCase {
+
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
 
   @Test
   public void test() {

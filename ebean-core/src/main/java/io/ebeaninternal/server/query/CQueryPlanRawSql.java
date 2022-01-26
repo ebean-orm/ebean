@@ -17,7 +17,7 @@ final class CQueryPlanRawSql extends CQueryPlan {
   private final int[] rsetIndexPositions;
 
   CQueryPlanRawSql(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, String logWhereSql) {
-    super(request, sqlRes, sqlTree, true, logWhereSql);
+    super(request, sqlRes, sqlTree.plan(), true, logWhereSql);
     this.rsetIndexPositions = createIndexPositions(request, sqlTree);
   }
 

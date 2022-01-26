@@ -2,8 +2,10 @@ package org.tests.insert;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,9 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestInsertCollection extends BaseTestCase {
 
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
+
   @Test
   public void test() {
-
     Customer cust1 = new Customer();
     cust1.setName("jim");
 

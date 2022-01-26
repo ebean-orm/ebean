@@ -39,6 +39,11 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
   }
 
   @Override
+  public SqlTreeLoad createLoad() {
+    return null;
+  }
+
+  @Override
   public boolean isSingleProperty() {
     return false;
   }
@@ -71,11 +76,6 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
   @Override
   public void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
     // nothing to do here
-  }
-
-  @Override
-  public ScalarType<?> getSingleAttributeReader() {
-    throw new IllegalStateException("No expected");
   }
 
   /**
@@ -182,14 +182,6 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
    */
   @Override
   public void appendWhere(DbSqlContext ctx) {
-  }
-
-  /**
-   * Does nothing.
-   */
-  @Override
-  public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) {
-    return null;
   }
 
   @Override
