@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import static java.lang.String.format;
+import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -25,12 +26,14 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.tests.model.basic.MDateTime;
 
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
@@ -48,7 +51,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(PlatformCondition.class)
-public class DatesAndTimesTest {
+public class DatesAndTimesTest extends BaseTestCase {
  
   private Database db;
   private TimeZone tz;
@@ -146,16 +149,17 @@ public class DatesAndTimesTest {
     doTest("localTime", LocalTime.of(23, 59, 59), "23:59:59");
 
     // it does not matter in which timezone the server or java is!
-    restartServer("PST", "Europe/Berlin");
-    doTest("localTime", LocalTime.of(5, 15, 15), "05:15:15");
-    doTest("localTime", LocalTime.of(0, 0, 0), "00:00:00");
-    doTest("localTime", LocalTime.of(23, 59, 59), "23:59:59");
-
-    restartServer("Europe/Berlin", "PST");
-    doTest("localTime", LocalTime.of(5, 15, 15), "05:15:15");
-    doTest("localTime", LocalTime.of(0, 0, 0), "00:00:00");
-    doTest("localTime", LocalTime.of(23, 59, 59), "23:59:59");
-
+    if (!isH2()) {
+      restartServer("PST", "Europe/Berlin");
+      doTest("localTime", LocalTime.of(5, 15, 15), "05:15:15");
+      doTest("localTime", LocalTime.of(0, 0, 0), "00:00:00");
+      doTest("localTime", LocalTime.of(23, 59, 59), "23:59:59");
+  
+      restartServer("Europe/Berlin", "PST");
+      doTest("localTime", LocalTime.of(5, 15, 15), "05:15:15");
+      doTest("localTime", LocalTime.of(0, 0, 0), "00:00:00");
+      doTest("localTime", LocalTime.of(23, 59, 59), "23:59:59");
+    }
   }
 
   @Test
@@ -169,16 +173,17 @@ public class DatesAndTimesTest {
     doTest("jodaLocalTime", org.joda.time.LocalTime.parse("23:59:59"), "23:59:59");
 
     // it does not matter in which timezone the server or java is!
-    restartServer("PST", "Europe/Berlin");
-    doTest("jodaLocalTime", org.joda.time.LocalTime.parse("05:15:15"), "05:15:15");
-    doTest("jodaLocalTime", org.joda.time.LocalTime.parse("00:00:00"), "00:00:00");
-    doTest("jodaLocalTime", org.joda.time.LocalTime.parse("23:59:59"), "23:59:59");
+    if (!isH2()) {
+      restartServer("PST", "Europe/Berlin");
+      doTest("jodaLocalTime", org.joda.time.LocalTime.parse("05:15:15"), "05:15:15");
+      doTest("jodaLocalTime", org.joda.time.LocalTime.parse("00:00:00"), "00:00:00");
+      doTest("jodaLocalTime", org.joda.time.LocalTime.parse("23:59:59"), "23:59:59");
 
-    restartServer("Europe/Berlin", "PST");
-    doTest("jodaLocalTime", org.joda.time.LocalTime.parse("05:15:15"), "05:15:15");
-    doTest("jodaLocalTime", org.joda.time.LocalTime.parse("00:00:00"), "00:00:00");
-    doTest("jodaLocalTime", org.joda.time.LocalTime.parse("23:59:59"), "23:59:59");
-
+      restartServer("Europe/Berlin", "PST");
+      doTest("jodaLocalTime", org.joda.time.LocalTime.parse("05:15:15"), "05:15:15");
+      doTest("jodaLocalTime", org.joda.time.LocalTime.parse("00:00:00"), "00:00:00");
+      doTest("jodaLocalTime", org.joda.time.LocalTime.parse("23:59:59"), "23:59:59");
+    }
   }
 
   @Test
@@ -431,13 +436,15 @@ public class DatesAndTimesTest {
     
     doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-08-21"), "2021-08-21");
 
-    restartServer("PST", "Europe/Berlin");
-    doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-11-21"), "2021-11-21");
-    doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-08-21"), "2021-08-21");
-
-    restartServer("Europe/Berlin", "PST");
-    doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-11-21"), "2021-11-21");
-    doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-08-21"), "2021-08-21");
+    if (!isH2()) {
+      restartServer("PST", "Europe/Berlin");
+      doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-11-21"), "2021-11-21");
+      doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-08-21"), "2021-08-21");
+  
+      restartServer("Europe/Berlin", "PST");
+      doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-11-21"), "2021-11-21");
+      doTest("jodaDateMidnight", org.joda.time.DateMidnight.parse("2021-08-21"), "2021-08-21");
+    }
   }
 
   @Test
@@ -470,15 +477,17 @@ public class DatesAndTimesTest {
     doTest("propMonthDay", MonthDay.of(8, 21), "2000-08-21");
     doTest("propMonthDay", MonthDay.of(2, 29), "2000-02-29"); // leap year check
 
-    restartServer("PST", "Europe/Berlin");
-    doTest("propMonthDay", MonthDay.of(11, 21), "2000-11-21");
-    doTest("propMonthDay", MonthDay.of(8, 21), "2000-08-21");
-    doTest("propMonthDay", MonthDay.of(2, 29), "2000-02-29"); // leap year check
-
-    restartServer("Europe/Berlin", "PST");
-    doTest("propMonthDay", MonthDay.of(11, 21), "2000-11-21");
-    doTest("propMonthDay", MonthDay.of(8, 21), "2000-08-21");
-    doTest("propMonthDay", MonthDay.of(2, 29), "2000-02-29"); // leap year check
+    if (!isH2()) {
+      restartServer("PST", "Europe/Berlin");
+      doTest("propMonthDay", MonthDay.of(11, 21), "2000-11-21");
+      doTest("propMonthDay", MonthDay.of(8, 21), "2000-08-21");
+      doTest("propMonthDay", MonthDay.of(2, 29), "2000-02-29"); // leap year check
+  
+      restartServer("Europe/Berlin", "PST");
+      doTest("propMonthDay", MonthDay.of(11, 21), "2000-11-21");
+      doTest("propMonthDay", MonthDay.of(8, 21), "2000-08-21");
+      doTest("propMonthDay", MonthDay.of(2, 29), "2000-02-29"); // leap year check
+    }
   }
 
   @Test
@@ -493,15 +502,16 @@ public class DatesAndTimesTest {
 
     doTest("sqlDate", new java.sql.Date(2021 - 1900, 8 - 1, 21), "2021-08-21");
 
-    // it does not matter in which timezone the server or java is!
-    restartServer("PST", "Europe/Berlin");
-    doTest("sqlDate", new java.sql.Date(2021 - 1900, 11 - 1, 21), "2021-11-21");
-    doTest("sqlDate", new java.sql.Date(2021 - 1900, 8 - 1, 21), "2021-08-21");
-
-    restartServer("Europe/Berlin", "PST");
-    doTest("sqlDate", new java.sql.Date(2021 - 1900, 11 - 1, 21), "2021-11-21");
-    doTest("sqlDate", new java.sql.Date(2021 - 1900, 8 - 1, 21), "2021-08-21");
-
+    if (!isH2()) {
+      // it does not matter in which timezone the server or java is!
+      restartServer("PST", "Europe/Berlin");
+      doTest("sqlDate", new java.sql.Date(2021 - 1900, 11 - 1, 21), "2021-11-21");
+      doTest("sqlDate", new java.sql.Date(2021 - 1900, 8 - 1, 21), "2021-08-21");
+  
+      restartServer("Europe/Berlin", "PST");
+      doTest("sqlDate", new java.sql.Date(2021 - 1900, 11 - 1, 21), "2021-11-21");
+      doTest("sqlDate", new java.sql.Date(2021 - 1900, 8 - 1, 21), "2021-08-21");
+    }
   }
 
   @Test
@@ -514,15 +524,17 @@ public class DatesAndTimesTest {
     doTest("sqlTime", new java.sql.Time(0, 0, 0), "00:00:00");
     doTest("sqlTime", new java.sql.Time(23, 59, 59), "23:59:59");
 
-    restartServer("PST", "Europe/Berlin");
-    doTest("sqlTime", new java.sql.Time(5, 15, 15), "05:15:15");
-    doTest("sqlTime", new java.sql.Time(0, 0, 0), "00:00:00");
-    doTest("sqlTime", new java.sql.Time(23, 59, 59), "23:59:59");
-
-    restartServer("Europe/Berlin", "PST");
-    doTest("sqlTime", new java.sql.Time(5, 15, 15), "05:15:15");
-    doTest("sqlTime", new java.sql.Time(0, 0, 0), "00:00:00");
-    doTest("sqlTime", new java.sql.Time(23, 59, 59), "23:59:59");
+    if (!isH2()) {
+      restartServer("PST", "Europe/Berlin");
+      doTest("sqlTime", new java.sql.Time(5, 15, 15), "05:15:15");
+      doTest("sqlTime", new java.sql.Time(0, 0, 0), "00:00:00");
+      doTest("sqlTime", new java.sql.Time(23, 59, 59), "23:59:59");
+  
+      restartServer("Europe/Berlin", "PST");
+      doTest("sqlTime", new java.sql.Time(5, 15, 15), "05:15:15");
+      doTest("sqlTime", new java.sql.Time(0, 0, 0), "00:00:00");
+      doTest("sqlTime", new java.sql.Time(23, 59, 59), "23:59:59");
+    }
   }
   
   @Test
