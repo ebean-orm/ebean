@@ -1,8 +1,22 @@
 package io.ebeaninternal.dbmigration;
 
+import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringJoiner;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.Platform;
+import io.ebean.config.ClassLoadConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.PlatformConfig;
@@ -27,6 +41,8 @@ import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
 import io.ebean.dbmigration.DbMigration;
+import io.ebean.util.IOUtils;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
@@ -42,17 +58,6 @@ import io.ebeaninternal.dbmigration.model.PlatformDdlWriter;
 import io.ebeaninternal.extraddl.model.DdlScript;
 import io.ebeaninternal.extraddl.model.ExtraDdl;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
-import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 
 /**
  * Generates DB Migration xml and sql scripts.
@@ -392,19 +397,22 @@ public class DefaultDbMigration implements DbMigration {
   private void generateExtraDdl(File migrationDir, DatabasePlatform dbPlatform, boolean tablePartitioning) throws IOException {
     if (dbPlatform != null) {
       if (tablePartitioning && includeBuiltInPartitioning) {
-        generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltinTablePartitioning());
+        generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltinTablePartitioning(), false);
       }
-      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin());
-      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.read());
+      // skip built-in migration stored procedures based on isUseMigrationStoredProcedures
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.readBuiltin(), true);
+      generateExtraDdlFor(migrationDir, dbPlatform, ExtraDdlXmlReader.read(), false);
     }
   }
 
-  private void generateExtraDdlFor(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl) throws IOException {
+  private void generateExtraDdlFor(File migrationDir, DatabasePlatform dbPlatform, ExtraDdl extraDdl, boolean checkSkip) throws IOException {
     if (extraDdl != null) {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
         if (!script.isDrop() && matchPlatform(dbPlatform.getPlatform(), script.getPlatforms())) {
-          writeExtraDdl(migrationDir, script);
+          if (!checkSkip || dbPlatform.isUseMigrationStoredProcedures()) {
+            writeExtraDdl(migrationDir, script);
+          }
         }
       }
     }
@@ -417,7 +425,7 @@ public class DefaultDbMigration implements DbMigration {
     String fullName = repeatableMigrationName(script.isInit(), script.getName());
     logger.debug("writing repeatable script {}", fullName);
     File file = new File(migrationDir, fullName);
-    try (FileWriter writer = new FileWriter(file)) {
+    try (Writer writer = IOUtils.newWriter(file)) {
       writer.write(script.getValue());
       writer.flush();
     }

@@ -11,7 +11,7 @@ class Db2Setup implements PlatformSetup {
     config.setDefaultPort(50000);
     config.setUsernameDefault();
     config.setPasswordDefault();
-    config.setUrl("jdbc:db2://localhost:${port}/${databaseName}");
+    config.setUrl("jdbc:db2://${host}:${port}/${databaseName}");
     config.setDriver("com.ibm.db2.jcc.DB2Driver");
     config.datasourceDefaults();
 

@@ -10,6 +10,7 @@ import org.tests.model.types.SomeNewTypesBean;
 import java.io.File;
 import java.nio.file.Paths;
 import java.time.*;
+import java.util.Calendar;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,6 +45,7 @@ public class TestNewTypes extends BaseTestCase {
     bean.setPath(Paths.get(TEMP_PATH));
     bean.setPeriod(Period.of(4,3,2));
     bean.setDuration(Duration.ofMinutes(5));
+    bean.setCalendar(Calendar.getInstance());
 
 
     DB.save(bean);
@@ -104,6 +106,10 @@ public class TestNewTypes extends BaseTestCase {
     list = DB.find(SomeNewTypesBean.class).where().eq("duration", Duration.ofMinutes(5)).findList();
     assertThat(list).isNotEmpty();
 
+    // Calendar.getInstance() returns an implementation, which then has to be remapped to ScalarTypeCalendar
+    list = DB.find(SomeNewTypesBean.class).where().le("calendar", Calendar.getInstance()).findList();
+    assertThat(list).isNotEmpty();
+
     SomeNewTypesBean fetched = DB.find(SomeNewTypesBean.class, bean.getId());
 
     assertEquals(bean.getZoneId(), fetched.getZoneId());
@@ -122,6 +128,7 @@ public class TestNewTypes extends BaseTestCase {
     assertEquals(bean.getPath(), fetched.getPath());
     assertEquals(bean.getPeriod(), fetched.getPeriod());
     assertEquals(bean.getDuration(), fetched.getDuration());
+    assertEquals(bean.getCalendar(), fetched.getCalendar());
 
 
     String asJson = DB.json().toJson(fetched);
@@ -139,10 +146,10 @@ public class TestNewTypes extends BaseTestCase {
     assertThat(toBean.getOffsetDateTime()).isEqualToIgnoringNanos(bean.getOffsetDateTime());
     assertEquals(bean.getLocalTime().toSecondOfDay(), toBean.getLocalTime().toSecondOfDay());
     assertEquals(bean.getInstant().toEpochMilli() / 1000, toBean.getInstant().toEpochMilli() / 1000);
-    // FIXME: This test fails on Windows with: expected:<\tmp> but was:<C:\tmp>
     assertEquals(bean.getPath(), toBean.getPath());
     assertEquals(bean.getPeriod(), toBean.getPeriod());
     assertEquals(bean.getDuration(), toBean.getDuration());
+    assertEquals(bean.getCalendar(), toBean.getCalendar());
 
   }
 

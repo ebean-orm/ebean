@@ -119,4 +119,9 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     // for update are hints on from clause of base table
     return sql;
   }
+
+  @Override
+  public boolean isUseMigrationStoredProcedures() {
+    return true;
+  }
 }

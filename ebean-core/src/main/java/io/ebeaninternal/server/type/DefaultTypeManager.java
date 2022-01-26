@@ -193,7 +193,7 @@ public final class DefaultTypeManager implements TypeManager {
       List<? extends ScalarType<?>> types = plugin.createTypes(config, objectMapper);
       for (ScalarType<?> type : types) {
         log.debug("adding ScalarType {}", type.getClass());
-        addCustomType(type);
+        add(type);
       }
     }
   }
@@ -208,25 +208,6 @@ public final class DefaultTypeManager implements TypeManager {
   @Override
   public void add(ScalarType<?> scalarType) {
     typeMap.put(scalarType.getType(), scalarType);
-    logAdd(scalarType);
-  }
-
-  /**
-   * Register the ScalarType for an enum. This is special in the sense that an Enum
-   * can have many classes if it uses method overrides and we need to register all
-   * the variations/classes for the enum.
-   */
-  @SuppressWarnings({"rawtypes", "unchecked"})
-  @Override
-  public void addEnumType(ScalarType<?> scalarType, Class<? extends Enum> enumClass) {
-    Set<Class<?>> mappedClasses = new HashSet<>();
-    mappedClasses.add(enumClass);
-    for (Object value : EnumSet.allOf(enumClass).toArray()) {
-      mappedClasses.add(value.getClass());
-    }
-    for (Class<?> cls : mappedClasses) {
-      typeMap.put(cls, scalarType);
-    }
     logAdd(scalarType);
   }
 
@@ -275,16 +256,43 @@ public final class DefaultTypeManager implements TypeManager {
           "ScalarType of Joda LocalTime not defined. You need to set DatabaseConfig.jodaLocalTimeMode to"
             + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
       }
-      found = checkInterfaceTypes(type);
+      found = checkInheritedTypes(type);
     }
-    return found;
+    return found != ScalarTypeNotFound.INSTANCE ? found : null; // Do not return ScalarTypeNotFound, otherwise checks will fail
   }
 
-  private ScalarType<?> checkInterfaceTypes(Class<?> type) {
-    if (java.nio.file.Path.class.isAssignableFrom(type)) {
-      return typeMap.get(java.nio.file.Path.class);
+  /**
+   * Checks the typeMap for inherited types.
+   *
+   * If e.g. <code>type</code> is a <code>GregorianCalendar</code>, then this method
+   * will check the class hierarchy and will probably return a
+   * <code>ScalarTypeCalendar</code> To speed up a second lookup, it will write
+   * back the found scalarType to typeMap.
+   *
+   * @param type the for which to search for a <code>ScalarType</code>
+   * @return either a valid <code>ScalarType</code> if one could be found or {@link ScalarTypeNotFound#INSTANCE} if not
+   */
+  private ScalarType<?> checkInheritedTypes(Class<?> type) {
+    // first step loop through inheritance chain
+    Class<?> parent = type;
+    while (parent != null && parent != Object.class) {
+      ScalarType<?> found = typeMap.get(parent);
+      if (found != null && found != ScalarTypeNotFound.INSTANCE) {
+        typeMap.put(type, found); // store type for next lookup
+        return found;
+      }
+      // second step - loop through interfaces of this type
+      for (Class<?> iface: parent.getInterfaces()) {
+        found = checkInheritedTypes(iface);
+        if (found != null && found != ScalarTypeNotFound.INSTANCE) {
+          typeMap.put(type, found); // store type for next lookup
+          return found;
+        }
+      }
+      parent = parent.getSuperclass();
     }
-    return null;
+    typeMap.put(type, ScalarTypeNotFound.INSTANCE);
+    return ScalarTypeNotFound.INSTANCE; // no success
   }
 
   @Override
@@ -389,7 +397,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private DocPropertyType getDocType(Type genericType) {
     if (genericType instanceof Class<?>) {
-      ScalarType<?> found = typeMap.get(genericType);
+      ScalarType<?> found = getScalarType((Class<?>)genericType);
       if (found != null) {
         return found.getDocType();
       }
@@ -447,7 +455,7 @@ public final class DefaultTypeManager implements TypeManager {
       return scalarType;
     }
 
-    scalarType = typeMap.get(type);
+    scalarType = getScalarType(type);
     if (scalarType != null) {
       if (jdbcType == 0 || scalarType.getJdbcType() == jdbcType) {
         // matching type
@@ -565,7 +573,7 @@ public final class DefaultTypeManager implements TypeManager {
       // use JPA normal Enum type (without mapping)
       scalarEnum = createEnumScalarTypePerSpec(enumType, type);
     }
-    addEnumType(scalarEnum, enumType);
+    add(scalarEnum);
     return scalarEnum;
   }
 
@@ -655,16 +663,13 @@ public final class DefaultTypeManager implements TypeManager {
             scalarType = cls.getDeclaredConstructor().newInstance();
           }
         }
-        addCustomType(scalarType);
+        add(scalarType);
       } catch (Exception e) {
         log.error("Error loading ScalarType [" + cls.getName() + "]", e);
       }
     }
   }
 
-  private void addCustomType(ScalarType<?> scalarType) {
-    add(scalarType);
-  }
 
   private Object initObjectMapper(DatabaseConfig config) {
     Object objectMapper = config.getObjectMapper();

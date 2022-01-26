@@ -9,10 +9,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestElementCollectionEmbeddedListCache extends BaseTestCase {
+class TestElementCollectionEmbeddedListCache extends BaseTestCase {
 
   @Test
-  public void test() {
+  void test() {
 
     EcblPerson person = new EcblPerson("CacheL");
     person.getPhoneNumbers().add(new EcPhone("64", "021","1234"));
@@ -86,11 +86,9 @@ public class TestElementCollectionEmbeddedListCache extends BaseTestCase {
     assertThat(four.getPhoneNumbers().toString()).contains("61-07-11");
     assertThat(four.getPhoneNumbers()).hasSize(1);
 
-
     DB.delete(four);
     sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
-
 
     LoggedSql.stop();
   }

@@ -18,12 +18,6 @@ public interface TypeManager {
   void add(ScalarType<?> scalarType);
 
   /**
-   * Register a ScalarType for an Enum with can have multiple classes.
-   */
-  @SuppressWarnings("rawtypes")
-  void addEnumType(ScalarType<?> type, Class<? extends Enum> myEnumClass);
-
-  /**
    * Return the scalar type for the given logical type.
    */
   ScalarType<?> getScalarType(String cast);

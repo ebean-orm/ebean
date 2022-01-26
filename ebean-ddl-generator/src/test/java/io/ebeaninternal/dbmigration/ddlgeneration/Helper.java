@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
+import io.ebean.util.IOUtils;
 import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
@@ -9,8 +10,8 @@ import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.Reader;
 import java.util.List;
 
 /**
@@ -89,8 +90,7 @@ public class Helper {
 
   public static String asText(InputStream in) throws IOException {
 
-    try {
-      InputStreamReader reader = new InputStreamReader(in);
+    try (Reader reader = IOUtils.newReader(in)) {
 
       LineNumberReader lineNumberReader = new LineNumberReader(reader);
 

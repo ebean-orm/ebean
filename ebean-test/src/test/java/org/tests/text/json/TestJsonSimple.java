@@ -4,9 +4,12 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.EJson;
 import io.ebean.text.json.JsonContext;
+import io.ebean.util.IOUtils;
+
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,18 +23,19 @@ public class TestJsonSimple extends BaseTestCase {
   public void test() throws IOException {
 
     InputStream is = this.getClass().getResourceAsStream("/example1.json");
+    String jsonText;
+    try (final Reader reader = IOUtils.newReader(is)) {
+      LineNumberReader lineReader = new LineNumberReader(reader);
 
-    final Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-    LineNumberReader lineReader = new LineNumberReader(reader);
+      String readLine;
 
-    String readLine;
+      StringBuilder sb = new StringBuilder();
+      while ((readLine = lineReader.readLine()) != null) {
+        sb.append(readLine);
+      }
 
-    StringBuilder sb = new StringBuilder();
-    while ((readLine = lineReader.readLine()) != null) {
-      sb.append(readLine);
+      jsonText = sb.toString();
     }
-
-    String jsonText = sb.toString();
 
     Object el = EJson.parse(jsonText);
     assertThat(el).isNotNull();

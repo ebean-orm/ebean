@@ -11,7 +11,7 @@ class ClickHouseSetup implements PlatformSetup {
     config.setDefaultPort(8123);
     config.setUsername("default");
     config.setPassword("");
-    config.setUrl("jdbc:clickhouse://localhost:${port}/${databaseName}");
+    config.setUrl("jdbc:clickhouse://${host}:${port}/${databaseName}");
     config.setDriver("ru.yandex.clickhouse.ClickHouseDriver");
     config.datasourceDefaults();
 

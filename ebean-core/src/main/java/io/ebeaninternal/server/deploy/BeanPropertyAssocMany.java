@@ -226,12 +226,21 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public void addBeanToCollectionWithCreate(EntityBean parentBean, EntityBean detailBean, boolean withCheck) {
-    BeanCollection<?> bc = (BeanCollection<?>) super.getValue(parentBean);
+    BeanCollection<?> bc = beanCollection(parentBean);
     if (bc == null) {
       bc = help.createEmpty(parentBean);
       setValue(parentBean, bc);
     }
     help.add(bc, detailBean, withCheck);
+  }
+
+  private BeanCollection<?> beanCollection(EntityBean parentBean) {
+    try {
+      return (BeanCollection<?>) super.getValue(parentBean);
+    } catch (ClassCastException e) {
+      // fetching element collection, ok for now
+      return null;
+    }
   }
 
   /**

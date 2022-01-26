@@ -8,12 +8,14 @@ import org.tests.model.basic.PersistentFileContent;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.nio.charset.StandardCharsets;
+
 public class TestSaveDeleteOneToOne extends BaseTestCase {
 
   @Test
   public void testCreateDeletePersistentFile() {
     PersistentFile persistentFile = new PersistentFile("test.txt",
-      new PersistentFileContent("test".getBytes()));
+      new PersistentFileContent("test".getBytes(StandardCharsets.UTF_8)));
 
     DB.save(persistentFile);
     DB.delete(persistentFile);
@@ -22,7 +24,7 @@ public class TestSaveDeleteOneToOne extends BaseTestCase {
   @Test
   public void testCreateLoadDeletePersistentFile() {
     PersistentFile persistentFile = new PersistentFile("test.txt",
-      new PersistentFileContent("test".getBytes()));
+      new PersistentFileContent("test".getBytes(StandardCharsets.UTF_8)));
 
     DB.save(persistentFile);
 
