@@ -5,6 +5,7 @@ import io.ebean.CountDistinctOrder;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.Identity;
+import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -105,10 +106,23 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     query1.setDistinct(true).setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC).setMaxRows(20);
     query1.findSingleAttributeList();
 
-    assertThat(query1.getGeneratedSql()).contains("select distinct r1.attribute_, count(*) from "
-        + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
-        + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
-        + "group by r1.attribute_ order by count(*) desc, r1.attribute_ limit 20");
+    if (isH2() || isMariaDB() || isPostgres()) {
+      assertThat(query1.getGeneratedSql()).contains("select distinct r1.attribute_, count(*) from "
+          + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
+          + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
+          + "group by r1.attribute_ order by count(*) desc, r1.attribute_ limit 20");
+    } else if (isDb2()) {
+      assertThat(query1.getGeneratedSql()).contains("select distinct r1.attribute_, count(*) from "
+          + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
+          + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
+          + "group by r1.attribute_ order by count(*) desc, r1.attribute_ fetch next 20 rows only");
+    } else if (isSqlServer()) {
+      assertThat(query1.getGeneratedSql()).contains("select distinct top 20 r1.attribute_, count(*) "
+          + "from (select distinct t0.user_id, t0.role_id, t1.name as attribute_ from em_user_role t0 "
+          + "join em_user t1 on t1.id = t0.user_id) r1 group by r1.attribute_ order by count(*) desc, r1.attribute_");
+    } else {
+      // no Oracle test yet
+    }
   }
 
   @Identity(generated = BY_DEFAULT)
