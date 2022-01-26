@@ -2,6 +2,7 @@ package org.tests.model.basic;
 
 import io.ebean.DB;
 import io.ebean.Database;
+import io.ebean.Transaction;
 import org.tests.model.basic.Order.Status;
 
 import java.sql.Date;
@@ -47,6 +48,7 @@ public class ResetBasicData {
         // the test rely on the products being in there
         return;
       }
+      Transaction.current().setBatchMode(false);
       //me.deleteAll();
       me.insertCountries();
       me.insertProducts();
