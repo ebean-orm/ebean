@@ -1,10 +1,7 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.bean.EntityBean;
-import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
 
@@ -37,13 +34,13 @@ final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
   }
 
   @Override
-  public boolean isSingleProperty() {
-    return false;
+  public SqlTreeLoad createLoad() {
+    return null;
   }
 
   @Override
-  public ScalarType<?> getSingleAttributeReader() {
-    throw new IllegalStateException("No expected");
+  public boolean isSingleProperty() {
+    return false;
   }
 
   @Override
@@ -130,12 +127,6 @@ final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
   @Override
   public void appendWhere(DbSqlContext ctx) {
     // nothing to do here
-  }
-
-  @Override
-  public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) {
-    // nothing to do here
-    return null;
   }
 
   @Override

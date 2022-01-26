@@ -33,13 +33,13 @@ final class SqlTreeNodeFormulaWhereJoin implements SqlTreeNode {
   }
 
   @Override
-  public boolean isSingleProperty() {
-    return true;
+  public SqlTreeLoad createLoad() {
+    return null;
   }
 
   @Override
-  public ScalarType<?> getSingleAttributeReader() {
-    throw new IllegalStateException("No expected");
+  public boolean isSingleProperty() {
+    return true;
   }
 
   @Override
@@ -96,12 +96,6 @@ final class SqlTreeNodeFormulaWhereJoin implements SqlTreeNode {
   @Override
   public void appendWhere(DbSqlContext ctx) {
     // nothing to do here
-  }
-
-  @Override
-  public EntityBean load(DbReadContext ctx, EntityBean localBean, EntityBean parentBean) {
-    // nothing to do here
-    return null;
   }
 
   @Override

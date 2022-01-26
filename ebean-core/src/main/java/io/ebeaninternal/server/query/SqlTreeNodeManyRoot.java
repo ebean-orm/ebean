@@ -1,16 +1,13 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 
-import java.sql.SQLException;
 import java.util.List;
 
 final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 
-  private final STreePropertyAssocMany manyProp;
+  final STreePropertyAssocMany manyProp;
 
   SqlTreeNodeManyRoot(String prefix, STreePropertyAssocMany prop, SqlTreeProperties props, List<SqlTreeNode> myList,
                       boolean withId, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
@@ -19,22 +16,13 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   }
 
   @Override
-  public boolean hasMany() {
-    return true;
+  public SqlTreeLoad createLoad() {
+    return new SqlTreeLoadManyRoot(this);
   }
 
   @Override
-  public EntityBean load(DbReadContext cquery, EntityBean parentBean, EntityBean contextParent) throws SQLException {
-    // pass in null for parentBean because added to a collection rather than set to the parentBean
-    SqlTreeNodeBean.Load load = createLoad(cquery, null);
-    EntityBean detailBean = load.perform();
-    if (contextParent != null) {
-      // Add to the collection and initialise collection if needed
-      // A null detailBean may initialise an empty collection
-      // Check for bean existing in collection based on load.isContextBean()
-      manyProp.addBeanToCollectionWithCreate(contextParent, detailBean, load.isContextBean());
-    }
-    return detailBean;
+  public boolean hasMany() {
+    return true;
   }
 
   /**

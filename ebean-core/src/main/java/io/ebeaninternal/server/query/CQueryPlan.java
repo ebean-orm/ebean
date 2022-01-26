@@ -55,7 +55,7 @@ public class CQueryPlan implements SpiQueryPlan {
   private final String sql;
   private final String hash;
   private final String logWhereSql;
-  private final SqlTree sqlTree;
+  private final SqlTreePlan sqlTree;
 
   /**
    * Encrypted properties required additional binding.
@@ -76,7 +76,7 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Create a query plan based on a OrmQueryRequest.
    */
-  CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTree sqlTree, boolean rawSql, String logWhereSql) {
+  CQueryPlan(OrmQueryRequest<?> request, SqlLimitResponse sqlRes, SqlTreePlan sqlTree, boolean rawSql, String logWhereSql) {
     this.server = request.server();
     this.dataTimeZone = server.dataTimeZone();
     this.beanType = request.descriptor().type();
@@ -101,7 +101,7 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Create a query plan for a raw sql query.
    */
-  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTree sqlTree, String logWhereSql) {
+  CQueryPlan(OrmQueryRequest<?> request, String sql, SqlTreePlan sqlTree, String logWhereSql) {
     this.server = request.server();
     this.dataTimeZone = server.dataTimeZone();
     this.beanType = request.descriptor().type();
@@ -249,7 +249,7 @@ public class CQueryPlan implements SpiQueryPlan {
     return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
   }
 
-  final SqlTree getSqlTree() {
+  final SqlTreePlan getSqlTree() {
     return sqlTree;
   }
 
