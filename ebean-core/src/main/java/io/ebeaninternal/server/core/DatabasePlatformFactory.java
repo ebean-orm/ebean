@@ -4,7 +4,10 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
-import io.ebean.config.dbplatform.db2.DB2Platform;
+import io.ebean.config.dbplatform.db2.DB2ForIPlatform;
+import io.ebean.config.dbplatform.db2.DB2LegacyPlatform;
+import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
+import io.ebean.config.dbplatform.db2.DB2ZosPlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
@@ -103,7 +106,19 @@ public class DatabasePlatformFactory {
       return new SqlAnywherePlatform();
     }
     if (dbName.equals("db2")) {
-      return new DB2Platform();
+      throw new IllegalArgumentException("Please choose the more specific db2luw/db2zos/db2fori platform. Refer to issue #xxxx for details");
+    }
+    if (dbName.equals("db2legacy")) {
+      return new DB2LegacyPlatform();
+    }
+    if (dbName.equals("db2zos")) {
+      return new DB2ZosPlatform();
+    }
+    if (dbName.equals("db2fori")) {
+      return new DB2ForIPlatform();
+    }
+    if (dbName.equals("db2luw")) {
+      return new DB2LuwPlatform();
     }
     if (dbName.equals("clickhouse")) {
       return new ClickHousePlatform();
@@ -159,7 +174,7 @@ public class DatabasePlatformFactory {
     } else if (dbProductName.contains("sqlite")) {
       return new SQLitePlatform();
     } else if (dbProductName.contains("db2")) {
-      return new DB2Platform();
+      throw new IllegalArgumentException("For DB2 please explicitly choose either db2legacy/db2luw/db2zos/db2fori platform. Refer to issue #xxxx for details");
     } else if (dbProductName.contains("sql anywhere")) {
       return new SqlAnywherePlatform();
     } else if (dbProductName.contains("hdb")) {
