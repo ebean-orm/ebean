@@ -6,8 +6,8 @@
 
 [![Postgres](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml)
 [![MySql](https://github.com/ebean-orm/ebean/actions/workflows/mysql.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mysql.yml)
-[![MariaDB](https://github.com/ebean-orm/ebean/actions/workflows/mariadb-10.6.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mariadb-10.6.yml)
-[![SqlServer](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver-2017-latest.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver-2017-latest.yml)
+[![MariaDB](https://github.com/ebean-orm/ebean/actions/workflows/mariadb.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mariadb.yml)
+[![SqlServer](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver.yml)
 
 # Sponsors
 <table>
