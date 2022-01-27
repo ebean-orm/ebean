@@ -34,5 +34,5 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: postgres
+    - name: oracle
       run: mvn clean test -Dprops.file=testconfig/ebean-oracle.properties
