@@ -27,6 +27,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     // SQL Server unless we are using sequences
     this.dbEncrypt = new SqlServerDbEncrypt();
     this.persistBatchOnCascade = PersistBatch.NONE;
+    this.maxInBinding = 2000;
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
     this.selectCountWithColumnAlias = true;
