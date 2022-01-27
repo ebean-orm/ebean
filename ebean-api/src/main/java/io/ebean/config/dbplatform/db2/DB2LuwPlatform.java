@@ -10,7 +10,7 @@ import io.ebean.annotation.Platform;
 public class DB2LuwPlatform extends BaseDB2Platform {
   public DB2LuwPlatform() {
     super();
-    this.platform = Platform.DB2; // TODO DB2LUW
+    this.platform = Platform.DB2LUW;
     this.maxTableNameLength = 128;
     this.maxConstraintNameLength = 128;
   }

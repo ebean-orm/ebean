@@ -24,7 +24,10 @@ import io.ebean.config.PropertiesWrapper;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
-import io.ebean.config.dbplatform.db2.DB2Platform;
+import io.ebean.config.dbplatform.db2.DB2ForIPlatform;
+import io.ebean.config.dbplatform.db2.DB2LegacyPlatform;
+import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
+import io.ebean.config.dbplatform.db2.DB2ZosPlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
@@ -831,7 +834,14 @@ public class DefaultDbMigration implements DbMigration {
       case SQLSERVER:
         throw new IllegalArgumentException("Please choose the more specific SQLSERVER16 or SQLSERVER17 platform. Refer to issue #1340 for details");
       case DB2:
-        return new DB2Platform();
+        logger.warn("Using DB2LegacyPlatform. It is recommended to migrate to db2luw/db2zos/db2fori. Refer to issue #xxxx for details");
+        return new DB2LegacyPlatform();
+      case DB2LUW:
+        return new DB2LuwPlatform();
+      case DB2ZOS:
+        return new DB2ZosPlatform();
+      case DB2FORI:
+        return new DB2ForIPlatform();
       case SQLITE:
         return new SQLitePlatform();
       case HANA:

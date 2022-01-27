@@ -11,7 +11,7 @@ import io.ebean.annotation.Platform;
 public class DB2ZosPlatform extends BaseDB2Platform {
   public DB2ZosPlatform() {
     super();
-    this.platform = Platform.DB2; // TODO DB2ZOS
+    this.platform = Platform.DB2ZOS;
     this.maxTableNameLength = 128;
     this.maxConstraintNameLength = 128;
   }

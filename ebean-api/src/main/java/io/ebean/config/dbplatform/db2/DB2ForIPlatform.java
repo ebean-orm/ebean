@@ -16,7 +16,7 @@ public class DB2ForIPlatform extends BaseDB2Platform {
 
   public DB2ForIPlatform() {
     super();
-    this.platform = Platform.DB2;
+    this.platform = Platform.DB2FORI;
     // Note: IBM i from 7.1 allow up to to 128
     // TODO: Check if we need to introduce older platform (DB2ForI_6 ? but older documentation is not anymore published on ibm.com),
     this.maxTableNameLength = 128;
