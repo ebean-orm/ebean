@@ -30,7 +30,7 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   boolean isId();
   
   /**
-   * Returns true, if this is a lob property.
+   * Returns true, if this is a lob property from db-perspective.
    */
   boolean isDbLob();
 

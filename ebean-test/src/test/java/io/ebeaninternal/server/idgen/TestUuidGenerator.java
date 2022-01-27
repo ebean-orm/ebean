@@ -85,7 +85,7 @@ public class TestUuidGenerator {
       prop.store(os, "ebean uuid state file");
     }
   }
-  
+
   private Properties readPropertyFile() throws IOException {
     Properties prop = new Properties();
     try (InputStream is = new FileInputStream(stateFile)) {
@@ -108,7 +108,7 @@ public class TestUuidGenerator {
     assertThat(Long.parseLong(props.getProperty("timeStamp")))
         .isCloseTo(uuid.timestamp(), within(2_000_000L));
   }
-  
+
   @Test
   public void testUuidInvalidMac() throws Exception {
     assertThatThrownBy(()-> UuidV1IdGenerator.getInstance(stateFile, "01-02-03-04-05"))
@@ -117,8 +117,7 @@ public class TestUuidGenerator {
     assertThatThrownBy(()-> UuidV1IdGenerator.getInstance(stateFile, "01-02-03-04-05-GG"))
         .isInstanceOf(IllegalArgumentException.class)
         .hasMessageContaining("01-02-03-04-05-gg is invalid.")
-        .hasRootCauseInstanceOf(NumberFormatException.class)
-        .hasRootCauseMessage("For input string: \"gg\"");
+        .hasRootCauseInstanceOf(NumberFormatException.class);
     assertThat(stateFile).doesNotExist();
   }
 
@@ -170,7 +169,7 @@ public class TestUuidGenerator {
     UUID uuid = gen.nextId(null);
     assertThat(uuid).isNotNull();
   }
-  
+
   @Test
   public void testMacChange() throws Exception {
     writePropertyFile("01-02-03-04-05", "1234", "1234");

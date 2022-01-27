@@ -1160,9 +1160,25 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public boolean isLob() {
     return lob;
   }
-  
+
+  /**
+   * Returns true if this <code>isLob()</code> or the type will effectively map to a lob. 
+   */
+  @Override
   public boolean isDbLob() {
-    return lob || dbType == DbPlatformType.JSON && dbLength == 0;
+    if (lob) {
+      return true;
+    }
+    switch (dbType) {
+    case DbPlatformType.JSON:
+    case DbPlatformType.JSONB:
+      return dbLength == 0; // must be analog to DbPlatformTypeMapping.lookup
+    case DbPlatformType.JSONBlob:
+    case DbPlatformType.JSONClob:
+      return true;
+    default:
+      return false;
+    }
   }
   
   public static boolean isLobType(int type) {

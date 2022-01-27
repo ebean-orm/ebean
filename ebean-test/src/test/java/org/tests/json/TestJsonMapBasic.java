@@ -7,6 +7,8 @@ import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.text.json.EJson;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonMap;
 import org.tests.model.json.EBasicJsonMapDetail;
@@ -21,25 +23,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestJsonMapBasic extends BaseTestCase {
 
+  private final EBasicJsonMap bean = new EBasicJsonMap();;
+
+  @AfterEach
+  void cleanup() {
+    if (bean != null && bean.getId() != null) {
+      DB.delete(EBasicJsonMap.class, bean.getId());
+    }
+  }
+
   @Test
   @ForPlatform(Platform.POSTGRES)
   public void whereManyPredicatePg() {
 
-    EBasicJsonMap bean = new EBasicJsonMap();
     bean.setName("own1");
     bean.getDetails().add(new EBasicJsonMapDetail("detail1"));
     bean.getDetails().add(new EBasicJsonMapDetail("detail2"));
 
     DB.save(bean);
 
-    Query<EBasicJsonMap> query1 = DB.find(EBasicJsonMap.class).fetch("details").where()
-        .startsWith("details.name", "detail").query();
+    Query<EBasicJsonMap> query1 = DB.find(EBasicJsonMap.class)
+      .fetch("details")
+      .where().startsWith("details.name", "detail")
+      .query();
 
     query1.findList();
 
     assertThat(query1.getGeneratedSql()).contains("select distinct on (t0.id, t1.id) ");
 
-    Query<EBasicJsonMap> query2 = DB.find(EBasicJsonMap.class).where().startsWith("details.name", "detail").query();
+    Query<EBasicJsonMap> query2 = DB.find(EBasicJsonMap.class)
+      .where().startsWith("details.name", "detail")
+      .query();
     query2.findList();
 
     assertThat(query2.getGeneratedSql()).contains("select distinct on (t0.id) ");
@@ -49,7 +63,6 @@ public class TestJsonMapBasic extends BaseTestCase {
   @ForPlatform(Platform.DB2)
   public void whereManyPredicateDb2() {
 
-    EBasicJsonMap bean = new EBasicJsonMap();
     Map<String, Object> m1 = new HashMap<>();
     m1.put("foo", "bar");
     bean.setContent(m1);
@@ -58,38 +71,32 @@ public class TestJsonMapBasic extends BaseTestCase {
     bean.getDetails().add(new EBasicJsonMapDetail("db2-detail2"));
 
     DB.save(bean);
-    try {
-      Query<EBasicJsonMap> query1 = DB.find(EBasicJsonMap.class).select("*").fetch("details").where()
-          .startsWith("details.name", "db2-detail").query();
+    Query<EBasicJsonMap> query1 = DB.find(EBasicJsonMap.class).select("*").fetch("details").where()
+        .startsWith("details.name", "db2-detail").query();
 
-      List<EBasicJsonMap> lst = query1.findList();
+    List<EBasicJsonMap> lst = query1.findList();
 
-      assertThat(query1.getGeneratedSql()).contains("select distinct t0.id, t0.name, t0.version,")
-          .doesNotContain("content");
-      assertThat(lst).hasSize(1);
-      assertThat(lst.get(0).getContent()).containsEntry("foo", "bar");
+    assertThat(query1.getGeneratedSql()).contains("select distinct t0.id, t0.name, t0.version,")
+        .doesNotContain("content");
+    assertThat(lst).hasSize(1);
+    assertThat(lst.get(0).getContent()).containsEntry("foo", "bar");
 
-      Query<EBasicJsonMap> query2 = DB.find(EBasicJsonMap.class).where().startsWith("details.name", "db2-detail")
-          .query();
-      query2.findList();
+    Query<EBasicJsonMap> query2 = DB.find(EBasicJsonMap.class).where().startsWith("details.name", "db2-detail")
+        .query();
+    query2.findList();
 
-      assertThat(query2.getGeneratedSql()).contains("select distinct t0.id, t0.name, t0.version from");
-    } finally {
-      // temporär hier, sollte die ganze Testklasse aufräumen
-      DB.delete(bean);
-    }
+    assertThat(query2.getGeneratedSql()).contains("select distinct t0.id, t0.name, t0.version from");
+
   }
 
   @Test
   public void testInsertUpdateDelete() throws IOException {
 
     String s0 = "{\"docId\":18,\"contentId\":\"asd\",\"active\":true,\"contentType\":\"pg-hello\",\"content\":{\"name\":\"rob\",\"age\":45}}";
-    // String s1 =
-    // "{\"docId\":19,\"contentId\":\"asd\",\"active\":true,\"contentType\":\"pg-hello\",\"content\":{\"name\":\"rob\",\"age\":45}}";
+    //String s1 = "{\"docId\":19,\"contentId\":\"asd\",\"active\":true,\"contentType\":\"pg-hello\",\"content\":{\"name\":\"rob\",\"age\":45}}";
 
     Map<String, Object> content = EJson.parseObject(s0);
 
-    EBasicJsonMap bean = new EBasicJsonMap();
     bean.setName("one");
     bean.setContent(content);
 
@@ -137,7 +144,6 @@ public class TestJsonMapBasic extends BaseTestCase {
     String s0 = "{\"docId\":22,\"contentId\":\"initialDoc\"}";
     Map<String, Object> content = EJson.parseObject(s0);
 
-    EBasicJsonMap bean = new EBasicJsonMap();
     bean.setName("one");
     bean.setContent(content);
 
@@ -148,7 +154,10 @@ public class TestJsonMapBasic extends BaseTestCase {
 
     LoggedSql.start();
 
-    final int rows = DB.update(EBasicJsonMap.class).set("content", content1).where().eq("id", bean.getId()).update();
+    final int rows = DB.update(EBasicJsonMap.class)
+      .set("content", content1)
+      .where().eq("id", bean.getId())
+      .update();
 
     final List<String> sql = LoggedSql.stop();
 
@@ -161,6 +170,5 @@ public class TestJsonMapBasic extends BaseTestCase {
     assertThat(content2.get("contentId")).isEqualTo("updatedDoc222");
     assertThat(content2.get("docId")).isEqualTo(222L);
 
-    DB.delete(found);
   }
 }
