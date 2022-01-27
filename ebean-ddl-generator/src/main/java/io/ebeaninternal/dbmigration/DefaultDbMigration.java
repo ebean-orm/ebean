@@ -834,7 +834,7 @@ public class DefaultDbMigration implements DbMigration {
       case SQLSERVER:
         throw new IllegalArgumentException("Please choose the more specific SQLSERVER16 or SQLSERVER17 platform. Refer to issue #1340 for details");
       case DB2:
-        logger.warn("Using DB2LegacyPlatform. It is recommended to migrate to db2luw/db2zos/db2fori. Refer to issue #xxxx for details");
+        logger.warn("Using DB2LegacyPlatform. It is recommended to migrate to db2luw/db2zos/db2fori. Refer to issue #2514 for details");
         return new DB2LegacyPlatform();
       case DB2LUW:
         return new DB2LuwPlatform();

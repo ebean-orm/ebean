@@ -106,7 +106,7 @@ public class DatabasePlatformFactory {
       return new SqlAnywherePlatform();
     }
     if (dbName.equals("db2")) {
-      throw new IllegalArgumentException("Please choose the more specific db2luw/db2zos/db2fori platform. Refer to issue #xxxx for details");
+      throw new IllegalArgumentException("Please choose the more specific db2luw/db2zos/db2fori platform. Refer to issue #2514 for details");
     }
     if (dbName.equals("db2legacy")) {
       return new DB2LegacyPlatform();
@@ -174,7 +174,7 @@ public class DatabasePlatformFactory {
     } else if (dbProductName.contains("sqlite")) {
       return new SQLitePlatform();
     } else if (dbProductName.contains("db2")) {
-      throw new IllegalArgumentException("For DB2 please explicitly choose either db2legacy/db2luw/db2zos/db2fori platform. Refer to issue #xxxx for details");
+      throw new IllegalArgumentException("For DB2 please explicitly choose either db2legacy/db2luw/db2zos/db2fori platform. Refer to issue #2514 for details");
     } else if (dbProductName.contains("sql anywhere")) {
       return new SqlAnywherePlatform();
     } else if (dbProductName.contains("hdb")) {
