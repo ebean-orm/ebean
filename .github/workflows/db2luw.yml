@@ -1,5 +1,5 @@
 
-name: Postgres
+name: DB2 LUW
 
 on:
   workflow_dispatch:
