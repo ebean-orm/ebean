@@ -1,10 +1,7 @@
 
-name: MariaDB 10.6
+name: SqlServer 2019
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '10 7 * * 1,4'
+on: [workflow_dispatch]
 
 jobs:
   build:
@@ -34,5 +31,5 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: mariadb 10.6
-      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
+    - name: sqlserver 2019 latest
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties

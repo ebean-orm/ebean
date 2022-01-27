@@ -1,7 +1,10 @@
 
-name: SqlServer 2019 latest
+name: SqlServer
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '10 7 * * 2,5'
 
 jobs:
   build:
@@ -31,5 +34,7 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: sqlserver 2019 latest
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties
+#    - name: sqlserver 2019 latest
+#      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver.properties
+    - name: sqlserver 2017 latest
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties

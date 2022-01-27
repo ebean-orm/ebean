@@ -1,7 +1,10 @@
 
-name: Multi-database platform test
+name: MariaDB
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '10 7 * * 1,4'
 
 jobs:
   build:
@@ -31,17 +34,5 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: h2
-      run: mvn clean test
-    - name: postgres
-      run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
-    - name: mysql
-      run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties
-    - name: sqlserver 2019
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties
-    - name: sqlserver 2017
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
-    - name: mariadb
+    - name: mariadb 10.6
       run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
-    - name: db2
-      run: mvn clean test -Dprops.file=testconfig/ebean-db2.properties
