@@ -114,6 +114,6 @@ public class ClusterTest {
   }
 
   private void allowAsyncMessaging() throws InterruptedException {
-    Thread.sleep(50);
+    Thread.sleep(100);
   }
 }
