@@ -23,6 +23,7 @@ public class OraclePlatform extends DatabasePlatform {
     super();
     this.platform = Platform.ORACLE;
     this.supportsDeleteTableAlias = true;
+    this.maxInBinding = 1000;
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();
