@@ -43,3 +43,5 @@ jobs:
       run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
     - name: mariadb
       run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
+    - name: db2
+      run: mvn clean test -Dprops.file=testconfig/ebean-db2.properties
