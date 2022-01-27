@@ -16,12 +16,12 @@ alter table migtest_fk_set_null drop constraint fk_mgtst_fk_wicx8x;
 alter table migtest_fk_set_null add constraint fk_mgtst_fk_wicx8x foreign key (one_id) references migtest_fk_one (id) on delete set null;
 alter table migtest_e_basic drop constraint ck_mgtst__bsc_stts;
 alter table migtest_e_basic alter column status drop default;
-alter table migtest_e_basic alter column status set null;
+alter table migtest_e_basic alter column status drop not null;
 alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in ('N','A','I'));
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 alter table migtest_e_basic drop constraint ck_mgtst__b_z543fg;
-alter table migtest_e_basic alter column status2 varchar(1);
+alter table migtest_e_basic alter column status2 set data type varchar(1);
 alter table migtest_e_basic alter column status2 set default 'N';
 alter table migtest_e_basic alter column status2 set not null;
 alter table migtest_e_basic add constraint ck_mgtst__b_z543fg check ( status2 in ('N','A','I'));
@@ -46,13 +46,13 @@ alter table migtest_e_enum add constraint ck_mgtst__n_773sok check ( test_status
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
 alter table migtest_e_history2 alter column test_string drop default;
-alter table migtest_e_history2 alter column test_string set null;
+alter table migtest_e_history2 alter column test_string drop not null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
 
-alter table migtest_e_history4 alter column test_number integer;
+alter table migtest_e_history4 alter column test_number set data type integer;
 alter table migtest_e_history6 alter column test_number1 drop default;
-alter table migtest_e_history6 alter column test_number1 set null;
+alter table migtest_e_history6 alter column test_number1 drop not null;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;

@@ -31,6 +31,9 @@ public class PlatformDdlBuilder {
       case H2:
         return new H2Ddl(platform);
       case DB2:
+      case DB2LUW:
+      case DB2FORI:
+      case DB2ZOS:
         return new DB2Ddl(platform);
       case MARIADB:
         return new MariaDbDdl(platform);

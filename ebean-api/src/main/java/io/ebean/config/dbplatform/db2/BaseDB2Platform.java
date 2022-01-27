@@ -15,15 +15,11 @@ import java.sql.Types;
 /**
  * DB2 specific platform.
  */
-public class DB2Platform extends DatabasePlatform {
+public abstract class BaseDB2Platform extends DatabasePlatform {
 
-  public DB2Platform() {
+  public BaseDB2Platform() {
     super();
     this.platform = Platform.DB2;
-    // Note: DB2 (at least LUW supports length up to 128)
-    // TOOD: Check if we need to introduce a new platform (DB2_LUW_11 ?)
-    this.maxTableNameLength = 18;
-    this.maxConstraintNameLength = 18;
     this.supportsNativeJavaTime = false;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.sqlLimiter = new Db2SqlLimiter();
