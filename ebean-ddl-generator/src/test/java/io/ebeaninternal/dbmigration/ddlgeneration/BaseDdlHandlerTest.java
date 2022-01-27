@@ -18,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BaseDdlHandlerTest extends BaseTestCase {
 
+  private static boolean useV1Syntax = Boolean.getBoolean("ebean.h2.useV1Syntax");
+  
   private final DatabaseConfig serverConfig = new DatabaseConfig();
 
   private DdlHandler handler(DatabasePlatform platform) {
@@ -107,7 +109,11 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     h2Handler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety varchar array;\n\n");
+    if (useV1Syntax) {
+      assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety array;\n\n");
+    } else {
+      assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety varchar array;\n\n");
+    }
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnWithLength());
@@ -127,7 +133,11 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     write = new DdlWrite();
     h2Handler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer integer array;\n\n");
+    if (useV1Syntax) {
+      assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer array;\n\n");
+    } else {
+      assertThat(write.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer integer array;\n\n");
+    }
 
     write = new DdlWrite();
     sqlserverHandler().generate(write, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());

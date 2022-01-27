@@ -101,7 +101,7 @@ public class PlatformNoGeneratedKeysTest {
     config.setDatabasePlatform(platform);
     config.getDataSourceConfig().setUsername("sa");
     config.getDataSourceConfig().setPassword("");
-    config.getDataSourceConfig().setUrl("jdbc:h2:mem:withPCQuery;MODE=LEGACY");
+    config.getDataSourceConfig().setUrl("jdbc:h2:mem:withPCQuery");
     config.getDataSourceConfig().setDriver("org.h2.Driver");
 
     config.setDisableLazyLoading(true);

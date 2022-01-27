@@ -11,6 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestSqlUpdateUpsert extends BaseTestCase {
 
+  private static boolean useV1Syntax = Boolean.getBoolean("ebean.h2.useV1Syntax");
+  
   @ForPlatform(Platform.H2)
   @Test
   public void h2Merge() throws InterruptedException {
@@ -39,7 +41,11 @@ public class TestSqlUpdateUpsert extends BaseTestCase {
       .setParameter("online", false);
 
     Object key2 = sqlUpdate2.executeGetKey();
-    assertThat(key2).isEqualTo(key);
+    if (useV1Syntax) {
+      assertThat(key2).isNull();
+    } else {
+      assertThat(key2).isEqualTo(key);
+    }
 
 
     EPersonOnline found2 = DB.find(EPersonOnline.class).where().eq("email", email).findOne();
