@@ -241,17 +241,17 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({Platform.HANA, Platform.DB2}))
+  @ForPlatform({Platform.HANA, Platform.DB2})
   public void where_or1_hana() {
 
     Query<Customer> query = parse("where name = 'Rob' or (status = 'N' and smallnote is null)");
     query.findList();
 
-    assertSql(query).contains("where (t0.name = ?  or (t0.status = ?  and t0.smallnote is null ) )");
+    assertSql(query).contains("where (t0.name = ? or (t0.status = ? and t0.smallnote is null))");
   }
 
   @Test
-  @IgnorePlatform({Platform.HANA, Platform.DB2})) // The HANA & DB2 JDBC driver checks the field length on binding and rejects 'NEW'
+  @IgnorePlatform({Platform.HANA, Platform.DB2}) // The HANA & DB2 JDBC driver checks the field length on binding and rejects 'NEW'
   public void where_or2() {
 
     Query<Customer> query = parse("where (name = 'Rob' or status = 'NEW') and smallnote is null");
@@ -261,17 +261,17 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({Platform.HANA, Platform.DB2}))
+  @ForPlatform({Platform.HANA, Platform.DB2})
   public void where_or2_hana() {
 
     Query<Customer> query = parse("where (name = 'Rob' or status = 'N') and smallnote is null");
     query.findList();
 
-    assertSql(query).contains("where ((t0.name = ?  or t0.status = ? )  and t0.smallnote is null )");
+    assertSql(query).contains("where ((t0.name = ? or t0.status = ?) and t0.smallnote is null)");
   }
 
   @Test
-  @IgnorePlatform({Platform.HANA, Platform.DB2})) // The HANA & DB2 JDBC driver checks the field length on binding and rejects 'NEW'
+  @IgnorePlatform({Platform.HANA, Platform.DB2}) // The HANA & DB2 JDBC driver checks the field length on binding and rejects 'NEW'
   public void test_simplifyExpressions() {
 
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'NEW')");
@@ -293,15 +293,15 @@ public class EqlParserTest extends BaseTestCase {
 
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'N')");
     query.findList();
-    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
 
     query = parse("where not ((name = 'Rob' and status = 'N'))");
     query.findList();
-    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
 
     query = parse("where not (((name = 'Rob') and (status = 'N')))");
     query.findList();
-    assertSql(query).contains("where not (t0.name = ?  and t0.status = ? )");
+    assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
   }
 
   @Test
