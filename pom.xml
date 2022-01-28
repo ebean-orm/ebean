@@ -129,7 +129,7 @@
       </modules>
     </profile>
   </profiles>
-
+<!-- 
   <repositories>
     <repository>
       <id>foconis-release</id>
@@ -151,7 +151,7 @@
       <url>https://mvnrepo.foconis.de/repository/snapshot/</url>
     </pluginRepository>
   </pluginRepositories>
-
+ -->
   <distributionManagement>
     <repository>
       <id>foconis-release</id>
