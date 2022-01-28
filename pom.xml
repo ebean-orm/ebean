@@ -40,7 +40,7 @@
   <properties>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.12.1</jackson.version>
-    <h2database.version>1.4.199</h2database.version>
+    <h2database.version>2.1.210</h2database.version>
     <ebean-ddl-runner.version>1.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.1</ebean-migration-auto.version>
     <ebean-migration.version>12.13.1</ebean-migration.version>
@@ -98,6 +98,12 @@
   <profiles>
     <profile>
       <id>release</id>
+    </profile>
+    <profile>
+      <id>h2v1</id>
+      <properties>
+        <h2database.version>1.4.199</h2database.version>
+      </properties>
     </profile>
     <profile>
       <id>default</id>

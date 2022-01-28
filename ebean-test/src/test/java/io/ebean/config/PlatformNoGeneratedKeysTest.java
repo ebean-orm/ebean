@@ -101,7 +101,7 @@ public class PlatformNoGeneratedKeysTest {
     config.setDatabasePlatform(platform);
     config.getDataSourceConfig().setUsername("sa");
     config.getDataSourceConfig().setPassword("");
-    config.getDataSourceConfig().setUrl("jdbc:h2:mem:withPCQuery");
+    config.getDataSourceConfig().setUrl("jdbc:h2:mem:withPCQuery;MODE=LEGACY");
     config.getDataSourceConfig().setDriver("org.h2.Driver");
 
     config.setDisableLazyLoading(true);
@@ -112,7 +112,7 @@ public class PlatformNoGeneratedKeysTest {
     config.setDdlRun(true);
     config.getClasses().add(EBasicVer.class);
     config.getClasses().add(BasicDraftableBean.class);
-
+    config.loadFromProperties(); // trigger auto config for H2 1.x
 
     return DatabaseFactory.create(config);
   }
