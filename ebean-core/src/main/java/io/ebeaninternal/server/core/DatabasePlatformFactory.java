@@ -24,12 +24,14 @@ import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.config.dbplatform.yugabyte.YugabytePlaform;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.DbOffline;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.Locale;
 
 /**
  * Create a DatabasePlatform from the configuration.
@@ -164,7 +166,8 @@ public class DatabasePlatformFactory {
     } else if (dbProductName.contains("hsql database engine")) {
       return new HsqldbPlatform();
     } else if (dbProductName.contains("postgres")) {
-      return readPostgres(connection, majorVersion);
+      String productVersion = metaData.getDatabaseProductVersion().toLowerCase(Locale.ENGLISH);
+      return readPostgres(connection, majorVersion, productVersion);
     } else if (dbProductName.contains("mariadb")) {
       return new MariaDbPlatform();
     } else if (dbProductName.contains("mysql")) {
@@ -207,11 +210,14 @@ public class DatabasePlatformFactory {
   /**
    * Use a select version() query as it could be Postgres or CockroachDB.
    */
-  private static DatabasePlatform readPostgres(Connection connection, int majorVersion) {
+  private static DatabasePlatform readPostgres(Connection connection, int majorVersion, String productVersion) {
+    if (productVersion.contains("-yb-")) {
+      return new YugabytePlaform();
+    }
     try (PreparedStatement statement = connection.prepareStatement("select version() as \"version\"")) {
       try (ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
-          String productVersion = resultSet.getString("version").toLowerCase();
+          productVersion = resultSet.getString("version").toLowerCase();
           if (productVersion.contains("cockroach")) {
             return new CockroachPlatform();
           }

@@ -174,16 +174,21 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected void createHistoryTable(DdlBuffer apply, MTable table) throws IOException {
+    createHistoryTableAs(apply, table);
+    createHistoryTableWithPeriod(apply);
+  }
 
+  protected void createHistoryTableAs(DdlBuffer apply, MTable table) throws IOException {
     apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(table.getName()).append(historySuffix).append("(").newLine();
-
-    Collection<MColumn> cols = table.allColumns();
-    for (MColumn column : cols) {
+    for (MColumn column : table.allColumns()) {
       if (!column.isDraftOnly()) {
         writeColumnDefinition(apply, column.getName(), column.getType());
         apply.append(",").newLine();
       }
     }
+  }
+
+  protected void createHistoryTableWithPeriod(DdlBuffer apply) throws IOException {
     writeColumnDefinition(apply, sysPeriodStart, sysPeriodType);
     apply.append(",").newLine();
     writeColumnDefinition(apply, sysPeriodEnd, sysPeriodType);
