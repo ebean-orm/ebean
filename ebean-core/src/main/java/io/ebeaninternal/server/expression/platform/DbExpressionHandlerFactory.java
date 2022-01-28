@@ -15,6 +15,8 @@ public final class DbExpressionHandlerFactory {
       case H2:
         return new H2DbExpression();
       case POSTGRES:
+      case YUGABYTE:
+      case COCKROACH:
         return new PostgresDbExpression();
       case MARIADB:
         return new MariaDbExpression();

@@ -22,11 +22,8 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
    */
   @Override
   protected void createHistoryTable(DdlBuffer apply, MTable table) throws IOException {
-
-    String baseTable = table.getName();
-    apply
-      .append("create table ").append(baseTable).append(historySuffix)
-      .append("(like ").append(baseTable).append(")").endOfStatement();
+    apply.append("create table ").append(table.getName()).append(historySuffix)
+      .append("(like ").append(table.getName()).append(")").endOfStatement();
   }
 
   /**
@@ -57,7 +54,6 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
   @Override
   protected void createTriggers(DdlWrite writer, MTable table) throws IOException {
-
     String baseTableName = table.getName();
     String procedureName = procedureName(baseTableName);
     String triggerName = triggerName(baseTableName);
@@ -110,7 +106,6 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
   @Override
   protected void createStoredFunction(DdlWrite writer, MTable table) throws IOException {
-
     String procedureName = procedureName(table.getName());
     String historyTable = historyTableName(table.getName());
 
@@ -120,16 +115,13 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
   @Override
   protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
-
     String procedureName = procedureName(update.getBaseTable());
-
     recreateHistoryView(update);
     createOrReplaceFunction(update.historyTriggerBuffer(), procedureName, update.getHistoryTable(), update.getColumns());
   }
 
   @Override
   protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) throws IOException {
-
     buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriod).append(",");
     appendColumnNames(buffer, columns, "");
     buffer.append(") values (tstzrange(lowerTs,upperTs), ");
