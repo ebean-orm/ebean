@@ -99,7 +99,6 @@ final class InitDataSource {
       if (config.getDatabasePlatformName() == null) {
         throw new PersistenceException("You MUST specify a DatabasePlatformName on DatabaseConfig when offline");
       }
-      return null;
     }
 
     attachAlert(dsConfig);
