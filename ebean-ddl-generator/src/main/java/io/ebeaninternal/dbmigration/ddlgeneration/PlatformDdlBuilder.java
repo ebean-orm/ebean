@@ -1,21 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.ClickHouseDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.CockroachDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.DB2Ddl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.H2Ddl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.HanaColumnStoreDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.HsqldbDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.MariaDbDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.MySqlDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.NuoDbDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.OracleDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.Postgres9Ddl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.PostgresDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.SQLiteDdl;
-import io.ebeaninternal.dbmigration.ddlgeneration.platform.SqlServerDdl;
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.*;
 
 /**
  * Builds platform specific DDL handler.
@@ -31,6 +17,9 @@ public class PlatformDdlBuilder {
       case H2:
         return new H2Ddl(platform);
       case DB2:
+      case DB2LUW:
+      case DB2FORI:
+      case DB2ZOS:
         return new DB2Ddl(platform);
       case MARIADB:
         return new MariaDbDdl(platform);
@@ -50,6 +39,8 @@ public class PlatformDdlBuilder {
         return new Postgres9Ddl(platform);
       case POSTGRES:
         return new PostgresDdl(platform);
+      case YUGABYTE:
+        return new YugabyteDdl(platform);
       case COCKROACH:
         return new CockroachDdl(platform);
       case SQLSERVER16:

@@ -282,7 +282,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
 
-    assertThat(sql).hasSize(2);
+    assertThat(sql.size()).isGreaterThan(1);
     assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where t1.first_name is not null order by t0.id; --bind()");
     platformAssertIn(sql.get(1), " from contact_note t0 where (t0.contact_id)");
     assertSql(sql.get(1)).contains(" and lower(t0.title) like");

@@ -15,16 +15,11 @@ import io.ebean.config.dbplatform.SqlErrorCodes;
 /**
  * DB2 specific platform.
  */
-public class DB2Platform extends DatabasePlatform {
+public abstract class BaseDB2Platform extends DatabasePlatform {
 
-  public DB2Platform() {
+  public BaseDB2Platform() {
     super();
     this.platform = Platform.DB2;
-    // Note: DB2 (at least LUW supports length up to 128)
-    // TOOD: Check if we need to introduce a new platform (DB2_LUW_11 ?)
-    // FIXME: This differs to original ebean branch, but is required run tests.
-    this.maxTableNameLength = 128;
-    this.maxConstraintNameLength = 128;
     this.supportsNativeJavaTime = false;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.likeClauseRaw = "like ?";

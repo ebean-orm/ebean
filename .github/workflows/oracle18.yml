@@ -1,10 +1,10 @@
 
-name: MariaDB 10.6
+name: Oracle18
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '10 7 * * 1,4'
+    - cron: '10 6 * * 1,4'
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: ${{ matrix.java_version }}
-        distribution: 'adopt'
+        distribution: 'zulu'
     - name: Maven cache
       uses: actions/cache@v2
       env:
@@ -34,5 +34,5 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: mariadb 10.6
-      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
+    - name: oracle
+      run: mvn clean test -Dprops.file=testconfig/ebean-oracle.properties

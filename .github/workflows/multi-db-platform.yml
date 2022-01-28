@@ -1,10 +1,7 @@
 
-name: SqlServer 2017 latest
+name: Multi-database platform
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '10 7 * * 2,5'
+on: [workflow_dispatch]
 
 jobs:
   build:
@@ -34,7 +31,17 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-#    - name: sqlserver 2019 latest
-#      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver.properties
-    - name: sqlserver 2017 latest
+    - name: h2
+      run: mvn clean test
+    - name: postgres
+      run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
+    - name: mysql
+      run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties
+    - name: sqlserver 2019
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties
+    - name: sqlserver 2017
       run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
+    - name: mariadb
+      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
+    - name: db2
+      run: mvn clean test -Dprops.file=testconfig/ebean-db2.properties

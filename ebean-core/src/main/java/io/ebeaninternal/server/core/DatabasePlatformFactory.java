@@ -4,7 +4,10 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
 import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
-import io.ebean.config.dbplatform.db2.DB2Platform;
+import io.ebean.config.dbplatform.db2.DB2ForIPlatform;
+import io.ebean.config.dbplatform.db2.DB2LegacyPlatform;
+import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
+import io.ebean.config.dbplatform.db2.DB2ZosPlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
@@ -21,12 +24,14 @@ import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.config.dbplatform.yugabyte.YugabytePlaform;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.DbOffline;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.Locale;
 
 /**
  * Create a DatabasePlatform from the configuration.
@@ -103,7 +108,19 @@ public class DatabasePlatformFactory {
       return new SqlAnywherePlatform();
     }
     if (dbName.equals("db2")) {
-      return new DB2Platform();
+      throw new IllegalArgumentException("Please choose the more specific db2luw/db2zos/db2fori platform. Refer to issue #2514 for details");
+    }
+    if (dbName.equals("db2legacy")) {
+      return new DB2LegacyPlatform();
+    }
+    if (dbName.equals("db2zos")) {
+      return new DB2ZosPlatform();
+    }
+    if (dbName.equals("db2fori")) {
+      return new DB2ForIPlatform();
+    }
+    if (dbName.equals("db2luw")) {
+      return new DB2LuwPlatform();
     }
     if (dbName.equals("clickhouse")) {
       return new ClickHousePlatform();
@@ -149,7 +166,8 @@ public class DatabasePlatformFactory {
     } else if (dbProductName.contains("hsql database engine")) {
       return new HsqldbPlatform();
     } else if (dbProductName.contains("postgres")) {
-      return readPostgres(connection, majorVersion);
+      String productVersion = metaData.getDatabaseProductVersion().toLowerCase(Locale.ENGLISH);
+      return readPostgres(connection, majorVersion, productVersion);
     } else if (dbProductName.contains("mariadb")) {
       return new MariaDbPlatform();
     } else if (dbProductName.contains("mysql")) {
@@ -159,7 +177,7 @@ public class DatabasePlatformFactory {
     } else if (dbProductName.contains("sqlite")) {
       return new SQLitePlatform();
     } else if (dbProductName.contains("db2")) {
-      return new DB2Platform();
+      throw new IllegalArgumentException("For DB2 please explicitly choose either db2legacy/db2luw/db2zos/db2fori platform. Refer to issue #2514 for details");
     } else if (dbProductName.contains("sql anywhere")) {
       return new SqlAnywherePlatform();
     } else if (dbProductName.contains("hdb")) {
@@ -192,11 +210,14 @@ public class DatabasePlatformFactory {
   /**
    * Use a select version() query as it could be Postgres or CockroachDB.
    */
-  private static DatabasePlatform readPostgres(Connection connection, int majorVersion) {
+  private static DatabasePlatform readPostgres(Connection connection, int majorVersion, String productVersion) {
+    if (productVersion.contains("-yb-")) {
+      return new YugabytePlaform();
+    }
     try (PreparedStatement statement = connection.prepareStatement("select version() as \"version\"")) {
       try (ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
-          String productVersion = resultSet.getString("version").toLowerCase();
+          productVersion = resultSet.getString("version").toLowerCase();
           if (productVersion.contains("cockroach")) {
             return new CockroachPlatform();
           }
