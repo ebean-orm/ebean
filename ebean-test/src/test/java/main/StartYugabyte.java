@@ -7,6 +7,7 @@ public class StartYugabyte {
 
   public static void main(String[] args) {
 
+    // Check add extensions ?
     YugabyteConfig config = new YugabyteConfig("2.11.2.0-b89");
     config.setDbName("unit");
     config.setUser("unit");
