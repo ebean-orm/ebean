@@ -112,7 +112,7 @@ public class PlatformNoGeneratedKeysTest {
     config.setDdlRun(true);
     config.getClasses().add(EBasicVer.class);
     config.getClasses().add(BasicDraftableBean.class);
-
+    config.loadFromProperties(); // trigger auto config for H2 1.x
 
     return DatabaseFactory.create(config);
   }

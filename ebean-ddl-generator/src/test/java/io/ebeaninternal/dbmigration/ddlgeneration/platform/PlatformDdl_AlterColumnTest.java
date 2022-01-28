@@ -25,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PlatformDdl_AlterColumnTest {
 
+  private static boolean useV1Syntax = Boolean.getBoolean("ebean.h2.useV1Syntax");
+
   private final PlatformDdl h2Ddl = PlatformDdlBuilder.create(new H2Platform());
   private final PlatformDdl pgDdl = PlatformDdlBuilder.create(new PostgresPlatform());
   private final PlatformDdl mysqlDdl = PlatformDdlBuilder.create(new MySqlPlatform());
@@ -57,10 +59,17 @@ public class PlatformDdl_AlterColumnTest {
 
   @Test
   public void convertArrayType_h2() {
-    assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("varchar array");
-    assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("integer array");
-    assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("varchar array");
-    assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("integer array");
+    if (useV1Syntax) {
+      assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("array");
+      assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("array");
+      assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("array");
+      assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("array");
+    } else {
+      assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("varchar array");
+      assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("integer array");
+      assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("varchar array");
+      assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("integer array");
+    }
   }
 
   @Test

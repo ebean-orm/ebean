@@ -100,6 +100,12 @@
       <id>release</id>
     </profile>
     <profile>
+      <id>h2v1</id>
+      <properties>
+        <h2database.version>1.4.199</h2database.version>
+      </properties>
+    </profile>
+    <profile>
       <id>default</id>
       <activation>
         <activeByDefault>true</activeByDefault>

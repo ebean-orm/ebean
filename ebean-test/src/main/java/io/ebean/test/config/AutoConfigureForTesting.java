@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 /**
  * Automatically configure ServerConfig for testing purposes.
  * <p>
@@ -47,6 +49,29 @@ public class AutoConfigureForTesting implements AutoConfigure {
   @Override
   public void postConfigure(DatabaseConfig config) {
     setupProviders(config);
+    
+    if (org.h2.engine.Constants.VERSION_MAJOR == 1) {
+      // This code may be removed later, when droppinv H2 1.xxx compatibility
+      System.err.println("Running tests in H2 1.xxx compatibility mode");
+      System.setProperty("ebean.h2.useV1Syntax", "true");
+      makeV1Compatible(config.getDataSourceConfig());
+      makeV1Compatible(config.getReadOnlyDataSourceConfig());
+    }
+  }
+
+  private void makeV1Compatible(DataSourceConfig ds) {
+    if (ds == null) {
+      return;
+    }
+    String url = ds.getUrl();
+    if (url == null || !url.startsWith("jdbc:h2:")) {
+      return;
+    }
+    // remove illegal URL options
+    url = url.replace(";MODE=LEGACY", "");
+    url = url.replace(";NON_KEYWORDS=KEY,VALUE", "");
+    url = url.replace(";NON_KEYWORDS=KEY", "");
+    ds.setUrl(url);
   }
 
   /**
