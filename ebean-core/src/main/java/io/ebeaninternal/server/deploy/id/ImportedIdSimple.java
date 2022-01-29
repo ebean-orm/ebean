@@ -151,6 +151,9 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
   @Override
   public int bind(int position, SqlUpdate update, EntityBean bean) {
     Object value = getIdValue(bean);
+    if (value == null) {
+      return -1; // could not bind
+    }
     update.setParameter(position, value);
     return ++position;
   }
