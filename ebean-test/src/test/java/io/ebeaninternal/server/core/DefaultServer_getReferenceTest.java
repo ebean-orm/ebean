@@ -41,7 +41,7 @@ public class DefaultServer_getReferenceTest extends BaseTestCase {
     Vehicle reference = DB.reference(Vehicle.class, car.getId());
 
     assertThat(reference).isInstanceOf(Car.class);
-    assertThat(reference.getId()).isSameAs(car.getId());
+    assertThat(reference.getId()).isEqualTo(car.getId());
 
     DB.delete(car);
   }
