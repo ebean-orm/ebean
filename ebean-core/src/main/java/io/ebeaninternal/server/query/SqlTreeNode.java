@@ -78,4 +78,10 @@ interface SqlTreeNode {
    * Create the loader for this node.
    */
   SqlTreeLoad createLoad();
+
+  /**
+   * Unselect lobs (for distinct queries on DB2 and Oracle).
+   */
+  default void unselectLobs() {
+  };
 }
