@@ -22,6 +22,7 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
     this.platform = Platform.DB2;
     this.supportsNativeJavaTime = false;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
+    this.likeClauseRaw = "like ?";
     this.sqlLimiter = new Db2SqlLimiter();
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
