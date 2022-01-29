@@ -1,10 +1,18 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.config.DatabaseConfig;
+import io.ebean.datasource.DataSourceAlert;
 import io.ebean.datasource.DataSourceConfig;
+import io.ebean.datasource.pool.ConnectionPool;
+
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
 
 public class InitDataSourceTest {
 
@@ -121,4 +129,62 @@ public class InitDataSourceTest {
     assertNotNull(roConfig);
     assertEquals("foo", roConfig.getUrl());
   }
+  
+  
+  @Test
+  public void online() {
+    DatabaseConfig config = new DatabaseConfig();
+    config.getDataSourceConfig().setUsername("sa");
+    config.getDataSourceConfig().setPassword("");
+    config.getDataSourceConfig().setUrl("jdbc:h2:mem:dsTestOnline");
+    config.getDataSourceConfig().setDriver("org.h2.Driver");
+    InitDataSource.init(config);
+    ConnectionPool pool = (ConnectionPool) config.getDataSource();
+    assertThat(pool.isDataSourceUp()).isTrue();
+    pool.shutdown();
+  }
+
+  static class MyAlert implements DataSourceAlert {
+
+    int up;
+
+    @Override
+    public void dataSourceUp(DataSource dataSource) {
+      up++;
+    }
+
+    @Override
+    public void dataSourceDown(DataSource dataSource, SQLException reason) {
+    }
+
+    @Override
+    public void dataSourceWarning(DataSource dataSource, String msg) {
+    }
+
+  }
+
+  @Test
+  public void offline() throws SQLException {
+    DatabaseConfig config = new DatabaseConfig();
+    config.getDataSourceConfig().setUsername("sa");
+    config.getDataSourceConfig().setPassword("");
+    config.getDataSourceConfig().setUrl("jdbc:h2:mem:dsTestOffline");
+    config.getDataSourceConfig().setDriver("org.h2.Driver");
+    config.getDataSourceConfig().setOffline(true);
+    config.getDataSourceConfig().setFailOnStart(false);
+    MyAlert alert = new MyAlert();
+    config.getDataSourceConfig().setAlert(alert);
+    config.setDatabasePlatformName("h2");
+    InitDataSource.init(config);
+    ConnectionPool pool = (ConnectionPool) config.getDataSource();
+    assertThat(pool).isNotNull();
+    // make some additional tests with the pool
+    assertThat(pool.isDataSourceUp()).isFalse();
+    assertThat(alert.up).isEqualTo(0);
+    pool.online();
+    assertThat(alert.up).isEqualTo(1);
+    assertThat(pool.isDataSourceUp()).isTrue();
+    pool.shutdown();
+  }
+
 }
