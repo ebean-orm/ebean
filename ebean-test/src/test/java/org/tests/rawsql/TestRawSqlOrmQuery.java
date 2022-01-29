@@ -147,7 +147,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     if (isSqlServer()) {
       assertSql(query).contains("top 100 ");
       assertSql(query).contains("order by o.ship_date desc");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains("fetch next 100 rows only");
     } else {
       assertSql(query).contains("order by o.ship_date desc limit 100");
@@ -182,7 +182,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     if (isSqlServer()) {
       assertSql(query).contains("top 100 ");
       assertSql(query).contains("order by o.ship_date desc, o.id");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains("fetch next 100 rows only");
     } else {
       assertSql(query).contains("order by o.ship_date desc, o.id limit 100");
@@ -224,7 +224,11 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       query.order("coalesce(shipDate, now()) desc");
       query.findList();
 
-      assertSql(query).contains("order by coalesce(o.ship_date, now()) desc limit 100");
+      if (isDb2()) {
+        assertSql(query).contains("order by coalesce(o.ship_date, now()) desc fetch next 100 rows only");
+      } else {
+        assertSql(query).contains("order by coalesce(o.ship_date, now()) desc limit 100");
+      }
     }
   }
 
@@ -257,7 +261,11 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
       query.order("coalesce(shipDate, now()) desc");
       query.findList();
 
-      assertSql(query).contains("order by coalesce(o.ship_date, now()) desc, o.id limit 100");
+      if (isDb2()) {
+        assertSql(query).contains("order by coalesce(o.ship_date, now()) desc, o.id fetch next 100 rows only");
+      } else {
+        assertSql(query).contains("order by coalesce(o.ship_date, now()) desc, o.id limit 100");
+      }
     }
   }
 
@@ -284,7 +292,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("select top 100 ");
       assertThat(sqlOf(query)).contains("order by o.id desc");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertThat(sqlOf(query)).contains("fetch next 100 rows only");
     } else {
       assertThat(sqlOf(query)).contains("order by o.id desc limit 100");

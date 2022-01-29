@@ -26,7 +26,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     if (isSqlServer()) {
       assertSql(query).startsWith("select top 100 ");
       assertSql(query).endsWith("order by t0.id");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains(" fetch next 100 rows only");
     } else {
       assertSql(query).endsWith("order by t0.id limit 100");
@@ -44,7 +44,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     if (isSqlServer()) {
       assertSql(query).startsWith("select top 10 ");
       assertSql(query).endsWith("order by t0.id");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains(" fetch next 10 rows only");
     } else {
       assertSql(query).endsWith("order by t0.id limit 10");
@@ -61,7 +61,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     if (isSqlServer()) {
       assertSql(query).endsWith("order by t0.id offset 3 rows fetch next 10 rows only");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains("offset 3 rows fetch next 10 rows only");
     } else {
       assertSql(query).endsWith("order by t0.id limit 10 offset 3");
@@ -81,7 +81,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     if (isSqlServer()) {
       assertSql(query).endsWith("order by t0.name offset 3 rows fetch next 10 rows only");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains("offset 3 rows fetch next 10 rows only");
     } else {
       assertSql(query).endsWith("order by t0.name limit 10 offset 3");
@@ -107,7 +107,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     if (isSqlServer()) {
       assertSql(query).endsWith("order by t0.name, t0.id offset 3 rows fetch next 10 rows only");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains("offset 3 rows fetch next 10 rows only");
     } else {
       assertSql(query).endsWith("order by t0.name, t0.id limit 10 offset 3");
@@ -136,7 +136,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     if (isSqlServer()) {
       assertSql(query).endsWith("from o_customer t0 order by t0.id offset 3 rows fetch next 10 rows only");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains("offset 3 rows fetch next 10 rows only");
     } else {
       assertSql(query).endsWith("from o_customer t0 limit 10 offset 3");
@@ -154,7 +154,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     if (isSqlServer()) {
       assertSql(query).startsWith("select top 10 ");
-    } else if (isOracle()) {
+    } else if (isOracle() || isDb2()) {
       assertSql(query).contains("fetch next 10 rows only");
     } else {
       assertSql(query).endsWith("limit 10");
