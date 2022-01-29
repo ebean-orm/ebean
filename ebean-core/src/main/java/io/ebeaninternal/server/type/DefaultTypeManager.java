@@ -95,6 +95,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final TypeJsonManager jsonManager;
   private final boolean offlineMigrationGeneration;
   private final EnumType defaultEnumType;
+  private final DatabasePlatform databasePlatform;
 
   // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
 
@@ -132,7 +133,8 @@ public final class DefaultTypeManager implements TypeManager {
     this.typeMap = new ConcurrentHashMap<>();
     this.nativeMap = new ConcurrentHashMap<>();
     this.logicalMap = new ConcurrentHashMap<>();
-    this.postgres = isPostgres(config.getDatabasePlatform());
+    this.databasePlatform = config.getDatabasePlatform();
+    this.postgres = isPostgresCompatible(config.getDatabasePlatform());
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
     this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
     this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.getJsonMutationDetection()) : null;
@@ -198,8 +200,13 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private boolean isPostgres(DatabasePlatform databasePlatform) {
-    return databasePlatform.getPlatform().base() == Platform.POSTGRES;
+  private boolean isPostgresCompatible(DatabasePlatform databasePlatform) {
+    return databasePlatform.isPlatform(Platform.POSTGRES)
+      || databasePlatform.isPlatform(Platform.YUGABYTE);
+  }
+
+  private boolean hstoreSupport() {
+    return databasePlatform.isPlatform(Platform.POSTGRES);
   }
 
   /**
@@ -302,7 +309,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   @Override
   public ScalarType<?> getDbMapScalarType() {
-    return (postgres) ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR, false);
+    return hstoreSupport() ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR, false);
   }
 
   @Override
@@ -740,7 +747,7 @@ public final class DefaultTypeManager implements TypeManager {
       jsonNodeVarchar = new ScalarTypeJsonNode.Varchar(mapper);
       jsonNodeJson = jsonNodeClob;  // Default for non-Postgres databases
       jsonNodeJsonb = jsonNodeClob; // Default for non-Postgres databases
-      if (isPostgres(config.getDatabasePlatform())) {
+      if (postgres) {
         jsonNodeJson = new ScalarTypeJsonNodePostgres.JSON(mapper);
         jsonNodeJsonb = new ScalarTypeJsonNodePostgres.JSONB(mapper);
       }
