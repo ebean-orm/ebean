@@ -31,14 +31,39 @@ public class SqlCodeTranslator implements SqlExceptionTranslator {
     this.map = Collections.emptyMap();
   }
 
-  @Override
-  public PersistenceException translate(String message, SQLException e) {
-
+  private DataErrorType getErrorType(SQLException e) {
     DataErrorType errorType = map.get(e.getSQLState());
     if (errorType == null) {
       // fall back to error code
       errorType = map.get(String.valueOf(e.getErrorCode()));
     }
+    return errorType;
+  }
+
+  @Override
+  public PersistenceException translate(String message, SQLException e) {
+
+    DataErrorType errorType = getErrorType(e);
+    // for DB2 we must inspect the sql exception chain to determine which
+    // persistence error occurred in a batch execution. We also concatenate
+    // the error messages to improve error analysis.
+    SQLException chain = e.getNextException();
+    if (chain != null) {
+      StringBuilder sb = new StringBuilder(message);
+      int i = 1;
+      while (chain != null && i < 100000) { // prevents from endless loop
+        sb.append("\n\t#").append(i++).append(": ").append(chain.getMessage());
+        if (errorType == null) {
+          errorType = getErrorType(chain);
+          if (errorType != null) {
+            sb.append(" (causing error)"); // mark the line, where we found a matching error code
+          }
+        }
+        chain = chain.getNextException();
+      }
+      message = sb.toString();
+    }
+
     if (errorType != null) {
       switch (errorType) {
         case AcquireLock:
