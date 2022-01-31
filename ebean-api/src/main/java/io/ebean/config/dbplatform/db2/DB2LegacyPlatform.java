@@ -1,5 +1,6 @@
 package io.ebean.config.dbplatform.db2;
 
+import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 
 /**
@@ -16,5 +17,6 @@ public class DB2LegacyPlatform extends BaseDB2Platform {
     // TOOD: Check if we need to introduce a new platform (DB2_LUW_11 ?)
     this.maxTableNameLength = 18;
     this.maxConstraintNameLength = 18;
+    this.persistBatchOnCascade = PersistBatch.NONE;
   }
 }
