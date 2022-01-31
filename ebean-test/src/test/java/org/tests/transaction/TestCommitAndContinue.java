@@ -57,7 +57,7 @@ class TestCommitAndContinue extends BaseTestCase {
    * The @Transactional is nicer to me.
    */
   @Test
-  @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB, Platform.COCKROACH}) // they will dead lock
+  @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB, Platform.COCKROACH, Platform.YUGABYTE}) // they will dead lock
   void tryFinally_partialSuccess() {
 
     MnyB a = new MnyB("a100");
