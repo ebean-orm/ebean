@@ -199,6 +199,10 @@ public abstract class BaseTestCase {
     return Platform.POSTGRES == platform().base();
   }
 
+  public boolean isYugabyte() {
+    return Platform.YUGABYTE == platform().base();
+  }
+
   public boolean isMySql() {
     return Platform.MYSQL == platform();
   }

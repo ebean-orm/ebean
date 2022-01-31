@@ -52,8 +52,8 @@ class TestElementCollectionBasicSet extends BaseTestCase {
     Set<String> phoneNumbers1 = found.get(1).getPhoneNumbers();
     phoneNumbers0.size();
 
-    assertThat(phoneNumbers0).containsExactly("021 1234", "021 4321");
-    assertThat(phoneNumbers1).containsExactly("09 1234", "09 4321", "09 9876");
+    assertThat(phoneNumbers0).containsExactlyInAnyOrder("021 1234", "021 4321");
+    assertThat(phoneNumbers1).containsExactlyInAnyOrder("09 1234", "09 4321", "09 9876");
 
     sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
