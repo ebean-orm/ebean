@@ -11,6 +11,7 @@ public class StartYugabyte {
     YugabyteConfig config = new YugabyteConfig("2.11.2.0-b89");
     config.setDbName("unit");
     config.setUser("unit");
+    config.setExtensions("pgcrypto");
 
     YugabyteContainer container = new YugabyteContainer(config);
     container.start();

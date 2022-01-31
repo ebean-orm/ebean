@@ -2,29 +2,21 @@ package org.tests.expression.bitwise;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestBitwiseExpressions extends BaseTestCase {
+class TestBitwiseExpressions extends BaseTestCase {
 
   @Test
-  public void where() {
-
-    setup();
-    bitwiseNot();
-    bitwiseAnd();
-    bitwiseAny();
-    bitwiseAll();
-  }
-
-  private void bitwiseNot() {
-
+  void bitwiseNot() {
     List<BwBean> notColour = DB.find(BwBean.class)
       // HAS_COLOUR not set ...
       .where().bitwiseNot("flags", BwFlags.HAS_COLOUR)
+      .orderBy("name")
       .findList();
 
     assertThat(notColour).hasSize(2);
@@ -32,8 +24,8 @@ public class TestBitwiseExpressions extends BaseTestCase {
     assertThat(notColour.get(1).getName()).isEqualTo("SizeOnly");
   }
 
-  private void bitwiseAnd() {
-
+  @Test
+  void bitwiseAnd() {
     List<BwBean> list = DB.find(BwBean.class)
       // not bulk set AND size set
       .where().bitwiseAnd("flags", BwFlags.HAS_BULK + BwFlags.HAS_SIZE, BwFlags.HAS_SIZE)
@@ -59,10 +51,11 @@ public class TestBitwiseExpressions extends BaseTestCase {
     assertThat(list.get(0).getName()).isEqualTo("ColourOnly");
   }
 
-  private void bitwiseAny() {
-
+  @Test
+  void bitwiseAny() {
     List<BwBean> list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_BULK + BwFlags.HAS_SIZE)
+      .order().asc("id")
       .findList();
 
     assertThat(list).hasSize(3);
@@ -70,21 +63,23 @@ public class TestBitwiseExpressions extends BaseTestCase {
     assertThat(list.get(1).getName()).isEqualTo("ColourAndBulk");
     assertThat(list.get(2).getName()).isEqualTo("Everything");
 
-
     list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_BULK + BwFlags.HAS_SIZE + BwFlags.HAS_COLOUR)
+      .order().asc("id")
       .findList();
 
     assertThat(list).hasSize(4);
 
     list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_SIZE + BwFlags.HAS_COLOUR)
+      .order().asc("id")
       .findList();
 
     assertThat(list).hasSize(4);
 
     list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_SIZE)
+      .order().asc("id")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -93,6 +88,7 @@ public class TestBitwiseExpressions extends BaseTestCase {
 
     list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_COLOUR)
+      .order().asc("id")
       .findList();
 
     assertThat(list).hasSize(3);
@@ -101,8 +97,8 @@ public class TestBitwiseExpressions extends BaseTestCase {
     assertThat(list.get(2).getName()).isEqualTo("Everything");
   }
 
-  private void bitwiseAll() {
-
+  @Test
+  void bitwiseAll() {
     List<BwBean> list = DB.find(BwBean.class)
       .where().bitwiseAll("flags", BwFlags.HAS_BULK + BwFlags.HAS_SIZE)
       .findList();
@@ -137,11 +133,10 @@ public class TestBitwiseExpressions extends BaseTestCase {
     assertThat(list.get(0).getName()).isEqualTo("ColourOnly");
     assertThat(list.get(1).getName()).isEqualTo("ColourAndBulk");
     assertThat(list.get(2).getName()).isEqualTo("Everything");
-
   }
 
-  private void setup() {
-
+  @BeforeAll
+  static void setup() {
     DB.find(BwBean.class).delete();
 
     new BwBean("Nothing", BwFlags.NOTHING).save();
@@ -149,6 +144,5 @@ public class TestBitwiseExpressions extends BaseTestCase {
     new BwBean("SizeOnly", BwFlags.HAS_SIZE).save();
     new BwBean("ColourAndBulk", BwFlags.HAS_COLOUR + BwFlags.HAS_BULK).save();
     new BwBean("Everything", BwFlags.HAS_COLOUR + BwFlags.HAS_BULK + BwFlags.HAS_SIZE).save();
-
   }
 }
