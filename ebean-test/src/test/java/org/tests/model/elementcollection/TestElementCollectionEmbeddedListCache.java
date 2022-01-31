@@ -15,8 +15,8 @@ class TestElementCollectionEmbeddedListCache extends BaseTestCase {
   void test() {
 
     EcblPerson person = new EcblPerson("CacheL");
-    person.getPhoneNumbers().add(new EcPhone("64", "021","1234"));
-    person.getPhoneNumbers().add(new EcPhone("64","021","4321"));
+    person.getPhoneNumbers().add(new EcPhone("64", "021", "1234"));
+    person.getPhoneNumbers().add(new EcPhone("64", "021", "4321"));
     DB.save(person);
 
     EcblPerson one = DB.find(EcblPerson.class)
@@ -42,7 +42,7 @@ class TestElementCollectionEmbeddedListCache extends BaseTestCase {
     assertThat(sql).isEmpty(); // cache hit
 
     two.getPhoneNumbers().add(new EcPhone("61", "07", "11"));
-    two.getPhoneNumbers().remove(1);
+    removeByNumber(two.getPhoneNumbers(), "4321");
 
     DB.save(two);
 
@@ -72,7 +72,7 @@ class TestElementCollectionEmbeddedListCache extends BaseTestCase {
 
 
     three.setName("mod-3");
-    three.getPhoneNumbers().remove(0);
+    removeByNumber(three.getPhoneNumbers(), "1234");
 
     DB.save(three);
 
@@ -91,5 +91,13 @@ class TestElementCollectionEmbeddedListCache extends BaseTestCase {
     assertThat(sql).hasSize(2);
 
     LoggedSql.stop();
+  }
+
+  private void removeByNumber(List<EcPhone> phoneNumbers, String num) {
+    phoneNumbers
+      .stream()
+      .filter(ecPhone1 -> ecPhone1.number.equals(num))
+      .findFirst()
+      .ifPresent(phoneNumbers::remove);
   }
 }
