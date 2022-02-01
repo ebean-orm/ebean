@@ -35,18 +35,14 @@ public class PlatformAutoConfig {
     KNOWN_PLATFORMS.put("cockroach", new CockroachSetup());
     KNOWN_PLATFORMS.put("hana", new HanaSetup());
     KNOWN_PLATFORMS.put("db2", new Db2Setup());
+    KNOWN_PLATFORMS.put("yugabyte", new YugabyteSetup());
   }
 
   private final DatabaseConfig config;
-
   private final Properties properties;
-
   private String db;
-
   private String platform;
-
   private PlatformSetup platformSetup;
-
   private String databaseName;
 
   public PlatformAutoConfig(String db, DatabaseConfig config) {
