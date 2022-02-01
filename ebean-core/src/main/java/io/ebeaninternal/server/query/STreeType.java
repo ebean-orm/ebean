@@ -7,6 +7,8 @@ import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
+import java.util.Map;
+
 /**
  * Bean type interface for Sql query tree.
  */
@@ -136,4 +138,8 @@ public interface STreeType {
    */
   void markAsDeleted(EntityBean bean);
 
+  /**
+   * Return the "path map" to toMany or toOne properties using the given prefix.
+   */
+  Map<String, String> pathMap(String prefix);
 }

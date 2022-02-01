@@ -15,14 +15,13 @@ import java.util.*;
 class SqlTreeNodeBean implements SqlTreeNode {
 
   private static final SqlTreeLoad[] NO_LOAD_CHILDREN = new SqlTreeLoad[0];
-  private static final SqlTreeNode[] NO_CHILDREN = new SqlTreeNode[0];
 
   final STreeType desc;
   final IdBinder idBinder;
   /**
    * The children which will be other SelectBean or SelectProxyBean.
    */
-  final SqlTreeNode[] children;
+  final List<SqlTreeNode> children;
   /**
    * Set to true if this is a partial object fetch.
    */
@@ -94,8 +93,8 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.disableLazyLoad = disableLazyLoad || !readIdNormal || desc.isRawSqlBased();
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();
-    this.children = myChildren == null ? NO_CHILDREN : myChildren.toArray(new SqlTreeNode[0]);
-    pathMap = createPathMap(prefix, desc);
+    this.children = myChildren == null ? Collections.emptyList() : myChildren;
+    this.pathMap = createPathMap(prefix, desc);
   }
 
   @Override
@@ -104,10 +103,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   protected SqlTreeLoad[] createLoadChildren() {
-    if (children.length == 0) {
+    if (children.isEmpty()) {
       return NO_LOAD_CHILDREN;
     }
-    List<SqlTreeLoad> loadChildren = new ArrayList<>(children.length);
+    List<SqlTreeLoad> loadChildren = new ArrayList<>(children.size());
     for (SqlTreeNode child : children) {
       SqlTreeLoad load = child.createLoad();
       if (load != null) {
@@ -119,24 +118,15 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public final boolean isSingleProperty() {
-    return properties != null && properties.length == 1 && children.length == 0;
+    return properties != null && properties.length == 1 && children.isEmpty();
   }
 
   private Map<String, String> createPathMap(String prefix, STreeType desc) {
-    HashMap<String, String> m = new HashMap<>();
-    for (STreePropertyAssocMany many : desc.propsMany()) {
-      String name = many.name();
-      m.put(name, getPath(prefix, name));
-    }
-    return m;
+    return prefix == null ? Collections.emptyMap() : desc.pathMap(prefix);
   }
 
-  private String getPath(String prefix, String propertyName) {
-    if (prefix == null) {
-      return propertyName;
-    } else {
-      return prefix + "." + propertyName;
-    }
+  private String path(String prefix, String propertyName) {
+    return prefix == null ? propertyName : prefix + "." + propertyName;
   }
 
   @Override
@@ -144,7 +134,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (readId) {
       if (inheritInfo != null) {
         // discriminator column always proceeds id column
-        selectChain.add(getPath(prefix, inheritInfo.getDiscriminatorColumn()));
+        selectChain.add(path(prefix, inheritInfo.getDiscriminatorColumn()));
       }
       idBinder.buildRawSqlSelectChain(prefix, selectChain);
     }
@@ -399,7 +389,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
     return false;
   }
-  
+
 
   @Override
   public void unselectLobs() {
