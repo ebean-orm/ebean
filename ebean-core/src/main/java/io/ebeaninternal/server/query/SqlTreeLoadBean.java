@@ -46,12 +46,12 @@ class SqlTreeLoadBean implements SqlTreeLoad {
     this.temporalMode = node.temporalMode;
     this.temporalVersions = node.temporalVersions;
     this.nodeBeanProp = node.nodeBeanProp;
-    this.readId = node.readId;//!aggregationRoot && withId && desc.hasId();
+    this.readId = node.readId;
     this.readIdNormal = readId && !temporalVersions;
-    this.disableLazyLoad = node.disableLazyLoad;// disableLazyLoad || !readIdNormal || desc.isRawSqlBased();
-    this.partialObject = node.partialObject;//props.isPartialObject();
-    this.properties = node.properties;//props.getProps();
-    this.pathMap = node.pathMap;//createPathMap(prefix, desc);
+    this.disableLazyLoad = node.disableLazyLoad;
+    this.partialObject = node.partialObject;
+    this.properties = node.properties;
+    this.pathMap = node.pathMap;
     this.children =  node.createLoadChildren();
   }
 
