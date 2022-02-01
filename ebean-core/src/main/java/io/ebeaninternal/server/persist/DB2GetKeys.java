@@ -44,8 +44,7 @@ final class DB2GetKeys {
         for (ResultSet resultSet : result) {
           while (resultSet.next()) {
             Object idValue = resultSet.getObject(1);
-            list.get(index).setGeneratedKey(idValue);
-            index++;
+            list.get(index++).setGeneratedKey(idValue);
           }
         }
         return true;

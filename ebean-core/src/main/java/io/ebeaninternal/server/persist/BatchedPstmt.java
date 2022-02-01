@@ -171,8 +171,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
     try (ResultSet rset = pstmt.getGeneratedKeys()) {
       while (rset.next()) {
         Object idValue = rset.getObject(1);
-        list.get(index).setGeneratedKey(idValue);
-        index++;
+        list.get(index++).setGeneratedKey(idValue);
       }
     }
   }
