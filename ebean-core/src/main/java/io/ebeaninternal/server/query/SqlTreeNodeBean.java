@@ -122,20 +122,11 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   private Map<String, String> createPathMap(String prefix, STreeType desc) {
-    HashMap<String, String> m = new HashMap<>();
-    for (STreePropertyAssocMany many : desc.propsMany()) {
-      String name = many.name();
-      m.put(name, path(prefix, name));
-    }
-    return m;
+    return prefix == null ? Collections.emptyMap() : desc.pathMap(prefix);
   }
 
   private String path(String prefix, String propertyName) {
-    if (prefix == null) {
-      return propertyName;
-    } else {
-      return prefix + "." + propertyName;
-    }
+    return prefix == null ? propertyName : prefix + "." + propertyName;
   }
 
   @Override
