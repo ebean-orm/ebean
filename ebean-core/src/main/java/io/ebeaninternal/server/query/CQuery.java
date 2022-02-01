@@ -581,20 +581,17 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   @Override
   public void registerBeanInherit(BeanPropertyAssocOne<?> property, EntityBeanIntercept ebi) {
-    String path = path(property.name());
-    request.loadContext().register(path, ebi, property);
+    request.loadContext().register(path(property.name()), ebi, property);
   }
 
   @Override
   public void register(String path, EntityBeanIntercept ebi) {
-    path = path(path);
-    request.loadContext().register(path, ebi);
+    request.loadContext().register(path(path), ebi);
   }
 
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
-    String path = path(many.name());
-    request.loadContext().register(path, many, bc);
+    request.loadContext().register(path(many.name()), many, bc);
   }
 
   /**
