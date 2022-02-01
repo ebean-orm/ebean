@@ -62,7 +62,9 @@ class VisitHandler {
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
     for (BeanPropertyAssocMany<?> many : manys) {
       // check that property is loaded and collection should be cascaded to
-      if (ebi.isLoadedProperty(many.propertyIndex()) && !many.isSkipSaveBeanCollection(bean, ebi.isNew())) {
+      if (ebi.isLoadedProperty(many.propertyIndex()) 
+          && !many.isSkipSaveBeanCollection(bean, ebi.isNew())
+          && !many.isElementCollection()) {
         Object manyValue = many.getValue(bean);
         if (manyValue != null) {
           PersistVisitor propertyVisitor = visitor.visitProperty(many);
