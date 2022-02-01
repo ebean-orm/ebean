@@ -41,7 +41,7 @@ alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 
 -- rename all collisions;
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_vs45xo unique  (description);
+create unique index uq_migtest_e_basic_description on migtest_e_basic(description) exclude null keys;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic add constraint fk_mgtst__bsc_sr_d foreign key (user_id) references migtest_e_user (id) on delete restrict;
@@ -57,10 +57,10 @@ alter table migtest_e_basic add column new_integer integer default 42 not null;
 
 alter table migtest_e_basic drop constraint uq_mgtst__b_4aybzy;
 alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc02;
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_ucfcne unique  (status,indextest1);
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__bsc_nm unique  (name);
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc00 unique  (indextest4);
--- NOT SUPPORTED alter table migtest_e_basic add constraint uq_mgtst__b_4ayc01 unique  (indextest5);
+create unique index uq_migtest_e_basic_status_indextest1 on migtest_e_basic(status,indextest1) exclude null keys;
+create unique index uq_migtest_e_basic_name on migtest_e_basic(name) exclude null keys;
+create unique index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) exclude null keys;
+create unique index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) exclude null keys;
 alter table migtest_e_enum drop constraint ck_mgtst__n_773sok;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string set data type bigint;
