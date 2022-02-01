@@ -6,6 +6,8 @@ import io.ebeaninternal.api.SpiTransaction;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,6 +44,18 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
   private int[] results;
   private List<InputStream> inputStreams;
 
+  private static Class<? extends PreparedStatement> DB2_PREPARED_STATEMENT;
+  private static Method GET_DB_GENERATED_KEYS;
+  
+  static {
+    try {
+      DB2_PREPARED_STATEMENT = (Class<? extends PreparedStatement>) Class.forName("com.ibm.db2.jcc.DB2PreparedStatement");
+      GET_DB_GENERATED_KEYS = DB2_PREPARED_STATEMENT.getDeclaredMethod("getDBGeneratedKeys");
+    } catch (ClassNotFoundException | NoSuchMethodException | SecurityException cnf) {
+      // NOP
+    }
+    
+  }
   /**
    * Create with a given statement.
    */
@@ -169,8 +183,35 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
     }
   }
 
-  private void getGeneratedKeys() throws SQLException {
+  protected void getGeneratedKeys() throws SQLException {
     int index = 0;
+    if (DB2_PREPARED_STATEMENT != null) {
+      PreparedStatement db2Stmt = null;
+      if (DB2_PREPARED_STATEMENT.isInstance(pstmt)) {
+        db2Stmt = pstmt;
+      } else if (pstmt.isWrapperFor(DB2_PREPARED_STATEMENT)) {
+        db2Stmt = pstmt.unwrap(DB2_PREPARED_STATEMENT);
+      }
+      if (db2Stmt != null) {
+        // WTF: https://stackoverflow.com/questions/41725492/how-to-get-auto-generated-keys-of-batch-insert-statement
+        ResultSet[] result;
+        try {
+          result = (ResultSet[]) GET_DB_GENERATED_KEYS.invoke(db2Stmt);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+          throw new SQLException("Could not get generated keys for DB2", e);
+        }
+        for (int i = 0; i < result.length; i++) {
+            while (result[i].next()) {
+                ResultSet rset = result[i];
+                Object idValue = rset.getObject(1);
+                list.get(index).setGeneratedKey(idValue);
+                index++;
+            }
+        }
+        return;
+      }
+    }
+
     try (ResultSet rset = pstmt.getGeneratedKeys()) {
       while (rset.next()) {
         Object idValue = rset.getObject(1);
