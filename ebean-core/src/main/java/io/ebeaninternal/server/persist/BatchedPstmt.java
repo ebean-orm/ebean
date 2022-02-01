@@ -21,18 +21,12 @@ import java.util.List;
  */
 public final class BatchedPstmt implements SpiProfileTransactionEvent {
 
-  /**
-   * The underlying statement.
-   */
+  private static final DB2GetKeys DB2_HACK = new DB2GetKeys();
+
   private PreparedStatement pstmt;
-
-  /**
-   * True if an insert that uses generated keys.
-   */
   private final boolean isGenKeys;
-
   /**
-   * The list of BatchPostExecute used to perform post processing.
+   * The list of BatchPostExecute used to perform post-processing.
    */
   private final List<BatchPostExecute> list = new ArrayList<>();
   private final String sql;
@@ -170,6 +164,9 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
   }
 
   private void getGeneratedKeys() throws SQLException {
+    if (DB2_HACK.getGeneratedKeys(pstmt, list)) {
+      return;
+    }
     int index = 0;
     try (ResultSet rset = pstmt.getGeneratedKeys()) {
       while (rset.next()) {
