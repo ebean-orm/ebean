@@ -13,14 +13,13 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MTableTest {
+class MTableTest {
 
   static MTable base() {
     MTable table = new MTable("tab");
     table.addColumn(new MColumn("id", "bigint"));
     table.addColumn(new MColumn("name", "varchar(20)"));
     table.addColumn(new MColumn("status", "varchar(3)"));
-
     return table;
   }
 
@@ -29,7 +28,6 @@ public class MTableTest {
     table.addColumn(new MColumn("id", "bigint"));
     table.addColumn(new MColumn("name", "varchar(20)"));
     table.addColumn(new MColumn("comment", "varchar(1000)"));
-
     return table;
   }
 
@@ -55,7 +53,7 @@ public class MTableTest {
   }
 
   @Test
-  public void schema() {
+  void schema() {
     MTable table = new MTable("tab");
     assertNull(table.getSchema());
 
@@ -65,8 +63,29 @@ public class MTableTest {
   }
 
   @Test
-  public void test_allHistoryColumns() throws Exception {
+  void addColumnScalar_when_new() {
+    MTable table = new MTable("tab");
 
+    MColumn mColumn = table.addColumnScalar("billing_id", "bigint");
+    assertThat(mColumn).isNotNull();
+    assertThat(mColumn.getName()).isEqualTo("billing_id");
+    assertThat(mColumn.getType()).isEqualTo("bigint");
+  }
+
+  @Test
+  void addColumnScalar_when_existingColumnDefined() {
+    MTable table = new MTable("tab");
+    MColumn col = new MColumn("billing_id", "bigint");
+    col.setForeignKeyName("fk_tab_billing_id");
+    col.setForeignKeyIndex("ix_tab_billing_id");
+    table.addColumn(col);
+
+    MColumn mColumn = table.addColumnScalar("billing_id", "bigint");
+    assertThat(mColumn).isSameAs(col);
+  }
+
+  @Test
+  void test_allHistoryColumns() {
     MTable base = base();
     base.registerPendingDropColumn("fullName");
     base.registerPendingDropColumn("last");
@@ -76,16 +95,14 @@ public class MTableTest {
   }
 
   @Test
-  public void test_dropTable() {
-
+  void test_dropTable() {
     MTable base = base();
     DropTable dropTable = base.dropTable();
     assertThat(dropTable.getName()).isEqualTo(base.getName());
   }
 
   @Test
-  public void test_compare_addColumnDropColumn() throws Exception {
-
+  void test_compare_addColumnDropColumn() {
     ModelDiff diff = new ModelDiff();
     diff.compareTables(base(), newTable());
 
@@ -104,8 +121,7 @@ public class MTableTest {
   }
 
   @Test
-  public void test_compare_addTwoColumnsToSameTable() throws Exception {
-
+  void test_compare_addTwoColumnsToSameTable() {
     ModelDiff diff = new ModelDiff();
     diff.compareTables(base(), newTableAdd2Columns());
 
@@ -117,12 +133,10 @@ public class MTableTest {
     assertThat(addColumn.getColumn()).extracting("type").contains("varchar(1000)", "varchar(2000)");
 
     assertThat(diff.getDropChanges()).hasSize(0);
-
   }
 
   @Test
-  public void test_compare_modifyColumn() throws Exception {
-
+  void test_compare_modifyColumn() {
     ModelDiff diff = new ModelDiff();
     diff.compareTables(base(), newTableModifiedColumn());
 
@@ -138,12 +152,10 @@ public class MTableTest {
     assertThat(alterColumn.getReferences()).isNull();
 
     assertThat(diff.getDropChanges()).hasSize(0);
-
   }
 
   @Test
-  public void test_apply_dropColumn() {
-
+  void test_apply_dropColumn() {
     MTable base = base();
 
     DropColumn dropColumn = new DropColumn();
@@ -155,7 +167,7 @@ public class MTableTest {
   }
 
   @Test
-  public void test_apply_dropColumn_doesNotExist() {
+  void test_apply_dropColumn_doesNotExist() {
     MTable base = base();
 
     DropColumn dropColumn = new DropColumn();
@@ -165,7 +177,7 @@ public class MTableTest {
   }
 
   @Test
-  public void test_apply_alterColumn_doesNotExist() {
+  void test_apply_alterColumn_doesNotExist() {
     MTable base = base();
 
     AlterColumn alterColumn = new AlterColumn();
@@ -177,8 +189,7 @@ public class MTableTest {
   }
 
   @Test
-  public void test_apply_alterColumn_type() {
-
+  void test_apply_alterColumn_type() {
     MTable base = base();
 
     AlterColumn alterColumn = new AlterColumn();
@@ -191,8 +202,7 @@ public class MTableTest {
   }
 
   @Test
-  public void test_compare_addAndDropColumn() throws Exception {
-
+  void test_compare_addAndDropColumn() {
     MTable base = base();
     MTable newTable = newTable();
 
@@ -204,8 +214,7 @@ public class MTableTest {
   }
 
   @Test
-  public void test_compare_addHistoryToTable() {
-
+  void test_compare_addHistoryToTable() {
     MTable base = base();
     MTable withHistory = base();
     withHistory.setWithHistory(true);
@@ -219,8 +228,7 @@ public class MTableTest {
   }
 
   @Test
-  public void test_compare_removeHistoryFromTable() throws Exception {
-
+  void test_compare_removeHistoryFromTable() {
     MTable withHistory = base();
     withHistory.setWithHistory(true);
 

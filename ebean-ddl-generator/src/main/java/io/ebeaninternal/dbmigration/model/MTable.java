@@ -561,6 +561,16 @@ public class MTable {
     return newCol;
   }
 
+  public MColumn addColumnScalar(String dbColumn, String columnDefn) {
+    MColumn existingColumn = getColumn(dbColumn);
+    if (existingColumn != null) {
+      return existingColumn;
+    }
+    MColumn newCol = new MColumn(dbColumn, columnDefn);
+    addColumn(newCol);
+    return newCol;
+  }
+
   /**
    * Add a 'new column' to the AddColumn migration object.
    */
