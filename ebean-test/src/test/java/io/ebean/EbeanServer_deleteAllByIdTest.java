@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
-public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
+class EbeanServer_deleteAllByIdTest extends BaseTestCase {
 
   @Test
-  public void saveAllByVarArgs() {
+  void saveAllByVarArgs() {
 
     final EBasicVer bean0 = bean("foo0");
     final EBasicVer bean1 = bean("foo1");
@@ -41,8 +41,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
   }
 
   @Test
-  public void deleteAllById() {
-
+  void deleteAllById() {
     List<EBasicVer> someBeans = beans(3);
 
     DB.saveAll(someBeans);
@@ -61,8 +60,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
   }
 
   @Test
-  public void deleteAllById_withTransaction() {
-
+  void deleteAllById_withTransaction() {
     List<EBasicVer> someBeans = beans(3);
 
     DB.saveAll(someBeans);
@@ -84,8 +82,7 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
   }
 
   @Test
-  public void deleteAllPermanentById() {
-
+  void deleteAllPermanentById() {
     List<EBasicVer> someBeans = beans(3);
 
     DB.saveAll(someBeans);
@@ -103,10 +100,8 @@ public class EbeanServer_deleteAllByIdTest extends BaseTestCase {
     platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
   }
 
-
   @Test
-  public void deleteAllPermanentById_withTransaction() {
-
+  void deleteAllPermanentById_withTransaction() {
     List<EBasicVer> someBeans = beans(3);
 
     DB.saveAll(someBeans);
