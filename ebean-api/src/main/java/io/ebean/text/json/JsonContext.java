@@ -59,6 +59,48 @@ public interface JsonContext {
   <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException;
 
   /**
+   * Convert json parser input into a Bean of a specific type.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, JsonParser parser) throws JsonIOException;
+
+  /**
+   * Convert json parser input into a Bean of a specific type additionally using JsonReadOptions..
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, JsonParser parser, JsonReadOptions options) throws JsonIOException;
+
+  /**
+   * Convert json reader input into a Bean of a specific type.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, Reader json) throws JsonIOException;
+
+  /**
+   * Convert json reader input into a Bean of a specific type additionally using JsonReadOptions.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, Reader json, JsonReadOptions options) throws JsonIOException;
+
+  /**
+   * Convert json string input into a Bean of a specific type.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, String json) throws JsonIOException;
+
+  /**
+   * Convert json string input into a Bean of a specific type additionally using JsonReadOptions.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, String json, JsonReadOptions options) throws JsonIOException;
+
+  /**
    * Create and return a new bean reading for the bean type given the JSON options and source.
    * <p>
    * Note that JsonOption provides an option for setting a persistence context and also enabling

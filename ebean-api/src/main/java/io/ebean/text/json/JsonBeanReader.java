@@ -15,8 +15,12 @@ public interface JsonBeanReader<T> {
   /**
    * Read the JSON returning a bean.
    */
-  T read();
+  T read(T target);
 
+  default T read() {
+    return read(null);
+  }
+  
   /**
    * Create a new reader taking the context from the existing one but using a new JsonParser.
    */

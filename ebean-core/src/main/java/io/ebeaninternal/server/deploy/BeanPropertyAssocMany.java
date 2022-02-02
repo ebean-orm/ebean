@@ -1016,7 +1016,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     BeanCollection<?> collection = createEmpty(parentBean);
     BeanCollectionAdd add = beanCollectionAdd(collection);
     do {
-      EntityBean detailBean = (EntityBean) targetDescriptor.jsonRead(readJson, name);
+      EntityBean detailBean = (EntityBean) targetDescriptor.jsonRead(readJson, name, null); // FIXME
       if (detailBean == null) {
         // read the entire array
         break;

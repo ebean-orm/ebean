@@ -3354,12 +3354,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
 
-  public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
-    return jsonHelp.jsonRead(jsonRead, path, true);
+  public T jsonRead(SpiJsonReader jsonRead, String path, T target) throws IOException {
+    return jsonHelp.jsonRead(jsonRead, path, true, target);
   }
 
-  T jsonReadObject(SpiJsonReader jsonRead, String path) throws IOException {
-    return jsonHelp.jsonRead(jsonRead, path, false);
+  T jsonReadObject(SpiJsonReader jsonRead, String path, T target) throws IOException {
+    return jsonHelp.jsonRead(jsonRead, path, false, target);
   }
 
   public List<BeanProperty[]> uniqueProps() {
