@@ -187,7 +187,7 @@ class TestDbArray_basic extends BaseTestCase {
   /**
    * Platforms without Array support use JSON which by default isn't including null values.
    */
-  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.YUGABYTE})
   @Test
   void nullItems() {
     EArrayBean bean = new EArrayBean();
@@ -268,7 +268,7 @@ class TestDbArray_basic extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform(Platform.POSTGRES)
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
   void asDto_withArray() {
     DB.find(EArrayBean.class).delete();
     bean.setName("array in dto test");
@@ -310,7 +310,7 @@ class TestDbArray_basic extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform(Platform.POSTGRES)
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
   void sqlUpdate_withArray() {
     DB.find(EArrayBean.class).delete();
     bean.setName("array in sql update test");
@@ -326,11 +326,7 @@ class TestDbArray_basic extends BaseTestCase {
     SqlUpdate update1 = DB.sqlUpdate("UPDATE earray_bean SET phone_numbers = ?")
       .setParameter(1, phNumbers);
     update1.execute();
-    System.out.println("done");
 
-    // Named param fails with
-    // javax.persistence.PersistenceException:
-    // ERROR: syntax error at or near "$2"
     SqlUpdate update2 = DB.sqlUpdate("UPDATE earray_bean SET phone_numbers = :pns")
       .setArrayParameter("pns", phNumbers);
     update2.execute();
@@ -338,7 +334,7 @@ class TestDbArray_basic extends BaseTestCase {
     found = DB.find(EArrayBean.class, bean.getId());
     System.out.println(found);
     assertEquals("array in sql update test", found.getName());
-    assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
+    assertThat(found.getPhoneNumbers()).containsExactlyInAnyOrder("4321", "9823");
   }
 
   public static class EArrayBeanDto {
