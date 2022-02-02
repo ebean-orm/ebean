@@ -44,7 +44,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.2.24</version>
+      <version>42.3.2</version>
       <scope>provided</scope>
     </dependency>
 
@@ -52,7 +52,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.30</version>
+      <version>1.7.33</version>
       <scope>provided</scope>
     </dependency>
 
