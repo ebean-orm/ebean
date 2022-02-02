@@ -37,11 +37,17 @@ jobs:
       run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
     - name: mysql
       run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties
-    - name: sqlserver 2019
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties
-    - name: sqlserver 2017
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
     - name: mariadb
       run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
-    - name: db2
-      run: mvn clean test -Dprops.file=testconfig/ebean-db2.properties
+    - name: mariadb
+      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
+    - name: sqlserver
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
+    - name: yugabyte
+      run: mvn clean test -Dprops.file=testconfig/ebean-yugabyte.properties
+#    - name: sqlserver 2019
+#      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties
+#    - name: db2
+#      run: mvn clean test -Dprops.file=testconfig/ebean-db2.properties
+#    - name: oracle
+#      run: mvn clean test -Dprops.file=testconfig/ebean-oracle.properties
