@@ -43,11 +43,11 @@
     <h2database.version>2.1.210</h2database.version>
     <ebean-ddl-runner.version>1.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.1</ebean-migration-auto.version>
-    <ebean-migration.version>12.13.1</ebean-migration.version>
+    <ebean-migration.version>12.15.0</ebean-migration.version>
     <ebean-test-docker.version>4.2</ebean-test-docker.version>
     <ebean-datasource.version>7.5</ebean-datasource.version>
-    <ebean-agent.version>12.14.1</ebean-agent.version>
-    <ebean-maven-plugin.version>12.14.1</ebean-maven-plugin.version>
+    <ebean-agent.version>12.15.0</ebean-agent.version>
+    <ebean-maven-plugin.version>12.15.0</ebean-maven-plugin.version>
   </properties>
 
   <dependencies>
