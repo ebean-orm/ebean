@@ -31,3 +31,4 @@ alter table migtest_oto_child drop column master_id;
 drop table if exists migtest_e_user;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
 drop table if exists migtest_mtm_m_migtest_mtm_c;
+drop table if exists migtest_mtm_m_phone_numbers;

@@ -21,6 +21,12 @@ create table migtest_mtm_m_migtest_mtm_c (
   foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict
 );
 
+create table migtest_mtm_m_phone_numbers (
+  migtest_mtm_m_id              integer not null,
+  value                         varchar(255) not null,
+  foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict on update restrict
+);
+
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 

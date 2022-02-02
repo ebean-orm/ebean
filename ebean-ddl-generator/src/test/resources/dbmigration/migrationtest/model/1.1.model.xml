@@ -85,6 +85,10 @@
             <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m"/>
             <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c"/>
         </createTable>
+        <createTable name="migtest_mtm_m_phone_numbers" pkName="pk_migtest_mtm_m_phone_numbers">
+            <column name="migtest_mtm_m_id" type="bigint" notnull="true" references="migtest_mtm_m.id" foreignKeyName="fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" foreignKeyIndex="ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id"/>
+            <column name="value" type="varchar" notnull="true"/>
+        </createTable>
         <addColumn tableName="migtest_oto_child">
             <column name="master_id" type="bigint" uniqueOneToOne="uq_migtest_oto_child_master_id" references="migtest_oto_master.id" foreignKeyName="fk_migtest_oto_child_master_id"/>
         </addColumn>

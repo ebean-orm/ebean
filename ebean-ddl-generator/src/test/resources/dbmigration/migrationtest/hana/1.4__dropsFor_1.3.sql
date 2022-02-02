@@ -49,3 +49,4 @@ CALL usp_ebean_drop_column('migtest_oto_child', 'master_id');
 drop table migtest_e_user cascade;
 drop table migtest_mtm_c_migtest_mtm_m cascade;
 drop table migtest_mtm_m_migtest_mtm_c cascade;
+drop table migtest_mtm_m_phone_numbers cascade;

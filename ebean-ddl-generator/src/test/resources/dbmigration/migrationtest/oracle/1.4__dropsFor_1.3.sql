@@ -32,3 +32,4 @@ drop table migtest_e_user cascade constraints purge;
 drop sequence migtest_e_user_seq;
 drop table migtest_mtm_c_migtest_mtm_m cascade constraints purge;
 drop table migtest_mtm_m_migtest_mtm_c cascade constraints purge;
+drop table migtest_mtm_m_phone_numbers cascade constraints purge;

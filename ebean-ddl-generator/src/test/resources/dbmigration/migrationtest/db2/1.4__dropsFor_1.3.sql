@@ -38,6 +38,7 @@ end if;
 end$$;
 drop table migtest_mtm_c_migtest_mtm_m;
 drop table migtest_mtm_m_migtest_mtm_c;
+drop table migtest_mtm_m_phone_numbers;
 call sysproc.admin_cmd('reorg table migtest_e_history2') /* reorg #1 */;
 call sysproc.admin_cmd('reorg table migtest_e_softdelete') /* reorg #2 */;
 call sysproc.admin_cmd('reorg table migtest_oto_child') /* reorg #3 */;

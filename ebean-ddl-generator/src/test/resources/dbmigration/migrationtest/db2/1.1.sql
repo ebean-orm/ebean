@@ -17,55 +17,120 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
+create table migtest_mtm_m_phone_numbers (
+  migtest_mtm_m_id              bigint not null,
+  value                         varchar(255) not null
+);
+
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 
-alter table migtest_ckey_detail add constraint fk_mgtst_ck_e1qkb5 foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key) on delete restrict;
+alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key) on delete restrict;
 alter table migtest_ckey_parent add column assoc_id integer;
 
-alter table migtest_fk_cascade drop constraint fk_mgtst_fk_65kf6l;
-alter table migtest_fk_cascade add constraint fk_mgtst_fk_65kf6l foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict;
-alter table migtest_fk_none add constraint fk_mgtst_fk_nn_n_d foreign key (one_id) references migtest_fk_one (id) on delete restrict;
-alter table migtest_fk_none_via_join add constraint fk_mgtst_fk_9tknzj foreign key (one_id) references migtest_fk_one (id) on delete restrict;
-alter table migtest_fk_set_null drop constraint fk_mgtst_fk_wicx8x;
-alter table migtest_fk_set_null add constraint fk_mgtst_fk_wicx8x foreign key (one_id) references migtest_fk_one (id) on delete restrict;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'FK_MIGTEST_FK_CASCADE_ONE_ID' and tabname = 'MIGTEST_FK_CASCADE') then
+  prepare stmt from 'alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id';
+  execute stmt;
+end if;
+end$$;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete restrict;
+alter table migtest_fk_none add constraint fk_migtest_fk_none_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
+alter table migtest_fk_none_via_join add constraint fk_migtest_fk_none_via_join_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'FK_MIGTEST_FK_SET_NULL_ONE_ID' and tabname = 'MIGTEST_FK_SET_NULL') then
+  prepare stmt from 'alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id';
+  execute stmt;
+end if;
+end$$;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict;
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic drop constraint ck_mgtst__bsc_stts;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MIGTEST_E_BASIC_STATUS' and tabname = 'MIGTEST_E_BASIC') then
+  prepare stmt from 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status';
+  execute stmt;
+end if;
+end$$;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
-alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in ('N','A','I','?'));
-alter table migtest_e_basic drop constraint ck_mgtst__b_z543fg;
+alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MIGTEST_E_BASIC_STATUS2' and tabname = 'MIGTEST_E_BASIC') then
+  prepare stmt from 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2';
+  execute stmt;
+end if;
+end$$;
 alter table migtest_e_basic alter column status2 set data type varchar(127);
 alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 
--- rename all collisions;
+call sysproc.admin_cmd('reorg table migtest_e_basic') /* reorg #1 */;
+-- db2 does not support parial null indices :( - so we have to clean;
+update migtest_e_basic set status = 'N' where id = 1;
 create unique index uq_migtest_e_basic_description on migtest_e_basic(description) exclude null keys;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
-alter table migtest_e_basic add constraint fk_mgtst__bsc_sr_d foreign key (user_id) references migtest_e_user (id) on delete restrict;
+alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict;
 alter table migtest_e_basic alter column user_id drop not null;
 alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add column new_boolean_field boolean default true not null;
+call sysproc.admin_cmd('reorg table migtest_e_basic') /* reorg #2 */;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
 alter table migtest_e_basic add column new_boolean_field2 boolean default true not null;
 alter table migtest_e_basic add column progress integer default 0 not null;
-alter table migtest_e_basic add constraint ck_mgtst__b_l39g41 check ( progress in (0,1,2));
+alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer integer default 42 not null;
 
-alter table migtest_e_basic drop constraint uq_mgtst__b_4aybzy;
-alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc02;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'UQ_MIGTEST_E_BASIC_INDEXTEST2' and tabname = 'MIGTEST_E_BASIC') then
+  prepare stmt from 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2';
+  execute stmt;
+end if;
+end$$
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'UQ_MIGTEST_E_BASIC_INDEXTEST2') then
+  prepare stmt from 'drop index uq_migtest_e_basic_indextest2';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'UQ_MIGTEST_E_BASIC_INDEXTEST6' and tabname = 'MIGTEST_E_BASIC') then
+  prepare stmt from 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6';
+  execute stmt;
+end if;
+end$$
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'UQ_MIGTEST_E_BASIC_INDEXTEST6') then
+  prepare stmt from 'drop index uq_migtest_e_basic_indextest6';
+  execute stmt;
+end if;
+end$$;
 create unique index uq_migtest_e_basic_status_indextest1 on migtest_e_basic(status,indextest1) exclude null keys;
 create unique index uq_migtest_e_basic_name on migtest_e_basic(name) exclude null keys;
 create unique index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) exclude null keys;
 create unique index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) exclude null keys;
-alter table migtest_e_enum drop constraint ck_mgtst__n_773sok;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MIGTEST_E_ENUM_TEST_STATUS' and tabname = 'MIGTEST_E_ENUM') then
+  prepare stmt from 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
+  execute stmt;
+end if;
+end$$;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string set data type bigint;
 comment on table migtest_e_history is 'We have history now';
 
+call sysproc.admin_cmd('reorg table migtest_e_history') /* reorg #3 */;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
@@ -78,6 +143,8 @@ alter table migtest_e_history4 alter column test_number set data type bigint;
 alter table migtest_e_history5 add column test_boolean boolean default false not null;
 
 
+call sysproc.admin_cmd('reorg table migtest_e_history2') /* reorg #4 */;
+call sysproc.admin_cmd('reorg table migtest_e_history4') /* reorg #5 */;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter column test_number1 set default 42;
@@ -87,24 +154,40 @@ alter table migtest_e_softdelete add column deleted boolean default false not nu
 
 alter table migtest_oto_child add column master_id bigint;
 
-create index ix_mgtst__b_eu8css on migtest_e_basic (indextest3);
-create index ix_mgtst__b_eu8csv on migtest_e_basic (indextest6);
-drop index ix_mgtst__b_eu8csq;
-drop index ix_mgtst__b_eu8csu;
-create index ix_mgtst_mt_3ug4ok on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
-alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awga foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
+call sysproc.admin_cmd('reorg table migtest_e_history6') /* reorg #6 */;
+create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
+create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'IX_MIGTEST_E_BASIC_INDEXTEST1') then
+  prepare stmt from 'drop index ix_migtest_e_basic_indextest1';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'IX_MIGTEST_E_BASIC_INDEXTEST5') then
+  prepare stmt from 'drop index ix_migtest_e_basic_indextest5';
+  execute stmt;
+end if;
+end$$;
+create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
+alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
 
-create index ix_mgtst_mt_3ug4ou on migtest_mtm_c_migtest_mtm_m (migtest_mtm_m_id);
-alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mt_93awgk foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
+create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m on migtest_mtm_c_migtest_mtm_m (migtest_mtm_m_id);
+alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
 
-create index ix_mgtst_mt_b7nbcu on migtest_mtm_m_migtest_mtm_c (migtest_mtm_m_id);
-alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mt_ggi34k foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
+create index ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m on migtest_mtm_m_migtest_mtm_c (migtest_mtm_m_id);
+alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
 
-create index ix_mgtst_mt_b7nbck on migtest_mtm_m_migtest_mtm_c (migtest_mtm_c_id);
-alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mt_ggi34a foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
+create index ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c on migtest_mtm_m_migtest_mtm_c (migtest_mtm_c_id);
+alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
 
-create index ix_mgtst_ck_x45o21 on migtest_ckey_parent (assoc_id);
-alter table migtest_ckey_parent add constraint fk_mgtst_ck_da00mr foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict;
+create index ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id on migtest_mtm_m_phone_numbers (migtest_mtm_m_id);
+alter table migtest_mtm_m_phone_numbers add constraint fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
 
-alter table migtest_oto_child add constraint fk_mgtst_t__csyl38 foreign key (master_id) references migtest_oto_master (id) on delete restrict;
+create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
+alter table migtest_ckey_parent add constraint fk_migtest_ckey_parent_assoc_id foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict;
+
+alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict;
 

@@ -17,6 +17,11 @@ create column table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
+create column table migtest_mtm_m_phone_numbers (
+  migtest_mtm_m_id              bigint not null,
+  value                         nvarchar(255) not null
+);
+
 alter table migtest_ckey_detail add ( one_key integer);
 alter table migtest_ckey_detail add ( two_key nvarchar(127));
 
@@ -161,6 +166,9 @@ alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_
 
 -- explicit index "ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" for single column "migtest_mtm_c_id" of table "migtest_mtm_m_migtest_mtm_c" is not necessary;
 alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
+
+-- explicit index "ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" for single column "migtest_mtm_m_id" of table "migtest_mtm_m_phone_numbers" is not necessary;
+alter table migtest_mtm_m_phone_numbers add constraint fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict on update restrict;
 
 -- explicit index "ix_migtest_ckey_parent_assoc_id" for single column "assoc_id" of table "migtest_ckey_parent" is not necessary;
 alter table migtest_ckey_parent add constraint fk_migtest_ckey_parent_assoc_id foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict on update restrict;
