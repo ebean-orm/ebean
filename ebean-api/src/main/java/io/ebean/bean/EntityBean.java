@@ -109,9 +109,4 @@ public interface EntityBean extends Serializable {
     throw new NotEnhancedException();
   }
 
-  /**
-   * Recalcs the bean. This is invoked by PersistRequestBean.
-   */
-  default void _ebean_onPersistTrigger(String profileEventId) {};
-
 }

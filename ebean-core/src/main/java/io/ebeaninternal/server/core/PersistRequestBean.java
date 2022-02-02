@@ -148,12 +148,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     super(server, t, persistExecute);
     this.entityBean = (EntityBean) bean;
     this.intercept = entityBean._ebean_getIntercept();
-    this.beanDescriptor = mgr.getBeanDescriptor();
-    boolean isReference =  beanDescriptor.isReference(intercept);
-    if(!isReference) {
-        this.entityBean._ebean_onPersistTrigger(type.profileEventId);
-    }
     this.beanManager = mgr;
+    this.beanDescriptor = mgr.getBeanDescriptor();
     this.beanPersistListener = beanDescriptor.persistListener();
     this.bean = bean;
     this.parentBean = parentBean;
