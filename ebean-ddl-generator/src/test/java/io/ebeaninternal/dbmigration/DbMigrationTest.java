@@ -50,6 +50,7 @@ public class DbMigrationTest extends BaseTestCase {
         "migtest_fk_set_null",
         "migtest_mtm_c",
         "migtest_mtm_m",
+        "migtest_mtm_m_phone_numbers",
         "migtest_mtm_c_migtest_mtm_m",
         "migtest_mtm_m_migtest_mtm_c",
         "migtest_oto_child",
@@ -184,7 +185,7 @@ public class DbMigrationTest extends BaseTestCase {
       sb.append("drop view ").append(table).append("_with_history;\n");
       sb.append("drop sequence ").append(table).append("_seq;\n");
     }
-
+System.err.println(sb);
     runScript(true, sb.toString(), "cleanup");
     runScript(true, sb.toString(), "cleanup");
   }

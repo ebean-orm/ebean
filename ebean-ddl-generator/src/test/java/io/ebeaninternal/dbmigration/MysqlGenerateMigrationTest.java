@@ -37,6 +37,7 @@ public class MysqlGenerateMigrationTest {
     config.getProperties().put("ebean.migrationtest.migration.pathToResources", pathToResources);
     config.getProperties().put("ebean.migrationtest.migration.platforms", "mysql");
     config.getProperties().put("ebean.migrationtest.migration.migrationPath", "dbmigration/migrationtest-procedures/");
+    config.getProperties().put("ebean.migrationtest.migration.migrationInitPath", "dbinit/migrationtest-procedures/");
     config.setPackages(Arrays.asList("misc.migration.mysql_v1_0"));
 
     // First, we clean up the output-directory

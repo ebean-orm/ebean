@@ -1,33 +1,31 @@
 package io.ebeaninternal.dbmigration.run;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.migration.auto.AutoMigrationRunner;
+import io.ebean.migration.MigrationConfig;
+import io.ebean.migration.MigrationRunner;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
-import io.ebeaninternal.server.core.ServiceUtil;
 
 public class DbRunMigrationPlugin implements Plugin {
 
   private SpiServer server;
-  private AutoMigrationRunner migrationRunner;
+  private MigrationConfig migrationConfig;
 
   @Override
   public void configure(SpiServer server) {
     this.server = server;
     DatabaseConfig config = server.config();
     if (config.isRunMigration()) {
-      migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
-      if (migrationRunner == null) {
-        throw new IllegalStateException(
-            "No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
-      }
+      migrationConfig = new MigrationConfig();
       final String dbSchema = config.getDbSchema();
       if (dbSchema != null) {
-        migrationRunner.setDefaultDbSchema(dbSchema);
+        migrationConfig.setSetCurrentSchema(false);
+        migrationConfig.setDbSchema(dbSchema);
       }
-      migrationRunner.setName(config.getName());
-      migrationRunner.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
-      migrationRunner.loadProperties(config.getProperties());
+      migrationConfig.setName(config.getName());
+      migrationConfig.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
+      migrationConfig.load(config.getProperties());
+      migrationConfig.setRunPlaceholderMap(config.getDdlPlaceholderMap());
     }
   }
 
@@ -43,8 +41,8 @@ public class DbRunMigrationPlugin implements Plugin {
 
   @Override
   public void start() {
-    if (migrationRunner != null) {
-      migrationRunner.run(server.dataSource());
+    if (migrationConfig != null) {
+      new MigrationRunner(migrationConfig).run(server.dataSource());
     }
   }
 }
