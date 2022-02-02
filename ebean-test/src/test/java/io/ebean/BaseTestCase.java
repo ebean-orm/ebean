@@ -195,6 +195,10 @@ public abstract class BaseTestCase {
     return Platform.DB2 == platform();
   }
 
+  public boolean platformDistinctOn() {
+    return isPostgresCompatible();
+  }
+
   public boolean isPostgresCompatible() {
     return isPostgres() || isYugabyte();
   }

@@ -41,7 +41,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     // order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind(1)
 
     String generatedSql = sqlOf(query, 1);
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(generatedSql).contains("select distinct on (t0.cretime, t0.id, t1.id, t1.order_qty, t1.cretime) t0.id, t0.status,"); // need the distinct
 
     } else {

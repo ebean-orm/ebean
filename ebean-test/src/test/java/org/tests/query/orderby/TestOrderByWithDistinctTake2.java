@@ -36,7 +36,7 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     // where lower(u1.first_name) like ?
     // order by t0.name; --bind(r%)
 
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(generatedSql).contains("select distinct on (t0.name, t0.id) t0.id, t0.name");
 
     } else {
@@ -59,7 +59,7 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
 
     String generatedSql = sqlOf(query);
 
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(generatedSql).contains("select distinct on (t0.name, t0.id) t0.id, t0.name, t0.id");
     } else {
       assertThat(generatedSql).contains("select distinct t0.id, t0.name, t0.id");

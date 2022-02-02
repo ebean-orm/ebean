@@ -42,7 +42,7 @@ public class TestQueryConversationRowCount extends BaseTestCase {
     // where t0.group_id = ?  and ((t0.open = ?  and u1.user_id = ? )  or t0.open = ? )
     // order by t0.when_created desc;
 
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(generatedSql).contains("select distinct on (t0.when_created, t0.id) t0.id, t0.title, t0.isopen");
 
     } else {
