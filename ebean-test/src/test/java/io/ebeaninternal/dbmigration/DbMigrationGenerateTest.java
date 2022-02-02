@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration;
 
+
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class DbMigrationGenerateTest {
   private static final Logger logger = LoggerFactory.getLogger(DbMigrationGenerateTest.class);
 
   public static void main(String[] args) throws IOException {
-    run("ebean-ddl-generator/src/test/resources");
+    run("ebean-test/src/test/resources");
   }
 
   @Test
@@ -46,7 +47,7 @@ public class DbMigrationGenerateTest {
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
 
     // First, we clean up the output-directory
-    Files.walk(Paths.get(pathToResources, "dbmigration","migrationtest"))
+    Files.walk(Paths.get(pathToResources, "migrationtest"))
       .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
     
     DatabaseFactory.create(config).shutdown();

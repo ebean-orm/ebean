@@ -36,12 +36,12 @@ public class MysqlGenerateMigrationTest {
     config.setRunMigration(false);
     config.getProperties().put("ebean.migrationtest.migration.pathToResources", pathToResources);
     config.getProperties().put("ebean.migrationtest.migration.platforms", "mysql");
-    config.getProperties().put("ebean.migrationtest.migration.migrationPath", "dbmigration/migrationtest-procedures/");
-    config.getProperties().put("ebean.migrationtest.migration.migrationInitPath", "dbinit/migrationtest-procedures/");
+    config.getProperties().put("ebean.migrationtest.migration.migrationPath", "migrationtest-procedures/dbmigration");
+    config.getProperties().put("ebean.migrationtest.migration.migrationInitPath", "migrationtest-procedures/dbinit");
     config.setPackages(Arrays.asList("misc.migration.mysql_v1_0"));
 
     // First, we clean up the output-directory
-    Path path = Paths.get(pathToResources , "dbmigration","migrationtest-procedures");
+    Path path = Paths.get(pathToResources , "migrationtest-procedures");
     Files.walk(path)
       .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
     
@@ -58,7 +58,7 @@ public class MysqlGenerateMigrationTest {
     assertThat(DbMigrationPlugin.getLastMigration()).isEqualTo("1.1,1.2__dropsFor_1.1");
     assertThat(DbMigrationPlugin.getLastInit()).isEqualTo("1.2");
     
-    final Path sqlFile = path.resolve("mysql/1.2__dropsFor_1.1.sql");
+    final Path sqlFile = path.resolve("dbmigration/mysql/1.2__dropsFor_1.1.sql");
 
     assertThat(sqlFile).isNotEmptyFile();
     assertThat(Files.readAllLines(sqlFile, StandardCharsets.UTF_8))
