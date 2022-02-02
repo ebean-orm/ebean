@@ -207,13 +207,9 @@ public class TestRawSqlBuilder extends BaseTestCase {
     assertEquals(5, columnMapping.getIndexPosition("dataMonth"));
   }
 
+  @ForPlatform(Platform.POSTGRES)
   @Test
   public void postgres_parse_withDateTruncCaseHaving() {
-
-    if (!isPostgres()) {
-      return;
-    }
-
     ResetBasicData.reset();
 
     String sql = "select DATE_TRUNC('DAY', d.order_date) as day," +

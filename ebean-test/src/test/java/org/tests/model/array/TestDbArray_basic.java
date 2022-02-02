@@ -60,7 +60,7 @@ class TestDbArray_basic extends BaseTestCase {
 
     assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
 
-    if (isPostgres()) {
+    if (isPostgresCompatible()) {
       Query<EArrayBean> query = DB.find(EArrayBean.class)
         .where()
         .arrayContains("otherIds", 96L, 97L)

@@ -369,7 +369,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     if (isH2()) {
       assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,'-',t0.code) in (?,?) order by t0.sku desc; --bind(def,Array[2]={2-1000,3-1000})");
-    } else if (isPostgres() || isOracle() || isDb2() || isYugabyte()) {
+    } else if (isPostgresCompatible() || isOracle() || isDb2()) {
       assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku||'-'||t0.code)");
     } else if (isHana()) {
       assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku, '-'||t0.code)");
@@ -412,7 +412,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     if (isH2()) {
       assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,':',t0.code,'-foo') in (?,?) order by t0.sku desc; --bind(def,Array[2]={2:1000-foo,3:1000-foo})");
-    } else if (isPostgres() || isOracle() || isDb2() || isYugabyte()){
+    } else if (isPostgresCompatible() || isOracle() || isDb2()){
       assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku||':'||t0.code||'-foo')");
     } else if (isHana()){
       assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku, ':'||t0.code||'-foo')");

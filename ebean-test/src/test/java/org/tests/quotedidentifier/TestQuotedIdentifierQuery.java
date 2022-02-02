@@ -25,7 +25,7 @@ public class TestQuotedIdentifierQuery extends BaseTestCase {
         .raw("t0.`CODE` = ?", "bar")
         .findList();
 
-    } else if (isH2() || isPostgres()) {
+    } else if (isH2() || isPostgresCompatible()) {
 
       DB.find(BWithQIdent.class)
         .where()

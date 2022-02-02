@@ -94,7 +94,7 @@ public class TestQueryDistinct extends BaseTestCase {
 
     query.findList();
 
-    if (isH2() || isPostgres()) {
+    if (isH2() || isPostgresCompatible()) {
       String generatedSql = sqlOf(query);
       assertThat(generatedSql).contains("select distinct t0.name from o_customer t0 limit 10");
     }
