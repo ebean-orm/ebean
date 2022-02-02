@@ -581,20 +581,17 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   @Override
   public void registerBeanInherit(BeanPropertyAssocOne<?> property, EntityBeanIntercept ebi) {
-    String path = getPath(property.name());
-    request.loadContext().register(path, ebi, property);
+    request.loadContext().register(path(property.name()), ebi, property);
   }
 
   @Override
   public void register(String path, EntityBeanIntercept ebi) {
-    path = getPath(path);
-    request.loadContext().register(path, ebi);
+    request.loadContext().register(path(path), ebi);
   }
 
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
-    String path = getPath(many.name());
-    request.loadContext().register(path, many, bc);
+    request.loadContext().register(path(many.name()), many, bc);
   }
 
   /**
@@ -663,18 +660,14 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     return autoTuneProfiling && query.isUsageProfiling();
   }
 
-  private String getPath(String propertyName) {
+  private String path(String propertyName) {
     if (currentPrefix == null) {
       return propertyName;
     } else if (propertyName == null) {
       return currentPrefix;
     }
     String path = currentPathMap.get(propertyName);
-    if (path != null) {
-      return path;
-    } else {
-      return currentPrefix + "." + propertyName;
-    }
+    return path != null ? path : currentPrefix + "." + propertyName;
   }
 
   @Override

@@ -10,14 +10,14 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestElementCollectionBasic extends BaseTestCase {
+class TestElementCollectionBasic extends BaseTestCase {
 
   private List<String> eventLog() {
     return EcPersonPersistAdapter.eventLog();
   }
 
   @Test
-  public void insertThen_UpdateWhenNotChanged_expect_noChanges() {
+  void insertThen_UpdateWhenNotChanged_expect_noChanges() {
 
     EcPerson person = new EcPerson("Nothing021");
     person.getPhoneNumbers().add("021 1234");
@@ -51,9 +51,10 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   @Test
-  public void test() {
+  void test() {
 
     eventLog();
+    DB.find(EcPerson.class).where().eq("name", "Fiona021").delete();
     LoggedSql.start();
 
     EcPerson person = new EcPerson("Fiona021");
@@ -95,8 +96,8 @@ public class TestElementCollectionBasic extends BaseTestCase {
     List<String> phoneNumbers1 = found.get(1).getPhoneNumbers();
     phoneNumbers0.size();
 
-    assertThat(phoneNumbers0).containsExactly("021 1234", "021 4321");
-    assertThat(phoneNumbers1).containsExactly("09 1234", "09 4321");
+    assertThat(phoneNumbers0).containsExactlyInAnyOrder("021 1234", "021 4321");
+    assertThat(phoneNumbers1).containsExactlyInAnyOrder("09 1234", "09 4321");
 
     sql = LoggedSql.collect();
     assertThat(sql).hasSize(2);
@@ -126,7 +127,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void updateBasic(EcPerson bean) {
-
     bean.setName("Fiona021-mod-0");
     DB.save(bean);
 
@@ -140,7 +140,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void updateBasicInBatch(EcPerson bean) {
-
     try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
       bean.setName("Fiona021-mod-0-batch");
@@ -158,7 +157,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void updateBoth(EcPerson bean) {
-
     bean.setName("Fiona021-mod-both");
     bean.getPhoneNumbers().add("01-22123");
     DB.save(bean);
@@ -187,7 +185,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void updateBothInBatch(EcPerson bean) {
-
     try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
       bean.setName("Fiona021-mod-both-batch");
@@ -210,7 +207,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void updateNothing(EcPerson bean) {
-
     DB.save(bean);
 
     List<String> sql = LoggedSql.collect();
@@ -222,7 +218,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void updateOnlyCollectionInBatch(EcPerson bean) {
-
     try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
       bean.getPhoneNumbers().add("01-4321");
@@ -243,7 +238,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void updateOnlyCollection(EcPerson bean) {
-
     bean.getPhoneNumbers().add("01-4321");
     DB.save(bean);
 
@@ -272,7 +266,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void delete(EcPerson bean) {
-
     DB.delete(bean);
 
     List<String> sql = LoggedSql.collect();
@@ -284,7 +277,6 @@ public class TestElementCollectionBasic extends BaseTestCase {
   }
 
   private void jsonToFrom(EcPerson foundFirst) {
-
     String asJson = DB.json().toJson(foundFirst);
     EcPerson fromJson = DB.json().toBean(EcPerson.class, asJson);
     assertThat(fromJson.getPhoneNumbers()).containsAll(foundFirst.getPhoneNumbers());

@@ -8,14 +8,14 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.util.UrlHelper;
 
 import javax.persistence.PersistenceException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.LineNumberReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URL;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+
+import static java.util.Objects.requireNonNull;
 
 final class DScriptRunner implements ScriptRunner {
 
@@ -30,8 +30,8 @@ final class DScriptRunner implements ScriptRunner {
   }
 
   @Override
-  public void run(String path) {
-    run(path, null);
+  public void run(String resourcePath) {
+    run(resourcePath, null);
   }
 
   @Override
@@ -49,27 +49,42 @@ final class DScriptRunner implements ScriptRunner {
     run(resource, null, placeholderMap);
   }
 
+  @Override
+  public void run(Path file) {
+    run(file, null);
+  }
+
+  @Override
+  public void run(Path file, Map<String, String> placeholderMap) {
+    requireNonNull(file);
+    String scriptName = file.toFile().getName();
+    String content = fileContent(file);
+    runScript(content, scriptName, placeholderMap, false);
+  }
+
   private void run(URL resource, String scriptName, Map<String, String> placeholderMap) {
-    if (resource == null) {
-      throw new IllegalArgumentException("resource is null?");
-    }
+    requireNonNull(resource);
     if (scriptName == null) {
       scriptName = resource.getFile();
     }
-
     String content = content(resource);
     runScript(content, scriptName, placeholderMap, false);
   }
 
-  private String content(URL resource) {
-    if (resource == null) {
-      throw new IllegalArgumentException("resource is null?");
-    }
-
-    try (InputStream inputStream = UrlHelper.openNoCache(resource);
-      Reader reader = IOUtils.newReader(inputStream)) {
+  private String fileContent(Path file) {
+    try (InputStream inputStream = new FileInputStream(file.toFile());
+         Reader reader = IOUtils.newReader(inputStream)) {
       return readContent(reader);
+    } catch (IOException e) {
+      throw new PersistenceException("Failed to read script content", e);
+    }
+  }
 
+  private String content(URL resource) {
+    requireNonNull(resource);
+    try (InputStream inputStream = UrlHelper.openNoCache(resource);
+         Reader reader = IOUtils.newReader(inputStream)) {
+      return readContent(reader);
     } catch (IOException e) {
       throw new PersistenceException("Failed to read script content", e);
     }
@@ -85,10 +100,9 @@ final class DScriptRunner implements ScriptRunner {
    */
   private void runScript(String content, String scriptName, Map<String, String> placeholderMap, boolean useAutoCommit) {
     try {
-      if (placeholderMap != null) {
+      if (placeholderMap != null && !placeholderMap.isEmpty()) {
         content = ScriptTransform.build(null, placeholderMap).transform(content);
       }
-
       try (Connection connection = obtainConnection()) {
         DdlRunner runner = new DdlRunner(useAutoCommit, scriptName, platformName);
         runner.runAll(content, connection);
@@ -110,7 +124,6 @@ final class DScriptRunner implements ScriptRunner {
   }
 
   private String readContent(Reader reader) throws IOException {
-
     StringBuilder buf = new StringBuilder();
     try (LineNumberReader lineReader = new LineNumberReader(reader)) {
       String line;

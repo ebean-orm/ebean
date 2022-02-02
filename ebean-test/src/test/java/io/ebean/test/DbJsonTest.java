@@ -1,6 +1,7 @@
 package io.ebean.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import org.etest.BSimpleFor;
 import org.junit.jupiter.api.Test;
@@ -11,10 +12,10 @@ import static io.ebean.test.DbJson.readResource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class DbJsonTest {
+class DbJsonTest extends BaseTestCase {
 
   @Test
-  public void of() {
+  void of() {
 
     DB.find(BSimpleFor.class).delete();
 
@@ -34,14 +35,19 @@ public class DbJsonTest {
 
     final List<BSimpleFor> beans = DB.find(BSimpleFor.class).findList();
 
+    if (isH2() || isPostgres()) {
+      DbJson.of(beans)
+        //.withPlaceholder("_")
+        .replace("id", "whenModified")
+        .assertContentMatches("/bean/example-list-match.json");
+    }
+
     DbJson.of(beans)
-      //.withPlaceholder("_")
-      .replace("id", "whenModified")
-      .assertContentMatches("/bean/example-list.json");
+      .assertContainsResource("/bean/example-list-contains.json");
   }
 
   @Test
-  public void assertContains_pass() {
+  void assertContains_pass() {
 
     BSimpleFor bean = new BSimpleFor("something-contains-me", "YeahNah");
     DB.save(bean);
@@ -55,7 +61,7 @@ public class DbJsonTest {
   }
 
   @Test
-  public void asJson() {
+  void asJson() {
 
     BSimpleFor bean = new BSimpleFor("other");
     DB.save(bean);

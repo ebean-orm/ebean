@@ -27,7 +27,7 @@ public class TestInetAddressType extends TransactionalTestCase {
   @Test
   public void testIp6() throws UnknownHostException {
 
-    if (isPostgres()) {
+    if (isPostgres() || isYugabyte()) {
       insertUpdateDeleteFind("2001:db8:85a3:0:0:8a2e:370:7334", "2001:db8:85a3::8a2e:370:7334", "2001:4f8:3:ba::/64", "2001:4f8:3:ba::/64");
     } else {
       insertUpdateDeleteFind("2001:db8:85a3:0:0:8a2e:370:7334", "2001:db8:85a3:0:0:8a2e:370:7334", "192.168.100.128/25", "192.168.100.128/25");

@@ -7,6 +7,8 @@ import io.ebean.config.dbplatform.DatabasePlatform;
  */
 public class H2Ddl extends PlatformDdl {
 
+  private static boolean useV1Syntax = Boolean.getBoolean("ebean.h2.useV1Syntax");
+  
   public H2Ddl(DatabasePlatform platform) {
     super(platform);
     this.historyDdl = new H2HistoryDdl();
@@ -22,6 +24,9 @@ public class H2Ddl extends PlatformDdl {
 
   @Override
   protected String convertArrayType(String logicalArrayType) {
+    if (useV1Syntax) {
+      return "array";
+    }
     int pos = logicalArrayType.indexOf('[');
     if (pos == -1) {
       return logicalArrayType;

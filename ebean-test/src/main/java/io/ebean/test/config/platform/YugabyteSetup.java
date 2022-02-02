@@ -2,11 +2,11 @@ package io.ebean.test.config.platform;
 
 import java.util.Properties;
 
-class PostgresSetup implements PlatformSetup {
+class YugabyteSetup implements PlatformSetup {
 
   @Override
   public Properties setup(Config config) {
-    int defaultPort = config.isUseDocker() ? 6432 : 5432;
+    int defaultPort = config.isUseDocker() ? 6433 : 5433;
     config.ddlMode("dropCreate");
     config.setDefaultPort(defaultPort);
     config.setUsernameDefault();
@@ -25,14 +25,14 @@ class PostgresSetup implements PlatformSetup {
     if (!config.isUseDocker()) {
       return new Properties();
     }
-    config.setDockerVersion("14");
-    config.setExtensions("hstore,pgcrypto");
+    config.setDockerVersion("2.11.2.0-b89");
+    config.setExtensions("pgcrypto");
     return config.getDockerProperties();
   }
 
   @Override
   public void setupExtraDbDataSource(Config config) {
-    int defaultPort = config.isUseDocker() ? 6432 : 5432;
+    int defaultPort = config.isUseDocker() ? 6433 : 5433;
     config.setDefaultPort(defaultPort);
     config.setExtraUsernameDefault();
     config.setExtraDbPasswordDefault();

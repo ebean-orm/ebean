@@ -1,6 +1,7 @@
 package io.ebean;
 
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -23,10 +24,10 @@ public interface ScriptRunner {
   /**
    * Run a script given the resource path (that should start with "/").
    */
-  void run(String path);
+  void run(String resourcePath);
 
   /**
-   * Run a script given the resource path (that should start with "/") and place holders.
+   * Run a script given the resource path (that should start with "/") and place-holders.
    *
    * <pre>{@code
    *
@@ -38,7 +39,7 @@ public interface ScriptRunner {
    *
    * }</pre>
    */
-  void run(String path, Map<String, String> placeholderMap);
+  void run(String resourcePath, Map<String, String> placeholderMap);
 
   /**
    * Run a DDL or SQL script given the resource.
@@ -46,9 +47,19 @@ public interface ScriptRunner {
   void run(URL resource);
 
   /**
-   * Run a DDL or SQL script given the resource and place holders.
+   * Run a DDL or SQL script given the resource and place-holders.
    */
   void run(URL resource, Map<String, String> placeholderMap);
+
+  /**
+   * Run a DDL or SQL script given the file.
+   */
+  void run(Path file);
+
+  /**
+   * Run a DDL or SQL script given the file and place-holders.
+   */
+  void run(Path file, Map<String, String> placeholderMap);
 
   /**
    * Run the raw provided DDL or SQL script.

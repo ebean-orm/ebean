@@ -246,14 +246,13 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       lastColumn = null;
       return;
     }
-
     // using non-strict mode to render the DB type such that we have a
     // "logical" type like jsonb(200) that can map to JSONB or VARCHAR(200)
-    MColumn col = new MColumn(p.dbColumn(), ctx.getColumnDefn(p, false));
+    MColumn col = table.addColumnScalar(p.dbColumn(), ctx.getColumnDefn(p, false));
+    //MColumn col = new MColumn(p.dbColumn(), ctx.getColumnDefn(p, false));
     col.setComment(p.dbComment());
     col.setDraftOnly(p.isDraftOnly());
     col.setHistoryExclude(p.isExcludedFromHistory());
-
     if (p.isId() || p.isImportedPrimaryKey()) {
       col.setPrimaryKey(true);
       if (p.descriptor().isUseIdGenerator()) {
@@ -279,7 +278,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
 
     col.setDbMigrationInfos(p.dbMigrationInfos());
-
     if (p.isUnique() && !p.isId()) {
       col.setUnique(uniqueConstraintName(col.getName()));
       indexSetAdd(col.getName());
@@ -293,9 +291,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       col.setCheckConstraint(buildCheckConstraint(p.dbColumn(), checkConstraintValues));
       col.setCheckConstraintName(checkConstraintName(col.getName()));
     }
-
     lastColumn = col;
-    table.addColumn(col);
   }
 
   /**

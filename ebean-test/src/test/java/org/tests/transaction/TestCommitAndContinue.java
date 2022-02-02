@@ -15,14 +15,14 @@ import org.tests.model.m2m.MnyB;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class TestCommitAndContinue extends BaseTestCase {
+class TestCommitAndContinue extends BaseTestCase {
 
   private static final Logger logger = LoggerFactory.getLogger("org.avaje.ebean.TXN");
 
   @Test
   @Transactional
   @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB, Platform.COCKROACH}) // they will dead lock
-  public void transactional_partialSuccess() {
+  void transactional_partialSuccess() {
 
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
@@ -57,8 +57,8 @@ public class TestCommitAndContinue extends BaseTestCase {
    * The @Transactional is nicer to me.
    */
   @Test
-  @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB, Platform.COCKROACH}) // they will dead lock
-  public void tryFinally_partialSuccess() {
+  @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB, Platform.COCKROACH, Platform.YUGABYTE}) // they will dead lock
+  void tryFinally_partialSuccess() {
 
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
@@ -69,7 +69,6 @@ public class TestCommitAndContinue extends BaseTestCase {
       a.save();
       // commit at this point
       txn.commitAndContinue();
-
       try {
         b.save();
 
@@ -102,7 +101,7 @@ public class TestCommitAndContinue extends BaseTestCase {
   @Test
   @Transactional
   @IgnorePlatform({Platform.SQLSERVER, Platform.HSQLDB, Platform.COCKROACH}) // they will dead lock
-  public void transactional_partialSuccess_secondTransactionInsert() {
+  void transactional_partialSuccess_secondTransactionInsert() {
 
     MnyB a = new MnyB("a100");
     MnyB b = new MnyB("b200");
@@ -150,8 +149,7 @@ public class TestCommitAndContinue extends BaseTestCase {
   }
 
   @Test
-  public void basic() {
-
+  void basic() {
     MnyB a = new MnyB("a");
     MnyB b = new MnyB("b");
     MnyB c = new MnyB("c");
@@ -176,7 +174,7 @@ public class TestCommitAndContinue extends BaseTestCase {
 
   @Test
   @Transactional
-  public void runTransactional() {
+  void runTransactional() {
 
     new MnyB("a100").save();
     new MnyB("a101").save();

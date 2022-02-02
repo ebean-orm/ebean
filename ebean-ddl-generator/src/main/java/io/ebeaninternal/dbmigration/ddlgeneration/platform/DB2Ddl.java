@@ -47,6 +47,7 @@ public class DB2Ddl extends PlatformDdl {
       String[] nullableColumns) {
     StringBuilder sb = new StringBuilder(300);
     if (nullableColumns == null || nullableColumns.length == 0) {
+
       sb.append("alter table ").append(lowerTableName(tableName));
       sb.append(" add constraint ").append(maxConstraintName(uqName)).append(" unique ");
       appendColumns(columns, sb);

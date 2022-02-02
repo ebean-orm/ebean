@@ -86,6 +86,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, STreeProperty> dynamicProperty = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Map<String,String>> pathMaps = new ConcurrentHashMap<>();
+
   private final Map<String, SpiRawSql> namedRawSql;
   private final Map<String, String> namedQuery;
   private final boolean multiValueSupported;
@@ -2773,6 +2775,22 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   public boolean isDraftableElement() {
     return draftableElement;
+  }
+
+  @Override
+  public Map<String, String> pathMap(String prefix) {
+    return pathMaps.computeIfAbsent(prefix, s -> {
+      HashMap<String, String> m = new HashMap<>();
+      for (STreePropertyAssocMany many : propsMany()) {
+        String name = many.name();
+        m.put(name, prefix + "." + name);
+      }
+      for (STreePropertyAssocOne one : propsOne()) {
+        String name = one.name();
+        m.put(name, prefix + "." + name);
+      }
+      return m.isEmpty() ? Collections.emptyMap() : m;
+    });
   }
 
   @Override
