@@ -287,7 +287,7 @@ class TestDbArray_basic extends BaseTestCase {
       // Interestingly writing `select("id,name,phone_numbers,doubs")`
       //   generates `select t0.id, t0.name, t0.id, t0.doubs`
       //   surprisingly changing unknown property to id
-      .select("id,name,phoneNumbers,doubs")
+      .select("id,name,phoneNumbers,decimals")
       .asDto(EArrayBeanDto.class)
       // Shouldn't be necessary
       // But without it I see error
@@ -297,7 +297,7 @@ class TestDbArray_basic extends BaseTestCase {
     List<EArrayBeanDto> dtos = query.findList();
 
     List<String> sql = LoggedSql.stop();
-    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.phone_numbers, t0.doubs");
+    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.phone_numbers, t0.decimals");
 
     for (EArrayBeanDto dto : dtos) {
       assertThat(dto.id).isNotNull();
@@ -305,7 +305,7 @@ class TestDbArray_basic extends BaseTestCase {
       // Failure: null
       assertThat(dto.phoneNumbers).isNotNull();
       // Failure: null
-      assertThat(dto.doubs).isNotNull();
+      assertThat(dto.decimals).isNotNull();
     }
   }
 
@@ -345,12 +345,12 @@ class TestDbArray_basic extends BaseTestCase {
 
     Integer id;
     List<String> phoneNumbers;
-    List<Double> doubs;
+    List<BigDecimal> decimals;
     String name;
 
     @Override
     public String toString() {
-      return "id:" + id + " name:" + name + " phoneNumbers:" + phoneNumbers + " doubs:" + doubs;
+      return "id:" + id + " name:" + name + " phoneNumbers:" + phoneNumbers + " doubs:" + decimals;
     }
 
     public Integer getId() {
@@ -377,12 +377,12 @@ class TestDbArray_basic extends BaseTestCase {
       this.phoneNumbers = phoneNumbers;
     }
 
-    public List<Double> getDoubs() {
-      return doubs;
+    public List<BigDecimal> getDecimals() {
+      return decimals;
     }
 
-    public void setDoubs(List<Double> doubs) {
-      this.doubs = doubs;
+    public void setDecimals(List<BigDecimal> decimals) {
+      this.decimals = decimals;
     }
   }
 }
