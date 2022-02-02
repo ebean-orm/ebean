@@ -1,7 +1,9 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.ScalarType;
+import io.ebeaninternal.server.core.BasicTypeConverter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -47,6 +49,8 @@ interface ArrayElementConverter<T> {
    * The Double converter implementation.
    */
   ArrayElementConverter<Double> DOUBLE = new DoubleConverter();
+
+  ArrayElementConverter<BigDecimal> BIG_DECIMAL = new BigDecimalConverter();
 
   class LongConverter implements ArrayElementConverter<Long> {
 
@@ -95,6 +99,23 @@ interface ArrayElementConverter<T> {
         return (Double) rawValue;
       } else {
         return ((Number) rawValue).doubleValue();
+      }
+    }
+  }
+
+  class BigDecimalConverter implements ArrayElementConverter<BigDecimal> {
+
+    @Override
+    public BigDecimal fromSerialized(Object rawValue) {
+      return fromDbArray(rawValue);
+    }
+
+    @Override
+    public BigDecimal fromDbArray(Object rawValue) {
+      if (rawValue instanceof BigDecimal) {
+        return (BigDecimal) rawValue;
+      } else {
+        return BasicTypeConverter.toBigDecimal(rawValue);
       }
     }
   }

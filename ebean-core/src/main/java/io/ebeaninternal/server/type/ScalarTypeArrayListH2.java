@@ -5,6 +5,7 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
@@ -49,6 +50,9 @@ final class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
         }
         if (valueType.equals(Double.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
+        }
+        if (valueType.equals(BigDecimal.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.BIG_DECIMAL));
         }
         if (valueType.equals(String.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));

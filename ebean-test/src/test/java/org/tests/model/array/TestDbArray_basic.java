@@ -7,6 +7,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class TestDbArray_basic extends BaseTestCase {
+class TestDbArray_basic extends BaseTestCase {
 
   private final EArrayBean bean = new EArrayBean();
 
@@ -22,7 +23,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.HANA)
-  public void insert() throws SQLException {
+  void insert() throws SQLException {
     DB.find(EArrayBean.class).delete();
     bean.setName("some stuff");
     assertThat(bean.getStatuses()).as("DbArray is auto initialised").isNotNull();
@@ -31,17 +32,16 @@ public class TestDbArray_basic extends BaseTestCase {
     phNumbers.add("4321");
     phNumbers.add("9823");
 
-
-    List<Double> doubles = new ArrayList<>();
-    doubles.add(1.3);
-    doubles.add(2.4);
+    List<BigDecimal> doubles = new ArrayList<>();
+    doubles.add(BigDecimal.valueOf(1.3));
+    doubles.add(BigDecimal.valueOf(2.4));
 
     bean.getUids().add(UUID.randomUUID());
     bean.getUids().add(UUID.randomUUID());
     bean.getOtherIds().add(95L);
     bean.getOtherIds().add(96L);
     bean.getOtherIds().add(97L);
-    bean.setDoubs(doubles);
+    bean.setDecimals(doubles);
     bean.setStatuses(new ArrayList<>());
     bean.getStatuses().add(EArrayBean.Status.ONE);
     bean.getStatuses().add(EArrayBean.Status.THREE);
@@ -118,7 +118,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   //@Test//(dependsOnMethods = "insert")
-  public void json_parse_format() {
+  void json_parse_format() {
 
     String asJson = DB.json().toJson(found);
     assertThat(asJson).contains("\"phoneNumbers\":[\"4321\",\"9823\"]");
@@ -132,7 +132,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   //@Test//(dependsOnMethods = "insert")
-  public void update_when_notDirty() {
+  void update_when_notDirty() {
 
     found.setName("jack");
     LoggedSql.start();
@@ -144,7 +144,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   //@Test//(dependsOnMethods = "update_when_notDirty")
-  public void update_when_dirty() {
+  void update_when_dirty() {
 
     found.getPhoneNumbers().add("9987");
     found.getUids().add(UUID.randomUUID());
@@ -158,8 +158,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.HANA)
-  public void insertNulls() {
-
+  void insertNulls() {
     EArrayBean bean = new EArrayBean();
     bean.setName("some nulls");
     bean.setPhoneNumbers(null);
@@ -171,8 +170,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.HANA)
-  public void insertAll_when_hasNulls() {
-
+  void insertAll_when_hasNulls() {
     EArrayBean bean = new EArrayBean();
     bean.setName("some nulls");
     bean.setPhoneNumbers(null);
@@ -191,14 +189,14 @@ public class TestDbArray_basic extends BaseTestCase {
    */
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
-  public void nullItems() {
+  void nullItems() {
     EArrayBean bean = new EArrayBean();
     bean.setName("null items");
 
-    List<Double> doubles = new ArrayList<>();
-    doubles.add(1.3);
+    List<BigDecimal> doubles = new ArrayList<>();
+    doubles.add(BigDecimal.valueOf(1.3));
     doubles.add(null);
-    doubles.add(2.4);
+    doubles.add(BigDecimal.valueOf(2.4));
 
     bean.getPhoneNumbers().add("111222333");
     bean.getPhoneNumbers().add(null);
@@ -213,7 +211,7 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.getUids().add(null);
     bean.getUids().add(UUID.randomUUID());
 
-    bean.setDoubs(doubles);
+    bean.setDecimals(doubles);
 
     bean.setStatuses(new ArrayList<>());
     bean.getStatuses().add(EArrayBean.Status.ONE);
@@ -235,7 +233,7 @@ public class TestDbArray_basic extends BaseTestCase {
     assertThat(found.getPhoneNumbers()).containsExactly("111222333", null, "333222111");
     assertThat(found.getOtherIds()).containsExactly(15L, null, 30L, null);
     assertNull(found.getUids().get(1));
-    assertThat(found.getDoubs()).containsExactly(1.3, null, 2.4);
+    assertThat(found.getDecimals()).contains(new BigDecimal("1.3"), null, new BigDecimal("2.4"));
     assertThat(found.getStatuses()).containsExactly(EArrayBean.Status.ONE, null, EArrayBean.Status.THREE);
     assertThat(found.getVcEnums()).containsExactly(VarcharEnum.ONE, null, VarcharEnum.TWO);
     assertThat(found.getIntEnums()).containsExactly(null, IntEnum.ZERO, null, IntEnum.TWO);
@@ -244,8 +242,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.HANA)
-  public void hitCache() {
-
+  void hitCache() {
     List<UUID> uids = new ArrayList<>();
     uids.add(UUID.randomUUID());
     uids.add(UUID.randomUUID());
@@ -272,16 +269,16 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @ForPlatform(Platform.POSTGRES)
-  public void asDto_withArray() {
+  void asDto_withArray() {
     DB.find(EArrayBean.class).delete();
     bean.setName("array in dto test");
 
     List<String> phNumbers = bean.getPhoneNumbers();
     phNumbers.add("4321");
     phNumbers.add("9823");
-    List<Double> doubs = bean.getDoubs();
-    doubs.add(1.23);
-    doubs.add(4.56);
+    List<BigDecimal> doubs = bean.getDecimals();
+    doubs.add(BigDecimal.valueOf(1.23));
+    doubs.add(BigDecimal.valueOf(4.56));
     DB.save(bean);
     // Data is saved correctly
 
@@ -314,7 +311,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @ForPlatform(Platform.POSTGRES)
-  public void sqlUpdate_withArray() {
+  void sqlUpdate_withArray() {
     DB.find(EArrayBean.class).delete();
     bean.setName("array in sql update test");
     DB.save(bean);

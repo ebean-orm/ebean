@@ -8,6 +8,7 @@ import io.ebean.annotation.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,7 @@ public class EArrayBean {
   List<Long> otherIds = new ArrayList<>();
 
   @DbArray
-  List<Double> doubs;
+  List<BigDecimal> decimals;
 
   @DbArray
   List<Status> statuses;
@@ -103,12 +104,12 @@ public class EArrayBean {
     this.otherIds = otherIds;
   }
 
-  public List<Double> getDoubs() {
-    return doubs;
+  public List<BigDecimal> getDecimals() {
+    return decimals;
   }
 
-  public void setDoubs(List<Double> doubs) {
-    this.doubs = doubs;
+  public void setDecimals(List<BigDecimal> decimals) {
+    this.decimals = decimals;
   }
 
   public List<Status> getStatuses() {

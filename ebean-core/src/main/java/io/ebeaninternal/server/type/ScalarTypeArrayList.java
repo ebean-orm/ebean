@@ -13,6 +13,7 @@ import io.ebeaninternal.json.ModifyAwareList;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
@@ -58,6 +59,9 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
         }
         if (valueType.equals(Double.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
+        }
+        if (valueType.equals(BigDecimal.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "decimal", DocPropertyType.DOUBLE, ArrayElementConverter.BIG_DECIMAL));
         }
         if (valueType.equals(String.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
