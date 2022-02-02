@@ -6,18 +6,39 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EbeanServer_refresh {
+class EbeanServer_refresh {
+
+  private Path createSqlFile() throws IOException {
+    File f = File.createTempFile("test-script", ".sql");
+    Path path = f.toPath();
+    List<String> lines = new ArrayList<>();
+    lines.add("select * from o_customer;");
+    Files.write(path, lines, StandardOpenOption.TRUNCATE_EXISTING);
+    return path;
+  }
 
   @Test
-  public void basic() {
+  void script_run_asFile() throws IOException {
+    ResetBasicData.reset();
 
+    Path path = createSqlFile();
+    DB.script().run(path);
+    DB.script().run(path, Collections.emptyMap());
+  }
+
+  @Test
+  void basic() {
     Map<String, String> map = new HashMap<>();
     map.put("tableName", "e_basic");
 
@@ -47,8 +68,7 @@ public class EbeanServer_refresh {
   }
 
   @Test
-  public void refresh_when_oneToManyLoaded() {
-
+  void refresh_when_oneToManyLoaded() {
     ResetBasicData.reset();
 
     Order order = DB.find(Order.class, 1);
@@ -59,8 +79,7 @@ public class EbeanServer_refresh {
   }
 
   @Test
-  public void refresh_when_oneToManyVanilla() {
-
+  void refresh_when_oneToManyVanilla() {
     ResetBasicData.reset();
 
     Order order = DB.find(Order.class, 1);
@@ -71,8 +90,7 @@ public class EbeanServer_refresh {
   }
 
   @Test
-  public void refresh_when_oneToManyNull() {
-
+  void refresh_when_oneToManyNull() {
     ResetBasicData.reset();
 
     Order order = DB.find(Order.class, 1);
@@ -82,15 +100,11 @@ public class EbeanServer_refresh {
     DB.refresh(order);
   }
 
-
-
   @Test
-  public void refresh_on_details_new() {
-
+  void refresh_on_details_new() {
     ResetBasicData.reset();
 
     Order order = DB.find(Order.class, 1);
-
     DB.refresh(order); // call refresh BEFORE first access on "getDetail";
 
     assertThat(order.getDetails()).hasSize(3);
@@ -100,13 +114,9 @@ public class EbeanServer_refresh {
     DB.save(detail);
 
     try {
-
       assertThat(order.getDetails()).hasSize(3);
-
       DB.refresh(order);
-
       assertThat(order.getDetails()).hasSize(4);
-
     } finally {
       DB.delete(detail); // restore old state
     }
@@ -116,13 +126,9 @@ public class EbeanServer_refresh {
     assertThat(order.getDetails()).hasSize(3);
   }
 
-
-
   @Test
-  public void refresh_on_details_changed() {
-
+  void refresh_on_details_changed() {
     ResetBasicData.reset();
-
     Order order = DB.find(Order.class, 1);
 
     DB.refresh(order); // call refresh BEFORE first access on "getDetail"
@@ -139,11 +145,8 @@ public class EbeanServer_refresh {
 
     try {
       assertThat(order.getDetails().get(0).getOrderQty()).isEqualTo(5);
-
       DB.refresh(order);
-
       assertThat(order.getDetails().get(0).getOrderQty()).isEqualTo(42);
-
     } finally {
       // restore old value
       detail.setOrderQty(5);
@@ -151,8 +154,6 @@ public class EbeanServer_refresh {
     }
 
     DB.refresh(order);
-
     assertThat(order.getDetails().get(0).getOrderQty()).isEqualTo(5);
-
   }
 }
