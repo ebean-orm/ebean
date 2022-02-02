@@ -94,7 +94,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     query.findList();
 
-    if (isH2() || isPostgres()) {
+    if (isH2() || isPostgresCompatible()) {
       assertThat(sqlOf(query)).contains(" limit 10");
     }
   }
@@ -113,7 +113,7 @@ public class TestNativeSqlBasic extends BaseTestCase {
 
     query.findList();
 
-    if (isH2() || isPostgres()) {
+    if (isH2() || isPostgresCompatible()) {
       assertThat(sqlOf(query)).contains(" limit 10 offset 20");
     }
   }

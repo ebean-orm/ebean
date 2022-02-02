@@ -139,7 +139,7 @@ public class TestHistoryInsert extends BaseTestCase {
     assertThat(sql).hasSize(1);
     if (isH2()) {
       assertThat(sql.get(0)).contains("and t0.sys_period_start < ? and (t0.sys_period_end >= ? or t0.sys_period_end is null)");
-    } else if (isPostgres()) {
+    } else if (isPostgresCompatible()) {
       assertThat(sql.get(0)).contains("and lower(t0.sys_period) < ? and (upper(t0.sys_period) >= ? or upper(t0.sys_period) is null)");
     }
 

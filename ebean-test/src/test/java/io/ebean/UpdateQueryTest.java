@@ -117,7 +117,7 @@ public class UpdateQueryTest extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(rows).isEqualTo(0);
 
-    if (isPostgres()) {
+    if (isPostgresCompatible()) {
       assertSql(sql.get(0)).contains("update o_customer set status = ? where id = any(?)");
     } else {
       assertSql(sql.get(0)).contains("update o_customer set status = ? where id in (?,?,?,?,?)"); // bind padding to 5

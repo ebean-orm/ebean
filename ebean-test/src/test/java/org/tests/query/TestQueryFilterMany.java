@@ -65,7 +65,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
     assertThat(sqlList.get(1)).contains("status = ?");
 
-    if (isH2() || isPostgres()) {
+    if (isH2() || isPostgresCompatible()) {
       assertThat(sqlList.get(0)).doesNotContain("offset");
       assertThat(sqlList.get(0)).contains(" limit 5");
       assertThat(sqlList.get(1)).contains(" offset 3");
@@ -97,7 +97,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
     assertThat(sqlList.get(1)).contains("status = ?");
 
-    if (isH2() || isPostgres()) {
+    if (isH2() || isPostgresCompatible()) {
       assertThat(sqlList.get(0)).doesNotContain("offset");
       assertThat(sqlList.get(0)).contains(" limit 5");
       assertThat(sqlList.get(1)).contains(" offset 3");
@@ -126,7 +126,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
     assertThat(sqlList.get(1)).contains("status = ?");
 
-    if (isH2() || isPostgres()) {
+    if (isH2() || isPostgresCompatible()) {
       assertThat(sqlList.get(0)).doesNotContain("offset");
       assertThat(sqlList.get(0)).contains(" limit 5");
       assertThat(sqlList.get(1)).contains(" order by t0.order_date desc, t0.id limit 100 offset 3");
@@ -220,7 +220,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
     assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where t1.status ");
-    if (isPostgres()) {
+    if (isPostgresCompatible()) {
       assertThat(sqlList.get(0)).contains("where t1.status = any(?) order by t0.id");
     } else {
       assertThat(sqlList.get(0)).contains("where t1.status in (?) order by t0.id");
@@ -243,7 +243,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sqlList = LoggedSql.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("from o_customer t0");
-    if (isPostgres()) {
+    if (isPostgresCompatible()) {
       assertThat(sqlList.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) = any(?)");
       assertThat(sqlList.get(1)).contains(" and t0.status = any(?)");
     } else {

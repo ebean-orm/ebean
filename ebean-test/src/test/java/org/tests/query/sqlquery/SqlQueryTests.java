@@ -313,8 +313,7 @@ public class SqlQueryTests extends BaseTestCase {
 
   @Test
   public void firstRow() {
-
-    if (isPostgres()) {
+    if (isPostgresCompatible()) {
 
       ResetBasicData.reset();
 

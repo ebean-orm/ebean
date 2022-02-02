@@ -34,8 +34,6 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else if (isPostgres()) {
-      assertThat(sqlOf(query)).contains("for update");
     } else {
       assertThat(sqlOf(query)).contains("for update");
     }
@@ -134,14 +132,10 @@ public class TestQueryForUpdate extends BaseTestCase {
 
       List<String> sql = LoggedSql.stop();
       assertThat(sql).hasSize(2);
-      if (isH2() || isPostgres()) {
+      if (isH2() || isPostgresCompatible()) {
         assertSql(sql.get(0)).contains("from e_basic t0 where t0.id =");
         assertSql(sql.get(1)).contains("from e_basic t0 where t0.id =");
-        if (isPostgres()) {
-          assertSql(sql.get(1)).contains("for update");
-        } else {
-          assertSql(sql.get(1)).contains("for update");
-        }
+        assertSql(sql.get(1)).contains("for update");
       }
 
       transaction.end();
@@ -165,8 +159,6 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sqlOf(query)).contains("for update");
     } else if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock,nowait)");
-    } else if (isPostgres()) {
-      assertThat(sqlOf(query)).contains("for update nowait");
     } else {
       assertThat(sqlOf(query)).contains("for update nowait");
     }
@@ -192,8 +184,6 @@ public class TestQueryForUpdate extends BaseTestCase {
         assertThat(sqlOf(query)).contains("with (updlock,nowait)");
       } else if (isH2()) {
         assertThat(sqlOf(query)).contains("for update");
-      } else if (isPostgres()) {
-        assertThat(sqlOf(query)).contains("for update nowait");
       } else {
         assertThat(sqlOf(query)).contains("for update nowait");
       }
