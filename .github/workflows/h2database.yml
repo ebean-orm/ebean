@@ -1,6 +1,7 @@
 
 name: H2Database
 
+on:
   workflow_dispatch:
   schedule:
     - cron: '10 1 * * *'

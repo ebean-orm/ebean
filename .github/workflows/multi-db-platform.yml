@@ -31,7 +31,7 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: h2
+    - name: h2database
       run: mvn clean test
     - name: postgres
       run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
@@ -39,13 +39,11 @@ jobs:
       run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties
     - name: mariadb
       run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
-    - name: mariadb
-      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
-    - name: sqlserver
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
     - name: yugabyte
       run: mvn clean test -Dprops.file=testconfig/ebean-yugabyte.properties
-#    - name: sqlserver 2019
+    - name: sqlserver
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
+#    - name: sqlserver19
 #      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties
 #    - name: db2
 #      run: mvn clean test -Dprops.file=testconfig/ebean-db2.properties
