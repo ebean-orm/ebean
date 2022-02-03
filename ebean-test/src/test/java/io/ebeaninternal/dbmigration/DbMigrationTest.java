@@ -38,9 +38,8 @@ public class DbMigrationTest extends BaseTestCase {
   }
 
 
-  @IgnorePlatform({Platform.ORACLE, Platform.NUODB})
-  // Note: This test is currently only executed against H2.
-  // it should be moved to ebean-tests, so that it takes advantage of the docker tests
+  @IgnorePlatform({Platform.ORACLE, Platform.NUODB, Platform.POSTGRES})
+  // Note: Postgres locks up on build server
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
