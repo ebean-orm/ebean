@@ -72,7 +72,7 @@ public class DbMigrationTest extends BaseTestCase {
         "migtest_oto_child",
         "migtest_oto_master");
 
-    if (isSqlServer()) { //  || isMySql()
+    if (isSqlServer() || isMariaDB()) { //  || isMySql()
       runScript("I__create_procs.sql");
     }
 
