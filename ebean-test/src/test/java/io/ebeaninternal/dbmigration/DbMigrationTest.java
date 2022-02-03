@@ -123,13 +123,9 @@ public class DbMigrationTest extends BaseTestCase {
 
     runScript("1.2__dropsFor_1.1.sql");
 
-    // Oracle caches the statement and does not detect schema change. It fails with
-    // an ORA-01007
-    if (isOracle() || isDb2()) {
-      result = server().sqlQuery("select * from migtest_e_basic order by id,id").findList();
-    } else {
-      result = server().sqlQuery("select * from migtest_e_basic order by id").findList();
-    }
+    // Some platforms (oracle, db2) caches the statement and does not detect schema change.
+    // so we must not perform the same query, again
+    result = server().sqlQuery("select * from migtest_e_basic order by id,status").findList();
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).doesNotContain("old_boolean", "old_boolean2");
@@ -137,8 +133,8 @@ public class DbMigrationTest extends BaseTestCase {
     runScript("1.3.sql");
     runScript("1.4__dropsFor_1.3.sql");
 
-    // now DB structure shoud be the same as v1_0
-    result = server().sqlQuery("select * from migtest_e_basic order by id").findList();
+    // now DB structure shoud be the same as v1_0 - perform a diffent query.
+    result = server().sqlQuery("select * from migtest_e_basic order by id,name").findList();
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).contains("old_boolean", "old_boolean2");
