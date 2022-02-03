@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestAggregateFormula extends BaseTestCase {
 
-  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.NUODB})
+  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.NUODB, Platform.COCKROACH})
   @Test
   public void minDistinctOrderByNulls() {
 

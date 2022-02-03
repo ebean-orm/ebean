@@ -297,7 +297,7 @@ public abstract class BaseTestCase {
    * Platform specific NOT IN clause assert.
    */
   protected void platformAssertNotIn(String sql, String containsIn) {
-    if (isPostgres() || isYugabyte()) {
+    if (isPostgresCompatible()) {
       assertThat(sql).contains(containsIn+" != all(");
     } else {
       assertThat(sql).contains(containsIn+" not in ");

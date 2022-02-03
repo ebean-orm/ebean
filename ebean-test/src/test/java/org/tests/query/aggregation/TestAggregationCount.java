@@ -13,6 +13,7 @@ import org.tests.model.basic.ResetBasicData;
 import org.tests.model.tevent.TEventMany;
 import org.tests.model.tevent.TEventOne;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
@@ -53,7 +54,7 @@ public class TestAggregationCount extends BaseTestCase {
     for (TEventOne eventOne : list) {
       // lazy loading on Aggregation properties
       // is not expected to work at this stage
-      Double totalAmount = eventOne.getTotalAmount();
+      BigDecimal totalAmount = eventOne.getTotalAmount();
       assertThat(totalAmount).isNull();
     }
   }
