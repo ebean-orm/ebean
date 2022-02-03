@@ -51,6 +51,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(PlatformCondition.class)
+@Disabled("Does not work @github")
 public class DatesAndTimesTest extends BaseTestCase {
  
   private Database db;
