@@ -35,7 +35,7 @@ public class TestQueryUsingConnection extends BaseTestCase {
     }
   }
 
-  @IgnorePlatform(Platform.SQLSERVER)
+  @IgnorePlatform({Platform.SQLSERVER, Platform.COCKROACH})
   @Test
   public void usingTransaction() {
 
