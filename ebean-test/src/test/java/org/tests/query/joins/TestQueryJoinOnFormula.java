@@ -115,7 +115,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().isNotNull("order.shipments.order.totalAmount").query();
 
     shipQuery.findList();
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(shipQuery.getGeneratedSql()).contains("select distinct on (t0.id) t0.id from or_order_ship t0");
     } else {
       assertSql(shipQuery.getGeneratedSql()).contains("select distinct t0.id from or_order_ship t0 ");

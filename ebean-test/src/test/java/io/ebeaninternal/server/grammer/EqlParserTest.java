@@ -22,17 +22,15 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class EqlParserTest extends BaseTestCase {
-
+class EqlParserTest extends BaseTestCase {
 
   @Test
-  public void illegal_syntax() {
+  void illegal_syntax() {
     assertThrows(IllegalArgumentException.class, () -> parse("find Article where name = :p0"));
   }
 
   @Test
-  public void where_eq() {
-
+  void where_eq() {
     Query<Customer> query = parse("where name eq 'Rob'");
     query.findList();
 
@@ -40,7 +38,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_eqOrNull_bindVal() {
+  void where_eqOrNull_bindVal() {
     Query<Customer> query = parse("where name eqOrNull 'Rob'");
     query.findList();
 
@@ -48,7 +46,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_eqOrNull_bindNamed() {
+  void where_eqOrNull_bindNamed() {
     Query<Customer> query = parse("where name eqOrNull :name");
     query.setParameter("name", "Rob");
     query.findList();
@@ -57,8 +55,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_eqOrNull_bindPositioned() {
-
+  void where_eqOrNull_bindPositioned() {
     final Query<Customer> query = where("name eqOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
@@ -67,8 +64,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_eqOrNull_bindPositioned_asNull() {
-
+  void where_eqOrNull_bindPositioned_asNull() {
     final Query<Customer> query = where("name eqOrNull ?", (String)null);
     query.findList();
     if (isH2()) {
@@ -77,8 +73,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_gtOrNull_bindPositioned() {
-
+  void where_gtOrNull_bindPositioned() {
     final Query<Customer> query = where("name gtOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
@@ -87,8 +82,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_geOrNull_bindPositioned() {
-
+  void where_geOrNull_bindPositioned() {
     final Query<Customer> query = where("name geOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
@@ -97,8 +91,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_ltOrNull_bindPositioned() {
-
+  void where_ltOrNull_bindPositioned() {
     final Query<Customer> query = where("name ltOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
@@ -107,8 +100,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_leOrNull_bindPositioned() {
-
+  void where_leOrNull_bindPositioned() {
     final Query<Customer> query = where("name leOrNull ?", "Rob");
     query.findList();
     if (isH2()) {
@@ -117,8 +109,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_eq_reverse() {
-
+  void where_eq_reverse() {
     Query<Customer> query = parse("where 'Rob' eq name");
     query.findList();
 
@@ -126,40 +117,35 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_gt_reverse() {
-
+  void where_gt_reverse() {
     Query<Customer> query = parse("where 'Rob' > name");
     query.findList();
     assertSql(query).contains("where t0.name < ?");
   }
 
   @Test
-  public void where_gte_reverse() {
-
+  void where_gte_reverse() {
     Query<Customer> query = parse("where 'Rob' >= name");
     query.findList();
     assertSql(query).contains("where t0.name <= ?");
   }
 
   @Test
-  public void where_lt_reverse() {
-
+  void where_lt_reverse() {
     Query<Customer> query = parse("where 'Rob' < name");
     query.findList();
     assertSql(query).contains("where t0.name > ?");
   }
 
   @Test
-  public void where_lte_reverse() {
-
+  void where_lte_reverse() {
     Query<Customer> query = parse("where 'Rob' <= name");
     query.findList();
     assertSql(query).contains("where t0.name >= ?");
   }
 
   @Test
-  public void where_ieq() {
-
+  void where_ieq() {
     Query<Customer> query = parse("where name ieq 'Rob'");
     query.findList();
 
@@ -167,8 +153,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_ine() {
-
+  void where_ine() {
     Query<Customer> query = parse("where name ine 'Rob'");
     query.findList();
 
@@ -176,16 +161,14 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_ieq_reverse() {
-
+  void where_ieq_reverse() {
     Query<Customer> query = parse("where 'Rob' ieq name");
     query.findList();
     assertSql(query).contains("where lower(t0.name) = ?");
   }
 
   @Test
-  public void where_ine_reverse() {
-
+  void where_ine_reverse() {
     Query<Customer> query = parse("where 'Rob' ine name");
     query.findList();
 
@@ -193,8 +176,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_eq2() {
-
+  void where_eq2() {
     Query<Customer> query = parse("where name = 'Rob'");
     query.findList();
 
@@ -202,8 +184,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_namedParam() {
-
+  void where_namedParam() {
     Query<Customer> query = parse("where name eq :name");
     query.setParameter("name", "Rob");
     query.findList();
@@ -212,7 +193,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_namedParam_otherOrder() {
+  void where_namedParam_otherOrder() {
     Query<Customer> query = parse("where :nm < name");
     query.setParameter("nm", "Rob");
     query.findList();
@@ -221,8 +202,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_namedParam_startsWith() {
-
+  void where_namedParam_startsWith() {
     Query<Customer> query = parse("where name startsWith :name");
     query.setParameter("name", "Rob");
     query.findList();
@@ -232,8 +212,7 @@ public class EqlParserTest extends BaseTestCase {
 
   @Test
   @IgnorePlatform({Platform.HANA, Platform.DB2}) // The HANA JDBC driver checks the field length on binding and rejects 'NEW'
-  public void where_or1() {
-
+  void where_or1() {
     Query<Customer> query = parse("where name = 'Rob' or (status = 'NEW' and smallnote is null)");
     query.findList();
 
@@ -242,8 +221,7 @@ public class EqlParserTest extends BaseTestCase {
 
   @Test
   @ForPlatform({Platform.HANA, Platform.DB2})
-  public void where_or1_hana() {
-
+  void where_or1_hana() {
     Query<Customer> query = parse("where name = 'Rob' or (status = 'N' and smallnote is null)");
     query.findList();
 
@@ -252,8 +230,7 @@ public class EqlParserTest extends BaseTestCase {
 
   @Test
   @IgnorePlatform({Platform.HANA, Platform.DB2}) // The HANA & DB2 JDBC driver checks the field length on binding and rejects 'NEW'
-  public void where_or2() {
-
+  void where_or2() {
     Query<Customer> query = parse("where (name = 'Rob' or status = 'NEW') and smallnote is null");
     query.findList();
 
@@ -262,8 +239,7 @@ public class EqlParserTest extends BaseTestCase {
 
   @Test
   @ForPlatform({Platform.HANA, Platform.DB2})
-  public void where_or2_hana() {
-
+  void where_or2_hana() {
     Query<Customer> query = parse("where (name = 'Rob' or status = 'N') and smallnote is null");
     query.findList();
 
@@ -272,8 +248,7 @@ public class EqlParserTest extends BaseTestCase {
 
   @Test
   @IgnorePlatform({Platform.HANA, Platform.DB2}) // The HANA & DB2 JDBC driver checks the field length on binding and rejects 'NEW'
-  public void test_simplifyExpressions() {
-
+  void test_simplifyExpressions() {
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'NEW')");
     query.findList();
     assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
@@ -289,8 +264,7 @@ public class EqlParserTest extends BaseTestCase {
 
   @Test
   @ForPlatform({Platform.HANA, Platform.DB2})
-  public void test_simplifyExpressions_hana() {
-
+  void test_simplifyExpressions_hana() {
     Query<Customer> query = parse("where not (name = 'Rob' and status = 'N')");
     query.findList();
     assertSql(query).contains("where not (t0.name = ? and t0.status = ?)");
@@ -305,8 +279,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in() {
-
+  void where_in() {
     Query<Customer> query = parse("where name in ('Rob','Jim')");
     query.findList();
 
@@ -314,8 +287,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in_when_namedParams() {
-
+  void where_in_when_namedParams() {
     Query<Customer> query = parse("where name in (:one, :two)");
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
@@ -325,8 +297,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in_when_namedParams_withWhitespace() {
-
+  void where_in_when_namedParams_withWhitespace() {
     Query<Customer> query = parse("where name in (:one,  :two)");
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
@@ -336,8 +307,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in_when_namedParams_withNoWhitespace() {
-
+  void where_in_when_namedParams_withNoWhitespace() {
     Query<Customer> query = parse("where name in (:one,:two)");
     query.setParameter("one", "Foo");
     query.setParameter("two", "Bar");
@@ -347,8 +317,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_in_when_namedParamAsList() {
-
+  void where_in_when_namedParamAsList() {
     Query<Customer> query = parse("where name in (:names)");
     query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
@@ -357,60 +326,49 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_inOrEmpty_withVals() {
-
+  void where_inOrEmpty_withVals() {
     final Query<Customer> query = where("name inOrEmpty ?", Arrays.asList("Baz", "Maz", "Jim"));
     query.findList();
     platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   @Test
-  public void where_inOrEmpty_withValsAsSet() {
-
+  void where_inOrEmpty_withValsAsSet() {
     final Query<Customer> query = where("name inOrEmpty ?", new HashSet<>(Arrays.asList("Baz", "Maz", "Jim")));
     query.findList();
     platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   @Test
-  public void where_inOrEmpty_withEmpty() {
-
+  void where_inOrEmpty_withEmpty() {
     final Query<Customer> query = where("name inOrEmpty ?", new ArrayList());
     query.findList();
     assertSql(query).doesNotContain("where");
   }
 
   @Test
-  public void where_inOrEmpty_withNull() {
-
+  void where_inOrEmpty_withNull() {
     List<String> names = null;
     final Query<Customer> query = where("name inOrEmpty ?", names);
     query.findList();
     assertSql(query).doesNotContain("where");
   }
 
-  @Test//(expected = IllegalArgumentException.class)
-  public void query_inOrEmpty_withVals() {
+  @Test
+  void query_inOrEmpty_withVals() {
     assertThrows(IllegalArgumentException.class, () -> parse("where name inOrEmpty (:names)"));
-//    query.setParameter("names", Arrays.asList("Baz", "Maz", "Jim"));
-//    query.findList();
-//    platformAssertIn(query.getGeneratedSql(), "where t0.name");
   }
 
   /**
    * This test fails in that we can't use inOrEmpty with named parameters.
    */
-  @Test//(expected = IllegalArgumentException.class)
-  public void query_inOrEmpty_withNamedParams_expect_IllegalArgument() {
+  @Test
+  void query_inOrEmpty_withNamedParams_expect_IllegalArgument() {
     assertThrows(IllegalArgumentException.class, () -> parse("where name inOrEmpty (:names)"));
-//    query.setParameter("names", new ArrayList<>());
-//    assertThrows(IllegalArgumentException.class, query::findList);
-//    assertSql(query).doesNotContain("where");
   }
 
   @Test
-  public void where_inrange() {
-
+  void where_inrange() {
     Query<Customer> query = parse("where name inrange 'As' to 'B'");
     query.findList();
 
@@ -418,8 +376,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_inrange_withNamedParams() {
-
+  void where_inrange_withNamedParams() {
     Query<Customer> query = parse("where name inrange :one to :two");
     query.setParameter("one", "a");
     query.setParameter("two", "b");
@@ -429,8 +386,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_between() {
-
+  void where_between() {
     Query<Customer> query = parse("where name between 'As' and 'B'");
     query.findList();
 
@@ -438,8 +394,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_between_withNamedParams() {
-
+  void where_between_withNamedParams() {
     Query<Customer> query = parse("where name between :one and :two");
     query.setParameter("one", "a");
     query.setParameter("two", "b");
@@ -449,8 +404,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_betweenProperty() {
-
+  void where_betweenProperty() {
     Query<Customer> query = parse("where 'x' between name and smallnote");
     query.findList();
 
@@ -458,8 +412,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_betweenProperty_withNamed() {
-
+  void where_betweenProperty_withNamed() {
     Query<Customer> query = parse("where :some between name and smallnote");
     query.setParameter("some", "A");
     query.findList();
@@ -468,8 +421,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void selectFetch_basic() {
-
+  void selectFetch_basic() {
     Query<Customer> query = parse("select name fetch billingAddress");
     query.findList();
 
@@ -477,8 +429,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void selectFetch_basic2() {
-
+  void selectFetch_basic2() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("select name, status fetch billingAddress");
@@ -488,8 +439,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void selectFetch_withProperties() {
-
+  void selectFetch_withProperties() {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) ");
     query.findList();
 
@@ -498,8 +448,7 @@ public class EqlParserTest extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.SQLSERVER)
-  public void selectFetchFetchLimit() {
-
+  void selectFetchFetchLimit() {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch shippingAddress (line1) limit 10");
     query.findList();
 
@@ -507,18 +456,15 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void selectFetchFetchMany() {
-
+  void selectFetchFetchMany() {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts");
     query.findList();
 
     assertSql(query, 16).contains("select t0.id, t0.name, t1.id, t1.line_1, t1.city, t2.id, t2.first_name, t2.last_name, t2.phone, t2.mobile, t2.email, t2.is_member, t2.cretime, t2.updtime, t2.customer_id, t2.group_id from o_customer t0");
   }
 
-
   @Test
-  public void selectFetchFetchManyProperties() {
-
+  void selectFetchFetchManyProperties() {
     Query<Customer> query = parse("select name fetch billingAddress (line1, city) fetch contacts (email)");
     query.findList();
 
@@ -527,8 +473,7 @@ public class EqlParserTest extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.SQLSERVER)
-  public void selectFetchFetchManyPropertiesLimit() {
-
+  void selectFetchFetchManyPropertiesLimit() {
     ResetBasicData.reset();
 
     LoggedSql.start();
@@ -543,8 +488,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_basic() {
-
+  void fetch_basic() {
     Query<Customer> query = parse("fetch billingAddress");
     query.findList();
 
@@ -552,8 +496,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_withProperty() {
-
+  void fetch_withProperty() {
     Query<Customer> query = parse("fetch billingAddress (city)");
     query.findList();
 
@@ -561,8 +504,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_withProperty_noWhitespace() {
-
+  void fetch_withProperty_noWhitespace() {
     Query<Customer> query = parse("fetch billingAddress(city)");
     query.findList();
 
@@ -570,8 +512,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_basic_multiple() {
-
+  void fetch_basic_multiple() {
     Query<Customer> query = parse("fetch billingAddress fetch shippingAddress");
     query.findList();
 
@@ -580,8 +521,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_basic_multiple_withProperties() {
-
+  void fetch_basic_multiple_withProperties() {
     Query<Customer> query = parse("fetch billingAddress (city) fetch shippingAddress (city)");
     query.findList();
 
@@ -589,8 +529,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_lazy() {
-
+  void fetch_lazy() {
     Query<Customer> query = parse("fetch lazy billingAddress");
     query.findList();
 
@@ -598,8 +537,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_lazy50() {
-
+  void fetch_lazy50() {
     Query<Customer> query = parse("fetch lazy(50) billingAddress");
     query.findList();
 
@@ -607,8 +545,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_query50() {
-
+  void fetch_query50() {
     ResetBasicData.reset();
     Query<Customer> query = parse("fetch query(50) billingAddress");
     query.findList();
@@ -617,8 +554,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_query50_asHint() {
-
+  void fetch_query50_asHint() {
     ResetBasicData.reset();
     Query<Customer> query = parse("fetch query(50) billingAddress (city)");
     query.findList();
@@ -627,8 +563,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void fetch_lazy50_asHint() {
-
+  void fetch_lazy50_asHint() {
     ResetBasicData.reset();
     Query<Customer> query = parse("fetch lazy(50) billingAddress (city) order by id");
     List<Customer> list = query.findList();
@@ -640,8 +575,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void select() {
-
+  void select() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("select (name)");
@@ -654,8 +588,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void select_sum() {
-
+  void select_sum() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("select (sum(id))");
@@ -664,8 +597,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void select_max() {
-
+  void select_max() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("select (max(cretime))");
@@ -678,8 +610,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void select_agg() {
-
+  void select_agg() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("select status, max(cretime)");
@@ -690,8 +621,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void select_agg_sum() {
-
+  void select_agg_sum() {
     ResetBasicData.reset();
 
     Query<OrderDetail> query = DB.createQuery(OrderDetail.class, "select sum(orderQty) fetch `order` (id)");
@@ -702,8 +632,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void selectDistinct() {
-
+  void selectDistinct() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("select distinct (name)");
@@ -711,10 +640,8 @@ public class EqlParserTest extends BaseTestCase {
     assertSql(query).contains("select distinct t0.name from o_customer t0");
   }
 
-
   @Test
-  public void limit() {
-
+  void limit() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("limit 10");
@@ -725,8 +652,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void limitOffset() {
-
+  void limitOffset() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("order by name limit 10 offset 5");
@@ -737,8 +663,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy() {
-
+  void orderBy() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("order by id");
@@ -749,8 +674,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy_desc() {
-
+  void orderBy_desc() {
     ResetBasicData.reset();
 
     Query<Customer> query = parse("order by id desc");
@@ -761,8 +685,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy_nullsLast() {
-
+  void orderBy_nullsLast() {
     if (!isPlatformOrderNullsSupport()) {
       return;
     }
@@ -777,8 +700,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy_nullsFirst() {
-
+  void orderBy_nullsFirst() {
     if (!isPlatformOrderNullsSupport()) {
       return;
     }
@@ -792,8 +714,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void orderBy_multiple() {
-
+  void orderBy_multiple() {
     if (!isPlatformOrderNullsSupport()) {
       return;
     }
@@ -807,15 +728,13 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   private Query<Customer> parse(String raw) {
-
     Query<Customer> query = DB.find(Customer.class);
     EqlParser.parse(raw, (SpiQuery<?>) query);
     return query;
   }
 
   @Test
-  public void where_simple() {
-
+  void where_simple() {
     final Query<Customer> query = where("name isNotNull");
     query.findList();
     if (isH2()) {
@@ -824,8 +743,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_withParams() {
-
+  void where_withParams() {
     final Query<Customer> query = where("id isNotNull and name = ? and smallnote istartsWith ?", "Rob", "Foo");
     query.findList();
     if (isH2()) {
@@ -834,8 +752,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_withParamsQuPos() {
-
+  void where_withParamsQuPos() {
     final Query<Customer> query = where("name = ?1 and smallnote istartsWith ?2 and name like ?1", "Rob", "Foo");
     query.findList();
     if (isH2()) {
@@ -844,8 +761,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_orSimple() {
-
+  void where_orSimple() {
     final Query<Customer> query = where("id isNotNull or name = ?", "Rob", "Foo");
     query.findList();
     if (isH2()) {
@@ -854,8 +770,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_orWithParams() {
-
+  void where_orWithParams() {
     final Query<Customer> query = where("(id isNotNull or name = ?) and smallnote istartsWith ?", "Rob", "Foo");
     query.findList();
     if (isH2()) {
@@ -864,8 +779,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_dateInRange() {
-
+  void where_dateInRange() {
     final Query<Customer> query = where("anniversary inrange ? to ?", LocalDate.now().minusDays(7), LocalDate.now());
     query.findList();
     if (isH2()) {
@@ -874,8 +788,7 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   @Test
-  public void where_dateInRange_camelCase() {
-
+  void where_dateInRange_camelCase() {
     final Query<Customer> query = where("anniversary inRange ? to ?", LocalDate.now().minusDays(7), LocalDate.now());
     query.findList();
     if (isH2()) {
@@ -884,10 +797,8 @@ public class EqlParserTest extends BaseTestCase {
   }
 
   private Query<Customer> where(String where, Object... params) {
-
     Query<Customer> query = DB.find(Customer.class);
     EqlParser.parseWhere(where, query.where(), query.getExpressionFactory(), params);
-
     return query;
   }
 }

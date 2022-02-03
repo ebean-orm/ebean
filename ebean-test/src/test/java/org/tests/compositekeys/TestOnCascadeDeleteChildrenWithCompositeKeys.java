@@ -86,7 +86,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     beanProperty.findIdsByParentId(null, ids, null, null, true);
     beanProperty.findIdsByParentId(1L, null, null, null, true);
   }
-  
+
   /**
    * Test makes select and a select distinct of entities with composite keys.
    */
@@ -106,7 +106,7 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     query1.setDistinct(true).setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC).setMaxRows(20);
     query1.findSingleAttributeList();
 
-    if (isH2() || isMariaDB() || isPostgres()) {
+    if (isH2() || isMariaDB() || isPostgresCompatible()) {
       assertThat(query1.getGeneratedSql()).contains("select distinct r1.attribute_, count(*) from "
           + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
           + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "

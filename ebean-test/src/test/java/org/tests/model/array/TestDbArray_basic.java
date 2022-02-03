@@ -7,6 +7,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -14,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class TestDbArray_basic extends BaseTestCase {
+class TestDbArray_basic extends BaseTestCase {
 
   private final EArrayBean bean = new EArrayBean();
 
@@ -22,7 +23,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.HANA)
-  public void insert() throws SQLException {
+  void insert() throws SQLException {
     DB.find(EArrayBean.class).delete();
     bean.setName("some stuff");
     assertThat(bean.getStatuses()).as("DbArray is auto initialised").isNotNull();
@@ -31,17 +32,16 @@ public class TestDbArray_basic extends BaseTestCase {
     phNumbers.add("4321");
     phNumbers.add("9823");
 
-
-    List<Double> doubles = new ArrayList<>();
-    doubles.add(1.3);
-    doubles.add(2.4);
+    List<BigDecimal> doubles = new ArrayList<>();
+    doubles.add(BigDecimal.valueOf(1.3));
+    doubles.add(BigDecimal.valueOf(2.4));
 
     bean.getUids().add(UUID.randomUUID());
     bean.getUids().add(UUID.randomUUID());
     bean.getOtherIds().add(95L);
     bean.getOtherIds().add(96L);
     bean.getOtherIds().add(97L);
-    bean.setDoubs(doubles);
+    bean.setDecimals(doubles);
     bean.setStatuses(new ArrayList<>());
     bean.getStatuses().add(EArrayBean.Status.ONE);
     bean.getStatuses().add(EArrayBean.Status.THREE);
@@ -60,7 +60,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
     assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
 
-    if (isPostgres()) {
+    if (isPostgresCompatible()) {
       Query<EArrayBean> query = DB.find(EArrayBean.class)
         .where()
         .arrayContains("otherIds", 96L, 97L)
@@ -118,7 +118,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   //@Test//(dependsOnMethods = "insert")
-  public void json_parse_format() {
+  void json_parse_format() {
 
     String asJson = DB.json().toJson(found);
     assertThat(asJson).contains("\"phoneNumbers\":[\"4321\",\"9823\"]");
@@ -132,7 +132,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   //@Test//(dependsOnMethods = "insert")
-  public void update_when_notDirty() {
+  void update_when_notDirty() {
 
     found.setName("jack");
     LoggedSql.start();
@@ -144,7 +144,7 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   //@Test//(dependsOnMethods = "update_when_notDirty")
-  public void update_when_dirty() {
+  void update_when_dirty() {
 
     found.getPhoneNumbers().add("9987");
     found.getUids().add(UUID.randomUUID());
@@ -158,8 +158,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.HANA)
-  public void insertNulls() {
-
+  void insertNulls() {
     EArrayBean bean = new EArrayBean();
     bean.setName("some nulls");
     bean.setPhoneNumbers(null);
@@ -171,8 +170,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.HANA)
-  public void insertAll_when_hasNulls() {
-
+  void insertAll_when_hasNulls() {
     EArrayBean bean = new EArrayBean();
     bean.setName("some nulls");
     bean.setPhoneNumbers(null);
@@ -189,16 +187,16 @@ public class TestDbArray_basic extends BaseTestCase {
   /**
    * Platforms without Array support use JSON which by default isn't including null values.
    */
-  @ForPlatform({Platform.H2, Platform.POSTGRES})
+  @ForPlatform({Platform.H2, Platform.POSTGRES, Platform.YUGABYTE})
   @Test
-  public void nullItems() {
+  void nullItems() {
     EArrayBean bean = new EArrayBean();
     bean.setName("null items");
 
-    List<Double> doubles = new ArrayList<>();
-    doubles.add(1.3);
+    List<BigDecimal> doubles = new ArrayList<>();
+    doubles.add(BigDecimal.valueOf(1.3));
     doubles.add(null);
-    doubles.add(2.4);
+    doubles.add(BigDecimal.valueOf(2.4));
 
     bean.getPhoneNumbers().add("111222333");
     bean.getPhoneNumbers().add(null);
@@ -213,7 +211,7 @@ public class TestDbArray_basic extends BaseTestCase {
     bean.getUids().add(null);
     bean.getUids().add(UUID.randomUUID());
 
-    bean.setDoubs(doubles);
+    bean.setDecimals(doubles);
 
     bean.setStatuses(new ArrayList<>());
     bean.getStatuses().add(EArrayBean.Status.ONE);
@@ -235,7 +233,7 @@ public class TestDbArray_basic extends BaseTestCase {
     assertThat(found.getPhoneNumbers()).containsExactly("111222333", null, "333222111");
     assertThat(found.getOtherIds()).containsExactly(15L, null, 30L, null);
     assertNull(found.getUids().get(1));
-    assertThat(found.getDoubs()).containsExactly(1.3, null, 2.4);
+    assertThat(found.getDecimals()).contains(new BigDecimal("1.3"), null, new BigDecimal("2.4"));
     assertThat(found.getStatuses()).containsExactly(EArrayBean.Status.ONE, null, EArrayBean.Status.THREE);
     assertThat(found.getVcEnums()).containsExactly(VarcharEnum.ONE, null, VarcharEnum.TWO);
     assertThat(found.getIntEnums()).containsExactly(null, IntEnum.ZERO, null, IntEnum.TWO);
@@ -244,8 +242,7 @@ public class TestDbArray_basic extends BaseTestCase {
 
   @Test
   @IgnorePlatform(Platform.HANA)
-  public void hitCache() {
-
+  void hitCache() {
     List<UUID> uids = new ArrayList<>();
     uids.add(UUID.randomUUID());
     uids.add(UUID.randomUUID());
@@ -271,17 +268,17 @@ public class TestDbArray_basic extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform(Platform.POSTGRES)
-  public void asDto_withArray() {
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  void asDto_withArray() {
     DB.find(EArrayBean.class).delete();
     bean.setName("array in dto test");
 
     List<String> phNumbers = bean.getPhoneNumbers();
     phNumbers.add("4321");
     phNumbers.add("9823");
-    List<Double> doubs = bean.getDoubs();
-    doubs.add(1.23);
-    doubs.add(4.56);
+    List<BigDecimal> doubs = bean.getDecimals();
+    doubs.add(BigDecimal.valueOf(1.23));
+    doubs.add(BigDecimal.valueOf(4.56));
     DB.save(bean);
     // Data is saved correctly
 
@@ -290,7 +287,7 @@ public class TestDbArray_basic extends BaseTestCase {
       // Interestingly writing `select("id,name,phone_numbers,doubs")`
       //   generates `select t0.id, t0.name, t0.id, t0.doubs`
       //   surprisingly changing unknown property to id
-      .select("id,name,phoneNumbers,doubs")
+      .select("id,name,phoneNumbers,decimals")
       .asDto(EArrayBeanDto.class)
       // Shouldn't be necessary
       // But without it I see error
@@ -300,7 +297,7 @@ public class TestDbArray_basic extends BaseTestCase {
     List<EArrayBeanDto> dtos = query.findList();
 
     List<String> sql = LoggedSql.stop();
-    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.phone_numbers, t0.doubs");
+    assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.phone_numbers, t0.decimals");
 
     for (EArrayBeanDto dto : dtos) {
       assertThat(dto.id).isNotNull();
@@ -308,13 +305,13 @@ public class TestDbArray_basic extends BaseTestCase {
       // Failure: null
       assertThat(dto.phoneNumbers).isNotNull();
       // Failure: null
-      assertThat(dto.doubs).isNotNull();
+      assertThat(dto.decimals).isNotNull();
     }
   }
 
   @Test
-  @ForPlatform(Platform.POSTGRES)
-  public void sqlUpdate_withArray() {
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  void sqlUpdate_withArray() {
     DB.find(EArrayBean.class).delete();
     bean.setName("array in sql update test");
     DB.save(bean);
@@ -329,11 +326,7 @@ public class TestDbArray_basic extends BaseTestCase {
     SqlUpdate update1 = DB.sqlUpdate("UPDATE earray_bean SET phone_numbers = ?")
       .setParameter(1, phNumbers);
     update1.execute();
-    System.out.println("done");
 
-    // Named param fails with
-    // javax.persistence.PersistenceException:
-    // ERROR: syntax error at or near "$2"
     SqlUpdate update2 = DB.sqlUpdate("UPDATE earray_bean SET phone_numbers = :pns")
       .setArrayParameter("pns", phNumbers);
     update2.execute();
@@ -341,19 +334,19 @@ public class TestDbArray_basic extends BaseTestCase {
     found = DB.find(EArrayBean.class, bean.getId());
     System.out.println(found);
     assertEquals("array in sql update test", found.getName());
-    assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
+    assertThat(found.getPhoneNumbers()).containsExactlyInAnyOrder("4321", "9823");
   }
 
   public static class EArrayBeanDto {
 
     Integer id;
     List<String> phoneNumbers;
-    List<Double> doubs;
+    List<BigDecimal> decimals;
     String name;
 
     @Override
     public String toString() {
-      return "id:" + id + " name:" + name + " phoneNumbers:" + phoneNumbers + " doubs:" + doubs;
+      return "id:" + id + " name:" + name + " phoneNumbers:" + phoneNumbers + " doubs:" + decimals;
     }
 
     public Integer getId() {
@@ -380,12 +373,12 @@ public class TestDbArray_basic extends BaseTestCase {
       this.phoneNumbers = phoneNumbers;
     }
 
-    public List<Double> getDoubs() {
-      return doubs;
+    public List<BigDecimal> getDecimals() {
+      return decimals;
     }
 
-    public void setDoubs(List<Double> doubs) {
-      this.doubs = doubs;
+    public void setDecimals(List<BigDecimal> decimals) {
+      this.decimals = decimals;
     }
   }
 }

@@ -29,7 +29,7 @@ public class TestQueryExists extends BaseTestCase {
     String sql = LoggedSql.stop().get(0);
     assertThat(check).isTrue();
 
-    if (isH2() || isPostgres()) {
+    if (isH2() || isPostgresCompatible()) {
       assertThat(sql).contains("select t0.id from o_order t0 where t0.id > ? limit 1");
     }
 

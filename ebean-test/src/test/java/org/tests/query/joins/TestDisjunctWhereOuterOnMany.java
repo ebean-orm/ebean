@@ -56,7 +56,7 @@ public class TestDisjunctWhereOuterOnMany extends BaseTestCase {
     assertEquals(2, list.size());
     assertEquals(2, rowCount);
 
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       String expectedSql = "select distinct on (t0.id) t0.id, t0.name, t0.description, t0.version from uuone t0 left join uutwo u1 on u1.master_id = t0.id where (t0.name = ? or u1.name = ?)";
       assertSql(query).contains(expectedSql);
 

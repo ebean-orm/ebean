@@ -49,7 +49,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
 
-    if (isH2() || isPostgres()) {
+    if (isH2() || isPostgresCompatible()) {
       assertSql(sql.get(0)).contains("select count(*) from ( select t0.edate, sum(t0.total_kms) from d_machine_stats t0 group by t0.edate having sum(t0.total_kms) > ?)");
       assertSql(sql.get(1)).contains("select t0.edate, sum(t0.total_kms) from d_machine_stats t0 group by t0.edate having sum(t0.total_kms) > ? limit 10");
     } else if (isSqlServer()) {

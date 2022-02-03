@@ -1,10 +1,10 @@
 
-name: SqlServer
+name: H2Database
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '10 7 * * 2,5'
+    - cron: '10 1 * * *'
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         java-version: ${{ matrix.java_version }}
-        distribution: 'adopt'
+        distribution: 'zulu'
     - name: Maven cache
       uses: actions/cache@v2
       env:
@@ -34,5 +34,8 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: sqlserver 2017
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
+    - name: Maven version
+      run: mvn --version
+    - name: H2Database
+      run: mvn clean package
+

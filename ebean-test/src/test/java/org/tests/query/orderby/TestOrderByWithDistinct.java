@@ -49,7 +49,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     query.findList();
 
     String sql = sqlOf(query);
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(sql).contains("select distinct on (t0.user_name, t0.userid) t0.userid,");
     } else if (isH2()) {
       assertThat(sql).contains("select distinct t0.userid, t0.user_name, t0.user_type_id from muser t0");
@@ -133,7 +133,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     assertEquals(1, list.size());
     assertEquals(user1, list.get(0));
     String generatedSql = query.getGeneratedSql();
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(generatedSql).contains("select distinct on (t1.name, t0.user_name, t0.userid) t0.userid"); // using distinct
 
     } else {
@@ -168,7 +168,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     // order by t1.name; --bind(A)
 
     generatedSql = query.getGeneratedSql();
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(generatedSql).contains("select distinct on (t1.name, t0.userid) t0.userid"); // using distinct
     } else {
       assertThat(generatedSql).contains("select distinct t0.userid"); // using distinct

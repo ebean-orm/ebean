@@ -40,7 +40,7 @@ public class TestDeleteByQuery extends BaseTestCase {
       assertSql(sql.get(0)).contains("delete from bbookmark_user where id in (select top 3 t0.id from bbookmark_user t0 where t0.name like ");
     } else {
       assertSql(sql.get(0)).contains("delete from bbookmark_user where id in (select t0.id from bbookmark_user t0 where t0.name like");
-      if (isH2() || isPostgres()) {
+      if (isH2() || isPostgresCompatible()) {
         assertSql(sql.get(0)).contains("limit 3");
       }
     }

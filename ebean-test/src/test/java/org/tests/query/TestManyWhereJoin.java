@@ -34,7 +34,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // join o_order u1 on u1.kcustomer_id = t0.id
     // where u1.status = ? ; --bind(NEW)
 
-    if (isPostgres()) {
+    if (isPostgresCompatible()) {
       assertThat(sql).contains("select distinct on (t0.id) t0.id, ");
     } else {
       assertThat(sql).contains("select distinct t0.id");
@@ -70,7 +70,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where t1.order_date is not null  and u1.status = ?
     // order by t0.id; --bind(NEW)
 
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(sql).contains("select distinct on (t0.id, t1.id) t0.id, t0.status,");
     } else {
       assertThat(sql).contains("select distinct t0.id, t0.status, t1.id, t1.status,");
@@ -101,7 +101,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where u1.product_id = ?
     // order by t0.cretime; --bind(1)
 
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(sql).contains("select distinct on (t0.cretime, t0.id) t0.id, t0.status,");
     } else {
       assertThat(sql).contains("select distinct t0.id, t0.status,");
@@ -135,7 +135,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where u1.product_id = ?
     // order by t0.cretime
 
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(sql).contains("select distinct on (t0.cretime, t0.id) t0.id, t0.status,");
     } else {
       assertThat(sql).contains("select distinct t0.id, t0.status,");
@@ -171,7 +171,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     // where t1.id > 0  and u1.product_id = ?
     // order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc; --bind(1)
 
-    if (isPostgres()) {
+    if (platformDistinctOn()) {
       assertThat(sql).contains("select distinct on (t0.cretime, t0.id, t1.id, t1.order_qty, t1.cretime) t0.id, t0.status,");
     } else {
       assertThat(sql).contains("select distinct t0.id, t0.status,");

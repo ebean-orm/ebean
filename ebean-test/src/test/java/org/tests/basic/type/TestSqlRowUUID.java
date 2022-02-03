@@ -43,7 +43,7 @@ public class TestSqlRowUUID extends BaseTestCase {
 
     assertThat(value).isEqualTo(e.getId());
 
-    if (isPostgres()) {
+    if (isPostgresCompatible()) {
       usingPostrgesAnyWithPositionedParameter_needsExplicitCast(e);
     }
   }
