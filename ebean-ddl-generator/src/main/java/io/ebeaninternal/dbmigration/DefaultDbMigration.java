@@ -190,33 +190,28 @@ public class DefaultDbMigration implements DbMigration {
       return;
     }
     String[] tmp = StringHelper.splitNames(platforms);
-    for (String platformName : tmp) {
-        DatabasePlatform dbPlatform;
+    for (String plat : tmp) {
+      DatabasePlatform dbPlatform;
+      String platformName = plat;
+      String platformPrefix = null;
+      int pos = plat.indexOf('=');
+      if (pos != -1) {
+        platformName = plat.substring(0, pos);
+        platformPrefix = plat.substring(pos + 1);
+      }
+
       if (platformName.indexOf('.') == -1) {
         // parse platform as enum value
         Platform platform = Enum.valueOf(Platform.class, platformName.toUpperCase());
-        dbPlatform =platform(platform);
+        dbPlatform = platform(platform);
       } else {
         // parse platform as class
         dbPlatform = (DatabasePlatform) config.getClassLoadConfig().newInstance(platformName);
       }
+      if (platformPrefix == null) {
+        platformPrefix = dbPlatform.getPlatform().name().toLowerCase();
+      }
 
-      // Special wrapper, that allows us to define properties like:
-      // migration.SERVERNAME.PLATFORMNAME.key
-      PropertiesWrapper platformProps = new PropertiesWrapper("migration", config.getName(), config.getProperties(), config.getClassLoadConfig()) {
-        @Override
-        public String get(String key, String defaultValue) {
-         String ret = super.get(platformName + "." + key, null);
-         if (ret == null) {
-           ret = super.get(key, defaultValue);
-         }
-         return ret;
-        }
-      };
-      String platformPrefix = platformProps.get("prefix", dbPlatform.getPlatform().name().toLowerCase());
-      PlatformConfig platformConfig = new PlatformConfig();
-      platformConfig.loadSettings(platformProps);
-      dbPlatform.configure(platformConfig);
       addDatabasePlatform(dbPlatform, platformPrefix);
     }
   }

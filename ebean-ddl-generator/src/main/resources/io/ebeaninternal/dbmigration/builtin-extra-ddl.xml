@@ -112,7 +112,7 @@ BEGIN
 END
 GO
 </ddl-script>
-<ddl-script name="create procs" platforms="mysql" init="true">-- Inital script to create stored procedures etc for mysql platform
+<ddl-script name="create procs" platforms="mysql mariadb" init="true">-- Inital script to create stored procedures etc for mysql platform
 DROP PROCEDURE IF EXISTS usp_ebean_drop_foreign_keys;
 
 delimiter $$
