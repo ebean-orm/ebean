@@ -51,10 +51,11 @@ public class EBasic {
   @Size(max=127)
   String name;
 
-
+  @DbMigration(preAlter = { "-- db2 does not support parial null indices :( - so we have to clean",
+      "update ${table} set status = 'N' where id = 1" }, platforms = Platform.DB2)
   @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)
-  @Size(max=127)
+  @Size(max = 127)
   String description;
 
   //@NotNull

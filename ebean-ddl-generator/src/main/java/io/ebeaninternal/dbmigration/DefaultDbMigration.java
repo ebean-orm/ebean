@@ -180,41 +180,44 @@ public class DefaultDbMigration implements DbMigration {
       generate = props.getBoolean("migration.generate", generate);
       generateInit = props.getBoolean("migration.generateInit", generateInit);
       // header & strictMode must be configured at DatabaseConfig level
-      parsePlatforms(props.get("migration.platforms"), config.getClassLoadConfig());
+      parsePlatforms(props, config);
     }
   }
 
-  protected void parsePlatforms(String platforms, ClassLoadConfig loader) {
+  protected void parsePlatforms(PropertiesWrapper props, DatabaseConfig config) {
+    String platforms = props.get("migration.platforms");
     if (platforms == null || platforms.isEmpty()) {
       return;
     }
     String[] tmp = StringHelper.splitNames(platforms);
-    for (String plat : tmp) {
-      int pos = plat.indexOf('=');
-      String platformName;
-      String prefix;
-      if (pos == -1) {
-        prefix = null;
-        platformName = plat;
-      } else {
-        platformName = plat.substring(0, pos);
-        prefix = plat.substring(pos + 1);
-      }
+    for (String platformName : tmp) {
+        DatabasePlatform dbPlatform;
       if (platformName.indexOf('.') == -1) {
         // parse platform as enum value
         Platform platform = Enum.valueOf(Platform.class, platformName.toUpperCase());
-        if (prefix == null) {
-          prefix = platform.name().toLowerCase();
-        }
-        addPlatform(platform, prefix);
+        dbPlatform =platform(platform);
       } else {
         // parse platform as class
-        DatabasePlatform dbPlatform = (DatabasePlatform) loader.newInstance(platformName);
-        if (prefix == null) {
-          prefix = dbPlatform.getPlatform().base().name().toLowerCase();
-        }
-        addDatabasePlatform(dbPlatform, prefix);
+        dbPlatform = (DatabasePlatform) config.getClassLoadConfig().newInstance(platformName);
       }
+
+      // Special wrapper, that allows us to define properties like:
+      // migration.SERVERNAME.PLATFORMNAME.key
+      PropertiesWrapper platformProps = new PropertiesWrapper("migration", config.getName(), config.getProperties(), config.getClassLoadConfig()) {
+        @Override
+        public String get(String key, String defaultValue) {
+         String ret = super.get(platformName + "." + key, null);
+         if (ret == null) {
+           ret = super.get(key, defaultValue);
+         }
+         return ret;
+        }
+      };
+      String platformPrefix = platformProps.get("prefix", dbPlatform.getPlatform().name().toLowerCase());
+      PlatformConfig platformConfig = new PlatformConfig();
+      platformConfig.loadSettings(platformProps);
+      dbPlatform.configure(platformConfig);
+      addDatabasePlatform(dbPlatform, platformPrefix);
     }
   }
 
