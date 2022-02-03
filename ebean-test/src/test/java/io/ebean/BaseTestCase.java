@@ -200,7 +200,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPostgresCompatible() {
-    return isPostgres() || isYugabyte();
+    return isPostgres() || isYugabyte() || isCockroach();
   }
 
   public boolean isPostgres() {
@@ -209,6 +209,10 @@ public abstract class BaseTestCase {
 
   public boolean isYugabyte() {
     return Platform.YUGABYTE == platform().base();
+  }
+
+  public boolean isCockroach() {
+    return Platform.COCKROACH == platform().base();
   }
 
   public boolean isMySql() {
@@ -281,7 +285,7 @@ public abstract class BaseTestCase {
    * Platform specific IN clause assert.
    */
   protected void platformAssertIn(String sql, String containsIn) {
-    if (isPostgres() || isYugabyte()) {
+    if (isPostgresCompatible()) {
       assertThat(sql).contains(containsIn+" = any(");
     } else {
       assertThat(sql).contains(containsIn+" in ");
