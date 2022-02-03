@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DbMigrationTest extends BaseTestCase {
 
   private void runScript(String scriptName) throws IOException {
-    URL url = getClass().getResource("/migrationtest/dbmigration/" + server().platform().name().toLowerCase() + "/" + scriptName);
+    URL url = getClass().getResource("/migrationtest/dbmigration/" + server().platform().base().name().toLowerCase() + "/" + scriptName);
     assert url != null : scriptName +  " not found";
     server().script().run(url);
   }
