@@ -33,7 +33,7 @@ public class TestJsonMapBasic extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform(Platform.POSTGRES)
+  @ForPlatform({Platform.POSTGRES, Platform.COCKROACH})
   public void whereManyPredicatePg() {
 
     bean.setName("own1");

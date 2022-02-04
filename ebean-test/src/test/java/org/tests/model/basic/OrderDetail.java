@@ -5,6 +5,7 @@ import io.ebean.annotation.DocEmbedded;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 /**
@@ -27,7 +28,7 @@ public class OrderDetail implements Serializable {
 
   Integer shipQty;
 
-  Double unitPrice;
+  BigDecimal unitPrice;
 
   @ManyToOne
   @DocEmbedded(doc = "id,name,sku")
@@ -41,7 +42,7 @@ public class OrderDetail implements Serializable {
   public OrderDetail() {
   }
 
-  public OrderDetail(Product product, Integer orderQty, Double unitPrice) {
+  public OrderDetail(Product product, Integer orderQty, BigDecimal unitPrice) {
     this.product = product;
     this.orderQty = orderQty;
     this.unitPrice = unitPrice;
@@ -89,11 +90,11 @@ public class OrderDetail implements Serializable {
     this.shipQty = shipQty;
   }
 
-  public Double getUnitPrice() {
+  public BigDecimal getUnitPrice() {
     return unitPrice;
   }
 
-  public void setUnitPrice(Double unitPrice) {
+  public void setUnitPrice(BigDecimal unitPrice) {
     this.unitPrice = unitPrice;
   }
 

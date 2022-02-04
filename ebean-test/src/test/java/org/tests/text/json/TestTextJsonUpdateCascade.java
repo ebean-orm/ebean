@@ -9,6 +9,7 @@ import org.tests.model.basic.*;
 import org.tests.model.basic.Order.Status;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,14 +37,14 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
     OrderDetail orderDetail0 = order.getDetails().get(0);
     orderDetail0.setShipQty(300);
-    orderDetail0.setUnitPrice(56.98d);
+    orderDetail0.setUnitPrice(BigDecimal.valueOf(56.98d));
 
     // remove one of the details...
     OrderDetail removedDetail = order.getDetails().remove(2);
     assertNotNull(removedDetail);
 
     Product p = DB.reference(Product.class, 1);
-    OrderDetail newDetail = new OrderDetail(p, 899, 12.12d);
+    OrderDetail newDetail = new OrderDetail(p, 899, BigDecimal.valueOf(12.12d));
     // newDetail.setOrder(order);
     order.addDetail(newDetail);
 

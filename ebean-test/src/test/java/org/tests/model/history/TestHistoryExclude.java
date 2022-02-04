@@ -70,7 +70,7 @@ public class TestHistoryExclude extends BaseTestCase {
     linkFound.getDocs().size();
   }
 
-  @IgnorePlatform({Platform.ORACLE, Platform.DB2})
+  @IgnorePlatform({Platform.ORACLE, Platform.DB2, Platform.COCKROACH})
   @Test
   public void testAsOfThenLazy() {
 
