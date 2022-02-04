@@ -81,8 +81,7 @@ public final class DefaultPersister implements Persister {
       int rc = request.executeOrQueue();
       request.commitTransIfRequired();
       return rc;
-
-    } catch (RuntimeException e) {
+    } catch (Throwable e) {
       request.rollbackTransIfRequired();
       throw e;
     } finally {
@@ -383,8 +382,7 @@ public final class DefaultPersister implements Persister {
       req.resetDepth();
       req.commitTransIfRequired();
       req.flushBatchOnCascade();
-
-    } catch (RuntimeException ex) {
+    } catch (Throwable ex) {
       req.rollbackTransIfRequired();
       throw ex;
     } finally {
@@ -420,8 +418,7 @@ public final class DefaultPersister implements Persister {
       req.resetDepth();
       req.commitTransIfRequired();
       req.flushBatchOnCascade();
-
-    } catch (RuntimeException ex) {
+    } catch (Throwable ex) {
       req.rollbackTransIfRequired();
       throw ex;
     } finally {
@@ -559,7 +556,7 @@ public final class DefaultPersister implements Persister {
       req.flushBatchOnCascade();
       return rows;
 
-    } catch (RuntimeException ex) {
+    } catch (Throwable ex) {
       req.rollbackTransIfRequired();
       throw ex;
     } finally {
