@@ -74,7 +74,7 @@ create table migtest_e_basic (
   constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
   constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I')),
   constraint pk_migtest_e_basic primary key (id)
-);
+) in TSTABLES index in INDEXTS long in TSTABLES;
 create unique index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) exclude null keys;
 create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) exclude null keys;
 

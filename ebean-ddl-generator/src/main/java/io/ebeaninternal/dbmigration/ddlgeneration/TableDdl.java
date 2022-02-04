@@ -6,6 +6,7 @@ import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
+import io.ebeaninternal.dbmigration.migration.AlterTable;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
@@ -29,6 +30,11 @@ public interface TableDdl {
    * Write the drop column change.
    */
   void generate(DdlWrite writer, DropTable dropTable) throws IOException;
+  
+  /**
+   * Write alter table changes.
+   */
+  void generate(DdlWrite writer, AlterTable dropTable) throws IOException;
 
   /**
    * Write the add column change.

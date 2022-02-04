@@ -8,6 +8,7 @@ import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
+import io.ebeaninternal.dbmigration.migration.AlterTable;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.ChangeSetType;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
@@ -19,6 +20,7 @@ import io.ebeaninternal.dbmigration.migration.DropTable;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migration.RenameColumn;
 import io.ebeaninternal.dbmigration.migration.Sql;
+import io.ebeaninternal.server.deploy.TablespaceMeta;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -155,6 +157,8 @@ public class ModelContainer {
         applyChange((CreateTable) change);
       } else if (change instanceof DropTable) {
         applyChange((DropTable) change);
+      } else if (change instanceof AlterTable) {
+        applyChange((AlterTable) change);
       } else if (change instanceof AlterColumn) {
         applyChange((AlterColumn) change);
       } else if (change instanceof AddColumn) {
@@ -260,6 +264,32 @@ public class ModelContainer {
    */
   protected void applyChange(DropTable dropTable) {
     tables.remove(dropTable.getName());
+  }
+  
+  
+  protected void applyChange(AlterTable alterTable) {
+    MTable table = getTable(alterTable.getName());
+    if (table == null) {
+      throw new IllegalStateException("Table [" + alterTable.getName() + "] does not exist in model?");
+    }
+    // Handle Tablespace change
+    TablespaceMeta ts = table.getTablespaceMeta();
+
+    if (alterTable.getTablespace() != null) {
+      String currentTableSpace = DdlHelp.toTablespace(alterTable.getTablespace());
+      String currentIndexSpace = DdlHelp.toTablespace(alterTable.getIndexTablespace());
+      String currentLobSpace = DdlHelp.toTablespace(alterTable.getLobTablespace());
+
+      if (currentTableSpace != null) {
+        assert currentIndexSpace != null;
+        assert currentLobSpace != null;
+        table.setTablespaceMeta(new TablespaceMeta(currentTableSpace, currentIndexSpace, currentLobSpace));
+      } else {
+        assert currentIndexSpace == null;
+        assert currentLobSpace == null;
+        table.setTablespaceMeta(null);
+      }
+    }
   }
 
   /**

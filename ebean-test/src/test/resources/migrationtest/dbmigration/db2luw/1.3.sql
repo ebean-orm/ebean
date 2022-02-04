@@ -183,6 +183,8 @@ call sysproc.admin_cmd('reorg table migtest_e_history4') /* reorg #6 */;
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
+CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_C','USERSPACE1','USERSPACE1','USERSPACE1','','','','','','MOVE');
+CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_M','USERSPACE1','USERSPACE1','USERSPACE1','','','','','','MOVE');
 call sysproc.admin_cmd('reorg table migtest_e_history6') /* reorg #7 */;
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

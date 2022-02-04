@@ -6,6 +6,7 @@ import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
+import io.ebeaninternal.dbmigration.migration.AlterTable;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.ChangeSetType;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
@@ -251,5 +252,12 @@ public class ModelDiff {
    */
   public void addAlterForeignKey(AlterForeignKey alterForeignKey) {
     applyChanges.add(alterForeignKey);
+  }
+  
+  /**
+   * Adds a table alter.
+   */
+  public void addAlterTable(AlterTable alterTable) {
+    applyChanges.add(alterTable);
   }
 }

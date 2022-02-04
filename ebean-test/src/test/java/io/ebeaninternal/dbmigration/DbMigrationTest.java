@@ -74,6 +74,10 @@ public class DbMigrationTest extends BaseTestCase {
     if (isSqlServer() || isMariaDB()) { //  || isMySql()
       runScript("I__create_procs.sql");
     }
+    
+    if(isDb2()) {
+      runScript("I__create_tablespaces.sql");
+    }
 
     runScript("1.0__initial.sql");
 

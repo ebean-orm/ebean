@@ -14,6 +14,7 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.InvalidateQueryCache;
 import io.ebean.annotation.ReadAudit;
 import io.ebean.annotation.StorageEngine;
+import io.ebean.annotation.Tablespace;
 import io.ebean.annotation.View;
 import io.ebean.config.TableName;
 import io.ebean.util.AnnotationUtil;
@@ -22,6 +23,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.PartitionMeta;
+import io.ebeaninternal.server.deploy.TablespaceMeta;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 import javax.persistence.AttributeOverride;
@@ -157,6 +159,18 @@ final class AnnotationClass extends AnnotationParser {
     DbPartition partition = typeGet(cls, DbPartition.class);
     if (partition != null) {
       descriptor.setPartitionMeta(new PartitionMeta(partition.mode(), partition.property()));
+    }
+    Tablespace tablespace = typeGet(cls, Tablespace.class);
+    if (tablespace != null) {
+      String indexTs = tablespace.index();
+      if("".equals(indexTs)) {
+        indexTs = tablespace.value();
+      }
+      String lobTs = tablespace.lob();
+      if("".equals(lobTs)) {
+        lobTs = tablespace.value();
+      }
+      descriptor.setTablespaceMeta(new TablespaceMeta(tablespace.value(), indexTs, lobTs));
     }
     Draftable draftable = typeGet(cls, Draftable.class);
     if (draftable != null) {

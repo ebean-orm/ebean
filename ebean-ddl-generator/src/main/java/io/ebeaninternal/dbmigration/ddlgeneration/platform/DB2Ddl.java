@@ -1,7 +1,10 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import java.io.IOException;
+
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 
 /**
  * DB2 platform specific DDL.
@@ -29,7 +32,8 @@ import io.ebean.config.dbplatform.DatabasePlatform;
  * 
  */
 public class DB2Ddl extends PlatformDdl {
-  
+  private static final String MOVE_TABLE = "CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'%s','%s','%s','%s','','','','','','MOVE')";
+
   public DB2Ddl(DatabasePlatform platform) {
     super(platform);
     this.dropTableIfExists = "drop table ";
@@ -42,6 +46,16 @@ public class DB2Ddl extends PlatformDdl {
     this.inlineUniqueWhenNullable = false;
   }
 
+  @Override
+  public String alterTableTablespace(String tablename, String tableSpace, String indexSpace, String lobSpace) {
+    if(tableSpace == null) {
+      // if no tableSpace set, use the default tablespace USERSPACE1
+      return String.format(MOVE_TABLE, tablename.toUpperCase(), "USERSPACE1", "USERSPACE1", "USERSPACE1");
+    } else {
+      return String.format(MOVE_TABLE, tablename.toUpperCase(), tableSpace, indexSpace, lobSpace);
+    }
+  }
+  
   @Override
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns,
       String[] nullableColumns) {
@@ -135,8 +149,13 @@ public class DB2Ddl extends PlatformDdl {
 
   @Override
   public String reorgTable(String table, int counter) {
-    // TODO Auto-generated method stub
     return "call sysproc.admin_cmd('reorg table " + lowerTableName(table) + "') /* reorg #" + counter + " */";
   }
-
+  
+  @Override
+  public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace)
+      throws IOException {
+    apply.append(" in ").append(tablespaceName).append(" index in ").append(indexTablespace).append(" long in ").append(lobTablespace);
+  }
+  
 }

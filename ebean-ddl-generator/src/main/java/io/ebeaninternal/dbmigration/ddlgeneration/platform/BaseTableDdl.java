@@ -18,6 +18,7 @@ import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
+import io.ebeaninternal.dbmigration.migration.AlterTable;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
@@ -198,7 +199,7 @@ public class BaseTableDdl implements TableDdl {
 
     private void handleStrictError(String tableName, String columnName) {
       if (strictMode) {
-        String message = "DB Migration of non-null column with no default value specified for: " + tableName + "." + columnName+" Use @DbDefault to specify a default value or specify dbMigration.setStrictMode(false)";
+        String message = "DB Migration of non-null column with no default value specified for: " + tableName + "." + columnName+" Use @DbDefault to specify a default value or disable strict mode for migration";
         throw new IllegalArgumentException(message);
       }
     }
@@ -279,6 +280,10 @@ public class BaseTableDdl implements TableDdl {
       writeInlineForeignKeys(writer, createTable);
     }
     apply.newLine().append(")");
+    if (createTable.getTablespace() != null) {
+      platformDdl.addTablespace(apply, createTable.getTablespace(), createTable.getIndexTablespace(),
+          createTable.getLobTablespace());
+    }
     addTableStorageEngine(apply, createTable);
     addTableCommentInline(apply, createTable);
     if (partitionMode != null) {
@@ -582,12 +587,12 @@ public class BaseTableDdl implements TableDdl {
     }
     return pk;
   }
-
+  
   @Override
   public void generate(DdlWrite writer, CreateIndex index) throws IOException {
     if (platformInclude(index.getPlatforms())) {
       flushReorgTables(writer.apply());
-      writer.apply().appendStatement(platformDdl.createIndex(new WriteCreateIndex(index)));
+      writer.apply().appendStatement(platformDdl.createIndex(new WriteCreateIndex(index))); 
       writer.dropAll().appendStatement(platformDdl.dropIndex(index.getIndexName(), index.getTableName(), Boolean.TRUE.equals(index.isConcurrent())));
     }
   }
@@ -712,6 +717,26 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
+  @Override
+  public void generate(DdlWrite writer, AlterTable alterTable) throws IOException {
+    if (hasValue(alterTable.getTablespace()) || hasValue(alterTable.getIndexTablespace()) || hasValue(alterTable.getLobTablespace())) {
+      writer.apply().appendStatement(platformDdl.alterTableTablespace(alterTable.getName(),
+              DdlHelp.toTablespace(alterTable.getTablespace()), 
+              DdlHelp.toTablespace(alterTable.getIndexTablespace()),
+              DdlHelp.toTablespace(alterTable.getLobTablespace())));
+    }
+  }
+
+  protected void writeTablespaceChange(DdlBuffer buffer, String tablename, String tableSpace, String indexSpace,
+      String lobSpace) throws IOException {
+    buffer.appendStatement("-- TableSpace changed: Table: " + tablename + ", tableSpace " + tableSpace + ", indexSpace "
+        + indexSpace + ", lobSpace " + lobSpace);
+    if (strictMode) {
+      throw new UnsupportedOperationException(
+          "Tablespace change is not supported by this platform. Disable strict mode for migration and write migration manually");
+    }
+  }
+  
   /**
    * Add drop column DDL.
    */

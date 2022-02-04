@@ -1,7 +1,8 @@
-1580812656,     1.0__initial.sql
--2144208808,    1.1.sql
+-1602289007,    I__create_tablespaces.sql
+999346633,      1.0__initial.sql
+2079409430,     1.1.sql
 1091886546,     1.2__dropsFor_1.1.sql
--1041850370,    1.3.sql
+-1291483335,    1.3.sql
 1293885677,     1.4__dropsFor_1.3.sql
 -133543359,     R__db2_explain_tables.sql
 561281075,      R__order_views.sql

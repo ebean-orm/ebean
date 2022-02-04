@@ -5,6 +5,7 @@ import io.ebeaninternal.dbmigration.migration.AddColumn;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
+import io.ebeaninternal.dbmigration.migration.AlterTable;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
@@ -17,6 +18,8 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.IdentityMode;
 import io.ebeaninternal.server.deploy.PartitionMeta;
+import io.ebeaninternal.server.deploy.TablespaceMeta;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +29,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.split;
@@ -56,11 +60,10 @@ public class MTable {
    */
   private boolean draft;
   private PartitionMeta partitionMeta;
+  private TablespaceMeta tablespaceMeta;
   private String pkName;
   private String comment;
-  private String tablespace;
   private String storageEngine;
-  private String indexTablespace;
   private IdentityMode identityMode;
   private boolean withHistory;
   private final Map<String, MColumn> columns = new LinkedHashMap<>();
@@ -93,6 +96,7 @@ public class MTable {
     this.identityMode = descriptor.identityMode();
     this.storageEngine = descriptor.storageEngine();
     this.partitionMeta = descriptor.partitionMeta();
+    this.tablespaceMeta = descriptor.tablespaceMeta();
     this.comment = descriptor.dbComment();
     if (descriptor.isHistorySupport()) {
       withHistory = true;
@@ -104,11 +108,28 @@ public class MTable {
   }
 
   /**
-   * Construct for element collection or intersection table.
+   * Constructor for test cases only!
    */
+  @Deprecated
   public MTable(String name) {
+    this(name, null, null);
+  }
+
+  /**
+   * Construct for element collection or intersection table. They have same table space and storage engine.
+   */
+  public MTable(String name, BeanDescriptor<?> descriptor) {
+    this(name, descriptor.tablespaceMeta(), descriptor.storageEngine());
+  }
+  
+  /**
+   * Constructor for dependant tables (draft/element collection or intersection).
+   */
+  private MTable(String name, TablespaceMeta tablespaceMeta, String storageEngine) {
     this.name = name;
     this.identityMode = IdentityMode.NONE;
+    this.tablespaceMeta = tablespaceMeta;
+    this.storageEngine = storageEngine;
   }
 
   /**
@@ -118,7 +139,7 @@ public class MTable {
    * later when creating the CreateTable object.
    */
   public MTable createDraftTable() {
-    draftTable = new MTable(name + "_draft");
+    draftTable = new MTable(name + "_draft", this.tablespaceMeta, this.storageEngine);
     draftTable.draft = true;
     draftTable.whenCreatedColumn = whenCreatedColumn;
     // compoundKeys
@@ -138,8 +159,13 @@ public class MTable {
     this.pkName = createTable.getPkName();
     this.comment = createTable.getComment();
     this.storageEngine = createTable.getStorageEngine();
-    this.tablespace = createTable.getTablespace();
-    this.indexTablespace = createTable.getIndexTablespace();
+    if (createTable.getTablespace() != null) {
+      this.tablespaceMeta = new TablespaceMeta(createTable.getTablespace(),
+          createTable.getIndexTablespace() != null ? createTable.getIndexTablespace() : createTable.getTablespace(),
+          createTable.getLobTablespace() != null ? createTable.getLobTablespace() : createTable.getTablespace());
+    } else {
+      this.tablespaceMeta = null;
+    }
     this.withHistory = Boolean.TRUE.equals(createTable.isWithHistory());
     this.draft = Boolean.TRUE.equals(createTable.isDraft());
     this.identityMode = fromCreateTable(createTable);
@@ -210,8 +236,11 @@ public class MTable {
       createTable.setPartitionColumn(partitionMeta.getProperty());
     }
     createTable.setStorageEngine(storageEngine);
-    createTable.setTablespace(tablespace);
-    createTable.setIndexTablespace(indexTablespace);
+    if (tablespaceMeta != null) {
+      createTable.setTablespace(tablespaceMeta.getTablespaceName());
+      createTable.setIndexTablespace(tablespaceMeta.getIndexTablespace());
+      createTable.setLobTablespace(tablespaceMeta.getLobTablespace());
+    }
     toCreateTable(identityMode, createTable);
     if (withHistory) {
       createTable.setWithHistory(Boolean.TRUE);
@@ -266,6 +295,8 @@ public class MTable {
 
     compareCompoundKeys(modelDiff, newTable);
     compareUniqueKeys(modelDiff, newTable);
+    compareTableAttrs(modelDiff, newTable);
+  
   }
 
   private void compareColumns(ModelDiff modelDiff, MTable newTable) {
@@ -333,6 +364,29 @@ public class MTable {
     }
     for (MCompoundUniqueConstraint newKey : newKeys) {
       modelDiff.addUniqueConstraint(newKey.addUniqueConstraint(name));
+    }
+  }
+  
+  private void compareTableAttrs(ModelDiff modelDiff, MTable newTable) {
+    AlterTable alterTable = new AlterTable();
+    alterTable.setName(newTable.getName());
+    boolean altered = false;
+
+    if (!Objects.equals(tablespaceMeta, newTable.getTablespaceMeta())) {
+      if (newTable.getTablespaceMeta() == null) {
+        alterTable.setTablespace(DdlHelp.TABLESPACE_DEFAULT);
+        alterTable.setIndexTablespace(DdlHelp.TABLESPACE_DEFAULT);
+        alterTable.setLobTablespace(DdlHelp.TABLESPACE_DEFAULT);
+      } else {
+        alterTable.setTablespace(newTable.getTablespaceMeta().getTablespaceName());
+        alterTable.setIndexTablespace(newTable.getTablespaceMeta().getIndexTablespace());
+        alterTable.setLobTablespace(newTable.getTablespaceMeta().getLobTablespace());
+      }
+      altered = true;
+    }
+
+    if (altered) {
+      modelDiff.addAlterTable(alterTable);
     }
   }
 
@@ -424,13 +478,13 @@ public class MTable {
   public void setComment(String comment) {
     this.comment = comment;
   }
-
-  public String getTablespace() {
-    return tablespace;
+  
+  public void setTablespaceMeta(TablespaceMeta tablespaceMeta) {
+    this.tablespaceMeta = tablespaceMeta;
   }
-
-  public String getIndexTablespace() {
-    return indexTablespace;
+  
+  public TablespaceMeta getTablespaceMeta() {
+    return tablespaceMeta;
   }
 
   public boolean isWithHistory() {

@@ -127,7 +127,7 @@ public class PlatformDdl {
   protected boolean inlineForeignKeys;
 
   protected boolean includeStorageEngine;
-
+  
   protected final DbDefaultValue dbDefaultValue;
 
   protected String fallbackArrayType = "varchar(1000)";
@@ -400,7 +400,7 @@ public class PlatformDdl {
   public String dropIndex(String indexName, String tableName, boolean concurrent) {
     return dropIndexIfExists + maxConstraintName(indexName);
   }
-
+  
   public String createIndex(WriteCreateIndex create) {
     if (create.useDefinition()) {
       return create.getDefinition();
@@ -506,6 +506,13 @@ public class PlatformDdl {
    */
   public String alterTableDropConstraint(String tableName, String constraintName) {
     return "alter table " + tableName + " " + dropConstraintIfExists + " " + maxConstraintName(constraintName);
+  }
+
+  /**
+   * Moves the table to an other tablespace.
+   */
+  public String alterTableTablespace(String tablename, String tableSpace, String indexSpace, String lobSpace) {
+    return null;
   }
 
   /**
@@ -771,6 +778,14 @@ public class PlatformDdl {
 
   public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
     // only supported by postgres initially
+  }
+  
+  /**
+   * Adds tablespace declaration. Now only supported for db2.
+   * @throws IOException 
+   */
+  public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) throws IOException{
+    // now only supported for db2
   }
 
   /**
