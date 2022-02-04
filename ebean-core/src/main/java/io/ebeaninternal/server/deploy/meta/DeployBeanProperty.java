@@ -1159,7 +1159,7 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
 
   private boolean matchPlatform(Platform[] platforms, Platform match) {
     for (Platform platform : platforms) {
-      if (platform == match) {
+      if (platform == match || platform == match.base()) {
         return true;
       }
     }
