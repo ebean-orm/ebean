@@ -43,7 +43,7 @@
 
 
   <scm>
-    <tag>ebean-parent-12.14.1-FOC1</tag>
+    <tag>HEAD</tag>
     <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
   </scm>
 </project>

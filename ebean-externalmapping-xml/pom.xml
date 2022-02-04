@@ -14,7 +14,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
-    <tag>ebean-parent-12.14.1-FOC1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <name>ebean external mapping xml</name>
