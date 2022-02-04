@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Version;
+import java.math.BigDecimal;
 
 @Entity
 public class TEventMany {
@@ -18,12 +19,12 @@ public class TEventMany {
 
   int myUnits;
 
-  double amount;
+  BigDecimal amount;
 
   @Version
   Long version;
 
-  public TEventMany(String description, int myUnits, double amount) {
+  public TEventMany(String description, int myUnits, BigDecimal amount) {
     this.description = description;
     this.myUnits = myUnits;
     this.amount = amount;
@@ -61,11 +62,11 @@ public class TEventMany {
     this.myUnits = myUnits;
   }
 
-  public double getAmount() {
+  public BigDecimal getAmount() {
     return amount;
   }
 
-  public void setAmount(double amount) {
+  public void setAmount(BigDecimal amount) {
     this.amount = amount;
   }
 

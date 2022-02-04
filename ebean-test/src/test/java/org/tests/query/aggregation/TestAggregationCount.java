@@ -25,15 +25,15 @@ public class TestAggregationCount extends BaseTestCase {
   @BeforeAll
   public static void setup() {
     TEventOne one = new TEventOne("first", TEventOne.Status.AA);
-    one.getLogs().add(new TEventMany("all", 1, 10));
-    one.getLogs().add(new TEventMany("be", 2, 12.2));
-    one.getLogs().add(new TEventMany("add", 3, 13));
+    one.getLogs().add(new TEventMany("all", 1, BigDecimal.valueOf(10)));
+    one.getLogs().add(new TEventMany("be", 2, BigDecimal.valueOf(12.2)));
+    one.getLogs().add(new TEventMany("add", 3, BigDecimal.valueOf(13)));
     DB.save(one);
 
     TEventOne two = new TEventOne("second", TEventOne.Status.AA);
-    two.getLogs().add(new TEventMany("at", 10, 10));
-    two.getLogs().add(new TEventMany("add", 30, 13));
-    two.getLogs().add(new TEventMany("alf", 30, 13));
+    two.getLogs().add(new TEventMany("at", 10, BigDecimal.valueOf(10)));
+    two.getLogs().add(new TEventMany("add", 30, BigDecimal.valueOf(13)));
+    two.getLogs().add(new TEventMany("alf", 30, BigDecimal.valueOf(13)));
     DB.save(two);
 
     TEventOne three = new TEventOne("thrird", TEventOne.Status.BB);

@@ -3,6 +3,8 @@ package org.tests.query;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CKeyParent;
 import org.tests.model.basic.ResetBasicData;
@@ -37,6 +39,7 @@ public class TestQueryAlias extends BaseTestCase {
     assertThat(sql).contains("(myt0.one_key) in (select st0.one_key from ckey_parent st0)");
   }
 
+  @IgnorePlatform(Platform.COCKROACH)
   @Test
   public void testExistsWithConcat() {
 

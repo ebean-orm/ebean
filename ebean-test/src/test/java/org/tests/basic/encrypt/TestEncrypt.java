@@ -56,7 +56,7 @@ public class TestEncrypt extends BaseTestCase {
     assertThat(loggedSql.get(1)).contains("left join e_basicenc t1 on t1.id = t0.other_id");
   }
 
-  @IgnorePlatform({Platform.ORACLE, Platform.DB2})
+  @IgnorePlatform({Platform.ORACLE, Platform.DB2, Platform.COCKROACH})
   @Test
   public void asDto() {
     DB.find(EBasicEncrypt.class).delete();
