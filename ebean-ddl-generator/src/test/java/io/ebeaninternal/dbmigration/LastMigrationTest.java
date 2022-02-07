@@ -9,20 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class LastMigrationTest {
 
   @Test
-  public void lastVersion() {
-    File d = new File("src/test/resources/dbmigration/migrationtest/h2");
-    assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.4");
-    assertThat(LastMigration.nextVersion(d, null, false)).isEqualTo("1.5");
-    assertThat(LastMigration.nextVersion(d, null, true)).isEqualTo("1.4");
-  }
-
-  @Test
-  public void lastVersion_no_v_Prefix() {
-    File d = new File("src/test/resources/dbmigration/migrationtest-history");
-    assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.2");
-  }
-
-  @Test
   public void lastVersion_test() {
     File d = new File("src/test/resources/test-dbmigration");
     assertThat(LastMigration.lastVersion(d, null)).isEqualTo("2.1");

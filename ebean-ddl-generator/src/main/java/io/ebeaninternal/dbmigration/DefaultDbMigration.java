@@ -43,6 +43,7 @@ import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.config.dbplatform.yugabyte.YugabytePlaform;
 import io.ebean.dbmigration.DbMigration;
 import io.ebean.util.IOUtils;
 import io.ebean.util.StringHelper;
@@ -815,6 +816,8 @@ public class DefaultDbMigration implements DbMigration {
         return new Postgres9Platform();
       case POSTGRES:
         return new PostgresPlatform();
+      case YUGABYTE:
+        return new YugabytePlaform();
       case MARIADB:
         return new MariaDbPlatform();
       case MYSQL55:

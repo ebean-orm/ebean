@@ -28,7 +28,8 @@ alter table migtest_e_softdelete drop column deleted;
 
 alter table migtest_oto_child drop column master_id;
 
-drop table migtest_e_user;
-drop sequence migtest_e_user_seq;
-drop table migtest_mtm_c_migtest_mtm_m;
-drop table migtest_mtm_m_migtest_mtm_c;
+drop table if exists migtest_e_user;
+drop sequence if exists migtest_e_user_seq;
+drop table if exists migtest_mtm_c_migtest_mtm_m;
+drop table if exists migtest_mtm_m_migtest_mtm_c;
+alter table migtest_e_history drop system versioning;

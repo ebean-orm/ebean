@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +29,7 @@ public class DbMigrationGenerateTest {
   private static final Logger logger = LoggerFactory.getLogger(DbMigrationGenerateTest.class);
 
   public static void main(String[] args) throws IOException {
-    run("ebean-ddl-generator/src/test/resources");
+    run("ebean-test/src/test/resources");
   }
 
   @Test
@@ -39,25 +40,40 @@ public class DbMigrationGenerateTest {
   public static void run(String pathToResources) throws IOException {
     logger.info("start current directory: " + new File(".").getAbsolutePath());
 
+
+    // First, we clean up the output-directory
+    Files.walk(Paths.get(pathToResources, "migrationtest"))
+      .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
+
     DefaultDbMigration migration = new DefaultDbMigration();
     migration.setIncludeIndex(true);
     // We use src/test/resources as output directory (so we see in GIT if files will change)
     migration.setPathToResources(pathToResources);
-    migration.setMigrationPath("db/migration");
-    migration.setMigrationPath(null); // use the default for this test
 
-    // migration.addPlatform(Platform.GENERIC, "generic"); there is no ddl handler for generic
-    // migration.addPlatform(Platform.SQLANYWHERE, "sqlanywhere"); and sqlanywhere
-    migration.addPlatform(Platform.DB2);
+    migration.addPlatform(Platform.CLICKHOUSE);
+    migration.addPlatform(Platform.COCKROACH);
+    migration.addPlatform(Platform.DB2FORI);
+    migration.addPlatform(Platform.DB2LUW);
+    migration.addPlatform(Platform.DB2ZOS);
+    migration.addPlatform(Platform.GENERIC);
     migration.addPlatform(Platform.H2);
-    migration.addPlatform(Platform.HSQLDB, "hsqldb");
-    migration.addPlatform(Platform.MYSQL, "mysql");
-    migration.addPlatform(Platform.MYSQL55, "mysql55");
-    migration.addPlatform(Platform.POSTGRES);
-    migration.addPlatform(Platform.ORACLE);
-    migration.addPlatform(Platform.SQLITE);
-    migration.addPlatform(Platform.SQLSERVER17, "sqlserver17");
     migration.addPlatform(Platform.HANA);
+    migration.addPlatform(Platform.HSQLDB);
+    migration.addPlatform(Platform.MARIADB);
+    migration.addPlatform(Platform.MARIADB, "mariadb-noprocs");
+    migration.addPlatform(Platform.MYSQL);
+    migration.addPlatform(Platform.MYSQL55);
+    migration.addPlatform(Platform.NUODB);
+    migration.addPlatform(Platform.ORACLE);
+    migration.addPlatform(Platform.ORACLE11);
+    migration.addPlatform(Platform.POSTGRES);
+    migration.addPlatform(Platform.POSTGRES9);
+    migration.addPlatform(Platform.SQLANYWHERE);
+    migration.addPlatform(Platform.SQLITE);
+    migration.addPlatform(Platform.SQLSERVER16);
+    migration.addPlatform(Platform.SQLSERVER17);
+    migration.addPlatform(Platform.YUGABYTE);
+
 
     DatabaseConfig config = new DatabaseConfig();
     config.setName("migrationtest");
@@ -66,15 +82,9 @@ public class DbMigrationGenerateTest {
     config.setDefaultServer(false);
     config.getProperties().put("ebean.hana.generateUniqueDdl", "true"); // need to generate unique statements to prevent them from being filtered out as duplicates by the DdlRunner
 
-
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
     Database server = DatabaseFactory.create(config);
     migration.setServer(server);
-
-    // First, we clean up the output-directory
-    assertThat(migration.migrationDirectory().getAbsolutePath()).contains("migrationtest");
-    Files.walk(migration.migrationDirectory().toPath())
-      .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
 
     // then we generate migration scripts for v1_0
     assertThat(migration.generateMigration()).isEqualTo("1.0__initial");

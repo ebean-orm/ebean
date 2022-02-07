@@ -1,30 +1,38 @@
 package io.ebeaninternal.dbmigration;
 
-import io.localtest.BaseTestCase;
+import io.ebean.BaseTestCase;
 import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
-import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DbMigrationTest extends BaseTestCase {
 
-  private void runScript(boolean expectErrors, String scriptName) throws IOException {
-    String ddl = Helper.asText(this, "/dbmigration/migrationtest/" + server().platform().name().toLowerCase() + "/" + scriptName);
-    runScript(expectErrors, ddl, scriptName);
+  private void runScript(String scriptName) throws IOException {
+    URL url = getClass().getResource("/migrationtest/dbmigration/" + server().platform().name().toLowerCase() + "/" + scriptName);
+    assert url != null : scriptName +  " not found";
+    server().script().run(url);
+  }
+  
+  @Test
+  public void lastVersion() {
+    File d = new File("src/test/resources/migrationtest/dbmigration/h2");
+    assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.4");
+    assertThat(LastMigration.nextVersion(d, null, false)).isEqualTo("1.5");
+    assertThat(LastMigration.nextVersion(d, null, true)).isEqualTo("1.4");
   }
 
-  private void runScript(boolean useAutoCommit, String content, String scriptName) {
-    server().script().runScript(scriptName, content, useAutoCommit);
-  }
-
-  @IgnorePlatform({Platform.ORACLE, Platform.NUODB, Platform.MARIADB})
+  @IgnorePlatform({Platform.ORACLE, Platform.NUODB, Platform.POSTGRES, Platform.YUGABYTE})
+  // Note: Postgres locks up on build server
+  // Note: YUGABYTE complains on "alter table migtest_e_basic alter column status set not null;"
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
@@ -50,16 +58,17 @@ public class DbMigrationTest extends BaseTestCase {
         "migtest_fk_set_null",
         "migtest_mtm_c",
         "migtest_mtm_m",
+        "migtest_mtm_m_phone_numbers",
         "migtest_mtm_c_migtest_mtm_m",
         "migtest_mtm_m_migtest_mtm_c",
         "migtest_oto_child",
         "migtest_oto_master");
 
-    if (isSqlServer()) { //  || isMySql()
-      runScript(false, "I__create_procs.sql");
+    if (isSqlServer() || isMariaDB()) { //  || isMySql()
+      runScript("I__create_procs.sql");
     }
 
-    runScript(false, "1.0__initial.sql");
+    runScript("1.0__initial.sql");
 
     if (isOracle() || isHana()) {
       SqlUpdate update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1)");
@@ -80,7 +89,7 @@ public class DbMigrationTest extends BaseTestCase {
     createHistoryEntities();
 
     // Run migration
-    runScript(false, "1.1.sql");
+    runScript("1.1.sql");
     List<SqlRow> result = server().sqlQuery("select * from migtest_e_basic order by id").findList();
     assertThat(result).hasSize(2);
 
@@ -104,24 +113,20 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(row.getBoolean("new_boolean_field2")).isTrue();
     //assertThat(row.getTimestamp("some_date")).isCloseTo(new Date(), 60_000); // allow 1 minute delta
 
-    runScript(false, "1.2__dropsFor_1.1.sql");
+    runScript("1.2__dropsFor_1.1.sql");
 
     // Oracle caches the statement and does not detect schema change. It fails with
     // an ORA-01007
-    if (isOracle()) {
-      result = server().sqlQuery("select * from migtest_e_basic order by id,id").findList();
-    } else {
-      result = server().sqlQuery("select * from migtest_e_basic order by id").findList();
-    }
+    result = server().sqlQuery("select * from migtest_e_basic order by id,status").findList();
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).doesNotContain("old_boolean", "old_boolean2");
 
-    runScript(false, "1.3.sql");
-    runScript(false, "1.4__dropsFor_1.3.sql");
+    runScript("1.3.sql");
+    runScript("1.4__dropsFor_1.3.sql");
 
-    // now DB structure shoud be the same as v1_0
-    result = server().sqlQuery("select * from migtest_e_basic order by id").findList();
+    // now DB structure shoud be the same as v1_0 - perform a diffent query.
+    result = server().sqlQuery("select * from migtest_e_basic order by id,name").findList();
     assertThat(result).hasSize(2);
     row = result.get(0);
     assertThat(row.keySet()).contains("old_boolean", "old_boolean2");
@@ -184,8 +189,7 @@ public class DbMigrationTest extends BaseTestCase {
       sb.append("drop view ").append(table).append("_with_history;\n");
       sb.append("drop sequence ").append(table).append("_seq;\n");
     }
-
-    runScript(true, sb.toString(), "cleanup");
-    runScript(true, sb.toString(), "cleanup");
+    server().script().runScript("cleanup", sb.toString(), true);
+    server().script().runScript("cleanup", sb.toString(), true);
   }
 }
