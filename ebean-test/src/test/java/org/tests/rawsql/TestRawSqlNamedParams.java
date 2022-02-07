@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestRawSqlNamedParams extends BaseTestCase {
 
@@ -43,9 +44,12 @@ public class TestRawSqlNamedParams extends BaseTestCase {
 
     Transaction transaction = DB.beginTransaction();
 
+    System.out.println(transaction.connection().getMetaData().getDriverName());
     try {
-      if ("MariaDB connector/J".equals(transaction.connection().getMetaData().getDriverName())) {
-        return; // MariaDb only supports callable statements in the form "? = call function x(?)"
+      if ("MariaDB Connector/J".equals(transaction.connection().getMetaData().getDriverName())) {
+        // CHECKME: Should we report/fail if we are running mysql-tests with mariadb driver
+        // BTW: This happens with java 8 - the drivers in drivermanager are in different order 
+        return; // MariaDB Connector/J only supports callable statements in the form "? = call function x(?)"
       }
       CallableSql callableSql = DB.createCallableSql("set @total = 0");
       DB.getDefault().execute(callableSql);
