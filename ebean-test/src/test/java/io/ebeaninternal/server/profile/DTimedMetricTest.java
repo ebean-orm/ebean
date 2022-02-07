@@ -12,7 +12,7 @@ public class DTimedMetricTest {
     DTimedMetric metric = new DTimedMetric("addSinceNanos");
 
     long start = System.nanoTime();
-    Thread.sleep(10);
+    Thread.sleep(11);
 
     metric.addSinceNanos(start);
 
@@ -35,7 +35,7 @@ public class DTimedMetricTest {
     DTimedMetric metric = new DTimedMetric("addSinceNanos");
 
     long start = System.nanoTime();
-    Thread.sleep(10);
+    Thread.sleep(11);
 
     metric.addBatchSince(start, 5);
 
