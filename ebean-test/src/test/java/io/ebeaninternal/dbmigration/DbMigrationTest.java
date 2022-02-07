@@ -38,8 +38,9 @@ public class DbMigrationTest extends BaseTestCase {
   }
 
 
-  @IgnorePlatform({Platform.ORACLE, Platform.NUODB, Platform.POSTGRES})
+  @IgnorePlatform({Platform.ORACLE, Platform.NUODB, Platform.POSTGRES, Platform.YUGABYTE})
   // Note: Postgres locks up on build server
+  // Note: YUGABYTE complains on "alter table migtest_e_basic alter column status set not null;"
   @Test
   public void testRunMigration() throws IOException {
     // first clean up previously created objects
