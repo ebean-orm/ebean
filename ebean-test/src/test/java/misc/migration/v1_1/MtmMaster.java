@@ -1,5 +1,6 @@
 package misc.migration.v1_1;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
@@ -18,6 +19,9 @@ public class MtmMaster {
   @ManyToMany
   List<MtmChild> children;
 
+  @ElementCollection
+  List<String> phoneNumbers;
+  
   public Long getId() {
     return id;
   }
