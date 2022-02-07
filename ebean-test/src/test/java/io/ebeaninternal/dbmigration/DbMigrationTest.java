@@ -87,7 +87,7 @@ public class DbMigrationTest extends BaseTestCase {
     ((ConnectionPool)server().dataSource()).offline();
     ((ConnectionPool)server().dataSource()).online();
     
-    if (isSqlServer() || isMariaDB()) { //  || isMySql()
+    if (isSqlServer() || isMariaDB() || isMySql()) {
       runScript("I__create_procs.sql");
     }
 

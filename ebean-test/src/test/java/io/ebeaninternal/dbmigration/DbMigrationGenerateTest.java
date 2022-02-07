@@ -20,7 +20,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 /**
- * This is the Migrationscript generator. It generates 3 migrationscript for the models
+ * This is the Migrationscript generator. It will generate migrationscripts for all platforms.
+ * It uses the packages 'misc.migration'
+ * <ul>
+ * <li><code>misc.migration.v1_0</code> Initial package.
+ * <li><code>misc.migration.v1_1</code> modified v1_0 - every migration change, that ebean supports should be done here.
+ * <li><code>misc.migration.v1_2</code> This is (nearly) the same as v1_0 and simulates every migration change in the other way
+ * </ul>
+ * 
+ * Changes in the migration scripts should be committed after they are reviewed (changes may be legitime or show, that something is broken).
+ * The {@link DbMigrationTest} will execute the generated scripts for various platforms.
  * @author Roland Praml, FOCONIS AG
  *
  */
