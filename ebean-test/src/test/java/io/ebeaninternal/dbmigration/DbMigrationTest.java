@@ -5,15 +5,23 @@ import io.ebean.SqlRow;
 import io.ebean.SqlUpdate;
 import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.datasource.pool.ConnectionPool;
+
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * This testcase tries to apply the migrationtests that are genearated by {@link DbMigrationGenerateTest}.
+ * @author Roland Praml, FOCONIS AG
+ *
+ */
 public class DbMigrationTest extends BaseTestCase {
 
   private void runScript(String scriptName) throws IOException {
@@ -30,12 +38,20 @@ public class DbMigrationTest extends BaseTestCase {
     assertThat(LastMigration.nextVersion(d, null, true)).isEqualTo("1.4");
   }
 
-  @IgnorePlatform({Platform.ORACLE, Platform.NUODB, Platform.POSTGRES, Platform.YUGABYTE})
+  @IgnorePlatform({
+    Platform.DB2, // currently does not work due missing reorg feature
+    //Platform.CLICKHOUSE, // test(s) do not start at all
+    //Platform.COCKROACH, // does not see applied DDL? commit missing?
+    // Platform.NUODB nuodb container does not start
+  })
+    //Platform.ORACLE, Platform.NUODB, Platform.POSTGRES, Platform.YUGABYTE})
   // Note: Postgres locks up on build server
   // Note: YUGABYTE complains on "alter table migtest_e_basic alter column status set not null;"
   @Test
-  public void testRunMigration() throws IOException {
-    // first clean up previously created objects
+  public void testRunMigration() throws IOException, SQLException {
+    // Shutdown and reconnect - this prevents postgres from lock up
+    ((ConnectionPool)server().dataSource()).offline();
+    ((ConnectionPool)server().dataSource()).online();
     cleanup("migtest_ckey_assoc",
         "migtest_ckey_detail",
         "migtest_ckey_parent",
@@ -63,7 +79,9 @@ public class DbMigrationTest extends BaseTestCase {
         "migtest_mtm_m_migtest_mtm_c",
         "migtest_oto_child",
         "migtest_oto_master");
-
+    ((ConnectionPool)server().dataSource()).offline();
+    ((ConnectionPool)server().dataSource()).online();
+    
     if (isSqlServer() || isMariaDB()) { //  || isMySql()
       runScript("I__create_procs.sql");
     }

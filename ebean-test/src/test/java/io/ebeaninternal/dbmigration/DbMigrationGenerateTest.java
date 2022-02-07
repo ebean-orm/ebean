@@ -52,9 +52,12 @@ public class DbMigrationGenerateTest {
 
     migration.addPlatform(Platform.CLICKHOUSE);
     migration.addPlatform(Platform.COCKROACH);
-    migration.addPlatform(Platform.DB2FORI);
-    migration.addPlatform(Platform.DB2LUW);
-    migration.addPlatform(Platform.DB2ZOS);
+    // for platforms like DB2-LUW, we specify the exact platform in the migration path
+    // see https://github.com/ebean-orm/ebean-migration/issues/102
+    migration.addPlatform(Platform.DB2LUW, "db2luw");
+    migration.addPlatform(Platform.DB2FORI, "db2fori"); 
+    migration.addPlatform(Platform.DB2ZOS, "db2zos");
+    migration.addPlatform(Platform.DB2, "db2legacy");
     migration.addPlatform(Platform.GENERIC);
     migration.addPlatform(Platform.H2);
     migration.addPlatform(Platform.HANA);
@@ -62,16 +65,16 @@ public class DbMigrationGenerateTest {
     migration.addPlatform(Platform.MARIADB);
     migration.addPlatform(Platform.MARIADB, "mariadb-noprocs");
     migration.addPlatform(Platform.MYSQL);
-    migration.addPlatform(Platform.MYSQL55);
+    migration.addPlatform(Platform.MYSQL55, "mysql55");
     migration.addPlatform(Platform.NUODB);
     migration.addPlatform(Platform.ORACLE);
-    migration.addPlatform(Platform.ORACLE11);
+    migration.addPlatform(Platform.ORACLE11, "oracle11"); // uses sequences
     migration.addPlatform(Platform.POSTGRES);
-    migration.addPlatform(Platform.POSTGRES9);
+    migration.addPlatform(Platform.POSTGRES9, "postgres9"); // different DDL as base!
     migration.addPlatform(Platform.SQLANYWHERE);
     migration.addPlatform(Platform.SQLITE);
-    migration.addPlatform(Platform.SQLSERVER16);
-    migration.addPlatform(Platform.SQLSERVER17);
+    migration.addPlatform(Platform.SQLSERVER16, "sqlserver16");
+    migration.addPlatform(Platform.SQLSERVER17, "sqlserver17");
     migration.addPlatform(Platform.YUGABYTE);
 
 
