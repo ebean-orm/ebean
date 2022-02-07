@@ -5,6 +5,7 @@ import io.ebean.Database;
 import io.ebean.Transaction;
 import org.tests.model.basic.Order.Status;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -213,9 +214,9 @@ public class ResetBasicData {
     order.setOrderDate(Date.valueOf("2018-07-01"));
 
     List<OrderDetail> details = new ArrayList<>();
-    details.add(new OrderDetail(product1, 5, 10.50));
-    details.add(new OrderDetail(product2, 3, 1.10));
-    details.add(new OrderDetail(product3, 1, 2.00));
+    details.add(new OrderDetail(product1, 5, BigDecimal.valueOf(10.50)));
+    details.add(new OrderDetail(product2, 3, BigDecimal.valueOf(1.10)));
+    details.add(new OrderDetail(product3, 1, BigDecimal.valueOf(2.00)));
     order.setDetails(details);
     order.addShipment(new OrderShipment());
     DB.save(order);
@@ -231,7 +232,7 @@ public class ResetBasicData {
     order.setOrderDate(Date.valueOf("2018-06-01"));
 
     List<OrderDetail> details = new ArrayList<>();
-    details.add(new OrderDetail(product1, 4, 10.50));
+    details.add(new OrderDetail(product1, 4, BigDecimal.valueOf(10.50)));
     order.setDetails(details);
     order.addShipment(new OrderShipment());
     DB.save(order);
@@ -247,9 +248,9 @@ public class ResetBasicData {
     order.setOrderDate(Date.valueOf("2018-07-02"));
 
     List<OrderDetail> details = new ArrayList<>();
-    details.add(new OrderDetail(product1, 3, 10.50));
-    details.add(new OrderDetail(product3, 40, 2.10));
-    details.add(new OrderDetail(product1, 5, 10.00));
+    details.add(new OrderDetail(product1, 3, BigDecimal.valueOf(10.50)));
+    details.add(new OrderDetail(product3, 40, BigDecimal.valueOf(2.10)));
+    details.add(new OrderDetail(product1, 5, BigDecimal.valueOf(10.00)));
     order.setDetails(details);
     order.addShipment(new OrderShipment());
     DB.save(order);

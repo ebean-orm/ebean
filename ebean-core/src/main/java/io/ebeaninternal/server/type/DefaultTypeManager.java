@@ -209,7 +209,8 @@ public final class DefaultTypeManager implements TypeManager {
 
   private boolean isPostgresCompatible(DatabasePlatform databasePlatform) {
     return databasePlatform.isPlatform(Platform.POSTGRES)
-      || databasePlatform.isPlatform(Platform.YUGABYTE);
+      || databasePlatform.isPlatform(Platform.YUGABYTE)
+      || databasePlatform.isPlatform(Platform.COCKROACH);
   }
 
   private boolean hstoreSupport() {

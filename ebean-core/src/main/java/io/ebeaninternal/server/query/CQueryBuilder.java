@@ -757,7 +757,7 @@ final class CQueryBuilder {
   }
 
   boolean isPlatformDistinctOn() {
-    return dbPlatform.isPlatform(Platform.POSTGRES) || dbPlatform.isPlatform(Platform.YUGABYTE);
+    return dbPlatform.isPlatform(Platform.POSTGRES) || dbPlatform.isPlatform(Platform.YUGABYTE) || dbPlatform.isPlatform(Platform.COCKROACH);
   }
 
   boolean isPlatformDistinctNoLobs() {

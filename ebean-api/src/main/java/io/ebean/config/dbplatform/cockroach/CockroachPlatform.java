@@ -11,10 +11,6 @@ public class CockroachPlatform extends PostgresPlatform {
   public CockroachPlatform() {
     super();
     this.platform = Platform.COCKROACH;
-    // no like escape clause supported
-    this.likeSpecialCharacters = new char[]{'%', '_'};
-    this.likeClauseRaw = "like ?";
-    this.likeClauseEscaped = "like ?";
   }
 
   /**
@@ -22,7 +18,7 @@ public class CockroachPlatform extends PostgresPlatform {
    */
   @Override
   public boolean isDdlAutoCommit() {
-    return true;
+    return false;
   }
 
 }

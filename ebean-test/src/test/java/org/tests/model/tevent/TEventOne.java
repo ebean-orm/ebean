@@ -3,6 +3,7 @@ package org.tests.model.tevent;
 import io.ebean.annotation.Aggregation;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -33,10 +34,10 @@ public class TEventOne {
   Long count;
 
   @Aggregation("sum(logs.myUnits)")
-  Double totalUnits;
+  BigDecimal totalUnits;
 
   @Aggregation("sum(logs.myUnits * logs.amount)")
-  Double totalAmount;
+  BigDecimal totalAmount;
 
   @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
   List<TEventMany> logs;
@@ -72,11 +73,11 @@ public class TEventOne {
     return customFormula;
   }
 
-  public Double getTotalUnits() {
+  public BigDecimal getTotalUnits() {
     return totalUnits;
   }
 
-  public Double getTotalAmount() {
+  public BigDecimal getTotalAmount() {
     return totalAmount;
   }
 

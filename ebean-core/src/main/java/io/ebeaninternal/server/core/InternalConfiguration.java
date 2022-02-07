@@ -283,7 +283,7 @@ public final class InternalConfiguration {
 
   private MultiValueBind createMultiValueBind(Platform platform) {
     // only Postgres at this stage
-    if (platform.base() == Platform.POSTGRES || platform.base() == Platform.YUGABYTE) {
+    if (platform.base() == Platform.POSTGRES || platform.base() == Platform.YUGABYTE || platform.base() == Platform.COCKROACH) {
       return new PostgresMultiValueBind();
     }
     return new MultiValueBind();
