@@ -17,6 +17,11 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
+create table migtest_mtm_m_phone_numbers (
+  migtest_mtm_m_id              bigint not null,
+  value                         varchar(255) not null
+);
+
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 
@@ -60,6 +65,7 @@ alter table migtest_e_history modify test_string bigint;
 alter table migtest_e_history comment = 'We have history now';
 
 -- NOTE: table has @History - special migration may be necessary
+SET @@system_versioning_alter_history = 1;
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 alter test_string set default 'unknown';
 alter table migtest_e_history2 modify test_string varchar(255) not null;
@@ -95,6 +101,9 @@ alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_
 
 create index ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c on migtest_mtm_m_migtest_mtm_c (migtest_mtm_c_id);
 alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
+
+create index ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id on migtest_mtm_m_phone_numbers (migtest_mtm_m_id);
+alter table migtest_mtm_m_phone_numbers add constraint fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict on update restrict;
 
 create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
 alter table migtest_ckey_parent add constraint fk_migtest_ckey_parent_assoc_id foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict on update restrict;

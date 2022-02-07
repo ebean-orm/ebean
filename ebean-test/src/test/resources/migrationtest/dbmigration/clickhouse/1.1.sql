@@ -14,6 +14,11 @@ create table migtest_mtm_m_migtest_mtm_c (
   migtest_mtm_c_id              UInt32
 ) ENGINE = Log();
 
+create table migtest_mtm_m_phone_numbers (
+  migtest_mtm_m_id              UInt64,
+  value                         String
+) ENGINE = Log();
+
 alter table migtest_ckey_detail add column one_key UInt32;
 alter table migtest_ckey_detail add column two_key String;
 

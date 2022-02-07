@@ -19,5 +19,6 @@
         <dropTable name="migtest_e_user" sequenceCol="id"/>
         <dropTable name="migtest_mtm_c_migtest_mtm_m"/>
         <dropTable name="migtest_mtm_m_migtest_mtm_c"/>
+        <dropTable name="migtest_mtm_m_phone_numbers"/>
     </changeSet>
 </migration>

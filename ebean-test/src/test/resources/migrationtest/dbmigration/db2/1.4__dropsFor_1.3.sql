@@ -32,3 +32,4 @@ drop table migtest_e_user;
 drop sequence migtest_e_user_seq;
 drop table migtest_mtm_c_migtest_mtm_m;
 drop table migtest_mtm_m_migtest_mtm_c;
+drop table migtest_mtm_m_phone_numbers;

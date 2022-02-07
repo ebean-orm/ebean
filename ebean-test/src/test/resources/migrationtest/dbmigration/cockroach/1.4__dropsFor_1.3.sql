@@ -36,3 +36,4 @@ drop table if exists migtest_e_user cascade;
 drop sequence if exists migtest_e_user_seq;
 drop table if exists migtest_mtm_c_migtest_mtm_m cascade;
 drop table if exists migtest_mtm_m_migtest_mtm_c cascade;
+drop table if exists migtest_mtm_m_phone_numbers cascade;

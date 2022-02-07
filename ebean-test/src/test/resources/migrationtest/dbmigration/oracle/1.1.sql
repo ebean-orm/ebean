@@ -18,6 +18,11 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
+create table migtest_mtm_m_phone_numbers (
+  migtest_mtm_m_id              number(19) not null,
+  value                         varchar2(255) not null
+);
+
 alter table migtest_ckey_detail add one_key number(10);
 alter table migtest_ckey_detail add two_key varchar2(127);
 
@@ -103,6 +108,9 @@ alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mtm_m_mgtst_mt_g
 
 create index ix_mgtst_mtm_m_mgtst_mt_b7nbck on migtest_mtm_m_migtest_mtm_c (migtest_mtm_c_id);
 alter table migtest_mtm_m_migtest_mtm_c add constraint fk_mgtst_mtm_m_mgtst_mt_ggi34a foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
+
+create index ix_mgtst_mtm_m_phn_nmbr_do9ma3 on migtest_mtm_m_phone_numbers (migtest_mtm_m_id);
+alter table migtest_mtm_m_phone_numbers add constraint fk_mgtst_mtm_m_phn_nmbr_s8neid foreign key (migtest_mtm_m_id) references migtest_mtm_m (id);
 
 create index ix_mgtst_cky_prnt_ssc_d on migtest_ckey_parent (assoc_id);
 alter table migtest_ckey_parent add constraint fk_mgtst_cky_prnt_ssc_d foreign key (assoc_id) references migtest_ckey_assoc (id);

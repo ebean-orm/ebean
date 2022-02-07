@@ -16,6 +16,10 @@
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="'A'" notnull="true" currentNotnull="false" checkConstraint="check ( status in ('N','A','I','?'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="status2" tableName="migtest_e_basic" type="varchar(127)" currentType="varchar(1)" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true" dropCheckConstraint="ck_migtest_e_basic_status2"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
+            <before platforms="db2">
+                <ddl>-- db2 does not support parial null indices :( - so we have to clean</ddl>
+                <ddl>update ${table} set status = 'N' where id = 1</ddl>
+            </before>
             <before>
                 <ddl>-- rename all collisions</ddl>
             </before>
@@ -50,7 +54,15 @@
             </before>
         </alterColumn>
         <addTableComment name="migtest_e_history" comment="We have history now"/>
-        <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false">
+            <before platforms="mariadb">
+                <ddl>SET @@system_versioning_alter_history = 1</ddl>
+                <ddl>update ${table} set ${column} = 'unknown' where ${column} is null</ddl>
+            </before>
+            <before>
+                <ddl>update ${table} set ${column} = 'unknown' where ${column} is null</ddl>
+            </before>
+        </alterColumn>
         <addColumn tableName="migtest_e_history2" withHistory="true">
             <column name="test_string2" type="varchar" historyExclude="true"/>
             <column name="test_string3" type="varchar" defaultValue="'unknown'" notnull="true"/>
@@ -80,6 +92,10 @@
             <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
             <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m"/>
             <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c"/>
+        </createTable>
+        <createTable name="migtest_mtm_m_phone_numbers" pkName="pk_migtest_mtm_m_phone_numbers">
+            <column name="migtest_mtm_m_id" type="bigint" notnull="true" references="migtest_mtm_m.id" foreignKeyName="fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" foreignKeyIndex="ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id"/>
+            <column name="value" type="varchar" notnull="true"/>
         </createTable>
         <addColumn tableName="migtest_oto_child">
             <column name="master_id" type="bigint" uniqueOneToOne="uq_migtest_oto_child_master_id" references="migtest_oto_master.id" foreignKeyName="fk_migtest_oto_child_master_id"/>

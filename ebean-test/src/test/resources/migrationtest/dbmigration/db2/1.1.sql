@@ -17,6 +17,11 @@ create table migtest_mtm_m_migtest_mtm_c (
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
+create table migtest_mtm_m_phone_numbers (
+  migtest_mtm_m_id              bigint not null,
+  value                         varchar(255) not null
+);
+
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 
@@ -40,7 +45,8 @@ alter table migtest_e_basic alter column status2 set data type varchar(127);
 alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 
--- rename all collisions;
+-- db2 does not support parial null indices :( - so we have to clean;
+update migtest_e_basic set status = 'N' where id = 1;
 create unique index uq_migtest_e_basic_description on migtest_e_basic(description) exclude null keys;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
@@ -102,6 +108,9 @@ alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_
 
 create index ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c on migtest_mtm_m_migtest_mtm_c (migtest_mtm_c_id);
 alter table migtest_mtm_m_migtest_mtm_c add constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict;
+
+create index ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id on migtest_mtm_m_phone_numbers (migtest_mtm_m_id);
+alter table migtest_mtm_m_phone_numbers add constraint fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id foreign key (migtest_mtm_m_id) references migtest_mtm_m (id) on delete restrict;
 
 create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
 alter table migtest_ckey_parent add constraint fk_migtest_ckey_parent_assoc_id foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict;
