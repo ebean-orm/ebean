@@ -43,6 +43,11 @@ public class DbMigrationTest extends BaseTestCase {
     //Platform.CLICKHOUSE, // test(s) do not start at all
     //Platform.COCKROACH, // does not see applied DDL? commit missing?
     // Platform.NUODB nuodb container does not start
+    
+    // Yugabyte does not see column updates on table alters:
+    // update table T set C = 'value'; alter table T alter column C set not null -> error column C has null values
+    // do we need a commit after update?
+    Platform.YUGABYTE, 
   })
     //Platform.ORACLE, Platform.NUODB, Platform.POSTGRES, Platform.YUGABYTE})
   // Note: Postgres locks up on build server
