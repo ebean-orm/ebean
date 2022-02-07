@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply" dropsFor="1.3">
+        <dropColumn columnName="one_key" tableName="migtest_ckey_detail"/>
+        <dropColumn columnName="two_key" tableName="migtest_ckey_detail"/>
+        <dropColumn columnName="assoc_id" tableName="migtest_ckey_parent"/>
+        <dropColumn columnName="new_string_field" tableName="migtest_e_basic"/>
+        <dropColumn columnName="new_boolean_field" tableName="migtest_e_basic"/>
+        <dropColumn columnName="new_boolean_field2" tableName="migtest_e_basic"/>
+        <dropColumn columnName="progress" tableName="migtest_e_basic"/>
+        <dropColumn columnName="new_integer" tableName="migtest_e_basic"/>
+        <dropHistoryTable baseTable="migtest_e_history"/>
+        <dropColumn columnName="test_string2" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="test_string3" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="new_column" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="test_boolean" tableName="migtest_e_history5" withHistory="true"/>
+        <dropColumn columnName="deleted" tableName="migtest_e_softdelete"/>
+        <dropColumn columnName="master_id" tableName="migtest_oto_child"/>
+        <dropTable name="migtest_e_user" sequenceCol="id"/>
+        <dropTable name="migtest_mtm_c_migtest_mtm_m"/>
+        <dropTable name="migtest_mtm_m_migtest_mtm_c"/>
+    </changeSet>
+</migration>

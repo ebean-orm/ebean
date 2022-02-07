@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+    <changeSet type="apply" dropsFor="1.1">
+        <dropColumn columnName="old_boolean" tableName="migtest_e_basic"/>
+        <dropColumn columnName="old_boolean2" tableName="migtest_e_basic"/>
+        <dropColumn columnName="eref_id" tableName="migtest_e_basic"/>
+        <dropColumn columnName="obsolete_string1" tableName="migtest_e_history2" withHistory="true"/>
+        <dropColumn columnName="obsolete_string2" tableName="migtest_e_history2" withHistory="true"/>
+        <dropTable name="migtest_e_ref" sequenceCol="id"/>
+    </changeSet>
+</migration>
