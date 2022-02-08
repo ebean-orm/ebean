@@ -4,8 +4,6 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
-
 /**
  * MySql history support using DB triggers to maintain a history table.
  */
@@ -15,13 +13,13 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
-  protected void dropTriggers(DdlBuffer buffer, String baseTable) throws IOException {
+  protected void dropTriggers(DdlBuffer buffer, String baseTable) {
     buffer.append("drop trigger ").append(updateTriggerName(baseTable)).endOfStatement();
     buffer.append("drop trigger ").append(deleteTriggerName(baseTable)).endOfStatement();
   }
 
   @Override
-  protected void createTriggers(DdlWrite writer, MTable table) throws IOException {
+  protected void createTriggers(DdlWrite writer, MTable table) {
 
     DbTriggerUpdate update = createDbTriggerUpdate(writer, table);
 
@@ -30,7 +28,7 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
-  protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
+  protected void updateHistoryTriggers(DbTriggerUpdate update) {
 
     recreateHistoryView(update);
 
@@ -42,7 +40,7 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
     addBeforeDelete(deleteTriggerName(baseTable), update);
   }
 
-  private void addBeforeUpdate(String triggerName, DbTriggerUpdate update) throws IOException {
+  private void addBeforeUpdate(String triggerName, DbTriggerUpdate update) {
 
     DdlBuffer apply = update.historyTriggerBuffer();
     apply
@@ -55,7 +53,7 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
       .append("end$$").newLine();
   }
 
-  private void addBeforeDelete(String triggerName, DbTriggerUpdate update) throws IOException {
+  private void addBeforeDelete(String triggerName, DbTriggerUpdate update) {
 
     DdlBuffer apply = update.historyTriggerBuffer();
     apply

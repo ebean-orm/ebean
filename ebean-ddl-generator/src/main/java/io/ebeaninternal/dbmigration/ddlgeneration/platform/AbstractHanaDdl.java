@@ -7,7 +7,6 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,31 +51,27 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
       : (alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue());
     String defaultValueClause = (defaultValue == null || defaultValue.isEmpty()) ? "" : " default " + defaultValue;
 
-    try {
-      DdlBuffer buffer = new BaseDdlBuffer(null);
-      if (!isConvertible(currentType, type)) {
-        // add an intermediate conversion if possible
-        if (isNumberType(currentType)) {
-          // numbers can always be converted to decimal
-          buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-            .append(" decimal ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
-            .endOfStatement();
+    DdlBuffer buffer = new BaseDdlBuffer(null);
+    if (!isConvertible(currentType, type)) {
+      // add an intermediate conversion if possible
+      if (isNumberType(currentType)) {
+        // numbers can always be converted to decimal
+        buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
+          .append(" decimal ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
+          .endOfStatement();
 
-        } else if (isStringType(currentType)) {
-          // strings can always be converted to nclob
-          buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-            .append(" nclob ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
-            .endOfStatement();
-        }
+      } else if (isStringType(currentType)) {
+        // strings can always be converted to nclob
+        buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
+          .append(" nclob ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
+          .endOfStatement();
       }
-
-      buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-        .append(" ").append(type).append(defaultValueClause).append(notnullClause).append(alterColumnSuffix);
-
-      return buffer.getBuffer();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
     }
+
+    buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
+      .append(" ").append(type).append(defaultValueClause).append(notnullClause).append(alterColumnSuffix);
+
+    return buffer.getBuffer();
   }
 
   @Override
@@ -121,19 +116,16 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
   @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
     DdlBuffer buffer = new BaseDdlBuffer(null);
-    try {
-      buffer.append("delimiter $$").newLine();
-      buffer.append("do").newLine();
-      buffer.append("begin").newLine();
-      buffer.append("declare exit handler for sql_error_code 397 begin end").endOfStatement();
-      buffer.append("exec 'alter table ").append(tableName).append(" ").append(dropUniqueConstraint).append(" ")
-        .append(maxConstraintName(uniqueConstraintName)).append("'").endOfStatement();
-      buffer.append("end").endOfStatement();
-      buffer.append("$$");
-      return buffer.getBuffer();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+
+    buffer.append("delimiter $$").newLine();
+    buffer.append("do").newLine();
+    buffer.append("begin").newLine();
+    buffer.append("declare exit handler for sql_error_code 397 begin end").endOfStatement();
+    buffer.append("exec 'alter table ").append(tableName).append(" ").append(dropUniqueConstraint).append(" ")
+      .append(maxConstraintName(uniqueConstraintName)).append("'").endOfStatement();
+    buffer.append("end").endOfStatement();
+    buffer.append("$$");
+    return buffer.getBuffer();
   }
 
   @Override
@@ -146,7 +138,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
    * foreign keys. That's why we call a user stored procedure here
    */
   @Override
-  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) {
     buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')")
       .endOfStatement();
   }

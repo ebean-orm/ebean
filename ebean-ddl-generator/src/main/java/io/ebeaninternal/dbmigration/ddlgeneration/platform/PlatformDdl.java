@@ -21,7 +21,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -234,7 +233,7 @@ public class PlatformDdl {
   /**
    * Write all the table columns converting to platform types as necessary.
    */
-  public void writeTableColumns(DdlBuffer apply, List<Column> columns, DdlIdentity identity) throws IOException {
+  public void writeTableColumns(DdlBuffer apply, List<Column> columns, DdlIdentity identity) {
     for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
         apply.append(",");
@@ -258,7 +257,7 @@ public class PlatformDdl {
   /**
    * Write the column definition to the create table statement.
    */
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) throws IOException {
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) {
 
     String columnDefn = convert(column.getType());
     if (identity.useIdentity() && isTrue(column.isPrimaryKey())) {
@@ -285,7 +284,7 @@ public class PlatformDdl {
   /**
    * Allow for platform overriding (e.g. ClickHouse).
    */
-  protected void writeColumnNotNull(DdlBuffer buffer) throws IOException {
+  protected void writeColumnNotNull(DdlBuffer buffer) {
     buffer.append(" not null");
   }
 
@@ -337,28 +336,28 @@ public class PlatformDdl {
   /**
    * Add history support to this table using the platform specific mechanism.
    */
-  public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
+  public void createWithHistory(DdlWrite writer, MTable table) {
     historyDdl.createWithHistory(writer, table);
   }
 
   /**
    * Drop history support for a given table.
    */
-  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     historyDdl.dropHistoryTable(writer, dropHistoryTable);
   }
 
   /**
    * Add history support to an existing table.
    */
-  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) {
     historyDdl.addHistoryTable(writer, addHistoryTable);
   }
 
   /**
    * Regenerate the history triggers (or function) due to a column being added/dropped/excluded or included.
    */
-  public void regenerateHistoryTriggers(DdlWrite write, HistoryTableUpdate update) throws IOException {
+  public void regenerateHistoryTriggers(DdlWrite write, HistoryTableUpdate update) {
     historyDdl.updateTriggers(write, update);
   }
 
@@ -521,7 +520,7 @@ public class PlatformDdl {
     return buffer.toString();
   }
 
-  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
+  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
 
     String convertedType = convert(column.getType());
 
@@ -558,7 +557,7 @@ public class PlatformDdl {
 
   }
 
-  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) {
     buffer.append("alter table ").append(tableName).append(" ").append(dropColumn).append(" ").append(columnName)
       .append(dropColumnSuffix).endOfStatement();
   }
@@ -676,21 +675,21 @@ public class PlatformDdl {
   /**
    * Add an inline table comment to the create table statement.
    */
-  public void inlineTableComment(DdlBuffer apply, String tableComment) throws IOException {
+  public void inlineTableComment(DdlBuffer apply, String tableComment) {
     // do nothing by default (MySql only)
   }
 
   /**
    * Add an table storage engine to the create table statement.
    */
-  public void tableStorageEngine(DdlBuffer apply, String storageEngine) throws IOException {
+  public void tableStorageEngine(DdlBuffer apply, String storageEngine) {
     // do nothing by default
   }
 
   /**
    * Add table comment as a separate statement (from the create table statement).
    */
-  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) {
     if (DdlHelp.isDropComment(tableComment)) {
       tableComment = "";
     }
@@ -700,7 +699,7 @@ public class PlatformDdl {
   /**
    * Add column comment as a separate statement.
    */
-  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
+  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) {
     if (DdlHelp.isDropComment(comment)) {
       comment = "";
     }
@@ -710,14 +709,14 @@ public class PlatformDdl {
   /**
    * Use this to generate a prolog for each script (stored procedures)
    */
-  public void generateProlog(DdlWrite write) throws IOException {
+  public void generateProlog(DdlWrite write) {
 
   }
 
   /**
    * Use this to generate an epilog. Will be added at the end of script
    */
-  public void generateEpilog(DdlWrite write) throws IOException {
+  public void generateEpilog(DdlWrite write) {
 
   }
 
@@ -743,14 +742,14 @@ public class PlatformDdl {
   /**
    * Mysql-specific: Locks all tables for triggers that have to be updated.
    */
-  public void lockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+  public void lockTables(DdlBuffer buffer, Collection<String> tables) {
 
   }
 
   /**
    * Mysql-specific: Unlocks all tables for triggers that have to be updated.
    */
-  public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+  public void unlockTables(DdlBuffer buffer, Collection<String> tables) {
 
   }
 
@@ -769,7 +768,7 @@ public class PlatformDdl {
     return false;
   }
 
-  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
+  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) {
     // only supported by postgres initially
   }
 }

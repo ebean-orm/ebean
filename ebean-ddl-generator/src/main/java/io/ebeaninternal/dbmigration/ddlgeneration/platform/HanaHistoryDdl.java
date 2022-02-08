@@ -8,7 +8,6 @@ import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +31,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
+  public void createWithHistory(DdlWrite writer, MTable table) {
     String tableName = table.getName();
     String historyTableName = tableName + historySuffix;
     DdlBuffer apply = writer.applyHistoryView();
@@ -73,12 +72,12 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     dropHistoryTable(writer.applyDropDependencies(), dropHistoryTable.getBaseTable(),
       dropHistoryTable.getBaseTable() + historySuffix);
   }
 
-  protected void dropHistoryTable(DdlBuffer apply, String baseTable, String historyTable) throws IOException {
+  protected void dropHistoryTable(DdlBuffer apply, String baseTable, String historyTable) {
     // disable system versioning
     disableSystemVersioning(apply, baseTable);
 
@@ -93,7 +92,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) {
     MTable table = writer.getTable(addHistoryTable.getBaseTable());
     if (table == null) {
       throw new IllegalStateException("MTable " + addHistoryTable.getBaseTable() + " not found in writer? (required for history DDL)");
@@ -107,7 +106,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected void writeColumnDefinition(DdlBuffer buffer, String columnName, String type, String defaultValue,
-                                       boolean isNotNull, String generated) throws IOException {
+                                       boolean isNotNull, String generated) {
 
     String platformType = platformDdl.convert(type);
     buffer.append(" ").append(platformDdl.lowerColumnName(columnName));
@@ -123,11 +122,11 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
     }
   }
 
-  public void disableSystemVersioning(DdlBuffer apply, String tableName) throws IOException {
+  public void disableSystemVersioning(DdlBuffer apply, String tableName) {
     disableSystemVersioning(apply, tableName, false);
   }
 
-  public void disableSystemVersioning(DdlBuffer apply, String tableName, boolean uniqueStatement) throws IOException {
+  public void disableSystemVersioning(DdlBuffer apply, String tableName, boolean uniqueStatement) {
     apply.append("alter table ").append(tableName).append(" drop system versioning");
     if (uniqueStatement) {
       // needed for the DB migration test to prevent the statement from being filtered
@@ -138,7 +137,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   public void enableSystemVersioning(DdlBuffer apply, String tableName, String historyTableName, boolean validated,
-                                     boolean uniqueStatement) throws IOException {
+                                     boolean uniqueStatement) {
     apply.append("alter table ").append(tableName).append(" add system versioning history table ").append(historyTableName);
     if (!validated) {
       apply.append(" not validated");

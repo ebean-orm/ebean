@@ -3,8 +3,6 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 
-import java.io.IOException;
-
 /**
  * Postgres specific DDL.
  */
@@ -40,7 +38,7 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
-  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
+  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) {
     apply.append(" partition by range (").append(partitionColumn).append(")");
   }
 

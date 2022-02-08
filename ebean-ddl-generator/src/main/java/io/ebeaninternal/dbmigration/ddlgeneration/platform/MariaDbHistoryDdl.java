@@ -7,8 +7,6 @@ import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
-
 /**
  * History DDL for MariaDB.
  */
@@ -20,12 +18,12 @@ public class MariaDbHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
+  public void createWithHistory(DdlWrite writer, MTable table) {
     String baseTable = table.getName();
     enableSystemVersioning(writer, baseTable);
   }
 
-  private void enableSystemVersioning(DdlWrite writer, String baseTable) throws IOException {
+  private void enableSystemVersioning(DdlWrite writer, String baseTable) {
     DdlBuffer apply = writer.applyHistoryView();
     apply.append("alter table ").append(baseTable).append(" add system versioning").endOfStatement();
 
@@ -34,14 +32,14 @@ public class MariaDbHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     String baseTable = dropHistoryTable.getBaseTable();
     DdlBuffer apply = writer.applyHistoryView();
     apply.append("alter table ").append(baseTable).append(" drop system versioning").endOfStatement();
   }
 
   @Override
-  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) {
     String baseTable = addHistoryTable.getBaseTable();
     enableSystemVersioning(writer, baseTable);
   }
