@@ -29,7 +29,7 @@ public class HanaColumnStoreDdl extends AbstractHanaDdl {
 
   @Override
   public String dropIndex(String indexName, String tableName, boolean concurrent) {
-    DdlBuffer buffer = new BaseDdlBuffer(null);
+    DdlBuffer buffer = new BaseDdlBuffer();
     buffer.append("delimiter $$").newLine();
     buffer.append("do").newLine();
     buffer.append("begin").newLine();

@@ -1,16 +1,9 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
-import io.ebeaninternal.dbmigration.model.MConfiguration;
-
 /**
  * Buffer to append generated DDL to.
  */
 public interface DdlBuffer {
-
-  /**
-   * Return the configuration (default tablespaces etc).
-   */
-  MConfiguration getConfiguration();
 
   /**
    * Return true if the buffer is empty.

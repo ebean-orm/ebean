@@ -11,16 +11,8 @@ public class BaseDdlBuffer implements DdlBuffer {
 
   protected final StringBuilder writer;
 
-  protected final MConfiguration configuration;
-
-  public BaseDdlBuffer(MConfiguration configuration) {
-    this.configuration = configuration;
+  public BaseDdlBuffer() {
     this.writer = new StringBuilder();
-  }
-
-  @Override
-  public MConfiguration getConfiguration() {
-    return configuration;
   }
 
   @Override

@@ -51,7 +51,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
       : (alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue());
     String defaultValueClause = (defaultValue == null || defaultValue.isEmpty()) ? "" : " default " + defaultValue;
 
-    DdlBuffer buffer = new BaseDdlBuffer(null);
+    DdlBuffer buffer = new BaseDdlBuffer();
     if (!isConvertible(currentType, type)) {
       // add an intermediate conversion if possible
       if (isNumberType(currentType)) {
@@ -115,7 +115,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
 
   @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
-    DdlBuffer buffer = new BaseDdlBuffer(null);
+    DdlBuffer buffer = new BaseDdlBuffer();
 
     buffer.append("delimiter $$").newLine();
     buffer.append("do").newLine();

@@ -12,19 +12,19 @@ public class DdlWrite {
 
   private final ModelContainer currentModel;
 
-  private final DdlBuffer applyDropDependencies;
+  private final DdlBuffer applyDropDependencies = new BaseDdlBuffer();
 
-  private final DdlBuffer apply;
+  private final DdlBuffer apply = new BaseDdlBuffer();
 
-  private final DdlBuffer applyForeignKeys;
+  private final DdlBuffer applyForeignKeys = new BaseDdlBuffer();
 
-  private final DdlBuffer applyHistoryView;
+  private final DdlBuffer applyHistoryView = new BaseDdlBuffer();
 
-  private final DdlBuffer applyHistoryTrigger;
+  private final DdlBuffer applyHistoryTrigger = new BaseDdlBuffer();
 
-  private final DdlBuffer dropAllForeignKeys;
+  private final DdlBuffer dropAllForeignKeys = new BaseDdlBuffer();
 
-  private final DdlBuffer dropAll;
+  private final DdlBuffer dropAll = new BaseDdlBuffer();
 
   private final DdlOptions options;
 
@@ -40,13 +40,6 @@ public class DdlWrite {
    */
   public DdlWrite(MConfiguration configuration, ModelContainer currentModel, DdlOptions options) {
     this.currentModel = currentModel;
-    this.applyDropDependencies = new BaseDdlBuffer(configuration);
-    this.apply = new BaseDdlBuffer(configuration);
-    this.applyForeignKeys = new BaseDdlBuffer(configuration);
-    this.applyHistoryView = new BaseDdlBuffer(configuration);
-    this.applyHistoryTrigger = new BaseDdlBuffer(configuration);
-    this.dropAllForeignKeys = new BaseDdlBuffer(configuration);
-    this.dropAll = new BaseDdlBuffer(configuration);
     this.options = options;
   }
 
