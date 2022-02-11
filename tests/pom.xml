@@ -10,7 +10,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>tests</artifactId>
-  <version>1.0</version>
+  <version>12.15.1-FOC4</version>
   <packaging>pom</packaging>
 
   <name>tests</name>
@@ -43,7 +43,7 @@
 
 
   <scm>
-    <tag>HEAD</tag>
+    <tag>ebean-parent-12.15.1-FOC4</tag>
     <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
   </scm>
 </project>
