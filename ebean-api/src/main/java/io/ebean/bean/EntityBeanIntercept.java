@@ -360,7 +360,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Return true if the entity should be updated.
    */
   public boolean isUpdate() {
-    return forceUpdate || state == STATE_LOADED;
+    return forceUpdate || state == STATE_LOADED || state == STATE_REFERENCE;
   }
 
   /**

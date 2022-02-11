@@ -34,7 +34,7 @@ public class TestOneToOneCascadeSave extends BaseTestCase {
   }
   
   @Test
-  public void test2() {
+  public void testSaveCascadeWithOneToOne() {
     OtoMasterVersion master = new OtoMasterVersion();
     master.setName("m1");
 
@@ -59,12 +59,12 @@ public class TestOneToOneCascadeSave extends BaseTestCase {
       master.setName("m2");
       DB.save(master);
       child = DB.find(OtoChildVersion.class).findOne();
-      // assertThat(child.getVersion()).isEqualTo(2); but is 1
+      assertThat(child.getVersion()).isEqualTo(2);
       child.setName("c3");
-      DB.save(child); // <-- throws OptimisticLockException
+      DB.save(child); 
       
       txn.commit();
     }
   }
-
+  
 }
