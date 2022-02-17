@@ -239,6 +239,7 @@ public class SqlServerDdl extends PlatformDdl {
         .append("_tvp') drop type ebean_").append(name).append("_tvp").endOfStatement();
   }
 
+  @SuppressWarnings("unused")
   private void createTVP(DdlBuffer ddl, String name, String definition) {
     ddl.append("if not exists (select name  from sys.types where name = 'ebean_").append(name)
     .append("_tvp') create type ebean_").append(name).append("_tvp as table (c1 ").append(definition).append(")")

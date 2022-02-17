@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
-import io.ebeaninternal.dbmigration.model.MConfiguration;
 
 
 /**

@@ -5,13 +5,10 @@ import io.ebean.Database;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Types;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class BaseTestCase {
 
