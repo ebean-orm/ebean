@@ -16,7 +16,6 @@ import io.ebeaninternal.extraddl.model.ExtraDdl;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 
-import java.io.IOException;
 import java.util.List;
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
@@ -117,7 +116,7 @@ public class CurrentModel {
   /**
    * Return the 'Create' DDL.
    */
-  public String getCreateDdl() throws IOException {
+  public String getCreateDdl() {
 
     createDdl();
 
@@ -150,7 +149,7 @@ public class CurrentModel {
   /**
    * Return the 'Drop' DDL.
    */
-  public String getDropAllDdl() throws IOException {
+  public String getDropAllDdl() {
 
     createDdl();
 
@@ -166,7 +165,7 @@ public class CurrentModel {
   /**
    * Create all the DDL based on the changeSet.
    */
-  private void createDdl() throws IOException {
+  private void createDdl() {
     if (write == null) {
       ChangeSet createChangeSet = getChangeSet();
       write = new DdlWrite(new MConfiguration(), model, ddlOptions);

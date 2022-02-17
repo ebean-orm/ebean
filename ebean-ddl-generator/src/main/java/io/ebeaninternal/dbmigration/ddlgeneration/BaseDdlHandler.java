@@ -17,7 +17,6 @@ import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropIndex;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -36,7 +35,7 @@ public class BaseDdlHandler implements DdlHandler {
   }
 
   @Override
-  public void generate(DdlWrite writer, ChangeSet changeSet) throws IOException {
+  public void generate(DdlWrite writer, ChangeSet changeSet) {
 
     List<Object> changeSetChildren = changeSet.getChangeSetChildren();
     for (Object change : changeSetChildren) {
@@ -76,72 +75,72 @@ public class BaseDdlHandler implements DdlHandler {
   }
 
   @Override
-  public void generateProlog(DdlWrite write) throws IOException {
+  public void generateProlog(DdlWrite write) {
     tableDdl.generateProlog(write);
   }
 
   @Override
-  public void generateEpilog(DdlWrite write) throws IOException {
+  public void generateEpilog(DdlWrite write) {
     tableDdl.generateEpilog(write);
   }
 
   @Override
-  public void generate(DdlWrite writer, CreateTable createTable) throws IOException {
+  public void generate(DdlWrite writer, CreateTable createTable) {
     tableDdl.generate(writer, createTable);
   }
 
   @Override
-  public void generate(DdlWrite writer, DropTable dropTable) throws IOException {
+  public void generate(DdlWrite writer, DropTable dropTable) {
     tableDdl.generate(writer, dropTable);
   }
 
   @Override
-  public void generate(DdlWrite writer, AddTableComment addTableComment) throws IOException {
+  public void generate(DdlWrite writer, AddTableComment addTableComment) {
     tableDdl.generate(writer, addTableComment);
   }
 
   @Override
-  public void generate(DdlWrite writer, AddColumn addColumn) throws IOException {
+  public void generate(DdlWrite writer, AddColumn addColumn) {
     tableDdl.generate(writer, addColumn);
   }
 
   @Override
-  public void generate(DdlWrite writer, DropColumn dropColumn) throws IOException {
+  public void generate(DdlWrite writer, DropColumn dropColumn) {
     tableDdl.generate(writer, dropColumn);
   }
 
   @Override
-  public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
+  public void generate(DdlWrite writer, AlterColumn alterColumn) {
     tableDdl.generate(writer, alterColumn);
   }
 
   @Override
-  public void generate(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+  public void generate(DdlWrite writer, AddHistoryTable addHistoryTable) {
     tableDdl.generate(writer, addHistoryTable);
   }
 
   @Override
-  public void generate(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+  public void generate(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     tableDdl.generate(writer, dropHistoryTable);
   }
 
   @Override
-  public void generate(DdlWrite writer, CreateIndex createIndex) throws IOException {
+  public void generate(DdlWrite writer, CreateIndex createIndex) {
     tableDdl.generate(writer, createIndex);
   }
 
   @Override
-  public void generate(DdlWrite writer, DropIndex dropIndex) throws IOException {
+  public void generate(DdlWrite writer, DropIndex dropIndex) {
     tableDdl.generate(writer, dropIndex);
   }
 
   @Override
-  public void generate(DdlWrite writer, AddUniqueConstraint constraint) throws IOException {
+  public void generate(DdlWrite writer, AddUniqueConstraint constraint) {
     tableDdl.generate(writer, constraint);
   }
 
   @Override
-  public void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException {
+  public void generate(DdlWrite writer, AlterForeignKey alterForeignKey) {
     tableDdl.generate(writer, alterForeignKey);
   }
 }
