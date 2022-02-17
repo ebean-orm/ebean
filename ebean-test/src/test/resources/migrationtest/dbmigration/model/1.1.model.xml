@@ -113,6 +113,7 @@
         <dropIndex indexName="ix_migtest_oto_child_lowername" tableName="migtest_oto_child" platforms="POSTGRES"/>
     </changeSet>
     <changeSet type="pendingDrops">
+        <dropColumn columnName="description2" tableName="migtest_e_basic"/>
         <dropColumn columnName="old_boolean" tableName="migtest_e_basic"/>
         <dropColumn columnName="old_boolean2" tableName="migtest_e_basic"/>
         <dropColumn columnName="eref_id" tableName="migtest_e_basic"/>
