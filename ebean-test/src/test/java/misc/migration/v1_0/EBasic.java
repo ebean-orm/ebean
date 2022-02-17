@@ -40,9 +40,11 @@ public class EBasic {
   @Size(max=127)
   String name;
 
- // @Size(max=127)
-  @Column(columnDefinition = "db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)")
+  @Size(max=127)
   String description;
+  
+  @Column(columnDefinition = "db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)")
+  String description2;
 
   Timestamp someDate;
 
