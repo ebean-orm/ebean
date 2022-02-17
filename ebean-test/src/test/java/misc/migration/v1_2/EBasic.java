@@ -5,6 +5,7 @@ import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -41,6 +42,9 @@ public class EBasic {
 
   @Size(max=127)
   String description;
+  
+  @Column(columnDefinition = "db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)")
+  String description2;
 
   Timestamp someDate;
 

@@ -333,16 +333,18 @@ public class PlatformDdl {
   // e.g. @Column(columnDefinition = "db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)")
   private String extract(String type) {
     String[] tmp = type.split(";");
-    assert tmp.length % 2 == 1;
-    for (int i = 0; i < tmp.length - 2; i+=2) {
+    if (tmp.length % 2 == 0) {
+      throw new IllegalArgumentException("You need an odd number of arguments. See Issue #2559 for details");
+    }
+    for (int i = 0; i < tmp.length - 2; i += 2) {
       String[] platforms = tmp[i].split(",");
       for (String plat : platforms) {
         if (platform.isPlatform(Platform.valueOf(plat.toUpperCase(Locale.ENGLISH)))) {
-          return tmp[i+1];
+          return tmp[i + 1];
         }
       }
     }
-    return tmp[tmp.length-1]; // else
+    return tmp[tmp.length - 1]; // else
   }
 
   /**
