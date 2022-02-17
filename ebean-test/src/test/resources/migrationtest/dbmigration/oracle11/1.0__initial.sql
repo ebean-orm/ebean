@@ -68,6 +68,7 @@ create table migtest_e_basic (
   status2                       varchar2(1) default 'N' not null,
   name                          varchar2(127),
   description                   varchar2(127),
+  description2                  varchar2(127),
   some_date                     timestamp,
   old_boolean                   number(1) default 0 not null,
   old_boolean2                  number(1),

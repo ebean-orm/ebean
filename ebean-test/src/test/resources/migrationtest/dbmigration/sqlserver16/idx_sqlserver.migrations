@@ -1,7 +1,7 @@
 -2122378240,    I__create_procs.sql
-802205012,      1.0__initial.sql
+-390904708,     1.0__initial.sql
 -1042228916,    1.1.sql
--1805601919,    1.2__dropsFor_1.1.sql
+1470614292,     1.2__dropsFor_1.1.sql
 -807119885,     1.3.sql
 -1335541264,    1.4__dropsFor_1.3.sql
 1607822082,     R__order_views_mssql.sql

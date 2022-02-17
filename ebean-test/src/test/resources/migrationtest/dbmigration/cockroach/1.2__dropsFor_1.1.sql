@@ -1,5 +1,7 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
+alter table migtest_e_basic drop column description2;
+
 alter table migtest_e_basic drop column old_boolean;
 
 alter table migtest_e_basic drop column old_boolean2;
