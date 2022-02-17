@@ -21,6 +21,7 @@ alter table migtest_e_basic drop constraint uq_migtest_e_basic_description;
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
+alter table migtest_e_basic add column description2 String;
 alter table migtest_e_basic add column old_boolean UInt8 default false;
 alter table migtest_e_basic add column old_boolean2 UInt8;
 alter table migtest_e_basic add column eref_id UInt32;
