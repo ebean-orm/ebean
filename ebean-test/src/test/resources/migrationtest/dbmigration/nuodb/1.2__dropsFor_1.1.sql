@@ -3,7 +3,7 @@
 drop view if exists migtest_e_history2_with_history;
 
 -- apply changes
-alter table migtest_e_basic drop column description2;
+alter table migtest_e_basic drop column description_file;
 
 alter table migtest_e_basic drop column old_boolean;
 

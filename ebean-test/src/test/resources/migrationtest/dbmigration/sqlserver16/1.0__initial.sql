@@ -60,7 +60,7 @@ create table migtest_e_basic (
   status2                       varchar(1) default 'N' not null,
   name                          varchar(127),
   description                   varchar(127),
-  description2                  varchar(227),
+  description_file              image,
   some_date                     datetime2,
   old_boolean                   bit default 0 not null,
   old_boolean2                  bit,

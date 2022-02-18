@@ -1,6 +1,6 @@
 -- Migrationscripts for ebean unittest
 -- apply changes
-EXEC usp_ebean_drop_column migtest_e_basic, description2;
+EXEC usp_ebean_drop_column migtest_e_basic, description_file;
 
 EXEC usp_ebean_drop_column migtest_e_basic, old_boolean;
 

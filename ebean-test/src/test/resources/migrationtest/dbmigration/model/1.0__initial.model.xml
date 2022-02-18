@@ -43,7 +43,7 @@
             <column name="status2" type="varchar(1)" defaultValue="'N'" notnull="true" checkConstraint="check ( status2 in ('N','A','I'))" checkConstraintName="ck_migtest_e_basic_status2"/>
             <column name="name" type="varchar(127)"/>
             <column name="description" type="varchar(127)"/>
-            <column name="description2" type="db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)"/>
+            <column name="description_file" type="db2;blob(64M);blob"/>
             <column name="some_date" type="timestamp"/>
             <column name="old_boolean" type="boolean" defaultValue="false" notnull="true"/>
             <column name="old_boolean2" type="boolean"/>

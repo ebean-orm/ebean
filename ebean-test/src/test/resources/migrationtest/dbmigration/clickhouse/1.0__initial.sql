@@ -51,7 +51,7 @@ create table migtest_e_basic (
   status2                       String default 'N',
   name                          String,
   description                   String,
-  description2                  String,
+  description_file              blob,
   some_date                     DateTime,
   old_boolean                   UInt8 default false,
   old_boolean2                  UInt8,

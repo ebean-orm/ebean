@@ -11,7 +11,7 @@
         <alterColumn columnName="description" tableName="migtest_e_basic" dropUnique="uq_migtest_e_basic_description"/>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" defaultValue="23" notnull="true" currentNotnull="false" dropForeignKey="fk_migtest_e_basic_user_id" dropForeignKeyIndex="ix_migtest_e_basic_user_id"/>
         <addColumn tableName="migtest_e_basic">
-            <column name="description2" type="db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)"/>
+            <column name="description_file" type="db2;blob(64M);blob"/>
             <column name="old_boolean" type="boolean" defaultValue="false" notnull="true"/>
             <column name="old_boolean2" type="boolean"/>
             <column name="eref_id" type="integer" references="migtest_e_ref.id" foreignKeyName="fk_migtest_e_basic_eref_id" foreignKeyIndex="ix_migtest_e_basic_eref_id"/>
