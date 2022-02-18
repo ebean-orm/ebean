@@ -60,6 +60,7 @@ create table migtest_e_basic (
   status2                       varchar(1) default 'N' not null,
   name                          varchar(127),
   description                   varchar(127),
+  description_file              longblob,
   some_date                     datetime,
   old_boolean                   tinyint(1) default 0 not null,
   old_boolean2                  tinyint(1),

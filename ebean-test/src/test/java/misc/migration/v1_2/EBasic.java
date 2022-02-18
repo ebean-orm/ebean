@@ -5,11 +5,15 @@ import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
+
+import java.io.File;
 import java.sql.Timestamp;
 
 @Entity
@@ -41,6 +45,10 @@ public class EBasic {
 
   @Size(max=127)
   String description;
+  
+  @Lob
+  @Column(columnDefinition = "db2;blob(64M);")
+  File descriptionFile;
 
   Timestamp someDate;
 

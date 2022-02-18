@@ -9,9 +9,12 @@ import io.ebean.annotation.Tablespace;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.Size;
+
+import java.io.File;
 import java.sql.Timestamp;
 
 @Entity
@@ -45,8 +48,9 @@ public class EBasic {
   @Size(max=127)
   String description;
 
-  @Column(columnDefinition = "db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)")
-  String description2;
+  @Lob
+  @Column(columnDefinition = "db2;blob(64M);")
+  File descriptionFile;
   
   Timestamp someDate;
 

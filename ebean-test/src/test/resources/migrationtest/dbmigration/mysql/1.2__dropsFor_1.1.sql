@@ -3,7 +3,7 @@
 drop view if exists migtest_e_history2_with_history;
 
 -- apply changes
-CALL usp_ebean_drop_column('migtest_e_basic', 'description2');
+CALL usp_ebean_drop_column('migtest_e_basic', 'description_file');
 
 CALL usp_ebean_drop_column('migtest_e_basic', 'old_boolean');
 

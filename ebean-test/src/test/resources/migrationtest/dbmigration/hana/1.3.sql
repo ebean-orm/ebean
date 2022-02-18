@@ -46,6 +46,7 @@ $$;
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop constraint  fk_migtest_e_basic_user_id;
 alter table migtest_e_basic alter ( user_id integer default 23 not null);
+alter table migtest_e_basic add ( description_file blob);
 alter table migtest_e_basic add ( old_boolean boolean default false not null);
 alter table migtest_e_basic add ( old_boolean2 boolean);
 alter table migtest_e_basic add ( eref_id integer);

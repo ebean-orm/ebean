@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply" dropsFor="1.1">
-        <dropColumn columnName="description2" tableName="migtest_e_basic"/>
+        <dropColumn columnName="description_file" tableName="migtest_e_basic"/>
         <dropColumn columnName="old_boolean" tableName="migtest_e_basic"/>
         <dropColumn columnName="old_boolean2" tableName="migtest_e_basic"/>
         <dropColumn columnName="eref_id" tableName="migtest_e_basic"/>

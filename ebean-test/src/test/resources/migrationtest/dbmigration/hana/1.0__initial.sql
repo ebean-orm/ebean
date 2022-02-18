@@ -60,7 +60,7 @@ create column table migtest_e_basic (
   status2                       nvarchar(1) default 'N' not null,
   name                          nvarchar(127),
   description                   nvarchar(127),
-  description2                  nvarchar(127),
+  description_file              blob,
   some_date                     timestamp,
   old_boolean                   boolean default false not null,
   old_boolean2                  boolean,

@@ -992,6 +992,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public String renderDbType(DbPlatformType dbType, boolean strict) {
     if (dbColumnDefn != null) {
+      if(dbColumnDefn.endsWith(";")) {
+        return dbColumnDefn + dbType.renderType(dbLength, dbScale, strict);
+      }
       return dbColumnDefn;
     }
     return dbType.renderType(dbLength, dbScale, strict);

@@ -94,6 +94,7 @@ end if;
 end$$;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
+alter table migtest_e_basic add column description_file blob(64M);
 alter table migtest_e_basic add column old_boolean boolean default false not null;
 alter table migtest_e_basic add column old_boolean2 boolean;
 alter table migtest_e_basic add column eref_id integer;

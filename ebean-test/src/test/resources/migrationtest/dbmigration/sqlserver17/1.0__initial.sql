@@ -68,7 +68,7 @@ create table migtest_e_basic (
   status2                       nvarchar(1) default 'N' not null,
   name                          nvarchar(127),
   description                   nvarchar(127),
-  description2                  nvarchar(227),
+  description_file              image,
   some_date                     datetime2,
   old_boolean                   bit default 0 not null,
   old_boolean2                  bit,
