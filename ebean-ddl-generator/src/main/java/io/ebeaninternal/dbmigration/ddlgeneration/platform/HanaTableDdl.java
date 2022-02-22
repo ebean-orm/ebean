@@ -9,7 +9,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
 import java.util.List;
 
 public class HanaTableDdl extends BaseTableDdl {
@@ -29,12 +28,12 @@ public class HanaTableDdl extends BaseTableDdl {
   }
 
   @Override
-  protected void alterColumnDefaultValue(DdlWrite writer, AlterColumn alter) throws IOException {
+  protected void alterColumnDefaultValue(DdlWrite writer, AlterColumn alter) {
     // done in alterColumnBaseAttributes
   }
 
   @Override
-  public void generate(DdlWrite writer, AddColumn addColumn) throws IOException {
+  public void generate(DdlWrite writer, AddColumn addColumn) {
     String tableName = addColumn.getTableName();
     MTable table = writer.getTable(tableName);
     if (table == null) {
@@ -63,7 +62,7 @@ public class HanaTableDdl extends BaseTableDdl {
   }
 
   @Override
-  public void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException {
+  public void generate(DdlWrite writer, AlterColumn alterColumn) {
     String tableName = alterColumn.getTableName();
     MTable table = writer.getTable(tableName);
     if (table == null) {
@@ -103,7 +102,7 @@ public class HanaTableDdl extends BaseTableDdl {
   }
 
   @Override
-  public void generate(DdlWrite writer, DropColumn dropColumn) throws IOException {
+  public void generate(DdlWrite writer, DropColumn dropColumn) {
     String tableName = dropColumn.getTableName();
     MTable table = writer.getTable(tableName);
     if (table == null) {

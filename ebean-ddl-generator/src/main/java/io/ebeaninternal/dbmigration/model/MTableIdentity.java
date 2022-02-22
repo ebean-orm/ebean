@@ -89,8 +89,9 @@ public class MTableIdentity {
         return IdentityType.EXTERNAL;
       case GENERATOR:
         return IdentityType.GENERATOR;
+    default:
+        return null;
     }
-    return null;
   }
 
   private static int toInt(BigInteger firstVal, BigInteger secVal) {

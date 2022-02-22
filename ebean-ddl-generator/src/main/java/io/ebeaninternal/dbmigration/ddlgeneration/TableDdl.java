@@ -13,8 +13,6 @@ import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropIndex;
 import io.ebeaninternal.dbmigration.migration.DropTable;
 
-import java.io.IOException;
-
 /**
  * Write table DDL.
  */
@@ -23,70 +21,70 @@ public interface TableDdl {
   /**
    * Generate the create table change.
    */
-  void generate(DdlWrite writer, CreateTable createTable) throws IOException;
+  void generate(DdlWrite writer, CreateTable createTable);
 
   /**
    * Write the drop column change.
    */
-  void generate(DdlWrite writer, DropTable dropTable) throws IOException;
+  void generate(DdlWrite writer, DropTable dropTable);
 
   /**
    * Write the add column change.
    */
-  void generate(DdlWrite writer, AddColumn addColumn) throws IOException;
+  void generate(DdlWrite writer, AddColumn addColumn);
 
   /**
    * Write the alter column changes.
    */
-  void generate(DdlWrite writer, AlterColumn alterColumn) throws IOException;
+  void generate(DdlWrite writer, AlterColumn alterColumn);
 
   /**
    * Write the drop column change.
    */
-  void generate(DdlWrite writer, DropColumn dropColumn) throws IOException;
+  void generate(DdlWrite writer, DropColumn dropColumn);
 
   /**
    * Write the AddTableComment change.
    */
-  void generate(DdlWrite writer, AddTableComment addTableComment) throws IOException;
+  void generate(DdlWrite writer, AddTableComment addTableComment);
 
   /**
    * Write the AddHistoryTable change.
    */
-  void generate(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException;
+  void generate(DdlWrite writer, AddHistoryTable addHistoryTable);
 
   /**
    * Write the DropHistoryTable change.
    */
-  void generate(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException;
+  void generate(DdlWrite writer, DropHistoryTable dropHistoryTable);
 
   /**
    * Generate the create index change.
    */
-  void generate(DdlWrite writer, CreateIndex createIndex) throws IOException;
+  void generate(DdlWrite writer, CreateIndex createIndex);
 
   /**
    * Write the drop index change.
    */
-  void generate(DdlWrite writer, DropIndex dropIndex) throws IOException;
+  void generate(DdlWrite writer, DropIndex dropIndex);
 
   /**
    * Write add unique constraint.
    */
-  void generate(DdlWrite writer, AddUniqueConstraint constraint) throws IOException;
+  void generate(DdlWrite writer, AddUniqueConstraint constraint);
 
   /**
    * Writes alter foreign key statements.
    */
-  void generate(DdlWrite writer, AlterForeignKey alterForeignKey) throws IOException;
+  void generate(DdlWrite writer, AlterForeignKey alterForeignKey);
 
   /**
    * Generate any extra DDL such as stored procedures or TableValueParameters.
    */
-  void generateProlog(DdlWrite write) throws IOException;
+  void generateProlog(DdlWrite write);
 
   /**
    * Generate any extra DDL such as regeneration of history triggers.
    */
-  void generateEpilog(DdlWrite write) throws IOException;
+  void generateEpilog(DdlWrite write);
 }

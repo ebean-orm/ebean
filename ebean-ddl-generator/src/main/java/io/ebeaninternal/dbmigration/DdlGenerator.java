@@ -305,21 +305,13 @@ public class DdlGenerator implements SpiDdlGenerator {
   }
 
   protected String generateDropAllDdl() {
-    try {
-      dropAllContent = currentModel().getDropAllDdl();
-      return dropAllContent;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    dropAllContent = currentModel().getDropAllDdl();
+    return dropAllContent;
   }
 
   protected String generateCreateAllDdl() {
-    try {
-      createAllContent = currentModel().getCreateDdl();
-      return createAllContent;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    createAllContent = currentModel().getCreateDdl();
+    return createAllContent;
   }
 
   protected String getDropFileName() {

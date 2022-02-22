@@ -7,8 +7,6 @@ import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
-
 /**
  * @author Vilmos Nagy
  */
@@ -26,7 +24,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
+  public void createWithHistory(DdlWrite writer, MTable table) {
     String baseTable = table.getName();
     enableSystemVersioning(writer, baseTable);
   }
@@ -43,7 +41,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
     return historyTable;
   }
 
-  private void enableSystemVersioning(DdlWrite writer, String baseTable) throws IOException {
+  private void enableSystemVersioning(DdlWrite writer, String baseTable) {
     DdlBuffer apply = writer.applyHistoryView();
     apply.append("alter table ").append(baseTable).newLine()
       .append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine()
@@ -59,7 +57,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     String baseTable = dropHistoryTable.getBaseTable();
     DdlBuffer apply = writer.applyHistoryView();
     apply.append("-- dropping history support for ").append(baseTable).endOfStatement();
@@ -78,13 +76,13 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) {
     String baseTable = addHistoryTable.getBaseTable();
     enableSystemVersioning(writer, baseTable);
   }
 
   @Override
-  public void updateTriggers(DdlWrite writer, HistoryTableUpdate baseTable) throws IOException {
+  public void updateTriggers(DdlWrite writer, HistoryTableUpdate baseTable) {
     // SQL Server 2016 does not need triggers
     DdlBuffer apply = writer.applyHistoryView();
     String baseTableName = baseTable.getBaseTable();

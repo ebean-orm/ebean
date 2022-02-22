@@ -6,8 +6,6 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
-import java.io.IOException;
-
 /**
  * MS SQL Server platform specific DDL.
  */
@@ -185,7 +183,7 @@ public class SqlServerDdl extends PlatformDdl {
    * Add table comment as a separate statement (from the create table statement).
    */
   @Override
-  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) {
 
     // do nothing for MS SQL Server (cause it requires stored procedures etc)
   }
@@ -194,7 +192,7 @@ public class SqlServerDdl extends PlatformDdl {
    * Add column comment as a separate statement.
    */
   @Override
-  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
+  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) {
 
     // do nothing for MS SQL Server (cause it requires stored procedures etc)
   }
@@ -204,7 +202,7 @@ public class SqlServerDdl extends PlatformDdl {
    * (constraints, default values, indices and foreign keys). That's why we call a user stored procedure here
    */
   @Override
-  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
+  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) {
 
     buffer.append("EXEC usp_ebean_drop_column ").append(tableName).append(", ").append(columnName).endOfStatement();
   }
@@ -213,7 +211,7 @@ public class SqlServerDdl extends PlatformDdl {
    * This writes the multi value datatypes needed for MultiValueBind.
    */
   @Override
-  public void generateProlog(DdlWrite write) throws IOException {
+  public void generateProlog(DdlWrite write) {
     super.generateProlog(write);
 
     generateTVPDefinitions(write, "bigint");
@@ -227,7 +225,7 @@ public class SqlServerDdl extends PlatformDdl {
 
   }
 
-  private void generateTVPDefinitions(DdlWrite write, String definition) throws IOException {
+  private void generateTVPDefinitions(DdlWrite write, String definition) {
     int pos = definition.indexOf('(');
     String name = pos == -1 ? definition : definition.substring(0, pos);
 
@@ -236,12 +234,13 @@ public class SqlServerDdl extends PlatformDdl {
     //createTVP(write.apply(), name, definition);
   }
 
-  private void dropTVP(DdlBuffer ddl, String name) throws IOException {
+  private void dropTVP(DdlBuffer ddl, String name) {
     ddl.append("if exists (select name  from sys.types where name = 'ebean_").append(name)
         .append("_tvp') drop type ebean_").append(name).append("_tvp").endOfStatement();
   }
 
-  private void createTVP(DdlBuffer ddl, String name, String definition) throws IOException {
+  @SuppressWarnings("unused")
+  private void createTVP(DdlBuffer ddl, String name, String definition) {
     ddl.append("if not exists (select name  from sys.types where name = 'ebean_").append(name)
     .append("_tvp') create type ebean_").append(name).append("_tvp as table (c1 ").append(definition).append(")")
         .endOfStatement();
