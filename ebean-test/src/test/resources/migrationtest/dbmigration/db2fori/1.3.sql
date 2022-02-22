@@ -31,6 +31,7 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop constraint fk_migtest_e_basic_user_id;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
+alter table migtest_e_basic add column description_file blob(64M);
 alter table migtest_e_basic add column old_boolean smallint default 0 default false not null;
 alter table migtest_e_basic add column old_boolean2 smallint default 0;
 alter table migtest_e_basic add column eref_id integer;
