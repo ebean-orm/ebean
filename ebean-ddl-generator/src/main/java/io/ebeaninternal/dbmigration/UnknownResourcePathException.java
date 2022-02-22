@@ -7,6 +7,8 @@ package io.ebeaninternal.dbmigration;
  */
 public class UnknownResourcePathException extends RuntimeException {
 
+  private static final long serialVersionUID = 8533769929372106003L;
+
   public UnknownResourcePathException(String msg) {
     super(msg);
   }

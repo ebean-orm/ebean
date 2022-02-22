@@ -1,18 +1,9 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
-import io.ebeaninternal.dbmigration.model.MConfiguration;
-
-import java.io.IOException;
-
 /**
  * Buffer to append generated DDL to.
  */
 public interface DdlBuffer {
-
-  /**
-   * Return the configuration (default tablespaces etc).
-   */
-  MConfiguration getConfiguration();
 
   /**
    * Return true if the buffer is empty.
@@ -22,37 +13,37 @@ public interface DdlBuffer {
   /**
    * Append a statement allowing for null or empty statements.
    */
-  DdlBuffer appendStatement(String content) throws IOException;
+  DdlBuffer appendStatement(String content);
 
   /**
    * Append DDL content to the buffer.
    */
-  DdlBuffer append(String content) throws IOException;
+  DdlBuffer append(String content);
 
   /**
    * Append DDL content to the buffer with space padding.
    */
-  DdlBuffer append(String type, int space) throws IOException;
+  DdlBuffer append(String type, int space);
 
   /**
    * Append a value that is potentially null or empty and proceed it with a space if so.
    */
-  DdlBuffer appendWithSpace(String foreignKeyRestrict) throws IOException;
+  DdlBuffer appendWithSpace(String foreignKeyRestrict);
 
   /**
    * Append new line character to the buffer.
    */
-  DdlBuffer newLine() throws IOException;
+  DdlBuffer newLine();
 
   /**
    * Append the end of statement content.
    */
-  DdlBuffer endOfStatement() throws IOException;
+  DdlBuffer endOfStatement();
 
   /**
    * End of a change - add some whitespace.
    */
-  DdlBuffer end() throws IOException;
+  DdlBuffer end();
 
   /**
    * Return the buffer content.

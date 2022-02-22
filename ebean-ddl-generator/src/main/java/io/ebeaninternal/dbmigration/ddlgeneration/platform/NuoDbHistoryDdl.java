@@ -4,8 +4,6 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
-
 /**
  * NuoDB history support using DB triggers to maintain a history table.
  */
@@ -17,14 +15,14 @@ public class NuoDbHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
-  protected void dropTriggers(DdlBuffer buffer, String baseTable) throws IOException {
+  protected void dropTriggers(DdlBuffer buffer, String baseTable) {
 
     buffer.append("drop trigger ").append(updateTriggerName(baseTable)).endOfStatement();
     buffer.append("drop trigger ").append(deleteTriggerName(baseTable)).endOfStatement();
   }
 
   @Override
-  protected void createTriggers(DdlWrite writer, MTable table) throws IOException {
+  protected void createTriggers(DdlWrite writer, MTable table) {
 
     DbTriggerUpdate update = createDbTriggerUpdate(writer, table);
 
@@ -33,7 +31,7 @@ public class NuoDbHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
-  protected void updateHistoryTriggers(DbTriggerUpdate update) throws IOException {
+  protected void updateHistoryTriggers(DbTriggerUpdate update) {
 
     recreateHistoryView(update);
 
@@ -45,7 +43,7 @@ public class NuoDbHistoryDdl extends DbTriggerBasedHistoryDdl {
     addBeforeDelete(deleteTriggerName(baseTable), update);
   }
 
-  private void addBeforeUpdate(String triggerName, DbTriggerUpdate update) throws IOException {
+  private void addBeforeUpdate(String triggerName, DbTriggerUpdate update) {
 
     DdlBuffer apply = update.historyTriggerBuffer();
     addTriggerStart(triggerName, update, apply, " before update for each row as ");
@@ -54,7 +52,7 @@ public class NuoDbHistoryDdl extends DbTriggerBasedHistoryDdl {
     addEndTrigger(apply);
   }
 
-  private void addBeforeDelete(String triggerName, DbTriggerUpdate update) throws IOException {
+  private void addBeforeDelete(String triggerName, DbTriggerUpdate update) {
 
     DdlBuffer apply = update.historyTriggerBuffer();
     addTriggerStart(triggerName, update, apply, " before delete for each row as");
@@ -62,14 +60,14 @@ public class NuoDbHistoryDdl extends DbTriggerBasedHistoryDdl {
     addEndTrigger(apply);
   }
 
-  private void addTriggerStart(String triggerName, DbTriggerUpdate update, DdlBuffer apply, String s) throws IOException {
+  private void addTriggerStart(String triggerName, DbTriggerUpdate update, DdlBuffer apply, String s) {
     apply
       .append("delimiter $$").newLine()
       .append("create or replace trigger ").append(triggerName).append(" for ").append(update.getBaseTable())
       .append(s).newLine();
   }
 
-  private void addEndTrigger(DdlBuffer apply) throws IOException {
+  private void addEndTrigger(DdlBuffer apply) {
     apply.append("end_trigger")
       .endOfStatement()
       .append("$$").newLine()

@@ -6,7 +6,6 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 
-import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -38,7 +37,7 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  public void alterTableDropColumn(final DdlBuffer buffer, final String tableName, final String columnName) throws IOException {
+  public void alterTableDropColumn(final DdlBuffer buffer, final String tableName, final String columnName) {
     if (this.useMigrationStoredProcedures) {
       buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
     } else {
@@ -127,7 +126,7 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) throws IOException {
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) {
     super.writeColumnDefinition(buffer, column, identity);
     String comment = column.getComment();
     if (!StringHelper.isNull(comment)) {
@@ -140,7 +139,7 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  public void inlineTableComment(DdlBuffer apply, String tableComment) throws IOException {
+  public void inlineTableComment(DdlBuffer apply, String tableComment) {
     if (tableComment.length() > 1000) {
       tableComment = tableComment.substring(0, 1000);
     }
@@ -151,7 +150,7 @@ public class MySqlDdl extends PlatformDdl {
    * Add table comment as a separate statement (from the create table statement).
    */
   @Override
-  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) {
     if (DdlHelp.isDropComment(tableComment)) {
       tableComment = "";
     }
@@ -168,7 +167,7 @@ public class MySqlDdl extends PlatformDdl {
    * Locks all tables for triggers that have to be updated.
    */
   @Override
-  public void lockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+  public void lockTables(DdlBuffer buffer, Collection<String> tables) {
     if (!tables.isEmpty()) {
       buffer.append("lock tables ");
       int i = 0;
@@ -187,7 +186,7 @@ public class MySqlDdl extends PlatformDdl {
    * Unlocks all tables for triggers that have to be updated.
    */
   @Override
-  public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
+  public void unlockTables(DdlBuffer buffer, Collection<String> tables) {
     buffer.append("unlock tables").endOfStatement();
   }
 
