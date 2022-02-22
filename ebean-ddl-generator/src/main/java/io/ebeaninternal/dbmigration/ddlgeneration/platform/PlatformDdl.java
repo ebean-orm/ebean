@@ -9,11 +9,7 @@ import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
-import io.ebeaninternal.dbmigration.ddlgeneration.BaseDdlHandler;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.ddlgeneration.*;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.VowelRemover;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
@@ -319,9 +315,7 @@ public class PlatformDdl {
     if (type == null) {
       return null;
     }
-    
     type = extract(type);
-    
     if (type.contains("[]")) {
       return convertArrayType(type);
     }
