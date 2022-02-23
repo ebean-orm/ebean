@@ -62,24 +62,11 @@ public class BaseTableDdl implements TableDdl {
   protected final String historyTableSuffix;
 
   /**
-   * Used to check that indexes on foreign keys should be skipped as a unique index on the columns
-   * already exists.
-   */
-  protected final IndexSet indexSet = new IndexSet();
-
-  /**
    * Used when unique constraints specifically for OneToOne can't be created normally (MsSqlServer).
    */
   protected final List<Column> externalUnique = new ArrayList<>();
 
   protected final List<UniqueConstraint> externalCompoundUnique = new ArrayList<>();
-
-  // counters used when constraint names are truncated due to maximum length
-  // and these counters are used to keep the constraint name unique
-  protected int countCheck;
-  protected int countUnique;
-  protected int countForeignKey;
-  protected int countIndex;
 
   /**
    * Base tables that have associated history tables that need their triggers/functions regenerated as
@@ -220,13 +207,8 @@ public class BaseTableDdl implements TableDdl {
    * Reset counters and index set for each table processed.
    */
   protected void reset() {
-    indexSet.clear();
     externalUnique.clear();
     externalCompoundUnique.clear();
-    countCheck = 0;
-    countUnique = 0;
-    countForeignKey = 0;
-    countIndex = 0;
   }
 
   /**
