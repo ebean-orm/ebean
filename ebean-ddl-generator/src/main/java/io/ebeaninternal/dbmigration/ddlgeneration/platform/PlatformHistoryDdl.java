@@ -34,5 +34,5 @@ public interface PlatformHistoryDdl {
   /**
    * Regenerate the history triggers/stored function due to column added/dropped/included or excluded.
    */
-  void updateTriggers(DdlWrite write, HistoryTableUpdate baseTable);
+  void updateTriggers(DdlWrite writer, HistoryTableUpdate baseTable);
 }

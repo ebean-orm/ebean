@@ -350,7 +350,7 @@ public class BaseTableDdl implements TableDdl {
    * Specific handling of OneToOne unique constraints for MsSqlServer.
    * For all other DB platforms these unique constraints are done inline as per normal.
    */
-  protected void writeUniqueOneToOneConstraints(DdlWrite write, CreateTable createTable) {
+  protected void writeUniqueOneToOneConstraints(DdlWrite writer, CreateTable createTable) {
     String tableName = createTable.getName();
     for (Column col : externalUnique) {
       String uqName = col.getUniqueOneToOne();
@@ -358,8 +358,8 @@ public class BaseTableDdl implements TableDdl {
         uqName = col.getUnique();
       }
       String[] columnNames = {col.getName()};
-      write.apply().appendStatement(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, Boolean.TRUE.equals(col.isNotnull()) ? null : columnNames));
-      write.dropAllForeignKeys().appendStatement(platformDdl.dropIndex(uqName, tableName));
+      writer.apply().appendStatement(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, Boolean.TRUE.equals(col.isNotnull()) ? null : columnNames));
+      writer.dropAllForeignKeys().appendStatement(platformDdl.dropIndex(uqName, tableName));
     }
 
     for (UniqueConstraint constraint : externalCompoundUnique) {
@@ -367,8 +367,8 @@ public class BaseTableDdl implements TableDdl {
       String[] columnNames = split(constraint.getColumnNames());
       String[] nullableColumns = split(constraint.getNullableColumns());
 
-      write.apply().appendStatement(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, nullableColumns));
-      write.dropAllForeignKeys().appendStatement(platformDdl.dropIndex(uqName, tableName));
+      writer.apply().appendStatement(platformDdl.alterTableAddUniqueConstraint(tableName, uqName, columnNames, nullableColumns));
+      writer.dropAllForeignKeys().appendStatement(platformDdl.dropIndex(uqName, tableName));
     }
   }
 
@@ -386,63 +386,63 @@ public class BaseTableDdl implements TableDdl {
     platformDdl.createWithHistory(writer, table);
   }
 
-  protected void writeInlineForeignKeys(DdlWrite write, CreateTable createTable) {
+  protected void writeInlineForeignKeys(DdlWrite writer, CreateTable createTable) {
     for (Column column : createTable.getColumn()) {
       String references = column.getReferences();
       if (hasValue(references)) {
-        writeInlineForeignKey(write, column);
+        writeInlineForeignKey(writer, column);
       }
     }
-    writeInlineCompoundForeignKeys(write, createTable);
+    writeInlineCompoundForeignKeys(writer, createTable);
   }
 
-  protected void writeInlineForeignKey(DdlWrite write, Column column) {
+  protected void writeInlineForeignKey(DdlWrite writer, Column column) {
     String fkConstraint = platformDdl.tableInlineForeignKey(new WriteForeignKey(null, column));
-    write.apply().append(",").newLine().append("  ").append(fkConstraint);
+    writer.apply().append(",").newLine().append("  ").append(fkConstraint);
   }
 
-  protected void writeInlineCompoundForeignKeys(DdlWrite write, CreateTable createTable) {
+  protected void writeInlineCompoundForeignKeys(DdlWrite writer, CreateTable createTable) {
     for (ForeignKey key : createTable.getForeignKey()) {
       String fkConstraint = platformDdl.tableInlineForeignKey(new WriteForeignKey(null, key));
-      write.apply().append(",").newLine().append("  ").append(fkConstraint);
+      writer.apply().append(",").newLine().append("  ").append(fkConstraint);
     }
   }
 
-  protected void writeAddForeignKeys(DdlWrite write, CreateTable createTable) {
+  protected void writeAddForeignKeys(DdlWrite writer, CreateTable createTable) {
     for (Column column : createTable.getColumn()) {
       String references = column.getReferences();
       if (hasValue(references)) {
-        writeForeignKey(write, createTable.getName(), column);
+        writeForeignKey(writer, createTable.getName(), column);
       }
     }
-    writeAddCompoundForeignKeys(write, createTable);
+    writeAddCompoundForeignKeys(writer, createTable);
   }
 
-  protected void writeAddCompoundForeignKeys(DdlWrite write, CreateTable createTable) {
+  protected void writeAddCompoundForeignKeys(DdlWrite writer, CreateTable createTable) {
     for (ForeignKey key : createTable.getForeignKey()) {
-      writeForeignKey(write, new WriteForeignKey(createTable.getName(), key));
+      writeForeignKey(writer, new WriteForeignKey(createTable.getName(), key));
     }
   }
 
-  protected void writeForeignKey(DdlWrite write, String tableName, Column column) {
-    writeForeignKey(write, new WriteForeignKey(tableName, column));
+  protected void writeForeignKey(DdlWrite writer, String tableName, Column column) {
+    writeForeignKey(writer, new WriteForeignKey(tableName, column));
   }
 
-  protected void writeForeignKey(DdlWrite write, WriteForeignKey request) {
-    DdlBuffer fkeyBuffer = write.applyForeignKeys();
+  protected void writeForeignKey(DdlWrite writer, WriteForeignKey request) {
+    DdlBuffer fkeyBuffer = writer.applyForeignKeys();
     String tableName = lowerTableName(request.table());
     if (request.indexName() != null) {
       // no matching unique constraint so add the index
       fkeyBuffer.appendStatement(platformDdl.createIndex(new WriteCreateIndex(request.indexName(), tableName, request.cols(), false)));
     }
-    alterTableAddForeignKey(write.getOptions(), fkeyBuffer, request);
+    alterTableAddForeignKey(writer.getOptions(), fkeyBuffer, request);
     fkeyBuffer.end();
 
-    write.dropAllForeignKeys().appendStatement(platformDdl.alterTableDropForeignKey(tableName, request.fkName()));
+    writer.dropAllForeignKeys().appendStatement(platformDdl.alterTableDropForeignKey(tableName, request.fkName()));
     if (hasValue(request.indexName())) {
-      write.dropAllForeignKeys().appendStatement(platformDdl.dropIndex(request.indexName(), tableName));
+      writer.dropAllForeignKeys().appendStatement(platformDdl.dropIndex(request.indexName(), tableName));
     }
-    write.dropAllForeignKeys().end();
+    writer.dropAllForeignKeys().end();
   }
 
   protected void alterTableAddForeignKey(DdlOptions options, DdlBuffer buffer, WriteForeignKey request) {
@@ -628,25 +628,25 @@ public class BaseTableDdl implements TableDdl {
   }
 
   @Override
-  public void generateProlog(DdlWrite write) {
-    platformDdl.generateProlog(write);
+  public void generateProlog(DdlWrite writer) {
+    platformDdl.generateProlog(writer);
   }
 
   /**
    * Called at the end to generate additional ddl such as regenerate history triggers.
    */
   @Override
-  public void generateEpilog(DdlWrite write) {
+  public void generateEpilog(DdlWrite writer) {
     if (!regenerateHistoryTriggers.isEmpty()) {
-      platformDdl.lockTables(write.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
+      platformDdl.lockTables(writer.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
 
       for (HistoryTableUpdate update : this.regenerateHistoryTriggers.values()) {
-        platformDdl.regenerateHistoryTriggers(write, update);
+        platformDdl.regenerateHistoryTriggers(writer, update);
       }
 
-      platformDdl.unlockTables(write.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
+      platformDdl.unlockTables(writer.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
     }
-    platformDdl.generateEpilog(write);
+    platformDdl.generateEpilog(writer);
   }
 
   @Override

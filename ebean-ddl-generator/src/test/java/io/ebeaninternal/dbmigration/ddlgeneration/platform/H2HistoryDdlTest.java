@@ -28,23 +28,23 @@ public class H2HistoryDdlTest {
 
     CurrentModel currentModel = new CurrentModel(ebeanServer);
     ModelContainer modelContainer = currentModel.read();
-    DdlWrite write = new DdlWrite(new MConfiguration(), modelContainer, new DdlOptions());
+    DdlWrite writer = new DdlWrite(new MConfiguration(), modelContainer, new DdlOptions());
 
     H2Platform h2Platform = new H2Platform();
     PlatformDdl h2Ddl = PlatformDdlBuilder.create(h2Platform);
     h2Ddl.configure(ebeanServer.config());
-    h2Ddl.regenerateHistoryTriggers(write, update);
+    h2Ddl.regenerateHistoryTriggers(writer, update);
 
-    assertThat(write.applyHistoryView().isEmpty()).isFalse();
-    assertThat(write.applyHistoryTrigger().isEmpty()).isFalse();
-    assertThat(write.applyHistoryView().getBuffer())
+    assertThat(writer.applyHistoryView().isEmpty()).isFalse();
+    assertThat(writer.applyHistoryTrigger().isEmpty()).isFalse();
+    assertThat(writer.applyHistoryView().getBuffer())
       .contains("create view")
       .doesNotContain("create trigger");
-    assertThat(write.applyHistoryTrigger().getBuffer())
+    assertThat(writer.applyHistoryTrigger().getBuffer())
       .contains("add one")
       .contains("create trigger")
       .doesNotContain("create view");
-    assertThat(write.dropAll().isEmpty()).isTrue();
+    assertThat(writer.dropAll().isEmpty()).isTrue();
 
   }
 }

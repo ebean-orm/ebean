@@ -81,10 +81,10 @@ public interface TableDdl {
   /**
    * Generate any extra DDL such as stored procedures or TableValueParameters.
    */
-  void generateProlog(DdlWrite write);
+  void generateProlog(DdlWrite writer);
 
   /**
    * Generate any extra DDL such as regeneration of history triggers.
    */
-  void generateEpilog(DdlWrite write);
+  void generateEpilog(DdlWrite writer);
 }

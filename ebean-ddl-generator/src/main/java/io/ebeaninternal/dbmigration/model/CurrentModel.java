@@ -35,7 +35,7 @@ public class CurrentModel {
 
   private ModelContainer model;
   private ChangeSet changeSet;
-  private DdlWrite write;
+  private DdlWrite writer;
 
   /**
    * Construct with a given EbeanServer instance for DDL create all generation, not migration.
@@ -127,10 +127,10 @@ public class CurrentModel {
     if (jaxbPresent) {
       addExtraDdl(ddl, ExtraDdlXmlReader.readBuiltin(), "-- init script ");
     }
-    ddl.append(write.apply().getBuffer());
-    ddl.append(write.applyForeignKeys().getBuffer());
-    ddl.append(write.applyHistoryView().getBuffer());
-    ddl.append(write.applyHistoryTrigger().getBuffer());
+    ddl.append(writer.apply().getBuffer());
+    ddl.append(writer.applyForeignKeys().getBuffer());
+    ddl.append(writer.applyHistoryView().getBuffer());
+    ddl.append(writer.applyHistoryTrigger().getBuffer());
     return ddl.toString();
   }
 
@@ -157,8 +157,8 @@ public class CurrentModel {
     if (ddlHeader != null && !ddlHeader.isEmpty()) {
       ddl.append(ddlHeader).append('\n');
     }
-    ddl.append(write.dropAllForeignKeys().getBuffer());
-    ddl.append(write.dropAll().getBuffer());
+    ddl.append(writer.dropAllForeignKeys().getBuffer());
+    ddl.append(writer.dropAll().getBuffer());
     return ddl.toString();
   }
 
@@ -166,13 +166,13 @@ public class CurrentModel {
    * Create all the DDL based on the changeSet.
    */
   private void createDdl() {
-    if (write == null) {
+    if (writer == null) {
       ChangeSet createChangeSet = getChangeSet();
-      write = new DdlWrite(new MConfiguration(), model, ddlOptions);
+      writer = new DdlWrite(new MConfiguration(), model, ddlOptions);
       DdlHandler handler = handler();
-      handler.generateProlog(write);
-      handler.generate(write, createChangeSet);
-      handler.generateEpilog(write);
+      handler.generateProlog(writer);
+      handler.generate(writer, createChangeSet);
+      handler.generateEpilog(writer);
     }
   }
 

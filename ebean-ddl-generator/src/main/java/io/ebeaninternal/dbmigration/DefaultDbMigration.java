@@ -582,9 +582,9 @@ public class DefaultDbMigration implements DbMigration {
         // writer needs the current model to provide table/column details for
         // history ddl generation (triggers, history tables etc)
         DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
-        DdlWrite write = new DdlWrite(new MConfiguration(), request.current, options);
-        PlatformDdlWriter writer = createDdlWriter(databasePlatform);
-        writer.processMigration(dbMigration, write, request.migrationDir, fullVersion);
+        DdlWrite writer = new DdlWrite(new MConfiguration(), request.current, options);
+        PlatformDdlWriter platformWriter = createDdlWriter(databasePlatform);
+        platformWriter.processMigration(dbMigration, writer, request.migrationDir, fullVersion);
       }
       return fullVersion;
     }
@@ -651,10 +651,10 @@ public class DefaultDbMigration implements DbMigration {
   private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
     DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
     for (Pair pair : platforms) {
-      DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
+      DdlWrite writer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
       PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
-      platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
+      platformWriter.processMigration(dbMigration, writer, subPath, fullVersion);
     }
   }
 

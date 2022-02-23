@@ -33,7 +33,7 @@ public class NoHistorySupportDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void updateTriggers(DdlWrite write, HistoryTableUpdate update) {
+  public void updateTriggers(DdlWrite writer, HistoryTableUpdate update) {
     // does nothing
   }
 }

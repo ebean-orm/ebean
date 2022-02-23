@@ -39,23 +39,24 @@ public class PlatformDdlWriter {
   /**
    * Write the migration as platform specific ddl.
    */
-  public void processMigration(Migration dbMigration, DdlWrite write, File writePath, String fullVersion) throws IOException {
+  public void processMigration(Migration dbMigration, DdlWrite writer, File writePath, String fullVersion)
+    throws IOException {
     DdlHandler handler = handler();
-    handler.generateProlog(write);
+    handler.generateProlog(writer);
     if (lockTimeoutSeconds > 0) {
       String lockSql = platformDdl.setLockTimeout(lockTimeoutSeconds);
       if (lockSql != null) {
-        write.apply().append(lockSql).endOfStatement().newLine();
+        writer.apply().append(lockSql).endOfStatement().newLine();
       }
     }
     List<ChangeSet> changeSets = dbMigration.getChangeSet();
     for (ChangeSet changeSet : changeSets) {
       if (isApply(changeSet)) {
-        handler.generate(write, changeSet);
+        handler.generate(writer, changeSet);
       }
     }
-    handler.generateEpilog(write);
-    writePlatformDdl(write, writePath, fullVersion);
+    handler.generateEpilog(writer);
+    writePlatformDdl(writer, writePath, fullVersion);
   }
 
   /**
@@ -68,10 +69,10 @@ public class PlatformDdlWriter {
   /**
    * Write the ddl files.
    */
-  protected void writePlatformDdl(DdlWrite write, File resourcePath, String fullVersion) throws IOException {
-    if (!write.isApplyEmpty()) {
+  protected void writePlatformDdl(DdlWrite writer, File resourcePath, String fullVersion) throws IOException {
+    if (!writer.isApplyEmpty()) {
       try (Writer applyWriter = createWriter(resourcePath, fullVersion, ".sql")) {
-        writeApplyDdl(applyWriter, write);
+        writeApplyDdl(applyWriter, writer);
         applyWriter.flush();
       }
     }
@@ -85,18 +86,18 @@ public class PlatformDdlWriter {
   /**
    * Write the 'Apply' DDL buffers to the writer.
    */
-  protected void writeApplyDdl(Writer writer, DdlWrite write) throws IOException {
+  protected void writeApplyDdl(Writer writer, DdlWrite ddl) throws IOException {
     String header = databaseConfig.getDdlHeader();
     if (header != null && !header.isEmpty()) {
       writer.append(header).append('\n');
     }
     // merge the apply buffers in the appropriate order
-    prependDropDependencies(writer, write.applyDropDependencies());
+    prependDropDependencies(writer, ddl.applyDropDependencies());
     writer.append("-- apply changes\n");
-    writer.append(write.apply().getBuffer());
-    writer.append(write.applyForeignKeys().getBuffer());
-    writer.append(write.applyHistoryView().getBuffer());
-    writer.append(write.applyHistoryTrigger().getBuffer());
+    writer.append(ddl.apply().getBuffer());
+    writer.append(ddl.applyForeignKeys().getBuffer());
+    writer.append(ddl.applyHistoryView().getBuffer());
+    writer.append(ddl.applyHistoryTrigger().getBuffer());
   }
 
   private void prependDropDependencies(Writer writer, DdlBuffer buffer) throws IOException {
