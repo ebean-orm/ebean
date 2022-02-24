@@ -24,6 +24,7 @@ public class TWithPreInsertChild implements TWithPreInsertCommon {
     this.name = name;
   }
 
+  @Override
   public Integer getId() {
     return id;
   }
@@ -32,18 +33,22 @@ public class TWithPreInsertChild implements TWithPreInsertCommon {
     this.id = id;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
+  @Override
   public String getTitle() {
     return title;
   }
 
+  @Override
   public void setTitle(String title) {
     this.title = title;
   }
@@ -52,6 +57,7 @@ public class TWithPreInsertChild implements TWithPreInsertCommon {
     return requestCascadeState;
   }
 
+  @Override
   public void requestCascadeState(int requestCascadeState) {
     this.requestCascadeState = requestCascadeState;
   }

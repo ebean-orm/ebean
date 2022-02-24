@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.annotation.DbArray;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 

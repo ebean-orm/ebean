@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
-import io.ebean.text.json.JsonContext;
 
 import java.io.IOException;
 import java.io.Writer;

@@ -1,11 +1,8 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.bean.EntityBean;
-import io.ebean.core.type.ScalarType;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.deploy.TableJoin;
 

@@ -3,7 +3,6 @@ package io.ebeaninternal.server.query;
 import io.ebean.QueryIterator;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 
-import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 
 /**

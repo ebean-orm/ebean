@@ -1,7 +1,6 @@
 package io.ebean.config.dbplatform.db2;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
