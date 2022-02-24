@@ -4,6 +4,7 @@ drop view if exists migtest_e_history2_with_history;
 drop view if exists migtest_e_history3_with_history;
 drop view if exists migtest_e_history4_with_history;
 drop view if exists migtest_e_history5_with_history;
+drop view if exists migtest_e_history6_with_history;
 
 -- apply changes
 create table migtest_e_user (
@@ -42,9 +43,7 @@ alter table migtest_fk_set_null drop foreign key fk_migtest_fk_set_null_one_id;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic alter status set default 'A';
-alter table migtest_e_basic modify status varchar(1) not null;
-alter table migtest_e_basic alter status2 drop default;
+alter table migtest_e_basic modify status varchar(1) not null default 'A';
 alter table migtest_e_basic modify status2 varchar(127);
 
 -- rename all collisions;
@@ -72,8 +71,7 @@ alter table migtest_e_history comment = 'We have history now';
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
-alter table migtest_e_history2 alter test_string set default 'unknown';
-alter table migtest_e_history2 modify test_string varchar(255) not null;
+alter table migtest_e_history2 modify test_string varchar(255) not null default 'unknown';
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2 add column new_column varchar(20);
@@ -89,9 +87,9 @@ alter table migtest_e_history5_history add column test_boolean tinyint(1) defaul
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
-alter table migtest_e_history6 alter test_number1 set default 42;
-alter table migtest_e_history6 modify test_number1 integer not null;
+alter table migtest_e_history6 modify test_number1 integer not null default 42;
 alter table migtest_e_history6 modify test_number2 integer;
+alter table migtest_e_history6_history modify test_number2 integer;
 alter table migtest_e_softdelete add column deleted tinyint(1) default 0 not null;
 
 alter table migtest_oto_child add column master_id bigint;
@@ -138,6 +136,8 @@ create view migtest_e_history4_with_history as select * from migtest_e_history4 
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
+
 delimiter $$
 create trigger migtest_e_history_history_upd before update on migtest_e_history for each row begin
     insert into migtest_e_history_history (sys_period_start,sys_period_end,id, test_string) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string);
@@ -147,7 +147,7 @@ delimiter $$
 create trigger migtest_e_history_history_del before delete on migtest_e_history for each row begin
     insert into migtest_e_history_history (sys_period_start,sys_period_end,id, test_string) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string);
 end$$
-lock tables migtest_e_history2 write, migtest_e_history3 write, migtest_e_history4 write, migtest_e_history5 write;
+lock tables migtest_e_history2 write, migtest_e_history3 write, migtest_e_history4 write, migtest_e_history5 write, migtest_e_history6 write;
 -- changes: [add test_string2, add test_string3, add new_column]
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
@@ -195,5 +195,17 @@ end$$
 delimiter $$
 create trigger migtest_e_history5_history_del before delete on migtest_e_history5 for each row begin
     insert into migtest_e_history5_history (sys_period_start,sys_period_end,id, test_number, test_boolean) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number, OLD.test_boolean);
+end$$
+-- changes: [alter test_number2]
+drop trigger migtest_e_history6_history_upd;
+drop trigger migtest_e_history6_history_del;
+delimiter $$
+create trigger migtest_e_history6_history_upd before update on migtest_e_history6 for each row begin
+    insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number1, OLD.test_number2);
+    set NEW.sys_period_start = now(6);
+end$$
+delimiter $$
+create trigger migtest_e_history6_history_del before delete on migtest_e_history6 for each row begin
+    insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number1, OLD.test_number2);
 end$$
 unlock tables;

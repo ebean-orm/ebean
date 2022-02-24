@@ -4,6 +4,7 @@ drop view if exists migtest_e_history2_with_history;
 drop view if exists migtest_e_history3_with_history;
 drop view if exists migtest_e_history4_with_history;
 drop view if exists migtest_e_history5_with_history;
+drop view if exists migtest_e_history6_with_history;
 
 -- apply changes
 create table migtest_e_user (
@@ -99,6 +100,7 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 set null;
+alter table migtest_e_history6_history alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
 alter table migtest_oto_child add column master_id bigint;
@@ -145,6 +147,8 @@ create view migtest_e_history4_with_history as select * from migtest_e_history4 
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
+
 create trigger migtest_e_history_history_upd before update,delete on migtest_e_history for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 -- changes: [add test_string2, add test_string3, add new_column]
 drop trigger migtest_e_history2_history_upd;
@@ -158,3 +162,6 @@ create trigger migtest_e_history4_history_upd before update,delete on migtest_e_
 -- changes: [add test_boolean]
 drop trigger migtest_e_history5_history_upd;
 create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+-- changes: [alter test_number2]
+drop trigger migtest_e_history6_history_upd;
+create trigger migtest_e_history6_history_upd before update,delete on migtest_e_history6 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

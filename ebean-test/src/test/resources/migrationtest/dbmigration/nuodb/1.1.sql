@@ -4,6 +4,7 @@ drop view if exists migtest_e_history2_with_history;
 drop view if exists migtest_e_history3_with_history;
 drop view if exists migtest_e_history4_with_history;
 drop view if exists migtest_e_history5_with_history;
+drop view if exists migtest_e_history6_with_history;
 
 -- apply changes
 create table migtest_e_user (
@@ -97,6 +98,7 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 set null;
+alter table migtest_e_history6_history alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
 alter table migtest_oto_child add column master_id bigint;
@@ -142,6 +144,8 @@ create view migtest_e_history3_with_history as select * from migtest_e_history3 
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
 
 delimiter $$
 create or replace trigger migtest_e_history_history_upd for migtest_e_history before update for each row as 
@@ -217,6 +221,22 @@ $$
 delimiter $$
 create or replace trigger migtest_e_history5_history_del for migtest_e_history5 before delete for each row as
     insert into migtest_e_history5_history (sys_period_start,sys_period_end,id, test_number, test_boolean) values (OLD.sys_period_start, NEW.sys_period_start,OLD.id, OLD.test_number, OLD.test_boolean);
+end_trigger;
+$$
+
+-- changes: [alter test_number2]
+drop trigger migtest_e_history6_history_upd;
+drop trigger migtest_e_history6_history_del;
+delimiter $$
+create or replace trigger migtest_e_history6_history_upd for migtest_e_history6 before update for each row as 
+    NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
+    insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, NEW.sys_period_start,OLD.id, OLD.test_number1, OLD.test_number2);
+end_trigger;
+$$
+
+delimiter $$
+create or replace trigger migtest_e_history6_history_del for migtest_e_history6 before delete for each row as
+    insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, NEW.sys_period_start,OLD.id, OLD.test_number1, OLD.test_number2);
 end_trigger;
 $$
 

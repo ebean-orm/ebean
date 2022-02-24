@@ -4,6 +4,7 @@ drop view if exists migtest_e_history2_with_history;
 drop view if exists migtest_e_history3_with_history;
 drop view if exists migtest_e_history4_with_history;
 drop view if exists migtest_e_history5_with_history;
+drop view if exists migtest_e_history6_with_history;
 
 -- apply changes
 create table migtest_e_user (
@@ -99,6 +100,7 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 drop not null;
+alter table migtest_e_history6_history alter column test_number2 drop not null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 
 alter table migtest_oto_child add column master_id bigint;
@@ -142,6 +144,8 @@ create view migtest_e_history3_with_history as select * from migtest_e_history3 
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
+
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
 
 create or replace function migtest_e_history_history_version() returns trigger as $$
 declare
@@ -236,6 +240,25 @@ begin
     return new;
   elsif (TG_OP = 'DELETE') then
     insert into migtest_e_history5_history (sys_period,id, test_number, test_boolean) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number, OLD.test_boolean);
+    return old;
+  end if;
+end;
+$$ LANGUAGE plpgsql;
+
+-- changes: [alter test_number2]
+create or replace function migtest_e_history6_history_version() returns trigger as $$
+declare
+  lowerTs timestamptz;
+  upperTs timestamptz;
+begin
+  lowerTs = lower(OLD.sys_period);
+  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
+  if (TG_OP = 'UPDATE') then
+    insert into migtest_e_history6_history (sys_period,id, test_number1, test_number2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number1, OLD.test_number2);
+    NEW.sys_period = tstzrange(upperTs,null);
+    return new;
+  elsif (TG_OP = 'DELETE') then
+    insert into migtest_e_history6_history (sys_period,id, test_number1, test_number2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number1, OLD.test_number2);
     return old;
   end if;
 end;

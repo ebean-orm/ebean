@@ -3,6 +3,7 @@
 drop view if exists migtest_e_history2_with_history;
 drop view if exists migtest_e_history3_with_history;
 drop view if exists migtest_e_history4_with_history;
+drop view if exists migtest_e_history6_with_history;
 
 -- apply changes
 create table migtest_e_ref (
@@ -51,6 +52,7 @@ alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string set null;
+alter table migtest_e_history2_history alter column test_string set null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
@@ -60,6 +62,7 @@ alter table migtest_e_history4 alter column test_number integer;
 alter table migtest_e_history4_history alter column test_number integer;
 alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 set null;
+alter table migtest_e_history6_history alter column test_number1 set null;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
@@ -78,7 +81,9 @@ create view migtest_e_history3_with_history as select * from migtest_e_history3 
 
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 
--- changes: [add obsolete_string1, add obsolete_string2]
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
+
+-- changes: [alter test_string, add obsolete_string1, add obsolete_string2]
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
 delimiter $$
@@ -123,6 +128,22 @@ $$
 delimiter $$
 create or replace trigger migtest_e_history4_history_del for migtest_e_history4 before delete for each row as
     insert into migtest_e_history4_history (sys_period_start,sys_period_end,id, test_number) values (OLD.sys_period_start, NEW.sys_period_start,OLD.id, OLD.test_number);
+end_trigger;
+$$
+
+-- changes: [alter test_number1]
+drop trigger migtest_e_history6_history_upd;
+drop trigger migtest_e_history6_history_del;
+delimiter $$
+create or replace trigger migtest_e_history6_history_upd for migtest_e_history6 before update for each row as 
+    NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
+    insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, NEW.sys_period_start,OLD.id, OLD.test_number1, OLD.test_number2);
+end_trigger;
+$$
+
+delimiter $$
+create or replace trigger migtest_e_history6_history_del for migtest_e_history6 before delete for each row as
+    insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, NEW.sys_period_start,OLD.id, OLD.test_number1, OLD.test_number2);
 end_trigger;
 $$
 

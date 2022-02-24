@@ -46,6 +46,7 @@ alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_stat
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string drop not null;
+alter table migtest_e_history2_history alter column test_string drop not null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
@@ -55,6 +56,7 @@ alter table migtest_e_history4 alter column test_number type integer;
 alter table migtest_e_history4_history alter column test_number type integer;
 alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 drop not null;
+alter table migtest_e_history6_history alter column test_number1 drop not null;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
