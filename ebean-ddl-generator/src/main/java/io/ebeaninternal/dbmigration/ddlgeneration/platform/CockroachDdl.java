@@ -11,7 +11,7 @@ public class CockroachDdl extends PlatformDdl {
   public CockroachDdl(DatabasePlatform platform) {
     super(platform);
     this.dropTableCascade = " cascade";
-    this.columnSetType = "type ";
+    this.columnSetType = "type";
     this.alterTableIfExists = "if exists ";
     this.columnSetNull = "drop not null";
   }

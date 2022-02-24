@@ -4,6 +4,7 @@ import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
+import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MTable;
 
@@ -62,9 +63,13 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
     DdlBuffer apply = writer.applyHistoryView();
     apply.append("-- dropping history support for ").append(baseTable).endOfStatement();
     // drop default constraints
-
-    apply.append(platformDdl.alterColumnDefaultValue(baseTable, systemPeriodStart, DdlHelp.DROP_DEFAULT)).endOfStatement();
-    apply.append(platformDdl.alterColumnDefaultValue(baseTable, systemPeriodEnd, DdlHelp.DROP_DEFAULT)).endOfStatement();
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName(baseTable);
+    alter.setDefaultValue(DdlHelp.DROP_DEFAULT);
+    alter.setColumnName(systemPeriodStart);
+    platformDdl.alterColumn(writer, alter);
+    alter.setColumnName(systemPeriodEnd);
+    platformDdl.alterColumn(writer, alter);
     // switch of versioning & period
     apply.append("alter table ").append(baseTable).append(" set (system_versioning = off)").endOfStatement();
     apply.append("alter table ").append(baseTable).append(" drop period for system_time").endOfStatement();

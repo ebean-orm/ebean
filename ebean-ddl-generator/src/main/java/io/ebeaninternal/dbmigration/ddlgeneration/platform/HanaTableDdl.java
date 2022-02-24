@@ -28,11 +28,6 @@ public class HanaTableDdl extends BaseTableDdl {
   }
 
   @Override
-  protected void alterColumnDefaultValue(DdlWrite writer, AlterColumn alter) {
-    // done in alterColumnBaseAttributes
-  }
-
-  @Override
   public void generate(DdlWrite writer, AddColumn addColumn) {
     String tableName = addColumn.getTableName();
     MTable table = writer.getTable(tableName);
@@ -54,7 +49,7 @@ public class HanaTableDdl extends BaseTableDdl {
       String historyTable = historyTable(tableName);
       List<Column> columns = addColumn.getColumn();
       for (Column column : columns) {
-        alterTableAddColumn(writer.apply(), historyTable, column, true, true);
+        alterTableAddColumn(writer, historyTable, column, true, true);
       }
 
       historyDdl.enableSystemVersioning(writer.apply(), table.getName(), historyTable, false, this.generateUniqueDdl);
@@ -91,10 +86,9 @@ public class HanaTableDdl extends BaseTableDdl {
         alterHistoryColumn.setCurrentType(alterColumn.getCurrentType());
         alterHistoryColumn.setCurrentDefaultValue(alterColumn.getCurrentDefaultValue());
         alterHistoryColumn.setCurrentNotnull(alterColumn.isCurrentNotnull());
-        String histColumnDdl = platformDdl.alterColumnBaseAttributes(alterHistoryColumn);
-
         // write the apply to history table
-        writer.apply().append(histColumnDdl).endOfStatement();
+        platformDdl.alterColumn(writer, alterHistoryColumn);
+
       }
 
       historyDdl.enableSystemVersioning(writer.apply(), tableName, historyTable, false, this.generateUniqueDdl);
@@ -121,7 +115,7 @@ public class HanaTableDdl extends BaseTableDdl {
     if (manageSystemVersioning) {
       // also drop from the history table
       String historyTable = historyTable(tableName);
-      alterTableDropColumn(writer.apply(), historyTable, dropColumn.getColumnName());
+      alterTableDropColumn(writer, historyTable, dropColumn.getColumnName());
 
       historyDdl.enableSystemVersioning(writer.apply(), tableName, historyTable, false, this.generateUniqueDdl);
     }
