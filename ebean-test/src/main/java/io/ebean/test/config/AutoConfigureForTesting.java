@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
 
-import javax.sql.DataSource;
-
 /**
  * Automatically configure ServerConfig for testing purposes.
  * <p>

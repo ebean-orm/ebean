@@ -3,8 +3,6 @@ package io.ebeaninternal.api;
 import io.ebean.*;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.CallOrigin;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetricVisitor;

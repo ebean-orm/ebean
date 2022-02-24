@@ -15,7 +15,6 @@ import org.tests.model.ivo.converter.MoneyTypeConverter;
 import javax.persistence.EnumType;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import static org.assertj.core.api.Assertions.assertThat;

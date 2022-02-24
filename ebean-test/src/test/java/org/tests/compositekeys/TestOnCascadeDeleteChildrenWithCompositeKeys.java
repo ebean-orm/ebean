@@ -5,7 +5,6 @@ import io.ebean.CountDistinctOrder;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.Identity;
-import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;

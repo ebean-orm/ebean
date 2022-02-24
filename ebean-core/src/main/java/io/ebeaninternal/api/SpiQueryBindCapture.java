@@ -1,6 +1,5 @@
 package io.ebeaninternal.api;
 
-import io.ebean.meta.QueryPlanRequest;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
 /**
