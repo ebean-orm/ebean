@@ -37,6 +37,12 @@ public class CockroachDdl extends PlatformDdl {
   }
 
   @Override
+  public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
+    // workaround for: https://github.com/cockroachdb/cockroach/issues/42840
+    return "drop index " + maxConstraintName(uniqueConstraintName) + " cascade";
+  }
+
+  @Override
   public boolean isInlineComments() {
     return false;
   }
