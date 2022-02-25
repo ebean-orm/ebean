@@ -375,8 +375,8 @@ public class PlatformDdl {
   /**
    * Regenerate the history triggers (or function) due to a column being added/dropped/excluded or included.
    */
-  public void regenerateHistoryTriggers(DdlWrite write, HistoryTableUpdate update) {
-    historyDdl.updateTriggers(write, update);
+  public void regenerateHistoryTriggers(DdlWrite writer, HistoryTableUpdate update) {
+    historyDdl.updateTriggers(writer, update);
   }
 
   /**
@@ -727,14 +727,14 @@ public class PlatformDdl {
   /**
    * Use this to generate a prolog for each script (stored procedures)
    */
-  public void generateProlog(DdlWrite write) {
+  public void generateProlog(DdlWrite writer) {
 
   }
 
   /**
    * Use this to generate an epilog. Will be added at the end of script
    */
-  public void generateEpilog(DdlWrite write) {
+  public void generateEpilog(DdlWrite writer) {
 
   }
 

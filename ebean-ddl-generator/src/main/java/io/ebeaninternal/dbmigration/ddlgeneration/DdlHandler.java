@@ -45,7 +45,7 @@ public interface DdlHandler {
 
   void generate(DdlWrite writer, AlterForeignKey alterForeignKey);
 
-  void generateProlog(DdlWrite write);
+  void generateProlog(DdlWrite writer);
 
-  void generateEpilog(DdlWrite write);
+  void generateEpilog(DdlWrite writer);
 }

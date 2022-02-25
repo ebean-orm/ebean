@@ -75,13 +75,13 @@ public class BaseDdlHandler implements DdlHandler {
   }
 
   @Override
-  public void generateProlog(DdlWrite write) {
-    tableDdl.generateProlog(write);
+  public void generateProlog(DdlWrite writer) {
+    tableDdl.generateProlog(writer);
   }
 
   @Override
-  public void generateEpilog(DdlWrite write) {
-    tableDdl.generateEpilog(write);
+  public void generateEpilog(DdlWrite writer) {
+    tableDdl.generateEpilog(writer);
   }
 
   @Override

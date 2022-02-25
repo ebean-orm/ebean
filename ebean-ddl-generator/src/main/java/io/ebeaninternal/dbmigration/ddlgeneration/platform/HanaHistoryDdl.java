@@ -101,7 +101,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void updateTriggers(DdlWrite write, HistoryTableUpdate baseTable) {
+  public void updateTriggers(DdlWrite writer, HistoryTableUpdate baseTable) {
     // nothing to do
   }
 

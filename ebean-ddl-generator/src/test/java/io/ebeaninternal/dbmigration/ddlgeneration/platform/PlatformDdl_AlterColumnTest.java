@@ -251,9 +251,9 @@ public class PlatformDdl_AlterColumnTest {
 
   @Test
   public void oracle_alterTableAddColumn() {
-    DdlWrite write = new DdlWrite();
-    oraDdl.alterTableAddColumn(write.apply(), "my_table", simpleColumn(), false, "1");
-    assertThat(write.apply().getBuffer()).isEqualTo("alter table my_table add my_column int default 1 not null;\n");
+    DdlWrite writer = new DdlWrite();
+    oraDdl.alterTableAddColumn(writer.apply(), "my_table", simpleColumn(), false, "1");
+    assertThat(writer.apply().getBuffer()).isEqualTo("alter table my_table add my_column int default 1 not null;\n");
   }
 
   private Column simpleColumn() {

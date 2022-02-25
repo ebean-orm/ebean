@@ -211,25 +211,25 @@ public class SqlServerDdl extends PlatformDdl {
    * This writes the multi value datatypes needed for MultiValueBind.
    */
   @Override
-  public void generateProlog(DdlWrite write) {
-    super.generateProlog(write);
+  public void generateProlog(DdlWrite writer) {
+    super.generateProlog(writer);
 
-    generateTVPDefinitions(write, "bigint");
-    generateTVPDefinitions(write, "float");
-    generateTVPDefinitions(write, "bit");
-    generateTVPDefinitions(write, "date");
-    generateTVPDefinitions(write, "time");
+    generateTVPDefinitions(writer, "bigint");
+    generateTVPDefinitions(writer, "float");
+    generateTVPDefinitions(writer, "bit");
+    generateTVPDefinitions(writer, "date");
+    generateTVPDefinitions(writer, "time");
     //generateTVPDefinitions(write, "datetime2");
-    generateTVPDefinitions(write, "uniqueidentifier");
-    generateTVPDefinitions(write, "nvarchar(max)");
+    generateTVPDefinitions(writer, "uniqueidentifier");
+    generateTVPDefinitions(writer, "nvarchar(max)");
 
   }
 
-  private void generateTVPDefinitions(DdlWrite write, String definition) {
+  private void generateTVPDefinitions(DdlWrite writer, String definition) {
     int pos = definition.indexOf('(');
     String name = pos == -1 ? definition : definition.substring(0, pos);
 
-    dropTVP(write.dropAll(), name);
+    dropTVP(writer.dropAll(), name);
     //TVPs are included in "I__create_procs.sql"
     //createTVP(write.apply(), name, definition);
   }
