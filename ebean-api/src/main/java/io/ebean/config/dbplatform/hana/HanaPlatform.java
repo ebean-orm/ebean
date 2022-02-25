@@ -92,4 +92,8 @@ public class HanaPlatform extends DatabasePlatform {
     }
   }
 
+  @Override
+  public boolean isUseMigrationStoredProcedures() {
+    return true;
+  }
 }

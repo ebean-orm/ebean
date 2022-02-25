@@ -32,7 +32,7 @@ declare exit handler for sql_error_code 397 begin end;
 exec 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2';
 end;
 $$;
-alter table migtest_e_basic alter ( status2 nclob  default 'N' not null);
+alter table migtest_e_basic alter ( status2 nclob not null);
 alter table migtest_e_basic alter ( status2 nvarchar(1) default 'N' not null);
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 delimiter $$
