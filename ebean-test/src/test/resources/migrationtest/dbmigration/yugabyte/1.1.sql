@@ -42,6 +42,7 @@ alter table if exists migtest_fk_set_null drop constraint if exists fk_migtest_f
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete restrict on update restrict;
 
 update migtest_e_basic set status = 'A' where status is null;
+commit transaction /* 1 */;
 alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
@@ -55,13 +56,21 @@ alter table migtest_e_basic alter column status2 drop not null;
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
+commit transaction /* 3 */;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_e_basic alter column user_id drop not null;
 alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
+update migtest_e_basic set new_string_field = 'foo''bar';
+commit transaction /* 4 */;
+
 alter table migtest_e_basic add column new_boolean_field boolean default true not null;
 update migtest_e_basic set new_boolean_field = old_boolean;
+commit transaction /* 2 */;
 
 alter table migtest_e_basic add column new_boolean_field2 boolean default true not null;
+update migtest_e_basic set new_boolean_field2 = true;
+commit transaction /* 5 */;
+
 alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer integer default 42 not null;
@@ -73,8 +82,15 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
 alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
+
+alter table migtest_e_history rename column test_string to test_string_tmp;
+alter table migtest_e_history add column test_string bigint;
+update migtest_e_history set test_string = cast(test_string_tmp as bigint);
+commit transaction /* alter testString */;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history alter column test_string type bigint using test_string::bigint;
+alter table migtest_e_history drop column test_string_tmp;
+
 comment on table migtest_e_history is 'We have history now';
 
 -- NOTE: table has @History - special migration may be necessary
@@ -88,8 +104,21 @@ alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255) default 'unknown';
 alter table migtest_e_history2_history add column new_column varchar(20);
 
+
+-- NOTE: table has @History - special migration may be necessary
+alter table migtest_e_history4 rename column test_number to test_number_tmp;
+alter table migtest_e_history4 add column test_number bigint;
+alter table migtest_e_history4_history rename column test_number to test_number_tmp;
+alter table migtest_e_history4_history add column test_number bigint;
+update migtest_e_history4 set test_number = cast(test_number_tmp as bigint);
+update migtest_e_history4_history set test_number = cast(test_number_tmp as bigint);
+commit transaction /* alter testNumber */;
 alter table migtest_e_history4 alter column test_number type bigint using test_number::bigint;
 alter table migtest_e_history4_history alter column test_number type bigint using test_number::bigint;
+-- NOTE: table has @History - special migration may be necessary
+alter table migtest_e_history4 drop column test_number_tmp;
+alter table migtest_e_history4_history drop column test_number_tmp;
+
 alter table migtest_e_history5 add column test_boolean boolean default false not null;
 alter table migtest_e_history5_history add column test_boolean boolean default false;
 

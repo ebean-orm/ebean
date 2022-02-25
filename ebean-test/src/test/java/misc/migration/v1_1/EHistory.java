@@ -20,6 +20,12 @@ public class EHistory {
   Integer id;
 
   @DbComment("Column altered to long now")
+  @DbMigration(platforms = Platform.YUGABYTE, preAlter = {
+      "alter table ${table} rename column ${column} to ${column}_tmp",
+      "alter table ${table} add column ${column} bigint",
+      "update ${table} set ${column} = cast(${column}_tmp as bigint)",
+      "commit transaction /* alter testString */"
+  }, postAlter = "alter table ${table} drop column ${column}_tmp")
   @DbMigration(platforms = Platform.POSTGRES,
       preAlter = "alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)")
   Long testString;

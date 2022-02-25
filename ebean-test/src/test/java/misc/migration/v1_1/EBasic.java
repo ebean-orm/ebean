@@ -41,6 +41,10 @@ public class EBasic {
   Integer id;
 
   @NotNull
+  @DbMigration(platforms = Platform.YUGABYTE, preAlter = {
+      "update ${table} set ${column} = ${default} where ${column} is null",
+      "commit transaction /* 1 */" })
+  @DbMigration(/* all other */ preAlter = "update ${table} set ${column} = ${default} where ${column} is null")
   @DbDefault("A")
   Status status;
 
@@ -66,15 +70,24 @@ public class EBasic {
 
   @NotNull
   @DbDefault("foo'bar")
+  @DbMigration(platforms = Platform.YUGABYTE, postAdd = {
+      "update ${table} set ${column} = ${default}",
+      "commit transaction /* 4 */" })
   String newStringField;
 
   @NotNull
   @DbDefault("true")
+  @DbMigration(platforms = Platform.YUGABYTE, postAdd = {
+      "update ${table} set ${column} = old_boolean",
+      "commit transaction /* 2 */" })
   @DbMigration(postAdd = "update ${table} set ${column} = old_boolean")
   Boolean newBooleanField;
 
   @NotNull
   @DbDefault("true")
+  @DbMigration(platforms = Platform.YUGABYTE, postAdd = {
+      "update ${table} set ${column} = ${default}",
+      "commit transaction /* 5 */" })
   boolean newBooleanField2;
 
   @Size(max=127)
@@ -107,6 +120,10 @@ public class EBasic {
   int newInteger;
 
   @ManyToOne
+  @DbMigration(platforms = Platform.YUGABYTE, preAlter = {
+      "insert into migtest_e_user (id) select distinct user_id from migtest_e_basic",
+      "commit transaction /* 3 */"
+  })
   @DbMigration(preAlter= "insert into migtest_e_user (id) select distinct user_id from migtest_e_basic") // ensure all users exist
   EUser user;
 
