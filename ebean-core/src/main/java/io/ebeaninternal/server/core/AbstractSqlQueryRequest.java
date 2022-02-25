@@ -15,8 +15,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.persistence.PersistenceException;
-
 /**
  * Wraps the objects involved in executing a SQL / Relational Query.
  */

@@ -1167,6 +1167,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Returns true if this <code>isLob()</code> or the type will effectively map to a lob.
    */
+  @Override
   public boolean isDbLob() {
     if (lob) {
       return true;

@@ -15,7 +15,6 @@ import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.util.Str;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;

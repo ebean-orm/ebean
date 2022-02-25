@@ -1,9 +1,6 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.bean.EntityBean;
-import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 
 import java.util.List;
