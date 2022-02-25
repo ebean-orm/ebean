@@ -29,7 +29,16 @@ alter table migtest_e_softdelete drop column deleted;
 alter table migtest_oto_child drop column master_id;
 
 drop table migtest_e_user cascade constraints purge;
-drop sequence migtest_e_user_seq;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_user_seq';
+exception
+  when expected_error then null;
+end;
+$$;
 drop table migtest_mtm_c_migtest_mtm_m cascade constraints purge;
 drop table migtest_mtm_m_migtest_mtm_c cascade constraints purge;
 drop table migtest_mtm_m_phone_numbers cascade constraints purge;

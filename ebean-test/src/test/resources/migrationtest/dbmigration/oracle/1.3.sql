@@ -14,18 +14,45 @@ alter table migtest_fk_none drop constraint fk_migtest_fk_none_one_id;
 alter table migtest_fk_none_via_join drop constraint fk_mgtst_fk_nn_v_jn_n_d;
 alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
-alter table migtest_e_basic modify status drop default;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status';
+exception
+  when expected_error then null;
+end;
+$$;
+alter table migtest_e_basic modify status default null;
 alter table migtest_e_basic modify status null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2';
+exception
+  when expected_error then null;
+end;
+$$;
 alter table migtest_e_basic modify status2 varchar2(1);
 alter table migtest_e_basic modify status2 default 'N';
 alter table migtest_e_basic modify status2 not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
-alter table migtest_e_basic drop constraint uq_migtest_e_basic_description;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_description';
+exception
+  when expected_error then null;
+end;
+$$;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic drop constraint fk_migtest_e_basic_user_id;
@@ -36,23 +63,68 @@ alter table migtest_e_basic add old_boolean number(1) default 0 not null;
 alter table migtest_e_basic add old_boolean2 number(1);
 alter table migtest_e_basic add eref_id number(10);
 
-alter table migtest_e_basic drop constraint uq_mgtst__bsc_stts_ndxtst1;
-alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
-alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
-alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint uq_mgtst__bsc_stts_ndxtst1';
+exception
+  when expected_error then null;
+end;
+$$;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_name';
+exception
+  when expected_error then null;
+end;
+$$;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4';
+exception
+  when expected_error then null;
+end;
+$$;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5';
+exception
+  when expected_error then null;
+end;
+$$;
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
-alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
+exception
+  when expected_error then null;
+end;
+$$;
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
-alter table migtest_e_history2 modify test_string drop default;
+alter table migtest_e_history2 modify test_string default null;
 alter table migtest_e_history2 modify test_string null;
 alter table migtest_e_history2 add obsolete_string1 varchar2(255);
 alter table migtest_e_history2 add obsolete_string2 varchar2(255);
 
 alter table migtest_e_history4 modify test_number number(10);
-alter table migtest_e_history6 modify test_number1 drop default;
+alter table migtest_e_history6 modify test_number1 default null;
 alter table migtest_e_history6 modify test_number1 null;
 
 -- NOTE: table has @History - special migration may be necessary
