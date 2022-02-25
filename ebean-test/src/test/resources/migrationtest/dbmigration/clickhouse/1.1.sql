@@ -41,10 +41,10 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic alter column user_id set null;
 alter table migtest_e_basic add column new_string_field String default 'foo''bar';
-alter table migtest_e_basic add column new_boolean_field UInt8 default true;
+alter table migtest_e_basic add column new_boolean_field UInt8 default 1;
 update migtest_e_basic set new_boolean_field = old_boolean;
 
-alter table migtest_e_basic add column new_boolean_field2 UInt8 default true;
+alter table migtest_e_basic add column new_boolean_field2 UInt8 default 1;
 alter table migtest_e_basic add column progress UInt32 default 0;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add column new_integer UInt32 default 42;
@@ -67,7 +67,7 @@ alter table migtest_e_history2 add column test_string3 String default 'unknown';
 alter table migtest_e_history2 add column new_column String;
 
 alter table migtest_e_history4 alter column test_number UInt64;
-alter table migtest_e_history5 add column test_boolean UInt8 default false;
+alter table migtest_e_history5 add column test_boolean UInt8 default 0;
 
 
 -- NOTE: table has @History - special migration may be necessary
@@ -75,7 +75,7 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 set null;
-alter table migtest_e_softdelete add column deleted UInt8 default false;
+alter table migtest_e_softdelete add column deleted UInt8 default 0;
 
 alter table migtest_oto_child add column master_id UInt64;
 
