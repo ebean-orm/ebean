@@ -29,7 +29,16 @@ public class PlatformDdl_dropUniqueConstraintTest {
     sql = pgDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("alter table mytab drop constraint uq_name", sql);
     sql = oraDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
-    assertEquals("alter table mytab drop constraint uq_name", sql);
+    assertEquals("delimiter $$\n"
+        + "declare\n"
+        + "  expected_error exception;\n"
+        + "  pragma exception_init(expected_error, -2443);\n"
+        + "begin\n"
+        + "  execute immediate 'alter table mytab drop constraint uq_name';\n"
+        + "exception\n"
+        + "  when expected_error then null;\n"
+        + "end;\n"
+        + "$$", sql);
     sql = sqlServerDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals(
           "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('mytab','U') AND name = 'uq_name') drop index uq_name ON mytab;\n"

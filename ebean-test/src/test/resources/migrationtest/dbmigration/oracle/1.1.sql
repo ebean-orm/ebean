@@ -36,13 +36,31 @@ alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id);
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status';
+exception
+  when expected_error then null;
+end;
+$$;
 alter table migtest_e_basic modify status default 'A';
 alter table migtest_e_basic modify status not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
-alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2';
+exception
+  when expected_error then null;
+end;
+$$;
 alter table migtest_e_basic modify status2 varchar2(127);
-alter table migtest_e_basic modify status2 drop default;
+alter table migtest_e_basic modify status2 default null;
 alter table migtest_e_basic modify status2 null;
 
 -- rename all collisions;
@@ -60,13 +78,40 @@ alter table migtest_e_basic add progress number(10) default 0 not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
 alter table migtest_e_basic add new_integer number(10) default 42 not null;
 
-alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
-alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2';
+exception
+  when expected_error then null;
+end;
+$$;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6';
+exception
+  when expected_error then null;
+end;
+$$;
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_mgtst__bsc_stts_ndxtst1 unique  (status,indextest1);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
-alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
+  execute immediate 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
+exception
+  when expected_error then null;
+end;
+$$;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 alter table migtest_e_history modify test_string number(19);
 comment on table migtest_e_history is 'We have history now';
