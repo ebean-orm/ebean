@@ -57,19 +57,21 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
       if (isNumberType(currentType)) {
         // numbers can always be converted to decimal
         buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-          .append(" decimal ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
-          .endOfStatement();
+            .append(" decimal ").append(notnullClause).append(alterColumnSuffix)
+            .endOfStatement();
 
       } else if (isStringType(currentType)) {
         // strings can always be converted to nclob
+        // Note: we do not add default clause here to avoid error[SAP DBTech JDBC: [336]: invalid default value:
+        // default value cannot be created on column of data type NCLOB 
         buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-          .append(" nclob ").append(defaultValueClause).append(notnullClause).append(alterColumnSuffix)
-          .endOfStatement();
+            .append(" nclob").append(notnullClause).append(alterColumnSuffix)
+            .endOfStatement();
       }
     }
 
     buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-      .append(" ").append(type).append(defaultValueClause).append(notnullClause).append(alterColumnSuffix);
+        .append(" ").append(type).append(defaultValueClause).append(notnullClause).append(alterColumnSuffix);
 
     return buffer.getBuffer();
   }
