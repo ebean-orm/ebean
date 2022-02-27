@@ -23,4 +23,20 @@ public class EHistory {
   @DbMigration(platforms = Platform.POSTGRES,
       preAlter = "alter table ${table} alter column ${column} TYPE bigint USING (${column}::integer)")
   Long testString;
+
+  public Long getTestString() {
+    return testString;
+  }
+
+  public void setTestString(Long testString) {
+    this.testString = testString;
+  }
+
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
 }

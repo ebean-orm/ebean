@@ -195,6 +195,14 @@ public abstract class BaseTestCase {
     return Platform.DB2 == platform();
   }
 
+  public boolean isSqLite() {
+    return Platform.SQLITE == platform();
+  }
+
+  public boolean isClickHouse() {
+    return Platform.CLICKHOUSE == platform();
+  }
+
   public boolean platformDistinctOn() {
     return isPostgresCompatible();
   }
