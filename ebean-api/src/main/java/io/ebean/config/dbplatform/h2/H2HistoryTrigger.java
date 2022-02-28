@@ -76,7 +76,13 @@ public class H2HistoryTrigger implements Trigger {
   public void fire(Connection connection, Object[] oldRow, Object[] newRow) throws SQLException {
     if (oldRow != null) {
       // a delete or update event
-      Timestamp now = new Timestamp(System.currentTimeMillis());
+      long nowMillis = System.currentTimeMillis();
+      Timestamp lastStart = (Timestamp) oldRow[effectStartPosition];
+      if (lastStart != null && lastStart.getTime() >= nowMillis) {
+        nowMillis = lastStart.getTime() + 1;
+      }
+
+      Timestamp now = new Timestamp(nowMillis);
       oldRow[effectEndPosition] = now;
       if (newRow != null) {
         // update event. Set the effective start timestamp to now.
