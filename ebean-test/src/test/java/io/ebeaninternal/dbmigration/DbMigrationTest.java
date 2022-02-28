@@ -213,6 +213,11 @@ public class DbMigrationTest extends BaseTestCase {
       hist2.setTestString2("bar1");
       hist2.setTestString3("baz1");
       tmpServer.save(hist2);
+      try {
+        Thread.sleep(1);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
       hist2.setTestString("foo2");
       hist2.setTestString2("bar2");
       tmpServer.save(hist2);
