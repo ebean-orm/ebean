@@ -224,19 +224,17 @@ public class DbMigrationTest extends BaseTestCase {
       // not all platforms will support history exclusions
       switch (server().platform()) {
       case H2: // Trigger ignores HistoryExclude
-
       case SQLSERVER17: // these DBs are 'standard based' so they also do not support HistoryExclude
       case MARIADB:
       case HANA:
-        assertThat(versions2.get(0).getDiff().toString()).as("using platform: %s", server().platform())
+        assertThat(versions2.get(0).getDiff().toString()).as("using platform: %s, versions2:%s", server().platform(), versions2)
             .contains("testString=foo2,foo1")
             .contains("testString2=bar2,bar1");
         break;
-
       case MYSQL:
       case POSTGRES:
       case YUGABYTE:
-        assertThat(versions2.get(0).getDiff().toString()).as("using platform: %s", server().platform())
+        assertThat(versions2.get(0).getDiff().toString()).as("using platform: %s, versions2:%s", server().platform(), versions2)
             .contains("testString=foo2,foo1")
             .contains("testString2=bar2,null");
         break;
