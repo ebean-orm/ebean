@@ -196,7 +196,7 @@ public class DbMigrationTest extends BaseTestCase {
       hist.setId(2);
       hist.setTestString(42L);
       tmpServer.save(hist);
-
+      sleepOneMilli();
       hist = tmpServer.find(EHistory.class).where().eq("testString", 42L).findOne();
       hist.setTestString(45L);
       tmpServer.save(hist);
@@ -213,12 +213,7 @@ public class DbMigrationTest extends BaseTestCase {
       hist2.setTestString2("bar1");
       hist2.setTestString3("baz1");
       tmpServer.save(hist2);
-      try {
-        // bit of a hack for H2HistoryTrigger with JDK 11+ JVMs, probably need more than millis precision for H2 history
-        Thread.sleep(1);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
-      }
+      sleepOneMilli();
       hist2.setTestString("foo2");
       hist2.setTestString2("bar2");
       tmpServer.save(hist2);
@@ -250,6 +245,15 @@ public class DbMigrationTest extends BaseTestCase {
 
     } finally {
       tmpServer.shutdown(false, false);
+    }
+  }
+
+  private void sleepOneMilli() {
+    try {
+      // bit of a hack for H2HistoryTrigger with JDK 11+ JVMs, probably need more than millis precision for H2 history
+      Thread.sleep(1);
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
     }
   }
 
