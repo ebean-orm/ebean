@@ -16,7 +16,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-runner</artifactId>
-      <version>1.2</version>
+      <version>${ebean-ddl-runner.version}</version>
     </dependency>
 
     <dependency>
