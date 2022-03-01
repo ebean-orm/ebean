@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class DbMigrationTest extends BaseTestCase {
 
-  private void runScript(String scriptName) throws IOException {
+  private void runScript(String scriptName) {
     URL url = getClass().getResource("/migrationtest/dbmigration/" + server().platform().name().toLowerCase() + "/" + scriptName);
     assert url != null : scriptName +  " not found";
     server().script().run(url);
@@ -188,7 +188,7 @@ public class DbMigrationTest extends BaseTestCase {
     config.setDdlGenerate(false);
     config.setDdlRun(false);
     config.setRegister(false);
-    config.setPackages(Arrays.asList("misc.migration.v1_1"));
+    config.setPackages(Collections.singletonList("misc.migration.v1_1"));
 
     Database tmpServer = DatabaseFactory.create(config);
     try {
@@ -196,8 +196,8 @@ public class DbMigrationTest extends BaseTestCase {
       hist.setId(2);
       hist.setTestString(42L);
       tmpServer.save(hist);
-      sleepOneMilli();
       hist = tmpServer.find(EHistory.class).where().eq("testString", 42L).findOne();
+      assert hist != null;
       hist.setTestString(45L);
       tmpServer.save(hist);
 
@@ -213,7 +213,6 @@ public class DbMigrationTest extends BaseTestCase {
       hist2.setTestString2("bar1");
       hist2.setTestString3("baz1");
       tmpServer.save(hist2);
-      sleepOneMilli();
       hist2.setTestString("foo2");
       hist2.setTestString2("bar2");
       tmpServer.save(hist2);
@@ -246,15 +245,6 @@ public class DbMigrationTest extends BaseTestCase {
     } finally {
       tmpServer.shutdown(false, false);
     }
-  }
-
-  private void sleepOneMilli() {
-//    try {
-//      // bit of a hack for H2HistoryTrigger with JDK 11+ JVMs, probably need more than millis precision for H2 history
-//      Thread.sleep(1);
-//    } catch (InterruptedException e) {
-//      throw new RuntimeException(e);
-//    }
   }
 
   private void createHistoryEntities() {
