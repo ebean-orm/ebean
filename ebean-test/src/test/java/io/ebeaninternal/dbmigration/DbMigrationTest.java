@@ -249,12 +249,12 @@ public class DbMigrationTest extends BaseTestCase {
   }
 
   private void sleepOneMilli() {
-    try {
-      // bit of a hack for H2HistoryTrigger with JDK 11+ JVMs, probably need more than millis precision for H2 history
-      Thread.sleep(1);
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+//    try {
+//      // bit of a hack for H2HistoryTrigger with JDK 11+ JVMs, probably need more than millis precision for H2 history
+//      Thread.sleep(1);
+//    } catch (InterruptedException e) {
+//      throw new RuntimeException(e);
+//    }
   }
 
   private void createHistoryEntities() {
