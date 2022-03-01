@@ -44,7 +44,6 @@ public class DdlGenerator implements SpiDdlGenerator {
   private final boolean extraDdl;
   private final boolean createOnly;
   private final boolean jaxbPresent;
-  private final boolean ddlAutoCommit;
   private final String dbSchema;
   private final ScriptTransform scriptTransform;
   private final Platform platform;
@@ -70,11 +69,9 @@ public class DdlGenerator implements SpiDdlGenerator {
     if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
       log.warn("DDL can't be run on startup with TenantMode " + config.getTenantMode());
       this.runDdl = false;
-      this.ddlAutoCommit = false;
       this.useMigrationStoredProcedures = false;
     } else {
       this.runDdl = config.isDdlRun();
-      this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
       this.useMigrationStoredProcedures = config.getDatabasePlatform().isUseMigrationStoredProcedures();
     }
     this.scriptTransform = createScriptTransform(config);
@@ -166,11 +163,11 @@ public class DdlGenerator implements SpiDdlGenerator {
 
     DdlRunner runner = createDdlRunner(expectErrors, scriptName);
     try {
-      if (expectErrors || ddlAutoCommit) {
+      if (expectErrors) {
         connection.setAutoCommit(true);
       }
       runner.runAll(scriptTransform.transform(content), connection);
-      if (expectErrors || ddlAutoCommit) {
+      if (expectErrors) {
         connection.setAutoCommit(false);
       }
       connection.commit();

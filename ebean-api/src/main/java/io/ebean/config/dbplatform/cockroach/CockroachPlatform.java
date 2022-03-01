@@ -14,12 +14,4 @@ public class CockroachPlatform extends PostgresPlatform {
     this.historySupport = null; // not yet implemented in DDL
   }
 
-  /**
-   * Needs a commit after create index such that alter table add foreign key ... succeeds.
-   */
-  @Override
-  public boolean isDdlAutoCommit() {
-    return false;
-  }
-
 }
