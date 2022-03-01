@@ -214,6 +214,7 @@ public class DbMigrationTest extends BaseTestCase {
       hist2.setTestString3("baz1");
       tmpServer.save(hist2);
       try {
+        // bit of a hack for H2HistoryTrigger with JDK 11+ JVMs, probably need more than millis precision for H2 history
         Thread.sleep(1);
       } catch (InterruptedException e) {
         throw new RuntimeException(e);
