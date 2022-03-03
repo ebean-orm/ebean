@@ -5,11 +5,7 @@ import io.ebeaninternal.api.SpiBackgroundExecutor;
 import org.slf4j.MDC;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * The default implementation of the BackgroundExecutor.
@@ -17,13 +13,15 @@ import java.util.concurrent.TimeUnit;
 @NonNullApi
 public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
-  private final ScheduledExecutorService executor;
+  private final ScheduledExecutorService schedulePool;
+  private final DaemonExecutorService pool;
 
   /**
    * Construct the default implementation of BackgroundExecutor.
    */
   public DefaultBackgroundExecutor(int schedulePoolSize, int shutdownWaitSeconds, String namePrefix) {
-    this.executor = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix);
+    this.schedulePool = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix + "-periodic-");
+    this.pool = new DaemonExecutorService(shutdownWaitSeconds, namePrefix);
   }
 
   /**
@@ -66,7 +64,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public <T> Future<T> submit(Callable<T> task) {
-    return executor.submit(wrapMDC(task));
+    return pool.submit(wrapMDC(task));
   }
 
   /**
@@ -74,7 +72,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
    */
   @Override
   public Future<?> submit(Runnable task) {
-    return executor.submit(wrapMDC(task));
+    return pool.submit(wrapMDC(task));
   }
 
   @Override
@@ -84,37 +82,38 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public void executePeriodically(Runnable task, long delay, TimeUnit unit) {
-    executor.scheduleWithFixedDelay(wrapMDC(task), delay, delay, unit);
+    schedulePool.scheduleWithFixedDelay(wrapMDC(task), delay, delay, unit);
   }
 
   @Override
   public void executePeriodically(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    executor.scheduleWithFixedDelay(wrapMDC(task), initialDelay, delay, unit);
+    schedulePool.scheduleWithFixedDelay(wrapMDC(task), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    return executor.scheduleWithFixedDelay(wrapMDC(task), initialDelay, delay, unit);
+    return schedulePool.scheduleWithFixedDelay(wrapMDC(task), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    return executor.scheduleAtFixedRate(wrapMDC(task), initialDelay, delay, unit);
+    return schedulePool.scheduleAtFixedRate(wrapMDC(task), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-    return executor.schedule(wrapMDC(task), delay, unit);
+    return schedulePool.schedule(wrapMDC(task), delay, unit);
   }
 
   @Override
   public <V> ScheduledFuture<V> schedule(Callable<V> task, long delay, TimeUnit unit) {
-    return executor.schedule(wrapMDC(task), delay, unit);
+    return schedulePool.schedule(wrapMDC(task), delay, unit);
   }
 
   @Override
   public void shutdown() {
-    executor.shutdown();
+    schedulePool.shutdown();
+    pool.shutdown();
   }
 
 }
