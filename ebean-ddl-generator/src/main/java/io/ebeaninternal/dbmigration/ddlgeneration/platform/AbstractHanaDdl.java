@@ -5,6 +5,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
 import java.util.Objects;
@@ -38,7 +39,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterColumnBaseAttributes(AlterColumn alter) {
+  public void alterColumn(DdlWrite writer, AlterColumn alter) {
     String tableName = alter.getTableName();
     String columnName = alter.getColumnName();
     String currentType = alter.getCurrentType();
@@ -51,7 +52,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
       : (alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue());
     String defaultValueClause = (defaultValue == null || defaultValue.isEmpty()) ? "" : " default " + defaultValue;
 
-    DdlBuffer buffer = new BaseDdlBuffer();
+    DdlBuffer buffer = writer.apply();
     if (!isConvertible(currentType, type)) {
       // add an intermediate conversion if possible
       if (isNumberType(currentType)) {
@@ -73,27 +74,12 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
     buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
         .append(" ").append(type).append(defaultValueClause).append(notnullClause).append(alterColumnSuffix);
 
-    return buffer.getBuffer();
-  }
-
-  @Override
-  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
-    return null;
+    buffer.endOfStatement();
   }
 
   @Override
   public DdlHandler createDdlHandler(DatabaseConfig config) {
     return new HanaDdlHandler(config, this);
-  }
-
-  @Override
-  public String alterColumnType(String tableName, String columnName, String type) {
-    return null;
   }
 
   @Override
@@ -140,8 +126,8 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
    * foreign keys. That's why we call a user stored procedure here
    */
   @Override
-  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) {
-    buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')")
+  public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
+    writer.apply().append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')")
       .endOfStatement();
   }
 

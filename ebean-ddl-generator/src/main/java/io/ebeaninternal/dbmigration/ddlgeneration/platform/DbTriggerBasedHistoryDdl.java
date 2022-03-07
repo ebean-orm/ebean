@@ -5,6 +5,7 @@ import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
+import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
@@ -241,8 +242,10 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected void dropSysPeriodColumns(DdlBuffer buffer, String baseTableName) {
-    platformDdl.alterTableDropColumn(buffer, baseTableName, sysPeriodStart);
-    platformDdl.alterTableDropColumn(buffer, baseTableName, sysPeriodEnd);
+    DdlWrite writer = new DdlWrite();
+    platformDdl.alterTableDropColumn(writer, baseTableName, sysPeriodStart);
+    platformDdl.alterTableDropColumn(writer, baseTableName, sysPeriodEnd);
+    buffer.append(writer.apply().getBuffer()); // Workaround - will be removed later
   }
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) {

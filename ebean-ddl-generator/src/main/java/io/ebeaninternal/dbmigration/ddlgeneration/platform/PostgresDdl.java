@@ -2,6 +2,8 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
 /**
  * Postgres specific DDL.
@@ -56,7 +58,13 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterColumnType(String tableName, String columnName, String type) {
-    return super.alterColumnType(tableName, columnName, type) + " using " + columnName + "::" + convert(type);
+  protected void alterColumnType(DdlWrite writer, AlterColumn alter) {
+    String type = convert(alter.getType());
+
+    writer.apply().append("alter table ").append(alter.getTableName())
+      .appendWithSpace(alterColumn).appendWithSpace(alter.getColumnName())
+      .appendWithSpace(columnSetType).append(type)
+      .append(" using ").append(alter.getColumnName()).append("::").append(type)
+      .endOfStatement();
   }
 }

@@ -3,6 +3,8 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
 /**
  * SQLite platform specific DDL.
@@ -59,18 +61,21 @@ public class SQLiteDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-    return "-- not supported: " + super.alterColumnDefaultValue(tableName, columnName, defaultValue);
+  public void alterColumnType(DdlWrite writer, AlterColumn alter) {
+    writer.apply().append("-- not supported: ");
+    super.alterColumnType(writer, alter);
   }
 
   @Override
-  public String alterColumnType(String tableName, String columnName, String type) {
-    return "-- not supported: " + super.alterColumnType(tableName, columnName, type);
+  public void alterColumnDefault(DdlWrite writer, AlterColumn alter) {
+    writer.apply().append("-- not supported: ");
+    super.alterColumnDefault(writer, alter);
   }
 
   @Override
-  public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
-    return "-- not supported: " + super.alterColumnNotnull(tableName, columnName, notnull);
+  public void alterColumnNotnull(DdlWrite writer, AlterColumn alter) {
+    writer.apply().append("-- not supported: ");
+    super.alterColumnNotnull(writer, alter);
   }
 
 }
