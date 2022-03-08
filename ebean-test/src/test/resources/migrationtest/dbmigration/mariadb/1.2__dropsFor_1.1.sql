@@ -12,5 +12,5 @@ CALL usp_ebean_drop_column('migtest_e_history2', 'obsolete_string1');
 
 CALL usp_ebean_drop_column('migtest_e_history2', 'obsolete_string2');
 
-drop table if exists migtest_e_ref;
 drop sequence if exists migtest_e_ref_seq;
+drop table if exists migtest_e_ref;
