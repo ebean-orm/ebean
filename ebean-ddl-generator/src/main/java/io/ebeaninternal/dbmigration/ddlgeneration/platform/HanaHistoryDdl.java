@@ -19,7 +19,6 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   private String systemPeriodEnd;
   private PlatformDdl platformDdl;
   private String historySuffix;
-  private final AtomicInteger counter = new AtomicInteger(0);
   private Map<String, String> createdHistoryTables = new ConcurrentHashMap<>();
 
   @Override
@@ -64,7 +63,8 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
     apply.append("alter table ").append(tableName).append(" add period for system_time(").append(systemPeriodStart)
       .append(",").append(systemPeriodEnd).append(")").endOfStatement();
 
-    enableSystemVersioning(apply, tableName, historyTableName, true, false);
+    enableSystemVersioning(apply, tableName, true);
+    platformDdl.alterTable(writer, tableName).setHistoryHandled();
 
     createdHistoryTables.put(tableName, historyTableName);
 
@@ -123,29 +123,13 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   public void disableSystemVersioning(DdlBuffer apply, String tableName) {
-    disableSystemVersioning(apply, tableName, false);
+    apply.append("alter table ").append(tableName).append(" drop system versioning").endOfStatement();
   }
 
-  public void disableSystemVersioning(DdlBuffer apply, String tableName, boolean uniqueStatement) {
-    apply.append("alter table ").append(tableName).append(" drop system versioning");
-    if (uniqueStatement) {
-      // needed for the DB migration test to prevent the statement from being filtered
-      // out as a duplicate
-      apply.append(" /* ").append(String.valueOf(counter.getAndIncrement())).append(" */");
-    }
-    apply.endOfStatement();
-  }
-
-  public void enableSystemVersioning(DdlBuffer apply, String tableName, String historyTableName, boolean validated,
-                                     boolean uniqueStatement) {
-    apply.append("alter table ").append(tableName).append(" add system versioning history table ").append(historyTableName);
+  public void enableSystemVersioning(DdlBuffer apply, String tableName, boolean validated) {
+    apply.append("alter table ").append(tableName).append(" add system versioning history table ").append(tableName).append(historySuffix);
     if (!validated) {
       apply.append(" not validated");
-    }
-    if (uniqueStatement) {
-      // needed for the DB migration test to prevent the statement from being filtered
-      // out as a duplicate
-      apply.append(" /* ").append(String.valueOf(counter.getAndIncrement())).append(" */");
     }
     apply.endOfStatement();
   }

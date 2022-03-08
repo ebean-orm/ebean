@@ -1,10 +1,13 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
 /**
  * SQLite platform specific DDL.
@@ -61,21 +64,28 @@ public class SQLiteDdl extends PlatformDdl {
   }
 
   @Override
-  public void alterColumnType(DdlWrite writer, AlterColumn alter) {
-    writer.apply().append("-- not supported: ");
-    super.alterColumnType(writer, alter);
+  protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
+    return writer.applyAlterTable(tableName, SQLiteAlterTableWrite::new);
   }
 
-  @Override
-  public void alterColumnDefault(DdlWrite writer, AlterColumn alter) {
-    writer.apply().append("-- not supported: ");
-    super.alterColumnDefault(writer, alter);
-  }
+  static class SQLiteAlterTableWrite extends BaseAlterTableWrite {
+    public SQLiteAlterTableWrite(String tableName) {
+      super(tableName);
+    }
 
-  @Override
-  public void alterColumnNotnull(DdlWrite writer, AlterColumn alter) {
-    writer.apply().append("-- not supported: ");
-    super.alterColumnNotnull(writer, alter);
+    @Override
+    protected List<AlterCmd> postProcessCommands(List<AlterCmd> cmds) {
+      List<AlterCmd> ret = new ArrayList<AlterCmd>();
+      for (AlterCmd cmd : cmds) {
+        switch (cmd.getOperation()) {
+        case "alter column":
+          ret.add(newRawCommand("-- not supported: " + cmd));
+          break;
+        default:
+          ret.add(cmd);
+        }
+      }
+      return ret;
+    }
   }
-
 }
