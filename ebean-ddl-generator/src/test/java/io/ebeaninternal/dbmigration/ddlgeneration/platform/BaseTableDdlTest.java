@@ -55,7 +55,7 @@ public class BaseTableDdlTest {
     column.setName("col_name");
     column.setType("varchar(20)");
 
-    ddlGen.alterTableAddColumn(writer.apply(), "mytable", column, false, false);
+    ddlGen.alterTableAddColumn(writer, "mytable", column, false, false);
 
     String ddl = writer.apply().getBuffer();
     assertThat(ddl).contains("alter table mytable add col_name varchar2(20)");
@@ -72,7 +72,7 @@ public class BaseTableDdlTest {
     column.setName("col_name");
     column.setType("varchar(20)");
 
-    ddlGen.alterTableAddColumn(writer.apply(), "mytable", column, false, false);
+    ddlGen.alterTableAddColumn(writer, "mytable", column, false, false);
 
     String ddl = writer.apply().getBuffer();
     assertThat(ddl).contains("alter table mytable add column col_name String");
@@ -105,7 +105,7 @@ public class BaseTableDdlTest {
     column.setComment("some comment");
     column.setType("int");
 
-    ddl.alterTableAddColumn(writer.apply(), "my_table", column, false, false);
+    ddl.alterTableAddColumn(writer, "my_table", column, false, false);
     assertEquals(
       "alter table my_table add column my_column int;\n" +
         "comment on column my_table.my_column is 'some comment';\n",

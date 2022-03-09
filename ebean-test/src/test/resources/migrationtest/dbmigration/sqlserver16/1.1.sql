@@ -36,11 +36,12 @@ IF OBJECT_ID('fk_migtest_fk_set_null_one_id', 'F') IS NOT NULL alter table migte
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id);
 
 update migtest_e_basic set status = 'A' where status is null;
-IF (OBJECT_ID('ck_migtest_e_basic_status', 'C') IS NOT NULL) alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
-alter table migtest_e_basic add default 'A' for status;
+IF OBJECT_ID('ck_migtest_e_basic_status', 'C') IS NOT NULL alter table migtest_e_basic drop constraint ck_migtest_e_basic_status;
+EXEC usp_ebean_drop_default_constraint migtest_e_basic, status;
 alter table migtest_e_basic alter column status varchar(1) not null;
+alter table migtest_e_basic add default 'A' for status;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
-IF (OBJECT_ID('ck_migtest_e_basic_status2', 'C') IS NOT NULL) alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2;
+IF OBJECT_ID('ck_migtest_e_basic_status2', 'C') IS NOT NULL alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2;
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, status2;
 alter table migtest_e_basic alter column status2 varchar(127);
 
@@ -60,20 +61,21 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( p
 alter table migtest_e_basic add new_integer integer default 42 not null;
 
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest2') drop index uq_migtest_e_basic_indextest2 ON migtest_e_basic;
-IF (OBJECT_ID('uq_migtest_e_basic_indextest2', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
+IF OBJECT_ID('uq_migtest_e_basic_indextest2', 'UQ') IS NOT NULL alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest6') drop index uq_migtest_e_basic_indextest6 ON migtest_e_basic;
-IF (OBJECT_ID('uq_migtest_e_basic_indextest6', 'UQ') IS NOT NULL) alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+IF OBJECT_ID('uq_migtest_e_basic_indextest6', 'UQ') IS NOT NULL alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
 create unique nonclustered index uq_migtest_e_basic_status_indextest1 on migtest_e_basic(status,indextest1) where indextest1 is not null;
 create unique nonclustered index uq_migtest_e_basic_name on migtest_e_basic(name) where name is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) where indextest4 is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) where indextest5 is not null;
-IF (OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL) alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
+IF OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
 alter table migtest_e_history alter column test_string numeric(19);
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
-alter table migtest_e_history2 add default 'unknown' for test_string;
+EXEC usp_ebean_drop_default_constraint migtest_e_history2, test_string;
 alter table migtest_e_history2 alter column test_string varchar(255) not null;
+alter table migtest_e_history2 add default 'unknown' for test_string;
 alter table migtest_e_history2 add test_string2 varchar(255);
 alter table migtest_e_history2 add test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2 add new_column varchar(20);
@@ -84,8 +86,9 @@ alter table migtest_e_history5 add test_boolean bit default 0 not null;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
-alter table migtest_e_history6 add default 42 for test_number1;
+EXEC usp_ebean_drop_default_constraint migtest_e_history6, test_number1;
 alter table migtest_e_history6 alter column test_number1 integer not null;
+alter table migtest_e_history6 add default 42 for test_number1;
 alter table migtest_e_history6 alter column test_number2 integer;
 alter table migtest_e_softdelete add deleted bit default 0 not null;
 

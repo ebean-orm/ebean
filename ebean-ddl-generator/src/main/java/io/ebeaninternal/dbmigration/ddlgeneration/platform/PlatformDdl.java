@@ -538,10 +538,10 @@ public class PlatformDdl {
     return buffer.toString();
   }
 
-  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
+  public void alterTableAddColumn(DdlWrite writer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
 
     String convertedType = convert(column.getType());
-
+    DdlBuffer buffer = writer.apply();
     buffer.append("alter table ").append(tableName)
       .append(" ").append(addColumn).append(" ").append(column.getName())
       .append(" ").append(convertedType);
@@ -575,8 +575,9 @@ public class PlatformDdl {
 
   }
 
-  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) {
-    buffer.append("alter table ").append(tableName).append(" ").append(dropColumn).append(" ").append(columnName)
+  public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
+    writer.apply().append("alter table ").append(tableName).append(" ")
+      .append(dropColumn).append(" ").append(columnName)
       .append(dropColumnSuffix).endOfStatement();
   }
 
@@ -592,22 +593,32 @@ public class PlatformDdl {
   /**
    * Alter a column type.
    * <p>
-   * Note that that MySql and SQL Server instead use alterColumnBaseAttributes()
+   * Note that that MySql, SQL Server, and HANA instead use alterColumn()
    * </p>
    */
-  public String alterColumnType(String tableName, String columnName, String type) {
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + convert(type) + alterColumnSuffix;
+  protected void alterColumnType(DdlWrite writer, AlterColumn alter) {
+    writer.apply().append("alter table ").append(alter.getTableName())
+      .appendWithSpace(alterColumn).appendWithSpace(alter.getColumnName())
+      .append(" ").append(columnSetType).append(convert(alter.getType()))
+      .endOfStatement();
   }
 
   /**
    * Alter a column adding or removing the not null constraint.
    * <p>
-   * Note that that MySql, SQL Server, and HANA instead use alterColumnBaseAttributes()
+   * Note that that MySql, SQL Server, and HANA instead use alterColumn()
    * </p>
    */
-  public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
-    String suffix = notnull ? columnSetNotnull : columnSetNull;
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix + alterColumnSuffix;
+  protected void alterColumnNotnull(DdlWrite writer, AlterColumn alter) {
+
+    DdlBuffer buffer = writer.apply().append("alter table ").append(alter.getTableName())
+      .appendWithSpace(alterColumn).appendWithSpace(alter.getColumnName());
+    if (Boolean.TRUE.equals(alter.isNotnull())) {
+      buffer.appendWithSpace(columnSetNotnull);
+    } else {
+      buffer.appendWithSpace(columnSetNull);
+    }
+    buffer.endOfStatement();
   }
 
   /**
@@ -619,22 +630,41 @@ public class PlatformDdl {
 
   /**
    * Alter column setting the default value.
+   * <p>
+   * Note that that MySql, SQL Server, and HANA instead use alterColumn()
+   * </p>
    */
-  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix + alterColumnSuffix;
+  protected void alterColumnDefault(DdlWrite writer, AlterColumn alter) {
+    DdlBuffer buffer = writer.apply().append("alter table ").append(alter.getTableName())
+      .appendWithSpace(alterColumn).appendWithSpace(alter.getColumnName());
+    if (DdlHelp.isDropDefault(alter.getDefaultValue())) {
+      buffer.appendWithSpace(columnDropDefault);
+    } else {
+      buffer.appendWithSpace(columnSetDefault).appendWithSpace(convertDefaultValue(alter.getDefaultValue()));
+    }
+    buffer.endOfStatement();
   }
 
   /**
-   * Alter column setting both the type and not null constraint.
+   * Alter column setting (type, default value and not null constraint).
    * <p>
-   * Used by MySql, SQL Server, and HANA as these require both column attributes to be set together.
+   * Used by MySql, SQL Server, and HANA as these require all column attributes to
+   * be set together.
    * </p>
    */
-  public String alterColumnBaseAttributes(AlterColumn alter) {
-    // by default do nothing, only used by mysql, sql server, and HANA as they can only
-    // modify the column with the full column definition
-    return null;
+  public void alterColumn(DdlWrite writer, AlterColumn alter) {
+
+    if (hasValue(alter.getType())) {
+      alterColumnType(writer, alter);
+    }
+
+    if (hasValue(alter.getDefaultValue())) {
+      alterColumnDefault(writer, alter);
+    }
+
+    if (alter.isNotnull() != null) {
+      alterColumnNotnull(writer, alter);
+    }
   }
 
   protected void appendColumns(String[] columns, StringBuilder buffer) {

@@ -3,6 +3,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 import io.ebean.DB;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
@@ -14,12 +15,12 @@ import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
 import io.ebeaninternal.dbmigration.migration.Column;
+
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.assertj.core.api.SoftAssertions;
 
 public class PlatformDdl_AlterColumnTest {
 
@@ -31,229 +32,359 @@ public class PlatformDdl_AlterColumnTest {
   private final PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
   private final PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServer17Platform());
   private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
+  private final PlatformDdl db2Ddl = PlatformDdlBuilder.create(new DB2LuwPlatform());
+
+  private final SoftAssertions softly = new SoftAssertions();
 
   {
     DatabaseConfig serverConfig = DB.getDefault().pluginApi().config();
     sqlServerDdl.configure(serverConfig);
   }
 
-  AlterColumn alterNotNull() {
-    AlterColumn alterColumn = new AlterColumn();
-    alterColumn.setTableName("mytab");
-    alterColumn.setColumnName("acol");
-    alterColumn.setCurrentType("varchar(5)");
-    alterColumn.setNotnull(Boolean.TRUE);
-
-    return alterColumn;
+  @AfterEach
+  void assertAll() {
+    softly.assertAll();
   }
 
   @Test
   public void convertArrayType_default() {
-    assertThat(mysqlDdl.convertArrayType("varchar[](90)")).isEqualTo("varchar(90)");
-    assertThat(mysqlDdl.convertArrayType("integer[](60)")).isEqualTo("varchar(60)");
-    assertThat(mysqlDdl.convertArrayType("varchar[]")).isEqualTo("varchar(1000)");
-    assertThat(mysqlDdl.convertArrayType("integer[]")).isEqualTo("varchar(1000)");
+    softly.assertThat(mysqlDdl.convertArrayType("varchar[](90)")).isEqualTo("varchar(90)");
+    softly.assertThat(mysqlDdl.convertArrayType("integer[](60)")).isEqualTo("varchar(60)");
+    softly.assertThat(mysqlDdl.convertArrayType("varchar[]")).isEqualTo("varchar(1000)");
+    softly.assertThat(mysqlDdl.convertArrayType("integer[]")).isEqualTo("varchar(1000)");
   }
 
   @Test
   public void convertArrayType_h2() {
     if (useV1Syntax) {
-      assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("array");
-      assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("array");
-      assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("array");
-      assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("array");
+      softly.assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("array");
+      softly.assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("array");
+      softly.assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("array");
+      softly.assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("array");
     } else {
-      assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("varchar array");
-      assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("integer array");
-      assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("varchar array");
-      assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("integer array");
+      softly.assertThat(h2Ddl.convertArrayType("varchar[](90)")).isEqualTo("varchar array");
+      softly.assertThat(h2Ddl.convertArrayType("integer[](60)")).isEqualTo("integer array");
+      softly.assertThat(h2Ddl.convertArrayType("varchar[]")).isEqualTo("varchar array");
+      softly.assertThat(h2Ddl.convertArrayType("integer[]")).isEqualTo("integer array");
     }
   }
 
   @Test
   public void convertArrayType_postgres() {
-    assertThat(pgDdl.convertArrayType("varchar[](90)")).isEqualTo("varchar[]");
-    assertThat(pgDdl.convertArrayType("integer[](60)")).isEqualTo("integer[]");
-    assertThat(pgDdl.convertArrayType("varchar[]")).isEqualTo("varchar[]");
-    assertThat(pgDdl.convertArrayType("integer[]")).isEqualTo("integer[]");
+    softly.assertThat(pgDdl.convertArrayType("varchar[](90)")).isEqualTo("varchar[]");
+    softly.assertThat(pgDdl.convertArrayType("integer[](60)")).isEqualTo("integer[]");
+    softly.assertThat(pgDdl.convertArrayType("varchar[]")).isEqualTo("varchar[]");
+    softly.assertThat(pgDdl.convertArrayType("integer[]")).isEqualTo("integer[]");
   }
 
   @Test
   public void convertArrayType_hana() {
-    assertThat(hanaDdl.convertArrayType("varchar[](90)")).isEqualTo("nvarchar(255) array(90)");
-    assertThat(hanaDdl.convertArrayType("integer[](60)")).isEqualTo("integer array(60)");
-    assertThat(hanaDdl.convertArrayType("varchar[]")).isEqualTo("nvarchar(255) array");
-    assertThat(hanaDdl.convertArrayType("integer[]")).isEqualTo("integer array");
+    softly.assertThat(hanaDdl.convertArrayType("varchar[](90)")).isEqualTo("nvarchar(255) array(90)");
+    softly.assertThat(hanaDdl.convertArrayType("integer[](60)")).isEqualTo("integer array(60)");
+    softly.assertThat(hanaDdl.convertArrayType("varchar[]")).isEqualTo("nvarchar(255) array");
+    softly.assertThat(hanaDdl.convertArrayType("integer[]")).isEqualTo("integer array");
   }
 
   @Test
   public void testAlterColumnBaseAttributes() {
 
-    AlterColumn alterColumn = alterNotNull();
-    assertNull(h2Ddl.alterColumnBaseAttributes(alterColumn));
-    assertNull(pgDdl.alterColumnBaseAttributes(alterColumn));
-    assertNull(oraDdl.alterColumnBaseAttributes(alterColumn));
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(5)");
+    alter.setCurrentDefaultValue("'ho'");
+    alter.setCurrentNotnull(Boolean.FALSE);
 
-    String sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab modify acol varchar(5) not null", sql);
+    // alter all attributes
+    alter.setNotnull(Boolean.TRUE); // -> alter to not null
+    alter.setDefaultValue("'hi'"); // and set default
+    alter.setType("varchar(50)"); // and alter type
 
-    sql = sqlServerDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab alter column acol nvarchar(5) not null", sql);
+    String sql = alterColumn(h2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol varchar(50);\n"
+      + "alter table mytab alter column acol set default 'hi';\n"
+      + "alter table mytab alter column acol set not null;\n");
 
-    sql = hanaDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab alter ( acol nvarchar(5) not null)", sql);
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol type varchar(50) using acol::varchar(50);\n"
+      + "alter table mytab alter column acol set default 'hi';\n"
+      + "alter table mytab alter column acol set not null;\n");
 
-    alterColumn.setNotnull(Boolean.FALSE);
-    sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab modify acol varchar(5)", sql);
+    sql = alterColumn(oraDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar2(50);\n"
+      + "alter table mytab modify acol default 'hi';\n"
+      + "alter table mytab modify acol not null;\n");
 
-    sql = hanaDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab alter ( acol nvarchar(5))", sql);
+    sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar(50) not null default 'hi';\n");
 
-    alterColumn.setNotnull(null);
-    alterColumn.setType("varchar(100)");
+    sql = alterColumn(sqlServerDdl, alter);
+    softly.assertThat(sql).isEqualTo("EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
+      + "alter table mytab alter column acol nvarchar(50) not null;\n"
+      + "alter table mytab add default 'hi' for acol;\n");
 
-    sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab modify acol varchar(100)", sql);
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nvarchar(50) default 'hi' not null);\n");
 
-    sql = hanaDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab alter ( acol nvarchar(100))", sql);
+    sql = alterColumn(db2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set data type varchar(50);\n"
+      + "alter table mytab alter column acol set default 'hi';\n"
+      + "alter table mytab alter column acol set not null;\n");
 
-    alterColumn.setCurrentNotnull(Boolean.TRUE);
-    sql = mysqlDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab modify acol varchar(100) not null", sql);
+    //
+    alter.setCurrentNotnull(Boolean.TRUE);
+    alter.setNotnull(Boolean.FALSE);
+    alter.setDefaultValue("DROP DEFAULT");
+    alter.setType(null); // do not alter type
 
-    sql = hanaDdl.alterColumnBaseAttributes(alterColumn);
-    assertEquals("alter table mytab alter ( acol nvarchar(100) not null)", sql);
+    sql = alterColumn(h2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n"
+      + "alter table mytab alter column acol set null;\n");
+
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n"
+      + "alter table mytab alter column acol drop not null;\n");
+
+    sql = alterColumn(oraDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol default null;\n"
+      + "alter table mytab modify acol null;\n");
+
+    sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar(5);\n");
+
+    sql = alterColumn(sqlServerDdl, alter);
+    softly.assertThat(sql).isEqualTo("EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
+      + "alter table mytab alter column acol nvarchar(5);\n");
+
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nvarchar(5) default null);\n");
+
+    sql = alterColumn(db2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n"
+      + "alter table mytab alter column acol drop not null;\n");
+
   }
 
   @Test
   public void testAlterColumnType() {
 
-    String sql = h2Ddl.alterColumnType("mytab", "acol", "varchar(20)");
-    assertEquals("alter table mytab alter column acol varchar(20)", sql);
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("integer");
+    alter.setType("varchar(20)");
 
-    sql = pgDdl.alterColumnType("mytab", "acol", "varchar(20)");
-    assertEquals("alter table mytab alter column acol type varchar(20) using acol::varchar(20)", sql);
-    sql = pgDdl.alterColumnType("mytab", "acol", "bigint");
-    assertEquals("alter table mytab alter column acol type bigint using acol::bigint", sql);
+    String sql = alterColumn(h2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol varchar(20);\n");
 
-    sql = oraDdl.alterColumnType("mytab", "acol", "varchar(20)");
-    assertEquals("alter table mytab modify acol varchar2(20)", sql);
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol type varchar(20) using acol::varchar(20);\n");
 
-    sql = mysqlDdl.alterColumnType("mytab", "acol", "varchar(20)");
-    assertNull(sql);
+    sql = alterColumn(oraDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar2(20);\n");
 
-    sql = sqlServerDdl.alterColumnType("mytab", "acol", "varchar(20)");
-    assertNull(sql);
+    sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar(20);\n");
 
-    sql = hanaDdl.alterColumnType("mytab", "acol", "varchar(20)");
-    assertNull(sql);
+    sql = alterColumn(sqlServerDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol nvarchar(20);\n");
+
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nvarchar(20));\n");
+
+    sql = alterColumn(db2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set data type varchar(20);\n");
+
+    alter.setType("bigint");
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol type bigint using acol::bigint;\n");
+
+    alter.setCurrentType("bigint");
+    alter.setType("integer");
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol decimal );\n"
+      + "alter table mytab alter ( acol integer);\n");
+
+    alter.setCurrentType("varchar(20)");
+    alter.setType("varchar(10)");
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nclob);\n"
+      + "alter table mytab alter ( acol nvarchar(10));\n");
+
   }
 
   @Test
   public void testAlterColumnNotnull() {
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(20)");
+    alter.setCurrentNotnull(Boolean.FALSE);
+    alter.setNotnull(Boolean.TRUE);
 
-    String sql = h2Ddl.alterColumnNotnull("mytab", "acol", true);
-    assertEquals("alter table mytab alter column acol set not null", sql);
+    String sql = alterColumn(h2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set not null;\n");
 
-    sql = pgDdl.alterColumnNotnull("mytab", "acol", true);
-    assertEquals("alter table mytab alter column acol set not null", sql);
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set not null;\n");
 
-    sql = oraDdl.alterColumnNotnull("mytab", "acol", true);
-    assertEquals("alter table mytab modify acol not null", sql);
+    sql = alterColumn(oraDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol not null;\n");
 
-    sql = mysqlDdl.alterColumnNotnull("mytab", "acol", true);
-    assertNull(sql);
+    sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar(20) not null;\n");
 
-    sql = sqlServerDdl.alterColumnNotnull("mytab", "acol", true);
-    assertNull(sql);
+    sql = alterColumn(sqlServerDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol nvarchar(20) not null;\n");
 
-    sql = hanaDdl.alterColumnNotnull("mytab", "acol", true);
-    assertNull(sql);
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nvarchar(20) not null);\n");
+
+    sql = alterColumn(db2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set not null;\n");
+
   }
 
   @Test
   public void testAlterColumnNull() {
 
-    String sql = h2Ddl.alterColumnNotnull("mytab", "acol", false);
-    assertEquals("alter table mytab alter column acol set null", sql);
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(20)");
+    alter.setCurrentDefaultValue("'hi'");
+    alter.setCurrentNotnull(Boolean.TRUE);
 
-    sql = pgDdl.alterColumnNotnull("mytab", "acol", false);
-    assertEquals("alter table mytab alter column acol drop not null", sql);
+    alter.setNotnull(Boolean.FALSE);
+    String sql = alterColumn(h2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set null;\n");
 
-    sql = oraDdl.alterColumnNotnull("mytab", "acol", false);
-    assertEquals("alter table mytab modify acol null", sql);
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop not null;\n");
 
-    sql = mysqlDdl.alterColumnNotnull("mytab", "acol", false);
-    assertNull(sql);
+    sql = alterColumn(oraDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol null;\n");
 
-    sql = sqlServerDdl.alterColumnNotnull("mytab", "acol", false);
-    assertNull(sql);
+    sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar(20) default 'hi';\n");
 
-    sql = hanaDdl.alterColumnNotnull("mytab", "acol", false);
-    assertNull(sql);
+    sql = alterColumn(sqlServerDdl, alter);
+    softly.assertThat(sql).isEqualTo("EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
+      + "alter table mytab alter column acol nvarchar(20);\n"
+      + "alter table mytab add default 'hi' for acol;\n");
+
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nvarchar(20) default 'hi');\n");
+
+    sql = alterColumn(db2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop not null;\n");
   }
 
   @Test
-  public void testAlterColumnDefaultValue() {
+  public void testAlterColumnAddDefaultValue() {
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(20)");
+    alter.setCurrentNotnull(Boolean.TRUE);
+    alter.setDefaultValue("'hi'");
 
-    String sql = h2Ddl.alterColumnDefaultValue("mytab", "acol", "'hi'");
-    assertEquals("alter table mytab alter column acol set default 'hi'", sql);
+    String sql = alterColumn(h2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
 
-    sql = pgDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
-    assertEquals("alter table mytab alter column acol set default 'hi'", sql);
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
 
-    sql = oraDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
-    assertEquals("alter table mytab modify acol default 'hi'", sql);
+    sql = alterColumn(oraDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol default 'hi';\n");
 
-    sql = mysqlDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
-    assertEquals("alter table mytab alter acol set default 'hi'", sql);
+    sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter acol set default 'hi';\n");
 
-    sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
-    assertEquals("alter table mytab add default 'hi' for acol", sql);
+    sql = alterColumn(sqlServerDdl, alter);
+    softly.assertThat(sql).isEqualTo("EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
+      + "alter table mytab add default 'hi' for acol;\n");
 
-    boolean exceptionCaught = false;
-    try {
-      hanaDdl.alterColumnDefaultValue("mytab", "acol", "'hi'");
-    } catch (UnsupportedOperationException e) {
-      exceptionCaught = true;
-    }
-    assertTrue(exceptionCaught);
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nvarchar(20) default 'hi' not null);\n");
+
+    sql = alterColumn(db2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+  }
+
+  @Test
+  public void testAlterColumnChangeDefaultValue() {
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(20)");
+    alter.setCurrentNotnull(Boolean.TRUE);
+    alter.setDefaultValue("'ho'");
+    alter.setDefaultValue("'hi'");
+
+    String sql = alterColumn(h2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+
+    sql = alterColumn(oraDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol default 'hi';\n");
+
+    sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter acol set default 'hi';\n");
+
+    sql = alterColumn(sqlServerDdl, alter);
+    softly.assertThat(sql).isEqualTo("EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
+      + "alter table mytab add default 'hi' for acol;\n");
+
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nvarchar(20) default 'hi' not null);\n");
+
+    sql = alterColumn(db2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
   }
 
   @Test
   public void testAlterColumnDropDefault() {
 
-    String sql = h2Ddl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    assertEquals("alter table mytab alter column acol drop default", sql);
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(20)");
+    alter.setCurrentNotnull(Boolean.TRUE);
+    alter.setCurrentDefaultValue("'hi'");
+    alter.setDefaultValue("DROP DEFAULT");
 
-    sql = pgDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    assertEquals("alter table mytab alter column acol drop default", sql);
+    String sql = alterColumn(h2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n");
 
-    sql = oraDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    assertEquals("alter table mytab modify acol default null", sql);
+    sql = alterColumn(pgDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n");
 
-    sql = mysqlDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    assertEquals("alter table mytab alter acol drop default", sql);
+    sql = alterColumn(oraDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab modify acol default null;\n");
 
-    sql = sqlServerDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    assertEquals("EXEC usp_ebean_drop_default_constraint mytab, acol", sql);
+    sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter acol drop default;\n");
 
-    boolean exceptionCaught = false;
-    try {
-      hanaDdl.alterColumnDefaultValue("mytab", "acol", "DROP DEFAULT");
-    } catch (UnsupportedOperationException e) {
-      exceptionCaught = true;
-    }
-    assertTrue(exceptionCaught);
+    sql = alterColumn(sqlServerDdl, alter);
+    softly.assertThat(sql).isEqualTo("EXEC usp_ebean_drop_default_constraint mytab, acol;\n");
+
+    sql = alterColumn(hanaDdl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter ( acol nvarchar(20) default null not null);\n");
+
+    sql = alterColumn(db2Ddl, alter);
+    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n");
+
   }
 
   @Test
   public void oracle_alterTableAddColumn() {
     DdlWrite writer = new DdlWrite();
-    oraDdl.alterTableAddColumn(writer.apply(), "my_table", simpleColumn(), false, "1");
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table my_table add my_column int default 1 not null;\n");
+    oraDdl.alterTableAddColumn(writer, "my_table", simpleColumn(), false, "1");
+    softly.assertThat(writer.apply().getBuffer())
+      .isEqualTo("alter table my_table add my_column int default 1 not null;\n");
   }
 
   private Column simpleColumn() {
@@ -267,79 +398,148 @@ public class PlatformDdl_AlterColumnTest {
 
   @Test
   public void useIdentityType_h2() {
-    assertEquals(h2Ddl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(h2Ddl.useIdentityType(IdType.SEQUENCE), IdType.SEQUENCE);
-    assertEquals(h2Ddl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
-    assertEquals(h2Ddl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
-    assertEquals(h2Ddl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
+    softly.assertThat(h2Ddl.useIdentityType(null)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(h2Ddl.useIdentityType(IdType.SEQUENCE)).isEqualTo(IdType.SEQUENCE);
+    softly.assertThat(h2Ddl.useIdentityType(IdType.IDENTITY)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(h2Ddl.useIdentityType(IdType.GENERATOR)).isEqualTo(IdType.GENERATOR);
+    softly.assertThat(h2Ddl.useIdentityType(IdType.EXTERNAL)).isEqualTo(IdType.EXTERNAL);
   }
 
   @Test
   public void useIdentityType_postgres() {
-    assertEquals(pgDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
-    assertEquals(pgDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
+    softly.assertThat(pgDdl.useIdentityType(IdType.GENERATOR)).isEqualTo(IdType.GENERATOR);
+    softly.assertThat(pgDdl.useIdentityType(IdType.EXTERNAL)).isEqualTo(IdType.EXTERNAL);
 
-    assertEquals(pgDdl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(pgDdl.useIdentityType(IdType.SEQUENCE), IdType.SEQUENCE);
-    assertEquals(pgDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
+    softly.assertThat(pgDdl.useIdentityType(null)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(pgDdl.useIdentityType(IdType.SEQUENCE)).isEqualTo(IdType.SEQUENCE);
+    softly.assertThat(pgDdl.useIdentityType(IdType.IDENTITY)).isEqualTo(IdType.IDENTITY);
   }
 
   @Test
   public void useIdentityType_mysql() {
 
-    assertEquals(mysqlDdl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(mysqlDdl.useIdentityType(IdType.SEQUENCE), IdType.IDENTITY);
-    assertEquals(mysqlDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
-    assertEquals(mysqlDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
-    assertEquals(mysqlDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
+    softly.assertThat(mysqlDdl.useIdentityType(null)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(mysqlDdl.useIdentityType(IdType.SEQUENCE)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(mysqlDdl.useIdentityType(IdType.IDENTITY)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(mysqlDdl.useIdentityType(IdType.GENERATOR)).isEqualTo(IdType.GENERATOR);
+    softly.assertThat(mysqlDdl.useIdentityType(IdType.EXTERNAL)).isEqualTo(IdType.EXTERNAL);
   }
 
   @Test
   public void useIdentityType_oracle() {
 
-    assertEquals(oraDdl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(oraDdl.useIdentityType(IdType.SEQUENCE), IdType.SEQUENCE);
-    assertEquals(oraDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
-    assertEquals(oraDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
-    assertEquals(oraDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
+    softly.assertThat(oraDdl.useIdentityType(null)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(oraDdl.useIdentityType(IdType.SEQUENCE)).isEqualTo(IdType.SEQUENCE);
+    softly.assertThat(oraDdl.useIdentityType(IdType.IDENTITY)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(oraDdl.useIdentityType(IdType.GENERATOR)).isEqualTo(IdType.GENERATOR);
+    softly.assertThat(oraDdl.useIdentityType(IdType.EXTERNAL)).isEqualTo(IdType.EXTERNAL);
   }
 
   @Test
   public void useIdentityType_hana() {
 
-    assertEquals(hanaDdl.useIdentityType(null), IdType.IDENTITY);
-    assertEquals(hanaDdl.useIdentityType(IdType.SEQUENCE), IdType.IDENTITY);
-    assertEquals(hanaDdl.useIdentityType(IdType.IDENTITY), IdType.IDENTITY);
-    assertEquals(hanaDdl.useIdentityType(IdType.GENERATOR), IdType.GENERATOR);
-    assertEquals(hanaDdl.useIdentityType(IdType.EXTERNAL), IdType.EXTERNAL);
+    softly.assertThat(hanaDdl.useIdentityType(null)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(hanaDdl.useIdentityType(IdType.SEQUENCE)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(hanaDdl.useIdentityType(IdType.IDENTITY)).isEqualTo(IdType.IDENTITY);
+    softly.assertThat(hanaDdl.useIdentityType(IdType.GENERATOR)).isEqualTo(IdType.GENERATOR);
+    softly.assertThat(hanaDdl.useIdentityType(IdType.EXTERNAL)).isEqualTo(IdType.EXTERNAL);
   }
 
   @Test
   public void appendForeignKeySuffix_when_defaults() {
-    assertThat(alterFkey(null, null)).isEqualTo(" on delete restrict on update restrict");
+    softly.assertThat(alterFkey(h2Ddl, null, null)).isEqualTo(" on delete restrict on update restrict");
+    softly.assertThat(alterFkey(pgDdl, null, null)).isEqualTo(" on delete restrict on update restrict");
+    softly.assertThat(alterFkey(mysqlDdl, null, null)).isEqualTo(" on delete restrict on update restrict");
+    softly.assertThat(alterFkey(oraDdl, null, null)).isEqualTo("");
+    softly.assertThat(alterFkey(sqlServerDdl, null, null)).isEqualTo("");
+    softly.assertThat(alterFkey(hanaDdl, null, null)).isEqualTo(" on delete restrict on update restrict");
+    softly.assertThat(alterFkey(db2Ddl, null, null)).isEqualTo(" on delete restrict");
   }
 
   @Test
   public void appendForeignKeySuffix_when_RestrictSetNull() {
-    assertThat(alterFkey("RESTRICT", "SET_NULL")).isEqualTo(" on delete restrict on update set null");
+    softly.assertThat(alterFkey(h2Ddl, "RESTRICT", "SET_NULL"))
+      .isEqualTo(" on delete restrict on update set null");
+
+    softly.assertThat(alterFkey(pgDdl, "RESTRICT", "SET_NULL"))
+      .isEqualTo(" on delete restrict on update set null");
+
+    softly.assertThat(alterFkey(mysqlDdl, "RESTRICT", "SET_NULL"))
+      .isEqualTo(" on delete restrict on update set null");
+
+    softly.assertThat(alterFkey(oraDdl, "RESTRICT", "SET_NULL"))
+      .isEqualTo("");
+
+    softly.assertThat(alterFkey(sqlServerDdl, "RESTRICT", "SET_NULL"))
+      .isEqualTo(" on update set null");
+
+    softly.assertThat(alterFkey(hanaDdl, "RESTRICT", "SET_NULL"))
+      .isEqualTo(" on delete restrict on update set null");
+
+    softly.assertThat(alterFkey(db2Ddl, "RESTRICT", "SET_NULL"))
+      .isEqualTo(" on delete restrict");
   }
 
   @Test
   public void appendForeignKeySuffix_when_SetNullRestrict() {
-    assertThat(alterFkey("SET_NULL", "RESTRICT")).isEqualTo(" on delete set null on update restrict");
+    softly.assertThat(alterFkey(h2Ddl, "SET_NULL", "RESTRICT"))
+      .isEqualTo(" on delete set null on update restrict");
+
+    softly.assertThat(alterFkey(pgDdl, "SET_NULL", "RESTRICT"))
+      .isEqualTo(" on delete set null on update restrict");
+
+    softly.assertThat(alterFkey(mysqlDdl, "SET_NULL", "RESTRICT"))
+      .isEqualTo(" on delete set null on update restrict");
+
+    softly.assertThat(alterFkey(oraDdl, "SET_NULL", "RESTRICT"))
+      .isEqualTo(" on delete set null");
+
+    softly.assertThat(alterFkey(sqlServerDdl, "SET_NULL", "RESTRICT"))
+      .isEqualTo(" on delete set null");
+
+    softly.assertThat(alterFkey(hanaDdl, "SET_NULL", "RESTRICT"))
+      .isEqualTo(" on delete set null on update restrict");
+
+    softly.assertThat(alterFkey(db2Ddl, "SET_NULL", "RESTRICT"))
+      .isEqualTo(" on delete set null");
   }
 
   @Test
   public void appendForeignKeySuffix_when_SetDefaultCascade() {
-    assertThat(alterFkey("SET_DEFAULT", "CASCADE")).isEqualTo(" on delete set default on update cascade");
+    softly.assertThat(alterFkey(h2Ddl, "SET_DEFAULT", "CASCADE"))
+      .isEqualTo(" on delete set default on update cascade");
+
+    softly.assertThat(alterFkey(pgDdl, "SET_DEFAULT", "CASCADE"))
+      .isEqualTo(" on delete set default on update cascade");
+
+    softly.assertThat(alterFkey(mysqlDdl, "SET_DEFAULT", "CASCADE"))
+      .isEqualTo(" on delete set default on update cascade");
+
+    softly.assertThat(alterFkey(oraDdl, "SET_DEFAULT", "CASCADE"))
+      .isEqualTo("");
+
+    softly.assertThat(alterFkey(sqlServerDdl, "SET_DEFAULT", "CASCADE"))
+      .isEqualTo(" on delete set default on update cascade");
+
+    softly.assertThat(alterFkey(hanaDdl, "SET_DEFAULT", "CASCADE"))
+      .isEqualTo(" on delete set default on update cascade");
+
+    softly.assertThat(alterFkey(db2Ddl, "SET_DEFAULT", "CASCADE"))
+      .isEqualTo(" on delete set default");
   }
 
-  private String alterFkey(String onDelete, String onUpdate) {
+  private String alterColumn(PlatformDdl ddl, AlterColumn alterColumn) {
+    DdlWrite write = new DdlWrite();
+    ddl.alterColumn(write, alterColumn);
+    return write.apply().getBuffer();
+  }
+
+  private String alterFkey(PlatformDdl ddl, String onDelete, String onUpdate) {
     AlterForeignKey afk = new AlterForeignKey();
     afk.setOnDelete(onDelete);
     afk.setOnUpdate(onUpdate);
     StringBuilder buffer = new StringBuilder();
-    h2Ddl.appendForeignKeySuffix(new WriteForeignKey(afk), buffer);
+    ddl.appendForeignKeySuffix(new WriteForeignKey(afk), buffer);
     return buffer.toString();
   }
 
