@@ -14,7 +14,7 @@ public class HanaDdlTest {
     HanaColumnStoreDdl ddl = new HanaColumnStoreDdl(new HanaPlatform());
     DdlWrite writer = new DdlWrite();
     ddl.alterTableDropColumn(writer, "my_table", "my_column");
-    assertEquals("CALL usp_ebean_drop_column('my_table', 'my_column');\n", writer.apply().getBuffer());
+    assertEquals("CALL usp_ebean_drop_column('my_table', 'my_column');\n", writer.toString());
   }
 
   @Test
@@ -34,6 +34,7 @@ public class HanaDdlTest {
     column.setHistoryExclude(Boolean.TRUE);
     column.setIdentity(Boolean.TRUE);
     ddl.alterTableAddColumn(writer, "my_table", column, false, "1");
-    assertEquals("alter table my_table add ( my_column int default 1 not null);\nalter table my_table add constraint check_constraint CHECK(my_column > 0);\n", writer.apply().getBuffer());
+    assertEquals("alter table my_table add (my_column int default 1 not null);\nalter table my_table add constraint check_constraint CHECK(my_column > 0);\n",
+      writer.toString());
   }
 }

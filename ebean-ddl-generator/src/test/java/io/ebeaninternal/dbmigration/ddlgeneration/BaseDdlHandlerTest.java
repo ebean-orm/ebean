@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class BaseDdlHandlerTest extends BaseTestCase {
 
   private static boolean useV1Syntax = Boolean.getBoolean("ebean.h2.useV1Syntax");
-  
+
   private final DatabaseConfig serverConfig = new DatabaseConfig();
 
   private DdlHandler handler(DatabasePlatform platform) {
@@ -47,15 +47,15 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     DdlWrite writer = new DdlWrite();
     h2Handler().generate(writer, Helper.getAddColumn());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column added_to_foo varchar(20);\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add column added_to_foo varchar(20);\n");
 
     writer = new DdlWrite();
     sqlserverHandler().generate(writer, Helper.getAddColumn());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add added_to_foo nvarchar(20);\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add added_to_foo nvarchar(20);\n");
 
     writer = new DdlWrite();
     hanaHandler().generate(writer, Helper.getAddColumn());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add ( added_to_foo nvarchar(20));\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add (added_to_foo nvarchar(20));\n");
   }
 
   @Test
@@ -63,18 +63,17 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     DdlWrite writer = new DdlWrite();
     h2Handler().generate(writer, Helper.getAlterTableAddColumnWithCheckConstraint());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column status integer;\n"
-        + "alter table foo add constraint ck_ordering_status check ( status in (0,1));\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add column status integer;\n"
+      + "alter table foo add constraint ck_ordering_status check ( status in (0,1));\n");
 
     writer = new DdlWrite();
     hanaHandler().generate(writer, Helper.getAlterTableAddColumnWithCheckConstraint());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add ( status integer);\n"
-        + "alter table foo add constraint ck_ordering_status check ( status in (0,1));\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add (status integer);\n"
+      + "alter table foo add constraint ck_ordering_status check ( status in (0,1));\n");
   }
 
   /**
-   * Test the functionality of the Ebean {@literal @}DbArray extension during DDL
-   * generation.
+   * Test the functionality of the Ebean {@literal @}DbArray extension during DDL generation.
    */
   @Test
   public void addColumn_dbarray() throws Exception {
@@ -84,20 +83,20 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     DdlHandler postgresHandler = postgresHandler();
     postgresHandler.generate(writer, Helper.getAlterTableAddDbArrayColumn());
 
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_added_to_foo varchar[];\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add column dbarray_added_to_foo varchar[];\n");
 
     writer = new DdlWrite();
 
     DdlHandler sqlserverHandler = sqlserverHandler();
     sqlserverHandler.generate(writer, Helper.getAlterTableAddDbArrayColumn());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add dbarray_added_to_foo varchar(1000);\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add dbarray_added_to_foo varchar(1000);\n");
 
     writer = new DdlWrite();
 
     DdlHandler hanaHandler = hanaHandler();
     hanaHandler.generate(writer, Helper.getAlterTableAddDbArrayColumn());
-    assertThat(writer.apply().getBuffer())
-      .isEqualTo("alter table foo add ( dbarray_added_to_foo nvarchar(255) array);\n\n");
+    assertThat(writer.toString())
+      .isEqualTo("alter table foo add (dbarray_added_to_foo nvarchar(255) array);\n");
   }
 
   @Test
@@ -106,24 +105,24 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     DdlWrite writer = new DdlWrite();
 
     postgresHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnWithLength());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety varchar[];\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add column dbarray_ninety varchar[];\n");
 
     writer = new DdlWrite();
     h2Handler().generate(writer, Helper.getAlterTableAddDbArrayColumnWithLength());
     if (useV1Syntax) {
-      assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety array;\n\n");
+      assertThat(writer.toString()).isEqualTo("alter table foo add column dbarray_ninety array;\n");
     } else {
-      assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_ninety varchar array;\n\n");
+      assertThat(writer.toString()).isEqualTo("alter table foo add column dbarray_ninety varchar array;\n");
     }
 
     writer = new DdlWrite();
     sqlserverHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnWithLength());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add dbarray_ninety varchar(90);\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add dbarray_ninety varchar(90);\n");
 
     writer = new DdlWrite();
     hanaHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnWithLength());
-    assertThat(writer.apply().getBuffer())
-      .isEqualTo("alter table foo add ( dbarray_ninety nvarchar(255) array(90));\n\n");
+    assertThat(writer.toString())
+      .isEqualTo("alter table foo add (dbarray_ninety nvarchar(255) array(90));\n");
   }
 
   @Test
@@ -131,31 +130,31 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     DdlWrite writer = new DdlWrite();
     postgresHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer integer[];\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add column dbarray_integer integer[];\n");
 
     writer = new DdlWrite();
     h2Handler().generate(writer, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
     if (useV1Syntax) {
-      assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer array;\n\n");
+      assertThat(writer.toString()).isEqualTo("alter table foo add column dbarray_integer array;\n");
     } else {
-      assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add column dbarray_integer integer array;\n\n");
+      assertThat(writer.toString()).isEqualTo("alter table foo add column dbarray_integer integer array;\n");
     }
 
     writer = new DdlWrite();
     sqlserverHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add dbarray_integer varchar(90);\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add dbarray_integer varchar(90);\n");
 
     writer = new DdlWrite();
     sqlserverHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnInteger());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add dbarray_integer varchar(1000);\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add dbarray_integer varchar(1000);\n");
 
     writer = new DdlWrite();
     hanaHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add ( dbarray_integer integer array(90));\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add (dbarray_integer integer array(90));\n");
 
     writer = new DdlWrite();
     hanaHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnInteger());
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo add ( dbarray_integer integer array);\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo add (dbarray_integer integer array);\n");
   }
 
   @Test
@@ -166,12 +165,12 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     DdlHandler handler = h2Handler();
     handler.generate(writer, Helper.getAlterTableAddColumn());
 
-    String buffer = writer.apply().getBuffer();
+    String buffer = writer.toString();
     assertThat(buffer).contains("alter table foo add column some_id integer;");
 
     String fkBuffer = writer.applyForeignKeys().getBuffer();
     assertThat(fkBuffer).contains(
-        "alter table foo add constraint fk_foo_some_id foreign key (some_id) references bar (id) on delete restrict on update restrict;");
+      "alter table foo add constraint fk_foo_some_id foreign key (some_id) references bar (id) on delete restrict on update restrict;");
     assertThat(fkBuffer).contains("create index idx_foo_some_id on foo (some_id);");
     assertThat(writer.dropAll().getBuffer()).isEqualTo("");
   }
@@ -184,7 +183,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     handler.generate(writer, Helper.getDropColumn());
 
-    assertThat(writer.apply().getBuffer()).isEqualTo("alter table foo drop column col2;\n\n");
+    assertThat(writer.toString()).isEqualTo("alter table foo drop column col2;\n");
     assertThat(writer.dropAll().getBuffer()).isEqualTo("");
 
     writer = new DdlWrite();
@@ -192,7 +191,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     hanaHandler.generate(writer, Helper.getDropColumn());
 
-    assertThat(writer.apply().getBuffer()).isEqualTo("CALL usp_ebean_drop_column('foo', 'col2');\n\n");
+    assertThat(writer.toString()).isEqualTo("CALL usp_ebean_drop_column('foo', 'col2');\n");
     assertThat(writer.dropAll().getBuffer()).isEqualTo("");
   }
 
@@ -204,9 +203,9 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     handler.generate(writer, Helper.getCreateTable());
 
-    String createTableDDL = Helper.asText(this, "/assert/create-table.txt");
+    String createTableDDL = Helper.asText(this, "/assert/drop-create-table.txt");
 
-    assertThat(writer.apply().getBuffer()).isEqualTo(createTableDDL);
+    assertThat(writer.toString()).isEqualTo(createTableDDL);
     assertThat(writer.dropAll().getBuffer().trim()).isEqualTo("drop table if exists foo;");
 
     writer = new DdlWrite();
@@ -214,9 +213,9 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     hanaHandler.generate(writer, Helper.getCreateTable());
 
-    String createColumnTableDDL = Helper.asText(this, "/assert/create-column-table.txt");
+    String createColumnTableDDL = Helper.asText(this, "/assert/drop-create-column-table.txt");
 
-    assertThat(writer.apply().getBuffer()).isEqualTo(createColumnTableDDL);
+    assertThat(writer.toString()).isEqualTo(createColumnTableDDL);
     assertThat(writer.dropAll().getBuffer().trim()).isEqualTo("drop table foo cascade;");
   }
 
@@ -230,9 +229,12 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     String apply = Helper.asText(this, "/assert/BaseDdlHandlerTest/baseApply.sql");
     String rollbackLast = Helper.asText(this, "/assert/BaseDdlHandlerTest/baseDropAll.sql");
-
-    assertThat(writer.apply().getBuffer()).isEqualTo(apply);
-    assertThat(writer.dropAll().getBuffer()).isEqualTo(rollbackLast);
+    StringBuilder sb = new StringBuilder();
+    writer.writeApply(sb);
+    assertThat(sb.toString()).isEqualTo(apply);
+    sb = new StringBuilder();
+    writer.writeDropAll(sb);
+    assertThat(sb.toString()).isEqualTo(rollbackLast);
   }
 
   @Disabled
@@ -251,7 +253,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     String apply = Helper.asText(this, "/assert/changeset-apply.txt");
     String rollbackLast = Helper.asText(this, "/assert/changeset-dropAll.txt");
 
-    assertThat(writer.apply().getBuffer()).isEqualTo(apply);
+    assertThat(writer.toString()).isEqualTo(apply);
     assertThat(writer.dropAll().getBuffer()).isEqualTo(rollbackLast);
   }
 
@@ -272,7 +274,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     String rollbackFirst = Helper.asText(this, "/assert/changeset-pg-rollbackFirst.sql");
     String rollbackLast = Helper.asText(this, "/assert/changeset-pg-rollbackLast.sql");
 
-    assertThat(writer.apply().getBuffer()).isEqualTo(apply);
+    assertThat(writer.toString()).isEqualTo(apply);
     assertThat(writer.applyForeignKeys().getBuffer()).isEqualTo(applyLast);
     assertThat(writer.dropAllForeignKeys().getBuffer()).isEqualTo(rollbackFirst);
     assertThat(writer.dropAll().getBuffer()).isEqualTo(rollbackLast);
