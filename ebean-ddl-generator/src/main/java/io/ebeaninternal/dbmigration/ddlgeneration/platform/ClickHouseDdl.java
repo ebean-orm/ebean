@@ -14,6 +14,7 @@ public class ClickHouseDdl extends PlatformDdl {
     super(platform);
     this.includeStorageEngine = true;
     this.identitySuffix = "";
+    this.columnNotNull = null;
   }
 
   @Override
@@ -66,11 +67,6 @@ public class ClickHouseDdl extends PlatformDdl {
   @Override
   public String createCheckConstraint(String ckName, String checkConstraint) {
     return null;
-  }
-
-  @Override
-  protected void writeColumnNotNull(DdlBuffer buffer) {
-    // do nothing
   }
 
   @Override

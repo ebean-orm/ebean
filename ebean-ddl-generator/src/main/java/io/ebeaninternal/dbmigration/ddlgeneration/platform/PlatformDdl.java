@@ -97,6 +97,8 @@ public class PlatformDdl {
 
   protected String columnSetNull = "set null";
 
+  protected String columnNotNull = "not null";
+
   protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
 
   protected String createTable = "create table";
@@ -272,18 +274,11 @@ public class PlatformDdl {
       }
     }
     if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
-      writeColumnNotNull(buffer);
+      buffer.appendWithSpace(columnNotNull);
     }
 
     // add check constraints later as we really want to give them a nice name
     // so that the database can potentially provide a nice SQL error
-  }
-
-  /**
-   * Allow for platform overriding (e.g. ClickHouse).
-   */
-  protected void writeColumnNotNull(DdlBuffer buffer) {
-    buffer.append(" not null");
   }
 
   /**
@@ -556,7 +551,7 @@ public class PlatformDdl {
 
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
-        writeColumnNotNull(buffer);
+        buffer.appendWithSpace(columnNotNull);
       }
       buffer.append(addColumnSuffix);
       buffer.endOfStatement();
