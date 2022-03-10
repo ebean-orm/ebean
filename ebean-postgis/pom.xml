@@ -14,7 +14,7 @@
   <artifactId>ebean-postgis</artifactId>
 
   <properties>
-    <postgis.jdbc.version>2.2.1</postgis.jdbc.version>
+    <postgis.jdbc.version>2.5.1</postgis.jdbc.version>
   </properties>
 
   <dependencies>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>net.postgis</groupId>
       <artifactId>postgis-jdbc</artifactId>
-      <version>[${postgis.jdbc.version}]</version>
+      <version>${postgis.jdbc.version}</version>
     </dependency>
 
     <!-- expected to be provided -->
@@ -62,13 +62,6 @@
       <artifactId>geolatte-geom</artifactId>
       <version>1.0.6</version>
       <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-datasource</artifactId>
-      <version>${ebean-datasource.version}</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
