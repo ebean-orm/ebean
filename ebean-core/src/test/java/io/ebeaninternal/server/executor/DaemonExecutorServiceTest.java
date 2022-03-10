@@ -31,7 +31,7 @@ class DaemonExecutorServiceTest {
 
   @Test
   void submit_via_DefaultBackgroundExecutor() throws Exception {
-    DefaultBackgroundExecutor des = new DefaultBackgroundExecutor(1, 5, "junk");
+    DefaultBackgroundExecutor des = new DefaultBackgroundExecutor(1, 5, "junk", null);
     long start = System.currentTimeMillis();
     List<Future<?>> futures = new ArrayList<>();
     for (int i = 0; i < count; i++) {

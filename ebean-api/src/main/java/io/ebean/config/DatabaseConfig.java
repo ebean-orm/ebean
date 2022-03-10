@@ -454,6 +454,7 @@ public class DatabaseConfig {
 
   private int backgroundExecutorSchedulePoolSize = 1;
   private int backgroundExecutorShutdownSecs = 30;
+  private BackgroundExecutorWrapper backgroundExecutorWrapper = new MdcBackgroundExecutorWrapper();
 
   // defaults for the L2 bean caching
 
@@ -1478,6 +1479,20 @@ public class DatabaseConfig {
    */
   public void setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs) {
     this.backgroundExecutorShutdownSecs = backgroundExecutorShutdownSecs;
+  }
+
+  /**
+   * Return the background executor wrapper.
+   */
+  public BackgroundExecutorWrapper getBackgroundExecutorWrapper() {
+    return backgroundExecutorWrapper;
+  }
+
+  /**
+   * Sets the background executor wrapper. The wrapper is used when a task is sent to background and should copy the thread-locals.
+   */
+  public void setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper) {
+    this.backgroundExecutorWrapper = backgroundExecutorWrapper;
   }
 
   /**
@@ -2926,6 +2941,7 @@ public class DatabaseConfig {
 
     backgroundExecutorSchedulePoolSize = p.getInt("backgroundExecutorSchedulePoolSize", backgroundExecutorSchedulePoolSize);
     backgroundExecutorShutdownSecs = p.getInt("backgroundExecutorShutdownSecs", backgroundExecutorShutdownSecs);
+    backgroundExecutorWrapper = p.createInstance(BackgroundExecutorWrapper.class, "backgroundExecutorWrapper", backgroundExecutorWrapper);
     disableClasspathSearch = p.getBoolean("disableClasspathSearch", disableClasspathSearch);
     currentUserProvider = p.createInstance(CurrentUserProvider.class, "currentUserProvider", currentUserProvider);
     databasePlatform = p.createInstance(DatabasePlatform.class, "databasePlatform", databasePlatform);
