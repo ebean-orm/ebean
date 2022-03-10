@@ -7,14 +7,15 @@ import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicClobNoVer;
 
+import javax.xml.transform.sax.SAXSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestBasicClobNoVer extends BaseTestCase {
+class TestBasicClobNoVer extends BaseTestCase {
 
   @Test
-  public void test() {
+  void test() {
 
     EBasicClobNoVer entity = new EBasicClobNoVer();
     entity.setName("test");
@@ -63,6 +64,23 @@ public class TestBasicClobNoVer extends BaseTestCase {
     assertThat(loggedSql).hasSize(1);
     assertThat(trimSql(loggedSql.get(0), 2)).contains(sqlWithClob);
     assertThat(entity.getDescription()).isEqualTo("modified");
+  }
+
+  @Test
+  void refresh_withSoftDelete() {
+
+    EBasicClobNoVer bean = new EBasicClobNoVer();
+    bean.setDescription("hello");
+    DB.save(bean);
+
+    DB.refresh(bean);
+
+    LoggedSql.start();
+    bean.children().forEach(System.out::println);
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains(" and t0.deleted =");
   }
 
 }

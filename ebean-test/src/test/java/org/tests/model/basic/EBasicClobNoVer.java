@@ -3,6 +3,9 @@ package org.tests.model.basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class EBasicClobNoVer {
@@ -17,6 +20,9 @@ public class EBasicClobNoVer {
    */
   @Lob
   private String description;
+
+  @OneToMany
+  private List<EBasicClobNoVerChild> children = new ArrayList<>();
 
   public void setId(Long id) {
     this.id = id;
@@ -40,5 +46,14 @@ public class EBasicClobNoVer {
 
   public String getDescription() {
     return description;
+  }
+
+  public List<EBasicClobNoVerChild> children() {
+    return children;
+  }
+
+  public EBasicClobNoVer children(List<EBasicClobNoVerChild> children) {
+    this.children = children;
+    return this;
   }
 }
