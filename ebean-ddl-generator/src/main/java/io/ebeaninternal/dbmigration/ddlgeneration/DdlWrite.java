@@ -169,25 +169,27 @@ public class DdlWrite {
       target.append(apply.getBuffer());
     }
     if (!applyAlterTables.isEmpty()) {
-      // target.append("-- apply alter tables\n");  maybe added later. Makes diff easier
+      target.append("-- apply alter tables\n");
       for (DdlAlterTable alterTable : applyAlterTables.values()) {
         alterTable.write(target);
       }
     }
     if (!applyPostAlter.isEmpty()) {
-      // target.append("-- apply post alter\n");  maybe added later.
+      target.append("-- apply post alter\n");
       target.append(applyPostAlter.getBuffer());
     }
     if (!applyForeignKeys.isEmpty()) {
-      // target.append("-- foreign keys and indices\n"); maybe added later.
+      target.append("-- foreign keys and indices\n");
       target.append(applyForeignKeys.getBuffer());
     }
 
     if (!applyHistoryView.isEmpty()) {
+      target.append("-- apply history view\n");
       target.append(applyHistoryView.getBuffer());
     }
 
     if (!applyHistoryTrigger.isEmpty()) {
+      target.append("-- apply history trigger\n");
       target.append(applyHistoryTrigger.getBuffer());
     }
   }
