@@ -207,7 +207,7 @@ public class DdlWrite {
       target.append(dropAll.getBuffer());
     }
   }
-  
+
   /**
    * Returns all create statements. Mainly used for unit-tests
    */
@@ -222,6 +222,5 @@ public class DdlWrite {
     }
     return sb.toString();
   }
-
 
 }

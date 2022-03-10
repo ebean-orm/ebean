@@ -664,7 +664,6 @@ public class BaseTableDdl implements TableDdl {
         writeForeignKey(writer, tableName, column);
       }
     }
-    writer.apply().end();
   }
 
   /**
@@ -696,7 +695,6 @@ public class BaseTableDdl implements TableDdl {
       regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.DROP, dropColumn.getColumnName());
       alterTableDropColumn(writer, historyTable(tableName), dropColumn.getColumnName());
     }
-    writer.apply().end();
   }
 
   /**
