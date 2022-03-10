@@ -169,6 +169,7 @@ create table migtest_oto_master (
   constraint pk_migtest_oto_master primary key (id)
 );
 
+-- apply post alter
 create table migtest_e_history2_history(
   id                            integer,
   test_string                   varchar(255),
@@ -214,6 +215,7 @@ create view migtest_e_history6_with_history as select * from migtest_e_history6 
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+-- foreign keys and indices
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 
@@ -223,6 +225,7 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
+-- apply history trigger
 delimiter $$
 create trigger migtest_e_history2_history_upd before update on migtest_e_history2 for each row begin
     insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, obsolete_string2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.obsolete_string2);

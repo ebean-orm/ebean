@@ -39,6 +39,7 @@ alter table migtest_e_history4_history alter column test_number type integer usi
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
+-- apply alter tables
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status drop not null;
 alter table migtest_e_basic alter column status2 set default 'N';
@@ -59,6 +60,7 @@ alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 drop not null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
@@ -71,17 +73,20 @@ create index if not exists ix_migtest_e_basic_indextest5 on migtest_e_basic (ind
 create index if not exists ix_m12_otoc71 on migtest_oto_child (name);
 create unique index if not exists uq_m12_otoc71 on migtest_oto_child (lower(name));
 create unique index if not exists ix_migtest_oto_master_lowername on migtest_oto_master (lower(name));
+-- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
+-- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
 create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
 
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 
+-- apply history trigger
 -- changes: [add obsolete_string1, add obsolete_string2]
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 declare

@@ -42,14 +42,17 @@ CALL usp_ebean_drop_column('migtest_e_softdelete', 'deleted');
 
 CALL usp_ebean_drop_column('migtest_oto_child', 'master_id');
 
+-- apply post alter
 drop table if exists migtest_e_user;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
 drop table if exists migtest_mtm_m_migtest_mtm_c;
 drop table if exists migtest_mtm_m_phone_numbers;
+-- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
+-- apply history trigger
 lock tables migtest_e_history2 write, migtest_e_history5 write;
 -- changes: [drop test_string2, drop test_string3, drop new_column]
 drop trigger migtest_e_history2_history_upd;

@@ -98,6 +98,7 @@ alter table migtest_e_history6 drop system versioning;
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 
 
+-- apply alter tables
 alter table migtest_ckey_detail add (one_key integer,
    two_key nvarchar(127));
 alter table migtest_ckey_parent add (assoc_id integer);
@@ -128,6 +129,7 @@ alter table migtest_e_history6_history alter (test_number1 integer default 42 no
    test_number2 integer);
 alter table migtest_e_softdelete add (deleted boolean default false not null);
 alter table migtest_oto_child add (master_id bigint);
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 -- cannot create unique index "uq_migtest_e_basic_description" on table "migtest_e_basic" with nullable columns;
 -- NOTE: table has @History - special migration may be necessary
@@ -147,6 +149,7 @@ alter table migtest_e_history5 add system versioning history table migtest_e_his
 alter table migtest_e_history6 add system versioning history table migtest_e_history6_history not validated;
 -- explicit index "ix_migtest_e_basic_indextest3" for single column "indextest3" of table "migtest_e_basic" is not necessary;
 -- explicit index "ix_migtest_e_basic_indextest6" for single column "indextest6" of table "migtest_e_basic" is not necessary;
+-- foreign keys and indices
 -- explicit index "ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" for single column "migtest_mtm_c_id" of table "migtest_mtm_c_migtest_mtm_m" is not necessary;
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
 
@@ -173,6 +176,7 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
 
+-- apply history view
 create column table migtest_e_history_history (
  id integer,
  test_string bigint,

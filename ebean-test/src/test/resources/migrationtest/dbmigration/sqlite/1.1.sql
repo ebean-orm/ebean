@@ -56,6 +56,7 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 
 
+-- apply alter tables
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -83,6 +84,7 @@ alter table migtest_e_history5 add column test_boolean int default 0 not null;
 -- not supported: alter table migtest_e_history6 alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted int default 0 not null;
 alter table migtest_oto_child add column master_id integer;
+-- apply post alter
 -- not supported: alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 -- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 -- NOTE: table has @History - special migration may be necessary
@@ -95,6 +97,7 @@ update migtest_e_basic set new_boolean_field = old_boolean;
 -- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+-- foreign keys and indices
 -- not supported: alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key) on delete restrict on update restrict;
 create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
 -- not supported: alter table migtest_ckey_parent add constraint fk_migtest_ckey_parent_assoc_id foreign key (assoc_id) references migtest_ckey_assoc (id) on delete restrict on update restrict;

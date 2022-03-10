@@ -165,5 +165,6 @@ create table migtest_oto_master (
   constraint pk_migtest_oto_master primary key (id)
 );
 
+-- apply post alter
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

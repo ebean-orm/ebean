@@ -60,6 +60,7 @@ alter table migtest_e_history4_history alter column test_number type bigint usin
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 
 
+-- apply alter tables
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -88,6 +89,7 @@ alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 drop not null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 alter table migtest_oto_child add column master_id bigint;
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 -- NOTE: table has @History - special migration may be necessary
@@ -109,6 +111,7 @@ comment on column migtest_e_history.test_string is 'Column altered to long now';
 comment on table migtest_e_history is 'We have history now';
 create index if not exists ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index if not exists ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+-- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
 
@@ -135,6 +138,7 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
 
+-- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
 create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
@@ -143,6 +147,7 @@ create view migtest_e_history4_with_history as select * from migtest_e_history4 
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
+-- apply history trigger
 create or replace function migtest_e_history_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;

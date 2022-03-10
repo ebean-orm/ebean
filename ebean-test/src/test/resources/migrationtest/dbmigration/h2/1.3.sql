@@ -36,6 +36,7 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
+-- apply alter tables
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status set null;
 alter table migtest_e_basic alter column status2 varchar(1);
@@ -59,6 +60,7 @@ alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 set null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
@@ -68,17 +70,20 @@ comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+-- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
+-- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
 create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
 
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 
+-- apply history trigger
 -- changes: [add obsolete_string1, add obsolete_string2]
 drop trigger migtest_e_history2_history_upd;
 create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";

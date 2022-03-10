@@ -29,8 +29,10 @@ CALL usp_ebean_drop_column('migtest_e_softdelete', 'deleted');
 CALL usp_ebean_drop_column('migtest_oto_child', 'master_id');
 
 drop sequence if exists migtest_e_user_seq;
+-- apply post alter
 drop table if exists migtest_e_user;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
 drop table if exists migtest_mtm_m_migtest_mtm_c;
 drop table if exists migtest_mtm_m_phone_numbers;
+-- apply history view
 alter table migtest_e_history drop system versioning;
