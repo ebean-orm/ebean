@@ -32,8 +32,6 @@ update migtest_e_basic set status2 = 'N' where status2 is null;
 alter table migtest_e_basic alter column status2 type varchar(1) using status2::varchar(1);
 
 update migtest_e_basic set user_id = 23 where user_id is null;
-
-
 alter table migtest_e_history4 alter column test_number type integer using test_number::integer;
 alter table migtest_e_history4_history alter column test_number type integer using test_number::integer;
 

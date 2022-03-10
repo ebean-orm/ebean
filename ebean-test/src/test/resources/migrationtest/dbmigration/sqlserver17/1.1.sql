@@ -36,8 +36,6 @@ create table migtest_mtm_m_phone_numbers (
 );
 
 
-
-
 update migtest_e_basic set status = 'A' where status is null;
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, status;
 alter table migtest_e_basic alter column status nvarchar(1) not null;
@@ -49,7 +47,6 @@ alter table migtest_e_basic alter column status2 nvarchar(127);
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic alter column user_id integer;
-
 alter table migtest_e_history alter column test_string numeric(19);
 
 -- NOTE: table has @History - special migration may be necessary
@@ -57,9 +54,7 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 EXEC usp_ebean_drop_default_constraint migtest_e_history2, test_string;
 alter table migtest_e_history2 alter column test_string nvarchar(255) not null;
 alter table migtest_e_history2 add default 'unknown' for test_string;
-
 alter table migtest_e_history4 alter column test_number numeric(19);
-
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
@@ -67,8 +62,6 @@ EXEC usp_ebean_drop_default_constraint migtest_e_history6, test_number1;
 alter table migtest_e_history6 alter column test_number1 integer not null;
 alter table migtest_e_history6 add default 42 for test_number1;
 alter table migtest_e_history6 alter column test_number2 integer;
-
-
 -- apply alter tables
 alter table migtest_ckey_detail add one_key integer;
 alter table migtest_ckey_detail add two_key nvarchar(127);

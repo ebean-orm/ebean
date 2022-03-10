@@ -41,10 +41,8 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, user_id;
 alter table migtest_e_basic alter column user_id integer not null;
 alter table migtest_e_basic add default 23 for user_id;
-
 EXEC usp_ebean_drop_default_constraint migtest_e_history2, test_string;
 alter table migtest_e_history2 alter column test_string nvarchar(255);
-
 alter table migtest_e_history4 alter column test_number integer;
 EXEC usp_ebean_drop_default_constraint migtest_e_history6, test_number1;
 alter table migtest_e_history6 alter column test_number1 integer;

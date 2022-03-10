@@ -6,13 +6,7 @@ alter table migtest_e_history drop (sys_period_start,sys_period_end);
 drop table migtest_e_history_history cascade;
 -- apply changes
 alter table migtest_e_history2 drop system versioning;
-
-
-
 alter table migtest_e_history5 drop system versioning;
-
-
-
 -- apply alter tables
 CALL usp_ebean_drop_column('migtest_ckey_detail', 'one_key');
 CALL usp_ebean_drop_column('migtest_ckey_detail', 'two_key');

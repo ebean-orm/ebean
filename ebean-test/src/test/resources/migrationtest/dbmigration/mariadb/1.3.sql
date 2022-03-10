@@ -28,9 +28,7 @@ alter table migtest_e_basic modify status2 varchar(1) not null default 'N';
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic modify user_id integer not null default 23;
-
 alter table migtest_e_history2 modify test_string varchar(255);
-
 alter table migtest_e_history4 modify test_number integer;
 alter table migtest_e_history6 modify test_number1 integer;
 

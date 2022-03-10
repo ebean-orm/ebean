@@ -88,9 +88,7 @@ create column table migtest_e_ref (
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
-
 alter table migtest_e_history2 drop system versioning;
-
 alter table migtest_e_history3 drop system versioning;
 alter table migtest_e_history4 drop system versioning;
 alter table migtest_e_history6 drop system versioning;

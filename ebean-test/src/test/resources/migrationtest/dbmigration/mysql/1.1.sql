@@ -34,8 +34,6 @@ create table migtest_mtm_m_phone_numbers (
 );
 
 
-
-
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic modify status varchar(1) not null default 'A';
 alter table migtest_e_basic modify status2 varchar(127);
@@ -44,7 +42,6 @@ alter table migtest_e_basic modify status2 varchar(127);
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic modify user_id integer;
-
 alter table migtest_e_history add column sys_period_start datetime(6) default now(6);
 alter table migtest_e_history add column sys_period_end datetime(6);
 alter table migtest_e_history modify test_string bigint;
@@ -52,17 +49,13 @@ alter table migtest_e_history modify test_string bigint;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 alter table migtest_e_history2 modify test_string varchar(255) not null default 'unknown';
-
 alter table migtest_e_history4 modify test_number bigint;
 alter table migtest_e_history4_history modify test_number bigint;
-
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 modify test_number1 integer not null default 42;
 alter table migtest_e_history6 modify test_number2 integer;
-
-
 -- apply alter tables
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);

@@ -40,15 +40,12 @@ create table migtest_mtm_m_phone_numbers (
 );
 
 
-
-
 update migtest_e_basic set status = 'A' where status is null;
 alter table migtest_e_basic alter column status2 type varchar(127) using status2::varchar(127);
 
 -- rename all collisions;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
-
 alter table migtest_e_history add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
 
 alter table migtest_e_history alter column test_string TYPE bigint USING (test_string::integer);
@@ -56,15 +53,11 @@ alter table migtest_e_history alter column test_string type bigint using test_st
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
-
 alter table migtest_e_history4 alter column test_number type bigint using test_number::bigint;
 alter table migtest_e_history4_history alter column test_number type bigint using test_number::bigint;
 
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
-
-
 -- apply alter tables
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
