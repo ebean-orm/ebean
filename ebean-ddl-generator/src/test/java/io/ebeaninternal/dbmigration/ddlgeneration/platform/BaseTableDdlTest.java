@@ -39,7 +39,7 @@ public class BaseTableDdlTest {
 
     ddlGen.generate(writer, alterColumn);
 
-    String ddl = writer.apply().getBuffer();
+    String ddl = writer.toString();
     assertThat(ddl).contains("alter table mytab drop constraint if exists ck_mytab_acol");
     assertThat(ddl).contains("alter table mytab add constraint ck_mytab_acol check (acol in ('A','B'))");
   }
@@ -57,7 +57,7 @@ public class BaseTableDdlTest {
 
     ddlGen.alterTableAddColumn(writer, "mytable", column, false, false);
 
-    String ddl = writer.apply().getBuffer();
+    String ddl = writer.toString();
     assertThat(ddl).contains("alter table mytable add col_name varchar2(20)");
   }
 
@@ -74,7 +74,7 @@ public class BaseTableDdlTest {
 
     ddlGen.alterTableAddColumn(writer, "mytable", column, false, false);
 
-    String ddl = writer.apply().getBuffer();
+    String ddl = writer.toString();
     assertThat(ddl).contains("alter table mytable add column col_name String");
   }
 
@@ -92,7 +92,7 @@ public class BaseTableDdlTest {
 
     ddlGen.generate(writer, alterColumn);
 
-    String ddl = writer.apply().getBuffer();
+    String ddl = writer.applyPostAlter().getBuffer();
     assertThat(ddl).contains("comment on column mytab.acol is 'my comment'");
   }
 
@@ -106,10 +106,9 @@ public class BaseTableDdlTest {
     column.setType("int");
 
     ddl.alterTableAddColumn(writer, "my_table", column, false, false);
-    assertEquals(
-      "alter table my_table add column my_column int;\n" +
-        "comment on column my_table.my_column is 'some comment';\n",
-      writer.apply().getBuffer());
+    assertEquals("alter table my_table add column my_column int;\n"
+        + "comment on column my_table.my_column is 'some comment';\n",
+      writer.toString());
   }
 
   @Test
@@ -125,7 +124,7 @@ public class BaseTableDdlTest {
 
     ddlGen.generate(writer, addTableComment);
 
-    String ddl = writer.apply().getBuffer();
+    String ddl = writer.applyPostAlter().getBuffer();
     assertThat(ddl).contains("comment on table mytab is 'my comment'");
   }
 
@@ -142,7 +141,7 @@ public class BaseTableDdlTest {
 
     ddlGen.generate(writer, addTableComment);
 
-    String ddl = writer.apply().getBuffer();
+    String ddl = writer.applyPostAlter().getBuffer();
     assertThat(ddl).contains("alter table mytab comment = 'my comment'");
   }
 

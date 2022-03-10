@@ -84,8 +84,6 @@ create table migtest_e_basic (
   constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I')),
   constraint pk_migtest_e_basic primary key (id)
 );
-create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) where indextest2 is not null;
-create unique nonclustered index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) where indextest6 is not null;
 create sequence migtest_e_basic_seq as bigint start with 1;
 
 create table migtest_e_enum (
@@ -146,7 +144,6 @@ create table migtest_e_ref (
   name                          nvarchar(127) not null,
   constraint pk_migtest_e_ref primary key (id)
 );
-alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 create sequence migtest_e_ref_seq as bigint start with 1;
 
 create table migtest_e_softdelete (
@@ -184,6 +181,9 @@ create table migtest_oto_master (
 );
 create sequence migtest_oto_master_seq as bigint start with 1;
 
+create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) where indextest2 is not null;
+create unique nonclustered index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) where indextest6 is not null;
+alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);

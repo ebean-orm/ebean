@@ -5,7 +5,6 @@ import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
@@ -63,8 +62,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected abstract void updateHistoryTriggers(DbTriggerUpdate triggerUpdate);
 
   /**
-   * Process the HistoryTableUpdate which can result in changes to the apply, rollback
-   * and drop scripts.
+   * Process the HistoryTableUpdate which can result in changes to the apply, rollback and drop scripts.
    */
   protected void updateTriggers(DdlWrite writer, MTable table, HistoryTableUpdate update) {
 
@@ -88,7 +86,10 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     // drop in appropriate order
     dropTriggers(writer.applyDropDependencies(), baseTable);
-    dropHistoryTableEtc(writer.applyDropDependencies(), baseTable);
+    dropWithHistoryView(writer.applyDropDependencies(), baseTable);
+    dropHistoryTable(writer.applyDropDependencies(), baseTable);
+
+    dropSysPeriodColumns(writer, baseTable);
   }
 
   @Override
@@ -107,14 +108,19 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   public void createWithHistory(DdlWrite writer, MTable table) {
 
     String baseTable = table.getName();
-    String whenCreatedColumn = table.getWhenCreatedColumn();
 
-    dropTriggers(writer.dropAll(), baseTable);
-    dropHistoryTableEtc(writer.dropAll(), baseTable);
+    addSysPeriodColumns(writer.apply(), baseTable, table.getWhenCreatedColumn());
+    createHistoryTable(writer.applyPostAlter(), table);
 
-    addHistoryTable(writer, table, whenCreatedColumn);
-    createStoredFunction(writer, table);
     createTriggers(writer, table);
+    createWithHistoryView(writer.applyPostAlter(), table.getName());
+
+    // drop all scripts
+    dropTriggers(writer.dropAll(), baseTable);
+    dropWithHistoryView(writer.dropAll(), baseTable);
+    dropHistoryTable(writer.dropAll(), baseTable);
+    // no need to dropSysPeriodColumns as whole table will be deleted soon
+
   }
 
   protected abstract void createTriggers(DdlWrite writer, MTable table);
@@ -156,7 +162,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     DdlBuffer apply = writer.applyHistoryView();
 
     addSysPeriodColumns(apply, baseTableName, whenCreatedColumn);
-    createHistoryTable(apply, table);
+    createHistoryTable(writer.applyPostAlter(), table);
     createWithHistoryView(apply, baseTableName);
   }
 
@@ -234,18 +240,17 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     appendColumnName(apply, prefix, sysPeriodEnd);
   }
 
-  protected void dropHistoryTableEtc(DdlBuffer buffer, String baseTableName) {
-
-    buffer.append("drop view ").append(baseTableName).append(viewSuffix).endOfStatement();
-    dropSysPeriodColumns(buffer, baseTableName);
-    buffer.append("drop table ").append(baseTableName).append(historySuffix).endOfStatement().end();
+  protected void dropWithHistoryView(DdlBuffer apply, String baseTableName) {
+    apply.append("drop view ").append(baseTableName).append(viewSuffix).endOfStatement();
   }
 
-  protected void dropSysPeriodColumns(DdlBuffer buffer, String baseTableName) {
-    DdlWrite writer = new DdlWrite();
+  protected void dropHistoryTable(DdlBuffer apply, String baseTableName) {
+    apply.append("drop table ").append(baseTableName).append(historySuffix).endOfStatement().end();
+  }
+
+  protected void dropSysPeriodColumns(DdlWrite writer, String baseTableName) {
     platformDdl.alterTableDropColumn(writer, baseTableName, sysPeriodStart);
     platformDdl.alterTableDropColumn(writer, baseTableName, sysPeriodEnd);
-    buffer.append(writer.apply().getBuffer()); // Workaround - will be removed later
   }
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) {

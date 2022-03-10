@@ -16,6 +16,7 @@ import io.ebeaninternal.extraddl.model.ExtraDdl;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 
+import java.io.IOException;
 import java.util.List;
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
@@ -127,10 +128,13 @@ public class CurrentModel {
     if (jaxbPresent) {
       addExtraDdl(ddl, ExtraDdlXmlReader.readBuiltin(), "-- init script ");
     }
-    ddl.append(writer.apply().getBuffer());
-    ddl.append(writer.applyForeignKeys().getBuffer());
-    ddl.append(writer.applyHistoryView().getBuffer());
-    ddl.append(writer.applyHistoryTrigger().getBuffer());
+
+    try {
+      writer.writeApply(ddl);
+    } catch (IOException e) { // should not happen on StringBuilder
+      throw new RuntimeException(e);
+    }
+
     return ddl.toString();
   }
 
@@ -157,8 +161,11 @@ public class CurrentModel {
     if (ddlHeader != null && !ddlHeader.isEmpty()) {
       ddl.append(ddlHeader).append('\n');
     }
-    ddl.append(writer.dropAllForeignKeys().getBuffer());
-    ddl.append(writer.dropAll().getBuffer());
+    try {
+      writer.writeDropAll(ddl);
+    } catch (IOException e) { // should not happen on StringBuilder
+      throw new RuntimeException(e);
+    }
     return ddl.toString();
   }
 

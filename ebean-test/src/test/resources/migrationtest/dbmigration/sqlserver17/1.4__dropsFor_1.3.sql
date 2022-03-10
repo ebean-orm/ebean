@@ -28,8 +28,8 @@ EXEC usp_ebean_drop_column migtest_e_softdelete, deleted;
 
 EXEC usp_ebean_drop_column migtest_oto_child, master_id;
 
-IF OBJECT_ID('migtest_e_user', 'U') IS NOT NULL drop table migtest_e_user;
 IF OBJECT_ID('migtest_e_user_seq', 'SO') IS NOT NULL drop sequence migtest_e_user_seq;
+IF OBJECT_ID('migtest_e_user', 'U') IS NOT NULL drop table migtest_e_user;
 IF OBJECT_ID('migtest_mtm_c_migtest_mtm_m', 'U') IS NOT NULL drop table migtest_mtm_c_migtest_mtm_m;
 IF OBJECT_ID('migtest_mtm_m_migtest_mtm_c', 'U') IS NOT NULL drop table migtest_mtm_m_migtest_mtm_c;
 IF OBJECT_ID('migtest_mtm_m_phone_numbers', 'U') IS NOT NULL drop table migtest_mtm_m_phone_numbers;

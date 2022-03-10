@@ -3,12 +3,21 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,16 +27,13 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
 
   public AbstractHanaDdl(DatabasePlatform platform) {
     super(platform);
-    this.addColumn = "add (";
-    this.addColumnSuffix = ")";
-    this.alterColumn = "alter (";
-    this.alterColumnSuffix = ")";
-    this.columnDropDefault = " default null";
-    this.columnSetDefault = " default";
-    this.columnSetNotnull = " not null";
+    this.addColumn = "add";
+    this.alterColumn = "alter";
+    this.columnDropDefault = "default null";
+    this.columnSetDefault = "default";
+    this.columnSetNotnull = "not null";
     this.columnSetNull = " null";
-    this.dropColumn = "drop (";
-    this.dropColumnSuffix = ")";
+    this.dropColumn = "drop";
     this.dropConstraintIfExists = "drop constraint ";
     this.dropIndexIfExists = "drop index ";
     this.dropSequenceIfExists = "drop sequence ";
@@ -52,29 +58,21 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
       : (alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue());
     String defaultValueClause = (defaultValue == null || defaultValue.isEmpty()) ? "" : " default " + defaultValue;
 
-    DdlBuffer buffer = writer.apply();
     if (!isConvertible(currentType, type)) {
       // add an intermediate conversion if possible
       if (isNumberType(currentType)) {
         // numbers can always be converted to decimal
-        buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-            .append(" decimal ").append(notnullClause).append(alterColumnSuffix)
-            .endOfStatement();
+        alterTable(writer, tableName).append(alterColumn, columnName).append("decimal").append(notnullClause);
 
       } else if (isStringType(currentType)) {
         // strings can always be converted to nclob
         // Note: we do not add default clause here to avoid error[SAP DBTech JDBC: [336]: invalid default value:
         // default value cannot be created on column of data type NCLOB 
-        buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-            .append(" nclob").append(notnullClause).append(alterColumnSuffix)
-            .endOfStatement();
+        alterTable(writer, tableName).append(alterColumn, columnName).append("nclob").append(notnullClause);
       }
     }
 
-    buffer.append("alter table ").append(tableName).append(" ").append(alterColumn).append(" ").append(columnName)
-        .append(" ").append(type).append(defaultValueClause).append(notnullClause).append(alterColumnSuffix);
-
-    buffer.endOfStatement();
+    alterTable(writer, tableName).append(alterColumn, columnName).append(type).append(defaultValueClause).append(notnullClause);
   }
 
   @Override
@@ -127,8 +125,7 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
    */
   @Override
   public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
-    writer.apply().append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')")
-      .endOfStatement();
+    alterTable(writer, tableName).raw("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')");
   }
 
   /**
@@ -202,4 +199,71 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
     return type != null
       && (type.startsWith("varchar") || type.startsWith("nvarchar") || "clob".equals(type) || "nclob".equals(type));
   }
+
+  @Override
+  protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
+    return writer.applyAlterTable(tableName, HanaAlterTableWrite::new);
+  }
+
+  /**
+   * Joins alter table commands and add open/closing brackets for the alter statements
+   */
+  private static class HanaAlterTableWrite extends BaseAlterTableWrite {
+
+    public HanaAlterTableWrite(String tableName) {
+      super(tableName);
+    }
+
+    @Override
+    protected List<AlterCmd> postProcessCommands(List<AlterCmd> cmds) {
+      List<AlterCmd> newCmds = new ArrayList<>();
+      Map<String, List<AlterCmd>> batches = new LinkedHashMap<>();
+      Set<String> columns = new HashSet<>();
+      for (AlterCmd cmd : cmds) {
+        switch (cmd.getOperation()) {
+        case "add":
+        case "alter":
+        case "drop":
+          if (cmd.getColumn() != null && !columns.add(cmd.getColumn())) {
+            // column already seen
+            flushBatches(newCmds, batches);
+            columns.clear();
+          }
+          batches.computeIfAbsent(cmd.getOperation(), k -> new ArrayList<>()).add(cmd);
+          break;
+        default:
+          flushBatches(newCmds, batches);
+          columns.clear();
+          newCmds.add(cmd);
+        }
+      }
+      flushBatches(newCmds, batches);
+      return newCmds;
+    }
+
+    /**
+     * Merges add/alter/drop commands into one statement.
+     */
+    private void flushBatches(List<AlterCmd> newCmds, Map<String, List<AlterCmd>> batches) {
+      for (Entry<String, List<AlterCmd>> entry : batches.entrySet()) {
+        AlterCmd raw = newRawCommand("alter table ").append(tableName()).append(" ")
+          .append(entry.getKey()).append(" (");
+        List<AlterCmd> cmds = entry.getValue();
+        for (int i = 0; i < cmds.size(); i++) {
+          AlterCmd cmd = cmds.get(i);
+          if (i > 0) {
+            raw.append(",\n   ");
+          }
+          raw.append(cmd.getColumn());
+          if (!cmd.getAlternation().isEmpty()) {
+            raw.append(" ").append(cmd.getAlternation());
+          }
+        }
+        raw.append(")");
+        newCmds.add(raw);
+      }
+      batches.clear();
+    }
+  }
+
 }

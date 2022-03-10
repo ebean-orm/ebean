@@ -1,8 +1,8 @@
 -756544611,     1.0__initial.sql
--1128902470,    1.1.sql
-1140013965,     1.2__dropsFor_1.1.sql
--1534972229,    1.3.sql
-1340223598,     1.4__dropsFor_1.3.sql
+852231507,      1.1.sql
+716378422,      1.2__dropsFor_1.1.sql
+1600556691,     1.3.sql
+1781097804,     1.4__dropsFor_1.3.sql
 1357801733,     R__oracle_only_views.sql
 561281075,      R__order_views.sql
 

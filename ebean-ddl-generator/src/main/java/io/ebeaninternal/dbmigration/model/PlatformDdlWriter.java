@@ -3,7 +3,6 @@ package io.ebeaninternal.dbmigration.model;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.IOUtils;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
@@ -91,21 +90,7 @@ public class PlatformDdlWriter {
     if (header != null && !header.isEmpty()) {
       writer.append(header).append('\n');
     }
-    // merge the apply buffers in the appropriate order
-    prependDropDependencies(writer, ddl.applyDropDependencies());
-    writer.append("-- apply changes\n");
-    writer.append(ddl.apply().getBuffer());
-    writer.append(ddl.applyForeignKeys().getBuffer());
-    writer.append(ddl.applyHistoryView().getBuffer());
-    writer.append(ddl.applyHistoryTrigger().getBuffer());
-  }
-
-  private void prependDropDependencies(Writer writer, DdlBuffer buffer) throws IOException {
-    if (!buffer.isEmpty()) {
-      writer.append("-- drop dependencies\n");
-      writer.append(buffer.getBuffer());
-      writer.append("\n");
-    }
+    ddl.writeApply(writer);
   }
 
   /**

@@ -1,5 +1,10 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.function.Function;
+
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.BaseDdlBuffer;
 import io.ebeaninternal.dbmigration.model.MConfiguration;
 import io.ebeaninternal.dbmigration.model.MTable;
@@ -15,6 +20,10 @@ public class DdlWrite {
   private final DdlBuffer applyDropDependencies = new BaseDdlBuffer();
 
   private final DdlBuffer apply = new BaseDdlBuffer();
+
+  private final Map<String, DdlAlterTable> applyAlterTables = new TreeMap<>();
+
+  private final DdlBuffer applyPostAlter = new BaseDdlBuffer();
 
   private final DdlBuffer applyForeignKeys = new BaseDdlBuffer();
 
@@ -66,10 +75,19 @@ public class DdlWrite {
    */
   public boolean isApplyEmpty() {
     return apply.getBuffer().isEmpty()
+      && applyAlterTables.isEmpty()
+      && applyPostAlter.getBuffer().isEmpty()
       && applyForeignKeys.getBuffer().isEmpty()
       && applyHistoryView.getBuffer().isEmpty()
       && applyHistoryTrigger.getBuffer().isEmpty()
       && applyDropDependencies.getBuffer().isEmpty();
+  }
+
+  /**
+   * Return the buffer that POST ALTER is written to.
+   */
+  public DdlBuffer applyPostAlter() {
+    return applyPostAlter;
   }
 
   /**
@@ -84,6 +102,20 @@ public class DdlWrite {
    */
   public DdlBuffer applyDropDependencies() {
     return applyDropDependencies;
+  }
+
+  /**
+   * Creates or returns the DdlAlterTable statement for <code>tablename</code>.
+   * 
+   * Note: All alters on a particular table are sorted in natural order in the ddl script. This allows optimizing the alters by
+   * merging them or doing a reorg table after altering is done.
+   * 
+   * @param tableName the table name
+   * @param factory   the factory to construct a new object
+   * @return
+   */
+  public DdlAlterTable applyAlterTable(String tableName, Function<String, DdlAlterTable> factory) {
+    return applyAlterTables.computeIfAbsent(tableName, factory);
   }
 
   /**
@@ -123,5 +155,71 @@ public class DdlWrite {
   public DdlBuffer dropAll() {
     return dropAll;
   }
+
+  /**
+   * Writes the apply ddl to the target.
+   */
+  public void writeApply(Appendable target) throws IOException {
+    if (!applyDropDependencies.isEmpty()) {
+      target.append("-- drop dependencies\n");
+      target.append(applyDropDependencies.getBuffer());
+    }
+    if (!apply.isEmpty()) {
+      target.append("-- apply changes\n");
+      target.append(apply.getBuffer());
+    }
+    if (!applyAlterTables.isEmpty()) {
+      // target.append("-- apply alter tables\n");  maybe added later. Makes diff easier
+      for (DdlAlterTable alterTable : applyAlterTables.values()) {
+        alterTable.write(target);
+      }
+    }
+    if (!applyPostAlter.isEmpty()) {
+      // target.append("-- apply post alter\n");  maybe added later.
+      target.append(applyPostAlter.getBuffer());
+    }
+    if (!applyForeignKeys.isEmpty()) {
+      // target.append("-- foreign keys and indices\n"); maybe added later.
+      target.append(applyForeignKeys.getBuffer());
+    }
+
+    if (!applyHistoryView.isEmpty()) {
+      target.append(applyHistoryView.getBuffer());
+    }
+
+    if (!applyHistoryTrigger.isEmpty()) {
+      target.append(applyHistoryTrigger.getBuffer());
+    }
+  }
+
+  /**
+   * Writes the drop all ddl to the target.
+   */
+  public void writeDropAll(Appendable target) throws IOException {
+    if (!dropAllForeignKeys.isEmpty()) {
+      target.append("-- drop all foreign keys\n");
+      target.append(dropAllForeignKeys.getBuffer());
+    }
+    if (!dropAll.isEmpty()) {
+      target.append("-- drop all\n");
+      target.append(dropAll.getBuffer());
+    }
+  }
+  
+  /**
+   * Returns all create statements. Mainly used for unit-tests
+   */
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    try {
+      writeDropAll(sb);
+      writeApply(sb);
+    } catch (IOException e) {
+      // can not happen
+    }
+    return sb.toString();
+  }
+
 
 }
