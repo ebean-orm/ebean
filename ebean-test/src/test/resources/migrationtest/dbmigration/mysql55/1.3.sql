@@ -31,9 +31,7 @@ alter table migtest_e_basic modify status2 varchar(1) not null default 'N';
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_basic modify user_id integer not null default 23;
-
 alter table migtest_e_history2 modify test_string varchar(255);
-
 alter table migtest_e_history4 modify test_number integer;
 alter table migtest_e_history4_history modify test_number integer;
 alter table migtest_e_history6 modify test_number1 integer;
@@ -41,6 +39,7 @@ alter table migtest_e_history6 modify test_number1 integer;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 alter table migtest_e_history6 modify test_number2 integer not null default 7;
+-- apply alter tables
 alter table migtest_e_basic add column description_file longblob;
 alter table migtest_e_basic add column old_boolean tinyint(1) default 0 not null;
 alter table migtest_e_basic add column old_boolean2 tinyint(1);
@@ -49,6 +48,7 @@ alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
+-- apply post alter
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
 alter table migtest_e_history comment = '';
@@ -58,17 +58,20 @@ create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 create index ix_m12_otoc72 on migtest_oto_child (name);
 create index ix_migtest_oto_master_name on migtest_oto_master (name);
+-- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
+-- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
 create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
 
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 
+-- apply history trigger
 lock tables migtest_e_history2 write, migtest_e_history3 write, migtest_e_history4 write;
 -- changes: [add obsolete_string1, add obsolete_string2]
 drop trigger migtest_e_history2_history_upd;

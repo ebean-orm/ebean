@@ -167,6 +167,7 @@ create table migtest_oto_master (
   constraint pk_migtest_oto_master primary key (id)
 );
 
+-- apply post alter
 create table migtest_e_history2_history(like migtest_e_history2);
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
@@ -187,6 +188,7 @@ create index if not exists ix_migtest_e_basic_indextest5 on migtest_e_basic (ind
 create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where upper(name) = 'JIM';
 create index concurrently if not exists ix_migtest_oto_child_lowername_id on migtest_oto_child (lower(name),id);
 create index if not exists ix_migtest_oto_child_lowername on migtest_oto_child (lower(name));
+-- foreign keys and indices
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 
@@ -196,6 +198,7 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
+-- apply history trigger
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;

@@ -28,10 +28,9 @@ update migtest_e_basic set status2 = 'N' where status2 is null;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 
-
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
+-- apply alter tables
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status drop not null;
 alter table migtest_e_basic alter column status2 set data type varchar(1);
@@ -52,6 +51,7 @@ alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 drop not null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
+-- apply post alter
 alter table migtest_e_ref add constraint uq_mgtst__rf_nm unique  (name);
 alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in ('N','A','I'));
 alter table migtest_e_basic add constraint ck_mgtst__b_z543fg check ( status2 in ('N','A','I'));
@@ -62,6 +62,7 @@ comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
 create index ix_mgtst__b_eu8csq on migtest_e_basic (indextest1);
 create index ix_mgtst__b_eu8csu on migtest_e_basic (indextest5);
+-- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_mgtst_fk_65kf6l foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 alter table migtest_fk_set_null add constraint fk_mgtst_fk_wicx8x foreign key (one_id) references migtest_fk_one (id) on delete set null;
 create index ix_mgtst__bsc_rf_d on migtest_e_basic (eref_id);

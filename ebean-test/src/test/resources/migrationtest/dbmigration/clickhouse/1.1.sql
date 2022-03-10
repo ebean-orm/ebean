@@ -26,24 +26,18 @@ create table migtest_mtm_m_phone_numbers (
 ) ENGINE = Log();
 
 
-
-
 update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 
-
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
-
-
+-- apply alter tables
 alter table migtest_ckey_detail add column one_key UInt32;
 alter table migtest_ckey_detail add column two_key String;
 alter table migtest_ckey_parent add column assoc_id UInt32;
@@ -71,6 +65,7 @@ alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted UInt8 default false;
 alter table migtest_oto_child add column master_id UInt64;
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 -- NOTE: table has @History - special migration may be necessary

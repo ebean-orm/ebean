@@ -106,8 +106,8 @@ public class BaseTableDdlTest {
     column.setType("int");
 
     ddl.alterTableAddColumn(writer, "my_table", column, false, false);
-    assertEquals("alter table my_table add column my_column int;\n"
-        + "comment on column my_table.my_column is 'some comment';\n",
+    assertEquals("-- apply alter tables\nalter table my_table add column my_column int;\n"
+      + "-- apply post alter\ncomment on column my_table.my_column is 'some comment';\n",
       writer.toString());
   }
 

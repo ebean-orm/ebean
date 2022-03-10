@@ -13,6 +13,7 @@ create table phones (
   constraint pk_phones primary key (id)
 );
 
+-- foreign keys and indices
 create index ix_phones_person_id on phones (person_id);
 alter table phones add constraint fk_phones_person_id foreign key (person_id) references persons (id) on delete restrict on update restrict not valid;
 

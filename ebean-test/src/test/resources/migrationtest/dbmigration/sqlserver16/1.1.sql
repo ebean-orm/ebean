@@ -35,8 +35,6 @@ create table migtest_mtm_m_phone_numbers (
 );
 
 
-
-
 update migtest_e_basic set status = 'A' where status is null;
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, status;
 alter table migtest_e_basic alter column status varchar(1) not null;
@@ -48,7 +46,6 @@ alter table migtest_e_basic alter column status2 varchar(127);
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 alter table migtest_e_basic alter column user_id integer;
-
 alter table migtest_e_history alter column test_string numeric(19);
 
 -- NOTE: table has @History - special migration may be necessary
@@ -56,9 +53,7 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 EXEC usp_ebean_drop_default_constraint migtest_e_history2, test_string;
 alter table migtest_e_history2 alter column test_string varchar(255) not null;
 alter table migtest_e_history2 add default 'unknown' for test_string;
-
 alter table migtest_e_history4 alter column test_number numeric(19);
-
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
@@ -66,8 +61,7 @@ EXEC usp_ebean_drop_default_constraint migtest_e_history6, test_number1;
 alter table migtest_e_history6 alter column test_number1 integer not null;
 alter table migtest_e_history6 add default 42 for test_number1;
 alter table migtest_e_history6 alter column test_number2 integer;
-
-
+-- apply alter tables
 alter table migtest_ckey_detail add one_key integer;
 alter table migtest_ckey_detail add two_key varchar(127);
 alter table migtest_ckey_parent add assoc_id integer;
@@ -82,6 +76,7 @@ alter table migtest_e_history2 add new_column varchar(20);
 alter table migtest_e_history5 add test_boolean bit default 0 not null;
 alter table migtest_e_softdelete add deleted bit default 0 not null;
 alter table migtest_oto_child add master_id numeric(19);
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
 -- NOTE: table has @History - special migration may be necessary
@@ -94,6 +89,7 @@ create unique nonclustered index uq_migtest_e_basic_indextest4 on migtest_e_basi
 create unique nonclustered index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) where indextest5 is not null;
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+-- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
 
@@ -120,6 +116,7 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id);
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id);
 
+-- apply history view
 alter table migtest_e_history
     add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
         sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
