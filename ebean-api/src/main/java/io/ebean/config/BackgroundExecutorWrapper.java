@@ -20,4 +20,23 @@ public interface BackgroundExecutorWrapper {
    */
   Runnable wrap(Runnable task);
 
+  /**
+   * Combines two wrappers by joining them.
+   */
+  default BackgroundExecutorWrapper with(BackgroundExecutorWrapper inner) {
+    return new BackgroundExecutorWrapper() {
+      
+      @Override
+      public Runnable wrap(Runnable task) {
+        return BackgroundExecutorWrapper.this.wrap(inner.wrap(task));
+      }
+      
+      @Override
+      public <T> Callable<T> wrap(Callable<T> task) {
+        return BackgroundExecutorWrapper.this.wrap(inner.wrap(task));
+      }
+    };
+   
+  }
+
 }
