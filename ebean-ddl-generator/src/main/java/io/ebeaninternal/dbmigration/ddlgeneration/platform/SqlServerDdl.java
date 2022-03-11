@@ -142,9 +142,9 @@ public class SqlServerDdl extends PlatformDdl {
     String columnName = alter.getColumnName();
     String defaultValue = alter.getDefaultValue();
     if (DdlHelp.isDropDefault(defaultValue)) {
-      writer.apply().appendStatement(execUspDropDefaultConstraint(tableName, columnName));
+      execUspDropDefaultConstraint(writer, tableName, columnName);
     } else {
-      writer.apply().appendStatement(execUspDropDefaultConstraint(tableName, columnName));
+      execUspDropDefaultConstraint(writer, tableName, columnName);
       setDefaultValue(writer, tableName, columnName, defaultValue);
     }
   }
@@ -164,20 +164,16 @@ public class SqlServerDdl extends PlatformDdl {
       type = convert(type);
       boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
       String defaultValue = alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue();
-      DdlBuffer buffer = writer.apply();
       if (hasValue(defaultValue)) {
         // default value present -> drop default constraint before altering
-        buffer.appendStatement(execUspDropDefaultConstraint(tableName, columnName));
+        execUspDropDefaultConstraint(writer, tableName, columnName);
       }
 
-      buffer = writer.apply().append("alter table ").append(tableName)
-        .appendWithSpace(alterColumn).appendWithSpace(columnName);
-      buffer.appendWithSpace(type);
+      DdlBuffer buffer = alterTable(writer, tableName).append(alterColumn, columnName);
+      buffer.append(type);
       if (notnull) {
         buffer.append(" not null");
       }
-
-      buffer.endOfStatement();
 
       // re add - default constraint
       if (hasValue(defaultValue) && !DdlHelp.isDropDefault(defaultValue)) {
@@ -210,7 +206,7 @@ public class SqlServerDdl extends PlatformDdl {
    */
   @Override
   public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
-    writer.apply().append("EXEC usp_ebean_drop_column ").append(tableName).append(", ").append(columnName).endOfStatement();
+    alterTable(writer, tableName).raw("EXEC usp_ebean_drop_column ").append(tableName).append(", ").append(columnName);
   }
 
   /**
@@ -252,18 +248,15 @@ public class SqlServerDdl extends PlatformDdl {
         .endOfStatement();
   }
 
-  private String ifObjectExists(String object, String objectType) {
+  public static String ifObjectExists(String object, String objectType) {
     return "IF OBJECT_ID('" + object + "', '" + objectType + "') IS NOT NULL ";
   }
 
-  private String execUspDropDefaultConstraint(String tableName, String columnName) {
-    return "EXEC usp_ebean_drop_default_constraint " + tableName + ", " + columnName;
+  private void execUspDropDefaultConstraint(DdlWrite writer, String tableName, String columnName) {
+    alterTable(writer, tableName).raw("EXEC usp_ebean_drop_default_constraint " + tableName + ", " + columnName);
   }
 
   private void setDefaultValue(DdlWrite writer, String tableName, String columnName, String defaultValue) {
-    writer.apply().append("alter table ").append(tableName)
-        .append(" add default ").append(convertDefaultValue(defaultValue)).append(" for ").append(columnName)
-        .endOfStatement();
+    alterTable(writer, tableName).append("add default " + convertDefaultValue(defaultValue) + " for", columnName);
   }
-
 }

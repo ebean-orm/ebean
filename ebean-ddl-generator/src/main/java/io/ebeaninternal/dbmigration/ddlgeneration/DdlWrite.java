@@ -11,7 +11,18 @@ import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 
 /**
- * Write context holding the buffers for both apply and rollback DDL.
+ * Write context holding the buffers for both apply and rollback DDL. Description of the apply buffers:
+ * <ul>
+ * <li><b>applyDropDependencies:</b> Contains drops for foreign keys, indices, constraint or drop history table</li>
+ * <li><b>apply:</b> Contains &#64;DbMigraion.before, create table, create sequence or disable system versioning statements</li>
+ * <li><b>applyAlterTables:</b> Contains table alters (only that change the table data structure, there may be table alters like
+ * constraints etc. in postAlter)</li>
+ * <li><b>applyPostAlter:</b> Contains check constraints, unique constraints (which CAN be an index), column and table comments,
+ * &#64;DbMigraion.after, drop tables, drop sequences or enable system versioning statement</li>
+ * <li><b>applyForeignKeys: Contains foreign keys and indices.</b>
+ * <li><b>applyHistoryView:</b> The views for trigger based history support</li>
+ * <li><b>applyHistoryTrigger:</b> The triggers for trigger based history support</li>
+ * </ul>
  */
 public class DdlWrite {
 
