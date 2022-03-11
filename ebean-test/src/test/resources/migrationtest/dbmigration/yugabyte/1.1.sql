@@ -38,18 +38,13 @@ create table migtest_mtm_m_phone_numbers (
 
 
 update migtest_e_basic set status = 'A' where status is null;
-alter table migtest_e_basic alter column status2 type varchar(127) using status2::varchar(127);
 
 -- rename all collisions;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
-alter table migtest_e_history add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history alter column test_string type bigint using test_string::bigint;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
-alter table migtest_e_history4 alter column test_number type bigint using test_number::bigint;
-alter table migtest_e_history4_history alter column test_number type bigint using test_number::bigint;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
@@ -59,6 +54,7 @@ alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
+alter table migtest_e_basic alter column status2 type varchar(127) using status2::varchar(127);
 alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 alter table migtest_e_basic alter column user_id drop not null;
@@ -67,6 +63,8 @@ alter table migtest_e_basic add column new_boolean_field boolean default true no
 alter table migtest_e_basic add column new_boolean_field2 boolean default true not null;
 alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add column new_integer integer default 42 not null;
+alter table migtest_e_history add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history alter column test_string type bigint using test_string::bigint;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
@@ -75,6 +73,8 @@ alter table migtest_e_history2 add column new_column varchar(20);
 alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255) default 'unknown';
 alter table migtest_e_history2_history add column new_column varchar(20);
+alter table migtest_e_history4 alter column test_number type bigint using test_number::bigint;
+alter table migtest_e_history4_history alter column test_number type bigint using test_number::bigint;
 alter table migtest_e_history5 add column test_boolean boolean default false not null;
 alter table migtest_e_history5_history add column test_boolean boolean default false;
 alter table migtest_e_history6 alter column test_number1 set default 42;
@@ -102,8 +102,6 @@ create view migtest_e_history_with_history as select * from migtest_e_history un
 
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 comment on table migtest_e_history is 'We have history now';
-create index if not exists ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
-create index if not exists ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
@@ -131,6 +129,8 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
 
+create index if not exists ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
+create index if not exists ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 -- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 

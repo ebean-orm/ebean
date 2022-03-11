@@ -7,8 +7,6 @@ drop table migtest_e_history_history;
 
 drop view if exists migtest_e_history2_with_history;
 drop view if exists migtest_e_history5_with_history;
--- apply changes
-drop sequence if exists migtest_e_user_seq;
 -- apply alter tables
 alter table migtest_ckey_detail drop column one_key;
 alter table migtest_ckey_detail drop column two_key;
@@ -32,6 +30,7 @@ alter table migtest_e_softdelete drop column deleted;
 alter table migtest_oto_child drop column master_id;
 -- apply post alter
 drop table if exists migtest_e_user;
+drop sequence if exists migtest_e_user_seq;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
 drop table if exists migtest_mtm_m_migtest_mtm_c;
 drop table if exists migtest_mtm_m_phone_numbers;
