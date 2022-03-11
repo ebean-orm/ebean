@@ -101,7 +101,7 @@ public class TestBeanCacheAsync extends BaseTestCase {
       assertThat(bean0.getName()).isEqualTo("findById2");
 
     } finally {
-      db.shutdown();
+      db.shutdown(false, false);
     }
   }
 
