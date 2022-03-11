@@ -12,6 +12,7 @@ import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
+import io.ebean.config.BackgroundExecutorWrapper;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.MdcBackgroundExecutorWrapper;
@@ -31,42 +32,35 @@ public class TestBeanCacheAsync extends BaseTestCase {
       return tenantId.get();
     }
   }
+
   /**
    * Copy tenant info to the background thread.
    */
-  class TenantCopyBackgroundExecutorWrapper extends MdcBackgroundExecutorWrapper {
+  class TenantCopyBackgroundExecutorWrapper implements BackgroundExecutorWrapper {
     @Override
     public <T> Callable<T> wrap(Callable<T> task) {
-      String tenant = tenantId.get();
-      if (tenant == null) {
-        return super.wrap(task);
-      } else {
-        return () -> {
-          tenantId.set(tenant);
-          try {
-            return super.wrap(task).call();
-          } finally {
-            tenantId.remove();
-          }
-        };
-      }
+      String tenant = tenantId.get(); // executed in current thread
+      return () -> {
+        tenantId.set(tenant);  // executed in other thread
+        try {
+          return task.call();
+        } finally {
+          tenantId.remove();
+        }
+      };
     }
-    
+
     @Override
     public Runnable wrap(Runnable task) {
       String tenant = tenantId.get();
-      if (tenant == null) {
-        return super.wrap(task);
-      } else {
-        return () -> {
-          tenantId.set(tenant);
-          try {
-            super.wrap(task).run();
-          } finally {
-            tenantId.remove();
-          }
-        };
-      }
+      return () -> {
+        tenantId.set(tenant);
+        try {
+          task.run();
+        } finally {
+          tenantId.remove();
+        }
+      };
     }
   }
   
@@ -84,7 +78,8 @@ public class TestBeanCacheAsync extends BaseTestCase {
     config.setRegister(false);
     config.setServerCachePlugin(new DefaultServerCachePlugin()); // disables foreground local caching (as it is done in Hz/Ignite)
     config.setCurrentTenantProvider(new ThreadLocalTenantProvider());
-    config.setBackgroundExecutorWrapper(new TenantCopyBackgroundExecutorWrapper());
+    config.setBackgroundExecutorWrapper(
+        new MdcBackgroundExecutorWrapper().with(new TenantCopyBackgroundExecutorWrapper()));
     tenantId.set("4711");
     
     Database db = DatabaseFactory.create(config);

@@ -36,9 +36,9 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
    */
   <T> Callable<T> wrap(Callable<T> task) {
     if (wrapper == null) {
-      return clock(task);
+      return task;
     } else {
-      return wrapper.wrap(clock(task));
+      return wrapper.wrap(task);
     }
   }
 
@@ -47,41 +47,43 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
    */
   Runnable wrap(Runnable task) {
     if (wrapper == null) {
-      return clock(task);
+      return task;
     } else {
-      return wrapper.wrap(clock(task));
+      return wrapper.wrap(task);
     }
   }
   
-  private <T> Callable<T> clock(Callable<T> task) {
-    if (logger.isTraceEnabled()) {
-      long queued = System.nanoTime();
-      logger.trace("Queued {}", task);
-      return () -> {
-        long start = System.nanoTime();
-        logger.trace("Start {} (delay time {} us)", task, (start - queued) / 1000L);
-        T ret = task.call();
-        logger.trace("Stop {} (exec time {} us)", task, (System.nanoTime() - start) / 1000L);
-        return ret;
-      };
-    } else {
-      return task;
-    }
-  }
-  
-  private Runnable clock(Runnable task) {
-    if (logger.isTraceEnabled()) {
-      long queued = System.nanoTime();
-      logger.trace("Queued {}", task);
-      return () -> {
-        long start = System.nanoTime();
-        logger.trace("Start {} (delay time {} us)", task, (start - queued) / 1000L);
-        task.run();
-        logger.trace("Stop {} (exec time {} us)", task, (System.nanoTime() - start) / 1000L);
-      };
-    } else {
-      return task;
-    }
+
+  /**
+   * Decorates a runnable by adding an exception handler and some timing metrics.
+   * This is used in methods that accepts a <code>Runnable</code> and return
+   * either <code>void</code> or <code>ScheduledFuture</code>, as there is
+   * normally no Future.get() call.
+   * 
+   * Note: When submitting a <code>Callable</code>, you must check
+   * <code>Future.get()</code> for exceptions.
+   */
+  private Runnable logExceptions(Runnable task) {
+    long queued = System.nanoTime();
+    logger.trace("Queued {}", task);
+    return () -> {
+      try {
+        if (logger.isTraceEnabled()) {
+          long start = System.nanoTime();
+          logger.trace("Start {} (delay time {} us)", task, (start - queued) / 1000L);
+          task.run();
+          logger.trace("Stop {} (exec time {} us)", task, (System.nanoTime() - start) / 1000L);
+        } else {
+          task.run();
+        }
+      } catch (Throwable t) {
+        // log any exception here. Note they will not bubble up to the calling user
+        // unless Future.get() is checked. (Which is almost never done on scheduled
+        // background executions)
+        logger.error("Error while executing the task {}", task, t);
+        throw t;
+      }
+    };
   }
 
   @Override
@@ -97,44 +99,40 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
     return pool.submit(wrap(task));
   }
 
+  
   @Override
   public void execute(Runnable task) {
-    submit(() -> {
-      try {
-        task.run();
-      } catch (Throwable t) {
-        logger.error("Error while executing the task {}", task, t);
-      }
-    });
+    submit(logExceptions(task));
   }
 
   @Override
   public void executePeriodically(Runnable task, long delay, TimeUnit unit) {
-    schedulePool.scheduleWithFixedDelay(wrap(task), delay, delay, unit);
+    schedulePool.scheduleWithFixedDelay(wrap(logExceptions(task)), delay, delay, unit);
   }
 
   @Override
   public void executePeriodically(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    schedulePool.scheduleWithFixedDelay(wrap(task), initialDelay, delay, unit);
+    schedulePool.scheduleWithFixedDelay(wrap(logExceptions(task)), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    return schedulePool.scheduleWithFixedDelay(wrap(task), initialDelay, delay, unit);
+    return schedulePool.scheduleWithFixedDelay(wrap(logExceptions(task)), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    return schedulePool.scheduleAtFixedRate(wrap(task), initialDelay, delay, unit);
+    return schedulePool.scheduleAtFixedRate(wrap(logExceptions(task)), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-    return schedulePool.schedule(wrap(task), delay, unit);
+    return schedulePool.schedule(wrap(logExceptions(task)), delay, unit);
   }
 
   @Override
   public <V> ScheduledFuture<V> schedule(Callable<V> task, long delay, TimeUnit unit) {
+    // Note: Here is no "logExceptions", because it is intended to check Future.get() by the invoker
     return schedulePool.schedule(wrap(task), delay, unit);
   }
 
