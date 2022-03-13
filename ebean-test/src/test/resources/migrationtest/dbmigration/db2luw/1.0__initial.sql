@@ -163,8 +163,6 @@ create table migtest_oto_master (
 create unique index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) exclude null keys;
 create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) exclude null keys;
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
-create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
-create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 -- foreign keys and indices
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
@@ -175,3 +173,5 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict;
 
+create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
+create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

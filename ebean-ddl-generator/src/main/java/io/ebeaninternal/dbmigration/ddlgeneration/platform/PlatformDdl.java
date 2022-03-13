@@ -555,6 +555,21 @@ public class PlatformDdl {
 
   }
 
+  /**
+   * This method is used from DbTriggerBasedHistoryDdl to add the sysPeriodColumns.
+   */
+  public void alterTableAddColumn(DdlWrite writer, String tableName, String columnName, String columnType, String defaultValue) {
+
+    String convertedType = convert(columnType);
+    DdlBuffer buffer = alterTable(writer, tableName).append(addColumn, columnName);
+    buffer.append(convertedType);
+
+    if (defaultValue != null) {
+      buffer.append(" default ");
+      buffer.append(defaultValue);
+    }
+  }
+
   public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
     alterTable(writer, tableName).append(dropColumn, columnName);
   }

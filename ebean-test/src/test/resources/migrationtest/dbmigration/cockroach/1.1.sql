@@ -83,8 +83,6 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_status_indextest1 
 alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
-create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
-create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
@@ -112,3 +110,5 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
 
+create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
+create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);

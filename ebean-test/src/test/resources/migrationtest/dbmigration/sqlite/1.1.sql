@@ -88,8 +88,6 @@ update migtest_e_basic set new_boolean_field = old_boolean;
 -- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 -- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 -- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
-create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
-create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
 -- foreign keys and indices
 -- not supported: alter table migtest_ckey_detail add constraint fk_migtest_ckey_detail_parent foreign key (one_key,two_key) references migtest_ckey_parent (one_key,two_key) on delete restrict on update restrict;
 create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
@@ -102,3 +100,5 @@ create index ix_migtest_ckey_parent_assoc_id on migtest_ckey_parent (assoc_id);
 -- not supported: alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 -- not supported: alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
 
+create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
+create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);

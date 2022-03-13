@@ -7,7 +7,7 @@ drop table migtest_e_history_history;
 
 drop view if exists migtest_e_history2_with_history;
 drop view if exists migtest_e_history5_with_history;
--- apply changes
+-- apply alter tables
 CALL usp_ebean_drop_column('migtest_ckey_detail', 'one_key');
 CALL usp_ebean_drop_column('migtest_ckey_detail', 'two_key');
 CALL usp_ebean_drop_column('migtest_ckey_parent', 'assoc_id');
@@ -19,10 +19,10 @@ CALL usp_ebean_drop_column('migtest_e_basic', 'new_integer');
 CALL usp_ebean_drop_column('migtest_e_history', 'sys_period_start');
 CALL usp_ebean_drop_column('migtest_e_history', 'sys_period_end');
 CALL usp_ebean_drop_column('migtest_e_history2', 'test_string2');
-CALL usp_ebean_drop_column('migtest_e_history2_history', 'test_string2');
 CALL usp_ebean_drop_column('migtest_e_history2', 'test_string3');
-CALL usp_ebean_drop_column('migtest_e_history2_history', 'test_string3');
 CALL usp_ebean_drop_column('migtest_e_history2', 'new_column');
+CALL usp_ebean_drop_column('migtest_e_history2_history', 'test_string2');
+CALL usp_ebean_drop_column('migtest_e_history2_history', 'test_string3');
 CALL usp_ebean_drop_column('migtest_e_history2_history', 'new_column');
 CALL usp_ebean_drop_column('migtest_e_history5', 'test_boolean');
 CALL usp_ebean_drop_column('migtest_e_history5_history', 'test_boolean');

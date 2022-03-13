@@ -60,11 +60,11 @@ create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6)
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
-create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
-create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 -- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict;
 
+create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
+create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

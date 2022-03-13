@@ -1,8 +1,8 @@
-235308122,      1.0__initial.sql
--1285933972,    1.1.sql
--97126202,      1.2__dropsFor_1.1.sql
--1371177335,    1.3.sql
--1491167595,    1.4__dropsFor_1.3.sql
+-698689813,     1.0__initial.sql
+2028346373,     1.1.sql
+-2063980912,    1.2__dropsFor_1.1.sql
+-508824171,     1.3.sql
+511468518,      1.4__dropsFor_1.3.sql
 783227075,      R__multi_comments.sql
 561281075,      R__order_views.sql
 

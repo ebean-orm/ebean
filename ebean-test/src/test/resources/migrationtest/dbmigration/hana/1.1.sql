@@ -140,8 +140,6 @@ alter table migtest_e_history3 add system versioning history table migtest_e_his
 alter table migtest_e_history4 add system versioning history table migtest_e_history4_history not validated;
 alter table migtest_e_history5 add system versioning history table migtest_e_history5_history not validated;
 alter table migtest_e_history6 add system versioning history table migtest_e_history6_history not validated;
--- explicit index "ix_migtest_e_basic_indextest3" for single column "indextest3" of table "migtest_e_basic" is not necessary;
--- explicit index "ix_migtest_e_basic_indextest6" for single column "indextest6" of table "migtest_e_basic" is not necessary;
 -- foreign keys and indices
 -- explicit index "ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" for single column "migtest_mtm_c_id" of table "migtest_mtm_c_migtest_mtm_m" is not necessary;
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
@@ -169,6 +167,8 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
 
+-- explicit index "ix_migtest_e_basic_indextest3" for single column "indextest3" of table "migtest_e_basic" is not necessary;
+-- explicit index "ix_migtest_e_basic_indextest6" for single column "indextest6" of table "migtest_e_basic" is not necessary;
 -- apply history view
 create column table migtest_e_history_history (
  id integer,

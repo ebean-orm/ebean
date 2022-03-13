@@ -96,32 +96,24 @@ create table migtest_e_history2 (
   obsolete_string2              varchar(255),
   constraint pk_migtest_e_history2 primary key (id)
 );
-alter table migtest_e_history2 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history2 add column sys_period_end datetime(6);
 
 create table migtest_e_history3 (
   id                            integer auto_increment not null,
   test_string                   varchar(255),
   constraint pk_migtest_e_history3 primary key (id)
 );
-alter table migtest_e_history3 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history3 add column sys_period_end datetime(6);
 
 create table migtest_e_history4 (
   id                            integer auto_increment not null,
   test_number                   integer,
   constraint pk_migtest_e_history4 primary key (id)
 );
-alter table migtest_e_history4 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history4 add column sys_period_end datetime(6);
 
 create table migtest_e_history5 (
   id                            integer auto_increment not null,
   test_number                   integer,
   constraint pk_migtest_e_history5 primary key (id)
 );
-alter table migtest_e_history5 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history5 add column sys_period_end datetime(6);
 
 create table migtest_e_history6 (
   id                            integer auto_increment not null,
@@ -129,8 +121,6 @@ create table migtest_e_history6 (
   test_number2                  integer not null,
   constraint pk_migtest_e_history6 primary key (id)
 );
-alter table migtest_e_history6 add column sys_period_start datetime(6) default now(6);
-alter table migtest_e_history6 add column sys_period_end datetime(6);
 
 create table migtest_e_ref (
   id                            integer auto_increment not null,
@@ -169,6 +159,17 @@ create table migtest_oto_master (
   constraint pk_migtest_oto_master primary key (id)
 );
 
+-- apply alter tables
+alter table migtest_e_history2 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history2 add column sys_period_end datetime(6);
+alter table migtest_e_history3 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history3 add column sys_period_end datetime(6);
+alter table migtest_e_history4 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history4 add column sys_period_end datetime(6);
+alter table migtest_e_history5 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history5 add column sys_period_end datetime(6);
+alter table migtest_e_history6 add column sys_period_start datetime(6) default now(6);
+alter table migtest_e_history6 add column sys_period_end datetime(6);
 -- apply post alter
 create table migtest_e_history2_history(
   id                            integer,
@@ -213,8 +214,6 @@ create table migtest_e_history6_history(
 );
 create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
 
-create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
-create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 -- foreign keys and indices
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
@@ -225,6 +224,8 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
+create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
+create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
 -- apply history trigger
 delimiter $$
 create trigger migtest_e_history2_history_upd before update on migtest_e_history2 for each row begin

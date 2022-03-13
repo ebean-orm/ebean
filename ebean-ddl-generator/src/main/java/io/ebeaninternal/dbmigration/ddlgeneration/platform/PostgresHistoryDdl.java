@@ -29,14 +29,11 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
    * Use Postgres range type rather than start and end timestamps.
    */
   @Override
-  protected void addSysPeriodColumns(DdlBuffer apply, String baseTableName, String whenCreatedColumn) {
-    apply
-      .append("alter table ").append(baseTableName)
-      .append(" add column ").append(sysPeriod).append(" tstzrange not null default tstzrange(").append(now).append(", null)")
-      .endOfStatement();
-
+  protected void addSysPeriodColumns(DdlWrite writer, String baseTableName, String whenCreatedColumn) {
+    platformDdl.alterTableAddColumn(writer, baseTableName, sysPeriod, "tstzrange not null", "tstzrange(" + now + ", null)");
     if (whenCreatedColumn != null) {
-      apply.append("update ").append(baseTableName).append(" set ")
+      writer.applyPostAlter()
+        .append("update ").append(baseTableName).append(" set ")
         .append(sysPeriod).append(" = tstzrange(").append(whenCreatedColumn).append(", null)").endOfStatement();
     }
   }

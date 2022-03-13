@@ -130,11 +130,11 @@ alter table migtest_e_history2 add system versioning history table migtest_e_his
 alter table migtest_e_history3 add system versioning history table migtest_e_history3_history not validated;
 alter table migtest_e_history4 add system versioning history table migtest_e_history4_history not validated;
 alter table migtest_e_history6 add system versioning history table migtest_e_history6_history not validated;
--- explicit index "ix_migtest_e_basic_indextest1" for single column "indextest1" of table "migtest_e_basic" is not necessary;
--- explicit index "ix_migtest_e_basic_indextest5" for single column "indextest5" of table "migtest_e_basic" is not necessary;
 -- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
 -- explicit index "ix_migtest_e_basic_eref_id" for single column "eref_id" of table "migtest_e_basic" is not necessary;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
+-- explicit index "ix_migtest_e_basic_indextest1" for single column "indextest1" of table "migtest_e_basic" is not necessary;
+-- explicit index "ix_migtest_e_basic_indextest5" for single column "indextest5" of table "migtest_e_basic" is not necessary;
