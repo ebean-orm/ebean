@@ -757,7 +757,7 @@ public class BaseTableDdl implements TableDdl {
 
     if (isTrue(alter.isWithHistory())) {
       // we will apply only type changes or notNull -> null transition
-      boolean isNull = false; // TODO: Boolean.FALSE.equals(alter.isNotnull());
+      boolean isNull = Boolean.FALSE.equals(alter.isNotnull());
       boolean applyToHistory = alter.getType() != null || isNull;
       if (applyToHistory) {
         platformDdl.regenerateHistoryTriggers(writer, alter.getTableName());
