@@ -224,8 +224,7 @@ public final class SqlTreeBuilder {
    * Recursively build the query tree depending on what leaves in the tree
    * should be included.
    */
-  private SqlTreeNode buildSelectChain(String prefix, STreePropertyAssoc prop,
-                                       STreeType desc, List<SqlTreeNode> joinList) {
+  private SqlTreeNode buildSelectChain(String prefix, STreePropertyAssoc prop, STreeType desc, List<SqlTreeNode> joinList) {
     List<SqlTreeNode> myJoinList = new ArrayList<>();
     List<STreePropertyAssocOne> extraProps = new ArrayList<>();
     for (STreePropertyAssocOne one : desc.propsOne()) {
@@ -256,7 +255,7 @@ public final class SqlTreeBuilder {
       }
       addManyWhereJoins(myJoinList);
     }
-    extraProps.forEach(props::add); //addExtra
+    extraProps.forEach(props::addExtra);
 
     if (!rawSql && manyWhereJoins.isFormulaWithJoin(prefix)) {
       for (String property : manyWhereJoins.getFormulaJoinProperties(prefix)) {

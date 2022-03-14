@@ -33,6 +33,12 @@ public final class SqlTreeProperties {
     propsList.addAll(Arrays.asList(props));
   }
 
+  public void addExtra(STreePropertyAssocOne prop) {
+    if (!propsList.contains(prop)) {
+      add(prop);
+    }
+  }
+
   public void add(STreeProperty prop) {
     propsList.add(prop);
     propNames.add(prop.name());

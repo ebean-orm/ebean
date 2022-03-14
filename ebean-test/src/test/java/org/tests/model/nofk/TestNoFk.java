@@ -5,6 +5,7 @@ import io.ebean.DB;
 import io.ebean.SqlRow;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -142,13 +143,16 @@ public class TestNoFk extends BaseTestCase {
     assertTrue(ownerEbi.isReference());
     assertTrue(ownerEbi.isPartial());
     assertTrue(ownerEbi.isLazyLoadFailure());
-
   }
 
   @Test
   public void testEagerLoadFile() {
+    LoggedSql.start();
     List<EFileNoFk> files = DB.find(EFileNoFk.class).fetch("owner").findList();
     assertThat(files).hasSize(2);
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.file_name, t0.owner_user_id, t0.owner_soft_del_user_id, t1.user_id, t1.user_name from efile_no_fk t0 left join euser_no_fk t1 on t1.user_id = t0.owner_user_id");
 
     EFileNoFk file1 = files.get(0);
     EFileNoFk file2 = files.get(1);
@@ -175,7 +179,6 @@ public class TestNoFk extends BaseTestCase {
     assertTrue(ownerEbi.isReference());
     assertTrue(ownerEbi.isPartial());
     assertTrue(ownerEbi.isLazyLoadFailure());
-
   }
 
   @Test
@@ -259,8 +262,12 @@ public class TestNoFk extends BaseTestCase {
 
   @Test
   public void testEagerLoadFileSoftDel() {
+    LoggedSql.start();
     List<EFileNoFk> files = DB.find(EFileNoFk.class).fetch("ownerSoftDel").findList();
     assertThat(files).hasSize(2);
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.file_name, t0.owner_user_id, t0.owner_soft_del_user_id, t1.user_id, t1.user_name, t1.user_id is null from efile_no_fk t0 left join euser_no_fk_soft_del t1 on t1.user_id = t0.owner_soft_del_user_id");
 
     EFileNoFk file1 = files.get(0);
     EFileNoFk file2 = files.get(1);
