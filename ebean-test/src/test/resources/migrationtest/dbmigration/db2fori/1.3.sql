@@ -28,10 +28,9 @@ update migtest_e_basic set status2 = 'N' where status2 is null;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 
-
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
+-- apply alter tables
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status drop not null;
 alter table migtest_e_basic alter column status2 set data type varchar(1);
@@ -52,6 +51,7 @@ alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 drop not null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
+-- apply post alter
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
@@ -60,10 +60,11 @@ create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6)
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
-create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
-create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+-- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict;
 
+create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
+create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

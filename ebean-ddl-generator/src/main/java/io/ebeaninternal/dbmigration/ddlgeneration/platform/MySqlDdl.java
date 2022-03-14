@@ -40,7 +40,7 @@ public class MySqlDdl extends PlatformDdl {
   @Override
   public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
     if (this.useMigrationStoredProcedures) {
-      writer.apply().append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
+      alterTable(writer, tableName).raw("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')");
     } else {
       super.alterTableDropColumn(writer, tableName, columnName);
     }
@@ -108,16 +108,14 @@ public class MySqlDdl extends PlatformDdl {
       boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
       String defaultValue = alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue();
 
-      DdlBuffer buffer = writer.apply().append("alter table ").append(tableName)
-        .appendWithSpace("modify").appendWithSpace(columnName);
-      buffer.appendWithSpace(type);
+      DdlBuffer buffer = alterTable(writer, tableName).append("modify", columnName);
+      buffer.append(type);
       if (notnull) {
         buffer.append(" not null");
       }
       if (hasValue(defaultValue) && !DdlHelp.isDropDefault(defaultValue)) {
         buffer.append(" default ").append(convertDefaultValue(defaultValue));
       }
-      buffer.endOfStatement();
     }
   }
 

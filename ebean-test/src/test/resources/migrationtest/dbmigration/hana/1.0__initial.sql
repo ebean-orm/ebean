@@ -162,8 +162,8 @@ create column table migtest_oto_master (
   constraint pk_migtest_oto_master primary key (id)
 );
 
--- explicit index "ix_migtest_e_basic_indextest1" for single column "indextest1" of table "migtest_e_basic" is not necessary;
--- explicit index "ix_migtest_e_basic_indextest5" for single column "indextest5" of table "migtest_e_basic" is not necessary;
+-- apply alter tables
+-- foreign keys and indices
 -- explicit index "ix_migtest_fk_cascade_one_id" for single column "one_id" of table "migtest_fk_cascade" is not necessary;
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 
@@ -173,6 +173,9 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 -- explicit index "ix_migtest_e_basic_eref_id" for single column "eref_id" of table "migtest_e_basic" is not necessary;
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
+-- explicit index "ix_migtest_e_basic_indextest1" for single column "indextest1" of table "migtest_e_basic" is not necessary;
+-- explicit index "ix_migtest_e_basic_indextest5" for single column "indextest5" of table "migtest_e_basic" is not necessary;
+-- apply history view
 create column table migtest_e_history2_history (
  id integer,
  test_string nvarchar(255),

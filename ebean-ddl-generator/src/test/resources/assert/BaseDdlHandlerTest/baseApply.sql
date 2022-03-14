@@ -7,7 +7,6 @@ create table foo (
 );
 comment on table foo is 'comment';
 
-
-
+-- apply alter tables
 alter table foo add column added_to_foo varchar(20);
 alter table foo drop column col2;

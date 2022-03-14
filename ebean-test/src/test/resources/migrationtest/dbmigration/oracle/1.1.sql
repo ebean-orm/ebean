@@ -78,24 +78,18 @@ create table migtest_mtm_m_phone_numbers (
 );
 
 
-
-
 update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 
-
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
-
-
+-- apply alter tables
 alter table migtest_ckey_detail add one_key number(10);
 alter table migtest_ckey_detail add two_key varchar2(127);
 alter table migtest_ckey_parent add assoc_id number(10);
@@ -123,6 +117,7 @@ alter table migtest_e_history6 modify test_number1 not null;
 alter table migtest_e_history6 modify test_number2 null;
 alter table migtest_e_softdelete add deleted number(1) default 0 not null;
 alter table migtest_oto_child add master_id number(19);
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 -- NOTE: table has @History - special migration may be necessary
@@ -135,8 +130,7 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( p
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 comment on table migtest_e_history is 'We have history now';
-create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
-create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+-- foreign keys and indices
 create index ix_mgtst_mtm_c_mgtst_mt_3ug4ok on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mtm_c_mgtst_mt_93awga foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
 
@@ -163,3 +157,5 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id);
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id);
 
+create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
+create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);

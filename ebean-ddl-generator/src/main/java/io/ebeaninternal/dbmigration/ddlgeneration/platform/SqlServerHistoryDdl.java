@@ -60,27 +60,25 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   @Override
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     String baseTable = dropHistoryTable.getBaseTable();
-    DdlBuffer apply = writer.applyHistoryView();
-    apply.append("-- dropping history support for ").append(baseTable).endOfStatement();
     // drop default constraints
-    DdlWrite tmpWriter = new DdlWrite();
     AlterColumn alter = new AlterColumn();
     alter.setTableName(baseTable);
     alter.setDefaultValue(DdlHelp.DROP_DEFAULT);
     alter.setColumnName(systemPeriodStart);
-    platformDdl.alterColumn(tmpWriter, alter);
+    platformDdl.alterColumn(writer, alter);
     alter.setColumnName(systemPeriodEnd);
-    platformDdl.alterColumn(tmpWriter, alter);
-    apply.append(tmpWriter.apply().getBuffer()); // workaround - will be refactored later
+    platformDdl.alterColumn(writer, alter);
 
-    // switch of versioning & period
+    // switch of versioning & period - must be done before altering
+    DdlBuffer apply = writer.apply();
+    apply.append("-- dropping history support for ").append(baseTable).endOfStatement();
     apply.append("alter table ").append(baseTable).append(" set (system_versioning = off)").endOfStatement();
     apply.append("alter table ").append(baseTable).append(" drop period for system_time").endOfStatement();
-    // now drop tables & columns
-    apply.append("alter table ").append(baseTable).append(" drop column ").append(systemPeriodStart).endOfStatement();
-    apply.append("alter table ").append(baseTable).append(" drop column ").append(systemPeriodEnd).endOfStatement();
-    apply.append("IF OBJECT_ID('").append(baseTable).append("_history', 'U') IS NOT NULL drop table ").append(baseTable).append("_history").endOfStatement();
     apply.end();
+    // now drop tables & columns, they will go to alter table/post alter buffers
+    platformDdl.alterTableDropColumn(writer, baseTable, systemPeriodStart);
+    platformDdl.alterTableDropColumn(writer, baseTable, systemPeriodEnd);
+    writer.applyPostAlter().appendStatement(platformDdl.dropTable(baseTable + "_history"));
   }
 
   @Override

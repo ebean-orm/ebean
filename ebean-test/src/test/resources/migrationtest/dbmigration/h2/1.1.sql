@@ -37,26 +37,18 @@ create table migtest_mtm_m_phone_numbers (
 );
 
 
-
-
 update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
-alter table migtest_e_history add column sys_period_start timestamp default now();
-alter table migtest_e_history add column sys_period_end timestamp;
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 
-
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
-
-
+-- apply alter tables
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -71,6 +63,8 @@ alter table migtest_e_basic add column new_boolean_field boolean default true no
 alter table migtest_e_basic add column new_boolean_field2 boolean default true not null;
 alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add column new_integer integer default 42 not null;
+alter table migtest_e_history add column sys_period_start timestamp default now();
+alter table migtest_e_history add column sys_period_end timestamp;
 alter table migtest_e_history alter column test_string bigint;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
@@ -89,6 +83,7 @@ alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 alter table migtest_oto_child add column master_id bigint;
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 -- NOTE: table has @History - special migration may be necessary
@@ -109,8 +104,7 @@ create view migtest_e_history_with_history as select * from migtest_e_history un
 
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 comment on table migtest_e_history is 'We have history now';
-create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
-create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+-- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;
 
@@ -137,6 +131,9 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 alter table migtest_e_basic add constraint fk_migtest_e_basic_user_id foreign key (user_id) references migtest_e_user (id) on delete restrict on update restrict;
 alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id foreign key (master_id) references migtest_oto_master (id) on delete restrict on update restrict;
 
+create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
+create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+-- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 
 create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
@@ -145,6 +142,7 @@ create view migtest_e_history4_with_history as select * from migtest_e_history4 
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 
+-- apply history trigger
 create trigger migtest_e_history_history_upd before update,delete on migtest_e_history for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 -- changes: [add test_string2, add test_string3, add new_column]
 drop trigger migtest_e_history2_history_upd;

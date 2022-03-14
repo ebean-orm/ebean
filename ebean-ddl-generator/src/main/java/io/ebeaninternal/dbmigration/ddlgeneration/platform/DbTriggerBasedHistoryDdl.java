@@ -109,7 +109,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     String baseTable = table.getName();
 
-    addSysPeriodColumns(writer.apply(), baseTable, table.getWhenCreatedColumn());
+    addSysPeriodColumns(writer, baseTable, table.getWhenCreatedColumn());
     createHistoryTable(writer.applyPostAlter(), table);
 
     createTriggers(writer, table);
@@ -161,20 +161,18 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     DdlBuffer apply = writer.applyHistoryView();
 
-    addSysPeriodColumns(apply, baseTableName, whenCreatedColumn);
+    addSysPeriodColumns(writer, baseTableName, whenCreatedColumn);
     createHistoryTable(writer.applyPostAlter(), table);
     createWithHistoryView(apply, baseTableName);
   }
 
-  protected void addSysPeriodColumns(DdlBuffer apply, String baseTableName, String whenCreatedColumn) {
+  protected void addSysPeriodColumns(DdlWrite writer, String baseTableName, String whenCreatedColumn) {
 
-    apply.append("alter table ").append(baseTableName).append(" add column ")
-      .append(sysPeriodStart).append(" ").append(sysPeriodType).append(" default ").append(now).endOfStatement();
-    apply.append("alter table ").append(baseTableName).append(" add column ")
-      .append(sysPeriodEnd).append(" ").append(sysPeriodType).endOfStatement();
-
+    platformDdl.alterTableAddColumn(writer, baseTableName, sysPeriodStart, sysPeriodType, now);
+    platformDdl.alterTableAddColumn(writer, baseTableName, sysPeriodEnd, sysPeriodType, null);
     if (whenCreatedColumn != null) {
-      apply.append("update ").append(baseTableName).append(" set ").append(sysPeriodStart).append(" = ").append(whenCreatedColumn).endOfStatement();
+      writer.applyPostAlter()
+        .append("update ").append(baseTableName).append(" set ").append(sysPeriodStart).append(" = ").append(whenCreatedColumn).endOfStatement();
     }
   }
 

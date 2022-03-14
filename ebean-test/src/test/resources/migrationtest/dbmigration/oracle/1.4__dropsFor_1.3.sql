@@ -1,15 +1,5 @@
 -- Migrationscripts for ebean unittest
--- apply changes
-delimiter $$
-declare
-  expected_error exception;
-  pragma exception_init(expected_error, -2289);
-begin
-  execute immediate 'drop sequence migtest_e_user_seq';
-exception
-  when expected_error then null;
-end;
-$$;
+-- apply alter tables
 alter table migtest_ckey_detail drop column one_key;
 alter table migtest_ckey_detail drop column two_key;
 alter table migtest_ckey_parent drop column assoc_id;
@@ -24,7 +14,18 @@ alter table migtest_e_history2 drop column new_column;
 alter table migtest_e_history5 drop column test_boolean;
 alter table migtest_e_softdelete drop column deleted;
 alter table migtest_oto_child drop column master_id;
+-- apply post alter
 drop table migtest_e_user cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_user_seq';
+exception
+  when expected_error then null;
+end;
+$$;
 drop table migtest_mtm_c_migtest_mtm_m cascade constraints purge;
 drop table migtest_mtm_m_migtest_mtm_c cascade constraints purge;
 drop table migtest_mtm_m_phone_numbers cascade constraints purge;

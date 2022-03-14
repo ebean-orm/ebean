@@ -19,7 +19,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-
 import org.assertj.core.api.SoftAssertions;
 
 public class PlatformDdl_AlterColumnTest {
@@ -101,36 +100,40 @@ public class PlatformDdl_AlterColumnTest {
     alter.setType("varchar(50)"); // and alter type
 
     String sql = alterColumn(h2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol varchar(50);\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol varchar(50);\n"
       + "alter table mytab alter column acol set default 'hi';\n"
       + "alter table mytab alter column acol set not null;\n");
 
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab alter column acol type varchar(50) using acol::varchar(50);\n"
       + "alter table mytab alter column acol set default 'hi';\n"
       + "alter table mytab alter column acol set not null;\n");
 
     sql = alterColumn(oraDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar2(50);\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol varchar2(50);\n"
       + "alter table mytab modify acol default 'hi';\n"
       + "alter table mytab modify acol not null;\n");
 
     sql = alterColumn(mysqlDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab modify acol varchar(50) not null default 'hi';\n");
 
     sql = alterColumn(sqlServerDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
       + "alter table mytab alter column acol nvarchar(50) not null;\n"
       + "alter table mytab add default 'hi' for acol;\n");
 
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nvarchar(50) default 'hi' not null);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nvarchar(50) default 'hi' not null);\n");
 
     sql = alterColumn(db2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set data type varchar(50);\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set data type varchar(50);\n"
       + "alter table mytab alter column acol set default 'hi';\n"
       + "alter table mytab alter column acol set not null;\n");
 
@@ -141,31 +144,36 @@ public class PlatformDdl_AlterColumnTest {
     alter.setType(null); // do not alter type
 
     sql = alterColumn(h2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol drop default;\n"
       + "alter table mytab alter column acol set null;\n");
 
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol drop default;\n"
       + "alter table mytab alter column acol drop not null;\n");
 
     sql = alterColumn(oraDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab modify acol default null;\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol default null;\n"
       + "alter table mytab modify acol null;\n");
 
     sql = alterColumn(mysqlDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab modify acol varchar(5);\n");
 
     sql = alterColumn(sqlServerDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
       + "alter table mytab alter column acol nvarchar(5);\n");
 
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nvarchar(5) default null);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nvarchar(5) default null);\n");
 
     sql = alterColumn(db2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol drop default;\n"
       + "alter table mytab alter column acol drop not null;\n");
 
   }
@@ -180,40 +188,50 @@ public class PlatformDdl_AlterColumnTest {
     alter.setType("varchar(20)");
 
     String sql = alterColumn(h2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol varchar(20);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol varchar(20);\n");
 
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\nalter table mytab alter column acol type varchar(20) using acol::varchar(20);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol type varchar(20) using acol::varchar(20);\n");
 
     sql = alterColumn(oraDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab modify acol varchar2(20);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol varchar2(20);\n");
 
     sql = alterColumn(mysqlDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\nalter table mytab modify acol varchar(20);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol varchar(20);\n");
 
     sql = alterColumn(sqlServerDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\nalter table mytab alter column acol nvarchar(20);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol nvarchar(20);\n");
 
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nvarchar(20));\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nvarchar(20));\n");
 
     sql = alterColumn(db2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set data type varchar(20);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set data type varchar(20);\n");
 
     alter.setType("bigint");
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\nalter table mytab alter column acol type bigint using acol::bigint;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol type bigint using acol::bigint;\n");
 
     alter.setCurrentType("bigint");
     alter.setType("integer");
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol decimal);\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol decimal);\n"
       + "alter table mytab alter (acol integer);\n");
 
     alter.setCurrentType("varchar(20)");
     alter.setType("varchar(10)");
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nclob);\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nclob);\n"
       + "alter table mytab alter (acol nvarchar(10));\n");
 
   }
@@ -228,27 +246,32 @@ public class PlatformDdl_AlterColumnTest {
     alter.setNotnull(Boolean.TRUE);
 
     String sql = alterColumn(h2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set not null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set not null;\n");
 
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set not null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set not null;\n");
 
     sql = alterColumn(oraDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab modify acol not null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol not null;\n");
 
     sql = alterColumn(mysqlDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab modify acol varchar(20) not null;\n");
 
     sql = alterColumn(sqlServerDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab alter column acol nvarchar(20) not null;\n");
 
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nvarchar(20) not null);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nvarchar(20) not null);\n");
 
     sql = alterColumn(db2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set not null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set not null;\n");
 
   }
 
@@ -264,27 +287,34 @@ public class PlatformDdl_AlterColumnTest {
 
     alter.setNotnull(Boolean.FALSE);
     String sql = alterColumn(h2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set null;\n");
 
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop not null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol drop not null;\n");
 
     sql = alterColumn(oraDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab modify acol null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol null;\n");
 
     sql = alterColumn(mysqlDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\nalter table mytab modify acol varchar(20) default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol varchar(20) default 'hi';\n");
 
     sql = alterColumn(sqlServerDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\nEXEC usp_ebean_drop_default_constraint mytab, acol;\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
       + "alter table mytab alter column acol nvarchar(20);\n"
       + "alter table mytab add default 'hi' for acol;\n");
 
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nvarchar(20) default 'hi');\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nvarchar(20) default 'hi');\n");
 
     sql = alterColumn(db2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop not null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol drop not null;\n");
   }
 
   @Test
@@ -297,27 +327,33 @@ public class PlatformDdl_AlterColumnTest {
     alter.setDefaultValue("'hi'");
 
     String sql = alterColumn(h2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set default 'hi';\n");
 
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set default 'hi';\n");
 
     sql = alterColumn(oraDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab modify acol default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol default 'hi';\n");
 
     sql = alterColumn(mysqlDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter acol set default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter acol set default 'hi';\n");
 
     sql = alterColumn(sqlServerDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
       + "alter table mytab add default 'hi' for acol;\n");
 
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nvarchar(20) default 'hi' not null);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nvarchar(20) default 'hi' not null);\n");
 
     sql = alterColumn(db2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set default 'hi';\n");
   }
 
   @Test
@@ -331,26 +367,33 @@ public class PlatformDdl_AlterColumnTest {
     alter.setDefaultValue("'hi'");
 
     String sql = alterColumn(h2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set default 'hi';\n");
 
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set default 'hi';\n");
 
     sql = alterColumn(oraDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab modify acol default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol default 'hi';\n");
 
     sql = alterColumn(mysqlDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter acol set default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter acol set default 'hi';\n");
 
     sql = alterColumn(sqlServerDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\nEXEC usp_ebean_drop_default_constraint mytab, acol;\n"
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "EXEC usp_ebean_drop_default_constraint mytab, acol;\n"
       + "alter table mytab add default 'hi' for acol;\n");
 
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nvarchar(20) default 'hi' not null);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nvarchar(20) default 'hi' not null);\n");
 
     sql = alterColumn(db2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol set default 'hi';\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol set default 'hi';\n");
   }
 
   @Test
@@ -365,25 +408,32 @@ public class PlatformDdl_AlterColumnTest {
     alter.setDefaultValue("DROP DEFAULT");
 
     String sql = alterColumn(h2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol drop default;\n");
 
     sql = alterColumn(pgDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol drop default;\n");
 
     sql = alterColumn(oraDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab modify acol default null;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol default null;\n");
 
     sql = alterColumn(mysqlDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter acol drop default;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter acol drop default;\n");
 
     sql = alterColumn(sqlServerDdl, alter);
-    softly.assertThat(sql).isEqualTo("-- apply changes\nEXEC usp_ebean_drop_default_constraint mytab, acol;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "EXEC usp_ebean_drop_default_constraint mytab, acol;\n");
 
     sql = alterColumn(hanaDdl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter (acol nvarchar(20) default null not null);\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter (acol nvarchar(20) default null not null);\n");
 
     sql = alterColumn(db2Ddl, alter);
-    softly.assertThat(sql).isEqualTo("alter table mytab alter column acol drop default;\n");
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab alter column acol drop default;\n");
 
   }
 
@@ -392,7 +442,8 @@ public class PlatformDdl_AlterColumnTest {
     DdlWrite writer = new DdlWrite();
     oraDdl.alterTableAddColumn(writer, "my_table", simpleColumn(), false, "1");
     softly.assertThat(writer.toString())
-      .isEqualTo("alter table my_table add my_column int default 1 not null;\n");
+      .isEqualTo("-- apply alter tables\n"
+        + "alter table my_table add my_column int default 1 not null;\n");
   }
 
   private Column simpleColumn() {

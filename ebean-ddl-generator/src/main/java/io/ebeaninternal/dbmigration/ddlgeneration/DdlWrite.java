@@ -11,7 +11,18 @@ import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 
 /**
- * Write context holding the buffers for both apply and rollback DDL.
+ * Write context holding the buffers for both apply and rollback DDL. Description of the apply buffers:
+ * <ul>
+ * <li><b>applyDropDependencies:</b> Contains drops for foreign keys, indices, constraint or drop history table</li>
+ * <li><b>apply:</b> Contains &#64;DbMigraion.before, create table, create sequence or disable system versioning statements</li>
+ * <li><b>applyAlterTables:</b> Contains table alters (only that change the table data structure, there may be table alters like
+ * constraints etc. in postAlter)</li>
+ * <li><b>applyPostAlter:</b> Contains check constraints, unique constraints (which CAN be an index), column and table comments,
+ * &#64;DbMigraion.after, drop tables, drop sequences or enable system versioning statement</li>
+ * <li><b>applyForeignKeys: Contains foreign keys and indices.</b>
+ * <li><b>applyHistoryView:</b> The views for trigger based history support</li>
+ * <li><b>applyHistoryTrigger:</b> The triggers for trigger based history support</li>
+ * </ul>
  */
 public class DdlWrite {
 
@@ -169,25 +180,27 @@ public class DdlWrite {
       target.append(apply.getBuffer());
     }
     if (!applyAlterTables.isEmpty()) {
-      // target.append("-- apply alter tables\n");  maybe added later. Makes diff easier
+      target.append("-- apply alter tables\n");
       for (DdlAlterTable alterTable : applyAlterTables.values()) {
         alterTable.write(target);
       }
     }
     if (!applyPostAlter.isEmpty()) {
-      // target.append("-- apply post alter\n");  maybe added later.
+      target.append("-- apply post alter\n");
       target.append(applyPostAlter.getBuffer());
     }
     if (!applyForeignKeys.isEmpty()) {
-      // target.append("-- foreign keys and indices\n"); maybe added later.
+      target.append("-- foreign keys and indices\n");
       target.append(applyForeignKeys.getBuffer());
     }
 
     if (!applyHistoryView.isEmpty()) {
+      target.append("-- apply history view\n");
       target.append(applyHistoryView.getBuffer());
     }
 
     if (!applyHistoryTrigger.isEmpty()) {
+      target.append("-- apply history trigger\n");
       target.append(applyHistoryTrigger.getBuffer());
     }
   }
@@ -205,7 +218,7 @@ public class DdlWrite {
       target.append(dropAll.getBuffer());
     }
   }
-  
+
   /**
    * Returns all create statements. Mainly used for unit-tests
    */
@@ -220,6 +233,5 @@ public class DdlWrite {
     }
     return sb.toString();
   }
-
 
 }

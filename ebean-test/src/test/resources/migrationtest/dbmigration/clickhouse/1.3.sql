@@ -19,10 +19,9 @@ update migtest_e_basic set status2 = 'N' where status2 is null;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
 
-
-
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
+-- apply alter tables
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status set null;
 alter table migtest_e_basic alter column status2 String;
@@ -43,6 +42,7 @@ alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 set null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
+-- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);

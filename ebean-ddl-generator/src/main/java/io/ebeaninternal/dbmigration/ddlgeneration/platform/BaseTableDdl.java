@@ -558,7 +558,7 @@ public class BaseTableDdl implements TableDdl {
   @Override
   public void generate(DdlWrite writer, CreateIndex index) {
     if (platformInclude(index.getPlatforms())) {
-      writer.applyPostAlter().appendStatement(platformDdl.createIndex(new WriteCreateIndex(index)));
+      writer.applyForeignKeys().appendStatement(platformDdl.createIndex(new WriteCreateIndex(index)));
       writer.dropAll().appendStatement(platformDdl.dropIndex(index.getIndexName(), index.getTableName(), Boolean.TRUE.equals(index.isConcurrent())));
     }
   }
@@ -664,7 +664,6 @@ public class BaseTableDdl implements TableDdl {
         writeForeignKey(writer, tableName, column);
       }
     }
-    writer.apply().end();
   }
 
   /**
@@ -679,7 +678,7 @@ public class BaseTableDdl implements TableDdl {
       if (!hasValue(sequenceName)) {
         sequenceName = namingConvention.getSequenceName(dropTable.getName(), dropTable.getSequenceCol());
       }
-      dropSequence(writer.apply(), sequenceName);
+      dropSequence(writer.applyPostAlter(), sequenceName);
     }
   }
 
@@ -696,7 +695,6 @@ public class BaseTableDdl implements TableDdl {
       regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.DROP, dropColumn.getColumnName());
       alterTableDropColumn(writer, historyTable(tableName), dropColumn.getColumnName());
     }
-    writer.apply().end();
   }
 
   /**

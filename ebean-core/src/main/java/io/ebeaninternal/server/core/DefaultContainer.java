@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.config.BackgroundExecutorWrapper;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DatabaseConfigProvider;
@@ -67,7 +68,8 @@ public final class DefaultContainer implements SpiContainer {
     String namePrefix = "ebean-" + config.getName();
     int schedulePoolSize = config.getBackgroundExecutorSchedulePoolSize();
     int shutdownSecs = config.getBackgroundExecutorShutdownSecs();
-    return new DefaultBackgroundExecutor(schedulePoolSize, shutdownSecs, namePrefix);
+    BackgroundExecutorWrapper wrapper = config.getBackgroundExecutorWrapper();
+    return new DefaultBackgroundExecutor(schedulePoolSize, shutdownSecs, namePrefix, wrapper);
   }
 
   /**
