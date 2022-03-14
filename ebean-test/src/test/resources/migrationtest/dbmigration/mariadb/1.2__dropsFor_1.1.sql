@@ -1,4 +1,6 @@
 -- Migrationscripts for ebean unittest
+-- apply changes
+SET @@system_versioning_alter_history = 1;
 -- apply alter tables
 CALL usp_ebean_drop_column('migtest_e_basic', 'description_file');
 CALL usp_ebean_drop_column('migtest_e_basic', 'old_boolean');

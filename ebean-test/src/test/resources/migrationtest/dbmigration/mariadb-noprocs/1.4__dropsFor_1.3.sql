@@ -1,4 +1,6 @@
 -- Migrationscripts for ebean unittest
+-- apply changes
+SET @@system_versioning_alter_history = 1;
 -- apply alter tables
 alter table migtest_ckey_detail drop column one_key;
 alter table migtest_ckey_detail drop column two_key;
@@ -8,6 +10,7 @@ alter table migtest_e_basic drop column new_boolean_field;
 alter table migtest_e_basic drop column new_boolean_field2;
 alter table migtest_e_basic drop column progress;
 alter table migtest_e_basic drop column new_integer;
+alter table migtest_e_history drop system versioning;
 alter table migtest_e_history2 drop column test_string2;
 alter table migtest_e_history2 drop column test_string3;
 alter table migtest_e_history2 drop column new_column;
@@ -20,5 +23,3 @@ drop sequence if exists migtest_e_user_seq;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
 drop table if exists migtest_mtm_m_migtest_mtm_c;
 drop table if exists migtest_mtm_m_phone_numbers;
--- apply history view
-alter table migtest_e_history drop system versioning;
