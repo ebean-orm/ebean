@@ -11,7 +11,7 @@
   <name>test-kotlin</name>
   <description>Kotlin specific tests</description>
   <artifactId>test-kotlin</artifactId>
-  <version>12.15.1-FOC10</version>
+  <version>1.0</version>
 
   <properties>
     <maven.compiler.source>11</maven.compiler.source>
@@ -34,14 +34,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.15.1-FOC10</version>
+      <version>12.15.1-FOC11-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.15.1-FOC10</version>
+      <version>12.15.1-FOC11-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -109,7 +109,7 @@
 
 
   <scm>
-    <tag>ebean-parent-12.15.1-FOC10</tag>
+    <tag>HEAD</tag>
     <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
   </scm>
 </project>
