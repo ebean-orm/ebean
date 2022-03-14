@@ -1,13 +1,15 @@
 package io.ebean.config;
 
+import org.slf4j.MDC;
+
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import org.slf4j.MDC;
+/**
+ * Propagates MDC context for tasks executed in the background.
+ */
+public final class MdcBackgroundExecutorWrapper implements BackgroundExecutorWrapper {
 
-public class MdcBackgroundExecutorWrapper implements BackgroundExecutorWrapper {
-
-  
   /**
    * Wrap the task with MDC context if defined.
    */
