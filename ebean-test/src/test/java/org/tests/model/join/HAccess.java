@@ -18,20 +18,20 @@ public abstract class Access {
 
   @Id
   UUID id;
-  
+
   @ManyToOne
   @DbForeignKey(noConstraint = true)
   @JoinColumn(name = "accessor_id")
-  Customer accessor;
+  ACustomer accessor;
 
   @ManyToOne
   @DbForeignKey(noConstraint = true)
   @JoinColumn(name = "principal_id")
-  Customer principal;
+  ACustomer principal;
 
   @ManyToOne
   @DbForeignKey(noConstraint = true)
-  @JoinColumn(name = "account_account_number")
+  @JoinColumn(name = "access_account_number")
   Account account;
 
   public UUID getId() {
@@ -42,22 +42,22 @@ public abstract class Access {
     this.id = id;
   }
 
-  public Customer getAccessor() {
+  public ACustomer getAccessor() {
     return accessor;
   }
-  
-  public void setAccessor(Customer accessor) {
+
+  public void setAccessor(ACustomer accessor) {
     this.accessor = accessor;
   }
-  
-  public Customer getPrincipal() {
+
+  public ACustomer getPrincipal() {
     return principal;
   }
 
-  public void setPrincipal(Customer principal) {
+  public void setPrincipal(ACustomer principal) {
     this.principal = principal;
   }
-  
+
   public Account getAccount() {
     return account;
   }
@@ -66,5 +66,5 @@ public abstract class Access {
     this.account = account;
     setPrincipal(account.getOwner());
   }
-  
+
 }

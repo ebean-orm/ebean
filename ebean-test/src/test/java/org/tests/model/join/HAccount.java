@@ -1,9 +1,6 @@
 package org.tests.model.join;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import org.tests.model.basic.Customer;
 
@@ -13,9 +10,10 @@ public abstract class Account {
 
   @Id
   String accountNumber;
-  
+
   @ManyToOne
-  Customer owner;
+  @JoinColumn(name = "owner_id")//, referencedColumnName = "id")
+  ACustomer owner;
 
   public String getAccountNumber() {
     return accountNumber;
@@ -25,12 +23,12 @@ public abstract class Account {
     this.accountNumber = accountNumber;
   }
 
-  public Customer getOwner() {
+  public ACustomer getOwner() {
     return owner;
   }
 
-  public void setOwner(Customer owner) {
+  public void setOwner(ACustomer owner) {
     this.owner = owner;
   }
-  
+
 }
