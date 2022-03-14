@@ -106,7 +106,10 @@ final class DScriptRunner implements ScriptRunner {
       try (Connection connection = obtainConnection()) {
         DdlRunner runner = new DdlRunner(useAutoCommit, scriptName, platformName);
         runner.runAll(content, connection);
-        connection.commit();
+        if (!connection.getAutoCommit()) {
+          // Clickhouse fails: Cannot commit when auto-commit is enabled
+          connection.commit();
+        }
         runner.runNonTransactional(connection);
       }
 
