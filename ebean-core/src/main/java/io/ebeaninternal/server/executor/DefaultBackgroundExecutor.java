@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 @NonNullApi
 public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
-  protected static final Logger logger = LoggerFactory.getLogger("io.ebean.BackgroundExecutor");
-  
+  private static final Logger log = LoggerFactory.getLogger("io.ebean.BackgroundExecutor");
+
   private final ScheduledExecutorService schedulePool;
   private final DaemonExecutorService pool;
   private final BackgroundExecutorWrapper wrapper;
@@ -28,7 +28,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
     this.schedulePool = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix + "-periodic-");
     this.pool = new DaemonExecutorService(shutdownWaitSeconds, namePrefix);
     this.wrapper = wrapper;
-    logger.debug("Created backgroundExecutor {} (schedulePoolSize={}, shutdownWaitSeconds={})", namePrefix, schedulePoolSize, shutdownWaitSeconds);
+    log.debug("Created backgroundExecutor {} (schedulePoolSize={}, shutdownWaitSeconds={})", namePrefix, schedulePoolSize, shutdownWaitSeconds);
   }
 
   /**
@@ -52,27 +52,27 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
       return wrapper.wrap(task);
     }
   }
-  
+
 
   /**
    * Decorates a runnable by adding an exception handler and some timing metrics.
    * This is used in methods that accepts a <code>Runnable</code> and return
    * either <code>void</code> or <code>ScheduledFuture</code>, as there is
    * normally no Future.get() call.
-   * 
+   *
    * Note: When submitting a <code>Callable</code>, you must check
    * <code>Future.get()</code> for exceptions.
    */
   private Runnable logExceptions(Runnable task) {
     long queued = System.nanoTime();
-    logger.trace("Queued {}", task);
+    log.trace("Queued {}", task);
     return () -> {
       try {
-        if (logger.isTraceEnabled()) {
+        if (log.isTraceEnabled()) {
           long start = System.nanoTime();
-          logger.trace("Start {} (delay time {} us)", task, (start - queued) / 1000L);
+          log.trace("Start {} (delay time {} us)", task, (start - queued) / 1000L);
           task.run();
-          logger.trace("Stop {} (exec time {} us)", task, (System.nanoTime() - start) / 1000L);
+          log.trace("Stop {} (exec time {} us)", task, (System.nanoTime() - start) / 1000L);
         } else {
           task.run();
         }
@@ -80,7 +80,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
         // log any exception here. Note they will not bubble up to the calling user
         // unless Future.get() is checked. (Which is almost never done on scheduled
         // background executions)
-        logger.error("Error while executing the task {}", task, t);
+        log.error("Error while executing the task {}", task, t);
         throw t;
       }
     };
@@ -88,6 +88,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public <T> Future<T> submit(Callable<T> task) {
+    // Note: No "logExceptions" as we expect Future.get() by the invoker
     return pool.submit(wrap(task));
   }
 
@@ -99,7 +100,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
     return pool.submit(wrap(task));
   }
 
-  
+
   @Override
   public void execute(Runnable task) {
     submit(logExceptions(task));
@@ -132,16 +133,16 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public <V> ScheduledFuture<V> schedule(Callable<V> task, long delay, TimeUnit unit) {
-    // Note: Here is no "logExceptions", because it is intended to check Future.get() by the invoker
+    // Note: No "logExceptions" as we expect Future.get() by the invoker
     return schedulePool.schedule(wrap(task), delay, unit);
   }
 
   @Override
   public void shutdown() {
-    logger.trace("Shutting down backgroundExecutor");
+    log.trace("BackgroundExecutor shutting down");
     schedulePool.shutdown();
     pool.shutdown();
-    logger.debug("BackgroundExecutor stopped");
+    log.debug("BackgroundExecutor stopped");
   }
 
 }
