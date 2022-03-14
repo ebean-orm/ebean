@@ -42,6 +42,9 @@ update migtest_e_basic set user_id = 23 where user_id is null;
 -- alter table migtest_e_history4 set (system_versioning = off (history_table=dbo.migtest_e_history4_history));
 -- history migration goes here
 -- alter table migtest_e_history4 set (system_versioning = on (history_table=dbo.migtest_e_history4_history));
+-- alter table migtest_e_history6 set (system_versioning = off (history_table=dbo.migtest_e_history6_history));
+-- history migration goes here
+-- alter table migtest_e_history6 set (system_versioning = on (history_table=dbo.migtest_e_history6_history));
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;

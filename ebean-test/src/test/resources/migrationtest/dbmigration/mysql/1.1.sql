@@ -53,6 +53,9 @@ drop view migtest_e_history5_with_history;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+drop trigger migtest_e_history6_history_upd;
+drop trigger migtest_e_history6_history_del;
+drop view migtest_e_history6_with_history;
 -- apply alter tables
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
@@ -81,6 +84,7 @@ alter table migtest_e_history5 add column test_boolean tinyint(1) default 0 not 
 alter table migtest_e_history5_history add column test_boolean tinyint(1) default 0;
 alter table migtest_e_history6 modify test_number1 integer not null default 42;
 alter table migtest_e_history6 modify test_number2 integer;
+alter table migtest_e_history6_history modify test_number2 integer;
 alter table migtest_e_softdelete add column deleted tinyint(1) default 0 not null;
 alter table migtest_oto_child add column master_id bigint;
 -- apply post alter
@@ -158,6 +162,18 @@ end$$
 delimiter $$
 create trigger migtest_e_history5_history_del before delete on migtest_e_history5 for each row begin
     insert into migtest_e_history5_history (sys_period_start,sys_period_end,id, test_number, test_boolean) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number, OLD.test_boolean);
+end$$
+unlock tables;
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
+lock tables migtest_e_history6 write;
+delimiter $$
+create trigger migtest_e_history6_history_upd before update on migtest_e_history6 for each row begin
+    insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number1, OLD.test_number2);
+    set NEW.sys_period_start = now(6);
+end$$
+delimiter $$
+create trigger migtest_e_history6_history_del before delete on migtest_e_history6 for each row begin
+    insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number1, OLD.test_number2);
 end$$
 unlock tables;
 -- foreign keys and indices

@@ -40,6 +40,10 @@ drop trigger if exists migtest_e_history4_history_upd on migtest_e_history4 casc
 drop function if exists migtest_e_history4_history_version();
 
 drop view migtest_e_history4_with_history;
+drop trigger if exists migtest_e_history6_history_upd on migtest_e_history6 cascade;
+drop function if exists migtest_e_history6_history_version();
+
+drop view migtest_e_history6_with_history;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
@@ -59,6 +63,7 @@ alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string drop not null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
+alter table migtest_e_history2_history alter column test_string drop not null;
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
 alter table migtest_e_history4 alter column test_number type integer using test_number::integer;
@@ -67,6 +72,7 @@ alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 drop not null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
+alter table migtest_e_history6_history alter column test_number1 drop not null;
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
@@ -143,6 +149,29 @@ $$ LANGUAGE plpgsql;
 create trigger migtest_e_history4_history_upd
   before update or delete on migtest_e_history4
   for each row execute procedure migtest_e_history4_history_version();
+
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
+create or replace function migtest_e_history6_history_version() returns trigger as $$
+declare
+  lowerTs timestamptz;
+  upperTs timestamptz;
+begin
+  lowerTs = lower(OLD.sys_period);
+  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
+  if (TG_OP = 'UPDATE') then
+    insert into migtest_e_history6_history (sys_period,id, test_number1, test_number2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number1, OLD.test_number2);
+    NEW.sys_period = tstzrange(upperTs,null);
+    return new;
+  elsif (TG_OP = 'DELETE') then
+    insert into migtest_e_history6_history (sys_period,id, test_number1, test_number2) values (tstzrange(lowerTs,upperTs), OLD.id, OLD.test_number1, OLD.test_number2);
+    return old;
+  end if;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger migtest_e_history6_history_upd
+  before update or delete on migtest_e_history6
+  for each row execute procedure migtest_e_history6_history_version();
 
 -- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;

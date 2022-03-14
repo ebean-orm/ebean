@@ -52,6 +52,8 @@ drop view migtest_e_history5_with_history;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+drop trigger migtest_e_history6_history_upd;
+drop view migtest_e_history6_with_history;
 -- apply alter tables
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
@@ -85,6 +87,7 @@ alter table migtest_e_history5_history add column test_boolean boolean default f
 alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 set null;
+alter table migtest_e_history6_history alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 alter table migtest_oto_child add column master_id bigint;
 -- apply post alter
@@ -117,6 +120,8 @@ create view migtest_e_history4_with_history as select * from migtest_e_history4 
 create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
+create trigger migtest_e_history6_history_upd before update,delete on migtest_e_history6 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;

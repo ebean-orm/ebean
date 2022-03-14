@@ -59,6 +59,9 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+-- alter table migtest_e_history6 set (system_versioning = off (history_table=dbo.migtest_e_history6_history));
+-- history migration goes here
+-- alter table migtest_e_history6 set (system_versioning = on (history_table=dbo.migtest_e_history6_history));
 -- apply alter tables
 alter table migtest_ckey_detail add one_key integer;
 alter table migtest_ckey_detail add two_key nvarchar(127);
