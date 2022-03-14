@@ -13,30 +13,22 @@ import java.util.Set;
 final class SqlTree {
 
   private final SqlTreeNode rootNode;
-
   /**
    * Property if resultSet contains master and detail rows.
    */
   private final STreePropertyAssocMany manyProperty;
-
   private final String distinctOn;
-
   private final String selectSql;
-
   private final String fromSql;
-
   private final String groupBy;
-
   /**
    * Encrypted Properties require additional binding.
    */
   private final STreeProperty[] encryptedProps;
-
   /**
    * Where clause for inheritance.
    */
   private final String inheritanceWhereSql;
-
   private final boolean noJoins;
 
   /**
@@ -44,7 +36,6 @@ final class SqlTree {
    */
   SqlTree(SqlTreeNode rootNode, String distinctOn, String selectSql, String fromSql, String groupBy, String inheritanceWhereSql,
           STreeProperty[] encryptedProps, STreePropertyAssocMany manyProperty, boolean includeJoins) {
-
     this.rootNode = rootNode;
     this.distinctOn = distinctOn;
     this.selectSql = selectSql;
