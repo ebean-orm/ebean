@@ -1,8 +1,8 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import java.util.List;
+
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
-import io.ebeaninternal.dbmigration.model.MTable;
 
 /**
  * H2 history support using DB triggers to maintain a history table.
@@ -23,18 +23,8 @@ public class H2HistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
-  protected void createTriggers(DdlWrite writer, MTable table) {
-    String baseTableName = table.getName();
-    DdlBuffer apply = writer.applyHistoryTrigger();
-    addCreateTrigger(apply, updateTriggerName(baseTableName), baseTableName);
-  }
-
-  @Override
-  protected void updateHistoryTriggers(DbTriggerUpdate update) {
-    recreateHistoryView(update);
-    DdlBuffer buffer = update.historyTriggerBuffer();
-    dropTriggers(buffer, update.getBaseTable());
-    addCreateTrigger(buffer, updateTriggerName(update.getBaseTable()), update.getBaseTable());
+  protected void createTriggers(DdlBuffer buffer, String baseTable, List<String> columnNames) {
+    addCreateTrigger(buffer, updateTriggerName(baseTable), baseTable);
   }
 
   private void addCreateTrigger(DdlBuffer apply, String triggerName, String baseTable) {

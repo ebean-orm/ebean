@@ -1,6 +1,9 @@
 -- Migrationscripts for ebean unittest
--- drop dependencies
-drop view if exists migtest_e_history2_with_history;
+-- apply changes
+drop trigger if exists migtest_e_history2_history_upd on migtest_e_history2 cascade;
+drop function if exists migtest_e_history2_history_version();
+
+drop view migtest_e_history2_with_history;
 -- apply alter tables
 alter table migtest_e_basic drop column description_file;
 alter table migtest_e_basic drop column old_boolean;
@@ -11,13 +14,7 @@ alter table migtest_e_history2 drop column obsolete_string2;
 alter table migtest_e_history2_history drop column obsolete_string1;
 alter table migtest_e_history2_history drop column obsolete_string2;
 -- apply post alter
-drop table if exists migtest_e_ref cascade;
-drop sequence if exists migtest_e_ref_seq;
--- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
-
--- apply history trigger
--- changes: [drop obsolete_string1, drop obsolete_string2]
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -36,3 +33,9 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
+create trigger migtest_e_history2_history_upd
+  before update or delete on migtest_e_history2
+  for each row execute procedure migtest_e_history2_history_version();
+
+drop table if exists migtest_e_ref cascade;
+drop sequence if exists migtest_e_ref_seq;

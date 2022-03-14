@@ -183,53 +183,6 @@ create table migtest_e_history2_history(
   sys_period_end                datetime(6)
 );
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
-
-create table migtest_e_history3_history(
-  id                            integer,
-  test_string                   varchar(255),
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
-);
-create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-
-create table migtest_e_history4_history(
-  id                            integer,
-  test_number                   integer,
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
-);
-create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-
-create table migtest_e_history5_history(
-  id                            integer,
-  test_number                   integer,
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
-);
-create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
-
-create table migtest_e_history6_history(
-  id                            integer,
-  test_number1                  integer,
-  test_number2                  integer,
-  sys_period_start              datetime(6),
-  sys_period_end                datetime(6)
-);
-create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
-
--- foreign keys and indices
-create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
-
-create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id);
-
-create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
-alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
-
-create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
-create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
--- apply history trigger
 delimiter $$
 create or replace trigger migtest_e_history2_history_upd for migtest_e_history2 before update for each row as 
     NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
@@ -243,6 +196,14 @@ create or replace trigger migtest_e_history2_history_del for migtest_e_history2 
 end_trigger;
 $$
 
+
+create table migtest_e_history3_history(
+  id                            integer,
+  test_string                   varchar(255),
+  sys_period_start              datetime(6),
+  sys_period_end                datetime(6)
+);
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
 delimiter $$
 create or replace trigger migtest_e_history3_history_upd for migtest_e_history3 before update for each row as 
     NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
@@ -256,6 +217,14 @@ create or replace trigger migtest_e_history3_history_del for migtest_e_history3 
 end_trigger;
 $$
 
+
+create table migtest_e_history4_history(
+  id                            integer,
+  test_number                   integer,
+  sys_period_start              datetime(6),
+  sys_period_end                datetime(6)
+);
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 delimiter $$
 create or replace trigger migtest_e_history4_history_upd for migtest_e_history4 before update for each row as 
     NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
@@ -269,6 +238,14 @@ create or replace trigger migtest_e_history4_history_del for migtest_e_history4 
 end_trigger;
 $$
 
+
+create table migtest_e_history5_history(
+  id                            integer,
+  test_number                   integer,
+  sys_period_start              datetime(6),
+  sys_period_end                datetime(6)
+);
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 delimiter $$
 create or replace trigger migtest_e_history5_history_upd for migtest_e_history5 before update for each row as 
     NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
@@ -282,6 +259,15 @@ create or replace trigger migtest_e_history5_history_del for migtest_e_history5 
 end_trigger;
 $$
 
+
+create table migtest_e_history6_history(
+  id                            integer,
+  test_number1                  integer,
+  test_number2                  integer,
+  sys_period_start              datetime(6),
+  sys_period_end                datetime(6)
+);
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
 delimiter $$
 create or replace trigger migtest_e_history6_history_upd for migtest_e_history6 before update for each row as 
     NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
@@ -295,3 +281,16 @@ create or replace trigger migtest_e_history6_history_del for migtest_e_history6 
 end_trigger;
 $$
 
+
+-- foreign keys and indices
+create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
+
+create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id);
+
+create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
+alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
+
+create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
+create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);

@@ -1,6 +1,8 @@
 -- Migrationscripts for ebean unittest
--- drop dependencies
-drop view if exists migtest_e_history2_with_history;
+-- apply changes
+drop trigger migtest_e_history2_history_upd;
+drop trigger migtest_e_history2_history_del;
+drop view migtest_e_history2_with_history;
 -- apply alter tables
 alter table migtest_e_basic drop column description_file;
 alter table migtest_e_basic drop column old_boolean;
@@ -11,15 +13,7 @@ alter table migtest_e_history2 drop column obsolete_string2;
 alter table migtest_e_history2_history drop column obsolete_string1;
 alter table migtest_e_history2_history drop column obsolete_string2;
 -- apply post alter
-drop table if exists migtest_e_ref;
-drop sequence if exists migtest_e_ref_seq;
--- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
-
--- apply history trigger
--- changes: [drop obsolete_string1, drop obsolete_string2]
-drop trigger migtest_e_history2_history_upd;
-drop trigger migtest_e_history2_history_del;
 delimiter $$
 create or replace trigger migtest_e_history2_history_upd for migtest_e_history2 before update for each row as 
     NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
@@ -33,3 +27,5 @@ create or replace trigger migtest_e_history2_history_del for migtest_e_history2 
 end_trigger;
 $$
 
+drop table if exists migtest_e_ref;
+drop sequence if exists migtest_e_ref_seq;

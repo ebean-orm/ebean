@@ -37,8 +37,8 @@ update migtest_e_basic set status = 'A' where status is null;
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
 -- NOTE: table has @History - special migration may be necessary
-SET @@system_versioning_alter_history = 1;
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
+SET @@system_versioning_alter_history = 1;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
@@ -54,6 +54,7 @@ alter table migtest_e_basic add column new_boolean_field tinyint(1) default 1 no
 alter table migtest_e_basic add column new_boolean_field2 tinyint(1) default 1 not null;
 alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add column new_integer integer default 42 not null;
+alter table migtest_e_history add system versioning;
 alter table migtest_e_history modify test_string bigint;
 alter table migtest_e_history2 modify test_string varchar(255) not null default 'unknown';
 alter table migtest_e_history2 add column test_string2 varchar(255);
@@ -104,8 +105,3 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
--- apply history view
-alter table migtest_e_history add system versioning;
--- apply history trigger
-lock tables migtest_e_history3 write;
-unlock tables;

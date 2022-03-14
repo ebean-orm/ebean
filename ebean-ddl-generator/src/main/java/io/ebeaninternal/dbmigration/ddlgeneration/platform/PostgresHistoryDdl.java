@@ -49,14 +49,11 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
-  protected void createTriggers(DdlWrite writer, MTable table) {
-    String baseTableName = table.getName();
+  protected void createTriggers(DdlBuffer buffer, String baseTableName, List<String> columnNames) {
     String procedureName = procedureName(baseTableName);
     String triggerName = triggerName(baseTableName);
-    List<String> columnNames = columnNamesForApply(table);
-    DdlBuffer apply = writer.applyHistoryTrigger();
-    createOrReplaceFunction(apply, procedureName, historyTableName(baseTableName), columnNames);
-    apply
+    createOrReplaceFunction(buffer, procedureName, historyTableName(baseTableName), columnNames);
+    buffer
       .append("create trigger ").append(triggerName).newLine()
       .append("  before update or delete on ").append(baseTableName).newLine()
       .append("  for each row execute procedure ").append(procedureName).append("();").newLine().newLine();
@@ -99,22 +96,6 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
       .append("$$ LANGUAGE plpgsql;").newLine();
 
     apply.end();
-  }
-
-  @Override
-  protected void createStoredFunction(DdlWrite writer, MTable table) {
-    String procedureName = procedureName(table.getName());
-    String historyTable = historyTableName(table.getName());
-
-    List<String> columnNames = columnNamesForApply(table);
-    createOrReplaceFunction(writer.applyHistoryTrigger(), procedureName, historyTable, columnNames);
-  }
-
-  @Override
-  protected void updateHistoryTriggers(DbTriggerUpdate update) {
-    String procedureName = procedureName(update.getBaseTable());
-    recreateHistoryView(update);
-    createOrReplaceFunction(update.historyTriggerBuffer(), procedureName, update.getHistoryTable(), update.getColumns());
   }
 
   @Override

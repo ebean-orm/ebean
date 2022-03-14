@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
@@ -43,7 +44,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   }
 
   private void enableSystemVersioning(DdlWrite writer, String baseTable) {
-    DdlBuffer apply = writer.applyHistoryView();
+    DdlBuffer apply = writer.applyPostAlter();
     apply.append("alter table ").append(baseTable).newLine()
       .append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine()
       .append("        ").append(systemPeriodEnd).append("   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',").newLine()
@@ -88,15 +89,19 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void updateTriggers(DdlWrite writer, HistoryTableUpdate baseTable) {
-    // SQL Server 2016 does not need triggers
-    DdlBuffer apply = writer.applyHistoryView();
-    String baseTableName = baseTable.getBaseTable();
-    apply.append("-- alter table ").append(baseTableName).append(" set (system_versioning = off (history_table=")
-      .append(getHistoryTable(baseTableName)).append("))").endOfStatement();
-    apply.append("-- history migration goes here").newLine();
-    apply.append("-- alter table ").append(baseTableName).append(" set (system_versioning = on (history_table=")
-      .append(getHistoryTable(baseTableName)).append("))").endOfStatement();
-
+  public void updateTriggers(DdlWrite writer, String tableName) {
+    DdlAlterTable alter = platformDdl.alterTable(writer, tableName);
+    writer.getTable(tableName);
+    if (!alter.isHistoryHandled()) {
+      // SQL Server 2016 does not need triggers
+      DdlBuffer apply = writer.apply();
+      apply.append("-- alter table ").append(tableName).append(" set (system_versioning = off (history_table=")
+        .append(getHistoryTable(tableName)).append("))").endOfStatement();
+      apply.append("-- history migration goes here").newLine();
+      apply.append("-- alter table ").append(tableName).append(" set (system_versioning = on (history_table=")
+        .append(getHistoryTable(tableName)).append("))").endOfStatement();
+    }
+    alter.setHistoryHandled();
   }
+
 }

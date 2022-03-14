@@ -1,15 +1,12 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -73,11 +70,6 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
     }
 
     alterTable(writer, tableName).append(alterColumn, columnName).append(type).append(defaultValueClause).append(notnullClause);
-  }
-
-  @Override
-  public DdlHandler createDdlHandler(DatabaseConfig config) {
-    return new HanaDdlHandler(config, this);
   }
 
   @Override

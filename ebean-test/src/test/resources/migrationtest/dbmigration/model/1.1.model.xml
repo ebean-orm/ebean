@@ -54,15 +54,7 @@
             </before>
         </alterColumn>
         <addTableComment name="migtest_e_history" comment="We have history now"/>
-        <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false">
-            <before platforms="mariadb">
-                <ddl>SET @@system_versioning_alter_history = 1</ddl>
-                <ddl>update ${table} set ${column} = 'unknown' where ${column} is null</ddl>
-            </before>
-            <before>
-                <ddl>update ${table} set ${column} = 'unknown' where ${column} is null</ddl>
-            </before>
-        </alterColumn>
+        <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false"/>
         <addColumn tableName="migtest_e_history2" withHistory="true">
             <column name="test_string2" type="varchar" historyExclude="true"/>
             <column name="test_string3" type="varchar" defaultValue="'unknown'" notnull="true"/>

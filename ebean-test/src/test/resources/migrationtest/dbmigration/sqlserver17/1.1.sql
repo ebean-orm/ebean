@@ -44,9 +44,24 @@ insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
+-- alter table migtest_e_history2 set (system_versioning = off (history_table=dbo.migtest_e_history2_history));
+-- history migration goes here
+-- alter table migtest_e_history2 set (system_versioning = on (history_table=dbo.migtest_e_history2_history));
+-- alter table migtest_e_history3 set (system_versioning = off (history_table=dbo.migtest_e_history3_history));
+-- history migration goes here
+-- alter table migtest_e_history3 set (system_versioning = on (history_table=dbo.migtest_e_history3_history));
+-- alter table migtest_e_history4 set (system_versioning = off (history_table=dbo.migtest_e_history4_history));
+-- history migration goes here
+-- alter table migtest_e_history4 set (system_versioning = on (history_table=dbo.migtest_e_history4_history));
+-- alter table migtest_e_history5 set (system_versioning = off (history_table=dbo.migtest_e_history5_history));
+-- history migration goes here
+-- alter table migtest_e_history5 set (system_versioning = on (history_table=dbo.migtest_e_history5_history));
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
+-- alter table migtest_e_history6 set (system_versioning = off (history_table=dbo.migtest_e_history6_history));
+-- history migration goes here
+-- alter table migtest_e_history6 set (system_versioning = on (history_table=dbo.migtest_e_history6_history));
 -- apply alter tables
 alter table migtest_ckey_detail add one_key integer;
 alter table migtest_ckey_detail add two_key nvarchar(127);
@@ -88,6 +103,11 @@ create unique nonclustered index uq_migtest_e_basic_status_indextest1 on migtest
 create unique nonclustered index uq_migtest_e_basic_name on migtest_e_basic(name) where name is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) where indextest4 is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) where indextest5 is not null;
+alter table migtest_e_history
+    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
+        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
+period for system_time (sys_periodFrom, sys_periodTo);
+alter table migtest_e_history set (system_versioning = on (history_table=dbo.migtest_e_history_history));
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
@@ -117,12 +137,3 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
--- apply history view
-alter table migtest_e_history
-    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
-        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
-period for system_time (sys_periodFrom, sys_periodTo);
-alter table migtest_e_history set (system_versioning = on (history_table=dbo.migtest_e_history_history));
--- alter table migtest_e_history3 set (system_versioning = off (history_table=dbo.migtest_e_history3_history));
--- history migration goes here
--- alter table migtest_e_history3 set (system_versioning = on (history_table=dbo.migtest_e_history3_history));
