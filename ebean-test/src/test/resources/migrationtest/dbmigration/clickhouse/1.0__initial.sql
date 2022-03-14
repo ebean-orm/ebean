@@ -53,7 +53,7 @@ create table migtest_e_basic (
   description                   String,
   description_file              blob,
   some_date                     DateTime,
-  old_boolean                   UInt8 default false,
+  old_boolean                   UInt8 default 0,
   old_boolean2                  UInt8,
   eref_id                       UInt32,
   indextest1                    String,

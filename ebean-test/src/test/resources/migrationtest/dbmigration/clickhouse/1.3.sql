@@ -30,7 +30,7 @@ alter table migtest_e_basic alter column status2 set not null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column description_file blob;
-alter table migtest_e_basic add column old_boolean UInt8 default false;
+alter table migtest_e_basic add column old_boolean UInt8 default 0;
 alter table migtest_e_basic add column old_boolean2 UInt8;
 alter table migtest_e_basic add column eref_id UInt32;
 alter table migtest_e_history2 alter column test_string drop default;
