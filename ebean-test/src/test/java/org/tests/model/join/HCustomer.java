@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class ACustomer {
+public class HCustomer {
 
   @Id
   final String cid;
@@ -13,7 +13,7 @@ public class ACustomer {
 
   String status = "A";
 
-  public ACustomer(String cid, String name) {
+  public HCustomer(String cid, String name) {
     this.cid = cid;
     this.name = name;
   }

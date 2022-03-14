@@ -5,6 +5,6 @@ import javax.persistence.Entity;
 
 @DiscriminatorValue("C")
 @Entity
-public class CustomerAccess extends Access {
+public class CustomerAccess extends HAccess {
 
 }

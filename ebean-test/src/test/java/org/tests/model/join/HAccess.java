@@ -8,13 +8,11 @@ import javax.persistence.Inheritance;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
-import org.tests.model.basic.Customer;
-
 import io.ebean.annotation.DbForeignKey;
 
 @Inheritance
 @Entity
-public abstract class Access {
+public abstract class HAccess {
 
   @Id
   UUID id;
@@ -22,17 +20,17 @@ public abstract class Access {
   @ManyToOne
   @DbForeignKey(noConstraint = true)
   @JoinColumn(name = "accessor_id")
-  ACustomer accessor;
+  HCustomer accessor;
 
   @ManyToOne
   @DbForeignKey(noConstraint = true)
   @JoinColumn(name = "principal_id")
-  ACustomer principal;
+  HCustomer principal;
 
   @ManyToOne
   @DbForeignKey(noConstraint = true)
   @JoinColumn(name = "access_account_number")
-  Account account;
+  HAccount account;
 
   public UUID getId() {
     return id;
@@ -42,27 +40,27 @@ public abstract class Access {
     this.id = id;
   }
 
-  public ACustomer getAccessor() {
+  public HCustomer getAccessor() {
     return accessor;
   }
 
-  public void setAccessor(ACustomer accessor) {
+  public void setAccessor(HCustomer accessor) {
     this.accessor = accessor;
   }
 
-  public ACustomer getPrincipal() {
+  public HCustomer getPrincipal() {
     return principal;
   }
 
-  public void setPrincipal(ACustomer principal) {
+  public void setPrincipal(HCustomer principal) {
     this.principal = principal;
   }
 
-  public Account getAccount() {
+  public HAccount getAccount() {
     return account;
   }
 
-  public void setAccount(Account account) {
+  public void setAccount(HAccount account) {
     this.account = account;
     setPrincipal(account.getOwner());
   }

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebeaninternal.server.query.SqlJoinType;
+import io.ebeaninternal.server.query.SqlTreeJoin;
 
 /**
  * Used to provide context during sql construction.
@@ -133,4 +134,13 @@ public interface DbSqlContext {
    */
   void appendFromForUpdate();
 
+  /**
+   * Delay adding an extra join to support inheritance discriminator in projection (IF required).
+   */
+  void addExtraJoin(SqlTreeJoin treeJoin);
+
+  /**
+   * Add extra joins *IF* required to support inheritance discriminator in projection.
+   */
+  void flushExtraJoins();
 }

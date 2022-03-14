@@ -5,6 +5,6 @@ import javax.persistence.Entity;
 
 @DiscriminatorValue("B")
 @Entity
-public class BankAccount extends Account {
-  
+public class BankAccount extends HAccount {
+
 }

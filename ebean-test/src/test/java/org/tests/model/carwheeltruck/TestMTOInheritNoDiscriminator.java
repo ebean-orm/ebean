@@ -9,10 +9,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestMTOInheritNoDiscriminator extends BaseTestCase {
+class TestMTOInheritNoDiscriminator extends BaseTestCase {
 
   @Test
-  public void test() {
+  void test() {
 
     final TTruckHolder holder = setup();
 
@@ -31,7 +31,7 @@ public class TestMTOInheritNoDiscriminator extends BaseTestCase {
 
     assertThat(sql).hasSize(1);
     if (isH2() || isPostgresCompatible()) {
-      assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version, t2.type, t0.truck_plate_no, t0.basic_id, t1.id, t1.some_uid, t1.foo, t1.owner_id from ttruck_holder t0 join tcar t2 on t2.plate_no = t0.truck_plate_no left join ttruck_holder_item t1 on t1.owner_id = t0.id where t0.id = ? order by t0.id");
+      assertSql(sql.get(0)).contains("select t0.id, t0.name, t0.version, t2.type, t0.truck_plate_no, t0.basic_id, t1.id, t1.some_uid, t1.foo, t1.owner_id from ttruck_holder t0 left join ttruck_holder_item t1 on t1.owner_id = t0.id join tcar t2 on t2.plate_no = t0.truck_plate_no where t0.id = ? order by t0.id");
     }
   }
 

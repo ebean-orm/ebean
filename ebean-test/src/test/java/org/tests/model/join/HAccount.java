@@ -2,18 +2,16 @@ package org.tests.model.join;
 
 import javax.persistence.*;
 
-import org.tests.model.basic.Customer;
-
 @Entity
 @Inheritance
-public abstract class Account {
+public abstract class HAccount {
 
   @Id
   String accountNumber;
 
   @ManyToOne
-  @JoinColumn(name = "owner_id")//, referencedColumnName = "id")
-  ACustomer owner;
+  @JoinColumn(name = "owner_id")
+  HCustomer owner;
 
   public String getAccountNumber() {
     return accountNumber;
@@ -23,11 +21,11 @@ public abstract class Account {
     this.accountNumber = accountNumber;
   }
 
-  public ACustomer getOwner() {
+  public HCustomer getOwner() {
     return owner;
   }
 
-  public void setOwner(ACustomer owner) {
+  public void setOwner(HCustomer owner) {
     this.owner = owner;
   }
 
