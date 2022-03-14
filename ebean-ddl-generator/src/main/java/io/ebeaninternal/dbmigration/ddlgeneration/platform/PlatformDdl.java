@@ -18,7 +18,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -364,8 +363,8 @@ public class PlatformDdl {
   /**
    * Regenerate the history triggers (or function) due to a column being added/dropped/excluded or included.
    */
-  public void regenerateHistoryTriggers(DdlWrite writer, HistoryTableUpdate update) {
-    historyDdl.updateTriggers(writer, update);
+  public void regenerateHistoryTriggers(DdlWrite writer, String tableName) {
+    historyDdl.updateTriggers(writer, tableName);
   }
 
   /**
@@ -778,20 +777,6 @@ public class PlatformDdl {
       }
     }
     return name;
-  }
-
-  /**
-   * Mysql-specific: Locks all tables for triggers that have to be updated.
-   */
-  public void lockTables(DdlBuffer buffer, Collection<String> tables) {
-
-  }
-
-  /**
-   * Mysql-specific: Unlocks all tables for triggers that have to be updated.
-   */
-  public void unlockTables(DdlBuffer buffer, Collection<String> tables) {
-
   }
 
   /**

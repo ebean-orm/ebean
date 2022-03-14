@@ -33,9 +33,7 @@ import io.ebeaninternal.server.deploy.IdentityMode;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import static io.ebean.util.StringHelper.replace;
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
@@ -45,12 +43,6 @@ import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.s
  * Base implementation for 'create table' and 'alter table' statements.
  */
 public class BaseTableDdl implements TableDdl {
-
-  enum HistorySupport {
-    NONE,
-    SQL2011,
-    TRIGGER_BASED
-  }
 
   protected final DbConstraintNaming naming;
 
@@ -67,15 +59,9 @@ public class BaseTableDdl implements TableDdl {
 
   protected final List<UniqueConstraint> externalCompoundUnique = new ArrayList<>();
 
-  /**
-   * Base tables that have associated history tables that need their triggers/functions regenerated as
-   * columns have been added, removed, included or excluded.
-   */
-  protected final Map<String, HistoryTableUpdate> regenerateHistoryTriggers = new LinkedHashMap<>();
-
   private final boolean strictMode;
 
-  private final HistorySupport historySupport;
+  private final boolean alterHistoryTables;
 
   /**
    * Helper class that is used to execute the migration ddl before and after the migration action.
@@ -196,9 +182,9 @@ public class BaseTableDdl implements TableDdl {
     this.strictMode = config.isDdlStrictMode();
     DbHistorySupport hist = platformDdl.getPlatform().getHistorySupport();
     if (hist == null) {
-      this.historySupport = HistorySupport.NONE;
+      this.alterHistoryTables = false;
     } else {
-      this.historySupport = hist.isStandardsBased() ? HistorySupport.SQL2011 : HistorySupport.TRIGGER_BASED;
+      this.alterHistoryTables = platformDdl.historyDdl.alterHistoryTables();
     }
   }
 
@@ -622,15 +608,6 @@ public class BaseTableDdl implements TableDdl {
    */
   @Override
   public void generateEpilog(DdlWrite writer) {
-    if (!regenerateHistoryTriggers.isEmpty()) {
-      platformDdl.lockTables(writer.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
-
-      for (HistoryTableUpdate update : this.regenerateHistoryTriggers.values()) {
-        platformDdl.regenerateHistoryTriggers(writer, update);
-      }
-
-      platformDdl.unlockTables(writer.applyHistoryTrigger(), regenerateHistoryTriggers.keySet());
-    }
     platformDdl.generateEpilog(writer);
   }
 
@@ -651,12 +628,14 @@ public class BaseTableDdl implements TableDdl {
     for (Column column : columns) {
       alterTableAddColumn(writer, tableName, column, false, isTrue(addColumn.isWithHistory()));
     }
-    if (isTrue(addColumn.isWithHistory()) && historySupport == HistorySupport.TRIGGER_BASED) {
+    if (isTrue(addColumn.isWithHistory())) {
+      platformDdl.regenerateHistoryTriggers(writer, tableName);
       // make same changes to the history table
-      String historyTable = historyTable(tableName);
-      for (Column column : columns) {
-        regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.ADD, column.getName());
-        alterTableAddColumn(writer, historyTable, column, true, true);
+      if (alterHistoryTables) {
+        String historyTable = historyTable(tableName);
+        for (Column column : columns) {
+          alterTableAddColumn(writer, historyTable, column, true, true);
+        }
       }
     }
     for (Column column : columns) {
@@ -690,10 +669,12 @@ public class BaseTableDdl implements TableDdl {
     String tableName = dropColumn.getTableName();
     alterTableDropColumn(writer, tableName, dropColumn.getColumnName());
 
-    if (isTrue(dropColumn.isWithHistory())  && historySupport == HistorySupport.TRIGGER_BASED) {
+    if (isTrue(dropColumn.isWithHistory())) {
+      platformDdl.regenerateHistoryTriggers(writer, tableName);
       // also drop from the history table
-      regenerateHistoryTriggers(tableName, HistoryTableUpdate.Change.DROP, dropColumn.getColumnName());
-      alterTableDropColumn(writer, historyTable(tableName), dropColumn.getColumnName());
+      if (alterHistoryTables) {
+        alterTableDropColumn(writer, historyTable(tableName), dropColumn.getColumnName());
+      }
     }
   }
 
@@ -705,10 +686,11 @@ public class BaseTableDdl implements TableDdl {
     DdlMigrationHelp ddlHelp = new DdlMigrationHelp(alterColumn);
     ddlHelp.write(writer);
 
-    if (isTrue(alterColumn.isHistoryExclude())) {
-      regenerateHistoryTriggers(alterColumn.getTableName(), HistoryTableUpdate.Change.EXCLUDE, alterColumn.getColumnName());
-    } else if (isFalse(alterColumn.isHistoryExclude())) {
-      regenerateHistoryTriggers(alterColumn.getTableName(), HistoryTableUpdate.Change.INCLUDE, alterColumn.getColumnName());
+    if (alterColumn.isHistoryExclude() != null) {
+      // CHECKME should we drop a small comment, if historyExclude changes, as not all DB systems will support this
+      // writer.apply().append("-- historyExclude of ").append(alterColumn.getTableName()).append(".").append(alterColumn.getColumnName())
+      //  .append(" altered to ").append(String.valueOf(alterColumn.isHistoryExclude())).end();
+      platformDdl.regenerateHistoryTriggers(writer, alterColumn.getTableName());
     }
 
     if (hasValue(alterColumn.getDropForeignKey())) {
@@ -765,30 +747,39 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
-   * Register the base table that we need to regenerate the history triggers on.
-   */
-  protected void regenerateHistoryTriggers(String baseTableName, HistoryTableUpdate.Change change, String column) {
-    HistoryTableUpdate update = regenerateHistoryTriggers.computeIfAbsent(baseTableName, HistoryTableUpdate::new);
-    update.add(change, column);
-  }
-
-  /**
-   * This is mysql specific - alter all the base attributes of the column together.
-   * Will be called, if there is a type, dbdefault or notnull change.
+   * alter all the base attributes (type/default/notnull) of the column together.
+   * Some platforms (like mysql/sqlserver/hana) must do that in one statement,
+   * other platforms may use several statements for altering one of the base
+   * attributes.
    */
   protected void alterColumn(DdlWrite writer, AlterColumn alter) {
     platformDdl.alterColumn(writer, alter);
 
-    if (isTrue(alter.isWithHistory()) && alter.getType() != null && historySupport == HistorySupport.TRIGGER_BASED) {
-      // mysql and sql server column type change allowing nulls in the history table column
-      regenerateHistoryTriggers(alter.getTableName(), HistoryTableUpdate.Change.ALTER, alter.getColumnName());
-      AlterColumn alterHistoryColumn = new AlterColumn();
-      alterHistoryColumn.setTableName(historyTable(alter.getTableName()));
-      alterHistoryColumn.setColumnName(alter.getColumnName());
-      alterHistoryColumn.setType(alter.getType());
-      platformDdl.alterColumn(writer, alterHistoryColumn);
+    if (isTrue(alter.isWithHistory())) {
+      // we will apply only type changes or notNull -> null transition
+      boolean isNull = false; // TODO: Boolean.FALSE.equals(alter.isNotnull());
+      boolean applyToHistory = alter.getType() != null || isNull;
+      if (applyToHistory) {
+        platformDdl.regenerateHistoryTriggers(writer, alter.getTableName());
+        if (alterHistoryTables) {
+          AlterColumn alterHistoryColumn = new AlterColumn();
+          alterHistoryColumn.setTableName(historyTable(alter.getTableName()));
+          alterHistoryColumn.setColumnName(alter.getColumnName());
+          // ignore default value (not needed on history tables)
+          alterHistoryColumn.setCurrentType(alter.getCurrentType());
+          alterHistoryColumn.setType(alter.getType());
+          if (isNull) {
+            // do transition from notNull to null
+            alterHistoryColumn.setCurrentNotnull(Boolean.TRUE);
+            alterHistoryColumn.setNotnull(Boolean.FALSE);
+          } else {
+            // assume that the column contains null values from the past (required for platforms like mysql/sqlserver/hana)
+            alterHistoryColumn.setCurrentNotnull(Boolean.FALSE);
+          }
+          platformDdl.alterColumn(writer, alterHistoryColumn);
+        }
+      }
     }
-
   }
 
   protected void dropCheckConstraint(DdlWrite writer, AlterColumn alter, String constraintName) {

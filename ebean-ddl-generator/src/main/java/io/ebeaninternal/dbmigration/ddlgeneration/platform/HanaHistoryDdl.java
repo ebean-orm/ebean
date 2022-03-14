@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
@@ -9,9 +10,6 @@ import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class HanaHistoryDdl implements PlatformHistoryDdl {
 
@@ -19,7 +17,6 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   private String systemPeriodEnd;
   private PlatformDdl platformDdl;
   private String historySuffix;
-  private Map<String, String> createdHistoryTables = new ConcurrentHashMap<>();
 
   @Override
   public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
@@ -33,10 +30,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   public void createWithHistory(DdlWrite writer, MTable table) {
     String tableName = table.getName();
     String historyTableName = tableName + historySuffix;
-    DdlBuffer apply = writer.applyHistoryView();
-    if (apply.isEmpty()) {
-      createdHistoryTables.clear();
-    }
+    DdlBuffer apply = writer.applyPostAlter();
 
     apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(historyTableName).append(" (").newLine();
 
@@ -65,8 +59,6 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
 
     enableSystemVersioning(apply, tableName, true);
     platformDdl.alterTable(writer, tableName).setHistoryHandled();
-
-    createdHistoryTables.put(tableName, historyTableName);
 
     dropHistoryTable(writer.dropAll(), tableName, historyTableName);
   }
@@ -101,8 +93,19 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public void updateTriggers(DdlWrite writer, HistoryTableUpdate baseTable) {
-    // nothing to do
+  public boolean alterHistoryTables() {
+    return true;
+  }
+
+  @Override
+  public void updateTriggers(DdlWrite writer, String tableName) {
+    DdlAlterTable alter = platformDdl.alterTable(writer, tableName);
+    MTable table = writer.getTable(tableName);
+    if (table.isWithHistory() && !alter.isHistoryHandled()) {
+      disableSystemVersioning(writer.apply(), tableName);
+      enableSystemVersioning(writer.applyPostAlter(), tableName, false);
+      alter.setHistoryHandled();
+    }
   }
 
   protected void writeColumnDefinition(DdlBuffer buffer, String columnName, String type, String defaultValue,
@@ -134,7 +137,4 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
     apply.endOfStatement();
   }
 
-  public boolean isSystemVersioningEnabled(String tableName) {
-    return !createdHistoryTables.containsKey(tableName);
-  }
 }

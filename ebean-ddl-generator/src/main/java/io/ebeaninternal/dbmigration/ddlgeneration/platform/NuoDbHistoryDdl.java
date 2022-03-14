@@ -1,8 +1,9 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+
+import java.util.List;
+
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
-import io.ebeaninternal.dbmigration.model.MTable;
 
 /**
  * NuoDB history support using DB triggers to maintain a history table.
@@ -22,48 +23,32 @@ public class NuoDbHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   @Override
-  protected void createTriggers(DdlWrite writer, MTable table) {
+  protected void createTriggers(DdlBuffer buffer, String baseTable, List<String> columnNames) {
 
-    DbTriggerUpdate update = createDbTriggerUpdate(writer, table);
-
-    addBeforeUpdate(updateTriggerName(update.getBaseTable()), update);
-    addBeforeDelete(deleteTriggerName(update.getBaseTable()), update);
+    addBeforeUpdate(buffer, updateTriggerName(baseTable), baseTable, columnNames);
+    addBeforeDelete(buffer, deleteTriggerName(baseTable), baseTable, columnNames);
   }
 
-  @Override
-  protected void updateHistoryTriggers(DbTriggerUpdate update) {
+  private void addBeforeUpdate(DdlBuffer apply, String triggerName, String tableName, List<String> columnNames) {
 
-    recreateHistoryView(update);
+    addTriggerStart(triggerName, tableName, apply, " before update for each row as ");
 
-    DdlBuffer buffer = update.historyTriggerBuffer();
-    String baseTable = update.getBaseTable();
-
-    dropTriggers(buffer, baseTable);
-    addBeforeUpdate(updateTriggerName(baseTable), update);
-    addBeforeDelete(deleteTriggerName(baseTable), update);
-  }
-
-  private void addBeforeUpdate(String triggerName, DbTriggerUpdate update) {
-
-    DdlBuffer apply = update.historyTriggerBuffer();
-    addTriggerStart(triggerName, update, apply, " before update for each row as ");
     apply.append("    NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond))").endOfStatement();
-    appendInsertIntoHistory(apply, update.getHistoryTable(), update.getColumns());
+    appendInsertIntoHistory(apply, tableName, columnNames);
     addEndTrigger(apply);
   }
 
-  private void addBeforeDelete(String triggerName, DbTriggerUpdate update) {
+  private void addBeforeDelete(DdlBuffer apply, String triggerName, String tableName, List<String> columnNames) {
 
-    DdlBuffer apply = update.historyTriggerBuffer();
-    addTriggerStart(triggerName, update, apply, " before delete for each row as");
-    appendInsertIntoHistory(apply, update.getHistoryTable(), update.getColumns());
+    addTriggerStart(triggerName, tableName, apply, " before delete for each row as");
+    appendInsertIntoHistory(apply, tableName, columnNames);
     addEndTrigger(apply);
   }
 
-  private void addTriggerStart(String triggerName, DbTriggerUpdate update, DdlBuffer apply, String s) {
+  private void addTriggerStart(String triggerName, String baseTable, DdlBuffer apply, String s) {
     apply
       .append("delimiter $$").newLine()
-      .append("create or replace trigger ").append(triggerName).append(" for ").append(update.getBaseTable())
+      .append("create or replace trigger ").append(triggerName).append(" for ").append(baseTable)
       .append(s).newLine();
   }
 

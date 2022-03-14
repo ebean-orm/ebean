@@ -32,7 +32,19 @@ public interface PlatformHistoryDdl {
   void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable);
 
   /**
-   * Regenerate the history triggers/stored function due to column added/dropped/included or excluded.
+   * Returns true, if alters on the live tables should be applied also to the history tables. This is required for DbTriggerBased
+   * histories or on platforms like Hana, which are not SQL2011 history compatible (at least from DDL perspective)
    */
-  void updateTriggers(DdlWrite writer, HistoryTableUpdate baseTable);
+  default boolean alterHistoryTables() {
+    return false;
+  }
+
+  /**
+   * Regenerate the history triggers/stored function due to column added/dropped/included or excluded.
+   * 
+   * Note: This function may be called multiple times for the same table.
+   */
+  default void updateTriggers(DdlWrite writer, String tableName) {
+    // nop
+  }
 }
