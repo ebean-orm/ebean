@@ -1,4 +1,8 @@
 -- Migrationscripts for ebean unittest
+-- apply changes
+-- alter table migtest_e_history2 set (system_versioning = off (history_table=dbo.migtest_e_history2_history));
+-- history migration goes here
+-- alter table migtest_e_history2 set (system_versioning = on (history_table=dbo.migtest_e_history2_history));
 -- apply alter tables
 EXEC usp_ebean_drop_column migtest_e_basic, description_file;
 EXEC usp_ebean_drop_column migtest_e_basic, old_boolean;
