@@ -256,7 +256,7 @@ public final class SqlTreeBuilder {
       }
       addManyWhereJoins(myJoinList);
     }
-    extraProps.forEach(props::add);
+    extraProps.forEach(props::add); //addExtra
 
     if (!rawSql && manyWhereJoins.isFormulaWithJoin(prefix)) {
       for (String property : manyWhereJoins.getFormulaJoinProperties(prefix)) {

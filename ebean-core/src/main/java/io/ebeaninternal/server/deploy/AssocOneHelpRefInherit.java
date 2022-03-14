@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.query.SqlJoinType;
+import io.ebeaninternal.server.query.SqlTreeJoin;
 
 import java.sql.SQLException;
 
@@ -60,11 +61,28 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
     return ref;
   }
 
-  @Override
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     // add join to support the discriminator column
     String relativePrefix = ctx.getRelativePrefix(property.name);
-    property.tableJoin.addJoin(joinType, relativePrefix, ctx);
+    ctx.addExtraJoin(new Extra(relativePrefix, joinType));
+  }
+
+  /**
+   * Extra join to support the discriminator column.
+   */
+  final class Extra implements SqlTreeJoin {
+    final String relativePrefix;
+    final SqlJoinType joinType;
+    Extra(String relativePrefix, SqlJoinType joinType) {
+      this.relativePrefix = relativePrefix;
+      this.joinType = joinType;
+    }
+
+    @Override
+    public void addJoin(DbSqlContext ctx) {
+      // add join to support the discriminator column *IF* join is not already present
+      property.tableJoin.addJoin(joinType, relativePrefix, ctx);
+    }
   }
 
   /**

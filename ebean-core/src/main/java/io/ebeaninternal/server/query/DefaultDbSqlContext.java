@@ -7,6 +7,7 @@ import io.ebeaninternal.server.util.ArrayStack;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 final class DefaultDbSqlContext implements DbSqlContext {
 
@@ -43,7 +44,9 @@ final class DefaultDbSqlContext implements DbSqlContext {
 
   private String currentPrefix;
 
-  private ArrayList<BeanProperty> encryptedProps;
+  private List<BeanProperty> encryptedProps;
+
+  private List<SqlTreeJoin> extraJoins;
 
   private final CQueryDraftSupport draftSupport;
 
@@ -68,6 +71,24 @@ final class DefaultDbSqlContext implements DbSqlContext {
   @Override
   public boolean isIncludeSoftDelete() {
     return alias.isIncludeSoftDelete();
+  }
+
+  @Override
+  public void addExtraJoin(SqlTreeJoin treeJoin) {
+    if (extraJoins == null) {
+      extraJoins = new ArrayList<>();
+    }
+    extraJoins.add(treeJoin);
+  }
+
+  @Override
+  public void flushExtraJoins() {
+    if (extraJoins != null) {
+      for (SqlTreeJoin extra : extraJoins) {
+        extra.addJoin(this);
+      }
+      extraJoins = null;
+    }
   }
 
   @Override
