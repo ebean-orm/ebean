@@ -16,9 +16,6 @@ alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
 alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 drop index if exists ix_migtest_e_basic_indextest3;
 drop index if exists ix_migtest_e_basic_indextest6;
-drop view if exists migtest_e_history2_with_history;
-drop view if exists migtest_e_history3_with_history;
-drop view if exists migtest_e_history4_with_history;
 -- apply changes
 create table migtest_e_ref (
   id                            serial not null,
@@ -31,6 +28,18 @@ create table migtest_e_ref (
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
+drop trigger if exists migtest_e_history2_history_upd on migtest_e_history2 cascade;
+drop function if exists migtest_e_history2_history_version();
+
+drop view migtest_e_history2_with_history;
+drop trigger if exists migtest_e_history3_history_upd on migtest_e_history3 cascade;
+drop function if exists migtest_e_history3_history_version();
+
+drop view migtest_e_history3_with_history;
+drop trigger if exists migtest_e_history4_history_upd on migtest_e_history4 cascade;
+drop function if exists migtest_e_history4_history_version();
+
+drop view migtest_e_history4_with_history;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
@@ -66,26 +75,7 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique 
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
--- foreign keys and indices
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
-create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
-alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
-
-create index if not exists ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
-create index if not exists ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
-create index if not exists ix_m12_otoc71 on migtest_oto_child (name);
-create unique index if not exists uq_m12_otoc71 on migtest_oto_child (lower(name));
-create unique index if not exists ix_migtest_oto_master_lowername on migtest_oto_master (lower(name));
--- apply history view
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
-
-create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-
-create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-
--- apply history trigger
--- changes: [add obsolete_string1, add obsolete_string2]
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -104,7 +94,11 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
--- changes: [include test_string]
+create trigger migtest_e_history2_history_upd
+  before update or delete on migtest_e_history2
+  for each row execute procedure migtest_e_history2_history_version();
+
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
 create or replace function migtest_e_history3_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -123,7 +117,11 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
--- changes: [alter test_number]
+create trigger migtest_e_history3_history_upd
+  before update or delete on migtest_e_history3
+  for each row execute procedure migtest_e_history3_history_version();
+
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 create or replace function migtest_e_history4_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -142,3 +140,18 @@ begin
 end;
 $$ LANGUAGE plpgsql;
 
+create trigger migtest_e_history4_history_upd
+  before update or delete on migtest_e_history4
+  for each row execute procedure migtest_e_history4_history_version();
+
+-- foreign keys and indices
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
+create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
+alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
+
+create index if not exists ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
+create index if not exists ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index if not exists ix_m12_otoc71 on migtest_oto_child (name);
+create unique index if not exists uq_m12_otoc71 on migtest_oto_child (lower(name));
+create unique index if not exists ix_migtest_oto_master_lowername on migtest_oto_master (lower(name));
