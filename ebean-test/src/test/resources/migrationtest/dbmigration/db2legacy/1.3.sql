@@ -158,6 +158,10 @@ create table migtest_e_ref (
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
+alter table migtest_e_history2 drop versioning;
+alter table migtest_e_history3 drop versioning;
+alter table migtest_e_history4 drop versioning;
+alter table migtest_e_history6 drop versioning;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
@@ -178,13 +182,21 @@ alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string drop not null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
+alter table migtest_e_history2_history alter column test_string drop not null;
+alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
+alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
 alter table migtest_e_history4 alter column test_number set data type integer;
 call sysproc.admin_cmd('reorg table migtest_e_history4');
+alter table migtest_e_history4_history alter column test_number set data type integer;
+call sysproc.admin_cmd('reorg table migtest_e_history4_history');
 alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 drop not null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
 call sysproc.admin_cmd('reorg table migtest_e_history6');
+alter table migtest_e_history6_history alter column test_number1 drop not null;
+alter table migtest_e_history6_history alter column test_number2 set not null;
+call sysproc.admin_cmd('reorg table migtest_e_history6_history');
 -- apply post alter
 alter table migtest_e_ref add constraint uq_mgtst__rf_nm unique  (name);
 alter table migtest_e_basic add constraint ck_mgtst__bsc_stts check ( status in ('N','A','I'));
@@ -194,6 +206,10 @@ create unique index uq_mgtst__b_4ayc02 on migtest_e_basic(indextest6) exclude nu
 alter table migtest_e_enum add constraint ck_mgtst__n_773sok check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
+alter table migtest_e_history2 add versioning use history table migtest_e_history2_history;
+alter table migtest_e_history3 add versioning use history table migtest_e_history3_history;
+alter table migtest_e_history4 add versioning use history table migtest_e_history4_history;
+alter table migtest_e_history6 add versioning use history table migtest_e_history6_history;
 -- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_mgtst_fk_65kf6l foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 alter table migtest_fk_set_null add constraint fk_mgtst_fk_wicx8x foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
