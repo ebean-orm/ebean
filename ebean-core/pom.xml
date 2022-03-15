@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>12.15.1-FOC11</version>
+    <version>12.15.1-FOC12-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -15,7 +15,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
-    <tag>ebean-parent-12.15.1-FOC11</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
@@ -35,19 +35,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.15.1-FOC11</version>
+      <version>12.15.1-FOC12-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>12.15.1-FOC11</version>
+      <version>12.15.1-FOC12-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>12.15.1-FOC11</version>
+      <version>12.15.1-FOC12-SNAPSHOT</version>
     </dependency>
 
     <dependency>
