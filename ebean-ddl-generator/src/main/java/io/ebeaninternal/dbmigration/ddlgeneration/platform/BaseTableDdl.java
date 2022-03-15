@@ -759,6 +759,11 @@ public class BaseTableDdl implements TableDdl {
       // we will apply only type changes or notNull -> null transition
       boolean isNull = Boolean.FALSE.equals(alter.isNotnull());
       boolean applyToHistory = alter.getType() != null || isNull;
+      boolean syncExact = platformDdl.getPlatform().isPlatform(Platform.DB2);
+      // DB2 needs exact sync for notnull/null
+      if (syncExact && alter.isNotnull() != null) {
+        applyToHistory = true;
+      }
       if (applyToHistory) {
         platformDdl.regenerateHistoryTriggers(writer, alter.getTableName());
         if (alterHistoryTables) {
@@ -768,7 +773,10 @@ public class BaseTableDdl implements TableDdl {
           // ignore default value (not needed on history tables)
           alterHistoryColumn.setCurrentType(alter.getCurrentType());
           alterHistoryColumn.setType(alter.getType());
-          if (isNull) {
+          if (syncExact) {
+            alterHistoryColumn.setCurrentNotnull(alter.isCurrentNotnull());
+            alterHistoryColumn.setNotnull(alter.isNotnull());
+          } else if (isNull) {
             // do transition from notNull to null
             alterHistoryColumn.setCurrentNotnull(Boolean.TRUE);
             alterHistoryColumn.setNotnull(Boolean.FALSE);

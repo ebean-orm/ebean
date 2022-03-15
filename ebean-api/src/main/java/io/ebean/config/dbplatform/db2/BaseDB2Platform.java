@@ -36,6 +36,7 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
         .addDataIntegrity("23502","23503","23504","23511","23512","23511","42917","23515")
         .build();
 
+    historySupport = new DB2HistorySupport();
     booleanDbType = Types.BOOLEAN;
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint", false));
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));

@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.migration.Column;
 
 /**
  * DB2 platform specific DDL.
@@ -22,6 +25,7 @@ public class DB2Ddl extends PlatformDdl {
     this.columnSetNull = "drop not null";
     this.columnSetType = "set data type ";
     this.inlineUniqueWhenNullable = false;
+    this.historyDdl = new Db2HistoryDdl();
   }
 
   @Override
@@ -46,6 +50,32 @@ public class DB2Ddl extends PlatformDdl {
     return sb.toString();
   }
 
+  @Override
+  public void alterTableAddColumn(DdlWrite writer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
+
+    String convertedType = convert(column.getType());
+    DdlBuffer buffer = alterTable(writer, tableName).append(addColumn, column.getName());
+    buffer.append(convertedType);
+
+    // Add default value also to history table if it is not excluded
+    if (defaultValue != null) {
+      buffer.append(" default ");
+      buffer.append(defaultValue);
+    }
+
+    if (isTrue(column.isNotnull())) {
+      buffer.appendWithSpace(columnNotNull);
+    }
+    // DB2 History table must match exact!
+    if (!onHistoryTable) {
+      // check constraints cannot be added in one statement for h2
+      if (!StringHelper.isNull(column.getCheckConstraint())) {
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
+        writer.applyPostAlter().appendStatement(ddl);
+      }
+    }
+
+  }
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
     return alterTableDropConstraint(tableName, fkName);
