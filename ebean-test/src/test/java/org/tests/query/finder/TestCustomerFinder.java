@@ -3,6 +3,8 @@ package org.tests.query.finder;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
+import io.ebean.annotation.IgnorePlatform;
+import io.ebean.annotation.Platform;
 import io.ebean.meta.*;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
@@ -163,6 +165,7 @@ public class TestCustomerFinder extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.DB2) // no query plans yet, for DB2
   public void test_finders_queryPlans() {
 
     ResetBasicData.reset();
