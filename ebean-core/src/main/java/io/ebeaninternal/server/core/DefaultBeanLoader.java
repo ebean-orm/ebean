@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
@@ -121,7 +122,7 @@ final class DefaultBeanLoader {
    * Load a batch of beans for +query or +lazy loading.
    */
   void loadBean(LoadBeanRequest loadRequest) {
-    List<EntityBeanIntercept> batch = loadRequest.batch();
+    Set<EntityBeanIntercept> batch = loadRequest.batch();
     if (batch.isEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
