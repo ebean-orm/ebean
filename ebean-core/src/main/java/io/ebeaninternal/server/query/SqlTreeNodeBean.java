@@ -279,18 +279,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
     ctx.pushTableAlias(prefix);
 
     baseTableAlias = ctx.getTableAlias(prefix);
-
     // join and return SqlJoinType to use for child joins
     joinType = appendFromBaseTable(ctx, joinType);
-
     for (STreeProperty property : properties) {
       // usually nothing... except for 1-1 Exported
       property.appendFrom(ctx, joinType, null);
     }
-
     for (SqlTreeNode child : children) {
       child.appendFrom(ctx, joinType);
     }
+    ctx.flushExtraJoins();
     ctx.popTableAlias();
     ctx.popJoin();
   }
