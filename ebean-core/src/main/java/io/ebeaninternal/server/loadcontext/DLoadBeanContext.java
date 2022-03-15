@@ -15,6 +15,7 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -91,7 +92,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     try {
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
-          if (!loadBuffer.list.isEmpty()) {
+          if (!loadBuffer.batch.isEmpty()) {
             parent.getEbeanServer().loadBean(new LoadBeanRequest(loadBuffer, parentRequest));
           }
           if (forEach) {
@@ -115,13 +116,13 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     private final ReentrantLock bufferLock = new ReentrantLock();
     private final DLoadBeanContext context;
     private final int batchSize;
-    private final List<EntityBeanIntercept> list;
+    private final Set<EntityBeanIntercept> batch;
     private PersistenceContext persistenceContext;
 
     LoadBuffer(DLoadBeanContext context, int batchSize) {
       this.context = context;
       this.batchSize = batchSize;
-      this.list = new ArrayList<>(batchSize);
+      this.batch = new HashSet<>(Math.max((int) (batchSize/.75f) + 1, 16));
     }
 
     @Override
@@ -139,7 +140,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
      * Return true if the buffer is full.
      */
     public boolean isFull() {
-      return batchSize == list.size();
+      return batchSize == batch.size();
     }
 
     /**
@@ -150,12 +151,12 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
         // get persistenceContext from first loaded bean into the buffer
         persistenceContext = ebi.getPersistenceContext();
       }
-      list.add(ebi);
+      batch.add(ebi);
     }
 
     @Override
-    public List<EntityBeanIntercept> batch() {
-      return list;
+    public Set<EntityBeanIntercept> batch() {
+      return batch;
     }
 
     @Override
@@ -190,13 +191,13 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
         // lazy load property was a Many
         return;
       }
-      if (!list.contains(ebi)) {
+      if (!batch.contains(ebi)) {
         // re-add to the batch and lazy load from DB skipping l2 cache
-        list.add(ebi);
+        batch.add(ebi);
       } else if (context.hitCache) {
-        Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(list, persistenceContext, ebi.getLazyLoadPropertyIndex(), ebi.getLazyLoadProperty());
-        list.removeAll(hits);
-        if (list.isEmpty() || hits.contains(ebi)) {
+        Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(batch, persistenceContext, ebi.getLazyLoadPropertyIndex(), ebi.getLazyLoadProperty());
+        batch.removeAll(hits);
+        if (batch.isEmpty() || hits.contains(ebi)) {
           // successfully hit the L2 cache so don't invoke DB lazy loading
           return;
         }
@@ -204,7 +205,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
 
       LoadBeanRequest req = new LoadBeanRequest(this, ebi, context.hitCache);
       context.desc.ebeanServer().loadBean(req);
-      list.clear();
+      batch.clear();
     }
   }
 

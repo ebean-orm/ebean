@@ -693,9 +693,9 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Load a batch of entities from L2 bean cache checking the lazy loaded property is loaded.
    */
-  Set<EntityBeanIntercept> beanCacheLoadAll(List<EntityBeanIntercept> list, PersistenceContext context, int lazyLoadProperty, String propertyName) {
+  Set<EntityBeanIntercept> beanCacheLoadAll(Set<EntityBeanIntercept> batch, PersistenceContext context, int lazyLoadProperty, String propertyName) {
     Map<Object, EntityBeanIntercept> ebis = new HashMap<>();
-    for (EntityBeanIntercept ebi : list) {
+    for (EntityBeanIntercept ebi : batch) {
       ebis.put(desc.cacheKeyForBean(ebi.getOwner()), ebi);
     }
 
