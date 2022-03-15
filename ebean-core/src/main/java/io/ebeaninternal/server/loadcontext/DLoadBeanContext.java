@@ -190,7 +190,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
         // lazy load property was a Many
         return;
       }
-      if (list.isEmpty()) {
+      if (!list.contains(ebi)) {
         // re-add to the batch and lazy load from DB skipping l2 cache
         list.add(ebi);
       } else if (context.hitCache) {
