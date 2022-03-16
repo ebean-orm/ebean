@@ -16,7 +16,7 @@ import java.util.Set;
  */
 public final class LoadBeanRequest extends LoadRequest {
 
-  private final List<EntityBeanIntercept> batch;
+  private final Set<EntityBeanIntercept> batch;
   private final LoadBeanBuffer loadBuffer;
   private final String lazyLoadProperty;
   private final boolean loadCache;
@@ -58,7 +58,7 @@ public final class LoadBeanRequest extends LoadRequest {
   /**
    * Return the batch of beans to actually load.
    */
-  public List<EntityBeanIntercept> batch() {
+  public Set<EntityBeanIntercept> batch() {
     return batch;
   }
 
