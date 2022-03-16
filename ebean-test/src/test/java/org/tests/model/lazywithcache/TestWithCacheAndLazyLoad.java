@@ -3,24 +3,22 @@ package org.tests.model.lazywithcache;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.List;
 
 /**
  * Test with bean cache and lazy loaded property.
  *
  * @author Noemi Szemenyei, FOCONIS AG
- *
  */
-public class TestWithCacheAndLazyLoad extends BaseTestCase{
+class TestWithCacheAndLazyLoad extends BaseTestCase {
 
   @Test
-  public void testGetters() {
+  void testGetters() {
 
     ChildWithCache child = new ChildWithCache();
     child.setId(1L);
@@ -52,19 +50,19 @@ public class TestWithCacheAndLazyLoad extends BaseTestCase{
     assertThat(temp.getAddress()).isEqualTo("Address");
     assertThat(temp.getName()).isEqualTo("Child With Cache");
   }
-  
+
   @Test
-  public void testBatch() throws Exception {
-    
+  void testBatch() {
+
     for (int i = 0; i < 2; i++) {
       ChildWithCache child = new ChildWithCache();
-      child.setId(1000L+i);
-      child.setName("Child With Cache "+ i);
+      child.setId(1000L + i);
+      child.setName("Child With Cache " + i);
       child.setAddress("Address");
       DB.save(child);
 
       ParentA parentA = new ParentA();
-      parentA.setId(1000L+i);
+      parentA.setId(1000L + i);
       parentA.setName("Parent A");
       parentA.setChild(child);
       DB.save(parentA);
@@ -72,7 +70,7 @@ public class TestWithCacheAndLazyLoad extends BaseTestCase{
     // 0. load cache
     ParentA temp = DB.find(ParentA.class, 1000L);
     temp.getChild().getName();
-    
+
     try (Transaction txn = DB.beginTransaction()) {
       // 1. FindList
       List<ParentA> list = DB.find(ParentA.class).where().ge("id", 1000L).orderBy("id").findList();
