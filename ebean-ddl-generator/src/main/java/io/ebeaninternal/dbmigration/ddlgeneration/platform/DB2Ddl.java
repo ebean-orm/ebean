@@ -12,28 +12,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 
 /**
  * DB2 platform specific DDL.
- * 
- * according to the list
- * https://datageek.blog/en/2014/05/06/db2-basics-what-is-a-reorg/ a reorg is
- * necessary after
- * <ol>
- * <li>Data type changes that increase the size of a varchar or vargraphic
- * column
- * <li>Data type changes that decrease the size of a varchar or vargraphic
- * column
- * <li>Altering a column to include NOT NULL
- * <li>Altering a column to inline LOBS
- * <li>Altering a column to compress the system default or turn off compression
- * for the system default
- * <li>Altering a table to enable value compression
- * <li>Altering a table to drop a column
- * <li>Changing the PCTFREE for a table
- * <li>Altering a table to turn APEND mode off
- * <li>Altering a table or index to turn compression on
- * </ol>
- * 
- * This is currently handled by BaseTableDdl
- * 
  */
 public class DB2Ddl extends PlatformDdl {
   private static final String MOVE_TABLE = "CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'%s','%s','%s','%s','','','','','','MOVE')";
@@ -62,39 +40,32 @@ public class DB2Ddl extends PlatformDdl {
   }
   
   @Override
-  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns,
-      String[] nullableColumns) {
-    StringBuilder sb = new StringBuilder(300);
+  public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
     if (nullableColumns == null || nullableColumns.length == 0) {
-
-      sb.append("alter table ").append(lowerTableName(tableName));
-      sb.append(" add constraint ").append(maxConstraintName(uqName)).append(" unique ");
-      appendColumns(columns, sb);
-      return sb.toString();
-    }
+      return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
+    }     
 
     if (uqName == null) {
       throw new NullPointerException();
     }
-    sb = new StringBuilder("create unique index ");
+    StringBuilder sb = new StringBuilder("create unique index ");
     sb.append(maxConstraintName(uqName)).append(" on ").append(tableName).append('(');
 
     for (int i = 0; i < columns.length; i++) {
       if (i > 0) {
         sb.append(",");
       }
-      sb.append(lowerColumnName(columns[i]));
+      sb.append(columns[i]);
     }
     sb.append(") exclude null keys");
     return sb.toString();
   }
 
 
-  //  @Override
-  //  public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace)
-  //      throws IOException {
-  //    apply.append(" in ").append(tablespaceName).append(" index in ").append(indexTablespace).append(" long in ").append(lobTablespace);
-  //  }
+  @Override
+  public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) {
+    apply.append(" in ").append(tablespaceName).append(" index in ").append(indexTablespace).append(" long in ").append(lobTablespace);
+  }
   
   @Override
   public void alterTableAddColumn(DdlWrite writer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {

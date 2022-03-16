@@ -187,13 +187,12 @@ public class ObjectFactory {
     return new ChangeSet();
   }
 
-    /**
-     * Create an instance of {@link AlterTable }
-     * 
-     */
-    public AlterTable createAlterTable() {
-        return new AlterTable();
-    }
+  /**
+   * Create an instance of {@link AlterTable }
+   */
+  public AlterTable createAlterTable() {
+    return new AlterTable();
+  }
 
   /**
    * Create an instance of {@link AddHistoryTable }

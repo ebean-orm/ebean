@@ -266,7 +266,9 @@ public class ModelContainer {
     tables.remove(dropTable.getName());
   }
   
-  
+  /**
+   * Apply a AlterTable change to the model.
+   */
   protected void applyChange(AlterTable alterTable) {
     MTable table = getTable(alterTable.getName());
     if (table == null) {

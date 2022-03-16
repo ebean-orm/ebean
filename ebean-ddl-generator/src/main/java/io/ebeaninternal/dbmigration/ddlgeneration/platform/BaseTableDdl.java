@@ -238,8 +238,7 @@ public class BaseTableDdl implements TableDdl {
     }
     apply.newLine().append(")");
     if (createTable.getTablespace() != null) {
-      platformDdl.addTablespace(apply, createTable.getTablespace(), createTable.getIndexTablespace(),
-          createTable.getLobTablespace());
+      platformDdl.addTablespace(apply, createTable.getTablespace(), createTable.getIndexTablespace(), createTable.getLobTablespace());
     }
     addTableStorageEngine(apply, createTable);
     addTableCommentInline(apply, createTable);
@@ -666,25 +665,22 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
+  /**
+   * Add table related changes to DDL (tableSpace,...)
+   */
   @Override
   public void generate(DdlWrite writer, AlterTable alterTable) {
-    if (hasValue(alterTable.getTablespace()) || hasValue(alterTable.getIndexTablespace()) || hasValue(alterTable.getLobTablespace())) {
+    if (hasValue(alterTable.getTablespace())
+      || hasValue(alterTable.getIndexTablespace())
+      || hasValue(alterTable.getLobTablespace())) {
+
       writer.apply().appendStatement(platformDdl.alterTableTablespace(alterTable.getName(),
-              DdlHelp.toTablespace(alterTable.getTablespace()), 
-              DdlHelp.toTablespace(alterTable.getIndexTablespace()),
-              DdlHelp.toTablespace(alterTable.getLobTablespace())));
+        DdlHelp.toTablespace(alterTable.getTablespace()),
+        DdlHelp.toTablespace(alterTable.getIndexTablespace()),
+        DdlHelp.toTablespace(alterTable.getLobTablespace())));
     }
   }
 
-  protected void writeTablespaceChange(DdlBuffer buffer, String tablename, String tableSpace, String indexSpace, String lobSpace)  {
-    buffer.appendStatement("-- TableSpace changed: Table: " + tablename + ", tableSpace " + tableSpace + ", indexSpace "
-        + indexSpace + ", lobSpace " + lobSpace);
-    if (strictMode) {
-      throw new UnsupportedOperationException(
-          "Tablespace change is not supported by this platform. Disable strict mode for migration and write migration manually");
-    }
-  }
-  
   /**
    * Add drop column DDL.
    */

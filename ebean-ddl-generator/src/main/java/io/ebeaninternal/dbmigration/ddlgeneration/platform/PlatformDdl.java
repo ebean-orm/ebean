@@ -813,14 +813,4 @@ public class PlatformDdl {
     // now only supported for db2
   }
 
-  /**
-   * Returns a statement to reorganize the table. This is required mainly for DB2.
-   * 
-   * @param table   the table name
-   * @param counter to make statements unique.
-   */
-  public String reorgTable(String table, int counter) {
-    return null;
-  }
-
 }
