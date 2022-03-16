@@ -61,6 +61,7 @@ create table migtest_e_basic (
   name                          varchar(127),
   description                   varchar(127),
   description_file              binary(4500),
+  json_list                     long varchar,
   some_date                     timestamp,
   old_boolean                   bit default false not null,
   old_boolean2                  bit,

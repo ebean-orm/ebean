@@ -52,6 +52,7 @@ create table migtest_e_basic (
   name                          String,
   description                   String,
   description_file              blob,
+  json_list                     String,
   some_date                     DateTime,
   old_boolean                   UInt8 default 0,
   old_boolean2                  UInt8,

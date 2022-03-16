@@ -6,6 +6,7 @@ import io.ebean.annotation.*;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "migtest_e_basic")
@@ -57,6 +58,10 @@ public class EBasic {
   @Column(unique = true)
   @Size(max = 127)
   String description;
+
+  @DbJson
+  //@Column(columnDefinition = "db2;clob(16K);")
+  List<String> jsonList;
 
   //@NotNull
   //@DbDefault("2000-01-01T00:00:00") //- date time literals do not work for each platform yet

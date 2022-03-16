@@ -44,6 +44,7 @@
             <column name="name" type="varchar(127)"/>
             <column name="description" type="varchar(127)"/>
             <column name="description_file" type="db2;blob(64M);blob"/>
+            <column name="json_list" type="json"/>
             <column name="some_date" type="timestamp"/>
             <column name="old_boolean" type="boolean" defaultValue="false" notnull="true"/>
             <column name="old_boolean2" type="boolean"/>

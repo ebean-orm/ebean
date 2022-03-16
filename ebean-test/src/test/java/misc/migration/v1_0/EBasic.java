@@ -1,6 +1,7 @@
 package misc.migration.v1_0;
 
 import io.ebean.annotation.DbDefault;
+import io.ebean.annotation.DbJson;
 import io.ebean.annotation.EnumValue;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
@@ -16,6 +17,7 @@ import javax.validation.constraints.Size;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.List;
 
 @Entity
 @Table(name = "migtest_e_basic")
@@ -51,6 +53,10 @@ public class EBasic {
   @Lob
   @Column(columnDefinition = "db2;blob(64M);")
   File descriptionFile;
+
+  @DbJson
+  //@Column(columnDefinition = "db2;clob(16K);")
+  List<String> jsonList;
   
   Timestamp someDate;
 
