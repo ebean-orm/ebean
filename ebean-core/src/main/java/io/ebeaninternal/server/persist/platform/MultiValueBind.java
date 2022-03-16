@@ -61,7 +61,12 @@ public class MultiValueBind {
     }
     sb.append(" in (?");
     for (int i = 1; i < size; i++) {
-      sb.append(",?");
+      if (i % 100 == 0) {
+        // Fix for JavaMelody to allow line wrap every 100th placeholder
+        sb.append(", ?");
+      } else {
+        sb.append(",?");
+      }
     }
     sb.append(")");
     return sb.toString();
