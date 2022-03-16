@@ -67,7 +67,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
   }
 
-  protected void register(EntityBeanIntercept ebi) {
+  void register(EntityBeanIntercept ebi) {
     if (currentBuffer.isFull()) {
       currentBuffer = createBuffer(batchSize);
     }

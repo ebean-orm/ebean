@@ -829,7 +829,7 @@ public final class EntityBeanIntercept implements Serializable {
   /**
    * Load the bean when it is a reference.
    */
-  protected void loadBean(int loadProperty) {
+  void loadBean(int loadProperty) {
     lock.lock();
     try {
       if (beanLoader == null) {
@@ -886,7 +886,7 @@ public final class EntityBeanIntercept implements Serializable {
    * Helper method to check if two objects are equal.
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
-  protected static boolean notEqual(Object obj1, Object obj2) {
+  static boolean notEqual(Object obj1, Object obj2) {
     if (obj1 == null) {
       return (obj2 != null);
     }
