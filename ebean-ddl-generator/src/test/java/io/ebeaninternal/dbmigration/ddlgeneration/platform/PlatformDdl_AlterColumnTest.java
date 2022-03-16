@@ -135,7 +135,8 @@ public class PlatformDdl_AlterColumnTest {
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab alter column acol set data type varchar(50);\n"
       + "alter table mytab alter column acol set default 'hi';\n"
-      + "alter table mytab alter column acol set not null;\n");
+      + "alter table mytab alter column acol set not null;\n"
+      + "call sysproc.admin_cmd('reorg table mytab');\n");
 
     //
     alter.setCurrentNotnull(Boolean.TRUE);
@@ -213,7 +214,10 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = alterColumn(db2Ddl, alter);
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
-      + "alter table mytab alter column acol set data type varchar(20);\n");
+      + "alter table mytab alter column acol set data type varchar(20);\n"
+      // Note, this reorg may be not necessary when only length attribute is alterd
+      // but this is currently not implemented.
+      + "call sysproc.admin_cmd('reorg table mytab');\n");
 
     alter.setType("bigint");
     sql = alterColumn(pgDdl, alter);
@@ -271,7 +275,8 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = alterColumn(db2Ddl, alter);
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
-      + "alter table mytab alter column acol set not null;\n");
+      + "alter table mytab alter column acol set not null;\n"
+      + "call sysproc.admin_cmd('reorg table mytab');\n");
 
   }
 
@@ -512,7 +517,7 @@ public class PlatformDdl_AlterColumnTest {
     softly.assertThat(alterFkey(oraDdl, null, null)).isEqualTo("");
     softly.assertThat(alterFkey(sqlServerDdl, null, null)).isEqualTo("");
     softly.assertThat(alterFkey(hanaDdl, null, null)).isEqualTo(" on delete restrict on update restrict");
-    softly.assertThat(alterFkey(db2Ddl, null, null)).isEqualTo(" on delete restrict");
+    softly.assertThat(alterFkey(db2Ddl, null, null)).isEqualTo(" on delete restrict on update restrict");
   }
 
   @Test
@@ -536,7 +541,7 @@ public class PlatformDdl_AlterColumnTest {
       .isEqualTo(" on delete restrict on update set null");
 
     softly.assertThat(alterFkey(db2Ddl, "RESTRICT", "SET_NULL"))
-      .isEqualTo(" on delete restrict");
+      .isEqualTo(" on delete restrict on update set null");
   }
 
   @Test
@@ -560,7 +565,7 @@ public class PlatformDdl_AlterColumnTest {
       .isEqualTo(" on delete set null on update restrict");
 
     softly.assertThat(alterFkey(db2Ddl, "SET_NULL", "RESTRICT"))
-      .isEqualTo(" on delete set null");
+      .isEqualTo(" on delete set null on update restrict");
   }
 
   @Test
@@ -584,7 +589,7 @@ public class PlatformDdl_AlterColumnTest {
       .isEqualTo(" on delete set default on update cascade");
 
     softly.assertThat(alterFkey(db2Ddl, "SET_DEFAULT", "CASCADE"))
-      .isEqualTo(" on delete set default");
+      .isEqualTo(" on delete set default on update cascade");
   }
 
   private String alterColumn(PlatformDdl ddl, AlterColumn alterColumn) {

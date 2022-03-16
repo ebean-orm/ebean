@@ -235,6 +235,9 @@ public class DbMigrationTest extends BaseTestCase {
       case SQLSERVER17: // these DBs are 'standard based' so they also do not support HistoryExclude
       case MARIADB:
       case HANA:
+      case DB2LUW:
+      case DB2FORI: // not yet tested
+      case DB2ZOS: // not yet tested
         assertThat(versions2.get(0).getDiff().toString()).as("using platform: %s, versions2:%s", server().platform(), versions2)
             .contains("testString=foo2,foo1")
             .contains("testString2=bar2,bar1");

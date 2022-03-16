@@ -37,7 +37,7 @@ public class TestHistoryInclude extends BaseTestCase {
     assertThat(linkFound.getDocs().size()).isEqualTo(2);
   }
 
-  @IgnorePlatform({Platform.ORACLE, Platform.DB2, Platform.COCKROACH})
+  @IgnorePlatform({Platform.ORACLE, Platform.COCKROACH})
   @Test
   public void testAsOfThenLazy() {
 

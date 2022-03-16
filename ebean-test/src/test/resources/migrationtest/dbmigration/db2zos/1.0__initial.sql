@@ -159,19 +159,83 @@ create table migtest_oto_master (
   constraint pk_migtest_oto_master primary key (id)
 );
 
+-- apply alter tables
+alter table migtest_e_history2 add column sys_period_start timestamp(12) not null generated always as row begin;
+alter table migtest_e_history2 add column sys_period_end timestamp(12) not null generated always as row end;
+alter table migtest_e_history2 add column sys_period_txn timestamp(12) generated always as transaction start id;
+alter table migtest_e_history2 add period system_time (sys_period_start,sys_period_end);
+alter table migtest_e_history3 add column sys_period_start timestamp(12) not null generated always as row begin;
+alter table migtest_e_history3 add column sys_period_end timestamp(12) not null generated always as row end;
+alter table migtest_e_history3 add column sys_period_txn timestamp(12) generated always as transaction start id;
+alter table migtest_e_history3 add period system_time (sys_period_start,sys_period_end);
+alter table migtest_e_history4 add column sys_period_start timestamp(12) not null generated always as row begin;
+alter table migtest_e_history4 add column sys_period_end timestamp(12) not null generated always as row end;
+alter table migtest_e_history4 add column sys_period_txn timestamp(12) generated always as transaction start id;
+alter table migtest_e_history4 add period system_time (sys_period_start,sys_period_end);
+alter table migtest_e_history5 add column sys_period_start timestamp(12) not null generated always as row begin;
+alter table migtest_e_history5 add column sys_period_end timestamp(12) not null generated always as row end;
+alter table migtest_e_history5 add column sys_period_txn timestamp(12) generated always as transaction start id;
+alter table migtest_e_history5 add period system_time (sys_period_start,sys_period_end);
+alter table migtest_e_history6 add column sys_period_start timestamp(12) not null generated always as row begin;
+alter table migtest_e_history6 add column sys_period_end timestamp(12) not null generated always as row end;
+alter table migtest_e_history6 add column sys_period_txn timestamp(12) generated always as transaction start id;
+alter table migtest_e_history6 add period system_time (sys_period_start,sys_period_end);
 -- apply post alter
 create unique index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) exclude null keys;
 create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) exclude null keys;
+create table migtest_e_history2_history (
+ id integer not null,
+ test_string varchar(255),
+ obsolete_string1 varchar(255),
+ obsolete_string2 varchar(255),
+ sys_period_start timestamp(12) not null,
+ sys_period_end timestamp(12) not null,
+ sys_period_txn timestamp(12)
+);
+alter table migtest_e_history2 add versioning use history table migtest_e_history2_history;
+create table migtest_e_history3_history (
+ id integer not null,
+ test_string varchar(255),
+ sys_period_start timestamp(12) not null,
+ sys_period_end timestamp(12) not null,
+ sys_period_txn timestamp(12)
+);
+alter table migtest_e_history3 add versioning use history table migtest_e_history3_history;
+create table migtest_e_history4_history (
+ id integer not null,
+ test_number integer,
+ sys_period_start timestamp(12) not null,
+ sys_period_end timestamp(12) not null,
+ sys_period_txn timestamp(12)
+);
+alter table migtest_e_history4 add versioning use history table migtest_e_history4_history;
+create table migtest_e_history5_history (
+ id integer not null,
+ test_number integer,
+ sys_period_start timestamp(12) not null,
+ sys_period_end timestamp(12) not null,
+ sys_period_txn timestamp(12)
+);
+alter table migtest_e_history5 add versioning use history table migtest_e_history5_history;
+create table migtest_e_history6_history (
+ id integer not null,
+ test_number1 integer,
+ test_number2 integer not null,
+ sys_period_start timestamp(12) not null,
+ sys_period_end timestamp(12) not null,
+ sys_period_txn timestamp(12)
+);
+alter table migtest_e_history6 add versioning use history table migtest_e_history6_history;
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 -- foreign keys and indices
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 
 create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
 
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
-alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict;
+alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
