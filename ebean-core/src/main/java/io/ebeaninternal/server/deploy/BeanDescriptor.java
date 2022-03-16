@@ -1310,8 +1310,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Hit the bean cache trying to load a list/batch of entities.
    * Return the set of entities that were successfully loaded from L2 cache.
    */
-  public Set<EntityBeanIntercept> cacheBeanLoadAll(List<EntityBeanIntercept> list, PersistenceContext persistenceContext, int lazyLoadProperty, String propertyName) {
-    return cacheHelp.beanCacheLoadAll(list, persistenceContext, lazyLoadProperty, propertyName);
+  public Set<EntityBeanIntercept> cacheBeanLoadAll(Set<EntityBeanIntercept> batch, PersistenceContext persistenceContext, int lazyLoadProperty, String propertyName) {
+    return cacheHelp.beanCacheLoadAll(batch, persistenceContext, lazyLoadProperty, propertyName);
   }
 
   /**

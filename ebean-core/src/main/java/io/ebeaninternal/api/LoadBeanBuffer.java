@@ -4,7 +4,7 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * A buffer of beans for batch lazy loading and secondary query loading.
@@ -13,7 +13,7 @@ public interface LoadBeanBuffer {
 
   int batchSize();
 
-  List<EntityBeanIntercept> batch();
+  Set<EntityBeanIntercept> batch();
 
   BeanDescriptor<?> descriptor();
 
