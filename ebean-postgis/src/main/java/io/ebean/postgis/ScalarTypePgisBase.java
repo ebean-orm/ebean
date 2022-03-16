@@ -7,8 +7,10 @@ import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import org.postgis.Geometry;
+import org.postgis.GeometryBuilder;
 import org.postgis.PGgeometry;
 import org.postgis.PGgeometryLW;
+import org.postgis.binary.BinaryParser;
 import org.postgresql.util.PGobject;
 
 import java.io.DataInput;
@@ -51,7 +53,7 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
       return (T) ((PGgeometry) object).getGeometry();
 
     } else if (object instanceof PGobject) {
-      return (T) PGgeometry.geomFromString(((PGobject) object).getValue());
+      return (T) GeometryBuilder.geomFromString(((PGobject) object).getValue(), new BinaryParser(), false);
 
     } else {
       throw new IllegalStateException("Could not convert from " + object.getClass() + " to " + cls);

@@ -15,7 +15,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,121 +27,121 @@ public class BaseTableDdlTest {
   private final PlatformDdl h2ddl = PlatformDdlBuilder.create(new H2Platform());
 
   @Test
-  public void testAlterColumn() throws IOException {
+  public void testAlterColumn() {
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
-    DdlWrite write = new DdlWrite();
+    DdlWrite writer = new DdlWrite();
 
     AlterColumn alterColumn = new AlterColumn();
     alterColumn.setTableName("mytab");
     alterColumn.setCheckConstraint("check (acol in ('A','B'))");
     alterColumn.setCheckConstraintName("ck_mytab_acol");
 
-    ddlGen.generate(write, alterColumn);
+    ddlGen.generate(writer, alterColumn);
 
-    String ddl = write.apply().getBuffer();
+    String ddl = writer.toString();
     assertThat(ddl).contains("alter table mytab drop constraint if exists ck_mytab_acol");
     assertThat(ddl).contains("alter table mytab add constraint ck_mytab_acol check (acol in ('A','B'))");
   }
 
   @Test
-  public void testAddColumn_withTypeConversion() throws IOException {
+  public void testAddColumn_withTypeConversion() {
 
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, PlatformDdlBuilder.create(new OraclePlatform()));
 
-    DdlWrite write = new DdlWrite();
+    DdlWrite writer = new DdlWrite();
 
     Column column = new Column();
     column.setName("col_name");
     column.setType("varchar(20)");
 
-    ddlGen.alterTableAddColumn(write.apply(), "mytable", column, false, false);
+    ddlGen.alterTableAddColumn(writer, "mytable", column, false, false);
 
-    String ddl = write.apply().getBuffer();
+    String ddl = writer.toString();
     assertThat(ddl).contains("alter table mytable add col_name varchar2(20)");
   }
 
   @Test
-  public void testAddColumn_withTypeConversion_clickHouseVarchar() throws IOException {
+  public void testAddColumn_withTypeConversion_clickHouseVarchar() {
 
     ClickHouseTableDdl ddlGen = new ClickHouseTableDdl(serverConfig, PlatformDdlBuilder.create(new ClickHousePlatform()));
 
-    DdlWrite write = new DdlWrite();
+    DdlWrite writer = new DdlWrite();
 
     Column column = new Column();
     column.setName("col_name");
     column.setType("varchar(20)");
 
-    ddlGen.alterTableAddColumn(write.apply(), "mytable", column, false, false);
+    ddlGen.alterTableAddColumn(writer, "mytable", column, false, false);
 
-    String ddl = write.apply().getBuffer();
+    String ddl = writer.toString();
     assertThat(ddl).contains("alter table mytable add column col_name String");
   }
 
   @Test
-  public void testAlterColumnComment() throws IOException {
+  public void testAlterColumnComment() {
 
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
-    DdlWrite write = new DdlWrite();
+    DdlWrite writer = new DdlWrite();
 
     AlterColumn alterColumn = new AlterColumn();
     alterColumn.setTableName("mytab");
     alterColumn.setColumnName("acol");
     alterColumn.setComment("my comment");
 
-    ddlGen.generate(write, alterColumn);
+    ddlGen.generate(writer, alterColumn);
 
-    String ddl = write.apply().getBuffer();
+    String ddl = writer.applyPostAlter().getBuffer();
     assertThat(ddl).contains("comment on column mytab.acol is 'my comment'");
   }
 
   @Test
-  public void alterTableAddColumnWithComment() throws IOException {
+  public void alterTableAddColumnWithComment() {
     BaseTableDdl ddl = new BaseTableDdl(serverConfig, h2ddl);
-    DdlWrite write = new DdlWrite();
+    DdlWrite writer = new DdlWrite();
     Column column = new Column();
     column.setName("my_column");
     column.setComment("some comment");
     column.setType("int");
 
-    ddl.alterTableAddColumn(write.apply(), "my_table", column, false, false);
-    assertEquals(
-      "alter table my_table add column my_column int;\n" +
-      "comment on column my_table.my_column is 'some comment';\n", write.apply().getBuffer());
+    ddl.alterTableAddColumn(writer, "my_table", column, false, false);
+    assertEquals("-- apply alter tables\nalter table my_table add column my_column int;\n"
+      + "-- apply post alter\ncomment on column my_table.my_column is 'some comment';\n",
+      writer.toString());
   }
 
   @Test
-  public void testAddTableComment() throws IOException {
+  public void testAddTableComment() {
 
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
-    DdlWrite write = new DdlWrite();
+    DdlWrite writer = new DdlWrite();
 
     AddTableComment addTableComment = new AddTableComment();
     addTableComment.setName("mytab");
     addTableComment.setComment("my comment");
 
-    ddlGen.generate(write, addTableComment);
+    ddlGen.generate(writer, addTableComment);
 
-    String ddl = write.apply().getBuffer();
+    String ddl = writer.applyPostAlter().getBuffer();
     assertThat(ddl).contains("comment on table mytab is 'my comment'");
   }
 
   @Test
-  public void testAddTableComment_mysql() throws IOException {
+  public void testAddTableComment_mysql() {
 
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, PlatformDdlBuilder.create(new MySqlPlatform()));
 
-    DdlWrite write = new DdlWrite();
+    DdlWrite writer = new DdlWrite();
 
     AddTableComment addTableComment = new AddTableComment();
     addTableComment.setName("mytab");
     addTableComment.setComment("my comment");
 
-    ddlGen.generate(write, addTableComment);
+    ddlGen.generate(writer, addTableComment);
 
-    String ddl = write.apply().getBuffer();
+    String ddl = writer.applyPostAlter().getBuffer();
     assertThat(ddl).contains("alter table mytab comment = 'my comment'");
   }
 
@@ -151,14 +150,14 @@ public class BaseTableDdlTest {
 
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
-    DdlWrite write = new DdlWrite();
+    DdlWrite writer = new DdlWrite();
 
-    ddlGen.generate(write, createTable());
-    String apply = write.apply().getBuffer();
-    String applyLast = write.applyForeignKeys().getBuffer();
+    ddlGen.generate(writer, createTable());
+    String apply = writer.apply().getBuffer();
+    String applyLast = writer.applyForeignKeys().getBuffer();
 
-    String rollbackFirst = write.dropAllForeignKeys().getBuffer();
-    String rollbackLast = write.dropAll().getBuffer();
+    String rollbackFirst = writer.dropAllForeignKeys().getBuffer();
+    String rollbackLast = writer.dropAll().getBuffer();
 
     assertThat(apply).isEqualTo(Helper.asText(this, "/assert/BaseTableDdlTest/createTable-apply.txt"));
     assertThat(applyLast).isEqualTo(Helper.asText(this, "/assert/BaseTableDdlTest/createTable-applyLast.txt"));

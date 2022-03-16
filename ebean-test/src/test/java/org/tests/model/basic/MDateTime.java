@@ -16,8 +16,6 @@ import javax.annotation.Nullable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.joda.time.DateTime;
-
 @Entity
 public class MDateTime {
 

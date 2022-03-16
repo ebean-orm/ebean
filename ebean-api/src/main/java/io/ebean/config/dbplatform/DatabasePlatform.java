@@ -607,13 +607,6 @@ public class DatabasePlatform {
   }
 
   /**
-   * Normally not needed - overridden in CockroachPlatform.
-   */
-  public boolean isDdlAutoCommit() {
-    return false;
-  }
-
-  /**
    * Return the DB identity/sequence features for this platform.
    *
    * @return the db identity

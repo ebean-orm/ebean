@@ -1,7 +1,6 @@
 package io.ebean.plugin;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * General deployment information. This is used in {@link CustomDeployParser}.

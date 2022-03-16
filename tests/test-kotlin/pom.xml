@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
     <version>3.4</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <name>test-kotlin</name>
@@ -27,21 +29,21 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.16.1-SNAPSHOT</version>
+      <version>12.16.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.16.1-SNAPSHOT</version>
+      <version>12.16.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -107,9 +109,4 @@
     </plugins>
   </build>
 
-
-  <scm>
-    <tag>HEAD</tag>
-    <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
-  </scm>
 </project>

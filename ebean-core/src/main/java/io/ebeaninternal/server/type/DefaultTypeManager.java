@@ -2,7 +2,6 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbEnumType;
 import io.ebean.annotation.DbEnumValue;
 import io.ebean.annotation.EnumValue;
@@ -48,7 +47,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.*;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

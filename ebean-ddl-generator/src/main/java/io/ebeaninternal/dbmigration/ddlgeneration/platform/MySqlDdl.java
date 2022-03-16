@@ -3,11 +3,9 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
-
-import java.io.IOException;
-import java.util.Collection;
 
 /**
  * MySql specific DDL.
@@ -22,7 +20,7 @@ public class MySqlDdl extends PlatformDdl {
 
   public MySqlDdl(DatabasePlatform platform) {
     super(platform);
-    this.alterColumn = "modify";
+    this.alterColumn = "alter";
     this.dropUniqueConstraint = "drop index";
     this.historyDdl = new MySqlHistoryDdl();
     this.inlineComments = true;
@@ -38,11 +36,11 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  public void alterTableDropColumn(final DdlBuffer buffer, final String tableName, final String columnName) throws IOException {
+  public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
     if (this.useMigrationStoredProcedures) {
-      buffer.append("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')").endOfStatement();
+      alterTable(writer, tableName).raw("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')");
     } else {
-      super.alterTableDropColumn(buffer, tableName, columnName);
+      super.alterTableDropColumn(writer, tableName, columnName);
     }
   }
 
@@ -92,42 +90,35 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterColumnType(String tableName, String columnName, String type) {
-    // can't alter itself - done in alterColumnBaseAttributes()
-    return null;
-  }
-
-  @Override
-  public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
-    // can't alter itself - done in alterColumnBaseAttributes()
-    return null;
-  }
-
-  @Override
-  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
-    return "alter table " + tableName + " alter " + columnName + " " + suffix;
-  }
-
-  @Override
-  public String alterColumnBaseAttributes(AlterColumn alter) {
-    if (alter.getType() == null && alter.isNotnull() == null) {
-      // No type change or notNull change
-      // defaultValue change already handled in alterColumnDefaultValue
-      return null;
-    }
+  public void alterColumn(DdlWrite writer, AlterColumn alter) {
     String tableName = alter.getTableName();
     String columnName = alter.getColumnName();
-    String type = alter.getType() != null ? alter.getType() : alter.getCurrentType();
-    type = convert(type);
-    boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
-    String notnullClause = notnull ? " not null" : "";
 
-    return "alter table " + tableName + " modify " + columnName + " " + type + notnullClause;
+    if (alter.getType() == null && alter.isNotnull() == null) {
+      // No type change or notNull change -> handle default value change
+      if (hasValue(alter.getDefaultValue())) {
+        alterColumnDefault(writer, alter);
+      }
+    } else {
+      // we must regenerate whole statement -> read altered and current value
+      String type = alter.getType() != null ? alter.getType() : alter.getCurrentType();
+      type = convert(type);
+      boolean notnull = (alter.isNotnull() != null) ? alter.isNotnull() : Boolean.TRUE.equals(alter.isCurrentNotnull());
+      String defaultValue = alter.getDefaultValue() != null ? alter.getDefaultValue() : alter.getCurrentDefaultValue();
+
+      DdlBuffer buffer = alterTable(writer, tableName).append("modify", columnName);
+      buffer.append(type);
+      if (notnull) {
+        buffer.append(" not null");
+      }
+      if (hasValue(defaultValue) && !DdlHelp.isDropDefault(defaultValue)) {
+        buffer.append(" default ").append(convertDefaultValue(defaultValue));
+      }
+    }
   }
 
   @Override
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) throws IOException {
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) {
     super.writeColumnDefinition(buffer, column, identity);
     String comment = column.getComment();
     if (!StringHelper.isNull(comment)) {
@@ -140,7 +131,7 @@ public class MySqlDdl extends PlatformDdl {
   }
 
   @Override
-  public void inlineTableComment(DdlBuffer apply, String tableComment) throws IOException {
+  public void inlineTableComment(DdlBuffer apply, String tableComment) {
     if (tableComment.length() > 1000) {
       tableComment = tableComment.substring(0, 1000);
     }
@@ -151,7 +142,7 @@ public class MySqlDdl extends PlatformDdl {
    * Add table comment as a separate statement (from the create table statement).
    */
   @Override
-  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) {
     if (DdlHelp.isDropComment(tableComment)) {
       tableComment = "";
     }
@@ -161,34 +152,6 @@ public class MySqlDdl extends PlatformDdl {
   @Override
   public void addColumnComment(DdlBuffer apply, String table, String column, String comment) {
     // alter comment currently not supported as it requires to repeat whole column definition
-  }
-
-
-  /**
-   * Locks all tables for triggers that have to be updated.
-   */
-  @Override
-  public void lockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
-    if (!tables.isEmpty()) {
-      buffer.append("lock tables ");
-      int i = 0;
-      for (String table : tables) {
-        if (i > 0) {
-          buffer.append(", ");
-        }
-        buffer.append(table).append(" write");
-        i++;
-      }
-      buffer.endOfStatement();
-    }
-  }
-
-  /**
-   * Unlocks all tables for triggers that have to be updated.
-   */
-  @Override
-  public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
-    buffer.append("unlock tables").endOfStatement();
   }
 
 }

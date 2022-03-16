@@ -9,11 +9,7 @@ import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
-import io.ebeaninternal.dbmigration.ddlgeneration.BaseDdlHandler;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.ddlgeneration.*;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.VowelRemover;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
@@ -22,8 +18,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -82,15 +76,11 @@ public class PlatformDdl {
 
   protected String alterColumn = "alter column";
 
-  protected String alterColumnSuffix = "";
-
   protected String dropUniqueConstraint = "drop constraint";
 
   protected String addConstraint = "add constraint";
 
   protected String addColumn = "add column";
-
-  protected String addColumnSuffix = "";
 
   protected String columnSetType = "";
 
@@ -102,13 +92,13 @@ public class PlatformDdl {
 
   protected String columnSetNull = "set null";
 
+  protected String columnNotNull = "not null";
+
   protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
 
   protected String createTable = "create table";
 
   protected String dropColumn = "drop column";
-
-  protected String dropColumnSuffix = "";
 
   protected String addForeignKeySkipCheck = "";
 
@@ -236,7 +226,7 @@ public class PlatformDdl {
   /**
    * Write all the table columns converting to platform types as necessary.
    */
-  public void writeTableColumns(DdlBuffer apply, List<Column> columns, DdlIdentity identity) throws IOException {
+  public void writeTableColumns(DdlBuffer apply, List<Column> columns, DdlIdentity identity) {
     for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
         apply.append(",");
@@ -260,7 +250,7 @@ public class PlatformDdl {
   /**
    * Write the column definition to the create table statement.
    */
-  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) throws IOException {
+  protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) {
 
     String columnDefn = convert(column.getType());
     if (identity.useIdentity() && isTrue(column.isPrimaryKey())) {
@@ -277,18 +267,11 @@ public class PlatformDdl {
       }
     }
     if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
-      writeColumnNotNull(buffer);
+      buffer.appendWithSpace(columnNotNull);
     }
 
     // add check constraints later as we really want to give them a nice name
     // so that the database can potentially provide a nice SQL error
-  }
-
-  /**
-   * Allow for platform overriding (e.g. ClickHouse).
-   */
-  protected void writeColumnNotNull(DdlBuffer buffer) throws IOException {
-    buffer.append(" not null");
   }
 
   /**
@@ -319,9 +302,7 @@ public class PlatformDdl {
     if (type == null) {
       return null;
     }
-    
     type = extract(type);
-    
     if (type.contains("[]")) {
       return convertArrayType(type);
     }
@@ -333,16 +314,18 @@ public class PlatformDdl {
   // e.g. @Column(columnDefinition = "db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)")
   private String extract(String type) {
     String[] tmp = type.split(";");
-    assert tmp.length % 2 == 1;
-    for (int i = 0; i < tmp.length - 2; i+=2) {
+    if (tmp.length % 2 == 0) {
+      throw new IllegalArgumentException("You need an odd number of arguments. See Issue #2559 for details");
+    }
+    for (int i = 0; i < tmp.length - 2; i += 2) {
       String[] platforms = tmp[i].split(",");
       for (String plat : platforms) {
         if (platform.isPlatform(Platform.valueOf(plat.toUpperCase(Locale.ENGLISH)))) {
-          return tmp[i+1];
+          return tmp[i + 1];
         }
       }
     }
-    return tmp[tmp.length-1]; // else
+    return tmp[tmp.length - 1]; // else
   }
 
   /**
@@ -359,29 +342,29 @@ public class PlatformDdl {
   /**
    * Add history support to this table using the platform specific mechanism.
    */
-  public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
+  public void createWithHistory(DdlWrite writer, MTable table) {
     historyDdl.createWithHistory(writer, table);
   }
 
   /**
    * Drop history support for a given table.
    */
-  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     historyDdl.dropHistoryTable(writer, dropHistoryTable);
   }
 
   /**
    * Add history support to an existing table.
    */
-  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) {
     historyDdl.addHistoryTable(writer, addHistoryTable);
   }
 
   /**
    * Regenerate the history triggers (or function) due to a column being added/dropped/excluded or included.
    */
-  public void regenerateHistoryTriggers(DdlWrite write, HistoryTableUpdate update) throws IOException {
-    historyDdl.updateTriggers(write, update);
+  public void regenerateHistoryTriggers(DdlWrite writer, String tableName) {
+    historyDdl.updateTriggers(writer, tableName);
   }
 
   /**
@@ -550,13 +533,11 @@ public class PlatformDdl {
     return buffer.toString();
   }
 
-  public void alterTableAddColumn(DdlBuffer buffer, String tableName, Column column, boolean onHistoryTable, String defaultValue) throws IOException {
+  public void alterTableAddColumn(DdlWrite writer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
 
     String convertedType = convert(column.getType());
-
-    buffer.append("alter table ").append(tableName)
-      .append(" ").append(addColumn).append(" ").append(column.getName())
-      .append(" ").append(convertedType);
+    DdlBuffer buffer = alterTable(writer, tableName).append(addColumn, column.getName());
+    buffer.append(convertedType);
 
     // Add default value also to history table if it is not excluded
     if (defaultValue != null) {
@@ -568,28 +549,35 @@ public class PlatformDdl {
 
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
-        writeColumnNotNull(buffer);
+        buffer.appendWithSpace(columnNotNull);
       }
-      buffer.append(addColumnSuffix);
-      buffer.endOfStatement();
 
       // check constraints cannot be added in one statement for h2
       if (!StringHelper.isNull(column.getCheckConstraint())) {
         String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
-        if (hasValue(ddl)) {
-          buffer.append(ddl).endOfStatement();
-        }
+        writer.applyPostAlter().appendStatement(ddl);
       }
-    } else {
-      buffer.append(addColumnSuffix);
-      buffer.endOfStatement();
     }
 
   }
 
-  public void alterTableDropColumn(DdlBuffer buffer, String tableName, String columnName) throws IOException {
-    buffer.append("alter table ").append(tableName).append(" ").append(dropColumn).append(" ").append(columnName)
-      .append(dropColumnSuffix).endOfStatement();
+  /**
+   * This method is used from DbTriggerBasedHistoryDdl to add the sysPeriodColumns.
+   */
+  public void alterTableAddColumn(DdlWrite writer, String tableName, String columnName, String columnType, String defaultValue) {
+
+    String convertedType = convert(columnType);
+    DdlBuffer buffer = alterTable(writer, tableName).append(addColumn, columnName);
+    buffer.append(convertedType);
+
+    if (defaultValue != null) {
+      buffer.append(" default ");
+      buffer.append(defaultValue);
+    }
+  }
+
+  public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
+    alterTable(writer, tableName).append(dropColumn, columnName);
   }
 
   /**
@@ -604,22 +592,27 @@ public class PlatformDdl {
   /**
    * Alter a column type.
    * <p>
-   * Note that that MySql and SQL Server instead use alterColumnBaseAttributes()
+   * Note that that MySql, SQL Server, and HANA instead use alterColumn()
    * </p>
    */
-  public String alterColumnType(String tableName, String columnName, String type) {
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + columnSetType + convert(type) + alterColumnSuffix;
+  protected void alterColumnType(DdlWrite writer, AlterColumn alter) {
+    alterTable(writer, alter.getTableName()).append(alterColumn, alter.getColumnName())
+      .append(columnSetType).append(convert(alter.getType()));
   }
 
   /**
    * Alter a column adding or removing the not null constraint.
    * <p>
-   * Note that that MySql, SQL Server, and HANA instead use alterColumnBaseAttributes()
+   * Note that that MySql, SQL Server, and HANA instead use alterColumn()
    * </p>
    */
-  public String alterColumnNotnull(String tableName, String columnName, boolean notnull) {
-    String suffix = notnull ? columnSetNotnull : columnSetNull;
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix + alterColumnSuffix;
+  protected void alterColumnNotnull(DdlWrite writer, AlterColumn alter) {
+    DdlBuffer buffer = alterTable(writer, alter.getTableName()).append(alterColumn, alter.getColumnName());
+    if (Boolean.TRUE.equals(alter.isNotnull())) {
+      buffer.append(columnSetNotnull);
+    } else {
+      buffer.append(columnSetNull);
+    }
   }
 
   /**
@@ -631,22 +624,46 @@ public class PlatformDdl {
 
   /**
    * Alter column setting the default value.
+   * <p>
+   * Note that that MySql, SQL Server, and HANA instead use alterColumn()
+   * </p>
    */
-  public String alterColumnDefaultValue(String tableName, String columnName, String defaultValue) {
-    String suffix = DdlHelp.isDropDefault(defaultValue) ? columnDropDefault : columnSetDefault + " " + convertDefaultValue(defaultValue);
-    return "alter table " + tableName + " " + alterColumn + " " + columnName + " " + suffix + alterColumnSuffix;
+  protected void alterColumnDefault(DdlWrite writer, AlterColumn alter) {
+    DdlBuffer buffer = alterTable(writer, alter.getTableName()).append(alterColumn, alter.getColumnName());
+    if (DdlHelp.isDropDefault(alter.getDefaultValue())) {
+      buffer.append(columnDropDefault);
+    } else {
+      buffer.append(columnSetDefault).appendWithSpace(convertDefaultValue(alter.getDefaultValue()));
+    }
   }
 
   /**
-   * Alter column setting both the type and not null constraint.
+   * Alter column setting (type, default value and not null constraint).
    * <p>
-   * Used by MySql, SQL Server, and HANA as these require both column attributes to be set together.
+   * Used by MySql, SQL Server, and HANA as these require all column attributes to
+   * be set together.
    * </p>
    */
-  public String alterColumnBaseAttributes(AlterColumn alter) {
-    // by default do nothing, only used by mysql, sql server, and HANA as they can only
-    // modify the column with the full column definition
-    return null;
+  public void alterColumn(DdlWrite writer, AlterColumn alter) {
+
+    if (hasValue(alter.getType())) {
+      alterColumnType(writer, alter);
+    }
+
+    if (hasValue(alter.getDefaultValue())) {
+      alterColumnDefault(writer, alter);
+    }
+
+    if (alter.isNotnull() != null) {
+      alterColumnNotnull(writer, alter);
+    }
+  }
+
+  /**
+   * Creates or replace a new DdlAlterTable for given tableName.
+   */
+  protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
+    return writer.applyAlterTable(tableName, BaseAlterTableWrite::new);
   }
 
   protected void appendColumns(String[] columns, StringBuilder buffer) {
@@ -705,21 +722,21 @@ public class PlatformDdl {
   /**
    * Add an inline table comment to the create table statement.
    */
-  public void inlineTableComment(DdlBuffer apply, String tableComment) throws IOException {
+  public void inlineTableComment(DdlBuffer apply, String tableComment) {
     // do nothing by default (MySql only)
   }
 
   /**
    * Add an table storage engine to the create table statement.
    */
-  public void tableStorageEngine(DdlBuffer apply, String storageEngine) throws IOException {
+  public void tableStorageEngine(DdlBuffer apply, String storageEngine) {
     // do nothing by default
   }
 
   /**
    * Add table comment as a separate statement (from the create table statement).
    */
-  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) throws IOException {
+  public void addTableComment(DdlBuffer apply, String tableName, String tableComment) {
     if (DdlHelp.isDropComment(tableComment)) {
       tableComment = "";
     }
@@ -729,7 +746,7 @@ public class PlatformDdl {
   /**
    * Add column comment as a separate statement.
    */
-  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) throws IOException {
+  public void addColumnComment(DdlBuffer apply, String table, String column, String comment) {
     if (DdlHelp.isDropComment(comment)) {
       comment = "";
     }
@@ -739,14 +756,14 @@ public class PlatformDdl {
   /**
    * Use this to generate a prolog for each script (stored procedures)
    */
-  public void generateProlog(DdlWrite write) throws IOException {
+  public void generateProlog(DdlWrite writer) {
 
   }
 
   /**
    * Use this to generate an epilog. Will be added at the end of script
    */
-  public void generateEpilog(DdlWrite write) throws IOException {
+  public void generateEpilog(DdlWrite writer) {
 
   }
 
@@ -770,20 +787,6 @@ public class PlatformDdl {
   }
 
   /**
-   * Mysql-specific: Locks all tables for triggers that have to be updated.
-   */
-  public void lockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
-
-  }
-
-  /**
-   * Mysql-specific: Unlocks all tables for triggers that have to be updated.
-   */
-  public void unlockTables(DdlBuffer buffer, Collection<String> tables) throws IOException {
-
-  }
-
-  /**
    * Returns the database-specific "create table" command prefix. For HANA this is
    * either "create column table" or "create row table", for all other databases
    * it is "create table".
@@ -798,7 +801,7 @@ public class PlatformDdl {
     return false;
   }
 
-  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
+  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) {
     // only supported by postgres initially
   }
   
@@ -806,7 +809,7 @@ public class PlatformDdl {
    * Adds tablespace declaration. Now only supported for db2.
    * @throws IOException 
    */
-  public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) throws IOException{
+  public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) {
     // now only supported for db2
   }
 

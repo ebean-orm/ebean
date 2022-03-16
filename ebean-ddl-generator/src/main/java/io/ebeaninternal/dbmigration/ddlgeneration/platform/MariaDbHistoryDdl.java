@@ -1,53 +1,59 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
 import io.ebeaninternal.dbmigration.model.MTable;
 
-import java.io.IOException;
-
 /**
  * History DDL for MariaDB.
  */
 public class MariaDbHistoryDdl implements PlatformHistoryDdl {
 
+  private PlatformDdl platformDdl;
+
   @Override
   public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
-    // do nothing
+    this.platformDdl = platformDdl;
   }
 
   @Override
-  public void createWithHistory(DdlWrite writer, MTable table) throws IOException {
+  public void createWithHistory(DdlWrite writer, MTable table) {
     String baseTable = table.getName();
     enableSystemVersioning(writer, baseTable);
   }
 
-  private void enableSystemVersioning(DdlWrite writer, String baseTable) throws IOException {
-    DdlBuffer apply = writer.applyHistoryView();
-    apply.append("alter table ").append(baseTable).append(" add system versioning").endOfStatement();
+  private void enableSystemVersioning(DdlWrite writer, String baseTable) {
+    platformDdl.alterTable(writer, baseTable).append("add system versioning", null);
 
     DdlBuffer drop = writer.dropAll();
     drop.append("alter table ").append(baseTable).append(" drop system versioning").endOfStatement();
   }
 
   @Override
-  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) throws IOException {
+  public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     String baseTable = dropHistoryTable.getBaseTable();
-    DdlBuffer apply = writer.applyHistoryView();
-    apply.append("alter table ").append(baseTable).append(" drop system versioning").endOfStatement();
+    platformDdl.alterTable(writer, baseTable).append("drop system versioning", null);
   }
 
   @Override
-  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) throws IOException {
+  public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) {
     String baseTable = addHistoryTable.getBaseTable();
     enableSystemVersioning(writer, baseTable);
   }
 
   @Override
-  public void updateTriggers(DdlWrite writer, HistoryTableUpdate baseTable) {
-    // do nothing
+  public void updateTriggers(DdlWrite writer, String tableName) {
+    MTable table = writer.getTable(tableName);
+    // For MariaDB we need to enable system_versioning_alter_history only once
+    // per DDL script. This info is stored in the virtual "__$HISTORY_FLAG__" table
+    DdlAlterTable history = platformDdl.alterTable(writer, "__$HISTORY_FLAG__");
+    if (table != null && table.isWithHistory() && !history.isHistoryHandled()) {
+      writer.apply().appendStatement("SET @@system_versioning_alter_history = 1");
+      history.setHistoryHandled();
+    }
   }
 }

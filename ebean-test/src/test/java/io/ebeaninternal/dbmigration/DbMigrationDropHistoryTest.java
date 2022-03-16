@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,10 +33,18 @@ public class DbMigrationDropHistoryTest {
     main(null);
   }
 
+  @Test
+  public void lastVersion_no_v_Prefix() {
+    File d = new File("src/test/resources/migrationtest-history/dbmigration");
+    assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.2");
+  }
+  
   public static void main(String[] args) throws IOException {
 
     logger.info("start");
-
+    // First, we clean up the output-directory
+    Files.walk(Paths.get("src/test/resources/migrationtest-history"))
+      .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
     DefaultDbMigration migration = new DefaultDbMigration();
 
     // We use src/test/resources as output directory (so we see in GIT if files will change)

@@ -2,7 +2,6 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.CacheMode;
 import io.ebean.ExpressionList;
-import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -40,14 +39,14 @@ final class DefaultBeanLoader {
   }
 
   void loadMany(BeanCollection<?> bc, boolean onlyIds) {
-    loadManyInternal(bc.getOwnerBean(), bc.getPropertyName(), null, false, onlyIds);
+    loadManyInternal(bc.getOwnerBean(), bc.getPropertyName(), false, onlyIds);
   }
 
   void refreshMany(EntityBean parentBean, String propertyName) {
-    loadManyInternal(parentBean, propertyName, null, true, false);
+    loadManyInternal(parentBean, propertyName, true, false);
   }
 
-  private void loadManyInternal(EntityBean parentBean, String propertyName, Transaction t, boolean refresh, boolean onlyIds) {
+  private void loadManyInternal(EntityBean parentBean, String propertyName, boolean refresh, boolean onlyIds) {
     EntityBeanIntercept ebi = parentBean._ebean_getIntercept();
     PersistenceContext pc = ebi.getPersistenceContext();
     BeanDescriptor<?> parentDesc = server.descriptor(parentBean.getClass());
@@ -106,7 +105,7 @@ final class DefaultBeanLoader {
       query.setReadOnly(true);
     }
 
-    server.findOne(query, t);
+    server.findOne(query, null);
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
         if (log.isDebugEnabled()) {
@@ -200,7 +199,7 @@ final class DefaultBeanLoader {
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     if (draft) {
       query.asDraft();
-    } else {
+    } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN) {
       query.setIncludeSoftDeletes();
     }
     if (embeddedOwnerIndex > -1) {

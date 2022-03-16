@@ -15,22 +15,14 @@ import java.util.TreeSet;
 final class SqlTreeAlias {
 
   private final SpiQuery.TemporalMode temporalMode;
-
-  private int counter;
-
-  private int manyWhereCounter;
-
   private final TreeSet<String> joinProps = new TreeSet<>();
-
   private HashSet<String> embeddedPropertyJoins;
-
   private final TreeSet<String> manyWhereJoinProps = new TreeSet<>();
-
   private final HashMap<String, String> aliasMap = new HashMap<>();
-
   private final HashMap<String, String> manyWhereAliasMap = new HashMap<>();
-
   private final String rootTableAlias;
+  private int counter;
+  private int manyWhereCounter;
 
   SqlTreeAlias(String rootTableAlias, SpiQuery.TemporalMode temporalMode) {
     this.rootTableAlias = rootTableAlias;

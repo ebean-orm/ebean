@@ -17,7 +17,6 @@ import io.avaje.classpath.scanner.core.Location;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.Platform;
-import io.ebean.config.ClassLoadConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.PlatformConfig;
@@ -658,9 +657,9 @@ public class DefaultDbMigration implements DbMigration {
         // writer needs the current model to provide table/column details for
         // history ddl generation (triggers, history tables etc)
         DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
-        DdlWrite write = new DdlWrite(new MConfiguration(), request.current, options);
-        PlatformDdlWriter writer = createDdlWriter(databasePlatform);
-        writer.processMigration(dbMigration, write, request.migrationDir, fullVersion);
+        DdlWrite writer = new DdlWrite(new MConfiguration(), request.current, options);
+        PlatformDdlWriter platformWriter = createDdlWriter(databasePlatform);
+        platformWriter.processMigration(dbMigration, writer, request.migrationDir, fullVersion);
       }
       return fullVersion;
     }
@@ -727,7 +726,7 @@ public class DefaultDbMigration implements DbMigration {
   private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath, boolean clear) throws IOException {
     DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
     for (Pair pair : platforms) {
-      DdlWrite platformBuffer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
+      DdlWrite writer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
       PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
       if (clear) {
@@ -735,7 +734,7 @@ public class DefaultDbMigration implements DbMigration {
           existing.delete();
         }
       }
-      platformWriter.processMigration(dbMigration, platformBuffer, subPath, fullVersion);
+      platformWriter.processMigration(dbMigration, writer, subPath, fullVersion);
     }
   }
 

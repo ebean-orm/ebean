@@ -41,4 +41,45 @@ public class EHistory2 {
 
   @Size(max = 20)
   String newColumn;
+
+  public Integer getId() {
+    return id;
+  }
+
+  public void setId(Integer id) {
+    this.id = id;
+  }
+
+  public String getTestString() {
+    return testString;
+  }
+
+  public void setTestString(String testString) {
+    this.testString = testString;
+  }
+
+  public String getTestString2() {
+    return testString2;
+  }
+
+  public void setTestString2(String testString2) {
+    this.testString2 = testString2;
+  }
+
+  public String getTestString3() {
+    return testString3;
+  }
+
+  public void setTestString3(String testString3) {
+    this.testString3 = testString3;
+  }
+
+  public String getNewColumn() {
+    return newColumn;
+  }
+
+  public void setNewColumn(String newColumn) {
+    this.newColumn = newColumn;
+  }
+
 }

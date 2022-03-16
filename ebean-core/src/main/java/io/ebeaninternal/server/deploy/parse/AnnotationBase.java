@@ -1,14 +1,9 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.Aggregation;
-import io.ebean.annotation.Avg;
 import io.ebean.annotation.DbMigration;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.Indices;
-import io.ebean.annotation.Max;
-import io.ebean.annotation.Min;
 import io.ebean.annotation.Platform;
-import io.ebean.annotation.Sum;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.AnnotationUtil;
@@ -20,7 +15,6 @@ import javax.persistence.JoinColumns;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Set;
 

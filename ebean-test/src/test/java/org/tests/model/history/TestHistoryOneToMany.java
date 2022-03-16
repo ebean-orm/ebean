@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestHistoryOneToMany extends BaseTestCase {
 
-  @IgnorePlatform({Platform.ORACLE, Platform.DB2, Platform.COCKROACH})
+  @IgnorePlatform({Platform.ORACLE, Platform.COCKROACH})
   @Test
   public void test() throws InterruptedException {
 

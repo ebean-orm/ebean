@@ -23,7 +23,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-runner</artifactId>
-      <version>1.2</version>
+      <version>${ebean-ddl-runner.version}</version>
     </dependency>
 
     <dependency>
@@ -130,7 +130,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.3.2</version>
+      <version>42.3.3</version>
       <optional>true</optional>
     </dependency>
 
@@ -146,7 +146,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.0</version>
+      <version>1.1</version>
       <scope>test</scope>
     </dependency>
 

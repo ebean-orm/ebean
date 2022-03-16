@@ -6,8 +6,6 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 
-import java.io.IOException;
-
 public class ClickHouseDdl extends PlatformDdl {
 
   private static final String LOG_TABLE = "ENGINE = Log()";
@@ -16,6 +14,7 @@ public class ClickHouseDdl extends PlatformDdl {
     super(platform);
     this.includeStorageEngine = true;
     this.identitySuffix = "";
+    this.columnNotNull = null;
   }
 
   @Override
@@ -32,7 +31,7 @@ public class ClickHouseDdl extends PlatformDdl {
    * Add an table storage engine to the create table statement.
    */
   @Override
-  public void tableStorageEngine(DdlBuffer apply, String storageEngine) throws IOException {
+  public void tableStorageEngine(DdlBuffer apply, String storageEngine) {
     if (storageEngine == null) {
       // default to Log() table but really should all be explicit (need arguments for MergeTree etc)
       storageEngine = LOG_TABLE;
@@ -68,11 +67,6 @@ public class ClickHouseDdl extends PlatformDdl {
   @Override
   public String createCheckConstraint(String ckName, String checkConstraint) {
     return null;
-  }
-
-  @Override
-  protected void writeColumnNotNull(DdlBuffer buffer) {
-    // do nothing
   }
 
   @Override

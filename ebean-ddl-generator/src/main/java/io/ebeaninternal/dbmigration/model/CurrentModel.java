@@ -36,7 +36,7 @@ public class CurrentModel {
 
   private ModelContainer model;
   private ChangeSet changeSet;
-  private DdlWrite write;
+  private DdlWrite writer;
 
   /**
    * Construct with a given EbeanServer instance for DDL create all generation, not migration.
@@ -117,7 +117,7 @@ public class CurrentModel {
   /**
    * Return the 'Create' DDL.
    */
-  public String getCreateDdl() throws IOException {
+  public String getCreateDdl() {
 
     createDdl();
 
@@ -128,10 +128,13 @@ public class CurrentModel {
     if (jaxbPresent) {
       addExtraDdl(ddl, ExtraDdlXmlReader.readBuiltin(), "-- init script ");
     }
-    ddl.append(write.apply().getBuffer());
-    ddl.append(write.applyForeignKeys().getBuffer());
-    ddl.append(write.applyHistoryView().getBuffer());
-    ddl.append(write.applyHistoryTrigger().getBuffer());
+
+    try {
+      writer.writeApply(ddl);
+    } catch (IOException e) { // should not happen on StringBuilder
+      throw new RuntimeException(e);
+    }
+
     return ddl.toString();
   }
 
@@ -150,7 +153,7 @@ public class CurrentModel {
   /**
    * Return the 'Drop' DDL.
    */
-  public String getDropAllDdl() throws IOException {
+  public String getDropAllDdl() {
 
     createDdl();
 
@@ -158,22 +161,25 @@ public class CurrentModel {
     if (ddlHeader != null && !ddlHeader.isEmpty()) {
       ddl.append(ddlHeader).append('\n');
     }
-    ddl.append(write.dropAllForeignKeys().getBuffer());
-    ddl.append(write.dropAll().getBuffer());
+    try {
+      writer.writeDropAll(ddl);
+    } catch (IOException e) { // should not happen on StringBuilder
+      throw new RuntimeException(e);
+    }
     return ddl.toString();
   }
 
   /**
    * Create all the DDL based on the changeSet.
    */
-  private void createDdl() throws IOException {
-    if (write == null) {
+  private void createDdl() {
+    if (writer == null) {
       ChangeSet createChangeSet = getChangeSet();
-      write = new DdlWrite(new MConfiguration(), model, ddlOptions);
+      writer = new DdlWrite(new MConfiguration(), model, ddlOptions);
       DdlHandler handler = handler();
-      handler.generateProlog(write);
-      handler.generate(write, createChangeSet);
-      handler.generateEpilog(write);
+      handler.generateProlog(writer);
+      handler.generate(writer, createChangeSet);
+      handler.generateEpilog(writer);
     }
   }
 

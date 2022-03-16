@@ -106,7 +106,9 @@ final class DScriptRunner implements ScriptRunner {
       try (Connection connection = obtainConnection()) {
         DdlRunner runner = new DdlRunner(useAutoCommit, scriptName, platformName);
         runner.runAll(content, connection);
-        connection.commit();
+        if (!connection.getAutoCommit()) {
+          connection.commit();
+        }
         runner.runNonTransactional(connection);
       }
 

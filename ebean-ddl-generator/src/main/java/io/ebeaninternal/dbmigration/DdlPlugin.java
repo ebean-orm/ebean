@@ -45,7 +45,6 @@ public class DdlPlugin implements Plugin {
   private boolean extraDdl;
   private boolean createOnly;
   private boolean jaxbPresent;
-  private boolean ddlAutoCommit;
   private String dbSchema;
   private ScriptTransform scriptTransform;
   private Platform platform;
@@ -71,7 +70,6 @@ public class DdlPlugin implements Plugin {
       final DatabasePlatform databasePlatform = server.databasePlatform();
       this.platform = databasePlatform.getPlatform();
       this.platformName = platform.base().name();
-      this.ddlAutoCommit = databasePlatform.isDdlAutoCommit();
       this.useMigrationStoredProcedures = config.getDatabasePlatform().isUseMigrationStoredProcedures();
       this.scriptTransform = createScriptTransform(config);
       this.baseDir = initBaseDir();
@@ -161,11 +159,11 @@ public class DdlPlugin implements Plugin {
 
     DdlRunner runner = createDdlRunner(expectErrors, scriptName);
     try {
-      if (expectErrors || ddlAutoCommit) {
+      if (expectErrors) {
         connection.setAutoCommit(true);
       }
       runner.runAll(scriptTransform.transform(content), connection);
-      if (expectErrors || ddlAutoCommit) {
+      if (expectErrors) {
         connection.setAutoCommit(false);
       }
       connection.commit();
@@ -300,21 +298,13 @@ public class DdlPlugin implements Plugin {
   }
 
   protected String generateDropAllDdl() {
-    try {
-      dropAllContent = currentModel().getDropAllDdl();
-      return dropAllContent;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    dropAllContent = currentModel().getDropAllDdl();
+    return dropAllContent;
   }
 
   protected String generateCreateAllDdl() {
-    try {
-      createAllContent = currentModel().getCreateDdl();
-      return createAllContent;
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    createAllContent = currentModel().getCreateDdl();
+    return createAllContent;
   }
 
   protected String getDropFileName() {

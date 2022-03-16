@@ -10,8 +10,6 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 
-import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
-
 /**
  * ScalarType for java.sql.Timestamp.
  */

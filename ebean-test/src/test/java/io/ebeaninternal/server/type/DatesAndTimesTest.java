@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.type;
 
 import static java.lang.String.format;
-import static org.junit.jupiter.api.Assumptions.assumeFalse;
 
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -18,13 +17,11 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import javax.sql.DataSource;
 
 import org.assertj.core.api.SoftAssertions;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

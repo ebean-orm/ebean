@@ -8,13 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicClobNoVer;
 
 import java.util.List;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestBasicClobNoVer extends BaseTestCase {
+class TestBasicClobNoVer extends BaseTestCase {
 
   @Test
-  public void test() {
+  void test() {
 
     EBasicClobNoVer entity = new EBasicClobNoVer();
     entity.setName("test");
@@ -65,4 +66,36 @@ public class TestBasicClobNoVer extends BaseTestCase {
     assertThat(entity.getDescription()).isEqualTo("modified");
   }
 
+  @Test
+  void refresh_withSoftDelete() {
+
+    EBasicClobNoVer bean = new EBasicClobNoVer();
+    bean.setDescription("hello");
+    DB.save(bean);
+
+    DB.refresh(bean);
+
+    LoggedSql.start();
+    bean.children().forEach(System.out::println);
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains(" and t0.deleted =");
+  }
+
+  @Test
+  void largeValueInsert() {
+    EBasicClobNoVer bean = new EBasicClobNoVer();
+    bean.setDescription(largeContent());
+    DB.save(bean);
+  }
+
+  private String largeContent() {
+    Random random = new Random();
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < 1048577; i++) {
+      sb.append((char) (random.nextInt(26) + 'a'));
+    }
+    return sb.toString();
+  }
 }

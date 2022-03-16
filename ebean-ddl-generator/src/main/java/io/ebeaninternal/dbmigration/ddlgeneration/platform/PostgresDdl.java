@@ -2,8 +2,8 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
-
-import java.io.IOException;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.migration.AlterColumn;
 
 /**
  * Postgres specific DDL.
@@ -40,7 +40,7 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
-  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) throws IOException {
+  public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) {
     apply.append(" partition by range (").append(partitionColumn).append(")");
   }
 
@@ -58,7 +58,10 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
-  public String alterColumnType(String tableName, String columnName, String type) {
-    return super.alterColumnType(tableName, columnName, type) + " using " + columnName + "::" + convert(type);
+  protected void alterColumnType(DdlWrite writer, AlterColumn alter) {
+    String type = convert(alter.getType());
+    alterTable(writer, alter.getTableName()).append(alterColumn, alter.getColumnName())
+      .append(columnSetType).append(type)
+      .append(" using ").append(alter.getColumnName()).append("::").append(type);
   }
 }

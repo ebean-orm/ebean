@@ -14,7 +14,6 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
 
   @Test
   void test() {
-
     HCustomer c1 = new HCustomer("c1", "c1");
     DB.save(c1);
 
@@ -60,9 +59,9 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
 
     assertThat(accesses).hasSize(2);
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).isEqualTo("select t0.dtype, t0.id, t0.accessor_id, t0.principal_id, t2.dtype, t0.access_account_number, t0.accessor_id, t2.dtype, t0.access_account_number, t1.cid, t1.name, t2.dtype, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number and t2.dtype = 'B' left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id in (?,?,?,?,?)");
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.dtype, t0.id, t0.accessor_id, t0.principal_id, t2.dtype, t0.access_account_number, t1.cid, t1.name, t2.dtype, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number and t2.dtype = 'B' left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id in (?,?,?,?,?)");
     } else {
-      assertThat(query.getGeneratedSql()).contains("select t0.dtype, t0.id, t0.accessor_id, t0.principal_id, t2.dtype, t0.access_account_number, t0.accessor_id, t2.dtype, t0.access_account_number, t1.cid, t1.name, t2.dtype, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number and t2.dtype = 'B' left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id ");
+      assertThat(query.getGeneratedSql()).contains("select t0.dtype, t0.id, t0.accessor_id, t0.principal_id, t2.dtype, t0.access_account_number, t1.cid, t1.name, t2.dtype, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number and t2.dtype = 'B' left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id ");
     }
   }
 

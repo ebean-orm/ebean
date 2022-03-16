@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 /**
@@ -76,7 +77,7 @@ public class H2HistoryTrigger implements Trigger {
   public void fire(Connection connection, Object[] oldRow, Object[] newRow) throws SQLException {
     if (oldRow != null) {
       // a delete or update event
-      Timestamp now = new Timestamp(System.currentTimeMillis());
+      LocalDateTime now = LocalDateTime.now();
       oldRow[effectEndPosition] = now;
       if (newRow != null) {
         // update event. Set the effective start timestamp to now.

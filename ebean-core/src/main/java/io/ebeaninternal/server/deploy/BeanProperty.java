@@ -992,7 +992,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public String renderDbType(DbPlatformType dbType, boolean strict) {
     if (dbColumnDefn != null) {
-      if(dbColumnDefn.endsWith(";")) {
+      if (dbColumnDefn.endsWith(";")) {
         return dbColumnDefn + dbType.renderType(dbLength, dbScale, strict);
       }
       return dbColumnDefn;
@@ -1165,7 +1165,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
-   * Returns true if this <code>isLob()</code> or the type will effectively map to a lob. 
+   * Returns true if this <code>isLob()</code> or the type will effectively map to a lob.
    */
   @Override
   public boolean isDbLob() {
@@ -1173,17 +1173,17 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       return true;
     }
     switch (dbType) {
-    case DbPlatformType.JSON:
-    case DbPlatformType.JSONB:
-      return dbLength == 0; // must be analog to DbPlatformTypeMapping.lookup
-    case DbPlatformType.JSONBlob:
-    case DbPlatformType.JSONClob:
-      return true;
-    default:
-      return false;
+      case DbPlatformType.JSON:
+      case DbPlatformType.JSONB:
+        return dbLength == 0; // must be analog to DbPlatformTypeMapping.lookup
+      case DbPlatformType.JSONBlob:
+      case DbPlatformType.JSONClob:
+        return true;
+      default:
+        return false;
     }
   }
-  
+
   public static boolean isLobType(int type) {
     switch (type) {
       case Types.CLOB:

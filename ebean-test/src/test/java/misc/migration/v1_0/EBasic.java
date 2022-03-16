@@ -47,7 +47,7 @@ public class EBasic {
 
   @Size(max=127)
   String description;
-
+  
   @Lob
   @Column(columnDefinition = "db2;blob(64M);")
   File descriptionFile;

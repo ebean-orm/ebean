@@ -98,4 +98,14 @@ public class Version<T> {
   public Map<String, ValuePair> getDiff() {
     return diff;
   }
+
+  @Override
+  public String toString() {
+    return "Version{" +
+      "bean=" + bean +
+      ", start=" + start +
+      ", end=" + end +
+      ", diff=" + diff +
+      '}';
+  }
 }
