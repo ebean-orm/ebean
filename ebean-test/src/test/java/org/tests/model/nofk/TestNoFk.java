@@ -267,7 +267,9 @@ public class TestNoFk extends BaseTestCase {
     assertThat(files).hasSize(2);
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.file_name, t0.owner_user_id, t0.owner_soft_del_user_id, t1.user_id, t1.user_name, t1.user_id is null from efile_no_fk t0 left join euser_no_fk_soft_del t1 on t1.user_id = t0.owner_soft_del_user_id");
+    if (isH2() || isPostgres()) {
+      assertThat(sql.get(0)).contains("select t0.file_name, t0.owner_user_id, t0.owner_soft_del_user_id, t1.user_id, t1.user_name, t1.user_id is null from efile_no_fk t0 left join euser_no_fk_soft_del t1 on t1.user_id = t0.owner_soft_del_user_id");
+    }
 
     EFileNoFk file1 = files.get(0);
     EFileNoFk file2 = files.get(1);
