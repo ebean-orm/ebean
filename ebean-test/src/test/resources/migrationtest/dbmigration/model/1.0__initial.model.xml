@@ -37,7 +37,7 @@
             <column name="id" type="bigint" primaryKey="true"/>
             <column name="one_id" type="bigint" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="SET_NULL" foreignKeyOnUpdate="RESTRICT"/>
         </createTable>
-        <createTable name="migtest_e_basic" pkName="pk_migtest_e_basic" tablespace="TSTABLES" indexTablespace="INDEXTS" lobTablespace="TSTABLES">
+        <createTable name="migtest_e_basic" pkName="pk_migtest_e_basic">
             <column name="id" type="integer" primaryKey="true"/>
             <column name="status" type="varchar(1)" checkConstraint="check ( status in ('N','A','I'))" checkConstraintName="ck_migtest_e_basic_status"/>
             <column name="status2" type="varchar(1)" defaultValue="'N'" notnull="true" checkConstraint="check ( status2 in ('N','A','I'))" checkConstraintName="ck_migtest_e_basic_status2"/>

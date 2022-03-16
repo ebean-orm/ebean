@@ -46,7 +46,6 @@
         <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" oneToOne="false" nullableColumns="name"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" oneToOne="false" nullableColumns="indextest4"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="indextest5" oneToOne="false" nullableColumns="indextest5"/>
-        <alterTable name="migtest_e_basic" tablespace="$TABLESPACE_DEFAULT" indexTablespace="$TABLESPACE_DEFAULT" lobTablespace="$TABLESPACE_DEFAULT"/>
         <alterColumn columnName="test_status" tableName="migtest_e_enum" dropCheckConstraint="ck_migtest_e_enum_test_status"/>
         <addHistoryTable baseTable="migtest_e_history"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history" type="bigint" currentType="varchar" currentNotnull="false" comment="Column altered to long now">
@@ -55,15 +54,7 @@
             </before>
         </alterColumn>
         <addTableComment name="migtest_e_history" comment="We have history now"/>
-        <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false">
-            <before platforms="mariadb">
-                <ddl>SET @@system_versioning_alter_history = 1</ddl>
-                <ddl>update ${table} set ${column} = 'unknown' where ${column} is null</ddl>
-            </before>
-            <before>
-                <ddl>update ${table} set ${column} = 'unknown' where ${column} is null</ddl>
-            </before>
-        </alterColumn>
+        <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="'unknown'" notnull="true" currentNotnull="false"/>
         <addColumn tableName="migtest_e_history2" withHistory="true">
             <column name="test_string2" type="varchar" historyExclude="true"/>
             <column name="test_string3" type="varchar" defaultValue="'unknown'" notnull="true"/>
@@ -82,21 +73,19 @@
         <createTable name="migtest_e_user" pkName="pk_migtest_e_user">
             <column name="id" type="integer" primaryKey="true"/>
         </createTable>
-        <alterTable name="migtest_mtm_c" tablespace="TESTTS" indexTablespace="TESTTS" lobTablespace="TESTTS"/>
-        <createTable name="migtest_mtm_c_migtest_mtm_m" pkName="pk_migtest_mtm_c_migtest_mtm_m" tablespace="TESTTS" indexTablespace="TESTTS" lobTablespace="TESTTS">
+        <createTable name="migtest_mtm_c_migtest_mtm_m" pkName="pk_migtest_mtm_c_migtest_mtm_m">
             <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
             <column name="migtest_mtm_m_id" type="bigint" notnull="true" primaryKey="true"/>
             <foreignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c"/>
             <foreignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m"/>
         </createTable>
-        <alterTable name="migtest_mtm_m" tablespace="TSMASTER" indexTablespace="TSMASTER" lobTablespace="TSMASTER"/>
-        <createTable name="migtest_mtm_m_migtest_mtm_c" pkName="pk_migtest_mtm_m_migtest_mtm_c" tablespace="TSMASTER" indexTablespace="TSMASTER" lobTablespace="TSMASTER">
+        <createTable name="migtest_mtm_m_migtest_mtm_c" pkName="pk_migtest_mtm_m_migtest_mtm_c">
             <column name="migtest_mtm_m_id" type="bigint" notnull="true" primaryKey="true"/>
             <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
             <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m"/>
             <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c"/>
         </createTable>
-        <createTable name="migtest_mtm_m_phone_numbers" pkName="pk_migtest_mtm_m_phone_numbers" tablespace="TSMASTER" indexTablespace="TSMASTER" lobTablespace="TSMASTER">
+        <createTable name="migtest_mtm_m_phone_numbers" pkName="pk_migtest_mtm_m_phone_numbers">
             <column name="migtest_mtm_m_id" type="bigint" notnull="true" references="migtest_mtm_m.id" foreignKeyName="fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" foreignKeyIndex="ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id"/>
             <column name="value" type="varchar" notnull="true"/>
         </createTable>

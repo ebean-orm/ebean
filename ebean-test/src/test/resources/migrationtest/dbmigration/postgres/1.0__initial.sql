@@ -162,40 +162,15 @@ create table migtest_oto_master (
   constraint pk_migtest_oto_master primary key (id)
 );
 
-create index if not exists ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
-create index if not exists ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
-create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where upper(name) = 'JIM';
-create index concurrently if not exists ix_migtest_oto_child_lowername_id on migtest_oto_child (lower(name),id);
-create index if not exists ix_migtest_oto_child_lowername on migtest_oto_child (lower(name));
-create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
-alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
-
-create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
-alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
-
-create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
-alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
-
+-- apply alter tables
 alter table migtest_e_history2 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history3 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history4 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history5 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history6 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+-- apply post alter
 create table migtest_e_history2_history(like migtest_e_history2);
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
-
-alter table migtest_e_history3 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-create table migtest_e_history3_history(like migtest_e_history3);
-create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-
-alter table migtest_e_history4 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-create table migtest_e_history4_history(like migtest_e_history4);
-create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-
-alter table migtest_e_history5 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-create table migtest_e_history5_history(like migtest_e_history5);
-create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
-
-alter table migtest_e_history6 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-create table migtest_e_history6_history(like migtest_e_history6);
-create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
-
 create or replace function migtest_e_history2_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -218,6 +193,9 @@ create trigger migtest_e_history2_history_upd
   before update or delete on migtest_e_history2
   for each row execute procedure migtest_e_history2_history_version();
 
+
+create table migtest_e_history3_history(like migtest_e_history3);
+create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
 create or replace function migtest_e_history3_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -240,6 +218,9 @@ create trigger migtest_e_history3_history_upd
   before update or delete on migtest_e_history3
   for each row execute procedure migtest_e_history3_history_version();
 
+
+create table migtest_e_history4_history(like migtest_e_history4);
+create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
 create or replace function migtest_e_history4_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -262,6 +243,9 @@ create trigger migtest_e_history4_history_upd
   before update or delete on migtest_e_history4
   for each row execute procedure migtest_e_history4_history_version();
 
+
+create table migtest_e_history5_history(like migtest_e_history5);
+create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 create or replace function migtest_e_history5_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -284,6 +268,9 @@ create trigger migtest_e_history5_history_upd
   before update or delete on migtest_e_history5
   for each row execute procedure migtest_e_history5_history_version();
 
+
+create table migtest_e_history6_history(like migtest_e_history6);
+create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
 create or replace function migtest_e_history6_history_version() returns trigger as $$
 declare
   lowerTs timestamptz;
@@ -306,3 +293,19 @@ create trigger migtest_e_history6_history_upd
   before update or delete on migtest_e_history6
   for each row execute procedure migtest_e_history6_history_version();
 
+
+-- foreign keys and indices
+create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
+alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
+
+create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
+alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
+
+create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
+alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;
+
+create index if not exists ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
+create index if not exists ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where upper(name) = 'JIM';
+create index concurrently if not exists ix_migtest_oto_child_lowername_id on migtest_oto_child (lower(name),id);
+create index if not exists ix_migtest_oto_child_lowername on migtest_oto_child (lower(name));
