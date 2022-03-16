@@ -165,6 +165,8 @@ alter table migtest_e_history6 drop versioning;
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
+CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_C','USERSPACE1','USERSPACE1','USERSPACE1','','','','','','MOVE');
+CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_M','USERSPACE1','USERSPACE1','USERSPACE1','','','','','','MOVE');
 -- apply alter tables
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status drop not null;

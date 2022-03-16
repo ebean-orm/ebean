@@ -87,18 +87,18 @@ create table migtest_mtm_c_migtest_mtm_m (
   migtest_mtm_c_id              integer not null,
   migtest_mtm_m_id              bigint not null,
   constraint pk_migtest_mtm_c_migtest_mtm_m primary key (migtest_mtm_c_id,migtest_mtm_m_id)
-);
+) in TESTTS index in TESTTS long in TESTTS;
 
 create table migtest_mtm_m_migtest_mtm_c (
   migtest_mtm_m_id              bigint not null,
   migtest_mtm_c_id              integer not null,
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
-);
+) in TSMASTER index in TSMASTER long in TSMASTER;
 
 create table migtest_mtm_m_phone_numbers (
   migtest_mtm_m_id              bigint not null,
   value                         varchar(255) not null
-);
+) in TSMASTER index in TSMASTER long in TSMASTER;
 
 
 update migtest_e_basic set status = 'A' where status is null;
@@ -107,6 +107,7 @@ update migtest_e_basic set status = 'A' where status is null;
 update migtest_e_basic set status = 'N' where id = 1;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
+CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_E_BASIC','USERSPACE1','USERSPACE1','USERSPACE1','','','','','','MOVE');
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
@@ -118,6 +119,8 @@ alter table migtest_e_history5 drop versioning;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 drop versioning;
+CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_C','TESTTS','TESTTS','TESTTS','','','','','','MOVE');
+CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_M','TSMASTER','TSMASTER','TSMASTER','','','','','','MOVE');
 -- apply alter tables
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
