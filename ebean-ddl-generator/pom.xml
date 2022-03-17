@@ -22,7 +22,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>12.13.0</version>
+      <version>${ebean-migration.version}</version>
     </dependency>
 
     <dependency>

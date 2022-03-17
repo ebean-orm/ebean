@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.run;
 
+import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.migration.MigrationConfig;
 import io.ebean.migration.MigrationRunner;
@@ -23,7 +24,9 @@ public class DbRunMigrationPlugin implements Plugin {
         migrationConfig.setDbSchema(dbSchema);
       }
       migrationConfig.setName(config.getName());
-      migrationConfig.setPlatform(config.getDatabasePlatform().getPlatform().base().name().toLowerCase());
+      Platform platform = config.getDatabasePlatform().getPlatform();
+      migrationConfig.setBasePlatform(platform.base().name().toLowerCase());
+      migrationConfig.setPlatform(platform.name().toLowerCase());
       migrationConfig.load(config.getProperties());
       migrationConfig.setRunPlaceholderMap(config.getDdlPlaceholderMap());
     }

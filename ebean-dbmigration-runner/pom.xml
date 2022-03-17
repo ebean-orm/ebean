@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>ebean-parent</artifactId>
@@ -16,22 +18,22 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration-auto</artifactId>
-      <version>1.1</version>
+      <version>${ebean-migration-auto.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
       <version>12.16.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-migration</artifactId>
-      <version>12.12.1</version>
+      <version>${ebean-migration.version}</version>
     </dependency>
-      </dependencies>
+  </dependencies>
 
   <build>
     <plugins>
