@@ -174,7 +174,7 @@ public class DB2Ddl extends PlatformDdl {
 
   @Override
   protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
-    return writer.applyAlterTable(tableName, Db2AlterTableWrite::new);
+    return writer.applyAlterTable(lowerTableName(tableName), Db2AlterTableWrite::new);
   };
 
   static class Db2AlterTableWrite extends BaseAlterTableWrite {

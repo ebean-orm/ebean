@@ -32,7 +32,8 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
     String historyTableName = tableName + historySuffix;
     DdlBuffer apply = writer.applyPostAlter();
 
-    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(historyTableName).append(" (").newLine();
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ")
+      .append(platformDdl.lowerTableName(historyTableName)).append(" (").newLine();
 
     // create history table
     Collection<MColumn> cols = table.allColumns();
@@ -126,11 +127,12 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   public void disableSystemVersioning(DdlBuffer apply, String tableName) {
-    apply.append("alter table ").append(tableName).append(" drop system versioning").endOfStatement();
+    apply.append("alter table ").append(platformDdl.lowerTableName(tableName)).append(" drop system versioning").endOfStatement();
   }
 
   public void enableSystemVersioning(DdlBuffer apply, String tableName, boolean validated) {
-    apply.append("alter table ").append(tableName).append(" add system versioning history table ").append(tableName).append(historySuffix);
+    apply.append("alter table ").append(platformDdl.lowerTableName(tableName))
+      .append(" add system versioning history table ").append(platformDdl.lowerTableName(tableName + historySuffix));
     if (!validated) {
       apply.append(" not validated");
     }

@@ -389,7 +389,7 @@ public class PlatformDdl {
    * Return the drop table statement (potentially with if exists clause).
    */
   public String dropTable(String tableName) {
-    return dropTableIfExists + tableName + dropTableCascade;
+    return dropTableIfExists + lowerTableName(tableName) + dropTableCascade;
   }
 
   /**
@@ -422,7 +422,7 @@ public class PlatformDdl {
     if (create.isNotExistsCheck()) {
       buffer.append(createIndexIfNotExists);
     }
-    buffer.append(maxConstraintName(create.getIndexName())).append(" on ").append(create.getTableName());
+    buffer.append(maxConstraintName(create.getIndexName())).append(" on ").append(lowerTableName(create.getTableName()));
     appendColumns(create.getColumns(), buffer);
     return buffer.toString();
   }
@@ -503,14 +503,14 @@ public class PlatformDdl {
    * Drop a unique constraint from the table (Sometimes this is an index).
    */
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
-    return "alter table " + tableName + " " + dropUniqueConstraint + " " + maxConstraintName(uniqueConstraintName);
+    return "alter table " + lowerTableName(tableName) + " " + dropUniqueConstraint + " " + maxConstraintName(uniqueConstraintName);
   }
 
   /**
    * Drop a unique constraint from the table.
    */
   public String alterTableDropConstraint(String tableName, String constraintName) {
-    return "alter table " + tableName + " " + dropConstraintIfExists + " " + maxConstraintName(constraintName);
+    return "alter table " + lowerTableName(tableName) + " " + dropConstraintIfExists + " " + maxConstraintName(constraintName);
   }
 
   /**
@@ -619,7 +619,7 @@ public class PlatformDdl {
    * Alter table adding the check constraint.
    */
   public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
-    return "alter table " + tableName + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + checkConstraint;
+    return "alter table " + lowerTableName(tableName) + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + checkConstraint;
   }
 
   /**
@@ -663,7 +663,7 @@ public class PlatformDdl {
    * Creates or replace a new DdlAlterTable for given tableName.
    */
   protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
-    return writer.applyAlterTable(tableName, BaseAlterTableWrite::new);
+    return writer.applyAlterTable(lowerTableName(tableName), BaseAlterTableWrite::new);
   }
 
   protected void appendColumns(String[] columns, StringBuilder buffer) {

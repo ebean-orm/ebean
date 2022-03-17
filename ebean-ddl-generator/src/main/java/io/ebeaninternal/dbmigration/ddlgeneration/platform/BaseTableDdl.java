@@ -223,7 +223,7 @@ public class BaseTableDdl implements TableDdl {
     String partitionMode = createTable.getPartitionMode();
 
     DdlBuffer apply = writer.apply();
-    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(tableName).append(" (");
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(lowerTableName(tableName)).append(" (");
     writeTableColumns(apply, columns, identity);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);

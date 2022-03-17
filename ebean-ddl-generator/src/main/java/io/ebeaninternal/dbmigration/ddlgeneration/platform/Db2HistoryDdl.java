@@ -39,7 +39,8 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
     String historyTableName = tableName + historySuffix;
 
     DdlBuffer apply = writer.applyPostAlter();
-    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(historyTableName).append(" (").newLine();
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ")
+      .append(platformDdl.lowerTableName(historyTableName)).append(" (").newLine();
 
     // create history table
     Collection<MColumn> cols = table.allColumns();

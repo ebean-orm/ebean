@@ -172,7 +172,8 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected void createHistoryTableAs(DdlBuffer apply, MTable table) {
-    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(table.getName()).append(historySuffix).append("(").newLine();
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ")
+      .append(platformDdl.lowerTableName(table.getName() + historySuffix)).append("(").newLine();
     for (MColumn column : table.allColumns()) {
       if (!column.isDraftOnly()) {
         writeColumnDefinition(apply, column.getName(), column.getType());
@@ -202,9 +203,9 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected void createWithHistoryView(DdlBuffer apply, String baseTableName) {
 
     apply
-      .append("create view ").append(baseTableName).append(viewSuffix)
-      .append(" as select * from ").append(baseTableName)
-      .append(" union all select * from ").append(baseTableName).append(historySuffix)
+      .append("create view ").append(platformDdl.lowerTableName(baseTableName)).append(viewSuffix)
+      .append(" as select * from ").append(platformDdl.lowerTableName(baseTableName))
+      .append(" union all select * from ").append(platformDdl.lowerTableName(baseTableName + historySuffix))
       .endOfStatement();
   }
 
@@ -214,11 +215,11 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected void dropWithHistoryView(DdlBuffer apply, String baseTableName) {
-    apply.append("drop view ").append(baseTableName).append(viewSuffix).endOfStatement();
+    apply.append("drop view ").append(platformDdl.lowerTableName(baseTableName + viewSuffix)).endOfStatement();
   }
 
   protected void dropHistoryTable(DdlBuffer apply, String baseTableName) {
-    apply.append("drop table ").append(baseTableName).append(historySuffix).endOfStatement().end();
+    apply.append("drop table ").append(platformDdl.lowerTableName(baseTableName + historySuffix)).endOfStatement().end();
   }
 
   protected void dropSysPeriodColumns(DdlWrite writer, String baseTableName) {
@@ -228,7 +229,8 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, String baseTable, List<String> columns) {
 
-    buffer.append("    insert into ").append(baseTable).append(historySuffix).append(" (").append(sysPeriodStart).append(",").append(sysPeriodEnd).append(",");
+    buffer.append("    insert into ").append(platformDdl.lowerTableName(baseTable + historySuffix))
+      .append(" (").append(sysPeriodStart).append(",").append(sysPeriodEnd).append(",");
     appendColumnNames(buffer, columns, "");
     buffer.append(") values (OLD.").append(sysPeriodStart).append(", ").append(sysPeriodEndValue).append(",");
     appendColumnNames(buffer, columns, "OLD.");

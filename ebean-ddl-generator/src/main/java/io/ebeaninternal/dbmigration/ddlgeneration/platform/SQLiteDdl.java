@@ -65,7 +65,7 @@ public class SQLiteDdl extends PlatformDdl {
 
   @Override
   protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
-    return writer.applyAlterTable(tableName, SQLiteAlterTableWrite::new);
+    return writer.applyAlterTable(lowerTableName(tableName), SQLiteAlterTableWrite::new);
   }
 
   static class SQLiteAlterTableWrite extends BaseAlterTableWrite {
