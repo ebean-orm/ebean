@@ -723,7 +723,7 @@ public class BaseTableDdl implements TableDdl {
       dropCheckConstraint(writer, alterColumn, alterColumn.getCheckConstraintName());
     }
 
-    if (hasValue(alterColumn.getType())
+    if (typeChange(alterColumn)
       || hasValue(alterColumn.getDefaultValue())
       || alterColumn.isNotnull() != null) {
       alterColumn(writer, alterColumn);
@@ -733,6 +733,18 @@ public class BaseTableDdl implements TableDdl {
       // add constraint last (after potential type change)
       addCheckConstraint(writer, alterColumn);
     }
+  }
+
+  private boolean typeChange(AlterColumn alterColumn) {
+    if (!hasValue(alterColumn.getType())) {
+      return false;
+    }
+    // check, if we have really a type change for that platform
+    // When specifying @Column("db2;clob(64K)") this would not alter
+    // other platforms from "String" to "String" for example
+    String currentType = platformDdl.convert(alterColumn.getCurrentType());
+    String type = platformDdl.convert(alterColumn.getType());
+    return !type.equals(currentType);
   }
 
   private void alterColumnComment(DdlWrite writer, AlterColumn alterColumn) {

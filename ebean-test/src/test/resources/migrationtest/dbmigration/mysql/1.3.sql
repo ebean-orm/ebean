@@ -24,6 +24,8 @@ create table migtest_e_ref (
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
+update migtest_e_basic set a_lob = 'X' where a_lob is null;
+
 update migtest_e_basic set user_id = 23 where user_id is null;
 drop trigger migtest_e_history2_history_upd;
 drop trigger migtest_e_history2_history_del;
@@ -43,6 +45,7 @@ update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 -- apply alter tables
 alter table migtest_e_basic modify status varchar(1);
 alter table migtest_e_basic modify status2 varchar(1) not null default 'N';
+alter table migtest_e_basic modify a_lob varchar(255) not null default 'X';
 alter table migtest_e_basic modify user_id integer not null default 23;
 alter table migtest_e_basic add column description_file longblob;
 alter table migtest_e_basic add column old_boolean tinyint(1) default 0 not null;

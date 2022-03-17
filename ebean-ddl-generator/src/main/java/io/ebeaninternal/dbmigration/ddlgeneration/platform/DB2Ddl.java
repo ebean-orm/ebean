@@ -8,6 +8,7 @@ import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
+import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
 
 /**
@@ -134,10 +135,31 @@ public class DB2Ddl extends PlatformDdl {
     return sb.toString();
   }
 
-@Override
-protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
-  return writer.applyAlterTable(tableName, Db2AlterTableWrite::new);
-};
+  @Override
+  protected void alterColumnType(DdlWrite writer, AlterColumn alter) {
+    String type = convert(alter.getType());
+    DB2ColumnOptionsParser parser = new DB2ColumnOptionsParser(type);
+    alterTable(writer, alter.getTableName()).append(alterColumn, alter.getColumnName())
+      .append(columnSetType).append(parser.getType());
+
+    if (parser.getInlineLength() != null) {
+      alterTable(writer, alter.getTableName()).append(alterColumn, alter.getColumnName())
+        .append("set").appendWithSpace(parser.getInlineLength());
+    }
+
+    if (parser.hasExtraOptions()) {
+      alterTable(writer, alter.getTableName()).raw("-- ignored options for ")
+        .append(alter.getTableName()).append(".").append(alter.getColumnName())
+        .append(": compact=").append(String.valueOf(parser.isCompact()))
+        .append(", logged=").append(String.valueOf(parser.isLogged()));
+    }
+  }
+
+  @Override
+  protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
+    return writer.applyAlterTable(tableName, Db2AlterTableWrite::new);
+  };
+
   static class Db2AlterTableWrite extends BaseAlterTableWrite {
 
     public Db2AlterTableWrite(String tableName) {

@@ -1,9 +1,12 @@
 package org.tests.model.basic;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
+
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +22,8 @@ public class EBasicClobNoVer {
    * Note that lobs default to FetchType.LAZY - see EBasicClobFetchEager.
    */
   @Lob
+  // Required for largeValueInsert-test. DB2 allows by default only 1MB
+  @Column(columnDefinition = "db2;clob(2M);")
   private String description;
 
   @OneToMany
