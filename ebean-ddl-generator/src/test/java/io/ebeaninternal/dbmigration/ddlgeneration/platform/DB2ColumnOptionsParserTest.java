@@ -13,6 +13,7 @@ public class DB2ColumnOptionsParserTest {
   void assertAll() {
     softly.assertAll();
   }
+
   @Test
   public void testParser() {
     DB2ColumnOptionsParser p = new DB2ColumnOptionsParser("blob(64M) inline length 200 logged compact");
