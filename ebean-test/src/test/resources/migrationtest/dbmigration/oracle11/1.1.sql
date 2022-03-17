@@ -99,6 +99,8 @@ alter table migtest_e_basic modify status not null;
 alter table migtest_e_basic modify status2 varchar2(127);
 alter table migtest_e_basic modify status2 default null;
 alter table migtest_e_basic modify status2 null;
+alter table migtest_e_basic modify a_lob default null;
+alter table migtest_e_basic modify a_lob null;
 alter table migtest_e_basic modify user_id null;
 alter table migtest_e_basic add new_string_field varchar2(255) default 'foo''bar' not null;
 alter table migtest_e_basic add new_boolean_field number(1) default 1 not null;

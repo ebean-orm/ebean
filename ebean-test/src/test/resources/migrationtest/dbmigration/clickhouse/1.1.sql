@@ -46,6 +46,8 @@ alter table migtest_e_basic alter column status set not null;
 alter table migtest_e_basic alter column status2 String;
 alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 set null;
+alter table migtest_e_basic alter column a_lob drop default;
+alter table migtest_e_basic alter column a_lob set null;
 alter table migtest_e_basic alter column user_id set null;
 alter table migtest_e_basic add column new_string_field String default 'foo''bar';
 alter table migtest_e_basic add column new_boolean_field UInt8 default 1;

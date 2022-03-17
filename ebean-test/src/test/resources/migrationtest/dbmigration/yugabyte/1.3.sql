@@ -27,6 +27,8 @@ create table migtest_e_ref (
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
+update migtest_e_basic set a_lob = 'X' where a_lob is null;
+
 update migtest_e_basic set user_id = 23 where user_id is null;
 drop trigger if exists migtest_e_history2_history_upd on migtest_e_history2 cascade;
 drop function if exists migtest_e_history2_history_version();
@@ -53,6 +55,9 @@ alter table migtest_e_basic alter column status drop not null;
 alter table migtest_e_basic alter column status2 type varchar(1) using status2::varchar(1);
 alter table migtest_e_basic alter column status2 set default 'N';
 alter table migtest_e_basic alter column status2 set not null;
+alter table migtest_e_basic alter column a_lob type varchar(255) using a_lob::varchar(255);
+alter table migtest_e_basic alter column a_lob set default 'X';
+alter table migtest_e_basic alter column a_lob set not null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column description_file bytea;

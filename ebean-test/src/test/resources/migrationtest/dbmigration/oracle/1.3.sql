@@ -99,6 +99,8 @@ create table migtest_e_ref (
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
+update migtest_e_basic set a_lob = 'X' where a_lob is null;
+
 update migtest_e_basic set user_id = 23 where user_id is null;
 
 -- NOTE: table has @History - special migration may be necessary
@@ -109,6 +111,9 @@ alter table migtest_e_basic modify status null;
 alter table migtest_e_basic modify status2 varchar2(1);
 alter table migtest_e_basic modify status2 default 'N';
 alter table migtest_e_basic modify status2 not null;
+alter table migtest_e_basic modify a_lob varchar2(255);
+alter table migtest_e_basic modify a_lob default 'X';
+alter table migtest_e_basic modify a_lob not null;
 alter table migtest_e_basic modify user_id default 23;
 alter table migtest_e_basic modify user_id not null;
 alter table migtest_e_basic add description_file blob;

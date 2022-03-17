@@ -27,6 +27,8 @@ create table migtest_e_ref (
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
+update migtest_e_basic set a_lob = 'X' where a_lob is null;
+
 update migtest_e_basic set user_id = 23 where user_id is null;
 
 -- NOTE: table has @History - special migration may be necessary
@@ -37,6 +39,9 @@ update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 -- not supported: alter table migtest_e_basic alter column status2 varchar(1);
 -- not supported: alter table migtest_e_basic alter column status2 set default 'N';
 -- not supported: alter table migtest_e_basic alter column status2 set not null;
+-- not supported: alter table migtest_e_basic alter column a_lob varchar(255);
+-- not supported: alter table migtest_e_basic alter column a_lob set default 'X';
+-- not supported: alter table migtest_e_basic alter column a_lob set not null;
 -- not supported: alter table migtest_e_basic alter column user_id set default 23;
 -- not supported: alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column description_file blob;
@@ -47,7 +52,6 @@ alter table migtest_e_basic add column eref_id integer;
 -- not supported: alter table migtest_e_history2 alter column test_string set null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
--- not supported: alter table migtest_e_history4 alter column test_number integer;
 -- not supported: alter table migtest_e_history6 alter column test_number1 drop default;
 -- not supported: alter table migtest_e_history6 alter column test_number1 set null;
 -- not supported: alter table migtest_e_history6 alter column test_number2 set default 7;
