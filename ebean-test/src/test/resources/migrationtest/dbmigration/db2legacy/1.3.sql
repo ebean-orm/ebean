@@ -157,6 +157,8 @@ create table migtest_e_ref (
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
+update migtest_e_basic set a_lob = 'X' where a_lob is null;
+
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_history2 drop versioning;
 alter table migtest_e_history3 drop versioning;
@@ -173,6 +175,11 @@ alter table migtest_e_basic alter column status drop not null;
 alter table migtest_e_basic alter column status2 set data type varchar(1);
 alter table migtest_e_basic alter column status2 set default 'N';
 alter table migtest_e_basic alter column status2 set not null;
+alter table migtest_e_basic alter column a_lob set data type clob(16K);
+alter table migtest_e_basic alter column a_lob set inline length 500;
+-- ignored options for migtest_e_basic.a_lob: compact=true, logged=true;
+alter table migtest_e_basic alter column a_lob set default 'X';
+alter table migtest_e_basic alter column a_lob set not null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column description_file blob(64M);

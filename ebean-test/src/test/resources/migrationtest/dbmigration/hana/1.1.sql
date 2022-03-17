@@ -97,6 +97,7 @@ alter table migtest_ckey_detail add (one_key integer,
 alter table migtest_ckey_parent add (assoc_id integer);
 alter table migtest_e_basic alter (status nvarchar(1) default 'A' not null,
    status2 nvarchar(127) default null,
+   a_lob nvarchar(255) default null,
    user_id integer);
 alter table migtest_e_basic add (new_string_field nvarchar(255) default 'foo''bar' not null,
    new_boolean_field boolean default true not null,

@@ -64,6 +64,7 @@ create table migtest_e_basic (
   description                   varchar(127),
   description_file              blob,
   json_list                     clob,
+  a_lob                         varchar(255) default 'X' not null,
   some_date                     timestamp,
   old_boolean                   int default 0 not null,
   old_boolean2                  int,
