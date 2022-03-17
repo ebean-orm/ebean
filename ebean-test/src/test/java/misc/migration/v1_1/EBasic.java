@@ -60,8 +60,11 @@ public class EBasic {
   String description;
 
   @DbJson
-  //@Column(columnDefinition = "db2;clob(16K);")
+  @Column(columnDefinition = "db2;clob(16K) inline length 500 compact;")
   List<String> jsonList;
+
+  @Column(columnDefinition = "db2;clob(16K) inline length 500 not logged;", nullable = true)
+  String aLob;
 
   //@NotNull
   //@DbDefault("2000-01-01T00:00:00") //- date time literals do not work for each platform yet

@@ -53,8 +53,13 @@ public class EBasic {
   File descriptionFile;
 
   @DbJson
-  //@Column(columnDefinition = "db2;clob(16K);")
+  @Column(columnDefinition = "db2;clob(16K) inline length 500 compact;")
   List<String> jsonList;
+
+  @NotNull
+  @DbDefault("X")
+  @Column(columnDefinition = "db2;clob(16K) inline length 500 compact;")
+  String aLob;
 
   Timestamp someDate;
 

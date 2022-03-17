@@ -1004,7 +1004,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the DB column default to use for DDL.
    */
   public String dbColumnDefault() {
-    return dbColumnDefn != null ? null : dbColumnDefault;
+    return dbColumnDefault;
   }
 
   /**
