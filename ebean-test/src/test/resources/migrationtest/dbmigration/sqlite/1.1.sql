@@ -58,6 +58,8 @@ alter table migtest_ckey_parent add column assoc_id integer;
 -- not supported: alter table migtest_e_basic alter column status2 varchar(127);
 -- not supported: alter table migtest_e_basic alter column status2 drop default;
 -- not supported: alter table migtest_e_basic alter column status2 set null;
+-- not supported: alter table migtest_e_basic alter column a_lob drop default;
+-- not supported: alter table migtest_e_basic alter column a_lob set null;
 -- not supported: alter table migtest_e_basic alter column user_id set null;
 alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add column new_boolean_field int default 1 not null;

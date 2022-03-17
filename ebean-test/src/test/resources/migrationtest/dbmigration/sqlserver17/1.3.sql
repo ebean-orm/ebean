@@ -32,6 +32,8 @@ create sequence migtest_e_ref_seq as bigint start with 1;
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
+update migtest_e_basic set a_lob = 'X' where a_lob is null;
+
 update migtest_e_basic set user_id = 23 where user_id is null;
 -- alter table migtest_e_history2 set (system_versioning = off (history_table=dbo.migtest_e_history2_history));
 -- history migration goes here
@@ -54,6 +56,9 @@ alter table migtest_e_basic alter column status nvarchar(1);
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, status2;
 alter table migtest_e_basic alter column status2 nvarchar(1) not null;
 alter table migtest_e_basic add default 'N' for status2;
+EXEC usp_ebean_drop_default_constraint migtest_e_basic, a_lob;
+alter table migtest_e_basic alter column a_lob nvarchar(255) not null;
+alter table migtest_e_basic add default 'X' for a_lob;
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, user_id;
 alter table migtest_e_basic alter column user_id integer not null;
 alter table migtest_e_basic add default 23 for user_id;

@@ -87,6 +87,8 @@ create column table migtest_e_ref (
 
 update migtest_e_basic set status2 = 'N' where status2 is null;
 
+update migtest_e_basic set a_lob = 'X' where a_lob is null;
+
 update migtest_e_basic set user_id = 23 where user_id is null;
 alter table migtest_e_history2 drop system versioning;
 alter table migtest_e_history3 drop system versioning;
@@ -99,6 +101,7 @@ update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 alter table migtest_e_basic alter (status nvarchar(1) default null,
    status2 nclob not null);
 alter table migtest_e_basic alter (status2 nvarchar(1) default 'N' not null,
+   a_lob nvarchar(255) default 'X' not null,
    user_id integer default 23 not null);
 alter table migtest_e_basic add (description_file blob,
    old_boolean boolean default false not null,
