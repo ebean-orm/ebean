@@ -70,7 +70,6 @@ alter table migtest_e_basic add column new_integer integer default 42 not null;
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2 add column new_column varchar(20);
--- not supported: alter table migtest_e_history4 alter column test_number integer;
 alter table migtest_e_history5 add column test_boolean int default 0 not null;
 -- not supported: alter table migtest_e_history6 alter column test_number1 set default 42;
 -- not supported: alter table migtest_e_history6 alter column test_number1 set not null;

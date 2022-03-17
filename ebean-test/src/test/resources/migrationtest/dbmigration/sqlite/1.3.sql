@@ -47,7 +47,6 @@ alter table migtest_e_basic add column eref_id integer;
 -- not supported: alter table migtest_e_history2 alter column test_string set null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
--- not supported: alter table migtest_e_history4 alter column test_number integer;
 -- not supported: alter table migtest_e_history6 alter column test_number1 drop default;
 -- not supported: alter table migtest_e_history6 alter column test_number1 set null;
 -- not supported: alter table migtest_e_history6 alter column test_number2 set default 7;
