@@ -86,13 +86,16 @@ class TestBasicClobNoVer extends BaseTestCase {
   @Test
   void largeValueInsert() {
     EBasicClobNoVer bean = new EBasicClobNoVer();
-    bean.setDescription(largeContent());
+    String s = largeContent();
+    bean.setDescription(s);
     DB.save(bean);
+    bean = DB.find(EBasicClobNoVer.class, bean.getId());
+    assertThat(bean.getDescription()).isEqualTo(s);
   }
 
   private String largeContent() {
     Random random = new Random();
-    StringBuilder sb = new StringBuilder();
+    StringBuilder sb = new StringBuilder(1048577);
     for (int i = 0; i < 1048577; i++) {
       sb.append((char) (random.nextInt(26) + 'a'));
     }
