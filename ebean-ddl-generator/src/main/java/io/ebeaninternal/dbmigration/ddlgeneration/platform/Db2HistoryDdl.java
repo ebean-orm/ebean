@@ -120,7 +120,7 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
   protected void writeColumnDefinition(DdlBuffer buffer, String columnName, String type, boolean isNotNull) {
 
     String platformType = platformDdl.convert(type);
-    buffer.append(" ").append(platformDdl.lowerColumnName(columnName));
+    buffer.append(" ").append(columnName);
     buffer.append(" ").append(platformType);
     if (isNotNull) {
       buffer.append(" not null");

@@ -204,7 +204,7 @@ public class BaseTableDdl implements TableDdl {
   public void generate(DdlWrite writer, CreateTable createTable) {
     reset();
 
-    String tableName = lowerTableName(createTable.getName());
+    String tableName = createTable.getName();
     List<Column> columns = createTable.getColumn();
     List<Column> pk = determinePrimaryKeyColumns(columns);
 
@@ -398,7 +398,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void writeForeignKey(DdlWrite writer, WriteForeignKey request) {
     DdlBuffer fkeyBuffer = writer.applyForeignKeys();
-    String tableName = lowerTableName(request.table());
+    String tableName = request.table();
     if (request.indexName() != null) {
       // no matching unique constraint so add the index
       fkeyBuffer.appendStatement(platformDdl.createIndex(new WriteCreateIndex(request.indexName(), tableName, request.cols(), false)));
@@ -423,7 +423,7 @@ public class BaseTableDdl implements TableDdl {
       if (i > 0) {
         buffer.append(",");
       }
-      buffer.append(lowerColumnName(columns[i].trim()));
+      buffer.append(columns[i].trim());
     }
     buffer.append(")");
   }
@@ -490,7 +490,7 @@ public class BaseTableDdl implements TableDdl {
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(uqName).append(" unique ");
     buffer.append("(");
-    buffer.append(lowerColumnName(column.getName()));
+    buffer.append(column.getName());
     buffer.append(")");
   }
 
@@ -512,20 +512,6 @@ public class BaseTableDdl implements TableDdl {
       cols[i] = columns.get(i).getName();
     }
     return cols;
-  }
-
-  /**
-   * Convert the table lower case.
-   */
-  protected String lowerTableName(String name) {
-    return naming.lowerTableName(name);
-  }
-
-  /**
-   * Convert the column name to lower case.
-   */
-  protected String lowerColumnName(String name) {
-    return naming.lowerColumnName(name);
   }
 
   /**

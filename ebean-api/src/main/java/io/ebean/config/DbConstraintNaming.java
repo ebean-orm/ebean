@@ -184,17 +184,4 @@ public class DbConstraintNaming {
     return normalise.normaliseColumn(tableName);
   }
 
-  /**
-   * Lower case the table name checking for quoted identifiers.
-   */
-  public String lowerTableName(String tableName) {
-    return normalise.lowerTableName(tableName);
-  }
-
-  /**
-   * Lower case the column name checking for quoted identifiers.
-   */
-  public String lowerColumnName(String name) {
-    return normalise.lowerColumnName(name);
-  }
 }

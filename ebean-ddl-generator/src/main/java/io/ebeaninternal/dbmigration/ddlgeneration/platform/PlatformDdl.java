@@ -258,7 +258,7 @@ public class PlatformDdl {
     }
 
     buffer.append("  ");
-    buffer.append(lowerColumnName(column.getName()), 29);
+    buffer.append(column.getName(), 29);
     buffer.append(columnDefn);
     if (!Boolean.TRUE.equals(column.isPrimaryKey())) {
       String defaultValue = convertDefaultValue(column.getDefaultValue());
@@ -435,7 +435,7 @@ public class PlatformDdl {
     StringBuilder buffer = new StringBuilder(90);
     buffer.append("foreign key");
     appendColumns(request.cols(), buffer);
-    buffer.append(" references ").append(lowerTableName(request.refTable()));
+    buffer.append(" references ").append(request.refTable());
     appendColumns(request.refCols(), buffer);
     appendForeignKeySuffix(request, buffer);
     return buffer.toString();
@@ -448,13 +448,13 @@ public class PlatformDdl {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer
-      .append("alter table ").append(lowerTableName(request.table()))
+      .append("alter table ").append(request.table())
       .append(" add constraint ").append(maxConstraintName(request.fkName()))
       .append(" foreign key");
     appendColumns(request.cols(), buffer);
     buffer
       .append(" references ")
-      .append(lowerTableName(request.refTable()));
+      .append(request.refTable());
     appendColumns(request.refCols(), buffer);
     appendForeignKeySuffix(request, buffer);
     if (options.isForeignKeySkipCheck()) {
@@ -665,29 +665,9 @@ public class PlatformDdl {
       if (i > 0) {
         buffer.append(",");
       }
-      buffer.append(lowerColumnName(columns[i].trim()));
+      buffer.append(columns[i].trim());
     }
     buffer.append(")");
-  }
-
-  /**
-   * Convert the table to lower case.
-   * <p>
-   * Override as desired. Generally lower case with underscore is a good cross database
-   * choice for column/table names.
-   */
-  protected String lowerTableName(String name) {
-    return naming.lowerTableName(name);
-  }
-
-  /**
-   * Convert the column name to lower case.
-   * <p>
-   * Override as desired. Generally lower case with underscore is a good cross database
-   * choice for column/table names.
-   */
-  protected String lowerColumnName(String name) {
-    return naming.lowerColumnName(name);
   }
 
   public DatabasePlatform getPlatform() {

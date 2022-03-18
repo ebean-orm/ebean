@@ -112,7 +112,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
                                        boolean isNotNull, String generated) {
 
     String platformType = platformDdl.convert(type);
-    buffer.append(" ").append(platformDdl.lowerColumnName(columnName));
+    buffer.append(" ").append(columnName);
     buffer.append(" ").append(platformType);
     if (defaultValue != null) {
       buffer.append(" default ").append(defaultValue);
