@@ -1,14 +1,12 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import java.util.Collection;
-
 import io.ebean.config.DatabaseConfig;
+import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
-import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
 
 /**
@@ -22,6 +20,7 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
   private String systemPeriodEnd;
   private String transactionId;
   private PlatformDdl platformDdl;
+  private DbConstraintNaming constraintNaming;
   private String historySuffix;
 
   @Override
@@ -30,35 +29,21 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";
     this.transactionId = config.getAsOfSysPeriod() + "_txn"; // required for DB2
     this.platformDdl = platformDdl;
+    this.constraintNaming = config.getConstraintNaming();
     this.historySuffix = config.getHistoryTableSuffix();
   }
 
   @Override
   public void createWithHistory(DdlWrite writer, MTable table) {
     String tableName = table.getName();
-    String historyTableName = tableName + historySuffix;
+    String historyTableName = historyTable(tableName);
 
-    DdlBuffer apply = writer.applyPostAlter();
-    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(historyTableName).append(" (").newLine();
-
-    // create history table
-    Collection<MColumn> cols = table.allColumns();
-    for (MColumn column : cols) {
-      if (!column.isDraftOnly()) {
-        writeColumnDefinition(apply, column.getName(), column.getType(), column.isNotnull() || column.isPrimaryKey());
-        apply.append(",").newLine();
-      }
-    }
-    writeColumnDefinition(apply, systemPeriodStart, "timestamp(12)", true);
-    apply.append(",").newLine();
-    writeColumnDefinition(apply, systemPeriodEnd, "timestamp(12)", true);
-    apply.append(",").newLine();
-    writeColumnDefinition(apply, transactionId, "timestamp(12)", false);
-    apply.newLine().append(")").endOfStatement();
-
-    // enable system versioning
+    // DB2 requires an EXACT copy (same column types with null/non-null, same order)
     addSysPeriodColumns(writer, tableName);
-    enableSystemVersioning(apply, tableName);
+    writer.applyPostAlter().append("create table ").append(historyTableName)
+      .append(" as (select * from ").append(tableName).append(") with no data").endOfStatement();
+
+    enableSystemVersioning(writer.applyPostAlter(), tableName);
     platformDdl.alterTable(writer, tableName).setHistoryHandled();
 
     // drop all: We do not drop columns here, as the whole table will be dropped
@@ -76,10 +61,10 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
 
   @Override
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
-    dropHistoryTable(writer, dropHistoryTable.getBaseTable(), dropHistoryTable.getBaseTable() + historySuffix);
+    dropHistoryTable(writer, dropHistoryTable.getBaseTable());
   }
 
-  protected void dropHistoryTable(DdlWrite writer, String baseTable, String historyTable) {
+  protected void dropHistoryTable(DdlWrite writer, String baseTable) {
     disableSystemVersioning(writer.apply(), baseTable);
     writer.apply().append("alter table ").append(baseTable).append(" drop period system_time").endOfStatement();
 
@@ -89,7 +74,7 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
     platformDdl.alterTableDropColumn(writer, baseTable, transactionId);
 
     // drop the history table
-    writer.applyPostAlter().append("drop table ").append(historyTable).endOfStatement();
+    writer.applyPostAlter().append("drop table ").append(historyTable(baseTable)).endOfStatement();
   }
 
   @Override
@@ -117,22 +102,16 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
     }
   }
 
-  protected void writeColumnDefinition(DdlBuffer buffer, String columnName, String type, boolean isNotNull) {
-
-    String platformType = platformDdl.convert(type);
-    buffer.append(" ").append(platformDdl.lowerColumnName(columnName));
-    buffer.append(" ").append(platformType);
-    if (isNotNull) {
-      buffer.append(" not null");
-    }
-  }
-
   public void disableSystemVersioning(DdlBuffer apply, String tableName) {
     apply.append("alter table ").append(tableName).append(" drop versioning").endOfStatement();
   }
 
   public void enableSystemVersioning(DdlBuffer apply, String tableName) {
-    apply.append("alter table ").append(tableName).append(" add versioning use history table ").append(tableName).append(historySuffix).endOfStatement();
+    apply.append("alter table ").append(tableName).append(" add versioning use history table ").append(historyTable(tableName)).endOfStatement();
+  }
+
+  protected String historyTable(String tableName) {
+    return constraintNaming.normaliseTable(tableName) + historySuffix;
   }
 
 }
