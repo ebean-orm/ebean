@@ -20,11 +20,16 @@ import io.ebeaninternal.dbmigration.model.MTable;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Controls the DDL generation for a specific database platform.
  */
 public class PlatformDdl {
+
+  // matches on pattern "check ( COLUMNAME ... )". ColumnName is match group 2;
+  private static final Pattern CHECK_PATTERN = Pattern.compile("(.*?\\( *)([^ ]+)(.*)");
 
   protected final DatabasePlatform platform;
 
@@ -278,7 +283,7 @@ public class PlatformDdl {
    * Returns the check constraint.
    */
   public String createCheckConstraint(String ckName, String checkConstraint) {
-    return "  constraint " + maxConstraintName(ckName) + " " + checkConstraint;
+    return "  constraint " + maxConstraintName(ckName) + " " + quoteCheckConstraint(checkConstraint);
   }
 
   /**
@@ -612,8 +617,9 @@ public class PlatformDdl {
    * Alter table adding the check constraint.
    */
   public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
-    return "alter table " + quote(tableName) + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + checkConstraint;
+    return "alter table " + quote(tableName) + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + quoteCheckConstraint(checkConstraint);
   }
+
 
   /**
    * Alter column setting the default value.
@@ -780,6 +786,14 @@ public class PlatformDdl {
 
   protected String quote(String dbName) {
     return platform.convertQuotedIdentifiers(dbName);
+  }
+
+  protected String quoteCheckConstraint(String checkConstraint) {
+    Matcher matcher = CHECK_PATTERN.matcher(checkConstraint);
+    if (matcher.matches()) {
+      return matcher.replaceFirst("$1" + quote(matcher.group(2)) + "$3");
+    }
+    return checkConstraint;
   }
 
 }

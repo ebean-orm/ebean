@@ -127,11 +127,11 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   }
 
   protected String historyTableName(String baseTableName) {
-    return normalise(baseTableName) + historySuffix;
+    return quote(normalise(baseTableName) + historySuffix);
   }
 
   protected String historyViewName(String baseTableName) {
-    return normalise(baseTableName) + viewSuffix;
+    return quote(normalise(baseTableName) + viewSuffix);
   }
 
   protected String procedureName(String baseTableName) {
@@ -193,7 +193,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     String platformType = platformDdl.convert(type);
     buffer.append("  ");
-    buffer.append(columnName, 29);
+    buffer.append(quote(columnName), 29);
     buffer.append(platformType);
   }
 
@@ -201,7 +201,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
     apply
       .append("create view ").append(historyViewName(baseTableName))
-      .append(" as select * from ").append(baseTableName)
+      .append(" as select * from ").append(quote(baseTableName))
       .append(" union all select * from ").append(historyTableName(baseTableName))
       .endOfStatement();
   }
@@ -267,5 +267,9 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   @Override
   public boolean alterHistoryTables() {
     return true;
+  }
+
+  protected String quote(String dbName) {
+    return platformDdl.quote(dbName);
   }
 }
