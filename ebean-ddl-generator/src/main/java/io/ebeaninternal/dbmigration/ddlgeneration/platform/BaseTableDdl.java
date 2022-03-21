@@ -222,7 +222,7 @@ public class BaseTableDdl implements TableDdl {
     String partitionMode = createTable.getPartitionMode();
 
     DdlBuffer apply = writer.apply();
-    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(tableName).append(" (");
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(platformDdl.quote(tableName)).append(" (");
     writeTableColumns(apply, columns, identity);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
@@ -423,7 +423,7 @@ public class BaseTableDdl implements TableDdl {
       if (i > 0) {
         buffer.append(",");
       }
-      buffer.append(columns[i].trim());
+      buffer.append(platformDdl.quote(columns[i].trim()));
     }
     buffer.append(")");
   }
@@ -490,7 +490,7 @@ public class BaseTableDdl implements TableDdl {
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(uqName).append(" unique ");
     buffer.append("(");
-    buffer.append(column.getName());
+    buffer.append(platformDdl.quote(column.getName()));
     buffer.append(")");
   }
 

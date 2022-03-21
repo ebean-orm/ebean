@@ -39,7 +39,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
 
   private void enableSystemVersioning(DdlWrite writer, String baseTable) {
     DdlBuffer apply = writer.applyPostAlter();
-    apply.append("alter table ").append(baseTable).newLine()
+    apply.append("alter table ").append(quote(baseTable)).newLine()
       .append("    add ").append(systemPeriodStart).append(" datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),").newLine()
       .append("        ").append(systemPeriodEnd).append("   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',").newLine()
       .append("period for system_time (").append(systemPeriodStart).append(", ").append(systemPeriodEnd).append(")").endOfStatement();
@@ -48,7 +48,8 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
       .append(historyTableWithSchema(baseTable)).append("))").endOfStatement();
 
     DdlBuffer drop = writer.dropAll();
-    drop.append("IF OBJECT_ID('").append(baseTable).append("', 'U') IS NOT NULL alter table ").append(baseTable).append(" set (system_versioning = off)").endOfStatement();
+    drop.append("IF OBJECT_ID('").append(quote(baseTable)).append("', 'U') IS NOT NULL alter table ")
+      .append(quote(baseTable)).append(" set (system_versioning = off)").endOfStatement();
     drop.append("IF OBJECT_ID('").append(historyTableName(baseTable)).append("', 'U') IS NOT NULL drop table ")
       .append(historyTableName(baseTable)).endOfStatement();
   }
@@ -68,8 +69,8 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
     // switch of versioning & period - must be done before altering
     DdlBuffer apply = writer.apply();
     apply.append("-- dropping history support for ").append(baseTable).endOfStatement();
-    apply.append("alter table ").append(baseTable).append(" set (system_versioning = off)").endOfStatement();
-    apply.append("alter table ").append(baseTable).append(" drop period for system_time").endOfStatement();
+    apply.append("alter table ").append(quote(baseTable)).append(" set (system_versioning = off)").endOfStatement();
+    apply.append("alter table ").append(quote(baseTable)).append(" drop period for system_time").endOfStatement();
     apply.end();
     // now drop tables & columns, they will go to alter table/post alter buffers
     platformDdl.alterTableDropColumn(writer, baseTable, systemPeriodStart);
@@ -90,13 +91,17 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
     if (!alter.isHistoryHandled()) {
       // SQL Server 2016 does not need triggers
       DdlBuffer apply = writer.apply();
-      apply.append("-- alter table ").append(tableName).append(" set (system_versioning = off (history_table=")
+      apply.append("-- alter table ").append(quote(tableName)).append(" set (system_versioning = off (history_table=")
         .append(historyTableWithSchema(tableName)).append("))").endOfStatement();
       apply.append("-- history migration goes here").newLine();
-      apply.append("-- alter table ").append(tableName).append(" set (system_versioning = on (history_table=")
+      apply.append("-- alter table ").append(quote(tableName)).append(" set (system_versioning = on (history_table=")
         .append(historyTableWithSchema(tableName)).append("))").endOfStatement();
     }
     alter.setHistoryHandled();
+  }
+
+  protected String quote(String baseTable) {
+    return platformDdl.quote(baseTable);
   }
 
   protected String normalise(String tableName) {

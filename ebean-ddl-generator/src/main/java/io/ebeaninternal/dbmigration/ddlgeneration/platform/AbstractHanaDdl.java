@@ -200,10 +200,10 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
   /**
    * Joins alter table commands and add open/closing brackets for the alter statements
    */
-  private static class HanaAlterTableWrite extends BaseAlterTableWrite {
+  class HanaAlterTableWrite extends BaseAlterTableWrite {
 
     public HanaAlterTableWrite(String tableName) {
-      super(tableName);
+      super(tableName, AbstractHanaDdl.this);
     }
 
     @Override

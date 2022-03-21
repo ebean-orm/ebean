@@ -68,9 +68,9 @@ public class SQLiteDdl extends PlatformDdl {
     return writer.applyAlterTable(tableName, SQLiteAlterTableWrite::new);
   }
 
-  static class SQLiteAlterTableWrite extends BaseAlterTableWrite {
+  class SQLiteAlterTableWrite extends BaseAlterTableWrite {
     public SQLiteAlterTableWrite(String tableName) {
-      super(tableName);
+      super(tableName, SQLiteDdl.this);
     }
 
     @Override

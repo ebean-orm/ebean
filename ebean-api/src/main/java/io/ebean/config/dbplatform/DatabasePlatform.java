@@ -165,7 +165,7 @@ public class DatabasePlatform {
    * want to use quoted identifiers for. The backticks get converted to the
    * appropriate characters in convertQuotedIdentifiers
    */
-  private static final char BACK_TICK = '`';
+  private static final char[] QUOTED_IDENTIFIERS = new char[] { '"', '\'', '[', ']', '`' };
 
   /**
    * The non-escaped like clause (to stop slash being escaped on some platforms).
@@ -662,8 +662,8 @@ public class DatabasePlatform {
   public String convertQuotedIdentifiers(String dbName) {
     // Ignore null values e.g. schema name or catalog
     if (dbName != null && !dbName.isEmpty()) {
-      if (dbName.charAt(0) == BACK_TICK) {
-        if (dbName.charAt(dbName.length() - 1) == BACK_TICK) {
+      if (isQuote(dbName.charAt(0))) {
+        if (isQuote(dbName.charAt(dbName.length() - 1))) {
           return openQuote + dbName.substring(1, dbName.length() - 1) + closeQuote;
         } else {
           log.error("Missing backquote on [" + dbName + "]");
@@ -673,6 +673,15 @@ public class DatabasePlatform {
       }
     }
     return dbName;
+  }
+
+  private boolean isQuote(char ch) {
+    for (char identifer : QUOTED_IDENTIFIERS) {
+      if (identifer == ch) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
