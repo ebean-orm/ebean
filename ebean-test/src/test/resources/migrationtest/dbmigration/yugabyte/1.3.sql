@@ -178,6 +178,7 @@ create trigger migtest_e_history6_history_upd
   before update or delete on migtest_e_history6
   for each row execute procedure migtest_e_history6_history_version();
 
+comment on column "table"."index" is 'this is a comment';
 -- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;

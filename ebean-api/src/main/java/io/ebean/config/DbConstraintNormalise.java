@@ -58,30 +58,16 @@ public class DbConstraintNormalise {
   /**
    * Trim off the platform quoted identifier quotes like [ ' and ".
    */
-  public boolean notQuoted(String tableName) {
+  public String trimQuotes(String identifier) {
 
-    // remove quoted identifier characters
-    for (String quotedIdentifier : quotedIdentifiers) {
-      if (tableName.contains(quotedIdentifier)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Trim off the platform quoted identifier quotes like [ ' and ".
-   */
-  public String trimQuotes(String tableName) {
-
-    if (tableName == null) {
+    if (identifier == null) {
       return "";
     }
     // remove quoted identifier characters
     for (String quotedIdentifier : quotedIdentifiers) {
-      tableName = tableName.replace(quotedIdentifier, "");
+      identifier = identifier.replace(quotedIdentifier, "");
     }
-    return tableName;
+    return identifier;
   }
 
 

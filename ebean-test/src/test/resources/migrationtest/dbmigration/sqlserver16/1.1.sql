@@ -61,7 +61,11 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 -- alter table migtest_e_history6 set (system_versioning = off (history_table=dbo.migtest_e_history6_history));
 -- history migration goes here
 -- alter table migtest_e_history6 set (system_versioning = on (history_table=dbo.migtest_e_history6_history));
+-- alter table [table] set (system_versioning = off (history_table=dbo.table_history));
+-- history migration goes here
+-- alter table [table] set (system_versioning = on (history_table=dbo.table_history));
 -- apply alter tables
+alter table [table] add [select] varchar(255);
 alter table migtest_ckey_detail add one_key integer;
 alter table migtest_ckey_detail add two_key varchar(127);
 alter table migtest_ckey_parent add assoc_id integer;
@@ -109,6 +113,7 @@ alter table migtest_e_history
         sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
 period for system_time (sys_periodFrom, sys_periodTo);
 alter table migtest_e_history set (system_versioning = on (history_table=dbo.migtest_e_history_history));
+create unique nonclustered index uq_table_select on "table"("select") where "select" is not null;
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);

@@ -161,10 +161,10 @@ public class DB2Ddl extends PlatformDdl {
     return writer.applyAlterTable(tableName, Db2AlterTableWrite::new);
   };
 
-  static class Db2AlterTableWrite extends BaseAlterTableWrite {
+  class Db2AlterTableWrite extends BaseAlterTableWrite {
 
     public Db2AlterTableWrite(String tableName) {
-      super(tableName);
+      super(tableName, DB2Ddl.this);
     }
 
     @Override

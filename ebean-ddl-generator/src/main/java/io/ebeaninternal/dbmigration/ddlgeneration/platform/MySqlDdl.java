@@ -32,13 +32,14 @@ public class MySqlDdl extends PlatformDdl {
    */
   @Override
   public String dropIndex(String indexName, String tableName, boolean concurrent) {
-    return "drop index " + maxConstraintName(indexName) + " on " + tableName;
+    return "drop index " + maxConstraintName(indexName) + " on " + quote(tableName);
   }
 
   @Override
   public void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
     if (this.useMigrationStoredProcedures) {
-      alterTable(writer, tableName).raw("CALL usp_ebean_drop_column('").append(tableName).append("', '").append(columnName).append("')");
+      alterTable(writer, tableName).raw("CALL usp_ebean_drop_column('").append(naming.normaliseTable(tableName))
+        .append("', '").append(naming.normaliseColumn(columnName)).append("')");
     } else {
       super.alterTableDropColumn(writer, tableName, columnName);
     }
@@ -49,7 +50,7 @@ public class MySqlDdl extends PlatformDdl {
    */
   @Override
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + tableName + " drop foreign key " + maxConstraintName(fkName);
+    return "alter table " + quote(tableName) + " drop foreign key " + maxConstraintName(fkName);
   }
 
   @Override
@@ -146,7 +147,7 @@ public class MySqlDdl extends PlatformDdl {
     if (DdlHelp.isDropComment(tableComment)) {
       tableComment = "";
     }
-    apply.append(String.format("alter table %s comment = '%s'", tableName, tableComment)).endOfStatement();
+    apply.append(String.format("alter table %s comment = '%s'", quote(tableName), tableComment)).endOfStatement();
   }
 
   @Override

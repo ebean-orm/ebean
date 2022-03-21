@@ -91,7 +91,9 @@ alter table migtest_e_history5 drop system versioning;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 drop system versioning;
+alter table "table" drop system versioning;
 -- apply alter tables
+alter table "table" add ("select" nvarchar(255));
 alter table migtest_ckey_detail add (one_key integer,
    two_key nvarchar(127));
 alter table migtest_ckey_parent add (assoc_id integer);
@@ -121,6 +123,7 @@ alter table migtest_e_history6 alter (test_number1 integer default 42 not null,
 alter table migtest_e_history6_history alter (test_number2 integer);
 alter table migtest_e_softdelete add (deleted boolean default false not null);
 alter table migtest_oto_child add (master_id bigint);
+alter table table_history add ("select" nvarchar(255));
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 -- cannot create unique index "uq_migtest_e_basic_description" on table "migtest_e_basic" with nullable columns;
@@ -151,6 +154,9 @@ alter table migtest_e_history3 add system versioning history table migtest_e_his
 alter table migtest_e_history4 add system versioning history table migtest_e_history4_history not validated;
 alter table migtest_e_history5 add system versioning history table migtest_e_history5_history not validated;
 alter table migtest_e_history6 add system versioning history table migtest_e_history6_history not validated;
+comment on column "table"."index" is 'this is an other comment';
+alter table "table" add system versioning history table table_history not validated;
+-- cannot create unique index "uq_table_select" on table ""table"" with nullable columns;
 -- foreign keys and indices
 -- explicit index "ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" for single column "migtest_mtm_c_id" of table "migtest_mtm_c_migtest_mtm_m" is not necessary;
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;

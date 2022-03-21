@@ -54,7 +54,10 @@ drop view migtest_e_history5_with_history;
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 drop trigger migtest_e_history6_history_upd;
 drop view migtest_e_history6_with_history;
+drop trigger table_history_upd;
+drop view table_with_history;
 -- apply alter tables
+alter table "table" add column "select" varchar(255);
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -92,6 +95,7 @@ alter table migtest_e_history6 alter column test_number2 set null;
 alter table migtest_e_history6_history alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 alter table migtest_oto_child add column master_id bigint;
+alter table table_history add column "select" varchar(255);
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
@@ -124,6 +128,10 @@ create view migtest_e_history5_with_history as select * from migtest_e_history5 
 create trigger migtest_e_history5_history_upd before update,delete on migtest_e_history5 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
 create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
 create trigger migtest_e_history6_history_upd before update,delete on migtest_e_history6 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+comment on column "table"."index" is 'this is an other comment';
+create view table_with_history as select * from "table" union all select * from table_history;
+create trigger table_history_upd before update,delete on "table" for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+alter table "table" add constraint uq_table_select unique  ("select");
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;

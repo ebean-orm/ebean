@@ -69,7 +69,12 @@ drop trigger if exists migtest_e_history6_history_upd on migtest_e_history6 casc
 drop function if exists migtest_e_history6_history_version();
 
 drop view migtest_e_history6_with_history;
+drop trigger if exists table_history_upd on "table" cascade;
+drop function if exists table_history_version();
+
+drop view table_with_history;
 -- apply alter tables
+alter table "table" add column "select" varchar(255);
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -106,6 +111,7 @@ alter table migtest_e_history6 alter column test_number2 drop not null;
 alter table migtest_e_history6_history alter column test_number2 drop not null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 alter table migtest_oto_child add column master_id bigint;
+alter table table_history add column "select" varchar(255);
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
@@ -259,6 +265,31 @@ create trigger migtest_e_history6_history_upd
   before update or delete on migtest_e_history6
   for each row execute procedure migtest_e_history6_history_version();
 
+comment on column "table"."index" is 'this is an other comment';
+create view table_with_history as select * from "table" union all select * from table_history;
+create or replace function table_history_version() returns trigger as $$
+declare
+  lowerTs timestamptz;
+  upperTs timestamptz;
+begin
+  lowerTs = lower(OLD.sys_period);
+  upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
+  if (TG_OP = 'UPDATE') then
+    insert into table_history (sys_period,"index", "from", "to", "varchar", "select", "foreign") values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+    NEW.sys_period = tstzrange(upperTs,null);
+    return new;
+  elsif (TG_OP = 'DELETE') then
+    insert into table_history (sys_period,"index", "from", "to", "varchar", "select", "foreign") values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+    return old;
+  end if;
+end;
+$$ LANGUAGE plpgsql;
+
+create trigger table_history_upd
+  before update or delete on "table"
+  for each row execute procedure table_history_version();
+
+alter table "table" add constraint uq_table_select unique  ("select");
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;

@@ -31,7 +31,7 @@ public class H2HistoryDdl extends DbTriggerBasedHistoryDdl {
     // Note that this does not take into account the historyTable name (excepts _history suffix) and
     // does not take into account excluded columns (all columns included in history)
     apply
-      .append("create trigger ").append(triggerName).append(" before update,delete on ").append(baseTable)
+      .append("create trigger ").append(triggerName).append(" before update,delete on ").append(quote(baseTable))
       .append(" for each row call \"" + TRIGGER_CLASS + "\";").newLine();
   }
 

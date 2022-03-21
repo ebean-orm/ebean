@@ -115,6 +115,14 @@ create table migtest_e_softdelete (
   test_string                   String
 ) ENGINE = Log();
 
+create table "table" (
+  "index"                       String,
+  "from"                        String,
+  "to"                          String,
+  "varchar"                     String,
+  "foreign"                     String
+) ENGINE = Log();
+
 create table migtest_mtm_c (
   id                            UInt32,
   name                          String

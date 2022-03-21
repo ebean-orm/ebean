@@ -392,9 +392,7 @@ public class ModelContainer {
     for (Object change : changeSet.getChangeSetChildren()) {
       if (change instanceof DropColumn) {
         DropColumn dropColumn = (DropColumn) change;
-        if (Boolean.TRUE.equals(dropColumn.isWithHistory())) {
-          registerPendingDropColumn(dropColumn);
-        }
+        registerPendingDropColumn(dropColumn);
       }
     }
   }
