@@ -95,9 +95,10 @@ public class DB2Ddl extends PlatformDdl {
       .append("begin\n")
       .append("if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = '")
       .append(maxConstraintName(constraintName).toUpperCase())
-      .append("' and tabname = '").append(lowerTableName(tableName).toUpperCase()).append("') then\n")
 
-      .append("  prepare stmt from 'alter table ").append(lowerTableName(tableName))
+      .append("' and tabname = '").append(naming.normaliseTable(tableName).toUpperCase()).append("') then\n")
+
+      .append("  prepare stmt from 'alter table ").append(tableName)
       .append(" drop constraint ").append(maxConstraintName(constraintName)).append("';\n")
 
       .append("  execute stmt;\n")

@@ -33,10 +33,6 @@ public class DbConstraintNamingTest {
   @Test
   public void testDefaultToLower() {
     assertThat(naming.normaliseTable("SCH.FOO_BAR]")).isEqualTo("foo_bar");
-    assertThat(naming.lowerTableName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
-    assertThat(naming.lowerTableName("SCH.FOO_BAR")).isEqualTo("sch.foo_bar");
-    assertThat(naming.lowerColumnName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
-    assertThat(naming.lowerColumnName("SCH.FOO_BAR")).isEqualTo("sch.foo_bar");
   }
 
   @Test
@@ -44,11 +40,7 @@ public class DbConstraintNamingTest {
     DbConstraintNaming naming = new DbConstraintNaming(false, true);
     assertThat(naming.normaliseTable("SCH.FOO_BAR]")).isEqualTo("FOO_BAR");
     assertThat(naming.normaliseColumn("SCH.FOO_BAR]")).isEqualTo("sch.foo_bar");
-    assertThat(naming.lowerTableName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
     // table name not lowered
-    assertThat(naming.lowerTableName("SCH.FOO_BAR")).isEqualTo("SCH.FOO_BAR");
-    assertThat(naming.lowerColumnName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
-    assertThat(naming.lowerColumnName("SCH.FOO_BAR")).isEqualTo("sch.foo_bar");
   }
 
   @Test
@@ -56,11 +48,7 @@ public class DbConstraintNamingTest {
     DbConstraintNaming naming = new DbConstraintNaming(true, false);
     assertThat(naming.normaliseTable("SCH.FOO_BAR]")).isEqualTo("foo_bar");
     assertThat(naming.normaliseColumn("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR");
-    assertThat(naming.lowerTableName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
-    assertThat(naming.lowerTableName("SCH.FOO_BAR")).isEqualTo("sch.foo_bar");
-    assertThat(naming.lowerColumnName("SCH.FOO_BAR]")).isEqualTo("SCH.FOO_BAR]");
     // column name not lowered
-    assertThat(naming.lowerColumnName("SCH.FOO_BAR")).isEqualTo("SCH.FOO_BAR");
   }
 
   @Test
