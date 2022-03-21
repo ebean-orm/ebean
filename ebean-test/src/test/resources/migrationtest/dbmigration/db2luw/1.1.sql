@@ -179,13 +179,7 @@ create unique index uq_migtest_e_basic_status_indextest1 on migtest_e_basic(stat
 create unique index uq_migtest_e_basic_name on migtest_e_basic(name) exclude null keys;
 create unique index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) exclude null keys;
 create unique index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) exclude null keys;
-create table migtest_e_history_history (
- id integer not null,
- test_string bigint,
- sys_period_start timestamp(12) not null,
- sys_period_end timestamp(12) not null,
- sys_period_txn timestamp(12)
-);
+create table migtest_e_history_history as (select * from migtest_e_history) with no data;
 alter table migtest_e_history add versioning use history table migtest_e_history_history;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 comment on table migtest_e_history is 'We have history now';
