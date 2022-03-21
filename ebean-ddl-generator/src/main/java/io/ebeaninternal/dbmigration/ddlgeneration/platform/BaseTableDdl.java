@@ -755,7 +755,7 @@ public class BaseTableDdl implements TableDdl {
    * Return the name of the history table given the base table name.
    */
   protected String historyTable(String baseTable) {
-    return baseTable + historyTableSuffix;
+    return naming.normaliseTable(baseTable) + historyTableSuffix;
   }
 
   /**

@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
+import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -16,6 +17,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   private String systemPeriodStart;
   private String systemPeriodEnd;
   private PlatformDdl platformDdl;
+  private DbConstraintNaming constraintNaming;
   private String historySuffix;
 
   @Override
@@ -23,13 +25,14 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
     this.systemPeriodStart = config.getAsOfSysPeriod() + "_start";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";
     this.platformDdl = platformDdl;
+    this.constraintNaming = config.getConstraintNaming();
     this.historySuffix = config.getHistoryTableSuffix();
   }
 
   @Override
   public void createWithHistory(DdlWrite writer, MTable table) {
     String tableName = table.getName();
-    String historyTableName = tableName + historySuffix;
+    String historyTableName = historyTableName(tableName);
     DdlBuffer apply = writer.applyPostAlter();
 
     apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(historyTableName).append(" (").newLine();
@@ -66,7 +69,7 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   @Override
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
     dropHistoryTable(writer.applyDropDependencies(), dropHistoryTable.getBaseTable(),
-      dropHistoryTable.getBaseTable() + historySuffix);
+      historyTableName(dropHistoryTable.getBaseTable()));
   }
 
   protected void dropHistoryTable(DdlBuffer apply, String baseTable, String historyTable) {
@@ -130,11 +133,15 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   public void enableSystemVersioning(DdlBuffer apply, String tableName, boolean validated) {
-    apply.append("alter table ").append(tableName).append(" add system versioning history table ").append(tableName).append(historySuffix);
+    apply.append("alter table ").append(tableName).append(" add system versioning history table ").append(historyTableName(tableName));
     if (!validated) {
       apply.append(" not validated");
     }
     apply.endOfStatement();
+  }
+
+  protected String historyTableName(String tableName) {
+    return constraintNaming.normaliseTable(tableName) + historySuffix;
   }
 
 }

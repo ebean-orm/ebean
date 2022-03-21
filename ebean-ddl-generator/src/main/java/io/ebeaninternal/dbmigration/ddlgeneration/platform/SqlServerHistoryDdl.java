@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
+import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -17,30 +18,23 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   private String systemPeriodStart;
   private String systemPeriodEnd;
   private PlatformDdl platformDdl;
+  protected DbConstraintNaming constraintNaming;
+  protected String historySuffix;
 
   @Override
   public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
     this.systemPeriodStart = config.getAsOfSysPeriod() + "From";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "To";
     this.platformDdl = platformDdl;
+
+    this.constraintNaming = config.getConstraintNaming();
+    this.historySuffix = config.getHistoryTableSuffix();
   }
 
   @Override
   public void createWithHistory(DdlWrite writer, MTable table) {
     String baseTable = table.getName();
     enableSystemVersioning(writer, baseTable);
-  }
-
-  String getHistoryTable(String baseTable) {
-    String historyTable = baseTable + "_history";
-    if (baseTable.startsWith("[")) {
-      historyTable = historyTable.replace("]", "") + "]";
-    }
-    if (historyTable.indexOf('.') == -1) {
-      // history must contain schema, add the default schema if none was specified
-      historyTable = "dbo." + historyTable;
-    }
-    return historyTable;
   }
 
   private void enableSystemVersioning(DdlWrite writer, String baseTable) {
@@ -51,11 +45,12 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
       .append("period for system_time (").append(systemPeriodStart).append(", ").append(systemPeriodEnd).append(")").endOfStatement();
 
     apply.append("alter table ").append(baseTable).append(" set (system_versioning = on (history_table=")
-      .append(getHistoryTable(baseTable)).append("))").endOfStatement();
+      .append(historyTableWithSchema(baseTable)).append("))").endOfStatement();
 
     DdlBuffer drop = writer.dropAll();
     drop.append("IF OBJECT_ID('").append(baseTable).append("', 'U') IS NOT NULL alter table ").append(baseTable).append(" set (system_versioning = off)").endOfStatement();
-    drop.append("IF OBJECT_ID('").append(baseTable).append("_history', 'U') IS NOT NULL drop table ").append(baseTable).append("_history").endOfStatement();
+    drop.append("IF OBJECT_ID('").append(historyTableName(baseTable)).append("', 'U') IS NOT NULL drop table ")
+      .append(historyTableName(baseTable)).endOfStatement();
   }
 
   @Override
@@ -79,7 +74,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
     // now drop tables & columns, they will go to alter table/post alter buffers
     platformDdl.alterTableDropColumn(writer, baseTable, systemPeriodStart);
     platformDdl.alterTableDropColumn(writer, baseTable, systemPeriodEnd);
-    writer.applyPostAlter().appendStatement(platformDdl.dropTable(baseTable + "_history"));
+    writer.applyPostAlter().appendStatement(platformDdl.dropTable(historyTableName(baseTable)));
   }
 
   @Override
@@ -96,12 +91,31 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
       // SQL Server 2016 does not need triggers
       DdlBuffer apply = writer.apply();
       apply.append("-- alter table ").append(tableName).append(" set (system_versioning = off (history_table=")
-        .append(getHistoryTable(tableName)).append("))").endOfStatement();
+        .append(historyTableWithSchema(tableName)).append("))").endOfStatement();
       apply.append("-- history migration goes here").newLine();
       apply.append("-- alter table ").append(tableName).append(" set (system_versioning = on (history_table=")
-        .append(getHistoryTable(tableName)).append("))").endOfStatement();
+        .append(historyTableWithSchema(tableName)).append("))").endOfStatement();
     }
     alter.setHistoryHandled();
+  }
+
+  protected String normalise(String tableName) {
+    return constraintNaming.normaliseTable(tableName);
+  }
+
+  protected String historyTableName(String baseTableName) {
+    return normalise(baseTableName) + historySuffix;
+  }
+
+  protected String historyTableWithSchema(String baseTableName) {
+    String historyTable = historyTableName(baseTableName);
+    int lastPeriod = baseTableName.lastIndexOf('.');
+    if (lastPeriod == -1) {
+      // history must contain schema, add the default schema if none was specified
+      return "dbo." + historyTable;
+    } else {
+      return baseTableName.substring(0, lastPeriod + 1) + historyTable;
+    }
   }
 
 }
