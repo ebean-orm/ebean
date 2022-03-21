@@ -456,6 +456,13 @@ public class MTable {
   }
 
   /**
+   * Returns true, if there are pending dropped columns.
+   */
+  public boolean hasDroppedColumns() {
+    return !droppedColumns.isEmpty();
+  }
+
+  /**
    * Return all the columns (excluding columns marked as dropped).
    */
   public Collection<MColumn> allColumns() {
