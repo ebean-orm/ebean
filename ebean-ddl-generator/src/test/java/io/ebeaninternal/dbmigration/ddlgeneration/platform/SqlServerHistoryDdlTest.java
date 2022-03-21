@@ -2,6 +2,9 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import org.junit.jupiter.api.Test;
 
+import io.ebean.config.DatabaseConfig;
+import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class SqlServerHistoryDdlTest {
@@ -10,8 +13,12 @@ public class SqlServerHistoryDdlTest {
   public void getHistoryTable() {
 
     SqlServerHistoryDdl ddl = new SqlServerHistoryDdl();
-    assertThat(ddl.getHistoryTable("foo")).isEqualTo("dbo.foo_history");
-    assertThat(ddl.getHistoryTable("bar.foo")).isEqualTo("bar.foo_history");
-    assertThat(ddl.getHistoryTable("[Foo]")).isEqualTo("dbo.[Foo_history]");
+    ddl.configure(new DatabaseConfig(), new SqlServerDdl(new SqlServer17Platform()));
+    assertThat(ddl.historyTableWithSchema("foo")).isEqualTo("dbo.foo_history");
+    assertThat(ddl.historyTableWithSchema("bar.foo")).isEqualTo("bar.foo_history");
+    // test with reserved keywords in quotes
+    assertThat(ddl.historyTableWithSchema("[select]")).isEqualTo("dbo.select_history");
+    assertThat(ddl.historyTableWithSchema("\"select\"")).isEqualTo("dbo.select_history");
+    assertThat(ddl.historyTableWithSchema("`select`")).isEqualTo("dbo.select_history");
   }
 }
