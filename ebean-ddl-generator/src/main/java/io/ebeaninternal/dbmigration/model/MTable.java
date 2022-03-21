@@ -278,7 +278,7 @@ public class MTable {
       if (localColumn == null) {
         // can ignore if draftOnly column and non-draft table
         if (!newColumn.isDraftOnly() || draft) {
-          diffNewColumn(newColumn);
+          diffNewColumn(newColumn, newTable);
         }
       } else {
         localColumn.compare(modelDiff, this, newColumn);
@@ -581,11 +581,11 @@ public class MTable {
   /**
    * Add a 'new column' to the AddColumn migration object.
    */
-  private void diffNewColumn(MColumn newColumn) {
+  private void diffNewColumn(MColumn newColumn, MTable newTable) {
     if (addColumn == null) {
       addColumn = new AddColumn();
       addColumn.setTableName(name);
-      if (withHistory) {
+      if (newTable.isWithHistory()) {
         // These addColumns need to occur on the history
         // table as well as the base table
         addColumn.setWithHistory(Boolean.TRUE);
