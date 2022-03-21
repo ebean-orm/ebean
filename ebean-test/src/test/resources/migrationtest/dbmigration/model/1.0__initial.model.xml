@@ -100,6 +100,15 @@
             <column name="id" type="integer" primaryKey="true"/>
             <column name="test_string" type="varchar"/>
         </createTable>
+        <createTable name="&quot;table&quot;" withHistory="true" identityType="external" pkName="pk_table">
+            <column name="&quot;index&quot;" type="varchar" primaryKey="true" comment="this is a comment"/>
+            <column name="&quot;from&quot;" type="varchar"/>
+            <column name="&quot;to&quot;" type="varchar"/>
+            <column name="&quot;varchar&quot;" type="varchar"/>
+            <column name="&quot;foreign&quot;" type="varchar" references="&quot;table&quot;.&quot;index&quot;" foreignKeyName="fk_table_foreign" foreignKeyIndex="ix_table_foreign"/>
+            <uniqueConstraint name="uq_table_to" columnNames="&quot;to&quot;" oneToOne="false" nullableColumns="&quot;to&quot;"/>
+            <uniqueConstraint name="uq_table_varchar" columnNames="&quot;varchar&quot;" oneToOne="false" nullableColumns="&quot;varchar&quot;"/>
+        </createTable>
         <createTable name="migtest_mtm_c" pkName="pk_migtest_mtm_c">
             <column name="id" type="integer" primaryKey="true"/>
             <column name="name" type="varchar"/>
@@ -118,6 +127,7 @@
         </createTable>
         <createIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic" columns="indextest1"/>
         <createIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic" columns="indextest5"/>
+        <createIndex indexName="ix_table_from" tableName="&quot;table&quot;" columns="&quot;from&quot;"/>
         <createIndex indexName="idxd_migtest_0" tableName="migtest_oto_child" columns="" definition="create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where upper(name) = 'JIM'" platforms="POSTGRES"/>
         <createIndex indexName="ix_migtest_oto_child_lowername_id" tableName="migtest_oto_child" columns="lower(name),id" concurrent="true" platforms="POSTGRES"/>
         <createIndex indexName="ix_migtest_oto_child_lowername" tableName="migtest_oto_child" columns="lower(name)" platforms="POSTGRES"/>

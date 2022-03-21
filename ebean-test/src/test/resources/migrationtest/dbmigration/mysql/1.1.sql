@@ -56,7 +56,11 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 drop trigger migtest_e_history6_history_upd;
 drop trigger migtest_e_history6_history_del;
 drop view migtest_e_history6_with_history;
+drop trigger table_history_upd;
+drop trigger table_history_del;
+drop view table_with_history;
 -- apply alter tables
+alter table `table` add column `select` varchar(255);
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -88,6 +92,7 @@ alter table migtest_e_history6 modify test_number2 integer;
 alter table migtest_e_history6_history modify test_number2 integer;
 alter table migtest_e_softdelete add column deleted tinyint(1) default 0 not null;
 alter table migtest_oto_child add column master_id bigint;
+alter table table_history add column `select` varchar(255);
 -- apply post alter
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 -- NOTE: table has @History - special migration may be necessary
@@ -177,6 +182,19 @@ create trigger migtest_e_history6_history_del before delete on migtest_e_history
     insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number1, OLD.test_number2);
 end$$
 unlock tables;
+create view table_with_history as select * from "table" union all select * from table_history;
+lock tables "table" write;
+delimiter $$
+create trigger table_history_upd before update on "table" for each row begin
+    insert into table_history (sys_period_start,sys_period_end,"index", "from", "to", "varchar", "select", "foreign") values (OLD.sys_period_start, now(6),OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+    set NEW.sys_period_start = now(6);
+end$$
+delimiter $$
+create trigger table_history_del before delete on "table" for each row begin
+    insert into table_history (sys_period_start,sys_period_end,"index", "from", "to", "varchar", "select", "foreign") values (OLD.sys_period_start, now(6),OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+end$$
+unlock tables;
+alter table `table` add constraint uq_table_select unique  (`select`);
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;

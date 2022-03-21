@@ -155,6 +155,15 @@ create table migtest_e_softdelete (
 );
 create sequence migtest_e_softdelete_seq as bigint start with 1;
 
+create table [table] (
+  [index]                       nvarchar(255) not null,
+  [from]                        nvarchar(255),
+  [to]                          nvarchar(255),
+  [varchar]                     nvarchar(255),
+  [foreign]                     nvarchar(255),
+  constraint pk_table primary key ([index])
+);
+
 create table migtest_mtm_c (
   id                            integer not null,
   name                          nvarchar(255),
@@ -212,6 +221,13 @@ alter table migtest_e_history6
 period for system_time (sys_periodFrom, sys_periodTo);
 alter table migtest_e_history6 set (system_versioning = on (history_table=dbo.migtest_e_history6_history));
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
+create unique nonclustered index uq_table_to on "table"("to") where "to" is not null;
+create unique nonclustered index uq_table_varchar on "table"("varchar") where "varchar" is not null;
+alter table [table]
+    add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
+        sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
+period for system_time (sys_periodFrom, sys_periodTo);
+alter table "table" set (system_versioning = on (history_table=dbo.table_history));
 -- foreign keys and indices
 create index ix_migtest_fk_cascade_one_id on migtest_fk_cascade (one_id);
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;
@@ -222,5 +238,9 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 
+create index ix_table_foreign on [table] ([foreign]);
+alter table [table] add constraint fk_table_foreign foreign key ([foreign]) references [table] ([index]);
+
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_table_from on [table] ([from]);

@@ -217,6 +217,7 @@ alter table migtest_e_history2 add versioning use history table migtest_e_histor
 alter table migtest_e_history3 add versioning use history table migtest_e_history3_history;
 alter table migtest_e_history4 add versioning use history table migtest_e_history4_history;
 alter table migtest_e_history6 add versioning use history table migtest_e_history6_history;
+comment on column "table"."index" is 'this is a comment';
 -- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
