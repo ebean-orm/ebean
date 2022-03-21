@@ -285,15 +285,15 @@ end$$
 unlock tables;
 
 create table table_history(
-  "index"                       varchar(255),
-  "from"                        varchar(255),
-  "to"                          varchar(255),
-  "varchar"                     varchar(255),
-  "foreign"                     varchar(255),
+  `index`                       varchar(255),
+  `from`                        varchar(255),
+  `to`                          varchar(255),
+  `varchar`                     varchar(255),
+  `foreign`                     varchar(255),
   sys_period_start              datetime(6),
   sys_period_end                datetime(6)
 );
-create view table_with_history as select * from "table" union all select * from table_history;
+create view table_with_history as select * from `table` union all select * from table_history;
 lock tables "table" write;
 delimiter $$
 create trigger table_history_upd before update on "table" for each row begin

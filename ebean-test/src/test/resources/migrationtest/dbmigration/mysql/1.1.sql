@@ -182,7 +182,7 @@ create trigger migtest_e_history6_history_del before delete on migtest_e_history
     insert into migtest_e_history6_history (sys_period_start,sys_period_end,id, test_number1, test_number2) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_number1, OLD.test_number2);
 end$$
 unlock tables;
-create view table_with_history as select * from "table" union all select * from table_history;
+create view table_with_history as select * from `table` union all select * from table_history;
 lock tables "table" write;
 delimiter $$
 create trigger table_history_upd before update on "table" for each row begin
