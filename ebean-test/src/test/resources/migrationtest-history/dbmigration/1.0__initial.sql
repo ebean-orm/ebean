@@ -5,13 +5,15 @@ create table migtest_e_history7 (
   constraint pk_migtest_e_history7 primary key (id)
 );
 
+-- apply alter tables
 alter table migtest_e_history7 add column sys_period_start timestamp default now();
 alter table migtest_e_history7 add column sys_period_end timestamp;
+-- apply post alter
 create table migtest_e_history7_history(
   id                            integer,
   sys_period_start              timestamp,
   sys_period_end                timestamp
 );
 create view migtest_e_history7_with_history as select * from migtest_e_history7 union all select * from migtest_e_history7_history;
-
 create trigger migtest_e_history7_history_upd before update,delete on migtest_e_history7 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+
