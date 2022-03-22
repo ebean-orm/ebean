@@ -52,3 +52,27 @@ Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
 [Maven central - all related projects](http://search.maven.org/#search%7Cga%7C1%7Cebean "maven central all related projects")
 
+
+## Early access builds
+
+<p>
+  <a href="https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml">
+    <img alt="ebean EA" src="https://img.shields.io/github/workflow/status/ebean-orm/ebean/JDK%20EA?label=ebean%20EA">
+  </a>
+  <a href="https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml">
+    <img alt="ebean-datasource EA" src="https://img.shields.io/github/workflow/status/ebean-orm/ebean-datasource/JDK%20EA?label=ebean-datasource%20EA">
+  </a>
+  <a href="https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml">
+    <img alt="ebean-migration EA" src="https://img.shields.io/github/workflow/status/ebean-orm/ebean-migration/JDK%20EA?label=ebean-migration%20EA">
+  </a>
+</p>
+
+<p>
+<a href="https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml">
+  <img src="https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml/badge.svg" alt="ebean" style="max-width: 100%;">
+</a>
+
+<a href="https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml">
+  <img src="https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml/badge.svg" alt="ebean-datasource" style="max-width: 100%;">
+</a>
+</p>
