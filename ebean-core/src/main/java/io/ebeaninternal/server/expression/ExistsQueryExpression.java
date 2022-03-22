@@ -1,19 +1,11 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 
-import java.io.IOException;
 import java.util.List;
 
 final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpression {
@@ -52,7 +44,7 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) {
     throw new IllegalStateException("Not supported");
   }
 
@@ -77,7 +69,7 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
   /**
    * Compile/build the sub query.
    */
-  protected CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
+  CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.database();
     return ebeanServer.compileQuery(Type.SQ_EXISTS, subQuery, queryRequest.transaction());
   }

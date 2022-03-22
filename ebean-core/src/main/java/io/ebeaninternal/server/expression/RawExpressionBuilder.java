@@ -16,7 +16,7 @@ final class RawExpressionBuilder {
    */
   static RawExpression buildSingle(String raw, Object value) {
     if (isExpand(value, raw, BP_1)) {
-      Collection val = (Collection) value;
+      Collection<?> val = (Collection<?>) value;
       raw = raw.replace(BP_1, expand(val));
       return new RawExpression(raw, val.toArray());
     }
@@ -50,8 +50,7 @@ final class RawExpressionBuilder {
     return "?" + (i + 1);
   }
 
-  private static String expand(Collection values) {
-
+  private static String expand(Collection<?> values) {
     StringBuilder sqlExpand = new StringBuilder(values.size() * 2);
     for (int i = 0; i < values.size(); i++) {
       if (i > 0) {
@@ -72,7 +71,7 @@ final class RawExpressionBuilder {
       if (!isExpand(values[i], raw, match)) {
         params.add(values[i]);
       } else {
-        Collection val = (Collection) values[i];
+        Collection<?> val = (Collection<?>) values[i];
         params.addAll(val);
         raw = raw.replace(match, expand(val));
       }

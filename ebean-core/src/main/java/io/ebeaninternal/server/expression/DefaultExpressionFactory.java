@@ -186,7 +186,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   /**
    * Case Insensitive Equal To - property equal to the given value (typically
-   * using a lower() function to make it case insensitive).
+   * using a lower() function to make it case-insensitive).
    */
   @Override
   public Expression ieq(String propertyName, String value) {
@@ -198,7 +198,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   /**
    * Case Insensitive Equal To - property equal to the given value (typically
-   * using a lower() function to make it case insensitive).
+   * using a lower() function to make it case-insensitive).
    */
   @Override
   public Expression ine(String propertyName, String value) {
@@ -336,7 +336,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
-   * Case insensitive {@link #exampleLike(Object)}
+   * Case-insensitive {@link #exampleLike(Object)}
    */
   @Override
   public ExampleExpression iexampleLike(Object example) {
@@ -344,7 +344,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
-   * Create the query by Example expression which is case sensitive and using
+   * Create the query by Example expression which is case-sensitive and using
    * LikeType.RAW (you need to add you own wildcards % and _).
    */
   @Override
@@ -375,9 +375,9 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
-   * Case insensitive Like - property like value where the value contains the
-   * SQL wild card characters % (percentage) and _ (underscore). Typically uses
-   * a lower() function to make the expression case insensitive.
+   * Case-insensitive Like - property like value where the value contains the
+   * SQL wild card characters % (percentage) and _ (underscore). Typically, uses
+   * a lower() function to make the expression case-insensitive.
    */
   @Override
   public Expression ilike(String propertyName, String value) {
@@ -397,8 +397,8 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
-   * Case insensitive Starts With - property like value%. Typically uses a
-   * lower() function to make the expression case insensitive.
+   * Case-insensitive Starts With - property like value%. Typically, uses a
+   * lower() function to make the expression case-insensitive.
    */
   @Override
   public Expression istartsWith(String propertyName, String value) {
@@ -414,8 +414,8 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
-   * Case insensitive Ends With - property like %value. Typically uses a lower()
-   * function to make the expression case insensitive.
+   * Case-insensitive Ends With - property like %value. Typically, uses a lower()
+   * function to make the expression case-insensitive.
    */
   @Override
   public Expression iendsWith(String propertyName, String value) {
@@ -431,8 +431,8 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   /**
-   * Case insensitive Contains - property like %value%. Typically uses a lower()
-   * function to make the expression case insensitive.
+   * Case-insensitive Contains - property like %value%. Typically, uses a lower()
+   * function to make the expression case-insensitive.
    */
   @Override
   public Expression icontains(String propertyName, String value) {

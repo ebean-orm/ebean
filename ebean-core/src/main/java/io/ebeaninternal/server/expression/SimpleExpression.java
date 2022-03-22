@@ -55,7 +55,7 @@ public final class SimpleExpression extends AbstractValueExpression {
     }
   }
 
-  public final String getPropName() {
+  public String getPropName() {
     return propName;
   }
 

@@ -9,7 +9,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +53,7 @@ final class InPairsExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) {
     throw new RuntimeException("Not supported with document query");
   }
 

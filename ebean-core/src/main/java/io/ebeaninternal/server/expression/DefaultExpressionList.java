@@ -162,7 +162,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       writeDocQuery(context, null);
 
     } else {
-      // this is a Top level "text" expressions so we may need to wrap in Bool SHOULD etc.
+      // this is a Top level "text" expressions, so we may need to wrap in Bool SHOULD etc.
       if (list.isEmpty()) {
         throw new IllegalStateException("empty expression list?");
       }

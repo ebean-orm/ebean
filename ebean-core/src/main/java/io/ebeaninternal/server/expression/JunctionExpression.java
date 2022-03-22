@@ -868,7 +868,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public Query<T> select(FetchGroup fetchGroup) {
+  public Query<T> select(FetchGroup<T> fetchGroup) {
     return exprList.select(fetchGroup);
   }
 

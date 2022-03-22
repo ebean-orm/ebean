@@ -4,8 +4,6 @@ import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
-import java.io.IOException;
-
 /**
  * Bitwise expression.
  */
@@ -25,7 +23,7 @@ final class BitwiseExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) {
     throw new IllegalStateException("Not supported for document queries");
   }
 

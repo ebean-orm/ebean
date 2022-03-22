@@ -35,7 +35,7 @@ public final class CacheIdLookupMany<T> implements CacheIdLookup<T> {
   @Override
   public List<T> removeHits(BeanCacheResult<T> cacheResult) {
     Set<Object> hitIds = new HashSet<>();
-    List<T> beans = new ArrayList<>(hitIds.size());
+    List<T> beans = new ArrayList<>();
     for (BeanCacheResult.Entry<T> hit : cacheResult.hits()) {
       hitIds.add(hit.getKey());
       beans.add(hit.getBean());

@@ -40,7 +40,7 @@ abstract class AbstractTextExpression extends AbstractExpression {
   @Override
   public void queryBindKey(BindValuesKey key) {
     // do nothing, only execute against document store
-  };
+  }
 
   @Override
   public boolean isSameByBind(SpiExpression other) {

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * In a collection of Id values.
+ * In a collection of ID values.
  */
 public final class IdInExpression extends NonPrepareExpression implements IdInCommon {
 
@@ -73,7 +73,7 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
     if (idCollection.isEmpty()) {
       return;
     }
-    // Bind the Id values including EmbeddedId and multiple Id
+    // Bind the ID values including EmbeddedId and multiple ID
 
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     BeanDescriptor<?> descriptor = r.getBeanDescriptor();
@@ -82,7 +82,7 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
   }
 
   /**
-   * For use with deleting non attached detail beans during stateless update.
+   * For use with deleting non-attached detail beans during stateless update.
    */
   public void addSqlNoAlias(SpiExpressionRequest request) {
 
@@ -116,7 +116,7 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
   }
 
   /**
-   * Incorporates the number of Id values to bind.
+   * Incorporates the number of ID values to bind.
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {

@@ -1,15 +1,10 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.query.CQuery;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -42,7 +37,7 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
+  public void writeDocQuery(DocQueryContext context) {
     throw new IllegalStateException("Not supported");
   }
 
