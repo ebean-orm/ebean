@@ -34,8 +34,8 @@ public class ModelContainerApplyTest {
 
     MTable foo = model.getTable("foo");
     assertThat(foo.getComment()).isEqualTo("comment");
-    assertThat(foo.getTablespace()).isEqualTo("fooSpace");
-    assertThat(foo.getIndexTablespace()).isEqualTo("fooIndexSpace");
+    assertThat(foo.getTablespaceMeta().getTablespaceName()).isEqualTo("fooSpace");
+    assertThat(foo.getTablespaceMeta().getIndexTablespace()).isEqualTo("fooIndexSpace");
     assertThat(foo.isWithHistory()).isEqualTo(false);
     assertThat(foo.allColumns()).extracting("name").contains("col1", "col3", "added_to_foo");
   }

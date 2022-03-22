@@ -163,6 +163,8 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected void createHistoryTable(DdlBuffer apply, MTable table) {
     createHistoryTableAs(apply, table);
     createHistoryTableWithPeriod(apply);
+
+    apply.endOfStatement();
   }
 
   protected void createHistoryTableAs(DdlBuffer apply, MTable table) {
@@ -183,7 +185,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     writeColumnDefinition(apply, sysPeriodStart, sysPeriodType);
     apply.append(",").newLine();
     writeColumnDefinition(apply, sysPeriodEnd, sysPeriodType);
-    apply.newLine().append(")").endOfStatement();
+    apply.newLine().append(")");
   }
 
   /**

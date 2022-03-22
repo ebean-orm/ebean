@@ -9,6 +9,7 @@ import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
+import io.ebeaninternal.dbmigration.migration.AlterTable;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
@@ -48,6 +49,8 @@ public class BaseDdlHandler implements DdlHandler {
         // ignore
       } else if (change instanceof DropTable) {
         generate(writer, (DropTable) change);
+      } else if (change instanceof AlterTable) {
+        generate(writer, (AlterTable) change);
       } else if (change instanceof AddTableComment) {
         generate(writer, (AddTableComment) change);
       } else if (change instanceof CreateIndex) {
@@ -92,6 +95,11 @@ public class BaseDdlHandler implements DdlHandler {
   @Override
   public void generate(DdlWrite writer, DropTable dropTable) {
     tableDdl.generate(writer, dropTable);
+  }
+
+  @Override
+  public void generate(DdlWrite writer, AlterTable alterTable) {
+    tableDdl.generate(writer, alterTable);
   }
 
   @Override
