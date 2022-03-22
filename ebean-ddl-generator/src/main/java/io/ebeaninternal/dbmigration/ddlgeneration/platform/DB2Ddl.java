@@ -15,6 +15,7 @@ import io.ebeaninternal.dbmigration.migration.Column;
  * DB2 platform specific DDL.
  */
 public class DB2Ddl extends PlatformDdl {
+  private static final String MOVE_TABLE = "CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'%s','%s','%s','%s','','','','','','MOVE')";
 
   public DB2Ddl(DatabasePlatform platform) {
     super(platform);
@@ -29,6 +30,16 @@ public class DB2Ddl extends PlatformDdl {
     this.historyDdl = new Db2HistoryDdl();
   }
 
+  @Override
+  public String alterTableTablespace(String tablename, String tableSpace, String indexSpace, String lobSpace) {
+    if(tableSpace == null) {
+      // if no tableSpace set, use the default tablespace USERSPACE1
+      return String.format(MOVE_TABLE, tablename.toUpperCase(), "USERSPACE1", "USERSPACE1", "USERSPACE1");
+    } else {
+      return String.format(MOVE_TABLE, tablename.toUpperCase(), tableSpace, indexSpace, lobSpace);
+    }
+  }
+  
   @Override
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
     if (nullableColumns == null || nullableColumns.length == 0) {
@@ -51,6 +62,11 @@ public class DB2Ddl extends PlatformDdl {
     return sb.toString();
   }
 
+  @Override
+  public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) {
+    apply.append(" in ").append(tablespaceName).append(" index in ").append(indexTablespace).append(" long in ").append(lobTablespace);
+  }
+  
   @Override
   public void alterTableAddColumn(DdlWrite writer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
 

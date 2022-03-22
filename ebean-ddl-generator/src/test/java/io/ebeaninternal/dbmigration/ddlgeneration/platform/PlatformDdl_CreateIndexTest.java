@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.DB;
 import io.ebean.config.DatabaseConfig;
+import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
@@ -23,6 +24,7 @@ public class PlatformDdl_CreateIndexTest {
   private final PlatformDdl oraDdl = PlatformDdlBuilder.create(new OraclePlatform());
   private final PlatformDdl sqlServerDdl = PlatformDdlBuilder.create(new SqlServer17Platform());
   private final PlatformDdl hanaDdl = PlatformDdlBuilder.create(new HanaPlatform());
+  private final PlatformDdl db2LuwDdl = PlatformDdlBuilder.create(new DB2LuwPlatform());
 
   {
     DatabaseConfig config = DB.getDefault().pluginApi().config();
@@ -32,6 +34,7 @@ public class PlatformDdl_CreateIndexTest {
     oraDdl.configure(config);
     sqlServerDdl.configure(config);
     hanaDdl.configure(config);
+    db2LuwDdl.configure(config);
   }
 
   WriteCreateIndex writeCreateIndex() {
@@ -71,6 +74,8 @@ public class PlatformDdl_CreateIndexTest {
     assertEquals("create unique index ix_mytab_acol on mytab (acol)", sql);
     sql = hanaDdl.createIndex(createIndex);
     assertThat(sql).isEqualTo("-- explicit index \"ix_mytab_acol\" for single column \"acol\" of table \"mytab\" is not necessary");
+    sql = db2LuwDdl.createIndex(createIndex);
+    assertThat(sql).isEqualTo("create unique index ix_mytab_acol on mytab (acol)");
   }
 
   @Test
@@ -93,6 +98,23 @@ public class PlatformDdl_CreateIndexTest {
 
     sql = pgDdl.createIndex(fkeyCreateIndex(false));
     assertEquals("create index ix_mytab_acol on mytab (acol)", sql);
+  }
+
+  @Test
+  public void db2luw_fkeyCreateIndex() {
+    String sql = db2LuwDdl.createIndex(fkeyCreateIndex(true));
+    assertEquals("create unique index ix_mytab_acol on mytab (acol)", sql);
+    
+    sql = db2LuwDdl.createIndex(fkeyCreateIndex(false));
+    assertEquals("create index ix_mytab_acol on mytab (acol)", sql);
+  }
+
+  @Test
+  public void db2luw_tablespaceIndex() {
+    String sql = db2LuwDdl.createIndex(new WriteCreateIndex("ix_mytab_acol", "mytab", new String[]{"acol"}, false));
+    assertEquals("create index ix_mytab_acol on mytab (acol)", sql);
+    sql = db2LuwDdl.createIndex(new WriteCreateIndex("ix_mytab_acol", "mytab", new String[]{"acol"}, true));
+    assertEquals("create unique index ix_mytab_acol on mytab (acol)", sql);
   }
 
 }

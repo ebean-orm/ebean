@@ -32,6 +32,7 @@ import io.ebeaninternal.server.deploy.IndexDefinition;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.TableJoin;
+import io.ebeaninternal.server.deploy.TablespaceMeta;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
 import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
@@ -135,6 +136,7 @@ public class DeployBeanDescriptor<T> {
   private ChangeLogFilter changeLogFilter;
   private String dbComment;
   private PartitionMeta partitionMeta;
+  private TablespaceMeta tablespaceMeta;
   /**
    * One of NONE, INDEX or EMBEDDED.
    */
@@ -251,6 +253,14 @@ public class DeployBeanDescriptor<T> {
       }
     }
     return partitionMeta;
+  }
+  
+  public void setTablespaceMeta(TablespaceMeta tablespaceMeta) {
+    this.tablespaceMeta = tablespaceMeta;
+  }
+
+  public TablespaceMeta getTablespaceMeta() {
+    return tablespaceMeta;
   }
 
   public void setDraftable() {

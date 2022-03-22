@@ -99,6 +99,8 @@ public class CreateTable {
   protected String tablespace;
   @XmlAttribute(name = "indexTablespace")
   protected String indexTablespace;
+  @XmlAttribute(name = "lobTablespace")
+  protected String lobTablespace;
   @XmlAttribute(name = "comment")
   protected String comment;
 
@@ -521,6 +523,26 @@ public class CreateTable {
    */
   public void setIndexTablespace(String value) {
     this.indexTablespace = value;
+  }
+  
+  /**
+   * Gets the value of the lobTablespace property.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getLobTablespace() {
+    return lobTablespace;
+  }
+
+  /**
+   * Sets the value of the lobTablespace property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setLobTablespace(String value) {
+    this.lobTablespace = value;
   }
 
   /**

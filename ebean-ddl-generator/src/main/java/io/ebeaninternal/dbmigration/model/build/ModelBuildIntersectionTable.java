@@ -62,7 +62,7 @@ class ModelBuildIntersectionTable {
     BeanDescriptor<?> targetDesc = manyProp.targetDescriptor();
 
     String tableName = intersectionTableJoin.getTable();
-    MTable table = new MTable(tableName);
+    MTable table = new MTable(tableName, localDesc);
     if (!manyProp.isExcludedFromHistory()) {
       if (localDesc.isHistorySupport()) {
         table.setWithHistory(true);

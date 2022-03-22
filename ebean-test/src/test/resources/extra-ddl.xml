@@ -64,4 +64,41 @@
     create index ix_ebasic_jmjb_gin2 on ebasic_json_map_json_b using gin(content jsonb_path_ops);
   </ddl-script>
 
+  <ddl-script name="create tablespaces" platforms="db2luw" init="true">
+delimiter $$
+BEGIN 
+IF (NOT exists (SELECT * FROM SYSIBM.SYSTABLESPACES WHERE TBSPACE = 'TSTABLES')) THEN 
+EXECUTE IMMEDIATE 'CREATE TABLESPACE "TSTABLES"';
+END IF;
+END
+$$
+delimiter $$
+BEGIN 
+IF (NOT exists (SELECT * FROM SYSIBM.SYSTABLESPACES WHERE TBSPACE = 'INDEXTS')) 
+THEN EXECUTE IMMEDIATE 'CREATE TABLESPACE "INDEXTS"';
+END IF;
+END
+$$
+delimiter $$
+BEGIN 
+IF (NOT exists (SELECT * FROM SYSIBM.SYSTABLESPACES WHERE TBSPACE = 'TESTTS')) THEN 
+EXECUTE IMMEDIATE 'CREATE TABLESPACE "TESTTS"';
+END IF;
+END
+$$
+delimiter $$
+BEGIN 
+IF (NOT exists (SELECT * FROM SYSIBM.SYSTABLESPACES WHERE TBSPACE = 'TSMASTER')) THEN 
+EXECUTE IMMEDIATE 'CREATE TABLESPACE "TSMASTER"';
+END IF;
+END
+$$
+delimiter $$
+BEGIN 
+IF (NOT exists (SELECT * FROM SYSIBM.SYSTABLESPACES WHERE TBSPACE = 'MAIN')) THEN 
+EXECUTE IMMEDIATE 'CREATE TABLESPACE "MAIN"';
+END IF;
+END
+$$
+</ddl-script>
 </extra-ddl>

@@ -40,9 +40,20 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
 
     // DB2 requires an EXACT copy (same column types with null/non-null, same order)
     addSysPeriodColumns(writer, tableName);
-    writer.applyPostAlter().append("create table ").append(historyTableName)
-      .append(" as (select * from ").append(tableName).append(") with no data").endOfStatement();
+    DdlBuffer tableBuf = writer.applyPostAlter();
+    tableBuf.append("create table ").append(historyTableName)
+      .append(" as (select * from ").append(tableName).append(") with no data");
 
+    if (table.getTablespaceMeta() != null) {
+      String tableSpace = platformDdl.extract(table.getTablespaceMeta().getTablespaceName());
+      if (tableSpace != null && !tableSpace.isEmpty()) {
+        platformDdl.addTablespace(tableBuf,
+          tableSpace,
+          platformDdl.extract(table.getTablespaceMeta().getIndexTablespace()),
+          platformDdl.extract(table.getTablespaceMeta().getLobTablespace()));
+      }
+    }
+    tableBuf.endOfStatement();
     enableSystemVersioning(writer.applyPostAlter(), tableName);
     platformDdl.alterTable(writer, tableName).setHistoryHandled();
 
