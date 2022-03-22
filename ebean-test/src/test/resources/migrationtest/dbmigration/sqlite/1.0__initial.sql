@@ -143,6 +143,18 @@ create table migtest_e_softdelete (
   constraint pk_migtest_e_softdelete primary key (id)
 );
 
+create table "table" (
+  "index"                       varchar(255) not null,
+  "from"                        varchar(255),
+  "to"                          varchar(255),
+  "varchar"                     varchar(255),
+  "foreign"                     varchar(255),
+  constraint uq_table_to unique ("to"),
+  constraint uq_table_varchar unique ("varchar"),
+  constraint pk_table primary key ("index"),
+  foreign key ("foreign") references "table" ("index") on delete restrict on update restrict
+);
+
 create table migtest_mtm_c (
   id                            integer not null,
   name                          varchar(255),
@@ -170,3 +182,4 @@ create table migtest_oto_master (
 -- foreign keys and indices
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_table_from on "table" ("from");

@@ -96,7 +96,7 @@ public class BaseDdlHandler implements DdlHandler {
   public void generate(DdlWrite writer, DropTable dropTable) {
     tableDdl.generate(writer, dropTable);
   }
-  
+
   @Override
   public void generate(DdlWrite writer, AlterTable alterTable) {
     tableDdl.generate(writer, alterTable);

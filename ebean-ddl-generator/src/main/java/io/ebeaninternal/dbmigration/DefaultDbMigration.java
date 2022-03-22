@@ -1,18 +1,5 @@
 package io.ebeaninternal.dbmigration;
 
-import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.StringJoiner;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.avaje.classpath.scanner.core.Location;
 import io.ebean.DB;
 import io.ebean.Database;
@@ -53,15 +40,22 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.Migration;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlWriter;
-import io.ebeaninternal.dbmigration.model.CurrentModel;
-import io.ebeaninternal.dbmigration.model.MConfiguration;
-import io.ebeaninternal.dbmigration.model.MigrationModel;
-import io.ebeaninternal.dbmigration.model.ModelContainer;
-import io.ebeaninternal.dbmigration.model.ModelDiff;
-import io.ebeaninternal.dbmigration.model.PlatformDdlWriter;
+import io.ebeaninternal.dbmigration.model.*;
 import io.ebeaninternal.extraddl.model.DdlScript;
 import io.ebeaninternal.extraddl.model.ExtraDdl;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.StringJoiner;
+
+import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 
 /**
  * Generates DB Migration xml and sql scripts.
@@ -686,6 +680,7 @@ public class DefaultDbMigration implements DbMigration {
     if (version == null) {
       version = (nextVersion != null) ? nextVersion : initialVersion;
     }
+    checkDropVersion(version, dropsFor);
 
     String fullVersion = applyPrefix + version;
     String name = name();
@@ -699,6 +694,13 @@ public class DefaultDbMigration implements DbMigration {
       fullVersion += "__initial";
     }
     return fullVersion;
+  }
+
+  void checkDropVersion(String version, String dropsFor) {
+    if (dropsFor != null && dropsFor.equals(version)) {
+      throw new IllegalArgumentException("The next migration version must not be the same as the pending drops version of " +
+        dropsFor + ". Please make the next migration version higher than " + dropsFor + ".");
+    }
   }
 
   String trimDropsFor(String dropsFor) {

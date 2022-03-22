@@ -72,7 +72,6 @@ public class SqlServerDdl extends PlatformDdl {
       throw new NullPointerException();
     }
     // issues#233
-
     StringBuilder sb = new StringBuilder(256);
     sb.append("create unique nonclustered index ").append(uqName).append(" on ").append(tableName).append('(');
     for (int i = 0; i < columns.length; i++) {

@@ -17,6 +17,8 @@ public class BaseAlterTableWrite implements DdlAlterTable {
 
   protected static final String RAW_OPERATION = "$RAW";
 
+  protected final PlatformDdl platformDdl;
+
   public class AlterCmd {
     // the command (e.g. "alter", "modify"
     private final String operation;
@@ -58,9 +60,9 @@ public class BaseAlterTableWrite implements DdlAlterTable {
         // of all alter commands
         target.append(getAlternation());
       } else {
-        target.append("alter table ").append(tableName).append(' ').append(operation);
+        target.append("alter table ").append(platformDdl.quote(tableName)).append(' ').append(operation);
         if (column != null) {
-          target.append(' ').append(column);
+          target.append(' ').append(platformDdl.quote(column));
         }
         if (!getAlternation().isEmpty()) {
           target.append(' ').append(getAlternation());
@@ -85,8 +87,9 @@ public class BaseAlterTableWrite implements DdlAlterTable {
 
   private boolean historyHandled;
 
-  public BaseAlterTableWrite(String tableName) {
+  public BaseAlterTableWrite(String tableName, PlatformDdl platformDdl) {
     this.tableName = tableName;
+    this.platformDdl = platformDdl;
   }
 
   public String tableName() {

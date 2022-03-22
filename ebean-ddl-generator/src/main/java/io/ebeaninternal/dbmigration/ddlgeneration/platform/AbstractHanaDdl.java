@@ -194,16 +194,16 @@ public abstract class AbstractHanaDdl extends PlatformDdl {
 
   @Override
   protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
-    return writer.applyAlterTable(lowerTableName(tableName), HanaAlterTableWrite::new);
+    return writer.applyAlterTable(tableName, HanaAlterTableWrite::new);
   }
 
   /**
    * Joins alter table commands and add open/closing brackets for the alter statements
    */
-  private static class HanaAlterTableWrite extends BaseAlterTableWrite {
+  class HanaAlterTableWrite extends BaseAlterTableWrite {
 
     public HanaAlterTableWrite(String tableName) {
-      super(tableName);
+      super(tableName, AbstractHanaDdl.this);
     }
 
     @Override

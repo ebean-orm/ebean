@@ -21,8 +21,8 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
    */
   @Override
   protected void createHistoryTable(DdlBuffer apply, MTable table) {
-    apply.append("create table ").append(platformDdl.lowerTableName(table.getName() + historySuffix))
-      .append("(like ").append(platformDdl.lowerTableName(table.getName())).append(")").endOfStatement();
+    apply.append("create table ").append(historyTableName(table.getName()))
+      .append("(like ").append(table.getName()).append(")").endOfStatement();
   }
 
   /**
@@ -33,8 +33,8 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     platformDdl.alterTableAddColumn(writer, baseTableName, sysPeriod, "tstzrange not null", "tstzrange(" + now + ", null)");
     if (whenCreatedColumn != null) {
       writer.applyPostAlter()
-        .append("update ").append(platformDdl.lowerTableName(baseTableName)).append(" set ")
-        .append(sysPeriod).append(" = tstzrange(").append(platformDdl.lowerColumnName(whenCreatedColumn)).append(", null)").endOfStatement();
+        .append("update ").append(baseTableName).append(" set ")
+        .append(sysPeriod).append(" = tstzrange(").append(whenCreatedColumn).append(", null)").endOfStatement();
     }
   }
 
@@ -55,15 +55,14 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     createOrReplaceFunction(buffer, procedureName, historyTableName(baseTableName), columnNames);
     buffer
       .append("create trigger ").append(triggerName).newLine()
-      .append("  before update or delete on ").append(platformDdl.lowerTableName(baseTableName)).newLine()
+      .append("  before update or delete on ").append(baseTableName).newLine()
       .append("  for each row execute procedure ").append(procedureName).append("();").newLine().newLine();
   }
 
   @Override
   protected void dropTriggers(DdlBuffer buffer, String baseTable) {
     // rollback trigger then function
-    buffer.append("drop trigger if exists ").append(triggerName(baseTable)).append(" on ")
-      .append(platformDdl.lowerTableName(baseTable)).append(" cascade").endOfStatement();
+    buffer.append("drop trigger if exists ").append(triggerName(baseTable)).append(" on ").append(baseTable).append(" cascade").endOfStatement();
     buffer.append("drop function if exists ").append(procedureName(baseTable)).append("()").endOfStatement();
     buffer.end();
   }
@@ -101,7 +100,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
 
   @Override
   protected void appendInsertIntoHistory(DdlBuffer buffer, String historyTable, List<String> columns) {
-    buffer.append("    insert into ").append(platformDdl.lowerTableName(historyTable)).append(" (").append(sysPeriod).append(",");
+    buffer.append("    insert into ").append(historyTable).append(" (").append(sysPeriod).append(",");
     appendColumnNames(buffer, columns, "");
     buffer.append(") values (tstzrange(lowerTs,upperTs), ");
     appendColumnNames(buffer, columns, "OLD.");

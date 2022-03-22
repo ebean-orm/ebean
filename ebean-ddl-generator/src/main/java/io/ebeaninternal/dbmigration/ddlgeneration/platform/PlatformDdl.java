@@ -20,11 +20,16 @@ import io.ebeaninternal.dbmigration.model.MTable;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Controls the DDL generation for a specific database platform.
  */
 public class PlatformDdl {
+
+  // matches on pattern "check ( COLUMNAME ... )". ColumnName is match group 2;
+  private static final Pattern CHECK_PATTERN = Pattern.compile("(.*?\\( *)([^ ]+)(.*)");
 
   protected final DatabasePlatform platform;
 
@@ -119,7 +124,7 @@ public class PlatformDdl {
   protected boolean inlineForeignKeys;
 
   protected boolean includeStorageEngine;
-  
+
   protected final DbDefaultValue dbDefaultValue;
 
   protected String fallbackArrayType = "varchar(1000)";
@@ -258,7 +263,7 @@ public class PlatformDdl {
     }
 
     buffer.append("  ");
-    buffer.append(lowerColumnName(column.getName()), 29);
+    buffer.append(quote(column.getName()), 29);
     buffer.append(columnDefn);
     if (!Boolean.TRUE.equals(column.isPrimaryKey())) {
       String defaultValue = convertDefaultValue(column.getDefaultValue());
@@ -278,7 +283,7 @@ public class PlatformDdl {
    * Returns the check constraint.
    */
   public String createCheckConstraint(String ckName, String checkConstraint) {
-    return "  constraint " + ckName + " " + checkConstraint;
+    return "  constraint " + maxConstraintName(ckName) + " " + quoteCheckConstraint(checkConstraint);
   }
 
   /**
@@ -292,7 +297,7 @@ public class PlatformDdl {
    * Return the drop foreign key clause.
    */
   public String alterTableDropForeignKey(String tableName, String fkName) {
-    return "alter table " + alterTableIfExists + lowerTableName(tableName) + " " + dropConstraintIfExists + " " + maxConstraintName(fkName);
+    return "alter table " + alterTableIfExists + quote(tableName) + " " + dropConstraintIfExists + " " + maxConstraintName(fkName);
   }
 
   /**
@@ -372,7 +377,7 @@ public class PlatformDdl {
    */
   public String createSequence(String sequenceName, DdlIdentity identity) {
     StringBuilder sb = new StringBuilder("create sequence ");
-    sb.append(sequenceName);
+    sb.append(quote(sequenceName));
     sb.append(identity.sequenceOptions(sequenceStartWith, sequenceIncrementBy, sequenceCache));
     sb.append(";");
     return sb.toString();
@@ -382,14 +387,14 @@ public class PlatformDdl {
    * Return the drop sequence statement (potentially with if exists clause).
    */
   public String dropSequence(String sequenceName) {
-    return dropSequenceIfExists + sequenceName;
+    return dropSequenceIfExists + quote(sequenceName);
   }
 
   /**
    * Return the drop table statement (potentially with if exists clause).
    */
   public String dropTable(String tableName) {
-    return dropTableIfExists + lowerTableName(tableName) + dropTableCascade;
+    return dropTableIfExists + quote(tableName) + dropTableCascade;
   }
 
   /**
@@ -405,7 +410,7 @@ public class PlatformDdl {
   public String dropIndex(String indexName, String tableName, boolean concurrent) {
     return dropIndexIfExists + maxConstraintName(indexName);
   }
-  
+
   public String createIndex(WriteCreateIndex create) {
     if (create.useDefinition()) {
       return create.getDefinition();
@@ -422,7 +427,7 @@ public class PlatformDdl {
     if (create.isNotExistsCheck()) {
       buffer.append(createIndexIfNotExists);
     }
-    buffer.append(maxConstraintName(create.getIndexName())).append(" on ").append(lowerTableName(create.getTableName()));
+    buffer.append(maxConstraintName(create.getIndexName())).append(" on ").append(quote(create.getTableName()));
     appendColumns(create.getColumns(), buffer);
     return buffer.toString();
   }
@@ -435,7 +440,7 @@ public class PlatformDdl {
     StringBuilder buffer = new StringBuilder(90);
     buffer.append("foreign key");
     appendColumns(request.cols(), buffer);
-    buffer.append(" references ").append(lowerTableName(request.refTable()));
+    buffer.append(" references ").append(quote(request.refTable()));
     appendColumns(request.refCols(), buffer);
     appendForeignKeySuffix(request, buffer);
     return buffer.toString();
@@ -448,13 +453,13 @@ public class PlatformDdl {
 
     StringBuilder buffer = new StringBuilder(90);
     buffer
-      .append("alter table ").append(lowerTableName(request.table()))
+      .append("alter table ").append(quote(request.table()))
       .append(" add constraint ").append(maxConstraintName(request.fkName()))
       .append(" foreign key");
     appendColumns(request.cols(), buffer);
     buffer
       .append(" references ")
-      .append(lowerTableName(request.refTable()));
+      .append(quote(request.refTable()));
     appendColumns(request.refCols(), buffer);
     appendForeignKeySuffix(request, buffer);
     if (options.isForeignKeySkipCheck()) {
@@ -503,14 +508,14 @@ public class PlatformDdl {
    * Drop a unique constraint from the table (Sometimes this is an index).
    */
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
-    return "alter table " + lowerTableName(tableName) + " " + dropUniqueConstraint + " " + maxConstraintName(uniqueConstraintName);
+    return "alter table " + quote(tableName) + " " + dropUniqueConstraint + " " + maxConstraintName(uniqueConstraintName);
   }
 
   /**
    * Drop a unique constraint from the table.
    */
   public String alterTableDropConstraint(String tableName, String constraintName) {
-    return "alter table " + lowerTableName(tableName) + " " + dropConstraintIfExists + " " + maxConstraintName(constraintName);
+    return "alter table " + quote(tableName) + " " + dropConstraintIfExists + " " + maxConstraintName(constraintName);
   }
 
   /**
@@ -528,7 +533,7 @@ public class PlatformDdl {
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
 
     StringBuilder buffer = new StringBuilder(90);
-    buffer.append("alter table ").append(tableName).append(" add constraint ").append(maxConstraintName(uqName)).append(" unique ");
+    buffer.append("alter table ").append(quote(tableName)).append(" add constraint ").append(maxConstraintName(uqName)).append(" unique ");
     appendColumns(columns, buffer);
     return buffer.toString();
   }
@@ -619,8 +624,9 @@ public class PlatformDdl {
    * Alter table adding the check constraint.
    */
   public String alterTableAddCheckConstraint(String tableName, String checkConstraintName, String checkConstraint) {
-    return "alter table " + lowerTableName(tableName) + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + checkConstraint;
+    return "alter table " + quote(tableName) + " " + addConstraint + " " + maxConstraintName(checkConstraintName) + " " + quoteCheckConstraint(checkConstraint);
   }
+
 
   /**
    * Alter column setting the default value.
@@ -663,7 +669,7 @@ public class PlatformDdl {
    * Creates or replace a new DdlAlterTable for given tableName.
    */
   protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
-    return writer.applyAlterTable(lowerTableName(tableName), BaseAlterTableWrite::new);
+    return writer.applyAlterTable(tableName, k -> new BaseAlterTableWrite(k, this));
   }
 
   protected void appendColumns(String[] columns, StringBuilder buffer) {
@@ -672,29 +678,9 @@ public class PlatformDdl {
       if (i > 0) {
         buffer.append(",");
       }
-      buffer.append(lowerColumnName(columns[i].trim()));
+      buffer.append(quote(columns[i].trim()));
     }
     buffer.append(")");
-  }
-
-  /**
-   * Convert the table to lower case.
-   * <p>
-   * Override as desired. Generally lower case with underscore is a good cross database
-   * choice for column/table names.
-   */
-  protected String lowerTableName(String name) {
-    return naming.lowerTableName(name);
-  }
-
-  /**
-   * Convert the column name to lower case.
-   * <p>
-   * Override as desired. Generally lower case with underscore is a good cross database
-   * choice for column/table names.
-   */
-  protected String lowerColumnName(String name) {
-    return naming.lowerColumnName(name);
   }
 
   public DatabasePlatform getPlatform() {
@@ -740,7 +726,7 @@ public class PlatformDdl {
     if (DdlHelp.isDropComment(tableComment)) {
       tableComment = "";
     }
-    apply.append(String.format("comment on table %s is '%s'", tableName, tableComment)).endOfStatement();
+    apply.append(String.format("comment on table %s is '%s'", quote(tableName), tableComment)).endOfStatement();
   }
 
   /**
@@ -750,7 +736,7 @@ public class PlatformDdl {
     if (DdlHelp.isDropComment(comment)) {
       comment = "";
     }
-    apply.append(String.format("comment on column %s.%s is '%s'", table, column, comment)).endOfStatement();
+    apply.append(String.format("comment on column %s.%s is '%s'", quote(table), quote(column), comment)).endOfStatement();
   }
 
   /**
@@ -811,6 +797,18 @@ public class PlatformDdl {
    */
   public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) {
     // now only supported for db2
+  }
+
+  protected String quote(String dbName) {
+    return platform.convertQuotedIdentifiers(dbName);
+  }
+
+  protected String quoteCheckConstraint(String checkConstraint) {
+    Matcher matcher = CHECK_PATTERN.matcher(checkConstraint);
+    if (matcher.matches()) {
+      return matcher.replaceFirst("$1" + quote(matcher.group(2)) + "$3");
+    }
+    return checkConstraint;
   }
 
 }

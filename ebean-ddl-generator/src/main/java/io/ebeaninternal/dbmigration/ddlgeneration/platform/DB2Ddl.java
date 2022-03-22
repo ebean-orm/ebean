@@ -1,12 +1,12 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
+import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.Column;
@@ -62,7 +62,6 @@ public class DB2Ddl extends PlatformDdl {
     return sb.toString();
   }
 
-
   @Override
   public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) {
     apply.append(" in ").append(tablespaceName).append(" index in ").append(indexTablespace).append(" long in ").append(lobTablespace);
@@ -112,9 +111,10 @@ public class DB2Ddl extends PlatformDdl {
       .append("begin\n")
       .append("if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = '")
       .append(maxConstraintName(constraintName).toUpperCase())
-      .append("' and tabname = '").append(lowerTableName(tableName).toUpperCase()).append("') then\n")
 
-      .append("  prepare stmt from 'alter table ").append(lowerTableName(tableName))
+      .append("' and tabname = '").append(naming.normaliseTable(tableName).toUpperCase()).append("') then\n")
+
+      .append("  prepare stmt from 'alter table ").append(tableName)
       .append(" drop constraint ").append(maxConstraintName(constraintName)).append("';\n")
 
       .append("  execute stmt;\n")
@@ -174,13 +174,13 @@ public class DB2Ddl extends PlatformDdl {
 
   @Override
   protected DdlAlterTable alterTable(DdlWrite writer, String tableName) {
-    return writer.applyAlterTable(lowerTableName(tableName), Db2AlterTableWrite::new);
+    return writer.applyAlterTable(tableName, Db2AlterTableWrite::new);
   };
 
-  static class Db2AlterTableWrite extends BaseAlterTableWrite {
+  class Db2AlterTableWrite extends BaseAlterTableWrite {
 
     public Db2AlterTableWrite(String tableName) {
-      super(tableName);
+      super(tableName, DB2Ddl.this);
     }
 
     @Override

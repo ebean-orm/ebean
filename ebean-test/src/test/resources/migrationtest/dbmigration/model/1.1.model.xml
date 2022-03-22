@@ -72,6 +72,11 @@
         <addColumn tableName="migtest_e_softdelete">
             <column name="deleted" type="boolean" defaultValue="false" notnull="true"/>
         </addColumn>
+        <alterColumn columnName="&quot;index&quot;" tableName="&quot;table&quot;" withHistory="true" comment="this is an other comment"/>
+        <addColumn tableName="&quot;table&quot;" withHistory="true">
+            <column name="&quot;select&quot;" type="varchar"/>
+        </addColumn>
+        <addUniqueConstraint constraintName="uq_table_select" tableName="&quot;table&quot;" columnNames="&quot;select&quot;" oneToOne="false" nullableColumns="&quot;select&quot;"/>
         <createTable name="migtest_e_user" pkName="pk_migtest_e_user">
             <column name="id" type="integer" primaryKey="true"/>
         </createTable>

@@ -87,18 +87,18 @@ create table migtest_mtm_c_migtest_mtm_m (
   migtest_mtm_c_id              integer not null,
   migtest_mtm_m_id              bigint not null,
   constraint pk_migtest_mtm_c_migtest_mtm_m primary key (migtest_mtm_c_id,migtest_mtm_m_id)
-) in TESTTS index in TESTTS long in TESTTS;
+);
 
 create table migtest_mtm_m_migtest_mtm_c (
   migtest_mtm_m_id              bigint not null,
   migtest_mtm_c_id              integer not null,
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
-) in TSMASTER index in TSMASTER long in TSMASTER;
+);
 
 create table migtest_mtm_m_phone_numbers (
   migtest_mtm_m_id              bigint not null,
   value                         varchar(255) not null
-) in TSMASTER index in TSMASTER long in TSMASTER;
+);
 
 
 update migtest_e_basic set status = 'A' where status is null;
@@ -107,7 +107,6 @@ update migtest_e_basic set status = 'A' where status is null;
 update migtest_e_basic set status = 'N' where id = 1;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
-CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_E_BASIC','USERSPACE1','USERSPACE1','USERSPACE1','','','','','','MOVE');
 
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history2 set test_string = 'unknown' where test_string is null;
@@ -119,9 +118,9 @@ alter table migtest_e_history5 drop versioning;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 drop versioning;
-CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_C','TESTTS','TESTTS','TESTTS','','','','','','MOVE');
-CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_M','TSMASTER','TSMASTER','TSMASTER','','','','','','MOVE');
+alter table "table" drop versioning;
 -- apply alter tables
+alter table "table" add column "select" varchar(255);
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -171,6 +170,7 @@ alter table migtest_e_history6_history alter column test_number2 drop not null;
 call sysproc.admin_cmd('reorg table migtest_e_history6_history');
 alter table migtest_e_softdelete add column deleted smallint default 0 default false not null;
 alter table migtest_oto_child add column master_id bigint;
+alter table table_history add column "select" varchar(255);
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 create unique index uq_migtest_e_basic_description on migtest_e_basic(description) exclude null keys;
@@ -182,13 +182,7 @@ create unique index uq_migtest_e_basic_status_indextest1 on migtest_e_basic(stat
 create unique index uq_migtest_e_basic_name on migtest_e_basic(name) exclude null keys;
 create unique index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) exclude null keys;
 create unique index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) exclude null keys;
-create table migtest_e_history_history (
- id integer not null,
- test_string bigint,
- sys_period_start timestamp(12) not null,
- sys_period_end timestamp(12) not null,
- sys_period_txn timestamp(12)
-);
+create table migtest_e_history_history as (select * from migtest_e_history) with no data;
 alter table migtest_e_history add versioning use history table migtest_e_history_history;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 comment on table migtest_e_history is 'We have history now';
@@ -197,6 +191,9 @@ alter table migtest_e_history3 add versioning use history table migtest_e_histor
 alter table migtest_e_history4 add versioning use history table migtest_e_history4_history;
 alter table migtest_e_history5 add versioning use history table migtest_e_history5_history;
 alter table migtest_e_history6 add versioning use history table migtest_e_history6_history;
+comment on column "table"."index" is 'this is an other comment';
+alter table "table" add versioning use history table table_history;
+create unique index uq_table_select on "table"("select") exclude null keys;
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;

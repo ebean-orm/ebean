@@ -158,6 +158,18 @@ create table migtest_e_softdelete (
 );
 create sequence migtest_e_softdelete_seq;
 
+create table "table" (
+  "index"                       varchar2(255) not null,
+  "from"                        varchar2(255),
+  "to"                          varchar2(255),
+  "varchar"                     varchar2(255),
+  "foreign"                     varchar2(255),
+  constraint uq_table_to unique ("to"),
+  constraint uq_table_varchar unique ("varchar"),
+  constraint pk_table primary key ("index")
+);
+comment on column "table"."index" is 'this is a comment';
+
 create table migtest_mtm_c (
   id                            number(10) not null,
   name                          varchar2(255),
@@ -196,5 +208,9 @@ alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id for
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);
 
+create index ix_table_foreign on "table" ("foreign");
+alter table "table" add constraint fk_table_foreign foreign key ("foreign") references "table" ("index");
+
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_table_from on "table" ("from");

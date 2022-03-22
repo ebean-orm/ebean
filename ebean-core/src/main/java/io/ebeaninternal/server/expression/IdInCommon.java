@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 
 /**
- * Id IN expression common for cache handling.
+ * ID IN expression common for cache handling.
  */
 public interface IdInCommon {
 

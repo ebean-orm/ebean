@@ -56,52 +56,18 @@ public class DbConstraintNormalise {
   }
 
   /**
-   * Lower case the table name checking for quoted identifiers.
-   */
-  public String lowerTableName(String tableName) {
-    if (lowerCaseTables && notQuoted(tableName)) {
-      return tableName.toLowerCase();
-    }
-    return tableName;
-  }
-
-  /**
-   * Lower case the column name checking for quoted identifiers.
-   */
-  public String lowerColumnName(String name) {
-    if (lowerCaseColumns && notQuoted(name)) {
-      return name.toLowerCase();
-    }
-    return name;
-  }
-
-  /**
    * Trim off the platform quoted identifier quotes like [ ' and ".
    */
-  public boolean notQuoted(String tableName) {
+  public String trimQuotes(String identifier) {
 
-    // remove quoted identifier characters
-    for (String quotedIdentifier : quotedIdentifiers) {
-      if (tableName.contains(quotedIdentifier)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Trim off the platform quoted identifier quotes like [ ' and ".
-   */
-  public String trimQuotes(String tableName) {
-
-    if (tableName == null) {
+    if (identifier == null) {
       return "";
     }
     // remove quoted identifier characters
     for (String quotedIdentifier : quotedIdentifiers) {
-      tableName = tableName.replace(quotedIdentifier, "");
+      identifier = identifier.replace(quotedIdentifier, "");
     }
-    return tableName;
+    return identifier;
   }
 
 

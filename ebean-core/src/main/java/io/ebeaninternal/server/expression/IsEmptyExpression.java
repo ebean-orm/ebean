@@ -48,7 +48,7 @@ final class IsEmptyExpression extends AbstractExpression {
     }
   }
 
-  public final String getPropName() {
+  public String getPropName() {
     return propName;
   }
 

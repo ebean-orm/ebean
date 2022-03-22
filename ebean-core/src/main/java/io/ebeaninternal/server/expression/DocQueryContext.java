@@ -71,7 +71,7 @@ public interface DocQueryContext {
   void writeIn(String propertyName, Object[] values, boolean not) throws IOException;
 
   /**
-   * Write an Id in expression.
+   * Write an ID in expression.
    */
   void writeIds(Collection<?> idCollection) throws IOException;
 
@@ -131,7 +131,7 @@ public interface DocQueryContext {
   void writeTextQueryString(String search, TextQueryString options) throws IOException;
 
   /**
-   * Start a Bool which may contain some of Must, Must Not, Should.
+   * Start a Bool which may contain Must, Must Not, Should.
    */
   void startBoolGroup() throws IOException;
 

@@ -47,12 +47,12 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
   private final EntityBean entity;
 
   /**
-   * Set to true to use case insensitive expressions.
+   * Set to true to use case-insensitive expressions.
    */
   private boolean caseInsensitive;
 
   /**
-   * The type of like (RAW, STARTS_WITH, ENDS_WITH etc)
+   * The type of like (RAW, STARTS_WITH, ENDS_WITH)
    */
   private LikeType likeType;
 
@@ -62,7 +62,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
   private boolean includeZeros;
 
   /**
-   * The non null bean properties and found and together added as a list of
+   * The non-null bean properties and found and together added as a list of
    * expressions (like or equal to expressions).
    */
   private ArrayList<SpiExpression> list;
@@ -71,8 +71,8 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
   /**
    * Construct the query by example expression.
    *
-   * @param entity          the example entity with non null property values
-   * @param caseInsensitive if true use case insensitive expressions
+   * @param entity          the example entity with non-null property values
+   * @param caseInsensitive if true use case-insensitive expressions
    * @param likeType        the type of Like wild card used
    */
   DefaultExampleExpression(EntityBean entity, boolean caseInsensitive, LikeType likeType) {
@@ -303,9 +303,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
    */
   private boolean isZero(Object value) {
     if (value instanceof Number) {
-      if (((Number) value).doubleValue() == 0) {
-        return true;
-      }
+      return ((Number) value).doubleValue() == 0;
     }
     return false;
   }

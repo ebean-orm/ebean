@@ -14,7 +14,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import java.io.IOException;
 
 /**
- * A logical And or Or for joining two expressions.
+ * A logical And or, Or for joining two expressions.
  */
 abstract class LogicExpression implements SpiExpression {
 

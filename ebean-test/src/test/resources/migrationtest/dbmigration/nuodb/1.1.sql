@@ -59,7 +59,11 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 drop trigger migtest_e_history6_history_upd;
 drop trigger migtest_e_history6_history_del;
 drop view migtest_e_history6_with_history;
+drop trigger table_history_upd;
+drop trigger table_history_del;
+drop view table_with_history;
 -- apply alter tables
+alter table "table" add column "select" varchar(255);
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -97,6 +101,7 @@ alter table migtest_e_history6 alter column test_number2 set null;
 alter table migtest_e_history6_history alter column test_number2 set null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 alter table migtest_oto_child add column master_id bigint;
+alter table table_history add column "select" varchar(255);
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
@@ -199,6 +204,21 @@ create or replace trigger migtest_e_history6_history_del for migtest_e_history6 
 end_trigger;
 $$
 
+create view table_with_history as select * from "table" union all select * from table_history;
+delimiter $$
+create or replace trigger table_history_upd for "table" before update for each row as 
+    NEW.sys_period_start = greatest(current_timestamp, date_add(OLD.sys_period_start, interval 1 microsecond));
+    insert into table_history (sys_period_start,sys_period_end,"index", "from", "to", "varchar", "select", "foreign") values (OLD.sys_period_start, NEW.sys_period_start,OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+end_trigger;
+$$
+
+delimiter $$
+create or replace trigger table_history_del for "table" before delete for each row as
+    insert into table_history (sys_period_start,sys_period_end,"index", "from", "to", "varchar", "select", "foreign") values (OLD.sys_period_start, NEW.sys_period_start,OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+end_trigger;
+$$
+
+alter table "table" add constraint uq_table_select unique  ("select");
 -- foreign keys and indices
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);

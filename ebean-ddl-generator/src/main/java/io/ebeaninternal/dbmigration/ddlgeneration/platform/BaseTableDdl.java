@@ -205,7 +205,7 @@ public class BaseTableDdl implements TableDdl {
   public void generate(DdlWrite writer, CreateTable createTable) {
     reset();
 
-    String tableName = lowerTableName(createTable.getName());
+    String tableName = createTable.getName();
     List<Column> columns = createTable.getColumn();
     List<Column> pk = determinePrimaryKeyColumns(columns);
 
@@ -223,7 +223,7 @@ public class BaseTableDdl implements TableDdl {
     String partitionMode = createTable.getPartitionMode();
 
     DdlBuffer apply = writer.apply();
-    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(lowerTableName(tableName)).append(" (");
+    apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(platformDdl.quote(tableName)).append(" (");
     writeTableColumns(apply, columns, identity);
     writeUniqueConstraints(apply, createTable);
     writeCompoundUniqueConstraints(apply, createTable);
@@ -402,7 +402,7 @@ public class BaseTableDdl implements TableDdl {
 
   protected void writeForeignKey(DdlWrite writer, WriteForeignKey request) {
     DdlBuffer fkeyBuffer = writer.applyForeignKeys();
-    String tableName = lowerTableName(request.table());
+    String tableName = request.table();
     if (request.indexName() != null) {
       // no matching unique constraint so add the index
       fkeyBuffer.appendStatement(platformDdl.createIndex(new WriteCreateIndex(request.indexName(), tableName, request.cols(), false)));
@@ -427,7 +427,7 @@ public class BaseTableDdl implements TableDdl {
       if (i > 0) {
         buffer.append(",");
       }
-      buffer.append(lowerColumnName(columns[i].trim()));
+      buffer.append(platformDdl.quote(columns[i].trim()));
     }
     buffer.append(")");
   }
@@ -494,7 +494,7 @@ public class BaseTableDdl implements TableDdl {
     buffer.append(",").newLine();
     buffer.append("  constraint ").append(uqName).append(" unique ");
     buffer.append("(");
-    buffer.append(lowerColumnName(column.getName()));
+    buffer.append(platformDdl.quote(column.getName()));
     buffer.append(")");
   }
 
@@ -519,20 +519,6 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
-   * Convert the table lower case.
-   */
-  protected String lowerTableName(String name) {
-    return naming.lowerTableName(name);
-  }
-
-  /**
-   * Convert the column name to lower case.
-   */
-  protected String lowerColumnName(String name) {
-    return naming.lowerColumnName(name);
-  }
-
-  /**
    * Return the list of columns that make the primary key.
    */
   protected List<Column> determinePrimaryKeyColumns(List<Column> columns) {
@@ -544,7 +530,7 @@ public class BaseTableDdl implements TableDdl {
     }
     return pk;
   }
-  
+
   @Override
   public void generate(DdlWrite writer, CreateIndex index) {
     if (platformInclude(index.getPlatforms())) {
@@ -775,7 +761,7 @@ public class BaseTableDdl implements TableDdl {
    * Return the name of the history table given the base table name.
    */
   protected String historyTable(String baseTable) {
-    return baseTable + historyTableSuffix;
+    return naming.normaliseTable(baseTable) + historyTableSuffix;
   }
 
   /**
@@ -832,6 +818,7 @@ public class BaseTableDdl implements TableDdl {
       .appendStatement(platformDdl.alterTableAddCheckConstraint(alter.getTableName(), alter.getCheckConstraintName(), alter.getCheckConstraint()));
   }
 
+
   protected void alterColumnAddForeignKey(DdlWrite writer, AlterColumn alterColumn) {
     alterTableAddForeignKey(writer.getOptions(), writer.applyForeignKeys(), new WriteForeignKey(alterColumn));
   }
@@ -862,6 +849,7 @@ public class BaseTableDdl implements TableDdl {
 
     writer.dropAllForeignKeys().appendStatement(platformDdl.dropIndex(uqName, alter.getTableName()));
   }
+
 
   protected void alterTableDropColumn(DdlWrite writer, String tableName, String columnName) {
     platformDdl.alterTableDropColumn(writer, tableName, columnName);

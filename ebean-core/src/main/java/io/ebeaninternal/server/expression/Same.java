@@ -10,7 +10,7 @@ import java.util.Objects;
 final class Same {
 
   /**
-   * Return true if both values are null or both an not null.
+   * Return true if both values are null or both not null.
    */
   static boolean sameByNull(Object v1, Object v2) {
     return (v1 == null) == (v2 == null);

@@ -38,6 +38,7 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 -- apply alter tables
+alter table "table" add column "select" String;
 alter table migtest_ckey_detail add column one_key UInt32;
 alter table migtest_ckey_detail add column two_key String;
 alter table migtest_ckey_parent add column assoc_id UInt32;
@@ -78,3 +79,4 @@ alter table migtest_e_basic add constraint uq_migtest_e_basic_status_indextest1 
 alter table migtest_e_basic add constraint uq_migtest_e_basic_name unique  (name);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest4 unique  (indextest4);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest5 unique  (indextest5);
+alter table "table" add constraint uq_table_select unique  ("select");
