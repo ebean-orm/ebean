@@ -143,6 +143,16 @@ create table migtest_e_history6 (
 );
 create sequence migtest_e_history6_seq;
 
+create table "migtest_QuOtEd" (
+  id                            varchar2(255) not null,
+  status1                       varchar2(1),
+  status2                       varchar2(1),
+  constraint ck_migtest_quoted_status1 check ( status1 in ('N','A','I')),
+  constraint ck_migtest_quoted_status2 check ( status2 in ('N','A','I')),
+  constraint uq_migtest_quoted_status2 unique (status2),
+  constraint pk_migtest_quoted primary key (id)
+);
+
 create table migtest_e_ref (
   id                            number(10) not null,
   name                          varchar2(127) not null,
@@ -213,4 +223,5 @@ alter table "table" add constraint fk_table_foreign foreign key ("foreign") refe
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_migtest_quoted_status1 on "migtest_QuOtEd" (status1);
 create index ix_table_from on "table" ("from");

@@ -9,6 +9,7 @@ alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
 alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 drop index if exists ix_migtest_e_basic_indextest1;
 drop index if exists ix_migtest_e_basic_indextest5;
+drop index if exists ix_migtest_quoted_status1;
 -- apply changes
 create table migtest_e_user (
   id                            integer auto_increment not null,

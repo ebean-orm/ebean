@@ -17,6 +17,16 @@
 drop index if exists ix_migtest_e_basic_indextest3;
 drop index if exists ix_migtest_e_basic_indextest6;
 -- apply changes
+create table "migtest_QuOtEd" (
+  id                            varchar(255) not null,
+  status1                       varchar(1),
+  status2                       varchar(1),
+  constraint ck_migtest_quoted_status1 check ( status1 in ('N','A','I')),
+  constraint ck_migtest_quoted_status2 check ( status2 in ('N','A','I')),
+  constraint uq_migtest_quoted_status2 unique (status2),
+  constraint pk_migtest_quoted primary key (id)
+);
+
 create table migtest_e_ref (
   id                            integer not null,
   name                          varchar(127) not null,
@@ -70,3 +80,4 @@ create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_migtest_quoted_status1 on "migtest_QuOtEd" (status1);

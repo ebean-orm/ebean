@@ -6,6 +6,7 @@ alter table migtest_e_basic drop index uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop index uq_migtest_e_basic_indextest6;
 drop index ix_migtest_e_basic_indextest1 on migtest_e_basic;
 drop index ix_migtest_e_basic_indextest5 on migtest_e_basic;
+drop index ix_migtest_quoted_status1 on `migtest_QuOtEd`;
 -- apply changes
 create table migtest_e_user (
   id                            integer auto_increment not null,

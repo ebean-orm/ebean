@@ -27,5 +27,6 @@ create or replace trigger migtest_e_history2_history_del for migtest_e_history2 
 end_trigger;
 $$
 
+drop table if exists "migtest_QuOtEd";
 drop table if exists migtest_e_ref;
 drop sequence if exists migtest_e_ref_seq;

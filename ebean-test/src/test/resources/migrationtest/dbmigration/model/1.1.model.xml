@@ -103,6 +103,7 @@
         <createIndex indexName="ix_migtest_oto_child_name" tableName="migtest_oto_child" columns="name" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic"/>
+        <dropIndex indexName="ix_migtest_quoted_status1" tableName="&quot;migtest_QuOtEd&quot;"/>
         <dropIndex indexName="idxd_migtest_0" tableName="migtest_oto_child" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_oto_child_lowername_id" tableName="migtest_oto_child" concurrent="true" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_oto_child_lowername" tableName="migtest_oto_child" platforms="POSTGRES"/>
@@ -114,6 +115,7 @@
         <dropColumn columnName="eref_id" tableName="migtest_e_basic"/>
         <dropColumn columnName="obsolete_string1" tableName="migtest_e_history2" withHistory="true"/>
         <dropColumn columnName="obsolete_string2" tableName="migtest_e_history2" withHistory="true"/>
+        <dropTable name="&quot;migtest_QuOtEd&quot;"/>
         <dropTable name="migtest_e_ref" sequenceCol="id"/>
     </changeSet>
 </migration>
