@@ -54,6 +54,7 @@ end;
 $$;
 drop index ix_migtest_e_basic_indextest1;
 drop index ix_migtest_e_basic_indextest5;
+drop index ix_migtest_quoted_status1;
 -- apply changes
 create table migtest_e_user (
   id                            number(10) not null,

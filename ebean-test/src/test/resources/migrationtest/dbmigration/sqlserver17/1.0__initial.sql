@@ -141,6 +141,15 @@ create table migtest_e_history6 (
 );
 create sequence migtest_e_history6_seq as bigint start with 1;
 
+create table [migtest_QuOtEd] (
+  id                            nvarchar(255) not null,
+  status1                       nvarchar(1),
+  status2                       nvarchar(1),
+  constraint ck_migtest_quoted_status1 check ( status1 in ('N','A','I')),
+  constraint ck_migtest_quoted_status2 check ( status2 in ('N','A','I')),
+  constraint pk_migtest_quoted primary key (id)
+);
+
 create table migtest_e_ref (
   id                            integer not null,
   name                          nvarchar(127) not null,
@@ -220,6 +229,7 @@ alter table migtest_e_history6
         sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',
 period for system_time (sys_periodFrom, sys_periodTo);
 alter table migtest_e_history6 set (system_versioning = on (history_table=dbo.migtest_e_history6_history));
+create unique nonclustered index uq_migtest_quoted_status2 on "migtest_QuOtEd"(status2) where status2 is not null;
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 create unique nonclustered index uq_table_to on "table"("to") where "to" is not null;
 create unique nonclustered index uq_table_varchar on "table"("varchar") where "varchar" is not null;
@@ -243,4 +253,5 @@ alter table [table] add constraint fk_table_foreign foreign key ([foreign]) refe
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_migtest_quoted_status1 on [migtest_QuOtEd] (status1);
 create index ix_table_from on [table] ([from]);

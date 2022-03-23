@@ -22,6 +22,15 @@ IF OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL alter table migte
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest3') drop index ix_migtest_e_basic_indextest3 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest6') drop index ix_migtest_e_basic_indextest6 ON migtest_e_basic;
 -- apply changes
+create table [migtest_QuOtEd] (
+  id                            nvarchar(255) not null,
+  status1                       nvarchar(1),
+  status2                       nvarchar(1),
+  constraint ck_migtest_quoted_status1 check ( status1 in ('N','A','I')),
+  constraint ck_migtest_quoted_status2 check ( status2 in ('N','A','I')),
+  constraint pk_migtest_quoted primary key (id)
+);
+
 create table migtest_e_ref (
   id                            integer not null,
   name                          nvarchar(127) not null,
@@ -77,6 +86,7 @@ EXEC usp_ebean_drop_default_constraint migtest_e_history6, test_number2;
 alter table migtest_e_history6 alter column test_number2 integer not null;
 alter table migtest_e_history6 add default 7 for test_number2;
 -- apply post alter
+create unique nonclustered index uq_migtest_quoted_status2 on "migtest_QuOtEd"(status2) where status2 is not null;
 alter table migtest_e_ref add constraint uq_migtest_e_ref_name unique  (name);
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
@@ -91,3 +101,4 @@ alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign ke
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_migtest_quoted_status1 on [migtest_QuOtEd] (status1);
