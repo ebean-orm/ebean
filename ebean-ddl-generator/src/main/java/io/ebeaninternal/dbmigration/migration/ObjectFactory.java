@@ -188,6 +188,13 @@ public class ObjectFactory {
   }
 
   /**
+   * Create an instance of {@link AlterTable }
+   */
+  public AlterTable createAlterTable() {
+    return new AlterTable();
+  }
+
+  /**
    * Create an instance of {@link AddHistoryTable }
    */
   public AddHistoryTable createAddHistoryTable() {

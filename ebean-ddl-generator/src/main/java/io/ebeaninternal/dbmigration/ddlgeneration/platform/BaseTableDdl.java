@@ -17,6 +17,7 @@ import io.ebeaninternal.dbmigration.migration.AddTableComment;
 import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
 import io.ebeaninternal.dbmigration.migration.AlterColumn;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
+import io.ebeaninternal.dbmigration.migration.AlterTable;
 import io.ebeaninternal.dbmigration.migration.Column;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
@@ -236,6 +237,7 @@ public class BaseTableDdl implements TableDdl {
       writeInlineForeignKeys(apply, createTable);
     }
     apply.newLine().append(")");
+    addTableTableSpaces(apply, createTable);
     addTableStorageEngine(apply, createTable);
     addTableCommentInline(apply, createTable);
     if (partitionMode != null) {
@@ -267,6 +269,8 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
+
+
   private String sequenceName(CreateTable createTable, List<Column> pk) {
     return namingConvention.getSequenceName(createTable.getName(), pk.get(0).getName());
   }
@@ -285,6 +289,19 @@ public class BaseTableDdl implements TableDdl {
           platformDdl.addColumnComment(apply, createTable.getName(), column.getName(), column.getComment());
         }
       }
+    }
+  }
+
+  /**
+   * Add tablespace declaration.
+   */
+  protected void addTableTableSpaces(DdlBuffer apply, CreateTable createTable) {
+    String tableSpace = platformDdl.extract(createTable.getTablespace());
+    if (hasValue(tableSpace)) {
+      platformDdl.addTablespace(apply,
+        tableSpace,
+        platformDdl.extract(createTable.getIndexTablespace()),
+        platformDdl.extract(createTable.getLobTablespace()));
     }
   }
 
@@ -644,6 +661,25 @@ public class BaseTableDdl implements TableDdl {
         sequenceName = namingConvention.getSequenceName(dropTable.getName(), dropTable.getSequenceCol());
       }
       dropSequence(writer.applyPostAlter(), sequenceName);
+    }
+  }
+
+  /**
+   * Add table related changes to DDL (tableSpace,...)
+   */
+  @Override
+  public void generate(DdlWrite writer, AlterTable alterTable) {
+    String tableSpace = platformDdl.extract(alterTable.getTablespace());
+    String indexSpace = platformDdl.extract(alterTable.getIndexTablespace());
+    String lobSpace = platformDdl.extract(alterTable.getLobTablespace());
+    if (hasValue(tableSpace)
+      || hasValue(indexSpace)
+      || hasValue(lobSpace)) {
+
+      writer.apply().appendStatement(platformDdl.alterTableTablespace(alterTable.getName(),
+        DdlHelp.toTablespace(tableSpace),
+        DdlHelp.toTablespace(indexSpace),
+        DdlHelp.toTablespace(lobSpace)));
     }
   }
 
