@@ -2,78 +2,85 @@
 -- drop dependencies
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'FK_MGTST_FK_65KF6L' and tabname = 'MIGTEST_FK_CASCADE') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MGTST_FK_65KF6L' and ucase(tabname) = 'MIGTEST_FK_CASCADE') then
   prepare stmt from 'alter table migtest_fk_cascade drop constraint fk_mgtst_fk_65kf6l';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'FK_MGTST_FK_WICX8X' and tabname = 'MIGTEST_FK_SET_NULL') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MGTST_FK_WICX8X' and ucase(tabname) = 'MIGTEST_FK_SET_NULL') then
   prepare stmt from 'alter table migtest_fk_set_null drop constraint fk_mgtst_fk_wicx8x';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MGTST__BSC_STTS' and tabname = 'MIGTEST_E_BASIC') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'CK_MGTST__BSC_STTS' and ucase(tabname) = 'MIGTEST_E_BASIC') then
   prepare stmt from 'alter table migtest_e_basic drop constraint ck_mgtst__bsc_stts';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MGTST__B_Z543FG' and tabname = 'MIGTEST_E_BASIC') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'CK_MGTST__B_Z543FG' and ucase(tabname) = 'MIGTEST_E_BASIC') then
   prepare stmt from 'alter table migtest_e_basic drop constraint ck_mgtst__b_z543fg';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'UQ_MGTST__B_4AYBZY' and tabname = 'MIGTEST_E_BASIC') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'UQ_MGTST__B_4AYBZY' and ucase(tabname) = 'MIGTEST_E_BASIC') then
   prepare stmt from 'alter table migtest_e_basic drop constraint uq_mgtst__b_4aybzy';
   execute stmt;
 end if;
 end$$
 delimiter $$
 begin
-if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'UQ_MGTST__B_4AYBZY') then
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'UQ_MGTST__B_4AYBZY') then
   prepare stmt from 'drop index uq_mgtst__b_4aybzy';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'UQ_MGTST__B_4AYC02' and tabname = 'MIGTEST_E_BASIC') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'UQ_MGTST__B_4AYC02' and ucase(tabname) = 'MIGTEST_E_BASIC') then
   prepare stmt from 'alter table migtest_e_basic drop constraint uq_mgtst__b_4ayc02';
   execute stmt;
 end if;
 end$$
 delimiter $$
 begin
-if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'UQ_MGTST__B_4AYC02') then
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'UQ_MGTST__B_4AYC02') then
   prepare stmt from 'drop index uq_mgtst__b_4ayc02';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MGTST__N_773SOK' and tabname = 'MIGTEST_E_ENUM') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'CK_MGTST__N_773SOK' and ucase(tabname) = 'MIGTEST_E_ENUM') then
   prepare stmt from 'alter table migtest_e_enum drop constraint ck_mgtst__n_773sok';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'IX_MGTST__B_EU8CSQ') then
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MGTST__B_EU8CSQ') then
   prepare stmt from 'drop index ix_mgtst__b_eu8csq';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'IX_MGTST__B_EU8CSU') then
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MGTST__B_EU8CSU') then
   prepare stmt from 'drop index ix_mgtst__b_eu8csu';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MGTST_QTD_STTS1') then
+  prepare stmt from 'drop index ix_mgtst_qtd_stts1';
   execute stmt;
 end if;
 end$$;

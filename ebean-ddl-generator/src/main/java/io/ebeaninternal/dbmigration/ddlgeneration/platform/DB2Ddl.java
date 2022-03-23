@@ -88,15 +88,21 @@ public class DB2Ddl extends PlatformDdl {
       + "\n" + dropIndex(uniqueConstraintName, tableName);
   }
 
+  private void assertNoSchema(String objName) {
+    if (objName.indexOf('.') != -1) {
+      throw new UnsupportedOperationException("Schemas are not yet supported. ObjectName: '" + objName + "'");
+    }
+  }
   @Override
   public String alterTableDropConstraint(String tableName, String constraintName) {
+    assertNoSchema(tableName);
     StringBuilder sb = new StringBuilder(300);
     sb.append("delimiter $$\n")
       .append("begin\n")
-      .append("if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = '")
+      .append("if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = '")
       .append(maxConstraintName(constraintName).toUpperCase())
 
-      .append("' and tabname = '").append(naming.normaliseTable(tableName).toUpperCase()).append("') then\n")
+      .append("' and ucase(tabname) = '").append(naming.normaliseTable(tableName).toUpperCase()).append("') then\n")
 
       .append("  prepare stmt from 'alter table ").append(tableName)
       .append(" drop constraint ").append(maxConstraintName(constraintName)).append("';\n")
@@ -110,10 +116,11 @@ public class DB2Ddl extends PlatformDdl {
 
   @Override
   public String dropIndex(String indexName, String tableName, boolean concurrent) {
+    assertNoSchema(indexName);
     StringBuilder sb = new StringBuilder(300);
     sb.append("delimiter $$\n")
       .append("begin\n")
-      .append("if exists (select indname from syscat.indexes where indschema = current_schema and indname = '")
+      .append("if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = '")
       .append(maxConstraintName(indexName).toUpperCase()).append("') then\n")
       .append("  prepare stmt from 'drop index ").append(maxConstraintName(indexName)).append("';\n")
       .append("  execute stmt;\n")
@@ -124,10 +131,11 @@ public class DB2Ddl extends PlatformDdl {
 
   @Override
   public String dropSequence(String sequenceName) {
+    assertNoSchema(sequenceName);
     StringBuilder sb = new StringBuilder(300);
     sb.append("delimiter $$\n");
     sb.append("begin\n");
-    sb.append("if exists (select seqschema from syscat.sequences where seqschema = current_schema and seqname = '")
+    sb.append("if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = '")
       .append(maxConstraintName(sequenceName).toUpperCase()).append("') then\n");
     sb.append("  prepare stmt from 'drop sequence ").append(maxConstraintName(sequenceName)).append("';\n");
     sb.append("  execute stmt;\n");

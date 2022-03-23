@@ -124,6 +124,14 @@ create table migtest_e_history6 (
   constraint pk_migtest_e_history6 primary key (id)
 );
 
+create table `migtest_QuOtEd` (
+  id                            varchar(255) not null,
+  status1                       varchar(1),
+  status2                       varchar(1),
+  constraint uq_migtest_quoted_status2 unique (status2),
+  constraint pk_migtest_quoted primary key (id)
+);
+
 create table migtest_e_ref (
   id                            integer auto_increment not null,
   name                          varchar(127) not null,
@@ -194,4 +202,5 @@ alter table `table` add constraint fk_table_foreign foreign key (`foreign`) refe
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_migtest_quoted_status1 on `migtest_QuOtEd` (status1);
 create index ix_table_from on `table` (`from`);

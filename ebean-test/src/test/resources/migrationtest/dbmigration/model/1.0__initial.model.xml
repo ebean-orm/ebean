@@ -91,6 +91,12 @@
             <column name="test_number1" type="integer"/>
             <column name="test_number2" type="integer" notnull="true"/>
         </createTable>
+        <createTable name="&quot;migtest_QuOtEd&quot;" identityType="external" pkName="pk_migtest_quoted">
+            <column name="id" type="varchar" primaryKey="true"/>
+            <column name="status1" type="varchar(1)" checkConstraint="check ( status1 in ('N','A','I'))" checkConstraintName="ck_migtest_quoted_status1"/>
+            <column name="status2" type="varchar(1)" checkConstraint="check ( status2 in ('N','A','I'))" checkConstraintName="ck_migtest_quoted_status2"/>
+            <uniqueConstraint name="uq_migtest_quoted_status2" columnNames="status2" oneToOne="false" nullableColumns="status2"/>
+        </createTable>
         <createTable name="migtest_e_ref" pkName="pk_migtest_e_ref">
             <column name="id" type="integer" primaryKey="true"/>
             <column name="name" type="varchar(127)" notnull="true"/>
@@ -127,6 +133,7 @@
         </createTable>
         <createIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic" columns="indextest1"/>
         <createIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic" columns="indextest5"/>
+        <createIndex indexName="ix_migtest_quoted_status1" tableName="&quot;migtest_QuOtEd&quot;" columns="status1"/>
         <createIndex indexName="ix_table_from" tableName="&quot;table&quot;" columns="&quot;from&quot;"/>
         <createIndex indexName="idxd_migtest_0" tableName="migtest_oto_child" columns="" definition="create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where upper(name) = 'JIM'" platforms="POSTGRES"/>
         <createIndex indexName="ix_migtest_oto_child_lowername_id" tableName="migtest_oto_child" columns="lower(name),id" concurrent="true" platforms="POSTGRES"/>

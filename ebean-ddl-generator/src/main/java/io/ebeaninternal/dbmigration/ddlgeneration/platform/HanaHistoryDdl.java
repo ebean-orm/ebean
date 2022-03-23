@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -12,21 +11,16 @@ import io.ebeaninternal.dbmigration.model.MTable;
 
 import java.util.Collection;
 
-public class HanaHistoryDdl implements PlatformHistoryDdl {
+public class HanaHistoryDdl extends DbTableBasedHistoryDdl implements PlatformHistoryDdl {
 
   private String systemPeriodStart;
   private String systemPeriodEnd;
-  private PlatformDdl platformDdl;
-  private DbConstraintNaming constraintNaming;
-  private String historySuffix;
 
   @Override
   public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+    super.configure(config, platformDdl);
     this.systemPeriodStart = config.getAsOfSysPeriod() + "_start";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";
-    this.platformDdl = platformDdl;
-    this.constraintNaming = config.getConstraintNaming();
-    this.historySuffix = config.getHistoryTableSuffix();
   }
 
   @Override
@@ -96,11 +90,6 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
   }
 
   @Override
-  public boolean alterHistoryTables() {
-    return true;
-  }
-
-  @Override
   public void updateTriggers(DdlWrite writer, String tableName) {
     DdlAlterTable alter = platformDdl.alterTable(writer, tableName);
     MTable table = writer.getTable(tableName);
@@ -140,8 +129,5 @@ public class HanaHistoryDdl implements PlatformHistoryDdl {
     apply.endOfStatement();
   }
 
-  protected String historyTableName(String tableName) {
-    return constraintNaming.normaliseTable(tableName) + historySuffix;
-  }
 
 }

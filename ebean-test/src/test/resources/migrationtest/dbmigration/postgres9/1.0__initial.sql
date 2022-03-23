@@ -127,6 +127,16 @@ create table migtest_e_history6 (
   constraint pk_migtest_e_history6 primary key (id)
 );
 
+create table "migtest_QuOtEd" (
+  id                            varchar(255) not null,
+  status1                       varchar(1),
+  status2                       varchar(1),
+  constraint ck_migtest_quoted_status1 check ( status1 in ('N','A','I')),
+  constraint ck_migtest_quoted_status2 check ( status2 in ('N','A','I')),
+  constraint uq_migtest_quoted_status2 unique (status2),
+  constraint pk_migtest_quoted primary key (id)
+);
+
 create table migtest_e_ref (
   id                            serial not null,
   name                          varchar(127) not null,
@@ -349,6 +359,7 @@ alter table "table" add constraint fk_table_foreign foreign key ("foreign") refe
 
 create index if not exists ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index if not exists ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index if not exists ix_migtest_quoted_status1 on "migtest_QuOtEd" (status1);
 create index if not exists ix_table_from on "table" ("from");
 create index idxd_migtest_0 on migtest_oto_child using hash (upper(name)) where upper(name) = 'JIM';
 create index concurrently if not exists ix_migtest_oto_child_lowername_id on migtest_oto_child (lower(name),id);

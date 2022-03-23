@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -14,29 +13,24 @@ import io.ebeaninternal.dbmigration.model.MTable;
  * 
  * @author Roland Praml, FOCONIS AG
  */
-public class Db2HistoryDdl implements PlatformHistoryDdl {
+public class Db2HistoryDdl extends DbTableBasedHistoryDdl implements PlatformHistoryDdl {
 
   private String systemPeriodStart;
   private String systemPeriodEnd;
   private String transactionId;
-  private PlatformDdl platformDdl;
-  private DbConstraintNaming constraintNaming;
-  private String historySuffix;
 
   @Override
   public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+    super.configure(config, platformDdl);
     this.systemPeriodStart = config.getAsOfSysPeriod() + "_start";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";
     this.transactionId = config.getAsOfSysPeriod() + "_txn"; // required for DB2
-    this.platformDdl = platformDdl;
-    this.constraintNaming = config.getConstraintNaming();
-    this.historySuffix = config.getHistoryTableSuffix();
   }
 
   @Override
   public void createWithHistory(DdlWrite writer, MTable table) {
     String tableName = table.getName();
-    String historyTableName = historyTable(tableName);
+    String historyTableName = historyTableName(tableName);
 
     // DB2 requires an EXACT copy (same column types with null/non-null, same order)
     addSysPeriodColumns(writer, tableName);
@@ -74,7 +68,7 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
     platformDdl.alterTableDropColumn(writer, baseTable, transactionId);
 
     // drop the history table
-    writer.applyPostAlter().append("drop table ").append(historyTable(baseTable)).endOfStatement();
+    writer.applyPostAlter().append("drop table ").append(historyTableName(baseTable)).endOfStatement();
   }
 
   @Override
@@ -86,10 +80,6 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
     createWithHistory(writer, table);
   }
 
-  @Override
-  public boolean alterHistoryTables() {
-    return true;
-  }
 
   @Override
   public void updateTriggers(DdlWrite writer, String tableName) {
@@ -107,11 +97,7 @@ public class Db2HistoryDdl implements PlatformHistoryDdl {
   }
 
   public void enableSystemVersioning(DdlBuffer apply, String tableName) {
-    apply.append("alter table ").append(tableName).append(" add versioning use history table ").append(historyTable(tableName)).endOfStatement();
-  }
-
-  protected String historyTable(String tableName) {
-    return constraintNaming.normaliseTable(tableName) + historySuffix;
+    apply.append("alter table ").append(tableName).append(" add versioning use history table ").append(historyTableName(tableName)).endOfStatement();
   }
 
 }

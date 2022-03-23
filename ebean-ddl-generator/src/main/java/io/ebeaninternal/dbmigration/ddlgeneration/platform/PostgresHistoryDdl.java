@@ -107,4 +107,23 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     buffer.append(");").newLine();
   }
 
+  @Override
+  protected String procedureName(String baseTableName) {
+    return normalise(baseTableName) + "_history_version";
+  }
+
+  @Override
+  protected String triggerName(String baseTableName) {
+    return normalise(baseTableName) + "_history_upd";
+  }
+
+  @Override
+  protected String updateTriggerName(String baseTableName) {
+    return normalise(baseTableName) + "_history_upd";
+  }
+
+  @Override
+  protected String deleteTriggerName(String baseTableName) {
+    return normalise(baseTableName) + "_history_del";
+  }
 }

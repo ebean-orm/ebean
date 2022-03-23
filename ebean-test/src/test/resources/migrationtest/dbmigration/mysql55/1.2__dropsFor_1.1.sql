@@ -25,4 +25,5 @@ create trigger migtest_e_history2_history_del before delete on migtest_e_history
     insert into migtest_e_history2_history (sys_period_start,sys_period_end,id, test_string, test_string3, new_column) values (OLD.sys_period_start, now(6),OLD.id, OLD.test_string, OLD.test_string3, OLD.new_column);
 end$$
 unlock tables;
+drop table if exists `migtest_QuOtEd`;
 drop table if exists migtest_e_ref;
