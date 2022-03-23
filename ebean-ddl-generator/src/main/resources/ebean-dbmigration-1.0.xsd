@@ -218,6 +218,27 @@
       <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
     </xsd:complexType>
   </xsd:element>
+  
+  <xsd:element name="alterTable">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string" use="required"/>
+      <xsd:attribute name="newName" type="xsd:string"/>
+      <xsd:attribute name="partitionMode" type="xsd:string"/>
+      <xsd:attribute name="partitionColumn" type="xsd:string"/>
+      <xsd:attribute name="identityType" type="identityType"/>
+      <xsd:attribute name="identityStart" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityIncrement" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityCache" type="xsd:positiveInteger"/>
+      <xsd:attribute name="identityGenerated" type="xsd:string"/>
+      <xsd:attribute name="sequenceName" type="xsd:string"/>
+      <xsd:attribute name="sequenceInitial" type="xsd:positiveInteger"/>
+      <xsd:attribute name="sequenceAllocate" type="xsd:positiveInteger"/>
+      <xsd:attribute name="pkName" type="xsd:string"/>
+      <xsd:attribute name="storageEngine" type="xsd:string"/>
+      <xsd:attributeGroup ref="tablespaceAttributes"/>
+    </xsd:complexType>
+  </xsd:element>
+  
 
   <xsd:element name="dropHistoryTable">
     <xsd:complexType>
@@ -341,6 +362,7 @@
   <xsd:attributeGroup name="tablespaceAttributes">
     <xsd:attribute name="tablespace" type="xsd:string"/>
     <xsd:attribute name="indexTablespace" type="xsd:string"/>
+    <xsd:attribute name="lobTablespace" type="xsd:string"/>
     <xsd:attribute name="comment" type="xsd:string"/>
   </xsd:attributeGroup>
 
@@ -351,6 +373,7 @@
       <xsd:element ref="sql" maxOccurs="unbounded"/>
 
       <xsd:element ref="createTable" maxOccurs="unbounded"/>
+      <xsd:element ref="alterTable" maxOccurs="unbounded"/>
       <xsd:element ref="dropTable" maxOccurs="unbounded"/>
       <xsd:element ref="renameTable" maxOccurs="unbounded"/>
       <xsd:element ref="addTableComment" maxOccurs="unbounded"/>

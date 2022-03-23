@@ -1,6 +1,8 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 public class DdlHelp {
+  public static final String TABLESPACE_DEFAULT = "$TABLESPACE_DEFAULT";
+  
   public static final String DROP_DEFAULT = "DROP DEFAULT";
 
   public static final String DROP_COMMENT = "DROP COMMENT";
@@ -35,5 +37,16 @@ public class DdlHelp {
    */
   public static boolean isDropForeignKey(String value) {
     return DROP_FOREIGN_KEY.equals(value);
+  }
+
+  /**
+   * Returns the tablespace. Returns null, if this is the special '$TABLESPACE_DEFAULT' value.
+   */
+  public static String toTablespace(String tablespace) {
+    if (TABLESPACE_DEFAULT.equals(tablespace)) { 
+      return null;
+    } else {
+      return tablespace;
+    }
   }
 }

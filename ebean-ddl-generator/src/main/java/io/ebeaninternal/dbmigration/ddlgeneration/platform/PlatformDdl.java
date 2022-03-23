@@ -317,10 +317,13 @@ public class PlatformDdl {
   // if columnType is different for different platforms, use pattern
   // @Column(columnDefinition = PLATFORM1;DEFINITION1;PLATFORM2;DEFINITON2;DEFINITON-DEFAULT)
   // e.g. @Column(columnDefinition = "db2;blob(64M);sqlserver,h2;varchar(227);varchar(127)")
-  private String extract(String type) {
-    String[] tmp = type.split(";");
+  protected String extract(String type) {
+    if (type == null) {
+      return null;
+    }
+    String[] tmp = type.split(";", -1); // do not discard trailing empty strings
     if (tmp.length % 2 == 0) {
-      throw new IllegalArgumentException("You need an odd number of arguments. See Issue #2559 for details");
+      throw new IllegalArgumentException("You need an odd number of arguments in '" + type + "'. See Issue #2559 for details");
     }
     for (int i = 0; i < tmp.length - 2; i += 2) {
       String[] platforms = tmp[i].split(",");
@@ -782,6 +785,23 @@ public class PlatformDdl {
 
   public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) {
     // only supported by postgres initially
+  }
+  
+  /**
+   * Adds tablespace declaration. Now only supported for db2.
+   */
+  public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) {
+    throw new UnsupportedOperationException("Tablespaces are not supported for this platform");
+  }
+
+  /**
+   * Moves the table to an other tablespace.
+   */
+  public String alterTableTablespace(String tablename, String tableSpace, String indexSpace, String lobSpace) {
+    if (tableSpace != null || indexSpace != null || lobSpace != null) {
+      throw new UnsupportedOperationException("Tablespaces are not supported for this platform");
+    }
+    return null;
   }
 
   protected String quote(String dbName) {

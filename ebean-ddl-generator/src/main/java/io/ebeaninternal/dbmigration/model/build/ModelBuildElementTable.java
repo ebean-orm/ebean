@@ -18,7 +18,7 @@ public class ModelBuildElementTable {
 
     BeanTable beanTable = manyProp.beanTable();
     BeanDescriptor<?> targetDescriptor = manyProp.targetDescriptor();
-    MTable table = new MTable(beanTable.getBaseTable());
+    MTable table = new MTable(beanTable.getBaseTable(), manyProp.descriptor());
 
     VisitProperties.visit(targetDescriptor, new ModelBuildPropertyVisitor(ctx, table, targetDescriptor));
     ctx.addTableElementCollection(table);
