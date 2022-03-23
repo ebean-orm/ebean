@@ -3,7 +3,6 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ebean-orm/ebean/blob/master/LICENSE)
 [![Multi-JDK Build](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml)
 [![JDK 18-ea](https://github.com/ebean-orm/ebean/actions/workflows/jdk-18-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-18-ea.yml)
-[![JDK EA](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml)
 
 [![H2Database](https://github.com/ebean-orm/ebean/actions/workflows/h2database.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/h2database.yml)
 [![Postgres](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml)
@@ -11,6 +10,15 @@
 [![MariaDB](https://github.com/ebean-orm/ebean/actions/workflows/mariadb.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mariadb.yml)
 [![SqlServer](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver.yml)
 [![Yugabyte](https://github.com/ebean-orm/ebean/actions/workflows/yugabyte.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/yugabyte.yml)
+
+
+#### Early access builds
+
+[![ebean EA](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml)
+[![datasource EA](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml)
+[![migration EA](https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml)
+[![test-docker EA](https://github.com/ebean-orm/ebean-test-docker/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-test-docker/actions/workflows/jdk-ea.yml)
+
 
 # Sponsors
 <table>
@@ -40,39 +48,15 @@
   </tbody>
 </table>
 
-# Need help?
+## Need help?
 Post questions or issues to the Ebean google group - https://groups.google.com/forum/#!forum/ebean
 
-# Documentation
+## Documentation
 Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
 
-## Maven central links:
-[Maven central - ebean](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.ebean%22%20AND%20a%3A%22ebean%22 "maven central ebean")
-
-[Maven central - all related projects](http://search.maven.org/#search%7Cga%7C1%7Cebean "maven central all related projects")
+## Maven central
+[Maven central - io.ebean](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.ebean%22%20)
 
 
-## Early access builds
 
-<p>
-  <a href="https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml">
-    <img alt="ebean EA" src="https://img.shields.io/github/workflow/status/ebean-orm/ebean/JDK%20EA?label=ebean%20EA">
-  </a>
-  <a href="https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml">
-    <img alt="ebean-datasource EA" src="https://img.shields.io/github/workflow/status/ebean-orm/ebean-datasource/JDK%20EA?label=ebean-datasource%20EA">
-  </a>
-  <a href="https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml">
-    <img alt="ebean-migration EA" src="https://img.shields.io/github/workflow/status/ebean-orm/ebean-migration/JDK%20EA?label=ebean-migration%20EA">
-  </a>
-</p>
-
-<p>
-<a href="https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml">
-  <img src="https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml/badge.svg" alt="ebean" style="max-width: 100%;">
-</a>
-
-<a href="https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml">
-  <img src="https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml/badge.svg" alt="ebean-datasource" style="max-width: 100%;">
-</a>
-</p>
