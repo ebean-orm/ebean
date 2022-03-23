@@ -300,7 +300,7 @@ public interface Database {
    * Create a new instance of T that is an EntityBean.
    * <p>
    * Useful if you use BeanPostConstructListeners or &#64;PostConstruct Annotations.
-   * In this case you should not use "new Bean...()". Making all bean construtors protected
+   * In this case you should not use "new Bean...()". Making all bean constructors protected
    * could be a good idea here.
    * </p>
    */
