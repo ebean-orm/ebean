@@ -1,5 +1,5 @@
 
-name: JDK EA
+name: ebean EA
 
 on:
   workflow_dispatch:
