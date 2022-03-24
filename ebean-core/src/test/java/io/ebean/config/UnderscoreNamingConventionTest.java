@@ -1,6 +1,5 @@
 package io.ebean.config;
 
-import io.ebean.config.UnderscoreNamingConvention;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

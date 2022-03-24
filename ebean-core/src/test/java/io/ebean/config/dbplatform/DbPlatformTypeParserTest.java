@@ -1,7 +1,5 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbPlatformTypeParser;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

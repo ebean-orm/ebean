@@ -1,7 +1,6 @@
 package io.ebean.config.dbplatform;
 
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.oracle.Oracle11Platform;
 import io.ebean.config.dbplatform.oracle.Oracle12Platform;
 import io.ebean.config.dbplatform.oracle.OraclePlatform;

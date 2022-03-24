@@ -1,8 +1,5 @@
 package io.ebean.config.dbplatform;
 
-import io.ebean.config.dbplatform.DbPlatformTypeLookup;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.ExtraDbTypes;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

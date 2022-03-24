@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class SequenceBatchIdGeneratorTest {
 

@@ -3,7 +3,6 @@ package io.ebeaninternal.server.rawsql;
 
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
-import io.ebeaninternal.server.rawsql.SpiRawSql;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

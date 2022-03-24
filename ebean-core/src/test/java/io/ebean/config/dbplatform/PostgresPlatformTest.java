@@ -2,8 +2,6 @@ package io.ebean.config.dbplatform;
 
 import io.ebean.Query;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import org.junit.jupiter.api.Test;
 
