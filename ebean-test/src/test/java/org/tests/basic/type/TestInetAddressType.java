@@ -1,7 +1,7 @@
 package org.tests.basic.type;
 
 import io.ebean.DB;
-import io.ebean.TransactionalTestCase;
+import io.ebean.xtest.base.TransactionalTestCase;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import org.junit.jupiter.api.Test;

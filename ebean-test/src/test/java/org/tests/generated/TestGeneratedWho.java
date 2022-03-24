@@ -2,7 +2,7 @@ package org.tests.generated;
 
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.MyCurrentUserProvider;
+import io.ebean.xtest.base.MyCurrentUserProvider;
 import org.junit.jupiter.api.Test;
 import org.tests.model.EWhoProps;
 import org.tests.model.generated.User;

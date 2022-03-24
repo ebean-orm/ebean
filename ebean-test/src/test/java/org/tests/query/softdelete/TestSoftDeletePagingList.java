@@ -2,7 +2,7 @@ package org.tests.query.softdelete;
 
 import io.ebean.DB;
 import io.ebean.PagedList;
-import io.ebean.TransactionalTestCase;
+import io.ebean.xtest.base.TransactionalTestCase;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.onetoone.album.Cover;

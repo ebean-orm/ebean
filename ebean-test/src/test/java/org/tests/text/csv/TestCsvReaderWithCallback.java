@@ -1,7 +1,7 @@
 package org.tests.text.csv;
 
 import io.ebean.DB;
-import io.ebean.TransactionalTestCase;
+import io.ebean.xtest.base.TransactionalTestCase;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.csv.DefaultCsvCallback;
 import io.ebean.util.IOUtils;

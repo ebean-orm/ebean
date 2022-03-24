@@ -1,0 +1,140 @@
+package io.ebean.xtest.base;
+
+import io.ebean.BaseTestCase;
+import io.ebean.DB;
+import io.ebean.Database;
+import io.ebean.Transaction;
+import io.ebean.test.LoggedSql;
+import org.junit.jupiter.api.Test;
+import org.tests.model.basic.EBasicVer;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+
+class EbeanServer_deleteAllByIdTest extends BaseTestCase {
+
+  @Test
+  void saveAllByVarArgs() {
+
+    final EBasicVer bean0 = bean("foo0");
+    final EBasicVer bean1 = bean("foo1");
+    final EBasicVer bean2 = bean("foo2");
+
+    LoggedSql.start();
+
+    DB.saveAll(bean0, bean1, bean2);
+
+    assertNotNull(bean0.getId());
+    assertNotNull(bean1.getId());
+    assertNotNull(bean2.getId());
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql.get(0)).contains("insert into e_basicver");
+    assertSqlBind(loggedSql, 1, 3);
+
+    List<Integer> ids = new ArrayList<>();
+    ids.add(bean0.getId());
+    ids.add(bean1.getId());
+    ids.add(bean2.getId());
+    DB.deleteAll(EBasicVer.class, ids);
+  }
+
+  @Test
+  void deleteAllById() {
+    List<EBasicVer> someBeans = beans(3);
+
+    DB.saveAll(someBeans);
+    List<Integer> ids = new ArrayList<>();
+    for (EBasicVer someBean : someBeans) {
+      ids.add(someBean.getId());
+    }
+
+    // act
+    LoggedSql.start();
+    DB.deleteAll(EBasicVer.class, ids);
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql).hasSize(1);
+    platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
+  }
+
+  @Test
+  void deleteAllById_withTransaction() {
+    List<EBasicVer> someBeans = beans(3);
+
+    DB.saveAll(someBeans);
+    List<Integer> ids = new ArrayList<>();
+    for (EBasicVer someBean : someBeans) {
+      ids.add(someBean.getId());
+    }
+
+    Database db = DB.getDefault();
+    // act
+    LoggedSql.start();
+    try (Transaction txn = db.beginTransaction()) {
+      db.deleteAll(EBasicVer.class, ids, txn);
+      txn.commit();
+    }
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql).hasSize(1);
+    platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
+  }
+
+  @Test
+  void deleteAllPermanentById() {
+    List<EBasicVer> someBeans = beans(3);
+
+    DB.saveAll(someBeans);
+    List<Integer> ids = new ArrayList<>();
+    for (EBasicVer someBean : someBeans) {
+      ids.add(someBean.getId());
+    }
+
+    LoggedSql.start();
+
+    DB.deleteAllPermanent(EBasicVer.class, ids);
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql).hasSize(1);
+    platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
+  }
+
+  @Test
+  void deleteAllPermanentById_withTransaction() {
+    List<EBasicVer> someBeans = beans(3);
+
+    DB.saveAll(someBeans);
+    List<Integer> ids = new ArrayList<>();
+    for (EBasicVer someBean : someBeans) {
+      ids.add(someBean.getId());
+    }
+
+    Database db = DB.getDefault();
+    // act
+    LoggedSql.start();
+    try (Transaction txn = db.beginTransaction()) {
+      db.deleteAllPermanent(EBasicVer.class, ids, txn);
+      txn.commit();
+    }
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql).hasSize(1);
+    platformAssertIn(loggedSql.get(0), "delete from e_basicver where id ");
+  }
+
+  private List<EBasicVer> beans(int count) {
+    List<EBasicVer> beans = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      beans.add(bean("foo" + i));
+    }
+    return beans;
+  }
+
+  private EBasicVer bean(String name) {
+    return new EBasicVer(name);
+  }
+}

@@ -3,7 +3,7 @@ package org.tests.batchload;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.QueryIterator;
-import io.ebean.TransactionalTestCase;
+import io.ebean.xtest.base.TransactionalTestCase;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
