@@ -1,7 +1,6 @@
 package io.ebean.config.dbplatform;
 
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
 import org.junit.jupiter.api.Test;
 

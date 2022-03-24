@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.rawsql;
 
 import io.ebean.SqlRow;
-import io.ebeaninternal.server.rawsql.DRawSqlService;
 import org.junit.jupiter.api.Test;
 
 import java.sql.ResultSet;
