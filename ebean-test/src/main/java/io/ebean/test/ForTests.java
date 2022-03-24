@@ -64,16 +64,16 @@ public class ForTests {
    * back all changes made during test execution.
    * </p>
    *
-   * <pre>{@code
+   * <pre><code>
    *
    *   private ForTests.RollbackAll rollbackAll;
    *
-   *   @Before
+   *   &#64;Before
    *   public void before() {
    *     rollbackAll = ForTests.createRollbackAll();
    *   }
    *
-   *   @After
+   *   &#64;After
    *   public void after() {
    *     rollbackAll.close();
    *   }
@@ -81,7 +81,7 @@ public class ForTests {
    *   ... tests execute and everything is rolled back
    *
    *
-   * }</pre>
+   * <code></pre>
    */
   public static RollbackAll createRollbackAll() {
 
