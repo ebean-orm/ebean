@@ -15,9 +15,9 @@ import java.util.List;
  * <p>
  * For testing the mocki-ebean project has the ability to replace the finder implementation.
  * </p>
- * <pre>{@code
+ * <pre><code>
  *
- * public class CustomerFinder extends Finder<Long,Customer> {
+ * public class CustomerFinder extends Finder&lt;Long,Customer&gt; {
  *
  *   public CustomerFinder() {
  *     super(Customer.class);
@@ -37,14 +37,14 @@ import java.util.List;
  *   }
  * }
  *
- * @Entity
+ * &#64;Entity
  * public class Customer extends BaseModel {
  *
  *   public static final CustomerFinder find = new CustomerFinder();
  *   ...
  *
  * }
- * }</pre>
+ * </code></pre>
  * <p>
  *  When the Finder is registered as a field on Customer it can then be used like:
  * </p>
@@ -70,9 +70,9 @@ public class Finder<I, T> {
 
   /**
    * Create with the type of the entity bean.
-   * <pre>{@code
+   * <pre><code>
    *
-   * public class CustomerFinder extends Finder<Customer> {
+   * public class CustomerFinder extends Finder&lt;Customer&gt; {
    *
    *   public CustomerFinder() {
    *     super(Customer.class);
@@ -81,14 +81,14 @@ public class Finder<I, T> {
    *   // ... add extra customer specific finder methods
    * }
    *
-   * @Entity
+   * &#64;Entity
    * public class Customer extends BaseModel {
    *
    *   public static final CustomerFinder find = new CustomerFinder();
    *   ...
    *
    * }
-   * }</pre>
+   * </code></pre>
    */
   public Finder(Class<T> type) {
     this.type = type;

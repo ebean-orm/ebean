@@ -11,11 +11,11 @@ package io.ebean.config;
  * spring specific configuration.  When we are not using a DI container we may use this mechanism to
  * explicitly register the entity beans and avoid classpath scanning.
  * </p>
- * <pre>{@code
+ * <pre><code>
  *
  * public class EbeanConfigProvider implements DatabaseConfigProvider {
  *
- *   @Override
+ *   &#64;Override
  *   public void apply(DatabaseConfig config) {
  *
  *     // register the entity bean classes explicitly
@@ -25,7 +25,7 @@ package io.ebean.config;
  *   }
  * }
  *
- * }</pre>
+ * </code></pre>
  */
 public interface DatabaseConfigProvider {
 

@@ -27,39 +27,39 @@ import io.ebean.bean.EntityBean;
  * relatively nice clean way to write queries.
  * <p>
  * <h3>Typical common @MappedSuperclass</h3>
- * <pre>{@code
+ * <pre><code>
  *
  *     // Typically there is a common base model that has some
  *     // common properties like the ones below
  *
- *   @MappedSuperclass
+ *   &#64;MappedSuperclass
  *   public class BaseModel extends Model {
  *
- *     @Id Long id;
+ *     &#64;Id Long id;
  *
- *     @Version Long version;
+ *     &#64;Version Long version;
  *
- *     @WhenCreated Timestamp whenCreated;
+ *     &#64;WhenCreated Timestamp whenCreated;
  *
- *     @WhenUpdated Timestamp whenUpdated;
+ *     &#64;WhenUpdated Timestamp whenUpdated;
  *
  *     ...
  *   }
- * }</pre>
+ * </code></pre>
  * <p>
  * <h3>Extend the Model</h3>
- * <pre>{@code
+ * <pre><code>
  *
  *     // Extend the mappedSuperclass
  *
- *     @Entity @Table(name="o_account")
+ *     &#64;Entity &#64;Table(name="o_account")
  *     public class Customer extends BaseModel {
  *
  *       String name;
  *       ...
  *     }
  *
- * }</pre>
+ * </code></pre>
  * <p>
  * <h3>Modal: save()</h3>
  * <pre>{@code

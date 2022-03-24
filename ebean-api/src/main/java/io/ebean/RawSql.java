@@ -39,16 +39,16 @@ package io.ebean;
  * to Order.
  * <p>
  * <h3>Example OrderAggregate</h3>
- * <pre>{@code
- *  ...
- *   // @Sql indicates to that this bean
+ * <pre><code>
+ *   ...
+ *   // &#64;Sql indicates to that this bean
  *   // is based on RawSql rather than a table
  *
- *   @Entity
- *   @Sql
+ *   &#64;Entity
+ *   &#64;Sql
  *   public class OrderAggregate {
  *
- *    @OneToOne
+ *    &#64;OneToOne
  *    Order order;
  *
  *    Double totalAmount;
@@ -58,7 +58,7 @@ package io.ebean;
  *    // getters and setters
  *    ...
  *   }
- * }</pre>
+ * </code></pre>
  *
  * <h3>Example 1:</h3>
  *

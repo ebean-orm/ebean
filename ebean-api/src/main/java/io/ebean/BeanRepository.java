@@ -8,26 +8,26 @@ import java.util.Collection;
 /**
  * Provides finder functionality for use with "Dependency Injection style" use of Ebean.
  * <p>
- * <pre>{@code
+ * <pre><code>
  *
- * @Repository
- * public class CustomerRepository extends BeanRepository<Long,Customer> {
+ * &#64;Repository
+ * public class CustomerRepository extends BeanRepository&lt;Long,Customer&gt; {
  *
- *   @Inject
+ *   &#64;Inject
  *   public CustomerRepository(Database server) {
  *     super(Customer.class, server);
  *   }
  *
  *   // ... add customer specific finders and persist logic
  *
- *   public List<Customer> findByName(String nameStart) {
+ *   public List&lt;Customer&gt; findByName(String nameStart) {
  *     return query().where()
  *             .istartsWith("name", nameStart)
  *             .findList();
  *   }
  *
  * }
- * }</pre>
+ * </code></pre>
  *
  * @param <I> The ID type
  * @param <T> The Bean type

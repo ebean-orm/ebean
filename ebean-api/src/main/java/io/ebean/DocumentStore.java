@@ -145,13 +145,13 @@ public interface DocumentStore {
    * <p>
    * Typically this is called indirectly by findEachWhile() on the query that has setUseDocStore(true).
    * </p>
-   * <pre>{@code
+   * <pre><code>
    *
    *  database.find(Order.class)
    *    .setUseDocStore(true)
    *    .where()... // perhaps add predicates
-   *    .findEachWhile(new Predicate<Order>() {
-   *      @Override
+   *    .findEachWhile(new Predicate&lt;Order&gt;() {
+   *      &#64;Override
    *      public void accept(Order bean) {
    *        // process the bean
    *
@@ -161,7 +161,7 @@ public interface DocumentStore {
    *      }
    *    });
    *
-   * }</pre>
+   * </code></pre>
    */
   <T> void findEachWhile(DocQueryContext<T> query, Predicate<T> consumer);
 

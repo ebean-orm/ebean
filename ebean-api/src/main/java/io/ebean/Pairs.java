@@ -15,11 +15,11 @@ import java.util.Objects;
  * These queries can have predicates that can be translated into a list of complex natural keys such that the L2
  * cache can be hit with these keys to obtain some or all of the beans from L2 cache rather than the DB.
  * </p>
- * <pre>{@code
+ * <pre><code>
  *
  *   // where a bean is annotated with a complex
  *   // natural key made of several properties
- *   @Cache(naturalKey = {"store","code","sku"})
+ *   &#64;Cache(naturalKey = {"store","code","sku"})
  *
  *
  *   Pairs pairs = new Pairs("sku", "code");
@@ -38,7 +38,7 @@ import java.util.Objects;
  *   .setUseCache(true)
  *   .findList();
  *
- * }</pre>
+ * </code></pre>
  * <h3>Important implementation Note</h3>
  * <p>
  * When binding many pairs of values we want to be able to utilise a DB index (as this type of query usually means the

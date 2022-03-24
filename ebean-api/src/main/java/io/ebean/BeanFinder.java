@@ -10,11 +10,11 @@ import java.util.Optional;
  * <p>
  * Note that typically users would extend BeanRepository rather than BeanFinder.
  * </p>
- * <pre>{@code
+ * <pre><code>
  *
- * public class CustomerFinder extends BeanFinder<Long,Customer> {
+ * public class CustomerFinder extends BeanFinder&lt;Long,Customergt; {
  *
- *   @Inject
+ *   &#64;Inject
  *   public CustomerFinder(Database database) {
  *     super(Customer.class, database);
  *   }
@@ -22,7 +22,7 @@ import java.util.Optional;
  *   // ... add customer specific finders
  * }
  *
- * }</pre>
+ * </code></pre>
  *
  * @param <I> The ID type
  * @param <T> The Bean type

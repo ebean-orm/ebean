@@ -990,14 +990,15 @@ public interface Database {
    * saving an order will also save all its details.
    * </p>
    * <p>
-   * <pre>{@code
-   *   public class Order { ...
+   * <pre><code>
+   * public class Order { ...
    *
-   *     @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
-   * 	   List<OrderDetail> details;
-   * 	   ...
+   *   &#64;OneToMany(cascade=CascadeType.ALL, mappedBy="order")
+   *   List<OrderDetail> details;
+   *     ...
    *   }
-   * }</pre>
+   * }
+   * </code></pre>
    * <p>
    * <p>
    * When a save cascades via a OneToMany or ManyToMany Ebean will automatically

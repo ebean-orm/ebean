@@ -342,14 +342,15 @@ public final class Ebean {
    * In this example below the details property has a CascadeType.ALL set so
    * saving an order will also save all its details.
    * </p>
-   * <pre>{@code
-   *   public class Order { ...
+   * <pre><code>
+   * public class Order { ...
    *
-   *     @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
-   * 	   List<OrderDetail> details;
-   * 	   ...
+   *   &#64;OneToMany(cascade=CascadeType.ALL, mappedBy="order")
+   *     List<OrderDetail> details;
+   *     ...
    *   }
-   * }</pre>
+   * }
+   * </code></pre>
    * <p>
    * When a save cascades via a OneToMany or ManyToMany Ebean will automatically
    * set the 'parent' object to the 'detail' object. In the example below in

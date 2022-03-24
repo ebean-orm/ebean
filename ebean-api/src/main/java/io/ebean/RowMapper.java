@@ -15,14 +15,14 @@ import java.sql.SQLException;
  * it can automatically map the ResultSet into beans.
  * </p>
  *
- * <pre>{@code
+ * <pre><code>
  *
  *    //
  *    // Map from ResultSet to CustomerDto bean
  *    //
  *    class CustomerMapper implements RowMapper<CustomerDto> {
  *
- *     @Override
+ *     &#64;Override
  *     public CustomerDto map(ResultSet rset, int rowNum) throws SQLException {
  *
  *       long id = rset.getLong(1);
@@ -46,7 +46,7 @@ import java.sql.SQLException;
  *    .findOne();
  *
  *
- * }</pre>
+ * </code></pre>
  *
  * @param <T> The type the row data is mapped into.
  */
