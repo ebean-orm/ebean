@@ -1,6 +1,6 @@
 package org.tests.query.embedded;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
 import org.junit.jupiter.api.Test;

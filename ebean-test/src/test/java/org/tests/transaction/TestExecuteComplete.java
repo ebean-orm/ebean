@@ -1,7 +1,8 @@
 package org.tests.transaction;
 
 import io.ebean.*;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;

@@ -1,7 +1,7 @@
 package org.tests.basic.join;
 
 import io.ebean.DB;
-import io.ebean.TransactionalTestCase;
+import io.ebean.xtest.base.TransactionalTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.Order.Status;

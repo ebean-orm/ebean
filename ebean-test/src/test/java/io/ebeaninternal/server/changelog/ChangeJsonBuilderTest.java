@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.changelog;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import org.junit.jupiter.api.Test;

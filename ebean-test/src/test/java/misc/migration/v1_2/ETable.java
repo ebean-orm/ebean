@@ -1,18 +1,11 @@
 package misc.migration.v1_2;
 
-import java.util.List;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Table(name = "`table`")
 @Entity

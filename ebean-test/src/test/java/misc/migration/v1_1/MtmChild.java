@@ -1,17 +1,16 @@
 package misc.migration.v1_1;
 
+import io.ebean.annotation.Tablespace;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-
-import io.ebean.annotation.Tablespace;
-
 import java.util.List;
 
 @Entity
 @Table(name = "migtest_mtm_c")
-@Tablespace("TESTTS")
+@Tablespace("db2;TESTTS;")
 public class MtmChild {
 
   @Id

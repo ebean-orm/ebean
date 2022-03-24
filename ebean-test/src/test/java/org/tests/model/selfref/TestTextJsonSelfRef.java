@@ -1,6 +1,6 @@
 package org.tests.model.selfref;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;

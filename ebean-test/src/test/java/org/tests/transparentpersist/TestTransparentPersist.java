@@ -4,6 +4,7 @@ import io.ebean.*;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxOption;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;

@@ -3,10 +3,10 @@ package io.ebean.config;
 
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
-import io.ebean.annotation.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.datasource.DataSourceAlert;
 import io.ebean.datasource.DataSourceInitialiseException;
+import io.ebean.xtest.ForPlatform;
 
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;

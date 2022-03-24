@@ -1,7 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -15,18 +14,14 @@ import java.util.List;
 /**
  * Uses DB triggers to maintain a history table.
  */
-public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
-
-  protected DbConstraintNaming constraintNaming;
-
-  protected PlatformDdl platformDdl;
+public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl implements PlatformHistoryDdl {
 
   protected String sysPeriod;
   protected String sysPeriodStart;
   protected String sysPeriodEnd;
 
   protected String viewSuffix;
-  protected String historySuffix;
+
 
   protected String sysPeriodType = "datetime(6)";
   protected String now = "now(6)";
@@ -37,11 +32,9 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
   @Override
   public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
-    this.platformDdl = platformDdl;
+    super.configure(config, platformDdl);
     this.sysPeriod = config.getAsOfSysPeriod();
     this.viewSuffix = config.getAsOfViewSuffix();
-    this.historySuffix = config.getHistoryTableSuffix();
-    this.constraintNaming = config.getConstraintNaming();
 
     this.sysPeriodStart = sysPeriod + "_start";
     this.sysPeriodEnd = sysPeriod + "_end";
@@ -121,33 +114,24 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
 
   protected abstract void dropTriggers(DdlBuffer buffer, String baseTable);
 
-
-  protected String normalise(String tableName) {
-    return constraintNaming.normaliseTable(tableName);
-  }
-
-  protected String historyTableName(String baseTableName) {
-    return quote(normalise(baseTableName) + historySuffix);
-  }
-
   protected String historyViewName(String baseTableName) {
-    return quote(normalise(baseTableName) + viewSuffix);
+    return normalise(baseTableName, viewSuffix);
   }
 
   protected String procedureName(String baseTableName) {
-    return normalise(baseTableName) + "_history_version";
+    return normalise(baseTableName, "_history_version");
   }
 
   protected String triggerName(String baseTableName) {
-    return normalise(baseTableName) + "_history_upd";
+    return normalise(baseTableName, "_history_upd");
   }
 
   protected String updateTriggerName(String baseTableName) {
-    return normalise(baseTableName) + "_history_upd";
+    return normalise(baseTableName, "_history_upd");
   }
 
   protected String deleteTriggerName(String baseTableName) {
-    return normalise(baseTableName) + "_history_del";
+    return normalise(baseTableName, "_history_del");
   }
 
   protected void addSysPeriodColumns(DdlWrite writer, String baseTableName, String whenCreatedColumn) {
@@ -163,6 +147,8 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
   protected void createHistoryTable(DdlBuffer apply, MTable table) {
     createHistoryTableAs(apply, table);
     createHistoryTableWithPeriod(apply);
+    // TODO: add tablespace here (currently no DbTriggerBased platforms with tablespace support)
+    apply.endOfStatement();
   }
 
   protected void createHistoryTableAs(DdlBuffer apply, MTable table) {
@@ -183,7 +169,7 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     writeColumnDefinition(apply, sysPeriodStart, sysPeriodType);
     apply.append(",").newLine();
     writeColumnDefinition(apply, sysPeriodEnd, sysPeriodType);
-    apply.newLine().append(")").endOfStatement();
+    apply.newLine().append(")");
   }
 
   /**
@@ -264,12 +250,5 @@ public abstract class DbTriggerBasedHistoryDdl implements PlatformHistoryDdl {
     return table.allHistoryColumns(true);
   }
 
-  @Override
-  public boolean alterHistoryTables() {
-    return true;
-  }
 
-  protected String quote(String dbName) {
-    return platformDdl.quote(dbName);
-  }
 }

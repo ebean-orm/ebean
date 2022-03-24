@@ -4,7 +4,6 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.NamingConvention;
-import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
@@ -62,7 +61,7 @@ public class BaseTableDdl implements TableDdl {
 
   private final boolean strictMode;
 
-  private final boolean alterHistoryTables;
+  private final PlatformHistoryDdl.TableBased tableHistory;
 
   /**
    * Helper class that is used to execute the migration ddl before and after the migration action.
@@ -181,11 +180,10 @@ public class BaseTableDdl implements TableDdl {
     this.platformDdl = platformDdl;
     this.platformDdl.configure(config);
     this.strictMode = config.isDdlStrictMode();
-    DbHistorySupport hist = platformDdl.getPlatform().getHistorySupport();
-    if (hist == null) {
-      this.alterHistoryTables = false;
+    if (platformDdl.historyDdl instanceof PlatformHistoryDdl.TableBased) {
+      this.tableHistory = (PlatformHistoryDdl.TableBased) platformDdl.historyDdl;
     } else {
-      this.alterHistoryTables = platformDdl.historyDdl.alterHistoryTables();
+      this.tableHistory = null;
     }
   }
 
@@ -237,9 +235,8 @@ public class BaseTableDdl implements TableDdl {
       writeInlineForeignKeys(apply, createTable);
     }
     apply.newLine().append(")");
-    if (createTable.getTablespace() != null) {
-      platformDdl.addTablespace(apply, createTable.getTablespace(), createTable.getIndexTablespace(), createTable.getLobTablespace());
-    }
+
+    addTableTableSpaces(apply, createTable);
     addTableStorageEngine(apply, createTable);
     addTableCommentInline(apply, createTable);
     if (partitionMode != null) {
@@ -271,6 +268,8 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
+
+
   private String sequenceName(CreateTable createTable, List<Column> pk) {
     return namingConvention.getSequenceName(createTable.getName(), pk.get(0).getName());
   }
@@ -289,6 +288,19 @@ public class BaseTableDdl implements TableDdl {
           platformDdl.addColumnComment(apply, createTable.getName(), column.getName(), column.getComment());
         }
       }
+    }
+  }
+
+  /**
+   * Add tablespace declaration.
+   */
+  protected void addTableTableSpaces(DdlBuffer apply, CreateTable createTable) {
+    String tableSpace = platformDdl.extract(createTable.getTablespace());
+    if (hasValue(tableSpace)) {
+      platformDdl.addTablespace(apply,
+        tableSpace,
+        platformDdl.extract(createTable.getIndexTablespace()),
+        platformDdl.extract(createTable.getLobTablespace()));
     }
   }
 
@@ -621,8 +633,8 @@ public class BaseTableDdl implements TableDdl {
     if (isTrue(addColumn.isWithHistory())) {
       platformDdl.regenerateHistoryTriggers(writer, tableName);
       // make same changes to the history table
-      if (alterHistoryTables) {
-        String historyTable = historyTable(tableName);
+      if (tableHistory != null) {
+        String historyTable = tableHistory.historyTableName(tableName);
         for (Column column : columns) {
           alterTableAddColumn(writer, historyTable, column, true, true);
         }
@@ -656,14 +668,17 @@ public class BaseTableDdl implements TableDdl {
    */
   @Override
   public void generate(DdlWrite writer, AlterTable alterTable) {
-    if (hasValue(alterTable.getTablespace())
-      || hasValue(alterTable.getIndexTablespace())
-      || hasValue(alterTable.getLobTablespace())) {
+    String tableSpace = platformDdl.extract(alterTable.getTablespace());
+    String indexSpace = platformDdl.extract(alterTable.getIndexTablespace());
+    String lobSpace = platformDdl.extract(alterTable.getLobTablespace());
+    if (hasValue(tableSpace)
+      || hasValue(indexSpace)
+      || hasValue(lobSpace)) {
 
       writer.apply().appendStatement(platformDdl.alterTableTablespace(alterTable.getName(),
-        DdlHelp.toTablespace(alterTable.getTablespace()),
-        DdlHelp.toTablespace(alterTable.getIndexTablespace()),
-        DdlHelp.toTablespace(alterTable.getLobTablespace())));
+        DdlHelp.toTablespace(tableSpace),
+        DdlHelp.toTablespace(indexSpace),
+        DdlHelp.toTablespace(lobSpace)));
     }
   }
 
@@ -678,8 +693,8 @@ public class BaseTableDdl implements TableDdl {
     if (isTrue(dropColumn.isWithHistory())) {
       platformDdl.regenerateHistoryTriggers(writer, tableName);
       // also drop from the history table
-      if (alterHistoryTables) {
-        alterTableDropColumn(writer, historyTable(tableName), dropColumn.getColumnName());
+      if (tableHistory != null) {
+        alterTableDropColumn(writer, tableHistory.historyTableName(tableName), dropColumn.getColumnName());
       }
     }
   }
@@ -758,13 +773,6 @@ public class BaseTableDdl implements TableDdl {
   }
 
   /**
-   * Return the name of the history table given the base table name.
-   */
-  protected String historyTable(String baseTable) {
-    return naming.normaliseTable(baseTable) + historyTableSuffix;
-  }
-
-  /**
    * alter all the base attributes (type/default/notnull) of the column together.
    * Some platforms (like mysql/sqlserver/hana) must do that in one statement,
    * other platforms may use several statements for altering one of the base
@@ -784,9 +792,9 @@ public class BaseTableDdl implements TableDdl {
       }
       if (applyToHistory) {
         platformDdl.regenerateHistoryTriggers(writer, alter.getTableName());
-        if (alterHistoryTables) {
+        if (tableHistory != null) {
           AlterColumn alterHistoryColumn = new AlterColumn();
-          alterHistoryColumn.setTableName(historyTable(alter.getTableName()));
+          alterHistoryColumn.setTableName(tableHistory.historyTableName(alter.getTableName()));
           alterHistoryColumn.setColumnName(alter.getColumnName());
           // ignore default value (not needed on history tables)
           alterHistoryColumn.setCurrentType(alter.getCurrentType());

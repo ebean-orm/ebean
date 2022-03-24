@@ -3,6 +3,7 @@ package org.tests.persistencecontext;
 import io.ebean.*;
 import io.ebean.config.ContainerConfig;
 import io.ebean.config.DatabaseConfig;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import org.junit.jupiter.api.Test;

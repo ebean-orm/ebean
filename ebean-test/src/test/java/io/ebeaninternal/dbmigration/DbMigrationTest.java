@@ -1,7 +1,8 @@
 package io.ebeaninternal.dbmigration;
 
 import io.ebean.*;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
@@ -9,13 +10,16 @@ import io.ebean.datasource.pool.ConnectionPool;
 import misc.migration.v1_0.ETable;
 import misc.migration.v1_1.EHistory;
 import misc.migration.v1_1.EHistory2;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,7 +47,7 @@ public class DbMigrationTest extends BaseTestCase {
   @Test
   public void lastVersion() {
     File d = new File("src/test/resources/migrationtest/dbmigration/h2");
-    assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.4");
+    Assertions.assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.4");
     assertThat(LastMigration.nextVersion(d, null, false)).isEqualTo("1.5");
     assertThat(LastMigration.nextVersion(d, null, true)).isEqualTo("1.4");
   }
@@ -60,35 +64,38 @@ public class DbMigrationTest extends BaseTestCase {
     ((ConnectionPool)server().dataSource()).offline();
     ((ConnectionPool)server().dataSource()).online();
     cleanup("migtest_ckey_assoc",
-        "migtest_ckey_detail",
-        "migtest_ckey_parent",
-        "migtest_e_basic",
-        "migtest_e_enum",
-        "migtest_e_history",
-        "migtest_e_history2",
-        "migtest_e_history3",
-        "migtest_e_history4",
-        "migtest_e_history5",
-        "migtest_e_history6",
-        "migtest_e_ref",
-        "migtest_e_softdelete",
-        "migtest_e_user",
-        "migtest_fk_cascade",
-        "migtest_fk_cascade_one",
-        "migtest_fk_none",
-        "migtest_fk_none_via_join",
-        "migtest_fk_one",
-        "migtest_fk_set_null",
-        "migtest_mtm_c",
-        "migtest_mtm_m",
-        "migtest_mtm_m_phone_numbers",
-        "migtest_mtm_c_migtest_mtm_m",
-        "migtest_mtm_m_migtest_mtm_c",
-        "migtest_oto_child",
-        "migtest_oto_master",
-        "table",
-        "\"table\"",
-        "`table`");
+      "migtest_ckey_detail",
+      "migtest_ckey_parent",
+      "migtest_e_basic",
+      "migtest_e_enum",
+      "migtest_e_history",
+      "migtest_e_history2",
+      "migtest_e_history3",
+      "migtest_e_history4",
+      "migtest_e_history5",
+      "migtest_e_history6",
+      "migtest_e_ref",
+      "migtest_e_softdelete",
+      "migtest_e_user",
+      "migtest_fk_cascade",
+      "migtest_fk_cascade_one",
+      "migtest_fk_none",
+      "migtest_fk_none_via_join",
+      "migtest_fk_one",
+      "migtest_fk_set_null",
+      "migtest_mtm_c",
+      "migtest_mtm_m",
+      "migtest_mtm_m_phone_numbers",
+      "migtest_mtm_c_migtest_mtm_m",
+      "migtest_mtm_m_migtest_mtm_c",
+      "migtest_oto_child",
+      "migtest_oto_master",
+      "`migtest_QuOtEd`",
+      "migtest_QuOtEd",
+      "\"migtest_QuOtEd\"",
+      "table",
+      "\"table\"",
+      "`table`");
     ((ConnectionPool)server().dataSource()).offline();
     ((ConnectionPool)server().dataSource()).online();
 
@@ -100,8 +107,21 @@ public class DbMigrationTest extends BaseTestCase {
       runScript("I__create_tablespaces.sql");
     }
 
-    runScript("1.0__initial.sql");
+    if(isDb2()) {
+      runScript("I__create_tablespaces.sql");
+    }
 
+    if (!isOracle()) {
+      // oracle.getMetaData is too slow. So skip this test
+      assertThat(getTables()).doesNotContain("migtest_QuOtEd");
+    }
+    runScript("1.0__initial.sql");
+    if (!isOracle()) {
+      assertThat(getTables()) // we expect exact spelling here
+        .contains("migtest_QuOtEd")
+        .doesNotContain("migtest_quoted")
+        .doesNotContain("MIGTEST_QUOTED");
+    }
     if (isClickHouse()) {
       // ClickHouse does not support transactions, so we cannot do update statements
       // Add column is also not implemented. So exit here
@@ -164,7 +184,10 @@ public class DbMigrationTest extends BaseTestCase {
       return;
     }
     runScript("1.2__dropsFor_1.1.sql");
-
+    if (!isOracle()) {
+      // too slow!
+      assertThat(getTables()).doesNotContain("migtest_QuOtEd");
+    }
     // Oracle caches the statement and does not detect schema change. It fails with
     // an ORA-01007
     result = server().sqlQuery("select * from migtest_e_basic order by id,status").findList();
@@ -348,5 +371,16 @@ public class DbMigrationTest extends BaseTestCase {
     }
     server().script().runScript("cleanup", sb.toString(), true);
     server().script().runScript("cleanup", sb.toString(), true);
+  }
+
+  private List<String> getTables() throws SQLException {
+    List<String> ret = new ArrayList<>();
+    try (Transaction txn = server().beginTransaction()) {
+      ResultSet rs = txn.connection().getMetaData().getTables(null, null, null, null);
+      while (rs.next()) {
+        ret.add(rs.getString(3));
+      }
+    }
+    return ret;
   }
 }

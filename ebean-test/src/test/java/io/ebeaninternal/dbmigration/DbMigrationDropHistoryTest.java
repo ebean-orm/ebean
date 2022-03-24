@@ -3,6 +3,7 @@ package io.ebeaninternal.dbmigration;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +37,9 @@ public class DbMigrationDropHistoryTest {
   @Test
   public void lastVersion_no_v_Prefix() {
     File d = new File("src/test/resources/migrationtest-history/dbmigration");
-    assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.2");
+    Assertions.assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.2");
   }
-  
+
   public static void main(String[] args) throws IOException {
 
     logger.info("start");

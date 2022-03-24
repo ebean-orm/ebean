@@ -1,6 +1,7 @@
 package org.tests.update;
 
 import io.ebean.*;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;

@@ -1,18 +1,13 @@
 package misc.migration.v1_1;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
 import io.ebean.annotation.Tablespace;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
 @Table(name = "migtest_mtm_m")
-@Tablespace("TSMASTER")
+@Tablespace("db2;TSMASTER;")
 public class MtmMaster {
 
   @Id
@@ -25,7 +20,7 @@ public class MtmMaster {
 
   @ElementCollection
   List<String> phoneNumbers;
-  
+
   public Long getId() {
     return id;
   }

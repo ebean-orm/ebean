@@ -105,6 +105,12 @@ create table migtest_e_history6 (
   test_number2                  UInt32
 ) ENGINE = Log();
 
+create table "migtest_QuOtEd" (
+  id                            String,
+  status1                       String,
+  status2                       String
+) ENGINE = Log();
+
 create table migtest_e_ref (
   id                            UInt32,
   name                          String

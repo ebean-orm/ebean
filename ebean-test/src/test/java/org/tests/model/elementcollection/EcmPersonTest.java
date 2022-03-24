@@ -1,7 +1,7 @@
 package org.tests.model.elementcollection;
 
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
 import io.ebean.text.json.JsonContext;

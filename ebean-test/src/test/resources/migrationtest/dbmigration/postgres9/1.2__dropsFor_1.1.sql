@@ -37,5 +37,6 @@ create trigger migtest_e_history2_history_upd
   before update or delete on migtest_e_history2
   for each row execute procedure migtest_e_history2_history_version();
 
+drop table if exists "migtest_QuOtEd" cascade;
 drop table if exists migtest_e_ref cascade;
 drop sequence if exists migtest_e_ref_seq;

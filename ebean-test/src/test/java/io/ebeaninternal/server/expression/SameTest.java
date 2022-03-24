@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,7 +11,7 @@ public class SameTest {
   @Test
   public void sameByNull() throws Exception {
 
-    assertThat(Same.sameByNull("a", "a")).isTrue();
+    Assertions.assertThat(Same.sameByNull("a", "a")).isTrue();
     assertThat(Same.sameByNull("a", "b")).isTrue();
     assertThat(Same.sameByNull(null, null)).isTrue();
     assertThat(Same.sameByNull("a", null)).isFalse();

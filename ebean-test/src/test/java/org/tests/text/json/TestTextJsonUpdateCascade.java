@@ -2,7 +2,7 @@ package org.tests.text.json;
 
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.TransactionalTestCase;
+import io.ebean.xtest.base.TransactionalTestCase;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;

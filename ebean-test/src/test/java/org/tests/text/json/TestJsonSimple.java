@@ -1,14 +1,16 @@
 package org.tests.text.json;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.EJson;
 import io.ebean.text.json.JsonContext;
 import io.ebean.util.IOUtils;
-
 import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.LineNumberReader;
+import java.io.Reader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

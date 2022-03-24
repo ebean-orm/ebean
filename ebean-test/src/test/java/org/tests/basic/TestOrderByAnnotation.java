@@ -2,7 +2,7 @@ package org.tests.basic;
 
 import io.ebean.DB;
 import io.ebean.Query;
-import io.ebean.TransactionalTestCase;
+import io.ebean.xtest.base.TransactionalTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;

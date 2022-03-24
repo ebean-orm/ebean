@@ -2,78 +2,85 @@
 -- drop dependencies
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'FK_MIGTEST_FK_CASCADE_ONE_ID' and tabname = 'MIGTEST_FK_CASCADE') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_FK_CASCADE_ONE_ID' and ucase(tabname) = 'MIGTEST_FK_CASCADE') then
   prepare stmt from 'alter table migtest_fk_cascade drop constraint fk_migtest_fk_cascade_one_id';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'FK_MIGTEST_FK_SET_NULL_ONE_ID' and tabname = 'MIGTEST_FK_SET_NULL') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_FK_SET_NULL_ONE_ID' and ucase(tabname) = 'MIGTEST_FK_SET_NULL') then
   prepare stmt from 'alter table migtest_fk_set_null drop constraint fk_migtest_fk_set_null_one_id';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MIGTEST_E_BASIC_STATUS' and tabname = 'MIGTEST_E_BASIC') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'CK_MIGTEST_E_BASIC_STATUS' and ucase(tabname) = 'MIGTEST_E_BASIC') then
   prepare stmt from 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MIGTEST_E_BASIC_STATUS2' and tabname = 'MIGTEST_E_BASIC') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'CK_MIGTEST_E_BASIC_STATUS2' and ucase(tabname) = 'MIGTEST_E_BASIC') then
   prepare stmt from 'alter table migtest_e_basic drop constraint ck_migtest_e_basic_status2';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'UQ_MIGTEST_E_BASIC_INDEXTEST2' and tabname = 'MIGTEST_E_BASIC') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'UQ_MIGTEST_E_BASIC_INDEXTEST2' and ucase(tabname) = 'MIGTEST_E_BASIC') then
   prepare stmt from 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2';
   execute stmt;
 end if;
 end$$
 delimiter $$
 begin
-if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'UQ_MIGTEST_E_BASIC_INDEXTEST2') then
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'UQ_MIGTEST_E_BASIC_INDEXTEST2') then
   prepare stmt from 'drop index uq_migtest_e_basic_indextest2';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'UQ_MIGTEST_E_BASIC_INDEXTEST6' and tabname = 'MIGTEST_E_BASIC') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'UQ_MIGTEST_E_BASIC_INDEXTEST6' and ucase(tabname) = 'MIGTEST_E_BASIC') then
   prepare stmt from 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6';
   execute stmt;
 end if;
 end$$
 delimiter $$
 begin
-if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'UQ_MIGTEST_E_BASIC_INDEXTEST6') then
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'UQ_MIGTEST_E_BASIC_INDEXTEST6') then
   prepare stmt from 'drop index uq_migtest_e_basic_indextest6';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and constname = 'CK_MIGTEST_E_ENUM_TEST_STATUS' and tabname = 'MIGTEST_E_ENUM') then
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'CK_MIGTEST_E_ENUM_TEST_STATUS' and ucase(tabname) = 'MIGTEST_E_ENUM') then
   prepare stmt from 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'IX_MIGTEST_E_BASIC_INDEXTEST1') then
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MIGTEST_E_BASIC_INDEXTEST1') then
   prepare stmt from 'drop index ix_migtest_e_basic_indextest1';
   execute stmt;
 end if;
 end$$;
 delimiter $$
 begin
-if exists (select indname from syscat.indexes where indschema = current_schema and indname = 'IX_MIGTEST_E_BASIC_INDEXTEST5') then
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MIGTEST_E_BASIC_INDEXTEST5') then
   prepare stmt from 'drop index ix_migtest_e_basic_indextest5';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MIGTEST_QUOTED_STATUS1') then
+  prepare stmt from 'drop index ix_migtest_quoted_status1';
   execute stmt;
 end if;
 end$$;
@@ -185,7 +192,7 @@ create unique index uq_migtest_e_basic_status_indextest1 on migtest_e_basic(stat
 create unique index uq_migtest_e_basic_name on migtest_e_basic(name) exclude null keys;
 create unique index uq_migtest_e_basic_indextest4 on migtest_e_basic(indextest4) exclude null keys;
 create unique index uq_migtest_e_basic_indextest5 on migtest_e_basic(indextest5) exclude null keys;
-create table migtest_e_history_history as (select * from migtest_e_history) with no data;
+create table migtest_e_history_history as (select * from migtest_e_history) with no data in MAIN index in MAIN long in MAIN;
 alter table migtest_e_history add versioning use history table migtest_e_history_history;
 comment on column migtest_e_history.test_string is 'Column altered to long now';
 comment on table migtest_e_history is 'We have history now';

@@ -1,7 +1,7 @@
 package io.ebean.test;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.etest.BSimpleFor;
 import org.junit.jupiter.api.Test;

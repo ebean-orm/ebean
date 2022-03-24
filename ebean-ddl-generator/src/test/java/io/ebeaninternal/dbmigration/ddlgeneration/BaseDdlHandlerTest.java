@@ -4,6 +4,7 @@ import io.localtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.config.dbplatform.hana.HanaPlatform;
 import io.ebean.config.dbplatform.postgres.PostgresPlatform;
@@ -42,6 +43,9 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     return handler(new HanaPlatform());
   }
 
+  private DdlHandler db2Handler() {
+    return handler(new DB2LuwPlatform());
+  }
   @Test
   public void addColumn_nullable_noConstraint() throws Exception {
 
@@ -217,6 +221,19 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     assertThat(writer.toString()).isEqualTo(createColumnTableDDL);
     assertThat(writer.dropAll().getBuffer().trim()).isEqualTo("drop table foo cascade;");
+  }
+
+  @Test
+  public void createTableWithTableSpace() throws Exception {
+
+    DdlWrite writer = new DdlWrite();
+    DdlHandler handler = db2Handler();
+
+    handler.generate(writer, Helper.getCreateTable());
+
+    assertThat(writer.toString())
+      .contains("create table foo (")
+      .contains(") in fooSpace index in fooIndexSpace long in fooLobSpace;");
   }
 
   @Test

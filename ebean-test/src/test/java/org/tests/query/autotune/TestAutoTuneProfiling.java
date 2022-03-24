@@ -1,6 +1,6 @@
 package org.tests.query.autotune;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ProfileLocation;
 import org.junit.jupiter.api.Disabled;

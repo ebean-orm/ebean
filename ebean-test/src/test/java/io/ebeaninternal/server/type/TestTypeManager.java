@@ -1,12 +1,13 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
-import io.ebean.server.type.MyDayOfWeek;
-import io.ebean.server.type.MyEnum;
-import io.ebean.server.type.MySex;
+import io.ebean.xtest.MyDayOfWeek;
+import io.ebean.xtest.MyEnum;
+import io.ebean.xtest.MySex;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import org.junit.jupiter.api.Test;
 import org.tests.model.ivo.Money;
@@ -21,21 +22,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-public class TestTypeManager extends BaseTestCase {
+class TestTypeManager extends BaseTestCase {
 
   @Test
-  public void testEnumWithSubclasses() throws SQLException {
-
+  void testEnumWithSubclasses() throws SQLException {
     DefaultTypeManager typeManager = createTypeManager();
 
     ScalarType<?> type = typeManager.createEnumScalarType(MyEnum.class, null);
 
-    Object val = type.read(new DummyDataReader("A"));
+    DataReader reader = mock(DataReader.class);
+    when(reader.getString()).thenReturn("A");
+    Object val = type.read(reader);
     assertThat(val).isEqualTo(MyEnum.Aval);
-    val = type.read(new DummyDataReader("B"));
+    when(reader.getString()).thenReturn("B");
+    val = type.read(reader);
     assertThat(val).isEqualTo(MyEnum.Bval);
-    val = type.read(new DummyDataReader("C"));
+    when(reader.getString()).thenReturn("C");
+    val = type.read(reader);
     assertThat(val).isEqualTo(MyEnum.Cval);
 
     ScalarType<?> typeGeneral = typeManager.getScalarType(MyEnum.class);
@@ -56,25 +62,29 @@ public class TestTypeManager extends BaseTestCase {
   }
 
   @Test
-  public void testEnumWithChar() throws SQLException {
-
+  void testEnumWithChar() throws SQLException {
     DefaultTypeManager typeManager = createTypeManager();
 
     ScalarType<?> dayOfWeekType = typeManager.createEnumScalarType(MyDayOfWeek.class, null);
-
-    Object val = dayOfWeekType.read(new DummyDataReader("MONDAY   "));
+    DataReader reader = mock(DataReader.class);
+    when(reader.getString()).thenReturn("MONDAY   ");
+    Object val = dayOfWeekType.read(reader);
     assertThat(val).isEqualTo(MyDayOfWeek.MONDAY);
 
-    val = dayOfWeekType.read(new DummyDataReader("TUESDAY  "));
+    when(reader.getString()).thenReturn("TUESDAY  ");
+    val = dayOfWeekType.read(reader);
     assertThat(val).isEqualTo(MyDayOfWeek.TUESDAY);
 
-    val = dayOfWeekType.read(new DummyDataReader("WEDNESDAY"));
+    when(reader.getString()).thenReturn("WEDNESDAY");
+    val = dayOfWeekType.read(reader);
     assertThat(val).isEqualTo(MyDayOfWeek.WEDNESDAY);
 
-    val = dayOfWeekType.read(new DummyDataReader("THURSDAY "));
+    when(reader.getString()).thenReturn("THURSDAY ");
+    val = dayOfWeekType.read(reader);
     assertThat(val).isEqualTo(MyDayOfWeek.THURSDAY);
 
-    val = dayOfWeekType.read(new DummyDataReader("FRIDAY   "));
+    when(reader.getString()).thenReturn("FRIDAY   ");
+    val = dayOfWeekType.read(reader);
     assertThat(val).isEqualTo(MyDayOfWeek.FRIDAY);
 
     try {
@@ -86,7 +96,7 @@ public class TestTypeManager extends BaseTestCase {
   }
 
   @Test
-  public void test() {
+  void test() {
     DefaultTypeManager typeManager = createTypeManager();
 
     ScalarType<?> scalarType = typeManager.getScalarType(Money.class);
@@ -96,7 +106,7 @@ public class TestTypeManager extends BaseTestCase {
   }
 
   @Test
-  public void testWithConfig() {
+  void testWithConfig() {
     DefaultTypeManager typeManager1 = createTypeManager();
     ScalarType<?> type1 = typeManager1.createEnumScalarType(MySex.class, null);
     assertThat(type1).isInstanceOf(ScalarTypeEnumStandard.OrdinalEnum.class);
@@ -132,27 +142,10 @@ public class TestTypeManager extends BaseTestCase {
   }
 
   @Test
-  public void testCalendar() throws SQLException {
-
+  void testCalendar() {
     DefaultTypeManager typeManager = createTypeManager();
     ScalarType<?> typeB = typeManager.getScalarType(GregorianCalendar.class);
     assertThat(typeB).isInstanceOf(ScalarTypeCalendar.class);
   }
-  /**
-   * Test double DataReader implementation.
-   */
-  private static class DummyDataReader extends RsetDataReader {
 
-    String val;
-
-    DummyDataReader(String val) {
-      super(null, null);
-      this.val = val;
-    }
-
-    @Override
-    public String getString() throws SQLException {
-      return val;
-    }
-  }
 }

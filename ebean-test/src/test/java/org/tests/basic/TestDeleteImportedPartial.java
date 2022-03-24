@@ -1,14 +1,14 @@
 package org.tests.basic;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.PFile;
 import org.tests.model.basic.PFileContent;
 
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class TestDeleteImportedPartial extends BaseTestCase {
 

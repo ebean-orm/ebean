@@ -9,6 +9,12 @@ alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
 alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 -- apply changes
+create table "migtest_QuOtEd" (
+  id                            String,
+  status1                       String,
+  status2                       String
+) ENGINE = Log();
+
 create table migtest_e_ref (
   id                            UInt32,
   name                          String

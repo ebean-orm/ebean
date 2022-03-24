@@ -1,11 +1,10 @@
 package io.ebeaninternal.server.expression;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AllEqualsExpressionTest extends BaseExpressionTest {
 
@@ -18,7 +17,7 @@ public class AllEqualsExpressionTest extends BaseExpressionTest {
   @Test
   public void isSameByBind_when_sameMultiple() {
 
-    assertThat(exp("a", 10, "b", "23").isSameByBind(exp("a", 10, "b", "23"))).isTrue();
+    Assertions.assertThat(exp("a", 10, "b", "23").isSameByBind(exp("a", 10, "b", "23"))).isTrue();
   }
 
   @Test
@@ -78,13 +77,13 @@ public class AllEqualsExpressionTest extends BaseExpressionTest {
   @Test
   public void isSameByBind_when_diffBindByNull_last() {
 
-    assertThat(exp("a", 10).isSameByBind(exp("a", null))).isFalse();
+    Assertions.assertThat(exp("a", 10).isSameByBind(exp("a", null))).isFalse();
   }
 
   @Test
   public void isSameByBind_when_diffBindByNull_first() {
 
-    assertThat(exp("a", null).isSameByBind(exp("a", 10))).isFalse();
+    Assertions.assertThat(exp("a", null).isSameByBind(exp("a", 10))).isFalse();
   }
 
   private AllEqualsExpression exp(Map<String, Object> propMap) {

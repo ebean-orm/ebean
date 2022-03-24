@@ -1,8 +1,8 @@
 package org.tests.basic;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import org.junit.jupiter.api.Test;

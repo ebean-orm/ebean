@@ -38,13 +38,13 @@ module io.ebean.core {
   requires static org.postgresql.jdbc;
   requires static joda.time;
 
-  exports io.ebeaninternal.api;
   exports io.ebeaninternal.server.cache;
-  // export these for io.ebean.ddl.generator (but that becomes unnamed module in maven test scope)
-  exports io.ebeaninternal.server.deploy;
-  exports io.ebeaninternal.server.deploy.visitor;
-//  exports io.ebeaninternal.server.deploy to io.ebean.autotune, io.ebean.ddl.generator;
-//  exports io.ebeaninternal.server.deploy.visitor to io.ebean.ddl.generator;
+
+  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test;
+  exports io.ebeaninternal.server.deploy to io.ebean.autotune, io.ebean.ddl.generator;
+  exports io.ebeaninternal.server.deploy.id to io.ebean.ddl.generator;
+  exports io.ebeaninternal.server.deploy.meta to io.ebean.ddl.generator;
+  exports io.ebeaninternal.server.deploy.visitor to io.ebean.ddl.generator;
 
   exports io.ebeaninternal.server.el to io.ebean.autotune;
   exports io.ebeaninternal.server.autotune to io.ebean.autotune;

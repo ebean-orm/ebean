@@ -1,6 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.*;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 

@@ -1,6 +1,6 @@
 package org.tests.cascade;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import io.ebean.test.LoggedSql;

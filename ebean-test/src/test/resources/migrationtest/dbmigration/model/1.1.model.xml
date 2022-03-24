@@ -80,21 +80,21 @@
         <createTable name="migtest_e_user" pkName="pk_migtest_e_user">
             <column name="id" type="integer" primaryKey="true"/>
         </createTable>
-        <alterTable name="migtest_mtm_c" tablespace="TESTTS" indexTablespace="TESTTS" lobTablespace="TESTTS"/>
-        <createTable name="migtest_mtm_c_migtest_mtm_m" pkName="pk_migtest_mtm_c_migtest_mtm_m" tablespace="TESTTS" indexTablespace="TESTTS" lobTablespace="TESTTS">
+        <alterTable name="migtest_mtm_c" tablespace="db2;TESTTS;" indexTablespace="db2;TESTTS;" lobTablespace="db2;TESTTS;"/>
+        <createTable name="migtest_mtm_c_migtest_mtm_m" pkName="pk_migtest_mtm_c_migtest_mtm_m" tablespace="db2;TESTTS;" indexTablespace="db2;TESTTS;" lobTablespace="db2;TESTTS;">
             <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
             <column name="migtest_mtm_m_id" type="bigint" notnull="true" primaryKey="true"/>
             <foreignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c"/>
             <foreignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m"/>
         </createTable>
-        <alterTable name="migtest_mtm_m" tablespace="TSMASTER" indexTablespace="TSMASTER" lobTablespace="TSMASTER"/>
-        <createTable name="migtest_mtm_m_migtest_mtm_c" pkName="pk_migtest_mtm_m_migtest_mtm_c" tablespace="TSMASTER" indexTablespace="TSMASTER" lobTablespace="TSMASTER">
+        <alterTable name="migtest_mtm_m" tablespace="db2;TSMASTER;" indexTablespace="db2;TSMASTER;" lobTablespace="db2;TSMASTER;"/>
+        <createTable name="migtest_mtm_m_migtest_mtm_c" pkName="pk_migtest_mtm_m_migtest_mtm_c" tablespace="db2;TSMASTER;" indexTablespace="db2;TSMASTER;" lobTablespace="db2;TSMASTER;">
             <column name="migtest_mtm_m_id" type="bigint" notnull="true" primaryKey="true"/>
             <column name="migtest_mtm_c_id" type="integer" notnull="true" primaryKey="true"/>
             <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="migtest_mtm_m_id" refColumnNames="id" refTableName="migtest_mtm_m" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m"/>
             <foreignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" columnNames="migtest_mtm_c_id" refColumnNames="id" refTableName="migtest_mtm_c" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c"/>
         </createTable>
-        <createTable name="migtest_mtm_m_phone_numbers" pkName="pk_migtest_mtm_m_phone_numbers" tablespace="TSMASTER" indexTablespace="TSMASTER" lobTablespace="TSMASTER">
+        <createTable name="migtest_mtm_m_phone_numbers" pkName="pk_migtest_mtm_m_phone_numbers" tablespace="db2;TSMASTER;" indexTablespace="db2;TSMASTER;" lobTablespace="db2;TSMASTER;">
             <column name="migtest_mtm_m_id" type="bigint" notnull="true" references="migtest_mtm_m.id" foreignKeyName="fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" foreignKeyIndex="ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id"/>
             <column name="value" type="varchar" notnull="true"/>
         </createTable>
@@ -106,6 +106,7 @@
         <createIndex indexName="ix_migtest_oto_child_name" tableName="migtest_oto_child" columns="name" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic"/>
+        <dropIndex indexName="ix_migtest_quoted_status1" tableName="&quot;migtest_QuOtEd&quot;"/>
         <dropIndex indexName="idxd_migtest_0" tableName="migtest_oto_child" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_oto_child_lowername_id" tableName="migtest_oto_child" concurrent="true" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_oto_child_lowername" tableName="migtest_oto_child" platforms="POSTGRES"/>
@@ -117,6 +118,7 @@
         <dropColumn columnName="eref_id" tableName="migtest_e_basic"/>
         <dropColumn columnName="obsolete_string1" tableName="migtest_e_history2" withHistory="true"/>
         <dropColumn columnName="obsolete_string2" tableName="migtest_e_history2" withHistory="true"/>
+        <dropTable name="&quot;migtest_QuOtEd&quot;"/>
         <dropTable name="migtest_e_ref" sequenceCol="id"/>
     </changeSet>
 </migration>

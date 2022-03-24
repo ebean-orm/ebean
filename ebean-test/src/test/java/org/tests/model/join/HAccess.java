@@ -1,14 +1,9 @@
 package org.tests.model.join;
 
-import java.util.UUID;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
 import io.ebean.annotation.DbForeignKey;
+
+import javax.persistence.*;
+import java.util.UUID;
 
 @Inheritance
 @Entity

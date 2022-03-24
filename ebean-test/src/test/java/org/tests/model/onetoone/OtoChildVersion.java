@@ -1,16 +1,9 @@
 package org.tests.model.onetoone;
 
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
-
 import io.ebean.annotation.Where;
+
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class OtoChildVersion {
@@ -25,12 +18,12 @@ public class OtoChildVersion {
 
   @Version
   int version;
-  
+
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "ref_id")
   @Where(clause = "${mta}.type=1")
   List<OtoNotification> notifications;
-  
+
   public Integer getId() {
     return id;
   }
@@ -54,7 +47,7 @@ public class OtoChildVersion {
   public void setMaster(OtoMasterVersion master) {
     this.master = master;
   }
-  
+
   public int getVersion() {
     return version;
   }

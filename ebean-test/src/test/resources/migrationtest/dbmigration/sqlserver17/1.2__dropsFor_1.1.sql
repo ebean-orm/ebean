@@ -11,5 +11,6 @@ EXEC usp_ebean_drop_column migtest_e_basic, eref_id;
 EXEC usp_ebean_drop_column migtest_e_history2, obsolete_string1;
 EXEC usp_ebean_drop_column migtest_e_history2, obsolete_string2;
 -- apply post alter
+IF OBJECT_ID('"migtest_QuOtEd"', 'U') IS NOT NULL drop table "migtest_QuOtEd";
 IF OBJECT_ID('migtest_e_ref', 'U') IS NOT NULL drop table migtest_e_ref;
 IF OBJECT_ID('migtest_e_ref_seq', 'SO') IS NOT NULL drop sequence migtest_e_ref_seq;

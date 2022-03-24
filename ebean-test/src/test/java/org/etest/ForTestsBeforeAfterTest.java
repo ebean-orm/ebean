@@ -1,8 +1,8 @@
 package org.etest;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebean.test.ForTests;

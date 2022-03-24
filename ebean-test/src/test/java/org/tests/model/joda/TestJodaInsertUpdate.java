@@ -1,6 +1,6 @@
 package org.tests.model.joda;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;

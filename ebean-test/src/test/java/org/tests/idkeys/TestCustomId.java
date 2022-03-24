@@ -1,7 +1,7 @@
 package org.tests.idkeys;
 
 import io.avaje.moduuid.ModUUID;
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ECustomId;

@@ -1,11 +1,11 @@
 package org.tests.model.basic.relates;
 
 
-import java.util.UUID;
-
-import javax.persistence.*;
-
 import io.ebean.annotation.ChangeLog;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import java.util.UUID;
 
 /**
  * Relation entity

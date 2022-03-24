@@ -1,0 +1,81 @@
+package io.ebean.xtest.config;
+
+import io.avaje.config.Config;
+import io.ebean.annotation.Platform;
+import io.ebean.config.PropertiesWrapper;
+import org.junit.jupiter.api.Test;
+
+import java.util.Properties;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+public class PropertiesWrapperTest {
+
+  @Test
+  public void testGetServerName() {
+
+    PropertiesWrapper pw = new PropertiesWrapper(null, "myserver", new Properties(), null);
+    assertEquals("myserver", pw.getServerName());
+  }
+
+  @Test
+  public void testGetEnum() {
+
+    Properties properties = new Properties();
+    properties.put("platform", "postgres");
+
+    PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", properties, null);
+    assertEquals(Platform.POSTGRES, pw.getEnum(Platform.class, "platform", Platform.H2));
+    assertEquals(Platform.H2, pw.getEnum(Platform.class, "junk", Platform.H2));
+    assertNull(pw.getEnum(Platform.class, "junk", null));
+  }
+
+  @Test
+  public void testTrimPropertyValues() {
+
+    Properties properties = new Properties();
+    properties.put("someBasic", " hello ");
+    properties.put("someInt", "42");
+    properties.put("noTrimReqr", "jim");
+    properties.put("includeSpaces", " jim bob ");
+
+    PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", properties, null);
+    assertEquals(" hello ", pw.get("someBasic"));
+    assertEquals(42, pw.getInt("someInt", 1));
+    assertNull(pw.get("doesNotExist", null));
+    assertEquals("jim", pw.get("noTrimReqr"));
+    assertEquals(" jim bob ", pw.get("includeSpaces"));
+  }
+
+  @Test
+  public void testGetProperties() {
+
+    String home = System.getProperty("user.home");
+    String tmpDir = System.getProperty("java.io.tmpdir");
+    String fileSeparator = System.getProperty("file.separator");
+
+    Properties properties = new Properties();
+    properties.put("someBasic", "hello");
+    properties.put("someInt", "42");
+    properties.put("someDouble", "5.5");
+    properties.put("somePath", "${user.home}" + fileSeparator + "hello");
+    properties.put("someSystemProp", fileSeparator + "aaa" + fileSeparator + "${java.io.tmpdir}" + fileSeparator + "bbb");
+
+    Properties evalCopy = Config.asConfiguration().eval(properties);
+    PropertiesWrapper pw = new PropertiesWrapper("pref", "myserver", evalCopy, null);
+
+    assertEquals(42, pw.getInt("someInt", 99));
+    assertEquals(Double.valueOf(5.5D), (Double.valueOf(pw.getDouble("someDouble", 99.9D))));
+    assertEquals(home + fileSeparator + "hello", pw.get("somePath", null));
+    assertEquals(fileSeparator + "aaa" + fileSeparator + tmpDir + fileSeparator + "bbb", pw.get("someSystemProp"));
+
+    pw = new PropertiesWrapper(evalCopy, null);
+
+    assertEquals(42, pw.getInt("someInt", 99));
+    assertEquals(Double.valueOf(5.5D), (Double.valueOf(pw.getDouble("someDouble", 99.9D))));
+    assertEquals(home + fileSeparator + "hello", pw.get("somePath", null));
+    assertEquals(fileSeparator + "aaa" + fileSeparator + tmpDir + fileSeparator + "bbb", pw.get("someSystemProp"));
+  }
+
+}

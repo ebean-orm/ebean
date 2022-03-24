@@ -1,6 +1,6 @@
 package org.tests.model.basic.mapsuper;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.bean.EntityBean;
 import org.junit.jupiter.api.Test;
 

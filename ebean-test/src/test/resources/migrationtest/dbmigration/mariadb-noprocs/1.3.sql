@@ -14,6 +14,14 @@ alter table migtest_e_basic drop index uq_migtest_e_basic_indextest5;
 drop index ix_migtest_e_basic_indextest3 on migtest_e_basic;
 drop index ix_migtest_e_basic_indextest6 on migtest_e_basic;
 -- apply changes
+create table `migtest_QuOtEd` (
+  id                            varchar(255) not null,
+  status1                       varchar(1),
+  status2                       varchar(1),
+  constraint uq_migtest_quoted_status2 unique (status2),
+  constraint pk_migtest_quoted primary key (id)
+);
+
 create table migtest_e_ref (
   id                            integer auto_increment not null,
   name                          varchar(127) not null,
@@ -58,3 +66,4 @@ alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign ke
 
 create index ix_migtest_e_basic_indextest1 on migtest_e_basic (indextest1);
 create index ix_migtest_e_basic_indextest5 on migtest_e_basic (indextest5);
+create index ix_migtest_quoted_status1 on `migtest_QuOtEd` (status1);

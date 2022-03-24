@@ -1,6 +1,6 @@
 package org.tests.compositekeys;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.CountDistinctOrder;
 import io.ebean.DB;
 import io.ebean.Query;

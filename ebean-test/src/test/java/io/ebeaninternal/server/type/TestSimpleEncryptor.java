@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.config.EncryptKey;
 import org.junit.jupiter.api.Test;
 import org.tests.basic.encrypt.BasicEncryptKey;

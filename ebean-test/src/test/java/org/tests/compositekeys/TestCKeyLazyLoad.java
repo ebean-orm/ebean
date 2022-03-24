@@ -1,6 +1,6 @@
 package org.tests.compositekeys;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.PagedList;
 import io.ebean.Query;

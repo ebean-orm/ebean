@@ -2,7 +2,7 @@ package org.tests.changelog;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.annotation.ChangeLog;

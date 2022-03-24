@@ -30,12 +30,9 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.tests.model.basic.MDateTime;
 
-import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
-import io.ebean.PlatformCondition;
-import io.ebean.annotation.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.core.type.ScalarType;
@@ -44,6 +41,9 @@ import io.ebean.plugin.Property;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonWriteOptions;
 import io.ebean.util.CamelCaseHelper;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
+import io.ebean.xtest.base.PlatformCondition;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 @TestInstance(Lifecycle.PER_CLASS)

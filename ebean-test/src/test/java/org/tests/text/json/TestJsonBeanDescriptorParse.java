@@ -1,7 +1,7 @@
 package org.tests.text.json;
 
 import com.fasterxml.jackson.core.JsonParser;
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;

@@ -1,6 +1,6 @@
 package org.tests.callable;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.CallableSql;
 import io.ebean.DB;
 import io.ebean.Database;

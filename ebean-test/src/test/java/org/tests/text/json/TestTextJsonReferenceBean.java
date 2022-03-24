@@ -1,6 +1,6 @@
 package org.tests.text.json;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;
@@ -17,7 +17,8 @@ import org.tests.model.basic.ResetBasicData;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestTextJsonReferenceBean extends BaseTestCase {
 

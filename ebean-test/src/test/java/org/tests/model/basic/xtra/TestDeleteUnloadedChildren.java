@@ -1,6 +1,6 @@
 package org.tests.model.basic.xtra;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;

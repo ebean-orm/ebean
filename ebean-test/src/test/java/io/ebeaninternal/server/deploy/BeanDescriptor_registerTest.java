@@ -6,6 +6,7 @@ import io.ebean.event.AbstractBeanPersistListener;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistListener;
 import io.ebeaninternal.api.SpiEbeanServer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 
@@ -46,7 +47,7 @@ public class BeanDescriptor_registerTest {
     Controller2 controller2 = new Controller2();
     desc.register(controller2);
 
-    assertEquals(2, ((ChainedBeanPersistController) desc.persistController()).size());
+    Assertions.assertEquals(2, ((ChainedBeanPersistController) desc.persistController()).size());
 
     desc.deregister(controller1);
     assertEquals(1, ((ChainedBeanPersistController) desc.persistController()).size());

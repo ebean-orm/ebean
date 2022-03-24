@@ -1,6 +1,6 @@
 package org.tests.json;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.EJson;
 import org.junit.jupiter.api.Test;

@@ -1,13 +1,15 @@
 package org.tests.batchinsert;
 
 import io.ebean.*;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.base.DtoQuery2Test;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;

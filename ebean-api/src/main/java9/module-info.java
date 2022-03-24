@@ -10,13 +10,13 @@ module io.ebean.api {
 
   requires transitive java.sql;
   requires transitive io.avaje.config;
+  requires transitive io.avaje.lang;
   requires transitive persistence.api;
   requires transitive io.ebean.annotation;
   requires transitive io.ebean.datasource.api;
   requires transitive org.slf4j;
 
   requires static io.ebean.types;
-  requires static io.avaje.jsr305x;
   requires static com.fasterxml.jackson.core;
   requires static javax.servlet.api;
   requires static com.h2database;
@@ -41,6 +41,7 @@ module io.ebean.api {
   exports io.ebean.config.dbplatform.sqlanywhere;
   exports io.ebean.config.dbplatform.sqlite;
   exports io.ebean.config.dbplatform.sqlserver;
+  exports io.ebean.config.dbplatform.yugabyte;
   exports io.ebean.event;
   exports io.ebean.event.readaudit;
   exports io.ebean.event.changelog;

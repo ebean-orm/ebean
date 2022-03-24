@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.core;
 
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.FetchConfig;
 import io.ebean.Query;

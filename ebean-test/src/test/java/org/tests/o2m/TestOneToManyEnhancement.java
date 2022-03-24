@@ -1,6 +1,6 @@
 package org.tests.o2m;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.common.BeanList;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonMap;

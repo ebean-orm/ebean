@@ -1,6 +1,6 @@
 package org.tests.inheritance;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.common.BeanList;

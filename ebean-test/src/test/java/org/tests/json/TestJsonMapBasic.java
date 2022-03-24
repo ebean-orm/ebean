@@ -1,13 +1,12 @@
 package org.tests.json;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.text.json.EJson;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonMap;
