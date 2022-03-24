@@ -1,7 +1,7 @@
 package org.tests.iud;
 
 import io.avaje.moduuid.ModUUID;
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 

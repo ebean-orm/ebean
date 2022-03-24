@@ -1,6 +1,6 @@
 package org.tests.lazyforeignkeys;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
@@ -87,7 +87,7 @@ public class TestLazyForeignKeys extends BaseTestCase {
     assertFalse(rel1.getEntity1().isDeleted());
     assertTrue(rel1.getEntity2().isDeleted());
   }
-  
+
   @Test
   public void testGetWithDbForeignKey() {
     MainEntityRelation relation = DB.find(MainEntityRelation.class).findOne();
@@ -95,9 +95,9 @@ public class TestLazyForeignKeys extends BaseTestCase {
     cat.setId(123L);
     relation.setCat(cat);
     DB.save(relation);
-    
+
     relation = DB.find(MainEntityRelation.class).findOne();
-    
+
     assertNotNull(relation.getCat());
   }
 }

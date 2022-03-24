@@ -1,6 +1,7 @@
 package org.tests.query.other;
 
 import io.ebean.*;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

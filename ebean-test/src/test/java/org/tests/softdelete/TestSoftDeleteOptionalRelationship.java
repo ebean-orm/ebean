@@ -1,6 +1,6 @@
 package org.tests.softdelete;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Finder;
 import io.ebean.test.LoggedSql;

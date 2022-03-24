@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;

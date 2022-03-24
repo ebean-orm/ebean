@@ -1,6 +1,7 @@
 package io.ebean.xtest.internal.server.query;
 
 import io.ebean.*;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.server.query.QueryFutureIds;
 import io.ebeaninternal.server.query.QueryFutureList;
 import io.ebeaninternal.server.query.QueryFutureRowCount;

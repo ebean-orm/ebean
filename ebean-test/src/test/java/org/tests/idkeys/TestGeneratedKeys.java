@@ -1,8 +1,8 @@
 package org.tests.idkeys;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.Transaction;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -26,7 +26,7 @@ public class TestGeneratedKeys extends BaseTestCase {
   @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
   public void testGenKeySeqA() throws SQLException {
     assumeTrue(idType() == IdType.SEQUENCE);
-    
+
     SpiEbeanServer server = spiEbeanServer();
 
     try (Transaction tx = server.beginTransaction()) {
@@ -46,7 +46,7 @@ public class TestGeneratedKeys extends BaseTestCase {
     }
 
   }
-  
+
   @Test
   @ForPlatform(Platform.H2) // readSequenceValue is H2 specific
   public void testGenKeySeqB() throws SQLException {
@@ -89,7 +89,7 @@ public class TestGeneratedKeys extends BaseTestCase {
       case MARIADB :
         throw new UnsupportedOperationException("reading sequence value outside of the current connection is not supported. "
             + "See https://mariadb.com/kb/en/previous-value-for-sequence_name/#description");
-        
+
       default :
         throw new UnsupportedOperationException("reading sequence value from "
             + spiEbeanServer().databasePlatform().getPlatform()
@@ -126,7 +126,7 @@ public class TestGeneratedKeys extends BaseTestCase {
       assertNotNull(al.getId());
     }
   }
-  
+
   @Test
   @ForPlatform({Platform.H2, Platform.MARIADB, Platform.SQLSERVER, Platform.DB2})
   public void testGeneratedKeys() throws SQLException {

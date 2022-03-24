@@ -1,6 +1,6 @@
 package org.tests.rawsql.inherit;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;

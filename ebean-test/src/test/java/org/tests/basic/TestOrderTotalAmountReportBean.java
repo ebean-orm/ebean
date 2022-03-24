@@ -1,6 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.*;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OrderAggregate;
 import org.tests.model.basic.ResetBasicData;

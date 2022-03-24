@@ -1,6 +1,6 @@
 package org.tests.text.json;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;

@@ -1,6 +1,6 @@
 package org.tests.enhancement;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;

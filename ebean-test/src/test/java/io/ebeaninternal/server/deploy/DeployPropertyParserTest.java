@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.BaseTestCase;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;

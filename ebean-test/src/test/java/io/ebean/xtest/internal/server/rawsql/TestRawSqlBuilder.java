@@ -1,7 +1,8 @@
 package io.ebean.xtest.internal.server.rawsql;
 
 import io.ebean.*;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebeaninternal.server.core.DefaultServer;

@@ -1,6 +1,6 @@
 package org.tests.unitinternal;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.OrderBy;
 import org.junit.jupiter.api.Test;
 

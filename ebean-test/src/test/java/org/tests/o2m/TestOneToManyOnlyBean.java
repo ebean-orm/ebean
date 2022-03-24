@@ -1,6 +1,6 @@
 package org.tests.o2m;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;

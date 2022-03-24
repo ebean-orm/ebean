@@ -3,6 +3,7 @@ package org.tests.cache;
 import io.ebean.*;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.server.cache.CachedManyIds;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

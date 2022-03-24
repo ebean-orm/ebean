@@ -1,6 +1,6 @@
 package org.tests.types;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.types.SomePeriodBean;

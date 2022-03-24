@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeanservice.docstore.api.mapping.DocPropertyAdapter;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;

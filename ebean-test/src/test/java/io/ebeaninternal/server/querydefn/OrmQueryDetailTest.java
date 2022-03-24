@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;

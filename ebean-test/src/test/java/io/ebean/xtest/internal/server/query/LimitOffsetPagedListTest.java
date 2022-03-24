@@ -1,6 +1,6 @@
 package io.ebean.xtest.internal.server.query;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.query.LimitOffsetPagedList;

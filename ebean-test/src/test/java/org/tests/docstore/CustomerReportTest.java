@@ -1,7 +1,7 @@
 package org.tests.docstore;
 
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.text.json.JsonReadOptions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;

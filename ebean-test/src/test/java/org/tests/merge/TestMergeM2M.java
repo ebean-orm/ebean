@@ -1,6 +1,6 @@
 package org.tests.merge;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;

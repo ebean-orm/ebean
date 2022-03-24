@@ -1,6 +1,6 @@
 package org.tests.basic;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Where;

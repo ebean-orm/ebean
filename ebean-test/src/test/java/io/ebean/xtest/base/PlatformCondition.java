@@ -1,8 +1,8 @@
 package io.ebean.xtest.base;
 
 import io.ebean.DB;
-import io.ebean.annotation.ForPlatform;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.ForPlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;

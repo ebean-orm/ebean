@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.core.type.DataReader;

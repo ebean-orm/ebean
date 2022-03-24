@@ -1,10 +1,10 @@
 package org.tests.basic.encrypt;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
-import io.ebean.annotation.ForPlatform;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.ForPlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.test.LoggedSql;

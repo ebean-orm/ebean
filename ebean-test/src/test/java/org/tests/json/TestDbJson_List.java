@@ -1,8 +1,8 @@
 package org.tests.json;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.text.TextException;

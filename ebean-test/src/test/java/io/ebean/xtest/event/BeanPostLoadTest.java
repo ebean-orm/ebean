@@ -4,6 +4,7 @@ package io.ebean.xtest.event;
 import io.ebean.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanPostLoad;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 

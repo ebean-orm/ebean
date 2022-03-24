@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.ValuePair;

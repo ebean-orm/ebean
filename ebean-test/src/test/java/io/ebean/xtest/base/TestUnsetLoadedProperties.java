@@ -1,9 +1,9 @@
 package io.ebean.xtest.base;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.bean.EntityBean;
 import io.ebean.test.LoggedSql;

@@ -1,6 +1,6 @@
 package org.tests.persistencecontext;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import org.junit.jupiter.api.Test;

@@ -1,6 +1,6 @@
 package org.tests.batchinsert;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.test.LoggedSql;

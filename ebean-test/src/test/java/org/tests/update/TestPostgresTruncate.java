@@ -1,6 +1,6 @@
 package org.tests.update;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 
 public class TestPostgresTruncate extends BaseTestCase {

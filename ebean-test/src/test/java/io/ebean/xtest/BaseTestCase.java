@@ -1,5 +1,6 @@
-package io.ebean;
+package io.ebean.xtest;
 
+import io.ebean.*;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCacheStatistics;

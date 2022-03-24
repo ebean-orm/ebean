@@ -1,6 +1,6 @@
 package org.tests.batchload;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.Transaction;

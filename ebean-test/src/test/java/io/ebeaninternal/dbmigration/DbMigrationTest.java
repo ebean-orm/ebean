@@ -1,7 +1,8 @@
 package io.ebeaninternal.dbmigration;
 
 import io.ebean.*;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;

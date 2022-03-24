@@ -1,6 +1,6 @@
 package org.tests.basic.delete;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.jupiter.api.Test;

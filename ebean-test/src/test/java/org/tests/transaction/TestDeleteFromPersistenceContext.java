@@ -1,6 +1,6 @@
 package org.tests.transaction;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;

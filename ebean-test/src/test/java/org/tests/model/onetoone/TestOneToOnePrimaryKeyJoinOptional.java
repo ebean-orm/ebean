@@ -1,6 +1,6 @@
 package org.tests.model.onetoone;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;

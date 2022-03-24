@@ -1,6 +1,6 @@
 package io.ebean.xtest.base;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.FetchGroup;
 import io.ebean.Query;
 import io.ebean.service.SpiFetchGroupQuery;

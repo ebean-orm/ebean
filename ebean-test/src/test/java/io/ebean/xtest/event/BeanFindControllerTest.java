@@ -1,6 +1,6 @@
 package io.ebean.xtest.event;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.bean.BeanCollection;

@@ -1,8 +1,8 @@
 package org.tests.family;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;

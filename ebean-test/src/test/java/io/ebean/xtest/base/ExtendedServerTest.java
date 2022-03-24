@@ -1,6 +1,7 @@
 package io.ebean.xtest.base;
 
 import io.ebean.*;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;

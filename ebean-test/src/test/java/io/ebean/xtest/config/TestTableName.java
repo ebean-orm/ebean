@@ -1,6 +1,6 @@
 package io.ebean.xtest.config;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.config.TableName;
 import org.junit.jupiter.api.Test;
 

@@ -1,6 +1,6 @@
 package org.tests.insert;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;

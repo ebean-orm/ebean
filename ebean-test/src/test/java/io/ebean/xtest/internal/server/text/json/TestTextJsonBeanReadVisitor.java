@@ -1,6 +1,6 @@
 package io.ebean.xtest.internal.server.text.json;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonReadBeanVisitor;

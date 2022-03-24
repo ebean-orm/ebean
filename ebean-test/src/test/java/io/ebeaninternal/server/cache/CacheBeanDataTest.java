@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.cache;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiEbeanServer;

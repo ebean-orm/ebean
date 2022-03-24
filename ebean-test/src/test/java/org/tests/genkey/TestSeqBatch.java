@@ -1,6 +1,6 @@
 package org.tests.genkey;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.config.dbplatform.IdType;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.junit.jupiter.api.Test;

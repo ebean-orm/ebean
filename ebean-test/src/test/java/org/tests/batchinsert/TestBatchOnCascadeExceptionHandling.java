@@ -1,9 +1,9 @@
 package org.tests.batchinsert;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.Transaction;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiTransaction;

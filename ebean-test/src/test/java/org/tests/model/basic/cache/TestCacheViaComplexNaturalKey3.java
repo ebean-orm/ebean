@@ -1,6 +1,6 @@
 package org.tests.model.basic.cache;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.Pairs;

@@ -1,6 +1,6 @@
 package org.tests.cascade;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
 import org.junit.jupiter.api.Test;

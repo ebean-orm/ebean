@@ -1,7 +1,7 @@
 package io.ebean.xtest.docstore;
 
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.Query;
 import io.ebean.docstore.DocUpdateContext;
 import io.ebeaninternal.api.SpiEbeanServer;

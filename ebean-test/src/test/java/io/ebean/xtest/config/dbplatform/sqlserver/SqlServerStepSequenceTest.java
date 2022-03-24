@@ -1,8 +1,8 @@
 package io.ebean.xtest.config.dbplatform.sqlserver;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.BaseTestCase;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.sqlserver.SqlServerStepSequence;
 import org.junit.jupiter.api.Disabled;

@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.loadcontext;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
 import io.ebeaninternal.server.core.OrmQueryRequest;

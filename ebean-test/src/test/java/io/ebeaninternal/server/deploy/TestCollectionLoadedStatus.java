@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;

@@ -1,6 +1,6 @@
 package org.tests.text.json;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonContext;

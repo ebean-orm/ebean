@@ -1,6 +1,6 @@
 package org.tests.basic;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.CacheMode;
 import io.ebean.DB;

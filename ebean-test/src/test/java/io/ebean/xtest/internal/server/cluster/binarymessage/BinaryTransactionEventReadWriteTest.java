@@ -1,6 +1,6 @@
 package io.ebean.xtest.internal.server.cluster.binarymessage;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.EbeanServer;
 import io.ebean.xtest.internal.api.TDSpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;

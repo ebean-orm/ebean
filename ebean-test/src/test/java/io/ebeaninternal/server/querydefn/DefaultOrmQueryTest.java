@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebeaninternal.api.BindValuesKey;

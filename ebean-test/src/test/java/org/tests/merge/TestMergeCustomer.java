@@ -3,6 +3,7 @@ package org.tests.merge;
 import io.ebean.*;
 import io.ebean.test.LoggedSql;
 import io.ebean.text.PathProperties;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

@@ -1,9 +1,9 @@
 package org.tests.batchinsert;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.annotation.IgnorePlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import org.junit.jupiter.api.BeforeAll;

@@ -1,9 +1,9 @@
 package org.tests.update;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlUpdate;
-import io.ebean.annotation.ForPlatform;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestSqlUpdateUpsert extends BaseTestCase {
 
   private static boolean useV1Syntax = Boolean.getBoolean("ebean.h2.useV1Syntax");
-  
+
   @ForPlatform(Platform.H2)
   @Test
   public void h2Merge() throws InterruptedException {

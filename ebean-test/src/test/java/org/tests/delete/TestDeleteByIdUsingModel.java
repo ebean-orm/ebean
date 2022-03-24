@@ -1,6 +1,6 @@
 package org.tests.delete;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.onetoone.Account;
 

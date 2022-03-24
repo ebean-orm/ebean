@@ -1,6 +1,6 @@
 package org.tests.text.csv;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.text.TimeStringParser;
 import org.junit.jupiter.api.Test;
 

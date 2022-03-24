@@ -1,6 +1,6 @@
 package io.ebean.xtest.base;
 
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DtoQuery;
 import io.ebean.QueryIterator;
 import io.ebean.meta.BasicMetricVisitor;

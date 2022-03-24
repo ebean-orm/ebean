@@ -1,7 +1,7 @@
 package io.ebean.xtest.json;
 
 import com.fasterxml.jackson.core.JsonParser;
-import io.ebean.BaseTestCase;
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.text.json.JsonBeanReader;
