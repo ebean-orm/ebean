@@ -5,7 +5,6 @@ import io.ebean.DB;
 import io.ebean.FetchPath;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
-
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,7 +214,7 @@ public class PathPropertiesTests extends BaseTestCase {
     String asJson = DB.json().toJson(list, pathProps);
     log.info("Json: {}", asJson);
   }
-  
+
   @Test
   public void test_withAllPropsQuery() {
     PathProperties root = PathProperties.parse("*,billingAddress(line1)");

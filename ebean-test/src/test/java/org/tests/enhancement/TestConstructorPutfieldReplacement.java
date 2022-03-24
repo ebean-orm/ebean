@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.PFile;
 import org.tests.model.basic.PFileContent;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestConstructorPutfieldReplacement extends BaseTestCase {
 

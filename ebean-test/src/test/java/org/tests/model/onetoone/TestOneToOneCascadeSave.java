@@ -3,7 +3,6 @@ package org.tests.model.onetoone;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +31,7 @@ public class TestOneToOneCascadeSave extends BaseTestCase {
     OtoMaster master2 = child2.getMaster();
     assertNotNull(master2);
   }
-  
+
   @Test
   public void testSaveCascadeWithOneToOne() {
     OtoMasterVersion master = new OtoMasterVersion();
@@ -40,19 +39,19 @@ public class TestOneToOneCascadeSave extends BaseTestCase {
 
     OtoChildVersion child = new OtoChildVersion();
     child.setName("c1");
-    
+
     master.setChild(child);
     DB.save(master);
-    
+
     assertThat(master.getVersion()).isEqualTo(1);
     assertThat(child.getVersion()).isEqualTo(1);
-    
+
     child.setName("c2");
     DB.save(master);
-    
+
     assertThat(master.getVersion()).isEqualTo(1);
     assertThat(child.getVersion()).isEqualTo(2);
-    
+
     try (Transaction txn = DB.beginTransaction()) {
       master = DB.find(OtoMasterVersion.class).findOne();
 
@@ -61,10 +60,10 @@ public class TestOneToOneCascadeSave extends BaseTestCase {
       child = DB.find(OtoChildVersion.class).findOne();
       assertThat(child.getVersion()).isEqualTo(2);
       child.setName("c3");
-      DB.save(child); 
-      
+      DB.save(child);
+
       txn.commit();
     }
   }
-  
+
 }

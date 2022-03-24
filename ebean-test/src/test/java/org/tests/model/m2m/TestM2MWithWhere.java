@@ -3,7 +3,6 @@ package org.tests.model.m2m;
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

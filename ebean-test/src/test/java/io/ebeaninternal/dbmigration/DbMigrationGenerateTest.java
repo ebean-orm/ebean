@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * <li><code>misc.migration.v1_1</code> modified v1_0 - every migration change, that ebean supports should be done here.
  * <li><code>misc.migration.v1_2</code> This is (nearly) the same as v1_0 and simulates every migration change in the other way
  * </ul>
- * 
+ *
  * Changes in the migration scripts should be committed after they are reviewed (changes may be legitime or show, that something is broken).
  * The {@link DbMigrationTest} will execute the generated scripts for various platforms.
  * @author Roland Praml, FOCONIS AG
@@ -64,7 +64,7 @@ public class DbMigrationGenerateTest {
     // for platforms like DB2-LUW, we specify the exact platform in the migration path
     // see https://github.com/ebean-orm/ebean-migration/issues/102
     migration.addPlatform(Platform.DB2LUW, "db2luw");
-    migration.addPlatform(Platform.DB2FORI, "db2fori"); 
+    migration.addPlatform(Platform.DB2FORI, "db2fori");
     migration.addPlatform(Platform.DB2ZOS, "db2zos");
     migration.addPlatform(Platform.DB2, "db2legacy");
     migration.addPlatform(Platform.GENERIC);

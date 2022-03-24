@@ -6,9 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.PersistentFile;
 import org.tests.model.basic.PersistentFileContent;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestSaveDeleteOneToOne extends BaseTestCase {
 

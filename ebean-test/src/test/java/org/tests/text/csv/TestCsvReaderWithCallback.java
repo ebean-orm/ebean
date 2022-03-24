@@ -5,7 +5,6 @@ import io.ebean.TransactionalTestCase;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.csv.DefaultCsvCallback;
 import io.ebean.util.IOUtils;
-
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 

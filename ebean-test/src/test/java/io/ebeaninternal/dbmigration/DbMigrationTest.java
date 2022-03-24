@@ -9,6 +9,7 @@ import io.ebean.datasource.pool.ConnectionPool;
 import misc.migration.v1_0.ETable;
 import misc.migration.v1_1.EHistory;
 import misc.migration.v1_1.EHistory2;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -45,7 +46,7 @@ public class DbMigrationTest extends BaseTestCase {
   @Test
   public void lastVersion() {
     File d = new File("src/test/resources/migrationtest/dbmigration/h2");
-    assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.4");
+    Assertions.assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.4");
     assertThat(LastMigration.nextVersion(d, null, false)).isEqualTo("1.5");
     assertThat(LastMigration.nextVersion(d, null, true)).isEqualTo("1.4");
   }
@@ -100,7 +101,7 @@ public class DbMigrationTest extends BaseTestCase {
     if (isSqlServer() || isMariaDB() || isMySql() || isHana()) {
       runScript("I__create_procs.sql");
     }
-    
+
     if(isDb2()) {
       runScript("I__create_tablespaces.sql");
     }

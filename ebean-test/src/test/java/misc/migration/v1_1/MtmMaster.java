@@ -1,13 +1,8 @@
 package misc.migration.v1_1;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-
 import io.ebean.annotation.Tablespace;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Entity
@@ -25,7 +20,7 @@ public class MtmMaster {
 
   @ElementCollection
   List<String> phoneNumbers;
-  
+
   public Long getId() {
     return id;
   }

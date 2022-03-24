@@ -1,11 +1,7 @@
 package misc.migration.v1_1;
 
 
-import io.ebean.annotation.DbComment;
-import io.ebean.annotation.DbMigration;
-import io.ebean.annotation.History;
-import io.ebean.annotation.Platform;
-import io.ebean.annotation.Tablespace;
+import io.ebean.annotation.*;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

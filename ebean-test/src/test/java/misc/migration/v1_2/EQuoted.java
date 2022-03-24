@@ -1,11 +1,11 @@
 package misc.migration.v1_2;
 
+import io.ebean.annotation.EnumValue;
+import io.ebean.annotation.Index;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import io.ebean.annotation.EnumValue;
-import io.ebean.annotation.Index;
 
 //table with upper and lower case letters
 @Table(name = "`migtest_QuOtEd`")

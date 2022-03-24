@@ -1,13 +1,5 @@
 package org.tests.cache;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-import java.util.concurrent.Callable;
-
-import org.junit.jupiter.api.Test;
-import org.tests.model.basic.OCachedBean;
-
 import io.ebean.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
@@ -17,9 +9,16 @@ import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.MdcBackgroundExecutorWrapper;
 import io.ebeaninternal.server.cache.DefaultServerCachePlugin;
+import org.junit.jupiter.api.Test;
+import org.tests.model.basic.OCachedBean;
+
+import java.util.concurrent.Callable;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * Test class testing async/background cache updates in a multi-tenant environment. 
+ * Test class testing async/background cache updates in a multi-tenant environment.
  */
 public class TestBeanCacheAsync extends BaseTestCase {
 
@@ -63,7 +62,7 @@ public class TestBeanCacheAsync extends BaseTestCase {
       };
     }
   }
-  
+
   @Test
   public void findById_with_tenant() throws InterruptedException {
     DatabaseConfig config = new DatabaseConfig();
@@ -81,7 +80,7 @@ public class TestBeanCacheAsync extends BaseTestCase {
     config.setBackgroundExecutorWrapper(
         new MdcBackgroundExecutorWrapper().with(new TenantCopyBackgroundExecutorWrapper()));
     tenantId.set("4711");
-    
+
     Database db = DatabaseFactory.create(config);
     try {
       OCachedBean bean = new OCachedBean();
@@ -95,7 +94,7 @@ public class TestBeanCacheAsync extends BaseTestCase {
       db.save(bean0);
 
       Thread.sleep(100); // TODO: can we block finds on that ID if a pending cache update is present?
-      
+
       bean0 = db.find(OCachedBean.class, bean.getId());
       assertNotNull(bean0);
       assertThat(bean0.getName()).isEqualTo("findById2");
