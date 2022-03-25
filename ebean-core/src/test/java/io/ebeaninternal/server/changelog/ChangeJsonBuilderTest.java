@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.changelog;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import org.junit.jupiter.api.Test;
@@ -11,12 +10,12 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class ChangeJsonBuilderTest extends BaseTestCase {
+class ChangeJsonBuilderTest {
 
   Helper helper = new Helper();
 
   @Test
-  public void testToJson() throws Exception {
+  void testToJson() throws Exception {
 
     ChangeJsonBuilder builder = new ChangeJsonBuilder();
 
