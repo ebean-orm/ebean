@@ -5,6 +5,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -217,6 +218,11 @@ public interface DbMigration {
    * Return the list of versions that contain pending drops.
    */
   List<String> getPendingDrops();
+
+  /**
+   * Return the main migration directory.
+   */
+  File migrationDirectory();
 
   /**
    * Generate the next migration sql script and associated model xml.
