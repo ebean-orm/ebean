@@ -1,19 +1,17 @@
-package io.ebeaninternal.dbmigration;
+package io.ebean.xtest.dbmigration;
 
 import io.ebean.*;
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.datasource.pool.ConnectionPool;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import misc.migration.v1_0.ETable;
 import misc.migration.v1_1.EHistory;
 import misc.migration.v1_1.EHistory2;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.ResultSet;
@@ -42,14 +40,6 @@ public class DbMigrationTest extends BaseTestCase {
     URL url = getClass().getResource("/migrationtest/dbmigration/" + server().platform().name().toLowerCase() + "/" + scriptName);
     assert url != null : scriptName +  " not found";
     server().script().run(url);
-  }
-
-  @Test
-  public void lastVersion() {
-    File d = new File("src/test/resources/migrationtest/dbmigration/h2");
-    Assertions.assertThat(LastMigration.lastVersion(d, null)).isEqualTo("1.4");
-    assertThat(LastMigration.nextVersion(d, null, false)).isEqualTo("1.5");
-    assertThat(LastMigration.nextVersion(d, null, true)).isEqualTo("1.4");
   }
 
   @IgnorePlatform({

@@ -1,4 +1,4 @@
-package io.ebeaninternal.dbmigration;
+package io.ebean.xtest.dbmigration;
 
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
@@ -6,6 +6,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.DbOffline;
 
+import io.ebean.dbmigration.DbMigration;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class DbMigrationGenerateTest {
     Files.walk(Paths.get(pathToResources, "migrationtest"))
       .filter(Files::isRegularFile).map(Path::toFile).forEach(File::delete);
 
-    DefaultDbMigration migration = new DefaultDbMigration();
+    DbMigration migration = DbMigration.create();
     migration.setIncludeIndex(true);
     // We use src/test/resources as output directory (so we see in GIT if files will change)
     migration.setPathToResources(pathToResources);

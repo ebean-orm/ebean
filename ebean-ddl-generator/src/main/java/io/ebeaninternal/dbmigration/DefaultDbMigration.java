@@ -837,10 +837,8 @@ public class DefaultDbMigration implements DbMigration {
     return val;
   }
 
-  /**
-   * Return the main migration directory.
-   */
-  File migrationDirectory() {
+  @Override
+  public File migrationDirectory() {
     return migrationDirectory(false);
   }
 

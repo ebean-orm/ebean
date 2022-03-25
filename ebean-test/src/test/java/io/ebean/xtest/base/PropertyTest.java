@@ -4,7 +4,6 @@ import io.ebean.OrderBy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-
 public class PropertyTest {
 
   @Test
