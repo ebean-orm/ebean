@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.core;
+package io.ebean.xtest.core;
 
 
 import io.ebean.xtest.BaseTestCase;

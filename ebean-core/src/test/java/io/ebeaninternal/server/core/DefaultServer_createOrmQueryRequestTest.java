@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.core;
 
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.Database;
 import io.ebean.FetchConfig;
 import io.ebean.Query;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
@@ -12,10 +12,14 @@ import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DefaultServer_createOrmQueryRequestTest extends BaseTestCase {
+public class DefaultServer_createOrmQueryRequestTest {
 
   Query<Order> query() {
     return server().find(Order.class);
+  }
+
+  private Database server() {
+    return DB.getDefault();
   }
 
   OrmQueryRequest<Order> queryRequest(Query<Order> query) {

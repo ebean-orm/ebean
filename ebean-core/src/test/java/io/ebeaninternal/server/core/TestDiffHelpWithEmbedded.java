@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.ValuePair;
@@ -14,7 +13,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestDiffHelpWithEmbedded extends BaseTestCase {
+public class TestDiffHelpWithEmbedded {
 
   Database server;
 

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.ValuePair;
@@ -19,7 +18,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestDiffHelpSimple extends BaseTestCase {
+class TestDiffHelpSimple {
 
   long firstTime = System.currentTimeMillis() - 10000;
   long secondTime = System.currentTimeMillis();
