@@ -1,6 +1,9 @@
 package io.ebean.xtest;
 
-import io.ebean.*;
+import io.ebean.CacheMode;
+import io.ebean.DB;
+import io.ebean.Database;
+import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCacheStatistics;
@@ -10,10 +13,7 @@ import io.ebean.meta.ServerMetrics;
 import io.ebean.util.StringHelper;
 import io.ebean.xtest.base.PlatformCondition;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.core.HelpCreateQueryRequest;
-import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
@@ -324,9 +324,5 @@ public abstract class BaseTestCase {
   protected String concat(String property0, String separator, String property1, String suffix) {
     DbExpressionHandler dbExpressionHandler = DbExpressionHandlerFactory.from(spiEbeanServer().databasePlatform());
     return dbExpressionHandler.concat(property0, separator, property1, suffix);
-  }
-
-  protected <T> OrmQueryRequest<T> createQueryRequest(SpiQuery.Type type, Query<T> query, Transaction t) {
-    return HelpCreateQueryRequest.create(server(), type, query, t);
   }
 }
