@@ -4,6 +4,7 @@ import io.ebean.DB;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TJodaEntity;
 
@@ -58,6 +59,6 @@ public class ScalarTypeJodaLocalTimeTest {
     String json = DB.json().toJson(bean);
     TJodaEntity bean1 = DB.json().toBean(TJodaEntity.class, json);
 
-    assertEquals(bean1.getLocalTime(), now);
+    Assertions.assertEquals(bean1.getLocalTime(), now);
   }
 }

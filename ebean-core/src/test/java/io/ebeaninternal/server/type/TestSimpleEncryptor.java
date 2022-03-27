@@ -1,9 +1,8 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.config.EncryptKey;
+import io.ebeaninternal.server.deploy.BaseTest;
 import org.junit.jupiter.api.Test;
-import org.tests.basic.encrypt.BasicEncryptKey;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
@@ -11,7 +10,7 @@ import java.sql.Timestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestSimpleEncryptor extends BaseTestCase {
+public class TestSimpleEncryptor extends BaseTest {
 
   @Test
   public void test() {
@@ -34,5 +33,20 @@ public class TestSimpleEncryptor extends BaseTestCase {
     String tsFormat = e.decryptString(ecTimestamp, key);
     Timestamp t1 = Timestamp.valueOf(tsFormat);
     assertEquals(t, t1);
+  }
+
+  static class BasicEncryptKey implements EncryptKey {
+
+    private final String key;
+
+    public BasicEncryptKey(String key) {
+      this.key = key;
+    }
+
+    @Override
+    public String getStringValue() {
+      return key;
+    }
+
   }
 }

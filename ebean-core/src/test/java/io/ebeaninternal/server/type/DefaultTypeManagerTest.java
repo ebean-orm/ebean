@@ -5,9 +5,9 @@ import io.ebean.config.dbplatform.postgres.PostgresPlatform;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import org.junit.jupiter.api.Test;
-import org.tests.model.array.IntEnum;
-import org.tests.model.array.VarcharEnum;
 import org.tests.model.basic.Car;
+import org.tests.model.basic.IntEnum;
+import org.tests.model.basic.VarcharEnum;
 
 import javax.persistence.EnumType;
 import java.time.DayOfWeek;

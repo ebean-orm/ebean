@@ -1,15 +1,15 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
-import io.ebean.xtest.MyDayOfWeek;
-import io.ebean.xtest.MyEnum;
-import io.ebean.xtest.MySex;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
+import io.ebeaninternal.server.deploy.BaseTest;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.enums.MyDayOfWeek;
+import org.tests.model.basic.enums.MyEnum;
+import org.tests.model.basic.enums.MySex;
 import org.tests.model.ivo.Money;
 import org.tests.model.ivo.converter.MoneyTypeConverter;
 
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class TestTypeManager extends BaseTestCase {
+class TestTypeManager extends BaseTest {
 
   @Test
   void testEnumWithSubclasses() throws SQLException {

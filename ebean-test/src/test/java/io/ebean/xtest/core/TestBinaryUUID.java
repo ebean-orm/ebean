@@ -1,18 +1,17 @@
-package io.ebeaninternal.server.type;
+package io.ebean.xtest.core;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UUOne;
 
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestBinaryUUID extends BaseTestCase {
+public class TestBinaryUUID {
 
   @Test
   public void test() {
@@ -31,11 +30,11 @@ public class TestBinaryUUID extends BaseTestCase {
     UUOne fetch0 = DB.find(UUOne.class, one0.getId());
     UUOne fetch1 = DB.find(UUOne.class, one1.getId());
 
-    assertEquals(one0.getId(), fetch0.getId());
-    assertEquals(one0.getName(), fetch0.getName());
+    Assertions.assertEquals(one0.getId(), fetch0.getId());
+    Assertions.assertEquals(one0.getName(), fetch0.getName());
 
-    assertEquals(one1.getId(), fetch1.getId());
-    assertEquals(one1.getName(), fetch1.getName());
+    Assertions.assertEquals(one1.getId(), fetch1.getId());
+    Assertions.assertEquals(one1.getName(), fetch1.getName());
 
     String sql = "select id, name from uuone";
     List<SqlRow> list = DB.sqlQuery(sql).findList();
@@ -50,8 +49,8 @@ public class TestBinaryUUID extends BaseTestCase {
     String asJson = DB.json().toJson(fetch0);
     UUOne bean = DB.json().toBean(UUOne.class, asJson);
 
-    assertEquals(fetch0.getId(), bean.getId());
-    assertEquals(fetch0.getName(), bean.getName());
+    Assertions.assertEquals(fetch0.getId(), bean.getId());
+    Assertions.assertEquals(fetch0.getName(), bean.getName());
   }
 
 }

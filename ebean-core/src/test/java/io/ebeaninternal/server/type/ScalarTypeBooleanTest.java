@@ -3,6 +3,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.DB;
 import io.ebean.text.json.JsonContext;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TOne;
 
@@ -25,7 +26,7 @@ public class ScalarTypeBooleanTest {
     String json = jsonContext.toJson(bean);
     TOne tOne = jsonContext.toBean(TOne.class, json);
 
-    assertTrue(tOne.isActive());
+    Assertions.assertTrue(tOne.isActive());
     assertEquals(json, "{\"id\":42,\"active\":true}");
   }
 
@@ -39,7 +40,7 @@ public class ScalarTypeBooleanTest {
     String json = jsonContext.toJson(bean);
     TOne tOne = jsonContext.toBean(TOne.class, json);
 
-    assertFalse(tOne.isActive());
+    Assertions.assertFalse(tOne.isActive());
     assertEquals(json, "{\"id\":42,\"active\":false}");
   }
 
