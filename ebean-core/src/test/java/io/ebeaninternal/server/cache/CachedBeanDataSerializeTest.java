@@ -1,27 +1,26 @@
 package io.ebeaninternal.server.cache;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
 import org.tests.model.basic.TBytesOnly;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+public class CachedBeanDataSerializeTest {
 
-public class CachedBeanDataSerializeTest extends BaseTestCase {
+  private final SpiEbeanServer db = (SpiEbeanServer)DB.getDefault();
 
   @Test
   public void write() throws IOException, ClassNotFoundException {
@@ -58,16 +57,13 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
 
   @Test
   public void fullBean() throws IOException, ClassNotFoundException {
+    Customer customer = new Customer();
+    customer.setId(42);
+    customer.setName("FooBar");
+    customer.setStatus(Customer.Status.INACTIVE);
+    customer.setVersion(3L);
 
-    ResetBasicData.reset();
-
-    List<Customer> customers = DB.find(Customer.class)
-      .order().asc("id")
-      .setMaxRows(1).findList();
-
-    Customer customer = customers.get(0);
-
-    BeanDescriptor<Customer> desc = getBeanDescriptor(Customer.class);
+    BeanDescriptor<Customer> desc = db.descriptor(Customer.class);
     CachedBeanData extract = CachedBeanDataFromBean.extract(desc, (EntityBean) customer);
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -97,7 +93,7 @@ public class CachedBeanDataSerializeTest extends BaseTestCase {
     bean.setId(42);
     bean.setContent(stringContent.getBytes(StandardCharsets.UTF_8));
 
-    BeanDescriptor<TBytesOnly> desc = getBeanDescriptor(TBytesOnly.class);
+    BeanDescriptor<TBytesOnly> desc = db.descriptor(TBytesOnly.class);
     CachedBeanData extract = CachedBeanDataFromBean.extract(desc, (EntityBean) bean);
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();

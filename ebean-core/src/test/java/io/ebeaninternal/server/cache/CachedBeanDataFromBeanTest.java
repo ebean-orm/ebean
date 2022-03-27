@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.cache;
 
-import io.ebean.xtest.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -17,9 +17,9 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class CachedBeanDataFromBeanTest extends BaseTestCase {
+public class CachedBeanDataFromBeanTest {
 
-  private final SpiEbeanServer server = spiEbeanServer();
+  private final SpiEbeanServer server = (SpiEbeanServer)DB.getDefault();
 
   @Test
   public void extract() {
@@ -84,7 +84,7 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
     // mutate, dirty
     contact.setLastName("Banana");
 
-    final BeanDescriptor<Contact> desc = getBeanDescriptor(Contact.class);
+    final BeanDescriptor<Contact> desc = server.descriptor(Contact.class);
     CachedBeanData cacheData = CachedBeanDataFromBean.extract(desc, entityBean);
 
     final Map<String, Object> data = cacheData.getData();
@@ -115,7 +115,7 @@ public class CachedBeanDataFromBeanTest extends BaseTestCase {
     contact.setCustomer(customer2);
     contact.setLastName("Banana");
 
-    final BeanDescriptor<Contact> desc = getBeanDescriptor(Contact.class);
+    final BeanDescriptor<Contact> desc = server.descriptor(Contact.class);
     CachedBeanData cacheData = CachedBeanDataFromBean.extract(desc, entityBean);
 
     final Map<String, Object> data = cacheData.getData();

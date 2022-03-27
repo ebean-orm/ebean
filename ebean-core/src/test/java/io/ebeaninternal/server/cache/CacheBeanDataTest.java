@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.cache;
 
-import io.ebean.xtest.BaseTestCase;
+import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -20,12 +20,12 @@ import java.sql.Timestamp;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class CacheBeanDataTest extends BaseTestCase {
+public class CacheBeanDataTest {
 
   @Test
   public void extract_load_on_customer() {
 
-    SpiEbeanServer server = spiEbeanServer();
+    SpiEbeanServer server = (SpiEbeanServer)DB.getDefault();
     BeanDescriptor<Customer> desc = server.descriptor(Customer.class);
 
     Customer c = new Customer();
@@ -77,7 +77,7 @@ public class CacheBeanDataTest extends BaseTestCase {
   @Test
   public void extract_load_withEmbeddedBean() {
 
-    SpiEbeanServer server = spiEbeanServer();
+    SpiEbeanServer server = (SpiEbeanServer)DB.getDefault();
     BeanDescriptor<EPerson> desc = server.descriptor(EPerson.class);
     BeanPropertyAssocOne<?> addressBeanProperty = (BeanPropertyAssocOne<?>) desc.beanProperty("address");
 
