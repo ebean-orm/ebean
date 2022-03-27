@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.xtest.BaseTestCase;
+import io.ebeaninternal.server.deploy.BaseTest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -8,7 +8,7 @@ import org.tests.model.basic.Order;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class OrmQueryDetailTest extends BaseTestCase {
+public class OrmQueryDetailTest extends BaseTest {
 
   OrmQueryDetail parse(String query) {
     return new OrmQueryDetailParser(query).parse();

@@ -5,10 +5,10 @@ import io.ebean.ExpressionList;
 import io.ebean.Query;
 import io.ebeaninternal.api.CQueryPlanKey;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.deploy.BaseTest;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
-import io.ebeaninternal.server.expression.BaseExpressionTest;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OrmQueryPlanKeyTest extends BaseExpressionTest {
+public class OrmQueryPlanKeyTest extends BaseTest {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   private DefaultOrmQuery<Customer> query() {

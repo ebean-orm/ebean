@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.expression;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,7 +15,7 @@ public class BetweenPropertyExpressionTest extends BaseExpressionTest {
   public void sqlExpression() {
     TDSpiExpressionRequest request = new TDSpiExpressionRequest(null);
     exp("a", "b", 10).addSql(request);
-    assertThat(request.getSql()).isEqualTo(" ? between a and b");
+    Assertions.assertThat(request.getSql()).isEqualTo(" ? between a and b");
   }
 
   @Test

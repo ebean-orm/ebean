@@ -1,19 +1,21 @@
 package io.ebeaninternal.server.querydefn;
 
 
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.CacheMode;
-import io.ebean.DB;
+import io.ebean.*;
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.core.DefaultServer;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.core.OrmQueryRequestTestHelper;
+import io.ebeaninternal.server.deploy.BaseTest;
+import io.ebeaninternal.server.expression.BaseExpressionTest;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DefaultOrmQueryTest extends BaseTestCase {
+public class DefaultOrmQueryTest extends BaseExpressionTest {
 
   @Test
   public void when_forUpdate_then_excludeFromBeanCache() {
@@ -105,10 +107,10 @@ public class DefaultOrmQueryTest extends BaseTestCase {
 
   private <T> void prepare(DefaultOrmQuery<T> q1, DefaultOrmQuery<T> q2) {
 
-    OrmQueryRequest<T> r1 = createQueryRequest(SpiQuery.Type.LIST, q1, null);
+    OrmQueryRequest<T> r1 = OrmQueryRequestTestHelper.queryRequest(q1);
     q1.prepare(r1);
 
-    OrmQueryRequest<T> r2 = createQueryRequest(SpiQuery.Type.LIST, q2, null);
+    OrmQueryRequest<T> r2 = OrmQueryRequestTestHelper.queryRequest(q2);
     q2.prepare(r2);
   }
 

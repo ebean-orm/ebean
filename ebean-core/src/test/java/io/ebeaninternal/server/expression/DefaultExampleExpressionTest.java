@@ -1,19 +1,16 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.LikeType;
-import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.ManyWhereJoins;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class DefaultExampleExpressionTest extends BaseExpressionTest {
@@ -72,43 +69,9 @@ public class DefaultExampleExpressionTest extends BaseExpressionTest {
     TDSpiExpressionRequest req = new TDSpiExpressionRequest(customerBeanDescriptor());
     expr.addBindValues(req);
 
-    assertThat(req.bindValues).contains("name", "billingAddress.city");
-
-    Customer customer = customer();
-    customer.setName("Rob");
-    customer.getBillingAddress().setCity("Auckland");
-
-    ResetBasicData.reset();
-
-    Query<Customer> query1 = server().find(Customer.class)
-      .where().exampleLike(customer)
-      .query();
-
-    query1.findList();
-
-    assertThat(query1.getGeneratedSql()).contains("(t0.name like ");
-    assertThat(query1.getGeneratedSql()).contains(" and t1.city like ");
-
+    Assertions.assertThat(req.bindValues).contains("name", "billingAddress.city");
   }
 
-  @Test
-  public void emptyExampleBean() {
-
-    ResetBasicData.reset();
-
-    Customer customer = new Customer();
-
-    Query<Customer> query = server().find(Customer.class)
-      .where()
-      .eq("status", Customer.Status.NEW)
-      .exampleLike(customer)
-      .startsWith("name", "Rob")
-      .query();
-
-    query.findList();
-
-    assertThat(sqlOf(query)).contains("and 1=1 and t0.name like");
-  }
 
   private <T> OrmQueryRequest<T> create(SpiQuery<T> query) {
     return new OrmQueryRequest<>(null, null, query, null);

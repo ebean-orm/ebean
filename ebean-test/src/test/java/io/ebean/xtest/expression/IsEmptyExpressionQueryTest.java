@@ -1,9 +1,10 @@
-package io.ebeaninternal.server.expression;
+package io.ebean.xtest.expression;
 
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;

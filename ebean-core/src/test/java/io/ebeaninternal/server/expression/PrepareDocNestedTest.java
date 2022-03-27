@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.server.deploy.BaseTest;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 
@@ -12,7 +12,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class PrepareDocNestedTest extends BaseTestCase {
+public class PrepareDocNestedTest extends BaseTest {
   @Test
   public void prepare() throws Exception {
 

@@ -1,18 +1,18 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.server.deploy.BaseTest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public abstract class BaseExpressionTest extends BaseTestCase {
+public abstract class BaseExpressionTest extends BaseTest {
 
   protected DefaultExpressionRequest newExpressionRequest() {
     BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
