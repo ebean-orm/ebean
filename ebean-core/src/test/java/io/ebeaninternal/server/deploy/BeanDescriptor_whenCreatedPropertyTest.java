@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.jupiter.api.Test;
@@ -10,9 +9,7 @@ import org.tests.model.basic.EBasic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-
-public class BeanDescriptor_whenCreatedPropertyTest extends BaseTestCase {
-
+public class BeanDescriptor_whenCreatedPropertyTest {
 
   @Test
   public void test() {

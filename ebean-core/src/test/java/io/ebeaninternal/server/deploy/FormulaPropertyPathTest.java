@@ -1,12 +1,11 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class FormulaPropertyPathTest extends BaseTestCase {
+public class FormulaPropertyPathTest extends BaseTest {
 
   private BeanDescriptor<Customer> customerDesc = getBeanDescriptor(Customer.class);
 

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
@@ -8,6 +7,7 @@ import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;
 import org.tests.model.bridge.BSite;
@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class BeanDescriptorTest extends BaseTestCase {
+public class BeanDescriptorTest extends BaseTest {
 
   private BeanDescriptor<Customer> customerDesc = spiEbeanServer().descriptor(Customer.class);
 
@@ -30,35 +30,37 @@ public class BeanDescriptorTest extends BaseTestCase {
 
     Customer bean = customerDesc.createReference(null, false, 42, null);
     assertThat(bean.getId()).isEqualTo(42);
-    assertThat(server().beanState(bean).isReadOnly()).isFalse();
+    Assertions.assertThat(server().beanState(bean).isReadOnly()).isFalse();
   }
 
   @Test
   public void createReference_whenReadOnly() {
 
     Customer bean = customerDesc.createReference(Boolean.TRUE, false, 42, null);
-    assertThat(server().beanState(bean).isReadOnly()).isTrue();
+    Assertions.assertThat(server().beanState(bean).isReadOnly()).isTrue();
   }
 
   @Test
   public void createReference_whenNotReadOnly() {
 
     Customer bean = customerDesc.createReference(Boolean.FALSE, false, 42, null);
-    assertThat(server().beanState(bean).isReadOnly()).isFalse();
+    Assertions.assertThat(server().beanState(bean).isReadOnly()).isFalse();
 
     bean = customerDesc.createReference(42, null);
-    assertThat(server().beanState(bean).isReadOnly()).isFalse();
+    Assertions.assertThat(server().beanState(bean).isReadOnly()).isFalse();
   }
 
   @Test
   public void createReference_when_disabledLazyLoad() {
 
     Customer bean = customerDesc.createReference(Boolean.FALSE, true, 42, null);
-    assertThat(server().beanState(bean).isDisableLazyLoad()).isTrue();
+    Assertions.assertThat(server().beanState(bean).isDisableLazyLoad()).isTrue();
   }
 
   @Test
   public void createReference_with_inheritance() {
+    initTables();
+
     Cat cat = new Cat();
     cat.setName("Puss");
     DB.save(cat);

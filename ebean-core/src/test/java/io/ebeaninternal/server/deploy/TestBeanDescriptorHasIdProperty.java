@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.bean.EntityBean;
@@ -19,7 +18,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestBeanDescriptorHasIdProperty extends BaseTestCase {
+public class TestBeanDescriptorHasIdProperty extends BaseTest {
 
   SpiEbeanServer spiServer;
 

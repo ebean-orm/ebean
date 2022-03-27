@@ -1,10 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -19,18 +16,14 @@ import java.sql.Timestamp;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class TestDiffHelpInsertSimple extends BaseTestCase {
+public class TestDiffHelpInsertSimple extends BaseTest {
 
   private final long firstTime = System.currentTimeMillis() - 10000;
-
-  private final Database server;
 
   private final BeanDescriptor<Order> orderDesc;
 
   public TestDiffHelpInsertSimple() {
-    server = DB.getDefault();
-    SpiEbeanServer spiServer = (SpiEbeanServer) server;
-    orderDesc = spiServer.descriptor(Order.class);
+    orderDesc = db.descriptor(Order.class);
   }
 
   private Order createBaseOrder(Database server) {
@@ -49,7 +42,7 @@ public class TestDiffHelpInsertSimple extends BaseTestCase {
 
     Date date = Date.valueOf("2000-01-01");
 
-    Order order1 = createBaseOrder(server);
+    Order order1 = createBaseOrder(db);
     order1.setOrderDate(date);
 
     StringWriter buffer = new StringWriter();

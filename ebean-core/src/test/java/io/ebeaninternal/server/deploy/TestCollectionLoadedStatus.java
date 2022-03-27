@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
@@ -14,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCollectionLoadedStatus extends BaseTestCase {
+public class TestCollectionLoadedStatus {
 
   @Test
   public void test() {

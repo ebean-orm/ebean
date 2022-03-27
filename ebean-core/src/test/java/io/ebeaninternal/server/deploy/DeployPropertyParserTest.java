@@ -1,16 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.xtest.ForPlatform;
-import io.ebean.annotation.Platform;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.BWithQIdent;
 import org.tests.model.basic.Customer;
 
-
-public class DeployPropertyParserTest extends BaseTestCase {
+public class DeployPropertyParserTest extends BaseTest {
 
   private final BeanDescriptor<Customer> descriptor = getBeanDescriptor(Customer.class);
 
@@ -61,21 +57,14 @@ public class DeployPropertyParserTest extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({Platform.H2, Platform.POSTGRES})
   public void withQuote_when_match_h2() {
-    Assertions.assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}\"Name\" like ?");
-  }
-
-  @Test
-  @ForPlatform(Platform.SQLSERVER)
-  public void withQuote_when_match_sqlserver() {
-    Assertions.assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}[Name] like ?");
-  }
-
-  @Test
-  @ForPlatform(Platform.MYSQL)
-  public void withQuote_when_match_mysql() {
-    Assertions.assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}`Name` like ?");
+    if (isH2() || isPostgres()) {
+      Assertions.assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}\"Name\" like ?");
+    } else if (isSqlServer()) {
+      Assertions.assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}[Name] like ?");
+    } else if (isMySql()) {
+      Assertions.assertThat(withQuoteParser().parse("name like ?")).isEqualTo("${}`Name` like ?");
+    }
   }
 
   @Test
