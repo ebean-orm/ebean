@@ -302,15 +302,15 @@ create table table_history(
   sys_period_end                datetime(6)
 );
 create view table_with_history as select * from `table` union all select * from table_history;
-lock tables "table" write;
+lock tables `table` write;
 delimiter $$
-create trigger table_history_upd before update on "table" for each row begin
-    insert into table_history (sys_period_start,sys_period_end,"index", "from", "to", "varchar", "foreign") values (OLD.sys_period_start, now(6),OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."foreign");
+create trigger table_history_upd before update on `table` for each row begin
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`);
     set NEW.sys_period_start = now(6);
 end$$
 delimiter $$
-create trigger table_history_del before delete on "table" for each row begin
-    insert into table_history (sys_period_start,sys_period_end,"index", "from", "to", "varchar", "foreign") values (OLD.sys_period_start, now(6),OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."foreign");
+create trigger table_history_del before delete on `table` for each row begin
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`);
 end$$
 unlock tables;
 

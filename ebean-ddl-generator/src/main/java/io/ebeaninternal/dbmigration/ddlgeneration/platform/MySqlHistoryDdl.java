@@ -18,19 +18,15 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
     buffer.append("drop trigger ").append(deleteTriggerName(baseTable)).endOfStatement();
   }
 
-
   @Override
   protected void createTriggers(DdlBuffer buffer, String baseTable, List<String> columnNames) {
-
     buffer.append("lock tables ").append(baseTable).append(" write").endOfStatement();
     addBeforeUpdate(buffer, updateTriggerName(baseTable), baseTable, columnNames);
     addBeforeDelete(buffer, deleteTriggerName(baseTable), baseTable, columnNames);
     buffer.appendStatement("unlock tables");
-
   }
 
   private void addBeforeUpdate(DdlBuffer apply, String triggerName, String tableName, List<String> columnNames) {
-
     apply
       .append("delimiter $$").newLine()
       .append("create trigger ").append(triggerName).append(" before update on ").append(tableName)
@@ -42,7 +38,6 @@ public class MySqlHistoryDdl extends DbTriggerBasedHistoryDdl {
   }
 
   private void addBeforeDelete(DdlBuffer apply, String triggerName, String tableName, List<String> columnNames) {
-
     apply
       .append("delimiter $$").newLine()
       .append("create trigger ").append(triggerName).append(" before delete on ").append(tableName)

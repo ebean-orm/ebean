@@ -1,7 +1,11 @@
 package io.ebean.test.config.platform;
 
+import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
+import io.ebeaninternal.api.DbOffline;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +15,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class ConfigTest {
+
+  @BeforeAll
+  public static void before() {
+    // so that RunOnceMarker is not set when running these tests
+    DbOffline.setPlatform(Platform.H2);
+  }
+
+  @AfterAll
+  public static void after() {
+    DbOffline.reset();
+  }
 
   @Test
   public void trimExtensions() {

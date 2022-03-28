@@ -27,7 +27,7 @@ public class ClusterTest {
   }
 
   @Test
-  public void testBothNear() {
+  public void testBothNear() throws InterruptedException {
     // ensure the default server exists first
     final Database db = DB.getDefault();
     Database other = createOther(db.pluginApi().dataSource());
@@ -44,6 +44,7 @@ public class ClusterTest {
     other.metaInfo().resetAllMetrics();
 
     Person fooA = DB.find(Person.class, foo.getId());
+    allowAsyncMessaging(); // allow time for background cache load
     Person fooB = other.find(Person.class, foo.getId());
 
     DuelCache dualCacheA = (DuelCache) DB.cacheManager().beanCache(Person.class);

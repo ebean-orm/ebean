@@ -1,0 +1,123 @@
+package io.ebeaninternal.server.cache;
+
+import io.ebean.DB;
+import io.ebean.bean.EntityBean;
+import io.ebean.bean.PersistenceContext;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
+import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Address;
+import org.tests.model.basic.Country;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.Customer.Status;
+import org.tests.model.embedded.EAddress;
+import org.tests.model.embedded.EPerson;
+
+import java.sql.Timestamp;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+public class CacheBeanDataTest {
+
+  @Test
+  public void extract_load_on_customer() {
+
+    SpiEbeanServer server = (SpiEbeanServer)DB.getDefault();
+    BeanDescriptor<Customer> desc = server.descriptor(Customer.class);
+
+    Customer c = new Customer();
+    c.setId(98989);
+    c.setName("Rob");
+    c.setCretime(new Timestamp(System.currentTimeMillis()));
+    c.setUpdtime(new Timestamp(System.currentTimeMillis()));
+    c.setStatus(Status.ACTIVE);
+    c.setSmallnote("somenote");
+
+    Address billingAddress = new Address();
+    billingAddress.setId(12);
+    billingAddress.setCity("Auckland");
+    billingAddress.setCountry(server.reference(Country.class, "NZ"));
+    billingAddress.setLine1("92 Someplace Else");
+    c.setBillingAddress(billingAddress);
+
+    ((EntityBean) c)._ebean_getIntercept().setLoaded();
+
+    CachedBeanData cacheData = CachedBeanDataFromBean.extract(desc, (EntityBean) c);
+
+
+    assertNotNull(cacheData);
+
+    Customer newCustomer = new Customer();
+    newCustomer.setId(c.getId());
+    CachedBeanDataToBean.load(desc, (EntityBean) newCustomer, cacheData, new DefaultPersistenceContext());
+
+    assertEquals(c.getId(), newCustomer.getId());
+    assertEquals(c.getName(), newCustomer.getName());
+    assertEquals(c.getStatus(), newCustomer.getStatus());
+    assertEquals(c.getSmallnote(), newCustomer.getSmallnote());
+    assertEquals(c.getCretime(), newCustomer.getCretime());
+    assertEquals(c.getUpdtime(), newCustomer.getUpdtime());
+    assertEquals(c.getBillingAddress().getId(), newCustomer.getBillingAddress().getId());
+
+    assertNotNull(newCustomer.getId());
+    assertNotNull(newCustomer.getName());
+    assertNotNull(newCustomer.getStatus());
+    assertNotNull(newCustomer.getSmallnote());
+    assertNotNull(newCustomer.getCretime());
+    assertNotNull(newCustomer.getUpdtime());
+    assertNotNull(newCustomer.getBillingAddress());
+    assertNotNull(newCustomer.getBillingAddress().getId());
+
+  }
+
+
+  @Test
+  public void extract_load_withEmbeddedBean() {
+
+    SpiEbeanServer server = (SpiEbeanServer)DB.getDefault();
+    BeanDescriptor<EPerson> desc = server.descriptor(EPerson.class);
+    BeanPropertyAssocOne<?> addressBeanProperty = (BeanPropertyAssocOne<?>) desc.beanProperty("address");
+
+    EAddress address = new EAddress();
+    address.setStreet("92 Someplace Else");
+    address.setSuburb("Sandringham");
+    address.setCity("Auckland");
+
+    EPerson person = new EPerson();
+    person.setId(98989L);
+    person.setName("Rob");
+    person.setAddress(address);
+
+    CachedBeanData addressCacheData = (CachedBeanData) addressBeanProperty.getCacheDataValue((EntityBean) person);
+
+    PersistenceContext context = new DefaultPersistenceContext();
+
+    EPerson newPersonCheck = new EPerson();
+    newPersonCheck.setId(98989L);
+    addressBeanProperty.setCacheDataValue((EntityBean) newPersonCheck, addressCacheData, context);
+
+    EAddress newAddress = newPersonCheck.getAddress();
+    assertEquals(address.getStreet(), newAddress.getStreet());
+    assertEquals(address.getCity(), newAddress.getCity());
+    assertEquals(address.getSuburb(), newAddress.getSuburb());
+
+
+    CachedBeanData cacheData = desc.cacheEmbeddedBeanExtract((EntityBean) person);
+
+    assertNotNull(cacheData);
+
+    EPerson newPerson = (EPerson) desc.cacheEmbeddedBeanLoad(cacheData, context);
+
+    assertNotNull(newPerson.getId());
+    assertNotNull(newPerson.getName());
+    assertNotNull(newPerson.getAddress());
+
+    assertEquals(person.getId(), newPerson.getId());
+    assertEquals(person.getName(), newPerson.getName());
+    assertEquals(person.getAddress().getStreet(), newPerson.getAddress().getStreet());
+    assertEquals(person.getAddress().getCity(), newPerson.getAddress().getCity());
+  }
+}

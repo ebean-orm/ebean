@@ -82,8 +82,8 @@ public class Order implements Serializable {
   @DocEmbedded
   List<OrderDetail> details;
 
-//  @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
-//  List<OrderShipment> shipments;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "order", orphanRemoval = true)
+  List<OrderShipment> shipments;
 
   @Override
   public String toString() {
@@ -234,19 +234,19 @@ public class Order implements Serializable {
     details.add(detail);
   }
 
-//  public List<OrderShipment> getShipments() {
-//    return shipments;
-//  }
-//
-//  public void setShipments(List<OrderShipment> shipments) {
-//    this.shipments = shipments;
-//  }
-//
-//  public void addShipment(OrderShipment shipment) {
-//
-//    if (shipments == null) {
-//      shipments = new ArrayList<>();
-//    }
-//    shipments.add(shipment);
-//  }
+  public List<OrderShipment> getShipments() {
+    return shipments;
+  }
+
+  public void setShipments(List<OrderShipment> shipments) {
+    this.shipments = shipments;
+  }
+
+  public void addShipment(OrderShipment shipment) {
+
+    if (shipments == null) {
+      shipments = new ArrayList<>();
+    }
+    shipments.add(shipment);
+  }
 }

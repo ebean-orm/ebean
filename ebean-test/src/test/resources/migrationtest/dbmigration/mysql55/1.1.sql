@@ -184,15 +184,15 @@ create trigger migtest_e_history6_history_del before delete on migtest_e_history
 end$$
 unlock tables;
 create view table_with_history as select * from `table` union all select * from table_history;
-lock tables "table" write;
+lock tables `table` write;
 delimiter $$
-create trigger table_history_upd before update on "table" for each row begin
-    insert into table_history (sys_period_start,sys_period_end,"index", "from", "to", "varchar", "select", "foreign") values (OLD.sys_period_start, now(6),OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+create trigger table_history_upd before update on `table` for each row begin
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `select`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`select`, OLD.`foreign`);
     set NEW.sys_period_start = now(6);
 end$$
 delimiter $$
-create trigger table_history_del before delete on "table" for each row begin
-    insert into table_history (sys_period_start,sys_period_end,"index", "from", "to", "varchar", "select", "foreign") values (OLD.sys_period_start, now(6),OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+create trigger table_history_del before delete on `table` for each row begin
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `select`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`select`, OLD.`foreign`);
 end$$
 unlock tables;
 alter table `table` add constraint uq_table_select unique  (`select`);
