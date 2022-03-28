@@ -80,15 +80,6 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
-     and not require a separate module for it -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>${h2database.version}</version>
-      <optional>true</optional>
-    </dependency>
-
     <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>jta</artifactId>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>12.16.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>ebean-h2</artifactId>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-api</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+
+    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
+         and not require a separate module for it -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${h2database.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>junit</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>

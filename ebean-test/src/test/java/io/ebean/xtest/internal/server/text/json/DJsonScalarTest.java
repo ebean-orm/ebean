@@ -3,7 +3,7 @@ package io.ebean.xtest.internal.server.text.json;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.platform.h2.H2Platform;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.text.json.DJsonScalar;
 import io.ebeaninternal.server.type.DefaultTypeManager;

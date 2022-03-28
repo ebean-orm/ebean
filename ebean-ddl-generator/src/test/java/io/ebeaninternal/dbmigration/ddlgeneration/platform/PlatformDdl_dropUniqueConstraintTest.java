@@ -1,12 +1,12 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.hana.HanaPlatform;
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
-import io.ebean.config.dbplatform.oracle.OraclePlatform;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.platform.h2.H2Platform;
+import io.ebean.platform.hana.HanaPlatform;
+import io.ebean.platform.mysql.MySqlPlatform;
+import io.ebean.platform.oracle.OraclePlatform;
+import io.ebean.platform.postgres.PostgresPlatform;
+import io.ebean.platform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import org.junit.jupiter.api.Test;
 

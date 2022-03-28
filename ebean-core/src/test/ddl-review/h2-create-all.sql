@@ -5469,14 +5469,14 @@ create table c_user_history(
 );
 create view c_user_with_history as select * from c_user union all select * from c_user_history;
 
-create trigger hembi_bean_history_upd before update,delete on hembi_bean for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger hx_link_history_upd before update,delete on hx_link for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger hi_link_history_upd before update,delete on hi_link for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger hi_link_doc_history_upd before update,delete on hi_link_doc for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger hi_tone_history_upd before update,delete on hi_tone for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger hi_tthree_history_upd before update,delete on hi_tthree for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger hi_ttwo_history_upd before update,delete on hi_ttwo for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger hsd_setting_history_upd before update,delete on hsd_setting for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger hsd_user_history_upd before update,delete on hsd_user for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger link_history_upd before update,delete on link for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
-create trigger c_user_history_upd before update,delete on c_user for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger hembi_bean_history_upd before update,delete on hembi_bean for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger hx_link_history_upd before update,delete on hx_link for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger hi_link_history_upd before update,delete on hi_link for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger hi_link_doc_history_upd before update,delete on hi_link_doc for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger hi_tone_history_upd before update,delete on hi_tone for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger hi_tthree_history_upd before update,delete on hi_tthree for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger hi_ttwo_history_upd before update,delete on hi_ttwo for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger hsd_setting_history_upd before update,delete on hsd_setting for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger hsd_user_history_upd before update,delete on hsd_user for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger link_history_upd before update,delete on link for each row call "io.ebean.platform.h2.H2HistoryTrigger";
+create trigger c_user_history_upd before update,delete on c_user for each row call "io.ebean.platform.h2.H2HistoryTrigger";

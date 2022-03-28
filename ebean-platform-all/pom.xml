@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>12.16.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>ebean-platform-all</artifactId>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-h2</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-clickhouse</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-db2</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-hana</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-hsqldb</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-mysql</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-mariadb</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-nuodb</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-oracle</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-postgres</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-cockroach</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-sqlanywhere</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-sqlite</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-sqlserver</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-yugabyte</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+
+</project>

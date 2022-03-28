@@ -2,7 +2,7 @@ package io.ebeaninternal.dbmigration;
 
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.hana.HanaPlatform;
+import io.ebean.platform.hana.HanaPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.jupiter.api.Test;

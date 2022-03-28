@@ -1,6 +1,7 @@
 module io.ebean.api {
 
   uses io.ebean.config.AutoConfigure;
+  uses io.ebean.config.dbplatform.DatabasePlatformProvider;
   uses io.ebean.datasource.DataSourceAlertFactory;
   uses io.ebean.metric.MetricFactory;
   uses io.ebean.service.SpiContainerFactory;

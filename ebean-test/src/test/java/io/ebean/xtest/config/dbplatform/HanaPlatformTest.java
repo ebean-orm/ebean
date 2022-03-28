@@ -2,7 +2,7 @@ package io.ebean.xtest.config.dbplatform;
 
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.hana.HanaPlatform;
+import io.ebean.platform.hana.HanaPlatform;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

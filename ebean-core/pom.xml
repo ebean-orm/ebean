@@ -141,6 +141,26 @@
     </dependency>
 
     <!-- Test scope -->
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-h2</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-postgres</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-sqlserver</artifactId>
+      <version>12.16.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>

@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.config.dbplatform.oracle.OraclePlatform;
+import io.ebean.platform.oracle.OraclePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.jupiter.api.Test;

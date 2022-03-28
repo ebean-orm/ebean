@@ -1,6 +1,6 @@
 package io.ebean.xtest.config.dbplatform;
 
-import io.ebean.config.dbplatform.hana.HanaHistorySupport;
+import io.ebean.platform.hana.HanaHistorySupport;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

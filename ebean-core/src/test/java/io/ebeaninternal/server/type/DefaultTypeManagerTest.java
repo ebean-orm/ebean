@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import org.junit.jupiter.api.Test;

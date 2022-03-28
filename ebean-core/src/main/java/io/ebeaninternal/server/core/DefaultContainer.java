@@ -10,7 +10,6 @@ import io.ebean.config.ServerConfigProvider;
 import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.h2.H2Platform;
 import io.ebean.event.ShutdownManager;
 import io.ebean.service.SpiContainer;
 import io.ebeaninternal.api.CoreLog;
@@ -86,7 +85,7 @@ public final class DefaultContainer implements SpiContainer {
 
       boolean online = true;
       if (config.isDocStoreOnly()) {
-        config.setDatabasePlatform(new H2Platform());
+        config.setDatabasePlatform(new DatabasePlatform());
       } else {
         TenantMode tenantMode = config.getTenantMode();
         if (TenantMode.DB != tenantMode) {

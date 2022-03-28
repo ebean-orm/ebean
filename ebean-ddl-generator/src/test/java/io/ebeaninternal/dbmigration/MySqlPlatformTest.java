@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
+import io.ebean.platform.mysql.MySqlPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import org.junit.jupiter.api.Test;

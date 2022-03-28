@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.annotation.ConstraintMode;
-import io.ebean.config.dbplatform.oracle.OraclePlatform;
+import io.ebean.platform.oracle.OraclePlatform;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

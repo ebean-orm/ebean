@@ -7,7 +7,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.platform.h2.H2Platform;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
