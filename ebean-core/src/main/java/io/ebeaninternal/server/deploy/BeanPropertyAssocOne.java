@@ -783,7 +783,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void jsonRead(SpiJsonReader readJson, EntityBean bean) throws IOException {
     if (jsonDeserialize && targetDescriptor != null) {
-      T assocBean = targetDescriptor.jsonRead(readJson, name);
+      T target = (T) value(bean);
+      T assocBean = targetDescriptor.jsonRead(readJson, name, target);
       setValue(bean, assocBean);
     }
   }

@@ -26,12 +26,9 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
 
     BeanDescriptor<Customer> descriptor = server.descriptor(Customer.class);
 
-    StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello rob\"}");
-    JsonParser parser = server.json().createParser(reader);
+    SpiJsonReader readJson = createRead(server, descriptor);
 
-    SpiJsonReader readJson = new ReadJson(descriptor, parser, null, null);
-
-    Customer customer = descriptor.jsonRead(readJson, null);
+    Customer customer = descriptor.jsonRead(readJson, null, null);
 
     assertEquals(Integer.valueOf(123), customer.getId());
     assertEquals("Hello rob", customer.getName());
@@ -42,6 +39,21 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     assertEquals(2, loadedProps.size());
     assertTrue(loadedProps.contains("id"));
     assertTrue(loadedProps.contains("name"));
+    
+    customer.setName("Hello Roland");
+    customer.setId(234);
+    readJson = createRead(server, descriptor);
+    descriptor.jsonRead(readJson, null, customer);
+    assertEquals(Integer.valueOf(123), customer.getId());
+    assertEquals("Hello rob", customer.getName());
+  }
+
+  private SpiJsonReader createRead(SpiEbeanServer server, BeanDescriptor<Customer> descriptor) {
+    StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello rob\"}");
+    JsonParser parser = server.json().createParser(reader);
+
+    SpiJsonReader readJson = new ReadJson(descriptor, parser, null, null);
+    return readJson;
   }
 
 }
