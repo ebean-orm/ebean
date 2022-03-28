@@ -19,10 +19,7 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
   protected String sysPeriod;
   protected String sysPeriodStart;
   protected String sysPeriodEnd;
-
   protected String viewSuffix;
-
-
   protected String sysPeriodType = "datetime(6)";
   protected String now = "now(6)";
   protected String sysPeriodEndValue = "now(6)";
@@ -35,14 +32,12 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
     super.configure(config, platformDdl);
     this.sysPeriod = config.getAsOfSysPeriod();
     this.viewSuffix = config.getAsOfViewSuffix();
-
     this.sysPeriodStart = sysPeriod + "_start";
     this.sysPeriodEnd = sysPeriod + "_end";
   }
 
   @Override
   public void dropHistoryTable(DdlWrite writer, DropHistoryTable dropHistoryTable) {
-
     String baseTable = dropHistoryTable.getBaseTable();
 
     // drop in appropriate order
@@ -55,20 +50,17 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
 
   @Override
   public void addHistoryTable(DdlWrite writer, AddHistoryTable addHistoryTable) {
-
     String baseTable = addHistoryTable.getBaseTable();
     MTable table = writer.getTable(baseTable);
     if (table == null) {
       throw new IllegalStateException("MTable " + baseTable + " not found in writer? (required for history DDL)");
     }
-
     createWithHistory(writer, table);
   }
 
   @Override
   public void createWithHistory(DdlWrite writer, MTable table) {
-
-    String baseTable = table.getName();
+    String baseTable = quote(table.getName());
 
     addSysPeriodColumns(writer, baseTable, table.getWhenCreatedColumn());
     createHistoryTable(writer.applyPostAlter(), table);
@@ -82,7 +74,6 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
     dropWithHistoryView(writer.dropAll(), baseTable);
     dropHistoryTable(writer.dropAll(), baseTable);
     // no need to dropSysPeriodColumns as whole table will be deleted soon
-
   }
 
   @Override
@@ -97,8 +88,7 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
         dropWithHistoryView(writer.apply(), tableName);
         // here are the alter commands
         createWithHistoryView(writer.applyPostAlter(), tableName);
-        createTriggers(writer.applyPostAlter(), tableName, columnNamesForApply(table));
-
+        createTriggers(writer.applyPostAlter(), quote(tableName), columnNamesForApply(table));
         alter.setHistoryHandled();
       }
     }
@@ -106,9 +96,6 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
 
   /**
    * Will add a history trigger to the buffer. The config
-   * 
-   * @param buffer
-   * @param table
    */
   protected abstract void createTriggers(DdlBuffer buffer, String baseTable, List<String> columnNames);
 
@@ -135,7 +122,6 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
   }
 
   protected void addSysPeriodColumns(DdlWrite writer, String baseTableName, String whenCreatedColumn) {
-
     platformDdl.alterTableAddColumn(writer, baseTableName, sysPeriodStart, sysPeriodType, now);
     platformDdl.alterTableAddColumn(writer, baseTableName, sysPeriodEnd, sysPeriodType, null);
     if (whenCreatedColumn != null) {
@@ -176,7 +162,6 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
    * Write the column definition to the create table statement.
    */
   protected void writeColumnDefinition(DdlBuffer buffer, String columnName, String type) {
-
     String platformType = platformDdl.convert(type);
     buffer.append("  ");
     buffer.append(quote(columnName), 29);
@@ -184,7 +169,6 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
   }
 
   protected void createWithHistoryView(DdlBuffer apply, String baseTableName) {
-
     apply
       .append("create view ").append(historyViewName(baseTableName))
       .append(" as select * from ").append(quote(baseTableName))
@@ -211,7 +195,6 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
   }
 
   protected void appendInsertIntoHistory(DdlBuffer buffer, String baseTable, List<String> columns) {
-
     buffer.append("    insert into ").append(historyTableName(baseTable)).append(" (").append(sysPeriodStart).append(",").append(sysPeriodEnd).append(",");
     appendColumnNames(buffer, columns, "");
     buffer.append(") values (OLD.").append(sysPeriodStart).append(", ").append(sysPeriodEndValue).append(",");
@@ -225,7 +208,7 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
         buffer.append(", ");
       }
       buffer.append(columnPrefix);
-      buffer.append(columns.get(i));
+      buffer.append(quote(columns.get(i)));
     }
   }
 
