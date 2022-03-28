@@ -2,13 +2,13 @@ package io.ebean.xtest.config.dbplatform;
 
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
-import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
-import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
-import io.ebean.config.dbplatform.oracle.OraclePlatform;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.platform.clickhouse.ClickHousePlatform;
+import io.ebean.platform.h2.H2Platform;
+import io.ebean.platform.mysql.MySqlPlatform;
+import io.ebean.platform.oracle.OraclePlatform;
+import io.ebean.platform.postgres.PostgresPlatform;
+import io.ebean.platform.sqlserver.SqlServer16Platform;
+import io.ebean.platform.sqlserver.SqlServer17Platform;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

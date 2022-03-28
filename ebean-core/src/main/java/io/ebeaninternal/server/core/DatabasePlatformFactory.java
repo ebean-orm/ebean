@@ -2,36 +2,17 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
-import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
-import io.ebean.config.dbplatform.db2.DB2ForIPlatform;
-import io.ebean.config.dbplatform.db2.DB2LegacyPlatform;
-import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
-import io.ebean.config.dbplatform.db2.DB2ZosPlatform;
-import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.hana.HanaPlatform;
-import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
-import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
-import io.ebean.config.dbplatform.mysql.MySql55Platform;
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
-import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
-import io.ebean.config.dbplatform.oracle.Oracle11Platform;
-import io.ebean.config.dbplatform.oracle.Oracle12Platform;
-import io.ebean.config.dbplatform.oracle.OraclePlatform;
-import io.ebean.config.dbplatform.postgres.Postgres9Platform;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
-import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import io.ebean.config.dbplatform.yugabyte.YugabytePlaform;
+import io.ebean.config.dbplatform.DatabasePlatformProvider;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.DbOffline;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.ServiceLoader;
 
 /**
  * Create a DatabasePlatform from the configuration.
@@ -40,6 +21,14 @@ import java.util.Locale;
  * determine the platform automatically.
  */
 public class DatabasePlatformFactory {
+
+  private final List<DatabasePlatformProvider> providers = new ArrayList<>();
+
+  public DatabasePlatformFactory() {
+    for (DatabasePlatformProvider platformProvider : ServiceLoader.load(DatabasePlatformProvider.class)) {
+      providers.add(platformProvider);
+    }
+  }
 
   /**
    * Create the appropriate database specific platform.
@@ -71,68 +60,13 @@ public class DatabasePlatformFactory {
    */
   private DatabasePlatform byDatabaseName(String dbName) {
     dbName = dbName.toLowerCase();
-    if (dbName.equals("h2")) {
-      return new H2Platform();
-    }
-    if (dbName.equals("mariadb")) {
-      return new MariaDbPlatform();
-    }
-    if (dbName.equals("mysql")) {
-      return new MySqlPlatform();
-    }
-    if (dbName.equals("mysql55")) {
-      return new MySql55Platform();
-    }
-    if (dbName.equals("postgres") || dbName.equals("postgres9")) {
-      return new PostgresPlatform();
-    }
-    if (dbName.equals("oracle11") || dbName.equals("oracle10") || dbName.equals("oracle9")) {
-      return new Oracle11Platform();
-    }
-    if (dbName.equals("oracle12")) {
-      return new Oracle12Platform();
-    }
-    if (dbName.equals("oracle")) {
-      return new OraclePlatform();
-    }
-    if (dbName.equals("sqlserver16")) {
-      return new SqlServer16Platform();
-    }
-    if (dbName.equals("sqlserver17")) {
-      return new SqlServer17Platform();
-    }
     if (dbName.equals("sqlserver")) {
       throw new IllegalArgumentException("Please choose the more specific sqlserver16 or sqlserver17 platform. Refer to issue #1340 for details");
     }
-    if (dbName.equals("sqlanywhere")) {
-      return new SqlAnywherePlatform();
-    }
-    if (dbName.equals("db2")) {
-      throw new IllegalArgumentException("Please choose the more specific db2luw/db2zos/db2fori platform. Refer to issue #2514 for details");
-    }
-    if (dbName.equals("db2legacy")) {
-      return new DB2LegacyPlatform();
-    }
-    if (dbName.equals("db2zos")) {
-      return new DB2ZosPlatform();
-    }
-    if (dbName.equals("db2fori")) {
-      return new DB2ForIPlatform();
-    }
-    if (dbName.equals("db2luw")) {
-      return new DB2LuwPlatform();
-    }
-    if (dbName.equals("clickhouse")) {
-      return new ClickHousePlatform();
-    }
-    if (dbName.equals("nuodb")) {
-      return new NuoDbPlatform();
-    }
-    if (dbName.equals("sqlite")) {
-      return new SQLitePlatform();
-    }
-    if (dbName.equals("hana")) {
-      return new HanaPlatform();
+    for (DatabasePlatformProvider provider : providers) {
+      if (provider.match(dbName)) {
+        return provider.create(dbName);
+      }
     }
     throw new RuntimeException("database platform " + dbName + " is not known?");
   }
@@ -156,79 +90,41 @@ public class DatabasePlatformFactory {
     final int majorVersion = metaData.getDatabaseMajorVersion();
     final int minorVersion = metaData.getDatabaseMinorVersion();
     CoreLog.log.debug("platform for productName[{}] version[{}.{}]", dbProductName, majorVersion, minorVersion);
-
-    if (dbProductName.contains("oracle")) {
-      return oracleVersion(majorVersion);
-    } else if (dbProductName.contains("microsoft")) {
+    if (dbProductName.contains("microsoft")) {
       throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via DatabaseConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
-    } else if (dbProductName.contains("h2")) {
-      return new H2Platform();
-    } else if (dbProductName.contains("hsql database engine")) {
-      return new HsqldbPlatform();
-    } else if (dbProductName.contains("postgres")) {
-      String productVersion = metaData.getDatabaseProductVersion().toLowerCase(Locale.ENGLISH);
-      return readPostgres(connection, majorVersion, productVersion);
-    } else if (dbProductName.contains("mariadb")) {
-      return new MariaDbPlatform();
-    } else if (dbProductName.contains("mysql")) {
-      return mysqlVersion(majorVersion, minorVersion);
-    } else if (dbProductName.contains("nuo")) {
-      return new NuoDbPlatform();
-    } else if (dbProductName.contains("sqlite")) {
-      return new SQLitePlatform();
-    } else if (dbProductName.contains("db2")) {
-      throw new IllegalArgumentException("For DB2 please explicitly choose either db2legacy/db2luw/db2zos/db2fori platform. Refer to issue #2514 for details");
-    } else if (dbProductName.contains("sql anywhere")) {
-      return new SqlAnywherePlatform();
-    } else if (dbProductName.contains("hdb")) {
-      return new HanaPlatform();
-    } else if (dbProductName.contains("clickhouse")) {
-      return new ClickHousePlatform();
     }
-
+    if (dbProductName.contains("postgres")) {
+      String productVersion = metaData.getDatabaseProductVersion().toLowerCase(Locale.ENGLISH);
+      dbProductName = readPostgres(connection, productVersion);
+    }
+    for (DatabasePlatformProvider provider : providers) {
+      if (provider.matchByProductName(dbProductName)) {
+        return provider.create(majorVersion, minorVersion, metaData, connection);
+      }
+    }
     // use the standard one
     return new DatabasePlatform();
-  }
-
-  private DatabasePlatform oracleVersion(int majorVersion) {
-    if (majorVersion < 12) {
-      return new Oracle11Platform();
-    }
-    if (majorVersion < 13) {
-      return new Oracle12Platform();
-    }
-    return new OraclePlatform();
-  }
-
-  private DatabasePlatform mysqlVersion(int majorVersion, int minorVersion) {
-    if (majorVersion <= 5 && minorVersion <= 5) {
-      return new MySql55Platform();
-    }
-    return new MySqlPlatform();
   }
 
   /**
    * Use a select version() query as it could be Postgres or CockroachDB.
    */
-  private static DatabasePlatform readPostgres(Connection connection, int majorVersion, String productVersion) {
+  private static String readPostgres(Connection connection, String productVersion) {
     if (productVersion.contains("-yb-")) {
-      return new YugabytePlaform();
+      return "yugabyte";
     }
     try (PreparedStatement statement = connection.prepareStatement("select version() as \"version\"")) {
       try (ResultSet resultSet = statement.executeQuery()) {
         if (resultSet.next()) {
           productVersion = resultSet.getString("version").toLowerCase();
           if (productVersion.contains("cockroach")) {
-            return new CockroachPlatform();
+            return "cockroach";
           }
         }
       }
     } catch (SQLException e) {
       CoreLog.log.warn("Error running detection query on Postgres", e);
     }
-    if (majorVersion <= 9) {
-      return new Postgres9Platform();
-    }
-    return new PostgresPlatform();
+    return "postgres";
   }
 }

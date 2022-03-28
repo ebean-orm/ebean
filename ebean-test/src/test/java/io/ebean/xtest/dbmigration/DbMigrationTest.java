@@ -38,7 +38,7 @@ public class DbMigrationTest extends BaseTestCase {
 
   private void runScript(String scriptName) {
     URL url = getClass().getResource("/migrationtest/dbmigration/" + server().platform().name().toLowerCase() + "/" + scriptName);
-    assert url != null : scriptName +  " not found";
+    assert url != null : scriptName +  " not found for platform [" + server().platform().name().toLowerCase() + "]";
     server().script().run(url);
   }
 

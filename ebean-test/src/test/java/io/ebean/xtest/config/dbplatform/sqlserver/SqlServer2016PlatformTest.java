@@ -1,7 +1,7 @@
 package io.ebean.xtest.config.dbplatform.sqlserver;
 
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerHistorySupport;
+import io.ebean.platform.sqlserver.SqlServer17Platform;
+import io.ebean.platform.sqlserver.SqlServerHistorySupport;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;

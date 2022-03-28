@@ -78,6 +78,22 @@
   <modules>
     <module>ebean</module>
     <module>ebean-api</module>
+    <module>ebean-platform-h2</module>
+    <module>ebean-platform-hsqldb</module>
+    <module>ebean-platform-clickhouse</module>
+    <module>ebean-platform-db2</module>
+    <module>ebean-platform-hana</module>
+    <module>ebean-platform-mysql</module>
+    <module>ebean-platform-mariadb</module>
+    <module>ebean-platform-nuodb</module>
+    <module>ebean-platform-oracle</module>
+    <module>ebean-platform-postgres</module>
+    <module>ebean-platform-cockroach</module>
+    <module>ebean-platform-sqlanywhere</module>
+    <module>ebean-platform-sqlite</module>
+    <module>ebean-platform-sqlserver</module>
+    <module>ebean-platform-yugabyte</module>
+    <module>ebean-platform-all</module>
     <module>ebean-bom</module>
     <module>ebean-core-type</module>
     <module>ebean-core</module>
@@ -91,7 +107,7 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
-<!--    <module>ebean-kotlin</module>-->
+    <!--    <module>ebean-kotlin</module>-->
 
   </modules>
 
