@@ -13,10 +13,17 @@ import io.ebean.bean.PersistenceContext;
 public interface JsonBeanReader<T> {
 
   /**
+   * Read the JSON into given bean. Will update existing properties.
+   */
+  T read(T target);
+
+  /**
    * Read the JSON returning a bean.
    */
-  T read();
-
+  default T read() {
+    return read(null);
+  }
+  
   /**
    * Create a new reader taking the context from the existing one but using a new JsonParser.
    */
