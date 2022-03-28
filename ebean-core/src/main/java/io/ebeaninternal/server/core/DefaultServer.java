@@ -18,6 +18,7 @@ import io.ebean.FutureRowCount;
 import io.ebean.MergeOptions;
 import io.ebean.MergeOptionsBuilder;
 import io.ebean.PagedList;
+import io.ebean.PersistVisitor;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
@@ -1635,6 +1636,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void save(Object bean, @Nullable Transaction transaction) {
     persister.save(checkEntityBean(bean), transaction);
+  }
+
+  @Override
+  public void visitSave(Object start, PersistVisitor visitor) {
+    new VisitHandler(descriptorManager).visit(start, visitor);
   }
 
   @Override
