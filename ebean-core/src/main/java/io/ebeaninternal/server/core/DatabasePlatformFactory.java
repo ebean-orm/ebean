@@ -60,9 +60,6 @@ public class DatabasePlatformFactory {
    */
   private DatabasePlatform byDatabaseName(String dbName) {
     dbName = dbName.toLowerCase();
-    if (dbName.equals("sqlserver")) {
-      throw new IllegalArgumentException("Please choose the more specific sqlserver16 or sqlserver17 platform. Refer to issue #1340 for details");
-    }
     for (DatabasePlatformProvider provider : providers) {
       if (provider.match(dbName)) {
         return provider.create(dbName);
@@ -90,9 +87,6 @@ public class DatabasePlatformFactory {
     final int majorVersion = metaData.getDatabaseMajorVersion();
     final int minorVersion = metaData.getDatabaseMinorVersion();
     CoreLog.log.debug("platform for productName[{}] version[{}.{}]", dbProductName, majorVersion, minorVersion);
-    if (dbProductName.contains("microsoft")) {
-      throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via DatabaseConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
-    }
     if (dbProductName.contains("postgres")) {
       String productVersion = metaData.getDatabaseProductVersion().toLowerCase(Locale.ENGLISH);
       dbProductName = readPostgres(connection, productVersion);

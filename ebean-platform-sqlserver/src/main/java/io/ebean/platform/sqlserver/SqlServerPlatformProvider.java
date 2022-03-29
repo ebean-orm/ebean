@@ -19,6 +19,9 @@ public class SqlServerPlatformProvider implements DatabasePlatformProvider {
 
   @Override
   public DatabasePlatform create(String name) {
+    if (name.equals("sqlserver")) {
+      throw new IllegalArgumentException("Please choose the more specific sqlserver16 or sqlserver17 platform. Refer to issue #1340 for details");
+    }
     if (name.equals("sqlserver16")) {
       return new SqlServer16Platform();
     }
@@ -30,7 +33,10 @@ public class SqlServerPlatformProvider implements DatabasePlatformProvider {
 
   @Override
   public boolean matchByProductName(String productName) {
-    return productName.contains("sqlserver");
+    if (productName.contains("microsoft")) {
+      throw new IllegalArgumentException("For SqlServer please explicitly choose either sqlserver16 or sqlserver17 as the platform via DatabaseConfig.setDatabasePlatformName. Refer to issue #1340 for more details");
+    }
+    return false;
   }
 
   @Override
