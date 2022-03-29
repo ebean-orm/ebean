@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class SqlAnywherePlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "SqlAnywhere";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.equals("sqlanywhere");
   }

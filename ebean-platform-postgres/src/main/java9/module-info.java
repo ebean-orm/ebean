@@ -1,6 +1,8 @@
 module io.ebean.postgres {
 
   exports io.ebean.platform.postgres;
+  exports io.ebean.platform.yugabyte;
+  exports io.ebean.platform.cockroach;
 
   requires io.ebean;
 

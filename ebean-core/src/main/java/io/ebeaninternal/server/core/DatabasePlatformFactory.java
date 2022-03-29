@@ -8,10 +8,11 @@ import io.ebeaninternal.api.DbOffline;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.ServiceLoader;
 
 /**
@@ -87,38 +88,15 @@ public class DatabasePlatformFactory {
     final int majorVersion = metaData.getDatabaseMajorVersion();
     final int minorVersion = metaData.getDatabaseMinorVersion();
     CoreLog.log.debug("platform for productName[{}] version[{}.{}]", dbProductName, majorVersion, minorVersion);
-    if (dbProductName.contains("postgres")) {
-      String productVersion = metaData.getDatabaseProductVersion().toLowerCase(Locale.ENGLISH);
-      dbProductName = readPostgres(connection, productVersion);
-    }
     for (DatabasePlatformProvider provider : providers) {
       if (provider.matchByProductName(dbProductName)) {
         return provider.create(majorVersion, minorVersion, metaData, connection);
       }
     }
-    // use the standard one
-    return new DatabasePlatform();
+    throw new IllegalStateException("Unable to determine the appropriate ebean platform given database product name [" + dbProductName
+      + "] and ebean platform providers " + providers + ". With ebean 13+ we now have separate platforms (ebean-postgres, ebean-mysql etc)"
+      + " and should use database specific platform dependency like ebean-postgres. Note that we can use ebean-platform-all to include"
+      + " all the platforms.");
   }
 
-  /**
-   * Use a select version() query as it could be Postgres or CockroachDB.
-   */
-  private static String readPostgres(Connection connection, String productVersion) {
-    if (productVersion.contains("-yb-")) {
-      return "yugabyte";
-    }
-    try (PreparedStatement statement = connection.prepareStatement("select version() as \"version\"")) {
-      try (ResultSet resultSet = statement.executeQuery()) {
-        if (resultSet.next()) {
-          productVersion = resultSet.getString("version").toLowerCase();
-          if (productVersion.contains("cockroach")) {
-            return "cockroach";
-          }
-        }
-      }
-    } catch (SQLException e) {
-      CoreLog.log.warn("Error running detection query on Postgres", e);
-    }
-    return "postgres";
-  }
 }

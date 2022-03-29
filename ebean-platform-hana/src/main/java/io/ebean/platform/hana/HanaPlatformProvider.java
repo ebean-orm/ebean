@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class HanaPlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "Hana";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.equals("hana");
   }

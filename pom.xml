@@ -88,11 +88,9 @@
     <module>ebean-platform-nuodb</module>
     <module>ebean-platform-oracle</module>
     <module>ebean-platform-postgres</module>
-    <module>ebean-platform-cockroach</module>
     <module>ebean-platform-sqlanywhere</module>
     <module>ebean-platform-sqlite</module>
     <module>ebean-platform-sqlserver</module>
-    <module>ebean-platform-yugabyte</module>
     <module>ebean-platform-all</module>
     <module>ebean-bom</module>
     <module>ebean-core-type</module>

@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class MariaDbPlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "MariaDb";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.equals("mariadb");
   }

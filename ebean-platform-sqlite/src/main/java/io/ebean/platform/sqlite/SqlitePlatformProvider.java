@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class SqlitePlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "Sqlite";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.equals("sqlite");
   }

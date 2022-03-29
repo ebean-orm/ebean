@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class H2PlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "H2";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.equals("h2");
   }

@@ -1,4 +1,4 @@
 /**
- * Cockroach DB specific support.
+ * Cockroach DB support.
  */
 package io.ebean.platform.cockroach;

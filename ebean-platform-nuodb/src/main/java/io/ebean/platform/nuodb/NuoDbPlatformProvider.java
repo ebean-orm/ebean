@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class NuoDbPlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "NuoDB";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.equals("nuodb");
   }

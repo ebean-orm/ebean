@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class MySqlPlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "MySql";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.startsWith("mysql");
   }

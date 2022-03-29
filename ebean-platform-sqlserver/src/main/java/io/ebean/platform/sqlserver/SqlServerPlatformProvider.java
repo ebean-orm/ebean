@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class SqlServerPlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "SqlServer";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.startsWith("sqlserver");
   }

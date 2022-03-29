@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class Db2PlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "DB2";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.startsWith("db2");
   }

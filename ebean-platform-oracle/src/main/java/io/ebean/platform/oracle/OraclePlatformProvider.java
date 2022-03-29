@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class OraclePlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "Oracle";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.startsWith("oracle");
   }

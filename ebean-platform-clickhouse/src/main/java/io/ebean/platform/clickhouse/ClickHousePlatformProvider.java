@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class ClickHousePlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "ClickHouse";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.equals("clickhouse");
   }

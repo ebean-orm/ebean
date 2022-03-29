@@ -13,6 +13,11 @@ import java.sql.DatabaseMetaData;
 public class HSqlDbPlatformProvider implements DatabasePlatformProvider {
 
   @Override
+  public String toString() {
+    return "HSqlDb";
+  }
+
+  @Override
   public boolean match(String name) {
     return name.equals("hsqldb");
   }
