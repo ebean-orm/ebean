@@ -59,11 +59,59 @@ public interface JsonContext {
   <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException;
 
   /**
+   * Read json parser input into a given Bean. <br>
+   * Note: This is a kind of "update". Only properties in the json will be modified. Embedded Lists and Maps will become new
+   * instances, so the object identity will not be preserved here.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, JsonParser parser) throws JsonIOException;
+
+  /**
+   * Read json parser input into a given Bean additionally using JsonReadOptions.<br>
+   * See {@link #toBean(Class, JsonParser)} for details modified.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, JsonParser parser, JsonReadOptions options) throws JsonIOException;
+
+  /**
+   * Read json reader input into a given Bean.<br>
+   * See {@link #toBean(Class, JsonParser)} for details
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, Reader json) throws JsonIOException;
+
+  /**
+   * Read json reader input into a given Bean additionally using JsonReadOptions.<br>
+   * See {@link #toBean(Class, JsonParser)} for details modified.
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, Reader json, JsonReadOptions options) throws JsonIOException;
+
+  /**
+   * Read json string input into a given Bean.<br>
+   * See {@link #toBean(Class, JsonParser)} for details
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, String json) throws JsonIOException;
+
+  /**
+   * Read json string input into a given Bean additionally using JsonReadOptions.<br>
+   * See {@link #toBean(Class, JsonParser)} for details
+   *
+   * @throws JsonIOException When IOException occurs
+   */
+  <T> void toBean(T target, String json, JsonReadOptions options) throws JsonIOException;
+
+  /**
    * Create and return a new bean reading for the bean type given the JSON options and source.
    * <p>
-   * Note that JsonOption provides an option for setting a persistence context and also enabling
-   * further lazy loading. Further lazy loading requires a persistence context so if that is set
-   * on then a persistence context is created if there is not one set.
+   * Note that JsonOption provides an option for setting a persistence context and also enabling further lazy loading. Further lazy
+   * loading requires a persistence context so if that is set on then a persistence context is created if there is not one set.
    */
   <T> JsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException;
 

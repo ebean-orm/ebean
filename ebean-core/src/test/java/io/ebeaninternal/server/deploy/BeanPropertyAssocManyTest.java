@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
@@ -9,7 +8,6 @@ import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;

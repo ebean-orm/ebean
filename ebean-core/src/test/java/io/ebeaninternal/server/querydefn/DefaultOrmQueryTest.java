@@ -3,11 +3,8 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.*;
 import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.core.DefaultServer;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.OrmQueryRequestTestHelper;
-import io.ebeaninternal.server.deploy.BaseTest;
 import io.ebeaninternal.server.expression.BaseExpressionTest;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
