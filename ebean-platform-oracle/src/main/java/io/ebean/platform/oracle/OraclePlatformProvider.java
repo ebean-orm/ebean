@@ -54,6 +54,9 @@ public class OraclePlatformProvider implements DatabasePlatformProvider {
     if (platform.equals(Platform.ORACLE11)) {
       return new Oracle11Platform();
     }
+    if (platform.equals(Platform.ORACLE12)) {
+      return new Oracle12Platform();
+    }
     return new OraclePlatform();
   }
 }
