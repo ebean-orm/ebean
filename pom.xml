@@ -46,8 +46,8 @@
     <ebean-migration.version>12.16.1</ebean-migration.version>
     <ebean-test-docker.version>4.5</ebean-test-docker.version>
     <ebean-datasource.version>7.5</ebean-datasource.version>
-    <ebean-agent.version>12.16.0</ebean-agent.version>
-    <ebean-maven-plugin.version>12.16.0</ebean-maven-plugin.version>
+    <ebean-agent.version>12.16.1</ebean-agent.version>
+    <ebean-maven-plugin.version>12.16.1</ebean-maven-plugin.version>
   </properties>
 
   <dependencies>
