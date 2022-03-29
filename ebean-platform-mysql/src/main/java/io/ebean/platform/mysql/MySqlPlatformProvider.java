@@ -13,24 +13,24 @@ import java.sql.DatabaseMetaData;
 public class MySqlPlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.startsWith("mysql");
+  public boolean match(String name) {
+    return name.startsWith("mysql");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
-    if (lowerPlatformName.equals("mysql")) {
+  public DatabasePlatform create(String name) {
+    if (name.equals("mysql")) {
       return new MySqlPlatform();
     }
-    if (lowerPlatformName.equals("mysql55")) {
+    if (name.equals("mysql55")) {
       return new MySql55Platform();
     }
-    throw new IllegalArgumentException("Unexpected MySql platform name " + lowerPlatformName);
+    throw new IllegalArgumentException("Unexpected MySql platform name " + name);
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("mysql");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("mysql");
   }
 
   @Override

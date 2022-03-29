@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class HanaPlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.equals("hana");
+  public boolean match(String name) {
+    return name.equals("hana");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new HanaPlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("hdb");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("hdb");
   }
 
   @Override

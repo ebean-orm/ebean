@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class YugabytePlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerName) {
-    return lowerName.equals("yugabyte");
+  public boolean match(String name) {
+    return name.equals("yugabyte");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new YugabytePlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("yugabyte");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("yugabyte");
   }
 
   @Override

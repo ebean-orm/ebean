@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class NuoDbPlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.equals("nuodb");
+  public boolean match(String name) {
+    return name.equals("nuodb");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new NuoDbPlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("nuo");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("nuo");
   }
 
   @Override

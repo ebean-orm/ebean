@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class PostgresPlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerName) {
-    return lowerName.startsWith("postgres");
+  public boolean match(String name) {
+    return name.startsWith("postgres");
   }
 
   @Override
-  public DatabasePlatform create(String lowerName) {
-    return lowerName.equals("postgres9") ? new Postgres9Platform() : new PostgresPlatform();
+  public DatabasePlatform create(String name) {
+    return name.equals("postgres9") ? new Postgres9Platform() : new PostgresPlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("postgres");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("postgres");
   }
 
   @Override

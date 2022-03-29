@@ -13,24 +13,24 @@ import java.sql.DatabaseMetaData;
 public class SqlServerPlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerName) {
-    return lowerName.startsWith("sqlserver");
+  public boolean match(String name) {
+    return name.startsWith("sqlserver");
   }
 
   @Override
-  public DatabasePlatform create(String lowerName) {
-    if (lowerName.equals("sqlserver16")) {
+  public DatabasePlatform create(String name) {
+    if (name.equals("sqlserver16")) {
       return new SqlServer16Platform();
     }
-    if (lowerName.equals("sqlserver17")) {
+    if (name.equals("sqlserver17")) {
       return new SqlServer17Platform();
     }
-    throw new IllegalArgumentException("Unknown SqlServer name " + lowerName);
+    throw new IllegalArgumentException("Unknown SqlServer name " + name);
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("sqlserver");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("sqlserver");
   }
 
   @Override

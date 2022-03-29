@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class ClickHousePlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.equals("clickhouse");
+  public boolean match(String name) {
+    return name.equals("clickhouse");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new ClickHousePlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("clickhouse");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("clickhouse");
   }
 
   @Override

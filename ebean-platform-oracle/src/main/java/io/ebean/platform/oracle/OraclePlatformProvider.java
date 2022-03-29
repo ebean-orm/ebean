@@ -13,24 +13,24 @@ import java.sql.DatabaseMetaData;
 public class OraclePlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.startsWith("oracle");
+  public boolean match(String name) {
+    return name.startsWith("oracle");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
-    if (lowerPlatformName.equals("oracle11") || lowerPlatformName.equals("oracle10") || lowerPlatformName.equals("oracle9")) {
+  public DatabasePlatform create(String name) {
+    if (name.equals("oracle11") || name.equals("oracle10") || name.equals("oracle9")) {
       return new Oracle11Platform();
     }
-    if (lowerPlatformName.equals("oracle12")) {
+    if (name.equals("oracle12")) {
       return new Oracle12Platform();
     }
     return new OraclePlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("oracle");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("oracle");
   }
 
   @Override

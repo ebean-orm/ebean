@@ -3,7 +3,6 @@ package io.ebean.platform.hsqldb;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatformProvider;
-import io.ebean.platform.h2.H2Platform;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -14,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class HSqlDbPlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.equals("hsqldb");
+  public boolean match(String name) {
+    return name.equals("hsqldb");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new HsqldbPlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("hsql database engine");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("hsql database engine");
   }
 
   @Override

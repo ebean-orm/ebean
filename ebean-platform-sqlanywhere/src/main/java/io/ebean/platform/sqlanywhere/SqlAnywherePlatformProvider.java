@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class SqlAnywherePlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.equals("sqlanywhere");
+  public boolean match(String name) {
+    return name.equals("sqlanywhere");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new SqlAnywherePlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("sql anywhere");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("sql anywhere");
   }
 
   @Override

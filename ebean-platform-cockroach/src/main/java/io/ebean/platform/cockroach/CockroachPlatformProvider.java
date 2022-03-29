@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class CockroachPlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.equals("cockroach");
+  public boolean match(String name) {
+    return name.equals("cockroach");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new CockroachPlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("cockroach");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("cockroach");
   }
 
   @Override

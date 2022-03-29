@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class SqlitePlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.equals("sqlite");
+  public boolean match(String name) {
+    return name.equals("sqlite");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new SQLitePlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("sqlite");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("sqlite");
   }
 
   @Override

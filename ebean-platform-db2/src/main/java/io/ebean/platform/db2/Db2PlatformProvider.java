@@ -8,38 +8,38 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
 /**
- * H2 platform provider.
+ * DB2 platform provider.
  */
 public class Db2PlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.startsWith("db2");
+  public boolean match(String name) {
+    return name.startsWith("db2");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
-    if (lowerPlatformName.equals("db2")) {
+  public DatabasePlatform create(String name) {
+    if (name.equals("db2")) {
       throw new IllegalArgumentException("Please choose the more specific db2luw/db2zos/db2fori platform. Refer to issue #2514 for details");
     }
-    if (lowerPlatformName.equals("db2legacy")) {
+    if (name.equals("db2legacy")) {
       return new DB2LegacyPlatform();
     }
-    if (lowerPlatformName.equals("db2zos")) {
+    if (name.equals("db2zos")) {
       return new DB2ZosPlatform();
     }
-    if (lowerPlatformName.equals("db2fori")) {
+    if (name.equals("db2fori")) {
       return new DB2ForIPlatform();
     }
-    if (lowerPlatformName.equals("db2luw")) {
+    if (name.equals("db2luw")) {
       return new DB2LuwPlatform();
     }
-    throw new IllegalArgumentException("Unknown DB2 platform, expecting db2luw/db2zos/db2fori but got "+lowerPlatformName);
+    throw new IllegalArgumentException("Unknown DB2 platform, expecting db2luw/db2zos/db2fori but got "+ name);
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    if (lowerProductName.contains("db2")) {
+  public boolean matchByProductName(String productName) {
+    if (productName.contains("db2")) {
       throw new IllegalArgumentException("For DB2 please explicitly choose either db2legacy/db2luw/db2zos/db2fori platform. Refer to issue #2514 for details");
     }
     return false;

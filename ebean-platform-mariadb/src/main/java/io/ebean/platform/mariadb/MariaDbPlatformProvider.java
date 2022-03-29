@@ -13,18 +13,18 @@ import java.sql.DatabaseMetaData;
 public class MariaDbPlatformProvider implements DatabasePlatformProvider {
 
   @Override
-  public boolean match(String lowerPlatformName) {
-    return lowerPlatformName.equals("mariadb");
+  public boolean match(String name) {
+    return name.equals("mariadb");
   }
 
   @Override
-  public DatabasePlatform create(String lowerPlatformName) {
+  public DatabasePlatform create(String name) {
     return new MariaDbPlatform();
   }
 
   @Override
-  public boolean matchByProductName(String lowerProductName) {
-    return lowerProductName.contains("mariadb");
+  public boolean matchByProductName(String productName) {
+    return productName.contains("mariadb");
   }
 
   @Override
