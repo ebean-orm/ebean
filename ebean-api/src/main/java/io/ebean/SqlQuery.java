@@ -247,6 +247,16 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   SqlQuery setParameter(Object value);
 
   /**
+   * Set a null parameter by position.
+   */
+  SqlQuery setNullParameter(int position, int jdbcType);
+
+  /**
+   * Set a null parameter by name.
+   */
+  SqlQuery setNullParameter(String name, int jdbcType);
+
+  /**
    * Bind the parameter by its index position (1 based like JDBC).
    * <p>
    * When binding a collection of values into a IN expression we should use

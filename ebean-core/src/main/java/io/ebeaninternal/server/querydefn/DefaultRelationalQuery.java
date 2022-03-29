@@ -120,6 +120,18 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   @Override
+  public SqlQuery setNullParameter(int position, int jdbcType) {
+    bindParams.setNullParameter(position, jdbcType);
+    return this;
+  }
+
+  @Override
+  public SqlQuery setNullParameter(String name, int jdbcType) {
+    bindParams.setNullParameter(name, jdbcType);
+    return this;
+  }
+
+  @Override
   public DefaultRelationalQuery setParameter(int position, Object value) {
     bindParams.setParameter(position, value);
     return this;
