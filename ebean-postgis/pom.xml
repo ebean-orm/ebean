@@ -22,7 +22,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-postgres</artifactId>
-      <version>12.16.1-SNAPSHOT</version>
+      <version>12.16.2-SNAPSHOT</version>
     </dependency>
 
     <!-- provided scope -->

@@ -6,11 +6,6 @@
     <groupId>io.ebean</groupId>
     <version>12.16.2-SNAPSHOT</version>
   </parent>
-<!--  <parent>-->
-<!--    <groupId>org.avaje</groupId>-->
-<!--    <artifactId>java8-oss</artifactId>-->
-<!--    <version>2.2</version>-->
-<!--  </parent>-->
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
@@ -59,7 +54,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-h2</artifactId>
-      <version>12.16.1-SNAPSHOT</version>
+      <version>12.16.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
