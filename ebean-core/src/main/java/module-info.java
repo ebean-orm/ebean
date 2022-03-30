@@ -30,6 +30,7 @@ module io.ebean.core {
   requires org.slf4j;
 
   requires static io.avaje.jsr305x;
+  requires static com.fasterxml.jackson.annotation;
   requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;
   requires static jakarta.validation;
