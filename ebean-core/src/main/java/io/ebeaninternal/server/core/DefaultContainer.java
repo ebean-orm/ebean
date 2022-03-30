@@ -23,6 +23,7 @@ import io.ebeaninternal.server.executor.DefaultBackgroundExecutor;
 import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -136,9 +137,21 @@ public final class DefaultContainer implements SpiContainer {
     }
     if (config.isAutoLoadModuleInfo()) {
       // auto register entity classes
+      boolean found = false;
       for (ModuleInfoLoader loader : ServiceLoader.load(ModuleInfoLoader.class)) {
         config.addAll(loader.classesFor(config.getName(), config.isDefaultServer()));
+        found = true;
       }
+      if (!found) {
+        checkMissingModulePathProvides();
+      }
+    }
+  }
+
+  private void checkMissingModulePathProvides() {
+    URL servicesFile = ClassLoader.getSystemResource("META-INF/services/io.ebean.config.ModuleInfoLoader");
+    if (servicesFile != null) {
+      log.error("module-info.java is probably missing 'provides io.ebean.config.ModuleInfoLoader with _Ebean$ModuleInfo' clause. ModuleInfoLoader exists but was not service loaded.");
     }
   }
 
