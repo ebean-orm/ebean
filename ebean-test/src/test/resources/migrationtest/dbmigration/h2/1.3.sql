@@ -89,13 +89,13 @@ alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( 
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
-create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history2_history_upd before update,delete on migtest_e_history2 for each row call "io.ebean.platform.h2.H2HistoryTrigger";
 create view migtest_e_history3_with_history as select * from migtest_e_history3 union all select * from migtest_e_history3_history;
-create trigger migtest_e_history3_history_upd before update,delete on migtest_e_history3 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history3_history_upd before update,delete on migtest_e_history3 for each row call "io.ebean.platform.h2.H2HistoryTrigger";
 create view migtest_e_history4_with_history as select * from migtest_e_history4 union all select * from migtest_e_history4_history;
-create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history4_history_upd before update,delete on migtest_e_history4 for each row call "io.ebean.platform.h2.H2HistoryTrigger";
 create view migtest_e_history6_with_history as select * from migtest_e_history6 union all select * from migtest_e_history6_history;
-create trigger migtest_e_history6_history_upd before update,delete on migtest_e_history6 for each row call "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+create trigger migtest_e_history6_history_upd before update,delete on migtest_e_history6 for each row call "io.ebean.platform.h2.H2HistoryTrigger";
 comment on column "table"."index" is 'this is a comment';
 -- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;

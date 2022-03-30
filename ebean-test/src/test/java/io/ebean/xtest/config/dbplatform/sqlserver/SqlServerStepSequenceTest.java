@@ -4,7 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServerStepSequence;
+import io.ebean.platform.sqlserver.SqlServerStepSequence;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.dbplatform.hana.HanaPlatform;
+import io.ebean.platform.hana.HanaPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.Column;
 import org.junit.jupiter.api.Test;

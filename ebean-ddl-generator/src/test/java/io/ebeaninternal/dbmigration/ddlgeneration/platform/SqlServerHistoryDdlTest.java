@@ -3,7 +3,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 import org.junit.jupiter.api.Test;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.platform.sqlserver.SqlServer17Platform;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

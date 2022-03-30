@@ -1,8 +1,8 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
-import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.platform.h2.H2Platform;
+import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import org.junit.jupiter.api.Test;
 
