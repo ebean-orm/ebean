@@ -15,6 +15,7 @@
   <modules>
     <module>ebean</module>
     <module>ebean-clickhouse</module>
+    <module>ebean-cockroach</module>
     <module>ebean-db2</module>
     <module>ebean-h2</module>
     <module>ebean-hana</module>
@@ -27,6 +28,7 @@
 <!--    <module>sqlanywhere</module>-->
     <module>ebean-sqlite</module>
     <module>ebean-sqlserver</module>
+    <module>ebean-yugabyte</module>
   </modules>
 
 </project>

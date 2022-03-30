@@ -7,9 +7,9 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <name>ebean (all platforms)</name>
-  <description>composite of common runtime dependencies for all platforms</description>
-  <artifactId>ebean</artifactId>
+  <name>ebean-cockroach</name>
+  <description>ebean-cockroach composite</description>
+  <artifactId>ebean-cockroach</artifactId>
 
   <dependencies>
 
@@ -40,7 +40,7 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-platform-all</artifactId>
+      <artifactId>ebean-platform-postgres</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
 
