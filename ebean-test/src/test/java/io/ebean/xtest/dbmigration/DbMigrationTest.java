@@ -4,7 +4,7 @@ import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
-import io.ebean.datasource.pool.ConnectionPool;
+import io.ebean.datasource.DataSourcePool;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.IgnorePlatform;
 import misc.migration.v1_0.ETable;
@@ -51,8 +51,8 @@ public class DbMigrationTest extends BaseTestCase {
   @Test
   public void testRunMigration() throws IOException, SQLException {
     // Shutdown and reconnect - this prevents postgres from lock up
-    ((ConnectionPool)server().dataSource()).offline();
-    ((ConnectionPool)server().dataSource()).online();
+    ((DataSourcePool)server().dataSource()).offline();
+    ((DataSourcePool)server().dataSource()).online();
     cleanup("migtest_ckey_assoc",
       "migtest_ckey_detail",
       "migtest_ckey_parent",
@@ -86,8 +86,8 @@ public class DbMigrationTest extends BaseTestCase {
       "table",
       "\"table\"",
       "`table`");
-    ((ConnectionPool)server().dataSource()).offline();
-    ((ConnectionPool)server().dataSource()).online();
+    ((DataSourcePool)server().dataSource()).offline();
+    ((DataSourcePool)server().dataSource()).online();
 
     if (isSqlServer() || isMariaDB() || isMySql() || isHana()) {
       runScript("I__create_procs.sql");

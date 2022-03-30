@@ -78,11 +78,27 @@
       <version>2.3.6</version>
     </dependency>
 
+    <!-- Needed for module path compile, jaxb foo bar needs review -->
+    <dependency>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
+      <version>1.2.1</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!-- Not strictly required but bring in H2 Driver because we use it so much -->
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>${h2database.version}</version>
+    </dependency>
+
+    <!-- provided for module path compile for tests with @PostConstruct -->
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-jsr305-x</artifactId>
+      <version>1.1</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Test dependencies -->
@@ -91,13 +107,6 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
       <version>12.16.2-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>avaje-jsr305</artifactId>
-      <version>1.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -144,12 +153,6 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-      <version>1.3.2</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -243,11 +246,12 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- provided scope for Java 11 compilation (not required for Java 17+) -->
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
       <version>1.1</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>
@@ -263,7 +267,6 @@
         <configuration>
           <tiles>
             <tile>io.ebean.tile:enhancement:12.15.0</tile>
-            <tile>io.avaje.tile:moditech-module:1.0</tile>
           </tiles>
         </configuration>
       </plugin>

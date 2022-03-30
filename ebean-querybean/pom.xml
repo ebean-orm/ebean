@@ -21,6 +21,13 @@
       <scope>provided</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-jsr305-x</artifactId>
+      <version>1.1</version>
+      <scope>provided</scope>
+    </dependency>
+
     <!--
     Class retention Nonnull and Nullable annotations
     to assist with IDE auto-completion with Ebean API
@@ -101,7 +108,6 @@
         <configuration>
           <tiles>
             <tile>io.ebean.tile:enhancement:12.15.0</tile>
-            <tile>io.avaje.tile:moditech-module:1.0</tile>
           </tiles>
         </configuration>
       </plugin>

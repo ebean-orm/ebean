@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.avaje</groupId>
-    <artifactId>java8-oss</artifactId>
+    <artifactId>java11-oss</artifactId>
     <version>3.6</version>
   </parent>
 
@@ -48,6 +48,7 @@
     <ebean-datasource.version>7.5</ebean-datasource.version>
     <ebean-agent.version>12.16.1</ebean-agent.version>
     <ebean-maven-plugin.version>12.16.1</ebean-maven-plugin.version>
+    <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
   <dependencies>
