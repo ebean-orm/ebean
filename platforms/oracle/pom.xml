@@ -9,7 +9,7 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-sqlserver</artifactId>
+  <artifactId>ebean-platform-oracle</artifactId>
 
   <dependencies>
 

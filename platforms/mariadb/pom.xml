@@ -9,7 +9,7 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-oracle</artifactId>
+  <artifactId>ebean-platform-mariadb</artifactId>
 
   <dependencies>
 
@@ -20,10 +20,9 @@
     </dependency>
 
     <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-platform-mysql</artifactId>
+      <version>12.16.2-SNAPSHOT</version>
     </dependency>
 
   </dependencies>

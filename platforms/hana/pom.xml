@@ -9,7 +9,7 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-nuodb</artifactId>
+  <artifactId>ebean-platform-hana</artifactId>
 
   <dependencies>
 

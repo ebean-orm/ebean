@@ -9,13 +9,13 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-hana</artifactId>
+  <artifactId>ebean-platform-hsqldb</artifactId>
 
   <dependencies>
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-api</artifactId>
+      <artifactId>ebean-platform-h2</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
 

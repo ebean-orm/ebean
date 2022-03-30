@@ -21,7 +21,7 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-postgres</artifactId>
+      <artifactId>ebean-platform-postgres</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
 

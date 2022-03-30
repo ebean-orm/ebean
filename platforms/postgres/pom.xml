@@ -9,7 +9,7 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-h2</artifactId>
+  <artifactId>ebean-platform-postgres</artifactId>
 
   <dependencies>
 
@@ -17,15 +17,6 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
       <version>12.16.2-SNAPSHOT</version>
-    </dependency>
-
-    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
-         and not require a separate module for it -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>${h2database.version}</version>
-      <optional>true</optional>
     </dependency>
 
     <dependency>

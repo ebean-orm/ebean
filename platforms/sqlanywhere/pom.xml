@@ -9,7 +9,7 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-clickhouse</artifactId>
+  <artifactId>ebean-platform-sqlanywhere</artifactId>
 
   <dependencies>
 

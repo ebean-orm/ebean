@@ -15,70 +15,71 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-h2</artifactId>
+      <artifactId>ebean-platform-h2</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-clickhouse</artifactId>
+      <artifactId>ebean-platform-clickhouse</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-db2</artifactId>
+      <artifactId>ebean-platform-db2</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-hana</artifactId>
+      <artifactId>ebean-platform-hana</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-hsqldb</artifactId>
+      <artifactId>ebean-platform-hsqldb</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-mysql</artifactId>
+      <artifactId>ebean-platform-mysql</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-mariadb</artifactId>
+      <artifactId>ebean-platform-mariadb</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-nuodb</artifactId>
+      <artifactId>ebean-platform-nuodb</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-oracle</artifactId>
+      <artifactId>ebean-platform-oracle</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-postgres</artifactId>
+      <artifactId>ebean-platform-postgres</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-sqlanywhere</artifactId>
+      <artifactId>ebean-platform-sqlanywhere</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-sqlite</artifactId>
+      <artifactId>ebean-platform-sqlite</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-sqlserver</artifactId>
+      <artifactId>ebean-platform-sqlserver</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
+
 
 </project>

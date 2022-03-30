@@ -9,19 +9,13 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-mariadb</artifactId>
+  <artifactId>ebean-platform-sqlite</artifactId>
 
   <dependencies>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>12.16.2-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-mysql</artifactId>
       <version>12.16.2-SNAPSHOT</version>
     </dependency>
 

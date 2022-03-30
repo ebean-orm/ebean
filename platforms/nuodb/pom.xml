@@ -9,7 +9,7 @@
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-mysql</artifactId>
+  <artifactId>ebean-platform-nuodb</artifactId>
 
   <dependencies>
 
@@ -17,13 +17,6 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
       <version>12.16.2-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
     </dependency>
 
   </dependencies>
