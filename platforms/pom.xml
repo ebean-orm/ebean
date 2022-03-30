@@ -13,6 +13,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>all</module>
     <module>clickhouse</module>
     <module>db2</module>
     <module>h2</module>
