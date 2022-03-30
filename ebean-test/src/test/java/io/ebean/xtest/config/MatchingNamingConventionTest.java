@@ -3,8 +3,8 @@ package io.ebean.xtest.config;
 import io.ebean.config.MatchingNamingConvention;
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.TableName;
-import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.platform.h2.H2Platform;
+import io.ebean.platform.sqlserver.SqlServer17Platform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 

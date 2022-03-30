@@ -2,13 +2,13 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.DB;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
-import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.hana.HanaPlatform;
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
-import io.ebean.config.dbplatform.oracle.OraclePlatform;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.platform.db2.DB2LuwPlatform;
+import io.ebean.platform.h2.H2Platform;
+import io.ebean.platform.hana.HanaPlatform;
+import io.ebean.platform.mysql.MySqlPlatform;
+import io.ebean.platform.oracle.OraclePlatform;
+import io.ebean.platform.postgres.PostgresPlatform;
+import io.ebean.platform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
 import io.ebeaninternal.dbmigration.migration.CreateIndex;
 import org.junit.jupiter.api.Test;
@@ -104,7 +104,7 @@ public class PlatformDdl_CreateIndexTest {
   public void db2luw_fkeyCreateIndex() {
     String sql = db2LuwDdl.createIndex(fkeyCreateIndex(true));
     assertEquals("create unique index ix_mytab_acol on mytab (acol)", sql);
-    
+
     sql = db2LuwDdl.createIndex(fkeyCreateIndex(false));
     assertEquals("create index ix_mytab_acol on mytab (acol)", sql);
   }

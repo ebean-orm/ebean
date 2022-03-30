@@ -19,6 +19,12 @@
 
   <dependencies>
 
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-platform-postgres</artifactId>
+      <version>12.16.2-SNAPSHOT</version>
+    </dependency>
+
     <!-- provided scope -->
     <dependency>
       <groupId>io.ebean</groupId>
