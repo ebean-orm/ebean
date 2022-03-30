@@ -246,11 +246,12 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- provided scope for Java 11 compilation (not required for Java 17+) -->
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
       <version>1.1</version>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>
