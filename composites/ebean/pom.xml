@@ -2,11 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>ebean-parent</artifactId>
+    <artifactId>composites</artifactId>
     <groupId>io.ebean</groupId>
     <version>12.16.2-SNAPSHOT</version>
   </parent>
 
+  <!-- TODO: Delete this, use platform specific ebean-postgres etc instead -->
   <name>ebean composite</name>
   <description>Composite of common runtime dependencies</description>
   <artifactId>ebean</artifactId>

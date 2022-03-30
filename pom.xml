@@ -76,9 +76,7 @@
   </dependencies>
 
   <modules>
-    <module>ebean</module>
     <module>ebean-api</module>
-    <module>platforms</module>
     <module>ebean-bom</module>
     <module>ebean-core-type</module>
     <module>ebean-core</module>
@@ -92,6 +90,8 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
+    <module>platforms</module>
+    <module>composites</module>
     <!--    <module>ebean-kotlin</module>-->
 
   </modules>
