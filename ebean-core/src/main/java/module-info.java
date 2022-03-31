@@ -43,33 +43,35 @@ module io.ebean.core {
 
   exports io.ebeaninternal.server.cache;
 
-  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test;
+  exports io.ebeanservice.docstore.api;
+  exports io.ebeanservice.docstore.api.support to io.ebean.elastic, io.ebean.test;
+  exports io.ebeanservice.docstore.api.mapping to io.ebean.elastic;
+
+  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.spring.txn;
   exports io.ebeaninternal.api.json to io.ebean.test;
   exports io.ebeaninternal.json to io.ebean.test;
   exports io.ebeaninternal.server.autotune to io.ebean.autotune;
-  exports io.ebeaninternal.server.core to io.ebean.test;
+  exports io.ebeaninternal.server.core to io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.core.bootup to io.ebean.test;
   exports io.ebeaninternal.server.core.timezone to io.ebean.test;
-  exports io.ebeaninternal.server.cluster to io.ebean.test;
-  exports io.ebeaninternal.server.deploy to io.ebean.autotune, io.ebean.ddl.generator, io.ebean.test;
+  exports io.ebeaninternal.server.cluster to io.ebean.test, io.ebean.k8scache;
+  exports io.ebeaninternal.server.deploy to io.ebean.autotune, io.ebean.ddl.generator, io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.deploy.id to io.ebean.ddl.generator;
-  exports io.ebeaninternal.server.deploy.meta to io.ebean.ddl.generator, io.ebean.test;
+  exports io.ebeaninternal.server.deploy.meta to io.ebean.ddl.generator, io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.deploy.visitor to io.ebean.ddl.generator;
   exports io.ebeaninternal.server.el to io.ebean.autotune, io.ebean.test;
-  exports io.ebeaninternal.server.expression to io.ebean.querybean, io.ebean.test;
+  exports io.ebeaninternal.server.expression to io.ebean.querybean, io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.expression.platform to io.ebean.test;
   exports io.ebeaninternal.server.grammer to io.ebean.test;
   exports io.ebeaninternal.server.idgen to io.ebean.test;
-  exports io.ebeaninternal.server.persist to io.ebean.test;
+  exports io.ebeaninternal.server.persist to io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.query to io.ebean.test;
-  exports io.ebeaninternal.server.querydefn to io.ebean.autotune, io.ebean.querybean, io.ebean.test;
+  exports io.ebeaninternal.server.querydefn to io.ebean.autotune, io.ebean.querybean, io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.rawsql to io.ebean.test;
-  exports io.ebeaninternal.server.text.json to io.ebean.test;
+  exports io.ebeaninternal.server.text.json to io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.type to io.ebean.postgis, io.ebean.test;
-  exports io.ebeaninternal.server.transaction to io.ebean.test;
+  exports io.ebeaninternal.server.transaction to io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.k8scache;
   exports io.ebeaninternal.server.util to io.ebean.querybean;
-  exports io.ebeanservice.docstore.api to io.ebean.test;
-  exports io.ebeanservice.docstore.api.support to io.ebean.test;
 
   provides io.ebean.metric.MetricFactory with io.ebeaninternal.server.profile.DMetricFactory;
   provides io.ebean.service.SpiContainerFactory with io.ebeaninternal.server.DContainerFactory;
