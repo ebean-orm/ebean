@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.0.0-SNAPSHOT</version>
+    <version>13.0.0</version>
   </parent>
 
   <artifactId>ebean-platform-oracle</artifactId>
@@ -16,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.0.0-SNAPSHOT</version>
+      <version>13.0.0</version>
     </dependency>
 
     <dependency>
@@ -28,4 +26,8 @@
 
   </dependencies>
 
+
+  <scm>
+    <tag>ebean-parent-13.0.0</tag>
+  </scm>
 </project>
