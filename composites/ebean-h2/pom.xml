@@ -4,7 +4,7 @@
   <parent>
     <artifactId>composites</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.0.0</version>
+    <version>13.0.1-SNAPSHOT</version>
   </parent>
 
   <name>ebean-h2</name>
@@ -16,13 +16,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.0.0</version>
+      <version>13.0.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.0.0</version>
+      <version>13.0.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -35,19 +35,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>13.0.0</version>
+      <version>13.0.1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.0.0</version>
+      <version>13.0.1-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
-
-
-  <scm>
-    <tag>ebean-parent-13.0.0</tag>
-  </scm>
 </project>
