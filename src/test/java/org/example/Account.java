@@ -3,7 +3,9 @@ package org.example;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
+@Table(name="o_account")
 @Entity
 public class Account {
 

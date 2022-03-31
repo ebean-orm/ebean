@@ -2,12 +2,10 @@ package org.example;
 
 import io.ebean.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.Set;
 
+@Table(name="o_user")
 @Entity
 public class User extends Model {
 
