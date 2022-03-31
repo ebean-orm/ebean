@@ -17,12 +17,14 @@ import java.util.logging.Logger;
  */
 final class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
 
+  private final CurrentTenantProvider tenantProvider;
   private final DataSource dataSource;
   private final DataSource readOnlyDataSource;
   private final SchemaDataSource schemaDataSource;
   private final SchemaDataSource readOnly;
 
   MultiTenantDbSchemaSupplier(CurrentTenantProvider tenantProvider, DataSource dataSource, DataSource readOnlyDataSource, TenantSchemaProvider schemaProvider) {
+    this.tenantProvider = tenantProvider;
     this.dataSource = dataSource;
     this.readOnlyDataSource = readOnlyDataSource;
     this.schemaDataSource = new SchemaDataSource(dataSource, schemaProvider, tenantProvider);
@@ -31,6 +33,11 @@ final class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
     } else {
       this.readOnly = new SchemaDataSource(readOnlyDataSource, schemaProvider, tenantProvider);
     }
+  }
+
+  @Override
+  public Object currentTenantId() {
+    return tenantProvider.currentId();
   }
 
   @Override

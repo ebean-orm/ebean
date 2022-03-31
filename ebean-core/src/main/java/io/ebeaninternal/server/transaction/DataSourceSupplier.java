@@ -16,7 +16,6 @@ public interface DataSourceSupplier {
    * Return the DataSource to use for the current request.
    * <p>
    * This should take into account multi-tenancy and the current tenantId.
-   * </p>
    */
   DataSource getDataSource();
 
@@ -25,9 +24,13 @@ public interface DataSourceSupplier {
    * <p>
    * This can return null meaning that no read only DataSource (with autoCommit)
    * is available for use so normal transactions with explicit commit should be used.
-   * </p>
    */
   DataSource getReadOnlyDataSource();
+
+  /**
+   * Obtain the current TenantId *IF* it is required for the DataSource.
+   */
+  Object currentTenantId();
 
   /**
    * Return a connection from the DataSource taking into account a tenantId for multi-tenant lazy loading.

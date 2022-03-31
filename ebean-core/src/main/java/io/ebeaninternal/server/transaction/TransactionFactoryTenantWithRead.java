@@ -27,8 +27,8 @@ final class TransactionFactoryTenantWithRead extends TransactionFactoryTenant {
     Connection connection = null;
     try {
       if (tenantId == null) {
-        // tenantId not set (by lazy loading) so get current tenantId
-        tenantId = tenantProvider.currentId();
+        // obtain the tenantId if the DataSource requires it
+        tenantId = dataSourceSupplier.currentTenantId();
       }
       connection = dataSourceSupplier.getReadOnlyConnection(tenantId);
       return new ImplicitReadOnlyTransaction(manager, connection, tenantId);
