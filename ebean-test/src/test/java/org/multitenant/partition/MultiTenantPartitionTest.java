@@ -1,11 +1,11 @@
 package org.multitenant.partition;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantMode;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MultiTenantPartitionTest extends BaseTestCase {
+class MultiTenantPartitionTest extends BaseTestCase {
 
   private static final String[] names = {"Ace", "Base", "Case", "Dae", "Eva"};
 
@@ -33,13 +33,26 @@ public class MultiTenantPartitionTest extends BaseTestCase {
   }
 
   @AfterAll
-  public static void shutdown() {
+  static void shutdown() {
     server.shutdown();
   }
 
   @Test
-  public void start() {
+  void queryOnly_noTenantIdRequired_expect_currentTenantNotCalled() {
+    // MtNone does not have any @TenantId property
+    MtNone none = new MtNone("none");
+    server.save(none);
 
+    int beforeCount = CurrentTenant.count();
+    // CurrentTenant should not be called for this query
+    server.find(MtNone.class).findList();
+    int afterCount = CurrentTenant.count();
+
+    assertThat(afterCount).isSameAs(beforeCount);
+  }
+
+  @Test
+  void start() {
     UserContext.set("rob", "ten_1");
 
     LoggedSql.start();
@@ -64,8 +77,7 @@ public class MultiTenantPartitionTest extends BaseTestCase {
   }
 
   @Test
-  public void deleteById() {
-
+  void deleteById() {
     UserContext.set("fred", "ten_2");
 
     MtContent content = new MtContent("first title");
@@ -83,8 +95,7 @@ public class MultiTenantPartitionTest extends BaseTestCase {
   }
 
   @Test
-  public void deleteByIds() {
-
+  void deleteByIds() {
     UserContext.set("fred", "ten_2");
 
     MtContent a = newContent("title a");
@@ -107,11 +118,8 @@ public class MultiTenantPartitionTest extends BaseTestCase {
     return content;
   }
 
-
   private static Database init() {
-
     DatabaseConfig config = new DatabaseConfig();
-
     config.setName("h2multitenant");
     config.loadFromProperties();
     config.setDdlGenerate(true);
@@ -124,6 +132,7 @@ public class MultiTenantPartitionTest extends BaseTestCase {
 
     config.getClasses().add(MtTenant.class);
     config.getClasses().add(MtContent.class);
+    config.getClasses().add(MtNone.class);
 
     return DatabaseFactory.create(config);
   }

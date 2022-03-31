@@ -22,6 +22,11 @@ final class MultiTenantDbSupplier implements DataSourceSupplier {
   }
 
   @Override
+  public Object currentTenantId() {
+    return tenantProvider.currentId();
+  }
+
+  @Override
   public DataSource getReadOnlyDataSource() {
     // read only datasource not supported with DB per tenant at this stage
     return null;

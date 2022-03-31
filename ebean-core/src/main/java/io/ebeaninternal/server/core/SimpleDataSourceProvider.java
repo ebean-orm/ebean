@@ -21,6 +21,11 @@ final class SimpleDataSourceProvider implements DataSourceSupplier {
   }
 
   @Override
+  public Object currentTenantId() {
+    return null; // not required here
+  }
+
+  @Override
   public DataSource getDataSource() {
     return dataSource;
   }
