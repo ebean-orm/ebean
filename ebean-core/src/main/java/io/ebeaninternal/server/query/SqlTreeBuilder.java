@@ -50,6 +50,7 @@ public final class SqlTreeBuilder {
    */
   private final boolean rawNoId;
   private final boolean disableLazyLoad;
+  private final boolean readOnly;
   private final SpiQuery.TemporalMode temporalMode;
   private SqlTreeNode rootNode;
   private boolean sqlDistinct;
@@ -63,6 +64,7 @@ public final class SqlTreeBuilder {
     this.desc = request.descriptor();
     this.rawNoId = rawNoId;
     this.disableLazyLoad = request.query().isDisableLazyLoading();
+    this.readOnly = Boolean.TRUE.equals(request.query().isReadOnly());
     this.query = null;
     this.subQuery = false;
     this.distinctOnPlatform = false;
@@ -88,6 +90,7 @@ public final class SqlTreeBuilder {
     this.query = request.query();
     this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
+    this.readOnly = Boolean.TRUE.equals(query.isReadOnly());
     this.subQuery = Type.SQ_EXISTS == query.getType()
         || Type.SQ_IN == query.getType()
         || Type.ID_LIST == query.getType()
@@ -308,13 +311,13 @@ public final class SqlTreeBuilder {
       if (baseTable == null) {
         baseTable = desc.baseTable(temporalMode);
       }
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, sqlDistinct, baseTable);
+      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, readOnly, sqlDistinct, baseTable);
 
     } else if (prop instanceof STreePropertyAssocMany) {
-      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, withId(), temporalMode, disableLazyLoad);
+      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, withId(), temporalMode, disableLazyLoad, readOnly);
 
     } else {
-      return new SqlTreeNodeBean(prefix, prop, props, myList, withId(), temporalMode, disableLazyLoad);
+      return new SqlTreeNodeBean(prefix, prop, props, myList, withId(), temporalMode, disableLazyLoad, readOnly);
     }
   }
 

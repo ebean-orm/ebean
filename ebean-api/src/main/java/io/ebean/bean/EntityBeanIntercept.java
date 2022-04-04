@@ -1,381 +1,178 @@
 package io.ebean.bean;
 
-import io.ebean.DB;
-import io.ebean.Database;
 import io.ebean.ValuePair;
 
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PersistenceException;
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * This is the object added to every entity bean using byte code enhancement.
- * <p>
- * This provides the mechanisms to support deferred fetching of reference beans
- * and oldValues generation for concurrency checking.
- * </p>
- */
-public final class EntityBeanIntercept implements Serializable {
-
-  private static final long serialVersionUID = -3664031775464862649L;
-
-  private static final int STATE_NEW = 0;
-  private static final int STATE_REFERENCE = 1;
-  private static final int STATE_LOADED = 2;
-
-  /**
-   * Used when a bean is partially filled.
-   */
-  private static final byte FLAG_LOADED_PROP = 1;
-  private static final byte FLAG_CHANGED_PROP = 2;
-  private static final byte FLAG_CHANGEDLOADED_PROP = 3;
-  /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
-   * between an embedded bean being completely overwritten and one of its
-   * embedded properties being made dirty.
-   */
-  private static final byte FLAG_EMBEDDED_DIRTY = 4;
-  /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
-   * between an embedded bean being completely overwritten and one of its
-   * embedded properties being made dirty.
-   */
-  private static final byte FLAG_ORIG_VALUE_SET = 8;
-
-  /**
-   * Flags indicating if the mutable hash is set.
-   */
-  private static final byte FLAG_MUTABLE_HASH_SET = 16;
-
-  private transient final ReentrantLock lock = new ReentrantLock();
-  private transient NodeUsageCollector nodeUsageCollector;
-  private transient PersistenceContext persistenceContext;
-  private transient BeanLoader beanLoader;
-  private transient PreGetterCallback preGetterCallback;
-
-  private String ebeanServerName;
-  private boolean deletedFromCollection;
-
-  /**
-   * The actual entity bean that 'owns' this intercept.
-   */
-  private final EntityBean owner;
-  private EntityBean embeddedOwner;
-  private int embeddedOwnerIndex;
-  /**
-   * One of NEW, REF, UPD.
-   */
-  private int state;
-  private boolean forceUpdate;
-  private boolean readOnly;
-  private boolean dirty;
-  /**
-   * Flag set to disable lazy loading - typically for SQL "report" type entity beans.
-   */
-  private boolean disableLazyLoad;
-
-  /**
-   * Flag set when lazy loading failed due to the underlying bean being deleted in the DB.
-   */
-  private boolean lazyLoadFailure;
-  private boolean fullyLoadedBean;
-  private boolean loadedFromCache;
-  private final byte[] flags;
-  private Object[] origValues;
-  private Exception[] loadErrors;
-  private int lazyLoadProperty = -1;
-  private Object ownerId;
-  private int sortOrder;
-
-  /**
-   * Holds information of json loaded jackson beans (e.g. the original json or checksum).
-   */
-  private MutableValueInfo[] mutableInfo;
-
-  /**
-   * Holds json content determined at point of dirty check.
-   * Stored here on dirty check such that we only convert to json once.
-   */
-  private MutableValueNext[] mutableNext;
-
-  /**
-   * Create a intercept with a given entity.
-   */
-  public EntityBeanIntercept(Object ownerBean) {
-    this.owner = (EntityBean) ownerBean;
-    this.flags = new byte[owner._ebean_getPropertyNames().length];
-  }
-
-  /**
-   * EXPERIMENTAL - Constructor only for use by serialization frameworks.
-   */
-  public EntityBeanIntercept() {
-    this.owner = null;
-    this.flags = null;
-  }
+public interface EntityBeanIntercept extends Serializable {
 
   /**
    * Return the 'owning' entity bean.
    */
-  public EntityBean getOwner() {
-    return owner;
-  }
+  EntityBean getOwner();
 
   /**
    * Return the persistenceContext.
    */
-  public PersistenceContext getPersistenceContext() {
-    return persistenceContext;
-  }
+  PersistenceContext getPersistenceContext();
 
   /**
    * Set the persistenceContext.
    */
-  public void setPersistenceContext(PersistenceContext persistenceContext) {
-    this.persistenceContext = persistenceContext;
-  }
+  void setPersistenceContext(PersistenceContext persistenceContext);
 
   /**
    * Turn on profile collection.
    */
-  public void setNodeUsageCollector(NodeUsageCollector usageCollector) {
-    this.nodeUsageCollector = usageCollector;
-  }
+  void setNodeUsageCollector(NodeUsageCollector usageCollector);
 
   /**
    * Return the ownerId (IdClass).
    */
-  public Object getOwnerId() {
-    return ownerId;
-  }
+  Object getOwnerId();
 
   /**
    * Set the ownerId (IdClass).
    */
-  public void setOwnerId(Object ownerId) {
-    this.ownerId = ownerId;
-  }
+  void setOwnerId(Object ownerId);
 
   /**
    * Return the owning bean for an embedded bean.
    */
-  public Object getEmbeddedOwner() {
-    return embeddedOwner;
-  }
+  Object getEmbeddedOwner();
 
   /**
    * Return the property index (for the parent) of this embedded bean.
    */
-  public int getEmbeddedOwnerIndex() {
-    return embeddedOwnerIndex;
-  }
+  int getEmbeddedOwnerIndex();
 
   /**
    * Clear the getter callback.
    */
-  public void clearGetterCallback() {
-    this.preGetterCallback = null;
-  }
+  void clearGetterCallback();
 
   /**
    * Register the callback to be triggered when getter is called.
    * This is used primarily to automatically flush the JDBC batch.
    */
-  public void registerGetterCallback(PreGetterCallback getterCallback) {
-    this.preGetterCallback = getterCallback;
-  }
+  void registerGetterCallback(PreGetterCallback getterCallback);
 
   /**
    * Set the embedded beans owning bean.
    */
-  public void setEmbeddedOwner(EntityBean parentBean, int embeddedOwnerIndex) {
-    this.embeddedOwner = parentBean;
-    this.embeddedOwnerIndex = embeddedOwnerIndex;
-  }
+  void setEmbeddedOwner(EntityBean parentBean, int embeddedOwnerIndex);
 
   /**
    * Set the BeanLoader with PersistenceContext.
    */
-  public void setBeanLoader(BeanLoader beanLoader, PersistenceContext ctx) {
-    this.beanLoader = beanLoader;
-    this.persistenceContext = ctx;
-    this.ebeanServerName = beanLoader.getName();
-  }
+  void setBeanLoader(BeanLoader beanLoader, PersistenceContext ctx);
 
   /**
    * Set the BeanLoader.
    */
-  public void setBeanLoader(BeanLoader beanLoader) {
-    this.beanLoader = beanLoader;
-    this.ebeanServerName = beanLoader.getName();
-  }
-
-  public boolean isFullyLoadedBean() {
-    return fullyLoadedBean;
-  }
-
-  public void setFullyLoadedBean(boolean fullyLoadedBean) {
-    this.fullyLoadedBean = fullyLoadedBean;
-  }
+  void setBeanLoader(BeanLoader beanLoader);
 
   /**
-   * Check each property to see if the bean is partially loaded.
+   * Return true if the bean is fully loaded (not a partial).
    */
-  public boolean isPartial() {
-    for (byte flag : flags) {
-      if ((flag & FLAG_LOADED_PROP) == 0) {
-        return true;
-      }
-    }
-    return false;
-  }
+  boolean isFullyLoadedBean();
+
+  /**
+   * Set true when the bean is fully loaded (not a partial).
+   */
+  void setFullyLoadedBean(boolean fullyLoadedBean);
+
+  /**
+   * Return true if the bean is partially loaded.
+   */
+  boolean isPartial();
 
   /**
    * Return true if this bean has been directly modified (it has oldValues) or
    * if any embedded beans are either new or dirty (and hence need saving).
    */
-  public boolean isDirty() {
-    if (dirty) {
-      return true;
-    }
-    if (mutableInfo != null) {
-      for (int i = 0; i < mutableInfo.length; i++) {
-        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
-          dirty = true;
-          break;
-        }
-      }
-    }
-    return dirty;
-  }
+  boolean isDirty();
 
   /**
    * Called by an embedded bean onto its owner.
    */
-  public void setEmbeddedDirty(int embeddedProperty) {
-    this.dirty = true;
-    setEmbeddedPropertyDirty(embeddedProperty);
-  }
+  void setEmbeddedDirty(int embeddedProperty);
 
-  public void setDirty(boolean dirty) {
-    this.dirty = dirty;
-  }
+  /**
+   * Marks the bean as dirty.
+   */
+  void setDirty(boolean dirty);
 
   /**
    * Return true if this entity bean is new and not yet saved.
    */
-  public boolean isNew() {
-    return state == STATE_NEW;
-  }
+  boolean isNew();
 
   /**
    * Return true if the entity bean is new or dirty (and should be saved).
    */
-  public boolean isNewOrDirty() {
-    return isNew() || isDirty();
-  }
+  boolean isNewOrDirty();
 
   /**
    * Return true if only the Id property has been loaded.
    */
-  public boolean hasIdOnly(int idIndex) {
-    for (int i = 0; i < flags.length; i++) {
-      if (i == idIndex) {
-        if ((flags[i] & FLAG_LOADED_PROP) == 0) return false;
-      } else if ((flags[i] & FLAG_LOADED_PROP) != 0) {
-        return false;
-      }
-    }
-    return true;
-  }
+  boolean hasIdOnly(int idIndex);
 
   /**
    * Return true if the entity is a reference.
    */
-  public boolean isReference() {
-    return state == STATE_REFERENCE;
-  }
+  boolean isReference();
 
   /**
    * Set this as a reference object.
    */
-  public void setReference(int idPos) {
-    state = STATE_REFERENCE;
-    if (idPos > -1) {
-      // For cases where properties are set on constructor
-      // set every non Id property to unloaded (for lazy loading)
-      for (int i = 0; i < flags.length; i++) {
-        if (i != idPos) {
-          flags[i] &= ~FLAG_LOADED_PROP;
-        }
-      }
-    }
-  }
+  void setReference(int idPos);
 
   /**
    * Set true when the bean has been loaded from L2 bean cache.
    * The effect of this is that we should skip the cache if there
    * is subsequent lazy loading (bean cache partially populated).
    */
-  public void setLoadedFromCache(boolean loadedFromCache) {
-    this.loadedFromCache = loadedFromCache;
-  }
+  void setLoadedFromCache(boolean loadedFromCache);
 
   /**
    * Return true if this bean was loaded from L2 bean cache.
    */
-  public boolean isLoadedFromCache() {
-    return loadedFromCache;
-  }
+  boolean isLoadedFromCache();
 
   /**
    * Return true if the bean should be treated as readOnly. If a setter method
    * is called when it is readOnly an Exception is thrown.
    */
-  public boolean isReadOnly() {
-    return readOnly;
-  }
+  boolean isReadOnly();
 
   /**
    * Set the readOnly status. If readOnly then calls to setter methods through
    * an exception.
    */
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-  }
+  void setReadOnly(boolean readOnly);
 
   /**
    * Set the bean to be updated when persisted (for merge).
    */
-  public void setForceUpdate(boolean forceUpdate) {
-    this.forceUpdate = forceUpdate;
-  }
+  void setForceUpdate(boolean forceUpdate);
 
   /**
    * Return true if the entity should be updated.
    */
-  public boolean isUpdate() {
-    return forceUpdate || state == STATE_LOADED || state == STATE_REFERENCE;
-  }
+  boolean isUpdate();
 
   /**
    * Return true if the entity has been loaded.
    */
-  public boolean isLoaded() {
-    return state == STATE_LOADED;
-  }
+  boolean isLoaded();
 
   /**
    * Set the bean into NEW state.
    */
-  public void setNew() {
-    this.state = STATE_NEW;
-  }
+  void setNew();
 
   /**
    * Set the loaded state to true.
@@ -386,826 +183,328 @@ public final class EntityBeanIntercept implements Serializable {
    * Worth noting that this is also set after a insert/update. By doing so it
    * 'resets' the bean for making further changes and saving again.
    */
-  public void setLoaded() {
-    this.state = STATE_LOADED;
-    this.owner._ebean_setEmbeddedLoaded();
-    this.lazyLoadProperty = -1;
-    this.origValues = null;
-    // after save, transfer the mutable next values back to mutable info
-    if (mutableNext != null) {
-      for (int i = 0; i < mutableNext.length; i++) {
-        MutableValueNext next = mutableNext[i];
-        if (next != null) {
-          mutableInfo(i, next.info());
-        }
-      }
-    }
-    this.mutableNext = null;
-    for (int i = 0; i < flags.length; i++) {
-      flags[i] &= ~(FLAG_CHANGED_PROP | FLAG_ORIG_VALUE_SET);
-    }
-    this.dirty = false;
-  }
+  void setLoaded();
 
   /**
    * When finished loading for lazy or refresh on an already partially populated bean.
    */
-  public void setLoadedLazy() {
-    this.state = STATE_LOADED;
-    this.lazyLoadProperty = -1;
-  }
+  void setLoadedLazy();
 
   /**
    * Set lazy load failure flag.
    */
-  public void setLazyLoadFailure(Object ownerId) {
-    this.lazyLoadFailure = true;
-    this.ownerId = ownerId;
-  }
+  void setLazyLoadFailure(Object ownerId);
 
   /**
    * Return true if the bean is marked as having failed lazy loading.
    */
-  public boolean isLazyLoadFailure() {
-    return lazyLoadFailure;
-  }
+  boolean isLazyLoadFailure();
 
   /**
    * Return true if lazy loading is disabled.
    */
-  public boolean isDisableLazyLoad() {
-    return disableLazyLoad;
-  }
+  boolean isDisableLazyLoad();
 
   /**
    * Set true to turn off lazy loading.
    */
-  public void setDisableLazyLoad(boolean disableLazyLoad) {
-    this.disableLazyLoad = disableLazyLoad;
-  }
+  void setDisableLazyLoad(boolean disableLazyLoad);
 
   /**
    * Set the loaded status for the embedded bean.
    */
-  public void setEmbeddedLoaded(Object embeddedBean) {
-    if (embeddedBean instanceof EntityBean) {
-      EntityBean eb = (EntityBean) embeddedBean;
-      eb._ebean_getIntercept().setLoaded();
-    }
-  }
+  void setEmbeddedLoaded(Object embeddedBean);
 
   /**
    * Return true if the embedded bean is new or dirty and hence needs saving.
    */
-  public boolean isEmbeddedNewOrDirty(Object embeddedBean) {
-    if (embeddedBean == null) {
-      // if it was previously set then the owning bean would
-      // have oldValues containing the previous embedded bean
-      return false;
-    }
-    if (embeddedBean instanceof EntityBean) {
-      return ((EntityBean) embeddedBean)._ebean_getIntercept().isNewOrDirty();
-    } else {
-      // non-enhanced so must assume it is new and needs to be saved
-      return true;
-    }
-  }
+  boolean isEmbeddedNewOrDirty(Object embeddedBean);
 
   /**
    * Return the original value that was changed via an update.
    */
-  public Object getOrigValue(int propertyIndex) {
-    if ((flags[propertyIndex] & (FLAG_ORIG_VALUE_SET | FLAG_MUTABLE_HASH_SET)) == FLAG_MUTABLE_HASH_SET) {
-      // mutable hash set, but not ORIG_VALUE
-      setOriginalValue(propertyIndex, mutableInfo[propertyIndex].get());
-    }
-    if (origValues == null) {
-      return null;
-    }
-    return origValues[propertyIndex];
-  }
+  Object getOrigValue(int propertyIndex);
 
   /**
    * Finds the index position of a given property. Returns -1 if the
    * property can not be found.
    */
-  public int findProperty(String propertyName) {
-    String[] names = owner._ebean_getPropertyNames();
-    for (int i = 0; i < names.length; i++) {
-      if (names[i].equals(propertyName)) {
-        return i;
-      }
-    }
-    return -1;
-  }
+  int findProperty(String propertyName);
 
   /**
    * Return the property name for the given property.
    */
-  public String getProperty(int propertyIndex) {
-    if (propertyIndex == -1) {
-      return null;
-    }
-    return owner._ebean_getPropertyName(propertyIndex);
-  }
+  String getProperty(int propertyIndex);
 
   /**
    * Return the number of properties.
    */
-  public int getPropertyLength() {
-    return flags.length;
-  }
+  int getPropertyLength();
 
   /**
    * Set the loaded state of the property given it's name.
    */
-  public void setPropertyLoaded(String propertyName, boolean loaded) {
-    int position = findProperty(propertyName);
-    if (position == -1) {
-      throw new IllegalArgumentException("Property " + propertyName + " not found");
-    }
-    if (loaded) {
-      flags[position] |= FLAG_LOADED_PROP;
-    } else {
-      flags[position] &= ~FLAG_LOADED_PROP;
-    }
-  }
+  void setPropertyLoaded(String propertyName, boolean loaded);
 
   /**
    * Set the property to be treated as unloaded. Used for properties initialised in default constructor.
    */
-  public void setPropertyUnloaded(int propertyIndex) {
-    flags[propertyIndex] &= ~FLAG_LOADED_PROP;
-  }
+  void setPropertyUnloaded(int propertyIndex);
 
   /**
    * Set the property to be loaded.
    */
-  public void setLoadedProperty(int propertyIndex) {
-    flags[propertyIndex] |= FLAG_LOADED_PROP;
-  }
+  void setLoadedProperty(int propertyIndex);
 
   /**
    * Set all properties to be loaded (post insert).
    */
-  public void setLoadedPropertyAll() {
-    for (int i = 0; i < flags.length; i++) {
-      flags[i] |= FLAG_LOADED_PROP;
-    }
-  }
+  void setLoadedPropertyAll();
 
   /**
    * Return true if the property is loaded.
    */
-  public boolean isLoadedProperty(int propertyIndex) {
-    return (flags[propertyIndex] & FLAG_LOADED_PROP) != 0;
-  }
+  boolean isLoadedProperty(int propertyIndex);
 
   /**
    * Return true if the property is considered changed.
    */
-  public boolean isChangedProperty(int propertyIndex) {
-    return (flags[propertyIndex] & FLAG_CHANGED_PROP) != 0;
-  }
+  boolean isChangedProperty(int propertyIndex);
 
   /**
    * Return true if the property was changed or if it is embedded and one of its
    * embedded properties is dirty.
    */
-  public boolean isDirtyProperty(int propertyIndex) {
-    return (flags[propertyIndex] & (FLAG_CHANGED_PROP + FLAG_EMBEDDED_DIRTY)) != 0;
-  }
+  boolean isDirtyProperty(int propertyIndex);
 
   /**
    * Explicitly mark a property as having been changed.
    */
-  public void markPropertyAsChanged(int propertyIndex) {
-    setChangedProperty(propertyIndex);
-    setDirty(true);
-  }
+  void markPropertyAsChanged(int propertyIndex);
 
-  public void setChangedProperty(int propertyIndex) {
-    flags[propertyIndex] |= FLAG_CHANGED_PROP;
-  }
+  void setChangedProperty(int propertyIndex);
 
-  private void setChangeLoaded(int propertyIndex) {
-    flags[propertyIndex] |= FLAG_CHANGEDLOADED_PROP;
-  }
+  void setChangeLoaded(int propertyIndex);
 
   /**
    * Set that an embedded bean has had one of its properties changed.
    */
-  private void setEmbeddedPropertyDirty(int propertyIndex) {
-    flags[propertyIndex] |= FLAG_EMBEDDED_DIRTY;
-  }
+  void setEmbeddedPropertyDirty(int propertyIndex);
 
-  private void setOriginalValue(int propertyIndex, Object value) {
-    if (origValues == null) {
-      origValues = new Object[flags.length];
-    }
-    if ((flags[propertyIndex] & FLAG_ORIG_VALUE_SET) == 0) {
-      flags[propertyIndex] |= FLAG_ORIG_VALUE_SET;
-      origValues[propertyIndex] = value;
-    }
-  }
+  void setOriginalValue(int propertyIndex, Object value);
 
   /**
    * Set old value but force it to be set regardless if it already has a value.
    */
-  private void setOriginalValueForce(int propertyIndex, Object value) {
-    if (origValues == null) {
-      origValues = new Object[flags.length];
-    }
-    origValues[propertyIndex] = value;
-  }
+  void setOriginalValueForce(int propertyIndex, Object value);
 
   /**
    * For forced update on a 'New' bean set all the loaded properties to changed.
    */
-  public void setNewBeanForUpdate() {
-    for (int i = 0; i < flags.length; i++) {
-      if ((flags[i] & FLAG_LOADED_PROP) != 0) {
-        flags[i] |= FLAG_CHANGED_PROP;
-      }
-    }
-    setDirty(true);
-  }
+  void setNewBeanForUpdate();
 
   /**
    * Return the set of property names for a partially loaded bean.
    */
-  public Set<String> getLoadedPropertyNames() {
-    if (fullyLoadedBean) {
-      return null;
-    }
-    Set<String> props = new LinkedHashSet<>();
-    for (int i = 0; i < flags.length; i++) {
-      if ((flags[i] & FLAG_LOADED_PROP) != 0) {
-        props.add(getProperty(i));
-      }
-    }
-    return props;
-  }
+  Set<String> getLoadedPropertyNames();
 
   /**
    * Return the array of flags indicating the dirty properties.
    */
-  public boolean[] getDirtyProperties() {
-    int len = getPropertyLength();
-    boolean[] dirties = new boolean[len];
-    for (int i = 0; i < len; i++) {
-      // this, or an embedded property has been changed - recurse
-      dirties[i] = (flags[i] & (FLAG_CHANGED_PROP + FLAG_EMBEDDED_DIRTY)) != 0;
-    }
-    return dirties;
-  }
+  boolean[] getDirtyProperties();
 
   /**
    * Return the set of dirty properties.
    */
-  public Set<String> getDirtyPropertyNames() {
-    Set<String> props = new LinkedHashSet<>();
-    addDirtyPropertyNames(props, null);
-    return props;
-  }
+  Set<String> getDirtyPropertyNames();
 
   /**
    * Recursively add dirty properties.
    */
-  public void addDirtyPropertyNames(Set<String> props, String prefix) {
-    int len = getPropertyLength();
-    for (int i = 0; i < len; i++) {
-      if (isChangedProp(i)) {
-        // the property has been changed on this bean
-        props.add((prefix == null ? getProperty(i) : prefix + getProperty(i)));
-      } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
-        // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
-        embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, getProperty(i) + ".");
-      }
-    }
-  }
+  void addDirtyPropertyNames(Set<String> props, String prefix);
 
   /**
    * Return true if any of the given property names are dirty.
    */
-  public boolean hasDirtyProperty(Set<String> propertyNames) {
-    String[] names = owner._ebean_getPropertyNames();
-    int len = getPropertyLength();
-    for (int i = 0; i < len; i++) {
-      if (isChangedProp(i)) {
-        if (propertyNames.contains(names[i])) {
-          return true;
-        }
-      } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
-        if (propertyNames.contains(names[i])) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
+  boolean hasDirtyProperty(Set<String> propertyNames);
 
   /**
    * Return a map of dirty properties with their new and old values.
    */
-  public Map<String, ValuePair> getDirtyValues() {
-    Map<String, ValuePair> dirtyValues = new LinkedHashMap<>();
-    addDirtyPropertyValues(dirtyValues, null);
-    return dirtyValues;
-  }
+  Map<String, ValuePair> getDirtyValues();
 
   /**
    * Recursively add dirty properties.
    */
-  public void addDirtyPropertyValues(Map<String, ValuePair> dirtyValues, String prefix) {
-    int len = getPropertyLength();
-    for (int i = 0; i < len; i++) {
-      if (isChangedProp(i)) {
-        // the property has been changed on this bean
-        String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
-        Object newVal = owner._ebean_getField(i);
-        Object oldVal = getOrigValue(i);
-        if (notEqual(oldVal, newVal)) {
-          dirtyValues.put(propName, new ValuePair(newVal, oldVal));
-        }
-      } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
-        // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
-        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(dirtyValues, getProperty(i) + ".");
-      }
-    }
-  }
+  void addDirtyPropertyValues(Map<String, ValuePair> dirtyValues, String prefix);
 
   /**
    * Recursively add dirty properties.
    */
-  public void addDirtyPropertyValues(BeanDiffVisitor visitor) {
-    int len = getPropertyLength();
-    for (int i = 0; i < len; i++) {
-      if (isChangedProp(i)) {
-        // the property has been changed on this bean
-        Object newVal = owner._ebean_getField(i);
-        Object oldVal = getOrigValue(i);
-        if (notEqual(oldVal, newVal)) {
-          visitor.visit(i, newVal, oldVal);
-        }
-      } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
-        // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
-        visitor.visitPush(i);
-        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(visitor);
-        visitor.visitPop();
-      }
-    }
-  }
+  void addDirtyPropertyValues(BeanDiffVisitor visitor);
 
   /**
    * Return a dirty property hash taking into account embedded beans.
    */
-  public StringBuilder getDirtyPropertyKey() {
-    StringBuilder sb = new StringBuilder();
-    addDirtyPropertyKey(sb);
-    return sb;
-  }
+  StringBuilder getDirtyPropertyKey();
 
   /**
    * Add and return a dirty property hash.
    */
-  private void addDirtyPropertyKey(StringBuilder sb) {
-    if (sortOrder > 0) {
-      sb.append("s,");
-    }
-    int len = getPropertyLength();
-    for (int i = 0; i < len; i++) {
-      if ((flags[i] & FLAG_CHANGED_PROP) != 0) { // we do not check against mutablecontent here.
-        sb.append(i).append(',');
-      } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
-        // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
-        sb.append(i).append('[');
-        embeddedBean._ebean_getIntercept().addDirtyPropertyKey(sb);
-        sb.append(']');
-      }
-    }
-  }
+  void addDirtyPropertyKey(StringBuilder sb);
 
   /**
    * Return a loaded property hash.
    */
-  public StringBuilder getLoadedPropertyKey() {
-    StringBuilder sb = new StringBuilder();
-    int len = getPropertyLength();
-    for (int i = 0; i < len; i++) {
-      if (isLoadedProperty(i)) {
-        sb.append(i).append(',');
-      }
-    }
-    return sb;
-  }
+  StringBuilder getLoadedPropertyKey();
 
-  public boolean[] getLoaded() {
-    boolean[] ret = new boolean[flags.length];
-    for (int i = 0; i < ret.length; i++) {
-      ret[i] = (flags[i] & FLAG_LOADED_PROP) != 0;
-    }
-    return ret;
-  }
+  boolean[] getLoaded();
 
   /**
    * Return the index of the property that triggered the lazy load.
    */
-  public int getLazyLoadPropertyIndex() {
-    return lazyLoadProperty;
-  }
+  int getLazyLoadPropertyIndex();
 
   /**
    * Return the property that triggered the lazy load.
    */
-  public String getLazyLoadProperty() {
-    return getProperty(lazyLoadProperty);
-  }
+  String getLazyLoadProperty();
 
   /**
    * Load the bean when it is a reference.
    */
-  void loadBean(int loadProperty) {
-    lock.lock();
-    try {
-      if (beanLoader == null) {
-        final Database database = DB.byName(ebeanServerName);
-        if (database == null) {
-          throw new PersistenceException("Database [" + ebeanServerName + "] was not found?");
-        }
-        // For stand alone reference bean or after deserialisation lazy load
-        // using the ebeanServer. Synchronise only on the bean.
-        loadBeanInternal(loadProperty, database.pluginApi().beanLoader());
-        return;
-      }
-    } finally {
-      lock.unlock();
-    }
-    final Lock lock = beanLoader.lock();
-    try {
-      // Lazy loading using LoadBeanContext which supports batch loading
-      // Synchronise on the beanLoader (a 'node' of the LoadBeanContext 'tree')
-      loadBeanInternal(loadProperty, beanLoader);
-    } finally {
-      lock.unlock();
-    }
-  }
+  void loadBean(int loadProperty);
 
   /**
    * Invoke the lazy loading. This method is synchronised externally.
    */
-  private void loadBeanInternal(int loadProperty, BeanLoader loader) {
-    if ((flags[loadProperty] & FLAG_LOADED_PROP) != 0) {
-      // race condition where multiple threads calling preGetter concurrently
-      return;
-    }
-    if (lazyLoadFailure) {
-      // failed when batch lazy loaded by another bean in the batch
-      throw new EntityNotFoundException("(Lazy) loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted");
-    }
-    if (lazyLoadProperty == -1) {
-      lazyLoadProperty = loadProperty;
-      if (nodeUsageCollector != null) {
-        nodeUsageCollector.setLoadProperty(getProperty(lazyLoadProperty));
-      }
-      loader.loadBean(this);
-      if (lazyLoadFailure) {
-        // failed when lazy loading this bean
-        throw new EntityNotFoundException("Lazy loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted.");
-      }
-      // bean should be loaded and intercepting now. setLoaded() has
-      // been called by the lazy loading mechanism
-    }
-  }
-
-  /**
-   * Helper method to check if two objects are equal.
-   */
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  static boolean notEqual(Object obj1, Object obj2) {
-    if (obj1 == null) {
-      return (obj2 != null);
-    }
-    if (obj2 == null) {
-      return true;
-    }
-    if (obj1 == obj2) {
-      return false;
-    }
-    if (obj1 instanceof BigDecimal) {
-      // Use comparable for BigDecimal as equals
-      // uses scale in comparison...
-      if (obj2 instanceof BigDecimal) {
-        Comparable com1 = (Comparable) obj1;
-        return (com1.compareTo(obj2) != 0);
-      } else {
-        return true;
-      }
-    }
-    if (obj1 instanceof URL) {
-      // use the string format to determine if dirty
-      return !obj1.toString().equals(obj2.toString());
-    }
-    return !obj1.equals(obj2);
-  }
+  void loadBeanInternal(int loadProperty, BeanLoader loader);
 
   /**
    * Called when a BeanCollection is initialised automatically.
    */
-  public void initialisedMany(int propertyIndex) {
-    flags[propertyIndex] |= FLAG_LOADED_PROP;
-  }
+  void initialisedMany(int propertyIndex);
 
-  private void preGetterCallback(int propertyIndex) {
-    PreGetterCallback preGetterCallback = this.preGetterCallback;
-    if (preGetterCallback != null) {
-      preGetterCallback.preGetterTrigger(propertyIndex);
-    }
-  }
+  void preGetterCallback(int propertyIndex);
 
   /**
    * Called prior to Id property getter.
    */
-  public void preGetId() {
-    preGetterCallback(-1);
-  }
+  void preGetId();
 
   /**
    * Method that is called prior to a getter method on the actual entity.
    */
-  public void preGetter(int propertyIndex) {
-    preGetterCallback(propertyIndex);
-    if (state == STATE_NEW || disableLazyLoad) {
-      return;
-    }
-    if (!isLoadedProperty(propertyIndex)) {
-      loadBean(propertyIndex);
-    }
-    if (nodeUsageCollector != null) {
-      nodeUsageCollector.addUsed(getProperty(propertyIndex));
-    }
-  }
+  void preGetter(int propertyIndex);
 
   /**
    * OneToMany and ManyToMany only set loaded state.
    */
-  public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else {
-      if (readOnly) {
-        throw new IllegalStateException("This bean is readOnly");
-      }
-      setChangeLoaded(propertyIndex);
-    }
-  }
+  void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue);
 
-  private void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
-    if (readOnly) {
-      throw new IllegalStateException("This bean is readOnly");
-    }
-    setChangedProperty(propertyIndex);
-    if (setDirtyState) {
-      setOriginalValue(propertyIndex, origValue);
-      setDirtyStatus();
-    }
-  }
+  void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue);
 
-  private void setDirtyStatus() {
-    if (!dirty) {
-      dirty = true;
-      if (embeddedOwner != null) {
-        // Cascade dirty state from Embedded bean to parent bean
-        embeddedOwner._ebean_getIntercept().setEmbeddedDirty(embeddedOwnerIndex);
-      }
-      if (nodeUsageCollector != null) {
-        nodeUsageCollector.setModified();
-      }
-    }
-  }
+  void setDirtyStatus();
 
   /**
    * Check to see if the values are not equal. If they are not equal then create
    * the old values for use with ConcurrencyMode.ALL.
    */
-  public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (notEqual(oldValue, newValue)) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue);
 
   /**
    * Check for primitive boolean.
    */
-  public void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (oldValue != newValue) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue);
 
   /**
    * Check for primitive int.
    */
-  public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (oldValue != newValue) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue);
 
   /**
-   * long.
+   * Check for primitive long.
    */
-  public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (oldValue != newValue) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue);
 
   /**
-   * double.
+   * Check for primitive double.
    */
-  public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (Double.compare(oldValue, newValue) != 0) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue);
 
   /**
-   * float.
+   * Check for primitive float.
    */
-  public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (Float.compare(oldValue, newValue) != 0) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue);
 
   /**
-   * short.
+   * Check for primitive short.
    */
-  public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (oldValue != newValue) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue);
 
   /**
-   * char.
+   * Check for primitive char.
    */
-  public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (oldValue != newValue) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue);
 
   /**
-   * byte.
+   * Check for primitive byte.
    */
-  public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (oldValue != newValue) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue);
 
   /**
-   * char[].
+   * Check for primitive char array.
    */
-  public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (!Arrays.equals(oldValue, newValue)) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue);
 
   /**
-   * byte[].
+   * Check for primitive byte array.
    */
-  public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else if (!Arrays.equals(oldValue, newValue)) {
-      setChangedPropertyValue(propertyIndex, intercept, oldValue);
-    }
-  }
+  void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue);
 
   /**
    * Explicitly set an old value with force (the old value is forced even it is already set).
    */
-  public void setOldValue(int propertyIndex, Object oldValue) {
-    setChangedProperty(propertyIndex);
-    setOriginalValueForce(propertyIndex, oldValue);
-    setDirtyStatus();
-  }
+  void setOldValue(int propertyIndex, Object oldValue);
 
   /**
    * Return the sort order value for an order column.
    */
-  public int getSortOrder() {
-    return sortOrder;
-  }
+  int getSortOrder();
 
   /**
    * Set the sort order value for an order column.
    */
-  public void setSortOrder(int sortOrder) {
-    this.sortOrder = sortOrder;
-  }
+  void setSortOrder(int sortOrder);
 
   /**
    * Set if the entity was deleted from a BeanCollection.
    */
-  public void setDeletedFromCollection(final boolean deletedFromCollection) {
-    this.deletedFromCollection = deletedFromCollection;
-  }
+  void setDeletedFromCollection(boolean deletedFromCollection);
 
-  public boolean isOrphanDelete() {
-    return deletedFromCollection && !isNew();
-  }
+  boolean isOrphanDelete();
 
   /**
    * Set the load error that happened on this property.
    */
-  public void setLoadError(int propertyIndex, Exception t) {
-    if (loadErrors == null) {
-      loadErrors = new Exception[flags.length];
-    }
-    loadErrors[propertyIndex] = t;
-    flags[propertyIndex] |= FLAG_LOADED_PROP;
-  }
+  void setLoadError(int propertyIndex, Exception t);
 
   /**
    * Returns the loadErrors.
    */
-  public Map<String, Exception> getLoadErrors() {
-    if (loadErrors == null) {
-      return Collections.emptyMap();
-    }
-    Map<String, Exception> ret = null;
-    int len = getPropertyLength();
-    for (int i = 0; i < len; i++) {
-      Exception loadError = loadErrors[i];
-      if (loadError != null) {
-        if (ret == null) {
-          ret = new LinkedHashMap<>();
-        }
-        ret.put(getProperty(i), loadError);
-      }
-    }
-    return ret;
-  }
+  Map<String, Exception> getLoadErrors();
 
-  private boolean isChangedProp(int i) {
-    if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
-      return true;
-    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
-      return false;
-    } else {
-      // mark for change
-      flags[i] |= FLAG_CHANGED_PROP;
-      dirty = true; // this makes the bean automatically dirty!
-      return true;
-    }
-  }
+  boolean isChangedProp(int i);
 
   /**
    * Return the MutableValueInfo for the given property or null.
    */
-  public MutableValueInfo mutableInfo(int propertyIndex) {
-    return mutableInfo == null ? null : mutableInfo[propertyIndex];
-  }
+  MutableValueInfo mutableInfo(int propertyIndex);
 
   /**
    * Set the MutableValueInfo for the given property.
    */
-  public void mutableInfo(int propertyIndex, MutableValueInfo info) {
-    if (mutableInfo == null) {
-      mutableInfo = new MutableValueInfo[flags.length];
-    }
-    flags[propertyIndex] |= FLAG_MUTABLE_HASH_SET;
-    mutableInfo[propertyIndex] = info;
-  }
+  void mutableInfo(int propertyIndex, MutableValueInfo info);
 
   /**
    * Dirty detection set the next mutable property content and info .
@@ -1214,22 +513,10 @@ public final class EntityBeanIntercept implements Serializable {
    * We only want to perform the json serialisation once so storing it here as part of
    * dirty detection so that we can get it back to bind in insert or update etc.
    */
-  public void mutableNext(int propertyIndex, MutableValueNext next) {
-    if (mutableNext == null) {
-      mutableNext = new MutableValueNext[flags.length];
-    }
-    mutableNext[propertyIndex] = next;
-  }
+  void mutableNext(int propertyIndex, MutableValueNext next);
 
   /**
    * Update the 'next' mutable info returning the content that was obtained via dirty detection.
    */
-  public String mutableNext(int propertyIndex) {
-    if (mutableNext == null) {
-      return null;
-    }
-    final MutableValueNext next = mutableNext[propertyIndex];
-    return next != null ? next.content() : null;
-  }
-
+  String mutableNext(int propertyIndex);
 }

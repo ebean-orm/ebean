@@ -80,7 +80,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:12.15.0</tile>
+            <tile>io.ebean.tile:enhancement:13.0.1-RC1</tile>
           </tiles>
         </configuration>
       </plugin>

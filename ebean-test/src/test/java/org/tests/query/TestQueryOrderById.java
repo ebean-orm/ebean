@@ -5,11 +5,15 @@ import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
+
+import java.util.List;
 
 public class TestQueryOrderById extends BaseTestCase {
 
   @Test
   public void orderById_default_expectNotOrderById() {
+    ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
       .select("id,name")
@@ -17,7 +21,8 @@ public class TestQueryOrderById extends BaseTestCase {
       .setFirstRow(1)
       .setMaxRows(5);
 
-    query.findList();
+    query.setReadOnly(true).setDisableLazyLoading(true);
+    List<Customer> list = query.findList();
     if (isSqlServer() || isDb2()) {
       assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");
     } else if (!isOracle()) {
