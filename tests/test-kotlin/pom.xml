@@ -19,7 +19,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <ebean-maven-plugin.version>12.14.1</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>13.0.1-RC1</ebean-maven-plugin.version>
     <kotlin.version>1.6.0</kotlin.version>
     <jackson.version>2.12.1</jackson.version>
     <maven.deploy.skip>true</maven.deploy.skip>
