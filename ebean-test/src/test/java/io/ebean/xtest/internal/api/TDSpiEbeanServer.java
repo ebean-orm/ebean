@@ -654,11 +654,6 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
-    return null;
-  }
-
-  @Override
   public <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction) {
   }
 

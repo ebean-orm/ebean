@@ -38,27 +38,6 @@ public class TestQueryFindStream extends BaseTestCase {
   }
 
   @Test
-  public void findLargeStream_basic() {
-    ResetBasicData.reset();
-    try (Stream<Customer> stream = DB.find(Customer.class)
-      .findLargeStream()) {
-
-      // bad example, don't use a stream like this when we can
-      // use findSingleAttributeList() instead
-      final List<String> namesStream = stream
-        .map(Customer::getName)
-        .collect(toList());
-
-      final List<String> namesQuery = DB.find(Customer.class)
-        .select("name")
-        .findSingleAttributeList();
-
-      assertThat(namesStream).hasSize(namesQuery.size());
-      assertThat(namesStream).containsAll(namesQuery);
-    }
-  }
-
-  @Test
   public void manualTest_findSteam_when_closeWithResources() {
     // confirm manually the stream is closed via try with resources block
     try (Stream<Customer> stream = DB.find(Customer.class).findStream()) {
