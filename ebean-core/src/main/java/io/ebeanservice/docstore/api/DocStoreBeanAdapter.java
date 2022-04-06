@@ -54,14 +54,13 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
   /**
    * Return the index type for this bean type.
    */
-  @Override
-  String getIndexType();
+  String indexType();
 
   /**
    * Return the index name for this bean type.
    */
   @Override
-  String getIndexName();
+  String indexName();
 
   /**
    * Process a delete by id of a given document.
