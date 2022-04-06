@@ -496,18 +496,8 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public SqlQuery createSqlQuery(String sql) {
-    return sqlQuery(sql);
-  }
-
-  @Override
   public SqlUpdate sqlUpdate(String sql) {
     return null;
-  }
-
-  @Override
-  public SqlUpdate createSqlUpdate(String sql) {
-    return sqlUpdate(sql);
   }
 
   @Override
