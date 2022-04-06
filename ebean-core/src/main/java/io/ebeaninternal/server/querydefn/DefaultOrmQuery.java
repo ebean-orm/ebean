@@ -1457,11 +1457,6 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
-  public Stream<T> findLargeStream() {
-    return server.findLargeStream(this, transaction);
-  }
-
-  @Override
   public List<Version<T>> findVersions() {
     this.temporalMode = TemporalMode.VERSIONS;
     return server.findVersions(this, transaction);

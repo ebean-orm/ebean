@@ -1377,11 +1377,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
-    return findStream(query, transaction);
-  }
-
-  @Override
   public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
     return toStream(findIterate(query, transaction));
   }

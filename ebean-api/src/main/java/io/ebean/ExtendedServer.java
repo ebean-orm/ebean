@@ -113,19 +113,6 @@ public interface ExtendedServer {
   <T> Stream<T> findStream(Query<T> query, Transaction transaction);
 
   /**
-   * Deprecated - migrate to findStream().
-   * <p>
-   * Execute the query returning the result as a Stream.
-   * <p>
-   * Note that this can support very large queries iterating any number of results.
-   * To do so internally it can use multiple persistence contexts.
-   * <p>
-   * Note that the stream needs to be closed so use with try with resources.
-   */
-  @Deprecated
-  <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction);
-
-  /**
    * Execute the query visiting the each bean one at a time.
    * <p>
    * Unlike findList() this is suitable for processing a query that will return
