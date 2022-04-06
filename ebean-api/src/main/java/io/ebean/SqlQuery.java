@@ -75,18 +75,6 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   SqlRow findOne();
 
   /**
-   * Deprecated migrate to use {@link #mapTo(RowMapper)}
-   */
-  @Deprecated
-  <T> T findOne(RowMapper<T> mapper);
-
-  /**
-   * Deprecated migrate to use {@link #mapTo(RowMapper)}
-   */
-  @Deprecated
-  <T> List<T> findList(RowMapper<T> mapper);
-
-  /**
    * Execute the query reading each row from ResultSet using the RowConsumer.
    * <p>
    * This provides a low level option that reads directly from the JDBC ResultSet
@@ -122,50 +110,6 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   Optional<SqlRow> findOneOrEmpty();
 
   /**
-   * Deprecated - migrate to <code>.mapToScalar(attributeType).findOne()</code>.
-   * <pre>{@code
-   *
-   *    .mapToScalar(BigDecimal.class)
-   *    .findOne();
-   * }
-   */
-  @Deprecated
-  <T> T findSingleAttribute(Class<T> attributeType);
-
-  /**
-   * Deprecated - migrate to <code>.mapToScalar(BigDecimal.class).findOne()</code>.
-   * <pre>{@code
-   *
-   *    .mapToScalar(BigDecimal.class)
-   *    .findOne();
-   * }
-   */
-  @Deprecated
-  BigDecimal findSingleDecimal();
-
-  /**
-   * Deprecated - migrate to <code>.mapToScalar(Long.class).findOne()</code>.
-   * <pre>{@code
-   *
-   *    .mapToScalar(Long.class)
-   *    .findOne();
-   * }
-   */
-  @Deprecated
-  Long findSingleLong();
-
-  /**
-   * Deprecated - migrate to <code>.mapToScalar(Long.class).findList()</code>.
-   * <pre>{@code
-   *
-   *    .mapToScalar(Long.class)
-   *    .findList();
-   * }
-   */
-  @Deprecated
-  <T> List<T> findSingleAttributeList(Class<T> attributeType);
-
-  /**
    * Set one of more positioned parameters.
    * <p>
    * This is a convenient alternative to multiple calls to {@link #setParameter(Object)}.
@@ -193,12 +137,6 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * }</pre>
    */
   SqlQuery setParameters(Object... values);
-
-  /**
-   * Deprecated migrate to setParameters(Object... values)
-   */
-  @Deprecated
-  SqlQuery setParams(Object... values);
 
   /**
    * Set the next bind parameter by position.
