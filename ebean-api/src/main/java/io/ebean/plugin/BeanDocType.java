@@ -16,28 +16,12 @@ public interface BeanDocType<T> {
   /**
    * Return the doc store index type for this bean type.
    */
-  default String indexType() {
-    return getIndexType();
-  }
-
-  /**
-   * Deprecated migrate to indexType().
-   */
-  @Deprecated
-  String getIndexType();
+  String indexType();
 
   /**
    * Return the doc store index name for this bean type.
    */
-  default String indexName() {
-    return getIndexName();
-  }
-
-  /**
-   * Deprecated migrate to indexName().
-   */
-  @Deprecated
-  String getIndexName();
+  String indexName();
 
   /**
    * Apply the appropriate fetch path to the query such that the query returns beans matching
@@ -48,29 +32,13 @@ public interface BeanDocType<T> {
   /**
    * Return the FetchPath for the embedded document.
    */
-  default FetchPath embedded(String path) {
-    return getEmbedded(path);
-  }
-
-  /**
-   * Deprecated migrate to embedded().
-   */
-  @Deprecated
-  FetchPath getEmbedded(String path);
+  FetchPath embedded(String path);
 
   /**
    * For embedded 'many' properties we need a FetchPath relative to the root which is used to
    * build and replace the embedded list.
    */
-  default FetchPath embeddedManyRoot(String path) {
-    return getEmbeddedManyRoot(path);
-  }
-
-  /**
-   * Deprecated migrate to embeddedManyRoot().
-   */
-  @Deprecated
-  FetchPath getEmbeddedManyRoot(String path);
+  FetchPath embeddedManyRoot(String path);
 
   /**
    * Return a 'raw' property mapped for the given property.

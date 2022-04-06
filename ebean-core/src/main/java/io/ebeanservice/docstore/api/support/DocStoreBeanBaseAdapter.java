@@ -102,7 +102,6 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   private boolean registerPaths;
 
   public DocStoreBeanBaseAdapter(BeanDescriptor<T> desc, DeployBeanDescriptor<T> deploy) {
-
     this.desc = desc;
     this.server = desc.ebeanServer();
     this.mapped = deploy.isDocStoreMapped();
@@ -123,7 +122,6 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   @Override
   public DocumentMapping createDocMapping() {
-
     if (documentMapping != null) {
       return documentMapping;
     }
@@ -143,12 +141,12 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
-  public String getIndexType() {
+  public String indexType() {
     return indexType;
   }
 
   @Override
-  public String getIndexName() {
+  public String indexName() {
     return indexName;
   }
 
@@ -159,7 +157,6 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   @Override
   public String rawProperty(String property) {
-
     String rawProperty = sortableMap.get(property);
     return rawProperty == null ? property : rawProperty;
   }
@@ -192,7 +189,6 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    */
   @Override
   public void registerInvalidationPath(String queueId, String path, Set<String> properties) {
-
     if (!mapped) {
       if (update == DocStoreMode.IGNORE) {
         // bean type not mapped but is included as nested document
@@ -207,7 +203,6 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * Return the DsInvalidationListener based on the properties, path.
    */
   protected DocStoreEmbeddedInvalidation getEmbeddedInvalidation(String queueId, String path, Set<String> properties) {
-
     if (properties.contains("*")) {
       return new DocStoreEmbeddedInvalidation(queueId, path);
     } else {
@@ -245,19 +240,15 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
    * This can add derived/embedded/nested parts to the document.
    */
   protected DocStructure derivePathProperties(PathProperties pathProps) {
-
     boolean includeByDefault = (pathProps == null);
     if (pathProps == null) {
       pathProps = new PathProperties();
     }
-
     return getDocStructure(pathProps, includeByDefault);
   }
 
   protected DocStructure getDocStructure(PathProperties pathProps, final boolean includeByDefault) {
-
     final DocStructure docStructure = new DocStructure(pathProps);
-
     BeanProperty[] properties = desc.propertiesNonTransient();
     for (BeanProperty property : properties) {
       property.docStoreInclude(includeByDefault, docStructure);
@@ -271,17 +262,16 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
         }
       });
     }
-
     return docStructure;
   }
 
   @Override
-  public FetchPath getEmbedded(String path) {
+  public FetchPath embedded(String path) {
     return docStructure.getEmbedded(path);
   }
 
   @Override
-  public FetchPath getEmbeddedManyRoot(String path) {
+  public FetchPath embeddedManyRoot(String path) {
     return docStructure.getEmbeddedManyRoot(path);
   }
 
@@ -297,7 +287,6 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   @Override
   public DocStoreMode getMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
-
     if (txnMode == null) {
       return getMode(persistType);
     } else if (txnMode == DocStoreMode.IGNORE) {
