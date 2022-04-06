@@ -132,14 +132,6 @@ public final class DB {
   }
 
   /**
-   * Deprecated migrate to expressionFactory().
-   */
-  @Deprecated
-  public static ExpressionFactory getExpressionFactory() {
-    return expressionFactory();
-  }
-
-  /**
    * Return the next identity value for a given bean type.
    * <p>
    * This will only work when a IdGenerator is on this bean type such as a DB
@@ -662,14 +654,6 @@ public final class DB {
   }
 
   /**
-   * Deprecated migrate to beanId().
-   */
-  @Deprecated
-  public static <T> T getReference(Class<T> beanType, Object id) {
-    return reference(beanType, id);
-  }
-
-  /**
    * Sort the list using the sortByClause which can contain a comma delimited
    * list of property names and keywords asc, desc, nullsHigh and nullsLow.
    * <ul>
@@ -776,16 +760,6 @@ public final class DB {
   }
 
   /**
-   * Deprecated - migrate to sqlQuery().
-   * <p>
-   * This is an alias for {@link #sqlQuery(String)}.
-   */
-  @Deprecated
-  public static SqlQuery createSqlQuery(String sql) {
-    return sqlQuery(sql);
-  }
-
-  /**
    * Look to execute a native sql insert update or delete statement.
    * <p>
    * Use this to execute a Insert Update or Delete statement. The statement will
@@ -800,16 +774,6 @@ public final class DB {
    */
   public static SqlUpdate sqlUpdate(String sql) {
     return getDefault().sqlUpdate(sql);
-  }
-
-  /**
-   * Deprecated - migrate to sqlUpdate().
-   * <p>
-   * This is an alias for {@link #sqlUpdate(String)}.
-   */
-  @Deprecated
-  public static SqlUpdate createSqlUpdate(String sql) {
-    return sqlUpdate(sql);
   }
 
   /**
@@ -1173,26 +1137,10 @@ public final class DB {
   }
 
   /**
-   * Deprecated migrate to beanState().
-   */
-  @Deprecated
-  public static BeanState getBeanState(Object bean) {
-    return beanState(bean);
-  }
-
-  /**
    * Return the value of the Id property for a given bean.
    */
   public static Object beanId(Object bean) {
     return getDefault().beanId(bean);
-  }
-
-  /**
-   * Deprecated migrate to beanId().
-   */
-  @Deprecated
-  public static Object getBeanId(Object bean) {
-    return beanId(bean);
   }
 
   /**
@@ -1211,14 +1159,6 @@ public final class DB {
   }
 
   /**
-   * Deprecated migrate to cacheManager().
-   */
-  @Deprecated
-  public static ServerCacheManager getServerCacheManager() {
-    return getDefault().cacheManager();
-  }
-
-  /**
    * Return the manager of the level 2 cache ("L2" cache).
    */
   public static ServerCacheManager cacheManager() {
@@ -1231,14 +1171,6 @@ public final class DB {
    */
   public static BackgroundExecutor backgroundExecutor() {
     return getDefault().backgroundExecutor();
-  }
-
-  /**
-   * Deprecated migrate to backgroundExecutor().
-   */
-  @Deprecated
-  public static BackgroundExecutor getBackgroundExecutor() {
-    return backgroundExecutor();
   }
 
   /**
