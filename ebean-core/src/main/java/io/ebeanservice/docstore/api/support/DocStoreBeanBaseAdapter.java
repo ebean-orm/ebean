@@ -266,7 +266,7 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
   }
 
   @Override
-  public FetchPath getEmbedded(String path) {
+  public FetchPath embedded(String path) {
     return docStructure.getEmbedded(path);
   }
 

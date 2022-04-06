@@ -32,15 +32,7 @@ public interface BeanDocType<T> {
   /**
    * Return the FetchPath for the embedded document.
    */
-  default FetchPath embedded(String path) {
-    return getEmbedded(path);
-  }
-
-  /**
-   * Deprecated migrate to embedded().
-   */
-  @Deprecated
-  FetchPath getEmbedded(String path);
+  FetchPath embedded(String path);
 
   /**
    * For embedded 'many' properties we need a FetchPath relative to the root which is used to
