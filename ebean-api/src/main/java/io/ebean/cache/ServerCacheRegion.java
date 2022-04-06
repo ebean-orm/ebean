@@ -11,14 +11,6 @@ public interface ServerCacheRegion {
   String name();
 
   /**
-   * Deprecated migrate to name().
-   */
-  @Deprecated
-  default String getName() {
-    return name();
-  }
-
-  /**
    * Return true if the cache region is enabled.
    */
   boolean isEnabled();
