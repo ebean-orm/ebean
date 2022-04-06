@@ -75,38 +75,14 @@ public interface BeanState {
   Set<String> loadedProps();
 
   /**
-   * Deprecated migrate to loadedProps().
-   */
-  @Deprecated
-  default Set<String> getLoadedProps() {
-    return loadedProps();
-  }
-
-  /**
    * Return the set of changed properties.
    */
   Set<String> changedProps();
 
   /**
-   * Deprecated migrate to changedProps().
-   */
-  @Deprecated
-  default Set<String> getChangedProps() {
-    return changedProps();
-  }
-
-  /**
    * Return a map of the updated properties and their new and old values.
    */
   Map<String, ValuePair> dirtyValues();
-
-  /**
-   * Deprecated migrate to dirtyValues().
-   */
-  @Deprecated
-  default Map<String, ValuePair> getDirtyValues() {
-    return dirtyValues();
-  }
 
   /**
    * Return true if the bean is readOnly.
@@ -140,23 +116,8 @@ public interface BeanState {
   Map<String, Exception> loadErrors();
 
   /**
-   * Deprecated migrate to loadErrors().
-   */
-  @Deprecated
-  default Map<String, Exception> getLoadErrors() {
-    return loadErrors();
-  }
-
-  /**
    * Return the sort order value for an order column.
    */
   int sortOrder();
 
-  /**
-   * Deprecated migrate to sortOrder().
-   */
-  @Deprecated
-  default int getSortOrder() {
-    return sortOrder();
-  }
 }
