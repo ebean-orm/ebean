@@ -26,25 +26,10 @@ public class QueryPlanCapture {
   }
 
   /**
-   * Deprecated migrate to database().
-   */
-  @Deprecated
-  public Database getDatabase() {
-    return database;
-  }
-
-  /**
    * Return the captured query plans.
    */
   public List<MetaQueryPlan> plans() {
     return plans;
   }
 
-  /**
-   * Deprecated migrate to plans().
-   */
-  @Deprecated
-  public List<MetaQueryPlan> getPlans() {
-    return plans;
-  }
 }
