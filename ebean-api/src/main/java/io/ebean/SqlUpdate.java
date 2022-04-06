@@ -288,23 +288,11 @@ public interface SqlUpdate {
   SqlUpdate setParameters(Object... values);
 
   /**
-   * Deprecated migrate to setParameters(Object... values).
-   */
-  @Deprecated
-  SqlUpdate setParams(Object... values);
-
-  /**
    * Set the next bind parameter by position.
    *
    * @param value The value to bind
    */
   SqlUpdate setParameter(Object value);
-
-  /**
-   * Deprecated migrate to setParameter(value).
-   */
-  @Deprecated
-  SqlUpdate setNextParameter(Object value);
 
   /**
    * Set a parameter via its index position.
