@@ -93,7 +93,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.0.0</tile>
+            <tile>io.ebean.tile:enhancement:13.1.0</tile>
           </tiles>
         </configuration>
       </plugin>
