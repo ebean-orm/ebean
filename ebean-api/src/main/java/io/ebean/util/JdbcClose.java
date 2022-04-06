@@ -11,7 +11,7 @@ import java.sql.Statement;
 /**
  * Utility for closing raw Jdbc resources.
  */
-public class JdbcClose {
+public final class JdbcClose {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean");
 

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 /**
  * Utility String class that supports String manipulation functions.
  */
-public class StringHelper {
+public final class StringHelper {
 
   private static final Pattern SPLIT_NAMES = Pattern.compile("[\\s,;]+");
 

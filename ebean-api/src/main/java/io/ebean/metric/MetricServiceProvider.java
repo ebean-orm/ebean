@@ -6,7 +6,7 @@ import java.util.ServiceLoader;
 /**
  * Lookup MetricFactory service.
  */
-class MetricServiceProvider {
+final class MetricServiceProvider {
 
   private static final MetricFactory metricFactory = init();
 

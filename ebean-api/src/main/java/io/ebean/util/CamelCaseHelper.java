@@ -1,6 +1,6 @@
 package io.ebean.util;
 
-public class CamelCaseHelper {
+public final class CamelCaseHelper {
 
   /**
    * To underscore from camel case using digits compressed true and force upper case false.

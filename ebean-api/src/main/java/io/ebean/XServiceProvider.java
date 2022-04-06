@@ -11,7 +11,7 @@ import java.util.ServiceLoader;
 /**
  * Lookup internal services.
  */
-class XServiceProvider {
+final class XServiceProvider {
 
   private static SpiRawSqlService rawSqlService = initRawSql();
 
