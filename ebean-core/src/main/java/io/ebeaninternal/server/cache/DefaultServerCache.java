@@ -85,7 +85,7 @@ public class DefaultServerCache implements ServerCache {
   }
 
   @Override
-  public ServerCacheStatistics getStatistics(boolean reset) {
+  public ServerCacheStatistics statistics(boolean reset) {
     ServerCacheStatistics cacheStats = new ServerCacheStatistics();
     cacheStats.setCacheName(name);
     cacheStats.setMaxSize(maxSize);
@@ -114,7 +114,7 @@ public class DefaultServerCache implements ServerCache {
   }
 
   @Override
-  public int getHitRatio() {
+  public int hitRatio() {
     long mc = missCount.get(false);
     long hc = hitCount.get(false);
     long totalCount = hc + mc;

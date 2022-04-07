@@ -69,13 +69,13 @@ public final class TenantAwareCache implements ServerCache {
   }
 
   @Override
-  public int getHitRatio() {
-    return delegate.getHitRatio();
+  public int hitRatio() {
+    return delegate.hitRatio();
   }
 
   @Override
-  public ServerCacheStatistics getStatistics(boolean reset) {
-    return delegate.getStatistics(reset);
+  public ServerCacheStatistics statistics(boolean reset) {
+    return delegate.statistics(reset);
   }
 
   @Override
