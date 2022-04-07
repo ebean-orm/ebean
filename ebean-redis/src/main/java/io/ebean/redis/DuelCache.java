@@ -141,18 +141,4 @@ public final class DuelCache implements ServerCache, NearCacheInvalidate {
     return remote.getMissCount();
   }
 
-  @Override
-  public int size() {
-    return 0;
-  }
-
-  @Override
-  public int getHitRatio() {
-    return 0;
-  }
-
-  @Override
-  public ServerCacheStatistics getStatistics(boolean reset) {
-    return null;
-  }
 }

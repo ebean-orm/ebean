@@ -45,7 +45,7 @@ class TenantAwareCacheTest {
 
   @Test
   void putAll_getAll_removeAll() {
-    Map<Object,Object> map = new HashMap<>();
+    Map<Object, Object> map = new HashMap<>();
     map.put("A", "a");
     map.put("B", "b");
     map.put("C", "c");
@@ -109,14 +109,5 @@ class TenantAwareCacheTest {
       return map.size();
     }
 
-    @Override
-    public int getHitRatio() {
-      return 0;
-    }
-
-    @Override
-    public ServerCacheStatistics getStatistics(boolean reset) {
-      return null;
-    }
   }
 }
