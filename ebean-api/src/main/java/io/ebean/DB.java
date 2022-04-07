@@ -22,10 +22,9 @@ import java.util.concurrent.Callable;
  * DB additionally provides a convenient way to use the 'default' Database.
  * <p>
  * <h3>Default database</h3>
- * <p>
  * One of the Database instances can be registered as the "default database"
  * and can be obtained using <code>DB.getDefault()</code>
- * </p>
+ *
  * <pre>{@code
  *
  * Database database = DB.getDefault();
@@ -36,7 +35,7 @@ import java.util.concurrent.Callable;
  * <p>
  * Multiple database instances can be registered with DB and we can obtain them
  * using <code>DB.byName()</code>
- * </p>
+ *
  * <pre>{@code
  *
  * Database hrDatabase = DB.byName("hr");
@@ -47,7 +46,6 @@ import java.util.concurrent.Callable;
  * <p>
  * DB has methods like {@link #find(Class)} and {@link #save(Object)} which are
  * just convenience for using the default database.
- * </p>
  *
  * <pre>{@code
  *
@@ -117,15 +115,12 @@ public final class DB {
    * build the WHERE and HAVING clauses. Alternatively you can use the
    * ExpressionFactory directly to create expressions to add to the query where
    * clause.
-   * </p>
    * <p>
    * Alternatively you can use the {@link Expr} as a shortcut to the
    * ExpressionFactory of the 'Default' database.
-   * </p>
    * <p>
    * You generally need to the an ExpressionFactory (or {@link Expr}) to build
    * an expression that uses OR like Expression e = Expr.or(..., ...);
-   * </p>
    */
   public static ExpressionFactory expressionFactory() {
     return getDefault().expressionFactory();
@@ -136,12 +131,10 @@ public final class DB {
    * <p>
    * This will only work when a IdGenerator is on this bean type such as a DB
    * sequence or UUID.
-   * </p>
    * <p>
    * For DB's supporting getGeneratedKeys and sequences such as Oracle10 you do
    * not need to use this method generally. It is made available for more
    * complex cases where it is useful to get an ID prior to some processing.
-   * </p>
    */
   public static Object nextId(Class<?> beanType) {
     return getDefault().nextId(beanType);
@@ -151,17 +144,14 @@ public final class DB {
    * Start a transaction with 'REQUIRED' semantics.
    * <p>
    * With REQUIRED semantics if an active transaction already exists that transaction will be used.
-   * </p>
    * <p>
    * The transaction is stored in a ThreadLocal variable and typically you only
    * need to use the returned Transaction <em>IF</em> you wish to do things like
    * use batch mode, change the transaction isolation level, use savepoints or
    * log comments to the transaction log.
-   * </p>
    * <p>
-   * Example of using a transaction to span multiple calls to find(), save()
-   * etc.
-   * </p>
+   * Example of using a transaction to span multiple calls to find(), save() etc.
+   *
    * <pre>{@code
    *
    *   try (Transaction transaction = DB.beginTransaction()) {
@@ -179,7 +169,6 @@ public final class DB {
    * With Database we can pass the transaction to the various find(), save() and execute()
    * methods. This gives us the ability to create the transactions externally from Ebean
    * and use the transaction explicitly via the various methods available on Database.
-   * </p>
    */
   public static Transaction beginTransaction() {
     return getDefault().beginTransaction();
@@ -191,7 +180,6 @@ public final class DB {
    * You will want to do this if you want multiple Transactions in a single
    * thread or generally use transactions outside of the TransactionThreadLocal
    * management.
-   * </p>
    */
   public static Transaction createTransaction() {
     return getDefault().createTransaction();
@@ -211,7 +199,6 @@ public final class DB {
    * <p>
    * Note that this provides an try finally alternative to using {@link #executeCall(TxScope, Callable)} or
    * {@link #execute(TxScope, Runnable)}.
-   * </p>
    * <p>
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
@@ -270,7 +257,7 @@ public final class DB {
 
   /**
    * Register a TransactionCallback on the currently active transaction.
-   * <p/>
+   * <p>
    * If there is no currently active transaction then a PersistenceException is thrown.
    *
    * @param transactionCallback the transaction callback to be registered with the current transaction
@@ -299,14 +286,12 @@ public final class DB {
    * rollback the transaction.
    * <p>
    * It is preferable to use <em>try with resources</em> rather than this.
-   * </p>
    * <p>
    * Useful to put in a finally block to ensure the transaction is ended, rather
    * than a rollbackTransaction() in each catch block.
-   * </p>
    * <p>
    * Code example:
-   * </p>
+   *
    * <pre>{@code
    *   DB.beginTransaction();
    *   try {
@@ -337,7 +322,6 @@ public final class DB {
    * <p>
    * When null is passed in for b, then the 'OldValues' of a is used for the
    * difference comparison.
-   * </p>
    */
   public static Map<String, ValuePair> diff(Object a, Object b) {
     return getDefault().diff(a, b);
@@ -348,18 +332,15 @@ public final class DB {
    * <p>
    * If there is no current transaction one will be created and committed for
    * you automatically.
-   * </p>
    * <p>
    * Save can cascade along relationships. For this to happen you need to
    * specify a cascade of CascadeType.ALL or CascadeType.PERSIST on the
    * OneToMany, OneToOne or ManyToMany annotation.
-   * </p>
    * <p>
    * When a save cascades via a OneToMany or ManyToMany Ebean will automatically
    * set the 'parent' object to the 'detail' object. In the example below in
    * saving the order and cascade saving the order details the 'parent' order
    * will be set against each order detail when it is saved.
-   * </p>
    */
   public static void save(Object bean) throws OptimisticLockException {
     getDefault().save(bean);
@@ -410,11 +391,9 @@ public final class DB {
    * <b>Stateless updates:</b> Note that the bean does not have to be previously fetched to call
    * update().You can create a new instance and set some of its properties programmatically for via
    * JSON/XML marshalling etc. This is described as a 'stateless update'.
-   * </p>
    * <p>
    * <b>Optimistic Locking: </b> Note that if the version property is not set when update() is
    * called then no optimistic locking is performed (internally ConcurrencyMode.NONE is used).
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -531,20 +510,16 @@ public final class DB {
    * Delete the bean.
    * <p>
    * This will return true if the bean was deleted successfully or JDBC batch is being used.
-   * </p>
    * <p>
    * If there is no current transaction one will be created and committed for
    * you automatically.
-   * </p>
    * <p>
    * If the bean is configured with <code>@SoftDelete</code> then this will perform a soft
    * delete rather than a hard/permanent delete.
-   * </p>
    * <p>
    * If the Bean does not have a version property (or loaded version property) and
    * the bean does not exist then this returns false indicating that nothing was
    * deleted. Note that, if JDBC batch mode is used then this always returns true.
-   * </p>
    */
   public static boolean delete(Object bean) throws OptimisticLockException {
     return getDefault().delete(bean);
@@ -604,7 +579,6 @@ public final class DB {
    * <p>
    * Note that this resets OneToMany and ManyToMany properties so that if they
    * are accessed a lazy load will refresh the many property.
-   * </p>
    */
   public static void refresh(Object bean) {
     getDefault().refresh(bean);
@@ -612,6 +586,7 @@ public final class DB {
 
   /**
    * Refresh a 'many' property of a bean.
+   *
    * <pre>{@code
    *
    *   Order order = ...;
@@ -632,7 +607,7 @@ public final class DB {
    * Get a reference object.
    * <p>
    * This is sometimes described as a proxy (with lazy loading).
-   * </p>
+   *
    * <pre>{@code
    *
    *   Product product = DB.getReference(Product.class, 1);
@@ -668,7 +643,7 @@ public final class DB {
    * <p>
    * Note that the sorting uses a Comparator and Collections.sort(); and does
    * not invoke a DB query.
-   * </p>
+   *
    * <pre>{@code
    *
    *   // find orders and their customers
@@ -703,9 +678,8 @@ public final class DB {
    *
    * }</pre>
    * <p>
-   * If you want more control over the query then you can use createQuery() and
-   * Query.findOne();
-   * </p>
+   * If you want more control over the query then you can use createQuery() and Query.findOne();
+   *
    * <pre>{@code
    *
    *   // ... additionally fetching customer, customer shipping address,
@@ -745,15 +719,12 @@ public final class DB {
   }
 
   /**
-   * Look to execute a native sql query that does not returns beans but instead
-   * returns SqlRow or direct access to ResultSet (see {@link SqlQuery#findList(RowMapper)}.
-   *
+   * Look to execute a native sql query that does not return beans but instead
+   * returns SqlRow or uses {@link RowMapper}.
    * <p>
    * Refer to {@link DtoQuery} for native sql queries returning DTO beans.
-   * </p>
    * <p>
    * Refer to {@link #findNative(Class, String)} for native sql queries returning entity beans.
-   * </p>
    */
   public static SqlQuery sqlQuery(String sql) {
     return getDefault().sqlQuery(sql);
@@ -764,11 +735,9 @@ public final class DB {
    * <p>
    * Use this to execute a Insert Update or Delete statement. The statement will
    * be native to the database and contain database table and column names.
-   * </p>
    *
    * <p>
    * See {@link SqlUpdate} for example usage.
-   * </p>
    *
    * @return The SqlUpdate instance to set parameters and execute
    */
@@ -792,10 +761,9 @@ public final class DB {
    * <p>
    * The orm update differs from the sql update in that it you can use the bean
    * name and bean property names rather than table and column names.
-   * </p>
    * <p>
    * An example:
-   * </p>
+   *
    * <pre>{@code
    *
    *   // The bean name and properties - "topic","postCount" and "id"
@@ -828,7 +796,6 @@ public final class DB {
    * Create a named query.
    * <p>
    * For RawSql the named query is expected to be in ebean.xml.
-   * </p>
    *
    * @param beanType   The type of entity bean
    * @param namedQuery The name of the query
@@ -844,15 +811,12 @@ public final class DB {
    * <p>
    * You can use the methods on the Query object to specify fetch paths,
    * predicates, order by, limits etc.
-   * </p>
    * <p>
    * You then use findList(), findSet(), findMap() and findOne() to execute
    * the query and return the collection or bean.
-   * </p>
    * <p>
    * Note that a query executed by {@link Query#findList()} etc will execute against
    * the same database from which is was created.
-   * </p>
    *
    * @param beanType the class of entity to be fetched
    * @return A ORM Query for this beanType
@@ -904,7 +868,6 @@ public final class DB {
    * This is actually the same as {@link #createQuery(Class)}. The reason it
    * exists is that people used to JPA will probably be looking for a
    * createQuery method (the same as entityManager).
-   * </p>
    *
    * @param beanType the type of entity bean to find
    * @return A ORM Query object for this beanType
@@ -917,7 +880,7 @@ public final class DB {
    * Create a query using native SQL.
    * <p>
    * The native SQL can contain named parameters or positioned parameters.
-   * </p>
+   *
    * <pre>{@code
    *
    *   String sql = "select c.id, c.name from customer c where c.name like ? order by c.name";
@@ -942,7 +905,6 @@ public final class DB {
    * <p>
    * DTO beans are just normal bean like classes with public constructor(s) and setters.
    * They do not need to be registered with Ebean before use.
-   * </p>
    *
    * @param dtoType The type of the DTO bean the rows will be mapped into.
    * @param sql     The SQL query to execute.
@@ -979,10 +941,8 @@ public final class DB {
    * going back to the database.
    * <p>
    * This produces and returns a new list with the sort and filters applied.
-   * </p>
    * <p>
    * Refer to {@link Filter} for an example of its use.
-   * </p>
    */
   public static <T> Filter<T> filter(Class<T> beanType) {
     return getDefault().filter(beanType);
@@ -993,7 +953,7 @@ public final class DB {
    * <p>
    * The scope can control the transaction type, isolation and rollback
    * semantics.
-   * </p>
+   *
    * <pre>{@code
    *
    * // set specific transactional scope settings
@@ -1017,7 +977,7 @@ public final class DB {
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
-   * </p>
+   *
    * <pre>{@code
    *
    * DB.execute(() -> {
@@ -1042,7 +1002,7 @@ public final class DB {
    * <p>
    * The scope can control the transaction type, isolation and rollback
    * semantics.
-   * </p>
+   *
    * <pre>{@code
    *
    * // set specific transactional scope settings
@@ -1066,11 +1026,10 @@ public final class DB {
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
-   * </p>
    * <p>
    * This is basically the same as TxRunnable except that it returns an Object
    * (and you specify the return type via generics).
-   * </p>
+   *
    * <pre>{@code
    *
    * DB.executeCall(() -> {
@@ -1099,23 +1058,19 @@ public final class DB {
    * <p>
    * If you use DB.execute(UpdateSql) then the table modification information
    * is automatically deduced and you do not need to call this method yourself.
-   * </p>
    * <p>
    * This information is used to invalidate objects out of the cache and
    * potentially text indexes. This information is also automatically broadcast
    * across the cluster.
-   * </p>
    * <p>
    * If there is a transaction then this information is placed into the current
    * transactions event information. When the transaction is committed this
    * information is registered (with the transaction manager). If this
    * transaction is rolled back then none of the transaction event information
    * registers including the information you put in via this method.
-   * </p>
    * <p>
    * If there is NO current transaction when you call this method then this
    * information is registered immediately (with the transaction manager).
-   * </p>
    *
    * @param tableName the name of the table that was modified
    * @param inserts   true if rows where inserted into the table
@@ -1130,7 +1085,6 @@ public final class DB {
    * Return the BeanState for a given entity bean.
    * <p>
    * This will return null if the bean is not an enhanced entity bean.
-   * </p>
    */
   public static BeanState beanState(Object bean) {
     return getDefault().beanState(bean);
