@@ -41,7 +41,7 @@ final class DefaultServerCacheFactory implements ServerCacheFactory {
     if (executor != null) {
       cache.periodicTrim(executor);
     }
-    return cache;
+    return config.tenantAware(cache);
   }
 
   @Override

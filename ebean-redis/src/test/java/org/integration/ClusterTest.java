@@ -40,14 +40,14 @@ public class ClusterTest {
     foo.save();
 
     DB.cacheManager().clearAll();
-    DB.getDefault().metaInfo().resetAllMetrics();
+    db.metaInfo().resetAllMetrics();
     other.metaInfo().resetAllMetrics();
 
     Person fooA = DB.find(Person.class, foo.getId());
     allowAsyncMessaging(); // allow time for background cache load
     Person fooB = other.find(Person.class, foo.getId());
 
-    DuelCache dualCacheA = (DuelCache) DB.cacheManager().beanCache(Person.class);
+    DuelCache dualCacheA = db.cacheManager().beanCache(Person.class).unwrap(DuelCache.class);
     assertCounts(dualCacheA, 0, 1, 0, 1);
     fooA = DB.find(Person.class, foo.getId());
     assertCounts(dualCacheA, 1, 1, 0, 1);
@@ -55,7 +55,7 @@ public class ClusterTest {
     fooA = DB.find(Person.class, foo.getId());
     assertCounts(dualCacheA, 2, 1, 0, 1);
     fooB = other.find(Person.class, foo.getId());
-    DuelCache dualCacheB = (DuelCache) other.cacheManager().beanCache(Person.class);
+    DuelCache dualCacheB = other.cacheManager().beanCache(Person.class).unwrap(DuelCache.class);
     assertCounts(dualCacheB, 2, 1, 1, 0);
   }
 
@@ -73,7 +73,7 @@ public class ClusterTest {
     other.cacheManager().clearAll();
     other.metaInfo().resetAllMetrics();
 
-    DuelCache dualCache = (DuelCache) other.cacheManager().beanCache(Person.class);
+    DuelCache dualCache = other.cacheManager().beanCache(Person.class).unwrap(DuelCache.class);
 
     Person foo0 = other.find(Person.class, 1);
     assertCounts(dualCache, 0, 1, 0, 1);

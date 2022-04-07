@@ -48,7 +48,6 @@ final class DCountMetric implements CountMetric {
 
   @Override
   public void visit(MetricVisitor visitor) {
-
     long val = visitor.reset() ? count.sumThenReset() : count.sum();
     if (val > 0) {
       visitor.visitCount(new DCountMetricStats(name, val));
