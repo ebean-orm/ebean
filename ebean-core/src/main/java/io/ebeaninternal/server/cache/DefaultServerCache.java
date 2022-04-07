@@ -3,7 +3,6 @@ package io.ebeaninternal.server.cache;
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import io.ebean.cache.TenantAwareKey;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
 import io.ebean.metric.MetricFactory;
@@ -12,11 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.ref.SoftReference;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
