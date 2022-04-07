@@ -27,8 +27,7 @@ public class DefaultServerQueryCache extends DefaultServerCache {
   }
 
   @Override
-  protected CacheEntry getCacheEntry(Object id) {
-    Object key = key(id);
+  protected CacheEntry getCacheEntry(Object key) {
     final SoftReference<CacheEntry> ref = map.get(key);
     CacheEntry entry = ref != null ? ref.get() : null;
     if (entry == null) {

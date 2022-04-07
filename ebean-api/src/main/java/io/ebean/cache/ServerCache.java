@@ -104,4 +104,11 @@ public interface ServerCache {
   default void visit(MetricVisitor visitor) {
     // do nothing by default
   }
+
+  /**
+   * Unwrap the underlying ServerCache.
+   */
+  default <T> T unwrap(Class<T> cls) {
+    return (T) this;
+  }
 }

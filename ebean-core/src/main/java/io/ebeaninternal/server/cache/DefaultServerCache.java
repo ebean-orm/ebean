@@ -52,14 +52,12 @@ public class DefaultServerCache implements ServerCache {
   private final int trimFrequency;
   private final int maxIdleSecs;
   private final int maxSecsToLive;
-  private final TenantAwareKey tenantAwareKey;
 
   public DefaultServerCache(DefaultServerCacheConfig config) {
     this.name = config.getName();
     this.shortName = config.getShortName();
     this.map = config.getMap();
     this.maxSize = config.getMaxSize();
-    this.tenantAwareKey = new TenantAwareKey(config.getTenantProvider());
     this.maxIdleSecs = config.getMaxIdleSecs();
     this.maxSecsToLive = config.getMaxSecsToLive();
     this.trimFrequency = config.determineTrimFrequency();
@@ -153,18 +151,11 @@ public class DefaultServerCache implements ServerCache {
   }
 
   /**
-   * Return the tenant aware key.
-   */
-  protected Object key(Object id) {
-    return tenantAwareKey.key(id);
-  }
-
-  /**
    * Return a value from the cache.
    */
   @Override
-  public Object get(Object id) {
-    CacheEntry entry = getCacheEntry(id);
+  public Object get(Object key) {
+    CacheEntry entry = getCacheEntry(key);
     if (entry == null) {
       missCount.increment();
       return null;
@@ -184,8 +175,8 @@ public class DefaultServerCache implements ServerCache {
   /**
    * Get the cache entry - override for query cache to validate dependent tables.
    */
-  protected CacheEntry getCacheEntry(Object id) {
-    final SoftReference<CacheEntry> ref = map.get(key(id));
+  protected CacheEntry getCacheEntry(Object key) {
+    final SoftReference<CacheEntry> ref = map.get(key);
     return ref != null ? ref.get() : null;
   }
 
@@ -198,8 +189,7 @@ public class DefaultServerCache implements ServerCache {
    * Put a value into the cache.
    */
   @Override
-  public void put(Object id, Object value) {
-    Object key = key(id);
+  public void put(Object key, Object value) {
     map.put(key, new SoftReference<>(new CacheEntry(key, value)));
     putCount.increment();
   }
@@ -208,8 +198,8 @@ public class DefaultServerCache implements ServerCache {
    * Remove an entry from the cache.
    */
   @Override
-  public void remove(Object id) {
-    SoftReference<CacheEntry> entry = map.remove(key(id));
+  public void remove(Object key) {
+    SoftReference<CacheEntry> entry = map.remove(key);
     if (entry != null && entry.get() != null) {
       removeCount.increment();
     }

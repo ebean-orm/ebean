@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.cache;
 
+import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
@@ -12,7 +13,7 @@ import org.tests.model.basic.Customer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class DefaultCacheHolderTest {
+class DefaultCacheHolderTest {
 
   private final ThreadLocal<String> tenantId = new ThreadLocal<>();
 
@@ -25,42 +26,30 @@ public class DefaultCacheHolderTest {
       .with(cacheFactory, new TableModState());
   }
 
-
   @Test
-  public void getCache_normal() {
-
+  void getCache_normal() {
     DefaultCacheHolder holder = new DefaultCacheHolder(options());
 
-    DefaultServerCache cache = cache(holder, Customer.class);
-    assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
-    assertThat(cache.getShortName()).isEqualTo("Customer_B");
-
-    DefaultServerCache cache1 = cache(holder, Customer.class);
+    ServerCache cache = cache(holder, Customer.class);
+    ServerCache cache1 = cache(holder, Customer.class);
     assertThat(cache1).isSameAs(cache);
 
-    DefaultServerCache cache2 = cache(holder, Contact.class);
+    ServerCache cache2 = cache(holder, Contact.class);
     assertThat(cache1).isNotSameAs(cache2);
-    assertThat(cache2.getName()).isEqualTo("org.tests.model.basic.Contact_B");
-    assertThat(cache2.getShortName()).isEqualTo("Contact_B");
-
   }
 
-  private DefaultServerCache cache(DefaultCacheHolder holder, Class<?> type) {
-    return (DefaultServerCache) holder.getCache(type, ServerCacheType.BEAN);
+  private ServerCache cache(DefaultCacheHolder holder, Class<?> type) {
+    return holder.getCache(type, ServerCacheType.BEAN);
   }
 
   @Test
-  public void getCache_multiTenant() throws Exception {
-
+  void getCache_multiTenant() throws Exception {
     CacheManagerOptions builder = options().with(tenantId::get);
 
     DefaultCacheHolder holder = new DefaultCacheHolder(builder);
 
     tenantId.set("ten_1");
-    DefaultServerCache cache = cache(holder, Customer.class);
-    assertThat(cache.getName()).isEqualTo("org.tests.model.basic.Customer_B");
-    assertThat(cache.getShortName()).isEqualTo("Customer_B");
-
+    ServerCache cache = cache(holder, Customer.class);
     cache.put("1", "value-for-tenant1");
     cache.put("2", "an other value-for-tenant1");
 
@@ -109,10 +98,9 @@ public class DefaultCacheHolderTest {
   }
 
   @Test
-  public void clearAll() {
-
+  void clearAll() {
     DefaultCacheHolder holder = new DefaultCacheHolder(options());
-    DefaultServerCache cache = cache(holder, Customer.class);
+    ServerCache cache = cache(holder, Customer.class);
     cache.put("foo", "foo");
     assertThat(cache.size()).isEqualTo(1);
     holder.clearAll();
@@ -121,12 +109,11 @@ public class DefaultCacheHolderTest {
   }
 
   @Test
-  public void clearAll_multiTenant() {
-
+  void clearAll_multiTenant() {
     CacheManagerOptions options = options().with(tenantId::get);
 
     DefaultCacheHolder holder = new DefaultCacheHolder(options);
-    DefaultServerCache cache = cache(holder, Customer.class);
+    ServerCache cache = cache(holder, Customer.class);
     cache.put("foo", "foo");
     assertThat(cache.size()).isEqualTo(1);
 
