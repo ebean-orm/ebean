@@ -18,7 +18,7 @@ import java.util.Set;
  * <em>java.util.Collection</em>. The reason being that java.util.Map is not a
  * Collection. I realise this makes this name confusing so I apologise for that.
  */
-public interface BeanCollection<E> extends Serializable {
+public interface BeanCollection<E> extends Serializable, ToStringAware {
 
   enum ModifyListenMode {
     /**

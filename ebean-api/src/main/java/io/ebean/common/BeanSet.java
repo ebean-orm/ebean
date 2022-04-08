@@ -1,9 +1,6 @@
 package io.ebean.common;
 
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.BeanCollectionAdd;
-import io.ebean.bean.BeanCollectionLoader;
-import io.ebean.bean.EntityBean;
+import io.ebean.bean.*;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -39,6 +36,11 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   public BeanSet(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
     super(loader, ownerBean, propertyName);
+  }
+
+  @Override
+  public void toString(ToStringBuilder builder) {
+    builder.addCollection(set);
   }
 
   @Override
