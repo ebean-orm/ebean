@@ -30,6 +30,34 @@ class ToStringBuilderTest {
   }
 
   @Test
+  void add_referenceBeanCollection_expect_nothingAdded() {
+    ToStringBuilder builder = new ToStringBuilder();
+    builder.add("ref", new BeanList<>(null));
+    assertThat(builder.toString()).isEqualTo("");
+  }
+
+  @Test
+  void addCollection_some() {
+    ToStringBuilder builder = new ToStringBuilder();
+    builder.addCollection( new BeanList<>(List.of("A","B")));
+    assertThat(builder.toString()).isEqualTo("[A, B]");
+  }
+
+  @Test
+  void addCollection_null() {
+    ToStringBuilder builder = new ToStringBuilder();
+    builder.addCollection(null);
+    assertThat(builder.toString()).isEqualTo("[]");
+  }
+
+  @Test
+  void addCollection_empty() {
+    ToStringBuilder builder = new ToStringBuilder();
+    builder.addCollection(Collections.emptyList());
+    assertThat(builder.toString()).isEqualTo("[]");
+  }
+
+  @Test
   void flatBean() {
     Recurse instance0 = new Recurse(42, "java");
     assertThat(instance0.toString()).isEqualTo("Recurse@0(id:42, nm:java)");

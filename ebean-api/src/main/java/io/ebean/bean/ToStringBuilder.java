@@ -125,10 +125,12 @@ public final class ToStringBuilder {
       sb.append("[]");
       return;
     }
-    int collectionPos = 0;
+    boolean firstElement = true;
     sb.append("[");
     for (Object o : c) {
-      if (collectionPos++ > 0) {
+      if (firstElement) {
+        firstElement = false;
+      } else {
         sb.append(", ");
       }
       value(o);
