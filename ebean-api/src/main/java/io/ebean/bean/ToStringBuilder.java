@@ -53,6 +53,12 @@ public final class ToStringBuilder {
    */
   public void add(String name, Object value) {
     if (value != null && counter <= MAX) {
+      if (value instanceof BeanCollection) {
+        if (((BeanCollection<?>)value).isReference()) {
+          // suppress unloaded bean collections
+          return;
+        }
+      }
       key(name);
       value(value);
     }
@@ -91,7 +97,9 @@ public final class ToStringBuilder {
       return;
     }
     if (value instanceof ToStringAware) {
-      if (push(value)) {
+      if (value instanceof BeanCollection) {
+        ((ToStringAware) value).toString(this);
+      } else if (push(value)) {
         ((ToStringAware) value).toString(this);
       }
     } else if (value instanceof Collection) {

@@ -193,18 +193,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(50);
-    sb.append("BeanList ");
-    if (isReadOnly()) {
-      sb.append("readOnly ");
-    }
     if (list == null) {
-      sb.append("deferred ");
+      return "BeanList<deferred>";
     } else {
-      sb.append("size[").append(list.size()).append("] ");
-      sb.append("list").append(list);
+      return list.toString();
     }
-    return sb.toString();
   }
 
   /**

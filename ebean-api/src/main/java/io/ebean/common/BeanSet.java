@@ -171,18 +171,11 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(50);
-    sb.append("BeanSet ");
-    if (isReadOnly()) {
-      sb.append("readOnly ");
-    }
     if (set == null) {
-      sb.append("deferred ");
+      return "BeanSet<deferred>";
     } else {
-      sb.append("size[").append(set.size()).append("]");
-      sb.append(" set").append(set);
+      return set.toString();
     }
-    return sb.toString();
   }
 
   /**

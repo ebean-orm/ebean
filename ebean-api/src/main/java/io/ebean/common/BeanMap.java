@@ -197,27 +197,20 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(50);
-    sb.append("BeanMap ");
-    if (isReadOnly()) {
-      sb.append("readOnly ");
-    }
     if (map == null) {
-      sb.append("deferred ");
+      return "BeanMap<deferred>";
     } else {
-      sb.append("size[").append(map.size()).append("]");
-      sb.append(" map").append(map);
+      return map.toString();
     }
-    return sb.toString();
   }
 
   /**
-   * Equal if obj is a Map and equal in a Map sense.
+   * Equal if object is a Map and equal in a Map sense.
    */
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(Object object) {
     init();
-    return map.equals(obj);
+    return map.equals(object);
   }
 
   @Override
