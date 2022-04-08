@@ -34,14 +34,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>12.16.1-FOC3-SNAPSHOT</version>
+      <version>13.2.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>12.16.1-FOC3-SNAPSHOT</version>
+      <version>13.2.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
