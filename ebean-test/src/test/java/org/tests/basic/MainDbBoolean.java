@@ -5,7 +5,7 @@ import io.ebean.DatabaseFactory;
 import io.ebean.Query;
 import io.ebean.SqlRow;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebean.datasource.DataSourceConfig;
 import org.tests.model.basic.TOne;
 import org.tests.model.basic.TSDetail;

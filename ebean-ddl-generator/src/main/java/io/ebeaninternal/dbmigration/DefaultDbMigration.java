@@ -9,28 +9,7 @@ import io.ebean.config.DbConstraintNaming;
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.PropertiesWrapper;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.clickhouse.ClickHousePlatform;
-import io.ebean.config.dbplatform.cockroach.CockroachPlatform;
-import io.ebean.config.dbplatform.db2.DB2ForIPlatform;
-import io.ebean.config.dbplatform.db2.DB2LegacyPlatform;
-import io.ebean.config.dbplatform.db2.DB2LuwPlatform;
-import io.ebean.config.dbplatform.db2.DB2ZosPlatform;
-import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.hana.HanaPlatform;
-import io.ebean.config.dbplatform.hsqldb.HsqldbPlatform;
-import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
-import io.ebean.config.dbplatform.mysql.MySql55Platform;
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
-import io.ebean.config.dbplatform.nuodb.NuoDbPlatform;
-import io.ebean.config.dbplatform.oracle.Oracle11Platform;
-import io.ebean.config.dbplatform.oracle.OraclePlatform;
-import io.ebean.config.dbplatform.postgres.Postgres9Platform;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
-import io.ebean.config.dbplatform.sqlanywhere.SqlAnywherePlatform;
-import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer16Platform;
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
-import io.ebean.config.dbplatform.yugabyte.YugabytePlaform;
+import io.ebean.config.dbplatform.DatabasePlatformProvider;
 import io.ebean.dbmigration.DbMigration;
 import io.ebean.util.IOUtils;
 import io.ebean.util.StringHelper;
@@ -53,7 +32,9 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.ServiceLoader;
 import java.util.StringJoiner;
+
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 
@@ -84,6 +65,7 @@ public class DefaultDbMigration implements DbMigration {
   private static final String initialVersion = "1.0";
   private static final String GENERATED_COMMENT = "THIS IS A GENERATED FILE - DO NOT MODIFY";
 
+  private List<DatabasePlatformProvider> platformProviders = new ArrayList<>();
   protected boolean online;
   private boolean logToSystemOut = true;
   protected SpiEbeanServer server;
@@ -121,6 +103,9 @@ public class DefaultDbMigration implements DbMigration {
    */
   public DefaultDbMigration() {
     this.online = false;
+    for (DatabasePlatformProvider platformProvider : ServiceLoader.load(DatabasePlatformProvider.class)) {
+      platformProviders.add(platformProvider);
+    }
   }
 
   @Override
@@ -892,58 +877,18 @@ public class DefaultDbMigration implements DbMigration {
    */
   protected DatabasePlatform platform(Platform platform) {
     switch (platform) {
-      case H2:
-        return new H2Platform();
-      case HSQLDB:
-        return new HsqldbPlatform();
-      case POSTGRES9:
-        return new Postgres9Platform();
-      case POSTGRES:
-        return new PostgresPlatform();
-      case YUGABYTE:
-        return new YugabytePlaform();
-      case MARIADB:
-        return new MariaDbPlatform();
-      case MYSQL55:
-        return new MySql55Platform();
-      case MYSQL:
-        return new MySqlPlatform();
-      case ORACLE:
-        return new OraclePlatform();
-      case ORACLE11:
-        return new Oracle11Platform();
-      case SQLANYWHERE:
-        return new SqlAnywherePlatform();
-      case SQLSERVER16:
-        return new SqlServer16Platform();
-      case SQLSERVER17:
-        return new SqlServer17Platform();
       case SQLSERVER:
         throw new IllegalArgumentException("Please choose the more specific SQLSERVER16 or SQLSERVER17 platform. Refer to issue #1340 for details");
       case DB2:
         logger.warn("Using DB2LegacyPlatform. It is recommended to migrate to db2luw/db2zos/db2fori. Refer to issue #2514 for details");
-        return new DB2LegacyPlatform();
-      case DB2LUW:
-        return new DB2LuwPlatform();
-      case DB2ZOS:
-        return new DB2ZosPlatform();
-      case DB2FORI:
-        return new DB2ForIPlatform();
-      case SQLITE:
-        return new SQLitePlatform();
-      case HANA:
-        return new HanaPlatform();
-      case NUODB:
-        return new NuoDbPlatform();
-      case COCKROACH:
-        return new CockroachPlatform();
-      case CLICKHOUSE:
-        return new ClickHousePlatform();
-
       case GENERIC:
         return new DatabasePlatform();
-
       default:
+        for (DatabasePlatformProvider platformProvider : platformProviders) {
+          if (platformProvider.matchPlatform(platform)) {
+            return platformProvider.create(platform);
+          }
+        }
         throw new IllegalArgumentException("Platform missing? " + platform);
     }
   }

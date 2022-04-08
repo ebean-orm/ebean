@@ -11,20 +11,4 @@
   <description>API for mapping external named queries</description>
   <artifactId>ebean-externalmapping-api</artifactId>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>io.repaint.maven</groupId>
-        <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.24</version>
-        <extensions>true</extensions>
-        <configuration>
-          <tiles>
-            <tile>io.avaje.tile:moditech-module:1.0</tile>
-          </tiles>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
 </project>

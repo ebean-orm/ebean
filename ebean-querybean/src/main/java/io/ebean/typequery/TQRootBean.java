@@ -1647,14 +1647,6 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Deprecated - migrate to findStream().
-   */
-  @Deprecated
-  public Stream<T> findLargeStream() {
-    return query.findLargeStream();
-  }
-
-  /**
    * Execute the query returning the set of objects.
    * <p>
    * This query will execute against the EbeanServer that was used to create it.

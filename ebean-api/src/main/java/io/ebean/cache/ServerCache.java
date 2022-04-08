@@ -1,5 +1,6 @@
 package io.ebean.cache;
 
+import io.avaje.lang.Nullable;
 import io.ebean.meta.MetricVisitor;
 
 import java.util.LinkedHashMap;
@@ -68,40 +69,39 @@ public interface ServerCache {
   /**
    * Return the number of entries in the cache.
    */
-  int size();
+  default int size() {
+    return 0;
+  }
 
   /**
    * Return the hit ratio the cache is currently getting.
    */
   default int hitRatio() {
-    return getHitRatio();
+    return 0;
   }
-
-  /**
-   * Deprecated migrate to hitRatio().
-   */
-  @Deprecated
-  int getHitRatio();
 
   /**
    * Return statistics for the cache.
    *
    * @param reset if true the statistics are reset.
    */
+  @Nullable
   default ServerCacheStatistics statistics(boolean reset) {
-    return getStatistics(reset);
+    return null;
   }
-
-  /**
-   * Deprecated migrate to statistics().
-   */
-  @Deprecated
-  ServerCacheStatistics getStatistics(boolean reset);
 
   /**
    * Visit the metrics for the cache.
    */
   default void visit(MetricVisitor visitor) {
     // do nothing by default
+  }
+
+  /**
+   * Unwrap the underlying ServerCache.
+   */
+  @SuppressWarnings("unchecked")
+  default <T> T unwrap(Class<T> cls) {
+    return (T) this;
   }
 }

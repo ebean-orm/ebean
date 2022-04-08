@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.h2.H2Platform;
+import io.ebean.platform.h2.H2Platform;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.core.bootup.BootupClasses;

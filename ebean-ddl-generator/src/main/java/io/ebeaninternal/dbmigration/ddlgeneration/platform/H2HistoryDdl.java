@@ -9,7 +9,7 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
  */
 public class H2HistoryDdl extends DbTriggerBasedHistoryDdl {
 
-  private static final String TRIGGER_CLASS = "io.ebean.config.dbplatform.h2.H2HistoryTrigger";
+  private static final String TRIGGER_CLASS = "io.ebean.platform.h2.H2HistoryTrigger";
 
   H2HistoryDdl() {
     this.sysPeriodType = "timestamp";

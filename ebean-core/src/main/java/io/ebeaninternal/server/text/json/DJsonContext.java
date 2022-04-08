@@ -224,7 +224,8 @@ public final class DJsonContext implements SpiJsonContext {
 
       List<T> list = new ArrayList<>();
       do {
-        T bean = desc.jsonRead(readJson, null, null); // FIXME: Should we update the list
+        // CHECKME: Should we update the list
+        T bean = desc.jsonRead(readJson, null, null); 
         if (bean == null) {
           break;
         } else {

@@ -1196,11 +1196,6 @@ public final class DefaultPersister implements Persister {
     return request;
   }
 
-  private String errNotRegistered(Class<?> beanClass) {
-    return "The type [" + beanClass + "] is not a registered entity?"
-      + " If you don't explicitly list the entity classes to use Ebean will search for them in the classpath.";
-  }
-
   /**
    * Return the BeanDescriptor for a bean that is being persisted.
    * <p>
@@ -1210,10 +1205,6 @@ public final class DefaultPersister implements Persister {
    */
   @SuppressWarnings("unchecked")
   private <T> BeanManager<T> beanManager(Class<?> cls) {
-    BeanManager<T> mgr = (BeanManager<T>) beanDescriptorManager.beanManager(cls);
-    if (mgr == null) {
-      throw new PersistenceException(errNotRegistered(cls));
-    }
-    return mgr;
+    return (BeanManager<T>) beanDescriptorManager.beanManager(cls);
   }
 }

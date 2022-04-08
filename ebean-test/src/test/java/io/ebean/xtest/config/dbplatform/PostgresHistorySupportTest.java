@@ -1,6 +1,6 @@
 package io.ebean.xtest.config.dbplatform;
 
-import io.ebean.config.dbplatform.postgres.PostgresHistorySupport;
+import io.ebean.platform.postgres.PostgresHistorySupport;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

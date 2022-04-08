@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>composites</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>13.2.1-SNAPSHOT</version>
+  </parent>
+
+  <name>ebean-yugabyte</name>
+  <description>ebean-yugabyte composite</description>
+  <artifactId>ebean-yugabyte</artifactId>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-api</artifactId>
+      <version>13.2.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-core</artifactId>
+      <version>13.2.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-datasource</artifactId>
+      <version>${ebean-datasource.version}</version>
+    </dependency>
+
+    <!-- Technically optional but most expected to use query beans -->
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-querybean</artifactId>
+      <version>13.2.1-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-platform-postgres</artifactId>
+      <version>13.2.1-SNAPSHOT</version>
+    </dependency>
+
+  </dependencies>
+</project>

@@ -31,7 +31,7 @@ import java.io.Serializable;
  * @author mario
  * @author rbygrave
  */
-public class FetchConfig implements Serializable {
+public final class FetchConfig implements Serializable {
 
   private static final long serialVersionUID = 1L;
 

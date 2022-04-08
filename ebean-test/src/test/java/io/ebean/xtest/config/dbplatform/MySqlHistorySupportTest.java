@@ -1,7 +1,7 @@
 package io.ebean.xtest.config.dbplatform;
 
 
-import io.ebean.config.dbplatform.mysql.MySqlHistorySupport;
+import io.ebean.platform.mysql.MySqlHistorySupport;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -975,18 +975,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public SqlQuery createSqlQuery(String sql) {
-    return sqlQuery(sql);
-  }
-
-  @Override
   public SqlUpdate sqlUpdate(String sql) {
     return new DefaultSqlUpdate(this, sql.trim());
-  }
-
-  @Override
-  public SqlUpdate createSqlUpdate(String sql) {
-    return sqlUpdate(sql);
   }
 
   @Override
@@ -1370,11 +1360,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       request.endTransIfRequired();
       throw ex;
     }
-  }
-
-  @Override
-  public <T> Stream<T> findLargeStream(Query<T> query, Transaction transaction) {
-    return findStream(query, transaction);
   }
 
   @Override

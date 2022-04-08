@@ -40,14 +40,6 @@ public interface ExpressionPath {
   StringParser stringParser();
 
   /**
-   * Deprecated migrate to stringParser().
-   */
-  @Deprecated
-  default StringParser getStringParser() {
-    return stringParser();
-  }
-
-  /**
    * For DateTime capable scalar types convert the long systemTimeMillis into
    * an appropriate java time (Date,Timestamp,Time,Calendar, JODA type etc).
    */
@@ -65,14 +57,6 @@ public interface ExpressionPath {
   int jdbcType();
 
   /**
-   * Deprecated migrate to jdbcType().
-   */
-  @Deprecated
-  default int getJdbcType() {
-    return jdbcType();
-  }
-
-  /**
    * Return true if this is an ManyToOne or OneToOne associated bean property.
    */
   boolean isAssocId();
@@ -86,25 +70,9 @@ public interface ExpressionPath {
   String assocIdExpression(String propName, String bindOperator);
 
   /**
-   * Deprecated migrate to assocIdExpression().
-   */
-  @Deprecated
-  default String getAssocIdExpression(String propName, String bindOperator) {
-    return assocIdExpression(propName, bindOperator);
-  }
-
-  /**
    * Return the Id values for the given bean value.
    */
   Object[] assocIdValues(EntityBean bean);
-
-  /**
-   * Deprecated migrate to assocIdValues().
-   */
-  @Deprecated
-  default Object[] getAssocIdValues(EntityBean bean) {
-    return assocIdValues(bean);
-  }
 
   /**
    * Return the underlying bean property.
@@ -112,23 +80,8 @@ public interface ExpressionPath {
   Property property();
 
   /**
-   * Deprecated migrate to property().
-   */
-  @Deprecated
-  default Property getProperty() {
-    return property();
-  }
-
-  /**
    * The ElPrefix plus name.
    */
   String elName();
 
-  /**
-   * Deprecated migrate to elName().
-   */
-  @Deprecated
-  default String getElName() {
-    return elName();
-  }
 }

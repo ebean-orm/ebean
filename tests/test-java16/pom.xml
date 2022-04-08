@@ -58,7 +58,7 @@
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>12.16.1-FOC3-SNAPSHOT</version>
+              <version>13.2.1-SNAPSHOT</version>
             </path>
           </annotationProcessorPaths>
         </configuration>

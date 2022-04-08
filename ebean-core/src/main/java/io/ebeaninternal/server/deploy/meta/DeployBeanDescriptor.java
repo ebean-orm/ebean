@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy.meta;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
-import io.ebean.annotation.EntityOverride;
+import io.ebean.annotation.ext.EntityOverride;
 import io.ebean.annotation.Identity;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TableName;

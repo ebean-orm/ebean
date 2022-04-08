@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.avaje</groupId>
-    <artifactId>java8-oss</artifactId>
-    <version>3.6</version>
+    <artifactId>java11-oss</artifactId>
+    <version>3.7</version>
   </parent>
 
   <groupId>io.ebean</groupId>
@@ -43,11 +43,12 @@
     <h2database.version>2.1.210</h2database.version>
     <ebean-ddl-runner.version>1.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
-    <ebean-migration.version>12.16.1</ebean-migration.version>
+    <ebean-migration.version>13.0.0</ebean-migration.version>
     <ebean-test-docker.version>4.5</ebean-test-docker.version>
     <ebean-datasource.version>7.5</ebean-datasource.version>
-    <ebean-agent.version>12.16.0</ebean-agent.version>
-    <ebean-maven-plugin.version>12.16.0</ebean-maven-plugin.version>
+    <ebean-agent.version>13.2.0</ebean-agent.version>
+    <ebean-maven-plugin.version>13.2.0</ebean-maven-plugin.version>
+    <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
   <build>
@@ -94,7 +95,6 @@
   </dependencies>
 
   <modules>
-    <module>ebean</module>
     <module>ebean-api</module>
     <module>ebean-bom</module>
     <module>ebean-core-type</module>
@@ -110,7 +110,9 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis</module>
     <module>ebean-redis</module>
-<!--    <module>ebean-kotlin</module>-->
+    <module>platforms</module>
+    <module>composites</module>
+    <!--    <module>ebean-kotlin</module>-->
 
   </modules>
 

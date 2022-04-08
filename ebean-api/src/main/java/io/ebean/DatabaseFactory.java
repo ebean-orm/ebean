@@ -26,7 +26,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * methods on the DB singleton such as {@link DB#find(Class)} are just a
  * convenient way of using the 'default/primary' Database.
  */
-public class DatabaseFactory {
+public final class DatabaseFactory {
 
   private static final ReentrantLock lock = new ReentrantLock();
   private static SpiContainer container;

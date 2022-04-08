@@ -178,17 +178,7 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public SqlQuery createSqlQuery(String sql) {
-    return null;
-  }
-
-  @Override
   public SqlUpdate sqlUpdate(String sql) {
-    return null;
-  }
-
-  @Override
-  public SqlUpdate createSqlUpdate(String sql) {
     return null;
   }
 

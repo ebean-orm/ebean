@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>13.2.1-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>composites</artifactId>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>ebean</module>
+    <module>ebean-clickhouse</module>
+    <module>ebean-cockroach</module>
+    <module>ebean-db2</module>
+    <module>ebean-h2</module>
+    <module>ebean-hana</module>
+<!--    <module>hsqldb</module>-->
+    <module>ebean-mariadb</module>
+    <module>ebean-mysql</module>
+    <module>ebean-nuodb</module>
+    <module>ebean-oracle</module>
+    <module>ebean-postgres</module>
+<!--    <module>sqlanywhere</module>-->
+    <module>ebean-sqlite</module>
+    <module>ebean-sqlserver</module>
+    <module>ebean-yugabyte</module>
+  </modules>
+
+</project>

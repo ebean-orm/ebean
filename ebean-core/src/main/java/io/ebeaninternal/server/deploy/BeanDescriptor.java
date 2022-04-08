@@ -2106,10 +2106,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return getId((EntityBean) bean);
   }
 
-  @Override
-  public Object getBeanId(T bean) {
-    return getId((EntityBean) bean);
-  }
+//  @Override
+//  public Object beanId(T bean) {
+//    return getId((EntityBean) bean);
+//  }
 
   /**
    * Return the Id value for the bean with embeddedId beans converted into maps.
@@ -2673,7 +2673,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public PartitionMeta partitionMeta() {
     return partitionMeta;
   }
-  
+
   /**
    * Return the tablespace details of the bean.
    */

@@ -19,6 +19,7 @@ public interface ServerMetricsAsJson {
 
   /**
    * Set the sort property - see SortMetric
+   *
    * @see SortMetric
    */
   ServerMetricsAsJson withSort(Comparator<MetaTimedMetric> sortBy);
@@ -35,9 +36,9 @@ public interface ServerMetricsAsJson {
    */
   ServerMetricsAsJson withHeader(boolean withHeader);
 
-    /**
-     * Collect and write metrics as JSON to the given buffer.
-     */
+  /**
+   * Collect and write metrics as JSON to the given buffer.
+   */
   void write(Appendable buffer);
 
   /**

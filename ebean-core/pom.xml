@@ -135,6 +135,26 @@
     </dependency>
 
     <!-- Test scope -->
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-platform-h2</artifactId>
+      <version>13.2.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-platform-postgres</artifactId>
+      <version>13.2.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-platform-sqlserver</artifactId>
+      <version>13.2.1-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
@@ -220,18 +240,6 @@
             </goals>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>io.repaint.maven</groupId>
-        <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.24</version>
-        <extensions>true</extensions>
-        <configuration>
-          <tiles>
-            <tile>io.avaje.tile:moditech-module:1.0</tile>
-          </tiles>
-        </configuration>
       </plugin>
 
     </plugins>

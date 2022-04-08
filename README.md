@@ -18,6 +18,7 @@
 [![datasource EA](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml)
 [![migration EA](https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml)
 [![test-docker EA](https://github.com/ebean-orm/ebean-test-docker/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-test-docker/actions/workflows/jdk-ea.yml)
+[![ebean-agent EA](https://github.com/ebean-orm/ebean-agent/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-agent/actions/workflows/jdk-ea.yml)
 
 
 # Sponsors

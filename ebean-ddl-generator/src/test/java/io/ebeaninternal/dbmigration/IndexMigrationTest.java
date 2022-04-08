@@ -1,8 +1,8 @@
 package io.ebeaninternal.dbmigration;
 
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.h2.H2Platform;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.platform.h2.H2Platform;
+import io.ebean.platform.postgres.PostgresPlatform;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

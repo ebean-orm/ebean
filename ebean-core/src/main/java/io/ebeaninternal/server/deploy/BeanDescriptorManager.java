@@ -575,7 +575,29 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
   @SuppressWarnings("unchecked")
   public <T> BeanManager<T> beanManager(Class<T> entityType) {
-    return (BeanManager<T>) beanManager(entityType.getName());
+    BeanManager<T> mgr = (BeanManager<T>) beanManager(entityType.getName());
+    if (mgr == null) {
+      errorBeanNotRegistered(entityType);
+    }
+    return mgr;
+  }
+
+  private <T> void errorBeanNotRegistered(Class<T> entityType) {
+    if (beanManagerMap.isEmpty()) {
+      throw new PersistenceException(errNothingRegistered());
+    } else {
+      throw new PersistenceException(errNotRegistered(entityType));
+    }
+  }
+
+  private <T> String errNothingRegistered() {
+    return "There are no registered entities. If using query beans, that generates _Ebean$ModuleInfo.java into " +
+      "generated sources and is service loaded. If using module-info.java, then probably missing 'provides io.ebean.config.ModuleInfoLoader with _Ebean$ModuleInfo' clause.";
+  }
+
+  private String errNotRegistered(Class<?> beanClass) {
+    return "The type [" + beanClass + "] is not a registered entity?"
+      + " If you don't explicitly list the entity classes to use Ebean will search for them in the classpath.";
   }
 
   private BeanManager<?> beanManager(String beanClassName) {

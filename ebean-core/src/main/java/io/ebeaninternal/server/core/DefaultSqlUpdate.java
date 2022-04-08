@@ -262,16 +262,6 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
-  public SqlUpdate setParams(Object... values) {
-    return setParameters(values);
-  }
-
-  @Override
-  public SqlUpdate setNextParameter(Object value) {
-    return setParameter(value);
-  }
-
-  @Override
   public SqlUpdate setParameters(Object... values) {
     for (Object value : values) {
       setParameter(++addPos, value);

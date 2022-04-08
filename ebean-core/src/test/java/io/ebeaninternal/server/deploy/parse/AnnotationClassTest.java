@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.sqlserver.SqlServer17Platform;
+import io.ebean.platform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;

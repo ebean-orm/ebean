@@ -124,38 +124,14 @@ public interface Database {
   AutoTune autoTune();
 
   /**
-   * Deprecated migrate to autoTune().
-   */
-  @Deprecated
-  default AutoTune getAutoTune() {
-    return autoTune();
-  }
-
-  /**
    * Return the associated DataSource for this Database instance.
    */
   DataSource dataSource();
 
   /**
-   * Deprecated migrate to dataSource().
-   */
-  @Deprecated
-  default DataSource getDataSource() {
-    return dataSource();
-  }
-
-  /**
    * Return the associated read only DataSource for this Database instance (can be null).
    */
   DataSource readOnlyDataSource();
-
-  /**
-   * Deprecated migrate to readOnlyDataSource().
-   */
-  @Deprecated
-  default DataSource getReadOnlyDataSource() {
-    return readOnlyDataSource();
-  }
 
   /**
    * Return the name. This is used with {@link DB#byName(String)} to get a
@@ -164,39 +140,15 @@ public interface Database {
   String name();
 
   /**
-   * Deprecated migrate to name().
-   */
-  @Deprecated
-  default String getName() {
-    return name();
-  }
-
-  /**
    * Return the ExpressionFactory for this database.
    */
   ExpressionFactory expressionFactory();
-
-  /**
-   * Deprecated migrate to expressionFactory().
-   */
-  @Deprecated
-  default ExpressionFactory getExpressionFactory() {
-    return expressionFactory();
-  }
 
   /**
    * Return the MetaInfoManager which is used to get meta data from the Database
    * such as query execution statistics.
    */
   MetaInfoManager metaInfo();
-
-  /**
-   * Deprecated migrate to metaInfo().
-   */
-  @Deprecated
-  default MetaInfoManager getMetaInfoManager() {
-    return metaInfo();
-  }
 
   /**
    * Return the platform used for this database instance.
@@ -218,25 +170,9 @@ public interface Database {
   Platform platform();
 
   /**
-   * Deprecated migrate to platform().
-   */
-  @Deprecated
-  default Platform getPlatform() {
-    return platform();
-  }
-
-  /**
    * Return the extended API intended for use by plugins.
    */
   SpiServer pluginApi();
-
-  /**
-   * Deprecated migrate to pluginApi().
-   */
-  @Deprecated
-  default SpiServer getPluginApi() {
-    return pluginApi();
-  }
 
   /**
    * Return the BeanState for a given entity bean.
@@ -247,25 +183,9 @@ public interface Database {
   BeanState beanState(Object bean);
 
   /**
-   * Deprecated migrate to beanState().
-   */
-  @Deprecated
-  default BeanState getBeanState(Object bean) {
-    return beanState(bean);
-  }
-
-  /**
    * Return the value of the Id property for a given bean.
    */
   Object beanId(Object bean);
-
-  /**
-   * Deprecated migrate to beanId().
-   */
-  @Deprecated
-  default Object getBeanId(Object bean) {
-    return beanId(bean);
-  }
 
   /**
    * Set the Id value onto the bean converting the type of the id value if necessary.
@@ -278,14 +198,6 @@ public interface Database {
    * @param id   The id value to set.
    */
   Object beanId(Object bean, Object id);
-
-  /**
-   * Deprecated migrate to beanId().
-   */
-  @Deprecated
-  default Object setBeanId(Object bean, Object id) {
-    return beanId(bean, id);
-  }
 
   /**
    * Return a map of the differences between two objects of the same type.
@@ -589,14 +501,6 @@ public interface Database {
   SqlQuery sqlQuery(String sql);
 
   /**
-   * Deprecated - migrate to sqlQuery().
-   * <p>
-   * This is an alias for {@link #sqlQuery(String)}.
-   */
-  @Deprecated
-  SqlQuery createSqlQuery(String sql);
-
-  /**
    * Look to execute a native sql insert update or delete statement.
    * <p>
    * Use this to execute a Insert Update or Delete statement. The statement will
@@ -610,14 +514,6 @@ public interface Database {
    * @return The SqlUpdate instance to set parameters and execute
    */
   SqlUpdate sqlUpdate(String sql);
-
-  /**
-   * Deprecated - migrate to sqlUpdate().
-   * <p>
-   * This is an alias for {@link #sqlUpdate(String)}.
-   */
-  @Deprecated
-  SqlUpdate createSqlUpdate(String sql);
 
   /**
    * Create a CallableSql to execute a given stored procedure.
@@ -951,14 +847,6 @@ public interface Database {
    * @param id       the id value
    */
   <T> T reference(Class<T> beanType, Object id);
-
-  /**
-   * Deprecated migrate to reference().
-   */
-  @Deprecated
-  default <T> T getReference(Class<T> beanType, Object id) {
-    return reference(beanType, id);
-  }
 
   /**
    * Return the extended API for Database.
@@ -1540,26 +1428,10 @@ public interface Database {
   ServerCacheManager cacheManager();
 
   /**
-   * Deprecated migrate to cacheManager().
-   */
-  @Deprecated
-  default ServerCacheManager getServerCacheManager() {
-    return cacheManager();
-  }
-
-  /**
    * Return the BackgroundExecutor service for asynchronous processing of
    * queries.
    */
   BackgroundExecutor backgroundExecutor();
-
-  /**
-   * Deprecated migrate to backgroundExecutor().
-   */
-  @Deprecated
-  default BackgroundExecutor getBackgroundExecutor() {
-    return backgroundExecutor();
-  }
 
   /**
    * Return the JsonContext for reading/writing JSON.

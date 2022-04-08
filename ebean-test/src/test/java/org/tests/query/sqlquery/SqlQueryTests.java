@@ -13,6 +13,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +23,54 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SqlQueryTests extends BaseTestCase {
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void selectBindNull_byPos() {
+    String sql = "select nvl(cast(? as int), 42)";
+    final Long val = DB.sqlQuery(sql)
+      .setNullParameter(1, Types.INTEGER)
+      .mapToScalar(Long.class)
+      .findOne();
+
+    assertThat(val).isEqualTo(42);
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void selectBindNull_byName() {
+    String sql = "select nvl(cast(:val as int), 42)";
+    final Long val = DB.sqlQuery(sql)
+      .setNullParameter("val", Types.INTEGER)
+      .mapToScalar(Long.class)
+      .findOne();
+
+    assertThat(val).isEqualTo(42);
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void selectBindNull_usingSetParameter_ByPosition() {
+    String sql = "select nvl(cast(? as int), 42)";
+    final Long val = DB.sqlQuery(sql)
+      .setParameter(1, null)
+      .mapToScalar(Long.class)
+      .findOne();
+
+    assertThat(val).isEqualTo(42);
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void selectBindNull_usingSetParameter_byName() {
+    String sql = "select nvl(cast(:val as int), 42)";
+    final Long val = DB.sqlQuery(sql)
+      .setParameter("val", null)
+      .mapToScalar(Long.class)
+      .findOne();
+
+    assertThat(val).isEqualTo(42);
+  }
 
   @ForPlatform(Platform.H2)
   @Test

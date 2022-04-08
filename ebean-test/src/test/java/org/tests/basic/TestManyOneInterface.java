@@ -25,7 +25,7 @@ public class TestManyOneInterface extends BaseTestCase {
 
     IPerson p = DB.getDefault().createEntityBean(Person.class);
     assertThat(p).isInstanceOf(ExtPerson1and2.class);
-    p = DB.getDefault().getPluginApi().createEntityBean(IPerson.class);
+    p = DB.getDefault().pluginApi().createEntityBean(IPerson.class);
     assertThat(p).isInstanceOf(ExtPerson1and2.class);
 
     p.setDefaultAddress(a);
@@ -46,8 +46,8 @@ public class TestManyOneInterface extends BaseTestCase {
     assertThat(p2.getDefaultAddress()).isInstanceOf(Address.class);
 
     // some more checks
-    IExtPerson1 pe1 = DB.getDefault().getPluginApi().createEntityBean(IExtPerson1.class);
-    IExtPerson2 pe2 = DB.getDefault().getPluginApi().createEntityBean(IExtPerson2.class);
+    IExtPerson1 pe1 = DB.getDefault().pluginApi().createEntityBean(IExtPerson1.class);
+    IExtPerson2 pe2 = DB.getDefault().pluginApi().createEntityBean(IExtPerson2.class);
     assertThat(pe1).isInstanceOf(ExtPerson1and2.class);
     assertThat(pe2).isInstanceOf(ExtPerson1and2.class);
 

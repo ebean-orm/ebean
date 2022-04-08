@@ -4,8 +4,8 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.*;
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
-import io.ebean.config.dbplatform.postgres.PostgresPlatform;
+import io.ebean.platform.mysql.MySqlPlatform;
+import io.ebean.platform.postgres.PostgresPlatform;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

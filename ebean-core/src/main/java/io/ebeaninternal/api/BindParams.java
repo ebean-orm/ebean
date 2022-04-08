@@ -167,7 +167,7 @@ public final class BindParams implements Serializable {
    */
   @SuppressWarnings("rawtypes")
   public void setParameter(int position, Object value) {
-    assert value != null : "use setNullParameter";
+    //TODO: Review - assert value != null : "use setNullParameter";
     Param p = getParam(position);
     if (value instanceof Collection) {
       // use of postgres ANY with positioned parameter
@@ -219,7 +219,7 @@ public final class BindParams implements Serializable {
    * Set a named In parameter that is not null.
    */
   public Param setParameter(String name, Object value) {
-    assert value != null : "use setNullParameter";
+    // TODO: Review - assert value != null : "use setNullParameter";
     Param p = getParam(name);
     p.setInValue(value);
     return p;

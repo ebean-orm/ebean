@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy.meta;
 
-import io.ebean.annotation.CreatedTimestamp;
 import io.ebean.annotation.DocCode;
 import io.ebean.annotation.DocProperty;
 import io.ebean.annotation.DocSortable;
@@ -8,7 +7,6 @@ import io.ebean.annotation.Formula;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.SoftDelete;
-import io.ebean.annotation.UpdatedTimestamp;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
 import io.ebean.annotation.Where;
@@ -233,9 +231,7 @@ public class DeployBeanProperty implements DeployBeanPropertyMeta {
     return (AnnotationUtil.has(field, WhenCreated.class)
       || AnnotationUtil.has(field, WhenModified.class)
       || AnnotationUtil.has(field, WhoModified.class)
-      || AnnotationUtil.has(field, WhoCreated.class)
-      || AnnotationUtil.has(field, UpdatedTimestamp.class)
-      || AnnotationUtil.has(field, CreatedTimestamp.class));
+      || AnnotationUtil.has(field, WhoCreated.class));
   }
 
   public String getFullBeanName() {

@@ -16,7 +16,7 @@
     <dependency>
       <groupId>redis.clients</groupId>
       <artifactId>jedis</artifactId>
-      <version>4.1.1</version>
+      <version>4.2.1</version>
     </dependency>
 
     <dependency>
@@ -80,8 +80,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:12.15.0</tile>
-            <tile>io.avaje.tile:moditech-module:1.0</tile>
+            <tile>io.ebean.tile:enhancement:13.1.0</tile>
           </tiles>
         </configuration>
       </plugin>

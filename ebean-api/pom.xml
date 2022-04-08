@@ -49,7 +49,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>7.7</version>
+      <version>8.0</version>
     </dependency>
 
     <dependency>
@@ -80,15 +80,6 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
-     and not require a separate module for it -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <version>${h2database.version}</version>
-      <optional>true</optional>
-    </dependency>
-
     <dependency>
       <groupId>javax.transaction</groupId>
       <artifactId>jta</artifactId>
@@ -112,19 +103,4 @@
 
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>io.repaint.maven</groupId>
-        <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.24</version>
-        <extensions>true</extensions>
-        <configuration>
-          <tiles>
-            <tile>io.avaje.tile:moditech-module:1.0</tile>
-          </tiles>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

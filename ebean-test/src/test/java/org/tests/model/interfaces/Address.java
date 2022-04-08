@@ -1,6 +1,6 @@
 package org.tests.model.interfaces;
 
-import io.ebean.annotation.EntityImplements;
+import io.ebean.annotation.ext.EntityImplements;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

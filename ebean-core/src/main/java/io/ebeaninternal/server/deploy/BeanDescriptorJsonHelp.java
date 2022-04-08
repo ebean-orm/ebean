@@ -102,7 +102,7 @@ final class BeanDescriptorJsonHelp<T> {
       String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
       throw new JsonParseException(newParser, msg, parser.getCurrentLocation());
     }
-    
+
     BeanDescriptor<T> inheritDesc = (BeanDescriptor<T>) inheritInfo.readType(discNode.asText()).desc();
     return inheritDesc.jsonReadObject(newReader, path, target);
   }

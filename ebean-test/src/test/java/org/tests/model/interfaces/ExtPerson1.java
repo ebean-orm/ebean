@@ -1,7 +1,7 @@
 package org.tests.model.interfaces;
 
-import io.ebean.annotation.EntityImplements;
-import io.ebean.annotation.EntityOverride;
+import io.ebean.annotation.ext.EntityImplements;
+import io.ebean.annotation.ext.EntityOverride;
 
 import javax.persistence.Entity;
 

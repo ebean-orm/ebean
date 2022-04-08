@@ -10,7 +10,6 @@ import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlQuery;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -57,36 +56,6 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   @Override
-  public BigDecimal findSingleDecimal() {
-    return server.findSingleAttribute(this, BigDecimal.class);
-  }
-
-  @Override
-  public Long findSingleLong() {
-    return server.findSingleAttribute(this, Long.class);
-  }
-
-  @Override
-  public <T> T findSingleAttribute(Class<T> cls) {
-    return server.findSingleAttribute(this, cls);
-  }
-
-  @Override
-  public <T> List<T> findSingleAttributeList(Class<T> cls) {
-    return server.findSingleAttributeList(this, cls);
-  }
-
-  @Override
-  public <T> T findOne(RowMapper<T> mapper) {
-    return server.findOneMapper(this, mapper);
-  }
-
-  @Override
-  public <T> List<T> findList(RowMapper<T> mapper) {
-    return server.findListMapper(this, mapper);
-  }
-
-  @Override
   public void findEachRow(RowConsumer consumer) {
     server.findEachRow(this, consumer);
   }
@@ -102,12 +71,6 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   @Override
-  @Deprecated
-  public DefaultRelationalQuery setParams(Object... values) {
-    return setParameters(values);
-  }
-
-  @Override
   public DefaultRelationalQuery setParameters(Object... values) {
     bindParams.setNextParameters(values);
     return this;
@@ -116,6 +79,18 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   @Override
   public DefaultRelationalQuery setParameter(Object value) {
     bindParams.setNextParameter(value);
+    return this;
+  }
+
+  @Override
+  public SqlQuery setNullParameter(int position, int jdbcType) {
+    bindParams.setNullParameter(position, jdbcType);
+    return this;
+  }
+
+  @Override
+  public SqlQuery setNullParameter(String name, int jdbcType) {
+    bindParams.setNullParameter(name, jdbcType);
     return this;
   }
 
@@ -223,6 +198,14 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   @Override
   public <T> TypeQuery<T> mapTo(RowMapper<T> mapper) {
     return new Mapper(mapper);
+  }
+
+  private <T> T findSingleAttribute(Class<T> cls) {
+    return server.findSingleAttribute(this, cls);
+  }
+
+  private <T> List<T> findSingleAttributeList(Class<T> cls) {
+    return server.findSingleAttributeList(this, cls);
   }
 
   private class Scalar<T> implements SqlQuery.TypeQuery<T> {
