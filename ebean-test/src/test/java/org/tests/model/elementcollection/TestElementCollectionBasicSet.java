@@ -183,6 +183,6 @@ class TestElementCollectionBasicSet extends BaseTestCase {
     final EcsPerson fromJson = DB.json().toBean(EcsPerson.class, asJson);
     assertThat(fromJson.getName()).isEqualTo("Fiona021");
     assertThat(fromJson.getPhoneNumbers()).hasSize(2);
-    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanSet size[2] set[021 1234, 021 4321]");
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("[021 1234, 021 4321]");
   }
 }

@@ -3,6 +3,7 @@ package io.ebean.common;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.ToStringBuilder;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +39,19 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   public BeanMap(BeanCollectionLoader ebeanServer, EntityBean ownerBean, String propertyName) {
     super(ebeanServer, ownerBean, propertyName);
+  }
+
+  @Override
+  public void toString(ToStringBuilder builder) {
+    if (map == null || map.isEmpty()) {
+      builder.addRaw("{}");
+    } else {
+      builder.addRaw("{");
+      for (Entry<K, E> entry : map.entrySet()) {
+        builder.add(String.valueOf(entry.getKey()), entry.getValue());
+      }
+      builder.addRaw("}");
+    }
   }
 
   @Override
@@ -183,27 +197,20 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder(50);
-    sb.append("BeanMap ");
-    if (isReadOnly()) {
-      sb.append("readOnly ");
-    }
     if (map == null) {
-      sb.append("deferred ");
+      return "BeanMap<deferred>";
     } else {
-      sb.append("size[").append(map.size()).append("]");
-      sb.append(" map").append(map);
+      return map.toString();
     }
-    return sb.toString();
   }
 
   /**
-   * Equal if obj is a Map and equal in a Map sense.
+   * Equal if object is a Map and equal in a Map sense.
    */
   @Override
-  public boolean equals(Object obj) {
+  public boolean equals(Object object) {
     init();
-    return map.equals(obj);
+    return map.equals(object);
   }
 
   @Override
