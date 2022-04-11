@@ -192,6 +192,6 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     final EcmPerson fromJson = DB.json().toBean(EcmPerson.class, asJson);
     assertThat(fromJson.getName()).isEqualTo("Fiona021");
     assertThat(fromJson.getPhoneNumbers()).hasSize(2);
-    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanMap size[2] map{home=021 1234, work=021 4321}");
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("{home=021 1234, work=021 4321}");
   }
 }

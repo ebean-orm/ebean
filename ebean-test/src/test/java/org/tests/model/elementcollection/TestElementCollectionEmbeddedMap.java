@@ -181,6 +181,6 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     final EcbmPerson fromJson = DB.json().toBean(EcbmPerson.class, asJson);
     assertThat(fromJson.getName()).isEqualTo("Fiona64021");
     assertThat(fromJson.getPhoneNumbers()).hasSize(2);
-    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanMap size[2] map{home=64-021-1234, work=64-021-4321}");
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("{home=64-021-1234, work=64-021-4321}");
   }
 }
