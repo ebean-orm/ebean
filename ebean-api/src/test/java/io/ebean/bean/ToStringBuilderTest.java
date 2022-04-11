@@ -30,6 +30,55 @@ class ToStringBuilderTest {
   }
 
   @Test
+  void max100Beans_expect_noMoreContentAfterMax100() {
+
+    String loop100 = addLoopForMaxBeans(100);
+    String loop101 = addLoopForMaxBeans(101);
+    String loop900 = addLoopForMaxBeans(900);
+
+    assertThat(loop100).isEqualTo(loop101);
+    assertThat(loop101).isEqualTo(loop900);
+  }
+
+  private String addLoopForMaxBeans(int loopMax) {
+    ToStringBuilder builder = new ToStringBuilder();
+    builder.start(new Object());
+    for (int i = 0; i <= loopMax; i++) {
+      addForMax(builder, i);
+    }
+    builder.end();
+    return builder.toString();
+  }
+
+  private void addForMax(ToStringBuilder builder, int i) {
+    builder.add("c", new B(i));
+  }
+
+  @Test
+  void maxContent_expect_noMoreContentAfterMax2000() {
+    String loop23 = addContentLoop(23);
+    String loop24 = addContentLoop(24);
+    String loop25 = addContentLoop(25);
+
+    assertThat(loop23).isEqualTo(loop24);
+    assertThat(loop23).isEqualTo(loop25);
+  }
+
+  private String addContentLoop(int loopMax) {
+    ToStringBuilder builder = new ToStringBuilder();
+    builder.start(new Object());
+    for (int i = 0; i <= loopMax; i++) {
+      addForMaxContent(builder, i);
+    }
+    builder.end();
+    return builder.toString();
+  }
+
+  private void addForMaxContent(ToStringBuilder builder, int i) {
+    builder.add("someContentThatAddsUp", new Recurse(i, "SomeContentThatAddsUp_SomeContentThatAddsUp!!"));
+  }
+
+  @Test
   void add_referenceBeanCollection_expect_nothingAdded() {
     ToStringBuilder builder = new ToStringBuilder();
     builder.add("ref", new BeanList<>(null));
@@ -123,7 +172,7 @@ class ToStringBuilderTest {
     return builder.toString();
   }
 
-  static class Recurse implements ToStringAware {
+  static final class Recurse implements ToStringAware {
 
     final int id;
     final String nm;
@@ -146,6 +195,28 @@ class ToStringBuilderTest {
       builder.add("id", id);
       builder.add("nm", nm);
       builder.add("other", other);
+      builder.end();
+    }
+  }
+
+  static final class B implements ToStringAware {
+
+    final int id;
+
+    B(int id) {
+      this.id = id;
+    }
+
+    public String toString() {
+      ToStringBuilder builder = new ToStringBuilder();
+      toString(builder);
+      return builder.toString();
+    }
+
+    @Override
+    public void toString(ToStringBuilder builder) {
+      builder.start(this);
+      builder.add("b", id);
       builder.end();
     }
   }
