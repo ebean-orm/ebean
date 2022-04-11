@@ -23,7 +23,7 @@ public interface JsonBeanReader<T> {
   default T read() {
     return read(null);
   }
-
+  
   /**
    * Create a new reader taking the context from the existing one but using a new JsonParser.
    */

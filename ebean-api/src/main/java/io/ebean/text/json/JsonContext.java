@@ -59,73 +59,49 @@ public interface JsonContext {
   <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException;
 
   /**
-<<<<<<< HEAD
-   * Convert json parser input into a Bean of a specific type.
-=======
    * Read json parser input into a given Bean. <br>
    * Note: This is a kind of "update". Only properties in the json will be modified. Embedded Lists and Maps will become new
    * instances, so the object identity will not be preserved here.
->>>>>>> upstream/master
    *
    * @throws JsonIOException When IOException occurs
    */
   <T> void toBean(T target, JsonParser parser) throws JsonIOException;
 
   /**
-<<<<<<< HEAD
-   * Convert json parser input into a Bean of a specific type additionally using JsonReadOptions..
-=======
    * Read json parser input into a given Bean additionally using JsonReadOptions.<br>
    * See {@link #toBean(Class, JsonParser)} for details modified.
->>>>>>> upstream/master
    *
    * @throws JsonIOException When IOException occurs
    */
   <T> void toBean(T target, JsonParser parser, JsonReadOptions options) throws JsonIOException;
 
   /**
-<<<<<<< HEAD
-   * Convert json reader input into a Bean of a specific type.
-=======
    * Read json reader input into a given Bean.<br>
    * See {@link #toBean(Class, JsonParser)} for details
->>>>>>> upstream/master
    *
    * @throws JsonIOException When IOException occurs
    */
   <T> void toBean(T target, Reader json) throws JsonIOException;
 
   /**
-<<<<<<< HEAD
-   * Convert json reader input into a Bean of a specific type additionally using JsonReadOptions.
-=======
    * Read json reader input into a given Bean additionally using JsonReadOptions.<br>
    * See {@link #toBean(Class, JsonParser)} for details modified.
->>>>>>> upstream/master
    *
    * @throws JsonIOException When IOException occurs
    */
   <T> void toBean(T target, Reader json, JsonReadOptions options) throws JsonIOException;
 
   /**
-<<<<<<< HEAD
-   * Convert json string input into a Bean of a specific type.
-=======
    * Read json string input into a given Bean.<br>
    * See {@link #toBean(Class, JsonParser)} for details
->>>>>>> upstream/master
    *
    * @throws JsonIOException When IOException occurs
    */
   <T> void toBean(T target, String json) throws JsonIOException;
 
   /**
-<<<<<<< HEAD
-   * Convert json string input into a Bean of a specific type additionally using JsonReadOptions.
-=======
    * Read json string input into a given Bean additionally using JsonReadOptions.<br>
    * See {@link #toBean(Class, JsonParser)} for details
->>>>>>> upstream/master
    *
    * @throws JsonIOException When IOException occurs
    */

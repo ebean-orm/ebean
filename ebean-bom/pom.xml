@@ -95,7 +95,7 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-dbmigration-runner</artifactId>
-        <version>13.2.1-SNAPSHOT</version>
+        <version>13.3.0-SNAPSHOT</version>
       </dependency>
 
       <dependency>

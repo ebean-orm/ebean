@@ -27,5 +27,4 @@ module io.ebean.test {
   requires static org.junit.jupiter.api;
   requires static jdk.management;
   requires static io.avaje.jsr305x;
-  requires io.ebean.api;
 }
