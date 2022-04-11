@@ -272,7 +272,10 @@ public class QCustomerTest {
     }
 
     Customer customer = DB.find(Customer.class, cust.getId());
-    assertThat(customer.toString()).contains("Customer@0(id:1, status:GOOD, inactive:false, name:usingConnection, version:1, whenCreated:");
+    assert customer != null;
+    String customerToString = customer.toString();
+    assertThat(customerToString).contains("Customer@0(id:");
+    assertThat(customerToString).contains(", status:GOOD, inactive:false, name:usingConnection, version:1, whenCreated:");
   }
 
   @Test
