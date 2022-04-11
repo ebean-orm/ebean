@@ -270,6 +270,9 @@ public class QCustomerTest {
 
       assertThat(foo).hasSize(1);
     }
+
+    Customer customer = DB.find(Customer.class, cust.getId());
+    assertThat(customer.toString()).contains("Customer@0(id:1, status:GOOD, inactive:false, name:usingConnection, version:1, whenCreated:");
   }
 
   @Test
