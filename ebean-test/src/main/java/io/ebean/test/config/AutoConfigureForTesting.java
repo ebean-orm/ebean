@@ -29,6 +29,10 @@ public class AutoConfigureForTesting implements AutoConfigure {
 
   @Override
   public void preConfigure(DatabaseConfig config) {
+    if (!config.isDefaultServer()) {
+      log.info("skip automatic testing config on non-default server name:{} register:{}", config.getName(), config.isRegister());
+      return;
+    }
 
     Properties properties = config.getProperties();
     if (isExtraServer(config, properties)) {
@@ -52,6 +56,9 @@ public class AutoConfigureForTesting implements AutoConfigure {
 
   @Override
   public void postConfigure(DatabaseConfig config) {
+    if (!config.isDefaultServer()) {
+      return;
+    }
     setupProviders(config);
 
     if (org.h2.engine.Constants.VERSION_MAJOR == 1) {
