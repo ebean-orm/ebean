@@ -7,12 +7,14 @@ import javax.persistence.DiscriminatorType;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Represents a node in the Inheritance tree.
  * Holds information regarding Super Subclass support.
  */
-public final class DeployInheritInfo {
+public final class DeployInheritInfo implements Comparable<DeployInheritInfo> {
 
   /**
    * the default discriminator column according to the JPA 1.0 spec.
@@ -27,7 +29,7 @@ public final class DeployInheritInfo {
   private String columnDefn;
   private final Class<?> type;
   private Class<?> parent;
-  private final ArrayList<DeployInheritInfo> children = new ArrayList<>();
+  private final Set<DeployInheritInfo> children = new TreeSet<>();
 
   /**
    * Create for a given type.
@@ -74,7 +76,7 @@ public final class DeployInheritInfo {
   /**
    * Return the child nodes.
    */
-  public List<DeployInheritInfo> children() {
+  public Set<DeployInheritInfo> children() {
     return children;
   }
 
@@ -251,7 +253,22 @@ public final class DeployInheritInfo {
 
   @Override
   public String toString() {
-    return "InheritInfo[" + type.getName() + "]" + " root[" + parent.getName() + "]" + " disValue[" + discriminatorStringValue + "]";
+    String root = parent == null ? null : parent.getName();
+    String name = type == null ? null : type.getName();
+    return "InheritInfo[" + name + "]" + " root[" + root + "]" + " disValue[" + discriminatorStringValue + "]";
+  }
+
+  @Override
+  public int compareTo(DeployInheritInfo o) {
+    if (o == this || o.discriminatorStringValue == null && discriminatorStringValue == null) {
+      return 0;
+    } else if (o.discriminatorStringValue == null) {
+      return 1;
+    } else if (discriminatorStringValue == null) {
+      return -1;
+    } else {
+      return discriminatorStringValue.compareTo(o.discriminatorStringValue);
+    }
   }
 
 }
