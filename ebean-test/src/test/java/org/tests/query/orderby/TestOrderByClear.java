@@ -6,6 +6,7 @@ import io.ebean.OrderBy;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
+import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -36,6 +37,19 @@ public class TestOrderByClear extends BaseTestCase {
 
     assertTrue(sql.contains("order by t0.ship_date"));
 
+  }
+  
+  @Test
+  public void testWithCache() {
+    ResetBasicData.reset();
+
+    Query<OrderDetail> query = DB.find(OrderDetail.class).where().idIn(1,2,3).query();
+    query.setUseCache(true);
+    query.findList();
+    query.order().asc("cretime").findList(); // hit cache
+    query.order().clear();
+    query.findList(); // hit cache again
+    
   }
 
 }
