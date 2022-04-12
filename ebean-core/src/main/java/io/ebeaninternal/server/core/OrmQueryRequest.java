@@ -524,7 +524,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     }
     if (result instanceof BeanList) {
       OrderBy<T> orderBy = query.getOrderBy();
-      if (orderBy != null) {
+      if (orderBy != null && !orderBy.isEmpty()) {
         // in memory sort after merging the cache hits with the DB hits
         beanDescriptor.sort(((BeanList<T>) result).getActualList(), orderBy.toStringFormat());
       }
@@ -543,7 +543,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   @Override
   public List<T> beanCacheHits() {
     OrderBy<T> orderBy = query.getOrderBy();
-    if (orderBy != null) {
+    if (orderBy != null && !orderBy.isEmpty()) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
     return cacheBeans;
@@ -552,7 +552,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   @Override
   public <K> Map<K, T> beanCacheHitsAsMap() {
     OrderBy<T> orderBy = query.getOrderBy();
-    if (orderBy != null) {
+    if (orderBy != null && !orderBy.isEmpty()) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
     return cacheBeansToMap();
