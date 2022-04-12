@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-<!--  <parent>-->
-<!--    <groupId>org.avaje</groupId>-->
-<!--    <artifactId>java11-oss</artifactId>-->
-<!--    <version>2.3</version>-->
-<!--  </parent>-->
 
   <groupId>io.ebean</groupId>
   <artifactId>test-java16</artifactId>
@@ -13,7 +9,6 @@
 
   <properties>
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-    <maven.deploy.skip>true</maven.deploy.skip>
   </properties>
 
   <dependencies>
@@ -26,7 +21,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.10</version>
+      <version>1.2.11</version>
     </dependency>
 
     <dependency>
@@ -63,6 +58,19 @@
           </annotationProcessorPaths>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>2.24</version>
+        <extensions>true</extensions>
+        <configuration>
+          <tiles>
+            <tile>io.ebean.tile:enhancement:13.3.0</tile>
+          </tiles>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
