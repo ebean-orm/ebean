@@ -117,9 +117,9 @@ public class TestNatKeyCacheWithForeignKey extends BaseTestCase {
 
   @Test
   public void findSimple() {
-
     setupData();
     clearAllL2Cache();
+    appStats();
 
     OCachedApp app0 = findAppByName("app0");
     assertThat(app0).isNotNull();

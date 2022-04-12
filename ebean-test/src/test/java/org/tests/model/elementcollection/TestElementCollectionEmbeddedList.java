@@ -190,6 +190,6 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     final EcblPerson fromJson = DB.json().toBean(EcblPerson.class, asJson);
     assertThat(fromJson.getName()).isEqualTo("Fiona64021");
     assertThat(fromJson.getPhoneNumbers()).hasSize(2);
-    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("BeanList size[2] list[64-021-1234, 64-021-4321]");
+    assertThat(fromJson.getPhoneNumbers().toString()).isEqualTo("[64-021-1234, 64-021-4321]");
   }
 }

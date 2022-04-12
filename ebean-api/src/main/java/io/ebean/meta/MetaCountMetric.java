@@ -10,11 +10,4 @@ public interface MetaCountMetric extends MetaMetric {
    */
   long count();
 
-  /**
-   * Migrate to count()
-   */
-  @Deprecated
-  default long getCount() {
-    return count();
-  }
 }

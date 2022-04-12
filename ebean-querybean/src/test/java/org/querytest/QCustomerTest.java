@@ -270,6 +270,12 @@ public class QCustomerTest {
 
       assertThat(foo).hasSize(1);
     }
+
+    Customer customer = DB.find(Customer.class, cust.getId());
+    assert customer != null;
+    String customerToString = customer.toString();
+    assertThat(customerToString).contains("Customer@0(id:");
+    assertThat(customerToString).contains(", status:GOOD, inactive:false, name:usingConnection, version:1, whenCreated:");
   }
 
   @Test
@@ -385,24 +391,6 @@ public class QCustomerTest {
     }
 
     assertThat(sb.toString()).isEqualTo("stream1|stream2");
-  }
-
-  @Test
-  public void testFindLargeStream() {
-    insertCustomer("largeStream1");
-    insertCustomer("largeStream2");
-    insertCustomer("largeStream3");
-
-    StringJoiner sb = new StringJoiner("|");
-    try (Stream<Customer> stream = new QCustomer()
-      .name.startsWith("largeStream")
-      .id.asc()
-      .findLargeStream()) {
-
-      stream.forEach(it -> sb.add(it.getName()));
-    }
-
-    assertThat(sb.toString()).isEqualTo("largeStream1|largeStream2|largeStream3");
   }
 
   @Test

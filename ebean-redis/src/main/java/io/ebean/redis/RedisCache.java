@@ -277,17 +277,7 @@ final class RedisCache implements ServerCache {
   }
 
   @Override
-  public int size() {
-    return 0;
-  }
-
-  @Override
-  public int getHitRatio() {
-    return 0;
-  }
-
-  @Override
-  public ServerCacheStatistics getStatistics(boolean reset) {
+  public ServerCacheStatistics statistics(boolean reset) {
     ServerCacheStatistics cacheStats = new ServerCacheStatistics();
     cacheStats.setCacheName(cacheKey);
     cacheStats.setHitCount(hitCount.get(reset));

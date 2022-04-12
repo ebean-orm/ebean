@@ -5,7 +5,7 @@ import java.util.Comparator;
 /**
  * Comparator for timed metrics sorted by name and then count.
  */
-public class SortMetric {
+public final class SortMetric {
 
   public static final Comparator<MetaCountMetric> COUNT_NAME = new CountName();
 

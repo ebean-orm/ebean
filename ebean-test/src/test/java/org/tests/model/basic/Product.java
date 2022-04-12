@@ -33,7 +33,7 @@ public class Product implements Serializable {
 
   String name;
 
-  @CreatedTimestamp
+  @WhenCreated
   Timestamp cretime;
 
   @Version

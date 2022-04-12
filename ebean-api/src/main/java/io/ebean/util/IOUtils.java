@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
  * Utilities for IO. It uses UTF-8 as encoding when reading/writing and uses
  * buffered IO for better performance.
  */
-public class IOUtils {
+public final class IOUtils {
 
   /**
    * Read from stream as UTF-8.

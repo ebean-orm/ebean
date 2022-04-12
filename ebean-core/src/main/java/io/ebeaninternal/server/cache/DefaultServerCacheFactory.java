@@ -1,11 +1,7 @@
 package io.ebeaninternal.server.cache;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.cache.ServerCache;
-import io.ebean.cache.ServerCacheConfig;
-import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheNotification;
-import io.ebean.cache.ServerCacheNotify;
+import io.ebean.cache.*;
 
 
 /**
@@ -41,7 +37,7 @@ final class DefaultServerCacheFactory implements ServerCacheFactory {
     if (executor != null) {
       cache.periodicTrim(executor);
     }
-    return cache;
+    return config.tenantAware(cache);
   }
 
   @Override

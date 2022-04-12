@@ -1,4 +1,4 @@
-package io.ebean.xtest.config;
+package io.ebean.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.annotation.MutationDetection;
@@ -17,11 +17,10 @@ import java.util.Properties;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DatabaseConfigTest {
+class DatabaseConfigTest {
 
   @Test
-  public void testLoadFromEbeanProperties() {
-
+  void testLoadFromEbeanProperties() {
     DatabaseConfig config = new DatabaseConfig();
     config.loadFromProperties();
 
@@ -30,8 +29,7 @@ public class DatabaseConfigTest {
   }
 
   @Test
-  public void evalPropertiesInput() {
-
+  void evalPropertiesInput() {
     String home = System.getProperty("user.home");
     String fileSeparator = System.getProperty("file.separator");
 
@@ -46,8 +44,7 @@ public class DatabaseConfigTest {
   }
 
   @Test
-  public void testLoadWithProperties() {
-
+  void testLoadWithProperties() {
     DatabaseConfig config = new DatabaseConfig();
     config.setPersistBatch(PersistBatch.NONE);
     config.setPersistBatchOnCascade(PersistBatch.NONE);
@@ -154,8 +151,7 @@ public class DatabaseConfigTest {
   }
 
   @Test
-  public void test_defaults() {
-
+  void test_defaults() {
     DatabaseConfig config = new DatabaseConfig();
     assertTrue(config.isIdGeneratorAutomatic());
     assertTrue(config.isDefaultServer());
@@ -186,8 +182,7 @@ public class DatabaseConfigTest {
   }
 
   @Test
-  public void test_putServiceObject() {
-
+  void test_putServiceObject() {
     ObjectMapper objectMapper = new ObjectMapper();
 
     DatabaseConfig config = new DatabaseConfig();

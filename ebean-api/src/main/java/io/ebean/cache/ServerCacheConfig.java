@@ -13,6 +13,7 @@ public class ServerCacheConfig {
   private final ServerCacheOptions cacheOptions;
   private final CurrentTenantProvider tenantProvider;
   private final QueryCacheEntryValidate queryCacheEntryValidate;
+  private final TenantAwareKey tenantAwareKey;
 
   public ServerCacheConfig(ServerCacheType type, String cacheKey, String shortName, ServerCacheOptions cacheOptions, CurrentTenantProvider tenantProvider, QueryCacheEntryValidate queryCacheEntryValidate) {
     this.type = type;
@@ -21,6 +22,14 @@ public class ServerCacheConfig {
     this.cacheOptions = cacheOptions;
     this.tenantProvider = tenantProvider;
     this.queryCacheEntryValidate = queryCacheEntryValidate;
+    this.tenantAwareKey = (tenantProvider == null) ? null : new TenantAwareKey(tenantProvider);
+  }
+
+  /**
+   * Return the ServerCache taking into account if multi-tenant is used.
+   */
+  public ServerCache tenantAware(ServerCache cache) {
+    return tenantAwareKey == null ? cache : new TenantAwareCache(cache, tenantAwareKey);
   }
 
   /**

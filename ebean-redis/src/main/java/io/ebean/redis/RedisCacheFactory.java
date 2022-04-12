@@ -139,7 +139,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
     RedisCache redisCache = createRedisCache(config);
     boolean nearCache = config.getCacheOptions().isNearCache();
     if (!nearCache) {
-      return redisCache;
+      return config.tenantAware(redisCache);
     }
 
     String cacheKey = config.getCacheKey();
@@ -147,7 +147,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
     near.periodicTrim(executor);
     DuelCache duelCache = new DuelCache(near, redisCache, cacheKey, nearCacheNotify);
     nearCacheMap.put(cacheKey, duelCache);
-    return duelCache;
+    return config.tenantAware(duelCache);
   }
 
   private RedisCache createRedisCache(ServerCacheConfig config) {
@@ -173,7 +173,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
         cache.periodicTrim(executor);
         queryCaches.put(config.getCacheKey(), cache);
       }
-      return cache;
+      return config.tenantAware(cache);
     } finally {
       lock.unlock();
     }

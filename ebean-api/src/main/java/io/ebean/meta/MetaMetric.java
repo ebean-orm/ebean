@@ -10,11 +10,4 @@ public interface MetaMetric {
    */
   String name();
 
-  /**
-   * Migrate to name().
-   */
-  @Deprecated
-  default String getName() {
-    return name();
-  }
 }

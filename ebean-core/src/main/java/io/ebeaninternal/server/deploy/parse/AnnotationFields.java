@@ -1,38 +1,7 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.Aggregation;
-import io.ebean.annotation.CreatedTimestamp;
-import io.ebean.annotation.DbArray;
-import io.ebean.annotation.DbComment;
-import io.ebean.annotation.DbDefault;
-import io.ebean.annotation.DbJson;
-import io.ebean.annotation.DbJsonB;
-import io.ebean.annotation.DbMap;
-import io.ebean.annotation.DbMigration;
-import io.ebean.annotation.DocCode;
-import io.ebean.annotation.DocEmbedded;
-import io.ebean.annotation.DocProperty;
-import io.ebean.annotation.DocSortable;
-import io.ebean.annotation.Draft;
-import io.ebean.annotation.DraftDirty;
-import io.ebean.annotation.DraftOnly;
-import io.ebean.annotation.DraftReset;
-import io.ebean.annotation.Encrypted;
-import io.ebean.annotation.Expose;
-import io.ebean.annotation.Formula;
-import io.ebean.annotation.HistoryExclude;
-import io.ebean.annotation.Identity;
 import io.ebean.annotation.Index;
-import io.ebean.annotation.JsonIgnore;
-import io.ebean.annotation.Length;
-import io.ebean.annotation.SoftDelete;
-import io.ebean.annotation.TenantId;
-import io.ebean.annotation.UnmappedJson;
-import io.ebean.annotation.UpdatedTimestamp;
-import io.ebean.annotation.WhenCreated;
-import io.ebean.annotation.WhenModified;
-import io.ebean.annotation.WhoCreated;
-import io.ebean.annotation.WhoModified;
+import io.ebean.annotation.*;
 import io.ebean.config.EncryptDeploy;
 import io.ebean.config.EncryptDeploy.Mode;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -51,24 +20,7 @@ import io.ebeaninternal.server.type.ScalarTypeBytesBase;
 import io.ebeaninternal.server.type.ScalarTypeBytesEncrypted;
 import io.ebeaninternal.server.type.ScalarTypeEncryptedWrapper;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PersistenceException;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.persistence.Version;
+import javax.persistence.*;
 import java.sql.Types;
 import java.util.Set;
 import java.util.UUID;
@@ -339,10 +291,10 @@ final class AnnotationFields extends AnnotationParser {
   }
 
   private void initWhen(DeployBeanProperty prop) {
-    if (has(prop, WhenCreated.class) || has(prop, CreatedTimestamp.class)) {
+    if (has(prop, WhenCreated.class)) {
       generatedPropFactory.setInsertTimestamp(prop);
     }
-    if (has(prop, WhenModified.class) || has(prop, UpdatedTimestamp.class)) {
+    if (has(prop, WhenModified.class)) {
       generatedPropFactory.setUpdateTimestamp(prop);
     }
   }

@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Annotation utility methods to find annotations.
  */
-public class AnnotationUtil {
+public final class AnnotationUtil {
 
   /**
    * Determine if the supplied {@link Annotation} is defined in the core JDK {@code java.lang.annotation} package.

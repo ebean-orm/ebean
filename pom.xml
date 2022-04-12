@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>3.6</version>
+    <version>3.7</version>
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.0.1-SNAPSHOT</version>
+  <version>13.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -40,14 +40,14 @@
   <properties>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.13.2</jackson.version>
-    <h2database.version>2.1.210</h2database.version>
+    <h2database.version>2.1.212</h2database.version>
     <ebean-ddl-runner.version>1.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>13.0.0</ebean-migration.version>
-    <ebean-test-docker.version>4.5</ebean-test-docker.version>
+    <ebean-test-docker.version>4.6</ebean-test-docker.version>
     <ebean-datasource.version>7.5</ebean-datasource.version>
-    <ebean-agent.version>13.0.1-RC2</ebean-agent.version>
-    <ebean-maven-plugin.version>13.0.1-RC2</ebean-maven-plugin.version>
+    <ebean-agent.version>13.3.0</ebean-agent.version>
+    <ebean-maven-plugin.version>13.3.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 

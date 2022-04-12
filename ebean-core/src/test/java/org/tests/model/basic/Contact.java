@@ -40,7 +40,7 @@ public class Contact {
   @OneToMany(cascade = CascadeType.ALL)
   List<ContactNote> notes;
 
-  @CreatedTimestamp
+  @WhenCreated
   Timestamp cretime;
 
   @Version

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.0.1-SNAPSHOT</version>
+    <version>13.3.0-SNAPSHOT</version>
   </parent>
 
   <name>ebean test</name>
@@ -29,20 +29,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.0.1-SNAPSHOT</version>
+      <version>13.3.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.0.1-SNAPSHOT</version>
+      <version>13.3.0-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.0.1-SNAPSHOT</version>
+      <version>13.3.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -62,7 +62,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test-docker</artifactId>
-      <version>4.5</version>
+      <version>${ebean-test-docker.version}</version>
     </dependency>
 
     <dependency>
@@ -106,7 +106,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>13.0.1-SNAPSHOT</version>
+      <version>13.3.0-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -266,7 +266,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.0.1-RC1</tile>
+            <tile>io.ebean.tile:enhancement:13.3.0</tile>
           </tiles>
         </configuration>
       </plugin>

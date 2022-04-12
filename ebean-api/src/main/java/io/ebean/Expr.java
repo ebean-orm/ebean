@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @see Query#where()
  */
-public class Expr {
+public final class Expr {
 
   private Expr() {
   }

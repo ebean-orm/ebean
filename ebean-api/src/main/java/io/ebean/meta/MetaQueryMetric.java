@@ -11,38 +11,14 @@ public interface MetaQueryMetric extends MetaTimedMetric {
   Class<?> type();
 
   /**
-   * Migrate to type().
-   */
-  @Deprecated
-  default Class<?> getType() {
-    return type();
-  }
-
-  /**
    * The label for the query (can be null).
    */
   String label();
 
   /**
-   * Migrate to label().
-   */
-  @Deprecated
-  default String getLabel() {
-    return label();
-  }
-
-  /**
    * The actual SQL of the query.
    */
   String sql();
-
-  /**
-   * Migrate to sql().
-   */
-  @Deprecated
-  default String getSql() {
-    return sql();
-  }
 
   /**
    * Return the hash of the plan.

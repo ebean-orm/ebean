@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p/>
  * Intended for internal use as part of bootup, construction, registration of the default database.
  */
-class DbPrimary {
+final class DbPrimary {
 
   private static final ReentrantLock lock = new ReentrantLock();
   private static String defaultServerName;

@@ -11,7 +11,7 @@ import java.io.Serializable;
  * general application consumption.
  * </p>
  */
-public interface EntityBean extends Serializable {
+public interface EntityBean extends Serializable, ToStringAware {
 
   /**
    * Return all the property names in defined order.
@@ -116,4 +116,8 @@ public interface EntityBean extends Serializable {
     throw new NotEnhancedException();
   }
 
+  @Override
+  default void toString(ToStringBuilder builder) {
+    throw new NotEnhancedException();
+  }
 }

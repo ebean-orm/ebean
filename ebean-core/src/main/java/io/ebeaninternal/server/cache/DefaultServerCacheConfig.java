@@ -3,7 +3,6 @@ package io.ebeaninternal.server.cache;
 import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
-import io.ebean.config.CurrentTenantProvider;
 import io.ebeaninternal.server.cache.DefaultServerCache.CacheEntry;
 
 import java.lang.ref.SoftReference;
@@ -32,10 +31,6 @@ public final class DefaultServerCacheConfig {
     this.maxSecsToLive = options.getMaxSecsToLive();
     this.trimFrequency = options.getTrimFrequency();
     this.maxSize = options.getMaxSize();
-  }
-
-  public CurrentTenantProvider getTenantProvider() {
-    return config.getTenantProvider();
   }
 
   public QueryCacheEntryValidate getQueryCacheEntryValidate() {

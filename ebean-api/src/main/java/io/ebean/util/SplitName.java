@@ -3,7 +3,7 @@ package io.ebean.util;
 /**
  * Helper for dot notation property paths.
  */
-public class SplitName {
+public final class SplitName {
 
   private static final char PERIOD = '.';
 

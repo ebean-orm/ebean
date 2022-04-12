@@ -751,29 +751,6 @@ public interface Query<T> extends CancelableQuery {
   Stream<T> findStream();
 
   /**
-   * Deprecated - migrate to findStream.
-   * <p>
-   * Execute the query returning the result as a Stream.
-   * <p>
-   * Note that this uses multiple persistence contexts such that we can use
-   * it with a large number of results.
-   * </p>
-   * <pre>{@code
-   *
-   *  // use try with resources to ensure Stream is closed
-   *
-   *  try (Stream<Customer> stream = query.findLargeStream()) {
-   *    stream
-   *    .map(...)
-   *    .collect(...);
-   *  }
-   *
-   * }</pre>
-   */
-  @Deprecated
-  Stream<T> findLargeStream();
-
-  /**
    * Execute the query processing the beans one at a time.
    * <p>
    * This method is appropriate to process very large query results as the

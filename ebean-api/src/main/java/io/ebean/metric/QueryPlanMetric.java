@@ -13,14 +13,6 @@ public interface QueryPlanMetric {
   TimedMetric metric();
 
   /**
-   * Deprecated migrate to metric().
-   */
-  @Deprecated
-  default TimedMetric getMetric() {
-    return metric();
-  }
-
-  /**
    * Visit the underlying metric.
    */
   void visit(MetricVisitor visitor);

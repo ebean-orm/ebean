@@ -1,7 +1,5 @@
 package org.tests.model;
 
-import io.ebean.annotation.CreatedTimestamp;
-import io.ebean.annotation.UpdatedTimestamp;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
 
@@ -31,40 +29,40 @@ public class EGenProps {
   @WhenModified
   Timestamp whenModified;
 
-  @CreatedTimestamp
+  @WhenCreated
   Timestamp tsCreated;
 
-  @UpdatedTimestamp
+  @WhenModified
   Timestamp tsUpdated;
 
-  @CreatedTimestamp
+  @WhenCreated
   LocalDateTime ldtCreated;
 
-  @UpdatedTimestamp
+  @WhenModified
   LocalDateTime ldtUpdated;
 
-  @CreatedTimestamp
+  @WhenCreated
   OffsetDateTime odtCreated;
 
-  @UpdatedTimestamp
+  @WhenModified
   OffsetDateTime odtUpdated;
 
-  @CreatedTimestamp
+  @WhenCreated
   ZonedDateTime zdtCreated;
 
-  @UpdatedTimestamp
+  @WhenModified
   ZonedDateTime zdtUpdated;
 
-  @CreatedTimestamp
+  @WhenCreated
   Instant instantCreated;
 
-  @UpdatedTimestamp
+  @WhenModified
   Instant instantUpdated;
 
-  @CreatedTimestamp
+  @WhenCreated
   long longCreated;
 
-  @UpdatedTimestamp
+  @WhenModified
   long longUpdated;
 
   public Long getId() {

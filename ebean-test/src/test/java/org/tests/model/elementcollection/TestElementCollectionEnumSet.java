@@ -45,6 +45,6 @@ public class TestElementCollectionEnumSet extends BaseTestCase {
     final EcEnumPerson fromJson = DB.json().toBean(EcEnumPerson.class, asJson);
     assertThat(fromJson.getName()).isEqualTo("Enum Person");
     assertThat(fromJson.getTags()).hasSize(2);
-    assertThat(fromJson.getTags().toString()).isEqualTo("BeanSet size[2] set[BLUE, RED]");
+    assertThat(fromJson.getTags().toString()).isEqualTo("[BLUE, RED]");
   }
 }

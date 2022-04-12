@@ -12,7 +12,7 @@ import java.util.Properties;
  *
  * @author Roland Praml, FOCONIS AG
  */
-public class EbeanVersion {
+public final class EbeanVersion {
 
   private static final Logger log = LoggerFactory.getLogger("io.ebean");
 

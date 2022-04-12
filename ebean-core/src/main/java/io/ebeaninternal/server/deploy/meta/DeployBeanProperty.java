@@ -219,9 +219,7 @@ public class DeployBeanProperty {
     return (AnnotationUtil.has(field, WhenCreated.class)
       || AnnotationUtil.has(field, WhenModified.class)
       || AnnotationUtil.has(field, WhoModified.class)
-      || AnnotationUtil.has(field, WhoCreated.class)
-      || AnnotationUtil.has(field, UpdatedTimestamp.class)
-      || AnnotationUtil.has(field, CreatedTimestamp.class));
+      || AnnotationUtil.has(field, WhoCreated.class));
   }
 
   public String getFullBeanName() {
