@@ -1,5 +1,5 @@
-
-module io.ebean.test {
+// module must be open, so tests will pass
+open module io.ebean.test {
 
   exports io.ebean.test;
   exports io.ebean.test.config;

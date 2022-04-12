@@ -1,4 +1,4 @@
-package io.ebeaninternal.dbmigration;
+package io.ebean.xtest.base;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
