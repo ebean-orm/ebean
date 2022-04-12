@@ -68,6 +68,8 @@ public abstract class BaseTestCase {
       DB_CLOCK_DELTA = 100;
     }
     try {
+      String propsFile = System.getProperty("props.file");
+      System.out.println("BaseTestCase: -Dprops.file=" + propsFile); // help debug CI
       // First try, if we get the default server. If this fails, all tests will fail.
       DB.getDefault();
     } catch (Throwable e) {
