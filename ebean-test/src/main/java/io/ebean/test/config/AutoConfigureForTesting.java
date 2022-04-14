@@ -29,16 +29,17 @@ public class AutoConfigureForTesting implements AutoConfigure {
 
   @Override
   public void preConfigure(DatabaseConfig config) {
-
+    if (!config.isDefaultServer()) {
+      log.info("skip automatic testing config on non-default server name:{} register:{}", config.getName(), config.isRegister());
+      return;
+    }
     Properties properties = config.getProperties();
     if (isExtraServer(config, properties)) {
       setupExtraDataSourceIfNecessary(config);
       return;
     }
-
     String testPlatform = properties.getProperty("ebean.test.platform");
-    log.debug("automatic testing config - with ebean.test.platform:{} environment db:{} name:{}", testPlatform, environmentDb, config.getName());
-
+    log.debug("automatic testing config - with ebean.test.platform:{} name:{} environmentDb:{}", testPlatform, config.getName(), environmentDb);
     if (RunOnceMarker.isRun()) {
       setupPlatform(environmentDb, config);
     }
@@ -46,8 +47,10 @@ public class AutoConfigureForTesting implements AutoConfigure {
 
   @Override
   public void postConfigure(DatabaseConfig config) {
+    if (!config.isDefaultServer()) {
+      return;
+    }
     setupProviders(config);
-    
     if (org.h2.engine.Constants.VERSION_MAJOR == 1) {
       // This code may be removed later, when droppinv H2 1.xxx compatibility
       System.err.println("Running tests in H2 1.xxx compatibility mode");
