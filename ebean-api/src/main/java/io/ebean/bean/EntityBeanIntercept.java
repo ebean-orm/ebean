@@ -6,6 +6,11 @@ import io.ebean.ValuePair;
 
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceException;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -910,7 +915,36 @@ public final class EntityBeanIntercept implements Serializable {
       // use the string format to determine if dirty
       return !obj1.toString().equals(obj2.toString());
     }
+    if (obj1 instanceof File && obj2 instanceof File) {
+      File file1 = (File) obj1;
+      File file2 = (File) obj2;
+      if (file1.exists() && file2.exists() && file1.length() == file2.length()) {
+        return notEqualContent(file1, file2);
+      }
+    }
     return !obj1.equals(obj2);
+  }
+
+  private static boolean notEqualContent(File file1, File file2) {
+    try (InputStream is1 = new FileInputStream(file1); InputStream is2 = new FileInputStream(file2)) {
+      byte[] buf1 = new byte[16384];
+      byte[] buf2 = new byte[16384];
+      int len1;
+      int len2;
+      while ((len1 = is1.read(buf1)) != -1 && (len2 = is2.read(buf2)) != -1) {
+        if (len1 != len2) {
+          return true;
+        }
+        if (!Arrays.equals(buf1, buf2)) {
+          // it does not matter, if we compare more than len1/len2 as the remainig
+          // bytes in the buffers are either 0 or equals from the prev. loop.
+          return true;
+        }
+      }
+      return false;
+    } catch (IOException e) {
+      return true; // handle them as "not equals"
+    }
   }
 
   /**
