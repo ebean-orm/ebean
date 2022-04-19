@@ -18,7 +18,7 @@ class TestHistoryOneToOne extends BaseTestCase {
   @IgnorePlatform({Platform.ORACLE, Platform.COCKROACH})
   @Test
   void test() throws InterruptedException {
-    HistorylessOneToOne historylessOneToOne = new HistorylessOneToOne();
+    HistorylessOneToOne historylessOneToOne = new HistorylessOneToOne("less");
     historylessOneToOne.setHistoryOneToOne(new HistoryOneToOne("one"));
     DB.save(historylessOneToOne);
     Thread.sleep(20);
@@ -56,7 +56,9 @@ class TestHistoryOneToOne extends BaseTestCase {
     assertThat(lessFetched.getId()).isEqualTo(expectedLessId);
     HistoryOneToOne history1 = lessFetched.getHistoryOneToOne();
     assertThat(history1.getId()).isEqualTo(expectedHistoryId);
-    assertThat(history1.getHistorylessOneToOne().getId()).isEqualTo(expectedLessId);
+    assertThat(history1.less().getId()).isEqualTo(expectedLessId);
+    assertThat(history1.less().getName()).isEqualTo("less");
+    assertThat(history1.getName()).isEqualTo("one");
   }
 
 
@@ -81,6 +83,8 @@ class TestHistoryOneToOne extends BaseTestCase {
   private void expected_viaHistory(HistoryOneToOne oneFetched) {
     assert oneFetched != null;
     assertThat(oneFetched.getId()).isEqualTo(expectedHistoryId);
-    assertThat(oneFetched.getHistorylessOneToOne().getId()).isEqualTo(expectedLessId);
+    assertThat(oneFetched.less().getId()).isEqualTo(expectedLessId);
+    assertThat(oneFetched.less().getName()).isEqualTo("less");
+    assertThat(oneFetched.getName()).isEqualTo("one");
   }
 }

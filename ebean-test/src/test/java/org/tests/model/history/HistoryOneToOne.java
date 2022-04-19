@@ -10,7 +10,7 @@ import org.tests.model.draftable.BaseDomain;
 @Entity
 public class HistoryOneToOne extends BaseDomain {
 
-  String name;
+  final String name;
 
   @OneToOne(cascade = CascadeType.REFRESH)
   HistorylessOneToOne historylessOneToOne;
@@ -19,14 +19,11 @@ public class HistoryOneToOne extends BaseDomain {
     this.name = name;
   }
 
-  public HistoryOneToOne() {
-  }
-
-  public HistorylessOneToOne getHistorylessOneToOne() {
+  public HistorylessOneToOne less() {
     return historylessOneToOne;
   }
 
-  public void setHistorylessOneToOne(final HistorylessOneToOne historylessOneToOne) {
-    this.historylessOneToOne = historylessOneToOne;
+  public String getName() {
+    return name;
   }
 }

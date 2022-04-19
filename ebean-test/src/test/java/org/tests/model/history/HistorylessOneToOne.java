@@ -9,15 +9,13 @@ import javax.persistence.OneToOne;
 @Entity
 public class HistorylessOneToOne extends BaseDomain {
 
-  private String name;
+  private final String name;
 
   /**
    * This @OneToOne(mappedBy=...) side should really be FetchType.LAZY
    */
   @OneToOne(mappedBy = "historylessOneToOne", cascade = CascadeType.ALL, orphanRemoval = true)//, fetch = FetchType.LAZY)
   HistoryOneToOne historyOneToOne;
-
-  public HistorylessOneToOne() {}
 
   public HistorylessOneToOne(final String name) {
     this.name = name;
@@ -29,5 +27,9 @@ public class HistorylessOneToOne extends BaseDomain {
 
   public void setHistoryOneToOne(final HistoryOneToOne historyOneToOne) {
     this.historyOneToOne = historyOneToOne;
+  }
+
+  public String getName() {
+    return name;
   }
 }
