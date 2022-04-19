@@ -3,7 +3,7 @@ package io.ebeaninternal.server.core;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceAlert;
 import io.ebean.datasource.DataSourceConfig;
-import io.ebean.datasource.pool.ConnectionPool;
+import io.ebean.datasource.DataSourcePool;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
@@ -137,7 +137,7 @@ public class InitDataSourceTest {
     config.getDataSourceConfig().setUrl("jdbc:h2:mem:dsTestOnline");
     config.getDataSourceConfig().setDriver("org.h2.Driver");
     InitDataSource.init(config);
-    ConnectionPool pool = (ConnectionPool) config.getDataSource();
+    DataSourcePool pool = (DataSourcePool) config.getDataSource();
     assertThat(pool.isDataSourceUp()).isTrue();
     pool.shutdown();
   }
@@ -174,7 +174,7 @@ public class InitDataSourceTest {
     config.getDataSourceConfig().setAlert(alert);
     config.setDatabasePlatformName("h2");
     InitDataSource.init(config);
-    ConnectionPool pool = (ConnectionPool) config.getDataSource();
+    DataSourcePool pool = (DataSourcePool) config.getDataSource();
     assertThat(pool).isNotNull();
     // make some additional tests with the pool
     assertThat(pool.isDataSourceUp()).isFalse();
