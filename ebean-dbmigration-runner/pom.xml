@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.3.1-FOC1-SNAPSHOT</version>
+    <version>13.3.1-FOC1</version>
   </parent>
 
   <name>ebean dbmigration runner</name>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.3.1-FOC1-SNAPSHOT</version>
+      <version>13.3.1-FOC1</version>
       <scope>provided</scope>
     </dependency>
 
