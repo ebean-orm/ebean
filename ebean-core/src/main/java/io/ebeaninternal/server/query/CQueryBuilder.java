@@ -647,6 +647,7 @@ final class CQueryBuilder {
       if (query.isAsOfBaseTable() && !historySupport.isStandardsBased()) {
         appendAndOrWhere();
         sb.append(historySupport.getAsOfPredicate(request.baseTableAlias()));
+        query.incrementAsOfTableCount();
       }
     }
 

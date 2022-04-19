@@ -12,7 +12,7 @@ public class HistoryOneToOne extends BaseDomain {
 
   String name;
 
-  @OneToOne(cascade = {CascadeType.REFRESH, CascadeType.REFRESH})
+  @OneToOne(cascade = CascadeType.REFRESH)
   HistorylessOneToOne historylessOneToOne;
 
   public HistoryOneToOne(String name) {

@@ -317,6 +317,11 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
+  public void incrementAsOfTableCount(int increment) {
+    asOfTableCount += increment;
+  }
+
+  @Override
   public int getAsOfTableCount() {
     return asOfTableCount;
   }

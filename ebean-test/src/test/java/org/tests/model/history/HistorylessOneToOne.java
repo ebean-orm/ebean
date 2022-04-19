@@ -1,22 +1,27 @@
 package org.tests.model.history;
 
+import org.tests.model.draftable.BaseDomain;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-import org.tests.model.draftable.BaseDomain;
 
 @Entity
 public class HistorylessOneToOne extends BaseDomain {
+
   private String name;
+
+  /**
+   * This @OneToOne(mappedBy=...) side should really be FetchType.LAZY
+   */
+  @OneToOne(mappedBy = "historylessOneToOne", cascade = CascadeType.ALL, orphanRemoval = true)//, fetch = FetchType.LAZY)
+  HistoryOneToOne historyOneToOne;
 
   public HistorylessOneToOne() {}
 
   public HistorylessOneToOne(final String name) {
     this.name = name;
   }
-
-  @OneToOne(mappedBy = "historylessOneToOne", cascade = CascadeType.ALL, orphanRemoval = true)
-  HistoryOneToOne historyOneToOne;
 
   public HistoryOneToOne getHistoryOneToOne() {
     return historyOneToOne;

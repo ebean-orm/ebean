@@ -120,6 +120,11 @@ public interface DbSqlContext {
   boolean isIncludeSoftDelete();
 
   /**
+   * Return the count of history table AS OF predicates added via joins.
+   */
+  int asOfTableCount();
+
+  /**
    * Return true if the query is a 'asDraft' query.
    */
   boolean isDraftQuery();

@@ -392,6 +392,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   void incrementAsOfTableCount();
 
   /**
+   * Increment the counter of tables used in 'As Of' query.
+   */
+  void incrementAsOfTableCount(int asOfTableCount);
+
+  /**
    * Return the table alias used for the base table.
    */
   int getAsOfTableCount();

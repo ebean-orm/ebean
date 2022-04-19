@@ -30,6 +30,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private boolean useColumnAlias;
 
   private int columnIndex;
+  private int asOfTableCount;
 
   private StringBuilder sb = new StringBuilder(STRING_BUILDER_INITIAL_CAPACITY);
 
@@ -178,6 +179,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
     }
     if (addAsOfOnClause) {
       sb.append(" and ").append(historySupport.getAsOfPredicate(a2));
+      asOfTableCount++;
     }
     if (extraWhere != null && !extraWhere.isEmpty()) {
       sb.append(" and ");
@@ -193,6 +195,11 @@ final class DefaultDbSqlContext implements DbSqlContext {
     } else {
       sb.append(" ").append(table).append(" ");
     }
+  }
+
+  @Override
+  public int asOfTableCount() {
+    return asOfTableCount;
   }
 
   @Override
