@@ -302,20 +302,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public void addAsOfTableAlias(SpiQuery<?> query) {
-    // if history on this bean type add it's alias
-    // for each alias we add an effect date predicate
-    if (desc.isHistorySupport()) {
-      query.incrementAsOfTableCount();
-    }
-    if (lazyLoadParent != null && lazyLoadParent.isManyToManyWithHistory()) {
-      query.incrementAsOfTableCount();
-    }
-    if (intersectionAsOfTableAlias) {
-      query.incrementAsOfTableCount();
-    }
-    for (SqlTreeNode child : children) {
-      child.addAsOfTableAlias(query);
-    }
+    // do nothing for non-root, handled by DbSqlContext for joins
   }
 
   @Override
