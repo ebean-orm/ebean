@@ -23,7 +23,7 @@ public class ProfileOriginTest extends BaseTestCase {
     c.addUsed("name");
 
     ProfileOrigin po = new ProfileOrigin(null, false, 1, 1);
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
@@ -38,11 +38,11 @@ public class ProfileOriginTest extends BaseTestCase {
     c.addUsed("name");
 
     ProfileOrigin po = new ProfileOrigin(null, false, 1, 1);
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node(null);
     c.addUsed("orderDate");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
@@ -56,11 +56,11 @@ public class ProfileOriginTest extends BaseTestCase {
     c.addUsed("id");
 
     ProfileOrigin po = new ProfileOrigin(null, false, 1, 1);
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node(null);
     c.addUsed("orderDate");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
@@ -75,15 +75,15 @@ public class ProfileOriginTest extends BaseTestCase {
     NodeUsageCollector c = node(null);
     c.addUsed("orderDate");
     c.addUsed("customer");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node("customer");
     c.addUsed("billingAddress");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node("customer.billingAddress");
     c.addUsed("id");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
@@ -100,20 +100,20 @@ public class ProfileOriginTest extends BaseTestCase {
 
     NodeUsageCollector c = node(null);
     c.addUsed("customer");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node("customer");
     c.addUsed("id");
     c.addUsed("name");
     c.addUsed("note");
     c.addUsed("billingAddress");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     //fetch details.product (id,name)
     c = node("customer.billingAddress");
     c.addUsed("id");
     c.addUsed("line1");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
     assertThat(detail.asString()).isEqualTo("fetch customer (name,note) fetch customer.billingAddress (line1)");
