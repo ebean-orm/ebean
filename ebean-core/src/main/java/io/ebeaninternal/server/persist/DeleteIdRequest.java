@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.persist;
 
 import io.ebean.Database;
-import io.ebean.EbeanServer;
 import io.ebean.Transaction;
 import io.ebean.event.BeanDeleteIdRequest;
 import io.ebeaninternal.api.SpiEbeanServer;
