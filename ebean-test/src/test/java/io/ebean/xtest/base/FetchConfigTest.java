@@ -9,31 +9,31 @@ public class FetchConfigTest {
 
   @Test
   public void testLazy() {
-    FetchConfig config = new FetchConfig().lazy();
+    FetchConfig config = FetchConfig.ofLazy();
     assertThat(config.getBatchSize()).isEqualTo(0);
   }
 
   @Test
   public void testLazy_withParameter() {
-    FetchConfig config = new FetchConfig().lazy(50);
+    FetchConfig config = FetchConfig.ofLazy(50);
     assertThat(config.getBatchSize()).isEqualTo(50);
   }
 
   @Test
   public void testQuery() {
-    FetchConfig config = new FetchConfig().query();
+    FetchConfig config = FetchConfig.ofQuery();
     assertThat(config.getBatchSize()).isEqualTo(100);
   }
 
   @Test
   public void testQuery_withParameter() {
-    FetchConfig config = new FetchConfig().query(50);
+    FetchConfig config = FetchConfig.ofQuery(50);
     assertThat(config.getBatchSize()).isEqualTo(50);
   }
 
   @Test
   public void testQueryFirst() {
-    FetchConfig config = new FetchConfig().queryFirst(50);
+    FetchConfig config = FetchConfig.ofQuery(50);
     assertThat(config.getBatchSize()).isEqualTo(50);
   }
 
@@ -52,67 +52,67 @@ public class FetchConfigTest {
 
   @Test
   public void testEquals_when_noOptions() {
-    assertSame(new FetchConfig(), new FetchConfig());
+    assertSame(FetchConfig.ofDefault(), FetchConfig.ofDefault());
   }
 
   @Test
   public void testEquals_when_query_50_lazy_40() {
-    assertSame(new FetchConfig().query(50), FetchConfig.ofQuery(50));
+    assertSame(FetchConfig.ofQuery(50), FetchConfig.ofQuery(50));
   }
 
   @Test
   public void testEquals_when_query_50_lazy() {
-    assertSame(new FetchConfig().lazy(), FetchConfig.ofLazy());
+    assertSame(FetchConfig.ofLazy(), FetchConfig.ofLazy());
   }
 
   @Test
   public void testEquals_when_query_50() {
-    assertSame(new FetchConfig().query(50), new FetchConfig().query(50));
+    assertSame(FetchConfig.ofQuery(50), FetchConfig.ofQuery(50));
   }
 
   @Test
   public void testEquals_when_queryFirst_50_lazy_40() {
-    assertSame(new FetchConfig().queryFirst(50).lazy(40), FetchConfig.ofLazy(40));
+    assertSame(FetchConfig.ofLazy(40), FetchConfig.ofLazy(40));
   }
 
   @Test
   public void testEquals_when_queryFirst_50_lazy() {
-    assertSame(new FetchConfig().queryFirst(50).lazy(), new FetchConfig().queryFirst(50).lazy());
+    assertSame(FetchConfig.ofLazy(), FetchConfig.ofLazy());
   }
 
   @Test
   public void testEquals_when_queryFirst_50() {
-    assertSame(new FetchConfig().queryFirst(50), FetchConfig.ofQuery(50));
+    assertSame(FetchConfig.ofQuery(50), FetchConfig.ofQuery(50));
   }
 
   @Test
   public void testNotEquals_when_query_50() {
-    assertDifferent(new FetchConfig().query(50), new FetchConfig().query(40));
+    assertDifferent(FetchConfig.ofQuery(50), FetchConfig.ofQuery(40));
   }
 
   @Test
   public void testNotEquals_when_query_50_lazy() {
-    assertDifferent(new FetchConfig().query(50), new FetchConfig().query(50).lazy());
+    assertDifferent(FetchConfig.ofQuery(50), FetchConfig.ofLazy(50));
   }
 
   @Test
   public void testNotEquals_when_query_50_lazy_40() {
-    assertDifferent(new FetchConfig().query(50), new FetchConfig().query(50).lazy(40));
+    assertDifferent(FetchConfig.ofQuery(50), FetchConfig.ofLazy(40));
   }
 
   @Test
   public void testNotEquals_when_queryFirst_50() {
-    assertDifferent(new FetchConfig().queryFirst(50), new FetchConfig().queryFirst(40));
+    assertDifferent(FetchConfig.ofQuery(50), FetchConfig.ofQuery(40));
   }
 
   @Test
   public void testNotEquals_when_queryFirst_50_lazy() {
-    assertDifferent(new FetchConfig().queryFirst(50), new FetchConfig().queryFirst(50).lazy());
+    assertDifferent(FetchConfig.ofQuery(50), FetchConfig.ofLazy());
   }
 
   @Test
   public void testNotEquals_when_queryFirst_50_lazy_40() {
-    assertDifferent(new FetchConfig().queryFirst(50), new FetchConfig().queryFirst(50).lazy(40));
+    assertDifferent(FetchConfig.ofQuery(50), FetchConfig.ofLazy(40));
   }
 
   void assertDifferent(FetchConfig v1, FetchConfig v2) {
