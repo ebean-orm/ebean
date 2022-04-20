@@ -103,11 +103,10 @@ public class ProfileOriginNodeUsage {
   /**
    * Collect usage from a node.
    */
-  protected void collectUsageInfo(NodeUsageCollector profile) {
+  protected void collectUsageInfo(NodeUsageCollector.State profile) {
     lock.lock();
     try {
-      Set<String> used = profile.getUsed();
-
+      Set<String> used = profile.used();
       profileCount++;
       if (!used.isEmpty()) {
         profileUsedCount++;
