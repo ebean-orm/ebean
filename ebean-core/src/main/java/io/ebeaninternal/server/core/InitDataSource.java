@@ -14,7 +14,6 @@ import javax.sql.DataSource;
  */
 final class InitDataSource {
 
-  private final JndiDataSourceLookup jndiDataSourceFactory = new JndiDataSourceLookup();
   private final DatabaseConfig config;
 
   /**
@@ -41,19 +40,7 @@ final class InitDataSource {
    * Initialise the "main" read write DataSource from configuration.
    */
   private DataSource initDataSource() {
-    final String jndiName = config.getDataSourceJndiName();
-    if (jndiName != null) {
-      return jndiDataSource(jndiName);
-    }
     return createFromConfig(config.getDataSourceConfig(), false);
-  }
-
-  private DataSource jndiDataSource(String jndiName) {
-    DataSource ds = jndiDataSourceFactory.lookup(jndiName);
-    if (ds == null) {
-      throw new PersistenceException("JNDI lookup for DataSource " + jndiName + " returned null.");
-    }
-    return ds;
   }
 
   /**
