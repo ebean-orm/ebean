@@ -40,26 +40,6 @@ public interface BackgroundExecutor {
   void execute(Runnable task);
 
   /**
-   * Deprecated - migrate to scheduleWithFixedDelay().
-   * Execute a task periodically with a fixed delay between each execution.
-   * <p>
-   * For example, execute a runnable every minute.
-   * <p>
-   * The delay is the time between executions no matter how long the task took.
-   * That is, this method has the same behaviour characteristics as
-   * {@link ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)}
-   */
-  @Deprecated
-  void executePeriodically(Runnable task, long delay, TimeUnit unit);
-
-  /**
-   * Deprecated - migrate to scheduleWithFixedDelay().
-   * Execute a task periodically additionally with an initial delay different from delay.
-   */
-  @Deprecated
-  void executePeriodically(Runnable task, long initialDelay, long delay, TimeUnit unit);
-
-  /**
    * Execute a task periodically with a given delay.
    *
    * @param task         the task to execute
