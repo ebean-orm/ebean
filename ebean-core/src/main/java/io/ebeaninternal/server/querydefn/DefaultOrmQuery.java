@@ -1613,7 +1613,6 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
-  @Deprecated
   public OrderBy<T> orderBy() {
     return order();
   }
@@ -1627,7 +1626,6 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
-  @Deprecated
   public Query<T> orderBy(String orderByClause) {
     return order(orderByClause);
   }
@@ -1643,7 +1641,6 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
-  @Deprecated
   public Query<T> setOrderBy(OrderBy<T> orderBy) {
     return setOrder(orderBy);
   }
