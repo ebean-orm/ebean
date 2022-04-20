@@ -874,9 +874,6 @@ public final class EntityBeanIntercept implements Serializable {
     }
     if (lazyLoadProperty == -1) {
       lazyLoadProperty = loadProperty;
-      if (nodeUsageCollector != null) {
-        nodeUsageCollector.setLoadProperty(getProperty(lazyLoadProperty));
-      }
       loader.loadBean(this);
       if (lazyLoadFailure) {
         // failed when lazy loading this bean

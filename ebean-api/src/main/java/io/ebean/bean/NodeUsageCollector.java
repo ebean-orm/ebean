@@ -1,7 +1,6 @@
 package io.ebean.bean;
 
 import java.lang.ref.Cleaner;
-import java.lang.ref.WeakReference;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -15,7 +14,8 @@ public final class NodeUsageCollector {
   private final static Cleaner cleaner = Cleaner.create();
 
   public static final class State implements Runnable {
-    private final WeakReference<NodeUsageListener> managerRef;
+
+    private final NodeUsageListener listener;
     /**
      * The properties used at this profile point.
      */
@@ -29,14 +29,9 @@ public final class NodeUsageCollector {
      */
     private boolean modified;
 
-    /**
-     * The property that cause a reference to lazy load.
-     */
-    private String loadProperty;
-
-    private State(ObjectGraphNode node, WeakReference<NodeUsageListener> managerRef) {
+    private State(ObjectGraphNode node, NodeUsageListener listener) {
       this.node = node;
-      this.managerRef = managerRef;
+      this.listener = listener;
     }
 
     @Override
@@ -46,10 +41,7 @@ public final class NodeUsageCollector {
 
     @Override
     public void run() {
-      NodeUsageListener manager = managerRef.get();
-      if (manager != null) {
-        manager.collectNodeUsage(this);
-      }
+      listener.collectNodeUsage(this);
     }
 
     /**
@@ -84,8 +76,8 @@ public final class NodeUsageCollector {
 
   private final State state;
 
-  public NodeUsageCollector(ObjectGraphNode node, WeakReference<NodeUsageListener> managerRef) {
-    this.state = new State(node, managerRef);
+  public NodeUsageCollector(ObjectGraphNode node, NodeUsageListener listener) {
+    this.state = new State(node, listener);
     cleaner.register(this, state);
   }
 
@@ -108,13 +100,6 @@ public final class NodeUsageCollector {
    */
   public void addUsed(String property) {
     state.used.add(property);
-  }
-
-  /**
-   * The property that invoked a lazy load.
-   */
-  public void setLoadProperty(String loadProperty) {
-    state.loadProperty = loadProperty;
   }
 
   @Override

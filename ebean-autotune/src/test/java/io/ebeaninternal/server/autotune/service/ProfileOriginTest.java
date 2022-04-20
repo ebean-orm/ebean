@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.autotune.service;
 
 import io.ebean.bean.NodeUsageCollector;
+import io.ebean.bean.NodeUsageListener;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -12,6 +13,15 @@ import org.tests.model.basic.Order;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProfileOriginTest extends BaseTestCase {
+
+  static class Noop implements NodeUsageListener {
+    @Override
+    public void collectNodeUsage(NodeUsageCollector.State state) {
+      // do nothing
+    }
+  }
+
+  private final NodeUsageListener listener = new Noop();
 
   private final BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
 
@@ -121,7 +131,7 @@ public class ProfileOriginTest extends BaseTestCase {
 
   private NodeUsageCollector node(String path) {
     ObjectGraphNode node = new ObjectGraphNode((ObjectGraphOrigin)null, path);
-    return new NodeUsageCollector(node, null);
+    return new NodeUsageCollector(node, listener);
   }
 
 //  @Test
