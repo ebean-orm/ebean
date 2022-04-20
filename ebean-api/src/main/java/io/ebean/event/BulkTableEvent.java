@@ -11,14 +11,6 @@ public interface BulkTableEvent {
   String tableName();
 
   /**
-   * Deprecated migrate to tableName().
-   */
-  @Deprecated
-  default String getTableName() {
-    return tableName();
-  }
-
-  /**
    * Return true if rows were inserted.
    */
   boolean isInsert();
