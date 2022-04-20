@@ -22,7 +22,7 @@ class BeanDescriptorElementEmbedded<T> extends BeanDescriptorElement<T> {
   BeanDescriptorElementEmbedded(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, ElementHelp elementHelp) {
     super(owner, deploy, elementHelp);
     try {
-      this.prototype = (EntityBean) beanType.newInstance();
+      this.prototype = (EntityBean) beanType.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       throw new IllegalStateException("Unable to create entity bean prototype for "+beanType);
     }
