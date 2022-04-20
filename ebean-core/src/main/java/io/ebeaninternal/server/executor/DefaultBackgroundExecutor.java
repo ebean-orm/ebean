@@ -100,20 +100,9 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
     return pool.submit(wrap(task));
   }
 
-
   @Override
   public void execute(Runnable task) {
     submit(logExceptions(task));
-  }
-
-  @Override
-  public void executePeriodically(Runnable task, long delay, TimeUnit unit) {
-    schedulePool.scheduleWithFixedDelay(wrap(logExceptions(task)), delay, delay, unit);
-  }
-
-  @Override
-  public void executePeriodically(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    schedulePool.scheduleWithFixedDelay(wrap(logExceptions(task)), initialDelay, delay, unit);
   }
 
   @Override
