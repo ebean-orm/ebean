@@ -79,12 +79,4 @@ public interface BeanPersistRequest<T> {
    */
   Map<String, ValuePair> updatedValues();
 
-  /**
-   * Deprecated migrate to updatedValues().
-   */
-  @Deprecated
-  default Map<String, ValuePair> getUpdatedValues() {
-    return updatedValues();
-  }
-
 }
