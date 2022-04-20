@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.Database;
 import io.ebean.EbeanServer;
 import io.ebean.Transaction;
 import io.ebean.event.BeanDeleteIdRequest;
@@ -7,9 +8,9 @@ import io.ebeaninternal.api.SpiEbeanServer;
 
 final class DeleteIdRequest implements BeanDeleteIdRequest {
 
-  private final EbeanServer server;
+  private final SpiEbeanServer server;
   private final Transaction transaction;
-  private Class<?> beanType;
+  private final Class<?> beanType;
   private Object id;
 
   DeleteIdRequest(SpiEbeanServer server, Transaction transaction, Class<?> beanType, Object id) {
@@ -24,7 +25,7 @@ final class DeleteIdRequest implements BeanDeleteIdRequest {
   }
 
   @Override
-  public EbeanServer getEbeanServer() {
+  public Database database() {
     return server;
   }
 
