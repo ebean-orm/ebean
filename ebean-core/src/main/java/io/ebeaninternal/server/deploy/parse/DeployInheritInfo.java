@@ -259,15 +259,11 @@ public final class DeployInheritInfo implements Comparable<DeployInheritInfo> {
   }
 
   @Override
-  public int compareTo(DeployInheritInfo o) {
-    if (o == this) {
+  public int compareTo(DeployInheritInfo other) {
+    if (other == this) {
       return 0;
-    } else if (o.discriminatorStringValue == null) {
-      return 1;
-    } else if (discriminatorStringValue == null) {
-      return -1;
     } else {
-      return type.getName().compareTo(o.getType().getName());
+      return type.getName().compareTo(other.type.getName());
     }
   }
 
