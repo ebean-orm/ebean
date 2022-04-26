@@ -166,11 +166,75 @@ class ToStringBuilderTest {
     assertThat(toStringFor(list)).isEqualTo("{a:Recurse@1(id:1, nm:a), b:Recurse@2(id:2, nm:b)}");
   }
 
+  @Test
+  void map_recurse() {
+    final ParamStore paramStore = new ParamStore(1);
+
+    paramStore.map.put("aaa", new ParamValue(1, paramStore));
+    paramStore.map.put("bbb", new ParamValue(2, paramStore));
+
+    assertThat(toStringFor(paramStore))
+      .isEqualTo("ParamStore@0(id:1, map:{aaa:ParamValue@1(id:1, pm:ParamStore@0), bbb:ParamValue@2(id:2, pm:ParamStore@0)})");
+  }
+
   private String toStringFor(ToStringAware aware) {
     ToStringBuilder builder = new ToStringBuilder();
     aware.toString(builder);
     return builder.toString();
   }
+
+  static final class ParamValue implements ToStringAware {
+
+    final int id;
+
+    final ParamStore parentModel;
+
+    ParamValue(final int id, final ParamStore parentModel) {
+      this.id = id;
+      this.parentModel = parentModel;
+    }
+
+    public String toString() {
+      ToStringBuilder builder = new ToStringBuilder();
+      toString(builder);
+      return builder.toString();
+    }
+
+    @Override
+    public void toString(ToStringBuilder builder) {
+      builder.start(this);
+      builder.add("id", id);
+      builder.add("pm", parentModel);
+      builder.end();
+    }
+  }
+
+  static final class ParamStore implements ToStringAware {
+
+    final int id;
+
+    final Map<String, ParamValue> map = new HashMap<>();
+
+
+    ParamStore(final int id) {
+      this.id = id;
+    }
+
+    public String toString() {
+      ToStringBuilder builder = new ToStringBuilder();
+      toString(builder);
+      return builder.toString();
+    }
+
+    @Override
+    public void toString(ToStringBuilder builder) {
+      builder.start(this);
+      builder.add("id", id);
+      builder.add("map", map);
+      builder.end();
+    }
+  }
+
 
   static final class Recurse implements ToStringAware {
 
