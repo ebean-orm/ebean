@@ -1,7 +1,10 @@
 package io.ebean.bean;
 
+import io.ebean.common.BeanMap;
+
 import java.util.Collection;
 import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * Helps build toString content taking into account recursion.
@@ -104,6 +107,8 @@ public final class ToStringBuilder {
       }
     } else if (value instanceof Collection) {
       addCollection((Collection<?>) value);
+    } else if (value instanceof Map) {
+      addMap(((Map<?, ?>) value));
     } else {
       String content = String.valueOf(value);
       if (content.length() > TRIM_LENGTH) {
@@ -114,6 +119,28 @@ public final class ToStringBuilder {
         sb.append(" ...");
         counter += MAX;
       }
+    }
+  }
+
+  public void addMap(Map<?,?> map) {
+    if (map == null || map.isEmpty()) {
+      sb.append("{}");
+    } else {
+      boolean firstElement = true;
+      sb.append("{");
+      for (Map.Entry<?, ?> entry : map.entrySet()) {
+        if (firstElement) {
+          firstElement = false;
+        } else {
+          sb.append(", ");
+        }
+        sb.append(entry.getKey()).append(":");
+        value(entry.getValue());
+        if (counter > MAX) {
+          return;
+        }
+      }
+      sb.append("}");
     }
   }
 
