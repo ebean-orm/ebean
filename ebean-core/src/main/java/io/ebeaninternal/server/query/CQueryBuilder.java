@@ -644,10 +644,12 @@ final class CQueryBuilder {
     }
 
     private void appendHistoryAsOfPredicate() {
-      if (query.isAsOfBaseTable() && !historySupport.isStandardsBased()) {
-        appendAndOrWhere();
-        sb.append(historySupport.getAsOfPredicate(request.baseTableAlias()));
+      if (query.isAsOfBaseTable()) {
         query.incrementAsOfTableCount();
+        if (!historySupport.isStandardsBased()){
+          appendAndOrWhere();
+          sb.append(historySupport.getAsOfPredicate(request.baseTableAlias()));
+        }
       }
     }
 

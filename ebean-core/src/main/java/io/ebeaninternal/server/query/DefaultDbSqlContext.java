@@ -134,6 +134,9 @@ final class DefaultDbSqlContext implements DbSqlContext {
       String asOfView = historySupport.getAsOfView(table);
       appendTable(table, asOfView);
       if (asOfView != null) {
+        if (historySupport.isStandardsBased()) {
+          asOfTableCount++;
+        }
         addAsOfOnClause = !historySupport.isStandardsBased();
       }
     }
