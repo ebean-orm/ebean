@@ -41,7 +41,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-oracle</artifactId>
-      <version>13.4.2-SNAPSHOT</version>
+      <version>13.5.0-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
