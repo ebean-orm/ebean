@@ -284,10 +284,6 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void flushBatch() throws PersistenceException {
-  }
-
-  @Override
   public Connection connection() {
     return null;
   }

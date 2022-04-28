@@ -1,7 +1,6 @@
 package io.ebean.event;
 
 import io.ebean.Database;
-import io.ebean.EbeanServer;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 
@@ -20,28 +19,12 @@ public interface BeanPersistRequest<T> {
   /**
    * Return the DB processing the request.
    */
-  default Database database() {
-    return getEbeanServer();
-  }
-
-  /**
-   * Deprecated migrate to database().
-   */
-  @Deprecated
-  EbeanServer getEbeanServer();
+  Database database();
 
   /**
    * Return the Transaction associated with this request.
    */
   Transaction transaction();
-
-  /**
-   * Deprecated migrate to transaction().
-   */
-  @Deprecated
-  default Transaction getTransaction() {
-    return transaction();
-  }
 
   /**
    * Return true if this request is due to cascading persist.
@@ -56,14 +39,6 @@ public interface BeanPersistRequest<T> {
   Set<String> loadedProperties();
 
   /**
-   * Deprecated migrate to loadedProperties().
-   */
-  @Deprecated
-  default Set<String> getLoadedProperties() {
-    return loadedProperties();
-  }
-
-  /**
    * For an update this is the set of properties that where updated.
    * <p>
    * Note that hasDirtyProperty() is a more efficient check than this method and
@@ -73,25 +48,9 @@ public interface BeanPersistRequest<T> {
   Set<String> updatedProperties();
 
   /**
-   * Deprecated migrate to updatedProperties().
-   */
-  @Deprecated
-  default Set<String> getUpdatedProperties() {
-    return updatedProperties();
-  }
-
-  /**
    * Flags set for dirty properties (used by ElasticSearch integration).
    */
   boolean[] dirtyProperties();
-
-  /**
-   * Deprecated migrate to updatedProperties().
-   */
-  @Deprecated
-  default boolean[] getDirtyProperties() {
-    return dirtyProperties();
-  }
 
   /**
    * Return true for an update request if at least one of dirty properties is contained
@@ -116,24 +75,8 @@ public interface BeanPersistRequest<T> {
   T bean();
 
   /**
-   * Deprecated migrate to bean().
-   */
-  @Deprecated
-  default T getBean() {
-    return bean();
-  }
-
-  /**
    * Returns a map of the properties that have changed and their new and old values.
    */
   Map<String, ValuePair> updatedValues();
-
-  /**
-   * Deprecated migrate to updatedValues().
-   */
-  @Deprecated
-  default Map<String, ValuePair> getUpdatedValues() {
-    return updatedValues();
-  }
 
 }

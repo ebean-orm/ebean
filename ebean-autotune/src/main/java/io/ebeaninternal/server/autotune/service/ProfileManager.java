@@ -91,8 +91,8 @@ public class ProfileManager implements ProfilingListener {
    * is called on the bean.
    */
   @Override
-  public void collectNodeUsage(NodeUsageCollector usageCollector) {
-    ProfileOrigin profileOrigin = getProfileOrigin(usageCollector.getNode().getOriginQueryPoint());
+  public void collectNodeUsage(NodeUsageCollector.State usageCollector) {
+    ProfileOrigin profileOrigin = getProfileOrigin(usageCollector.node().getOriginQueryPoint());
     profileOrigin.collectUsageInfo(usageCollector);
   }
 

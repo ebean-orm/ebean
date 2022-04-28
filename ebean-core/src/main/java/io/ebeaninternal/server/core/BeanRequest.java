@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
@@ -79,7 +79,7 @@ public abstract class BeanRequest {
    * Return the server processing the request. Made available for
    * BeanController and BeanFinder.
    */
-  public EbeanServer getEbeanServer() {
+  public Database database() {
     return server;
   }
 

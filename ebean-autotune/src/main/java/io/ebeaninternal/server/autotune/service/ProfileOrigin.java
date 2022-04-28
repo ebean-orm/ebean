@@ -151,9 +151,9 @@ public class ProfileOrigin {
   /**
    * Collect the usage information for from a instance for this node.
    */
-  public void collectUsageInfo(NodeUsageCollector profile) {
+  public void collectUsageInfo(NodeUsageCollector.State profile) {
     if (!profile.isEmpty()) {
-      getNodeStats(profile.getNode().getPath()).collectUsageInfo(profile);
+      getNodeStats(profile.node().getPath()).collectUsageInfo(profile);
     }
   }
 

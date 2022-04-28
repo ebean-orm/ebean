@@ -433,22 +433,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public Query<T> order(String orderByClause) {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public OrderBy<T> order() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
   public OrderBy<T> orderBy() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public Query<T> setOrder(OrderBy<T> orderBy) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 

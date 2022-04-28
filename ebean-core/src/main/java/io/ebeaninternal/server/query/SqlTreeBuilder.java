@@ -127,6 +127,7 @@ public final class SqlTreeBuilder {
       groupBy = buildGroupByClause();
       distinctOn = buildDistinctOn();
       encryptedProps = ctx.getEncryptedProps();
+      query.incrementAsOfTableCount(ctx.asOfTableCount());
     }
 
     boolean includeJoins = alias != null && alias.isIncludeJoins();

@@ -317,6 +317,11 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
+  public void incrementAsOfTableCount(int increment) {
+    asOfTableCount += increment;
+  }
+
+  @Override
   public int getAsOfTableCount() {
     return asOfTableCount;
   }
@@ -1608,13 +1613,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
-  @Deprecated
   public OrderBy<T> orderBy() {
-    return order();
-  }
-
-  @Override
-  public OrderBy<T> order() {
     if (orderBy == null) {
       orderBy = new OrderBy<>(this, null);
     }
@@ -1622,13 +1621,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
-  @Deprecated
   public Query<T> orderBy(String orderByClause) {
-    return order(orderByClause);
-  }
-
-  @Override
-  public Query<T> order(String orderByClause) {
     if (orderByClause == null || orderByClause.trim().isEmpty()) {
       this.orderBy = null;
     } else {
@@ -1638,13 +1631,7 @@ public final class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<
   }
 
   @Override
-  @Deprecated
   public Query<T> setOrderBy(OrderBy<T> orderBy) {
-    return setOrder(orderBy);
-  }
-
-  @Override
-  public Query<T> setOrder(OrderBy<T> orderBy) {
     this.orderBy = orderBy;
     if (orderBy != null) {
       orderBy.setQuery(this);
