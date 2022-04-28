@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.5.1-FOC1-SNAPSHOT</version>
+    <version>13.5.1-FOC1</version>
   </parent>
 
   <artifactId>ebean-platform-h2</artifactId>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.5.1-FOC1-SNAPSHOT</version>
+      <version>13.5.1-FOC1</version>
     </dependency>
 
     <!-- Provided scope so that the H2HistoryTrigger can live in Ebean core
@@ -36,6 +36,6 @@
   </dependencies>
 
   <scm>
-    <tag>ebean-parent-13.3.1-FOC1</tag>
+    <tag>ebean-parent-13.5.1-FOC1</tag>
   </scm>
 </project>
