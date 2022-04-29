@@ -1,6 +1,5 @@
 package io.ebean.test.config.platform;
 
-import io.ebean.docker.commands.ElasticConfig;
 import io.ebean.docker.commands.ElasticContainer;
 
 import java.util.Properties;
@@ -19,27 +18,18 @@ class ElasticSearchSetup {
   }
 
   void run() {
-    ElasticConfig elasticConfig = readConfig();
-    if (elasticConfig != null) {
-      new ElasticContainer(elasticConfig).start();
-    }
-  }
-
-  ElasticConfig readConfig() {
-
     String version = read("version", null);
-    if (version == null) {
-      // we need an explicit version to run
-      return null;
+    if (version != null) {
+      Properties properties = populateDockerProperties(version);
+      ElasticContainer.newBuilder(version)
+        .properties(properties)
+        .build()
+        .start();
     }
-
-    return new ElasticConfig(version, populateDockerProperties(version));
   }
 
   private Properties populateDockerProperties(String version) {
-
     PropertiesBuilder properties = new PropertiesBuilder();
-
     String mode = config.getProperty("ebean.test.shutdown");
     if (mode != null) {
       properties.set("shutdown", mode);
@@ -63,7 +53,7 @@ class ElasticSearchSetup {
 
   private static class PropertiesBuilder {
 
-    private Properties dockerProperties = new Properties();
+    private final Properties dockerProperties = new Properties();
 
     private void set(String key, String val) {
       dockerProperties.setProperty("elastic." + key, val);
