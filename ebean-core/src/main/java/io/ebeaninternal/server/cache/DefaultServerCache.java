@@ -238,46 +238,50 @@ public class DefaultServerCache implements ServerCache {
     long trimmedByTTL = 0;
     long trimmedByLRU = 0;
 
-    List<CacheEntry> activeList = new ArrayList<>(map.size());
-    long idleExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
-    long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
-    Iterator<SoftReference<CacheEntry>> it = map.values().iterator();
-    while (it.hasNext()) {
-      SoftReference<CacheEntry> ref = it.next();
-      final CacheEntry cacheEntry = ref.get();
-      if (cacheEntry == null) {
-        it.remove();
-        trimmedByGC++;
-      } else if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
-        it.remove();
-        trimmedByIdle++;
-      } else if (maxSecsToLive > 0 && ttlExpireNano > cacheEntry.getCreateTime()) {
-        it.remove();
-        trimmedByTTL++;
-      } else if (trimForMaxSize > 0) {
-        activeList.add(cacheEntry.forSort());
-      }
-    }
-    if (trimForMaxSize > 0 && activeList.size() > maxSize) {
-      // sort into last access time ascending
-      activeList.sort(BY_LAST_ACCESS);
-      int trimSize = getTrimSize();
-      for (int i = trimSize; i < activeList.size(); i++) {
-        // remove if still in the cache
-        if (map.remove(activeList.get(i).getKey()) != null) {
-          trimmedByLRU++;
+    try {
+      List<CacheEntry> activeList = new ArrayList<>(map.size());
+      long idleExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
+      long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
+      Iterator<SoftReference<CacheEntry>> it = map.values().iterator();
+      while (it.hasNext()) {
+        SoftReference<CacheEntry> ref = it.next();
+        final CacheEntry cacheEntry = ref.get();
+        if (cacheEntry == null) {
+          it.remove();
+          trimmedByGC++;
+        } else if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
+          it.remove();
+          trimmedByIdle++;
+        } else if (maxSecsToLive > 0 && ttlExpireNano > cacheEntry.getCreateTime()) {
+          it.remove();
+          trimmedByTTL++;
+        } else if (trimForMaxSize > 0) {
+          activeList.add(cacheEntry.forSort());
         }
       }
-    }
+      if (trimForMaxSize > 0 && activeList.size() > maxSize) {
+        // sort into last access time ascending
+        activeList.sort(BY_LAST_ACCESS);
+        int trimSize = getTrimSize();
+        for (int i = trimSize; i < activeList.size(); i++) {
+          // remove if still in the cache
+          if (map.remove(activeList.get(i).getKey()) != null) {
+            trimmedByLRU++;
+          }
+        }
+      }
 
-    evictCount.add(trimmedByIdle);
-    evictCount.add(trimmedByGC);
-    evictCount.add(trimmedByTTL);
-    evictCount.add(trimmedByLRU);
-    if (logger.isTraceEnabled()) {
-      long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
-      logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
-        name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
+      evictCount.add(trimmedByIdle);
+      evictCount.add(trimmedByGC);
+      evictCount.add(trimmedByTTL);
+      evictCount.add(trimmedByLRU);
+      if (logger.isTraceEnabled()) {
+        long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
+        logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
+          name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
+      }
+    } catch (Throwable e) {
+      logger.warn("Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
     }
   }
 
