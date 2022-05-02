@@ -10,16 +10,14 @@ import org.junit.jupiter.api.Test;
 import java.util.Random;
 
 
-public class DefaultServerCache_RunEvictionTest {
-
+class DefaultServerCache_RunEvictionTest {
 
   private DefaultServerCache createCache() {
-
     ServerCacheOptions cacheOptions = new ServerCacheOptions();
-    cacheOptions.setMaxSize(10000);
+    cacheOptions.setMaxSize(300);
     cacheOptions.setMaxIdleSecs(1);
     cacheOptions.setMaxSecsToLive(2);
-    cacheOptions.setTrimFrequency(1);
+    cacheOptions.setTrimFrequency(5);
 
     ServerCacheConfig con = new ServerCacheConfig(ServerCacheType.BEAN, "foo", "foo", cacheOptions, null, null);
     return new DefaultServerCache(new DefaultServerCacheConfig(con));
@@ -35,8 +33,7 @@ public class DefaultServerCache_RunEvictionTest {
 
   @Disabled("test takes long time")
   @Test
-  public void runEvict() throws InterruptedException {
-
+  void runEvict() throws InterruptedException {
     for (int i = 0; i < 15; i++) {
       doStuff();
       cache.runEviction();
@@ -47,12 +44,10 @@ public class DefaultServerCache_RunEvictionTest {
   }
 
   private void doStuff() {
-
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 5000; i++) {
       String key = "" + random.nextInt(20000);
-
       int mode = random.nextInt(10);
-      if (mode < 8) {
+      if (mode < 7) {
         cache.get(key);
       } else {
         cache.put(key, key + "-" + System.currentTimeMillis());

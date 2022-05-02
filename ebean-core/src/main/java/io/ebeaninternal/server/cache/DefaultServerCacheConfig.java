@@ -76,4 +76,14 @@ public final class DefaultServerCacheConfig {
     }
     return 0;
   }
+
+  /**
+   * Determine the number of mutations/puts required to trigger a runEviction() in the foreground.
+   */
+  public long determineTrimOnPut() {
+    if (maxSize > 0) {
+      return maxSize / 10;
+    }
+    return 1000;
+  }
 }
