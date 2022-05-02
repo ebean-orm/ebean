@@ -61,28 +61,28 @@ Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 ## Building Ebean from source
 
 - JDK 11 or higher installed
-- maven installed
+- Maven installed
 - `git clone git@github.com:ebean-orm/ebean.git`
 - `mvn clean install`
 
-Ebean 13 uses java modules with module-info. This means that there is now stricter compilation
-rules in place that when building with classpath pre version 13.
+Ebean 13 uses Java modules with module-info. This means that there are stricter compilation
+rules in place now than when building with classpath pre version 13.
 
-For maven surefire testing we use `<surefire.useModulePath>false</surefire.useModulePath>` such
+For Maven Surefire testing we use `<surefire.useModulePath>false</surefire.useModulePath>` such
 that tests run using classpath and not module-path. We are doing this until all the tooling
-(maven, IDE) improves in the area of testing with module-info.
+(Maven, IDE) improves in the area of testing with module-info.
 
 #### Eclipse IDE
 
-Right now we can't use Eclipse IDE to build ebean and run it's tests due to it's poor support
+Right now we can't use Eclipse IDE to build Ebean and run its tests due to its poor support
 for java modules. See [ebean/issues/2653](https://github.com/ebean-orm/ebean/issues/2653)
 
-The current recommendation is to use IntelliJ IDEA as the IDE to build and hack ebean.
+The current recommendation is to use IntelliJ IDEA as the IDE to build and hack Ebean.
 
 
 #### IntelliJ IDEA
 
-We want to get IntelliJ to run tests using classpath similar to maven surefire. To do this set:
+We want to get IntelliJ to run tests using classpath similar to Maven Surefire. To do this set:
 `Junit -> modify options -> Do not use module-path option`
 
 To set this option as the global default for IntelliJ use:
