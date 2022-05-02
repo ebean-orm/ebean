@@ -94,7 +94,7 @@ public class BootupClasses implements Predicate<Class<?>> {
   public void runServerConfigStartup(DatabaseConfig config) {
     for (Class<?> cls : serverConfigStartupCandidates) {
       try {
-        ServerConfigStartup newInstance = (ServerConfigStartup) cls.newInstance();
+        ServerConfigStartup newInstance = (ServerConfigStartup) cls.getDeclaredConstructor().newInstance();
         newInstance.onStart(config);
       } catch (Exception e) {
         // assume that the desired behavior is to fail - add your own try catch if needed

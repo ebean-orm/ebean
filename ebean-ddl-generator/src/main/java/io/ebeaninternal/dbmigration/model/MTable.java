@@ -1,36 +1,12 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
-import io.ebeaninternal.dbmigration.migration.AddColumn;
-import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
-import io.ebeaninternal.dbmigration.migration.AddTableComment;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.dbmigration.migration.AlterTable;
-import io.ebeaninternal.dbmigration.migration.Column;
-import io.ebeaninternal.dbmigration.migration.CreateTable;
-import io.ebeaninternal.dbmigration.migration.DropColumn;
-import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
-import io.ebeaninternal.dbmigration.migration.DropTable;
-import io.ebeaninternal.dbmigration.migration.ForeignKey;
-import io.ebeaninternal.dbmigration.migration.RenameColumn;
-import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.IdentityMode;
-import io.ebeaninternal.server.deploy.PartitionMeta;
-import io.ebeaninternal.server.deploy.TablespaceMeta;
-
+import io.ebeaninternal.dbmigration.migration.*;
+import io.ebeaninternal.server.deploy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static io.ebeaninternal.dbmigration.ddlgeneration.platform.SplitColumns.split;
 import static io.ebeaninternal.dbmigration.model.MTableIdentity.fromCreateTable;
@@ -110,8 +86,7 @@ public class MTable {
   /**
    * Constructor for test cases only!
    */
-  @Deprecated
-  public MTable(String name) {
+  MTable(String name) {
     this(name, null, null);
   }
 
@@ -121,7 +96,7 @@ public class MTable {
   public MTable(String name, BeanDescriptor<?> descriptor) {
     this(name, descriptor.tablespaceMeta(), descriptor.storageEngine());
   }
-  
+
   /**
    * Constructor for dependant tables (draft/element collection or intersection).
    */
@@ -161,8 +136,8 @@ public class MTable {
     this.storageEngine = createTable.getStorageEngine();
     if (createTable.getTablespace() != null) {
       this.tablespaceMeta = new TablespaceMeta(createTable.getTablespace(),
-          createTable.getIndexTablespace() != null ? createTable.getIndexTablespace() : createTable.getTablespace(),
-          createTable.getLobTablespace() != null ? createTable.getLobTablespace() : createTable.getTablespace());
+        createTable.getIndexTablespace() != null ? createTable.getIndexTablespace() : createTable.getTablespace(),
+        createTable.getLobTablespace() != null ? createTable.getLobTablespace() : createTable.getTablespace());
     } else {
       this.tablespaceMeta = null;
     }
@@ -296,7 +271,7 @@ public class MTable {
     compareCompoundKeys(modelDiff, newTable);
     compareUniqueKeys(modelDiff, newTable);
     compareTableAttrs(modelDiff, newTable);
-  
+
   }
 
   private void compareColumns(ModelDiff modelDiff, MTable newTable) {
@@ -366,7 +341,7 @@ public class MTable {
       modelDiff.addUniqueConstraint(newKey.addUniqueConstraint(name));
     }
   }
-  
+
   private void compareTableAttrs(ModelDiff modelDiff, MTable newTable) {
     AlterTable alterTable = new AlterTable();
     alterTable.setName(newTable.getName());
@@ -478,11 +453,11 @@ public class MTable {
   public void setComment(String comment) {
     this.comment = comment;
   }
-  
+
   public void setTablespaceMeta(TablespaceMeta tablespaceMeta) {
     this.tablespaceMeta = tablespaceMeta;
   }
-  
+
   public TablespaceMeta getTablespaceMeta() {
     return tablespaceMeta;
   }

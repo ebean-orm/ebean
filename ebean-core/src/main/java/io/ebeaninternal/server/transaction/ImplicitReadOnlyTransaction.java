@@ -378,17 +378,10 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   /**
    * Flush any queued persist requests.
    * <p>
-   * This is general will result in a number of batched PreparedStatements
-   * executing.
-   * </p>
+   * This is general will result in a number of batched PreparedStatements executing.
    */
   @Override
   public void flush() {
-  }
-
-  @Override
-  public void flushBatch() {
-    flush();
   }
 
   /**
@@ -405,7 +398,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * This could be considered similar to EJB3 Extended PersistanceContext. In
    * that you get the PersistanceContext from a transaction, hold onto it, and
    * then set it back later to a second transaction.
-   * </p>
    */
   @Override
   public void setPersistenceContext(SpiPersistenceContext context) {
@@ -503,7 +495,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * <p>
    * This leaves the transaction active and expects another commit
    * to occur later (which closes the underlying connection etc).
-   * </p>
    */
   @Override
   public void commitAndContinue() {

@@ -347,11 +347,6 @@ public class DatabaseConfig {
   private ClassLoadConfig classLoadConfig = new ClassLoadConfig();
 
   /**
-   * The data source JNDI name if using a JNDI DataSource.
-   */
-  private String dataSourceJndiName;
-
-  /**
    * The naming convention.
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
@@ -398,12 +393,12 @@ public class DatabaseConfig {
    * Note: It is possible that multiple servers are sharing the same state file as
    * long as they are in the <b>same</b> JVM/ClassLoader scope. In this case it is
    * recommended to use the same uuidNodeId configuration.
-   * 
+   *
    * If you have multiple servers in different JVMs, do <b>not</b> share the state
    * files!
    */
   private String uuidNodeId;
-  
+
   /**
    * The clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
    */
@@ -1793,24 +1788,6 @@ public class DatabaseConfig {
   }
 
   /**
-   * Return the JNDI name of the DataSource to use.
-   */
-  public String getDataSourceJndiName() {
-    return dataSourceJndiName;
-  }
-
-  /**
-   * Set the JNDI name of the DataSource to use.
-   * <p>
-   * By default a prefix of "java:comp/env/jdbc/" is used to lookup the
-   * DataSource. This prefix is not used if dataSourceJndiName starts with
-   * "java:".
-   */
-  public void setDataSourceJndiName(String dataSourceJndiName) {
-    this.dataSourceJndiName = dataSourceJndiName;
-  }
-
-  /**
    * Return a value used to represent TRUE in the database.
    * <p>
    * This is used for databases that do not support boolean natively.
@@ -2092,14 +2069,14 @@ public class DatabaseConfig {
   public void setUuidStateFile(String uuidStateFile) {
     this.uuidStateFile = uuidStateFile;
   }
-  
+
   /**
-   * Returns the V1-UUID-NodeId 
+   * Returns the V1-UUID-NodeId
    */
   public String getUuidNodeId() {
     return uuidNodeId;
   }
-  
+
   /**
    * Sets the V1-UUID-NodeId.
    */
@@ -2979,7 +2956,6 @@ public class DatabaseConfig {
     asOfViewSuffix = p.get("asOfViewSuffix", asOfViewSuffix);
     asOfSysPeriod = p.get("asOfSysPeriod", asOfSysPeriod);
     historyTableSuffix = p.get("historyTableSuffix", historyTableSuffix);
-    dataSourceJndiName = p.get("dataSourceJndiName", dataSourceJndiName);
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);

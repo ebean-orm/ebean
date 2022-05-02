@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.event.BeanQueryRequest;
@@ -62,7 +62,7 @@ public abstract class BaseExpressionTest extends BaseTest {
     }
 
     @Override
-    public EbeanServer getEbeanServer() {
+    public Database database() {
       return null;
     }
 

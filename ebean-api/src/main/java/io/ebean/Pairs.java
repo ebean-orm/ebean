@@ -10,11 +10,10 @@ import java.util.Objects;
  * <p>
  * This feature is to enable use of L2 cache with complex natural keys with findList() queries in cases where the
  * IN clause is not a single property but instead a pair of properties.
- * </p>
  * <p>
  * These queries can have predicates that can be translated into a list of complex natural keys such that the L2
  * cache can be hit with these keys to obtain some or all of the beans from L2 cache rather than the DB.
- * </p>
+ *
  * <pre>{@code
  *
  *   // where a bean is annotated with a complex
@@ -45,11 +44,10 @@ import java.util.Objects;
  * pairs are a unique key/index or part of a unique key/index and highly selective). Currently we know we can do this
  * on any DB that supports expression/formula based indexes.
  * using a DB string concatenation formula
- * </p>
  * <p>
  * This means, the implementation converts the list of pairs into a list of strings via concatenation and we use a
  * DB concatenation formula to match. We see SQL like:
- * </p>
+ *
  * <pre>{@code sql
  *
  *   ...
@@ -60,7 +58,7 @@ import java.util.Objects;
  * }</pre>
  * <p>
  * We often create a DB expression index to match the DB concat formula like:
- * </p>
+ *
  * <pre>{@code sql
  *
  *   create index ix_name on table_name (sku || '-' || code);
@@ -145,14 +143,6 @@ public final class Pairs {
   }
 
   /**
-   * Deprecated migrate to concatSeparator()
-   */
-  @Deprecated
-  public Pairs setConcatSeparator(String concatSeparator) {
-    return concatSeparator(concatSeparator);
-  }
-
-  /**
    * Return  a suffix used with DB varchar concatenation to combine the 2 values.
    */
   public String concatSuffix() {
@@ -165,14 +155,6 @@ public final class Pairs {
   public Pairs concatSuffix(String concatSuffix) {
     this.concatSuffix = concatSuffix;
     return this;
-  }
-
-  /**
-   * Deprecated migrate to concatSuffix()
-   */
-  @Deprecated
-  public Pairs setConcatSuffix(String concatSuffix) {
-    return concatSuffix(concatSuffix);
   }
 
   @Override

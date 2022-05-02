@@ -441,14 +441,6 @@ public interface Transaction extends AutoCloseable {
   void setGetGeneratedKeys(boolean getGeneratedKeys);
 
   /**
-   * Deprecated renamed to setGetGeneratedKeys().
-   */
-  @Deprecated
-  default void setBatchGetGeneratedKeys(boolean getGeneratedKeys) {
-    setGetGeneratedKeys(getGeneratedKeys);
-  }
-
-  /**
    * By default when mixing UpdateSql (or CallableSql) with Beans the batch is
    * automatically flushed when you change (between persisting beans and
    * executing UpdateSql or CallableSql).
@@ -464,14 +456,6 @@ public interface Transaction extends AutoCloseable {
   void setFlushOnMixed(boolean batchFlushOnMixed);
 
   /**
-   * Deprecated renamed to setFlushOnMixed().
-   */
-  @Deprecated
-  default void setBatchFlushOnMixed(boolean batchFlushOnMixed) {
-    setFlushOnMixed(batchFlushOnMixed);
-  }
-
-  /**
    * By default executing a query will automatically flush any batched
    * statements (persisted beans, executed UpdateSql etc).
    * <p>
@@ -481,28 +465,12 @@ public interface Transaction extends AutoCloseable {
   void setFlushOnQuery(boolean batchFlushOnQuery);
 
   /**
-   * Deprecated renamed to setFlushOnQuery().
-   */
-  @Deprecated
-  default void setBatchFlushOnQuery(boolean batchFlushOnQuery) {
-    setFlushOnQuery(batchFlushOnQuery);
-  }
-
-  /**
    * Return true if the batch (of persisted beans or executed UpdateSql etc)
    * should be flushed prior to executing a query.
    * <p>
    * The default is for this to be true.
    */
   boolean isFlushOnQuery();
-
-  /**
-   * Deprecated renamed to isFlushOnQuery().
-   */
-  @Deprecated
-  default boolean isBatchFlushOnQuery() {
-    return isFlushOnQuery();
-  }
 
   /**
    * The batch will be flushing automatically but you can use this to explicitly
@@ -520,14 +488,6 @@ public interface Transaction extends AutoCloseable {
   void flush() throws PersistenceException;
 
   /**
-   * Deprecated - migrate to flush().
-   * <p>
-   * flush() is preferred as it matches the JPA flush() method.
-   */
-  @Deprecated
-  void flushBatch() throws PersistenceException;
-
-  /**
    * Return the underlying Connection object.
    * <p>
    * Useful where a Developer wishes to use the JDBC API directly. Note that the
@@ -539,14 +499,6 @@ public interface Transaction extends AutoCloseable {
    * Savepoints, advanced CLOB BLOB use and advanced stored procedure calls.
    */
   Connection connection();
-
-  /**
-   * Deprecated migrate to connection().
-   */
-  @Deprecated
-  default Connection getConnection() {
-    return connection();
-  }
 
   /**
    * Add table modification information to the TransactionEvent.

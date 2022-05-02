@@ -313,11 +313,6 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void flushBatch() throws PersistenceException {
-    flush();
-  }
-
-  @Override
   public Connection connection() {
     return transaction.connection();
   }

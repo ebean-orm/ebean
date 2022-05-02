@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.autotune.service;
 
 import io.ebean.bean.NodeUsageCollector;
+import io.ebean.bean.NodeUsageListener;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -13,6 +14,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProfileOriginTest extends BaseTestCase {
 
+  static class Noop implements NodeUsageListener {
+    @Override
+    public void collectNodeUsage(NodeUsageCollector.State state) {
+      // do nothing
+    }
+  }
+
+  private final NodeUsageListener listener = new Noop();
+
   private final BeanDescriptor<Order> desc = getBeanDescriptor(Order.class);
 
   @Test
@@ -23,7 +33,7 @@ public class ProfileOriginTest extends BaseTestCase {
     c.addUsed("name");
 
     ProfileOrigin po = new ProfileOrigin(null, false, 1, 1);
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
@@ -38,11 +48,11 @@ public class ProfileOriginTest extends BaseTestCase {
     c.addUsed("name");
 
     ProfileOrigin po = new ProfileOrigin(null, false, 1, 1);
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node(null);
     c.addUsed("orderDate");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
@@ -56,11 +66,11 @@ public class ProfileOriginTest extends BaseTestCase {
     c.addUsed("id");
 
     ProfileOrigin po = new ProfileOrigin(null, false, 1, 1);
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node(null);
     c.addUsed("orderDate");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
@@ -75,15 +85,15 @@ public class ProfileOriginTest extends BaseTestCase {
     NodeUsageCollector c = node(null);
     c.addUsed("orderDate");
     c.addUsed("customer");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node("customer");
     c.addUsed("billingAddress");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node("customer.billingAddress");
     c.addUsed("id");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
 
@@ -100,20 +110,20 @@ public class ProfileOriginTest extends BaseTestCase {
 
     NodeUsageCollector c = node(null);
     c.addUsed("customer");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     c = node("customer");
     c.addUsed("id");
     c.addUsed("name");
     c.addUsed("note");
     c.addUsed("billingAddress");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     //fetch details.product (id,name)
     c = node("customer.billingAddress");
     c.addUsed("id");
     c.addUsed("line1");
-    po.collectUsageInfo(c);
+    po.collectUsageInfo(c.state());
 
     OrmQueryDetail detail = po.buildDetail(desc);
     assertThat(detail.asString()).isEqualTo("fetch customer (name,note) fetch customer.billingAddress (line1)");
@@ -121,7 +131,7 @@ public class ProfileOriginTest extends BaseTestCase {
 
   private NodeUsageCollector node(String path) {
     ObjectGraphNode node = new ObjectGraphNode((ObjectGraphOrigin)null, path);
-    return new NodeUsageCollector(node, null);
+    return new NodeUsageCollector(node, listener);
   }
 
 //  @Test

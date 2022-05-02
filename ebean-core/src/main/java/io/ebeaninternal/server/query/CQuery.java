@@ -18,7 +18,6 @@ import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.*;
 
 import javax.persistence.PersistenceException;
-import java.lang.ref.WeakReference;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -149,8 +148,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   private final ProfilingListener profilingListener;
 
-  private final WeakReference<NodeUsageListener> profilingListenerRef;
-
   private final Boolean readOnly;
 
   private long profileOffset;
@@ -189,7 +186,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.objectGraphNode = query.getParentNode();
     this.profilingListener = query.getProfilingListener();
     this.autoTuneProfiling = profilingListener != null;
-    this.profilingListenerRef = autoTuneProfiling ? new WeakReference<>(profilingListener) : null;
     // set the generated sql back to the query
     // so its available to the user...
     query.setGeneratedSql(queryPlan.getSql());
@@ -673,7 +669,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   @Override
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
     ObjectGraphNode node = request.loadContext().getObjectGraphNode(prefix);
-    ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListenerRef));
+    ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListener));
   }
 
   @Override
