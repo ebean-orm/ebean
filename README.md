@@ -83,10 +83,10 @@ The current recommendation is to use IntelliJ IDEA as the IDE to build and hack 
 #### IntelliJ IDEA
 
 We want to get IntelliJ to run tests using classpath similar to Maven Surefire. To do this set:
-`Junit -> modify options -> Do not use module-path option`
+`JUnit -> modify options -> Do not use module-path option`
 
 To set this option as the global default for IntelliJ use:
 
-`Run - Edit Configurations -> Edit configuration templates -> Junit -> modify options - Do not use module-path option`
+`Run - Edit Configurations -> Edit configuration templates -> JUnit -> modify options - Do not use module-path option`
 
 
