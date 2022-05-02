@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 /**
  * Service Provider extension to EbeanServer.
  */
-public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, BeanCollectionLoader {
+public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectionLoader {
 
   /**
    * Return true if the L2 cache has been disabled.
@@ -55,7 +55,6 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, EbeanServer, 
    * <p>
    * Typically used to identify the origin of queries for AutoTune and object
    * graph costing.
-   * </p>
    */
   CallOrigin createCallOrigin();
 

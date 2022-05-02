@@ -5,8 +5,6 @@ import io.ebean.config.ContainerConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DatabaseConfigProvider;
 import io.ebean.config.ModuleInfoLoader;
-import io.ebean.config.ServerConfig;
-import io.ebean.config.ServerConfigProvider;
 import io.ebean.config.TenantMode;
 import io.ebean.config.UnderscoreNamingConvention;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -128,15 +126,8 @@ public final class DefaultContainer implements SpiContainer {
 
   private void applyConfigServices(DatabaseConfig config) {
     if (config.isDefaultServer()) {
-      boolean appliedConfig = false;
       for (DatabaseConfigProvider configProvider : ServiceLoader.load(DatabaseConfigProvider.class)) {
         configProvider.apply(config);
-        appliedConfig = true;
-      }
-      if (!appliedConfig && config instanceof ServerConfig) {
-        for (ServerConfigProvider configProvider : ServiceLoader.load(ServerConfigProvider.class)) {
-          configProvider.apply((ServerConfig)config);
-        }
       }
     }
     if (config.isAutoLoadModuleInfo()) {

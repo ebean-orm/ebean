@@ -1,7 +1,7 @@
 package io.ebean.xtest.internal.server.cluster.binarymessage;
 
+import io.ebean.Database;
 import io.ebean.xtest.BaseTestCase;
-import io.ebean.EbeanServer;
 import io.ebean.xtest.internal.api.TDSpiEbeanServer;
 import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.cache.RemoteCacheEvent;
@@ -94,7 +94,7 @@ public class BinaryTransactionEventReadWriteTest extends BaseTestCase {
 
   class TDServerLookup implements ServerLookup {
     @Override
-    public EbeanServer getServer(String name) {
+    public Database getServer(String name) {
       return mockEbeanServer;
     }
   }

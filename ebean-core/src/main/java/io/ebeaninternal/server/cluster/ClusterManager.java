@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.cluster;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.config.ContainerConfig;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class ClusterManager implements ServerLookup {
 
   private final ReentrantLock lock = new ReentrantLock();
 
-  private final ConcurrentHashMap<String, EbeanServer> serverMap = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Database> serverMap = new ConcurrentHashMap<>();
 
   private final Object monitor = new Object();
 
@@ -53,7 +53,7 @@ public class ClusterManager implements ServerLookup {
     return factory;
   }
 
-  public void registerServer(EbeanServer server) {
+  public void registerServer(Database server) {
     lock.lock();
     try {
       serverMap.put(server.name(), server);
@@ -66,7 +66,7 @@ public class ClusterManager implements ServerLookup {
   }
 
   @Override
-  public EbeanServer getServer(String name) {
+  public Database getServer(String name) {
     lock.lock();
     try {
       return serverMap.get(name);
