@@ -1,14 +1,14 @@
 package io.ebeaninternal.server.cluster;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 
 /**
- * Returns EbeanServer instances for remote message reading.
+ * Returns Database instances for remote message reading.
  */
 public interface ServerLookup {
 
   /**
    * Return the EbeanServer instance by name.
    */
-  EbeanServer getServer(String name);
+  Database getServer(String name);
 }

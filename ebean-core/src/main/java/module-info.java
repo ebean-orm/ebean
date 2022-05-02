@@ -4,7 +4,6 @@ module io.ebean.core {
   uses io.ebean.cache.ServerCachePlugin;
   uses io.ebean.cache.ServerCacheNotifyPlugin;
   uses io.ebean.config.DatabaseConfigProvider;
-  uses io.ebean.config.ServerConfigProvider;
   uses io.ebean.config.ModuleInfoLoader;
   uses io.ebean.config.dbplatform.DatabasePlatformProvider;
   uses io.ebean.datasource.DataSourceAlertFactory;
