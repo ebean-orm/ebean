@@ -255,7 +255,7 @@ public class DefaultServerCache implements ServerCache {
         it.remove();
         trimmedByTTL++;
       } else if (trimForMaxSize > 0) {
-        activeList.add(cacheEntry);
+        activeList.add(cacheEntry.forSort());
       }
     }
     if (trimForMaxSize > 0 && activeList.size() > maxSize) {
@@ -293,7 +293,7 @@ public class DefaultServerCache implements ServerCache {
   }
 
   /**
-   * Comparator for sorting by last access time.
+   * Comparator for sorting by last access sort, a copy of last access time that should not mutate during trim processing.
    */
   public static final class CompareByLastAccess implements Comparator<CacheEntry>, Serializable {
 
@@ -301,7 +301,7 @@ public class DefaultServerCache implements ServerCache {
 
     @Override
     public int compare(CacheEntry e1, CacheEntry e2) {
-      return Long.compare(e1.getLastAccessTime(), e2.getLastAccessTime());
+      return Long.compare(e1.lastAccessSort, e2.lastAccessSort);
     }
   }
 
@@ -314,12 +314,21 @@ public class DefaultServerCache implements ServerCache {
     private final Object value;
     private final long createTime;
     private long lastAccessTime;
+    private long lastAccessSort;
 
     public CacheEntry(Object key, Object value) {
       this.key = key;
       this.value = value;
       this.createTime = System.nanoTime();
       this.lastAccessTime = createTime;
+    }
+
+    /**
+     * Store a copy of lastAccessTime used for sorting. This value should not change during trim processing.
+     */
+    public CacheEntry forSort() {
+      this.lastAccessSort = lastAccessTime;
+      return this;
     }
 
     /**
