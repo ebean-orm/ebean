@@ -4,7 +4,7 @@
   <parent>
     <artifactId>composites</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.5.1-FOC2-SNAPSHOT</version>
+    <version>13.6.0-SNAPSHOT</version>
   </parent>
 
   <name>ebean-clickhouse</name>
@@ -16,13 +16,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.5.1-FOC2-SNAPSHOT</version>
+      <version>13.6.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.5.1-FOC2-SNAPSHOT</version>
+      <version>13.6.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -35,13 +35,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>13.5.1-FOC2-SNAPSHOT</version>
+      <version>13.6.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-clickhouse</artifactId>
-      <version>13.5.1-FOC2-SNAPSHOT</version>
+      <version>13.6.0-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
