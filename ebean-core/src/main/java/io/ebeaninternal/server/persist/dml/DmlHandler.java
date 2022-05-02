@@ -259,4 +259,14 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     return stmt;
   }
 
+  @Override
+  public String toString() {
+    if (sql == null) {
+      return "not yet initialized";
+    } else if (bindLog == null || bindLog.length() == 0) {
+      return sql;
+    } else {
+      return Str.add(sql, " -- bind(", bindLog.toString(), ")");
+    }
+  }
 }

@@ -4,6 +4,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BeanPersister;
+import io.ebeaninternal.server.type.DataBindCapture;
 
 import java.sql.SQLException;
 
@@ -70,7 +71,7 @@ final class DmlBeanPersister implements BeanPersister {
       }
     } catch (SQLException e) {
       // log the error to the transaction log
-      String msg = "Error[" + StringHelper.removeNewLines(e.getMessage()) + "]";
+      String msg = "Error[" + StringHelper.removeNewLines(e.getMessage()) + "] " + handler;
       if (request.transaction().isLogSummary()) {
         request.transaction().logSummary(msg);
       }
