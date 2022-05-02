@@ -17,7 +17,7 @@ class DefaultServerCache_RunEvictionTest {
     cacheOptions.setMaxSize(300);
     cacheOptions.setMaxIdleSecs(1);
     cacheOptions.setMaxSecsToLive(2);
-    cacheOptions.setTrimFrequency(1);
+    cacheOptions.setTrimFrequency(5);
 
     ServerCacheConfig con = new ServerCacheConfig(ServerCacheType.BEAN, "foo", "foo", cacheOptions, null, null);
     return new DefaultServerCache(new DefaultServerCacheConfig(con));
@@ -44,10 +44,10 @@ class DefaultServerCache_RunEvictionTest {
   }
 
   private void doStuff() {
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 5000; i++) {
       String key = "" + random.nextInt(20000);
       int mode = random.nextInt(10);
-      if (mode < 8) {
+      if (mode < 7) {
         cache.get(key);
       } else {
         cache.put(key, key + "-" + System.currentTimeMillis());

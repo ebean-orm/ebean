@@ -13,6 +13,8 @@ import java.io.Serializable;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The default cache implementation.
@@ -43,10 +45,12 @@ public class DefaultServerCache implements ServerCache {
 
   protected final String name;
   protected final String shortName;
-  private final int maxSize;
-  private final int trimFrequency;
-  private final int maxIdleSecs;
-  private final int maxSecsToLive;
+  protected final int maxSize;
+  protected final int trimFrequency;
+  protected final int maxIdleSecs;
+  protected final int maxSecsToLive;
+  protected final ReentrantLock lock = new ReentrantLock();
+  protected final AtomicLong mutationCounter = new AtomicLong();
 
   public DefaultServerCache(DefaultServerCacheConfig config) {
     this.name = config.getName();
@@ -187,6 +191,9 @@ public class DefaultServerCache implements ServerCache {
   public void put(Object key, Object value) {
     map.put(key, new SoftReference<>(new CacheEntry(key, value)));
     putCount.increment();
+    if (mutationCounter.incrementAndGet() > 1000) {
+      runEviction();
+    }
   }
 
   /**
@@ -222,66 +229,72 @@ public class DefaultServerCache implements ServerCache {
    * Run the eviction based on Idle time, Time to live and LRU last access.
    */
   public void runEviction() {
-    long trimForMaxSize;
-    if (maxSize == 0) {
-      trimForMaxSize = 0;
-    } else {
-      trimForMaxSize = size() - maxSize;
-    }
-    if (maxIdleSecs == 0 && maxSecsToLive == 0 && trimForMaxSize < 0) {
-      // nothing to trim on this cache
-      return;
-    }
-    long startNanos = System.nanoTime();
-    long trimmedByIdle = 0;
-    long trimmedByGC = 0;
-    long trimmedByTTL = 0;
-    long trimmedByLRU = 0;
-
+    lock.lock();
     try {
-      List<CacheEntry> activeList = new ArrayList<>(map.size());
-      long idleExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
-      long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
-      Iterator<SoftReference<CacheEntry>> it = map.values().iterator();
-      while (it.hasNext()) {
-        SoftReference<CacheEntry> ref = it.next();
-        final CacheEntry cacheEntry = ref.get();
-        if (cacheEntry == null) {
-          it.remove();
-          trimmedByGC++;
-        } else if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
-          it.remove();
-          trimmedByIdle++;
-        } else if (maxSecsToLive > 0 && ttlExpireNano > cacheEntry.getCreateTime()) {
-          it.remove();
-          trimmedByTTL++;
-        } else if (trimForMaxSize > 0) {
-          activeList.add(cacheEntry.forSort());
-        }
+      long trimForMaxSize;
+      if (maxSize == 0) {
+        trimForMaxSize = 0;
+      } else {
+        trimForMaxSize = size() - maxSize;
       }
-      if (trimForMaxSize > 0 && activeList.size() > maxSize) {
-        // sort into last access time ascending
-        activeList.sort(BY_LAST_ACCESS);
-        int trimSize = getTrimSize();
-        for (int i = trimSize; i < activeList.size(); i++) {
-          // remove if still in the cache
-          if (map.remove(activeList.get(i).getKey()) != null) {
-            trimmedByLRU++;
+      if (maxIdleSecs == 0 && maxSecsToLive == 0 && trimForMaxSize < 0) {
+        // nothing to trim on this cache
+        mutationCounter.set(0);
+        return;
+      }
+      long startNanos = System.nanoTime();
+      long trimmedByIdle = 0;
+      long trimmedByGC = 0;
+      long trimmedByTTL = 0;
+      long trimmedByLRU = 0;
+
+      try {
+        List<CacheEntry> activeList = new ArrayList<>(map.size());
+        long idleExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxIdleSecs);
+        long ttlExpireNano = startNanos - TimeUnit.SECONDS.toNanos(maxSecsToLive);
+        Iterator<SoftReference<CacheEntry>> it = map.values().iterator();
+        while (it.hasNext()) {
+          SoftReference<CacheEntry> ref = it.next();
+          final CacheEntry cacheEntry = ref.get();
+          if (cacheEntry == null) {
+            it.remove();
+            trimmedByGC++;
+          } else if (maxIdleSecs > 0 && idleExpireNano > cacheEntry.getLastAccessTime()) {
+            it.remove();
+            trimmedByIdle++;
+          } else if (maxSecsToLive > 0 && ttlExpireNano > cacheEntry.getCreateTime()) {
+            it.remove();
+            trimmedByTTL++;
+          } else if (trimForMaxSize > 0) {
+            activeList.add(cacheEntry.forSort());
           }
         }
+        if (trimForMaxSize > 0 && activeList.size() > maxSize) {
+          // sort into last access time ascending
+          activeList.sort(BY_LAST_ACCESS);
+          int trimSize = getTrimSize();
+          for (int i = trimSize; i < activeList.size(); i++) {
+            // remove if still in the cache
+            if (map.remove(activeList.get(i).getKey()) != null) {
+              trimmedByLRU++;
+            }
+          }
+        }
+        mutationCounter.set(0);
+        evictCount.add(trimmedByIdle);
+        evictCount.add(trimmedByGC);
+        evictCount.add(trimmedByTTL);
+        evictCount.add(trimmedByLRU);
+        if (logger.isTraceEnabled()) {
+          long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
+          logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
+            name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
+        }
+      } catch (Throwable e) {
+        logger.warn("Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
       }
-
-      evictCount.add(trimmedByIdle);
-      evictCount.add(trimmedByGC);
-      evictCount.add(trimmedByTTL);
-      evictCount.add(trimmedByLRU);
-      if (logger.isTraceEnabled()) {
-        long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
-        logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
-          name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
-      }
-    } catch (Throwable e) {
-      logger.warn("Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
+    } finally {
+      lock.unlock();
     }
   }
 
