@@ -49,6 +49,7 @@ public class DefaultServerCache implements ServerCache {
   protected final int trimFrequency;
   protected final int maxIdleSecs;
   protected final int maxSecsToLive;
+  protected final long trimOnPut;
   protected final ReentrantLock lock = new ReentrantLock();
   protected final AtomicLong mutationCounter = new AtomicLong();
 
@@ -60,6 +61,7 @@ public class DefaultServerCache implements ServerCache {
     this.maxIdleSecs = config.getMaxIdleSecs();
     this.maxSecsToLive = config.getMaxSecsToLive();
     this.trimFrequency = config.determineTrimFrequency();
+    this.trimOnPut = config.determineTrimOnPut();
 
     MetricFactory factory = MetricFactory.get();
     String prefix = "l2n.";
@@ -191,7 +193,7 @@ public class DefaultServerCache implements ServerCache {
   public void put(Object key, Object value) {
     map.put(key, new SoftReference<>(new CacheEntry(key, value)));
     putCount.increment();
-    if (mutationCounter.incrementAndGet() > 1000) {
+    if (mutationCounter.incrementAndGet() > trimOnPut) {
       runEviction();
     }
   }
