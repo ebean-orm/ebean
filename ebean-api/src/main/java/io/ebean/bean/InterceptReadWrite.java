@@ -6,6 +6,10 @@ import io.ebean.ValuePair;
 
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.PersistenceException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
@@ -717,7 +721,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   @Override
   public void loadBeanInternal(int loadProperty, BeanLoader loader) {
-    if ((flags[loadProperty] & InterceptReadWrite.FLAG_LOADED_PROP) != 0) {
+    if ((flags[loadProperty] & FLAG_LOADED_PROP) != 0) {
       // race condition where multiple threads calling preGetter concurrently
       return;
     }
@@ -727,9 +731,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
     if (lazyLoadProperty == -1) {
       lazyLoadProperty = loadProperty;
-      if (nodeUsageCollector != null) {
-        nodeUsageCollector.setLoadProperty(getProperty(lazyLoadProperty));
-      }
       loader.loadBean(this);
       if (lazyLoadFailure) {
         // failed when lazy loading this bean
@@ -737,6 +738,66 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       }
       // bean should be loaded and intercepting now. setLoaded() has
       // been called by the lazy loading mechanism
+    }
+  }
+
+  /**
+   * Helper method to check if two objects are equal.
+   */
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  static boolean notEqual(Object obj1, Object obj2) {
+    if (obj1 == null) {
+      return (obj2 != null);
+    }
+    if (obj2 == null) {
+      return true;
+    }
+    if (obj1 == obj2) {
+      return false;
+    }
+    if (obj1 instanceof BigDecimal) {
+      // Use comparable for BigDecimal as equals
+      // uses scale in comparison...
+      if (obj2 instanceof BigDecimal) {
+        Comparable com1 = (Comparable) obj1;
+        return (com1.compareTo(obj2) != 0);
+      } else {
+        return true;
+      }
+    }
+    if (obj1 instanceof URL) {
+      // use the string format to determine if dirty
+      return !obj1.toString().equals(obj2.toString());
+    }
+    if (obj1 instanceof File && obj2 instanceof File) {
+      File file1 = (File) obj1;
+      File file2 = (File) obj2;
+      if (file1.exists() && file2.exists() && file1.length() == file2.length()) {
+        return notEqualContent(file1, file2);
+      }
+    }
+    return !obj1.equals(obj2);
+  }
+
+  private static boolean notEqualContent(File file1, File file2) {
+    try (InputStream is1 = new FileInputStream(file1); InputStream is2 = new FileInputStream(file2)) {
+      byte[] buf1 = new byte[16384];
+      byte[] buf2 = new byte[16384];
+      int len1;
+      int len2;
+      while ((len1 = is1.read(buf1)) != -1 && (len2 = is2.read(buf2)) != -1) {
+        if (len1 != len2) {
+          return true;
+        }
+        if (!Arrays.equals(buf1, buf2)) {
+          // it does not matter, if we compare more than len1/len2 as the remainig
+          // bytes in the buffers are either 0 or equals from the prev. loop.
+          return true;
+        }
+      }
+      return false;
+    } catch (IOException e) {
+      return true; // handle them as "not equals"
     }
   }
 
@@ -773,6 +834,18 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
+  public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
+    if (state == STATE_NEW) {
+      setLoadedProperty(propertyIndex);
+    } else {
+      if (readOnly) {
+        throw new IllegalStateException("This bean is readOnly");
+      }
+      setChangeLoaded(propertyIndex);
+    }
+  }
+
+  @Override
   public void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
     if (readOnly) {
       throw new IllegalStateException("This bean is readOnly");
@@ -799,18 +872,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-    if (state == STATE_NEW) {
-      setLoadedProperty(propertyIndex);
-    } else {
-      if (readOnly) {
-        throw new IllegalStateException("This bean is readOnly");
-      }
-      setChangeLoaded(propertyIndex);
-    }
-  }
-
-  @Override
   public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
@@ -828,9 +889,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * Check for primitive int.
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
     if (state == STATE_NEW) {
@@ -840,9 +898,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * long.
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
     if (state == STATE_NEW) {
@@ -852,9 +907,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * double.
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
     if (state == STATE_NEW) {
@@ -864,9 +916,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * float.
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
     if (state == STATE_NEW) {
@@ -876,9 +925,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * short.
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
     if (state == STATE_NEW) {
@@ -888,9 +934,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * char.
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
     if (state == STATE_NEW) {
@@ -900,9 +943,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * byte.
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
     if (state == STATE_NEW) {
@@ -912,9 +952,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * char[].
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
     if (state == STATE_NEW) {
@@ -924,9 +961,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  /**
-   * byte[].
-   */
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
     if (state == STATE_NEW) {
@@ -1034,36 +1068,5 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
     final MutableValueNext next = mutableNext[propertyIndex];
     return next != null ? next.content() : null;
-  }
-
-  /**
-   * Helper method to check if two objects are equal.
-   */
-  @SuppressWarnings({"unchecked", "rawtypes"})
-  static boolean notEqual(Object obj1, Object obj2) {
-    if (obj1 == null) {
-      return (obj2 != null);
-    }
-    if (obj2 == null) {
-      return true;
-    }
-    if (obj1 == obj2) {
-      return false;
-    }
-    if (obj1 instanceof BigDecimal) {
-      // Use comparable for BigDecimal as equals
-      // uses scale in comparison...
-      if (obj2 instanceof BigDecimal) {
-        Comparable com1 = (Comparable) obj1;
-        return (com1.compareTo(obj2) != 0);
-      } else {
-        return true;
-      }
-    }
-    if (obj1 instanceof URL) {
-      // use the string format to determine if dirty
-      return !obj1.toString().equals(obj2.toString());
-    }
-    return !obj1.equals(obj2);
   }
 }
