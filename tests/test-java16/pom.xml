@@ -4,7 +4,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>test-java16</artifactId>
-  <version>1.0</version>
+  <version>13.6.0-FOC1</version>
 
   <properties>
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>13.6.0-FOC1-SNAPSHOT</version>
+      <version>13.6.0-FOC1</version>
     </dependency>
 
     <dependency>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.6.0-FOC1-SNAPSHOT</version>
+      <version>13.6.0-FOC1</version>
       <scope>test</scope>
     </dependency>
 
