@@ -12,6 +12,7 @@ import java.io.PrintStream;
 import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestFileType extends BaseTestCase {
 
@@ -182,6 +183,31 @@ public class TestFileType extends BaseTestCase {
     DB.save(bean3);
 
     DB.delete(bean3);
+  }
+
+  @Test
+  void test_FileDirty() throws Exception {
+    SomeFileBean bean0 = new SomeFileBean();
+    bean0.setName("afile");
+    bean0.setContent(file);
+
+    DB.save(bean0);
+
+    SomeFileBean bean1 = DB.find(SomeFileBean.class)
+        .select("name, file")
+        .setId(bean0.getId())
+        .findOne();
+
+    assertThat(bean1.getContent())
+        .isNotEqualTo(file) // not same file object, but same content
+        .hasSameBinaryContentAs(file);
+
+    assertFalse(DB.beanState(bean1).isDirty());
+    bean1.setContent(file);
+    assertFalse(DB.beanState(bean1).isDirty());
+    bean1.setContent(file2);
+    assertTrue(DB.beanState(bean1).isDirty());
+
   }
 
   private File getFile(String resource) {

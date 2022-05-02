@@ -58,13 +58,6 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   public void addAsOfTableAlias(SpiQuery<?> query) {
     if (desc.isHistorySupport()) {
       query.setAsOfBaseTable();
-      query.incrementAsOfTableCount();
-    }
-    if (lazyLoadParent != null && lazyLoadParent.isManyToManyWithHistory()) {
-      query.incrementAsOfTableCount();
-    }
-    for (SqlTreeNode aChildren : children) {
-      aChildren.addAsOfTableAlias(query);
     }
   }
 

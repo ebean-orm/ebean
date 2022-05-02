@@ -1,16 +1,17 @@
 package main;
 
-import io.ebean.docker.commands.MySqlConfig;
 import io.ebean.docker.commands.MySqlContainer;
 
 public class StartMySql {
 
   public static void main(String[] args) {
 
-    MySqlConfig config = new MySqlConfig("8.0");
-    config.setDbName("unit");
-    config.setUser("unit");
-    config.setPassword("unit");
+    MySqlContainer.newBuilder("8.0")
+      .dbName("unit")
+      .user("unit")
+      .password("unit")
+      .build()
+      .startWithDropCreate();
 
     // by default this mysql docker collation is case sensitive
     // using utf8mb4_bin
@@ -22,7 +23,5 @@ public class StartMySql {
 //    config.setCollation("utf8mb4_unicode_ci");
 //    config.setCharacterSet("utf8mb4");
 
-    MySqlContainer container = new MySqlContainer(config);
-    container.startWithDropCreate();
   }
 }

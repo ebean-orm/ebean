@@ -10,10 +10,9 @@ class ClassUtil {
    * Return a new instance of the class using the default constructor.
    */
   static Object newInstance(String className) {
-
     try {
       Class<?> cls = forName(className);
-      return cls.newInstance();
+      return cls.getDeclaredConstructor().newInstance();
     } catch (Exception e) {
       String msg = "Error constructing " + className;
       throw new IllegalArgumentException(msg, e);
@@ -26,7 +25,6 @@ class ClassUtil {
   static Class<?> forName(String name) throws ClassNotFoundException {
     return new ClassLoadContext().forName(name);
   }
-
 
   /**
    * Helper to wrap the context and caller classLoaders (to use/try both).
@@ -48,7 +46,6 @@ class ClassUtil {
     }
 
     public Class<?> forName(String name) throws ClassNotFoundException {
-
       try {
         return Class.forName(name, true, contextLoader);
       } catch (ClassNotFoundException e) {
@@ -59,7 +56,6 @@ class ClassUtil {
         }
       }
     }
-
   }
 }
 

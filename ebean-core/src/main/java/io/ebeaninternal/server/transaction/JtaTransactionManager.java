@@ -27,7 +27,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
   private TransactionScopeManager scope;
 
   /**
-   * Instantiates a new spring aware transaction scope manager.
+   * Instantiates a new JTA transaction manager.
    */
   public JtaTransactionManager() {
   }
@@ -37,10 +37,8 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
    */
   @Override
   public void setTransactionManager(Object txnMgr) {
-
     // RB: At this stage not exposing TransactionManager to
     // the public API and hence the Object type and casting here
-
     this.transactionManager = (TransactionManager) txnMgr;
     this.scope = transactionManager.scope();
   }
@@ -72,16 +70,13 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
   }
 
   /**
-   * Looks for a current Spring managed transaction and wraps/returns that as a Ebean transaction.
+   * Looks for a current JTA managed transaction and wraps/returns that as an Ebean transaction.
    * <p>
    * Returns null if there is no current spring transaction (lazy loading outside a spring txn etc).
-   * </p>
    */
   @Override
   public Object getCurrentTransaction() {
-
     TransactionSynchronizationRegistry syncRegistry = getSyncRegistry();
-
     SpiTransaction t = (SpiTransaction) syncRegistry.getResource(EBEAN_TXN_RESOURCE);
     if (t != null) {
       // we have already seen this transaction
@@ -122,14 +117,10 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     return newTrans;
   }
 
-
   /**
-   * Create a listener to register with JTA to enable Ebean to be
-   * notified when transactions commit and rollback.
+   * Create a listener to register with JTA to enable Ebean to be notified when transactions commit and rollback.
    * <p>
-   * This is used by Ebean to notify it's appropriate listeners and maintain it's server
-   * cache etc.
-   * </p>
+   * This is used by Ebean to notify its appropriate listeners and maintain its server cache etc.
    */
   private JtaTxnListener createJtaTxnListener(SpiTransaction t) {
     return new JtaTxnListener(transactionManager, t);
@@ -169,7 +160,6 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
    * <p>
    * When Ebean is notified (of the commit/rollback) it can then manage its
    * cache, notify BeanPersistListeners etc.
-   * </p>
    */
   private static class JtaTxnListener implements Synchronization {
 

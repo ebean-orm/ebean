@@ -1,7 +1,6 @@
 package io.ebean.event;
 
 import io.ebean.Database;
-import io.ebean.EbeanServer;
 import io.ebean.Query;
 import io.ebean.Transaction;
 
@@ -13,15 +12,7 @@ public interface BeanQueryRequest<T> {
   /**
    * Return the DB processing the request.
    */
-  default Database database() {
-    return getEbeanServer();
-  }
-
-  /**
-   * Deprecated migrate to database().
-   */
-  @Deprecated
-  EbeanServer getEbeanServer();
+  Database database();
 
   /**
    * Return the Transaction associated with this request.
@@ -29,25 +20,9 @@ public interface BeanQueryRequest<T> {
   Transaction transaction();
 
   /**
-   * Deprecated migrate to transaction().
-   */
-  @Deprecated
-  default Transaction getTransaction() {
-    return transaction();
-  }
-
-  /**
    * Returns the query.
    */
   Query<T> query();
-
-  /**
-   * Deprecated migrate to query().
-   */
-  @Deprecated
-  default Query<T> getQuery() {
-    return query();
-  }
 
   /**
    * Return true if an Id IN expression should have the bind parameters padded.

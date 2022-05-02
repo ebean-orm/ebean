@@ -2,6 +2,7 @@ package io.ebean;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
+
 import javax.persistence.NonUniqueResultException;
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -1372,18 +1373,9 @@ public interface Query<T> extends CancelableQuery {
    * optional asc and desc keywords representing ascending and descending order
    * respectively.
    */
-  Query<T> order(String orderByClause);
-
-  /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * <p>
-   * This is the same as <code>orderBy()</code>
-   */
-  OrderBy<T> order();
+  default Query<T> order(String orderByClause) {
+    return orderBy(orderByClause);
+  }
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -1397,14 +1389,29 @@ public interface Query<T> extends CancelableQuery {
   OrderBy<T> orderBy();
 
   /**
-   * Set an OrderBy object to replace any existing OrderBy clause.
+   * Return the OrderBy so that you can append an ascending or descending
+   * property to the order by clause.
+   * <p>
+   * This will never return a null. If no order by clause exists then an 'empty'
+   * OrderBy object is returned.
+   * <p>
+   * This is the same as <code>orderBy()</code>
    */
-  Query<T> setOrder(OrderBy<T> orderBy);
+  default OrderBy<T> order() {
+    return orderBy();
+  }
 
   /**
    * Set an OrderBy object to replace any existing OrderBy clause.
    */
   Query<T> setOrderBy(OrderBy<T> orderBy);
+
+  /**
+   * Set an OrderBy object to replace any existing OrderBy clause.
+   */
+  default Query<T> setOrder(OrderBy<T> orderBy) {
+    return setOrderBy(orderBy);
+  }
 
   /**
    * Set whether this query uses DISTINCT.

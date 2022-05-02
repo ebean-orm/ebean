@@ -10,7 +10,6 @@ public interface NodeUsageListener {
    * <p>
    * This is the properties that are used for a given bean in the object graph.
    * This information is used by autoTune to tune queries.
-   * </p>
    */
-  void collectNodeUsage(NodeUsageCollector collector);
+  void collectNodeUsage(NodeUsageCollector.State state);
 }

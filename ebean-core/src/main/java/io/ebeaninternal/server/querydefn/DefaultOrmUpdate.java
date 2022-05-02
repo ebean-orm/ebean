@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.ebean.EbeanServer;
+import io.ebean.Database;
 import io.ebean.Update;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiUpdate;
@@ -14,7 +14,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
 
   private static final long serialVersionUID = -8791423602246515438L;
 
-  private transient final EbeanServer server;
+  private transient final Database server;
   private final Class<?> beanType;
   private final String name;
   private String label;
@@ -35,7 +35,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
    * Create with a specific server. This means you can use the
    * UpdateSql.execute() method.
    */
-  public DefaultOrmUpdate(Class<?> beanType, EbeanServer server, String baseTable, String updateStatement) {
+  public DefaultOrmUpdate(Class<?> beanType, Database server, String baseTable, String updateStatement) {
     this.beanType = beanType;
     this.server = server;
     this.baseTable = baseTable;

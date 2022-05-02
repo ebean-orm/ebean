@@ -18,45 +18,27 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private static final String tableAliasManyPlaceHolder = "${mta}";
 
   private final String columnAliasPrefix;
-
   private final ArrayStack<String> tableAliasStack = new ArrayStack<>();
-
   private final ArrayStack<String> joinStack = new ArrayStack<>();
-
   private final ArrayStack<String> prefixStack = new ArrayStack<>();
-
   private final String fromForUpdate;
-
   private boolean useColumnAlias;
-
   private int columnIndex;
-
+  private int asOfTableCount;
   private StringBuilder sb = new StringBuilder(STRING_BUILDER_INITIAL_CAPACITY);
-
   /**
    * A Set used to make sure formula joins are only added once to a query.
    */
   private HashSet<String> formulaJoins;
-
   private HashSet<String> tableJoins;
-
   private final SqlTreeAlias alias;
-
   private String currentPrefix;
-
   private List<BeanProperty> encryptedProps;
-
   private List<SqlTreeJoin> extraJoins;
-
   private final CQueryDraftSupport draftSupport;
-
   private final CQueryHistorySupport historySupport;
-
   private final boolean historyQuery;
 
-  /**
-   * Construct for SELECT clause (with column alias settings).
-   */
   DefaultDbSqlContext(SqlTreeAlias alias, String columnAliasPrefix, CQueryHistorySupport historySupport,
                       CQueryDraftSupport draftSupport, String fromForUpdate) {
     this.alias = alias;
@@ -116,7 +98,6 @@ final class DefaultDbSqlContext implements DbSqlContext {
     if (encryptedProps == null) {
       return null;
     }
-
     return encryptedProps.toArray(new BeanProperty[0]);
   }
 
@@ -153,6 +134,9 @@ final class DefaultDbSqlContext implements DbSqlContext {
       String asOfView = historySupport.getAsOfView(table);
       appendTable(table, asOfView);
       if (asOfView != null) {
+        if (historySupport.isStandardsBased()) {
+          asOfTableCount++;
+        }
         addAsOfOnClause = !historySupport.isStandardsBased();
       }
     }
@@ -178,6 +162,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
     }
     if (addAsOfOnClause) {
       sb.append(" and ").append(historySupport.getAsOfPredicate(a2));
+      asOfTableCount++;
     }
     if (extraWhere != null && !extraWhere.isEmpty()) {
       sb.append(" and ");
@@ -193,6 +178,11 @@ final class DefaultDbSqlContext implements DbSqlContext {
     } else {
       sb.append(" ").append(table).append(" ");
     }
+  }
+
+  @Override
+  public int asOfTableCount() {
+    return asOfTableCount;
   }
 
   @Override
@@ -236,7 +226,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String manyWhere) {
-    // replace ${ta} place holder with the real table alias...
+    // replace ${ta} placeholder with the real table alias...
     String tableAlias = manyWhere == null ? tableAliasStack.peek() : getTableAliasManyWhere(manyWhere);
     String converted = sqlFormulaJoin.replace(tableAliasPlaceHolder, tableAlias);
     if (formulaJoins == null) {
@@ -250,9 +240,9 @@ final class DefaultDbSqlContext implements DbSqlContext {
     formulaJoins.add(converted);
     sb.append(" ");
     if (joinType == SqlJoinType.OUTER) {
-      if ("join".equals(sqlFormulaJoin.substring(0, 4).toLowerCase())) {
+      if ("join".equalsIgnoreCase(sqlFormulaJoin.substring(0, 4))) {
         // prepend left as we are in the 'many' part
-        append(" left ");
+        sb.append("left ");
       }
     }
     sb.append(converted);

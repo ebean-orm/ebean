@@ -1,20 +1,16 @@
 package main;
 
-import io.ebean.docker.commands.YugabyteConfig;
 import io.ebean.docker.commands.YugabyteContainer;
 
 public class StartYugabyte {
 
   public static void main(String[] args) {
-
-    // Check add extensions ?
-    YugabyteConfig config = new YugabyteConfig("2.11.2.0-b89");
-    config.setDbName("unit");
-    config.setUser("unit");
-    config.setExtensions("pgcrypto");
-
-    YugabyteContainer container = new YugabyteContainer(config);
-    container.startWithDropCreate();
+    YugabyteContainer.newBuilder("2.11.2.0-b89")
+      .dbName("unit")
+      .user("unit")
+      .extensions("pgcrypto")
+      .build()
+      .startWithDropCreate();
 
 //    Run container ut_yugabyte with host:localhost port:6433 db:unit user:unit/test shutdown:None
 //    docker run -d --name ut_yugabyte -p 6433:5433 -p 7000:7000 -p 9000:9000 -p 9042:9042 yugabytedb/yugabyte:2.11.2.0-b89 bin/yugabyted start --daemon=false

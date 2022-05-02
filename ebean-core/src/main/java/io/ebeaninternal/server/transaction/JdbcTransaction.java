@@ -758,11 +758,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     internalBatchFlush();
   }
 
-  @Override
-  public final void flushBatch() {
-    flush();
-  }
-
   /**
    * Flush the JDBC batch and execute derived relationship statements if necessary.
    */
