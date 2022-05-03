@@ -2,11 +2,15 @@
 
 We @foconis use this command to release.
 
-    mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=12.14.2-FOC1-SNAPSHOT 
-    mvn release:prepare release:perform -Darguments="-Dgpg.skip -DskipTests"
-    # das failed leider ab Ebean 13. Aktuell einzige Möglichkeit zu release ist dann ins target/checkout Verzeichnis zu gehen und
+    mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=13.6.0-FOC2-SNAPSHOT 
+    mvn release:prepare release:perform -Darguments="-Dgpg.skip -DskipTests" -PfoconisRelease
+    
+    # RELEASE klappt nun, sollte es failen, ist wie folgt vorzugehen:
+    # um bei einen Fehler zu release ist dann ins target/checkout Verzeichnis zu gehen und
     mvn clean source:jar install org.apache.maven.plugins:maven-deploy-plugin:deploy -DskipTests
     # auszuführen. Aber auch das failed bei Kotlin.
+
+    # nach dem Release müssen die Versionen in tests/test-java16/pom.xml und tests/test-kotlin/pom.xml manuell angepasst werden
     
 generate Java classes from .xsd:
 
