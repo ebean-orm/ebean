@@ -602,6 +602,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
+  public void createEmptyReference(EntityBean localBean) {
+    setValue(localBean, help.createEmptyReference());
+  }
+
+  @Override
   public BeanCollection<?> createReference(EntityBean localBean, boolean forceNewReference) {
     return forceNewReference ? createReference(localBean) : createReferenceIfNull(localBean);
   }

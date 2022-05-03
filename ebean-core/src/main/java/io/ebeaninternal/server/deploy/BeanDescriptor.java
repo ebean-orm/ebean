@@ -86,7 +86,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final ConcurrentHashMap<String, ElPropertyDeploy> elDeployCache = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, ElComparator<T>> comparatorCache = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, STreeProperty> dynamicProperty = new ConcurrentHashMap<>();
-  private final ConcurrentHashMap<String, Map<String,String>> pathMaps = new ConcurrentHashMap<>();
+  private final ConcurrentHashMap<String, Map<String, String>> pathMaps = new ConcurrentHashMap<>();
 
   private final Map<String, SpiRawSql> namedRawSql;
   private final Map<String, String> namedQuery;
@@ -1765,6 +1765,14 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return createEntityBean(false);
   }
 
+  @Override
+  public EntityBean createEntityBean2(boolean readOnlyNoIntercept) {
+    if (readOnlyNoIntercept) {
+      return (EntityBean) prototypeEntityBean._ebean_newInstanceReadOnly();
+    }
+    return createEntityBean(false);
+  }
+
   /**
    * Create an entity bean for JSON marshalling (which differs for the element collection case).
    */
@@ -2879,7 +2887,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     for (BeanPropertyAssocMany<?> many : propertiesManySave) {
       if (ebi.isLoadedProperty(many.propertyIndex())) {
         final Object value = many.getValue(bean);
-        if (value instanceof BeanCollection && ((BeanCollection<?>)value).hasModifications() || value != null) {
+        if (value instanceof BeanCollection && ((BeanCollection<?>) value).hasModifications() || value != null) {
           return true;
         }
       }
