@@ -4,6 +4,9 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceAlert;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.datasource.DataSourcePool;
+import io.ebean.platform.h2.H2Platform;
+import io.ebean.platform.postgres.Postgres9Platform;
+import io.ebean.platform.postgres.PostgresPlatform;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
@@ -128,6 +131,41 @@ public class InitDataSourceTest {
     assertEquals("foo", roConfig.getUrl());
   }
 
+  @Test
+  void isPostgresAllQuotedIdentifiers_true_when_postgres() {
+    DatabaseConfig config = new DatabaseConfig();
+    config.setAllQuotedIdentifiers(true);
+    config.setDatabasePlatform(new PostgresPlatform());
+
+    assertTrue(new InitDataSource(config).isPostgresAllQuotedIdentifiers());
+  }
+
+  @Test
+  void isPostgresAllQuotedIdentifiers_true_when_postgres9() {
+    DatabaseConfig config = new DatabaseConfig();
+    config.setAllQuotedIdentifiers(true);
+    config.setDatabasePlatform(new Postgres9Platform());
+
+    assertTrue(new InitDataSource(config).isPostgresAllQuotedIdentifiers());
+  }
+
+  @Test
+  void isPostgresAllQuotedIdentifiers_false() {
+    DatabaseConfig config = new DatabaseConfig();
+    config.setAllQuotedIdentifiers(false);
+    config.setDatabasePlatform(new PostgresPlatform());
+
+    assertFalse(new InitDataSource(config).isPostgresAllQuotedIdentifiers());
+  }
+
+  @Test
+  void isPostgresAllQuotedIdentifiers_false_when_notPostgres() {
+    DatabaseConfig config = new DatabaseConfig();
+    config.setAllQuotedIdentifiers(true);
+    config.setDatabasePlatform(new H2Platform());
+
+    assertFalse(new InitDataSource(config).isPostgresAllQuotedIdentifiers());
+  }
 
   @Test
   public void online() {
