@@ -29,7 +29,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>classpath-scanner</artifactId>
-      <version>6.2</version>
+      <version>7.1</version>
     </dependency>
 
     <dependency>
