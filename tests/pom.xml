@@ -5,7 +5,7 @@
     <groupId>org.avaje</groupId>
     <artifactId>java8-oss</artifactId>
     <version>3.3</version>
-    <relativePath />
+    <relativePath/>
   </parent>
 
   <groupId>io.ebean</groupId>
@@ -40,4 +40,5 @@
       </modules>
     </profile>
   </profiles>
+
 </project>
