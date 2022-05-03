@@ -15,7 +15,6 @@ public final class BeanMapHelpElement<T> extends BeanMapHelp<T> {
   public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
     Object key = bean._ebean_getField(0);
     Object val = bean._ebean_getField(1);
-
     BeanMap<?, ?> map = ((BeanMap<?, ?>) collection);
     if (withCheck) {
       map.internalPutWithCheck(key, val);

@@ -28,8 +28,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
-
+  public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanList<?>) {
       BeanList<?> bl = (BeanList<?>) bc;
       if (bl.getActualList() == null) {
@@ -43,17 +42,17 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public Object createEmptyReference() {
+  public final Object createEmptyReference() {
     return Collections.EMPTY_LIST;
   }
 
   @Override
-  public BeanCollection<T> createEmptyNoParent() {
+  public final BeanCollection<T> createEmptyNoParent() {
     return new BeanList<>();
   }
 
   @Override
-  public BeanCollection<T> createEmpty(EntityBean parentBean) {
+  public final BeanCollection<T> createEmpty(EntityBean parentBean) {
     BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
     if (many != null) {
       beanList.setModifyListening(many.modifyListenMode());
@@ -62,29 +61,23 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public BeanCollection<T> createReference(EntityBean parentBean) {
-
+  public final BeanCollection<T> createReference(EntityBean parentBean) {
     BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
     beanList.setModifyListening(many.modifyListenMode());
     return beanList;
   }
 
   @Override
-  public void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
-
+  public final void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
     BeanList<?> newBeanList = (BeanList<?>) server.findList(query, t);
     refresh(newBeanList, parentBean);
   }
 
   @Override
-  public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
-
+  public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {
     BeanList<?> newBeanList = (BeanList<?>) bc;
-
     List<?> currentList = (List<?>) many.getValue(parentBean);
-
     newBeanList.setModifyListening(many.modifyListenMode());
-
     if (currentList == null) {
       // the currentList is null? Not really expecting this...
       many.setValue(parentBean, newBeanList);
@@ -102,8 +95,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
-
+  public final void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
     List<?> list;
     if (collection instanceof BeanCollection<?>) {
       BeanList<?> beanList = (BeanList<?>) collection;
@@ -120,7 +112,6 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
     } else {
       list = (List<?>) collection;
     }
-
     jsonWriteCollection(ctx, name, list);
   }
 

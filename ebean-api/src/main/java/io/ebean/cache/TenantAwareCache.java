@@ -29,9 +29,10 @@ public final class TenantAwareCache implements ServerCache {
   /**
    * Return the underlying ServerCache that is being delegated to.
    */
+  @SuppressWarnings("unchecked")
   @Override
   public <T> T unwrap(Class<T> cls) {
-    return (T)delegate;
+    return (T) delegate;
   }
 
   @Override
