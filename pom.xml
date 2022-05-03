@@ -99,7 +99,7 @@
 
   <profiles>
     <profile>
-      <id>release</id>
+      <id>central</id>
     </profile>
     <profile>
       <id>h2v1</id>
