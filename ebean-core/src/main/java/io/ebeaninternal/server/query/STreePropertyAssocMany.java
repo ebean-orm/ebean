@@ -34,6 +34,11 @@ public interface STreePropertyAssocMany extends STreePropertyAssoc {
   BeanCollection<?> createReference(EntityBean localBean, boolean forceNewReference);
 
   /**
+   * Populate the collection for read-only disabled lazy loading (aka Java Collections non mutable empty collection).
+   */
+  void createEmptyReference(EntityBean localBean);
+
+  /**
    * Return true if the property has a join table.
    */
   boolean hasJoinTable();

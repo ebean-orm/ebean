@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceAlertFactory;
 import io.ebean.datasource.DataSourceConfig;
@@ -97,8 +98,14 @@ final class InitDataSource {
       dsConfig.setReadOnly(true);
       dsConfig.setDefaults(config.getDataSourceConfig());
       dsConfig.setIsolationLevel(config.getDataSourceConfig().getIsolationLevel());
+    } else if (isPostgresAllQuotedIdentifiers()) {
+      dsConfig.addProperty("quoteReturningIdentifiers", false);
     }
     return create(dsConfig, readOnly);
+  }
+
+  boolean isPostgresAllQuotedIdentifiers() {
+    return config.isAllQuotedIdentifiers() && Platform.POSTGRES == config.getDatabasePlatform().getPlatform().base();
   }
 
   private DataSource create(DataSourceConfig dsConfig, boolean readOnly) {

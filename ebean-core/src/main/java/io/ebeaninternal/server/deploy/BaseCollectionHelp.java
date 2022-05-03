@@ -28,7 +28,7 @@ abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
   }
 
   @Override
-  public void setLoader(BeanCollectionLoader loader) {
+  public final void setLoader(BeanCollectionLoader loader) {
     this.loader = loader;
   }
 
@@ -43,7 +43,7 @@ abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
 
   @SuppressWarnings("rawtypes")
   @Override
-  public Collection underlying(Object value) {
+  public final Collection underlying(Object value) {
     if (value instanceof BeanCollection) {
       return ((BeanCollection)value).getActualDetails();
     } else {
@@ -51,7 +51,7 @@ abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
     }
   }
 
-  void jsonWriteCollection(SpiJsonWriter ctx, String name, Collection<?> list) throws IOException {
+  final void jsonWriteCollection(SpiJsonWriter ctx, String name, Collection<?> list) throws IOException {
     if (!list.isEmpty() || ctx.isIncludeEmpty()) {
       ctx.beginAssocMany(name);
       for (Object bean : list) {

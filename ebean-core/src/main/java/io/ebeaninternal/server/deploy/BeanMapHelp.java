@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,13 +37,11 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
-
+  public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
     if (mapKey == null) {
       mapKey = many.mapKey();
     }
     BeanProperty beanProp = targetDescriptor.beanProperty(mapKey);
-
     if (bc instanceof BeanMap<?, ?>) {
       BeanMap<Object, Object> bm = (BeanMap<Object, Object>) bc;
       Map<Object, Object> actualMap = bm.getActualMap();
@@ -57,10 +56,9 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     }
   }
 
-  static class Adder implements BeanCollectionAdd {
+  static final class Adder implements BeanCollectionAdd {
 
     private final BeanProperty beanProperty;
-
     private final Map<Object, Object> map;
 
     Adder(BeanProperty beanProperty, Map<Object, Object> map) {
@@ -76,13 +74,17 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public BeanCollection<T> createEmptyNoParent() {
+  public final Object createEmptyReference() {
+    return Collections.EMPTY_MAP;
+  }
+
+  @Override
+  public final BeanCollection<T> createEmptyNoParent() {
     return new BeanMap<>();
   }
 
   @Override
-  public BeanCollection<T> createEmpty(EntityBean ownerBean) {
-
+  public final BeanCollection<T> createEmpty(EntityBean ownerBean) {
     BeanMap<?, T> beanMap = new BeanMap<>(loader, ownerBean, propertyName);
     if (many != null) {
       beanMap.setModifyListening(many.modifyListenMode());
@@ -92,7 +94,6 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
-
     if (bean == null) {
       ((BeanMap<?, ?>) collection).internalPutNull();
     } else {
@@ -104,8 +105,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public BeanCollection<T> createReference(EntityBean parentBean) {
-
+  public final BeanCollection<T> createReference(EntityBean parentBean) {
     BeanMap beanMap = new BeanMap(loader, parentBean, propertyName);
     if (many != null) {
       beanMap.setModifyListening(many.modifyListenMode());
@@ -114,14 +114,13 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
+  public final void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
     BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) server.findMap(query, t);
     refresh(newBeanMap, parentBean);
   }
 
   @Override
-  public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
-
+  public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {
     BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) bc;
     Map<?, ?> current = (Map<?, ?>) many.getValue(parentBean);
 
@@ -143,8 +142,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
-
+  public final void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
     Map<?, ?> map;
     if (collection instanceof BeanCollection<?>) {
       BeanMap<?, ?> bc = (BeanMap<?, ?>) collection;

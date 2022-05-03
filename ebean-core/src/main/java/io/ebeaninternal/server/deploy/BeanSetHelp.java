@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
+  public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanSet<?>) {
       BeanSet<?> beanSet = (BeanSet<?>) bc;
       if (beanSet.getActualSet() == null) {
@@ -46,12 +47,17 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public BeanCollection<T> createEmptyNoParent() {
+  public final Object createEmptyReference() {
+    return Collections.EMPTY_SET;
+  }
+
+  @Override
+  public final BeanCollection<T> createEmptyNoParent() {
     return new BeanSet<>();
   }
 
   @Override
-  public BeanCollection<T> createEmpty(EntityBean ownerBean) {
+  public final BeanCollection<T> createEmpty(EntityBean ownerBean) {
     BeanSet<T> beanSet = new BeanSet<>(loader, ownerBean, propertyName);
     if (many != null) {
       beanSet.setModifyListening(many.modifyListenMode());
@@ -60,20 +66,20 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public BeanCollection<T> createReference(EntityBean parentBean) {
+  public final BeanCollection<T> createReference(EntityBean parentBean) {
     BeanSet<T> beanSet = new BeanSet<>(loader, parentBean, propertyName);
     beanSet.setModifyListening(many.modifyListenMode());
     return beanSet;
   }
 
   @Override
-  public void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
+  public final void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
     BeanSet<?> newBeanSet = (BeanSet<?>) server.findSet(query, t);
     refresh(newBeanSet, parentBean);
   }
 
   @Override
-  public void refresh(BeanCollection<?> bc, EntityBean parentBean) {
+  public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {
     BeanSet<?> newBeanSet = (BeanSet<?>) bc;
     Set<?> current = (Set<?>) many.getValue(parentBean);
     newBeanSet.setModifyListening(many.modifyListenMode());
@@ -94,7 +100,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
+  public final void jsonWrite(SpiJsonWriter ctx, String name, Object collection, boolean explicitInclude) throws IOException {
     Set<?> set;
     if (collection instanceof BeanCollection<?>) {
       BeanSet<?> bc = (BeanSet<?>) collection;
