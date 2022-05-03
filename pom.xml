@@ -54,11 +54,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <extensions>false</extensions>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
         <version>1.6</version>
@@ -118,6 +113,9 @@
 
   <profiles>
     <profile>
+      <id>foconisRelease</id>
+    </profile>
+    <profile>
       <id>central</id>
     </profile>
     <profile>
@@ -137,7 +135,7 @@
       </modules>
     </profile>
   </profiles>
-<!-- 
+<!--
   <repositories>
     <repository>
       <id>foconis-release</id>
