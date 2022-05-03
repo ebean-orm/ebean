@@ -11,6 +11,7 @@ import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,6 +40,11 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
     } else {
       throw new RuntimeException("Unhandled type " + bc);
     }
+  }
+
+  @Override
+  public Object createEmptyReference() {
+    return Collections.EMPTY_LIST;
   }
 
   @Override

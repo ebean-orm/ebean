@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -43,6 +44,11 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
     } else {
       throw new RuntimeException("Unhandled type " + bc);
     }
+  }
+
+  @Override
+  public Object createEmptyReference() {
+    return Collections.EMPTY_SET;
   }
 
   @Override

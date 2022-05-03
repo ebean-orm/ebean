@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -73,6 +74,11 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
       Object keyValue = beanProperty.getValue(bean);
       map.put(keyValue, bean);
     }
+  }
+
+  @Override
+  public Object createEmptyReference() {
+    return Collections.EMPTY_MAP;
   }
 
   @Override

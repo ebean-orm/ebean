@@ -284,14 +284,18 @@ class SqlTreeLoadBean implements SqlTreeLoad {
       boolean forceNewReference = queryMode == Mode.REFRESH_BEAN;
       for (STreePropertyAssocMany many : localDesc.propsMany()) {
         if (many != fetchedMany) {
-          // create a proxy for the many (deferred fetching)
-          BeanCollection<?> ref = many.createReference(localBean, forceNewReference);
-          if (ref != null) {
-            if (disableLazyLoad) {
-              ref.setDisableLazyLoad(true);
-            }
-            if (!ref.isRegisteredWithLoadContext()) {
-              ctx.register(many.asMany(), ref);
+          if (readOnlyNoIntercept) {
+            many.createEmptyReference(localBean);
+          } else {
+            // create a proxy for the many (deferred fetching)
+            BeanCollection<?> ref = many.createReference(localBean, forceNewReference);
+            if (ref != null) {
+              if (disableLazyLoad) {
+                ref.setDisableLazyLoad(true);
+              }
+              if (!ref.isRegisteredWithLoadContext()) {
+                ctx.register(many.asMany(), ref);
+              }
             }
           }
         }
