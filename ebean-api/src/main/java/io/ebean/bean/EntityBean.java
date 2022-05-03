@@ -35,6 +35,13 @@ public interface EntityBean extends Serializable, ToStringAware {
   }
 
   /**
+   * Create and return a new entity bean instance optimised for read only no interception use.
+   */
+  default Object _ebean_newInstanceReadOnly() {
+    throw new NotEnhancedException();
+  }
+
+  /**
    * Generated method that sets the loaded state on all the embedded beans on
    * this entity bean by using EntityBeanIntercept.setEmbeddedLoaded(Object o);
    */

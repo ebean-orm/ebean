@@ -48,6 +48,11 @@ public interface BeanCollectionHelp<T> extends CQueryCollectionAdd<T> {
   BeanCollection<T> createEmpty(EntityBean bean);
 
   /**
+   * Create and return an empty 'vanilla' collection that does not support lazy loading.
+   */
+  Object createEmptyReference();
+
+  /**
    * Add a bean to the List Set or Map.
    */
   @Override

@@ -80,6 +80,11 @@ public interface STreeType {
   EntityBean createEntityBean();
 
   /**
+   * Create a new entity bean instance with option for read only optimisation.
+   */
+  EntityBean createEntityBean2(boolean readOnlyNoIntercept);
+
+  /**
    * Put the entity bean into the persistence context.
    */
   Object contextPutIfAbsent(PersistenceContext persistenceContext, Object id, EntityBean localBean);

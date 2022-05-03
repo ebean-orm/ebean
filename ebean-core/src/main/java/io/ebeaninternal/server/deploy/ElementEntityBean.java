@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.InterceptReadWrite;
 
 final class ElementEntityBean implements EntityBean {
 
@@ -13,7 +14,7 @@ final class ElementEntityBean implements EntityBean {
 
   ElementEntityBean(String[] properties) {
     this.properties = properties;
-    this.intercept = new EntityBeanIntercept(this);
+    this.intercept = new InterceptReadWrite(this);
   }
 
   @Override

@@ -38,6 +38,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   final boolean readId;
   final boolean readIdNormal;
   final boolean disableLazyLoad;
+  final boolean readOnly;
   final InheritInfo inheritInfo;
   final String prefix;
   final Map<String, String> pathMap;
@@ -57,16 +58,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
    * Construct for leaf node.
    */
   SqlTreeNodeBean(String prefix, STreePropertyAssoc beanProp, SqlTreeProperties props,
-                  List<SqlTreeNode> myChildren, boolean withId, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
-    this(prefix, beanProp, beanProp.target(), props, myChildren, withId, null, temporalMode, disableLazyLoad);
+                  List<SqlTreeNode> myChildren, boolean withId, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean readOnly) {
+    this(prefix, beanProp, beanProp.target(), props, myChildren, withId, null, temporalMode, disableLazyLoad, readOnly);
   }
 
   /**
    * Construct for root node.
    */
   SqlTreeNodeBean(STreeType desc, SqlTreeProperties props, List<SqlTreeNode> myList, boolean withId,
-                  STreePropertyAssocMany many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
-    this(null, null, desc, props, myList, withId, many, temporalMode, disableLazyLoad);
+                  STreePropertyAssocMany many, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean readOnly) {
+    this(null, null, desc, props, myList, withId, many, temporalMode, disableLazyLoad, readOnly);
   }
 
   /**
@@ -74,7 +75,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   private SqlTreeNodeBean(String prefix, STreePropertyAssoc beanProp, STreeType desc, SqlTreeProperties props,
                           List<SqlTreeNode> myChildren, boolean withId, STreePropertyAssocMany lazyLoadParent,
-                          SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad) {
+                          SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean readOnly) {
     this.lazyLoadParent = lazyLoadParent;
     this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.idBinder();
     this.prefix = prefix;
@@ -91,6 +92,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.readId = !aggregationRoot && withId && desc.hasId();
     this.readIdNormal = readId && !temporalVersions;
     this.disableLazyLoad = disableLazyLoad || !readIdNormal || desc.isRawSqlBased();
+    this.readOnly = readOnly;
     this.partialObject = props.isPartialObject();
     this.properties = props.getProps();
     this.children = myChildren == null ? Collections.emptyList() : myChildren;
