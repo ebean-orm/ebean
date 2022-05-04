@@ -21,7 +21,7 @@ class ElasticSearchSetup {
     String version = read("version", null);
     if (version != null) {
       Properties properties = populateDockerProperties(version);
-      ElasticContainer.newBuilder(version)
+      ElasticContainer.builder(version)
         .properties(properties)
         .build()
         .start();

@@ -5,7 +5,7 @@ import io.ebean.docker.commands.SqlServerContainer;
 public class StartSqlServer {
 
   public static void main(String[] args) {
-    SqlServerContainer.newBuilder("2019-GA-ubuntu-16.04")
+    SqlServerContainer.builder("2019-GA-ubuntu-16.04")
       .dbName("test_ebean")
       .user("test_ebean")
       .build()
