@@ -9,7 +9,9 @@ import io.ebean.datasource.DataSourceAlert;
 import io.ebean.datasource.DataSourceInitialiseException;
 import io.ebean.xtest.ForPlatform;
 
+import io.ebean.xtest.base.PlatformCondition;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.tests.model.basic.EBasicVer;
 
 import java.sql.Connection;
@@ -24,6 +26,7 @@ import javax.sql.DataSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@ExtendWith(PlatformCondition.class)
 public class TestServerOffline {
 
   @Test
@@ -88,7 +91,7 @@ public class TestServerOffline {
       LazyDatasourceInitializer alert = new LazyDatasourceInitializer() ;
       config.getDataSourceConfig().setAlert(alert);
       config.getDataSourceConfig().setHeartbeatFreqSecs(1);
-      
+
       Database h2Offline = DatabaseFactory.create(config);
       alert.server = h2Offline;
       assertThat(h2Offline).isNotNull();
@@ -107,7 +110,7 @@ public class TestServerOffline {
       }
 
       assertThat(alert.initialized).isFalse();
-      
+
       // next access to ebean should bring DS online
       h2Offline.find(EBasicVer.class).findCount();
       assertThat(alert.initialized).isTrue();
