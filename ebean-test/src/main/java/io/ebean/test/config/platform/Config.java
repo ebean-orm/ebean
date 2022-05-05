@@ -63,7 +63,7 @@ class Config {
   }
 
   void setDefaultPort(int defaultPort) {
-    String val = getPlatformKey("port", null);
+    String val = getKey("port", null);
     if (val != null) {
       port = Integer.parseInt(val);
     } else {
@@ -225,7 +225,7 @@ class Config {
   }
 
   void setUrl(String urlPattern) {
-    String val = getPlatformKey("url", urlPattern);
+    String val = getKey("url", urlPattern);
     val = val.replace("${host}", host());
     val = val.replace("${port}", String.valueOf(port));
     val = val.replace("${databaseName}", databaseName);
@@ -245,7 +245,7 @@ class Config {
   }
 
   void setDriver(String driver) {
-    this.driver = getPlatformKey("driver", driver);
+    this.driver = getKey("driver", driver);
   }
 
   void setPasswordDefault() {
@@ -259,7 +259,7 @@ class Config {
   private String deriveDbSchema() {
     String dbSchema = properties.getProperty("ebean.dbSchema", config.getDbSchema());
     dbSchema = properties.getProperty("ebean.test.dbSchema", dbSchema);
-    return getPlatformKey("schema", dbSchema);
+    return getKey("schema", dbSchema);
   }
 
   /**
@@ -267,7 +267,7 @@ class Config {
    */
   void setUsernameDefault() {
     this.schema = first(deriveDbSchema());
-    String defaultValue = schema != null ? schema : getPlatformKey("databaseName", this.databaseName);
+    String defaultValue = schema != null ? schema : getKey("databaseName", this.databaseName);
     this.username = getKey("username", defaultValue);
   }
 
@@ -308,11 +308,11 @@ class Config {
   }
 
   void setUsername(String username) {
-    this.username = getPlatformKey("username", username);
+    this.username = getKey("username", username);
   }
 
   void setDatabaseName(String databaseName) {
-    this.databaseName = getPlatformKey("databaseName", databaseName);
+    this.databaseName = getKey("databaseName", databaseName);
   }
 
   boolean isUseDocker() {
@@ -321,7 +321,7 @@ class Config {
   }
 
   void setDockerVersion(String version) {
-    String val = getPlatformKey("version", version);
+    String val = getKey("version", version);
     dockerProperties.setProperty(dockerKey("version"), val);
     if (containerDropCreate) {
       dockerProperties.setProperty(dockerKey("startMode"), "dropCreate");
@@ -334,16 +334,16 @@ class Config {
   }
 
   void setDockerContainerName(String containerName) {
-    dockerProperties.setProperty(dockerKey("containerName"), getPlatformKey("containerName", containerName));
+    dockerProperties.setProperty(dockerKey("containerName"), getKey("containerName", containerName));
   }
 
   void setDockerImage(String defaultImage) {
-    dockerProperties.setProperty(dockerKey("image"), getPlatformKey("image", defaultImage));
+    dockerProperties.setProperty(dockerKey("image"), getKey("image", defaultImage));
   }
 
   void setExtensions(String defaultValue) {
     // ebean.test.postgres.extensions=hstore,pgcrypto
-    String val = getPlatformKey("extensions", defaultValue);
+    String val = getKey("extensions", defaultValue);
     if (val != null) {
       dockerProperties.setProperty(dockerKey("extensions"), trimExtensions(val));
     }
@@ -363,7 +363,7 @@ class Config {
     return properties.getProperty("ebean.test." + platform + "." + key, defaultValue);
   }
 
-  private String getKey(String key, String defaultValue) {
+  String getKey(String key, String defaultValue) {
     defaultValue = properties.getProperty("ebean.test." + key, defaultValue);
     return properties.getProperty("ebean.test." + platform + "." + key, defaultValue);
   }
@@ -402,7 +402,7 @@ class Config {
       }
     }
     for (String key : DOCKER_PLATFORM_PARAMS) {
-      String val = getPlatformKey(key, null);
+      String val = getKey(key, null);
       val = properties.getProperty("docker." + platform + "." + key, val);
       if (val != null) {
         dockerProperties.setProperty(dockerKey(key), val);
@@ -442,7 +442,7 @@ class Config {
    * Pretty much only for SqlServer as we have the 2 platforms we need to choose from.
    */
   void setDatabasePlatformName() {
-    String databasePlatformName = getPlatformKey("databasePlatformName", null);
+    String databasePlatformName = getKey("databasePlatformName", null);
     if (databasePlatformName != null) {
       setProperty("ebean." + db + ".databasePlatformName", databasePlatformName);
     }

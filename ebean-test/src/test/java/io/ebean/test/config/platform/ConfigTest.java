@@ -14,22 +14,21 @@ import java.util.Properties;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class ConfigTest {
+class ConfigTest {
 
   @BeforeAll
-  public static void before() {
+  static void before() {
     // so that RunOnceMarker is not set when running these tests
     DbOffline.setPlatform(Platform.H2);
   }
 
   @AfterAll
-  public static void after() {
+  static void after() {
     DbOffline.reset();
   }
 
   @Test
-  public void trimExtensions() {
-
+  void trimExtensions() {
     Config config = new Config("db", "db", "db", new DatabaseConfig());
 
     assertThat(config.trimExtensions("a,b")).isEqualTo("a,b");
@@ -38,8 +37,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void extraDbProperties_basic() {
-
+  void extraDbProperties_basic() {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb", "other");
 
@@ -61,8 +59,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void extraDbProperties_basic_extraDb_dbName() {
-
+  void extraDbProperties_basic_extraDb_dbName() {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb.dbName", "other");
 
@@ -84,8 +81,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void extraDbProperties_withOptions() {
-
+  void extraDbProperties_withOptions() {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb", "other1");
     p.setProperty("ebean.test.extraDb.dbName", "other_db_name");
@@ -112,10 +108,8 @@ public class ConfigTest {
     assertThat(p.getProperty("datasource.other_db_name.url")).isEqualTo("other_url");
   }
 
-
   @Test
-  public void extraDbProperties_withExtraDbOptions() {
-
+  void extraDbProperties_withExtraDbOptions() {
     Properties sourceProperties = new Properties();
     sourceProperties.setProperty("ebean.test.dbName", "main");
     sourceProperties.setProperty("ebean.test.extraDb.dbName", "central");
@@ -144,12 +138,10 @@ public class ConfigTest {
 
     Properties centralProps = serverConfig.getProperties();
     assertThat(centralProps.getProperty("datasource.central.username")).isEqualTo("central");
-
   }
 
   @Test
-  public void ignoreDockerShutdown() {
-
+  void ignoreDockerShutdown() {
     Properties sourceProperties = new Properties();
     DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(sourceProperties);
@@ -162,8 +154,7 @@ public class ConfigTest {
 
   @Disabled
   @Test
-  public void run_local_only_ignoreDockerShutdown() {
-
+  void run_local_only_ignoreDockerShutdown() {
     Properties sourceProperties = new Properties();
     DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(sourceProperties);
@@ -174,8 +165,7 @@ public class ConfigTest {
   }
 
   @Test
-  public void ignoreDockerShutdown_viaProperties() {
-
+  void ignoreDockerShutdown_viaProperties() {
     Properties sourceProperties = new Properties();
     sourceProperties.setProperty("ebean.test.localDevelopment", "./src/test/resources/logback-test.xml");
 
@@ -184,6 +174,55 @@ public class ConfigTest {
 
     Config config = new Config("main", "postgres", "main", serverConfig);
     assertThat(config.ignoreDockerShutdown()).isTrue();
+  }
+
+  @Test
+  void readImage_fromPlatform() {
+    Properties p = new Properties();
+    p.setProperty("ebean.test.postgres.image", "bar/bar");
+    Config config = createConfig(p);
+
+    String val = config.getPlatformKey("image", "someDefault");
+    assertThat(val).isEqualTo("bar/bar");
+
+    val = config.getKey("image", "someDefault");
+    assertThat(val).isEqualTo("bar/bar");
+  }
+
+  @Test
+  void readImage_fromTopLevel() {
+    Properties p = new Properties();
+    p.setProperty("ebean.test.image", "bar/bar");
+    p.setProperty("ebean.test.notPlatform.image", "bar/bar");
+    Config config = createConfig(p);
+
+    String val = config.getPlatformKey("image", "someDefault");
+    assertThat(val).isEqualTo("someDefault");
+
+    val = config.getKey("image", "someDefault");
+    assertThat(val).isEqualTo("bar/bar");
+  }
+
+  @Test
+  void readImage_expect_platformSpecificWins() {
+    Properties p = new Properties();
+    p.setProperty("ebean.test.image", "foo/foo");
+    p.setProperty("ebean.test.postgres.image", "bar/bar");
+
+    Config config = createConfig(p);
+
+    String val = config.getPlatformKey("image", "someDefault");
+    assertThat(val).isEqualTo("bar/bar");
+
+    val = config.getKey("image", "someDefault");
+    assertThat(val).isEqualTo("bar/bar");
+  }
+
+  private Config createConfig(Properties p) {
+    DatabaseConfig serverConfig = new DatabaseConfig();
+    serverConfig.setName("scOther");
+    serverConfig.loadFromProperties(p);
+    return new Config("db_name", "postgres", "db_name", serverConfig);
   }
 
 }
