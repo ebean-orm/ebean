@@ -5,13 +5,12 @@ import java.util.Properties;
 /**
  * A variation of Postgres that expected Postgis extension support.
  *
- * Uses mdillon/postgis image by default.
+ * Uses postgis/postgis image by default.
  */
 class PostgisSetup implements PlatformSetup {
 
   @Override
   public Properties setup(Config config) {
-
     int defaultPort = config.isUseDocker() ? 7432 : 5432;
 
     config.setDockerPlatform("postgres");
@@ -27,20 +26,17 @@ class PostgisSetup implements PlatformSetup {
       config.urlAppend("?currentSchema=" + schema);
     }
     config.datasourceDefaults();
-
     return dockerProperties(config);
   }
 
   private Properties dockerProperties(Config config) {
-
     if (!config.isUseDocker()) {
       return new Properties();
     }
-
     config.setExtensions("hstore,pgcrypto,postgis");
-    config.setDockerImage("mdillon/postgis");
-    config.setDockerContainerName("postgis");
-    config.setDockerVersion("10");
+    config.setDockerContainerName("ut_postgis");
+    config.setDockerImage("postgis/postgis");
+    config.setDockerVersion("14");
     return config.getDockerProperties();
   }
 
