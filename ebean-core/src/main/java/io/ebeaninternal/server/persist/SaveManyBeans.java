@@ -35,6 +35,7 @@ public final class SaveManyBeans extends SaveManyBase {
   private final boolean untouchedBeanCollection;
   private final Collection<?> collection;
   private int sortOrder;
+  private boolean insertAllChildren;
 
   SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(persister, insertedParent, many, parentBean, request);
@@ -176,8 +177,11 @@ public final class SaveManyBeans extends SaveManyBase {
             skipSavingThisBean = false;
             // set the parent bean to detailBean
             many.setJoinValuesToChild(parentBean, detail, mapKeyValue);
+          } else if (insertAllChildren) {
+            ebi.setNew();
+            skipSavingThisBean = false;
+            many.setJoinValuesToChild(parentBean, detail, mapKeyValue);
           } else {
-            // unmodified so skip depending on prop.isSaveRecurseSkippable();
             skipSavingThisBean = saveRecurseSkippable;
           }
         }
@@ -342,6 +346,7 @@ public final class SaveManyBeans extends SaveManyBase {
     if (!(value instanceof BeanCollection<?>)) {
       if (!insertedParent && cascade && isChangedProperty()) {
         persister.addToFlushQueue(many.deleteByParentId(request.beanId(), null), transaction, 0);
+        insertAllChildren = true;
       }
     } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
