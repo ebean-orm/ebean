@@ -75,7 +75,7 @@
   <logger name="org.tests" level="INFO"/>
   <logger name="io.ebean" level="INFO"/>
   <logger name="io.avaje.config" level="TRACE"/>
-  <logger name="io.ebean.docker" level="TRACE"/>
+  <logger name="io.ebean.docker" level="DEBUG"/>
   <logger name="io.ebean.test" level="TRACE"/>
 
 <!--  <logger name="io.ebean.DDL" level="DEBUG"/>-->

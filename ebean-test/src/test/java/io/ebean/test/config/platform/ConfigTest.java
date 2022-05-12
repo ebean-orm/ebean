@@ -6,7 +6,6 @@ import io.ebean.datasource.DataSourceConfig;
 import io.ebeaninternal.api.DbOffline;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Properties;
@@ -138,42 +137,6 @@ class ConfigTest {
 
     Properties centralProps = serverConfig.getProperties();
     assertThat(centralProps.getProperty("datasource.central.username")).isEqualTo("central");
-  }
-
-  @Test
-  void ignoreDockerShutdown() {
-    Properties sourceProperties = new Properties();
-    DatabaseConfig serverConfig = new DatabaseConfig();
-    serverConfig.loadFromProperties(sourceProperties);
-
-    Config config = new Config("main", "postgres", "main", serverConfig);
-
-    assertThat(config.ignoreDockerShutdown("./src/test/resources/logback-test.xml")).isTrue();
-    assertThat(config.ignoreDockerShutdown("./src/test/resources/file-does-not-exist")).isFalse();
-  }
-
-  @Disabled
-  @Test
-  void run_local_only_ignoreDockerShutdown() {
-    Properties sourceProperties = new Properties();
-    DatabaseConfig serverConfig = new DatabaseConfig();
-    serverConfig.loadFromProperties(sourceProperties);
-
-    Config config = new Config("main", "postgres", "main", serverConfig);
-    assertThat(config.ignoreDockerShutdown("~/.ebean/ignore-docker-shutdown")).isTrue();
-    assertThat(config.ignoreDockerShutdown()).isTrue();
-  }
-
-  @Test
-  void ignoreDockerShutdown_viaProperties() {
-    Properties sourceProperties = new Properties();
-    sourceProperties.setProperty("ebean.test.localDevelopment", "./src/test/resources/logback-test.xml");
-
-    DatabaseConfig serverConfig = new DatabaseConfig();
-    serverConfig.loadFromProperties(sourceProperties);
-
-    Config config = new Config("main", "postgres", "main", serverConfig);
-    assertThat(config.ignoreDockerShutdown()).isTrue();
   }
 
   @Test
