@@ -4,7 +4,7 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.File;
+
 import java.util.Properties;
 
 /**
@@ -18,7 +18,7 @@ class Config {
    * Common optional docker parameters that we just transfer to docker properties.
    */
   private static final String[] DOCKER_TEST_PARAMS = {"fastStartMode", "inMemory", "initSqlFile", "seedSqlFile", "adminUser", "adminPassword", "extraDb", "extraDb.dbName", "extraDb.username", "extraDb.password", "extraDb.initSqlFile", "extraDb.seedSqlFile"};
-  private static final String[] DOCKER_PLATFORM_PARAMS = {"containerName", "image", "internalPort", "startMode", "stopMode", "shutdown", "maxReadyAttempts", "tmpfs", "collation", "characterSet"};
+  private static final String[] DOCKER_PLATFORM_PARAMS = {"containerName", "image", "internalPort", "startMode", "shutdownMode", "maxReadyAttempts", "tmpfs", "collation", "characterSet"};
 
   private static final String DDL_MODE_OPTIONS = "dropCreate, create, none, migration, createOnly or migrationDropCreate";
 
@@ -388,11 +388,10 @@ class Config {
   }
 
   private void setDockerOptionalParameters() {
-
     // check for shutdown mode on all containers
-    String mode = properties.getProperty("ebean.test.shutdown");
-    if (mode != null && !ignoreDockerShutdown()) {
-      dockerProperties.setProperty(dockerKey("shutdown"), mode);
+    String mode = properties.getProperty("ebean.test.shutdownMode");
+    if (mode != null) {
+      dockerProperties.setProperty(dockerKey("shutdownMode"), mode);
     }
     for (String key : DOCKER_TEST_PARAMS) {
       String val = getKey(key, null);
@@ -408,26 +407,6 @@ class Config {
         dockerProperties.setProperty(dockerKey(key), val);
       }
     }
-  }
-
-  /**
-   * For local development we might want to ignore docker shutdown.
-   * <p>
-   * So we just want the shutdown mode to be used on the CI server.
-   */
-  boolean ignoreDockerShutdown() {
-    String localDev = properties.getProperty("ebean.test.localDevelopment", "~/.ebean/ignore-docker-shutdown");
-    return ignoreDockerShutdown(localDev);
-  }
-
-  boolean ignoreDockerShutdown(String localDev) {
-
-    if (localDev.startsWith("~/")) {
-      File homeDir = new File(System.getProperty("user.home"));
-      return new File(homeDir, localDev.substring(2)).exists();
-    }
-
-    return new File(localDev).exists();
   }
 
   private String dockerKey(String key) {
