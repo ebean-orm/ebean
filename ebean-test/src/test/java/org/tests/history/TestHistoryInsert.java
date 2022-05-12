@@ -28,7 +28,7 @@ public class TestHistoryInsert extends BaseTestCase {
   public void mariadb_simple_history() {
 
     Timestamp t0 = new Timestamp(System.currentTimeMillis());
-    littleSleep();
+    littleSleep(50);
 
     User user = new User();
     user.setName("Jim");
@@ -37,15 +37,16 @@ public class TestHistoryInsert extends BaseTestCase {
     DB.save(user);
     Timestamp t1 = new Timestamp(System.currentTimeMillis());
 
-    littleSleep();
+    littleSleep(100);
     user.setName("NotJim");
     user.save();
     Timestamp t2 = new Timestamp(System.currentTimeMillis());
 
-    littleSleep();
+    littleSleep(100);
     user.setName("NotJimV2");
     user.setEmail("two@email.com");
     user.save();
+    littleSleep(50);
     Timestamp t3 = new Timestamp(System.currentTimeMillis());
 
     List<Version<User>> versions = DB.find(User.class).setId(user.getId()).findVersionsBetween(t0, t3);
@@ -66,9 +67,9 @@ public class TestHistoryInsert extends BaseTestCase {
     assertThat(user0).isNull();
   }
 
-  private void littleSleep() {
+  private void littleSleep(int millis) {
     try {
-      Thread.sleep(100);
+      Thread.sleep(millis);
     } catch (InterruptedException e) {
       throw new RuntimeException(e);
     }
