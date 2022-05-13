@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.6.0-FOC2</version>
+    <version>13.6.0-FOC3-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-platform-postgres</artifactId>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.6.0-FOC2</version>
+      <version>13.6.0-FOC3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -27,6 +27,6 @@
   </dependencies>
 
   <scm>
-    <tag>ebean-parent-13.6.0-FOC2</tag>
+    <tag>ebean-parent-13.3.1-FOC1</tag>
   </scm>
 </project>
