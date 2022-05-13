@@ -24,7 +24,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
  */
-public final class SaveManyBeans extends SaveManyBase {
+final class SaveManyBeans extends SaveManyBase {
 
   private final boolean cascade;
   private final boolean publish;
@@ -34,7 +34,9 @@ public final class SaveManyBeans extends SaveManyBase {
   private final DeleteMode deleteMode;
   private final boolean untouchedBeanCollection;
   private final Collection<?> collection;
+  private final boolean hasOrderColumn;
   private int sortOrder;
+  private boolean insertAllChildren;
 
   SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(persister, insertedParent, many, parentBean, request);
@@ -46,6 +48,7 @@ public final class SaveManyBeans extends SaveManyBase {
     this.deleteMode = targetDescriptor.isSoftDelete() ? DeleteMode.SOFT : DeleteMode.HARD;
     this.untouchedBeanCollection = untouchedBeanCollection();
     this.collection = cascade ? BeanCollectionUtil.getActualEntries(value) : null;
+    this.hasOrderColumn = many.hasOrderColumn();
   }
 
   /**
@@ -73,7 +76,7 @@ public final class SaveManyBeans extends SaveManyBase {
         resetModifyState();
       }
     } else {
-      if (isModifyListenMode() || many.hasOrderColumn()) {
+      if (isModifyListenMode() || hasOrderColumn) {
         // delete any removed beans / orphans
         removeAssocManyOrphans();
       }
@@ -90,6 +93,7 @@ public final class SaveManyBeans extends SaveManyBase {
 
   private boolean isSaveIntersection() {
     if (!many.isManyToMany()) {
+      // OneToMany JoinTable
       return true;
     }
     return transaction.isSaveAssocManyIntersection(many.intersectionTableJoin().getTable(), many.descriptor().rootName());
@@ -112,26 +116,22 @@ public final class SaveManyBeans extends SaveManyBase {
 
   private void processDetails() {
     BeanProperty orderColumn = null;
-    boolean hasOrderColumn = many.hasOrderColumn();
     if (hasOrderColumn) {
       if (!insertedParent && canSkipForOrderColumn() && saveRecurseSkippable) {
         return;
       }
       orderColumn = targetDescriptor.orderColumn();
     }
-
     if (insertedParent) {
       // performance optimisation for large collections
       targetDescriptor.preAllocateIds(collection.size());
     }
-
     if (!insertedParent && many.isOrphanRemoval() && request.isForcedUpdate()) {
       // collect the Id's (to exclude from deleteManyDetails)
       List<Object> detailIds = collectIds(collection, targetDescriptor, isMap);
       // deleting missing children - children not in our collected detailIds
       persister.deleteManyDetails(transaction, many.descriptor(), parentBean, many, detailIds, deleteMode);
     }
-
     transaction.depth(+1);
     saveAllBeans(orderColumn);
     if (hasOrderColumn) {
@@ -140,17 +140,14 @@ public final class SaveManyBeans extends SaveManyBase {
     transaction.depth(-1);
   }
 
-  private void saveAllBeans(BeanProperty orderColumn) {
-    // if a map, then we get the key value and
-    // set it to the appropriate property on the
-    // detail bean before we save it
+  private void saveAllBeans(final BeanProperty orderColumn) {
     Object mapKeyValue = null;
     boolean skipSavingThisBean;
-
+    boolean clearedParent = false;
     for (Object detailBean : collection) {
       sortOrder++;
       if (isMap) {
-        // its a map so need the key and value
+        // a map so need the key and value
         Map.Entry<?, ?> entry = (Map.Entry<?, ?>) detailBean;
         mapKeyValue = entry.getKey();
         detailBean = entry.getValue();
@@ -169,25 +166,28 @@ public final class SaveManyBeans extends SaveManyBase {
               ebi.setDirty(true);
             }
           }
-          if (targetDescriptor.isReference(ebi) && originalOrder == 0) {
+          if (originalOrder == 0 && targetDescriptor.isReference(ebi)) {
             // we can skip this one
             skipSavingThisBean = true;
           } else if (ebi.isNewOrDirty()) {
             skipSavingThisBean = false;
             // set the parent bean to detailBean
             many.setJoinValuesToChild(parentBean, detail, mapKeyValue);
+          } else if (insertAllChildren) {
+            ebi.setNew();
+            skipSavingThisBean = false;
+            many.setJoinValuesToChild(parentBean, detail, mapKeyValue);
           } else {
-            // unmodified so skip depending on prop.isSaveRecurseSkippable();
             skipSavingThisBean = saveRecurseSkippable;
           }
         }
-
         if (!skipSavingThisBean) {
           persister.saveRecurse(detail, transaction, parentBean, request.flags());
-          if (many.hasOrderColumn()) {
-            // Clear the bean from the PersistenceContext (L1 cache), because the order of referenced beans might have changed
+          if (hasOrderColumn && !clearedParent) {
+            // Clear the parent bean from the PersistenceContext (L1 cache), because the order of referenced beans might have changed
             final BeanDescriptor<?> beanDescriptor = many.descriptor();
             beanDescriptor.contextClear(transaction.getPersistenceContext(), beanDescriptor.getId(parentBean));
+            clearedParent = true;
           }
         }
       }
@@ -342,6 +342,7 @@ public final class SaveManyBeans extends SaveManyBase {
     if (!(value instanceof BeanCollection<?>)) {
       if (!insertedParent && cascade && isChangedProperty()) {
         persister.addToFlushQueue(many.deleteByParentId(request.beanId(), null), transaction, 0);
+        insertAllChildren = true;
       }
     } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
@@ -351,7 +352,7 @@ public final class SaveManyBeans extends SaveManyBase {
         c.setModifyListening(many.modifyListenMode());
       }
       // We must not reset when we still have to update other entities in the collection and set their new orderColumn value
-      if (!many.hasOrderColumn()) {
+      if (!hasOrderColumn) {
         c.modifyReset();
       }
       if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
