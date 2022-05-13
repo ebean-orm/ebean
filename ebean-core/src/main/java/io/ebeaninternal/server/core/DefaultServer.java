@@ -364,7 +364,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     startQueryPlanCapture();
   }
 
-  
+
   @Override
   public void start() {
     for (Plugin plugin : serverPlugins) {
@@ -1189,7 +1189,23 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     try {
       request.initTransIfRequired();
-      return request.findSingleAttributeList();
+      return request.findSingleAttributeCollection(new ArrayList<>());
+    } finally {
+      request.endTransIfRequired();
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <A, T> Set<A> findSingleAttributeSet(Query<T> query, Transaction transaction) {
+    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ATTRIBUTE_SET, query, transaction);
+    Object result = request.getFromQueryCache();
+    if (result != null) {
+      return (Set<A>) result;
+    }
+    try {
+      request.initTransIfRequired();
+      return request.findSingleAttributeCollection(new LinkedHashSet<>());
     } finally {
       request.endTransIfRequired();
     }

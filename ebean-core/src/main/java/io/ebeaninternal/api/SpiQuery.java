@@ -93,6 +93,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
     ATTRIBUTE(FIND_ATTRIBUTE, "findAttribute", false, false),
 
     /**
+     * Find single attribute set.
+     */
+    ATTRIBUTE_SET(FIND_ATTRIBUTE_SET, "findAttributeSet", false, false),
+
+    /**
      * Find rowCount.
      */
     COUNT(FIND_COUNT, "findCount"),

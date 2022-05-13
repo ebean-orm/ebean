@@ -7,6 +7,7 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeanservice.docstore.api.DocQueryRequest;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -120,9 +121,9 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   <K> Map<K, T> findMap();
 
   /**
-   * Execute the findSingleAttributeList query.
+   * Execute the findSingleAttributeCollection query.
    */
-  <A> List<A> findSingleAttributeList();
+  <A extends Collection<?>> A findSingleAttributeCollection(A collection);
 
   /**
    * Execute returning the ResultSet.

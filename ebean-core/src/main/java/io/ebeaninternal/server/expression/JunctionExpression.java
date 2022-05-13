@@ -465,6 +465,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public <A> Set<A> findSingleAttributeSet() {
+    return exprList.findSingleAttributeSet();
+  }
+
+  @Override
   public PagedList<T> findPagedList() {
     return exprList.findPagedList();
   }
