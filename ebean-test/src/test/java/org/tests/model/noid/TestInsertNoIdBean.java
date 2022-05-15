@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestInsertNoIdBean extends BaseTestCase {
+class TestInsertNoIdBean extends BaseTestCase {
 
   @Test
-  public void testInsert() {
+  void testInsert() {
     NoIdBean bean = new NoIdBean();
     bean.setName("Rocky");
     bean.setSubject("Blowing up stuff");

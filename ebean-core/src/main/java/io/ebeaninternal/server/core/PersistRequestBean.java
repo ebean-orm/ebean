@@ -9,25 +9,12 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.changelog.BeanChange;
-import io.ebeaninternal.api.ConcurrencyMode;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiProfileTransactionEvent;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.TransactionEvent;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.cache.CacheChangeSet;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanManager;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
-import io.ebeaninternal.server.persist.BatchControl;
-import io.ebeaninternal.server.persist.BatchedSqlException;
-import io.ebeaninternal.server.persist.DeleteMode;
-import io.ebeaninternal.server.persist.Flags;
-import io.ebeaninternal.server.persist.PersistExecute;
-import io.ebeaninternal.server.persist.SaveMany;
+import io.ebeaninternal.server.persist.*;
 import io.ebeaninternal.server.transaction.BeanPersistIdMap;
 import io.ebeanservice.docstore.api.DocStoreUpdate;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -38,11 +25,7 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * PersistRequest for insert update or delete of a bean.
@@ -953,7 +936,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     String name = beanDescriptor.name();
     switch (type) {
       case INSERT:
-        transaction.logSummary("Inserted [" + name + "] [" + idValue + "]" + draft);
+        transaction.logSummary("Inserted [" + name + "] [" + (idValue == null ? "" : idValue) + "]" + draft);
         break;
       case UPDATE:
         transaction.logSummary("Updated [" + name + "] [" + idValue + "]" + draft);
