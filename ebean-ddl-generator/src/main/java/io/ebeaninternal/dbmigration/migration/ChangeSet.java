@@ -1,12 +1,6 @@
 package io.ebeaninternal.dbmigration.migration;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,23 +11,23 @@ import java.util.List;
  * <p>The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
- * &lt;complexType>
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;choice>
- *           &lt;group ref="{http://ebean-orm.github.io/xml/ns/dbmigration}changeSetChildren" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;/choice>
- *       &lt;/sequence>
- *       &lt;attribute name="type" use="required" type="{http://ebean-orm.github.io/xml/ns/dbmigration}changeSetType" />
- *       &lt;attribute name="dropsFor" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="suppressDropsForever" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="generated" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="author" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;choice&gt;
+ *           &lt;group ref="{http://ebean-orm.github.io/xml/ns/dbmigration}changeSetChildren" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;/choice&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="type" use="required" type="{http://ebean-orm.github.io/xml/ns/dbmigration}changeSetType" /&gt;
+ *       &lt;attribute name="dropsFor" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="suppressDropsForever" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="generated" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="author" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -46,6 +40,7 @@ public class ChangeSet {
   @XmlElements({
     @XmlElement(name = "configuration", type = Configuration.class),
     @XmlElement(name = "sql", type = Sql.class),
+    @XmlElement(name = "createSchema", type = CreateSchema.class),
     @XmlElement(name = "createTable", type = CreateTable.class),
     @XmlElement(name = "alterTable", type = AlterTable.class),
     @XmlElement(name = "dropTable", type = DropTable.class),
@@ -82,7 +77,7 @@ public class ChangeSet {
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
-   * returned list will be present inside the JAXB object.
+   * returned list will be present inside the Jakarta XML Binding object.
    * This is why there is not a <CODE>set</CODE> method for the changeSetChildren property.
    *
    * <p>
@@ -94,22 +89,24 @@ public class ChangeSet {
    *
    * <p>
    * Objects of the following type(s) are allowed in the list
-   * {@link Configuration }
-   * {@link Sql }
-   * {@link CreateTable }
-   * {@link DropTable }
-   * {@link RenameTable }
+   * {@link AddColumn }
+   * {@link AddHistoryTable }
    * {@link AddTableComment }
    * {@link AddUniqueConstraint }
-   * {@link AddHistoryTable }
-   * {@link DropHistoryTable }
-   * {@link AlterForeignKey }
-   * {@link AddColumn }
-   * {@link DropColumn }
    * {@link AlterColumn }
-   * {@link RenameColumn }
+   * {@link AlterForeignKey }
+   * {@link AlterTable }
+   * {@link Configuration }
    * {@link CreateIndex }
+   * {@link CreateSchema }
+   * {@link CreateTable }
+   * {@link DropColumn }
+   * {@link DropHistoryTable }
    * {@link DropIndex }
+   * {@link DropTable }
+   * {@link RenameColumn }
+   * {@link RenameTable }
+   * {@link Sql }
    */
   public List<Object> getChangeSetChildren() {
     if (changeSetChildren == null) {

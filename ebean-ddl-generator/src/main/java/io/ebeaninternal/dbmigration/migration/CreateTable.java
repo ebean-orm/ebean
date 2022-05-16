@@ -1,12 +1,6 @@
 package io.ebeaninternal.dbmigration.migration;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,33 +12,33 @@ import java.util.List;
  * <p>The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
- * &lt;complexType>
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}column" maxOccurs="unbounded"/>
- *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}uniqueConstraint" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}foreignKey" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attGroup ref="{http://ebean-orm.github.io/xml/ns/dbmigration}tablespaceAttributes"/>
- *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="partitionMode" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="partitionColumn" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="withHistory" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="draft" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="identityType" type="{http://ebean-orm.github.io/xml/ns/dbmigration}identityType" />
- *       &lt;attribute name="identityStart" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
- *       &lt;attribute name="identityIncrement" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
- *       &lt;attribute name="identityCache" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
- *       &lt;attribute name="identityGenerated" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="sequenceName" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="sequenceInitial" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
- *       &lt;attribute name="sequenceAllocate" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" />
- *       &lt;attribute name="pkName" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="storageEngine" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}column" maxOccurs="unbounded"/&gt;
+ *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}uniqueConstraint" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://ebean-orm.github.io/xml/ns/dbmigration}foreignKey" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attGroup ref="{http://ebean-orm.github.io/xml/ns/dbmigration}tablespaceAttributes"/&gt;
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="partitionMode" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="partitionColumn" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="withHistory" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="draft" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="identityType" type="{http://ebean-orm.github.io/xml/ns/dbmigration}identityType" /&gt;
+ *       &lt;attribute name="identityStart" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+ *       &lt;attribute name="identityIncrement" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+ *       &lt;attribute name="identityCache" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+ *       &lt;attribute name="identityGenerated" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="sequenceName" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="sequenceInitial" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+ *       &lt;attribute name="sequenceAllocate" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+ *       &lt;attribute name="pkName" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="storageEngine" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -110,7 +104,7 @@ public class CreateTable {
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
-   * returned list will be present inside the JAXB object.
+   * returned list will be present inside the Jakarta XML Binding object.
    * This is why there is not a <CODE>set</CODE> method for the column property.
    *
    * <p>
@@ -137,7 +131,7 @@ public class CreateTable {
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
-   * returned list will be present inside the JAXB object.
+   * returned list will be present inside the Jakarta XML Binding object.
    * This is why there is not a <CODE>set</CODE> method for the uniqueConstraint property.
    *
    * <p>
@@ -164,7 +158,7 @@ public class CreateTable {
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
-   * returned list will be present inside the JAXB object.
+   * returned list will be present inside the Jakarta XML Binding object.
    * This is why there is not a <CODE>set</CODE> method for the foreignKey property.
    *
    * <p>
@@ -524,7 +518,7 @@ public class CreateTable {
   public void setIndexTablespace(String value) {
     this.indexTablespace = value;
   }
-  
+
   /**
    * Gets the value of the lobTablespace property.
    *

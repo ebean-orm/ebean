@@ -1,23 +1,16 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
-import io.ebeaninternal.dbmigration.migration.AddColumn;
-import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
-import io.ebeaninternal.dbmigration.migration.AddTableComment;
-import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
-import io.ebeaninternal.dbmigration.migration.AlterTable;
-import io.ebeaninternal.dbmigration.migration.CreateIndex;
-import io.ebeaninternal.dbmigration.migration.CreateTable;
-import io.ebeaninternal.dbmigration.migration.DropColumn;
-import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
-import io.ebeaninternal.dbmigration.migration.DropIndex;
-import io.ebeaninternal.dbmigration.migration.DropTable;
+import io.ebeaninternal.dbmigration.migration.*;
 
 /**
  * Write table DDL.
  */
 public interface TableDdl {
+
+  /**
+   * Generate the create schema change.
+   */
+  void generate(DdlWrite writer, CreateSchema createSchema);
 
   /**
    * Generate the create table change.
@@ -28,7 +21,7 @@ public interface TableDdl {
    * Write the drop column change.
    */
   void generate(DdlWrite writer, DropTable dropTable);
-  
+
   /**
    * Write alter table changes.
    */

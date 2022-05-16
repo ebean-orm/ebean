@@ -8,10 +8,11 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 public class H2Ddl extends PlatformDdl {
 
   private static boolean useV1Syntax = Boolean.getBoolean("ebean.h2.useV1Syntax");
-  
+
   public H2Ddl(DatabasePlatform platform) {
     super(platform);
     this.historyDdl = new H2HistoryDdl();
+    this.createSchemaSupport = true;
   }
 
   /**

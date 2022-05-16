@@ -15,6 +15,7 @@ public class PostgresDdl extends PlatformDdl {
   public PostgresDdl(DatabasePlatform platform) {
     super(platform);
     this.historyDdl = new PostgresHistoryDdl();
+    this.createSchemaSupport = true;
     this.dropTableCascade = " cascade";
     this.columnSetType = "type ";
     this.alterTableIfExists = "if exists ";

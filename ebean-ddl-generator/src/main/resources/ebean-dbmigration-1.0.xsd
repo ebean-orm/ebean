@@ -97,6 +97,12 @@
     </xsd:complexType>
   </xsd:element>
 
+  <xsd:element name="createSchema">
+    <xsd:complexType>
+      <xsd:attribute name="name" type="xsd:string"/>
+    </xsd:complexType>
+  </xsd:element>
+
   <!-- TABLE  -->
 
   <xsd:element name="createTable">
@@ -218,7 +224,7 @@
       <xsd:attribute name="baseTable" type="xsd:string" use="required"/>
     </xsd:complexType>
   </xsd:element>
-  
+
   <xsd:element name="alterTable">
     <xsd:complexType>
       <xsd:attribute name="name" type="xsd:string" use="required"/>
@@ -238,7 +244,7 @@
       <xsd:attributeGroup ref="tablespaceAttributes"/>
     </xsd:complexType>
   </xsd:element>
-  
+
 
   <xsd:element name="dropHistoryTable">
     <xsd:complexType>
@@ -372,6 +378,7 @@
       <xsd:element ref="configuration" maxOccurs="1"/>
       <xsd:element ref="sql" maxOccurs="unbounded"/>
 
+      <xsd:element ref="createSchema" maxOccurs="unbounded"/>
       <xsd:element ref="createTable" maxOccurs="unbounded"/>
       <xsd:element ref="alterTable" maxOccurs="unbounded"/>
       <xsd:element ref="dropTable" maxOccurs="unbounded"/>
@@ -390,7 +397,6 @@
 
       <xsd:element ref="createIndex" maxOccurs="unbounded"/>
       <xsd:element ref="dropIndex" maxOccurs="unbounded"/>
-
     </xsd:choice>
   </xsd:group>
 
