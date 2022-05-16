@@ -31,11 +31,6 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
-  public boolean suppressPrimaryKeyOnPartition() {
-    return true;
-  }
-
-  @Override
   protected String convertArrayType(String logicalArrayType) {
     return NativeDbArray.logicalToNative(logicalArrayType);
   }

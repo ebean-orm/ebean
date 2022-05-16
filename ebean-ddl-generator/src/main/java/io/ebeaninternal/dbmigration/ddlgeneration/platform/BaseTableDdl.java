@@ -216,9 +216,7 @@ public class BaseTableDdl implements TableDdl {
     writeCompoundUniqueConstraints(apply, createTable);
     if (!pk.isEmpty()) {
       // defined on the columns
-      if (partitionMode == null || !platformDdl.suppressPrimaryKeyOnPartition()) {
-        writePrimaryKeyConstraint(apply, createTable.getPkName(), toColumnNames(pk));
-      }
+      writePrimaryKeyConstraint(apply, createTable.getPkName(), toColumnNames(pk));
     }
     if (platformDdl.isInlineForeignKeys()) {
       writeInlineForeignKeys(apply, createTable);

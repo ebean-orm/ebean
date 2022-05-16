@@ -732,10 +732,6 @@ public class PlatformDdl {
     return createTable;
   }
 
-  public boolean suppressPrimaryKeyOnPartition() {
-    return false;
-  }
-
   public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) {
     // only supported by postgres initially
   }
