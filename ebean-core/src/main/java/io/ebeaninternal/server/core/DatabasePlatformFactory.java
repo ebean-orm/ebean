@@ -93,6 +93,11 @@ public class DatabasePlatformFactory {
         return provider.create(majorVersion, minorVersion, metaData, connection);
       }
     }
+    if (providers.isEmpty()) {
+      throw new IllegalStateException("There are no ebean platform providers in the classpath. " +
+        "Add a missing dependency like ebean-h2, ebean-postgres, ebean-mysql etc to support the database [" + dbProductName
+        + "]. Adding a dependency on io.ebean:ebean will add support for all platforms.");
+    }
     throw new IllegalStateException("Unable to determine the appropriate ebean platform given database product name [" + dbProductName
       + "] and ebean platform providers " + providers + ". With ebean 13+ we now have separate platforms (ebean-postgres, ebean-mysql etc)"
       + " and should use database specific platform dependency like ebean-postgres. Note that we can use ebean-platform-all to include"
