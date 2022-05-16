@@ -29,10 +29,10 @@ public final class IndexDefinition {
   /**
    * Create a unique constraint given the column names.
    */
-  public IndexDefinition(String[] columns) {
+  public IndexDefinition(String name, String[] columns) {
     this.columns = columns;
     this.unique = true;
-    this.name = null;
+    this.name = name;
     this.platforms = null;
     this.concurrent = false;
     this.definition = null;
