@@ -256,8 +256,6 @@ public class BaseTableDdl implements TableDdl {
     }
   }
 
-
-
   private String sequenceName(CreateTable createTable, List<Column> pk) {
     return namingConvention.getSequenceName(createTable.getName(), pk.get(0).getName());
   }
@@ -726,18 +724,15 @@ public class BaseTableDdl implements TableDdl {
     }
 
     boolean alterCheckConstraint = hasValue(alterColumn.getCheckConstraint());
-
     if (alterCheckConstraint) {
       // drop constraint before altering type etc
       dropCheckConstraint(writer, alterColumn, alterColumn.getCheckConstraintName());
     }
-
     if (typeChange(alterColumn)
       || hasValue(alterColumn.getDefaultValue())
       || alterColumn.isNotnull() != null) {
       alterColumn(writer, alterColumn);
     }
-
     if (alterCheckConstraint) {
       // add constraint last (after potential type change)
       addCheckConstraint(writer, alterColumn);

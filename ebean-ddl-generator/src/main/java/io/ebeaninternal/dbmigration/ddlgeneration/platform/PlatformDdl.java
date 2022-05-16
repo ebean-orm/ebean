@@ -29,39 +29,30 @@ public class PlatformDdl {
   private static final Pattern CHECK_PATTERN = Pattern.compile("(.*?\\( *)([^ ]+)(.*)");
 
   protected final DatabasePlatform platform;
-
   protected PlatformHistoryDdl historyDdl = new NoHistorySupportDdl();
-
   /**
    * Converter for logical/standard types to platform specific types. (eg. clob -> text)
    */
   private final PlatformTypeConverter typeConverter;
-
   /**
    * For handling support of sequences and autoincrement.
    */
   private final DbIdentity dbIdentity;
-
   /**
    * Set to true if table and column comments are included inline with the create statements.
    */
   protected boolean inlineComments;
-
   /**
    * Default assumes if exists is supported.
    */
   protected String dropTableIfExists = "drop table if exists ";
-
   protected String dropTableCascade = "";
-
   /**
    * Default assumes if exists is supported.
    */
   protected String dropSequenceIfExists = "drop sequence if exists ";
-
   protected String foreignKeyOnDelete = "on delete";
   protected String foreignKeyOnUpdate = "on update";
-
   protected String identitySuffix = " auto_increment";
   protected String identityStartWith = "start with";
   protected String identityIncrementBy = "increment by";
@@ -69,64 +60,39 @@ public class PlatformDdl {
   protected String sequenceStartWith = "start with";
   protected String sequenceIncrementBy = "increment by";
   protected String sequenceCache = "cache";
-
   protected String alterTableIfExists = "";
-
   protected String dropConstraintIfExists = "drop constraint if exists";
-
   protected String dropIndexIfExists = "drop index if exists ";
-
   protected String alterColumn = "alter column";
-
   protected String dropUniqueConstraint = "drop constraint";
-
   protected String addConstraint = "add constraint";
-
   protected String addColumn = "add column";
-
   protected String columnSetType = "";
-
   protected String columnSetDefault = "set default";
-
   protected String columnDropDefault = "drop default";
-
   protected String columnSetNotnull = "set not null";
-
   protected String columnSetNull = "set null";
-
   protected String columnNotNull = "not null";
-
   protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
-
   protected boolean createSchemaSupport;
   protected String createSchema = "create schema if not exists";
-
   protected String createTable = "create table";
-
   protected String dropColumn = "drop column";
-
   protected String addForeignKeySkipCheck = "";
-
   protected String uniqueIndex = "unique";
   protected String indexConcurrent = "";
   protected String createIndexIfNotExists = "";
-
   /**
    * Set false for MsSqlServer to allow multiple nulls for OneToOne mapping.
    */
   protected boolean inlineUniqueWhenNullable = true;
-
   protected DbConstraintNaming naming;
-
   /**
    * Generally not desired as then they are not named (used with SQLite).
    */
   protected boolean inlineForeignKeys;
-
   protected boolean includeStorageEngine;
-
   protected final DbDefaultValue dbDefaultValue;
-
   protected String fallbackArrayType = "varchar(1000)";
 
   public PlatformDdl(DatabasePlatform platform) {
@@ -256,7 +222,6 @@ public class PlatformDdl {
    * Write the column definition to the create table statement.
    */
   protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) {
-
     String columnDefn = convert(column.getType());
     if (identity.useIdentity() && isTrue(column.isPrimaryKey())) {
       columnDefn = asIdentityColumn(columnDefn, identity);
@@ -274,7 +239,6 @@ public class PlatformDdl {
     if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
       buffer.appendWithSpace(columnNotNull);
     }
-
     // add check constraints later as we really want to give them a nice name
     // so that the database can potentially provide a nice SQL error
   }
@@ -439,7 +403,6 @@ public class PlatformDdl {
    * Return the foreign key constraint when used inline with create table.
    */
   public String tableInlineForeignKey(WriteForeignKey request) {
-
     StringBuilder buffer = new StringBuilder(90);
     buffer.append("foreign key");
     appendColumns(request.cols(), buffer);
@@ -453,7 +416,6 @@ public class PlatformDdl {
    * Add foreign key.
    */
   public String alterTableAddForeignKey(DdlOptions options, WriteForeignKey request) {
-
     StringBuilder buffer = new StringBuilder(90);
     buffer
       .append("alter table ").append(quote(request.table()))
@@ -527,7 +489,6 @@ public class PlatformDdl {
    * Overridden by MsSqlServer for specific null handling on unique constraints.
    */
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
-
     StringBuilder buffer = new StringBuilder(90);
     buffer.append("alter table ").append(quote(tableName)).append(" add constraint ").append(maxConstraintName(uqName)).append(" unique ");
     appendColumns(columns, buffer);
@@ -535,7 +496,6 @@ public class PlatformDdl {
   }
 
   public void alterTableAddColumn(DdlWrite writer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
-
     String convertedType = convert(column.getType());
     DdlBuffer buffer = alterTable(writer, tableName).append(addColumn, column.getName());
     buffer.append(convertedType);
@@ -547,12 +507,10 @@ public class PlatformDdl {
         buffer.append(defaultValue);
       }
     }
-
     if (!onHistoryTable) {
       if (isTrue(column.isNotnull())) {
         buffer.appendWithSpace(columnNotNull);
       }
-
       // check constraints cannot be added in one statement for h2
       if (!StringHelper.isNull(column.getCheckConstraint())) {
         String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
@@ -566,7 +524,6 @@ public class PlatformDdl {
    * This method is used from DbTriggerBasedHistoryDdl to add the sysPeriodColumns.
    */
   public void alterTableAddColumn(DdlWrite writer, String tableName, String columnName, String columnType, String defaultValue) {
-
     String convertedType = convert(columnType);
     DdlBuffer buffer = alterTable(writer, tableName).append(addColumn, columnName);
     buffer.append(convertedType);
@@ -644,18 +601,14 @@ public class PlatformDdl {
    * <p>
    * Used by MySql, SQL Server, and HANA as these require all column attributes to
    * be set together.
-   * </p>
    */
   public void alterColumn(DdlWrite writer, AlterColumn alter) {
-
     if (hasValue(alter.getType())) {
       alterColumnType(writer, alter);
     }
-
     if (hasValue(alter.getDefaultValue())) {
       alterColumnDefault(writer, alter);
     }
-
     if (alter.isNotnull() != null) {
       alterColumnNotnull(writer, alter);
     }
@@ -739,14 +692,14 @@ public class PlatformDdl {
    * Use this to generate a prolog for each script (stored procedures)
    */
   public void generateProlog(DdlWrite writer) {
-
+    // do nothing by default
   }
 
   /**
    * Use this to generate an epilog. Will be added at the end of script
    */
   public void generateEpilog(DdlWrite writer) {
-
+    // do nothing by default
   }
 
   /**
