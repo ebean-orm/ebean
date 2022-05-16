@@ -27,10 +27,59 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link AddUniqueConstraint }
+   * Create an instance of {@link Migration }
    */
-  public AddUniqueConstraint createAddUniqueConstraint() {
-    return new AddUniqueConstraint();
+  public Migration createMigration() {
+    return new Migration();
+  }
+
+  /**
+   * Create an instance of {@link ChangeSet }
+   */
+  public ChangeSet createChangeSet() {
+    return new ChangeSet();
+  }
+
+  /**
+   * Create an instance of {@link Configuration }
+   */
+  public Configuration createConfiguration() {
+    return new Configuration();
+  }
+
+  /**
+   * Create an instance of {@link DefaultTablespace }
+   */
+  public DefaultTablespace createDefaultTablespace() {
+    return new DefaultTablespace();
+  }
+
+  /**
+   * Create an instance of {@link Sql }
+   */
+  public Sql createSql() {
+    return new Sql();
+  }
+
+  /**
+   * Create an instance of {@link Apply }
+   */
+  public Apply createApply() {
+    return new Apply();
+  }
+
+  /**
+   * Create an instance of {@link Rollback }
+   */
+  public Rollback createRollback() {
+    return new Rollback();
+  }
+
+  /**
+   * Create an instance of {@link CreateSchema }
+   */
+  public CreateSchema createCreateSchema() {
+    return new CreateSchema();
   }
 
   /**
@@ -69,17 +118,17 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link Configuration }
+   * Create an instance of {@link AlterTable }
    */
-  public Configuration createConfiguration() {
-    return new Configuration();
+  public AlterTable createAlterTable() {
+    return new AlterTable();
   }
 
   /**
-   * Create an instance of {@link DefaultTablespace }
+   * Create an instance of {@link DropTable }
    */
-  public DefaultTablespace createDefaultTablespace() {
-    return new DefaultTablespace();
+  public DropTable createDropTable() {
+    return new DropTable();
   }
 
   /**
@@ -87,6 +136,27 @@ public class ObjectFactory {
    */
   public RenameTable createRenameTable() {
     return new RenameTable();
+  }
+
+  /**
+   * Create an instance of {@link AddTableComment }
+   */
+  public AddTableComment createAddTableComment() {
+    return new AddTableComment();
+  }
+
+  /**
+   * Create an instance of {@link AddUniqueConstraint }
+   */
+  public AddUniqueConstraint createAddUniqueConstraint() {
+    return new AddUniqueConstraint();
+  }
+
+  /**
+   * Create an instance of {@link AddHistoryTable }
+   */
+  public AddHistoryTable createAddHistoryTable() {
+    return new AddHistoryTable();
   }
 
   /**
@@ -104,55 +174,6 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link DropColumn }
-   */
-  public DropColumn createDropColumn() {
-    return new DropColumn();
-  }
-
-  /**
-   * Create an instance of {@link Sql }
-   */
-  public Sql createSql() {
-    return new Sql();
-  }
-
-  /**
-   * Create an instance of {@link Apply }
-   */
-  public Apply createApply() {
-    return new Apply();
-  }
-
-  /**
-   * Create an instance of {@link Rollback }
-   */
-  public Rollback createRollback() {
-    return new Rollback();
-  }
-
-  /**
-   * Create an instance of {@link DropIndex }
-   */
-  public DropIndex createDropIndex() {
-    return new DropIndex();
-  }
-
-  /**
-   * Create an instance of {@link RenameColumn }
-   */
-  public RenameColumn createRenameColumn() {
-    return new RenameColumn();
-  }
-
-  /**
-   * Create an instance of {@link DropTable }
-   */
-  public DropTable createDropTable() {
-    return new DropTable();
-  }
-
-  /**
    * Create an instance of {@link AddColumn }
    */
   public AddColumn createAddColumn() {
@@ -160,10 +181,10 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link AddTableComment }
+   * Create an instance of {@link DropColumn }
    */
-  public AddTableComment createAddTableComment() {
-    return new AddTableComment();
+  public DropColumn createDropColumn() {
+    return new DropColumn();
   }
 
   /**
@@ -174,6 +195,13 @@ public class ObjectFactory {
   }
 
   /**
+   * Create an instance of {@link RenameColumn }
+   */
+  public RenameColumn createRenameColumn() {
+    return new RenameColumn();
+  }
+
+  /**
    * Create an instance of {@link CreateIndex }
    */
   public CreateIndex createCreateIndex() {
@@ -181,24 +209,10 @@ public class ObjectFactory {
   }
 
   /**
-   * Create an instance of {@link ChangeSet }
+   * Create an instance of {@link DropIndex }
    */
-  public ChangeSet createChangeSet() {
-    return new ChangeSet();
-  }
-
-  /**
-   * Create an instance of {@link AlterTable }
-   */
-  public AlterTable createAlterTable() {
-    return new AlterTable();
-  }
-
-  /**
-   * Create an instance of {@link AddHistoryTable }
-   */
-  public AddHistoryTable createAddHistoryTable() {
-    return new AddHistoryTable();
+  public DropIndex createDropIndex() {
+    return new DropIndex();
   }
 
   /**
@@ -206,13 +220,6 @@ public class ObjectFactory {
    */
   public AlterHistoryTable createAlterHistoryTable() {
     return new AlterHistoryTable();
-  }
-
-  /**
-   * Create an instance of {@link Migration }
-   */
-  public Migration createMigration() {
-    return new Migration();
   }
 
 }

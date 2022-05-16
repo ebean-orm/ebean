@@ -9,16 +9,15 @@ import javax.xml.bind.annotation.XmlType;
  * <p>Java class for changeSetType.
  *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * <p>
  * <pre>
- * &lt;simpleType name="changeSetType">
- *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
- *     &lt;enumeration value="apply"/>
- *     &lt;enumeration value="pendingDrops"/>
- *     &lt;enumeration value="baseline"/>
- *     &lt;enumeration value="drop"/>
- *   &lt;/restriction>
- * &lt;/simpleType>
+ * &lt;simpleType name="changeSetType"&gt;
+ *   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *     &lt;enumeration value="apply"/&gt;
+ *     &lt;enumeration value="pendingDrops"/&gt;
+ *     &lt;enumeration value="baseline"/&gt;
+ *     &lt;enumeration value="drop"/&gt;
+ *   &lt;/restriction&gt;
+ * &lt;/simpleType&gt;
  * </pre>
  */
 @XmlType(name = "changeSetType")

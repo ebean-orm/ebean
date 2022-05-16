@@ -3,25 +3,12 @@ package io.ebeaninternal.dbmigration.ddlgeneration;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.BaseTableDdl;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
-import io.ebeaninternal.dbmigration.migration.AddColumn;
-import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
-import io.ebeaninternal.dbmigration.migration.AddTableComment;
-import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
-import io.ebeaninternal.dbmigration.migration.AlterTable;
-import io.ebeaninternal.dbmigration.migration.ChangeSet;
-import io.ebeaninternal.dbmigration.migration.CreateIndex;
-import io.ebeaninternal.dbmigration.migration.CreateTable;
-import io.ebeaninternal.dbmigration.migration.DropColumn;
-import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
-import io.ebeaninternal.dbmigration.migration.DropIndex;
-import io.ebeaninternal.dbmigration.migration.DropTable;
+import io.ebeaninternal.dbmigration.migration.*;
 
 import java.util.List;
 
 /**
- *
+ * Base DDL handler.
  */
 public class BaseDdlHandler implements DdlHandler {
 
@@ -37,16 +24,12 @@ public class BaseDdlHandler implements DdlHandler {
 
   @Override
   public void generate(DdlWrite writer, ChangeSet changeSet) {
-
     List<Object> changeSetChildren = changeSet.getChangeSetChildren();
+    createSchemas(writer, changeSetChildren);
+    createTables(writer, changeSetChildren);
     for (Object change : changeSetChildren) {
-      if (change instanceof CreateTable) {
-        generate(writer, (CreateTable) change);
-      }
-    }
-    for (Object change : changeSetChildren) {
-      if (change instanceof CreateTable) {
-        // ignore
+      if (change instanceof CreateTable || change instanceof CreateSchema) {
+        // ignore, CreateSchema and CreateTable always done first
       } else if (change instanceof DropTable) {
         generate(writer, (DropTable) change);
       } else if (change instanceof AlterTable) {
@@ -77,6 +60,27 @@ public class BaseDdlHandler implements DdlHandler {
     }
   }
 
+  private void createTables(DdlWrite writer, List<Object> changeSetChildren) {
+    for (Object change : changeSetChildren) {
+      if (change instanceof CreateTable) {
+        generate(writer, (CreateTable) change);
+      }
+    }
+  }
+
+  private void createSchemas(DdlWrite writer, List<Object> changeSetChildren) {
+    boolean createdSchemas = false;
+    for (Object change : changeSetChildren) {
+      if (change instanceof CreateSchema) {
+        generate(writer, (CreateSchema) change);
+        createdSchemas = true;
+      }
+    }
+    if (createdSchemas) {
+      writer.apply().newLine();
+    }
+  }
+
   @Override
   public void generateProlog(DdlWrite writer) {
     tableDdl.generateProlog(writer);
@@ -85,6 +89,11 @@ public class BaseDdlHandler implements DdlHandler {
   @Override
   public void generateEpilog(DdlWrite writer) {
     tableDdl.generateEpilog(writer);
+  }
+
+  @Override
+  public void generate(DdlWrite writer, CreateSchema createSchema) {
+    tableDdl.generate(writer, createSchema);
   }
 
   @Override

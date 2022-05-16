@@ -12,10 +12,7 @@ import io.ebean.util.StringHelper;
 import io.ebeaninternal.dbmigration.ddlgeneration.*;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.VowelRemover;
-import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.dbmigration.migration.Column;
-import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
+import io.ebeaninternal.dbmigration.migration.*;
 import io.ebeaninternal.dbmigration.model.MTable;
 
 import java.util.List;
@@ -100,6 +97,9 @@ public class PlatformDdl {
   protected String columnNotNull = "not null";
 
   protected String updateNullWithDefault = "update ${table} set ${column} = ${default} where ${column} is null";
+
+  protected boolean createSchemaSupport;
+  protected String createSchema = "create schema if not exists";
 
   protected String createTable = "create table";
 
@@ -786,7 +786,7 @@ public class PlatformDdl {
   public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) {
     // only supported by postgres initially
   }
-  
+
   /**
    * Adds tablespace declaration. Now only supported for db2.
    */
@@ -816,4 +816,11 @@ public class PlatformDdl {
     return checkConstraint;
   }
 
+  public void createSchema(DdlWrite writer, CreateSchema request) {
+    DdlBuffer apply = writer.apply();
+    if (!createSchemaSupport) {
+      apply.append("-- ");
+    }
+    apply.append(createSchema).append(" ").append(quote(request.getName())).endOfStatement();
+  }
 }

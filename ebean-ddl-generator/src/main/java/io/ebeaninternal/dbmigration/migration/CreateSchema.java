@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.*;
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;attribute name="baseTable" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="name" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -20,30 +20,30 @@ import javax.xml.bind.annotation.*;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
-@XmlRootElement(name = "alterHistoryTable")
-public class AlterHistoryTable {
+@XmlRootElement(name = "createSchema")
+public class CreateSchema {
 
-  @XmlAttribute(name = "baseTable", required = true)
-  protected String baseTable;
+  @XmlAttribute(name = "name")
+  protected String name;
 
   /**
-   * Gets the value of the baseTable property.
+   * Gets the value of the name property.
    *
    * @return possible object is
    * {@link String }
    */
-  public String getBaseTable() {
-    return baseTable;
+  public String getName() {
+    return name;
   }
 
   /**
-   * Sets the value of the baseTable property.
+   * Sets the value of the name property.
    *
    * @param value allowed object is
    *              {@link String }
    */
-  public void setBaseTable(String value) {
-    this.baseTable = value;
+  public void setName(String value) {
+    this.name = value;
   }
 
 }

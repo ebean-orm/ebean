@@ -10,23 +10,7 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.TableDdl;
-import io.ebeaninternal.dbmigration.migration.AddColumn;
-import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
-import io.ebeaninternal.dbmigration.migration.AddTableComment;
-import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
-import io.ebeaninternal.dbmigration.migration.AlterTable;
-import io.ebeaninternal.dbmigration.migration.Column;
-import io.ebeaninternal.dbmigration.migration.CreateIndex;
-import io.ebeaninternal.dbmigration.migration.CreateTable;
-import io.ebeaninternal.dbmigration.migration.DdlScript;
-import io.ebeaninternal.dbmigration.migration.DropColumn;
-import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
-import io.ebeaninternal.dbmigration.migration.DropIndex;
-import io.ebeaninternal.dbmigration.migration.DropTable;
-import io.ebeaninternal.dbmigration.migration.ForeignKey;
-import io.ebeaninternal.dbmigration.migration.UniqueConstraint;
+import io.ebeaninternal.dbmigration.migration.*;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.MTableIdentity;
 import io.ebeaninternal.server.deploy.IdentityMode;
@@ -193,6 +177,11 @@ public class BaseTableDdl implements TableDdl {
   protected void reset() {
     externalUnique.clear();
     externalCompoundUnique.clear();
+  }
+
+  @Override
+  public void generate(DdlWrite writer, CreateSchema createSchema) {
+    platformDdl.createSchema(writer, createSchema);
   }
 
   /**
