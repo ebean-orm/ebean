@@ -18,13 +18,9 @@ import java.util.TreeSet;
 class SimpleQueryBeanWriter {
 
   private final Set<String> importTypes = new TreeSet<>();
-
   private final List<PropertyMeta> properties = new ArrayList<>();
-
   private final TypeElement element;
-
   private final ProcessingContext processingContext;
-
   private final String dbName;
   private final String beanFullName;
   private final boolean isEntity;
@@ -33,17 +29,21 @@ class SimpleQueryBeanWriter {
 
   private String destPackage;
   private String origDestPackage;
-
   private String shortName;
-  private String origShortName;
+  private final String shortInnerName;
+  private final String origShortName;
   private Append writer;
 
   SimpleQueryBeanWriter(TypeElement element, ProcessingContext processingContext) {
     this.element = element;
     this.processingContext = processingContext;
     this.beanFullName = element.getQualifiedName().toString();
-    this.destPackage = derivePackage(beanFullName) + ".query";
-    this.shortName = deriveShortName(beanFullName);
+    boolean nested = element.getNestingKind().isNested();
+    this.destPackage = Util.packageOf(nested, beanFullName) + ".query";
+    String sn = Util.shortName(nested, beanFullName);
+    this.shortInnerName = Util.shortName(false, sn);
+    this.shortName = sn.replace('.', '$');
+    this.origShortName = shortName;
     this.isEntity = processingContext.isEntity(element);
     this.embeddable = processingContext.isEmbeddable(element);
     this.dbName = findDbName();
@@ -125,7 +125,6 @@ class SimpleQueryBeanWriter {
     writingAssocBean = true;
     origDestPackage = destPackage;
     destPackage = destPackage + ".assoc";
-    origShortName = shortName;
     shortName = "Assoc" + shortName;
 
     prepareAssocBeanImports();
@@ -318,7 +317,7 @@ class SimpleQueryBeanWriter {
       writer.append(" */").eol();
       writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      writer.append("public class Q%s<R> extends TQAssocBean<%s,R> {", shortName, origShortName).eol();
+      writer.append("public class Q%s<R> extends TQAssocBean<%s,R> {", shortName, shortInnerName).eol();
 
     } else {
       writer.append("/**").eol();
@@ -388,19 +387,4 @@ class SimpleQueryBeanWriter {
     return jfo.openWriter();
   }
 
-  private String derivePackage(String name) {
-    int pos = name.lastIndexOf('.');
-    if (pos == -1) {
-      return "";
-    }
-    return name.substring(0, pos);
-  }
-
-  private String deriveShortName(String name) {
-    int pos = name.lastIndexOf('.');
-    if (pos == -1) {
-      return name;
-    }
-    return name.substring(pos + 1);
-  }
 }
