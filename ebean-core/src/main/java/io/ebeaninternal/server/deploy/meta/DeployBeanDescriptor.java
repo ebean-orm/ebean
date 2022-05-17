@@ -8,31 +8,14 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.event.BeanFindController;
-import io.ebean.event.BeanPersistController;
-import io.ebean.event.BeanPersistListener;
-import io.ebean.event.BeanPostConstructListener;
-import io.ebean.event.BeanPostLoad;
-import io.ebean.event.BeanQueryAdapter;
+import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
-import io.ebeaninternal.server.deploy.BeanDescriptorManager;
-import io.ebeaninternal.server.deploy.ChainedBeanPersistController;
-import io.ebeaninternal.server.deploy.ChainedBeanPersistListener;
-import io.ebeaninternal.server.deploy.ChainedBeanPostConstructListener;
-import io.ebeaninternal.server.deploy.ChainedBeanPostLoad;
-import io.ebeaninternal.server.deploy.ChainedBeanQueryAdapter;
-import io.ebeaninternal.server.deploy.DeployPropertyParserMap;
-import io.ebeaninternal.server.deploy.IdentityMode;
-import io.ebeaninternal.server.deploy.IndexDefinition;
-import io.ebeaninternal.server.deploy.InheritInfo;
-import io.ebeaninternal.server.deploy.PartitionMeta;
-import io.ebeaninternal.server.deploy.TableJoin;
-import io.ebeaninternal.server.deploy.TablespaceMeta;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
 import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
@@ -41,13 +24,7 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import javax.persistence.Entity;
 import javax.persistence.MappedSuperclass;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Describes Beans including their deployment information.
@@ -118,6 +95,8 @@ public class DeployBeanDescriptor<T> {
    * The EntityBean type used to create new EntityBeans.
    */
   private final Class<T> beanType;
+  private Class<?> originalType;
+  private boolean customized;
   private final List<BeanPersistController> persistControllers = new ArrayList<>();
   private final List<BeanPersistListener> persistListeners = new ArrayList<>();
   private final List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
@@ -254,7 +233,7 @@ public class DeployBeanDescriptor<T> {
     }
     return partitionMeta;
   }
-  
+
   public void setTablespaceMeta(TablespaceMeta tablespaceMeta) {
     this.tablespaceMeta = tablespaceMeta;
   }
@@ -312,11 +291,9 @@ public class DeployBeanDescriptor<T> {
   }
 
   public DeployBeanTable createDeployBeanTable() {
-
-    DeployBeanTable beanTable = new DeployBeanTable(getBeanType());
+    DeployBeanTable beanTable = new DeployBeanTable(beanType);
     beanTable.setBaseTable(baseTable);
     beanTable.setIdProperty(idProperty());
-
     return beanTable;
   }
 
@@ -390,6 +367,20 @@ public class DeployBeanDescriptor<T> {
 
   public void setProperties(String[] props) {
     this.properties = props;
+  }
+
+  public boolean isCustomized() {
+    return customized;
+  }
+
+  public void markAsCustomized() {
+    this.customized = true;
+    this.entityType = EntityType.VIEW;
+    this.dependentTables = new String[]{baseTable};
+  }
+
+  public Class<?> getOriginalType() {
+    return originalType;
   }
 
   /**
@@ -976,15 +967,18 @@ public class DeployBeanDescriptor<T> {
    * Check valid mapping annotations on the class hierarchy.
    */
   private void checkInheritance(Class<?> beanType) {
-
     Class<?> parent = beanType.getSuperclass();
     if (parent == null || Object.class.equals(parent)) {
       // all good
       return;
     }
     if (parent.isAnnotationPresent(Entity.class)) {
-      String msg = "Checking " + getBeanType() + " and found " + parent + " that has @Entity annotation rather than MappedSuperclass?";
-      throw new IllegalStateException(msg);
+      // String msg = "Checking " + getBeanType() + " and found " + parent + " that has @Entity annotation rather than MappedSuperclass?";
+      // throw new IllegalStateException(msg);
+      // allow an entity to extend an entity ... as "customization"
+      originalType = parent;
+      manager.addCustomizedEntity(beanType, parent);
+      return;
     }
     if (parent.isAnnotationPresent(MappedSuperclass.class)) {
       // continue checking
