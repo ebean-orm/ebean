@@ -26,6 +26,11 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
+  public boolean addPartitionColumnToPrimaryKey() {
+    return true;
+  }
+
+  @Override
   public String setLockTimeout(int lockTimeoutSeconds) {
     return "set lock_timeout = " + (lockTimeoutSeconds * 1000);
   }

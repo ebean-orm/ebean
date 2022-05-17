@@ -772,4 +772,12 @@ public class PlatformDdl {
     }
     apply.append(createSchema).append(" ").append(quote(request.getName())).endOfStatement();
   }
+
+  /**
+   * Override to return true for Postgres / platforms that want the partition column to be
+   * part of the primary key when using table partitioning.
+   */
+  public boolean addPartitionColumnToPrimaryKey() {
+    return false;
+  }
 }
