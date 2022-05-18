@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Map capable of lazy loading.
+ * Map capable of lazy loading and modification aware.
  */
 public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Map<K, E> {
 
@@ -247,7 +247,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   @Override
   public Set<Entry<K, E>> entrySet() {
     init();
-    if (isReadOnly()) {
+    if (readOnly) {
       return Collections.unmodifiableSet(map.entrySet());
     }
     return modifyListening ? new ModifyEntrySet<>(this, map.entrySet()) : map.entrySet();
@@ -268,7 +268,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   @Override
   public Set<K> keySet() {
     init();
-    if (isReadOnly()) {
+    if (readOnly) {
       return Collections.unmodifiableSet(map.keySet());
     }
     return modifyListening ? new ModifyKeySet<>(this, map.keySet()) : map.keySet();
@@ -339,7 +339,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   @Override
   public Collection<E> values() {
     init();
-    if (isReadOnly()) {
+    if (readOnly) {
       return Collections.unmodifiableCollection(map.values());
     }
     return modifyListening ? new ModifyCollection<>(this, map.values()) : map.values();
