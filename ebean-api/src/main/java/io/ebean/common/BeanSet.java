@@ -9,7 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Set capable of lazy loading.
+ * Set capable of lazy loading and modification aware.
  */
 public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E>, BeanCollectionAdd {
 
@@ -210,27 +210,27 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   // -----------------------------------------------------//
 
   @Override
-  public boolean add(E o) {
+  public boolean add(E bean) {
     checkReadOnly();
     init();
     if (modifyListening) {
-      if (set.add(o)) {
-        modifyAddition(o);
+      if (set.add(bean)) {
+        modifyAddition(bean);
         return true;
       } else {
         return false;
       }
     }
-    return set.add(o);
+    return set.add(bean);
   }
 
   @Override
-  public boolean addAll(Collection<? extends E> addCollection) {
+  public boolean addAll(Collection<? extends E> beans) {
     checkReadOnly();
     init();
     if (modifyListening) {
       boolean changed = false;
-      for (E bean : addCollection) {
+      for (E bean : beans) {
         if (set.add(bean)) {
           // register the addition of the bean
           modifyAddition(bean);
@@ -239,7 +239,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
       }
       return changed;
     }
-    return set.addAll(addCollection);
+    return set.addAll(beans);
   }
 
   @Override
@@ -255,15 +255,15 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   @Override
-  public boolean contains(Object o) {
+  public boolean contains(Object bean) {
     init();
-    return set.contains(o);
+    return set.contains(bean);
   }
 
   @Override
-  public boolean containsAll(Collection<?> c) {
+  public boolean containsAll(Collection<?> beans) {
     init();
-    return set.containsAll(c);
+    return set.containsAll(beans);
   }
 
   @Override
@@ -275,7 +275,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   @Override
   public Iterator<E> iterator() {
     init();
-    if (isReadOnly()) {
+    if (readOnly) {
       return new ReadOnlyIterator<>(set.iterator());
     }
     if (modifyListening) {
@@ -285,17 +285,17 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   @Override
-  public boolean remove(Object o) {
+  public boolean remove(Object bean) {
     checkReadOnly();
     init();
     if (modifyListening) {
-      if (set.remove(o)) {
-        modifyRemoval(o);
+      if (set.remove(bean)) {
+        modifyRemoval(bean);
         return true;
       }
       return false;
     }
-    return set.remove(o);
+    return set.remove(bean);
   }
 
   @Override
@@ -349,13 +349,13 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   @Override
-  public <T> T[] toArray(T[] a) {
+  public <T> T[] toArray(T[] array) {
     init();
     //noinspection SuspiciousToArrayCall
-    return set.toArray(a);
+    return set.toArray(array);
   }
 
-  private static class ReadOnlyIterator<E> implements Iterator<E>, Serializable {
+  private static final class ReadOnlyIterator<E> implements Iterator<E>, Serializable {
 
     private static final long serialVersionUID = 2577697326745352605L;
 
