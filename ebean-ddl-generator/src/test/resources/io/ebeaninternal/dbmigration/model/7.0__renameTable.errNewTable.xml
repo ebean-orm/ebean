@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
+  <changeSet type="apply">
+
+    <createTable name="document" withHistory="true" pkName="pk_document">
+      <column name="id" type="bigint" primaryKey="true" references="document_draft.id" foreignKeyName="fk_document_id"/>
+      <column name="title" type="varchar(255)"/>
+    </createTable>
+
+    <createTable name="document_newname" pkName="pk_document">
+      <column name="id" type="bigint"/>
+    </createTable>
+
+    <renameTable oldName="document" newName="document_newname"/>
+
+  </changeSet>
+</migration>

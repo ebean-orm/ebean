@@ -28,7 +28,7 @@ public class MTable {
 
   private static final Logger logger = LoggerFactory.getLogger(MTable.class);
 
-  private final String name;
+  private String name;
   private MTable draftTable;
   /**
    * Marked true for draft tables. These need to have their FK references adjusted
@@ -408,6 +408,14 @@ public class MTable {
     addColumn(column.rename(renameColumn.getNewName()));
   }
 
+  /**
+   * Apply table rename to the model.
+   */
+  public void apply(RenameTable renameTable) {
+    checkTableName(renameTable.getOldName());
+    this.name = renameTable.getNewName();
+  }
+
   public String getName() {
     return name;
   }
@@ -547,7 +555,7 @@ public class MTable {
 
   private void checkTableName(String tableName) {
     if (!name.equals(tableName)) {
-      throw new IllegalArgumentException("addColumn tableName [" + tableName + "] does not match [" + name + "]");
+      throw new IllegalArgumentException("tableName [" + tableName + "] does not match [" + name + "]");
     }
   }
 
