@@ -6,7 +6,7 @@ public class StartMySql {
 
   public static void main(String[] args) {
 
-    MySqlContainer.newBuilder("8.0")
+    MySqlContainer.builder("8.0")
       .dbName("unit")
       .user("unit")
       .password("unit")

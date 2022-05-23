@@ -139,7 +139,7 @@ final class AnnotationClass extends AnnotationParser {
 
     UniqueConstraint uc = typeGet(cls, UniqueConstraint.class);
     if (uc != null) {
-      descriptor.addIndex(new IndexDefinition(convertColumnNames(uc.columnNames())));
+      descriptor.addIndex(new IndexDefinition(uc.name(), convertColumnNames(uc.columnNames())));
     }
     View view = typeGet(cls, View.class);
     if (view != null) {
@@ -149,7 +149,7 @@ final class AnnotationClass extends AnnotationParser {
     if (table != null) {
       UniqueConstraint[] uniqueConstraints = table.uniqueConstraints();
       for (UniqueConstraint c : uniqueConstraints) {
-        descriptor.addIndex(new IndexDefinition(convertColumnNames(c.columnNames())));
+        descriptor.addIndex(new IndexDefinition(c.name(), convertColumnNames(c.columnNames())));
       }
     }
     StorageEngine storage = typeGet(cls, StorageEngine.class);

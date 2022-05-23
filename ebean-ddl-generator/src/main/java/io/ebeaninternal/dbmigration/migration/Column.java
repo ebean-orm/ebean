@@ -1,10 +1,6 @@
 package io.ebeaninternal.dbmigration.migration;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,33 +11,33 @@ import java.util.List;
  * <p>The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
- * &lt;complexType>
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element name="before" type="{http://ebean-orm.github.io/xml/ns/dbmigration}ddl-script" maxOccurs="unbounded" minOccurs="0"/>
- *         &lt;element name="after" type="{http://ebean-orm.github.io/xml/ns/dbmigration}ddl-script" maxOccurs="unbounded" minOccurs="0"/>
- *       &lt;/sequence>
- *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="defaultValue" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="historyExclude" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="primaryKey" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="identity" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="checkConstraintName" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="uniqueOneToOne" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="references" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="foreignKeyName" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="foreignKeyIndex" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="foreignKeyOnDelete" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="foreignKeyOnUpdate" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     &lt;/restriction>
- *   &lt;/complexContent>
- * &lt;/complexType>
+ * &lt;complexType&gt;
+ *   &lt;complexContent&gt;
+ *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element name="before" type="{http://ebean-orm.github.io/xml/ns/dbmigration}ddl-script" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *         &lt;element name="after" type="{http://ebean-orm.github.io/xml/ns/dbmigration}ddl-script" maxOccurs="unbounded" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
+ *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="defaultValue" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="historyExclude" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="primaryKey" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="identity" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
+ *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="checkConstraintName" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="unique" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="uniqueOneToOne" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="references" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="foreignKeyName" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="foreignKeyIndex" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="foreignKeyOnDelete" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="foreignKeyOnUpdate" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *     &lt;/restriction&gt;
+ *   &lt;/complexContent&gt;
+ * &lt;/complexType&gt;
  * </pre>
  */
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -95,7 +91,7 @@ public class Column {
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
-   * returned list will be present inside the JAXB object.
+   * returned list will be present inside the Jakarta XML Binding object.
    * This is why there is not a <CODE>set</CODE> method for the before property.
    *
    * <p>
@@ -122,7 +118,7 @@ public class Column {
    * <p>
    * This accessor method returns a reference to the live list,
    * not a snapshot. Therefore any modification you make to the
-   * returned list will be present inside the JAXB object.
+   * returned list will be present inside the Jakarta XML Binding object.
    * This is why there is not a <CODE>set</CODE> method for the after property.
    *
    * <p>

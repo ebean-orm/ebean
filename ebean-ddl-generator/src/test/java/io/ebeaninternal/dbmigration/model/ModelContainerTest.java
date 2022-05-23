@@ -2,10 +2,7 @@ package io.ebeaninternal.dbmigration.model;
 
 
 import io.ebean.migration.MigrationVersion;
-import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
-import io.ebeaninternal.dbmigration.migration.DropIndex;
-import io.ebeaninternal.dbmigration.migration.DropTable;
-import io.ebeaninternal.dbmigration.migration.Migration;
+import io.ebeaninternal.dbmigration.migration.*;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 import org.junit.jupiter.api.Test;
 
@@ -14,11 +11,10 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ModelContainerTest {
+class ModelContainerTest {
 
   @Test
-  public void elementCollectionTable_single_expect_foreignKeys() {
-
+  void elementCollectionTable_single_expect_foreignKeys() {
     ModelContainer container = new ModelContainer();
 
     container.addTableElementCollection(createElementCollectionTable("ec_bean.id", "fk_ec_bean_ec_table"));
@@ -29,8 +25,7 @@ public class ModelContainerTest {
   }
 
   @Test
-  public void elementCollectionTable_reused_expect_noForeignKeys() {
-
+  void elementCollectionTable_reused_expect_noForeignKeys() {
     ModelContainer container = new ModelContainer();
 
     container.addTableElementCollection(createElementCollectionTable("ec_bean.id", "fk_ec_bean_ec_table"));
@@ -47,7 +42,6 @@ public class ModelContainerTest {
   }
 
   private MTable createElementCollectionTable(String references, String fkName) {
-
     MTable ecTable = new MTable("ec_table");
     final MColumn colFk = new MColumn("fk_col", "varchar", true);
     colFk.setReferences(references);
@@ -62,8 +56,7 @@ public class ModelContainerTest {
   }
 
   @Test
-  public void apply_when_noPendingDrops_then_emptyPending() {
-
+  void apply_when_noPendingDrops_then_emptyPending() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("1.0.model.xml"), ver("1.1"));
     assertThat(container.getPendingDrops()).isEmpty();
@@ -71,8 +64,7 @@ public class ModelContainerTest {
 
 
   @Test
-  public void apply_when_pendingDrops_then_registeredHistoryTable() {
-
+  void apply_when_pendingDrops_then_registeredHistoryTable() {
     ModelContainer base = container_1_1();
 
     MTable table = base.getTable("document");
@@ -85,8 +77,7 @@ public class ModelContainerTest {
 
 
   @Test
-  public void apply_when_pendingDropsApplied_then_droppedTableNotInHistory() {
-
+  void apply_when_pendingDropsApplied_then_droppedTableNotInHistory() {
     ModelContainer container = container_1_1();
     container.apply(mig("1.1_2__drops.model.xml"), ver("1.1_2"));
 
@@ -99,8 +90,7 @@ public class ModelContainerTest {
   }
 
   @Test
-  public void apply_when_apply_partial_pendingDrops_then_some_remainder() {
-
+  void apply_when_apply_partial_pendingDrops_then_some_remainder() {
     ModelContainer container = container_2_1();
     container.apply(mig("2.2__drops.model.xml"), ver("2.2"));
 
@@ -116,30 +106,28 @@ public class ModelContainerTest {
   }
 
   @Test
-  public void apply_sql() {
+  void apply_sql() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("3.0__rawSql.model.xml"), ver("3.0"));
     assertThat(container.getPendingDrops()).isEmpty();
   }
 
   @Test
-  public void apply_alterForeignKey() {
+  void apply_alterForeignKey() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("4.0__alterForeignKey.model.xml"), ver("4.0"));
     assertThat(container.getPendingDrops()).isEmpty();
   }
 
   @Test
-  public void apply_dropTable_when_notInModel_then_ok() {
-
+  void apply_dropTable_when_notInModel_then_ok() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("5.0__dropTable.model.xml"), ver("5.0"));
     assertThat(container.getTables()).isEmpty();
   }
 
   @Test
-  public void apply_drop_when_notInModel_then_ok() {
-
+  void apply_drop_when_notInModel_then_ok() {
     ModelContainer container = new ModelContainer();
     DropTable dropTable = new DropTable();
     dropTable.setName("DoesNotExist");
@@ -155,7 +143,7 @@ public class ModelContainerTest {
   }
 
   @Test
-  public void apply_renameColumn() {
+  void apply_renameColumn() {
     ModelContainer container = new ModelContainer();
     container.apply(mig("6.0__renameColumn.model.xml"), ver("6.0"));
 
@@ -165,8 +153,7 @@ public class ModelContainerTest {
   }
 
   @Test
-  public void getSchemas() {
-
+  void getSchemas() {
     MTable t0 = new MTable("foo.one");
     MTable t1 = new MTable("foo.two");
     MTable t2 = new MTable("bar.three");

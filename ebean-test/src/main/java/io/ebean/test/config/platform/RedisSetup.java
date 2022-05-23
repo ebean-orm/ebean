@@ -15,7 +15,7 @@ class RedisSetup {
         String host = dockerHost.dockerHost(properties.getProperty("ebean.test.dockerHost"));
         properties.setProperty("redis.host",  host);
       }
-      RedisContainer.newBuilder(version)
+      RedisContainer.builder(version)
         .properties(properties)
         .build()
         .start();

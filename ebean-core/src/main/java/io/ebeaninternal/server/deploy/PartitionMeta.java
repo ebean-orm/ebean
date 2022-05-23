@@ -16,11 +16,17 @@ public final class PartitionMeta {
     return mode;
   }
 
+  /**
+   * Originally the property name but replaced with the db column.
+   */
   public String getProperty() {
     return property;
   }
 
-  public void setProperty(String dbColumn) {
+  /**
+   * Set the db column being partitioned on.
+   */
+  public void setColumn(String dbColumn) {
     this.property = dbColumn;
   }
 }

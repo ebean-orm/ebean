@@ -234,7 +234,7 @@ public class DdlPlugin implements Plugin {
         if (!databasePlatform.tablePartitionsExist(connection, tableName)) {
           log.info("No table partitions for table {}", tableName);
           PartitionMeta meta = table.getPartitionMeta();
-          String initPart = databasePlatform.tablePartitionInit(tableName, meta.getMode(), meta.getProperty(), table.singlePrimaryKey());
+          String initPart = databasePlatform.tablePartitionInit(tableName, meta.getMode());
           sb.append(initPart).append("\n");
         }
       }

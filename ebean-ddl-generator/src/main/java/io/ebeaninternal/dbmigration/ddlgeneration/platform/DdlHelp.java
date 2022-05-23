@@ -1,14 +1,11 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 public class DdlHelp {
+
   public static final String TABLESPACE_DEFAULT = "$TABLESPACE_DEFAULT";
-  
   public static final String DROP_DEFAULT = "DROP DEFAULT";
-
   public static final String DROP_COMMENT = "DROP COMMENT";
-
   public static final String DROP_CONSTRAINT = "DROP CONSTRAINT";
-
   public static final String DROP_FOREIGN_KEY = "DROP FOREIGN KEY";
 
   /**
@@ -24,7 +21,7 @@ public class DdlHelp {
   public static boolean isDropComment(String value) {
     return DROP_COMMENT.equals(value);
   }
-  
+
   /**
    * Return true if the default value is the special DROP CONSTRAINT value.
    */
@@ -43,7 +40,7 @@ public class DdlHelp {
    * Returns the tablespace. Returns null, if this is the special '$TABLESPACE_DEFAULT' value.
    */
   public static String toTablespace(String tablespace) {
-    if (TABLESPACE_DEFAULT.equals(tablespace)) { 
+    if (TABLESPACE_DEFAULT.equals(tablespace)) {
       return null;
     } else {
       return tablespace;

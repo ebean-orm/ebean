@@ -7,7 +7,7 @@ import javax.persistence.UniqueConstraint;
 
 @Cache(naturalKey = "appName")
 @Entity
-@UniqueConstraint(columnNames = "app_name")
+@UniqueConstraint(name="uq_ocached_app", columnNames = "app_name")
 public class OCachedApp extends OCacheBase {
 
   private String appName;

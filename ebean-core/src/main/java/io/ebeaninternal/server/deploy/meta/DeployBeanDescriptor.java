@@ -258,12 +258,12 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     if (partitionMeta != null) {
       DeployBeanProperty beanProperty = getBeanProperty(partitionMeta.getProperty());
       if (beanProperty != null) {
-        partitionMeta.setProperty(beanProperty.getDbColumn());
+        partitionMeta.setColumn(beanProperty.getDbColumn());
       }
     }
     return partitionMeta;
   }
-  
+
   public void setTablespaceMeta(TablespaceMeta tablespaceMeta) {
     this.tablespaceMeta = tablespaceMeta;
   }

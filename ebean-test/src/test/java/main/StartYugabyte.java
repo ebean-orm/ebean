@@ -5,7 +5,7 @@ import io.ebean.docker.commands.YugabyteContainer;
 public class StartYugabyte {
 
   public static void main(String[] args) {
-    YugabyteContainer.newBuilder("2.11.2.0-b89")
+    YugabyteContainer.builder("2.11.2.0-b89")
       .dbName("unit")
       .user("unit")
       .extensions("pgcrypto")

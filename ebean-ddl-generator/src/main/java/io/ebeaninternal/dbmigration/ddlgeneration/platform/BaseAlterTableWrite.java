@@ -10,7 +10,7 @@ import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 
 /**
  * Contains alter statements per table.
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  */
 public class BaseAlterTableWrite implements DdlAlterTable {
@@ -29,7 +29,7 @@ public class BaseAlterTableWrite implements DdlAlterTable {
       @Override
       public DdlBuffer endOfStatement() {
         throw new UnsupportedOperationException();
-      };
+      }
     };
 
     protected AlterCmd(String operation, String column) {
@@ -82,9 +82,7 @@ public class BaseAlterTableWrite implements DdlAlterTable {
   }
 
   private final String tableName;
-
-  private List<AlterCmd> cmds = new ArrayList<>();
-
+  private final List<AlterCmd> cmds = new ArrayList<>();
   private boolean historyHandled;
 
   public BaseAlterTableWrite(String tableName, PlatformDdl platformDdl) {
@@ -100,10 +98,6 @@ public class BaseAlterTableWrite implements DdlAlterTable {
     AlterCmd cmd = new AlterCmd(RAW_OPERATION, null);
     cmd.alternationBuffer.append(sql);
     return cmd;
-  }
-
-  public AlterCmd newOperation(String operation, String column) {
-    return new AlterCmd(operation, column);
   }
 
   /**

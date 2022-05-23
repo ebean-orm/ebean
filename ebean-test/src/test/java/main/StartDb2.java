@@ -5,7 +5,7 @@ import io.ebean.docker.commands.Db2Container;
 public class StartDb2 {
 
   public static void main(String[] args) {
-    Db2Container.newBuilder("11.5.6.0a")
+    Db2Container.builder("11.5.6.0a")
       .dbName("unit")
       .user("unit")
       .password("unit")

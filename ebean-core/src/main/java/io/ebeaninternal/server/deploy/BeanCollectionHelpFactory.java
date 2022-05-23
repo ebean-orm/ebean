@@ -1,5 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.bean.BeanCollection;
+import io.ebean.bean.EntityBean;
+import io.ebean.common.BeanList;
+import io.ebean.common.BeanSet;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -12,18 +16,17 @@ import io.ebeaninternal.server.query.CQueryCollectionAdd;
 public final class BeanCollectionHelpFactory {
 
   @SuppressWarnings("rawtypes")
-  private static final BeanListHelp LIST_HELP = new BeanListHelp();
+  private static final CQueryCollectionAdd LIST_HELP = new ListAdd();
 
   @SuppressWarnings("rawtypes")
-  private static final BeanSetHelp SET_HELP = new BeanSetHelp();
+  private static final CQueryCollectionAdd SET_HELP = new SetAdd();
 
   /**
    * Create the helper based on the many property.
    */
   public static <T> BeanCollectionHelp<T> create(BeanPropertyAssocMany<T> many) {
     boolean elementCollection = many.isElementCollection();
-    ManyType manyType = many.manyType();
-    switch (manyType) {
+    switch (many.manyType()) {
       case LIST:
         return elementCollection ? new BeanListHelpElement<>(many) : new BeanListHelp<>(many);
       case SET:
@@ -31,7 +34,7 @@ public final class BeanCollectionHelpFactory {
       case MAP:
         return elementCollection ? new BeanMapHelpElement<>(many) : new BeanMapHelp<>(many);
       default:
-        throw new RuntimeException("Invalid type " + manyType);
+        throw new RuntimeException("Invalid type " + many.manyType());
     }
   }
 
@@ -50,6 +53,32 @@ public final class BeanCollectionHelpFactory {
 
     } else {
       return null;
+    }
+  }
+
+  private static final class ListAdd<T> implements CQueryCollectionAdd<T> {
+
+    @Override
+    public BeanCollection<T> createEmptyNoParent() {
+      return new BeanList<>();
+    }
+
+    @Override
+    public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
+      collection.internalAdd(bean);
+    }
+  }
+
+  private static final class SetAdd<T> implements CQueryCollectionAdd<T> {
+
+    @Override
+    public BeanCollection<T> createEmptyNoParent() {
+      return new BeanSet<>();
+    }
+
+    @Override
+    public void add(BeanCollection<?> collection, EntityBean bean, boolean withCheck) {
+      collection.internalAdd(bean);
     }
   }
 

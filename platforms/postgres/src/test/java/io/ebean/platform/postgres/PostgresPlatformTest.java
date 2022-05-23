@@ -1,12 +1,11 @@
 package io.ebean.platform.postgres;
 
-import io.ebean.Query;
+import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
-
 import org.junit.jupiter.api.Test;
 
 import static io.ebean.Query.LockType.*;
@@ -14,11 +13,10 @@ import static io.ebean.Query.LockWait.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PostgresPlatformTest {
+class PostgresPlatformTest {
 
   @Test
-  public void testUuidType() {
-
+ void testUuidType() {
     PostgresPlatform platform = new PostgresPlatform();
     platform.configure(new PlatformConfig());
 
@@ -29,8 +27,21 @@ public class PostgresPlatformTest {
   }
 
   @Test
-  public void default_forUpdate_expect_noKeyUsed() {
+  void tablePartitionInit() {
+    String sql = new PostgresPlatform().tablePartitionInit("foo", PartitionMode.WEEK);
+    assertThat(sql).isEqualTo("create table foo_default partition of foo default;\n" +
+      "select partition('week','foo',1);");
+  }
 
+  @Test
+  void tablePartitionInit_withSchema() {
+    String sql = new PostgresPlatform().tablePartitionInit("bar.foo", PartitionMode.WEEK);
+    assertThat(sql).isEqualTo("create table bar.foo_default partition of bar.foo default;\n" +
+      "select partition('week','foo',1,'bar');");
+  }
+
+  @Test
+  void default_forUpdate_expect_noKeyUsed() {
     PostgresPlatform platform = new PostgresPlatform();
 
     PlatformConfig config = new PlatformConfig();
@@ -58,8 +69,7 @@ public class PostgresPlatformTest {
   }
 
   @Test
-  public void lockWithKey_forUpdate() {
-
+  void lockWithKey_forUpdate() {
     PostgresPlatform platform = new PostgresPlatform();
 
     PlatformConfig config = new PlatformConfig();

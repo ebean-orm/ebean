@@ -10,10 +10,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestOrderColumn extends TransactionalTestCase {
+class TestOrderColumn extends TransactionalTestCase {
 
   @Test
-  public void testOrderColumnInheritance() {
+  void testOrderColumnInheritance() {
     final OrderMaster master = new OrderMaster();
 
     for (int i = 0; i < 5; i++) {
@@ -33,7 +33,7 @@ public class TestOrderColumn extends TransactionalTestCase {
   }
 
   @Test
-  public void testOrderColumnSortChange() {
+  void testOrderColumnSortChange() {
     final OrderMaster master = new OrderMaster();
 
     for (int i = 0; i < 5; i++) {
@@ -62,7 +62,7 @@ public class TestOrderColumn extends TransactionalTestCase {
   }
 
   @Test
-  public void testModifyTree() {
+  void testModifyTree() {
     final OrderMaster master = new OrderMaster();
 
     for (int i = 0; i < 5; i++) {
@@ -108,7 +108,7 @@ public class TestOrderColumn extends TransactionalTestCase {
   }
 
   @Test
-  public void testRemoveElement() {
+  void testRemoveElement() {
     final OrderMaster master = new OrderMaster();
 
     for (int i = 0; i < 5; i++) {

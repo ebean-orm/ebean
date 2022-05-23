@@ -5,13 +5,11 @@ import io.ebean.platform.clickhouse.ClickHousePlatform;
 import io.ebean.platform.h2.H2Platform;
 import io.ebean.platform.mysql.MySqlPlatform;
 import io.ebean.platform.oracle.OraclePlatform;
+import io.ebeaninternal.dbmigration.ddlgeneration.BaseDdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 import io.ebeaninternal.dbmigration.ddlgeneration.PlatformDdlBuilder;
-import io.ebeaninternal.dbmigration.migration.AddTableComment;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.dbmigration.migration.Column;
-import io.ebeaninternal.dbmigration.migration.CreateTable;
+import io.ebeaninternal.dbmigration.migration.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,14 +17,53 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
-public class BaseTableDdlTest {
+class BaseTableDdlTest {
 
   private final DatabaseConfig serverConfig = new DatabaseConfig();
   private final PlatformDdl h2ddl = PlatformDdlBuilder.create(new H2Platform());
 
   @Test
-  public void testAlterColumn() {
+  void createSchema_h2() {
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
+
+    CreateSchema createSchema = new CreateSchema();
+    createSchema.setName("foo");
+
+    DdlWrite writer = new DdlWrite();
+    ddlGen.generate(writer, createSchema);
+
+    String ddl = writer.toString();
+    assertThat(ddl).contains("-- apply changes\n");
+    assertThat(ddl).contains("create schema if not exists foo;");
+  }
+
+  @Test
+  void createSchema_oracle() {
+    final PlatformDdl oraDDL = PlatformDdlBuilder.create(new OraclePlatform());
+    BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, oraDDL);
+
+    CreateSchema createSchema = new CreateSchema();
+    createSchema.setName("foo");
+
+    DdlWrite writer = new DdlWrite();
+    ddlGen.generate(writer, createSchema);
+    assertThat(writer.toString())
+      .contains("-- apply changes\n")
+      .contains("-- create schema if not exists foo;");
+
+    ChangeSet changeSet = new ChangeSet();
+    changeSet.getChangeSetChildren().add(createSchema);
+
+    BaseDdlHandler ddlHandler = new BaseDdlHandler(new DatabaseConfig(), oraDDL);
+    DdlWrite writer2 = new DdlWrite();
+    ddlHandler.generate(writer2, changeSet);
+    assertThat(writer.toString())
+      .contains("-- apply changes\n")
+      .contains("-- create schema if not exists foo;");
+  }
+
+  @Test
+  void testAlterColumn() {
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite writer = new DdlWrite();
@@ -44,8 +81,7 @@ public class BaseTableDdlTest {
   }
 
   @Test
-  public void testAddColumn_withTypeConversion() {
-
+  void testAddColumn_withTypeConversion() {
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, PlatformDdlBuilder.create(new OraclePlatform()));
 
     DdlWrite writer = new DdlWrite();
@@ -61,8 +97,7 @@ public class BaseTableDdlTest {
   }
 
   @Test
-  public void testAddColumn_withTypeConversion_clickHouseVarchar() {
-
+  void testAddColumn_withTypeConversion_clickHouseVarchar() {
     ClickHouseTableDdl ddlGen = new ClickHouseTableDdl(serverConfig, PlatformDdlBuilder.create(new ClickHousePlatform()));
 
     DdlWrite writer = new DdlWrite();
@@ -78,8 +113,7 @@ public class BaseTableDdlTest {
   }
 
   @Test
-  public void testAlterColumnComment() {
-
+  void testAlterColumnComment() {
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite writer = new DdlWrite();
@@ -96,7 +130,7 @@ public class BaseTableDdlTest {
   }
 
   @Test
-  public void alterTableAddColumnWithComment() {
+  void alterTableAddColumnWithComment() {
     BaseTableDdl ddl = new BaseTableDdl(serverConfig, h2ddl);
     DdlWrite writer = new DdlWrite();
     Column column = new Column();
@@ -111,8 +145,7 @@ public class BaseTableDdlTest {
   }
 
   @Test
-  public void testAddTableComment() {
-
+  void testAddTableComment() {
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite writer = new DdlWrite();
@@ -128,8 +161,7 @@ public class BaseTableDdlTest {
   }
 
   @Test
-  public void testAddTableComment_mysql() {
-
+  void testAddTableComment_mysql() {
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, PlatformDdlBuilder.create(new MySqlPlatform()));
 
     DdlWrite writer = new DdlWrite();
@@ -145,8 +177,7 @@ public class BaseTableDdlTest {
   }
 
   @Test
-  public void testGenerate() throws Exception {
-
+  void testGenerate() throws Exception {
     BaseTableDdl ddlGen = new BaseTableDdl(serverConfig, h2ddl);
 
     DdlWrite writer = new DdlWrite();

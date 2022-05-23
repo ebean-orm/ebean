@@ -11,6 +11,7 @@ import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.util.SplitName;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -163,11 +164,23 @@ public class PostgresPlatform extends DatabasePlatform {
    * Only use this if extra-ddl doesn't have some initial partitions defined (which it should).
    */
   @Override
-  public String tablePartitionInit(String tableName, PartitionMode mode, String property, String pkey) {
-    // default partition required pg11 but this is only used for testing but bumped test docker container to pg11 by default
+  public String tablePartitionInit(String tableName, PartitionMode mode) {
+    // default partition required pg11 but this is only used for testing but bumped test docker container to pg14 by default
+    String[] schemaTable = SplitName.split(tableName);
+
+    String baseTable;
+    String plusSchema;
+    if (schemaTable[0] == null) {
+      plusSchema = "";
+      baseTable = tableName;
+    } else {
+      // table in an explicit schema
+      plusSchema = ",'" + schemaTable[0] + "'";
+      baseTable = schemaTable[1];
+    }
     return
       "create table " + tableName + "_default" + " partition of " + tableName + " default;\n" +
-        "select partition('" + mode.name().toLowerCase() + "','" + tableName + "',1);";
+        "select partition('" + mode.name().toLowerCase() + "','" + baseTable + "',1" + plusSchema + ");";
   }
 
 }

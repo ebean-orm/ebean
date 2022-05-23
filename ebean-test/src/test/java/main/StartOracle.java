@@ -5,7 +5,7 @@ import io.ebean.docker.commands.OracleContainer;
 public class StartOracle {
 
   public static void main(String[] args) {
-    OracleContainer.newBuilder("latest")
+    OracleContainer.builder("latest")
       .user("test_ebean")
       .build()
       .startWithDropCreate();

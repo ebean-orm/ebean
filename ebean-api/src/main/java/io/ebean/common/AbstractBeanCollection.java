@@ -17,39 +17,28 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   private static final long serialVersionUID = 3365725236140187588L;
 
   protected final ReentrantLock lock = new ReentrantLock();
-
   protected boolean readOnly;
-
   protected boolean disableLazyLoad;
-
   /**
    * The Database this is associated with. (used for lazy fetch).
    */
   protected transient BeanCollectionLoader loader;
-
   protected transient ExpressionList<?> filterMany;
-
   /**
    * Flag set when registered with the batch loading context.
    */
   protected boolean registeredWithLoadContext;
-
   protected String ebeanServerName;
-
   /**
    * The owning bean (used for lazy fetch).
    */
   protected EntityBean ownerBean;
-
   /**
    * The name of this property in the owning bean (used for lazy fetch).
    */
   protected String propertyName;
-
   protected ModifyHolder<E> modifyHolder;
-
   protected ModifyListenMode modifyListenMode;
-
   protected boolean modifyListening;
 
   /**
@@ -126,8 +115,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   void checkReadOnly() {
     if (readOnly) {
-      String msg = "This collection is in ReadOnly mode";
-      throw new IllegalStateException(msg);
+      throw new IllegalStateException("This collection is in ReadOnly mode");
     }
   }
 

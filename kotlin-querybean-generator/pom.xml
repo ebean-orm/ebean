@@ -12,7 +12,7 @@
   <artifactId>kotlin-querybean-generator</artifactId>
 
   <properties>
-    <kotlin.version>1.6.0</kotlin.version>
+    <kotlin.version>1.6.20</kotlin.version>
   </properties>
 
   <dependencies>
@@ -63,6 +63,13 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-platform-h2</artifactId>
+      <version>13.6.3-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
       <version>13.6.3-SNAPSHOT</version>
       <scope>test</scope>
@@ -106,7 +113,7 @@
                 <annotationProcessorPath>
                   <groupId>io.ebean</groupId>
                   <artifactId>kotlin-querybean-generator</artifactId>
-                  <version>12.13.0</version>
+                  <version>13.6.2</version>
                 </annotationProcessorPath>
               </annotationProcessorPaths>
             </configuration>
@@ -155,8 +162,8 @@
           </execution>
         </executions>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>11</source>
+          <target>11</target>
           <!-- Turn off annotation processing for building -->
           <compilerArgument>-proc:none</compilerArgument>
         </configuration>

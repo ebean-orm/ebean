@@ -15,6 +15,7 @@ public class PostgresDdl extends PlatformDdl {
   public PostgresDdl(DatabasePlatform platform) {
     super(platform);
     this.historyDdl = new PostgresHistoryDdl();
+    this.createSchemaSupport = true;
     this.dropTableCascade = " cascade";
     this.columnSetType = "type ";
     this.alterTableIfExists = "if exists ";
@@ -25,13 +26,13 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
-  public String setLockTimeout(int lockTimeoutSeconds) {
-    return "set lock_timeout = " + (lockTimeoutSeconds * 1000);
+  public boolean addPartitionColumnToPrimaryKey() {
+    return true;
   }
 
   @Override
-  public boolean suppressPrimaryKeyOnPartition() {
-    return true;
+  public String setLockTimeout(int lockTimeoutSeconds) {
+    return "set lock_timeout = " + (lockTimeoutSeconds * 1000);
   }
 
   @Override

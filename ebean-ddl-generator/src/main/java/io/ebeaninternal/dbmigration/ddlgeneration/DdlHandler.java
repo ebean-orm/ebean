@@ -1,19 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
-import io.ebeaninternal.dbmigration.migration.AddColumn;
-import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
-import io.ebeaninternal.dbmigration.migration.AddTableComment;
-import io.ebeaninternal.dbmigration.migration.AddUniqueConstraint;
-import io.ebeaninternal.dbmigration.migration.AlterColumn;
-import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
-import io.ebeaninternal.dbmigration.migration.AlterTable;
-import io.ebeaninternal.dbmigration.migration.ChangeSet;
-import io.ebeaninternal.dbmigration.migration.CreateIndex;
-import io.ebeaninternal.dbmigration.migration.CreateTable;
-import io.ebeaninternal.dbmigration.migration.DropColumn;
-import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
-import io.ebeaninternal.dbmigration.migration.DropIndex;
-import io.ebeaninternal.dbmigration.migration.DropTable;
+import io.ebeaninternal.dbmigration.migration.*;
 
 /**
  * DDL generation interface.
@@ -22,10 +9,12 @@ public interface DdlHandler {
 
   void generate(DdlWrite writer, ChangeSet changeSet);
 
+  void generate(DdlWrite writer, CreateSchema createSchema);
+
   void generate(DdlWrite writer, CreateTable createTable);
 
   void generate(DdlWrite writer, DropTable dropTable);
-  
+
   void generate(DdlWrite writer, AlterTable dropTable);
 
   void generate(DdlWrite writer, AddTableComment addTableComment);
