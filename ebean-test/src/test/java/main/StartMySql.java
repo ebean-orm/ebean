@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.MySqlContainer;
+import io.ebean.test.containers.MySqlContainer;
 
 public class StartMySql {
 

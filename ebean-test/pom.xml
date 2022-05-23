@@ -61,8 +61,8 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-test-docker</artifactId>
-      <version>${ebean-test-docker.version}</version>
+      <artifactId>ebean-test-containers</artifactId>
+      <version>${ebean-test-containers.version}</version>
     </dependency>
 
     <dependency>

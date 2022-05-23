@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.Db2Container;
+import io.ebean.test.containers.Db2Container;
 
 public class StartDb2 {
 

@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.MariaDBContainer;
+import io.ebean.test.containers.MariaDBContainer;
 
 public class StartMariaDb {
 

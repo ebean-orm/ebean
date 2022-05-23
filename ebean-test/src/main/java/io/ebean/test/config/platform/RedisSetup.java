@@ -1,6 +1,6 @@
 package io.ebean.test.config.platform;
 
-import io.ebean.docker.commands.RedisContainer;
+import io.ebean.test.containers.RedisContainer;
 
 import java.util.Properties;
 

@@ -1,6 +1,6 @@
 package io.ebean.test.config.platform;
 
-import io.ebean.docker.commands.ElasticContainer;
+import io.ebean.test.containers.ElasticContainer;
 
 import java.util.Properties;
 
