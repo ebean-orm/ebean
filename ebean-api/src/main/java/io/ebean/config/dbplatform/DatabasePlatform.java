@@ -812,7 +812,7 @@ public class DatabasePlatform {
   /**
    * Return the SQL to create an initial partition for the given table.
    */
-  public String tablePartitionInit(String tableName, PartitionMode mode, String property, String singlePrimaryKey) {
+  public String tablePartitionInit(String tableName, PartitionMode mode) {
     return null;
   }
 

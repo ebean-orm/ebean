@@ -63,7 +63,6 @@ public final class SplitName {
   }
 
   private static String[] split(String name, boolean last) {
-
     int pos = last ? name.lastIndexOf('.') : name.indexOf('.');
     if (pos == -1) {
       if (last) {

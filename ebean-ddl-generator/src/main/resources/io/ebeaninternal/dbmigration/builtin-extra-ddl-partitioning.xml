@@ -17,6 +17,7 @@ begin
       period_start   timestamptz,
       period_end     timestamptz,
       period_name    text,
+      schema_name    text,
       base_name      text,
       part_name      text
     );
@@ -34,7 +35,11 @@ language plpgsql
 set timezone to 'UTC'
 as $$
 begin
-  execute format('create table if not exists %I partition of %I for values from (''%s'') TO (''%s'')', meta.part_name, meta.base_name, meta.period_start, meta.period_end);
+  if (meta.schema_name = '') then
+    execute format('create table if not exists %I partition of %I for values from (''%s'') TO (''%s'')', meta.part_name, meta.base_name, meta.period_start, meta.period_end);
+  else
+    execute format('create table if not exists %I partition of %I.%I for values from (''%s'') TO (''%s'')', meta.part_name, meta.schema_name, meta.base_name, meta.period_start, meta.period_end);
+  end if;
   return meta.part_name;
 end;
 $$;
@@ -49,7 +54,8 @@ $$;
 create or replace function _partition_meta(
   mode          text,
   asOf          date,
-  baseName      text)
+  baseName      text,
+  schemaName    text default '')
   returns partition_meta
 language plpgsql
 set timezone to 'UTC'
@@ -81,8 +87,8 @@ begin
     select asOfUtc, asOfUtc + interval '1 month' into meta.period_start, meta.period_end;
   end if;
 
-  select partName, baseName, format('%s_%s', baseName, partName)
-    into meta.period_name, meta.base_name, meta.part_name;
+  select partName, schemaName, baseName, format('%s_%s', baseName, partName)
+    into meta.period_name, meta.schema_name, meta.base_name, meta.part_name;
 
   return meta;
 end;
@@ -133,67 +139,28 @@ $$;
 -- Function: partition
 --
 -- Helper to ensure we create partitions into the future as needed for day, week, month
--- and year based partitioning. Typically we call this periodically (e.g. every day).
+-- and year based partitioning. Typically, we call this periodically (e.g. every day).
 --
 -- Examples:
 --
---   select partition('week', 'trip', 4);
+--   select partition('week',  'trip',  4);
 --   select partition('month', 'event', 1);
+--   select partition('year',  'log',   1, 'my_schema');
 --
 ------------------------------------------------------------------------------------
 create or replace function partition(
   mode           text,                       -- one of 'day','week','month','year'
   baseName       text,                       -- base table name
   partitionCount integer default 0,          -- number of additional partitions
+  schemaName     text default '',            -- schema
   fromDate       date default current_date)  -- date to create first partition for
   returns text
 language plpgsql
 set timezone to 'UTC'
 as $$
 begin
-  perform _partition_create(_partition_meta(mode, poDate, baseName))
+  perform _partition_create(_partition_meta(mode, poDate, baseName, schemaName))
   from _partition_over(mode, fromDate, partitionCount) poDate;
-  return 'done';
-end;
-$$;
-
-
-------------------------------------------------------------------------------------
--- Function: partition_init
---
--- Similar to partition but allows the first partition to be bigger with an explicit
--- initDate typically to allow back dated rows to go into the initial partition.
---
--- Examples:
---
---   select partition_init(date '2001-01-01', 'week', 'event');
---
-------------------------------------------------------------------------------------
-create or replace function partition_init(
-  initDate       date,                       -- first partition period start date
-  mode           text,                       -- one of 'day','week','month','year'
-  baseName       text,                       -- base table name
-  partitionCount integer default 0,          -- number of additional partitions
-  fromDate       date default current_date)  -- date to create first partition for
-  returns text
-language plpgsql
-set timezone to 'UTC'
-as $$
-declare
-  meta partition_meta;
-begin
-  -- override the period start for the first partition
-  meta = _partition_meta(mode, fromDate, baseName);
-  meta.period_start = initDate;
-  perform _partition_create(meta);
-
-  if (partitionCount > 0) then
-    -- create additional partitions normally
-    fromDate = fromDate + interval '1 day';
-    perform _partition_create(_partition_meta(mode, poDate, baseName))
-    from _partition_over(mode, fromDate, partitionCount) poDate;
-  end if;
-
   return 'done';
 end;
 $$;
