@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.OracleContainer;
+import io.ebean.test.containers.OracleContainer;
 
 public class StartOracle {
 

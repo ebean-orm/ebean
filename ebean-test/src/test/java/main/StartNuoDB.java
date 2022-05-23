@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.NuoDBContainer;
+import io.ebean.test.containers.NuoDBContainer;
 
 public class StartNuoDB {
 
