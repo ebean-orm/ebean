@@ -1499,6 +1499,10 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final <A> Set<A> findSingleAttributeSet() {
+    return (Set<A>) server.findSingleAttributeSet(this, transaction);
+  }
+  @Override
   public final <A> A findSingleAttribute() {
     List<A> list = findSingleAttributeList();
     return !list.isEmpty() ? list.get(0) : null;

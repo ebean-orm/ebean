@@ -696,6 +696,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
+  public <A, T> Set<A> findSingleAttributeSet(Query<T> query, Transaction transaction) {
+    return null;
+  }
+
+  @Override
   public <T> T findOne(Query<T> query, Transaction transaction) {
     return null;
   }
