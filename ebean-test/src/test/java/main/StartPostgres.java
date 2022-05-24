@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.PostgresContainer;
+import io.ebean.test.containers.PostgresContainer;
 
 public class StartPostgres {
 

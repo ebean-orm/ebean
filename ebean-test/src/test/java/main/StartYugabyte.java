@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.YugabyteContainer;
+import io.ebean.test.containers.YugabyteContainer;
 
 public class StartYugabyte {
 

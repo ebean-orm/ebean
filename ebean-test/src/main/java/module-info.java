@@ -18,7 +18,7 @@ open module io.ebean.test {
   requires com.fasterxml.jackson.databind;
   requires com.fasterxml.jackson.datatype.jsr310;
 
-  requires transitive io.ebean.docker;
+  requires transitive io.ebean.test.containers;
   requires transitive org.assertj.core;
   requires transitive java.xml.bind;
   requires transitive com.h2database;

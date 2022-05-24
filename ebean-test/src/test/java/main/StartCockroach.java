@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.CockroachContainer;
+import io.ebean.test.containers.CockroachContainer;
 
 public class StartCockroach {
 

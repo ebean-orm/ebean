@@ -1,6 +1,6 @@
 package main;
 
-import io.ebean.docker.commands.SqlServerContainer;
+import io.ebean.test.containers.SqlServerContainer;
 
 public class StartSqlServer {
 

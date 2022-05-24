@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ModelContainerTest {
 
@@ -150,6 +151,42 @@ class ModelContainerTest {
     final MTable table = container.getTable("document");
     assertThat(table.getColumn("title")).isNotNull();
     assertThat(table.getColumn("short_title")).isNull();
+  }
+
+  @Test
+  void apply_renameTable() {
+    ModelContainer container = new ModelContainer();
+    container.apply(mig("7.0__renameTable.model.xml"), ver("7.0"));
+
+    final MTable table = container.getTable("document_newname");
+    assertThat(table.getColumn("title")).isNotNull();
+    assertThat(table.getColumn("short_title")).isNull();
+  }
+
+  @Test
+  void apply_renameTable_when_oldTableNotFound() {
+    ModelContainer container = new ModelContainer();
+
+    assertThatThrownBy(() -> {
+      container.apply(mig("7.0__renameTable.errOldTable.xml"), ver("7.0"));
+    }).isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("RenameTable oldName");
+
+    final MTable table = container.getTable("document");
+    assertThat(table.getColumn("title")).isNotNull();
+  }
+
+  @Test
+  void apply_renameTable_when_newTableAlreadyExists() {
+    ModelContainer container = new ModelContainer();
+
+    assertThatThrownBy(() -> {
+      container.apply(mig("7.0__renameTable.errNewTable.xml"), ver("7.0"));
+    }).isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("RenameTable to newName");
+
+    final MTable table = container.getTable("document");
+    assertThat(table.getColumn("title")).isNotNull();
   }
 
   @Test

@@ -1,7 +1,7 @@
 package io.ebean.test.config.platform;
 
 import io.ebean.config.DatabaseConfig;
-import io.ebean.docker.container.ContainerFactory;
+import io.ebean.test.containers.ContainerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
