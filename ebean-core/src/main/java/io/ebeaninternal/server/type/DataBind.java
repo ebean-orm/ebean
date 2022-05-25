@@ -158,7 +158,7 @@ public class DataBind implements DataBinder {
 
   @Override
   public final void setDate(java.sql.Date v) throws SQLException {
-    Calendar timeZone = dataTimeZone.getDateTimeZone();
+    Calendar timeZone = dataTimeZone.getTimeComponentTimeZone();
     if (timeZone != null) {
       pstmt.setDate(++pos, v, timeZone);
     } else {
@@ -178,7 +178,7 @@ public class DataBind implements DataBinder {
 
   @Override
   public final void setTime(Time v) throws SQLException {
-    Calendar timeZone = dataTimeZone.getDateTimeZone();
+    Calendar timeZone = dataTimeZone.getTimeComponentTimeZone();
     if (timeZone != null) {
       pstmt.setTime(++pos, v, timeZone);
     } else {
