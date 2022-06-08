@@ -24,11 +24,7 @@ import org.slf4j.Logger;
 import javax.persistence.PersistenceException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Handles the Object Relational fetching.
@@ -91,16 +87,16 @@ public final class CQueryEngine {
   /**
    * Build and execute the findSingleAttributeList query.
    */
-  public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
+  public <A extends Collection<?>> A findSingleAttributeList(OrmQueryRequest<?> request, A collection) {
     CQueryFetchSingleAttribute rcQuery = queryBuilder.buildFetchAttributeQuery(request);
     request.setCancelableQuery(rcQuery);
-    return findAttributeList(request, rcQuery);
+    return findAttributeCollection(request, rcQuery, collection);
   }
 
   @SuppressWarnings("unchecked")
-  private <A> List<A> findAttributeList(OrmQueryRequest<?> request, CQueryFetchSingleAttribute rcQuery) {
+  private <A extends Collection<?>> A findAttributeCollection(OrmQueryRequest<?> request, CQueryFetchSingleAttribute rcQuery, A collection) {
     try {
-      List<A> list = (List<A>) rcQuery.findList();
+      rcQuery.findCollection(collection);
       if (request.logSql()) {
         logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
       }
@@ -109,13 +105,21 @@ public final class CQueryEngine {
       }
       if (request.isQueryCachePut()) {
         request.addDependentTables(rcQuery.getDependentTables());
-        list = Collections.unmodifiableList(list);
-        request.putToQueryCache(list);
-        if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-          list = new ArrayList<>(list);
+        if (collection instanceof List) {
+          collection = (A) Collections.unmodifiableList((List<?>) collection);
+          request.putToQueryCache(collection);
+          if (Boolean.FALSE.equals(request.query().isReadOnly())) {
+            collection = (A) new ArrayList<>(collection);
+          }
+        } else if (collection instanceof Set) {
+          collection = (A) Collections.unmodifiableSet((Set<?>) collection);
+          request.putToQueryCache(collection);
+          if (Boolean.FALSE.equals(request.query().isReadOnly())) {
+            collection = (A) new LinkedHashSet<>(collection);
+          }
         }
       }
-      return list;
+      return collection;
     } catch (SQLException e) {
       throw translate(request, rcQuery.getBindLog(), rcQuery.getGeneratedSql(), e);
     }
@@ -144,7 +148,7 @@ public final class CQueryEngine {
   public <A> List<A> findIds(OrmQueryRequest<?> request) {
     CQueryFetchSingleAttribute rcQuery = queryBuilder.buildFetchIdsQuery(request);
     request.setCancelableQuery(rcQuery);
-    return findAttributeList(request, rcQuery);
+    return findAttributeCollection(request, rcQuery, new ArrayList<>());
   }
 
   private <T> void logGeneratedSql(OrmQueryRequest<T> request, String sql, String bindLog, long micros) {

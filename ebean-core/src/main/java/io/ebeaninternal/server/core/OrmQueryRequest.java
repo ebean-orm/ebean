@@ -431,8 +431,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
-  public <A> List<A> findSingleAttributeList() {
-    return queryEngine.findSingleAttributeList(this);
+  public <A extends Collection<?>> A findSingleAttributeCollection(A collection) {
+    return queryEngine.findSingleAttributeCollection(this, collection);
   }
 
   /**
