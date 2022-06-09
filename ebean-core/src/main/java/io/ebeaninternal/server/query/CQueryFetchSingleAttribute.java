@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -76,11 +77,10 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   /**
    * Execute the query returning the row count.
    */
-  List<Object> findList() throws SQLException {
+  void findCollection(Collection result) throws SQLException {
     long startNano = System.nanoTime();
     try {
       prepareExecute();
-      List<Object> result = new ArrayList<>();
       while (dataReader.next()) {
         Object value = reader.read(dataReader);
         if (containsCounts) {
@@ -95,7 +95,6 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
       getTransaction().profileEvent(this);
-      return result;
     } finally {
       close();
     }

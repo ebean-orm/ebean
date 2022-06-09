@@ -1,21 +1,23 @@
 package org.tests.cache;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.cache.EColAB;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryCache extends BaseTestCase {
@@ -50,7 +52,7 @@ public class TestQueryCache extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttribute() {
+  public void findSingleAttributeList() {
 
     DB.find(EColAB.class).delete();
     new EColAB("03", "SingleAttribute").save();
@@ -96,6 +98,30 @@ public class TestQueryCache extends BaseTestCase {
         .eq("columnB", "SingleAttribute")
         .findCount();
     assertThat(count).isEqualTo(2);
+  }
+
+  @Test
+  public void findSingleAttributeSet() {
+
+    DB.find(EColAB.class).delete();
+    new EColAB("03", "SingleAttribute").save();
+    new EColAB("03", "SingleAttribute").save();
+    ExpressionList<EColAB> query = DB
+      .find(EColAB.class)
+      .setUseQueryCache(true)
+      .select("columnA")
+      .where()
+      .eq("columnB", "SingleAttribute");
+    Set<String> colA_first = query.findSingleAttributeSet();
+
+    Set<String> colA_Second = query.findSingleAttributeSet();
+
+    assertThat(colA_Second).isSameAs(colA_first).hasSize(1);
+    assertThatThrownBy(colA_first::clear).isInstanceOf(UnsupportedOperationException.class);
+    // ensure, that we do not have cache collisions on same query
+    query.findSingleAttributeList();
+    query.findSingleAttribute();
+    query.findCount();
   }
 
   @Test

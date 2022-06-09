@@ -384,6 +384,15 @@ public interface ExpressionList<T> {
   <A> List<A> findSingleAttributeList();
 
   /**
+   * Executes the query returning a set of values for a single property.
+   *
+   * This can be used to cache sets.
+   *
+   * @return a HashSet of values for the selegted property
+   */
+  <A> Set<A> findSingleAttributeSet();
+
+  /**
    * Execute a query returning a single value of a single property/column.
    * <pre>{@code
    *

@@ -369,6 +369,11 @@ public interface ExtendedServer {
   <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction);
 
   /**
+   * Execute the query returning a hashset of values for a single property.
+   */
+  <A, T> Set<A> findSingleAttributeSet(Query<T> query, Transaction transaction);
+
+  /**
    * Execute the query returning at most one entity bean or null (if no matching
    * bean is found).
    * <p>

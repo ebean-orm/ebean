@@ -6,6 +6,7 @@ import io.ebean.bean.BeanCollection;
 
 import javax.persistence.PersistenceException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -29,9 +30,9 @@ public interface OrmQueryEngine {
   <T> BeanCollection<T> findMany(OrmQueryRequest<T> request);
 
   /**
-   * Execute the findSingleAttributeList query.
+   * Execute the findSingleAttributeCollection query.
    */
-  <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request);
+  <A extends Collection<?>> A findSingleAttributeCollection(OrmQueryRequest<?> request, A collection);
 
   /**
    * Execute the findVersions query.

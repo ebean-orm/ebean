@@ -6,11 +6,15 @@ import io.ebean.bean.EntityBean;
 import java.util.Collection;
 
 /**
- * Provides finder functionality for use with "Dependency Injection style" use of Ebean.
+ * Provides find and persist functionality for use with "Dependency Injection style" use of Ebean.
  * <p>
+ * Extend the BeanRepository with additional finder and persisting methods as needed by the
+ * application. The intention is to keep all the related logic together, for example, all the
+ * persisting and finding logic for Customer would be in CustomerRepository.
+ *
  * <pre>{@code
  *
- * @Repository
+ * @Component
  * public class CustomerRepository extends BeanRepository<Long,Customer> {
  *
  *   @Inject
@@ -50,10 +54,10 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
    * }</pre>
    *
    * @param type   The bean type
-   * @param server The Database instance typically created via Spring factory or equivalent
+   * @param database The Database instance typically created via Spring factory or equivalent
    */
-  protected BeanRepository(Class<T> type, Database server) {
-    super(type, server);
+  protected BeanRepository(Class<T> type, Database database) {
+    super(type, database);
   }
 
   /**
@@ -122,8 +126,8 @@ public abstract class BeanRepository<I, T> extends BeanFinder<I, T> {
   /**
    * Save all the beans in the collection.
    */
-  public int saveAll(Collection<T> bean) {
-    return db().saveAll(bean);
+  public int saveAll(Collection<T> beans) {
+    return db().saveAll(beans);
   }
 
   /**

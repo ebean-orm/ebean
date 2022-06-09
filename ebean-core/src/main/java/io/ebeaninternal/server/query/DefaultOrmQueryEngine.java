@@ -17,6 +17,7 @@ import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Main Finder implementation.
@@ -97,9 +98,9 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
   }
 
   @Override
-  public <A> List<A> findSingleAttributeList(OrmQueryRequest<?> request) {
+  public <A extends Collection<?>> A findSingleAttributeCollection(OrmQueryRequest<?> request, A collection) {
     flushJdbcBatchOnQuery(request);
-    return queryEngine.findSingleAttributeList(request);
+    return queryEngine.findSingleAttributeList(request, collection);
   }
 
   @Override

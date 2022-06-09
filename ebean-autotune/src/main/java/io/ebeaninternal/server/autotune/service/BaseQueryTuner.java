@@ -143,6 +143,7 @@ public class BaseQueryTuner {
     switch (type) {
       case COUNT:
       case ATTRIBUTE:
+      case ATTRIBUTE_SET:
       case ID_LIST:
       case UPDATE:
       case DELETE:

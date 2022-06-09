@@ -926,6 +926,11 @@ public interface Query<T> extends CancelableQuery {
   <A> List<A> findSingleAttributeList();
 
   /**
+   * Execute the query returning a hashset of values for a single property.
+   */
+  <A> Set<A> findSingleAttributeSet();
+
+  /**
    * Execute a query returning a single value of a single property/column.
    * <p>
    * <pre>{@code

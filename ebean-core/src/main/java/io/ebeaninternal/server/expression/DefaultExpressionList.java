@@ -468,6 +468,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public <A> Set<A> findSingleAttributeSet() {
+    return query.findSingleAttributeSet();
+  }
+
+  @Override
   public boolean exists() {
     return query.exists();
   }
