@@ -6,8 +6,6 @@ import org.tests.model.basic.Customer;
 
 import java.util.List;
 
-//import javax.inject.Inject;
-
 public class CustomerRepository extends BeanRepository<Integer, Customer> {
 
   //@Inject
@@ -28,7 +26,6 @@ public class CustomerRepository extends BeanRepository<Integer, Customer> {
   }
 
   public int updateNotes(String blah, String whot) {
-
     return updateQuery()
       .set("smallnote", whot)
       .where().eq("name", blah)
