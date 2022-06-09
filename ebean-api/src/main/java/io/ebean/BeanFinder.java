@@ -12,6 +12,7 @@ import java.util.Optional;
  * </p>
  * <pre>{@code
  *
+ * @Component
  * public class CustomerFinder extends BeanFinder<Long,Customer> {
  *
  *   @Inject
@@ -26,29 +27,37 @@ import java.util.Optional;
  *
  * @param <I> The ID type
  * @param <T> The Bean type
+ *
+ * @see BeanRepository
  */
 @NonNullApi
 public abstract class BeanFinder<I,T> {
 
+  /**
+   * Migrate to using database rather than server.
+   */
+  @Deprecated
   protected final Database server;
+  protected final Database database;
   protected final Class<T> type;
 
   /**
    * Create with the given bean type and Database instance.
    *
    * @param type The bean type
-   * @param server The Database instance typically created via Spring factory or equivalent.
+   * @param database The Database instance typically created via Spring factory or equivalent.
    */
-  protected BeanFinder(Class<T> type, Database server) {
+  protected BeanFinder(Class<T> type, Database database) {
     this.type = type;
-    this.server = server;
+    this.database = database;
+    this.server = database;
   }
 
   /**
    * Return the Database to use.
    */
   public Database db() {
-    return server;
+    return database;
   }
 
   /**
@@ -70,10 +79,10 @@ public abstract class BeanFinder<I,T> {
    * <p>
    * This is equivalent to {@link DB#byName(String)}
    *
-   * @param server The name of the Database. If this is null then the default Database is returned.
+   * @param name The name of the Database. If this is null then the default Database is returned.
    */
-  public Database db(String server) {
-    return DB.byName(server);
+  public Database db(String name) {
+    return DB.byName(name);
   }
 
   /**

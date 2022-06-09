@@ -8,6 +8,9 @@ import java.util.List;
  * Intended to be used as a base class for 'Finder' implementations that can then
  * be injected or used as public static fields on the associated entity bean.
  * <p>
+ * When using dependency injection {@link BeanRepository} and {@link BeanFinder}
+ * are expected to be used rather than this Finder.
+ * <p>
  * These 'finders' are a place to organise all the finder methods for that bean type
  * and specific finder methods are expected to be added (find by unique properties etc).
  * </p>
@@ -54,6 +57,8 @@ import java.util.List;
  *
  * }</pre>
  *
+ * @see BeanRepository
+ * @see BeanFinder
  */
 @NonNullApi
 public class Finder<I, T> {

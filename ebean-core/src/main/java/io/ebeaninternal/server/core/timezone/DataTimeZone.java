@@ -13,11 +13,10 @@ public interface DataTimeZone {
   Calendar getTimeZone();
 
   /**
-   * Return the Calendar to use for Timezone information when reading/writing date.
-   * A 'date' only value has normally no timezone information, but some platforms (like MySQL)
-   * reqire this.
+   * Return the Calendar to use for Timezone information when reading/writing a time component (date only/time only).
+   * A time component has normally no timezone information, but some platforms (like MySQL) reqire this.
    */
-  default Calendar getDateTimeZone() {
+  default Calendar getTimeComponentTimeZone() {
     return null;
   }
 }
