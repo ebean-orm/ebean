@@ -17,7 +17,7 @@ class Config {
   /**
    * Common optional docker parameters that we just transfer to docker properties.
    */
-  private static final String[] DOCKER_TEST_PARAMS = {"fastStartMode", "inMemory", "initSqlFile", "seedSqlFile", "adminUser", "adminPassword", "extraDb", "extraDb.dbName", "extraDb.username", "extraDb.password", "extraDb.initSqlFile", "extraDb.seedSqlFile"};
+  private static final String[] DOCKER_TEST_PARAMS = {"fastStartMode", "inMemory", "initSqlFile", "seedSqlFile", "adminUser", "adminPassword", "extraDb", "extraDb.dbName", "extraDb.username", "extraDb.password", "extraDb.extensions", "extraDb.initSqlFile", "extraDb.seedSqlFile"};
   private static final String[] DOCKER_PLATFORM_PARAMS = {"containerName", "image", "internalPort", "startMode", "shutdownMode", "maxReadyAttempts", "tmpfs", "collation", "characterSet"};
 
   private static final String DDL_MODE_OPTIONS = "dropCreate, create, none, migration, createOnly or migrationDropCreate";
@@ -224,12 +224,20 @@ class Config {
     properties.setProperty(dsKey, val);
   }
 
-  void setUrl(String urlPattern) {
-    String val = getKey("url", urlPattern);
+  private void setUrl(String key, String urlPattern) {
+    String val = getKey(key, urlPattern);
     val = val.replace("${host}", host());
     val = val.replace("${port}", String.valueOf(port));
     val = val.replace("${databaseName}", databaseName);
     this.url = val;
+  }
+
+  void setUrl(String urlPattern) {
+    setUrl("url", urlPattern);
+  }
+
+  void setExtraUrl(String urlPattern) {
+    setUrl("extraDb.url", urlPattern);
   }
 
   String host() {
@@ -343,9 +351,17 @@ class Config {
 
   void setExtensions(String defaultValue) {
     // ebean.test.postgres.extensions=hstore,pgcrypto
-    String val = getKey("extensions", defaultValue);
+    setExtensionsInternal("extensions", defaultValue);
+  }
+
+  void setExtraExtensions(String defaultValue) {
+    setExtensionsInternal("extraDb.extensions", defaultValue);
+  }
+
+  void setExtensionsInternal(String key, String defaultValue) {
+    String val = getKey(key, defaultValue);
     if (val != null) {
-      dockerProperties.setProperty(dockerKey("extensions"), trimExtensions(val));
+      dockerProperties.setProperty(dockerKey(key), trimExtensions(val));
     }
   }
 

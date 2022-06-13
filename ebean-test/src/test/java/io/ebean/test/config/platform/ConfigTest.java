@@ -36,6 +36,43 @@ class ConfigTest {
   }
 
   @Test
+  void extensions_whenNoSetValues() {
+    DatabaseConfig databaseConfig = new DatabaseConfig();
+    databaseConfig.loadFromProperties(new Properties());
+
+    Config config = new Config("db", "postgis", "db", databaseConfig);
+
+    config.setUsernameDefault();
+    config.setPasswordDefault();
+    config.setDefaultPort(42);
+    config.setExtensions("a,b");
+    config.setExtraExtensions("c,d");
+
+    Properties dockerProperties = config.getDockerProperties();
+    assertThat(dockerProperties.getProperty("postgis.extensions")).isEqualTo("a,b");
+    assertThat(dockerProperties.getProperty("postgis.extraDb.extensions")).isEqualTo("c,d");
+  }
+
+  @Test
+  void extensions_whenSetValues() {
+    DatabaseConfig databaseConfig = new DatabaseConfig();
+    Properties properties = new Properties();
+    properties.setProperty("ebean.test.extensions", "x,y");
+    properties.setProperty("ebean.test.extraDb.extensions", "z");
+    databaseConfig.loadFromProperties(properties);
+
+    Config config = new Config("db", "postgis", "db", databaseConfig);
+
+    config.setExtensions("a,b");
+    config.setExtraExtensions("c,d");
+
+    Properties dockerProperties = config.getDockerProperties();
+    assertThat(dockerProperties.getProperty("postgis.extensions")).isEqualTo("x,y");
+    assertThat(dockerProperties.getProperty("postgis.extraDb.extensions")).isEqualTo("z");
+  }
+
+
+  @Test
   void extraDbProperties_basic() {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb", "other");
