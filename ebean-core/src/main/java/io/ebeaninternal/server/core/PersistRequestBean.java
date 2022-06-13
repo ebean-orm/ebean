@@ -147,10 +147,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         // 'stateless update' - set loaded properties as dirty
         intercept.setNewBeanForUpdate();
         statelessUpdate = true;
-      }
-      if (!intercept.isDirty()) {
-        // check if mutable scalar properties are dirty
-        beanDescriptor.checkMutableProperties(intercept);
+      } else if (!intercept.isDirty()) {
+        // check if any mutable scalar properties are dirty
+        beanDescriptor.checkAnyMutableProperties(intercept);
       }
     }
     this.concurrencyMode = beanDescriptor.concurrencyMode(intercept);
@@ -1205,8 +1204,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private void executeUpdate() {
     setTenantId();
     if (controller == null || controller.preUpdate(this)) {
-      // check dirty state for mutable scalar properties (like DbJson, Hstore)
-      beanDescriptor.checkMutableProperties(intercept);
+      // check dirty state for all mutable scalar properties (like DbJson, Hstore)
+      beanDescriptor.checkAllMutableProperties(intercept);
       if (beanPersistListener != null) {
         updatedProperties = updatedProperties();
       }
