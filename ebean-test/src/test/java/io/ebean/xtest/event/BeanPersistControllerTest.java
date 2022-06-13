@@ -4,6 +4,7 @@ package io.ebean.xtest.event;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
+import io.ebean.ValuePair;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanDeleteIdRequest;
 import io.ebean.event.BeanPersistAdapter;
@@ -13,9 +14,7 @@ import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,8 +25,30 @@ public class BeanPersistControllerTest {
   private final PersistAdapter stopPersistingAdapter = new PersistAdapter(false);
 
   @Test
-  public void issue_1341() {
+  public void issued1() {
+    Database db = getDatabase(continuePersistingAdapter);
 
+    UTMaster bean0 = new UTMaster("m0");
+    bean0.setJournal(new UTMaster.Journal());
+    db.save(bean0);
+
+    UTMaster change0 = db.find(UTMaster.class, bean0.getId());
+    change0.setName("change0");
+    db.save(change0);
+
+    UTMaster change1 = db.find(UTMaster.class, bean0.getId());
+    change1.setName("change1");
+    db.save(change1);
+
+    UTMaster again = db.find(UTMaster.class, bean0.getId());
+    UTMaster.Journal journal = again.getJournal();
+    assertThat(journal.getEntries()).hasSize(2);
+
+    db.shutdown();
+  }
+
+  @Test
+  public void issue_1341() {
     Database db = getDatabase(continuePersistingAdapter);
 
     UTMaster bean0 = new UTMaster("one0");
@@ -118,7 +139,6 @@ public class BeanPersistControllerTest {
   }
 
   private Database getDatabase(PersistAdapter persistAdapter) {
-
     DatabaseConfig config = new DatabaseConfig();
     config.setName("h2ebasicver");
     config.loadFromProperties();
@@ -133,7 +153,6 @@ public class BeanPersistControllerTest {
     config.getClasses().add(UTDetail.class);
 
     config.add(persistAdapter);
-
     return DatabaseFactory.create(config);
   }
 
@@ -176,6 +195,16 @@ public class BeanPersistControllerTest {
         UTDetail detail = (UTDetail)bean;
         // invoke lazy loading ... which invoke the flush of the jdbc batch
         detail.setQty(42);
+      }
+      if (bean instanceof UTMaster) {
+        UTMaster master = (UTMaster)bean;
+        UTMaster.Journal journal = master.getJournal();
+        if (journal == null) {
+          journal = new UTMaster.Journal();
+          master.setJournal(journal);
+        }
+        // modify a "mutable scalar type" in preUpdate, should be included in update
+        journal.addEntry();
       }
 
       return continueDefaultPersisting;
