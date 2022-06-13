@@ -1,5 +1,5 @@
 
-name: Oracle18
+name: Oracle
 
 on:
   workflow_dispatch:
