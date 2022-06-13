@@ -79,16 +79,6 @@ final class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
-  public MonthDay convertFromMillis(long dateTime) {
-    throw new RuntimeException("Not supported on this type");
-  }
-
-  @Override
   public MonthDay readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

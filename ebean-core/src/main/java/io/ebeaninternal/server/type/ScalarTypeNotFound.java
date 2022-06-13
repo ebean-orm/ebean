@@ -22,25 +22,6 @@ class ScalarTypeNotFound implements ScalarType<Void> {
 
   public static final ScalarTypeNotFound INSTANCE = new ScalarTypeNotFound();
   private ScalarTypeNotFound() {  }
-  @Override
-  public boolean isBinaryType() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isMutable() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isDirty(Object value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int getLength() {
-    throw new UnsupportedOperationException();
-  }
 
   @Override
   public boolean isJdbcNative() {
@@ -99,21 +80,6 @@ class ScalarTypeNotFound implements ScalarType<Void> {
 
   @Override
   public DocPropertyType getDocType() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public long asVersion(Void value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Void convertFromMillis(long dateTime) {
     throw new UnsupportedOperationException();
   }
 

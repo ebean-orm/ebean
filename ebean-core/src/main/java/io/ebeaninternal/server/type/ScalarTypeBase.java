@@ -19,41 +19,6 @@ abstract class ScalarTypeBase<T> implements ScalarType<T> {
   }
 
   @Override
-  public long asVersion(T value) {
-    throw new RuntimeException("not supported");
-  }
-
-  @Override
-  public boolean isBinaryType() {
-    // override for binary/byte based types
-    return false;
-  }
-
-  /**
-   * Default implementation of mutable false.
-   */
-  @Override
-  public boolean isMutable() {
-    return false;
-  }
-
-  /**
-   * Default to true.
-   */
-  @Override
-  public boolean isDirty(Object value) {
-    return true;
-  }
-
-  /**
-   * Just return 0.
-   */
-  @Override
-  public int getLength() {
-    return 0;
-  }
-
-  @Override
   public boolean isJdbcNative() {
     return jdbcNative;
   }

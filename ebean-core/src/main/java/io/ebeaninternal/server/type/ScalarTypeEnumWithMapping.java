@@ -39,16 +39,6 @@ class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase implemen
     return enumType == null;
   }
 
-  @Override
-  public long asVersion(Object value) {
-    throw new RuntimeException("not supported");
-  }
-
-  @Override
-  public boolean isBinaryType() {
-    return false;
-  }
-
   /**
    * Return the IN values for DB constraint construction.
    */

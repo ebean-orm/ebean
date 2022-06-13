@@ -60,16 +60,6 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   }
 
   @Override
-  public byte[] convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not supported");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public byte[] readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

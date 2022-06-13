@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.text.TextException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -11,13 +10,12 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ScalarTypeDurationTest {
+class ScalarTypeDurationTest {
 
   ScalarTypeDuration type = new ScalarTypeDuration();
 
   @Test
-  public void testReadData() throws Exception {
-
+  void testReadData() throws Exception {
     Duration duration = Duration.ofSeconds(1234);
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -39,8 +37,7 @@ public class ScalarTypeDurationTest {
   }
 
   @Test
-  public void testToJdbcType() throws Exception {
-
+  void testToJdbcType() throws Exception {
     Duration duration = Duration.ofSeconds(1234);
     long seconds = duration.getSeconds();
 
@@ -52,8 +49,7 @@ public class ScalarTypeDurationTest {
   }
 
   @Test
-  public void testToBeanType() throws Exception {
-
+  void testToBeanType() throws Exception {
     Duration duration = Duration.ofSeconds(1234);
     long seconds = duration.getSeconds();
 
@@ -67,37 +63,34 @@ public class ScalarTypeDurationTest {
   }
 
   @Test
-  public void testFormatValue() throws Exception {
-
+  void testFormatValue() {
     Duration duration = Duration.ofSeconds(1234);
     String formatValue = type.formatValue(duration);
     assertEquals("PT20M34S", formatValue);
   }
 
   @Test
-  public void testParse() {
+  void testParse() {
     Duration duration = type.parse("PT20M34S");
     assertEquals(Duration.ofSeconds(1234), duration);
   }
 
   @Test
-  public void testIsDateTimeCapable() {
+  void testIsDateTimeCapable() {
     assertFalse(type.isDateTimeCapable());
   }
 
   @Test
-  public void testConvertFromMillis() {
-    assertThrows(TextException.class, () -> type.convertFromMillis(1000));
+  void testConvertFromMillis() {
+    assertThrows(UnsupportedOperationException.class, () -> type.convertFromMillis(1000));
   }
 
   @Test
-  public void testJsonRead() throws Exception {
-
+  void testJsonRead() throws Exception {
     Duration duration = Duration.ofSeconds(1234);
 
     JsonTester<Duration> jsonTester = new JsonTester<>(type);
     jsonTester.test(duration);
-
   }
 
 }

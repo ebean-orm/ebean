@@ -86,16 +86,6 @@ final class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public Byte convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not Supported");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public Byte readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
