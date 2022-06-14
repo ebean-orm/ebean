@@ -10,19 +10,12 @@ import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiDdlGenerator;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
-import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
-import io.ebeaninternal.server.deploy.PartitionMeta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.LineNumberReader;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -205,7 +198,6 @@ public class DdlGenerator implements SpiDdlGenerator {
       createAllContent = readFile(getCreateFileName());
     }
     runScript(connection, false, createAllContent, getCreateFileName());
-
     if (extraDdl && jaxbPresent) {
       if (currentModel().isTablePartitioning()) {
         String extraPartitioning = ExtraDdlXmlReader.buildPartitioning(platform);
@@ -213,43 +205,10 @@ public class DdlGenerator implements SpiDdlGenerator {
           runScript(connection, false, extraPartitioning, "builtin-partitioning-ddl");
         }
       }
-
       String extraApply = ExtraDdlXmlReader.buildExtra(platform, false);
       if (extraApply != null) {
         runScript(connection, false, extraApply, "extra-ddl");
       }
-
-      if (currentModel().isTablePartitioning()) {
-        checkInitialTablePartitions(connection);
-      }
-    }
-  }
-
-  /**
-   * Check if table partitions exist and if not create some. The expectation is that
-   * extra-ddl.xml should have some partition initialisation but this helps people get going.
-   */
-  private void checkInitialTablePartitions(Connection connection) {
-    DatabasePlatform databasePlatform = server.databasePlatform();
-    try {
-      StringBuilder sb = new StringBuilder();
-      for (MTable table : currentModel.getPartitionedTables()) {
-        String tableName = table.getName();
-        if (!databasePlatform.tablePartitionsExist(connection, tableName)) {
-          log.info("No table partitions for table {}", tableName);
-          PartitionMeta meta = table.getPartitionMeta();
-          String initPart = databasePlatform.tablePartitionInit(tableName, meta.getMode());
-          sb.append(initPart).append("\n");
-        }
-      }
-
-      String initialPartitionSql = sb.toString();
-      if (!initialPartitionSql.isEmpty()) {
-        runScript(connection, false, initialPartitionSql, "initial table partitions");
-      }
-
-    } catch (SQLException e) {
-      log.error("Error checking initial table partitions", e);
     }
   }
 
