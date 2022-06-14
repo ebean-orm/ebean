@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <extra-ddl xmlns="http://ebean-orm.github.io/xml/ns/extraddl">
 
-<ddl-script name="partition help" init="true" platforms="postgres">
+<ddl-script name="partition help" init="true" platforms="postgres,yugabyte">
 -- partitioning helper functions (UTC based)
 
 ------------------------------------------------------------------------------------
