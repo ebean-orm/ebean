@@ -733,7 +733,11 @@ public class PlatformDdl {
   }
 
   public void addTablePartition(DdlBuffer apply, String partitionMode, String partitionColumn) {
-    // only supported by postgres initially
+    // only supported by postgres and yugabyte
+  }
+
+  public void addDefaultTablePartition(DdlBuffer apply, String tableName) {
+    // only supported by postgres and yugabyte
   }
 
   /**

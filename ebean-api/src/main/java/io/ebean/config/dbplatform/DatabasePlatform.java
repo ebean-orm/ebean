@@ -803,20 +803,6 @@ public class DatabasePlatform {
   }
 
   /**
-   * Return true if partitions exist for the given table.
-   */
-  public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
-    return true;
-  }
-
-  /**
-   * Return the SQL to create an initial partition for the given table.
-   */
-  public String tablePartitionInit(String tableName, PartitionMode mode) {
-    return null;
-  }
-
-  /**
    * Escapes the like string for this DB-Platform
    */
   public String escapeLikeString(String value) {

@@ -7,11 +7,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class PostgresPlatformTest {
+class PostgresPlatformTest {
 
   @Test
-  public void testTypeConversion() {
-
+  void testTypeConversion() {
     PostgresPlatform platform = new PostgresPlatform();
     PlatformDdl ddl = PlatformDdlBuilder.create(platform);
 
