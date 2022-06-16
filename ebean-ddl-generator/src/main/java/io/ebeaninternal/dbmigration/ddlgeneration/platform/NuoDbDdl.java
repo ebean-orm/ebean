@@ -14,6 +14,22 @@ public class NuoDbDdl extends PlatformDdl {
   }
 
   @Override
+  public String createSequence(String sequenceName, DdlIdentity identity) {
+    StringBuilder sb = new StringBuilder("create sequence ");
+    sb.append(quote(sequenceName));
+    int start = identity.getStart();
+    if (start > 0) {
+      sb.append(" ").append(sequenceStartWith).append(" ").append(start);
+    }
+    int cache = identity.getCache();
+    if (cache > 0) {
+      sb.append(" quantum size ").append(cache);
+    }
+    sb.append(";");
+    return sb.toString();
+  }
+
+  @Override
   public void addTableComment(DdlBuffer apply, String tableName, String tableComment) {
     // do nothing
   }
