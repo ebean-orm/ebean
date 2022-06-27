@@ -35,4 +35,4 @@ jobs:
           ~/.m2
         key: build-${{ env.cache-name }}
     - name: postgres
-      run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
+      run: mvn  -T 8 clean test -Dprops.file=testconfig/ebean-postgres.properties
