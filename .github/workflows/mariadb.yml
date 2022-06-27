@@ -35,4 +35,4 @@ jobs:
           ~/.m2
         key: build-${{ env.cache-name }}
     - name: mariadb 10.6
-      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
+      run: mvn -T 8 clean test -Dprops.file=testconfig/ebean-mariadb.properties

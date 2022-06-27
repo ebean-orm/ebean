@@ -37,5 +37,5 @@ jobs:
     - name: Maven version
       run: mvn --version
     - name: H2Database
-      run: mvn clean package
+      run: mvn -T 8 clean package
 
