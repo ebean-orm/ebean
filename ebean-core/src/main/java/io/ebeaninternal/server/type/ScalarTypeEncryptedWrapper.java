@@ -31,11 +31,6 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public long asVersion(T value) {
-    throw new RuntimeException("not supported");
-  }
-
-  @Override
   public boolean isBinaryType() {
     return wrapped.isBinaryType();
   }

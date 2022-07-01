@@ -216,16 +216,6 @@ abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public final Map convertFromMillis(long dateTime) {
-    throw new RuntimeException("Should never be called");
-  }
-
-  @Override
-  public final boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public final Map readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

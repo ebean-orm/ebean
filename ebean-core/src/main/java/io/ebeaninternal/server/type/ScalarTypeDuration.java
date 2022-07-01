@@ -94,16 +94,6 @@ class ScalarTypeDuration extends ScalarTypeBase<Duration> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
-  public Duration convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not Supported");
-  }
-
-  @Override
   public Duration jsonRead(JsonParser parser) throws IOException {
     return Duration.parse(parser.getValueAsString());
   }

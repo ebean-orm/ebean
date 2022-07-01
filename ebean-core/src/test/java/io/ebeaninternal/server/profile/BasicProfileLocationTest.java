@@ -17,11 +17,11 @@ class BasicProfileLocationTest {
       assertThat(loc.fullLocation()).endsWith("invoke0(Native Method:12)");
       assertThat(loc.location()).isEqualTo("sun.reflect.NativeMethodAccessorImpl.invoke0");
       assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");
-    } else if (javaVersion.startsWith("18") || javaVersion.startsWith("19")){
+    } else if (javaVersion.startsWith("18") || javaVersion.startsWith("19") || javaVersion.startsWith("20")){
       assertThat(loc.fullLocation()).endsWith("jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)");
       assertThat(loc.location()).isEqualTo("java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke");
       assertThat(loc.label()).isEqualTo("DirectMethodHandleAccessor.invoke");
-    } else {
+    } else if (javaVersion.startsWith("11") || javaVersion.startsWith("17")) {
       assertThat(loc.fullLocation()).endsWith("jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method:12)");
       assertThat(loc.location()).isEqualTo("java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0");
       assertThat(loc.label()).isEqualTo("NativeMethodAccessorImpl.invoke0");

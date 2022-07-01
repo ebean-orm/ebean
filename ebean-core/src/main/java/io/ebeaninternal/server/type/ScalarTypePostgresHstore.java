@@ -83,16 +83,6 @@ final class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Map convertFromMillis(long dateTime) {
-    throw new RuntimeException("Should never be called");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public Map readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

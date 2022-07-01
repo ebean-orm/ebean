@@ -81,16 +81,6 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
-  public T convertFromMillis(long dateTime) {
-    return null;
-  }
-
-  @Override
   public T readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

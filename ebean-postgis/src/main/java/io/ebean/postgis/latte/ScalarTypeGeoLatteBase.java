@@ -78,26 +78,6 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   }
 
   @Override
-  public boolean isBinaryType() {
-    return false;
-  }
-
-  @Override
-  public boolean isMutable() {
-    return false;
-  }
-
-  @Override
-  public boolean isDirty(Object value) {
-    return false;
-  }
-
-  @Override
-  public int getLength() {
-    return 0;
-  }
-
-  @Override
   public void loadIgnore(DataReader reader) {
     reader.incrementPos(1);
   }
@@ -129,21 +109,6 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
 
   @Override
   public DocPropertyType getDocType() {
-    return null;
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
-  public long asVersion(T value) {
-    return 0;
-  }
-
-  @Override
-  public T convertFromMillis(long dateTime) {
     return null;
   }
 

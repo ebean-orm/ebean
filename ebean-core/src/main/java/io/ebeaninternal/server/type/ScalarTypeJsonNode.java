@@ -168,16 +168,6 @@ abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   }
 
   @Override
-  public JsonNode convertFromMillis(long dateTime) {
-    throw new RuntimeException("Should never be called");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public JsonNode readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

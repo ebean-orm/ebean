@@ -234,7 +234,6 @@ public final class ScalarTypeBoolean {
 
     @Override
     public int getLength() {
-      // typically this will return 1
       return Math.max(trueValue.length(), falseValue.length());
     }
 
@@ -327,16 +326,6 @@ public final class ScalarTypeBoolean {
     @Override
     public Boolean parse(String value) {
       return Boolean.valueOf(value);
-    }
-
-    @Override
-    public Boolean convertFromMillis(long systemTimeMillis) {
-      throw new TextException("Not Supported");
-    }
-
-    @Override
-    public boolean isDateTimeCapable() {
-      return false;
     }
 
     @Override

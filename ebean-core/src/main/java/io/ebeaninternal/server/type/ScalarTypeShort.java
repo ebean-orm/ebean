@@ -58,16 +58,6 @@ final class ScalarTypeShort extends ScalarTypeBase<Short> {
   }
 
   @Override
-  public Short convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not Supported");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public Short readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

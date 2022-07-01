@@ -35,5 +35,5 @@ jobs:
           ~/.m2
         key: build-${{ env.cache-name }}
     - name: Build with Maven
-      run: mvn package
+      run: mvn -T 8 test
 

@@ -82,16 +82,6 @@ final class ScalarTypeYear extends ScalarTypeBase<Year> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
-  public Year convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not Supported");
-  }
-
-  @Override
   public Year jsonRead(JsonParser parser) throws IOException {
     return Year.of(parser.getIntValue());
   }

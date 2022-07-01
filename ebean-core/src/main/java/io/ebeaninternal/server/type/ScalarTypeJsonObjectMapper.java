@@ -55,16 +55,6 @@ final class ScalarTypeJsonObjectMapper {
     NoMutationDetection(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
       super(Object.class, jsonManager, field, dbType, docType);
     }
-
-    @Override
-    public boolean isMutable() {
-      return false;
-    }
-
-    @Override
-    public boolean isDirty(Object value) {
-      return false;
-    }
   }
 
   /**
@@ -77,6 +67,11 @@ final class ScalarTypeJsonObjectMapper {
     GenericObject(TypeJsonManager jsonManager, AnnotatedField field, int dbType, DocPropertyType docType) {
       super(Object.class, jsonManager, field, dbType, docType);
       this.jsonb = "jsonb".equals(pgType);
+    }
+
+    @Override
+    public boolean isMutable() {
+      return true;
     }
 
     @Override
@@ -145,11 +140,6 @@ final class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public boolean isMutable() {
-      return true;
-    }
-
-    @Override
     public T read(DataReader reader) throws SQLException {
       String json = reader.getString();
       if (json == null || json.isEmpty()) {
@@ -210,16 +200,6 @@ final class ScalarTypeJsonObjectMapper {
     @Override
     public final DocPropertyType getDocType() {
       return docType;
-    }
-
-    @Override
-    public final boolean isDateTimeCapable() {
-      return false;
-    }
-
-    @Override
-    public final T convertFromMillis(long dateTime) {
-      throw new IllegalStateException("Not supported");
     }
 
     @Override

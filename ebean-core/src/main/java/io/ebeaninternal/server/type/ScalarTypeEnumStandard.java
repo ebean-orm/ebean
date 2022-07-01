@@ -230,16 +230,6 @@ final class ScalarTypeEnumStandard {
     }
 
     @Override
-    public Object convertFromMillis(long systemTimeMillis) {
-      throw new TextException("Not Supported");
-    }
-
-    @Override
-    public boolean isDateTimeCapable() {
-      return false;
-    }
-
-    @Override
     public Object jsonRead(JsonParser parser) throws IOException {
       if (parser.getCodec() != null) {
         return parser.readValueAs(enumType);

@@ -127,16 +127,6 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public File convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not supported");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public File readData(DataInput dataInput) throws IOException {
     // skip reading large file
     return null;

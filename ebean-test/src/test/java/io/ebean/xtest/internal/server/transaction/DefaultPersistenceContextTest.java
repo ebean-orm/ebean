@@ -178,16 +178,16 @@ class DefaultPersistenceContextTest {
     assertThat(pc.size(Customer.class)).isEqualTo(100);
     assertThat(pc.size(Contact.class)).isEqualTo(1010);
 
-    addCustomers(pc, 200, 100);
-    addContacts(pc, 2000, 1010);
-
-    assertThat(pc.size(Customer.class)).isEqualTo(200);
-    assertThat(pc.size(Contact.class)).isEqualTo(2020);
+    addCustomers(pc, 200, 103);
+    assertThat(pc.size(Customer.class)).isEqualTo(203);
+    addContacts(pc, 2000, 1013);
+    assertThat(pc.size(Contact.class)).isEqualTo(2023);
     pc.endIterate();
 
     System.gc();
-    Thread.sleep(50); // give the GC some time
+    Thread.sleep(100); // give the GC some time
 
+    // back to pre beginIterate() now
     assertThat(pc.size(Customer.class)).isEqualTo(100);
     assertThat(pc.size(Contact.class)).isEqualTo(1010);
   }

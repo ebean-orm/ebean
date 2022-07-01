@@ -228,7 +228,7 @@
     <dependency>
       <groupId>com.nuodb.jdbc</groupId>
       <artifactId>nuodb-jdbc</artifactId>
-      <version>22.0.0</version>
+      <version>23.0.0</version>
       <scope>test</scope>
     </dependency>
 

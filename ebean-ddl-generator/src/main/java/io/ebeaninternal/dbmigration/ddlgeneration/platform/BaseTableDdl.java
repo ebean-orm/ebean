@@ -214,6 +214,8 @@ public class BaseTableDdl implements TableDdl {
     String partitionMode = createTable.getPartitionMode();
     if (partitionMode != null) {
       platformDdl.addTablePartition(apply, partitionMode, createTable.getPartitionColumn());
+      apply.endOfStatement().newLine();
+      platformDdl.addDefaultTablePartition(apply, createTable.getName());
     }
     apply.endOfStatement();
 

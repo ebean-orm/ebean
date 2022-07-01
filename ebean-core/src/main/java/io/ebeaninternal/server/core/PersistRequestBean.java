@@ -77,8 +77,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private List<BeanPropertyAssocMany<?>> updatedManys;
   /**
-   * Need to get and store the updated properties because the persist listener is notified
-   * later on a different thread and the bean has been reset at that point.
+   * Store the updated properties to notify persist listener.
    */
   private Set<String> updatedProperties;
   /**
@@ -122,7 +121,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private boolean complete;
   /**
-   * Many to many intersection table changes that are held for later batch processing.
+   * Many-to-many intersection table changes that are held for later batch processing.
    */
   private List<SaveMany> saveMany;
 
@@ -148,9 +147,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         // 'stateless update' - set loaded properties as dirty
         intercept.setNewBeanForUpdate();
         statelessUpdate = true;
+      } else if (!intercept.isDirty()) {
+        // check if any mutable scalar properties are dirty
+        beanDescriptor.checkAnyMutableProperties(intercept);
       }
-      // Mark Mutable scalar properties (like Hstore) as dirty where necessary
-      beanDescriptor.checkMutableProperties(intercept);
     }
     this.concurrencyMode = beanDescriptor.concurrencyMode(intercept);
     this.publish = Flags.isPublish(flags);
@@ -726,10 +726,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         executeInsert();
         return -1;
       case UPDATE:
-        if (beanPersistListener != null) {
-          // store the updated properties for sending later
-          updatedProperties = updatedProperties();
-        }
         executeUpdate();
         return -1;
       case DELETE_SOFT:
@@ -1208,6 +1204,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private void executeUpdate() {
     setTenantId();
     if (controller == null || controller.preUpdate(this)) {
+      // check dirty state for all mutable scalar properties (like DbJson, Hstore)
+      beanDescriptor.checkAllMutableProperties(intercept);
+      if (beanPersistListener != null) {
+        updatedProperties = updatedProperties();
+      }
       postControllerPrepareUpdate();
       beanManager.getBeanPersister().update(this);
     }

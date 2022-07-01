@@ -46,6 +46,11 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   @Override
+  public void addDefaultTablePartition(DdlBuffer apply, String tableName) {
+    apply.append("create table ").append(tableName).append("_default partition of ").append(tableName).append(" default");
+  }
+
+  @Override
   public String dropIndex(String indexName, String tableName, boolean concurrent) {
     return (concurrent ? dropIndexConcurrentlyIfExists : dropIndexIfExists) + maxConstraintName(indexName);
   }

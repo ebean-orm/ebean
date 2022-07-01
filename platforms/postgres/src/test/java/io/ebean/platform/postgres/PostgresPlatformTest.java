@@ -1,6 +1,5 @@
 package io.ebean.platform.postgres;
 
-import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -16,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class PostgresPlatformTest {
 
   @Test
- void testUuidType() {
+  void testUuidType() {
     PostgresPlatform platform = new PostgresPlatform();
     platform.configure(new PlatformConfig());
 
@@ -24,20 +23,6 @@ class PostgresPlatformTest {
     String columnDefn = dbType.renderType(0, 0);
 
     assertThat(columnDefn).isEqualTo("uuid");
-  }
-
-  @Test
-  void tablePartitionInit() {
-    String sql = new PostgresPlatform().tablePartitionInit("foo", PartitionMode.WEEK);
-    assertThat(sql).isEqualTo("create table foo_default partition of foo default;\n" +
-      "select partition('week','foo',1);");
-  }
-
-  @Test
-  void tablePartitionInit_withSchema() {
-    String sql = new PostgresPlatform().tablePartitionInit("bar.foo", PartitionMode.WEEK);
-    assertThat(sql).isEqualTo("create table bar.foo_default partition of bar.foo default;\n" +
-      "select partition('week','foo',1,'bar');");
   }
 
   @Test

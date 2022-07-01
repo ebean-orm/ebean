@@ -44,8 +44,7 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
 
   @Override
   public long asVersion(B value) {
-    S unwrapValue = converter.unwrapValue(value);
-    return scalarType.asVersion(unwrapValue);
+    return scalarType.asVersion(converter.unwrapValue(value));
   }
 
   @Override

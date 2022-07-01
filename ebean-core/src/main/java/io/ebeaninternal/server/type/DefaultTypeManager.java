@@ -359,6 +359,9 @@ public final class DefaultTypeManager implements TypeManager {
     Type genericType = prop.getGenericType();
     boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
 
+    if (type.equals(String.class)) {
+      return ScalarTypeJsonString.typeFor(postgres, dbType);
+    }
     if (type.equals(List.class)) {
       DocPropertyType docType = getDocType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {

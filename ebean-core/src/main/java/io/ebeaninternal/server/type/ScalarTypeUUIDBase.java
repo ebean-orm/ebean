@@ -26,16 +26,6 @@ abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements Scalar
   }
 
   @Override
-  public boolean isMutable() {
-    return false;
-  }
-
-  @Override
-  public boolean isDirty(Object value) {
-    return true;
-  }
-
-  @Override
   public String format(Object value) {
     return String.valueOf(value);
   }
@@ -48,16 +38,6 @@ abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements Scalar
   @Override
   public UUID parse(String value) {
     return UUID.fromString(value);
-  }
-
-  @Override
-  public UUID convertFromMillis(long dateTime) {
-    throw new RuntimeException("Should never be called");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
   }
 
   @Override
