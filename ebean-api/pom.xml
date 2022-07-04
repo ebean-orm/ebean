@@ -103,4 +103,23 @@
 
   </dependencies>
 
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/ebean-maven-version.txt</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/ebean-maven-version.txt</exclude>
+        </excludes>
+      </resource>
+    </resources>
+  </build>
+
 </project>
