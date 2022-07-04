@@ -13,7 +13,7 @@ final class ScalarTypeTimeZone extends ScalarTypeBaseVarchar<TimeZone> {
 
   @Override
   public int getLength() {
-    return 20;
+    return 32;
   }
 
   @Override
