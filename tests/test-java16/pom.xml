@@ -66,7 +66,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.6.0</tile>
+            <tile>io.ebean.tile:enhancement:13.6.5</tile>
           </tiles>
         </configuration>
       </plugin>
