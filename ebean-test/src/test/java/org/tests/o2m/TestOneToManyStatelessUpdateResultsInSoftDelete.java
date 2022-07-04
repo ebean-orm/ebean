@@ -12,9 +12,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
+class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
   @Test
-  public void testStatelessUpdateShouldntDelete() {
+  void testStatelessUpdateShouldntDelete() {
     LoggedSql.start();
     var goods = new GoodsEntity();
     var workflow = new WorkflowEntity();
@@ -23,9 +23,7 @@ public class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCas
     workflow.setOperations(List.of(operation1));
 
     DB.save(goods);
-
-    List<String> createSql = LoggedSql.stop();
-    LoggedSql.start();
+    LoggedSql.collect();
 
     // statelessly add another operation to the workflow and save goods
     var goodsStateless = new GoodsEntity();
@@ -38,6 +36,16 @@ public class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCas
     goodsStateless.setWorkflowEntity(workflowStateless);
     workflowStateless.setOperations(List.of(operation1Stateless, operation2));
 
+    // With the fix the SQL is now:
+    /*
+      txn[1002] update workflow_entity set when_modified=? where id=?
+      txn[1002]  -- bind(2022-07-04 11:10:54.446,1)
+      txn[1002] update workflow_operation_entity set deleted=true where workflow_id = ? and not ( id in (?) )
+      txn[1002]  -- bind(1, Array[1]={1})
+      txn[1002] insert into workflow_operation_entity (name, version, when_created, when_modified, deleted, workflow_id) values (?,?,?,?,?,?)
+      txn[1002]  -- bind(null,1,2022-07-04 11:10:54.458,2022-07-04 11:10:54.458,false,1)
+      txn[1002] update goods_entity set when_modified=?, workflow_entity_id=? where id=?; -- bind(2022-07-04 11:10:54.446,1,1)
+     */
 
     /*
       - this update generates following statements
@@ -59,18 +67,16 @@ public class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCas
      */
     DB.update(goodsStateless);
     var updateSql = LoggedSql.stop();
-    updateSql.forEach(System.out::println);
-
+    //updateSql.forEach(System.out::println);
     var dbGoodsAfterUpdate = DB.find(GoodsEntity.class, goods.getId());
     assertThat(dbGoodsAfterUpdate.getWorkflowEntity().getOperations()).hasSize(2);
-    assertThat(dbGoodsAfterUpdate.getWorkflowEntity().getOperations().get(0).getId()).isEqualTo(1L);
-    assertThat(dbGoodsAfterUpdate.getWorkflowEntity().getOperations().get(1).getId()).isEqualTo(2L);
+    assertThat(dbGoodsAfterUpdate.getWorkflowEntity().getOperations()).extracting("id").contains(operation1.getId(), operation2.getId());
     updateSql.forEach(sql -> assertThat(sql).doesNotContain("delete from workflow_entity"));
   }
 
   // same as previous but DB.update throws exception
   @Test
-  public void testStatelessUpdateShouldntDeleteThrows() {
+  void testStatelessUpdateShouldntDeleteThrows() {
     LoggedSql.start();
     var goods = new GoodsEntity();
     goods.setName("ver1");
@@ -106,7 +112,7 @@ public class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCas
     DB.update(goodsStateless);
     var updateSql = LoggedSql.stop();
     updateSql.forEach(System.out::println);
-    var dbGoodsAfterUpdate = DB.find(GoodsEntity.class).findOne();
+    var dbGoodsAfterUpdate = DB.find(GoodsEntity.class, goods.getId());
     assertThat(dbGoodsAfterUpdate.getWorkflowEntity().getOperations()).hasSize(2);
     assertThat(dbGoodsAfterUpdate.getWorkflowEntity().getOperations().get(0).getId()).isEqualTo(operation1.getId());
     assertThat(dbGoodsAfterUpdate.getWorkflowEntity().getOperations().get(1).getId()).isEqualTo(operation2.getId());
@@ -114,7 +120,7 @@ public class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCas
   }
 
   @Test
-  public void duplicateKeyWorkflowEntityInsertInsteadOfUpdate() {
+  void duplicateKeyWorkflowEntityInsertInsteadOfUpdate() {
     var goods = new GoodsEntity();
     goods.setName("ver1");
     var workflow = new WorkflowEntity();
@@ -135,7 +141,7 @@ public class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCas
     assertThat(goodsAfterInsert.getWorkflowEntity().getOperations()).isEmpty();
     assertThat(DB.find(GoodsEntity.class, goods.getId()).getWorkflowEntity().getOperations()).isEmpty();
 
-    // statelessly add new operation
+    // statelessly add new WorkflowOperationEntity
     var goodsStateless = new GoodsEntity();
     goodsStateless.setId(goods.getId());
 
@@ -146,11 +152,9 @@ public class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCas
     var operation2 = new WorkflowOperationEntity();
     workflowStateless.setOperations(List.of(operation2));
 
-    // throws
-    // io.ebean.DuplicateKeyException: Error when batch flush on sql: insert into workflow_entity (id, revision, version, when_created, when_modified, deleted) values (?,?,?,?,?,?)
-    //	#1: Unique index or primary key violation: "PRIMARY KEY ON PUBLIC.WORKFLOW_ENTITY(ID) ( /* key:2 */ CAST(2 AS BIGINT), NULL, CAST(1 AS BIGINT), TIMESTAMP '2022-06-29 17:38:06.463', TIMESTAMP '2022-06-29 17:38:06.463', FALSE)"; SQL statement:
-    //insert into workflow_entity (id, revision, version, when_created, when_modified, deleted) values (?,?,?,?,?,?) [23505-212]
-    DB.save(goodsStateless);
+    // Using save() throws io.ebean.DuplicateKeyException: Error when batch flush on sql: insert into workflow_entity ...
+    // Must be an update() and not save() for this to be a "stateless update"
+    DB.update(goodsStateless);
 
     var ops = workflow.getOperations();
     // shouldn't contain deleted operations
