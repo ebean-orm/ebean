@@ -24,12 +24,36 @@ public class DtoQuery2Test extends BaseTestCase {
   private static final Logger log = LoggerFactory.getLogger(DtoQuery2Test.class);
 
   @Test
-  public void dto_findList_constructorMatch() {
+  void dto_findList_fluidAccessors() {
+    ResetBasicData.reset();
 
+    List<DCustFluidAccessors> list = server().findDto(DCustFluidAccessors.class, "select id, name from o_customer").findList();
+
+    assertThat(list).isNotEmpty();
+    for (DCustFluidAccessors cust: list) {
+      assertThat(cust.id()).isNotNull();
+      assertThat(cust.name()).isNotNull();
+    }
+  }
+
+  @Test
+  void dto_findList_plainAccessors() {
+    ResetBasicData.reset();
+
+    List<DCustPlainAccessors> list = server().findDto(DCustPlainAccessors.class, "select id, name from o_customer").findList();
+
+    assertThat(list).isNotEmpty();
+    for (DCustPlainAccessors cust: list) {
+      assertThat(cust.id()).isNotNull();
+      assertThat(cust.name()).isNotNull();
+    }
+  }
+
+  @Test
+  void dto_findList_constructorMatch() {
     ResetBasicData.reset();
 
     DtoQuery<DCust> dtoQuery = server().findDto(DCust.class, "select id, name from o_customer");
-
     List<DCust> list = dtoQuery.findList();
 
     log.info(list.toString());
@@ -37,7 +61,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findIterator_closeWithResources() {
+  void dto_findIterator_closeWithResources() {
     ResetBasicData.reset();
 
     int counter = 0;
@@ -55,7 +79,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findIterator() {
+  void dto_findIterator() {
     ResetBasicData.reset();
     final int expectedCount = server().find(Customer.class).findCount();
 
@@ -80,7 +104,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findStream() {
+  void dto_findStream() {
     ResetBasicData.reset();
     final int expectedCount = server().find(Customer.class).findCount();
 
@@ -104,8 +128,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findEach_constructorMatch() {
-
+  void dto_findEach_constructorMatch() {
     ResetBasicData.reset();
 
     LoggedSql.start();
@@ -118,8 +141,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findEachWhile_constructorMatch() {
-
+  void dto_findEachWhile_constructorMatch() {
     ResetBasicData.reset();
 
     LoggedSql.start();
@@ -135,8 +157,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findOneEmpty() {
-
+  void dto_findOneEmpty() {
     ResetBasicData.reset();
 
     Optional<DCust> rob = server().findDto(DCust.class, "select id, name from o_customer where name = :name")
@@ -153,8 +174,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findOne() {
-
+  void dto_findOne() {
     ResetBasicData.reset();
 
     DCust fiona = server().findDto(DCust.class, "select id, name from o_customer where name = :name")
@@ -172,8 +192,7 @@ public class DtoQuery2Test extends BaseTestCase {
 
 
   @Test
-  public void dto_queryPlanHits() {
-
+  void dto_queryPlanHits() {
     ResetBasicData.reset();
 
     resetAllMetrics();
@@ -218,8 +237,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findList_relaxedMode() {
-
+  void dto_findList_relaxedMode() {
     ResetBasicData.reset();
 
     List<DCust2> list = server().findDto(DCust2.class, "select id, '42' as something_we_cannot_map, name from o_customer")
@@ -231,8 +249,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findList_relaxedMode_defaultConstructor() {
-
+  void dto_findList_relaxedMode_defaultConstructor() {
     ResetBasicData.reset();
 
     List<DCust2> list = server().findDto(DCust2.class, "select id, '42' as something_we_cannot_map, name from o_customer")
@@ -244,8 +261,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findList_constructorPlusMatch() {
-
+  void dto_findList_constructorPlusMatch() {
     ResetBasicData.reset();
 
     String sql = "select c.id, c.name, count(o.id) as totalOrders\n" +
@@ -263,8 +279,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto_findList_setters() {
-
+  void dto_findList_setters() {
     ResetBasicData.reset();
 
     DtoQuery<DCust2> dtoQuery = server().findDto(DCust2.class, "select id, name from o_customer");
@@ -275,8 +290,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto3_findList_constructorMatch() {
-
+  void dto3_findList_constructorMatch() {
     ResetBasicData.reset();
 
     List<DCust3> robs = server().findDto(DCust3.class, "select id, name, 42 as totalOrders from o_customer where name like ?")
@@ -290,8 +304,7 @@ public class DtoQuery2Test extends BaseTestCase {
   }
 
   @Test
-  public void dto3_findList_settersMatch() {
-
+  void dto3_findList_settersMatch() {
     ResetBasicData.reset();
 
     List<DCust3> robs = server().findDto(DCust3.class, "select id, name from o_customer where name = :name")
@@ -305,9 +318,7 @@ public class DtoQuery2Test extends BaseTestCase {
   public static class DCust {
 
     final Integer id;
-
     final String name;
-
     int totalOrders;
 
     public DCust(Integer id, String name) {
@@ -340,7 +351,6 @@ public class DtoQuery2Test extends BaseTestCase {
   public static class DCust2 {
 
     Integer id;
-
     String name;
 
     @Override
@@ -368,9 +378,7 @@ public class DtoQuery2Test extends BaseTestCase {
   public static class DCust3 {
 
     Integer id;
-
     String name;
-
     int totalOrders;
 
     public DCust3() {
@@ -408,6 +416,62 @@ public class DtoQuery2Test extends BaseTestCase {
     }
 
     public void setName(String name) {
+      this.name = name;
+    }
+  }
+
+  public static class DCustFluidAccessors {
+
+    Integer id;
+    String name;
+
+    @Override
+    public String toString() {
+      return "id:" + id + " name:" + name;
+    }
+
+    public Integer id() {
+      return id;
+    }
+
+    public DCustFluidAccessors id(Integer id) {
+      this.id = id;
+      return this;
+    }
+
+    public String name() {
+      return name;
+    }
+
+    public DCustFluidAccessors name(String name) {
+      this.name = name;
+      return this;
+    }
+  }
+
+  public static class DCustPlainAccessors {
+
+    Integer id;
+    String name;
+
+    @Override
+    public String toString() {
+      return "id:" + id + " name:" + name;
+    }
+
+    public Integer id() {
+      return id;
+    }
+
+    public void id(Integer id) {
+      this.id = id;
+    }
+
+    public String name() {
+      return name;
+    }
+
+    public void name(String name) {
       this.name = name;
     }
   }

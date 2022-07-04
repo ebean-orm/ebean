@@ -46,20 +46,29 @@ final class DtoMetaBuilder {
   }
 
   static String propertyName(String methodName) {
-    final String name = methodName.substring(3);
-    return Character.toLowerCase(name.charAt(0)) + name.substring(1);
+    if (isTraditionalSetterMethod(methodName)) {
+      final String name = methodName.substring(3);
+      return Character.toLowerCase(name.charAt(0)) + name.substring(1);
+    } else {
+      // accessor style setter method
+      return methodName;
+    }
+  }
+
+  private static boolean isTraditionalSetterMethod(String methodName) {
+    return methodName.startsWith("set") && methodName.length() > 3 && Character.isUpperCase(methodName.charAt(3));
   }
 
   /**
    * Include a public "setter" method - 1 argument, returns void.
    */
   static boolean includeMethod(Method method) {
+    String name = method.getName();
     final int modifiers = method.getModifiers();
     return Modifier.isPublic(modifiers)
       && !Modifier.isStatic(modifiers)
-      && Void.TYPE.equals(method.getReturnType())
       && method.getParameterTypes().length == 1
-      && method.getName().startsWith("set") && method.getName().length() > 3;
+      && (!name.equals("wait") && !name.equals("equals"));
   }
 
   private void readConstructors() {
