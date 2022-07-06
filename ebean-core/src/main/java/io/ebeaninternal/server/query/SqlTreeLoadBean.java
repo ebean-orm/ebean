@@ -36,6 +36,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
   private final SpiQuery.TemporalMode temporalMode;
   private final boolean temporalVersions;
   final IdBinder lazyLoadParentIdBinder;
+  private final STreePropertyAssocMany loadingChildProperty;
 
   SqlTreeLoadBean(SqlTreeNodeBean node) {
     this.lazyLoadParent = node.lazyLoadParent;
@@ -55,6 +56,16 @@ class SqlTreeLoadBean implements SqlTreeLoad {
     this.properties = node.properties;
     this.pathMap = node.pathMap;
     this.children =  node.createLoadChildren();
+    this.loadingChildProperty = loadingChildProperty();
+  }
+
+  private STreePropertyAssocMany loadingChildProperty() {
+    for (SqlTreeLoad child : children) {
+      if (child instanceof SqlTreeLoadManyRoot) {
+        return ((SqlTreeLoadManyRoot) child).manyProp();
+      }
+    }
+    return null;
   }
 
   boolean isRoot() {
@@ -280,10 +291,9 @@ class SqlTreeLoadBean implements SqlTreeLoad {
      * included in the actual query.
      */
     private void createListProxies() {
-      STreePropertyAssocMany fetchedMany = ctx.getManyProperty();
       boolean forceNewReference = queryMode == Mode.REFRESH_BEAN;
       for (STreePropertyAssocMany many : localDesc.propsMany()) {
-        if (many != fetchedMany) {
+        if (many != loadingChildProperty) {
           if (readOnlyNoIntercept) {
             many.createEmptyReference(localBean);
           } else {
