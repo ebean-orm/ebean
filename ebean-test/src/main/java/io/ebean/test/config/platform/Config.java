@@ -2,6 +2,7 @@ package io.ebean.test.config.platform;
 
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
+import io.ebean.test.containers.DockerHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +39,6 @@ class Config {
   private final DatabaseConfig config;
   private boolean containerDropCreate;
   private final Properties dockerProperties = new Properties();
-  private final DockerHost dockerHost = new DockerHost();
 
   Config(String db, String platform, String databaseName, DatabaseConfig config) {
     this.db = db;
@@ -241,8 +241,7 @@ class Config {
   }
 
   String host() {
-    String explicitDockerHost = getKey("dockerHost", null);
-    return getKey("host", dockerHost.dockerHost(explicitDockerHost));
+    return getKey("host", getKey("dockerHost", DockerHost.host()));
   }
 
   /**
@@ -385,10 +384,6 @@ class Config {
   }
 
   private void initDockerProperties() {
-    if (dockerHost.runningInDocker()) {
-      // tell ebean-docker-test we are not using localhost (for jdbc DB setup commands)
-      dockerProperties.setProperty(dockerKey("host"), dockerHost.dockerHost());
-    }
     dockerProperties.setProperty(dockerKey("port"), String.valueOf(port));
     dockerProperties.setProperty(dockerKey("dbName"), databaseName);
     if (schema != null) {
