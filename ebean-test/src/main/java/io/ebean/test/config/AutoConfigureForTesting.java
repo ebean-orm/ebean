@@ -5,6 +5,7 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.test.config.platform.PlatformAutoConfig;
 import io.ebean.test.config.provider.ProviderAutoConfig;
+import io.ebean.test.containers.DockerHost;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,11 +30,17 @@ public class AutoConfigureForTesting implements AutoConfigure {
 
   @Override
   public void preConfigure(DatabaseConfig config) {
+    Properties properties = config.getProperties();
+    if (properties != null) {
+      // trigger determination of docker.host system property if not already done
+      // and re-evaluate properties in case there is use of ${docker.host} in jdbc url etc
+      DockerHost.host();
+      io.avaje.config.Config.asConfiguration().evalModify(properties);
+    }
     if (!config.isDefaultServer()) {
       log.info("skip automatic testing config on non-default server name:{} register:{}", config.getName(), config.isRegister());
       return;
     }
-    Properties properties = config.getProperties();
     if (isExtraServer(config, properties)) {
       setupExtraDataSourceIfNecessary(config);
       return;
