@@ -198,6 +198,7 @@ public class PlatformDdl {
    * Write all the table columns converting to platform types as necessary.
    */
   public void writeTableColumns(DdlBuffer apply, List<Column> columns, DdlIdentity identity) {
+    columns = sortColumns(columns);
     for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
         apply.append(",");
@@ -216,6 +217,11 @@ public class PlatformDdl {
         }
       }
     }
+  }
+
+  protected List<Column> sortColumns(List<Column> columns) {
+    // do nothing by default
+    return columns;
   }
 
   /**
