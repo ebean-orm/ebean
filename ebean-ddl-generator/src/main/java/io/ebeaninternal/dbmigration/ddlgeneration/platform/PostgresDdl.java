@@ -106,7 +106,7 @@ public class PostgresDdl extends PlatformDdl {
   }
 
   private boolean isVariableLength(String type) {
-    return type.startsWith("varchar") || type.startsWith("varbinary");
+    return type.startsWith("varchar") || type.startsWith("varbinary") || type.startsWith("json");
   }
 
   static final class DDLColumnSort implements Comparable<DDLColumnSort> {

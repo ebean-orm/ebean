@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class PostgresDdlTest {
 
-  private PostgresDdl postgresDdl = new PostgresDdl(new PostgresPlatform());
+  final PostgresDdl postgresDdl = new PostgresDdl(new PostgresPlatform());
 
   @Test
   void setLockTimeout() {
@@ -38,6 +38,12 @@ class PostgresDdlTest {
   void sortColumns_varbinary() {
     List<Column> cols = postgresDdl.sortColumns(columns("decimal(1)", "varbinary(1)", "varbinary(2)", "int", "decimal(2)"));
     assertThat(cols).extracting("type").containsExactly("int", "decimal(1)", "decimal(2)", "varbinary(1)", "varbinary(2)");
+  }
+
+  @Test
+  void sortColumns_json() {
+    List<Column> cols = postgresDdl.sortColumns(columns("json", "jsonb", "int"));
+    assertThat(cols).extracting("type").containsExactly("int", "json", "jsonb");
   }
 
   @Test
