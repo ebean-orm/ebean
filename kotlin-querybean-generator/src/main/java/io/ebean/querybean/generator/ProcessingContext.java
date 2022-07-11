@@ -88,7 +88,7 @@ class ProcessingContext implements Constants {
   private List<String> loadedPrefixEntities = new ArrayList<>(); ;
 
   /**
-   * The package for the generated ModuleInfoLoader.
+   * The package for the generated EntityClassRegister.
    */
   private String factoryPackage;
 
@@ -537,7 +537,7 @@ class ProcessingContext implements Constants {
   }
 
   /**
-   * Return the class name of the generated ModuleInfoLoader
+   * Return the class name of the generated EntityClassRegister
    * (such that we can read the current meta data for partial compile).
    */
   String loadMetaInfServices() {

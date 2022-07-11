@@ -105,20 +105,20 @@ public class Processor extends AbstractProcessor implements Constants {
       }
     } catch (Throwable e) {
       e.printStackTrace();
-      processingContext.logError(null, "Failed to initialise ModuleInfoLoader error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+      processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
 
   private void writeModuleInfoBean() {
     try {
       if (moduleWriter == null) {
-        processingContext.logError(null, "ModuleInfoLoader was not initialised and not written");
+        processingContext.logError(null, "EntityClassRegister was not initialised and not written");
       } else {
         moduleWriter.write();
       }
     } catch (Throwable e) {
       e.printStackTrace();
-      processingContext.logError(null, "Failed to write ModuleInfoLoader error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+      processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
 
