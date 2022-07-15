@@ -2,13 +2,10 @@ package org.tests.o2m.dm;
 
 import org.tests.model.draftable.BaseDomain;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 
 @Entity
-public class GoodsEntity extends BaseDomain {
+public class GoodsEntity extends HistoryColumns {
     private String name;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)

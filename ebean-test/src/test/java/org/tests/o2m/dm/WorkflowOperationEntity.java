@@ -1,5 +1,6 @@
 package org.tests.o2m.dm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.ebean.annotation.SoftDelete;
 import org.tests.model.draftable.BaseDomain;
 
@@ -8,14 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class WorkflowOperationEntity extends BaseDomain {
-
+public class WorkflowOperationEntity extends HistoryColumns {
   private String name;
 
   @ManyToOne
   @JoinColumn(name = "workflow_id")
+  @JsonIgnore
   private WorkflowEntity workflowEntity;
-
   @SoftDelete
   private boolean deleted;
 
