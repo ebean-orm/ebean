@@ -6,6 +6,12 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * This is the object associated to every entity bean using byte code enhancement.
+ * <p>
+ * This provides per property state such as loaded state, changed state, original values
+ * as well as bean level dirty state etc.
+ */
 public interface EntityBeanIntercept extends Serializable {
 
   /**
@@ -282,8 +288,14 @@ public interface EntityBeanIntercept extends Serializable {
    */
   void markPropertyAsChanged(int propertyIndex);
 
+  /**
+   * Set the changed state for the given property.
+   */
   void setChangedProperty(int propertyIndex);
 
+  /**
+   * Set the changed and loaded state for the given property.
+   */
   void setChangeLoaded(int propertyIndex);
 
   /**
@@ -291,6 +303,9 @@ public interface EntityBeanIntercept extends Serializable {
    */
   void setEmbeddedPropertyDirty(int propertyIndex);
 
+  /**
+   * Set the original value for the property.
+   */
   void setOriginalValue(int propertyIndex, Object value);
 
   /**
@@ -358,6 +373,9 @@ public interface EntityBeanIntercept extends Serializable {
    */
   StringBuilder getLoadedPropertyKey();
 
+  /**
+   * Return the loaded state for all the properties.
+   */
   boolean[] getLoaded();
 
   /**
@@ -385,6 +403,9 @@ public interface EntityBeanIntercept extends Serializable {
    */
   void initialisedMany(int propertyIndex);
 
+  /**
+   * Invoke the PreGetterCallback if it has been set due to getter for the given property.
+   */
   void preGetterCallback(int propertyIndex);
 
   /**
@@ -402,8 +423,14 @@ public interface EntityBeanIntercept extends Serializable {
    */
   void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue);
 
+  /**
+   * Set the property changed state, bean dirtyState and property original value.
+   */
   void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue);
 
+  /**
+   * Set the dirty state on the bean.
+   */
   void setDirtyStatus();
 
   /**
@@ -482,6 +509,9 @@ public interface EntityBeanIntercept extends Serializable {
    */
   void setDeletedFromCollection(boolean deletedFromCollection);
 
+  /**
+   * Return true if the bean was orphan deleted from a collection.
+   */
   boolean isOrphanDelete();
 
   /**
@@ -494,7 +524,10 @@ public interface EntityBeanIntercept extends Serializable {
    */
   Map<String, Exception> getLoadErrors();
 
-  boolean isChangedProp(int i);
+  /**
+   * Return true if the property has its changed state set.
+   */
+  boolean isChangedProp(int propertyIndex);
 
   /**
    * Return the MutableValueInfo for the given property or null.

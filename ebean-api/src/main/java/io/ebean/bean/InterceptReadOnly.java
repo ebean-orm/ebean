@@ -6,6 +6,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * EntityBeanIntercept optimised for read only use.
+ * <p>
+ * For the read only use this intercept doesn't need to hold any state that is normally
+ * required for updates such as per property changed, loaded, dirty state, original values
+ * bean state etc.
+ */
 public class InterceptReadOnly implements EntityBeanIntercept {
 
   private final EntityBean owner;
