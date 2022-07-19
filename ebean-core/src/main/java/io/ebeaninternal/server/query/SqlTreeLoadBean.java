@@ -270,6 +270,9 @@ class SqlTreeLoadBean implements SqlTreeLoad {
         if (disableLazyLoad) {
           // bean does not have an Id or is SqlSelect based
           ebi.setDisableLazyLoad(true);
+          if (!partialObject) {
+            ebi.setFullyLoadedBean(true);
+          }
         } else if (partialObject) {
           if (readId) {
             // register for lazy loading
