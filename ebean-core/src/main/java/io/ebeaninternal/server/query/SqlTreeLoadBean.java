@@ -365,7 +365,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
      * context we need to check if it is already contained in the collection.
      */
     final boolean isContextBean() {
-      return localBean == null;
+      return localBean == null || queryMode == Mode.LAZYLOAD_BEAN;
     }
   }
 
