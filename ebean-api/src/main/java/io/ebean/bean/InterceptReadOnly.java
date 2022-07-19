@@ -17,6 +17,9 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   private final EntityBean owner;
 
+  /**
+   * Create with a given entity.
+   */
   public InterceptReadOnly(Object ownerBean) {
     this.owner = (EntityBean) ownerBean;
   }
