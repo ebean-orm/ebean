@@ -1579,10 +1579,11 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setReadOnly(boolean readOnly);
 
   /**
-   * Will be deprecated - migrate to use setBeanCacheMode(CacheMode.RECACHE).
+   * Deprecated - migrate to use setBeanCacheMode(CacheMode.PUT) or other CacheMode.
    * <p>
    * When set to true all the beans from this query are loaded into the bean cache.
    */
+  @Deprecated
   Query<T> setLoadBeanCache(boolean loadBeanCache);
 
   /**
