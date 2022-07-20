@@ -766,8 +766,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .setDistinct(true);
 
     List<Order.Status> statusList = query.findSingleAttributeList();
-    assertSql(query).contains("select distinct t1.status from o_customer t0 "
-       + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null");
+    assertSql(query)
+      .contains("select distinct t1.status from o_customer t0 "
+          + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null")
+      .doesNotContain("order by");
     // query was: select distinct t1.status from o_customer t0
     // left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null order by t0.id
     // -> why order by t0.id?
