@@ -756,6 +756,30 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     }
   }
 
+  @Test
+  public void oneToMany_maxRows() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = DB.find(Customer.class)
+      .fetch("orders", "status")
+      .setMaxRows(2);
+
+    List<Order.Status> statusList = query.findSingleAttributeList();
+    assertSql(query)
+      .contains("select t1.status from o_customer t0 "
+        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null limit 2")
+      .doesNotContain("order by");
+    // Results in java.lang.AssertionError: selectSql was null
+    //    at io.ebeaninternal.server.query.SqlTree.getSelectSql(SqlTree.java:99)
+    //    at io.ebeaninternal.server.query.CQueryBuilder$BuildReq.appendSelect(CQueryBuilder.java:584)
+    //    at io.ebeaninternal.server.query.CQueryBuilder$BuildReq.buildSql(CQueryBuilder.java:695)
+    //    at io.ebeaninternal.server.query.CQueryBuilder.buildSql(CQueryBuilder.java:519)
+    //    at io.ebeaninternal.server.query.CQueryBuilder.buildFetchAttributeQuery(CQueryBuilder.java:198)
+    //    at io.ebeaninternal.server.query.CQueryEngine.findSingleAttributeList(CQueryEngine.java:91)
+    assertThat(statusList).hasSize(2);
+  }
+
   @BeforeEach
   public void setup() {
     MainEntity e1 = new MainEntity();
