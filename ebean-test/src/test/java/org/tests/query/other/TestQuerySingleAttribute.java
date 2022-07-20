@@ -756,6 +756,33 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     }
   }
 
+  @Test
+  public void oneToMany_notNull() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query =  DB.find(Customer.class)
+      .fetch("orders", "status")
+      .where()
+      .isNotNull("orders.status")
+      .query();
+
+    List<Order.Status> statusList = query
+        .findSingleAttributeList();
+    assertSql(query)
+      .contains("select distinct t1.status from o_customer t0 "
+        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null and t1.status is not null")
+      .doesNotContain("order by");
+    // query was: select distinct t1.status from o_customer t0
+    // left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null
+    // join o_order u1 on u1.kcustomer_id = t0.id and u1.order_date is not null where u1.status is not null
+    // order by t0.id
+    // -> why order by t0.id? and query could be optimized by adding t1.status is not null instead of another join
+    // Results in JdbcSQLSyntaxErrorException:
+    // Order by expression "T0.ID" must be in the result list in this case
+    assertThat(statusList).hasSize(5);
+  }
+
   @BeforeEach
   public void setup() {
     MainEntity e1 = new MainEntity();
