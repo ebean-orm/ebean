@@ -247,4 +247,15 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   public final R isIn(Query<?> subQuery) {
     return in(subQuery);
   }
+  
+  /**
+   * Is NOT in the result of a subquery.
+   *
+   * @param subQuery values provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R notIn(Query<?> subQuery) {
+    expr().notIn(_name, subQuery);
+    return _root;
+  }
 }
