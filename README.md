@@ -1,3 +1,30 @@
+## Ebean ORM for Java & Kotlin
+
+**Multiple abstraction levels**: Ebean provides multiple levels of query abstraction [ORM Queries, mixed with SQL](https://ebean.io/docs/intro/queries/orm-query), [DTO Queries](https://ebean.io/docs/intro/queries/dto-query), [SqlQuery and JDBC](https://ebean.io/docs/intro/queries/sql-query).
+Work at the highest level of abstraction and drop down levels as needed.
+
+**Database migrations**: Built in [DB migration](https://ebean.io/docs/db-migrations/) generation and running. Support for "rebase" migrations as well as repeatable, init and 'normal' migrations.
+
+**Awesome SQL**: Ebean produces SQL that you would hand craft yourself. Use great SQL, never generate SQL cartesian product, always honor relational limit/offset.
+
+**Automated query tuning**: For ORM queries Ebean can profile the object graph being used and either [automatically tune the query](https://ebean.io/docs/query/background/autotune).
+
+**Docker test containers**: [Docker test containers](https://ebean.io/docs/testing/) for all the supported databases. Get 100% test coverage on all the features of the database we use.
+
+**Type safe queries**: We can build queries using type safe [query beans](https://ebean.io/docs/query/query-beans). IDE auto-complete when writing queries, compile time checking and it's FUN.
+
+**Performance isn't optional**: Optimise queries to only fetch what we need (partial objects). Automatically avoid N+1 via a smart load context.
+
+#### Benefits of ORM
+
+* Automatically avoid N+1
+* L2 caching to reduce database load
+* Queries mixing database and L2 cache
+* Automatically tune ORM queries
+* Elasticsearch for search or L3 cache
+
+## Actions
+
 [![Build](https://github.com/ebean-orm/ebean/actions/workflows/build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/build.yml)
 [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ebean-orm/ebean/blob/master/LICENSE)
@@ -14,6 +41,8 @@
 
 
 #### Builds against EA (Early Access) versions of Java (19, Loom, panama etc)
+
+
 
 [![ebean EA](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml)
 [![datasource EA](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml)
