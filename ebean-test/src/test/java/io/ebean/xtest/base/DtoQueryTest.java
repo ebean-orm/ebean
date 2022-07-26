@@ -298,7 +298,7 @@ public class DtoQueryTest extends BaseTestCase {
     }
 
     // collect without reset
-    BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true, true);
+    BasicMetricVisitor basic = new BasicMetricVisitor("db", false, true, true, true);
     server().metaInfo().visitMetrics(basic);
 
     List<MetaQueryMetric> stats = basic.queryMetrics();
@@ -322,6 +322,8 @@ public class DtoQueryTest extends BaseTestCase {
 
     log.info("stats " + stats);
 
+    String asJson = server().metaInfo().metricsAsJson(metric2).withHash(false).withNewLine(false).json();
+    assertThat(asJson).contains("dto.DCust_basic2");
   }
 
   @Test
