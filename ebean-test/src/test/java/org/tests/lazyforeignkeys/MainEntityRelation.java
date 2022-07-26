@@ -33,7 +33,7 @@ public class MainEntityRelation {
   @ManyToOne
   @NotNull
   @JoinColumn(name = "cat2_id")
-  @DbForeignKey(noConstraint = true, forceLeftJoin = true)
+  @DbForeignKey(noConstraint = true)
   private Cat cat2;
 
   private String attr1;
