@@ -2,11 +2,10 @@ package org.tests.o2m.dm;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.ebean.annotation.SoftDelete;
-import org.tests.model.draftable.BaseDomain;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class WorkflowOperationEntity extends HistoryColumns {

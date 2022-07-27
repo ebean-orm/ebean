@@ -1,14 +1,11 @@
 package org.tests.o2m.dm;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.ebean.annotation.WhenCreated;
-import io.ebean.annotation.WhenModified;
-import io.ebean.annotation.WhoCreated;
-import io.ebean.annotation.WhoModified;
 import org.tests.model.draftable.BaseDomain;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public class HistoryColumns extends BaseDomain {

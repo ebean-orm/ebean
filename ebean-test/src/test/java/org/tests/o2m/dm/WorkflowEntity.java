@@ -1,12 +1,11 @@
 package org.tests.o2m.dm;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.ebean.annotation.SoftDelete;
-import io.ebean.annotation.Where;
-import io.ebean.annotation.WhoCreated;
-import org.tests.model.draftable.BaseDomain;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
