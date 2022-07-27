@@ -101,7 +101,7 @@ public final class DLoadContext implements LoadContext {
     this.useDocStore = query.isUseDocStore();
     this.asOf = query.getAsOf();
     this.asDraft = query.isAsDraft();
-    this.includeSoftDeletes = query.isIncludeSoftDeletes();
+    this.includeSoftDeletes = query.isIncludeSoftDeletes() && query.getMode() == SpiQuery.Mode.NORMAL;
     this.readOnly = query.isReadOnly();
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();

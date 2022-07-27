@@ -199,7 +199,7 @@ final class DefaultBeanLoader {
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     if (draft) {
       query.asDraft();
-    } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN) {
+    } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN && desc.isSoftDelete()) {
       query.setIncludeSoftDeletes();
     }
     if (embeddedOwnerIndex > -1) {
