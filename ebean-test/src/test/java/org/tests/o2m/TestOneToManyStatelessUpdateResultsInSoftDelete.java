@@ -1,13 +1,16 @@
 package org.tests.o2m;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.o2m.dm.GoodsEntity;
+import org.tests.o2m.dm.PersonEntity;
 import org.tests.o2m.dm.WorkflowEntity;
 import org.tests.o2m.dm.WorkflowOperationEntity;
 
+import java.io.StringWriter;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -160,5 +163,76 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     // shouldn't contain deleted operations
     assertThat(ops).hasSize(1);
     assertThat(goodsStateless.getWorkflowEntity().getOperations().get(0).getId()).isNotEqualTo(operation1.getId());
+  }
+
+  @Test
+  void softDeleteIncludedInQuery() throws Exception {
+    var defaultPerson = new PersonEntity();
+    defaultPerson.setName("test");
+    DB.save(defaultPerson);
+
+    // create GoodsEntity with 1 WorkflowOperationEntity
+    var goods = new GoodsEntity();
+    goods.setCreatedBy(defaultPerson);
+    goods.setName("ver1");
+    var workflow = new WorkflowEntity();
+    workflow.setRevision("ver1");
+    var operation1 = new WorkflowOperationEntity();
+    operation1.setName("ver1");
+    goods.setWorkflowEntity(workflow);
+    workflow.setOperations(List.of(operation1));
+
+    DB.save(goods);
+
+    // statelessly delete WorkflowOperationEntity
+    var goodsStateless = new GoodsEntity();
+    goodsStateless.setId(goods.getId());
+    var workflowStateless = new WorkflowEntity();
+    workflowStateless.setId(workflow.getId());
+    goodsStateless.setWorkflowEntity(workflowStateless);
+    workflowStateless.setOperations(List.of());
+
+    LoggedSql.start();
+    DB.update(goodsStateless);
+    // uncommenting this lines makes the test pass
+    //assertThat(goodsStateless.getWorkflowEntity().getOperations().size()).isEqualTo(0);
+
+    var sql = LoggedSql.stop();
+    sql.forEach(System.out::println);
+
+    System.out.println("BEFORE TRY");
+    LoggedSql.start();
+
+    try (var writer = new StringWriter()) {
+      var mapper = new ObjectMapper();
+      mapper.writeValue(writer, goodsStateless);
+      sql = LoggedSql.stop();
+      sql.forEach(System.out::println);
+      /*
+      select t0.id, t0.name, t0.workflow_entity_id, t0.version, t0.when_created, t0.when_modified from goods_entity t0 where t0.id = ?; --bind(4, ) --micros(161)
+      select t0.id, t0.name, t0.version, t0.when_created, t0.when_modified, t0.created_by, t0.updated_by, t0.workflow_entity_id from goods_entity t0 where t0.id = ?; --bind(4, ) --micros(525)
+      select t0.id, t0.name, t0.version, t0.when_created, t0.when_modified from person_entity t0 where t0.id = ?; --bind(1, ) --micros(325)
+      ! is this even issue? - select does not check if workflow_entity is deleted
+      select t0.id, t0.revision, t0.version, t0.when_created, t0.when_modified from workflow_entity t0 where t0.id = ?; --bind(1, ) --micros(439)
+      select t0.id, t0.revision, t0.version, t0.when_created, t0.when_modified, t0.created_by, t0.updated_by from workflow_entity t0 where t0.id = ?; --bind(1, ) --micros(332)
+
+      select t0.id, t0.name, t0.version, t0.when_created, t0.when_modified from person_entity t0 where t0.id = ?; --bind(1, ) --micros(197)
+      select t0.workflow_id, t0.id, t0.position, t0.name, t0.workflow_id, t0.version, t0.when_created, t0.when_modified, t0.deleted from workflow_operation_entity t0 where (t0.workflow_id) in (?) order by t0.workflow_id, t0.position; --bind(Array[1]={1}) --micros(2776)
+      select t0.id, t0.position, t0.name, t0.version, t0.when_created, t0.when_modified, t0.deleted, t0.workflow_id, t0.created_by, t0.updated_by from workflow_operation_entity t0 where t0.id = ?; --bind(1, ) --micros(415)
+
+     !! ignores soft delete
+       also to note - when the DM extends BaseDomain instead of HistoryColumns, this bug does not happen
+       (presumably since @WhoCreated Person createdBy is lazy loaded, when it is eagerly loaded, this bug does not occur)
+      select t0.workflow_id, t0.id, t0.position, t0.name, t0.workflow_id, t0.version, t0.when_created, t0.when_modified, t0.deleted from workflow_operation_entity t0 where (t0.workflow_id) in (?) order by t0.workflow_id, t0.position; --bind(Array[1]={4}) --micros(585)
+
+      select t0.id, t0.position, t0.name, t0.version, t0.when_created, t0.when_modified, t0.deleted, t0.created_by, t0.updated_by, t0.workflow_id from workflow_operation_entity t0 where t0.id = ?; --bind(7, ) --micros(532)
+      */
+
+      writer.flush();
+      var serialized = writer.toString();
+      System.out.println(serialized);
+      var readGoods = mapper.readValue(writer.toString(), GoodsEntity.class);
+      assertThat(readGoods.getWorkflowEntity().getOperations()).hasSize(0);
+    }
   }
 }
