@@ -30,6 +30,12 @@
       <version>2.2</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-applog-slf4j</artifactId>
+      <version>1.0</version>
+    </dependency>
+
     <!--
     Class retention Nonnull and Nullable annotations
     to assist with IDE auto-completion with Ebean API
