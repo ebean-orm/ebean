@@ -184,7 +184,6 @@ alter table table_history add column "select" varchar(255);
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 create unique index uq_migtest_e_basic_description on migtest_e_basic(description) exclude null keys;
--- NOTE: table has @History - special migration may be necessary
 update migtest_e_basic set new_boolean_field = old_boolean;
 
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));

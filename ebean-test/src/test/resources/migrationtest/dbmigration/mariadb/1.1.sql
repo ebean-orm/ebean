@@ -71,7 +71,6 @@ alter table migtest_e_softdelete add column deleted tinyint(1) default 0 not nul
 alter table migtest_oto_child add column master_id bigint;
 -- apply post alter
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
--- NOTE: table has @History - special migration may be necessary
 update migtest_e_basic set new_boolean_field = old_boolean;
 
 alter table migtest_e_basic add constraint uq_migtest_e_basic_status_indextest1 unique  (status,indextest1);
