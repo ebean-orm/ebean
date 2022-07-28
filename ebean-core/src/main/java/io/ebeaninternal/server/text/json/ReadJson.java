@@ -32,11 +32,12 @@ public final class ReadJson implements SpiJsonReader {
   private final Object objectMapper;
   private final PersistenceContext persistenceContext;
   private final LoadContext loadContext;
+  private final boolean intercept;
 
   /**
    * Construct with parser and readOptions.
    */
-  public ReadJson(BeanDescriptor<?> desc, JsonParser parser, JsonReadOptions readOptions, Object objectMapper) {
+  public ReadJson(BeanDescriptor<?> desc, JsonParser parser, JsonReadOptions readOptions, Object objectMapper, boolean intercept) {
     this.rootDesc = desc;
     this.parser = parser;
     this.objectMapper = objectMapper;
@@ -45,6 +46,7 @@ public final class ReadJson implements SpiJsonReader {
     // only create visitorMap, pathStack if needed ...
     this.visitorMap = (readOptions == null) ? null : readOptions.getVisitorMap();
     this.pathStack = (visitorMap == null && loadContext == null) ? null : new PathStack();
+    this.intercept = intercept;
   }
 
   /**
@@ -58,6 +60,7 @@ public final class ReadJson implements SpiJsonReader {
     this.objectMapper = source.objectMapper;
     this.persistenceContext = source.persistenceContext;
     this.loadContext = source.loadContext;
+    this.intercept = source.intercept;
   }
 
   private LoadContext initLoadContext(BeanDescriptor<?> desc, JsonReadOptions readOptions) {
@@ -203,4 +206,11 @@ public final class ReadJson implements SpiJsonReader {
     return getObjectMapper().readValue(parser, propertyType);
   }
 
+  /**
+   * Do we have to set values via intercept or not.
+   */
+  @Override
+  public boolean isIntercept() {
+    return intercept;
+  }
 }
