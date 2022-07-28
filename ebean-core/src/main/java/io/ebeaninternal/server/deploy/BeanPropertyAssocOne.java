@@ -785,7 +785,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     if (jsonDeserialize && targetDescriptor != null) {
       T target = (T) value(bean);
       T assocBean = targetDescriptor.jsonRead(readJson, name, target);
-      setValue(bean, assocBean);
+      if (readJson.isIntercept()) {
+        setValueIntercept(bean, assocBean);
+      } else {
+        setValue(bean, assocBean);
+      }
     }
   }
 
