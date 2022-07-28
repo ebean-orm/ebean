@@ -108,8 +108,9 @@ public class BaseTableDdl implements TableDdl {
       // altered columns will be in the alterTable buffers.
       // 'after' goes to the post-alter-buffer
       if (!after.isEmpty()) {
-        writer.applyPostAlter().append("-- NOTE: table has @History - special migration may be necessary").newLine();
-
+        if (withHistory) {
+          writer.applyPostAlter().append("-- NOTE: table has @History - special migration may be necessary").newLine();
+        }
         // here we run post migration scripts
         for (String ddlScript : after) {
           writer.applyPostAlter().appendStatement(translate(ddlScript, tableName, columnName, defaultValue));
