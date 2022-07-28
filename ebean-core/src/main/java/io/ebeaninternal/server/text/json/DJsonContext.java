@@ -125,7 +125,7 @@ public final class DJsonContext implements SpiJsonContext {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
     try {
-      return desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options)), null, null);
+      return desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), false), null, null);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -158,10 +158,10 @@ public final class DJsonContext implements SpiJsonContext {
 
   @Override
   public <T> void toBean(T target, JsonParser parser, JsonReadOptions options) throws JsonIOException {
-  
+
     BeanDescriptor<T> desc = (BeanDescriptor<T>) getDescriptor(target.getClass());
     try {
-      desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options)), null, target);
+      desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), target != null), null, target);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -171,14 +171,14 @@ public final class DJsonContext implements SpiJsonContext {
   public <T> DJsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
-    return new DJsonBeanReader<>(desc, new ReadJson(desc, parser, options, determineObjectMapper(options)));
+    return new DJsonBeanReader<>(desc, new ReadJson(desc, parser, options, determineObjectMapper(options), false));
   }
 
   @Override
   public <T> DJsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = (BeanDescriptor<T>) beanType;
-    SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
+    SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options), false);
     return new DJsonBeanReader<>(desc, readJson);
   }
 
@@ -211,7 +211,7 @@ public final class DJsonContext implements SpiJsonContext {
   public <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options) throws JsonIOException {
 
     BeanDescriptor<T> desc = getDescriptor(cls);
-    SpiJsonReader readJson = new ReadJson(desc, src, options, determineObjectMapper(options));
+    SpiJsonReader readJson = new ReadJson(desc, src, options, determineObjectMapper(options), false);
     try {
 
       JsonToken currentToken = src.getCurrentToken();
@@ -225,7 +225,7 @@ public final class DJsonContext implements SpiJsonContext {
       List<T> list = new ArrayList<>();
       do {
         // CHECKME: Should we update the list
-        T bean = desc.jsonRead(readJson, null, null); 
+        T bean = desc.jsonRead(readJson, null, null);
         if (bean == null) {
           break;
         } else {
@@ -395,7 +395,7 @@ public final class DJsonContext implements SpiJsonContext {
 
     BeanDescriptor<?> desc = (BeanDescriptor<?>) beanType;
     JsonParser parser = createParser(new StringReader(json));
-    return new ReadJson(desc, parser, null, defaultObjectMapper);
+    return new ReadJson(desc, parser, null, defaultObjectMapper, false);
   }
 
   @Override
