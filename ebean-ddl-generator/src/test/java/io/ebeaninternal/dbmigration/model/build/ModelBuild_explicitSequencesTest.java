@@ -16,7 +16,7 @@ import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ModelBuild_explicitSequencesTest extends BaseTestCase {
+class ModelBuild_explicitSequencesTest extends BaseTestCase {
 
   private SpiEbeanServer createServer(boolean postgres) {
 
@@ -38,7 +38,7 @@ public class ModelBuild_explicitSequencesTest extends BaseTestCase {
   }
 
   @Test
-  public void test() throws IOException {
+  void test() throws IOException {
     SpiEbeanServer ebeanServer = createServer(false);
     try {
       CurrentModel currentModel = new CurrentModel(ebeanServer);
@@ -54,7 +54,7 @@ public class ModelBuild_explicitSequencesTest extends BaseTestCase {
   }
 
   @Test
-  public void test_asPostgres() throws IOException {
+  void test_asPostgres() throws IOException {
     SpiEbeanServer ebeanServer = createServer(true);
     try {
       CurrentModel currentModel = new CurrentModel(ebeanServer);

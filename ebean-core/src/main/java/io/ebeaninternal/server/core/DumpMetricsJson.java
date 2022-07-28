@@ -17,9 +17,11 @@ import java.util.List;
 final class DumpMetricsJson implements ServerMetricsAsJson {
 
   private final Database database;
+  private final ServerMetrics metrics;
+  private final String name;
   private Appendable writer;
   /**
-   * By default include sql and location attributes for the initial collection only.
+   * By default, include sql and location attributes for the initial collection only.
    */
   private int includeExtraAttributes = 1;
   private boolean withHeader = true;
@@ -31,6 +33,14 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
 
   DumpMetricsJson(Database database) {
     this.database = database;
+    this.name = database.name();
+    this.metrics = null;
+  }
+
+  DumpMetricsJson(ServerMetrics metrics) {
+    this.database = null;
+    this.metrics = metrics;
+    this.name = metrics.name();
   }
 
   @Override
@@ -66,14 +76,18 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
   @Override
   public String json() {
     writer = new StringWriter();
-    collect(database.metaInfo().collectMetrics());
+    collect(obtainMetrics());
     return writer.toString();
   }
 
   @Override
   public void write(Appendable buffer) {
     writer = buffer;
-    collect(database.metaInfo().collectMetrics());
+    collect(obtainMetrics());
+  }
+
+  private ServerMetrics obtainMetrics() {
+    return metrics != null ? metrics :  database.metaInfo().collectMetrics();
   }
 
   private void collect(ServerMetrics serverMetrics) {
@@ -112,7 +126,7 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
     if (withHeader) {
       objStart();
       key("db");
-      val(database.name());
+      val(name);
       key("metrics");
       listStart();
     }

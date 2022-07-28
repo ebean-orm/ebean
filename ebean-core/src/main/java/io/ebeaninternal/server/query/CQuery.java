@@ -605,14 +605,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     return logWhereSql;
   }
 
-  /**
-   * Return the property that is associated with the many. There can only be one
-   * per SqlSelect. This can be null.
-   */
-  @Override
-  public STreePropertyAssocMany getManyProperty() {
-    return manyProperty;
-  }
 
   public String getBindLog() {
     return bindLog;

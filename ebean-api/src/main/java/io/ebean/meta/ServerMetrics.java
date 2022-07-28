@@ -8,6 +8,11 @@ import java.util.List;
 public interface ServerMetrics {
 
   /**
+   * Return the name of the database these metrics were obtained for.
+   */
+  String name();
+
+  /**
    * Return timed metrics for Transactions, labelled SqlQuery, labelled SqlUpdate.
    */
   List<MetaTimedMetric> timedMetrics();

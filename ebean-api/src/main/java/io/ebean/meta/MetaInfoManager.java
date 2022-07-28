@@ -17,6 +17,17 @@ public interface MetaInfoManager {
   ServerMetrics collectMetrics();
 
   /**
+   * Given the already collected metrics provide them in json form.
+   * <p>
+   * Expected to be used when we wish to collect the metrics and report them
+   * to some service and additionally format them as json for say output into
+   * an application log.
+   *
+   * @param metrics The already collected metrics
+   */
+  ServerMetricsAsJson metricsAsJson(ServerMetrics metrics);
+
+  /**
    * Collect the metrics in raw JSON form.
    * <pre>{@code
    *

@@ -9,10 +9,9 @@ import java.lang.annotation.Target;
  * Used to denote a type query bean.
  * <p>
  * These are typically generated beans used to build queries using type safe query criteria.
- * </p>
  */
 @Target({ ElementType.TYPE })
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.CLASS)
 public @interface TypeQueryBean {
 
   /**

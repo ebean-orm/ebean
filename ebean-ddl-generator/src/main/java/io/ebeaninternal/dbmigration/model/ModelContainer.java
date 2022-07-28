@@ -161,7 +161,7 @@ public class ModelContainer {
         applyChange((AlterForeignKey) change);
       } else if (change instanceof AddTableComment) {
         applyChange((AddTableComment) change);
-      } else if (change instanceof Sql) {
+      } else if (change instanceof Sql || change instanceof CreateSchema) {
         // do nothing
       } else {
         throw new IllegalArgumentException("No rule for " + change);

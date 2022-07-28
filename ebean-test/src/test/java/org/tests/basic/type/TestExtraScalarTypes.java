@@ -16,8 +16,26 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class TestExtraScalarTypes extends BaseTestCase {
 
   @Test
-  void test() {
+  void insertLargeTimezone() {
+    TimeZone tz = TimeZone.getTimeZone("America/Argentina/ComodRivadavia");
+    var bean = new ESomeType();
+    bean.setTimeZone(tz);
+    DB.save(bean);
 
+    var found = DB.find(ESomeType.class, bean.getId());
+    assert found != null;
+    assertThat(found.getTimeZone()).isEqualTo(tz);
+
+    var findByTimezone = DB.find(ESomeType.class).where().eq("timeZone", tz).findList();
+    assertThat(findByTimezone).hasSize(1);
+    assertThat(findByTimezone.get(0).getId()).isEqualTo(found.getId());
+    assertThat(findByTimezone.get(0).getTimeZone()).isEqualTo(tz);
+
+    DB.delete(found);
+  }
+
+  @Test
+  void test() {
     Locale locale = Locale.ENGLISH;
     Currency currency = Currency.getInstance(Locale.US);
     TimeZone tz = TimeZone.getDefault();

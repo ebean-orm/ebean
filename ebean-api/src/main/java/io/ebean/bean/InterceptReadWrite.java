@@ -21,7 +21,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * This provides the mechanisms to support deferred fetching of reference beans
  * and oldValues generation for concurrency checking.
- * </p>
  */
 public final class InterceptReadWrite implements EntityBeanIntercept {
 
@@ -32,24 +31,17 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   private static final int STATE_LOADED = 2;
 
   /**
-   * Used when a bean is partially filled.
+   * Used when a bean is partially loaded.
    */
   private static final byte FLAG_LOADED_PROP = 1;
   private static final byte FLAG_CHANGED_PROP = 2;
   private static final byte FLAG_CHANGEDLOADED_PROP = 3;
   /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
-   * between an embedded bean being completely overwritten and one of its
-   * embedded properties being made dirty.
+   * Flags indicating if a property is a dirty embedded bean. Used to distinguish between an
+   * embedded bean being completely overwritten vs one with embedded properties that are dirty.
    */
   private static final byte FLAG_EMBEDDED_DIRTY = 4;
-  /**
-   * Flags indicating if a property is a dirty embedded bean. Used to distinguish
-   * between an embedded bean being completely overwritten and one of its
-   * embedded properties being made dirty.
-   */
   private static final byte FLAG_ORIG_VALUE_SET = 8;
-
   /**
    * Flags indicating if the mutable hash is set.
    */
@@ -78,10 +70,9 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   private boolean readOnly;
   private boolean dirty;
   /**
-   * Flag set to disable lazy loading - typically for SQL "report" type entity beans.
+   * Flag set to disable lazy loading.
    */
   private boolean disableLazyLoad;
-
   /**
    * Flag set when lazy loading failed due to the underlying bean being deleted in the DB.
    */
@@ -107,7 +98,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   private MutableValueNext[] mutableNext;
 
   /**
-   * Create a intercept with a given entity.
+   * Create with a given entity.
    */
   public InterceptReadWrite(Object ownerBean) {
     this.owner = (EntityBean) ownerBean;

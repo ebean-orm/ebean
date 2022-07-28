@@ -29,17 +29,13 @@ final class DumpMetricsData {
   }
 
   private void collect(ServerMetrics serverMetrics) {
-    final List<MetaTimedMetric> timedMetrics = serverMetrics.timedMetrics();
-    final List<MetaCountMetric> countMetrics = serverMetrics.countMetrics();
-    final List<MetaQueryMetric> queryMetrics = serverMetrics.queryMetrics();
-
-    for (MetaTimedMetric metric : timedMetrics) {
+    for (MetaTimedMetric metric : serverMetrics.timedMetrics()) {
       add(metric);
     }
-    for (MetaCountMetric metric : countMetrics) {
+    for (MetaCountMetric metric : serverMetrics.countMetrics()) {
       addCount(metric);
     }
-    for (MetaQueryMetric metric : queryMetrics) {
+    for (MetaQueryMetric metric : serverMetrics.queryMetrics()) {
       addQuery(metric);
     }
   }

@@ -3,8 +3,7 @@ package io.ebean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -29,9 +28,11 @@ public final class EbeanVersion {
 
   private static void readVersion() {
     try {
-      try (InputStream in = ClassLoader.getSystemResourceAsStream("META-INF/maven/io.ebean/ebean-api/pom.properties")) {
+      try (InputStream in = ClassLoader.getSystemResourceAsStream("META-INF/ebean-maven-version.txt")) {
         if (in != null) {
-          version = readVersion(in);
+          try (LineNumberReader reader = new LineNumberReader(new InputStreamReader(in))) {
+            version = reader.readLine();
+          }
         }
       }
       log.info("ebean version: {}", version);
@@ -88,7 +89,7 @@ public final class EbeanVersion {
   }
 
   /**
-   * Returns the ebean version (read from /META-INF/maven/io.ebean/ebean/pom.properties)
+   * Returns the ebean version (read from META-INF/ebean-maven-version.txt)
    */
   public static String getVersion() {
     return version;

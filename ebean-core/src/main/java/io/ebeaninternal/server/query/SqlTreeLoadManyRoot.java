@@ -14,6 +14,10 @@ final class SqlTreeLoadManyRoot extends SqlTreeLoadBean {
     this.manyProp = node.manyProp;
   }
 
+  STreePropertyAssocMany manyProp() {
+    return manyProp;
+  }
+
   @Override
   public EntityBean load(DbReadContext cquery, EntityBean parentBean, EntityBean contextParent) throws SQLException {
     // pass in null for parentBean because added to a collection rather than set to the parentBean
