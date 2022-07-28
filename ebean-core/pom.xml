@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.6.4-FOC3-SNAPSHOT</version>
+    <version>13.6.6-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -35,19 +35,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.6.4-FOC3-SNAPSHOT</version>
+      <version>13.6.6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>13.6.4-FOC3-SNAPSHOT</version>
+      <version>13.6.6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>13.6.4-FOC3-SNAPSHOT</version>
+      <version>13.6.6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -138,21 +138,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.6.4-FOC3-SNAPSHOT</version>
+      <version>13.6.6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>13.6.4-FOC3-SNAPSHOT</version>
+      <version>13.6.6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>13.6.4-FOC3-SNAPSHOT</version>
+      <version>13.6.6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
