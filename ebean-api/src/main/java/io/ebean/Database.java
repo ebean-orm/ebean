@@ -553,7 +553,7 @@ public interface Database {
    *     txn.commit();
    *
    *   } finally {
-   * 	   txn.end();
+   *     txn.end();
    *   }
    * }</pre>
    *
@@ -1285,16 +1285,16 @@ public interface Database {
    * semantics.
    *
    * <pre>{@code
-   *  // set specific transactional scope settings
-   *  TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
+   *   // set specific transactional scope settings
+   *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *  database.executeCall(scope, new Callable<String>() {
-   * 	  public String call() {
-   * 		  User u1 = database.find(User.class, 1);
-   * 		  ...
-   * 		  return u1.getEmail();
-   *    }
-   *  });
+   *   database.executeCall(scope, new Callable<String>() {
+   *     public String call() {
+   *       User u1 = database.find(User.class, 1);
+   *       ...
+   *       return u1.getEmail();
+   *     }
+   *   });
    *
    * }</pre>
    */
