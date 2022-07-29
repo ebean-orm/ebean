@@ -797,6 +797,31 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     assertThat(statusList).hasSize(3);
   }
 
+  @Test
+  public void oneToMany_orderBy() {
+
+    ResetBasicData.reset();
+
+    Query<Customer> query = DB.find(Customer.class)
+      .fetch("orders", "status")
+      .orderBy("orders.status");
+
+    List<Order.Status> statusList = query.findSingleAttributeList();
+
+    assertSql(query)
+      .contains("select t1.status from o_customer t0 "
+        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null order by t1.status")
+      .doesNotContain("order by t0.id");
+    // query was: select t1.status from o_customer t0
+    // left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null
+    // order by t0.id, t1.status
+    // -> why order by t0.id?
+    // Results in wrong order:
+    assertThat(statusList).hasSize(7);
+    assertThat(statusList.get(0)).isEqualTo(null);
+    assertThat(statusList.get(6)).isEqualTo(Order.Status.COMPLETE);
+  }
+
   @BeforeEach
   public void setup() {
     MainEntity e1 = new MainEntity();
