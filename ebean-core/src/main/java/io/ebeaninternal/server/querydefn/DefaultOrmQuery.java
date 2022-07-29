@@ -15,7 +15,10 @@ import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-import io.ebeaninternal.server.expression.*;
+import io.ebeaninternal.server.expression.DefaultExpressionList;
+import io.ebeaninternal.server.expression.IdInExpression;
+import io.ebeaninternal.server.expression.InExpression;
+import io.ebeaninternal.server.expression.SimpleExpression;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
@@ -504,7 +507,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (Mode.LAZYLOAD_MANY == mode) {
       return false;
     } else {
-      return !hasMaxRowsOrFirstRow() || isRawSql();
+      return singleAttribute || !hasMaxRowsOrFirstRow() || isRawSql();
     }
   }
 
@@ -593,6 +596,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // clear select and fetch joins
     detail.clear();
     select(beanDescriptor.idSelect());
+    singleAttribute = true;
   }
 
   @Override
@@ -636,7 +640,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
       if (singleExpression instanceof IdInExpression) {
         return new CacheIdLookupMany<>((IdInExpression) singleExpression);
       } else if (singleExpression instanceof InExpression) {
-        InExpression in = (InExpression)singleExpression;
+        InExpression in = (InExpression) singleExpression;
         if (in.property().equals(beanDescriptor.idName())) {
           return new CacheIdLookupMany<>(in);
         }
@@ -1502,6 +1506,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final <A> Set<A> findSingleAttributeSet() {
     return (Set<A>) server.findSingleAttributeSet(this, transaction);
   }
+
   @Override
   public final <A> A findSingleAttribute() {
     List<A> list = findSingleAttributeList();
