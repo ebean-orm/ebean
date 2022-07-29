@@ -83,7 +83,6 @@ alter table migtest_oto_child add column master_id integer;
 -- apply post alter
 -- not supported: alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 -- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
--- NOTE: table has @History - special migration may be necessary
 update migtest_e_basic set new_boolean_field = old_boolean;
 
 -- not supported: alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
