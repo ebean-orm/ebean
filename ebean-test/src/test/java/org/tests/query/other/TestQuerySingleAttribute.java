@@ -757,8 +757,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void oneToMany_distinct() {
-
+  void oneToMany_distinct() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)

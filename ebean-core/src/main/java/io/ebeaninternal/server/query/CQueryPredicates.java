@@ -225,7 +225,7 @@ public final class CQueryPredicates {
    */
   private void parsePropertiesToDbColumns(DeployParser deployParser) {
     // order by is dependent on the manyProperty (if there is one)
-    String logicalOrderBy = deriveOrderByWithMany(request.manyProperty());
+    String logicalOrderBy = deriveOrderByWithMany(request.manyPropertyForOrderBy());
     if (logicalOrderBy != null) {
       dbOrderBy = deployParser.parse(logicalOrderBy);
     }
@@ -234,7 +234,7 @@ public final class CQueryPredicates {
     dbWhere = deriveWhere(deployParser);
     dbFilterMany = deriveFilterMany(deployParser);
     dbHaving = deriveHaving(deployParser);
-    // all includes including ones for manyWhere clause
+    // all includes, including ones for manyWhere clause
     predicateIncludes = deployParser.getIncludes();
   }
 
@@ -293,8 +293,7 @@ public final class CQueryPredicates {
   }
 
   /**
-   * There is a many property so we need to make sure the ordering is
-   * appropriate.
+   * There is a many property we need to make sure the ordering is appropriate.
    */
   private String deriveOrderByWithMany(BeanPropertyAssocMany<?> manyProp) {
     if (manyProp == null) {

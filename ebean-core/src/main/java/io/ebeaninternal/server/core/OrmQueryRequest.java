@@ -458,8 +458,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Return the many property that is fetched in the query or null if there is not one.
    */
-  public BeanPropertyAssocMany<?> manyProperty() {
-    return manyProperty;
+  public BeanPropertyAssocMany<?> manyPropertyForOrderBy() {
+    return query.isSingleAttribute() ? null : manyProperty;
   }
 
   /**
