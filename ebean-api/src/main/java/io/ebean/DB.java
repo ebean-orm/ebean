@@ -238,7 +238,7 @@ public final class DB {
   }
 
   /**
-   * The batch will be flushing automatically but you can use this to explicitly
+   * The batch will be flushing automatically but, you can use this to explicitly
    * flush the batch if you like.
    * <p>
    * Flushing occurs automatically when:
@@ -961,7 +961,7 @@ public final class DB {
    *
    * DB.execute(scope, new TxRunnable() {
    *   public void run() {
-   * 	   User u1 = DB.find(User.class, 1);
+   *     User u1 = DB.find(User.class, 1);
    *     ...
    *   }
    * });
@@ -1010,9 +1010,9 @@ public final class DB {
    *
    * DB.executeCall(scope, new Callable<String>() {
    *   public String call() {
-   * 	   User u1 = DB.find(User.class, 1);
-   * 		 ...
-   * 		 return u1.getEmail();
+   *     User u1 = DB.find(User.class, 1);
+   *     ...
+   *     return u1.getEmail();
    *   }
    * });
    * }</pre>
