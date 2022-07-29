@@ -1,6 +1,9 @@
 package org.tests.query.other;
 
-import io.ebean.*;
+import io.ebean.CountDistinctOrder;
+import io.ebean.CountedValue;
+import io.ebean.DB;
+import io.ebean.Query;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -798,8 +801,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void oneToMany_orderBy() {
-
+  void oneToMany_orderBy() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -812,11 +814,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .contains("select t1.status from o_customer t0 "
         + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null order by t1.status")
       .doesNotContain("order by t0.id");
-    // query was: select t1.status from o_customer t0
-    // left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null
-    // order by t0.id, t1.status
-    // -> why order by t0.id?
-    // Results in wrong order:
+
     assertThat(statusList).hasSize(7);
     assertThat(statusList.get(0)).isEqualTo(null);
     assertThat(statusList.get(6)).isEqualTo(Order.Status.COMPLETE);
