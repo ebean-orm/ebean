@@ -798,12 +798,13 @@ class TestQuerySingleAttribute extends BaseTestCase {
       .setMaxRows(2);
 
     List<Order.Status> statusList = query.findSingleAttributeList();
-    assertSql(query)
-      .contains("select t1.status from o_customer t0 "
-        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null limit 2")
-      .doesNotContain("order by");
-    // Results in java.lang.AssertionError: selectSql was null
-    //    at io.ebeaninternal.server.query.SqlTree.getSelectSql(SqlTree.java:99)
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).isEqualTo("select top 2 t1.status from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null");
+    } else if (isLimitOffset()) {
+      assertThat(sqlOf(query)).isEqualTo("select t1.status from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null limit 2");
+    } else if (isAnsiSqlLimit()) {
+      assertThat(sqlOf(query)).isEqualTo("select t1.status from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null fetch next 100 rows only");
+    }
     assertThat(statusList).hasSize(2);
   }
 
