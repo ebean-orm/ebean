@@ -23,51 +23,51 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestQuerySingleAttribute extends BaseTestCase {
+class TestQuerySingleAttribute extends BaseTestCase {
 
-	@Test
-	  public void findSingleAttributesTwoToMany() {
-	    ResetBasicData.reset();
-	    // Query without ors with equals causing joins, only one Customer with name Rob exists
-	    Query<Customer> query0 = DB.find(Customer.class)
-		        .select("name")
-		        .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
-		        .where()
-		        .eq("name", "Rob")
-		        .query();
+  @SuppressWarnings("unchecked")
+  @Test
+  void findSingleAttributesTwoToMany() {
+    ResetBasicData.reset();
+    // Query without ors with equals causing joins, only one Customer with name Rob exists
+    Query<Customer> query0 = DB.find(Customer.class)
+      .select("name")
+      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+      .where()
+      .eq("name", "Rob")
+      .query();
 
-		    CountedValue<String> robs0 = (CountedValue<String>) query0.findSingleAttributeList().get(0);
-		    assertThat(robs0.getValue()).isEqualTo("Rob");
-		    assertThat(robs0.getCount()).isEqualTo(1);
+    CountedValue<String> robs0 = (CountedValue<String>) query0.findSingleAttributeList().get(0);
+    assertThat(robs0.getValue()).isEqualTo("Rob");
+    assertThat(robs0.getCount()).isEqualTo(1);
 
-		 // Query with or with equals causing joins
-	    Query<Customer> query = DB.find(Customer.class)
-	        .select("name")
-	        .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
-	        .where()
-	        .eq("name", "Rob")
-	        .or()
-	         .eq("orders.status", Order.Status.NEW)
-	         .eq("contacts.firstName", "Fred1")
-	         .endOr()
-	        .query();
+    // Query with or with equals causing joins
+    Query<Customer> query = DB.find(Customer.class)
+      .select("name")
+      .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
+      .where()
+      .eq("name", "Rob")
+      .or()
+      .eq("orders.status", Order.Status.NEW)
+      .eq("contacts.firstName", "Fred1")
+      .endOr()
+      .query();
 
-	    CountedValue<String> robs = (CountedValue<String>) query.findSingleAttributeList().get(0);
-	    assertThat(robs.getValue()).isEqualTo("Rob");
-	    // only one Customer named rob exists, but 7 is returned for the amount of Customers named Rob
-	    assertThat(robs.getCount()).isEqualTo(1);
+    CountedValue<String> robs = (CountedValue<String>) query.findSingleAttributeList().get(0);
+    assertThat(robs.getValue()).isEqualTo("Rob");
+    // only one Customer named rob exists, but 7 is returned for the amount of Customers named Rob
+    assertThat(robs.getCount()).isEqualTo(1);
 
-	    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) " +
-        "from (select distinct t0.id, t0.name as attribute_ " +
-        "from o_customer t0 left join contact u1 on u1.customer_id = t0.id left join o_order u2 on u2.kcustomer_id = t0.id and u2.order_date is not null " +
-        "where t0.name = ? and (u2.status = ? or u1.first_name = ?)) r1 " +
-        "group by r1.attribute_ " +
-        "order by count(*) desc, r1.attribute_");
-	  }
+    assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) " +
+      "from (select distinct t0.id, t0.name as attribute_ " +
+      "from o_customer t0 left join contact u1 on u1.customer_id = t0.id left join o_order u2 on u2.kcustomer_id = t0.id and u2.order_date is not null " +
+      "where t0.name = ? and (u2.status = ? or u1.first_name = ?)) r1 " +
+      "group by r1.attribute_ " +
+      "order by count(*) desc, r1.attribute_");
+  }
 
   @Test
-  public void exampleUsage() {
-
+  void exampleUsage() {
     ResetBasicData.reset();
 
     List<String> names =
@@ -86,8 +86,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void exampleUsage_otherType() {
-
+  void exampleUsage_otherType() {
     ResetBasicData.reset();
 
     List<Date> dates =
@@ -102,8 +101,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void withOrderBy() {
-
+  void withOrderBy() {
     Query<Customer> query =
       DB.find(Customer.class)
         .setDistinct(true)
@@ -116,8 +114,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void basic() {
-
+  void basic() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class).select("name");
@@ -129,8 +126,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttribute() {
-
+  void findSingleAttribute() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -144,7 +140,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttributeList_with_join_column() {
+  void findSingleAttributeList_with_join_column() {
     ResetBasicData.reset();
     Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .fetch("entity1", "attr1")
@@ -155,19 +151,19 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<CountedValue<String>> attr1list = query.findSingleAttributeList();
 
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*)"
-        + " from (select distinct t0.id, t0.id1, t1.attr1 as attribute_ from main_entity_relation t0 left join main_entity t1 on t1.id = t0.id1) r1"
-        + " group by r1.attribute_"
-        + " order by count(*) desc, r1.attribute_"); // sub-query select clause includes t0.id1
+      + " from (select distinct t0.id, t0.id1, t1.attr1 as attribute_ from main_entity_relation t0 left join main_entity t1 on t1.id = t0.id1) r1"
+      + " group by r1.attribute_"
+      + " order by count(*) desc, r1.attribute_"); // sub-query select clause includes t0.id1
     assertThat(attr1list).isNotNull();
     assertThat(attr1list).hasSize(2);
     assertThat(attr1list.get(0).getValue()).isEqualTo("a1");
-    assertThat(attr1list.get(0).getCount()).isEqualTo(2l);
+    assertThat(attr1list.get(0).getCount()).isEqualTo(2);
     assertThat(attr1list.get(1).getValue()).isEqualTo("a2");
-    assertThat(attr1list.get(1).getCount()).isEqualTo(1l);
+    assertThat(attr1list.get(1).getCount()).isEqualTo(1);
   }
 
   @Test
-  public void findSingleAttributesVariousSelection1() {
+  void findSingleAttributesVariousSelection1() {
     Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .fetch("entity1", "attr1")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
@@ -180,7 +176,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttributesVariousSelection2() {
+  void findSingleAttributesVariousSelection2() {
     Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .select("attr1")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
@@ -193,7 +189,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttributesVariousSelection3() {
+  void findSingleAttributesVariousSelection3() {
     Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .select("id")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
@@ -206,7 +202,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttributesVariousSelection4() {
+  void findSingleAttributesVariousSelection4() {
     Query<MainEntityRelation> query = DB.find(MainEntityRelation.class)
       .fetch("entity1", "id")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
@@ -219,7 +215,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttributesVariousSelection5() {
+  void findSingleAttributesVariousSelection5() {
     Query<OmBasicParent> query = DB.find(OmBasicParent.class)
       .fetch("children", "name")
       .setCountDistinct(CountDistinctOrder.COUNT_DESC_ATTR_ASC)
@@ -231,8 +227,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttribute_with_aggregate() {
-
+  void findSingleAttribute_with_aggregate() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -246,8 +241,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttribute_viaExpression() {
-
+  void findSingleAttribute_viaExpression() {
     ResetBasicData.reset();
 
     String name = DB.find(Customer.class)
@@ -259,8 +253,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctAndWhere() {
-
+  void distinctAndWhere() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -276,8 +269,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWhereWithJoin() {
-
+  void distinctWhereWithJoin() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -293,10 +285,8 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     assertThat(names).isNotNull();
   }
 
-
   @Test
-  public void queryPlan_expect_differentPlans() {
-
+  void queryPlan_expect_differentPlans() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class).select("name");
@@ -309,7 +299,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctOnIdProperty() {
+  void distinctOnIdProperty() {
     Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .select("id")
@@ -327,8 +317,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithFetch() {
-
+  void distinctWithFetch() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -342,8 +331,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithCascadedFetch() {
-
+  void distinctWithCascadedFetch() {
     ResetBasicData.reset();
 
     Query<Contact> query = DB.find(Contact.class)
@@ -357,8 +345,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctSelectOnInheritedBean() {
-
+  void distinctSelectOnInheritedBean() {
     ResetBasicData.reset();
 
     Query<ChildA> query = DB.find(ChildA.class)
@@ -370,8 +357,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctFetchManyToOneInheritedBean() {
-
+  void distinctFetchManyToOneInheritedBean() {
     ResetBasicData.reset();
 
     Query<EUncle> query = DB.find(EUncle.class)
@@ -386,8 +372,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   // hmm - same problem when not using distinct
   @Test
-  public void findSingleOnIdProperty() {
-
+  void findSingleOnIdProperty() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -406,8 +391,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleWithFetch() {
-
+  void findSingleWithFetch() {
     ResetBasicData.reset();
 
     Query<Customer> query = DB.find(Customer.class)
@@ -420,8 +404,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleWithFetchOnView() {
-
+  void findSingleWithFetchOnView() {
     ResetBasicData.reset();
 
     Query<VwCustomer> query = DB.find(VwCustomer.class)
@@ -434,8 +417,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleSelectOnInheritedBean() {
-
+  void findSingleSelectOnInheritedBean() {
     ResetBasicData.reset();
 
     Query<ChildA> query = DB.find(ChildA.class)
@@ -443,12 +425,10 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
     query.findSingleAttributeList();
     assertThat(sqlOf(query)).contains("select t0.more from rawinherit_parent t0 where t0.type = 'A'");
-
   }
 
   @Test
-  public void findSingleFetchManyToOneInheritedBean() {
-
+  void findSingleFetchManyToOneInheritedBean() {
     ResetBasicData.reset();
 
     Query<EUncle> query = DB.find(EUncle.class)
@@ -460,8 +440,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void findSingleFetchManyToOneInheritedBean_viaEbeanServer() {
-
+  void findSingleFetchManyToOneInheritedBean_viaEbeanServer() {
     ResetBasicData.reset();
 
     Query<EUncle> query = DB.find(EUncle.class)
@@ -474,8 +453,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
 
   @Test
   @Disabled //don't know if ebean can handle this on many to many, as this means that the cartesian product is generated
-  public void distinctFetchManyToManyInheritedBean() {
-
+  void distinctFetchManyToManyInheritedBean() {
     ResetBasicData.reset();
 
     Query<Data> query = DB.find(Data.class)
@@ -491,8 +469,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithOrderByPk() {
-
+  void distinctWithOrderByPk() {
     ResetBasicData.reset();
 
     Query<Contact> query = DB.find(Contact.class)
@@ -506,8 +483,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithOrderByPkWithId() {
-
+  void distinctWithOrderByPkWithId() {
     ResetBasicData.reset();
 
     Query<Contact> query = DB.find(Contact.class)
@@ -521,8 +497,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithCascadedFetchOrderByPk() {
-
+  void distinctWithCascadedFetchOrderByPk() {
     ResetBasicData.reset();
 
     Query<Contact> query = DB.find(Contact.class)
@@ -536,8 +511,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithOrderByPkAndQuery() {
-
+  void distinctWithOrderByPkAndQuery() {
     ResetBasicData.reset();
 
     Query<Contact> query = DB.find(Contact.class)
@@ -557,8 +531,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithCascadedFetchOrderByPkAndQuery() {
-
+  void distinctWithCascadedFetchOrderByPkAndQuery() {
     ResetBasicData.reset();
 
     Query<Contact> query = DB.find(Contact.class)
@@ -578,8 +551,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithCascadedFetchOrderByPkAndQuery3() {
-
+  void distinctWithCascadedFetchOrderByPkAndQuery3() {
     ResetBasicData.reset();
 
     Query<Contact> query = DB.find(Contact.class)
@@ -599,8 +571,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void distinctWithCascadedFetchOrderByPkAndQuery2() {
-
+  void distinctWithCascadedFetchOrderByPkAndQuery2() {
     ResetBasicData.reset();
 
     Query<Contact> query = DB.find(Contact.class)
@@ -617,14 +588,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       + "left join o_address t2 on t2.id = t1.shipping_address_id "
       + "where t2.city = ? "
       + "order by t1.billing_address_id desc");
-
   }
 
   @Test
-  public void distinctWithCascadedFetchCount() {
-
+  void distinctWithCascadedFetchCount() {
     ResetBasicData.reset();
-
 
     int count = DB.find(Contact.class).findCount();
     assertThat(count).isGreaterThanOrEqualTo(12);
@@ -643,7 +611,6 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     // FIXME: These asserts will fail, because other tests will interfere. see #1298
     //assertThat(list1.toString()).isEqualTo("[3: Bugs1, 1: Fiona, 3: Fred1, 1: Jack, 3: Jim1, 1: Tracy]");
 
-
     query = DB.find(Contact.class).select("firstName");
     list1 = query
       .setCountDistinct(CountDistinctOrder.ATTR_DESC)
@@ -657,7 +624,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .findSingleAttributeList();
     assertThat(list1.get(0)).isInstanceOf(CountedValue.class);
     assertThat(sqlOf(query)).contains("select r1.attribute_, count(*) from ("
-        + "select t0.first_name as attribute_ from contact t0");
+      + "select t0.first_name as attribute_ from contact t0");
 
     query = DB.find(Contact.class).select("firstName");
     list1 = query
@@ -741,8 +708,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @Test
-  public void example() {
-
+  void example() {
     ResetBasicData.reset();
 
     List<CountedValue<Order.Status>> orderStatusCount =
@@ -755,7 +721,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
         .findSingleAttributeList();
 
     for (CountedValue<Order.Status> entry : orderStatusCount) {
-      System.out.println(" count:" + entry.getCount()+" orderStatus:" + entry.getValue() );
+      System.out.println(" count:" + entry.getCount() + " orderStatus:" + entry.getValue());
     }
   }
 
@@ -770,7 +736,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
     List<Order.Status> statusList = query.findSingleAttributeList();
     assertSql(query)
       .contains("select distinct t1.status from o_customer t0 "
-          + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null")
+        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null")
       .doesNotContain("order by");
     // query was: select distinct t1.status from o_customer t0
     // left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null order by t0.id
@@ -785,7 +751,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   void oneToMany_notNull() {
     ResetBasicData.reset();
 
-    Query<Customer> query =  DB.find(Customer.class)
+    Query<Customer> query = DB.find(Customer.class)
       .setDistinct(true)
       .fetch("orders", "status")
       .filterMany("orders").isNotNull("status")
@@ -842,7 +808,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @BeforeEach
-  public void setup() {
+  void setup() {
     MainEntity e1 = new MainEntity();
     e1.setId("1");
     e1.setAttr1("a1");
@@ -875,7 +841,7 @@ public class TestQuerySingleAttribute extends BaseTestCase {
   }
 
   @AfterEach
-  public void cleanup() {
+  void cleanup() {
     DB.find(MainEntityRelation.class).delete();
     DB.find(MainEntity.class).delete();
   }
