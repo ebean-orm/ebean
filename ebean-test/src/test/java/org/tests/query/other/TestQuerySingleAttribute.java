@@ -803,7 +803,7 @@ class TestQuerySingleAttribute extends BaseTestCase {
     } else if (isLimitOffset()) {
       assertThat(sqlOf(query)).isEqualTo("select t1.status from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null limit 2");
     } else if (isAnsiSqlLimit()) {
-      assertThat(sqlOf(query)).isEqualTo("select t1.status from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null fetch next 100 rows only");
+      assertThat(sqlOf(query)).isEqualTo("select t1.status from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null fetch next 2 rows only");
     }
     assertThat(statusList).hasSize(2);
   }
