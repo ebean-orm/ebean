@@ -816,7 +816,11 @@ public class TestQuerySingleAttribute extends BaseTestCase {
       .doesNotContain("order by t0.id");
 
     assertThat(statusList).hasSizeGreaterThan(6);
-    assertThat(statusList.get(0)).isEqualTo(null);
+    if (isH2()) {
+      assertThat(statusList.get(0)).isEqualTo(null);
+    } else if (isPostgres()) {
+      assertThat(statusList.get(0)).isEqualTo(Order.Status.NEW);
+    }
   }
 
   @Test
