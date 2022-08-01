@@ -17,10 +17,23 @@ import org.tests.model.basic.ResetBasicData;
 import java.io.IOException;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestTextJsonReferenceBean extends BaseTestCase {
+
+  @Test
+  void fromJson_refBean_shouldNotLazyLoadByDefault() {
+    ResetBasicData.reset();
+
+    JsonContext jsonContext = DB.json();
+    Product productRefBean = jsonContext.toBean(Product.class, "{\"id\": 1}");
+
+    assertThat(DB.beanState(productRefBean).isReference()).isTrue();
+    // does not lazy load by default
+    assertThat(productRefBean.getName()).isNull();
+  }
 
   @Test
   public void test() throws IOException {
