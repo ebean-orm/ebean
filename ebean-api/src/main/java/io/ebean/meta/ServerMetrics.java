@@ -13,6 +13,11 @@ public interface ServerMetrics {
   String name();
 
   /**
+   * Return ServerMetricsAsJson to build the metrics as JSON content.
+   */
+  ServerMetricsAsJson asJson();
+
+  /**
    * Return timed metrics for Transactions, labelled SqlQuery, labelled SqlUpdate.
    */
   List<MetaTimedMetric> timedMetrics();

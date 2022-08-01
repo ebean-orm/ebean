@@ -48,13 +48,8 @@ final class DefaultMetaInfoManager implements MetaInfoManager {
   }
 
   @Override
-  public ServerMetricsAsJson metricsAsJson(ServerMetrics metrics) {
-    return new DumpMetricsJson(metrics);
-  }
-
-  @Override
   public ServerMetricsAsJson collectMetricsAsJson() {
-    return new DumpMetricsJson(server);
+    return collectMetrics().asJson();
   }
 
   @Override
