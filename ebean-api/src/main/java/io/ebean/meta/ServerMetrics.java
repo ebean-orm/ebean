@@ -18,6 +18,11 @@ public interface ServerMetrics {
   ServerMetricsAsJson asJson();
 
   /**
+   * Return the metrics as a list of MetricData.
+   */
+  List<MetricData> asData();
+
+  /**
    * Return timed metrics for Transactions, labelled SqlQuery, labelled SqlUpdate.
    */
   List<MetaTimedMetric> timedMetrics();

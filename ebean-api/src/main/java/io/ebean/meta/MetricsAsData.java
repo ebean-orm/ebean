@@ -1,12 +1,4 @@
-package io.ebeaninternal.server.core;
-
-import io.ebean.Database;
-import io.ebean.meta.MetaCountMetric;
-import io.ebean.meta.MetaMetric;
-import io.ebean.meta.MetaQueryMetric;
-import io.ebean.meta.MetaTimedMetric;
-import io.ebean.meta.MetricData;
-import io.ebean.meta.ServerMetrics;
+package io.ebean.meta;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,30 +6,26 @@ import java.util.List;
 /**
  * Dump the metrics into a list of MetricData.
  */
-final class DumpMetricsData {
+final class MetricsAsData {
 
-  private final Database database;
+  private final ServerMetrics metrics;
   private final List<MetricData> list = new ArrayList<>();
 
-  DumpMetricsData(Database database) {
-    this.database = database;
+  MetricsAsData(ServerMetrics metrics) {
+    this.metrics = metrics;
   }
 
   List<MetricData> data() {
-    collect(database.metaInfo().collectMetrics());
-    return list;
-  }
-
-  private void collect(ServerMetrics serverMetrics) {
-    for (MetaTimedMetric metric : serverMetrics.timedMetrics()) {
+    for (MetaTimedMetric metric : metrics.timedMetrics()) {
       add(metric);
     }
-    for (MetaCountMetric metric : serverMetrics.countMetrics()) {
+    for (MetaCountMetric metric : metrics.countMetrics()) {
       addCount(metric);
     }
-    for (MetaQueryMetric metric : serverMetrics.queryMetrics()) {
+    for (MetaQueryMetric metric : metrics.queryMetrics()) {
       addQuery(metric);
     }
+    return list;
   }
 
   private MetricData create(MetaMetric metric) {
