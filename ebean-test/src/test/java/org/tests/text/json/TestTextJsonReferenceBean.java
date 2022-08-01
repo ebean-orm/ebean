@@ -1,5 +1,6 @@
 package org.tests.text.json;
 
+import io.ebean.text.json.JsonReadOptions;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
@@ -54,7 +55,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
       String jsonString = jsonContext.toJson(product);
 
-      Product refProd = jsonContext.toBean(Product.class, jsonString);
+      Product refProd = jsonContext.toBean(Product.class, jsonString, new JsonReadOptions().setEnableLazyLoading(true));
 
       BeanDescriptor<Product> prodDesc = server.descriptor(Product.class);
       EntityBean eb = (EntityBean) refProd;
