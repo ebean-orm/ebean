@@ -80,6 +80,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   private boolean fullyLoadedBean;
   private boolean loadedFromCache;
   private final byte[] flags;
+  private final Object[] virtualValues;
   private Object[] origValues;
   private Exception[] loadErrors;
   private int lazyLoadProperty = -1;
@@ -102,6 +103,12 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    */
   public InterceptReadWrite(Object ownerBean) {
     this.owner = (EntityBean) ownerBean;
+    int virtualPropertyCount = owner._ebean_getVirtualPropertyCount();
+    if (virtualPropertyCount > 0) {
+      this.virtualValues = new Object[virtualPropertyCount];
+    } else {
+      virtualValues = null;
+    }
     this.flags = new byte[owner._ebean_getPropertyNames().length];
   }
 
@@ -111,6 +118,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   public InterceptReadWrite() {
     this.owner = null;
     this.flags = null;
+    this.virtualValues = null;
   }
 
   @Override
@@ -209,7 +217,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
     if (mutableInfo != null) {
       for (int i = 0; i < mutableInfo.length; i++) {
-        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
+        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(getValue(i))) {
           dirty = true;
           break;
         }
@@ -554,7 +562,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
         props.add((prefix == null ? getProperty(i) : prefix + getProperty(i)));
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
+        EntityBean embeddedBean = (EntityBean) getValue(i);
         embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, getProperty(i) + ".");
       }
     }
@@ -592,7 +600,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       if (isChangedProp(i)) {
         // the property has been changed on this bean
         String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
-        Object newVal = owner._ebean_getField(i);
+        Object newVal = getValue(i);
         Object oldVal = getOrigValue(i);
         if (notEqual(oldVal, newVal)) {
           dirtyValues.put(propName, new ValuePair(newVal, oldVal));
@@ -611,7 +619,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     for (int i = 0; i < len; i++) {
       if (isChangedProp(i)) {
         // the property has been changed on this bean
-        Object newVal = owner._ebean_getField(i);
+        Object newVal = getValue(i);
         Object oldVal = getOrigValue(i);
         if (notEqual(oldVal, newVal)) {
           visitor.visit(i, newVal, oldVal);
@@ -644,7 +652,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
         sb.append(i).append(',');
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
+        EntityBean embeddedBean = (EntityBean) getValue(i);
         sb.append(i).append('[');
         embeddedBean._ebean_getIntercept().addDirtyPropertyKey(sb);
         sb.append(']');
@@ -1020,7 +1028,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   public boolean isChangedProp(int i) {
     if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
       return true;
-    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
+    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(getValue(i))) {
       return false;
     } else {
       // mark for change
@@ -1059,5 +1067,51 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
     final MutableValueNext next = mutableNext[propertyIndex];
     return next != null ? next.content() : null;
+  }
+
+  @Override
+  public Object getValue(int index) {
+    if (virtualValues == null || index < flags.length - virtualValues.length) {
+      return owner._ebean_getField(index);
+    } else {
+      return virtualValues[index - (flags.length - virtualValues.length)];
+    }
+  }
+
+  @Override
+  public Object getValueIntercept(int index) {
+    if (virtualValues == null || index < flags.length - virtualValues.length) {
+      return owner._ebean_getFieldIntercept(index);
+    } else {
+      preGetter(index);
+      return virtualValues[index - (flags.length - virtualValues.length)];
+    }
+  }
+
+  public void setValue(boolean intercept, int index, Object value, boolean many) {
+    if (virtualValues == null || index < virtualOffset()) {
+      if (intercept) {
+        owner._ebean_setFieldIntercept(index, value);
+      } else {
+        owner._ebean_setField(index, value);
+      }
+    } else {
+      if (intercept) {
+        preGetter(index);
+        if (many) {
+          preSetterMany(false, index, virtualValues[index - virtualOffset()], value);
+        } else if (intercept) {
+          preSetter(true, index, virtualValues[index - virtualOffset()], value);
+        }
+        virtualValues[index - virtualOffset()] = value;
+      } else {
+        virtualValues[index - virtualOffset()] = value;
+        setLoadedProperty(index);
+      }
+    }
+  }
+
+  private int virtualOffset() {
+    return flags.length - virtualValues.length;
   }
 }

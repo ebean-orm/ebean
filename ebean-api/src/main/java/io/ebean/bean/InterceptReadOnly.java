@@ -17,11 +17,20 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   private final EntityBean owner;
 
+  private final Object[] virtualValues;
+
   /**
    * Create with a given entity.
    */
   public InterceptReadOnly(Object ownerBean) {
+
     this.owner = (EntityBean) ownerBean;
+    int virtualPropertyCount = owner._ebean_getVirtualPropertyCount();
+    if (virtualPropertyCount > 0) {
+      this.virtualValues = new Object[virtualPropertyCount];
+    } else {
+      virtualValues = null;
+    }
   }
 
   @Override
@@ -542,5 +551,28 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   @Override
   public String mutableNext(int propertyIndex) {
     return null;
+  }
+
+  @Override
+  public Object getValue(int index) {
+    if (virtualValues == null || index < virtualOffset()) {
+      return owner._ebean_getField(index);
+    } else {
+      return virtualValues[index - virtualOffset()];
+    }
+  }
+
+  @Override
+  public Object getValueIntercept(int index) {
+    if (virtualValues == null || index < virtualOffset()) {
+      return owner._ebean_getFieldIntercept(index);
+    } else {
+      preGetter(index);
+      return virtualValues[index - virtualOffset()];
+    }
+  }
+
+  private int virtualOffset() {
+    return owner._ebean_getPropertyNames().length - virtualValues.length;
   }
 }

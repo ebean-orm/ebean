@@ -1205,4 +1205,8 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   public DeployBeanDescriptorMeta getDeployBeanDescriptorMeta(Class<?> propertyType) {
     return getDeploy(propertyType).getDescriptor();
   }
+
+  public BeanDescriptorManager getManager() {
+    return manager;
+  }
 }

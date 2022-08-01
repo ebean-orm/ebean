@@ -301,6 +301,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       readOverridesAndAliases();
       readXmlMapping(mappings);
       readEntityBeanTable();
+      deployInfoMap.values().forEach(customDeployParserManager::prepare);
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
       deployInfoMap.values().forEach(customDeployParserManager::parse);

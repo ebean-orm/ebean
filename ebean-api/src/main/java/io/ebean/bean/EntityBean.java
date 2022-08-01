@@ -21,6 +21,13 @@ public interface EntityBean extends Serializable, ToStringAware {
   }
 
   /**
+   * Returns all virtual properties
+   */
+  default int _ebean_getVirtualPropertyCount() {
+    return 0;
+  }
+
+  /**
    * Return the property name at the given position.
    */
   default String _ebean_getPropertyName(int pos) {
@@ -120,4 +127,5 @@ public interface EntityBean extends Serializable, ToStringAware {
   default void toString(ToStringBuilder builder) {
     throw new NotEnhancedException();
   }
+
 }
