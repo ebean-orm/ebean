@@ -4,29 +4,28 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-public class OtoUBPrime {
+public class OtoUPrimeWithConstraint {
 
   @Id
   UUID pid;
 
   String name;
 
-  /**
-   * Master side of bi-directional PrimaryJoinColumn.
-   */
-  @OneToOne(mappedBy = "prime", optional = false)
-  OtoUBPrimeExtra extra;
+  @OneToOne(orphanRemoval = true, optional = false)
+  // @DbForeignKey(noConstraint = true) see OtoUPrime
+  @PrimaryKeyJoinColumn
+  OtoUPrimeExtraWithConstraint extra;
 
   @Version
   Long version;
 
-  public OtoUBPrime(String name) {
+  public OtoUPrimeWithConstraint(String name) {
     this.name = name;
   }
 
   @Override
   public String toString() {
-    return "id:"+ pid +" name:"+name+" extra:"+extra;
+    return "id:" + pid + " name:" + name + " extra:" + extra;
   }
 
   public UUID getPid() {
@@ -45,11 +44,11 @@ public class OtoUBPrime {
     this.name = name;
   }
 
-  public OtoUBPrimeExtra getExtra() {
+  public OtoUPrimeExtraWithConstraint getExtra() {
     return extra;
   }
 
-  public void setExtra(OtoUBPrimeExtra extra) {
+  public void setExtra(OtoUPrimeExtraWithConstraint extra) {
     this.extra = extra;
   }
 
@@ -60,4 +59,5 @@ public class OtoUBPrime {
   public void setVersion(Long version) {
     this.version = version;
   }
+
 }
