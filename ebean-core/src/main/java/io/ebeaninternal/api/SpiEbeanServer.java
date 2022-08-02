@@ -26,6 +26,11 @@ import java.util.stream.Stream;
 public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectionLoader {
 
   /**
+   * Return the NOW time from the Clock.
+   */
+  long clockNow();
+
+  /**
    * Return true if the L2 cache has been disabled.
    */
   boolean isDisableL2Cache();
