@@ -120,7 +120,7 @@ final class AnnotationAssocOnes extends AnnotationAssoc {
       }
     }
 
-    prop.setJoinType(prop.isNullable() || prop.getForeignKey() != null && prop.getForeignKey().isNoConstraint());
+    prop.setJoinType(prop.isNullable() || prop.getForeignKey() != null && prop.getForeignKey().isForceLeftJoin());
 
     if (!prop.getTableJoin().hasJoinColumns() && beanTable != null) {
 
