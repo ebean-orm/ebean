@@ -1,12 +1,7 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.config.BackgroundExecutorWrapper;
-import io.ebean.config.ContainerConfig;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DatabaseConfigProvider;
-import io.ebean.config.ModuleInfoLoader;
-import io.ebean.config.TenantMode;
-import io.ebean.config.UnderscoreNamingConvention;
+import io.ebean.config.*;
+import io.ebean.config.EntityClassRegister;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.ShutdownManager;
 import io.ebean.service.SpiContainer;
@@ -129,7 +124,7 @@ public final class DefaultContainer implements SpiContainer {
     if (config.isAutoLoadModuleInfo()) {
       // auto register entity classes
       boolean found = false;
-      for (ModuleInfoLoader loader : ServiceLoader.load(ModuleInfoLoader.class)) {
+      for (EntityClassRegister loader : ServiceLoader.load(EntityClassRegister.class)) {
         config.addAll(loader.classesFor(config.getName(), config.isDefaultServer()));
         found = true;
       }
@@ -140,9 +135,9 @@ public final class DefaultContainer implements SpiContainer {
   }
 
   private void checkMissingModulePathProvides() {
-    URL servicesFile = ClassLoader.getSystemResource("META-INF/services/io.ebean.config.ModuleInfoLoader");
+    URL servicesFile = ClassLoader.getSystemResource("META-INF/services/io.ebean.config.EntityClassRegister");
     if (servicesFile != null) {
-      log.error("module-info.java is probably missing 'provides io.ebean.config.ModuleInfoLoader with _Ebean$ModuleInfo' clause. ModuleInfoLoader exists but was not service loaded.");
+      log.error("module-info.java is probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause. EntityClassRegister exists but was not service loaded.");
     }
   }
 

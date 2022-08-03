@@ -417,6 +417,8 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
 
   /**
    * Return a copy of the query.
+   * <p>
+   * Note that this does NOT copy the forUpdate property. See #2762.
    */
   @Override
   SpiQuery<T> copy();
