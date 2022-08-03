@@ -331,4 +331,77 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     assertThat(loggedSql.get(0)).contains("select count(*) from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
     assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");
   }
+
+  @Test
+  public void test_fetch_only() {
+
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class).select("name").fetch("parent.effectiveBean").findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0)).contains("from child_person t0 "
+      + "left join parent_person t1 on t1.identifier = t0.parent_identifier "
+      + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
+      + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id)");
+  }
+
+  @Test
+  public void test_where_only() {
+
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class).select("name")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0))
+      .contains("from child_person t0 "
+      + "left join parent_person t1 on t1.identifier = t0.parent_identifier "
+      + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
+      + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id) "
+      + "where t2.name = ?");
+  }
+
+  @Test
+  public void test_fetch_one_prop_with_where() {
+
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class).select("name")
+      .fetch("parent", "name")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0))
+      .contains("from child_person t0 "
+        + "left join parent_person t1 on t1.identifier = t0.parent_identifier "
+        + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
+        + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id) "
+        + "where t2.name = ?");
+  }
+
+  @Test
+  public void test_fetch_complete_with_where() {
+
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class).select("name")
+      .fetch("parent")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0))
+      .contains("from child_person t0 "
+        + "left join parent_person t1 on t1.identifier = t0.parent_identifier "
+        + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
+        + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id) "
+        + "where t2.name = ?");
+    // -> JdbcSQLSyntaxErrorException: Ambiguous column name "IDENTIFIER"
+    // join on grand_parent_person j1 is twice in sql
+  }
+
 }
