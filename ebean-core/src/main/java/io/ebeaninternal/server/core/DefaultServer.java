@@ -1186,7 +1186,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   @SuppressWarnings("unchecked")
   public <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction) {
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ATTRIBUTE, query, transaction);
+    SpiOrmQueryRequest<T> request = buildQueryRequest(Type.ATTRIBUTE, query, transaction);
+    request.query().setSingleAttribute();
+    request.prepareQuery();
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (List<A>) result;
@@ -1202,7 +1204,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   @SuppressWarnings("unchecked")
   public <A, T> Set<A> findSingleAttributeSet(Query<T> query, Transaction transaction) {
-    SpiOrmQueryRequest<T> request = createQueryRequest(Type.ATTRIBUTE_SET, query, transaction);
+    SpiOrmQueryRequest<T> request = buildQueryRequest(Type.ATTRIBUTE_SET, query, transaction);
+    request.query().setSingleAttribute();
+    request.prepareQuery();
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (Set<A>) result;

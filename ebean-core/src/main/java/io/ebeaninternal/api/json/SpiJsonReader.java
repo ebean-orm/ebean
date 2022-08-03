@@ -33,4 +33,6 @@ public interface SpiJsonReader {
   void beanVisitor(Object bean, Map<String, Object> unmappedProperties);
 
   Object readValueUsingObjectMapper(Class<?> propertyType) throws IOException;
+
+  boolean isIntercept();
 }

@@ -1,5 +1,6 @@
 package io.ebean.typequery;
 
+import io.avaje.lang.Nullable;
 import io.ebean.Query;
 
 import java.util.Collection;
@@ -79,6 +80,25 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
    */
   public final R eq(T value) {
     expr().eq(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is equal to if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * That is, only add the EQUAL TO predicate if the value is not null.
+   * <p>
+   * This is the EQUAL TO equivalent to {@link #inOrEmpty(Collection)} where the expression/predicate
+   * is only added to the query when the value is non-null.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>eqIfPresent()</code> rather than having a separate if block.
+   *
+   * @param value the equal to bind value
+   * @return the root query bean instance
+   */
+  public final R eqIfPresent(@Nullable T value) {
+    expr().eqIfPresent(_name, value);
     return _root;
   }
 
@@ -247,7 +267,7 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   public final R isIn(Query<?> subQuery) {
     return in(subQuery);
   }
-  
+
   /**
    * Is NOT in the result of a subquery.
    *

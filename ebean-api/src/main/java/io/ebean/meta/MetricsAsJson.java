@@ -1,25 +1,16 @@
-package io.ebeaninternal.server.core;
-
-import io.ebean.Database;
-import io.ebean.meta.MetaCountMetric;
-import io.ebean.meta.MetaMetric;
-import io.ebean.meta.MetaQueryMetric;
-import io.ebean.meta.MetaTimedMetric;
-import io.ebean.meta.ServerMetrics;
-import io.ebean.meta.ServerMetricsAsJson;
-import io.ebean.meta.SortMetric;
+package io.ebean.meta;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Comparator;
 import java.util.List;
 
-final class DumpMetricsJson implements ServerMetricsAsJson {
+final class MetricsAsJson implements ServerMetricsAsJson {
 
-  private final Database database;
+  private final ServerMetrics metrics;
   private Appendable writer;
   /**
-   * By default include sql and location attributes for the initial collection only.
+   * By default, include sql and location attributes for the initial collection only.
    */
   private int includeExtraAttributes = 1;
   private boolean withHeader = true;
@@ -29,8 +20,8 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
   private int listCounter;
   private int objKeyCounter;
 
-  DumpMetricsJson(Database database) {
-    this.database = database;
+  MetricsAsJson(ServerMetrics metrics) {
+    this.metrics = metrics;
   }
 
   @Override
@@ -66,24 +57,24 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
   @Override
   public String json() {
     writer = new StringWriter();
-    collect(database.metaInfo().collectMetrics());
+    collect();
     return writer.toString();
   }
 
   @Override
   public void write(Appendable buffer) {
     writer = buffer;
-    collect(database.metaInfo().collectMetrics());
+    collect();
   }
 
-  private void collect(ServerMetrics serverMetrics) {
+  private void collect() {
     try {
       start();
-      for (MetaTimedMetric metric : serverMetrics.timedMetrics()) {
+      for (MetaTimedMetric metric : metrics.timedMetrics()) {
         logTimed(metric);
       }
 
-      List<MetaCountMetric> countMetrics = serverMetrics.countMetrics();
+      List<MetaCountMetric> countMetrics = metrics.countMetrics();
       if (!countMetrics.isEmpty()) {
         if (sortBy != null) {
           countMetrics.sort(SortMetric.COUNT_NAME);
@@ -93,7 +84,7 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
         }
       }
 
-      List<MetaQueryMetric> queryMetrics = serverMetrics.queryMetrics();
+      List<MetaQueryMetric> queryMetrics = metrics.queryMetrics();
       if (!queryMetrics.isEmpty()) {
         if (sortBy != null) {
           queryMetrics.sort(sortBy);
@@ -112,7 +103,7 @@ final class DumpMetricsJson implements ServerMetricsAsJson {
     if (withHeader) {
       objStart();
       key("db");
-      val(database.name());
+      val(metrics.name());
       key("metrics");
       listStart();
     }

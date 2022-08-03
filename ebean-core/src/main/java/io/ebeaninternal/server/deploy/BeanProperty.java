@@ -1414,7 +1414,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     JsonToken event = ctx.nextToken();
     if (JsonToken.VALUE_NULL == event) {
       if (jsonDeserialize) {
-        setValue(bean, null);
+        if (ctx.isIntercept()) {
+          setValueIntercept(bean, null);
+        } else {
+          setValue(bean, null);
+        }
       }
     } else {
       // expect to read non-null json value
@@ -1433,7 +1437,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
         }
       }
       if (jsonDeserialize) {
-        setValue(bean, objValue);
+        if (ctx.isIntercept()) {
+          setValueIntercept(bean, objValue);
+        } else {
+          setValue(bean, objValue);
+        }
       }
     }
   }

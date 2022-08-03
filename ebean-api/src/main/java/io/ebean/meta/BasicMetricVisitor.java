@@ -8,22 +8,43 @@ import java.util.List;
  */
 public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerMetrics {
 
+  private final String name;
   private final List<MetaTimedMetric> timed = new ArrayList<>();
   private final List<MetaQueryMetric> query = new ArrayList<>();
   private final List<MetaCountMetric> count = new ArrayList<>();
 
+  public BasicMetricVisitor() {
+    this("db");
+  }
+
   /**
    * Construct to reset and collect everything.
    */
-  public BasicMetricVisitor() {
-    super(true, true, true, true);
+  public BasicMetricVisitor(String name) {
+    this(name, true, true, true, true);
   }
 
   /**
    * Construct specifying reset and what to collect.
    */
-  public BasicMetricVisitor(boolean reset, boolean collectTransactionMetrics, boolean collectQueryMetrics, boolean collectL2Metrics) {
+  public BasicMetricVisitor(String name, boolean reset, boolean collectTransactionMetrics, boolean collectQueryMetrics, boolean collectL2Metrics) {
     super(reset, collectTransactionMetrics, collectQueryMetrics, collectL2Metrics);
+    this.name = name;
+  }
+
+  @Override
+  public String name() {
+    return name;
+  }
+
+  @Override
+  public ServerMetricsAsJson asJson() {
+    return new MetricsAsJson(this);
+  }
+
+  @Override
+  public List<MetricData> asData() {
+    return new MetricsAsData(this).data();
   }
 
   @Override

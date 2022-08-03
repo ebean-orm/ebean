@@ -24,6 +24,52 @@ public class TestQueryIsNull extends BaseTestCase {
   }
 
   @Test
+  void query_defaultNullToIsNull() {
+    ResetBasicData.reset();
+
+    Query<Order> query = DB.find(Order.class).select("id, status")
+      .where().eq("status", null).query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.status is null");
+  }
+
+  @Test
+  void query_eqIfPresent() {
+    ResetBasicData.reset();
+
+    Query<Order> query = DB.find(Order.class).select("id, status")
+      .where().eqIfPresent("status", null).query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0");
+
+    Query<Order> query1 = DB.find(Order.class).select("id, status")
+      .where().eqIfPresent("status", null).isNull("shipDate").query();
+    query1.findList();
+
+    assertThat(query1.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.ship_date is null");
+
+    Query<Order> query2 = DB.find(Order.class).select("id, status")
+      .where().isNotNull("orderDate").eqIfPresent("status", null).query();
+    query2.findList();
+
+    assertThat(query2.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.order_date is not null");
+
+    Query<Order> query3 = DB.find(Order.class).select("id, status")
+      .where().isNotNull("orderDate").eqIfPresent("status", null).isNull("shipDate").query();
+    query3.findList();
+
+    assertThat(query3.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.order_date is not null and t0.ship_date is null");
+
+    Query<Order> query4 = DB.find(Order.class).select("id, status")
+      .where().isNotNull("orderDate").eqIfPresent("status", Order.Status.NEW).isNull("shipDate").query();
+    query4.findList();
+
+    assertThat(query4.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.order_date is not null and t0.status = ? and t0.ship_date is null");
+  }
+
+  @Test
   public void isNotNull_when_OneToMany_expect_existsSubquery() {
     ResetBasicData.reset();
 

@@ -32,19 +32,23 @@ public final class ReadJson implements SpiJsonReader {
   private final Object objectMapper;
   private final PersistenceContext persistenceContext;
   private final LoadContext loadContext;
+  private final boolean intercept;
+  private final boolean enableLazyLoading;
 
   /**
    * Construct with parser and readOptions.
    */
-  public ReadJson(BeanDescriptor<?> desc, JsonParser parser, JsonReadOptions readOptions, Object objectMapper) {
+  public ReadJson(BeanDescriptor<?> desc, JsonParser parser, JsonReadOptions readOptions, Object objectMapper, boolean intercept) {
     this.rootDesc = desc;
     this.parser = parser;
     this.objectMapper = objectMapper;
     this.persistenceContext = initPersistenceContext(readOptions);
     this.loadContext = initLoadContext(desc, readOptions);
+    this.enableLazyLoading = readOptions != null && readOptions.isEnableLazyLoading();
     // only create visitorMap, pathStack if needed ...
     this.visitorMap = (readOptions == null) ? null : readOptions.getVisitorMap();
     this.pathStack = (visitorMap == null && loadContext == null) ? null : new PathStack();
+    this.intercept = intercept;
   }
 
   /**
@@ -58,6 +62,8 @@ public final class ReadJson implements SpiJsonReader {
     this.objectMapper = source.objectMapper;
     this.persistenceContext = source.persistenceContext;
     this.loadContext = source.loadContext;
+    this.intercept = source.intercept;
+    this.enableLazyLoading = source.enableLazyLoading;
   }
 
   private LoadContext initLoadContext(BeanDescriptor<?> desc, JsonReadOptions readOptions) {
@@ -106,6 +112,9 @@ public final class ReadJson implements SpiJsonReader {
    */
   @Override
   public Object persistenceContextPutIfAbsent(Object id, EntityBean bean, BeanDescriptor<?> beanDesc) {
+    if (!enableLazyLoading) {
+      bean._ebean_getIntercept().setDisableLazyLoad(true);
+    }
     if (persistenceContext == null) {
       // no persistenceContext means no lazy loading either
       return null;
@@ -203,4 +212,11 @@ public final class ReadJson implements SpiJsonReader {
     return getObjectMapper().readValue(parser, propertyType);
   }
 
+  /**
+   * Do we have to set values via intercept or not.
+   */
+  @Override
+  public boolean isIntercept() {
+    return intercept;
+  }
 }

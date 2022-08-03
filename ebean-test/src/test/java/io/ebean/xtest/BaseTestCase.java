@@ -171,6 +171,14 @@ public abstract class BaseTestCase {
     return spiEbeanServer().databasePlatform().isCaseSensitiveCollation();
   }
 
+  public boolean isLimitOffset() {
+    return isH2() || isPostgresCompatible() || isMySql() || isMariaDB();
+  }
+
+  public boolean isAnsiSqlLimit() {
+    return isOracle() || isDb2();
+  }
+
   /**
    * MS SQL Server does not allow setting explicit values on identity columns
    * so tests that do this need to be skipped for SQL Server.

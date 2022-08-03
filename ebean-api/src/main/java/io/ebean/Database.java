@@ -30,10 +30,8 @@ import java.util.concurrent.Callable;
  * singleton (see {@link DatabaseConfig#setRegister(boolean)}). The DB
  * singleton is essentially a map of Database's that have been registered
  * with it.
- * </p>
  * <p>
  * The Database can then be retrieved later via {@link DB#byName(String)}.
- * </p>
  *
  * <h5>The 'default' Database</h5>
  * <p>
@@ -41,18 +39,15 @@ import java.util.concurrent.Callable;
  * (see {@link DatabaseConfig#setDefaultServer(boolean)}. Many methods on DB
  * such as {@link DB#find(Class)} etc are actually just a convenient way to
  * call methods on the 'default/primary' Database.
- * </p>
  *
  * <h5>Constructing a Database</h5>
  * <p>
- * Database's are constructed by the DatabaseFactory. They can be created
+ * Databases are constructed by the DatabaseFactory. They can be created
  * programmatically via {@link DatabaseFactory#create(DatabaseConfig)} or they
  * can be automatically constructed on demand using configuration information in
  * the application.properties file.
- * </p>
  *
  * <h5>Example: Get a Database</h5>
- * <p>
  * <pre>{@code
  *
  *   // Get access to the Human Resources Database
@@ -71,22 +66,19 @@ import java.util.concurrent.Callable;
  *
  * <h5>Database vs DB API</h5>
  * <p>
- * Database provides additional API compared with DB. For example it
+ * Database provides additional API compared with DB. For example, it
  * provides more control over the use of Transactions that is not available in
  * the DB API.
- * </p>
  *
  * <p>
  * <em>External Transactions:</em> If you wanted to use transactions created
  * externally to Ebean then Database provides additional methods where you
  * can explicitly pass a transaction (that can be created externally).
- * </p>
  *
  * <p>
- * <em>Bypass ThreadLocal Mechanism:</em> If you want to bypass the built in
+ * <em>Bypass ThreadLocal Mechanism:</em> If you want to bypass the built-in
  * ThreadLocal transaction management you can use the createTransaction()
  * method. Example: a single thread requires more than one transaction.
- * </p>
  *
  * @see DB
  * @see DatabaseFactory
@@ -104,12 +96,10 @@ public interface Database {
    * Shutdown the Database instance programmatically.
    * <p>
    * This method is not normally required. Ebean registers a shutdown hook and shuts down cleanly.
-   * </p>
    * <p>
    * If the under underlying DataSource is the Ebean implementation then you
-   * also have the option of shutting down the DataSource and deregistering the
+   * also have the option of shutting down the DataSource and de-registering the
    * JDBC driver.
-   * </p>
    *
    * @param shutdownDataSource if true then shutdown the underlying DataSource if it is the Ebean
    *                           DataSource implementation.
@@ -155,10 +145,10 @@ public interface Database {
    * <p>
    * Note many platforms have multiple specific platform types so often we want to
    * get the base platform via {@link Platform#base()}.
-   * </p>
+   *
    * <pre>{@code
    *
-   *  Platform platform = database.getPlatform().base();
+   *  Platform platform = database.platform().base();
    *  if (platform == Platform.MYSQL) {
    *    // do MySql specific function
    *  }
@@ -178,7 +168,6 @@ public interface Database {
    * Return the BeanState for a given entity bean.
    * <p>
    * This will return null if the bean is not an enhanced entity bean.
-   * </p>
    */
   BeanState beanState(Object bean);
 
@@ -192,7 +181,6 @@ public interface Database {
    * <p>
    * For example, if the id value passed in is a String but ought to be a Long or UUID etc
    * then it will automatically be converted.
-   * </p>
    *
    * @param bean The entity bean to set the id value on.
    * @param id   The id value to set.
@@ -204,7 +192,6 @@ public interface Database {
    * <p>
    * When null is passed in for b, then the 'OldValues' of a is used for the
    * difference comparison.
-   * </p>
    */
   Map<String, ValuePair> diff(Object newBean, Object oldBean);
 
@@ -214,7 +201,6 @@ public interface Database {
    * Useful if you use BeanPostConstructListeners or &#64;PostConstruct Annotations.
    * In this case you should not use "new Bean...()". Making all bean constructors protected
    * could be a good idea here.
-   * </p>
    */
   <T> T createEntityBean(Class<T> type);
 
@@ -248,7 +234,6 @@ public interface Database {
    * Create a named query.
    * <p>
    * For RawSql the named query is expected to be in ebean.xml.
-   * </p>
    *
    * @param beanType   The type of entity bean
    * @param namedQuery The name of the query
@@ -304,17 +289,14 @@ public interface Database {
    * <p>
    * You can use the methods on the Query object to specify fetch paths,
    * predicates, order by, limits etc.
-   * </p>
    * <p>
    * You then use findList(), findSet(), findMap() and findOne() to execute
    * the query and return the collection or bean.
-   * </p>
    * <p>
    * Note that a query executed by {@link Query#findList()}
    * {@link Query#findSet()} etc will execute against the same Database from
    * which is was created.
-   * </p>
-   * <p>
+   *
    * <pre>{@code
    *
    *   // Find order 2 specifying explicitly the parts of the object graph to
@@ -344,7 +326,7 @@ public interface Database {
    * Create a query using native SQL.
    * <p>
    * The native SQL can contain named parameters or positioned parameters.
-   * </p>
+   *
    * <pre>{@code
    *
    *   String sql = "select c.id, c.name from customer c where c.name like ? order by c.name";
@@ -367,12 +349,10 @@ public interface Database {
    * <p>
    * This will only work when a IdGenerator is on the bean such as for beans
    * that use a DB sequence or UUID.
-   * </p>
    * <p>
    * For DB's supporting getGeneratedKeys and sequences such as Oracle10 you do
    * not need to use this method generally. It is made available for more
    * complex cases where it is useful to get an ID prior to some processing.
-   * </p>
    */
   Object nextId(Class<?> beanType);
 
@@ -381,10 +361,8 @@ public interface Database {
    * going back to the database.
    * <p>
    * This produces and returns a new list with the sort and filters applied.
-   * </p>
    * <p>
    * Refer to {@link Filter} for an example of its use.
-   * </p>
    */
   <T> Filter<T> filter(Class<T> beanType);
 
@@ -401,12 +379,10 @@ public interface Database {
    * <p>
    * If you leave off any keywords the defaults are ascending order and treating
    * nulls as high values.
-   * </p>
    * <p>
    * Note that the sorting uses a Comparator and Collections.sort(); and does
    * not invoke a DB query.
-   * </p>
-   * <p>
+   *
    * <pre>{@code
    *
    *   // find orders and their customers
@@ -431,17 +407,15 @@ public interface Database {
   <T> void sort(List<T> list, String sortByClause);
 
   /**
-   * Create a orm update where you will supply the insert/update or delete
+   * Create an orm update where you will supply the insert/update or delete
    * statement (rather than using a named one that is already defined using the
    * &#064;NamedUpdates annotation).
    * <p>
    * The orm update differs from the sql update in that it you can use the bean
    * name and bean property names rather than table and column names.
-   * </p>
    * <p>
    * An example:
-   * </p>
-   * <p>
+   *
    * <pre>{@code
    *
    *   // The bean name and properties - "topic","postCount" and "id"
@@ -466,7 +440,6 @@ public interface Database {
    * <p>
    * DTO beans are just normal bean like classes with public constructor(s) and setters.
    * They do not need to be registered with DB before use.
-   * </p>
    *
    * @param dtoType The type of the DTO bean the rows will be mapped into.
    * @param sql     The SQL query to execute.
@@ -479,7 +452,6 @@ public interface Database {
    * <p>
    * DTO beans are just normal bean like classes with public constructor(s) and setters.
    * They do not need to be registered with DB before use.
-   * </p>
    *
    * @param dtoType    The type of the DTO bean the rows will be mapped into.
    * @param namedQuery The name of the query
@@ -493,10 +465,8 @@ public interface Database {
    *
    * <p>
    * Refer to {@link DtoQuery} for native sql queries returning DTO beans.
-   * </p>
    * <p>
    * Refer to {@link #findNative(Class, String)} for native sql queries returning entity beans.
-   * </p>
    */
   SqlQuery sqlQuery(String sql);
 
@@ -505,11 +475,9 @@ public interface Database {
    * <p>
    * Use this to execute a Insert Update or Delete statement. The statement will
    * be native to the database and contain database table and column names.
-   * </p>
    *
    * <p>
    * See {@link SqlUpdate} for example usage.
-   * </p>
    *
    * @return The SqlUpdate instance to set parameters and execute
    */
@@ -522,7 +490,7 @@ public interface Database {
 
   /**
    * Register a TransactionCallback on the currently active transaction.
-   * <p/>
+   * <p>
    * If there is no currently active transaction then a PersistenceException is thrown.
    *
    * @param transactionCallback The transaction callback to be registered with the current transaction.
@@ -536,7 +504,6 @@ public interface Database {
    * You will want to do this if you want multiple Transactions in a single
    * thread or generally use transactions outside of the TransactionThreadLocal
    * management.
-   * </p>
    */
   Transaction createTransaction();
 
@@ -544,7 +511,6 @@ public interface Database {
    * Create a new transaction additionally specifying the isolation level.
    * <p>
    * Note that this transaction is NOT stored in a thread local.
-   * </p>
    */
   Transaction createTransaction(TxIsolation isolation);
 
@@ -552,86 +518,77 @@ public interface Database {
    * Start a transaction with 'REQUIRED' semantics.
    * <p>
    * With REQUIRED semantics if an active transaction already exists that transaction will be used.
-   * </p>
    * <p>
    * The transaction is stored in a ThreadLocal variable and typically you only
    * need to use the returned Transaction <em>IF</em> you wish to do things like
    * use batch mode, change the transaction isolation level, use savepoints or
    * log comments to the transaction log.
-   * </p>
    * <p>
-   * Example of using a transaction to span multiple calls to find(), save()
-   * etc.
-   * </p>
-   * <p>
+   * Example of using a transaction to span multiple calls to find(), save() etc.
+   *
    * <h3>Using try with resources</h3>
    * <pre>{@code
    *
-   *    // start a transaction (stored in a ThreadLocal)
+   *   // start a transaction (stored in a ThreadLocal)
+   *   try (Transaction txn = database.beginTransaction()) {
    *
-   *    try (Transaction txn = database.beginTransaction()) {
+   *     Order order = database.find(Order.class, 10);
+   *     ...
+   *     database.save(order);
    *
-   * 	    Order order = database.find(Order.class, 10);
-   * 	    ...
-   * 	    database.save(order);
-   *
-   * 	    txn.commit();
-   *    }
+   *     txn.commit();
+   *   }
    *
    * }</pre>
-   * <p>
+   *
    * <h3>Using try finally block</h3>
    * <pre>{@code
    *
-   *    // start a transaction (stored in a ThreadLocal)
-   *    Transaction txn = database.beginTransaction();
-   *    try {
-   * 	    Order order = database.find(Order.class,10);
+   *   // start a transaction (stored in a ThreadLocal)
+   *   Transaction txn = database.beginTransaction();
+   *   try {
+   * 	   Order order = database.find(Order.class,10);
    *
-   * 	    database.save(order);
+   *     database.save(order);
+   *     txn.commit();
    *
-   * 	    txn.commit();
-   *
-   *    } finally {
-   * 	    txn.end();
-   *    }
-   *
+   *   } finally {
+   *     txn.end();
+   *   }
    * }</pre>
-   * <p>
+   *
    * <h3>Transaction options</h3>
    * <pre>{@code
    *
-   *     try (Transaction txn = database.beginTransaction()) {
+   *   try (Transaction txn = database.beginTransaction()) {
    *
-   *       // explicitly turn on/off JDBC batch use
-   *       txn.setBatchMode(true);
-   *       txn.setBatchSize(50);
+   *     // explicitly turn on/off JDBC batch use
+   *     txn.setBatchMode(true);
+   *     txn.setBatchSize(50);
    *
-   *       // control flushing when mixing save and queries
-   *       txn.setBatchFlushOnQuery(false);
+   *     // control flushing when mixing save and queries
+   *     txn.setBatchFlushOnQuery(false);
    *
-   *       // turn off persist cascade if needed
-   *       txn.setPersistCascade(false);
+   *     // turn off persist cascade if needed
+   *     txn.setPersistCascade(false);
    *
-   *       // for large batch insert processing when we do not
-   *       // ... need the generatedKeys, don't get them
-   *       txn.setBatchGetGeneratedKeys(false);
+   *     // for large batch insert processing when we do not
+   *     // ... need the generatedKeys, don't get them
+   *     txn.setBatchGetGeneratedKeys(false);
    *
-   *       // explicitly flush the JDBC batch buffer
-   *       txn.flush();
+   *     // explicitly flush the JDBC batch buffer
+   *     txn.flush();
    *
-   *       ...
+   *     ...
    *
-   *       txn.commit();
-   *    }
+   *     txn.commit();
+   *   }
    *
    * }</pre>
-   * <p>
    * <p>
    * If you want to externalise the transaction management then you use
    * createTransaction() and pass the transaction around to the various methods on
    * Database yourself.
-   * </p>
    */
   Transaction beginTransaction();
 
@@ -643,11 +600,9 @@ public interface Database {
   /**
    * Start a transaction typically specifying REQUIRES_NEW or REQUIRED semantics.
    * <p>
-   * <p>
    * Note that this provides an try finally alternative to using {@link #executeCall(TxScope, Callable)} or
    * {@link #execute(TxScope, Runnable)}.
-   * </p>
-   * <p>
+   *
    * <h3>REQUIRES_NEW example:</h3>
    * <pre>{@code
    * // Start a new transaction. If there is a current transaction
@@ -694,10 +649,8 @@ public interface Database {
    * This only is useful when JDBC batch is used. Flush occurs automatically when the
    * transaction commits or batch size is reached. This manually flushes the JDBC batch
    * buffer.
-   * </p>
    * <p>
    * This is the same as <code>currentTransaction().flush()</code>.
-   * </p>
    */
   void flush();
 
@@ -717,7 +670,6 @@ public interface Database {
    * <p>
    * Useful to put in a finally block to ensure the transaction is ended, rather
    * than a rollbackTransaction() in each catch block.
-   * </p>
    * <p>
    * Code example:
    * <p>
@@ -744,7 +696,6 @@ public interface Database {
    * <p>
    * Note that this resets OneToMany and ManyToMany properties so that if they
    * are accessed a lazy load will refresh the many property.
-   * </p>
    */
   void refresh(Object bean);
 
@@ -763,12 +714,11 @@ public interface Database {
    *   // Fetch order 1
    *   Order order = database.find(Order.class, 1);
    * }</pre>
-   * <p>
+   *
    * <p>
    * If you want more control over the query then you can use createQuery() and
    * Query.findOne();
-   * </p>
-   * <p>
+   *
    * <pre>{@code
    *   // ... additionally fetching customer, customer shipping address,
    *   // order details, and the product associated with each order detail.
@@ -810,10 +760,9 @@ public interface Database {
    * <p>
    * This will not perform a query against the database unless some property other
    * that the id property is accessed.
-   * </p>
    * <p>
    * It is most commonly used to set a 'foreign key' on another bean like:
-   * </p>
+   *
    * <pre>{@code
    *
    *   Product product = database.getReference(Product.class, 1);
@@ -853,12 +802,10 @@ public interface Database {
    * <p>
    * The extended API has the options for executing queries that take an explicit
    * transaction as an argument.
-   * </p>
    * <p>
-   * Typically we only need to use the extended API when we do NOT want to use the
+   * Typically, we only need to use the extended API when we do NOT want to use the
    * usual ThreadLocal based mechanism to obtain the current transaction but instead
    * supply the transaction explicitly.
-   * </p>
    */
   ExtendedServer extended();
 
@@ -867,32 +814,27 @@ public interface Database {
    * <p>
    * If there is no current transaction one will be created and committed for
    * you automatically.
-   * </p>
    * <p>
    * Save can cascade along relationships. For this to happen you need to
    * specify a cascade of CascadeType.ALL or CascadeType.PERSIST on the
    * OneToMany, OneToOne or ManyToMany annotation.
-   * </p>
    * <p>
    * In this example below the details property has a CascadeType.ALL set so
    * saving an order will also save all its details.
-   * </p>
-   * <p>
+   *
    * <pre>{@code
    *   public class Order { ...
    *
    *     @OneToMany(cascade=CascadeType.ALL, mappedBy="order")
-   * 	   List<OrderDetail> details;
-   * 	   ...
+   *     List<OrderDetail> details;
+   *     ...
    *   }
    * }</pre>
-   * <p>
    * <p>
    * When a save cascades via a OneToMany or ManyToMany Ebean will automatically
    * set the 'parent' object to the 'detail' object. In the example below in
    * saving the order and cascade saving the order details the 'parent' order
    * will be set against each order detail when it is saved.
-   * </p>
    */
   void save(Object bean) throws OptimisticLockException;
 
@@ -910,16 +852,13 @@ public interface Database {
    * Delete the bean.
    * <p>
    * This will return true if the bean was deleted successfully or JDBC batch is being used.
-   * </p>
    * <p>
    * If there is no current transaction one will be created and committed for
    * you automatically.
-   * </p>
    * <p>
    * If the Bean does not have a version property (or loaded version property) and
    * the bean does not exist then this returns false indicating that nothing was
    * deleted. Note that, if JDBC batch mode is used then this always returns true.
-   * </p>
    */
   boolean delete(Object bean) throws OptimisticLockException;
 
@@ -927,12 +866,10 @@ public interface Database {
    * Delete the bean with an explicit transaction.
    * <p>
    * This will return true if the bean was deleted successfully or JDBC batch is being used.
-   * </p>
    * <p>
    * If the Bean does not have a version property (or loaded version property) and
    * the bean does not exist then this returns false indicating that nothing was
    * deleted. However, if JDBC batch mode is used then this always returns true.
-   * </p>
    */
   boolean delete(Object bean, Transaction transaction) throws OptimisticLockException;
 
@@ -1014,16 +951,13 @@ public interface Database {
    * <p>
    * If you wish to execute a Sql Select natively then you should use the
    * SqlQuery object or DtoQuery.
-   * </p>
    * <p>
    * Note that the table modification information is automatically deduced and
    * you do not need to call the DB.externalModification() method when you
    * use this method.
-   * </p>
    * <p>
    * Example:
-   * </p>
-   * <p>
+   *
    * <pre>{@code
    *
    *   // example that uses 'named' parameters
@@ -1051,7 +985,6 @@ public interface Database {
    * transaction.
    * <p>
    * This returns the number of rows that where inserted, updated or deleted.
-   * </p>
    */
   int execute(Update<?> update);
 
@@ -1065,8 +998,7 @@ public interface Database {
    * For making calls to stored procedures.
    * <p>
    * Example:
-   * </p>
-   * <p>
+   *
    * <pre>{@code
    *
    *   String sql = "{call sp_order_modify(?,?,?)}";
@@ -1091,23 +1023,19 @@ public interface Database {
    * <p>
    * If you use database.execute(UpdateSql) then the table modification information
    * is automatically deduced and you do not need to call this method yourself.
-   * </p>
    * <p>
    * This information is used to invalidate objects out of the cache and
    * potentially text indexes. This information is also automatically broadcast
    * across the cluster.
-   * </p>
    * <p>
    * If there is a transaction then this information is placed into the current
    * transactions event information. When the transaction is committed this
    * information is registered (with the transaction manager). If this
    * transaction is rolled back then none of the transaction event information
    * registers including the information you put in via this method.
-   * </p>
    * <p>
    * If there is NO current transaction when you call this method then this
    * information is registered immediately (with the transaction manager).
-   * </p>
    *
    * @param tableName the name of the table that was modified
    * @param inserted  true if rows where inserted into the table
@@ -1147,7 +1075,6 @@ public interface Database {
    * Note: This checks only the root bean!
    * <p>
    * <pre>{@code
-   *
    *   // there is a unique constraint on title
    *
    *   Document doc = new Document();
@@ -1176,7 +1103,7 @@ public interface Database {
    *     // uniqueProperties > [title]
    *     //       custom msg > property[title] value[One flew over the cuckoo's nest]
    *
-   *  }
+   *   }
    *
    * }</pre>
    *
@@ -1200,13 +1127,12 @@ public interface Database {
    * dirty so that it is not skipped.
    * <p>
    * <pre>{@code
+   *   Customer customer = database.find(Customer, id);
    *
-   * Customer customer = database.find(Customer, id);
-   *
-   * // mark the bean as dirty so that a save() or update() will
-   * // increment the version property
-   * database.markAsDirty(customer);
-   * database.save(customer);
+   *   // mark the bean as dirty so that a save() or update() will
+   *   // increment the version property
+   *   database.markAsDirty(customer);
+   *   database.save(customer);
    *
    * }</pre>
    */
@@ -1219,18 +1145,17 @@ public interface Database {
    * <b>Stateless updates:</b> Note that the bean does not have to be previously fetched to call
    * update().You can create a new instance and set some of its properties programmatically for via
    * JSON/XML marshalling etc. This is described as a 'stateless update'.
-   * </p>
    * <p>
    * <b>Optimistic Locking: </b> Note that if the version property is not set when update() is
    * called then no optimistic locking is performed (internally ConcurrencyMode.NONE is used).
-   * </p>
+   *
    * <pre>{@code
    *
-   * // A 'stateless update' example
-   * Customer customer = new Customer();
-   * customer.setId(7);
-   * customer.setName("ModifiedNameNoOCC");
-   * database.update(customer);
+   *   // A 'stateless update' example
+   *   Customer customer = new Customer();
+   *   customer.setId(7);
+   *   customer.setName("ModifiedNameNoOCC");
+   *   database.update(customer);
    *
    * }</pre>
    */
@@ -1281,7 +1206,6 @@ public interface Database {
    * Compared to save() this forces bean to perform an insert rather than trying to decide
    * based on the bean state. As such this is useful when you fetch beans from one database
    * and want to insert them into another database (and you want to explicitly insert them).
-   * </p>
    */
   void insert(Object bean);
 
@@ -1314,21 +1238,18 @@ public interface Database {
   /**
    * Execute a Runnable in a Transaction with an explicit scope.
    * <p>
-   * The scope can control the transaction type, isolation and rollback
-   * semantics.
-   * </p>
-   * <p>
+   * The scope can control the transaction type, isolation and rollback semantics.
+   *
    * <pre>{@code
+   *  // set specific transactional scope settings
+   *  TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
-   *   // set specific transactional scope settings
-   *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
-   *
-   *   database.execute(scope, new Runnable() {
-   * 	   public void run() {
-   * 		   User u1 = database.find(User.class, 1);
-   * 		   ...
-   *     }
-   *   });
+   *  database.execute(scope, new Runnable() {
+   *    public void run() {
+   *      User u1 = database.find(User.class, 1);
+   *      ...
+   *    }
+   *  });
    *
    * }</pre>
    */
@@ -1339,21 +1260,19 @@ public interface Database {
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
-   * </p>
-   * <p>
+   *
    * <pre>{@code
+   *  database.execute(() -> {
    *
-   *    database.execute(() -> {
+   *    User u1 = database.find(User.class, 1);
+   *    User u2 = database.find(User.class, 2);
    *
-   *        User u1 = database.find(User.class, 1);
-   *        User u2 = database.find(User.class, 2);
+   *    u1.setName("u1 mod");
+   *    u2.setName("u2 mod");
    *
-   *        u1.setName("u1 mod");
-   *        u2.setName("u2 mod");
-   *
-   *        u1.save();
-   *        u2.save();
-   *    });
+   *    u1.save();
+   *    u2.save();
+   *  });
    *
    * }</pre>
    */
@@ -1364,18 +1283,16 @@ public interface Database {
    * <p>
    * The scope can control the transaction type, isolation and rollback
    * semantics.
-   * </p>
-   * <p>
-   * <pre>{@code
    *
+   * <pre>{@code
    *   // set specific transactional scope settings
    *   TxScope scope = TxScope.requiresNew().setIsolation(TxIsolation.SERIALIZABLE);
    *
    *   database.executeCall(scope, new Callable<String>() {
-   * 	   public String call() {
-   * 		   User u1 = database.find(User.class, 1);
-   * 		   ...
-   * 		   return u1.getEmail();
+   *     public String call() {
+   *       User u1 = database.find(User.class, 1);
+   *       ...
+   *       return u1.getEmail();
    *     }
    *   });
    *
@@ -1388,10 +1305,8 @@ public interface Database {
    * <p>
    * The default scope runs with REQUIRED and by default will rollback on any
    * exception (checked or runtime).
-   * </p>
-   * <p>
-   * <pre>{@code
    *
+   * <pre>{@code
    *   database.executeCall(new Callable<String>() {
    *     public String call() {
    *       User u1 = database.find(User.class, 1);
@@ -1406,7 +1321,6 @@ public interface Database {
    *       return u1.getEmail();
    *     }
    *   });
-   *
    * }</pre>
    */
   <T> T executeCall(Callable<T> callable);
@@ -1417,8 +1331,7 @@ public interface Database {
   ServerCacheManager cacheManager();
 
   /**
-   * Return the BackgroundExecutor service for asynchronous processing of
-   * queries.
+   * Return the BackgroundExecutor service for asynchronous processing of queries.
    */
   BackgroundExecutor backgroundExecutor();
 
@@ -1427,33 +1340,30 @@ public interface Database {
    * <p>
    * This instance is safe to be used concurrently by multiple threads and this
    * method is cheap to call.
-   * </p>
-   * <p>
+   *
    * <h3>Simple example:</h3>
    * <pre>{@code
-   *
-   *     JsonContext json = database.json();
-   *     String jsonOutput = json.toJson(list);
-   *     System.out.println(jsonOutput);
-   *
+   *   JsonContext json = database.json();
+   *   String jsonOutput = json.toJson(list);
+   *   System.out.println(jsonOutput);
    * }</pre>
+   *
    * <p>
    * <h3>Using PathProperties:</h3>
    * <pre>{@code
+   *   // specify just the properties we want
+   *   PathProperties paths = PathProperties.parse("name, status, anniversary");
    *
-   *     // specify just the properties we want
-   *     PathProperties paths = PathProperties.parse("name, status, anniversary");
+   *   List<Customer> customers =
+   *     database.find(Customer.class)
+   *       // apply those paths to the query (only fetch what we need)
+   *       .apply(paths)
+   *       .where().ilike("name", "rob%")
+   *       .findList();
    *
-   *     List<Customer> customers =
-   *       database.find(Customer.class)
-   *         // apply those paths to the query (only fetch what we need)
-   *         .apply(paths)
-   *         .where().ilike("name", "rob%")
-   *         .findList();
-   *
-   *     // ... get the json
-   *     JsonContext jsonContext = database.json();
-   *     String json = jsonContext.toJson(customers, paths);
+   *   // ... get the json
+   *   JsonContext jsonContext = database.json();
+   *   String json = jsonContext.toJson(customers, paths);
    *
    * }</pre>
    *
@@ -1478,7 +1388,6 @@ public interface Database {
    * Publish a single bean given its type and id returning the resulting live bean.
    * <p>
    * The values are published from the draft to the live bean.
-   * </p>
    *
    * @param <T>         the type of the entity bean
    * @param beanType    the type of the entity bean
@@ -1493,7 +1402,6 @@ public interface Database {
    * This will use the current transaction or create one if required.
    * <p>
    * The values are published from the draft to the live bean.
-   * </p>
    *
    * @param <T>      the type of the entity bean
    * @param beanType the type of the entity bean
@@ -1506,7 +1414,6 @@ public interface Database {
    * Publish the beans that match the query returning the resulting published beans.
    * <p>
    * The values are published from the draft beans to the live beans.
-   * </p>
    *
    * @param <T>         the type of the entity bean
    * @param query       the query used to select the draft beans to publish
@@ -1519,7 +1426,6 @@ public interface Database {
    * This will use the current transaction or create one if required.
    * <p>
    * The values are published from the draft beans to the live beans.
-   * </p>
    *
    * @param <T>   the type of the entity bean
    * @param query the query used to select the draft beans to publish
@@ -1531,7 +1437,6 @@ public interface Database {
    * <p>
    * The values from the live beans are set back to the draft bean and the
    * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
-   * </p>
    *
    * @param <T>         the type of the entity bean
    * @param beanType    the type of the entity bean
@@ -1546,7 +1451,6 @@ public interface Database {
    * <p>
    * The values from the live beans are set back to the draft bean and the
    * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
-   * </p>
    *
    * @param <T>      the type of the entity bean
    * @param beanType the type of the entity bean
@@ -1560,7 +1464,6 @@ public interface Database {
    * <p>
    * The values from the live beans are set back to the draft bean and the
    * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
-   * </p>
    *
    * @param <T>         the type of the entity bean
    * @param query       the query used to select the draft beans to restore
@@ -1573,7 +1476,6 @@ public interface Database {
    * <p>
    * The values from the live beans are set back to the draft bean and the
    * <code>@DraftDirty</code> and <code>@DraftReset</code> properties are reset.
-   * </p>
    *
    * @param <T>   the type of the entity bean
    * @param query the query used to select the draft beans to restore
@@ -1585,7 +1487,6 @@ public interface Database {
    * <p>
    * Validate the query checking the where and orderBy expression paths to confirm if
    * they represent valid properties/path for the given bean type.
-   * </p>
    */
   <T> Set<String> validateQuery(Query<T> query);
 
@@ -1611,6 +1512,6 @@ public interface Database {
   /**
    * Truncate the base tables for the given bean types.
    */
-  void truncate(Class<?>... tables);
+  void truncate(Class<?>... beanTypes);
 
 }

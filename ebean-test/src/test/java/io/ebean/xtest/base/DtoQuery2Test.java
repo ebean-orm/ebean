@@ -210,7 +210,7 @@ public class DtoQuery2Test extends BaseTestCase {
     }
 
     // collect without reset
-    BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true, true);
+    BasicMetricVisitor basic = new BasicMetricVisitor("db", false, true, true, true);
     server().metaInfo().visitMetrics(basic);
 
     List<MetaQueryMetric> stats = basic.queryMetrics();

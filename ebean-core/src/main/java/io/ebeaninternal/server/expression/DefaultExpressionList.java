@@ -799,6 +799,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> eqIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.eq(propertyName, value));
+  }
+
+  @Override
   public ExpressionList<T> eqOrNull(String propertyName, Object value) {
     return add(expr.eqOrNull(propertyName, value));
   }
