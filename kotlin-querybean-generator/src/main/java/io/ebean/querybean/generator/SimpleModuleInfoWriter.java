@@ -25,7 +25,7 @@ class SimpleModuleInfoWriter {
   SimpleModuleInfoWriter(ProcessingContext processingContext) throws IOException {
     this.processingContext = processingContext;
     this.factoryPackage = processingContext.getFactoryPackage();
-    this.factoryShortName = "_Ebean$ModuleInfo";
+    this.factoryShortName = "EbeanEntityRegister";
     this.factoryFullName = factoryPackage + "." + factoryShortName;
     this.javaFileObject = processingContext.createWriter(factoryFullName);
   }
@@ -94,7 +94,7 @@ class SimpleModuleInfoWriter {
     writer.append("import %s;", Constants.GENERATED).eol();
     writer.eol();
     writer.append("import io.ebean.config.ModuleInfo;").eol();
-    writer.append("import io.ebean.config.ModuleInfoLoader;").eol();
+    writer.append("import io.ebean.config.EntityClassRegister;").eol();
     writer.eol();
   }
 
@@ -128,7 +128,7 @@ class SimpleModuleInfoWriter {
 
     buildAtContextModule(writer);
 
-    writer.append("public class %s implements ModuleInfoLoader {", factoryShortName).eol().eol();
+    writer.append("public class %s implements EntityClassRegister {", factoryShortName).eol().eol();
     writeMethodOtherClasses();
     writeMethodEntityClasses(processingContext.getDbEntities(), null);
 

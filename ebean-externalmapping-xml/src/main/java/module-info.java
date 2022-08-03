@@ -10,8 +10,7 @@ module io.ebean.xmapping.xml {
   provides XmapService with JaxbXmapService;
 
   requires transitive io.ebean.xmapping.api;
-  requires transitive java.xml;
-  requires transitive java.xml.bind;
+  requires transitive jakarta.xml.bind;
   requires io.avaje.classpath.scanner.api;
   requires io.avaje.classpath.scanner;
   requires static org.slf4j;

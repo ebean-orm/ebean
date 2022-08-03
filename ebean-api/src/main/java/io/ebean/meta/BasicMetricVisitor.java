@@ -38,6 +38,16 @@ public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerM
   }
 
   @Override
+  public ServerMetricsAsJson asJson() {
+    return new MetricsAsJson(this);
+  }
+
+  @Override
+  public List<MetricData> asData() {
+    return new MetricsAsData(this).data();
+  }
+
+  @Override
   public List<MetaTimedMetric> timedMetrics() {
     return timed;
   }

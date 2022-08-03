@@ -17,32 +17,20 @@ public interface MetaInfoManager {
   ServerMetrics collectMetrics();
 
   /**
-   * Given the already collected metrics provide them in json form.
-   * <p>
-   * Expected to be used when we wish to collect the metrics and report them
-   * to some service and additionally format them as json for say output into
-   * an application log.
-   *
-   * @param metrics The already collected metrics
+   * Deprecated migrate to collectMetrics().asJson().
    */
-  ServerMetricsAsJson metricsAsJson(ServerMetrics metrics);
+  @Deprecated
+  default ServerMetricsAsJson collectMetricsAsJson() {
+    return collectMetrics().asJson();
+  }
 
   /**
-   * Collect the metrics in raw JSON form.
-   * <pre>{@code
-   *
-   *   String metricsJson = database.getMetaInfoManager()
-   *       .collectMetricsAsJson()
-   *       .json();
-   *
-   * }</pre>
+   * Deprecated migrate to collectMetrics().asData().
    */
-  ServerMetricsAsJson collectMetricsAsJson();
-
-  /**
-   * Return the metrics as a list of MetricData.
-   */
-  List<MetricData> collectMetricsAsData();
+  @Deprecated
+  default List<MetricData> collectMetricsAsData() {
+    return collectMetrics().asData();
+  }
 
   /**
    * Visit the metrics resetting and collecting/reporting as desired.

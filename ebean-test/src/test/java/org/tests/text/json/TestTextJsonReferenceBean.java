@@ -1,5 +1,6 @@
 package org.tests.text.json;
 
+import io.ebean.text.json.JsonReadOptions;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
@@ -17,10 +18,23 @@ import org.tests.model.basic.ResetBasicData;
 import java.io.IOException;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestTextJsonReferenceBean extends BaseTestCase {
+
+  @Test
+  void fromJson_refBean_shouldNotLazyLoadByDefault() {
+    ResetBasicData.reset();
+
+    JsonContext jsonContext = DB.json();
+    Product productRefBean = jsonContext.toBean(Product.class, "{\"id\": 1}");
+
+    assertThat(DB.beanState(productRefBean).isReference()).isTrue();
+    // does not lazy load by default
+    assertThat(productRefBean.getName()).isNull();
+  }
 
   @Test
   public void test() throws IOException {
@@ -41,7 +55,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
       String jsonString = jsonContext.toJson(product);
 
-      Product refProd = jsonContext.toBean(Product.class, jsonString);
+      Product refProd = jsonContext.toBean(Product.class, jsonString, new JsonReadOptions().setEnableLazyLoading(true));
 
       BeanDescriptor<Product> prodDesc = server.descriptor(Product.class);
       EntityBean eb = (EntityBean) refProd;

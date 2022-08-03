@@ -385,7 +385,7 @@ public interface ExpressionList<T> {
 
   /**
    * Executes the query returning a set of values for a single property.
-   *
+   * <p>
    * This can be used to cache sets.
    *
    * @return a HashSet of values for the selegted property
@@ -834,6 +834,20 @@ public interface ExpressionList<T> {
    * Equal To - property is equal to a given value.
    */
   ExpressionList<T> eq(String propertyName, Object value);
+
+  /**
+   * Is EQUAL TO if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is the EQUAL TO equivalent to {@link #inOrEmpty(String, Collection)} where the expression/predicate
+   * is only added when the value is non-null.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>eqIfPresent()</code> rather than having a separate if block.
+   * <p>
+   * Another option is to instead globally use {@link io.ebean.config.DatabaseConfig#setExpressionEqualsWithNullAsNoop(boolean)}
+   * but that is not always desirable.
+   */
+  ExpressionList<T> eqIfPresent(String propertyName, @Nullable Object value);
 
   /**
    * Equal To or Null - property is equal to a given value or null.

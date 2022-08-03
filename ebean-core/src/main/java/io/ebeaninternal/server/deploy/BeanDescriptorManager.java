@@ -578,8 +578,8 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   private <T> String errNothingRegistered() {
-    return "There are no registered entities. If using query beans, that generates _Ebean$ModuleInfo.java into " +
-      "generated sources and is service loaded. If using module-info.java, then probably missing 'provides io.ebean.config.ModuleInfoLoader with _Ebean$ModuleInfo' clause.";
+    return "There are no registered entities. If using query beans, that generates EbeanEntityRegister.java into " +
+      "generated sources and is service loaded. If using module-info.java, then probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause.";
   }
 
   private String errNotRegistered(Class<?> beanClass) {
