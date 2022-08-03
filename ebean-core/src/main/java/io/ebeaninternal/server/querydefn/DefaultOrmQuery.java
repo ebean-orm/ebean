@@ -708,6 +708,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public SpiQuery<T> copy(SpiEbeanServer server) {
+    // forUpdate is NOT copied - see #2762
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<>(beanDescriptor, server, expressionFactory);
     copy.transaction = transaction;
     copy.m2mIncludeJoin = m2mIncludeJoin;
@@ -748,7 +749,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.usageProfiling = usageProfiling;
     copy.autoTune = autoTune;
     copy.parentNode = parentNode;
-    copy.forUpdate = forUpdate;
     copy.rawSql = rawSql;
     setCancelableQuery(copy); // required to cancel findId query
     return copy;
