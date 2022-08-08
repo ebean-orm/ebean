@@ -1514,7 +1514,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private <P> P executeSqlQuery(Function<RelationalQueryRequest, P> fun, SpiSqlQuery query) {
-    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, null);
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, query.transaction());
     try {
       request.initTransIfRequired();
       return fun.apply(request);

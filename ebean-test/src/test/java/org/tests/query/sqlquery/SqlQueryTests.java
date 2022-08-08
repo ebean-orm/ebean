@@ -196,6 +196,23 @@ public class SqlQueryTests extends BaseTestCase {
     assertThat(minCreated).isBefore(OffsetDateTime.now());
   }
 
+  @Test
+  public void typeQuery_usingTransaction() {
+    ResetBasicData.reset();
+
+    String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
+    try (Transaction transaction = DB.createTransaction()) {
+
+      BigDecimal maxPrice = DB.sqlQuery(sql)
+        .setParameter(1, 2)
+        .mapToScalar(BigDecimal.class)
+        .usingTransaction(transaction)
+        .findOne();
+
+      assertThat(maxPrice).isNotNull();
+    }
+  }
+
   static class CustDto {
 
     long id;
@@ -223,6 +240,44 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   private static final CustMapper CUST_MAPPER = new CustMapper();
+
+  @Test
+  void queryUsingTransaction() {
+    ResetBasicData.reset();
+
+    try (Transaction txn = DB.createTransaction()) {
+      String sql = "select id, name, status from o_customer where name is not null";
+      AtomicInteger counter = new AtomicInteger();
+      DB.sqlQuery(sql)
+        .usingTransaction(txn)
+        .mapTo(CUST_MAPPER)
+        .findEach(custDto -> {
+          counter.incrementAndGet();
+          assertThat(custDto.name).isNotNull();
+        });
+
+      assertThat(counter.get()).isGreaterThan(0);
+    }
+  }
+
+  @Test
+  void mapperUsingTransaction() {
+    ResetBasicData.reset();
+
+    try (Transaction txn = DB.createTransaction()) {
+      String sql = "select id, name, status from o_customer where name is not null";
+      AtomicInteger counter = new AtomicInteger();
+      DB.sqlQuery(sql)
+        .mapTo(CUST_MAPPER)
+        .usingTransaction(txn)
+        .findEach(custDto -> {
+          counter.incrementAndGet();
+          assertThat(custDto.name).isNotNull();
+        });
+
+      assertThat(counter.get()).isGreaterThan(0);
+    }
+  }
 
   @Test
   public void findEach_mapper() {
