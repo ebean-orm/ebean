@@ -13,6 +13,7 @@ final class DCountMetric implements CountMetric {
 
   private final String name;
   private final LongAdder count = new LongAdder();
+  private String reportName;
 
   DCountMetric(String name) {
     this.name = name;
@@ -50,8 +51,15 @@ final class DCountMetric implements CountMetric {
   public void visit(MetricVisitor visitor) {
     long val = visitor.reset() ? count.sumThenReset() : count.sum();
     if (val > 0) {
+      final String name = reportName != null ? reportName : reportName(visitor);
       visitor.visitCount(new DCountMetricStats(name, val));
     }
+  }
+
+  String reportName(MetricVisitor visitor) {
+    final String tmp = visitor.namingConvention().apply(name);
+    this.reportName = tmp;
+    return tmp;
   }
 
   private static class DCountMetricStats implements CountMetricStats {
