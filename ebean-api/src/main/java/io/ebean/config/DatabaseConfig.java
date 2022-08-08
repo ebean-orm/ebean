@@ -16,6 +16,7 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.meta.MetricNamingMatch;
 import io.ebean.util.StringHelper;
 
 import javax.persistence.EnumType;
@@ -24,6 +25,7 @@ import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * The configuration used for creating a Database.
@@ -545,6 +547,8 @@ public class DatabaseConfig {
   private boolean dumpMetricsOnShutdown;
 
   private String dumpMetricsOptions;
+
+  private Function<String, String> metricNaming = MetricNamingMatch.INSTANCE;
 
   /**
    * Construct a Database Configuration for programmatically creating an Database.
@@ -3394,6 +3398,20 @@ public class DatabaseConfig {
    */
   public void setLoadModuleInfo(boolean loadModuleInfo) {
     this.loadModuleInfo = loadModuleInfo;
+  }
+
+  /**
+   * Return the naming convention to apply to metrics names.
+   */
+  public Function<String, String> getMetricNaming() {
+    return metricNaming;
+  }
+
+  /**
+   * Set the naming convention to apply to metrics names.
+   */
+  public void setMetricNaming(Function<String, String> metricNaming) {
+    this.metricNaming = metricNaming;
   }
 
   public enum UuidVersion {

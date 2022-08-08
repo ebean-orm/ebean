@@ -14,6 +14,7 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -209,8 +210,10 @@ public class DtoQuery2Test extends BaseTestCase {
       log.info("Found " + custs);
     }
 
+    Function<String, String> lowerUnderscore = (String key) -> "prefix:" + key.replace('.','_').toLowerCase();
+
     // collect without reset
-    BasicMetricVisitor basic = new BasicMetricVisitor("db", false, true, true, true);
+    BasicMetricVisitor basic = new BasicMetricVisitor("db", lowerUnderscore, false, true, true, true);
     server().metaInfo().visitMetrics(basic);
 
     List<MetaQueryMetric> stats = basic.queryMetrics();
@@ -219,7 +222,7 @@ public class DtoQuery2Test extends BaseTestCase {
     MetaQueryMetric queryMetric = stats.get(0);
     assertThat(queryMetric.label()).isEqualTo("basic");
     assertThat(queryMetric.count()).isEqualTo(3);
-    assertThat(queryMetric.name()).isEqualTo("dto.DCust_basic");
+    assertThat(queryMetric.name()).isEqualTo("prefix:dto_dcust_basic");
 
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")

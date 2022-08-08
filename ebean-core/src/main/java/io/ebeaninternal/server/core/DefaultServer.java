@@ -213,7 +213,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.transactionManager = config.createTransactionManager(this, docStoreComponents.updateProcessor());
     this.documentStore = docStoreComponents.documentStore();
     this.queryPlanManager = config.initQueryPlanManager(transactionManager);
-    this.metaInfoManager = new DefaultMetaInfoManager(this);
+    this.metaInfoManager = new DefaultMetaInfoManager(this, this.config.getMetricNaming());
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = config.initDdlGenerator(this);
     this.scriptRunner = new DScriptRunner(this);

@@ -4,6 +4,7 @@ import io.ebean.ProfileLocation;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarDataReader;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.*;
@@ -279,8 +280,8 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Return a copy of the current query statistics.
    */
-  public final Snapshot getSnapshot(boolean reset) {
-    return stats.getSnapshot(reset);
+  public final Snapshot visit(MetricVisitor visitor) {
+    return stats.visit(visitor);
   }
 
   /**
