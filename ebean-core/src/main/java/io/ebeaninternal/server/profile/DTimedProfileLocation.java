@@ -13,6 +13,7 @@ final class DTimedProfileLocation extends DProfileLocation implements TimedProfi
   private final TimedMetric timedMetric;
   private final boolean overrideMetricName;
   private String fullName;
+  private String reportName;
 
   DTimedProfileLocation(int lineNumber, String label, TimedMetric timedMetric) {
     super(lineNumber);
@@ -47,11 +48,17 @@ final class DTimedProfileLocation extends DProfileLocation implements TimedProfi
   public void visit(MetricVisitor visitor) {
     TimedMetricStats collect = timedMetric.collect(visitor.reset());
     if (collect != null) {
-      if (overrideMetricName) {
-        collect.setName(fullName);
-      }
+      final String name = reportName != null ? reportName : reportName(visitor, collect.name());
+      collect.setName(name);
       collect.setLocation(location());
       visitor.visitTimed(collect);
     }
+  }
+
+  private String reportName(MetricVisitor visitor, String name) {
+    final String defaultName = overrideMetricName ? fullName : name;
+    final String tmp = visitor.namingConvention().apply(defaultName);
+    this.reportName = tmp;
+    return tmp;
   }
 }

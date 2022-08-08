@@ -1,5 +1,6 @@
 package io.ebean.xtest.base;
 
+import io.ebean.meta.MetricNamingMatch;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DtoQuery;
@@ -286,7 +287,7 @@ class DtoQueryTest extends BaseTestCase {
     }
 
     // collect without reset
-    BasicMetricVisitor basic = new BasicMetricVisitor("db", false, true, true, true);
+    BasicMetricVisitor basic = new BasicMetricVisitor("db", MetricNamingMatch.INSTANCE, false, true, true, true);
     server().metaInfo().visitMetrics(basic);
 
     List<MetaQueryMetric> stats = basic.queryMetrics();

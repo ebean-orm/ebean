@@ -1482,7 +1482,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     iudMetrics.visit(visitor);
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        visitor.visitQuery(queryPlan.getSnapshot(visitor.reset()));
+        visitor.visitQuery(queryPlan.visit(visitor));
       }
     }
   }
