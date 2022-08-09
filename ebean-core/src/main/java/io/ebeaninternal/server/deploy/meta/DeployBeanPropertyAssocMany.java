@@ -113,6 +113,10 @@ public class DeployBeanPropertyAssocMany<T> extends DeployBeanPropertyAssoc<T> {
     }
   }
 
+  public boolean isTableManaged() {
+    return intersectionJoin != null && desc.isTableManaged(intersectionJoin.getTable());
+  }
+
   /**
    * Create the immutable version of the inverse join.
    */

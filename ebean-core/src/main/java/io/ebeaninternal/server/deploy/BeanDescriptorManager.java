@@ -89,6 +89,8 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final String serverName;
   private final List<BeanDescriptor<?>> elementDescriptors = new ArrayList<>();
   private final Map<String, BeanTable> beanTableMap = new HashMap<>();
+
+  private final Set<String> managedTables = new HashSet<>();
   private final Map<String, BeanDescriptor<?>> descMap = new HashMap<>();
   private final Map<String, BeanDescriptor<?>> descQueueMap = new HashMap<>();
   private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<>();
@@ -422,8 +424,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
   @Override
   public boolean isTableManaged(String tableName) {
-    return tableToDescMap.get(tableName.toLowerCase()) != null
-      || tableToViewDescMap.get(tableName.toLowerCase()) != null;
+    return managedTables.contains(tableName);
   }
 
   /**
@@ -691,6 +692,9 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       BeanTable beanTable = createBeanTable(info);
       beanTableMap.put(beanTable.getBeanType().getName(), beanTable);
+      if (beanTable.getBaseTable() != null) {
+        managedTables.add(beanTable.getBaseTable());
+      }
     }
     // register non-id embedded beans (after bean tables are created)
     for (DeployBeanInfo<?> info : embeddedBeans) {

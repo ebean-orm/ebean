@@ -16,7 +16,7 @@ public class MnyNode {
 
   String name;
 
-  @ManyToMany
+  @ManyToMany(cascade = CascadeType.REFRESH)
   @JoinTable(name = "mny_edge",
     joinColumns = @JoinColumn(name = "from_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "to_id", referencedColumnName = "id"))

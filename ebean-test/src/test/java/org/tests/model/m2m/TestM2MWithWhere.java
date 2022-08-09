@@ -19,6 +19,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestM2MWithWhere extends BaseTestCase {
 
   @Test
+  public void testModify() throws Exception {
+    createTestData();
+    MnyNode node = DB.find(MnyNode.class, 1);
+    node.setName("fooBarBaz");
+    MnyNode removed = node.getAllRelations().remove(0);
+    LoggedSql.start();
+    DB.save(node);
+    List<String> sql = LoggedSql.stop();
+    sql.forEach(System.out::println);
+
+    node.getAllRelations().add(removed);
+    LoggedSql.start();
+    DB.save(node);
+    sql = LoggedSql.stop();
+    sql.forEach(System.out::println);
+  }
+  @Test
   public void testQuery() throws Exception {
     createTestData();
     MnyNode node = DB.find(MnyNode.class, 1);
