@@ -178,7 +178,6 @@ final class CQueryBuilder {
 
   CQueryFetchSingleAttribute buildFetchAttributeQuery(OrmQueryRequest<?> request) {
     SpiQuery<?> query = request.query();
-    query.setSingleAttribute();
     if (!query.isIncludeSoftDeletes()) {
       BeanDescriptor<?> desc = request.descriptor();
       if (desc.isSoftDelete()) {
@@ -561,7 +560,7 @@ final class CQueryBuilder {
       if (selectClause != null) {
         sb.append(selectClause);
       } else {
-        useSqlLimiter = (query.hasMaxRowsOrFirstRow() && select.getManyProperty() == null);
+        useSqlLimiter = (query.hasMaxRowsOrFirstRow() && (select.getManyProperty() == null || query.isSingleAttribute()));
         if (!useSqlLimiter) {
           appendSelectDistinct();
         }

@@ -20,7 +20,7 @@ open module io.ebean.test {
 
   requires transitive io.ebean.test.containers;
   requires transitive org.assertj.core;
-  requires transitive java.xml.bind;
+  requires transitive jakarta.xml.bind;
   requires transitive com.h2database;
 
   // support testing

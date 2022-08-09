@@ -73,17 +73,15 @@
 
     <!-- Including JAXB for DB Migration generation with Java 11+ -->
     <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <version>2.3.6</version>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+      <version>4.0.0</version>
     </dependency>
-
-    <!-- Needed for module path compile, jaxb foo bar needs review -->
     <dependency>
-      <groupId>jakarta.activation</groupId>
-      <artifactId>jakarta.activation-api</artifactId>
-      <version>1.2.1</version>
-      <scope>provided</scope>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <version>4.0.0</version>
+      <scope>runtime</scope>
     </dependency>
 
     <!-- Not strictly required but bring in H2 Driver because we use it so much -->
@@ -163,7 +161,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.3.3</version>
+      <version>42.4.1</version>
       <exclusions>
         <exclusion>
           <groupId>org.checkerframework</groupId>

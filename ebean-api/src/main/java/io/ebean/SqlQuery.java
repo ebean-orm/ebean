@@ -2,8 +2,8 @@ package io.ebean;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
+
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -39,6 +39,11 @@ import java.util.function.Predicate;
  */
 @NonNullApi
 public interface SqlQuery extends Serializable, CancelableQuery {
+
+  /**
+   * Execute the query using the given transaction.
+   */
+  SqlQuery usingTransaction(Transaction transaction);
 
   /**
    * Execute the query returning a list.
@@ -297,6 +302,11 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * @param <T> The type of the scalar values
    */
   interface TypeQuery<T> {
+
+    /**
+     * Execute the query using the given transaction.
+     */
+    TypeQuery<T> usingTransaction(Transaction transaction);
 
     /**
      * Return the single value.
