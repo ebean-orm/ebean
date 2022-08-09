@@ -65,7 +65,7 @@ abstract class DynamicPropertyBase implements STreeProperty {
 
   @Override
   public void loadIgnore(DbReadContext ctx) {
-    scalarType.loadIgnore(ctx.getDataReader());
+    scalarType.loadIgnore(ctx.dataReader());
   }
 
   @Override

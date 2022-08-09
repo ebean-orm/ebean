@@ -45,8 +45,8 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
   public void prepareExpression(BeanQueryRequest<?> request) {
 
     CQuery<?> subQuery = compileSubQuery(request);
-    this.bindParams = subQuery.getPredicates().getWhereExprBindValues();
-    this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
+    this.bindParams = subQuery.predicates().getWhereExprBindValues();
+    this.sql = subQuery.generatedSql().replace('\n', ' ');
   }
 
   @Override

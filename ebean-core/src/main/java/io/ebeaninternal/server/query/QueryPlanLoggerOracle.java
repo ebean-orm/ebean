@@ -22,7 +22,7 @@ public final class QueryPlanLoggerOracle extends QueryPlanLogger {
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
     try (Statement stmt = conn.createStatement()) {
-      try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN PLAN FOR " + plan.getSql())) {
+      try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN PLAN FOR " + plan.sql())) {
         bind.prepare(explainStmt, conn);
         explainStmt.execute();
       }

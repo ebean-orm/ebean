@@ -24,7 +24,7 @@ public final class QueryPlanLoggerSqlServer extends QueryPlanLogger {
     try (Statement stmt = conn.createStatement()) {
       stmt.execute("set statistics xml on");
       stmt.execute("begin transaction");
-      try (PreparedStatement explainStmt = conn.prepareStatement(plan.getSql())) {
+      try (PreparedStatement explainStmt = conn.prepareStatement(plan.sql())) {
         bind.prepare(explainStmt, conn);
 
         try (ResultSet rset = explainStmt.executeQuery()) {
