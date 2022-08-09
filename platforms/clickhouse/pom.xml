@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.7.1-FOC2</version>
+    <version>13.7.1-FOC3-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-platform-clickhouse</artifactId>
@@ -14,12 +14,12 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.7.1-FOC2</version>
+      <version>13.7.1-FOC3-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
 
   <scm>
-    <tag>ebean-parent-13.7.1-FOC2</tag>
+    <tag>ebean-parent-13.6.4-FOC1</tag>
   </scm>
 </project>
