@@ -88,6 +88,22 @@ final class SaveManyBeans extends SaveManyBase {
       // OneToMany JoinTable
       return true;
     }
+    if (many.isTableManaged()) {
+      List<String> tables = new ArrayList<>(3);
+      tables.add(many.descriptor().baseTable());
+      tables.add(many.targetDescriptor().baseTable());
+      tables.add(many.intersectionTableJoin().getTable());
+      // put all tables in a deterministic order
+      tables.sort(Comparator.naturalOrder());
+
+      if (transaction.isSaveAssocManyIntersection(String.join("-", tables), many.descriptor().rootName())) {
+        // notify others, that we do save this transaction
+        transaction.isSaveAssocManyIntersection(many.intersectionTableJoin().getTable(), many.descriptor().rootName());
+        return true;
+      } else {
+        return false;
+      }
+    }
     return transaction.isSaveAssocManyIntersection(many.intersectionTableJoin().getTable(), many.descriptor().rootName());
   }
 
