@@ -1,8 +1,8 @@
 package org.tests.model.m2m;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,27 +14,72 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests M2M with complex where queries.
  *
  * @author Roland Praml, FOCONIS AG
- *
  */
 public class TestM2MWithWhere extends BaseTestCase {
 
   @Test
   public void testModify() throws Exception {
+ 
+    MnyNode node1 = new MnyNode();
+    node1.setName("node1");
+    node1.setId(111);
+    MnyNode node2 = new MnyNode();
+    node2.setName("node2");
+    node2.setId(222);
+    MnyNode node3 = new MnyNode();
+    node3.setName("node3");
+    node3.setId(333);
+    MnyNode node4 = new MnyNode();
+    node4.setName("node4");
+    node4.setId(444);
+
+    node1.getAllReverseRelations().add(node2);
+    node1.getAllRelations().add(node2);
+    node2.getAllRelations().add(node3);
+    node3.getAllRelations().add(node4);
+    DB.save(node1);
+    DB.save(node1);
+
+    DB.refresh(node2);
+    DB.refresh(node3);
+    assertThat(node2.getAllRelations()).containsExactlyInAnyOrder(node1, node3);
+    assertThat(node3.getAllReverseRelations()).containsExactlyInAnyOrder(node2);
+
+    DB.refresh(node1);
+    node1.getAllReverseRelations().clear();
+    System.out.println("Clearing");
+    DB.save(node1);
+    DB.refresh(node2);
+    assertThat(node2.getAllRelations()).containsExactlyInAnyOrder(node3);
+
+  }
+
+  @Test
+  public void testAccessAndModify() throws Exception {
     createTestData();
+
     MnyNode node = DB.find(MnyNode.class, 1);
     node.setName("fooBarBaz");
     MnyNode removed = node.getAllRelations().remove(0);
+
     LoggedSql.start();
     DB.save(node);
     List<String> sql = LoggedSql.stop();
-    sql.forEach(System.out::println);
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).contains("update mny_node set name=? where id=?; -- bind(fooBarBaz");
+    assertThat(sql.get(1)).contains("delete from mny_edge where from_id = ? and to_id = ? and mny_edge.flags != 12345 and 'mny_node' = 'mny_node'");
+    assertThat(sql.get(2)).contains("-- bind");
 
     node.getAllRelations().add(removed);
     LoggedSql.start();
     DB.save(node);
     sql = LoggedSql.stop();
-    sql.forEach(System.out::println);
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("insert into mny_edge (id, flags, from_id, to_id) values (?,?,?,?)");
+    assertThat(sql.get(1)).contains("-- bind");
+
   }
+
   @Test
   public void testQuery() throws Exception {
     createTestData();
@@ -87,9 +132,9 @@ public class TestM2MWithWhere extends BaseTestCase {
     // prefetch everything
     LoggedSql.start();
     node = DB.find(MnyNode.class)
-        .fetch("bit1Relations","*")
-        .fetch("bit1ReverseRelations","*")
-        .where().idEq(3).findOne();
+      .fetch("bit1Relations", "*")
+      .fetch("bit1ReverseRelations", "*")
+      .where().idEq(3).findOne();
     sqls = LoggedSql.stop();
     assertThat(sqls).hasSize(2);
 

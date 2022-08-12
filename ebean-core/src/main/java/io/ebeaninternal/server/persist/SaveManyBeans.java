@@ -6,18 +6,10 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.BeanCollectionUtil;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.IntersectionRow;
+import io.ebeaninternal.server.deploy.*;
 
 import javax.persistence.PersistenceException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 
@@ -305,7 +297,7 @@ final class SaveManyBeans extends SaveManyBase {
         // the object from the 'other' side of the ManyToMany
         // build a intersection row for 'delete'
         IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
-        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
+        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD, many.extraWhere());
         persister.executeOrQueue(sqlDelete, transaction, queue);
       }
     }
@@ -322,6 +314,18 @@ final class SaveManyBeans extends SaveManyBase {
         } else {
           if (!many.hasImportedId(otherBean)) {
             throw new PersistenceException("ManyToMany bean " + otherBean + " does not have an Id value.");
+          } else if (many.getIntersectionFactory() != null) {
+            // build a intersection bean for 'insert'
+            // They need to be executed very late and would normally go to Queue#2, but we do not have
+            // a SpiSqlUpdate for now.
+            if (queue) {
+              transaction.depth(+100);
+            }
+            Object intersectionBean = many.getIntersectionFactory().invoke(parentBean, otherBean);
+            persister.saveRecurse((EntityBean) intersectionBean, transaction, parentBean, request.flags());
+            if (queue) {
+              transaction.depth(-100);
+            }
           } else {
             // build a intersection row for 'insert'
             IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);

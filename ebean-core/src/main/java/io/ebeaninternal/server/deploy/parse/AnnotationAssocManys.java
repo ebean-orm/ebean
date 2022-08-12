@@ -4,15 +4,13 @@ import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
 import io.ebean.annotation.HistoryExclude;
 import io.ebean.annotation.Where;
+import io.ebean.annotation.ext.IntersectionFactory;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.config.NamingConvention;
 import io.ebean.config.TableName;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.CamelCaseHelper;
-import io.ebeaninternal.server.deploy.BeanDescriptorManager;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanTable;
-import io.ebeaninternal.server.deploy.PropertyForeignKey;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
@@ -128,6 +126,11 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       prop.getTableJoin().addJoinColumn(util, true, joinColumns, beanTable);
     }
 
+    IntersectionFactory intersectionFactory = get(prop, IntersectionFactory.class);
+    if (intersectionFactory != null) {
+      readIntersectionFactory(prop, intersectionFactory);
+    }
+
     JoinTable joinTable = get(prop, JoinTable.class);
     if (joinTable != null) {
       if (prop.isManyToMany()) {
@@ -163,6 +166,12 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       BeanTable owningBeanTable = factory.beanTable(descriptor.getBeanType());
       owningBeanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), false, prop.getSqlFormulaSelect());
     }
+  }
+
+  private void readIntersectionFactory(DeployBeanPropertyAssocMany<?> prop, IntersectionFactory factory) {
+    Class<?> leftSide = descriptor.getBeanType();
+    Class<?> rightSide = prop.getPropertyType();
+    prop.setIntersectionFactory(new IntersectionFactoryHelp(factory.value(), leftSide, rightSide, factory.factoryMethod()));
   }
 
   private void checkSelfManyToMany(DeployBeanPropertyAssocMany<?> prop) {

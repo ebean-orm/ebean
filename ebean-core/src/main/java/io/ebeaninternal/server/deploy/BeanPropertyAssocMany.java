@@ -41,6 +41,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   private final String intersectionPublishTable;
   private final String intersectionDraftTable;
   private final boolean orphanRemoval;
+  private final IntersectionFactoryHelp intersectionFactory;
   private IntersectionTable intersectionTable;
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
@@ -99,6 +100,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     this.mapKey = deploy.getMapKey();
     this.fetchOrderBy = deploy.getFetchOrderBy();
     this.intersectionJoin = deploy.createIntersectionTableJoin();
+    this.intersectionFactory = deploy.getIntersectionFactory();
     if (intersectionJoin != null) {
       this.tableManaged = deploy.isTableManaged();
       this.intersectionPublishTable = intersectionJoin.getTable();
@@ -1059,4 +1061,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       return false;
     }
   }
+
+  public boolean isTableManaged() {
+    return tableManaged;
+  }
+
+  public IntersectionFactoryHelp getIntersectionFactory() {
+    return intersectionFactory;
+  }
+
 }
