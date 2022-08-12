@@ -1767,7 +1767,7 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Execute the query returning a single value for a single property.
+   * Execute the query returning a single value or null for a single property.
    * <p>
    * <h3>Example</h3>
    * <pre>{@code
@@ -1781,6 +1781,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @return the list of values for the selected property
    */
+  @Nullable
   public <A> A findSingleAttribute() {
     return query.findSingleAttribute();
   }
