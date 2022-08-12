@@ -307,6 +307,7 @@ final class SaveManyBeans extends SaveManyBase {
     }
 
     transaction.depth(+1);
+    boolean needsFlush = false;
     if (deletions != null && !deletions.isEmpty()) {
       for (Object other : deletions) {
         EntityBean otherDelete = (EntityBean) other;
@@ -315,6 +316,7 @@ final class SaveManyBeans extends SaveManyBase {
         IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
         SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD, many.extraWhere());
         persister.executeOrQueue(sqlDelete, transaction, queue);
+        needsFlush = true;
       }
     }
     if (additions != null && !additions.isEmpty()) {
@@ -334,6 +336,9 @@ final class SaveManyBeans extends SaveManyBase {
             // build a intersection bean for 'insert'
             // They need to be executed very late and would normally go to Queue#2, but we do not have
             // a SpiSqlUpdate for now.
+            if (needsFlush) {
+              transaction.flushBatchOnCascade();
+            }
             if (queue) {
               transaction.depth(+100);
             }

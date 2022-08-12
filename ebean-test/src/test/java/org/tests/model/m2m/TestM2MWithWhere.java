@@ -19,7 +19,7 @@ public class TestM2MWithWhere extends BaseTestCase {
 
   @Test
   public void testModify() throws Exception {
- 
+
     MnyNode node1 = new MnyNode();
     node1.setName("node1");
     node1.setId(111);
@@ -51,6 +51,12 @@ public class TestM2MWithWhere extends BaseTestCase {
     DB.save(node1);
     DB.refresh(node2);
     assertThat(node2.getAllRelations()).containsExactlyInAnyOrder(node3);
+
+    node2.getAllRelations().clear();
+    node2.getAllRelations().add(node3);
+    LoggedSql.start();
+    DB.save(node2);
+    LoggedSql.stop().forEach(System.out::println);
 
   }
 
