@@ -73,15 +73,17 @@
 
     <!-- Including JAXB for DB Migration generation with Java 11+ -->
     <dependency>
-      <groupId>jakarta.xml.bind</groupId>
-      <artifactId>jakarta.xml.bind-api</artifactId>
-      <version>4.0.0</version>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>2.3.6</version>
     </dependency>
+
+    <!-- Needed for module path compile, jaxb foo bar needs review -->
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>4.0.0</version>
-      <scope>runtime</scope>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
+      <version>1.2.1</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Not strictly required but bring in H2 Driver because we use it so much -->
