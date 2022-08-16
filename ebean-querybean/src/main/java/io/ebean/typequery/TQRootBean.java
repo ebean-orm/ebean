@@ -1779,7 +1779,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    *
-   * @return the list of values for the selected property
+   * @return a single value or null for the selected property
    */
   @Nullable
   public <A> A findSingleAttribute() {
