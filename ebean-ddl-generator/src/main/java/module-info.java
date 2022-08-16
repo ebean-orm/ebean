@@ -7,7 +7,7 @@ module io.ebean.ddl.generator {
 
   requires transitive io.ebean.ddl.runner;
   requires transitive io.ebean.core;
-  requires transitive jakarta.xml.bind;
+  requires transitive java.xml.bind;
   requires io.ebean.core.type;
   requires io.ebean.migration;
 
