@@ -21,7 +21,7 @@ final class RawSqlQueryPlanKey implements CQueryPlanKey {
 
   @Override
   public String toString() {
-    return getPartialKey() + ":r";
+    return partialKey() + ":r";
   }
 
   @Override
@@ -35,7 +35,7 @@ final class RawSqlQueryPlanKey implements CQueryPlanKey {
    * can be used as a short form proxy for the actual sql.
    */
   @Override
-  public String getPartialKey() {
+  public String partialKey() {
     return hashCode() + "_0";
   }
 

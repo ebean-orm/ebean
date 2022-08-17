@@ -1330,7 +1330,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     copy.setFutureFetch(true);
     Transaction newTxn = createTransaction();
     QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy, newTxn));
-    backgroundExecutor.execute(queryFuture.getFutureTask());
+    backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 
@@ -1340,7 +1340,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     copy.setFutureFetch(true);
     Transaction newTxn = createTransaction();
     QueryFutureIds<T> queryFuture = new QueryFutureIds<>(new CallableQueryIds<>(this, copy, newTxn));
-    backgroundExecutor.execute(queryFuture.getFutureTask());
+    backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 
@@ -1357,7 +1357,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     // Create a new transaction solely to execute the findList() at some future time
     Transaction newTxn = createTransaction();
     QueryFutureList<T> queryFuture = new QueryFutureList<>(new CallableQueryList<>(this, spiQuery, newTxn));
-    backgroundExecutor.execute(queryFuture.getFutureTask());
+    backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 

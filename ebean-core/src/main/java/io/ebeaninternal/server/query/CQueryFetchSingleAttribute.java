@@ -58,12 +58,12 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   /**
    * Return a summary description of this query.
    */
-  String getSummary() {
+  String summary() {
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindAttr exeMicros[").append(executionTimeMicros)
       .append("] rows[").append(rowCount)
       .append("] type[").append(desc.name())
-      .append("] predicates[").append(predicates.getLogWhereSql())
+      .append("] predicates[").append(predicates.logWhereSql())
       .append("] bind[").append(bindLog).append("]");
     return sb.toString();
   }
@@ -75,6 +75,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   /**
    * Execute the query returning the row count.
    */
+  @SuppressWarnings({"rawtypes", "unchecked"})
   void findCollection(Collection result) throws SQLException {
     long startNano = System.nanoTime();
     try {
@@ -92,27 +93,27 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
       if (queryPlan.executionTime(executionTimeMicros)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
-      getTransaction().profileEvent(this);
+      transaction().profileEvent(this);
     } finally {
       close();
     }
   }
 
-  private SpiTransaction getTransaction() {
+  private SpiTransaction transaction() {
     return request.transaction();
   }
 
   /**
    * Return the bind log.
    */
-  String getBindLog() {
+  String bindLog() {
     return bindLog;
   }
 
   /**
    * Return the generated sql.
    */
-  String getGeneratedSql() {
+  String generatedSql() {
     return sql;
   }
 
@@ -120,7 +121,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
     lock.lock();
     try {
       query.checkCancelled();
-      SpiTransaction t = getTransaction();
+      SpiTransaction t = transaction();
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
       pstmt = conn.prepareStatement(sql);
@@ -160,12 +161,12 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
 
   @Override
   public void profile() {
-    getTransaction()
+    transaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
   }
 
-  Set<String> getDependentTables() {
+  Set<String> dependentTables() {
     return queryPlan.dependentTables();
   }
 

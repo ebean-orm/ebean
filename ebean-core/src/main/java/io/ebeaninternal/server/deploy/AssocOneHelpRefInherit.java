@@ -63,7 +63,7 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
 
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     // add join to support the discriminator column
-    String relativePrefix = ctx.getRelativePrefix(property.name);
+    String relativePrefix = ctx.relativePrefix(property.name);
     ctx.addExtraJoin(new Extra(relativePrefix, joinType));
   }
 
@@ -92,8 +92,8 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!subQuery) {
       // add discriminator column
-      String relativePrefix = ctx.getRelativePrefix(property.name());
-      String tableAlias = ctx.getTableAlias(relativePrefix);
+      String relativePrefix = ctx.relativePrefix(property.name());
+      String tableAlias = ctx.tableAlias(relativePrefix);
       ctx.appendColumn(tableAlias, property.targetInheritInfo.getDiscriminatorColumn());
     }
     property.importedId.sqlAppend(ctx);

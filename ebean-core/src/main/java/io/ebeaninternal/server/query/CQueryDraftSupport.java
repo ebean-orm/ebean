@@ -22,7 +22,7 @@ final class CQueryDraftSupport {
    * This returns null for entities that are not draftable and in that case
    * the usual base table is used.
    */
-  String getDraftTable(String table) {
+  String draftTable(String table) {
     return tableMap.get(table);
   }
 }

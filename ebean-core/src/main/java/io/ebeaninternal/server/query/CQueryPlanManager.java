@@ -62,7 +62,7 @@ public final class CQueryPlanManager implements QueryPlanManager {
       while (req.hasNext()) {
         req.nextCapture();
       }
-      return req.getPlans();
+      return req.plans();
     } catch (SQLException e) {
       CoreLog.log.error("Error during query plan collection", e);
       return emptyList();

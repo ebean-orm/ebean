@@ -50,7 +50,7 @@ public final class CQueryPlanStats {
   /**
    * Return the last time this query was executed.
    */
-  long getLastQueryTime() {
+  long lastQueryTime() {
     return lastQueryTime;
   }
 

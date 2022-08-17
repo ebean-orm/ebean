@@ -31,7 +31,7 @@ public interface DbSqlContext {
   /**
    * Return a list of encrypted properties which require additional binding.
    */
-  BeanProperty[] getEncryptedProps();
+  BeanProperty[] encryptedProps();
 
   /**
    * Append a string directly to the SQL buffer.
@@ -83,7 +83,7 @@ public interface DbSqlContext {
   /**
    * Return the current context of the sql context.
    */
-  String getContent();
+  String content();
 
   /**
    * Push a join node onto the stack.
@@ -99,14 +99,14 @@ public interface DbSqlContext {
    * Return a table alias without many where clause joins. Typically this is for
    * the select clause (fetch joins).
    */
-  String getTableAlias(String prefix);
+  String tableAlias(String prefix);
 
   /**
    * Return a table alias that takes into account many where joins.
    */
-  String getTableAliasManyWhere(String prefix);
+  String tableAliasManyWhere(String prefix);
 
-  String getRelativePrefix(String propName);
+  String relativePrefix(String propName);
 
   /**
    * Append the lower and upper bound columns into the select clause

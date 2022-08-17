@@ -350,60 +350,60 @@ public final class CQueryPredicates {
   /**
    * Return the bind values for the where expression.
    */
-  public List<Object> getWhereExprBindValues() {
+  public List<Object> whereExprBindValues() {
     return where == null ? Collections.emptyList() : where.getBindValues();
   }
 
   /**
    * Return the db update set clause for an UpdateQuery.
    */
-  String getDbUpdateClause() {
+  String dbUpdateClause() {
     return dbUpdateClause;
   }
 
   /**
    * Return the db column version of the combined where clause.
    */
-  String getDbHaving() {
+  String dbHaving() {
     return dbHaving;
   }
 
   /**
    * Return the db column version of the combined where clause.
    */
-  String getDbWhere() {
+  String dbWhere() {
     return dbWhere;
   }
 
   /**
    * Return a db filter for filtering many fetch joins.
    */
-  String getDbFilterMany() {
+  String dbFilterMany() {
     return dbFilterMany;
   }
 
   /**
    * Return the db column version of the order by clause.
    */
-  String getDbOrderBy() {
+  String dbOrderBy() {
     return dbOrderBy;
   }
 
   /**
    * Return the includes required for the where and order by clause.
    */
-  Set<String> getPredicateIncludes() {
+  Set<String> predicateIncludes() {
     return predicateIncludes;
   }
 
   /**
    * Return the orderBy includes.
    */
-  Set<String> getOrderByIncludes() {
+  Set<String> orderByIncludes() {
     return orderByIncludes;
   }
 
-  String getLogWhereSql() {
+  String logWhereSql() {
     if (dbWhere == null && dbFilterMany == null) {
       return "";
     }

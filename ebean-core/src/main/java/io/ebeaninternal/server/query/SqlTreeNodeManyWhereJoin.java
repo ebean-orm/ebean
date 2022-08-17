@@ -73,7 +73,6 @@ final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
    */
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType currentJoinType) {
-
     // always use the join type as per this many where join
     // (OUTER for disjunction and otherwise INNER)
     appendFromBaseTable(ctx, manyJoinType);
@@ -84,9 +83,8 @@ final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
    * intersection table if this is a ManyToMany node.
    */
   private void appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
-
-    String alias = ctx.getTableAliasManyWhere(prefix);
-    String parentAlias = ctx.getTableAliasManyWhere(parentPrefix);
+    String alias = ctx.tableAliasManyWhere(prefix);
+    String parentAlias = ctx.tableAliasManyWhere(parentPrefix);
 
     if (nodeBeanProp instanceof STreePropertyAssocOne) {
       nodeBeanProp.addJoin(joinType, parentAlias, alias, ctx);

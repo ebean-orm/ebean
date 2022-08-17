@@ -104,8 +104,8 @@ public final class SqlTreeBuilder {
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
     this.distinctNoLobs = builder.isPlatformDistinctNoLobs();
     String fromForUpdate = builder.fromForUpdate(query);
-    CQueryHistorySupport historySupport = builder.getHistorySupport(query);
-    CQueryDraftSupport draftSupport = builder.getDraftSupport(query);
+    CQueryHistorySupport historySupport = builder.historySupport(query);
+    CQueryDraftSupport draftSupport = builder.draftSupport(query);
     String colAlias = subQuery ? null : columnAliasPrefix;
     this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate);
   }
@@ -129,7 +129,7 @@ public final class SqlTreeBuilder {
       inheritanceWhereSql = buildWhereClause();
       groupBy = buildGroupByClause();
       distinctOn = buildDistinctOn();
-      encryptedProps = ctx.getEncryptedProps();
+      encryptedProps = ctx.encryptedProps();
       query.incrementAsOfTableCount(ctx.asOfTableCount());
     }
 
@@ -146,7 +146,7 @@ public final class SqlTreeBuilder {
       return "1";
     }
     rootNode.appendSelect(ctx, subQuery);
-    return trimComma(ctx.getContent());
+    return trimComma(ctx.content());
   }
 
   private String buildGroupByClause() {
@@ -155,7 +155,7 @@ public final class SqlTreeBuilder {
     }
     ctx.startGroupBy();
     rootNode.appendGroupBy(ctx, subQuery);
-    return trimComma(ctx.getContent());
+    return trimComma(ctx.content());
   }
 
   private String buildDistinctOn() {
@@ -164,8 +164,8 @@ public final class SqlTreeBuilder {
     }
     ctx.startGroupBy();
     rootNode.appendDistinctOn(ctx, subQuery);
-    String idCols = trimComma(ctx.getContent());
-    return idCols == null ? null : mergeOnDistinct(idCols, predicates.getDbOrderBy());
+    String idCols = trimComma(ctx.content());
+    return idCols == null ? null : mergeOnDistinct(idCols, predicates.dbOrderBy());
   }
 
   static String mergeOnDistinct(String idCols, String dbOrderBy) {
@@ -201,7 +201,7 @@ public final class SqlTreeBuilder {
       return "Not Used";
     }
     rootNode.appendWhere(ctx);
-    return ctx.getContent();
+    return ctx.content();
   }
 
   private String buildFromClause() {
@@ -209,14 +209,14 @@ public final class SqlTreeBuilder {
       return "Not Used";
     }
     rootNode.appendFrom(ctx, SqlJoinType.AUTO);
-    return ctx.getContent();
+    return ctx.content();
   }
 
   private void buildRoot(STreeType desc) {
     rootNode = buildSelectChain(null, null, desc, null);
     if (!rawSql) {
       alias.addJoin(queryDetail.getFetchPaths(), desc);
-      alias.addJoin(predicates.getPredicateIncludes(), desc);
+      alias.addJoin(predicates.predicateIncludes(), desc);
       alias.addManyWhereJoins(manyWhereJoins.getPropertyNames());
       // build set of table alias
       alias.buildAlias();
@@ -348,7 +348,7 @@ public final class SqlTreeBuilder {
     if (rawSql) {
       return;
     }
-    Set<String> predicateIncludes = predicates.getPredicateIncludes();
+    Set<String> predicateIncludes = predicates.predicateIncludes();
     if (predicateIncludes == null) {
       return;
     }
@@ -360,7 +360,7 @@ public final class SqlTreeBuilder {
 
     // remove ManyWhereJoins from the predicateIncludes
     predicateIncludes.removeAll(manyWhereJoins.getPropertyNames());
-    predicateIncludes.addAll(predicates.getOrderByIncludes());
+    predicateIncludes.addAll(predicates.orderByIncludes());
 
     // look for predicateIncludes that are not in selectIncludes and add
     // them as extra joins to the query
@@ -641,7 +641,7 @@ public final class SqlTreeBuilder {
         SqlTreeNodeExtraJoin root = findExtraJoinRoot(includeProp, extraJoin);
         // register the root because these are the only ones we
         // return back.
-        rootRegister.put(root.getName(), root);
+        rootRegister.put(root.name(), root);
       }
     }
 
@@ -653,7 +653,7 @@ public final class SqlTreeBuilder {
       if (extra == null) {
         return null;
       } else {
-        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.getProperty(), extra.isContainsMany(), temporalMode);
+        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
         joinRegister.put(propertyName, extraJoin);
         return extraJoin;
       }

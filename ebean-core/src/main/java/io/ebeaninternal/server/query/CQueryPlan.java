@@ -92,7 +92,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
     this.logWhereSql = logWhereSql;
-    this.encryptedProps = sqlTree.getEncryptedProps();
+    this.encryptedProps = sqlTree.encryptedProps();
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(query);
@@ -117,7 +117,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.sqlTree = sqlTree;
     this.rawSql = false;
     this.logWhereSql = logWhereSql;
-    this.encryptedProps = sqlTree.getEncryptedProps();
+    this.encryptedProps = sqlTree.encryptedProps();
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCaptureRaw(sql, query);
@@ -247,7 +247,7 @@ public class CQueryPlan implements SpiQueryPlan {
 
   private String calcAuditQueryKey() {
     // rawSql needs to include the MD5 hash of the sql
-    return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
+    return rawSql ? planKey.partialKey() + "_" + hash : planKey.partialKey();
   }
 
   final SqlTreePlan sqlTree() {
@@ -288,11 +288,11 @@ public class CQueryPlan implements SpiQueryPlan {
    * Return the time this query plan was last used.
    */
   public final long lastQueryTime() {
-    return stats.getLastQueryTime();
+    return stats.lastQueryTime();
   }
 
   final ScalarDataReader<?> singleAttributeScalarType() {
-    return sqlTree.getRootNode().getSingleAttributeReader();
+    return sqlTree.rootNode().singleAttributeReader();
   }
 
   /**

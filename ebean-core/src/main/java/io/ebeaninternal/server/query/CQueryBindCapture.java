@@ -62,14 +62,14 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
    * Collect the query plan using already captured bind values.
    */
   public boolean collectQueryPlan(CQueryPlanRequest request) {
-    if (bindCapture == null || request.getSince() < lastBindCapture) {
+    if (bindCapture == null || request.since() < lastBindCapture) {
       // no bind capture since the last capture
       return false;
     }
 
     final BindCapture last = this.bindCapture;
 
-    SpiDbQueryPlan queryPlan = manager.collectPlan(request.getConnection(), this.queryPlan, last);
+    SpiDbQueryPlan queryPlan = manager.collectPlan(request.connection(), this.queryPlan, last);
     if (queryPlan != null) {
       request.add(queryPlan.with(queryTimeMicros, captureCount));
       // effectively turn off bind capture for this plan
