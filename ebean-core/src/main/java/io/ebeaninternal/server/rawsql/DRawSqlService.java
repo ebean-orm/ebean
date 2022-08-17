@@ -58,6 +58,7 @@ public final class DRawSqlService implements SpiRawSqlService {
           ret.put(name, resultSet.getString(i));
           break;
 
+        case Types.LONGVARBINARY:
         case Types.BLOB:
           ret.put(name, resultSet.getBytes(i));
           break;

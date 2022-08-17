@@ -298,7 +298,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
   }
 
   @Test
-  public void testBLobClosedConnection() throws Exception {
+  void testBLobClosedConnection() throws Exception {
     final PersistentFileContent pfc = new PersistentFileContent();
     final byte[] bytes = "This is the blob as String".getBytes(StandardCharsets.UTF_8);
     pfc.setContent(bytes);
