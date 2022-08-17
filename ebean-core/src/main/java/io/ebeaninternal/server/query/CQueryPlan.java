@@ -157,39 +157,39 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   @Override
-  public final Class<?> getBeanType() {
+  public final Class<?> beanType() {
     return beanType;
   }
 
   @Override
-  public final String getName() {
+  public final String name() {
     return name;
   }
 
   @Override
-  public final String getHash() {
+  public final String hash() {
     return hash;
   }
 
   @Override
-  public final String getSql() {
+  public final String sql() {
     return sql;
   }
 
   @Override
-  public final ProfileLocation getProfileLocation() {
+  public final ProfileLocation profileLocation() {
     return profileLocation;
   }
 
-  public final String getLabel() {
+  public final String label() {
     return label;
   }
 
-  public final Set<String> getDependentTables() {
+  public final Set<String> dependentTables() {
     return dependentTables;
   }
 
-  public final String getLocation() {
+  public final String location() {
     return location;
   }
 
@@ -200,7 +200,7 @@ public class CQueryPlan implements SpiQueryPlan {
 
   @Override
   public final DQueryPlanOutput createMeta(String bind, String planString) {
-    return new DQueryPlanOutput(getBeanType(), name, hash, sql, profileLocation, bind, planString);
+    return new DQueryPlanOutput(beanType(), name, hash, sql, profileLocation, bind, planString);
   }
 
   public DataReader createDataReader(ResultSet rset) {
@@ -230,14 +230,14 @@ public class CQueryPlan implements SpiQueryPlan {
     return dataBind;
   }
 
-  final int getAsOfTableCount() {
+  final int asOfTableCount() {
     return asOfTableCount;
   }
 
   /**
    * Return a key used in audit logging to identify the query.
    */
-  final String getAuditQueryKey() {
+  final String auditQueryKey() {
     if (auditQueryHash == null) {
       // volatile object assignment (so happy for multithreaded access)
       auditQueryHash = calcAuditQueryKey();
@@ -250,7 +250,7 @@ public class CQueryPlan implements SpiQueryPlan {
     return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
   }
 
-  final SqlTreePlan getSqlTree() {
+  final SqlTreePlan sqlTree() {
     return sqlTree;
   }
 
@@ -258,7 +258,7 @@ public class CQueryPlan implements SpiQueryPlan {
     return rawSql;
   }
 
-  final String getLogWhereSql() {
+  final String logWhereSql() {
     return logWhereSql;
   }
 
@@ -287,11 +287,11 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Return the time this query plan was last used.
    */
-  public final long getLastQueryTime() {
+  public final long lastQueryTime() {
     return stats.getLastQueryTime();
   }
 
-  final ScalarDataReader<?> getSingleAttributeScalarType() {
+  final ScalarDataReader<?> singleAttributeScalarType() {
     return sqlTree.getRootNode().getSingleAttributeReader();
   }
 

@@ -331,10 +331,10 @@ public final class CQueryEngine {
       if (request.logSql()) {
         logSql(cquery);
       }
-      return new SpiResultSet(cquery.getPstmt(), resultSet);
+      return new SpiResultSet(cquery.pstmt(), resultSet);
 
     } catch (SQLException e) {
-      JdbcClose.close(cquery.getPstmt());
+      JdbcClose.close(cquery.pstmt());
       throw cquery.createPersistenceException(e);
     }
   }
@@ -366,7 +366,7 @@ public final class CQueryEngine {
       }
       request.executeSecondaryQueries(false);
       if (request.isQueryCachePut()) {
-        request.addDependentTables(cquery.getDependentTables());
+        request.addDependentTables(cquery.dependentTables());
       }
       return beanCollection;
 
@@ -414,14 +414,14 @@ public final class CQueryEngine {
    * Log the generated SQL to the transaction log.
    */
   private void logSql(CQuery<?> query) {
-    query.getTransaction().logSql(Str.add(query.getGeneratedSql(), "; --bind(", query.getBindLog(), ") --micros(", query.micros() + ")"));
+    query.transaction().logSql(Str.add(query.generatedSql(), "; --bind(", query.bindLog(), ") --micros(", query.micros() + ")"));
   }
 
   /**
    * Log the FindById summary to the transaction log.
    */
   private void logFindBeanSummary(CQuery<?> q) {
-    SpiQuery<?> query = q.getQueryRequest().query();
+    SpiQuery<?> query = q.request().query();
     String loadMode = query.getLoadMode();
     String loadDesc = query.getLoadDescription();
     String lazyLoadProp = query.getLazyLoadProperty();
@@ -438,7 +438,7 @@ public final class CQueryEngine {
     if (loadMode != null) {
       msg.append("mode[").append(loadMode).append("] ");
     }
-    msg.append("type[").append(q.getBeanName()).append("] ");
+    msg.append("type[").append(q.beanName()).append("] ");
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
@@ -454,17 +454,17 @@ public final class CQueryEngine {
     if (loadDesc != null) {
       msg.append("load[").append(loadDesc).append("] ");
     }
-    msg.append("exeMicros[").append(q.getQueryExecutionTimeMicros());
-    msg.append("] rows[").append(q.getLoadedRowDetail());
-    msg.append("] bind[").append(q.getBindLog()).append("]");
-    q.getTransaction().logSummary(msg.toString());
+    msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
+    msg.append("] rows[").append(q.loadedRowDetail());
+    msg.append("] bind[").append(q.bindLog()).append("]");
+    q.transaction().logSummary(msg.toString());
   }
 
   /**
    * Log the FindMany to the transaction log.
    */
   private void logFindManySummary(CQuery<?> q) {
-    SpiQuery<?> query = q.getQueryRequest().query();
+    SpiQuery<?> query = q.request().query();
     String loadMode = query.getLoadMode();
     String loadDesc = query.getLoadDescription();
     String lazyLoadProp = query.getLazyLoadProperty();
@@ -482,7 +482,7 @@ public final class CQueryEngine {
     if (loadMode != null) {
       msg.append("mode[").append(loadMode).append("] ");
     }
-    msg.append("type[").append(q.getBeanName()).append("] ");
+    msg.append("type[").append(q.beanName()).append("] ");
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
@@ -498,10 +498,10 @@ public final class CQueryEngine {
     if (loadDesc != null) {
       msg.append("load[").append(loadDesc).append("] ");
     }
-    msg.append("exeMicros[").append(q.getQueryExecutionTimeMicros());
-    msg.append("] rows[").append(q.getLoadedRowDetail());
-    msg.append("] predicates[").append(q.getLogWhereSql());
-    msg.append("] bind[").append(q.getBindLog()).append("]");
-    q.getTransaction().logSummary(msg.toString());
+    msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
+    msg.append("] rows[").append(q.loadedRowDetail());
+    msg.append("] predicates[").append(q.logWhereSql());
+    msg.append("] bind[").append(q.bindLog()).append("]");
+    q.transaction().logSummary(msg.toString());
   }
 }

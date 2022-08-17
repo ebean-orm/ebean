@@ -57,8 +57,8 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     CQuery<?> subQuery = compileSubQuery(request);
-    this.bindParams = subQuery.getPredicates().getWhereExprBindValues();
-    this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
+    this.bindParams = subQuery.predicates().getWhereExprBindValues();
+    this.sql = subQuery.generatedSql().replace('\n', ' ');
   }
 
   @Override

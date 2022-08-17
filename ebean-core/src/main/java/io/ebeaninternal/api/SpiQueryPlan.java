@@ -10,27 +10,27 @@ public interface SpiQueryPlan {
   /**
    * The related entity bean type
    */
-  Class<?> getBeanType();
+  Class<?> beanType();
 
   /**
    * The plan name.
    */
-  String getName();
+  String name();
 
   /**
    * The hash of the sql.
    */
-  String getHash();
+  String hash();
 
   /**
    * The SQL for the query plan.
    */
-  String getSql();
+  String sql();
 
   /**
    * The related profile location.
    */
-  ProfileLocation getProfileLocation();
+  ProfileLocation profileLocation();
 
   /**
    * Initiate bind capture with the give threshold.

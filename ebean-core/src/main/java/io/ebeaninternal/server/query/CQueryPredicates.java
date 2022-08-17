@@ -111,7 +111,7 @@ public final class CQueryPredicates {
     }
     CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
-      int asOfTableCount = queryPlan.getAsOfTableCount();
+      int asOfTableCount = queryPlan.asOfTableCount();
       if (asOfTableCount > 0) {
         // bind the asOf value for each table alias as part of the from/join clauses
         // there is one effective date predicate per table alias

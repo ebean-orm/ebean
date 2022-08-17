@@ -163,8 +163,8 @@ class SqlTreeLoadBean implements SqlTreeLoad {
     }
 
     private void initPersistenceContext() {
-      queryMode = ctx.getQueryMode();
-      persistenceContext = (!readIdNormal) ? null : ctx.getPersistenceContext();
+      queryMode = ctx.queryMode();
+      persistenceContext = (!readIdNormal) ? null : ctx.persistenceContext();
     }
 
     private void readId() throws SQLException {

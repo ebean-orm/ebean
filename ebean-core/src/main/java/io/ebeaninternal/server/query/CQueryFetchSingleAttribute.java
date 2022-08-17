@@ -15,9 +15,7 @@ import io.ebeaninternal.server.type.RsetDataReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -49,11 +47,11 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
     this.request = request;
     this.queryPlan = queryPlan;
     this.query = request.query();
-    this.sql = queryPlan.getSql();
+    this.sql = queryPlan.sql();
     this.desc = request.descriptor();
     this.predicates = predicates;
     this.containsCounts = containsCounts;
-    this.reader = queryPlan.getSingleAttributeScalarType();
+    this.reader = queryPlan.singleAttributeScalarType();
     query.setGeneratedSql(sql);
   }
 
@@ -168,7 +166,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   }
 
   Set<String> getDependentTables() {
-    return queryPlan.getDependentTables();
+    return queryPlan.dependentTables();
   }
 
   @Override

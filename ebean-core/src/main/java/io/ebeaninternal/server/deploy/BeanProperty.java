@@ -506,7 +506,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public void loadIgnore(DbReadContext ctx) {
-    scalarType.loadIgnore(ctx.getDataReader());
+    scalarType.loadIgnore(ctx.dataReader());
   }
 
   @Override
@@ -541,11 +541,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object read(DbReadContext ctx) throws SQLException {
-    return scalarType.read(ctx.getDataReader());
+    return scalarType.read(ctx.dataReader());
   }
 
   public Object readSet(DbReadContext ctx, EntityBean bean) throws SQLException {
-    return readSet(ctx.getDataReader(), bean);
+    return readSet(ctx.dataReader(), bean);
   }
 
   @SuppressWarnings("unchecked")

@@ -17,7 +17,7 @@ public final class QueryPlanLoggerExplain extends QueryPlanLogger {
 
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
-    try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN " + plan.getSql())) {
+    try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN " + plan.sql())) {
       bind.prepare(explainStmt, conn);
       try (ResultSet rset = explainStmt.executeQuery()) {
         return readQueryPlan(plan, bind, rset);

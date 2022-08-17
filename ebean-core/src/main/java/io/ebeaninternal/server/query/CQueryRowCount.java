@@ -42,7 +42,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
     this.queryPlan = queryPlan;
     this.request = request;
     this.query = request.query();
-    this.sql = queryPlan.getSql();
+    this.sql = queryPlan.sql();
     this.desc = request.descriptor();
     this.predicates = predicates;
     query.setGeneratedSql(sql);
@@ -141,7 +141,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   }
 
   Set<String> getDependentTables() {
-    return queryPlan.getDependentTables();
+    return queryPlan.dependentTables();
   }
 
   @Override

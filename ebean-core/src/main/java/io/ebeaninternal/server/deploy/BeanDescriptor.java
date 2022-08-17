@@ -1468,7 +1468,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
-      if (request.includeHash(queryPlan.getHash())) {
+      if (request.includeHash(queryPlan.hash())) {
         queryPlan.queryPlanInit(request.thresholdMicros());
         list.add(queryPlan.createMeta(null, null));
       }
@@ -1500,7 +1500,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Trim query plans not used since the passed in epoch time.
    */
   void trimQueryPlans(long unusedSince) {
-    queryPlanCache.values().removeIf(queryPlan -> queryPlan.getLastQueryTime() < unusedSince);
+    queryPlanCache.values().removeIf(queryPlan -> queryPlan.lastQueryTime() < unusedSince);
   }
 
   /**

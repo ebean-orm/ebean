@@ -22,7 +22,7 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
   @Override
   void loadIgnore(DbReadContext ctx) {
     property.targetIdBinder.loadIgnore(ctx);
-    ctx.getDataReader().incrementPos(1);
+    ctx.dataReader().incrementPos(1);
   }
 
   /**
@@ -47,7 +47,7 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
       return null;
     }
     // check transaction context to see if it already exists
-    PersistenceContext pc = ctx.getPersistenceContext();
+    PersistenceContext pc = ctx.persistenceContext();
     Object existing = desc.contextGet(pc, id);
     if (existing != null) {
       return existing;
