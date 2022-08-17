@@ -32,10 +32,10 @@ public final class EbeanVersion {
         if (in != null) {
           try (LineNumberReader reader = new LineNumberReader(new InputStreamReader(in))) {
             version = reader.readLine();
+            log.info("ebean version: {}", version);
           }
         }
       }
-      log.info("ebean version: {}", version);
     } catch (IOException e) {
       log.warn("Could not determine ebean version: {}", e.getMessage());
     }
