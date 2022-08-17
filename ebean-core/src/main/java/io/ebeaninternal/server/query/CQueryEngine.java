@@ -3,6 +3,7 @@ package io.ebeaninternal.server.query;
 import io.ebean.QueryIterator;
 import io.ebean.ValuePair;
 import io.ebean.Version;
+import io.ebean.annotation.Platform;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
@@ -32,19 +33,13 @@ import java.util.*;
 public final class CQueryEngine {
 
   private static final Logger log = CoreLog.log;
-
   private static final String T0 = "t0";
 
   private final int defaultFetchSizeFindList;
-
   private final int defaultFetchSizeFindEach;
-
   private final boolean forwardOnlyHintOnFindIterate;
-
   private final CQueryBuilder queryBuilder;
-
   private final CQueryHistorySupport historySupport;
-
   private final DatabasePlatform dbPlatform;
 
   public CQueryEngine(DatabaseConfig config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
@@ -54,6 +49,11 @@ public final class CQueryEngine {
     this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
     this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, config.getAsOfSysPeriod());
     this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
+  }
+
+  public int forwardOnlyFetchSize() {
+    Platform base = dbPlatform.getPlatform().base();
+    return Platform.MYSQL == base ? Integer.MIN_VALUE : 1;
   }
 
   public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {

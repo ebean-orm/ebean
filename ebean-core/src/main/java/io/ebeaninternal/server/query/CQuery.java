@@ -314,7 +314,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       if (forwardOnlyHint) {
         // Use forward only hints for large resultSet processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        pstmt.setFetchSize(1);
+        pstmt.setFetchSize(request.forwardOnlyFetchSize());
       } else {
         pstmt = conn.prepareStatement(sql);
       }
