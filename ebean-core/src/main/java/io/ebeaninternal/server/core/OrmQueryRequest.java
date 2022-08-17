@@ -761,4 +761,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public boolean isInlineSqlUpdateLimit() {
     return query.getMaxRows() < 1 || server.databasePlatform().isInlineSqlUpdateLimit();
   }
+
+  public int forwardOnlyFetchSize() {
+    return queryEngine.forwardOnlyFetchSize();
+  }
 }
