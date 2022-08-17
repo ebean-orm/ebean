@@ -43,6 +43,8 @@ class TestDbArray_basic extends BaseTestCase {
     bean.getOtherIds().add(96L);
     bean.getOtherIds().add(97L);
     bean.setDecimals(doubles);
+    bean.setDoubs(List.of(1.1d, 2.3d));
+    bean.setFloats(List.of(1.01f, 2.02f));
     bean.setStatuses(new ArrayList<>());
     bean.getStatuses().add(EArrayBean.Status.ONE);
     bean.getStatuses().add(EArrayBean.Status.THREE);
@@ -60,6 +62,8 @@ class TestDbArray_basic extends BaseTestCase {
     found = DB.find(EArrayBean.class, bean.getId());
 
     assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
+    assertThat(found.getDoubs()).hasSize(2);
+    assertThat(found.getFloats()).hasSize(2);
 
     if (isPostgresCompatible()) {
       Query<EArrayBean> query = DB.find(EArrayBean.class)
@@ -277,9 +281,9 @@ class TestDbArray_basic extends BaseTestCase {
     List<String> phNumbers = bean.getPhoneNumbers();
     phNumbers.add("4321");
     phNumbers.add("9823");
-    List<BigDecimal> doubs = bean.getDecimals();
-    doubs.add(BigDecimal.valueOf(1.23));
-    doubs.add(BigDecimal.valueOf(4.56));
+    List<BigDecimal> decimals = bean.getDecimals();
+    decimals.add(BigDecimal.valueOf(1.23));
+    decimals.add(BigDecimal.valueOf(4.56));
     DB.save(bean);
     // Data is saved correctly
 

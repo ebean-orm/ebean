@@ -48,6 +48,9 @@ final class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
         if (valueType.equals(Integer.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
         }
+        if (valueType.equals(Float.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "real", DocPropertyType.DOUBLE, ArrayElementConverter.FLOAT));
+        }
         if (valueType.equals(Double.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
         }

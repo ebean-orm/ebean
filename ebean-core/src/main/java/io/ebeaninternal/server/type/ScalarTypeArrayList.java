@@ -57,6 +57,9 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
         if (valueType.equals(Integer.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
         }
+        if (valueType.equals(Float.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float4", DocPropertyType.DOUBLE, ArrayElementConverter.FLOAT));
+        }
         if (valueType.equals(Double.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
         }

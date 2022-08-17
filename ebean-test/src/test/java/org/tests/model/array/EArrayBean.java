@@ -42,6 +42,11 @@ public class EArrayBean {
   List<BigDecimal> decimals;
 
   @DbArray
+  List<Double> doubs;
+  @DbArray
+  List<Float> floats;
+
+  @DbArray
   List<Status> statuses;
 
   @DbArray
@@ -110,6 +115,22 @@ public class EArrayBean {
 
   public void setDecimals(List<BigDecimal> decimals) {
     this.decimals = decimals;
+  }
+
+  public List<Double> getDoubs() {
+    return doubs;
+  }
+
+  public void setDoubs(List<Double> doubs) {
+    this.doubs = doubs;
+  }
+
+  public List<Float> getFloats() {
+    return floats;
+  }
+
+  public void setFloats(List<Float> floats) {
+    this.floats = floats;
   }
 
   public List<Status> getStatuses() {
