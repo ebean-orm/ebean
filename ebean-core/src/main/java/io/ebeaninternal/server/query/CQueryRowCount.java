@@ -51,13 +51,13 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   /**
    * Return a summary description of this query.
    */
-  public String getSummary() {
+  public String summary() {
     //noinspection StringBufferReplaceableByString
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindCount exeMicros[").append(executionTimeMicros)
       .append("] rows[").append(rowCount)
       .append("] type[").append(desc.fullName())
-      .append("] predicates[").append(predicates.getLogWhereSql())
+      .append("] predicates[").append(predicates.logWhereSql())
       .append("] bind[").append(bindLog).append("]");
 
     return sb.toString();
@@ -66,14 +66,14 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   /**
    * Return the bind log.
    */
-  public String getBindLog() {
+  public String bindLog() {
     return bindLog;
   }
 
   /**
    * Return the generated sql.
    */
-  public String getGeneratedSql() {
+  public String generatedSql() {
     return sql;
   }
 
@@ -87,7 +87,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   public int findCount() throws SQLException {
     long startNano = System.nanoTime();
     try {
-      SpiTransaction t = getTransaction();
+      SpiTransaction t = transaction();
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
       lock.lock();
@@ -119,7 +119,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
     }
   }
 
-  private SpiTransaction getTransaction() {
+  private SpiTransaction transaction() {
     return request.transaction();
   }
 
@@ -135,12 +135,12 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
 
   @Override
   public void profile() {
-    getTransaction()
+    transaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
   }
 
-  Set<String> getDependentTables() {
+  Set<String> dependentTables() {
     return queryPlan.dependentTables();
   }
 

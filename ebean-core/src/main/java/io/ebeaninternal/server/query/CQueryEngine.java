@@ -76,11 +76,11 @@ public final class CQueryEngine {
     try {
       int rows = query.execute();
       if (request.logSql()) {
-        request.logSql(Str.add(query.getGeneratedSql(), "; --bind(", query.getBindLog(), ") --micros(", query.micros() + ") --rows(", rows + ")"));
+        request.logSql(Str.add(query.generatedSql(), "; --bind(", query.bindLog(), ") --micros(", query.micros() + ") --rows(", rows + ")"));
       }
       return rows;
     } catch (SQLException e) {
-      throw translate(request, query.getBindLog(), query.getGeneratedSql(), e);
+      throw translate(request, query.bindLog(), query.generatedSql(), e);
     }
   }
 
@@ -98,13 +98,13 @@ public final class CQueryEngine {
     try {
       rcQuery.findCollection(collection);
       if (request.logSql()) {
-        logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
+        logGeneratedSql(request, rcQuery.generatedSql(), rcQuery.bindLog(), rcQuery.micros());
       }
       if (request.logSummary()) {
-        request.transaction().logSummary(rcQuery.getSummary());
+        request.transaction().logSummary(rcQuery.summary());
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.getDependentTables());
+        request.addDependentTables(rcQuery.dependentTables());
         if (collection instanceof List) {
           collection = (A) Collections.unmodifiableList((List<?>) collection);
           request.putToQueryCache(collection);
@@ -121,7 +121,7 @@ public final class CQueryEngine {
       }
       return collection;
     } catch (SQLException e) {
-      throw translate(request, rcQuery.getBindLog(), rcQuery.getGeneratedSql(), e);
+      throw translate(request, rcQuery.bindLog(), rcQuery.generatedSql(), e);
     }
   }
 
@@ -164,21 +164,21 @@ public final class CQueryEngine {
     try {
       int count = rcQuery.findCount();
       if (request.logSql()) {
-        logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
+        logGeneratedSql(request, rcQuery.generatedSql(), rcQuery.bindLog(), rcQuery.micros());
       }
       if (request.logSummary()) {
-        request.transaction().logSummary(rcQuery.getSummary());
+        request.transaction().logSummary(rcQuery.summary());
       }
       if (request.query().isFutureFetch()) {
         request.transaction().end();
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.getDependentTables());
+        request.addDependentTables(rcQuery.dependentTables());
         request.putToQueryCache(count);
       }
       return count;
     } catch (SQLException e) {
-      throw translate(request, rcQuery.getBindLog(), rcQuery.getGeneratedSql(), e);
+      throw translate(request, rcQuery.bindLog(), rcQuery.generatedSql(), e);
     }
   }
 
@@ -271,9 +271,7 @@ public final class CQueryEngine {
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
     } finally {
-      if (cquery != null) {
-        cquery.close();
-      }
+      cquery.close();
     }
   }
 
@@ -299,11 +297,11 @@ public final class CQueryEngine {
   }
 
   private <T> String getSysPeriodLower(SpiQuery<T> query) {
-    return historySupport.getSysPeriodLower(query.getAlias(T0));
+    return historySupport.sysPeriodLower(query.getAlias(T0));
   }
 
   private <T> String getSysPeriodUpper(SpiQuery<T> query) {
-    return historySupport.getSysPeriodUpper(query.getAlias(T0));
+    return historySupport.sysPeriodUpper(query.getAlias(T0));
   }
 
   /**
@@ -373,9 +371,7 @@ public final class CQueryEngine {
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
     } finally {
-      if (cquery != null) {
-        cquery.close();
-      }
+      cquery.close();
     }
   }
 

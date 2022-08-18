@@ -190,8 +190,8 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     // so its available to the user...
     query.setGeneratedSql(queryPlan.sql());
     SqlTreePlan sqlTree = queryPlan.sqlTree();
-    this.rootNode = sqlTree.getRootNode();
-    this.manyProperty = sqlTree.getManyProperty();
+    this.rootNode = sqlTree.rootNode();
+    this.manyProperty = sqlTree.manyProperty();
     this.sql = queryPlan.sql();
     this.rawSql = queryPlan.isRawSql();
     this.logWhereSql = queryPlan.logWhereSql();

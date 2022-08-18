@@ -88,33 +88,33 @@ final class SqlTree {
     return list;
   }
 
-  String getDistinctOn() {
+  String distinctOn() {
     return distinctOn;
   }
 
   /**
    * Return the String for the actual SQL.
    */
-  String getSelectSql() {
+  String selectSql() {
     assert selectSql != null : "selectSql was null";
     return selectSql;
   }
 
-  String getFromSql() {
+  String fromSql() {
     return fromSql;
   }
 
   /**
    * Return the groupBy clause.
    */
-  String getGroupBy() {
+  String groupBy() {
     return groupBy;
   }
 
   /**
    * Return the where clause for inheritance.
    */
-  String getInheritanceWhereSql() {
+  String inheritanceWhereSql() {
     return inheritanceWhereSql;
   }
 
@@ -122,7 +122,7 @@ final class SqlTree {
    * Return the property that is associated with the many. There can only be one
    * per SqlSelect. This can be null.
    */
-  STreePropertyAssocMany getManyProperty() {
+  STreePropertyAssocMany manyProperty() {
     return manyProperty;
   }
 

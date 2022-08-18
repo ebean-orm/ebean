@@ -26,11 +26,8 @@ import java.util.function.Predicate;
 public final class DefaultRelationalQueryEngine implements RelationalQueryEngine {
 
   private final Binder binder;
-
   private final String dbTrueValue;
-
   private final boolean binaryOptimizedUUID;
-
   private final TimedMetricMap timedMetricMap;
 
   public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue, boolean binaryOptimizedUUID) {

@@ -22,7 +22,7 @@ final class AssocOneHelpRefExported extends AssocOneHelp {
   @Override
   void appendSelect(DbSqlContext ctx, boolean subQuery) {
     // set appropriate tableAlias for the exported id columns
-    String relativePrefix = ctx.getRelativePrefix(property.name());
+    String relativePrefix = ctx.relativePrefix(property.name());
     ctx.pushTableAlias(relativePrefix);
     property.targetIdBinder.appendSelect(ctx, subQuery);
     ctx.popTableAlias();
@@ -30,7 +30,7 @@ final class AssocOneHelpRefExported extends AssocOneHelp {
 
   @Override
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
-    String relativePrefix = ctx.getRelativePrefix(property.name());
+    String relativePrefix = ctx.relativePrefix(property.name());
     if (softDelete && !ctx.isIncludeSoftDelete()) {
       property.tableJoin.addJoin(joinType, relativePrefix, ctx, softDeletePredicate);
     } else {

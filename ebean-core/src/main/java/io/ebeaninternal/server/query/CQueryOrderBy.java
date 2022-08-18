@@ -16,7 +16,6 @@ import java.util.List;
 final class CQueryOrderBy {
 
   private final BeanDescriptor<?> desc;
-
   private final OrderBy<?> orderBy;
 
   /**
@@ -32,9 +31,7 @@ final class CQueryOrderBy {
   }
 
   private String parseInternal() {
-
     StringBuilder sb = new StringBuilder();
-
     List<Property> properties = orderBy.getProperties();
     if (properties.isEmpty()) {
       // order by clause removed by filterMany()
@@ -52,7 +49,6 @@ final class CQueryOrderBy {
   }
 
   private String parseProperty(Property p) {
-
     String propName = p.getProperty();
     ElPropertyValue el = desc.elGetValue(propName);
     if (el == null) {
@@ -65,7 +61,6 @@ final class CQueryOrderBy {
       IdBinder idBinder = ap.targetDescriptor().idBinder();
       return idBinder.getOrderBy(el.elName(), p.isAscending());
     }
-
     return p.toStringFormat();
   }
 }

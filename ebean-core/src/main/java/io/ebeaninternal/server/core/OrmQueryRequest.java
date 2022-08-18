@@ -639,7 +639,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         for (T bean : actualDetails) {
           ids.add(beanDescriptor.idForJson(bean));
         }
-        beanDescriptor.readAuditMany(queryPlanKey.getPartialKey(), "l2-query-cache", ids);
+        beanDescriptor.readAuditMany(queryPlanKey.partialKey(), "l2-query-cache", ids);
       }
     }
     if (Boolean.FALSE.equals(query.isReadOnly())) {

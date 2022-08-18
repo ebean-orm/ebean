@@ -455,7 +455,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     if (formula && sqlFormulaJoin != null) {
       ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
     } else if (secondaryTableJoin != null) {
-      String relativePrefix = ctx.getRelativePrefix(secondaryTableJoinPrefix);
+      String relativePrefix = ctx.relativePrefix(secondaryTableJoinPrefix);
       secondaryTableJoin.addJoin(joinType, relativePrefix, ctx);
     }
   }
@@ -481,7 +481,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       ctx.appendFormulaSelect(sqlFormulaSelect);
     } else if (!isTransient && !ignoreDraftOnlyProperty(ctx.isDraftQuery())) {
       if (secondaryTableJoin != null) {
-        ctx.pushTableAlias(ctx.getRelativePrefix(secondaryTableJoinPrefix));
+        ctx.pushTableAlias(ctx.relativePrefix(secondaryTableJoinPrefix));
       }
       if (dbEncrypted) {
         ctx.appendRawColumn(decryptSqlWithColumnAlias(ctx.peekTableAlias()));

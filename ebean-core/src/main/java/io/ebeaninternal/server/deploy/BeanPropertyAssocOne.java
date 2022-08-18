@@ -155,7 +155,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Return the property value as an entity bean.
    */
   @Override
-  public EntityBean getValueAsEntityBean(EntityBean owner) {
+  public EntityBean valueAsEntityBean(EntityBean owner) {
     return (EntityBean) getValue(owner);
   }
 

@@ -136,10 +136,8 @@ public interface STreeType {
 
   /**
    * Mark the bean as deleted by setting the softDelete property to true.
-   *
    * This works also, if there is only a virtual softDelete property computed by a formula.
-   *
-   * If there is no softdelete property, it sets the lazyLoadFailure flag in EBI.
+   * If there is no soft delete property, it sets the lazyLoadFailure flag in EBI.
    */
   void markAsDeleted(EntityBean bean);
 

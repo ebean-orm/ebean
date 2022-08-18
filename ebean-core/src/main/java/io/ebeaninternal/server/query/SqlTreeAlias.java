@@ -89,7 +89,7 @@ final class SqlTreeAlias {
       for (String propJoin : embeddedPropertyJoins) {
         String[] split = SplitName.split(propJoin);
         // the table alias of the parent path
-        String alias = getTableAlias(split[0]);
+        String alias = tableAlias(split[0]);
         aliasMap.put(propJoin, alias);
       }
     }
@@ -109,7 +109,7 @@ final class SqlTreeAlias {
   /**
    * Return the table alias for a given property name.
    */
-  String getTableAlias(String prefix) {
+  String tableAlias(String prefix) {
     if (prefix == null) {
       return rootTableAlias;
     } else {
@@ -124,7 +124,7 @@ final class SqlTreeAlias {
   /**
    * Return an alias using "Many where joins".
    */
-  String getTableAliasManyWhere(String prefix) {
+  String tableAliasManyWhere(String prefix) {
     if (prefix == null) {
       return rootTableAlias;
     }

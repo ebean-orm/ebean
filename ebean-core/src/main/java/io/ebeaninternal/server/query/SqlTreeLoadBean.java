@@ -73,14 +73,14 @@ class SqlTreeLoadBean implements SqlTreeLoad {
   }
 
   @Override
-  public final ScalarDataReader<?> getSingleAttributeReader() {
+  public final ScalarDataReader<?> singleAttributeReader() {
     if (properties == null || properties.length == 0) {
       // if we have no property ask first children (in a distinct select with join)
       if (children.length == 0) {
         // expected to be a findIds query
         return desc.idBinder().getBeanProperty();
       }
-      return children[0].getSingleAttributeReader();
+      return children[0].singleAttributeReader();
     }
     if (properties[0] instanceof STreePropertyAssocOne) {
       STreePropertyAssocOne assocOne = (STreePropertyAssocOne)properties[0];
@@ -208,7 +208,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
       localBean = null;
       // ... but there may exist as reference bean in parent which has to be marked as deleted.
       if (parentBean != null && nodeBeanProp instanceof STreePropertyAssocOne) {
-        contextBean = ((STreePropertyAssocOne)nodeBeanProp).getValueAsEntityBean(parentBean);
+        contextBean = ((STreePropertyAssocOne)nodeBeanProp).valueAsEntityBean(parentBean);
         if (contextBean != null) {
           desc.markAsDeleted(contextBean);
         }

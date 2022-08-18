@@ -14,7 +14,6 @@ import io.ebeaninternal.server.deploy.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -867,7 +866,7 @@ public final class DefaultPersister implements Persister {
     for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedSave()) {
       // check for partial beans
       if (request.isLoadedProperty(prop)) {
-        EntityBean detailBean = prop.getValueAsEntityBean(parentBean);
+        EntityBean detailBean = prop.valueAsEntityBean(parentBean);
         if (detailBean != null) {
           if (!prop.isSaveRecurseSkippable(detailBean)) {
             t.depth(+1);
@@ -1056,7 +1055,7 @@ public final class DefaultPersister implements Persister {
         request.setImportedOrphanForRemoval(prop);
       }
       if (request.isLoadedProperty(prop)) {
-        EntityBean detailBean = prop.getValueAsEntityBean(request.entityBean());
+        EntityBean detailBean = prop.valueAsEntityBean(request.entityBean());
         if (detailBean != null
           && !prop.isSaveRecurseSkippable(detailBean)
           && !prop.isReference(detailBean)
