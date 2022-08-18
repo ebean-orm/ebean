@@ -34,7 +34,7 @@ public abstract class PBaseNumber<R,T extends Comparable> extends PBaseCompareab
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R equalTo(int value) {
+  public final R equalTo(int value) {
     expr().eq(_name, value);
     return _root;
   }
@@ -45,7 +45,7 @@ public abstract class PBaseNumber<R,T extends Comparable> extends PBaseCompareab
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R greaterThan(int value) {
+  public final R greaterThan(int value) {
     expr().gt(_name, value);
     return _root;
   }
@@ -56,7 +56,7 @@ public abstract class PBaseNumber<R,T extends Comparable> extends PBaseCompareab
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R lessThan(int value) {
+  public final R lessThan(int value) {
     expr().lt(_name, value);
     return _root;
   }
@@ -68,7 +68,7 @@ public abstract class PBaseNumber<R,T extends Comparable> extends PBaseCompareab
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R eq(int value) {
+  public final R eq(int value) {
     expr().eq(_name, value);
     return _root;
   }
@@ -79,7 +79,7 @@ public abstract class PBaseNumber<R,T extends Comparable> extends PBaseCompareab
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R gt(int value) {
+  public final R gt(int value) {
     expr().gt(_name, value);
     return _root;
   }
@@ -90,7 +90,7 @@ public abstract class PBaseNumber<R,T extends Comparable> extends PBaseCompareab
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R lt(int value) {
+  public final R lt(int value) {
     expr().lt(_name, value);
     return _root;
   }
@@ -102,7 +102,7 @@ public abstract class PBaseNumber<R,T extends Comparable> extends PBaseCompareab
    * @param upper the upper bind value
    * @return the root query bean instance
    */
-  public R between(int lower, int upper) {
+  public final R between(int lower, int upper) {
     expr().between(_name, lower, upper);
     return _root;
   }

@@ -32,7 +32,7 @@ public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareabl
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R after(D value) {
+  public final R after(D value) {
     expr().gt(_name, value);
     return _root;
   }
@@ -43,7 +43,7 @@ public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareabl
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R before(D value) {
+  public final R before(D value) {
     expr().lt(_name, value);
     return _root;
   }
