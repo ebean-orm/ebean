@@ -1,19 +1,21 @@
 package io.ebean.platform.h2;
 
+import io.avaje.applog.AppLog;
 import org.h2.api.Trigger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.lang.System.Logger.Level;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 /**
  * H2 database trigger used to populate history tables to support the @History feature.
  */
 public class H2HistoryTrigger implements Trigger {
 
-  private static final Logger log = LoggerFactory.getLogger(H2HistoryTrigger.class);
+  private static final System.Logger log = AppLog.getLogger(H2HistoryTrigger.class);
 
   /**
    * Hardcoding the column and history table suffix for now. Not sure how to get that
@@ -70,7 +72,7 @@ public class H2HistoryTrigger implements Trigger {
     insertSql.append(");");
 
     this.insertHistorySql = insertSql.toString();
-    log.debug("History table insert sql: {}", insertHistorySql);
+    log.log(Level.DEBUG, "History table insert sql: {0}", insertHistorySql);
   }
 
   @Override
@@ -82,9 +84,6 @@ public class H2HistoryTrigger implements Trigger {
       if (newRow != null) {
         // update event. Set the effective start timestamp to now.
         newRow[effectStartPosition] = now;
-      }
-      if (log.isTraceEnabled()) {
-        log.trace("History insert: {}", Arrays.toString(oldRow));
       }
       insertIntoHistory(connection, oldRow);
     }

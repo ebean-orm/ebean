@@ -1,14 +1,14 @@
 package io.ebean.test.config;
 
+import io.avaje.applog.AppLog;
 import io.ebean.config.AutoConfigure;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.test.config.platform.PlatformAutoConfig;
 import io.ebean.test.config.provider.ProviderAutoConfig;
 import io.ebean.test.containers.DockerHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.lang.System.Logger.Level;
 import java.util.Properties;
 
 /**
@@ -21,7 +21,7 @@ import java.util.Properties;
  */
 public class AutoConfigureForTesting implements AutoConfigure {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.test");
 
   /**
    * System property that can override the platform.  mvn clean test -Ddb=sqlserver
@@ -38,7 +38,7 @@ public class AutoConfigureForTesting implements AutoConfigure {
       io.avaje.config.Config.asConfiguration().evalModify(properties);
     }
     if (!config.isDefaultServer()) {
-      log.info("skip automatic testing config on non-default server name:{} register:{}", config.getName(), config.isRegister());
+      log.log(Level.INFO, "skip automatic testing config on non-default server name:{0} register:{1}", config.getName(), config.isRegister());
       return;
     }
     if (isExtraServer(config, properties)) {
@@ -46,7 +46,7 @@ public class AutoConfigureForTesting implements AutoConfigure {
       return;
     }
     String testPlatform = properties.getProperty("ebean.test.platform");
-    log.debug("automatic testing config - with ebean.test.platform:{} name:{} environmentDb:{}", testPlatform, config.getName(), environmentDb);
+    log.log(Level.DEBUG, "automatic testing config - with ebean.test.platform:{0} name:{1} environmentDb:{2}", testPlatform, config.getName(), environmentDb);
     if (RunOnceMarker.isRun()) {
       setupPlatform(environmentDb, config);
     }

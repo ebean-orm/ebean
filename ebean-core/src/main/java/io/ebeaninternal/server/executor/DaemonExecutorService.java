@@ -1,9 +1,8 @@
 package io.ebeaninternal.server.executor;
 
+import io.avaje.applog.AppLog;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.lang.System.Logger.Level;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -14,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 final class DaemonExecutorService {
 
-  private static final Logger logger = LoggerFactory.getLogger(DaemonExecutorService.class);
+  private static final System.Logger logger = AppLog.getLogger(DaemonExecutorService.class);
 
   private final ReentrantLock lock = new ReentrantLock(false);
   private final String namePrefix;
@@ -44,19 +43,19 @@ final class DaemonExecutorService {
     lock.lock();
     try {
       if (service.isShutdown()) {
-        logger.debug("DaemonExecutorService[{}] already shut down", namePrefix);
+        logger.log(Level.DEBUG, "DaemonExecutorService[{0}] already shut down", namePrefix);
         return;
       }
       try {
-        logger.debug("DaemonExecutorService[{}] shutting down...", namePrefix);
+        logger.log(Level.DEBUG, "DaemonExecutorService[{0}] shutting down...", namePrefix);
         service.shutdown();
         if (!service.awaitTermination(shutdownWaitSeconds, TimeUnit.SECONDS)) {
-          logger.info("DaemonExecutorService[{}] shut down timeout exceeded. Terminating running threads.", namePrefix);
+          logger.log(Level.INFO, "DaemonExecutorService[{0}] shut down timeout exceeded. Terminating running threads.", namePrefix);
           service.shutdownNow();
         }
 
       } catch (Exception e) {
-        logger.error("Error during shutdown of DaemonThreadPool[" + namePrefix + "]", e);
+        logger.log(Level.ERROR, "Error during shutdown of DaemonThreadPool[" + namePrefix + "]", e);
         e.printStackTrace();
       }
     } finally {

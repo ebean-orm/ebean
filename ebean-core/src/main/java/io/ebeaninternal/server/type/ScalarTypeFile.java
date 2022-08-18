@@ -9,6 +9,7 @@ import io.ebean.text.TextException;
 import io.ebeaninternal.api.CoreLog;
 
 import java.io.*;
+import java.lang.System.Logger.Level;
 import java.sql.SQLException;
 import java.sql.Types;
 
@@ -169,14 +170,14 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
         try {
           output.close();
         } catch (IOException e) {
-          CoreLog.log.error("Error when closing outputstream", e);
+          CoreLog.log.log(Level.ERROR, "Error when closing outputStream", e);
         }
       }
       if (input != null) {
         try {
           input.close();
         } catch (IOException e) {
-          CoreLog.log.error("Error when closing inputstream ", e);
+          CoreLog.log.log(Level.ERROR, "Error when closing inputStream ", e);
         }
       }
     }

@@ -2,49 +2,11 @@ package io.ebeaninternal.server.core;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
-import io.ebean.AutoTune;
-import io.ebean.BackgroundExecutor;
-import io.ebean.BeanState;
-import io.ebean.CallableSql;
-import io.ebean.DocumentStore;
-import io.ebean.DtoQuery;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.ExtendedServer;
-import io.ebean.Filter;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.MergeOptions;
-import io.ebean.MergeOptionsBuilder;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.ProfileLocation;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.RowConsumer;
-import io.ebean.RowMapper;
-import io.ebean.ScriptRunner;
-import io.ebean.SqlQuery;
-import io.ebean.SqlRow;
-import io.ebean.SqlUpdate;
-import io.ebean.Transaction;
-import io.ebean.TransactionCallback;
-import io.ebean.TxScope;
-import io.ebean.Update;
-import io.ebean.UpdateQuery;
-import io.ebean.ValuePair;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.BeanLoader;
-import io.ebean.bean.CallOrigin;
-import io.ebean.bean.EntityBean;
-import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.PersistenceContext;
+import io.ebean.bean.*;
 import io.ebean.bean.PersistenceContext.WithOption;
-import io.ebean.bean.SingleBeanLoader;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.*;
@@ -53,11 +15,7 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.ShutdownManager;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.meta.MetaInfoManager;
-import io.ebean.meta.MetaQueryPlan;
-import io.ebean.meta.MetricVisitor;
-import io.ebean.meta.QueryPlanInit;
-import io.ebean.meta.QueryPlanRequest;
+import io.ebean.meta.*;
 import io.ebean.migration.auto.AutoMigrationRunner;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
@@ -78,21 +36,8 @@ import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.el.ElFilter;
 import io.ebeaninternal.server.grammer.EqlParser;
-import io.ebeaninternal.server.query.CQuery;
-import io.ebeaninternal.server.query.CQueryEngine;
-import io.ebeaninternal.server.query.CallableQueryCount;
-import io.ebeaninternal.server.query.CallableQueryIds;
-import io.ebeaninternal.server.query.CallableQueryList;
-import io.ebeaninternal.server.query.DtoQueryEngine;
-import io.ebeaninternal.server.query.LimitOffsetPagedList;
-import io.ebeaninternal.server.query.QueryFutureIds;
-import io.ebeaninternal.server.query.QueryFutureList;
-import io.ebeaninternal.server.query.QueryFutureRowCount;
-import io.ebeaninternal.server.querydefn.DefaultDtoQuery;
-import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
-import io.ebeaninternal.server.querydefn.DefaultOrmUpdate;
-import io.ebeaninternal.server.querydefn.DefaultRelationalQuery;
-import io.ebeaninternal.server.querydefn.DefaultUpdateQuery;
+import io.ebeaninternal.server.query.*;
+import io.ebeaninternal.server.querydefn.*;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.text.csv.TCsvReader;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
@@ -101,12 +46,12 @@ import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
-import org.slf4j.Logger;
 
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -129,7 +74,7 @@ import static java.util.stream.StreamSupport.stream;
 @NonNullApi
 public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final ReentrantLock lock = new ReentrantLock();
   private final DatabaseConfig config;
@@ -386,7 +331,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (config.isQueryPlanCapture()) {
       long secs = config.getQueryPlanCapturePeriodSecs();
       if (secs > 10) {
-        log.info("capture query plan enabled, every {}secs", secs);
+        log.log(Level.INFO, "capture query plan enabled, every {0}secs", secs);
         backgroundExecutor.scheduleWithFixedDelay(this::collectQueryPlans, secs, secs, TimeUnit.SECONDS);
       }
     }
@@ -434,7 +379,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Shutdown the services like threads and DataSource.
    */
   private void shutdownInternal(boolean shutdownDataSource, boolean deregisterDriver) {
-    log.trace("shutting down instance {}", serverName);
+    log.log(Level.TRACE, "shutting down instance {0}", serverName);
     if (shutdown) {
       // already shutdown
       return;
@@ -463,7 +408,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       try {
         plugin.shutdown();
       } catch (Exception e) {
-        log.error("Error when shutting down plugin", e);
+        log.log(Level.ERROR, "Error when shutting down plugin", e);
       }
     }
   }
@@ -2038,7 +1983,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return desc(bean.getClass()).getId(eb);
   }
 
-  private  <T> BeanDescriptor<T> desc(Class<T> beanClass) {
+  private <T> BeanDescriptor<T> desc(Class<T> beanClass) {
     BeanDescriptor<T> desc = descriptorManager.descriptor(beanClass);
     if (desc == null) {
       throw new PersistenceException(beanClass.getName() + " is NOT an Entity Bean registered with this server?");
@@ -2130,7 +2075,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
             try {
               serverCacheManager.clearLocal(Class.forName(cache));
             } catch (Exception e) {
-              log.error("Error clearing local cache for type " + cache, e);
+              log.log(Level.ERROR, "Error clearing local cache for type " + cache, e);
             }
           }
         }

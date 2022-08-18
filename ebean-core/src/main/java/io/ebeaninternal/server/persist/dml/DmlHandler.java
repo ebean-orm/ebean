@@ -15,6 +15,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Base class for Handler implementations.
  */
@@ -123,7 +125,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
         dataBind.close();
       }
     } catch (SQLException ex) {
-      CoreLog.log.error(null, ex);
+      CoreLog.log.log(ERROR, "Error closing DataBind", ex);
     }
   }
 

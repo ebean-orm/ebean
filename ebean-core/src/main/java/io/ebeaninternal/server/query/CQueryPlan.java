@@ -23,6 +23,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Represents a query for a given SQL statement.
  * <p>
@@ -313,7 +315,7 @@ public class CQueryPlan implements SpiQueryPlan {
       predicates.bind(capture);
       bindCapture.setBind(capture.bindCapture(), executionTimeMicros, startNanos);
     } catch (SQLException e) {
-      CoreLog.log.error("Error capturing bind values", e);
+      CoreLog.log.log(ERROR, "Error capturing bind values", e);
     }
   }
 }

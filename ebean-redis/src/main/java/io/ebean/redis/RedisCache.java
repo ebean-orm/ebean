@@ -1,5 +1,6 @@
 package io.ebean.redis;
 
+import io.avaje.applog.AppLog;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
@@ -11,19 +12,20 @@ import io.ebean.metric.TimedMetric;
 import io.ebean.metric.TimedMetricStats;
 import io.ebean.redis.encode.Encode;
 import io.ebean.redis.encode.EncodePrefixKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import redis.clients.jedis.*;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.Transaction;
 import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.resps.ScanResult;
 import redis.clients.jedis.util.SafeEncoder;
 
+import java.lang.System.Logger.Level;
 import java.util.*;
 
 final class RedisCache implements ServerCache {
 
-  private static final Logger log = LoggerFactory.getLogger(RedisCache.class);
+  private static final System.Logger log = AppLog.getLogger(RedisCache.class);
 
   private static final String CURSOR_0 = "0";
   private static final byte[] CURSOR_0_BYTES = SafeEncoder.encode(CURSOR_0);
@@ -67,7 +69,7 @@ final class RedisCache implements ServerCache {
     if (cacheOptions != null) {
       final int maxSecsToLive = cacheOptions.getMaxSecsToLive();
       if (maxSecsToLive > 0) {
-        return new SetParams().ex((long)maxSecsToLive);
+        return new SetParams().ex((long) maxSecsToLive);
       }
     }
     return null;
@@ -104,17 +106,17 @@ final class RedisCache implements ServerCache {
       }
       return valueEncode.decode(data);
     } catch (Exception e) {
-      log.error("Error decoding data, treated as cache miss", e);
+      log.log(Level.ERROR, "Error decoding data, treated as cache miss", e);
       return null;
     }
   }
 
   private void errorOnRead(Exception e) {
-    log.warn("Error when reading redis cache", e);
+    log.log(Level.WARNING, "Error when reading redis cache", e);
   }
 
   private void errorOnWrite(Exception e) {
-    log.warn("Error when writing redis cache", e);
+    log.log(Level.WARNING, "Error when writing redis cache", e);
   }
 
   @Override

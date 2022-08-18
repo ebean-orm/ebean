@@ -14,10 +14,10 @@ import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.util.Str;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
-import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -28,7 +28,7 @@ import java.util.function.Consumer;
  */
 class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
-  private static final Logger log = CoreLog.log;
+  private static final System.Logger log = CoreLog.log;
   private static final Object PLACEHOLDER = new Object();
   private static final String illegalStateMessage = "Transaction is Inactive";
 
@@ -356,7 +356,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         try {
           consumer.accept(callbackList.get(i));
         } catch (Exception e) {
-          log.error("Error executing transaction callback", e);
+          log.log(Level.ERROR, "Error executing transaction callback", e);
         }
       }
     }
@@ -884,7 +884,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         connection.setReadOnly(false);
       }
     } catch (SQLException e) {
-      log.error("Error setting to readOnly?", e);
+      log.log(Level.ERROR, "Error setting to readOnly?", e);
     }
     try {
       if (autoCommit) {
@@ -892,14 +892,14 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         connection.setAutoCommit(true);
       }
     } catch (SQLException e) {
-      log.error("Error setting to readOnly?", e);
+      log.log(Level.ERROR, "Error setting to readOnly?", e);
     }
     try {
       connection.close();
     } catch (Exception ex) {
       // the connection pool will automatically remove the
       // connection if it does not pass the test
-      log.error("Error closing connection", ex);
+      log.log(Level.ERROR, "Error closing connection", ex);
     }
     connection = null;
     active = false;
@@ -932,7 +932,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       }
       withEachCallback(TransactionCallback::postCommit);
     } catch (SQLException e) {
-      log.error("Error when ending a query only transaction via " + onQueryOnly, e);
+      log.log(Level.ERROR, "Error when ending a query only transaction via " + onQueryOnly, e);
     }
   }
 
@@ -1056,7 +1056,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private RuntimeException wrapIfNeeded(Exception e) {
     if (e instanceof PersistenceException) {
       // keep more specific exception if we have it
-      return (PersistenceException)e;
+      return (PersistenceException) e;
     }
     return new RollbackException(e);
   }

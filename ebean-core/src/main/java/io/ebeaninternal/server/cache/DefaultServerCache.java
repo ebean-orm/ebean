@@ -1,15 +1,15 @@
 package io.ebeaninternal.server.cache;
 
+import io.avaje.applog.AppLog;
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
 import io.ebean.metric.MetricFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.lang.System.Logger.Level;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +25,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DefaultServerCache implements ServerCache {
 
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultServerCache.class);
+  protected static final System.Logger logger = AppLog.getLogger(DefaultServerCache.class);
 
   /**
    * Compare by last access time (for LRU eviction).
@@ -287,13 +287,13 @@ public class DefaultServerCache implements ServerCache {
         evictCount.add(trimmedByGC);
         evictCount.add(trimmedByTTL);
         evictCount.add(trimmedByLRU);
-        if (logger.isTraceEnabled()) {
+        if (logger.isLoggable(Level.TRACE)) {
           long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
-          logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
+          logger.log(Level.TRACE, "Executed trim of cache {0} in [{1}]millis idle[{2}] timeToLive[{3}] accessTime[{4}] gc[{5}]",
             name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
         }
       } catch (Throwable e) {
-        logger.warn("Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
+        logger.log(Level.WARNING, "Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
       }
     } finally {
       lock.unlock();

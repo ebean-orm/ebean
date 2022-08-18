@@ -1,11 +1,11 @@
 package io.ebean.test.config.platform;
 
+import io.avaje.applog.AppLog;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.test.containers.DockerHost;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.lang.System.Logger.Level;
 import java.util.Properties;
 
 /**
@@ -13,7 +13,7 @@ import java.util.Properties;
  */
 class Config {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.test");
 
   /**
    * Common optional docker parameters that we just transfer to docker properties.
@@ -193,7 +193,7 @@ class Config {
     ds.setDriver(driverClass);
     config.setDataSourceConfig(ds);
 
-    log.info("Using jdbc settings - username:{} url:{} driver:{}", ds.getUsername(), ds.getUrl(), ds.getDriver());
+    log.log(Level.INFO, "Using jdbc settings - username:{0} url:{1} driver:{2}", ds.getUsername(), ds.getUrl(), ds.getDriver());
 
     if (driverClass != null) {
       try {

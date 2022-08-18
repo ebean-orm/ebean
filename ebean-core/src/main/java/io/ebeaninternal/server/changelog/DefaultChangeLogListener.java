@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.changelog;
 
+import io.avaje.applog.AppLog;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeSet;
@@ -7,10 +8,9 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.CoreLog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
+import java.lang.System.Logger.Level;
 import java.util.Properties;
 
 /**
@@ -21,7 +21,7 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
   /**
    * The named logger we send the change set payload to. Can be externally configured as desired.
    */
-  private static final Logger changeLog = LoggerFactory.getLogger("io.ebean.ChangeLog");
+  private static final System.Logger changeLog = AppLog.getLogger("io.ebean.ChangeLog");
 
   /**
    * Used to build the JSON.
@@ -65,9 +65,9 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
       try {
         StringWriter writer = new StringWriter(getBufferSize(beanChange));
         jsonBuilder.writeBeanJson(writer, beanChange, changeSet);
-        changeLog.info(writer.toString());
+        changeLog.log(Level.INFO, writer.toString());
       } catch (Exception e) {
-        CoreLog.log.error("Exception logging beanChange " + beanChange, e);
+        CoreLog.log.log(Level.ERROR, "Exception logging beanChange " + beanChange, e);
       }
     }
   }

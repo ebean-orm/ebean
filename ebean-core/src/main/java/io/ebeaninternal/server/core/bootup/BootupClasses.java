@@ -13,12 +13,12 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
-import org.slf4j.Logger;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import java.lang.System.Logger.Level;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ import java.util.function.Predicate;
  */
 public class BootupClasses implements Predicate<Class<?>> {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final List<Class<?>> embeddableList = new ArrayList<>();
   private final List<Class<?>> entityList = new ArrayList<>();
@@ -205,13 +205,13 @@ public class BootupClasses implements Predicate<Class<?>> {
     try {
       return cls.getConstructor().newInstance();
     } catch (NoSuchMethodException e) {
-      log.debug("Ignore/expected - no default constructor: " +e.getMessage());
+      log.log(Level.DEBUG, "Ignore/expected - no default constructor: " + e.getMessage());
       return null;
 
     } catch (Exception e) {
       if (logOnException) {
         // not expected but we log and carry on
-        log.error("Error creating " + cls, e);
+        log.log(Level.ERROR, "Error creating " + cls, e);
         return null;
 
       } else {

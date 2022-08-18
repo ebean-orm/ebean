@@ -54,11 +54,11 @@ import io.ebeanservice.docstore.api.DocStoreUpdates;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
-import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.lang.System.Logger.Level;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -74,7 +74,7 @@ import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
  */
 public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -494,9 +494,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * as they are used to get the imported and exported properties.
    */
   void initialiseId(BeanDescriptorInitContext initContext) {
-    if (log.isTraceEnabled()) {
-      log.trace("BeanDescriptor initialise " + fullName);
-    }
     if (draftable) {
       initContext.addDraft(baseTable, draftTable);
     }
@@ -795,7 +792,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       changeJson.flush();
       return beanChange(ChangeType.UPDATE, request.beanId(), changeJson.newJson(), changeJson.oldJson());
     } catch (RuntimeException e) {
-      log.error("Failed to write ChangeLog entry for update", e);
+      log.log(Level.ERROR, "Failed to write ChangeLog entry for update", e);
       return null;
     }
   }
@@ -811,7 +808,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       jsonWriter.flush();
       return beanChange(ChangeType.INSERT, request.beanId(), writer.toString(), null);
     } catch (IOException e) {
-      log.error("Failed to write ChangeLog entry for insert", e);
+      log.log(Level.ERROR, "Failed to write ChangeLog entry for insert", e);
       return null;
     }
   }
@@ -2291,11 +2288,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private ElComparator<T> createPropertyComparator(SortByClause.Property sortProp) {
     ElPropertyValue elGetValue = elGetValue(sortProp.getName());
     if (elGetValue == null) {
-      log.error("Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
+      log.log(Level.ERROR, "Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
       return new ElComparatorNoop<>();
     }
     if (elGetValue.isAssocMany()) {
-      log.error("Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
+      log.log(Level.ERROR, "Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
       return new ElComparatorNoop<>();
     }
     Boolean nullsHigh = sortProp.getNullsHigh();
@@ -2771,7 +2768,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void markAsDeleted(EntityBean bean) {
     if (softDeleteProperty == null) {
       Object id = getId(bean);
-      log.info("(Lazy) loading unsuccessful for type:{} id:{} - expecting when bean has been deleted", name(), id);
+      log.log(Level.INFO, "(Lazy) loading unsuccessful for type:{0} id:{1} - expecting when bean has been deleted", name(), id);
       bean._ebean_getIntercept().setLazyLoadFailure(id);
     } else {
       softDeleteValue(bean);

@@ -27,6 +27,7 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.support.DocStructure;
 
 import javax.persistence.PersistenceException;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -432,7 +433,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     if (!idProp.isEmbedded()) {
       // simple single scalar id
       if (cols.length != 1) {
-        CoreLog.log.error("No Imported Id column for [" + idProp + "] in table [" + join.getTable() + "]");
+        CoreLog.log.log(Level.ERROR, "No Imported Id column for [" + idProp + "] in table [" + join.getTable() + "]");
         return null;
       } else {
         BeanProperty[] idProps = {idProp};

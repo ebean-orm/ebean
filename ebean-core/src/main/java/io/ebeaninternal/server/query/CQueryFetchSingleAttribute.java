@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Base compiled query request for single attribute queries.
  */
@@ -153,7 +155,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
         dataReader = null;
       }
     } catch (SQLException e) {
-      CoreLog.log.error("Error closing DataReader", e);
+      CoreLog.log.log(ERROR, "Error closing DataReader", e);
     }
     JdbcClose.close(pstmt);
     pstmt = null;

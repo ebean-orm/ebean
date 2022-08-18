@@ -1,16 +1,15 @@
 package io.ebeaninternal.server.idgen;
 
+import io.avaje.applog.AppLog;
 import io.ebean.Transaction;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 
+import java.lang.System.Logger.Level;
 import java.security.SecureRandom;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * IdGenerator for (pseudo) type 1 UUIDs.
@@ -27,7 +26,7 @@ import org.slf4j.LoggerFactory;
  */
 public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
-  protected static final Logger log = LoggerFactory.getLogger("io.ebean.IDGEN");
+  protected static final System.Logger log = AppLog.getLogger("io.ebean.IDGEN");
 
   // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
   protected static final long UUID_EPOCH_OFFSET = 0x01B21DD213814000L;
@@ -106,7 +105,7 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
         delta = current - last;
         if (delta < -10000 * 20000) {
-          log.info("Clock skew of {} ms detected", delta / -10000);
+          log.log(Level.INFO, "Clock skew of {} ms detected", delta / -10000);
           // The clock was adjusted back about 2 seconds, or we were generating a lot of ids too fast
           // if so, we try to set the current as last and also increment the clockSeq.
           lock.lock();

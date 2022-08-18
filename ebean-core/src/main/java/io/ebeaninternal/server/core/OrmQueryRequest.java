@@ -24,6 +24,8 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Wraps the objects involved in executing a Query.
  */
@@ -244,7 +246,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means
         // that the connection is broken (and the dataSource and db will cleanup)
-        CoreLog.log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
+        CoreLog.log.log(ERROR, "Error trying to rollback a transaction (after a prior exception thrown)", e);
       }
     }
   }

@@ -11,23 +11,16 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
-import org.slf4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.lang.System.Logger.Level;
+import java.util.*;
 
 /**
  * Factory for SqlTree.
  */
 public final class SqlTreeBuilder {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final SpiQuery<?> query;
   private final STreeType desc;
@@ -92,10 +85,10 @@ public final class SqlTreeBuilder {
     this.disableLazyLoad = query.isDisableLazyLoading();
     this.readOnly = Boolean.TRUE.equals(query.isReadOnly());
     this.subQuery = Type.SQ_EXISTS == query.getType()
-        || Type.SQ_IN == query.getType()
-        || Type.ID_LIST == query.getType()
-        || Type.DELETE == query.getType()
-        || query.isCountDistinct();
+      || Type.SQ_IN == query.getType()
+      || Type.ID_LIST == query.getType()
+      || Type.DELETE == query.getType()
+      || query.isCountDistinct();
     this.includeJoin = query.getM2mIncludeJoin();
     this.manyWhereJoins = query.getManyWhereJoins();
     this.queryDetail = query.getDetail();
@@ -392,7 +385,7 @@ public final class SqlTreeBuilder {
   private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName, String path) {
     STreeProperty p = desc.findPropertyWithDynamic(propName, path);
     if (p == null) {
-      log.error("property [" + propName + "]not found on " + desc + " for query - excluding it.");
+      log.log(Level.ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
       return;
     } else if (p instanceof STreePropertyAssoc && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
@@ -427,13 +420,13 @@ public final class SqlTreeBuilder {
           if (p != null) {
             selectProps.add(p);
           } else {
-            log.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+            log.log(Level.ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
           }
         } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.name()))) {
           // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
         } else {
-          log.error("property [" + p.fullName() + "] expected to be an embedded or *ToOne bean for query - excluding it.");
+          log.log(Level.ERROR, "property [{0}] expected to be an embedded or *ToOne bean for query - excluding it.", p.fullName());
         }
       }
 
@@ -442,7 +435,7 @@ public final class SqlTreeBuilder {
       // sub class hierarchy if required
       STreeProperty p = desc.findPropertyWithDynamic(propName, queryProps.getPath());
       if (p == null) {
-        log.error("property [" + propName + "] not found on " + desc + " for query - excluding it.");
+        log.log(Level.ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
         p = desc.findProperty("id");
         selectProps.add(p);
 
@@ -542,9 +535,6 @@ public final class SqlTreeBuilder {
     if (queryDetail.includesPath(propName)) {
       if (manyProperty != null) {
         // only one many associated allowed to be included in fetch
-        if (log.isDebugEnabled()) {
-          log.debug("Not joining [" + propName + "] as already joined to a Many[" + manyProperty + "].");
-        }
         return false;
       }
       manyProperty = manyProp;
@@ -559,7 +549,6 @@ public final class SqlTreeBuilder {
    * Return true if this node is FULLY included resulting in table join. If the
    * node is not included but its parent has been included then a "bean proxy"
    * is added and false is returned.
-   * </p>
    */
   private boolean isIncludeBean(String prefix) {
     if (queryDetail.includesPath(prefix)) {

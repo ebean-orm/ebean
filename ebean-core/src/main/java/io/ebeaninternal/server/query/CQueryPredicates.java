@@ -26,6 +26,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * Compile Query Predicates.
  * <p>
@@ -339,7 +341,7 @@ public final class CQueryPredicates {
         msg += "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById + "]";
         msg += " must come before the many property [" + manyProp.name() + "] in the orderBy.";
         msg += " Ebean has automatically modified the orderBy clause to do this.";
-        CoreLog.log.warn(msg);
+        CoreLog.log.log(WARNING, msg);
       }
       // the id needs to come before the manyPropName
       orderBy = orderBy.substring(0, manyPos) + orderById + ", " + orderBy.substring(manyPos);

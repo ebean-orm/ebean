@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.config.*;
-import io.ebean.config.EntityClassRegister;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.ShutdownManager;
 import io.ebean.service.SpiContainer;
@@ -13,9 +12,9 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.executor.DefaultBackgroundExecutor;
-import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;
+import java.lang.System.Logger.Level;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -28,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class DefaultContainer implements SpiContainer {
 
-  private static final Logger log = CoreLog.log;
+  private static final System.Logger log = CoreLog.log;
 
   private final ReentrantLock lock = new ReentrantLock();
   private final ClusterManager clusterManager;
@@ -108,7 +107,7 @@ public final class DefaultContainer implements SpiContainer {
         startServer(online, server);
       }
       DbOffline.reset();
-      log.info("Started database[{}] platform[{}] in {}ms", config.getName(), config.getDatabasePlatform().getPlatform(), System.currentTimeMillis() - start);
+      log.log(Level.INFO, "Started database[{0}] platform[{1}] in {2}ms", config.getName(), config.getDatabasePlatform().getPlatform(), System.currentTimeMillis() - start);
       return server;
     } finally {
       lock.unlock();
@@ -137,7 +136,7 @@ public final class DefaultContainer implements SpiContainer {
   private void checkMissingModulePathProvides() {
     URL servicesFile = ClassLoader.getSystemResource("META-INF/services/io.ebean.config.EntityClassRegister");
     if (servicesFile != null) {
-      log.error("module-info.java is probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause. EntityClassRegister exists but was not service loaded.");
+      log.log(Level.ERROR, "module-info.java is probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause. EntityClassRegister exists but was not service loaded.");
     }
   }
 
@@ -201,7 +200,7 @@ public final class DefaultContainer implements SpiContainer {
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
       if (config.getTenantMode().isDynamicDataSource()) {
-        throw new IllegalStateException("DatabasePlatform must be explicitly set on DatabaseConfig for TenantMode "+config.getTenantMode());
+        throw new IllegalStateException("DatabasePlatform must be explicitly set on DatabaseConfig for TenantMode " + config.getTenantMode());
       }
       // automatically determine the platform
       platform = new DatabasePlatformFactory().create(config);
@@ -215,7 +214,7 @@ public final class DefaultContainer implements SpiContainer {
    */
   private void setDataSource(DatabaseConfig config) {
     if (isOfflineMode(config)) {
-      log.debug("... DbOffline using platform [{}]", DbOffline.getPlatform());
+      log.log(Level.DEBUG, "... DbOffline using platform [{0}]", DbOffline.getPlatform());
     } else {
       InitDataSource.init(config);
     }
@@ -251,7 +250,7 @@ public final class DefaultContainer implements SpiContainer {
     }
     try (Connection connection = config.getDataSource().getConnection()) {
       if (connection.getAutoCommit()) {
-        log.warn("DataSource [{}] has autoCommit defaulting to true!", config.getName());
+        log.log(Level.WARNING, "DataSource [{0}] has autoCommit defaulting to true!", config.getName());
       }
       return true;
     } catch (SQLException ex) {

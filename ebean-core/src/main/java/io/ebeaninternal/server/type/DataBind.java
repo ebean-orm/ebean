@@ -4,18 +4,10 @@ import io.ebean.core.type.DataBinder;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
+import java.io.*;
+import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
-import java.sql.Array;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Time;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -109,7 +101,7 @@ public class DataBind implements DataBinder {
         try {
           inputStream.close();
         } catch (IOException e) {
-          CoreLog.log.warn("Error closing InputStream that was bound to PreparedStatement", e);
+          CoreLog.log.log(Level.WARNING, "Error closing InputStream that was bound to PreparedStatement", e);
         }
       }
       inputStreams = null;

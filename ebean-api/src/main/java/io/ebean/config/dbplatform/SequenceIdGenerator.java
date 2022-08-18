@@ -1,13 +1,13 @@
 package io.ebean.config.dbplatform;
 
+import io.avaje.applog.AppLog;
 import io.ebean.BackgroundExecutor;
 import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public abstract class SequenceIdGenerator implements PlatformIdGenerator {
 
-  protected static final Logger log = LoggerFactory.getLogger("io.ebean.SEQ");
+  protected static final System.Logger log = AppLog.getLogger("io.ebean.SEQ");
 
   private final ReentrantLock lock = new ReentrantLock();
   protected final String seqName;
@@ -120,7 +120,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   protected void loadInBackground(final int requestSize) {
     if (currentlyBackgroundLoading.get()) {
       // skip as already background loading
-      log.debug("... skip background sequence load (another load in progress)");
+      log.log(Level.DEBUG, "... skip background sequence load (another load in progress)");
       return;
     }
     currentlyBackgroundLoading.set(true);
@@ -152,9 +152,6 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
       resultSet = statement.executeQuery();
 
       List<Long> newIds = readIds(resultSet, requestSize);
-      if (log.isTraceEnabled()) {
-        log.trace("seq:{} loaded:{} sql:{}", seqName, newIds.size(), sql);
-      }
       if (newIds.isEmpty()) {
         throw new PersistenceException("Always expecting more than 1 row from " + sql);
       }
@@ -164,7 +161,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     } catch (SQLException e) {
       if (e.getMessage().contains("Database is already closed")) {
         String msg = "Error getting SEQ when DB shutting down " + e.getMessage();
-        log.error(msg);
+        log.log(Level.ERROR, msg);
         System.out.println(msg);
         return Collections.emptyList();
       } else {

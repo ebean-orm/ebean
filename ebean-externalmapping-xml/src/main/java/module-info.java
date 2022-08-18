@@ -14,7 +14,6 @@ module io.ebean.xmapping.xml {
   requires transitive java.xml.bind;
   requires io.avaje.classpath.scanner.api;
   requires io.avaje.classpath.scanner;
-  requires static org.slf4j;
   requires static java.sql; // for testing
 
   uses ClassPathScannerFactory;

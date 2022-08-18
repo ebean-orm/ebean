@@ -12,6 +12,7 @@ import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
 import javax.persistence.PersistenceException;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -483,7 +484,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     } catch (Exception ex) {
       // the connection pool will automatically remove the
       // connection if it does not pass the test
-      CoreLog.log.error("Error closing connection", ex);
+      CoreLog.log.log(Level.ERROR, "Error closing connection", ex);
     }
     connection = null;
     active = false;

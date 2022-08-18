@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
+import io.avaje.applog.AppLog;
 import io.ebean.BackgroundExecutor;
 import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
@@ -28,11 +29,10 @@ import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -47,8 +47,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TransactionManager implements SpiTransactionManager {
 
-  private static final Logger log = CoreLog.log;
-  private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
+  private static final System.Logger log = CoreLog.log;
+  private static final System.Logger clusterLogger = AppLog.getLogger("io.ebean.Cluster");
 
   private final SpiServer server;
   private final BeanDescriptorManager beanDescriptorManager;
@@ -365,7 +365,7 @@ public class TransactionManager implements SpiTransactionManager {
         txnLogger.debug(msg);
       }
     } catch (Exception ex) {
-      log.error("Error while notifying TransactionEventListener of rollback event", ex);
+      log.log(Level.ERROR, "Error while notifying TransactionEventListener of rollback event", ex);
     }
   }
 
@@ -416,7 +416,7 @@ public class TransactionManager implements SpiTransactionManager {
       postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
     } catch (Exception ex) {
-      log.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
+      log.log(Level.ERROR, "NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
     }
   }
 
@@ -442,8 +442,8 @@ public class TransactionManager implements SpiTransactionManager {
    * Notify local BeanPersistListeners etc of events from another server in the cluster.
    */
   public final void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
-    if (clusterLogger.isDebugEnabled()) {
-      clusterLogger.debug("processing {}", remoteEvent);
+    if (clusterLogger.isLoggable(Level.DEBUG)) {
+      clusterLogger.log(Level.DEBUG, "processing {0}", remoteEvent);
     }
     CacheChangeSet changeSet = new CacheChangeSet();
 

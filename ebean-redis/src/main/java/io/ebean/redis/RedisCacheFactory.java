@@ -1,11 +1,8 @@
 package io.ebean.redis;
 
+import io.avaje.applog.AppLog;
 import io.ebean.BackgroundExecutor;
-import io.ebean.cache.ServerCache;
-import io.ebean.cache.ServerCacheConfig;
-import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheNotification;
-import io.ebean.cache.ServerCacheNotify;
+import io.ebean.cache.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
@@ -18,18 +15,13 @@ import io.ebean.redis.topic.DaemonTopicRunner;
 import io.ebeaninternal.server.cache.DefaultServerCache;
 import io.ebeaninternal.server.cache.DefaultServerCacheConfig;
 import io.ebeaninternal.server.cache.DefaultServerQueryCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.util.SafeEncoder;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
+import java.lang.System.Logger.Level;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -41,11 +33,11 @@ import static java.util.Arrays.asList;
 
 final class RedisCacheFactory implements ServerCacheFactory {
 
-  private static final Logger log = LoggerFactory.getLogger(RedisCacheFactory.class);
+  private static final System.Logger log = AppLog.getLogger(RedisCacheFactory.class);
 
-  private static final Logger queryLogger = LoggerFactory.getLogger("io.ebean.cache.QUERY");
-  private static final Logger logger = LoggerFactory.getLogger("io.ebean.cache.CACHE");
-  private static final Logger tableModLogger = LoggerFactory.getLogger("io.ebean.cache.TABLEMODS");
+  private static final System.Logger queryLogger = AppLog.getLogger("io.ebean.cache.QUERY");
+  private static final System.Logger logger = AppLog.getLogger("io.ebean.cache.CACHE");
+  private static final System.Logger tableModLogger = AppLog.getLogger("io.ebean.cache.TABLEMODS");
 
   private static final int MSG_NEARCACHE_CLEAR = 1;
   private static final int MSG_NEARCACHE_KEYS = 2;
@@ -113,7 +105,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
       redisConfig = new RedisConfig();
     }
     redisConfig.loadProperties(config.getProperties());
-    log.info("using l2cache redis host {}:{}", redisConfig.getServer(), redisConfig.getPort());
+    log.log(Level.INFO, "using l2cache redis host {0}:{1}", redisConfig.getServer(), redisConfig.getPort());
     return redisConfig.createPool();
   }
 
@@ -168,7 +160,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
     try {
       RQueryCache cache = queryCaches.get(config.getCacheKey());
       if (cache == null) {
-        logger.debug("create query cache [{}]", config.getCacheKey());
+        logger.log(Level.DEBUG, "create query cache [{0}]", config.getCacheKey());
         cache = new RQueryCache(new DefaultServerCacheConfig(config));
         cache.periodicTrim(executor);
         queryCaches.put(config.getCacheKey(), cache);
@@ -222,7 +214,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
      * Process the invalidation message coming from the cluster.
      */
     private void invalidate() {
-      queryLogger.debug("   CLEAR {}(*) - cluster invalidate", name);
+      queryLogger.log(Level.DEBUG, "   CLEAR {0}(*) - cluster invalidate", name);
       super.clear();
     }
   }
@@ -241,8 +233,8 @@ final class RedisCacheFactory implements ServerCacheFactory {
           msg.append(table).append(",");
         }
         String formattedMsg = msg.toString();
-        if (tableModLogger.isDebugEnabled()) {
-          tableModLogger.debug("Publish TableMods - {}", formattedMsg);
+        if (tableModLogger.isLoggable(Level.DEBUG)) {
+          tableModLogger.log(Level.DEBUG, "Publish TableMods - {0}", formattedMsg);
         }
         sendTableMod(formattedMsg);
       }
@@ -270,8 +262,8 @@ final class RedisCacheFactory implements ServerCacheFactory {
   private void processTableNotify(String rawMessage) {
     long nanos = System.nanoTime();
     try {
-      if (logger.isDebugEnabled()) {
-        logger.debug("processTableNotify {}", rawMessage);
+      if (logger.isLoggable(Level.DEBUG)) {
+        logger.log(Level.DEBUG, "processTableNotify {0}", rawMessage);
       }
       Set<String> tables = new HashSet<>(asList(rawMessage.split(",")));
       listener.notify(new ServerCacheNotification(tables));
@@ -290,7 +282,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
       try {
         sendMessage(messageInvalidateKeys(cacheKey, keySet));
       } catch (IOException e) {
-        logger.error("failed to transmit invalidateKeys() message", e);
+        logger.log(Level.ERROR, "failed to transmit invalidateKeys() message", e);
       }
     }
 
@@ -299,7 +291,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
       try {
         sendMessage(messageInvalidateKey(cacheKey, id));
       } catch (IOException e) {
-        logger.error("failed to transmit invalidateKeys() message", e);
+        logger.log(Level.ERROR, "failed to transmit invalidateKeys() message", e);
       }
     }
 
@@ -308,7 +300,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
       try {
         sendMessage(messageInvalidateClear(cacheKey));
       } catch (IOException e) {
-        logger.error("failed to transmit invalidateKeys() message", e);
+        logger.log(Level.ERROR, "failed to transmit invalidateKeys() message", e);
       }
     }
 
@@ -372,7 +364,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
 
     @Override
     public void notifyConnected() {
-      logger.info("Established connection to Redis");
+      logger.log(Level.INFO, "Established connection to Redis");
     }
 
     /**
@@ -403,8 +395,8 @@ final class RedisCacheFactory implements ServerCacheFactory {
           }
           msgType = oi.readInt();
           cacheKey = oi.readUTF();
-          if (logger.isDebugEnabled()) {
-            logger.debug("processNearCacheMessage serverId:{} type:{} cacheKey:{}", sourceServerId, msgType, cacheKey);
+          if (logger.isLoggable(Level.DEBUG)) {
+            logger.log(Level.DEBUG, "processNearCacheMessage serverId:{0} type:{1} cacheKey:{2}", sourceServerId, msgType, cacheKey);
           }
 
           switch (msgType) {
@@ -431,7 +423,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
           }
 
         } catch (IOException | ClassNotFoundException e) {
-          logger.error("failed to decode near cache message [" + SafeEncoder.encode(message) + "] for cache:" + cacheKey, e);
+          logger.log(Level.ERROR, "failed to decode near cache message [" + SafeEncoder.encode(message) + "] for cache:" + cacheKey, e);
           if (cacheKey != null) {
             nearCacheInvalidateClear(cacheKey);
           }
@@ -457,10 +449,10 @@ final class RedisCacheFactory implements ServerCacheFactory {
               queryCacheInvalidate(split[2]);
               break;
             default:
-              logger.error("Unknown L2 message type[{}] on redis channel - message[{}] ", split[0], message);
+              logger.log(Level.ERROR, "Unknown L2 message type[{0}] on redis channel - message[{1}] ", split[0], message);
           }
         } catch (Exception e) {
-          logger.error("Error handling L2 message[" + message + "]", e);
+          logger.log(Level.ERROR, "Error handling L2 message[" + message + "]", e);
         }
       }
     }
@@ -503,7 +495,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
   }
 
   private void warnNearCacheNotFound(String cacheKey) {
-    logger.warn("No near cache found for cacheKey [" + cacheKey + "] yet - probably on startup");
+    logger.log(Level.WARNING, "No near cache found for cacheKey [" + cacheKey + "] yet - probably on startup");
   }
 
 }

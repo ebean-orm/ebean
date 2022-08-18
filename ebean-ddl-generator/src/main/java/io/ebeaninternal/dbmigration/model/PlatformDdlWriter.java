@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.avaje.applog.AppLog;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.IOUtils;
@@ -10,12 +11,11 @@ import io.ebeaninternal.dbmigration.ddlgeneration.platform.PlatformDdl;
 import io.ebeaninternal.dbmigration.migration.ChangeSet;
 import io.ebeaninternal.dbmigration.migration.ChangeSetType;
 import io.ebeaninternal.dbmigration.migration.Migration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.System.Logger.Level;
 import java.util.List;
 
 /**
@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class PlatformDdlWriter {
 
-  private static final Logger logger = LoggerFactory.getLogger(PlatformDdlWriter.class);
+  private static final System.Logger logger = AppLog.getLogger(PlatformDdlWriter.class);
 
   private final DatabaseConfig databaseConfig;
   private final PlatformDdl platformDdl;
@@ -107,7 +107,7 @@ public class PlatformDdlWriter {
     File subPath = new File(path, suffix);
     if (!subPath.exists()) {
       if (!subPath.mkdirs()) {
-        logger.error("failed to create directories for " + subPath.getAbsolutePath());
+        logger.log(Level.ERROR, "failed to create directories for " + subPath.getAbsolutePath());
       }
     }
     return subPath;

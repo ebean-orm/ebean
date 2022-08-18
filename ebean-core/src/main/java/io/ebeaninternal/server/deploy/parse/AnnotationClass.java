@@ -32,6 +32,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import java.lang.System.Logger.Level;
+
 import static io.ebean.util.AnnotationUtil.typeGet;
 
 /**
@@ -65,7 +67,7 @@ final class AnnotationClass extends AnnotationParser {
       Column column = override.column();
       DeployBeanProperty beanProperty = descriptor.getBeanProperty(propertyName);
       if (beanProperty == null) {
-        CoreLog.log.error("AttributeOverride property [" + propertyName + "] not found on " + descriptor.getFullName());
+        CoreLog.log.log(Level.ERROR, "AttributeOverride property [" + propertyName + "] not found on " + descriptor.getFullName());
       } else {
         readColumn(column, beanProperty);
       }

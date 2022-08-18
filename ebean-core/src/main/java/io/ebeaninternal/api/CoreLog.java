@@ -1,13 +1,12 @@
 package io.ebeaninternal.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.avaje.applog.AppLog;
 
 /**
  * Common loggers used in ebean-core.
  */
 public final class CoreLog {
 
-  public static final Logger log = LoggerFactory.getLogger("io.ebean.core");
-  public static final Logger internal = LoggerFactory.getLogger("io.ebean.internal");
+  public static final System.Logger log = AppLog.getLogger("io.ebean.core");
+  public static final System.Logger internal = AppLog.getLogger("io.ebean.internal");
 }

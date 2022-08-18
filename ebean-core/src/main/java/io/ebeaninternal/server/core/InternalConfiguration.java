@@ -56,8 +56,8 @@ import io.ebeanservice.docstore.api.DocStoreFactory;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
-import org.slf4j.Logger;
 
+import java.lang.System.Logger.Level;
 import java.util.*;
 
 /**
@@ -66,7 +66,7 @@ import java.util.*;
  */
 public final class InternalConfiguration {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final TableModState tableModState;
   private final boolean online;
@@ -246,7 +246,7 @@ public final class InternalConfiguration {
    */
   ReadAuditLogger getReadAuditLogger() {
     ReadAuditLogger found = bootupClasses.getReadAuditLogger();
-    return plugin(found != null ? found : jacksonCorePresent? new DefaultReadAuditLogger(): null);
+    return plugin(found != null ? found : jacksonCorePresent ? new DefaultReadAuditLogger() : null);
   }
 
   /**
@@ -433,7 +433,7 @@ public final class InternalConfiguration {
       externalTransactionManager = new JtaTransactionManager();
     }
     if (externalTransactionManager != null) {
-      log.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
+      log.log(Level.INFO, "Using Transaction Manager {0}", externalTransactionManager.getClass());
       return new ExternalTransactionScopeManager(externalTransactionManager);
     } else {
       return new DefaultTransactionScopeManager();
@@ -523,7 +523,7 @@ public final class InternalConfiguration {
       if (iterator.hasNext()) {
         // use the cacheFactory (via classpath service loader)
         plugin = iterator.next();
-        log.debug("using ServerCacheFactory {}", plugin.getClass());
+        log.log(Level.DEBUG, "using ServerCacheFactory {0}", plugin.getClass());
       } else {
         // use the built in default l2 caching which is local cache based
         localL2Caching = true;
@@ -605,6 +605,7 @@ public final class InternalConfiguration {
 
   private static class NoopDdl implements SpiDdlGenerator {
     private final boolean ddlRun;
+
     NoopDdl(boolean ddlRun) {
       this.ddlRun = ddlRun;
     }
@@ -612,7 +613,7 @@ public final class InternalConfiguration {
     @Override
     public void execute(boolean online) {
       if (online && ddlRun) {
-        CoreLog.log.error("Configured to run DDL but ebean-ddl-generator is not in the classpath (or ebean-test in the test classpath?)");
+        CoreLog.log.log(Level.ERROR, "Configured to run DDL but ebean-ddl-generator is not in the classpath (or ebean-test in the test classpath?)");
       }
     }
   }

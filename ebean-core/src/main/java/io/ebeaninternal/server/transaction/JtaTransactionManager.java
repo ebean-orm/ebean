@@ -4,7 +4,6 @@ import io.ebean.config.ExternalTransactionManager;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiTransaction;
-import org.slf4j.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -14,13 +13,14 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
+import java.lang.System.Logger.Level;
 
 /**
  * Hook into external JTA transaction manager.
  */
 public final class JtaTransactionManager implements ExternalTransactionManager {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
   private static final String EBEAN_TXN_RESOURCE = "EBEAN_TXN_RESOURCE";
 
   private TransactionManager transactionManager;
@@ -87,15 +87,15 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     SpiTransaction currentEbeanTransaction = scope.inScope();
     if (currentEbeanTransaction != null) {
       // NOT expecting this so log WARNING
-      log.warn("JTA Transaction - no current txn BUT using current Ebean one {}", currentEbeanTransaction.getId());
+      log.log(Level.WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.getId());
       return currentEbeanTransaction;
     }
 
     UserTransaction ut = getUserTransaction();
     if (ut == null) {
       // no current JTA transaction
-      if (log.isDebugEnabled()) {
-        log.debug("JTA Transaction - no current txn");
+      if (log.isLoggable(Level.DEBUG)) {
+        log.log(Level.DEBUG, "JTA Transaction - no current txn");
       }
       return null;
     }
@@ -181,27 +181,21 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     public void afterCompletion(int status) {
       switch (status) {
         case Status.STATUS_COMMITTED:
-          if (log.isDebugEnabled()) {
-            log.debug("Jta Txn [" + transaction.getId() + "] committed");
-          }
+          log.log(Level.DEBUG, "Jta Txn [{0}] committed", transaction.getId());
           transaction.postCommit();
           // Remove this transaction object as it is completed
           transactionManager.scope().clearExternal();
           break;
 
         case Status.STATUS_ROLLEDBACK:
-          if (log.isDebugEnabled()) {
-            log.debug("Jta Txn [" + transaction.getId() + "] rollback");
-          }
+          log.log(Level.DEBUG, "Jta Txn [{0}] rollback", transaction.getId());
           transaction.postRollback(null);
           // Remove this transaction object as it is completed
           transactionManager.scope().clearExternal();
           break;
 
         default:
-          if (log.isDebugEnabled()) {
-            log.debug("Jta Txn [" + transaction.getId() + "] status:" + status);
-          }
+          log.log(Level.DEBUG, "Jta Txn [{0}] status:{1}", transaction.getId(), status);
       }
 
       // No matter the completion status of the transaction, we release the connection we got from the pool.

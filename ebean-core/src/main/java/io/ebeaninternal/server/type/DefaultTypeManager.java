@@ -25,11 +25,11 @@ import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
-import org.slf4j.Logger;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.EnumType;
 import java.io.File;
+import java.lang.System.Logger.Level;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -52,7 +52,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class DefaultTypeManager implements TypeManager {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final ConcurrentHashMap<Class<?>, ScalarType<?>> typeMap;
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
@@ -194,7 +194,6 @@ public final class DefaultTypeManager implements TypeManager {
       ExtraTypeFactory plugin = iterator.next();
       List<? extends ScalarType<?>> types = plugin.createTypes(config, objectMapper);
       for (ScalarType<?> type : types) {
-        log.debug("adding ScalarType {}", type.getClass());
         add(type);
       }
     }
@@ -220,10 +219,10 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void logAdd(ScalarType<?> scalarType) {
-    if (log.isTraceEnabled()) {
+    if (log.isLoggable(Level.TRACE)) {
       String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
       msg += " for [" + scalarType.getType().getName() + "]";
-      log.trace(msg);
+      log.log(Level.TRACE, msg);
     }
   }
 
@@ -676,7 +675,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
         add(scalarType);
       } catch (Exception e) {
-        log.error("Error loading ScalarType [" + cls.getName() + "]", e);
+        log.log(Level.ERROR, "Error loading ScalarType [" + cls.getName() + "]", e);
       }
     }
   }
@@ -707,10 +706,10 @@ public final class DefaultTypeManager implements TypeManager {
         }
         ScalarTypeConverter converter = foundType.getDeclaredConstructor().newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
-        log.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
+        log.log(Level.DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
       } catch (Exception e) {
-        log.error("Error registering ScalarTypeConverter [" + foundType.getName() + "]", e);
+        log.log(Level.ERROR, "Error registering ScalarTypeConverter [" + foundType.getName() + "]", e);
       }
     }
   }
@@ -731,10 +730,10 @@ public final class DefaultTypeManager implements TypeManager {
         }
         AttributeConverter converter = foundType.getDeclaredConstructor().newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
-        log.debug("Register ScalarTypeWrapper from {} -> {} using:{}", logicalType, persistType, foundType);
+        log.log(Level.DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
       } catch (Exception e) {
-        log.error("Error registering AttributeConverter [" + foundType.getName() + "]", e);
+        log.log(Level.ERROR, "Error registering AttributeConverter [" + foundType.getName() + "]", e);
       }
     }
   }
@@ -744,7 +743,6 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private void initialiseJacksonTypes(DatabaseConfig config) {
     if (objectMapper != null) {
-      log.trace("Registering JsonNode type support");
       ObjectMapper mapper = (ObjectMapper) objectMapper;
       jsonNodeClob = new ScalarTypeJsonNode.Clob(mapper);
       jsonNodeBlob = new ScalarTypeJsonNode.Blob(mapper);
@@ -807,7 +805,7 @@ public final class DefaultTypeManager implements TypeManager {
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
       // Joda classes are in the classpath so register the types
-      log.debug("Registering Joda data types");
+      log.log(Level.DEBUG, "Registering Joda data types");
       addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(jsonDateTime));
       addType(DateTime.class, new ScalarTypeJodaDateTime(jsonDateTime));
       if (config.getDatabasePlatform().supportsNativeJavaTime()) {
@@ -822,11 +820,9 @@ public final class DefaultTypeManager implements TypeManager {
       if ("normal".equalsIgnoreCase(jodaLocalTimeMode)) {
         // use the expected/normal local time zone
         addType(LocalTime.class, new ScalarTypeJodaLocalTime());
-        log.debug("registered ScalarTypeJodaLocalTime");
       } else if ("utc".equalsIgnoreCase(jodaLocalTimeMode)) {
         // use the old UTC based
         addType(LocalTime.class, new ScalarTypeJodaLocalTimeUTC());
-        log.debug("registered ScalarTypeJodaLocalTimeUTC");
       }
     }
   }

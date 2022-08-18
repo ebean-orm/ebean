@@ -4,8 +4,6 @@ import io.avaje.classpath.scanner.ClassPathScanner;
 import io.avaje.classpath.scanner.ClassPathScannerFactory;
 import io.avaje.classpath.scanner.Resource;
 import io.ebeaninternal.xmapping.api.XmapEbean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +13,6 @@ import java.util.ServiceLoader;
  * Reads the Xml deployment information.
  */
 class InternalConfigXmlRead {
-
-  private static final Logger log = LoggerFactory.getLogger(InternalConfigXmlRead.class);
 
   private final ToXmapEbean to = new ToXmapEbean();
   private final ClassLoader classLoader;
@@ -40,7 +36,6 @@ class InternalConfigXmlRead {
   private List<Resource> xmlMappingResources() {
     List<ClassPathScanner> scanners = scanners();
     List<Resource> resourceList = new ArrayList<>();
-    long st = System.currentTimeMillis();
     if (mappingLocations != null && !mappingLocations.isEmpty()) {
       for (ClassPathScanner finder : scanners) {
         for (String mappingLocation : mappingLocations) {
@@ -48,8 +43,6 @@ class InternalConfigXmlRead {
         }
       }
     }
-    long searchTime = System.currentTimeMillis() - st;
-    log.debug("Classpath search mappings[{}] searchTime[{}]", resourceList.size(), searchTime);
     return resourceList;
   }
 

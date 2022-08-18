@@ -1,11 +1,10 @@
 package io.ebeaninternal.dbmigration.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import io.avaje.applog.AppLog;
 import io.ebean.migration.MigrationVersion;
 
 import java.io.File;
+import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,7 +14,7 @@ import java.util.List;
  */
 public class MigrationModel {
 
-  private static final Logger logger = LoggerFactory.getLogger(MigrationModel.class);
+  private static final System.Logger logger = AppLog.getLogger(MigrationModel.class);
 
   private final ModelContainer model = new ModelContainer();
   private final File modelDirectory;
@@ -53,7 +52,7 @@ public class MigrationModel {
 
     if (!initMigration) {
       for (MigrationResource migrationResource : resources) {
-        logger.debug("read {}", migrationResource);
+        logger.log(Level.DEBUG, "read {0}", migrationResource);
         model.apply(migrationResource.read(), migrationResource.version());
       }
     }

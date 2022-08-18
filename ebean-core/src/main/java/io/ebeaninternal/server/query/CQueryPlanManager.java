@@ -7,6 +7,7 @@ import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.type.bindcapture.BindCapture;
 
+import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -64,7 +65,7 @@ public final class CQueryPlanManager implements QueryPlanManager {
       }
       return req.plans();
     } catch (SQLException e) {
-      CoreLog.log.error("Error during query plan collection", e);
+      CoreLog.log.log(Level.ERROR, "Error during query plan collection", e);
       return emptyList();
     }
   }

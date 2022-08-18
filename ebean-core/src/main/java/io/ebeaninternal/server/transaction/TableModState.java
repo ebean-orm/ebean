@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.transaction;
 
+import io.avaje.applog.AppLog;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.lang.System.Logger.Level;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class TableModState implements QueryCacheEntryValidate, ServerCacheNotify {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.TABLEMOD");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.cache.TABLEMOD");
 
   private final Map<String, Long> tableModStamp = new ConcurrentHashMap<>();
 
@@ -34,8 +34,8 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
     for (String tableName : touchedTables) {
       tableModStamp.put(tableName, modNanoTime);
     }
-    if (log.isDebugEnabled()) {
-      log.debug("TableModState updated - touched:{} modNanoTime:{}", touchedTables, modNanoTime);
+    if (log.isLoggable(Level.DEBUG)) {
+      log.log(Level.DEBUG, "TableModState updated - touched:{0} modNanoTime:{1}", touchedTables, modNanoTime);
     }
   }
 
@@ -46,8 +46,8 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
     for (String tableName : tables) {
       Long modTime = tableModStamp.get(tableName);
       if (modTime != null && modTime >= sinceNanoTime) {
-        if (log.isTraceEnabled()) {
-          log.trace("Invalidate on table:{}", tableName);
+        if (log.isLoggable(Level.TRACE)) {
+          log.log(Level.TRACE, "Invalidate on table:{0}", tableName);
         }
         return false;
       }
@@ -68,15 +68,13 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
    * Update the table modification timestamps based on remote table modification events.
    * <p>
    * Generally this is used with distributed caches (Hazelcast, Ignite etc) via topic.
-   * </p>
    */
   @Override
   public void notify(ServerCacheNotification notification) {
-
     // use local clock - for slightly more aggressive invalidation (as later)
     // that removes any concern regarding clock syncing across cluster
-    if (log.isDebugEnabled()) {
-      log.debug("ServerCacheNotification:{}", notification);
+    if (log.isLoggable(Level.DEBUG)) {
+      log.log(Level.DEBUG, "ServerCacheNotification:{0}", notification);
     }
     touch(notification.getDependentTables());
   }
@@ -85,14 +83,12 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
    * Update from Remote transaction event.
    * <p>
    * Generally this is used with Clustering (ebean-cluster, k8scache).
-   * </p>
    */
   public void notify(RemoteTableMod tableMod) {
-
     // use local clock - for slightly more aggressive invalidation (as later)
     // that removes any concern regarding clock syncing across cluster
-    if (log.isDebugEnabled()) {
-      log.debug("RemoteTableMod:{}", tableMod);
+    if (log.isLoggable(Level.DEBUG)) {
+      log.log(Level.DEBUG, "RemoteTableMod:{0}", tableMod);
     }
     touch(tableMod.getTables());
   }
