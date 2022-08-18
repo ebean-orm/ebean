@@ -20,10 +20,21 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>persistence-api</artifactId>
+        <version>${ebean-persistence-api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-annotation</artifactId>
         <version>${ebean-annotation.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-types</artifactId>
+        <version>${ebean-types.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>

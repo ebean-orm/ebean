@@ -49,7 +49,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>persistence-api</artifactId>
-      <version>3.0</version>
+      <version>${ebean-persistence-api.version}</version>
     </dependency>
 
     <dependency>
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-types</artifactId>
-      <version>3.0</version>
+      <version>${ebean-types.version}</version>
     </dependency>
 
     <dependency>

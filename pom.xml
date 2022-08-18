@@ -41,6 +41,8 @@
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.13.2</jackson.version>
     <h2database.version>2.1.212</h2database.version>
+    <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
+    <ebean-types.version>3.0</ebean-types.version>
     <ebean-annotation.version>8.2</ebean-annotation.version>
     <ebean-ddl-runner.version>2.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
