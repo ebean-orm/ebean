@@ -9,12 +9,14 @@ import io.ebean.metric.CountMetric;
 import io.ebean.metric.MetricFactory;
 
 import java.io.Serializable;
-import java.lang.System.Logger.Level;
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * The default cache implementation.
@@ -287,13 +289,13 @@ public class DefaultServerCache implements ServerCache {
         evictCount.add(trimmedByGC);
         evictCount.add(trimmedByTTL);
         evictCount.add(trimmedByLRU);
-        if (logger.isLoggable(Level.TRACE)) {
+        if (logger.isLoggable(TRACE)) {
           long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
-          logger.log(Level.TRACE, "Executed trim of cache {0} in [{1}]millis idle[{2}] timeToLive[{3}] accessTime[{4}] gc[{5}]",
+          logger.log(TRACE, "Executed trim of cache {0} in [{1}]millis idle[{2}] timeToLive[{3}] accessTime[{4}] gc[{5}]",
             name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
         }
       } catch (Throwable e) {
-        logger.log(Level.WARNING, "Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
+        logger.log(WARNING, "Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
       }
     } finally {
       lock.unlock();

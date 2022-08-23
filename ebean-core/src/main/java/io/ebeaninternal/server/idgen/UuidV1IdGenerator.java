@@ -1,11 +1,12 @@
 package io.ebeaninternal.server.idgen;
 
 import java.io.*;
-import java.lang.System.Logger.Level;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * IdGenerator for java util UUID.
@@ -82,7 +83,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
           }
         }
       } catch (SocketException ex) {
-        log.log(Level.DEBUG, "Skipping " + network, ex);
+        log.log(DEBUG, "Skipping " + network, ex);
       }
     }
     return fallbackAddr;
@@ -119,7 +120,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
         // See, if there is an alternative MAC address set.
         nodeId = parseAlternativeNodeId(altNodeId);
         restoreState();
-        log.log(Level.INFO, "Explicitly using ID {0} to generate Type 1 UUIDs", getNodeIdentifier());
+        log.log(INFO, "Explicitly using ID {0} to generate Type 1 UUIDs", getNodeIdentifier());
       }
       UUID uuid = nextId(null);
       long ts = timeStamp.get();
@@ -127,9 +128,9 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
       ts /= MILLIS_TO_UUID;
 
       saveState();
-      log.log(Level.DEBUG, "Saved state: clockSeq {0}, timestamp {1}, uuid {2}, stateFile: {3})", clockSeq.get(), new Date(ts), uuid, stateFile);
+      log.log(DEBUG, "Saved state: clockSeq {0}, timestamp {1}, uuid {2}, stateFile: {3})", clockSeq.get(), new Date(ts), uuid, stateFile);
     } catch (IOException e) {
-      log.log(Level.ERROR, "There was a problem while detecting the nodeId. Falling back to random mode. Try using to specify 'ebean.uuidNodeId' property", e);
+      log.log(ERROR, "There was a problem while detecting the nodeId. Falling back to random mode. Try using to specify 'ebean.uuidNodeId' property", e);
       useRandomMode();
     }
   }
@@ -146,16 +147,16 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     try {
       nodeId = getHardwareId();
     } catch (IOException e) {
-      log.log(Level.ERROR, "Error while reading MAC address. Fall back to 'generate' mode", e);
+      log.log(ERROR, "Error while reading MAC address. Fall back to 'generate' mode", e);
       tryGenerateMode();
     }
 
     if (nodeId != null) {
       restoreState();
-      log.log(Level.INFO, "Using MAC {0} to generate Type 1 UUIDs", getNodeIdentifier());
+      log.log(INFO, "Using MAC {0} to generate Type 1 UUIDs", getNodeIdentifier());
       return;
     }
-    log.log(Level.WARNING, "No suitable network interface found. Fall back to 'generate' mode");
+    log.log(WARNING, "No suitable network interface found. Fall back to 'generate' mode");
     tryGenerateMode();
   }
 
@@ -165,11 +166,11 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
    */
   private void tryGenerateMode() throws IOException {
     if (restoreState()) {
-      log.log(Level.INFO, "Using recently generated nodeId {0} to generate Type 1 UUIDs", getNodeIdentifier());
+      log.log(INFO, "Using recently generated nodeId {0} to generate Type 1 UUIDs", getNodeIdentifier());
     } else {
       // RFC 4.5 use random portion for node
       nodeId = super.getNodeIdBytes();
-      log.log(Level.INFO, "Using a newly generated nodeId {0} to generate Type 1 UUIDs", getNodeIdentifier());
+      log.log(INFO, "Using a newly generated nodeId {0} to generate Type 1 UUIDs", getNodeIdentifier());
     }
   }
 
@@ -180,7 +181,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
   private void useRandomMode() {
     canSaveState = false;
     nodeId = super.getNodeIdBytes();
-    log.log(Level.INFO, "Explicitly using a new random ID {0} to generate Type 1 UUIDs", getNodeIdentifier());
+    log.log(INFO, "Explicitly using a new random ID {0} to generate Type 1 UUIDs", getNodeIdentifier());
   }
 
   /**
@@ -211,14 +212,14 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
     String propNodeId = prop.getProperty("nodeId");
     if (propNodeId == null || propNodeId.isEmpty()) {
-      log.log(Level.WARNING, "State file '{0}' is incomplete", stateFile);
+      log.log(WARNING, "State file '{0}' is incomplete", stateFile);
       return false; // we cannot restore
     }
     try {
       if (nodeId == null) {
         nodeId = parseAlternativeNodeId(propNodeId);
       } else if (!getNodeIdentifier().equals(propNodeId)) {
-        log.log(Level.WARNING,
+        log.log(WARNING,
           "The nodeId in the state file '{0}' has changed from {1} to {2}. "
             + "This can happen when MAC address changes or when two containers share the same state file",
           stateFile, propNodeId, getNodeIdentifier());
@@ -231,7 +232,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
       return true;
 
     } catch (IllegalArgumentException nfe) {
-      log.log(Level.ERROR, "State file corrupt: " + stateFile, nfe);
+      log.log(ERROR, "State file corrupt: " + stateFile, nfe);
     }
     return false;
   }
@@ -255,7 +256,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     try (OutputStream os = new FileOutputStream(stateFile)) {
       prop.store(os, "ebean uuid state file");
     } catch (IOException e) {
-      log.log(Level.ERROR, "Could not persist uuid state to: " + stateFile, e);
+      log.log(ERROR, "Could not persist uuid state to: " + stateFile, e);
     }
   }
 

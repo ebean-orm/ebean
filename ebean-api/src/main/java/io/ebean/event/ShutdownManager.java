@@ -4,7 +4,6 @@ import io.ebean.Database;
 import io.ebean.EbeanVersion;
 import io.ebean.service.SpiContainer;
 
-import java.lang.System.Logger.Level;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -12,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Manages the shutdown of Ebean.
@@ -121,8 +122,8 @@ public final class ShutdownManager {
         // Already run shutdown...
         return;
       }
-      if (log.isLoggable(Level.DEBUG)) {
-        log.log(Level.DEBUG, "Ebean shutting down");
+      if (log.isLoggable(DEBUG)) {
+        log.log(DEBUG, "Ebean shutting down");
       }
       stopping = true;
       deregisterShutdownHook();
@@ -134,7 +135,7 @@ public final class ShutdownManager {
           Runnable r = (Runnable) ClassUtil.newInstance(shutdownRunner);
           r.run();
         } catch (Exception e) {
-          log.log(Level.ERROR, "Error running custom shutdown runnable", e);
+          log.log(ERROR, "Error running custom shutdown runnable", e);
         }
       }
 
@@ -148,7 +149,7 @@ public final class ShutdownManager {
         try {
           server.shutdown();
         } catch (Exception ex) {
-          log.log(Level.ERROR, "Error executing shutdown runnable", ex);
+          log.log(ERROR, "Error executing shutdown runnable", ex);
           ex.printStackTrace();
         }
       }
@@ -166,10 +167,10 @@ public final class ShutdownManager {
     while (drivers.hasMoreElements()) {
       Driver driver = drivers.nextElement();
       try {
-        log.log(Level.INFO, "De-registering jdbc driver: " + driver);
+        log.log(INFO, "De-registering jdbc driver: " + driver);
         DriverManager.deregisterDriver(driver);
       } catch (SQLException e) {
-        log.log(Level.ERROR, "Error de-registering driver " + driver, e);
+        log.log(ERROR, "Error de-registering driver " + driver, e);
       }
     }
   }

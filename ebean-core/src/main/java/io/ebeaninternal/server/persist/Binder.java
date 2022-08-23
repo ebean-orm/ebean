@@ -12,11 +12,12 @@ import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.*;
 
 import javax.persistence.PersistenceException;
-import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Collection;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Binds bean values to a PreparedStatement.
@@ -133,7 +134,7 @@ public final class Binder {
       }
 
     } catch (SQLException ex) {
-      CoreLog.log.log(Level.WARNING, "error binding parameter [{0}][{1}]", (dataBind.currentPos() - 1), value);
+      CoreLog.log.log(WARNING, "error binding parameter [{0}][{1}]", (dataBind.currentPos() - 1), value);
       throw ex;
     }
   }

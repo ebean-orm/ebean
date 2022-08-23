@@ -9,10 +9,11 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.lang.System.Logger.Level;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Collects usages statistics for a given node in the object graph.
@@ -45,7 +46,7 @@ public class ProfileOriginNodeUsage {
       if (path != null) {
         ElPropertyValue elGetValue = rootDesc.elGetValue(path);
         if (elGetValue == null) {
-          logger.log(Level.WARNING, "AutoTune: Can't find join for path[" + path + "] for " + rootDesc.name());
+          logger.log(WARNING, "AutoTune: Can't find join for path[" + path + "] for " + rootDesc.name());
           return;
         } else {
           BeanProperty beanProperty = elGetValue.beanProperty();
@@ -61,7 +62,7 @@ public class ProfileOriginNodeUsage {
       for (String propName : aggregateUsed) {
         BeanProperty beanProp = desc.findPropertyFromPath(propName);
         if (beanProp == null) {
-          logger.log(Level.WARNING, "AutoTune: Can't find property[" + propName + "] for " + desc.name());
+          logger.log(WARNING, "AutoTune: Can't find property[" + propName + "] for " + desc.name());
 
         } else {
           if (beanProp.isId()) {

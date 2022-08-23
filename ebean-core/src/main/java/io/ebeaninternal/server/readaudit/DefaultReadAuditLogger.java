@@ -11,8 +11,10 @@ import io.ebeaninternal.api.CoreLog;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.System.Logger.Level;
 import java.util.Map;
+
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Default implementation of ReadAuditLogger that writes the event in JSON format to standard loggers.
@@ -48,9 +50,9 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       }
       gen.writeEndObject();
       gen.flush();
-      queryLogger.log(Level.INFO, writer.toString());
+      queryLogger.log(INFO, writer.toString());
     } catch (IOException e) {
-      CoreLog.log.log(Level.ERROR, "Error writing Read audit event", e);
+      CoreLog.log.log(ERROR, "Error writing Read audit event", e);
     }
   }
 
@@ -75,9 +77,9 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       StringWriter writer = new StringWriter(defaultReadBuffer);
       JsonGenerator gen = jsonFactory.createGenerator(writer);
       writeDetails(gen, event);
-      auditLogger.log(Level.INFO, writer.toString());
+      auditLogger.log(INFO, writer.toString());
     } catch (IOException e) {
-      CoreLog.log.log(Level.ERROR, "Error writing Read audit event", e);
+      CoreLog.log.log(ERROR, "Error writing Read audit event", e);
     }
   }
 

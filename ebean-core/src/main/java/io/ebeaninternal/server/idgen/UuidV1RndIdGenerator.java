@@ -4,12 +4,13 @@ import io.avaje.applog.AppLog;
 import io.ebean.Transaction;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 
-import java.lang.System.Logger.Level;
 import java.security.SecureRandom;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * IdGenerator for (pseudo) type 1 UUIDs.
@@ -105,7 +106,7 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
         delta = current - last;
         if (delta < -10000 * 20000) {
-          log.log(Level.INFO, "Clock skew of {} ms detected", delta / -10000);
+          log.log(INFO, "Clock skew of {} ms detected", delta / -10000);
           // The clock was adjusted back about 2 seconds, or we were generating a lot of ids too fast
           // if so, we try to set the current as last and also increment the clockSeq.
           lock.lock();

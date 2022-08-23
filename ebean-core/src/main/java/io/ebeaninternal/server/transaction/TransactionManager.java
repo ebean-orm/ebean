@@ -32,13 +32,15 @@ import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Manages transactions.
@@ -365,7 +367,7 @@ public class TransactionManager implements SpiTransactionManager {
         txnLogger.debug(msg);
       }
     } catch (Exception ex) {
-      log.log(Level.ERROR, "Error while notifying TransactionEventListener of rollback event", ex);
+      log.log(ERROR, "Error while notifying TransactionEventListener of rollback event", ex);
     }
   }
 
@@ -416,7 +418,7 @@ public class TransactionManager implements SpiTransactionManager {
       postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
     } catch (Exception ex) {
-      log.log(Level.ERROR, "NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
+      log.log(ERROR, "NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
     }
   }
 
@@ -442,8 +444,8 @@ public class TransactionManager implements SpiTransactionManager {
    * Notify local BeanPersistListeners etc of events from another server in the cluster.
    */
   public final void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
-    if (clusterLogger.isLoggable(Level.DEBUG)) {
-      clusterLogger.log(Level.DEBUG, "processing {0}", remoteEvent);
+    if (clusterLogger.isLoggable(DEBUG)) {
+      clusterLogger.log(DEBUG, "processing {0}", remoteEvent);
     }
     CacheChangeSet changeSet = new CacheChangeSet();
 

@@ -2,9 +2,10 @@ package io.ebeaninternal.server.executor;
 
 import io.avaje.applog.AppLog;
 
-import java.lang.System.Logger.Level;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * A "CachedThreadPool" based on Daemon threads.
@@ -43,19 +44,19 @@ final class DaemonExecutorService {
     lock.lock();
     try {
       if (service.isShutdown()) {
-        logger.log(Level.DEBUG, "DaemonExecutorService[{0}] already shut down", namePrefix);
+        logger.log(DEBUG, "DaemonExecutorService[{0}] already shut down", namePrefix);
         return;
       }
       try {
-        logger.log(Level.DEBUG, "DaemonExecutorService[{0}] shutting down...", namePrefix);
+        logger.log(DEBUG, "DaemonExecutorService[{0}] shutting down...", namePrefix);
         service.shutdown();
         if (!service.awaitTermination(shutdownWaitSeconds, TimeUnit.SECONDS)) {
-          logger.log(Level.INFO, "DaemonExecutorService[{0}] shut down timeout exceeded. Terminating running threads.", namePrefix);
+          logger.log(INFO, "DaemonExecutorService[{0}] shut down timeout exceeded. Terminating running threads.", namePrefix);
           service.shutdownNow();
         }
 
       } catch (Exception e) {
-        logger.log(Level.ERROR, "Error during shutdown of DaemonThreadPool[" + namePrefix + "]", e);
+        logger.log(ERROR, "Error during shutdown of DaemonThreadPool[" + namePrefix + "]", e);
         e.printStackTrace();
       }
     } finally {

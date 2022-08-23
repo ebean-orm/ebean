@@ -5,8 +5,9 @@ import io.avaje.lang.NonNullApi;
 import io.ebean.config.BackgroundExecutorWrapper;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 
-import java.lang.System.Logger.Level;
 import java.util.concurrent.*;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * The default implementation of the BackgroundExecutor.
@@ -27,7 +28,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
     this.schedulePool = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix + "-periodic-");
     this.pool = new DaemonExecutorService(shutdownWaitSeconds, namePrefix);
     this.wrapper = wrapper;
-    log.log(Level.DEBUG, "Created backgroundExecutor {0} (schedulePoolSize={1}, shutdownWaitSeconds={2})", namePrefix, schedulePoolSize, shutdownWaitSeconds);
+    log.log(DEBUG, "Created backgroundExecutor {0} (schedulePoolSize={1}, shutdownWaitSeconds={2})", namePrefix, schedulePoolSize, shutdownWaitSeconds);
   }
 
   /**
@@ -64,14 +65,14 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
    */
   private Runnable logExceptions(Runnable task) {
     long queued = System.nanoTime();
-    log.log(Level.TRACE, "Queued {0}", task);
+    log.log(TRACE, "Queued {0}", task);
     return () -> {
       try {
-        if (log.isLoggable(Level.TRACE)) {
+        if (log.isLoggable(TRACE)) {
           long start = System.nanoTime();
-          log.log(Level.TRACE, "Start {0} (delay time {1} us)", task, (start - queued) / 1000L);
+          log.log(TRACE, "Start {0} (delay time {1} us)", task, (start - queued) / 1000L);
           task.run();
-          log.log(Level.TRACE, "Stop {0} (exec time {1} us)", task, (System.nanoTime() - start) / 1000L);
+          log.log(TRACE, "Stop {0} (exec time {1} us)", task, (System.nanoTime() - start) / 1000L);
         } else {
           task.run();
         }
@@ -79,7 +80,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
         // log any exception here. Note they will not bubble up to the calling user
         // unless Future.get() is checked. (Which is almost never done on scheduled
         // background executions)
-        log.log(Level.ERROR, "Error while executing the task " + task, t);
+        log.log(ERROR, "Error while executing the task " + task, t);
         throw t;
       }
     };
@@ -127,10 +128,10 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public void shutdown() {
-    log.log(Level.TRACE, "BackgroundExecutor shutting down");
+    log.log(TRACE, "BackgroundExecutor shutting down");
     schedulePool.shutdown();
     pool.shutdown();
-    log.log(Level.DEBUG, "BackgroundExecutor stopped");
+    log.log(DEBUG, "BackgroundExecutor stopped");
   }
 
 }

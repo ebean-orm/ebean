@@ -8,9 +8,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.System.Logger.Level;
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Read ExtraDdl from an XML document.
@@ -42,7 +42,7 @@ public class ExtraDdlXmlReader {
     StringBuilder sb = new StringBuilder(300);
     for (DdlScript script : read.getDdlScript()) {
       if (script.isDrop() == drops && matchPlatform(platform, script.getPlatforms())) {
-        logger.log(Level.DEBUG, "include script {}", script.getName());
+        logger.log(DEBUG, "include script {}", script.getName());
         String value = script.getValue();
         sb.append(value);
         if (value.lastIndexOf(';') == -1) {

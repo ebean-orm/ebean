@@ -13,9 +13,11 @@ import io.ebeaninternal.server.core.*;
 import io.ebeaninternal.server.core.PersistRequest.Type;
 import io.ebeaninternal.server.deploy.*;
 
-import java.lang.System.Logger.Level;
 import java.sql.SQLException;
 import java.util.*;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.TRACE;
 
 /**
  * Persister implementation using DML.
@@ -143,7 +145,7 @@ public final class DefaultPersister implements Persister {
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
     List<T> liveBeans = draftHandler.fetchSourceBeans(query, false);
-    PUB.log(Level.DEBUG, "draftRestore [{0}] count[{1}]", desc.name(), liveBeans.size());
+    PUB.log(DEBUG, "draftRestore [{0}] count[{1}]", desc.name(), liveBeans.size());
     if (liveBeans.isEmpty()) {
       return Collections.emptyList();
     }
@@ -156,11 +158,11 @@ public final class DefaultPersister implements Persister {
       // reset @DraftDirty and @DraftReset properties
       draftHandler.resetDraft(draftBean);
 
-      PUB.log(Level.TRACE, "draftRestore bean [{0}] id[{1}]", desc.name(), draftHandler.getId());
+      PUB.log(TRACE, "draftRestore bean [{0}] id[{1}]", desc.name(), draftHandler.getId());
       update(createRequest(draftBean, transaction, null, mgr, Type.UPDATE, Flags.RECURSE));
     }
 
-    PUB.log(Level.DEBUG, "draftRestore - complete for [{0}]", desc.name());
+    PUB.log(DEBUG, "draftRestore - complete for [{0}]", desc.name());
     return draftHandler.getDrafts();
   }
 
@@ -185,7 +187,7 @@ public final class DefaultPersister implements Persister {
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
     List<T> draftBeans = draftHandler.fetchSourceBeans(query, true);
-    PUB.log(Level.DEBUG, "publish [{0}] count[{1}]", desc.name(), draftBeans.size());
+    PUB.log(DEBUG, "publish [{0}] count[{1}]", desc.name(), draftBeans.size());
     if (draftBeans.isEmpty()) {
       return Collections.emptyList();
     }
@@ -202,7 +204,7 @@ public final class DefaultPersister implements Persister {
       draftHandler.resetDraft(draftBean);
 
       Type persistType = draftHandler.isInsert() ? Type.INSERT : Type.UPDATE;
-      PUB.log(Level.TRACE, "publish bean [{0}] id[{1}] type[{2}]", desc.name(), draftHandler.getId(), persistType);
+      PUB.log(TRACE, "publish bean [{0}] id[{1}] type[{2}]", desc.name(), draftHandler.getId(), persistType);
 
       PersistRequestBean<T> request = createRequest(liveBean, transaction, null, mgr, persistType, Flags.PUBLISH_RECURSE);
       if (persistType == Type.INSERT) {
@@ -214,7 +216,7 @@ public final class DefaultPersister implements Persister {
     }
 
     draftHandler.updateDrafts(transaction, mgr);
-    PUB.log(Level.DEBUG, "publish - complete for [{0}]", desc.name());
+    PUB.log(DEBUG, "publish - complete for [{0}]", desc.name());
     return livePublish;
   }
 
@@ -270,7 +272,7 @@ public final class DefaultPersister implements Persister {
     void updateDrafts(Transaction transaction, BeanManager<T> mgr) {
       if (!draftUpdates.isEmpty()) {
         // update the dirty status on the drafts that have been published
-        PUB.log(Level.DEBUG, "publish - update dirty status on [{0}] drafts", draftUpdates.size());
+        PUB.log(DEBUG, "publish - update dirty status on [{0}] drafts", draftUpdates.size());
         for (T draftUpdate : draftUpdates) {
           update(createRequest(draftUpdate, transaction, null, mgr, Type.UPDATE, Flags.ZERO));
         }
@@ -491,8 +493,8 @@ public final class DefaultPersister implements Persister {
       }
       if (request.isDirty()) {
         request.executeOrQueue();
-      } else if (log.isLoggable(Level.DEBUG)) {
-        log.log(Level.DEBUG, "Update skipped as bean is unchanged: {0}", request.bean());
+      } else if (log.isLoggable(DEBUG)) {
+        log.log(DEBUG, "Update skipped as bean is unchanged: {0}", request.bean());
       }
       if (request.isPersistCascade()) {
         // save all the beans in assocMany's after
@@ -538,8 +540,8 @@ public final class DefaultPersister implements Persister {
     if (req.isRegisteredForDeleteBean()) {
       // skip deleting bean. Used where cascade is on
       // both sides of a relationship
-      if (log.isLoggable(Level.DEBUG)) {
-        log.log(Level.DEBUG, "skipping delete on alreadyRegistered {0}", req.bean());
+      if (log.isLoggable(DEBUG)) {
+        log.log(DEBUG, "skipping delete on alreadyRegistered {0}", req.bean());
       }
       return 0;
     }

@@ -6,7 +6,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 
-import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.DEBUG;
 
 
 /**
@@ -107,7 +107,7 @@ public final class BeanTable {
     if (complexKey) {
       // just to copy the column name rather than prefix with the foreignKeyPrefix.
       // I think that with complex keys this is the more common approach.
-      CoreLog.internal.log(Level.DEBUG, "On table[{0}] foreign key column [{1}]", baseTable, lc);
+      CoreLog.internal.log(DEBUG, "On table[{0}] foreign key column [{1}]", baseTable, lc);
       fk = lc;
     }
     if (sqlFormulaSelect != null) {

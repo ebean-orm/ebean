@@ -4,7 +4,8 @@ import io.avaje.applog.AppLog;
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
 
-import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.TRACE;
 
 /**
  * Create a logger that captures the SQL and register it for later access in tests.
@@ -33,22 +34,22 @@ public class CapturingLoggerFactory implements SpiLoggerFactory {
 
     @Override
     public boolean isDebug() {
-      return logger.isLoggable(Level.DEBUG);
+      return logger.isLoggable(DEBUG);
     }
 
     @Override
     public boolean isTrace() {
-      return logger.isLoggable(Level.TRACE);
+      return logger.isLoggable(TRACE);
     }
 
     @Override
     public void debug(String msg) {
-      logger.log(Level.DEBUG, msg);
+      logger.log(DEBUG, msg);
     }
 
     @Override
     public void trace(String msg) {
-      logger.log(Level.TRACE, msg);
+      logger.log(TRACE, msg);
     }
   }
 }

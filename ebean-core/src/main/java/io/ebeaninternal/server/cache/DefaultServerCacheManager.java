@@ -9,8 +9,10 @@ import io.ebeaninternal.api.SpiCacheRegion;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.deploy.DCacheRegion;
 
-import java.lang.System.Logger.Level;
 import java.util.*;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Manages the bean and query caches.
@@ -65,23 +67,23 @@ public final class DefaultServerCacheManager implements SpiCacheManager {
           enabled.add(region.name());
           if (!region.isEnabled()) {
             region.setEnabled(true);
-            log.log(Level.DEBUG, "Cache region[{0}] enabled", region.name());
+            log.log(DEBUG, "Cache region[{0}] enabled", region.name());
           }
         } else {
           disabled.add(region.name());
           if (region.isEnabled()) {
             region.setEnabled(false);
-            log.log(Level.DEBUG, "Cache region[{0}] disabled", region.name());
+            log.log(DEBUG, "Cache region[{0}] disabled", region.name());
           }
         }
       }
-      log.log(Level.INFO, "Cache regions enabled:{0} disabled:{1}", enabled, disabled);
+      log.log(INFO, "Cache regions enabled:{0} disabled:{1}", enabled, disabled);
     }
   }
 
   @Override
   public void setAllRegionsEnabled(boolean enabled) {
-    log.log(Level.DEBUG, "All cache regions enabled[{0}]", enabled);
+    log.log(DEBUG, "All cache regions enabled[{0}]", enabled);
     for (SpiCacheRegion region : regionMap.values()) {
       region.setEnabled(enabled);
     }

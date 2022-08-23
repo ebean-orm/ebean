@@ -5,8 +5,9 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.test.containers.DockerHost;
 
-import java.lang.System.Logger.Level;
 import java.util.Properties;
+
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Config for a database / datasource with associated DDL mode and Docker configuration.
@@ -193,8 +194,7 @@ class Config {
     ds.setDriver(driverClass);
     config.setDataSourceConfig(ds);
 
-    log.log(Level.INFO, "Using jdbc settings - username:{0} url:{1} driver:{2}", ds.getUsername(), ds.getUrl(), ds.getDriver());
-
+    log.log(INFO, "Using jdbc settings - username:{0} url:{1} driver:{2}", ds.getUsername(), ds.getUrl(), ds.getDriver());
     if (driverClass != null) {
       try {
         Class.forName(driverClass);

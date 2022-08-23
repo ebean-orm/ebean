@@ -5,12 +5,13 @@ import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 
 import java.io.*;
-import java.lang.System.Logger.Level;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 public class DataBind implements DataBinder {
 
@@ -101,7 +102,7 @@ public class DataBind implements DataBinder {
         try {
           inputStream.close();
         } catch (IOException e) {
-          CoreLog.log.log(Level.WARNING, "Error closing InputStream that was bound to PreparedStatement", e);
+          CoreLog.log.log(WARNING, "Error closing InputStream that was bound to PreparedStatement", e);
         }
       }
       inputStreams = null;

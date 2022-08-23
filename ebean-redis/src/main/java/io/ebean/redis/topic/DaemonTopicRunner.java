@@ -5,9 +5,10 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
-import java.lang.System.Logger.Level;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Subscribe to redis topic listening for changes.
@@ -49,13 +50,13 @@ public final class DaemonTopicRunner {
       try {
         subscribe();
       } catch (JedisException e) {
-        log.log(Level.DEBUG, "... redis subscribe connection attempt:{0} failed:{1}", attempts, e.getMessage());
+        log.log(DEBUG, "... redis subscribe connection attempt:{0} failed:{1}", attempts, e.getMessage());
         try {
           // wait a little before retrying
           Thread.sleep(reconnectWaitMillis);
         } catch (InterruptedException e1) {
           Thread.currentThread().interrupt();
-          log.log(Level.WARNING, "Interrupted redis re-connection wait", e1);
+          log.log(WARNING, "Interrupted redis re-connection wait", e1);
         }
       }
     }
@@ -70,13 +71,13 @@ public final class DaemonTopicRunner {
     try {
       daemonTopic.subscribe(jedis);
     } catch (Exception e) {
-      log.log(Level.ERROR, "Lost connection to topic, starting re-connection loop", e);
+      log.log(ERROR, "Lost connection to topic, starting re-connection loop", e);
       attemptConnections();
     } finally {
       try {
         jedis.close();
       } catch (Exception e) {
-        log.log(Level.WARNING, "Error closing probably broken Redis connection", e);
+        log.log(WARNING, "Error closing probably broken Redis connection", e);
       }
     }
   }

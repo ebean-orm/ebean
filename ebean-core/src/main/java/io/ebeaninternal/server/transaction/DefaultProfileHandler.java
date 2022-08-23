@@ -11,7 +11,6 @@ import io.ebeaninternal.api.SpiProfileHandler;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.System.Logger.Level;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
@@ -22,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.*;
 import static java.time.temporal.ChronoField.*;
 
 /**
@@ -79,7 +79,7 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
     this.executor = Executors.newSingleThreadExecutor();
     this.dir = new File(config.getDirectory());
     if (!dir.exists() && !dir.mkdirs()) {
-      log.log(Level.ERROR, "failed to mkdirs " + dir.getAbsolutePath());
+      log.log(ERROR, "failed to mkdirs " + dir.getAbsolutePath());
     }
     incrementFile();
   }
@@ -109,7 +109,7 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
           out.close();
           out = null;
         } catch (IOException e) {
-          log.log(Level.ERROR, "Failed to flush and close transaction profiling file ", e);
+          log.log(ERROR, "Failed to flush and close transaction profiling file ", e);
         }
       }
     } finally {
@@ -129,7 +129,7 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
         File file = new File(dir, "txprofile-" + now + ".tprofile");
         out = IOUtils.newWriter(file);
       } catch (IOException e) {
-        log.log(Level.ERROR, "Not expected", e);
+        log.log(ERROR, "Not expected", e);
       }
     } finally {
       lock.unlock();
@@ -152,7 +152,7 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
       }
       flushCurrentFile();
     } catch (Exception e) {
-      log.log(Level.WARNING, "Error on collect", e);
+      log.log(WARNING, "Error on collect", e);
     }
   }
 
@@ -183,10 +183,10 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
 
       if (profileCounter % profilesPerFile == 0) {
         incrementFile();
-        log.log(Level.DEBUG, "profiled {0} transactions", profileCounter);
+        log.log(DEBUG, "profiled {0} transactions", profileCounter);
       }
     } catch (IOException e) {
-      log.log(Level.WARNING, "Error writing transaction profiling", e);
+      log.log(WARNING, "Error writing transaction profiling", e);
     }
   }
 
@@ -250,16 +250,16 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
   @Override
   public void shutdown() {
     shutdown = true;
-    log.log(Level.TRACE, "shutting down");
+    log.log(TRACE, "shutting down");
     try {
       executor.shutdown();
       if (!executor.awaitTermination(4, TimeUnit.SECONDS)) {
-        log.log(Level.INFO, "Shut down timeout exceeded. Terminating profiling consumer thread.");
+        log.log(INFO, "Shut down timeout exceeded. Terminating profiling consumer thread.");
         executor.shutdownNow();
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      log.log(Level.WARNING, "Interrupt on shutdown", e);
+      log.log(WARNING, "Interrupt on shutdown", e);
     }
     flushCurrentFile();
   }

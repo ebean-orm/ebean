@@ -9,7 +9,8 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 
 import java.io.IOException;
-import java.lang.System.Logger.Level;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Base for saving entity bean collections and element collections.
@@ -72,7 +73,7 @@ abstract class SaveManyBase implements SaveMany {
           String asJson = many.jsonWriteCollection(value);
           request.addCollectionChange(many.name(), asJson);
         } catch (IOException e) {
-          CoreLog.log.log(Level.ERROR, "Error build element collection entry for L2 cache", e);
+          CoreLog.log.log(ERROR, "Error build element collection entry for L2 cache", e);
         }
       }
     }

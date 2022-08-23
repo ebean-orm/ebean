@@ -20,8 +20,10 @@ import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.resps.ScanResult;
 import redis.clients.jedis.util.SafeEncoder;
 
-import java.lang.System.Logger.Level;
 import java.util.*;
+
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.WARNING;
 
 final class RedisCache implements ServerCache {
 
@@ -106,17 +108,17 @@ final class RedisCache implements ServerCache {
       }
       return valueEncode.decode(data);
     } catch (Exception e) {
-      log.log(Level.ERROR, "Error decoding data, treated as cache miss", e);
+      log.log(ERROR, "Error decoding data, treated as cache miss", e);
       return null;
     }
   }
 
   private void errorOnRead(Exception e) {
-    log.log(Level.WARNING, "Error when reading redis cache", e);
+    log.log(WARNING, "Error when reading redis cache", e);
   }
 
   private void errorOnWrite(Exception e) {
-    log.log(Level.WARNING, "Error when writing redis cache", e);
+    log.log(WARNING, "Error when writing redis cache", e);
   }
 
   @Override

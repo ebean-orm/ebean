@@ -3,12 +3,13 @@ package io.ebeaninternal.server.dto;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.type.TypeManager;
 
-import java.lang.System.Logger.Level;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Build the DtoMeta for a bean.
@@ -40,7 +41,7 @@ final class DtoMetaBuilder {
           final String name = propertyName(method.getName());
           properties.add(new DtoMetaProperty(typeManager, dtoType, method, name));
         } catch (Exception e) {
-          CoreLog.log.log(Level.DEBUG, "exclude on " + dtoType + " method " + method, e);
+          CoreLog.log.log(DEBUG, "exclude on " + dtoType + " method " + method, e);
         }
       }
     }
@@ -78,7 +79,7 @@ final class DtoMetaBuilder {
         constructorList.add(new DtoMetaConstructor(typeManager, constructor, dtoType));
       } catch (Exception e) {
         // we don't want that constructor
-        CoreLog.log.log(Level.DEBUG, "exclude on " + dtoType + " constructor " + constructor, e);
+        CoreLog.log.log(DEBUG, "exclude on " + dtoType + " constructor " + constructor, e);
       }
     }
   }

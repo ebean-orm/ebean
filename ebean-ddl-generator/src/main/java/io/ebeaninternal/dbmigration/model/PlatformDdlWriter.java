@@ -15,8 +15,9 @@ import io.ebeaninternal.dbmigration.migration.Migration;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.System.Logger.Level;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Writes migration changes as platform specific DDL.
@@ -107,7 +108,7 @@ public class PlatformDdlWriter {
     File subPath = new File(path, suffix);
     if (!subPath.exists()) {
       if (!subPath.mkdirs()) {
-        logger.log(Level.ERROR, "failed to create directories for " + subPath.getAbsolutePath());
+        logger.log(ERROR, "failed to create directories for " + subPath.getAbsolutePath());
       }
     }
     return subPath;

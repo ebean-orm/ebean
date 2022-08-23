@@ -10,8 +10,10 @@ import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.CoreLog;
 
 import java.io.StringWriter;
-import java.lang.System.Logger.Level;
 import java.util.Properties;
+
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Simply logs the change sets in JSON form to logger named <code>io.ebean.ChangeLog</code>.
@@ -65,9 +67,9 @@ public final class DefaultChangeLogListener implements ChangeLogListener, Plugin
       try {
         StringWriter writer = new StringWriter(getBufferSize(beanChange));
         jsonBuilder.writeBeanJson(writer, beanChange, changeSet);
-        changeLog.log(Level.INFO, writer.toString());
+        changeLog.log(INFO, writer.toString());
       } catch (Exception e) {
-        CoreLog.log.log(Level.ERROR, "Exception logging beanChange " + beanChange, e);
+        CoreLog.log.log(ERROR, "Exception logging beanChange " + beanChange, e);
       }
     }
   }

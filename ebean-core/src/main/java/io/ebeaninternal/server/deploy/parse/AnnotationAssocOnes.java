@@ -15,7 +15,8 @@ import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.query.SqlJoinType;
 
 import javax.persistence.*;
-import java.lang.System.Logger.Level;
+
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Read the deployment annotations for Associated One beans.
@@ -214,10 +215,10 @@ final class AnnotationAssocOnes extends AnnotationAssoc {
     prop.setPrimaryKeyJoin(true);
 
     if (!primaryKeyJoin.name().isEmpty()) {
-      CoreLog.internal.log(Level.INFO, "Automatically determining join columns for @PrimaryKeyJoinColumn - ignoring PrimaryKeyJoinColumn.name attribute [{0}] on {1}", primaryKeyJoin.name(), prop.getFullBeanName());
+      CoreLog.internal.log(INFO, "Automatically determining join columns for @PrimaryKeyJoinColumn - ignoring PrimaryKeyJoinColumn.name attribute [{0}] on {1}", primaryKeyJoin.name(), prop.getFullBeanName());
     }
     if (!primaryKeyJoin.referencedColumnName().isEmpty()) {
-      CoreLog.internal.log(Level.INFO, "Automatically determining join columns for @PrimaryKeyJoinColumn - Ignoring PrimaryKeyJoinColumn.referencedColumnName attribute [{0}] on {1}", primaryKeyJoin.referencedColumnName(), prop.getFullBeanName());
+      CoreLog.internal.log(INFO, "Automatically determining join columns for @PrimaryKeyJoinColumn - Ignoring PrimaryKeyJoinColumn.referencedColumnName attribute [{0}] on {1}", primaryKeyJoin.referencedColumnName(), prop.getFullBeanName());
     }
     BeanTable baseBeanTable = factory.beanTable(info.getDescriptor().getBeanType());
     String localPrimaryKey = baseBeanTable.getIdColumn();

@@ -6,8 +6,10 @@ import io.ebean.config.CurrentUserProvider;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKeyManager;
 
-import java.lang.System.Logger.Level;
 import java.util.Properties;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Auto configuration of User and Tenant providers and Encrypt key manager for testing purposes.
@@ -44,12 +46,12 @@ public class ProviderAutoConfig {
     if (keyManager == null) {
       // Must be 16 Chars for Oracle function
       String keyVal = properties.getProperty("ebean.test.encryptKey", "simple0123456789");
-      log.log(Level.DEBUG, "for testing - using FixedEncryptKeyManager() keyVal:{0}", keyVal);
+      log.log(DEBUG, "for testing - using FixedEncryptKeyManager() keyVal:{0}", keyVal);
       config.setEncryptKeyManager(new FixedEncryptKeyManager(keyVal));
     }
 
     if (providerSetFlag > 0) {
-      log.log(Level.INFO, msg(providerSetFlag));
+      log.log(INFO, msg(providerSetFlag));
     }
   }
 

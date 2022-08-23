@@ -14,9 +14,10 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import javax.persistence.EntityNotFoundException;
-import java.lang.System.Logger.Level;
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
@@ -108,8 +109,8 @@ final class DefaultBeanLoader {
     server.findOne(query, null);
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
-        if (log.isLoggable(Level.DEBUG)) {
-          log.log(Level.DEBUG, "BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
+        if (log.isLoggable(DEBUG)) {
+          log.log(DEBUG, "BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
         }
       } else if (useManyIdCache) {
         parentDesc.cacheManyPropPut(many, beanCollection, parentId);

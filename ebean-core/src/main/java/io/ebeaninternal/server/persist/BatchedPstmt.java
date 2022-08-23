@@ -6,12 +6,13 @@ import io.ebeaninternal.api.SpiTransaction;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.System.Logger.Level;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * A batched statement that is held in BatchedPstmtHolder. It has a list of
@@ -136,7 +137,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
       try {
         pstmt.close();
       } catch (SQLException e) {
-        CoreLog.log.log(Level.WARNING, "BatchedPstmt Error closing statement", e);
+        CoreLog.log.log(WARNING, "BatchedPstmt Error closing statement", e);
       } finally {
         pstmt = null;
       }
@@ -202,7 +203,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
         try {
           inputStream.close();
         } catch (IOException e) {
-          CoreLog.log.log(Level.WARNING, "BatchedPstmt Error closing inputStream ", e);
+          CoreLog.log.log(WARNING, "BatchedPstmt Error closing inputStream ", e);
         }
       }
       inputStreams = null;

@@ -5,9 +5,10 @@ import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.ClassPathScanners;
 
-import java.lang.System.Logger.Level;
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Searches for interesting classes such as Entities, Embedded and ScalarTypes.
@@ -58,7 +59,7 @@ public class BootupClassPathSearch {
       }
 
       long searchTime = System.currentTimeMillis() - st;
-      log.log(Level.DEBUG, "Classpath search entities[{0}] searchTime[{1}] in packages[{2}]", bc.getEntities().size(), searchTime, packages);
+      log.log(DEBUG, "Classpath search entities[{0}] searchTime[{1}] in packages[{2}]", bc.getEntities().size(), searchTime, packages);
       return bc;
 
     } catch (Exception ex) {

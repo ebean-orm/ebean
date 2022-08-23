@@ -6,10 +6,12 @@ import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 
-import java.lang.System.Logger.Level;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.TRACE;
 
 /**
  * Holds timestamp of last modification per table.
@@ -34,8 +36,8 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
     for (String tableName : touchedTables) {
       tableModStamp.put(tableName, modNanoTime);
     }
-    if (log.isLoggable(Level.DEBUG)) {
-      log.log(Level.DEBUG, "TableModState updated - touched:{0} modNanoTime:{1}", touchedTables, modNanoTime);
+    if (log.isLoggable(DEBUG)) {
+      log.log(DEBUG, "TableModState updated - touched:{0} modNanoTime:{1}", touchedTables, modNanoTime);
     }
   }
 
@@ -46,8 +48,8 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
     for (String tableName : tables) {
       Long modTime = tableModStamp.get(tableName);
       if (modTime != null && modTime >= sinceNanoTime) {
-        if (log.isLoggable(Level.TRACE)) {
-          log.log(Level.TRACE, "Invalidate on table:{0}", tableName);
+        if (log.isLoggable(TRACE)) {
+          log.log(TRACE, "Invalidate on table:{0}", tableName);
         }
         return false;
       }
@@ -73,8 +75,8 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
   public void notify(ServerCacheNotification notification) {
     // use local clock - for slightly more aggressive invalidation (as later)
     // that removes any concern regarding clock syncing across cluster
-    if (log.isLoggable(Level.DEBUG)) {
-      log.log(Level.DEBUG, "ServerCacheNotification:{0}", notification);
+    if (log.isLoggable(DEBUG)) {
+      log.log(DEBUG, "ServerCacheNotification:{0}", notification);
     }
     touch(notification.getDependentTables());
   }
@@ -87,8 +89,8 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
   public void notify(RemoteTableMod tableMod) {
     // use local clock - for slightly more aggressive invalidation (as later)
     // that removes any concern regarding clock syncing across cluster
-    if (log.isLoggable(Level.DEBUG)) {
-      log.log(Level.DEBUG, "RemoteTableMod:{0}", tableMod);
+    if (log.isLoggable(DEBUG)) {
+      log.log(DEBUG, "RemoteTableMod:{0}", tableMod);
     }
     touch(tableMod.getTables());
   }

@@ -9,11 +9,13 @@ import io.ebean.config.CurrentTenantProvider;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.util.AnnotationUtil;
 
-import java.lang.System.Logger.Level;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.TRACE;
 
 /**
  * Manages the construction of caches.
@@ -89,7 +91,7 @@ final class DefaultCacheHolder {
   }
 
   void clearAll() {
-    log.log(Level.DEBUG, "clearAll");
+    log.log(DEBUG, "clearAll");
     for (ServerCache serverCache : allCaches.values()) {
       serverCache.clear();
     }
@@ -97,7 +99,7 @@ final class DefaultCacheHolder {
 
 
   public void clear(String name) {
-    log.log(Level.DEBUG, "clear {0}", name);
+    log.log(DEBUG, "clear {0}", name);
     clearIfExists(key(name, ServerCacheType.QUERY));
     clearIfExists(key(name, ServerCacheType.BEAN));
     clearIfExists(key(name, ServerCacheType.NATURAL_KEY));
@@ -112,7 +114,7 @@ final class DefaultCacheHolder {
   private void clearIfExists(String fullKey) {
     ServerCache cache = allCaches.get(fullKey);
     if (cache != null) {
-      log.log(Level.TRACE, "clear cache {0}", fullKey);
+      log.log(TRACE, "clear cache {0}", fullKey);
       cache.clear();
     }
   }

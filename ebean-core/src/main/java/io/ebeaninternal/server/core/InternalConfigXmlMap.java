@@ -6,10 +6,11 @@ import io.ebeaninternal.xmapping.api.XmapDto;
 import io.ebeaninternal.xmapping.api.XmapEbean;
 import io.ebeaninternal.xmapping.api.XmapRawSql;
 
-import java.lang.System.Logger.Level;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Reads the Xml deployment information.
@@ -56,7 +57,7 @@ final class InternalConfigXmlMap {
     try {
       dtoClass = Class.forName(dto.getClazz(), false, classLoader);
     } catch (Exception e) {
-      CoreLog.internal.log(Level.ERROR, "Could not load dto bean class " + dto.getClazz() + " for ebean xml entry");
+      CoreLog.internal.log(ERROR, "Could not load dto bean class " + dto.getClazz() + " for ebean xml entry");
       return;
     }
     DtoNamedQueries namedQueries = dtoNamedQueries.computeIfAbsent(dtoClass, aClass -> new DtoNamedQueries());

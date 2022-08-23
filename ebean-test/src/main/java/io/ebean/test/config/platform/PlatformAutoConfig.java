@@ -4,11 +4,11 @@ import io.avaje.applog.AppLog;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.test.containers.ContainerFactory;
 
-import java.lang.System.Logger.Level;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static java.lang.System.Logger.Level.*;
 import static java.util.concurrent.CompletableFuture.allOf;
 import static java.util.concurrent.CompletableFuture.runAsync;
 
@@ -62,7 +62,7 @@ public class PlatformAutoConfig {
 
       Config config = new Config(db, platform, databaseName, this.config);
       platformSetup.setupExtraDbDataSource(config);
-      log.log(Level.DEBUG, "configured dataSource for extraDb name:{0} url:{1}", db, this.config.getDataSourceConfig().getUrl());
+      log.log(DEBUG, "configured dataSource for extraDb name:{0} url:{1}", db, this.config.getDataSourceConfig().getUrl());
     }
   }
 
@@ -92,9 +92,9 @@ public class PlatformAutoConfig {
     Properties dockerProperties = platformSetup.setup(config);
     if (!dockerProperties.isEmpty()) {
       if (isDebug()) {
-        log.log(Level.INFO, "Docker properties: {0}", dockerProperties);
+        log.log(INFO, "Docker properties: {0}", dockerProperties);
       } else {
-        log.log(Level.DEBUG, "Docker properties: {0}", dockerProperties);
+        log.log(DEBUG, "Docker properties: {0}", dockerProperties);
       }
       // start the docker container with appropriate configuration
       new ContainerFactory(dockerProperties, config.getDockerPlatform()).startContainers();
@@ -130,7 +130,7 @@ public class PlatformAutoConfig {
     }
     this.platformSetup = KNOWN_PLATFORMS.get(platform);
     if (platformSetup == null) {
-      log.log(Level.WARNING, "unknown platform {0} - skipping platform setup", platform);
+      log.log(WARNING, "unknown platform {0} - skipping platform setup", platform);
     }
     return platformSetup != null;
   }

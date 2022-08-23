@@ -15,9 +15,10 @@ import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 
 import javax.persistence.PersistenceException;
 import java.io.*;
-import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Controls the generation and execution of "Create All" and "Drop All" DDL scripts.
@@ -60,7 +61,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     this.platform = databasePlatform.getPlatform();
     this.platformName = platform.base().name();
     if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
-      log.log(Level.WARNING, "DDL can't be run on startup with TenantMode " + config.getTenantMode());
+      log.log(WARNING, "DDL can't be run on startup with TenantMode " + config.getTenantMode());
       this.runDdl = false;
       this.useMigrationStoredProcedures = false;
     } else {
@@ -224,7 +225,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     if (sqlScript != null) {
       try (InputStream is = getClassLoader().getResourceAsStream(sqlScript)) {
         if (is == null) {
-          log.log(Level.WARNING, "sql script {0} was not found as a resource", sqlScript);
+          log.log(WARNING, "sql script {0} was not found as a resource", sqlScript);
         } else {
           String content = readContent(IOUtils.newReader(is)); // 'is' is closed
           runScript(connection, false, content, sqlScript);

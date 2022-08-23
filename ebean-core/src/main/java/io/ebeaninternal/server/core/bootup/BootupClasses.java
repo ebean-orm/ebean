@@ -18,12 +18,14 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import java.lang.System.Logger.Level;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Interesting classes for a EbeanServer such as Embeddable, Entity,
@@ -205,13 +207,13 @@ public class BootupClasses implements Predicate<Class<?>> {
     try {
       return cls.getConstructor().newInstance();
     } catch (NoSuchMethodException e) {
-      log.log(Level.DEBUG, "Ignore/expected - no default constructor: " + e.getMessage());
+      log.log(DEBUG, "Ignore/expected - no default constructor: " + e.getMessage());
       return null;
 
     } catch (Exception e) {
       if (logOnException) {
         // not expected but we log and carry on
-        log.log(Level.ERROR, "Error creating " + cls, e);
+        log.log(ERROR, "Error creating " + cls, e);
         return null;
 
       } else {

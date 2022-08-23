@@ -4,10 +4,11 @@ import io.avaje.applog.AppLog;
 import io.ebean.migration.MigrationVersion;
 
 import java.io.File;
-import java.lang.System.Logger.Level;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Build the model from the series of migrations.
@@ -52,7 +53,7 @@ public class MigrationModel {
 
     if (!initMigration) {
       for (MigrationResource migrationResource : resources) {
-        logger.log(Level.DEBUG, "read {0}", migrationResource);
+        logger.log(DEBUG, "read {0}", migrationResource);
         model.apply(migrationResource.read(), migrationResource.version());
       }
     }

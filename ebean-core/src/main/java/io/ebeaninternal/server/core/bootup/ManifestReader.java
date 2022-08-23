@@ -6,7 +6,6 @@ import io.ebeaninternal.util.UrlHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.System.Logger.Level;
 import java.net.URL;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -14,6 +13,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Reads all the META-INF/ebean.mf resources with the package locations of entity beans.
@@ -63,7 +64,7 @@ class ManifestReader {
         }
       }
     } catch (IOException e) {
-      log.log(Level.WARNING, "Error reading " + resourcePath + " manifest resources", e);
+      log.log(WARNING, "Error reading " + resourcePath + " manifest resources", e);
     }
     return packageSet;
   }

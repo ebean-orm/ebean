@@ -11,8 +11,9 @@ import io.ebean.util.JdbcClose;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.lang.System.Logger.Level;
 import java.sql.*;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Database platform specific settings.
@@ -659,7 +660,7 @@ public class DatabasePlatform {
         if (isQuote(dbName.charAt(dbName.length() - 1))) {
           return openQuote + dbName.substring(1, dbName.length() - 1) + closeQuote;
         } else {
-          log.log(Level.ERROR, "Missing backquote on [" + dbName + "]");
+          log.log(ERROR, "Missing backquote on [" + dbName + "]");
         }
       } else if (allQuotedIdentifiers) {
         return openQuote + dbName + closeQuote;
@@ -722,7 +723,7 @@ public class DatabasePlatform {
 
   protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
     // silently assume the database does not support the "for update" clause.
-    log.log(Level.INFO, "it seems your database does not support the 'for update' clause");
+    log.log(INFO, "it seems your database does not support the 'for update' clause");
     return sql;
   }
 
@@ -756,7 +757,7 @@ public class DatabasePlatform {
     if (!schemaExists(dbSchema, connection)) {
       Statement query = connection.createStatement();
       try {
-        log.log(Level.DEBUG, "create schema:{0}", dbSchema);
+        log.log(DEBUG, "create schema:{0}", dbSchema);
         query.executeUpdate("create schema " + dbSchema);
       } finally {
         JdbcClose.close(query);

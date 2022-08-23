@@ -16,8 +16,9 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import java.io.IOException;
-import java.lang.System.Logger.Level;
 import java.util.*;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Helper for BeanDescriptor that manages the bean, query and collection caches.
@@ -104,10 +105,10 @@ final class BeanDescriptorCacheHelp<T> {
   void deriveNotifyFlags() {
     cacheNotifyOnAll = (invalidateQueryCache || beanCache != null || queryCache != null);
     cacheNotifyOnDelete = !cacheNotifyOnAll && isNotifyOnDeletes();
-    if (log.isLoggable(Level.DEBUG)) {
+    if (log.isLoggable(DEBUG)) {
       if (cacheNotifyOnAll || cacheNotifyOnDelete) {
         String notifyMode = cacheNotifyOnAll ? "All" : "Delete";
-        log.log(Level.DEBUG, "l2 caching on {0} - beanCaching:{1} queryCaching:{2} notifyMode:{3} ",
+        log.log(DEBUG, "l2 caching on {0} - beanCaching:{1} queryCaching:{2} notifyMode:{3} ",
           desc.fullName(), isBeanCaching(), isQueryCaching(), notifyMode);
       }
     }
@@ -178,8 +179,8 @@ final class BeanDescriptorCacheHelp<T> {
    */
   void queryCacheClear() {
     if (queryCache != null) {
-      if (queryLog.isLoggable(Level.DEBUG)) {
-        queryLog.log(Level.DEBUG, "   CLEAR {0}", cacheName);
+      if (queryLog.isLoggable(DEBUG)) {
+        queryLog.log(DEBUG, "   CLEAR {0}", cacheName);
       }
       queryCache.clear();
     }
@@ -202,11 +203,11 @@ final class BeanDescriptorCacheHelp<T> {
       throw new IllegalStateException("No query cache enabled on " + desc + ". Need explicit @Cache(enableQueryCache=true)");
     }
     Object queryResult = queryCache.get(id);
-    if (queryLog.isLoggable(Level.DEBUG)) {
+    if (queryLog.isLoggable(DEBUG)) {
       if (queryResult == null) {
-        queryLog.log(Level.DEBUG, "   GET {0}({1}) - cache miss", cacheName, id);
+        queryLog.log(DEBUG, "   GET {0}({1}) - cache miss", cacheName, id);
       } else {
-        queryLog.log(Level.DEBUG, "   GET {0}({1}) - hit", cacheName, id);
+        queryLog.log(DEBUG, "   GET {0}({1}) - hit", cacheName, id);
       }
     }
     return queryResult;
@@ -219,8 +220,8 @@ final class BeanDescriptorCacheHelp<T> {
     if (queryCache == null) {
       throw new IllegalStateException("No query cache enabled on " + desc + ". Need explicit @Cache(enableQueryCache=true)");
     }
-    if (queryLog.isLoggable(Level.DEBUG)) {
-      queryLog.log(Level.DEBUG, "   PUT {0}({1})", cacheName, id);
+    if (queryLog.isLoggable(DEBUG)) {
+      queryLog.log(DEBUG, "   PUT {0}({1})", cacheName, id);
     }
     queryCache.put(id, entry);
   }
@@ -228,16 +229,16 @@ final class BeanDescriptorCacheHelp<T> {
 
   void manyPropRemove(String propertyName, Object parentId) {
     ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
-    if (manyLog.isLoggable(Level.TRACE)) {
-      manyLog.log(Level.TRACE, "   REMOVE {0}({1}).{2}", cacheName, parentId, propertyName);
+    if (manyLog.isLoggable(TRACE)) {
+      manyLog.log(TRACE, "   REMOVE {0}({1}).{2}", cacheName, parentId, propertyName);
     }
     collectionIdsCache.remove(parentId);
   }
 
   void manyPropClear(String propertyName) {
     ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
-    if (manyLog.isLoggable(Level.DEBUG)) {
-      manyLog.log(Level.DEBUG, "   CLEAR {0}(*).{1} ", cacheName, propertyName);
+    if (manyLog.isLoggable(DEBUG)) {
+      manyLog.log(DEBUG, "   CLEAR {0}(*).{1} ", cacheName, propertyName);
     }
     collectionIdsCache.clear();
   }
@@ -249,11 +250,11 @@ final class BeanDescriptorCacheHelp<T> {
     ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
     CachedManyIds entry = (CachedManyIds) collectionIdsCache.get(parentId);
     if (entry == null) {
-      if (manyLog.isLoggable(Level.TRACE)) {
-        manyLog.log(Level.TRACE, "   GET {0}({1}).{2} - cache miss", cacheName, parentId, propertyName);
+      if (manyLog.isLoggable(TRACE)) {
+        manyLog.log(TRACE, "   GET {0}({1}).{2} - cache miss", cacheName, parentId, propertyName);
       }
-    } else if (manyLog.isLoggable(Level.DEBUG)) {
-      manyLog.log(Level.DEBUG, "   GET {0}({1}).{2} - hit", cacheName, parentId, propertyName);
+    } else if (manyLog.isLoggable(DEBUG)) {
+      manyLog.log(DEBUG, "   GET {0}({1}).{2} - hit", cacheName, parentId, propertyName);
     }
     return entry;
   }
@@ -303,12 +304,12 @@ final class BeanDescriptorCacheHelp<T> {
           changes.put(many.name(), asJson);
 
           CachedBeanData newData = data.update(changes, data.getVersion());
-          if (beanLog.isLoggable(Level.DEBUG)) {
-            beanLog.log(Level.DEBUG, "   UPDATE {0}({1})  changes:{2}", cacheName, parentId, changes);
+          if (beanLog.isLoggable(DEBUG)) {
+            beanLog.log(DEBUG, "   UPDATE {0}({1})  changes:{2}", cacheName, parentId, changes);
           }
           beanCache.put(parentId, newData);
         } catch (IOException e) {
-          log.log(Level.ERROR, "Error updating L2 cache", e);
+          log.log(ERROR, "Error updating L2 cache", e);
         }
       }
     } else {
@@ -321,8 +322,8 @@ final class BeanDescriptorCacheHelp<T> {
 
   void cachePutManyIds(Object parentId, String manyName, CachedManyIds entry) {
     ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, manyName);
-    if (manyLog.isLoggable(Level.DEBUG)) {
-      manyLog.log(Level.DEBUG, "   PUT {0}({1}).{2} - ids:{3}", cacheName, parentId, manyName, entry);
+    if (manyLog.isLoggable(DEBUG)) {
+      manyLog.log(DEBUG, "   PUT {0}({1}).{2} - ids:{3}", cacheName, parentId, manyName, entry);
     }
     collectionIdsCache.put(parentId, entry);
   }
@@ -353,8 +354,8 @@ final class BeanDescriptorCacheHelp<T> {
       return new BeanCacheResult<>();
     }
     Map<Object, Object> beanDataMap = beanCache.getAll(keys);
-    if (beanLog.isLoggable(Level.TRACE)) {
-      beanLog.log(Level.TRACE, "   MGET {0}({1}) - hits:{2}", cacheName, ids, beanDataMap.keySet());
+    if (beanLog.isLoggable(TRACE)) {
+      beanLog.log(TRACE, "   MGET {0}({1}) - hits:{2}", cacheName, ids, beanDataMap.keySet());
     }
     BeanCacheResult<T> result = new BeanCacheResult<>();
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
@@ -375,8 +376,8 @@ final class BeanDescriptorCacheHelp<T> {
 
     // naturalKey -> Id map
     Map<Object, Object> naturalKeyMap = naturalKeyCache.getAll(keys);
-    if (natLog.isLoggable(Level.TRACE)) {
-      natLog.log(Level.TRACE, " MLOOKUP {0}({1}) - hits:{2}", cacheName, keys, naturalKeyMap);
+    if (natLog.isLoggable(TRACE)) {
+      natLog.log(TRACE, " MLOOKUP {0}({1}) - hits:{2}", cacheName, keys, naturalKeyMap);
     }
 
     BeanCacheResult<T> result = new BeanCacheResult<>();
@@ -392,8 +393,8 @@ final class BeanDescriptorCacheHelp<T> {
 
     Set<Object> ids = new HashSet<>(naturalKeyMap.values());
     Map<Object, Object> beanDataMap = beanCache.getAll(ids);
-    if (beanLog.isLoggable(Level.TRACE)) {
-      beanLog.log(Level.TRACE, "   MGET {0}({1}) - hits:{2}", cacheName, ids, beanDataMap.keySet());
+    if (beanLog.isLoggable(TRACE)) {
+      beanLog.log(TRACE, "   MGET {0}({1}) - hits:{2}", cacheName, ids, beanDataMap.keySet());
     }
     // process the hits into beans etc
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
@@ -437,8 +438,8 @@ final class BeanDescriptorCacheHelp<T> {
    */
   void beanCacheClear() {
     if (beanCache != null) {
-      if (beanLog.isLoggable(Level.DEBUG)) {
-        beanLog.log(Level.DEBUG, "   CLEAR {0}", cacheName);
+      if (beanLog.isLoggable(DEBUG)) {
+        beanLog.log(DEBUG, "   CLEAR {0}", cacheName);
       }
       beanCache.clear();
     }
@@ -507,14 +508,14 @@ final class BeanDescriptorCacheHelp<T> {
         }
       }
     }
-    if (beanLog.isLoggable(Level.DEBUG)) {
-      beanLog.log(Level.DEBUG, "   MPUT {0}({1})", cacheName, map.keySet());
+    if (beanLog.isLoggable(DEBUG)) {
+      beanLog.log(DEBUG, "   MPUT {0}({1})", cacheName, map.keySet());
     }
     getBeanCache().putAll(map);
 
     if (natKeys != null && !natKeys.isEmpty()) {
-      if (natLog.isLoggable(Level.DEBUG)) {
-        natLog.log(Level.DEBUG, " MPUT {0}({1}, {2})", cacheName, naturalKey, natKeys.keySet());
+      if (natLog.isLoggable(DEBUG)) {
+        natLog.log(DEBUG, " MPUT {0}({1}, {2})", cacheName, naturalKey, natKeys.keySet());
       }
       naturalKeyCache.putAll(natKeys);
     }
@@ -526,15 +527,15 @@ final class BeanDescriptorCacheHelp<T> {
   void beanCachePutDirect(EntityBean bean) {
     CachedBeanData beanData = beanExtractData(desc, bean);
     String key = desc.cacheKeyForBean(bean);
-    if (beanLog.isLoggable(Level.DEBUG)) {
-      beanLog.log(Level.DEBUG, "   PUT {0}({1}) data:{2}", cacheName, key, beanData);
+    if (beanLog.isLoggable(DEBUG)) {
+      beanLog.log(DEBUG, "   PUT {0}({1}) data:{2}", cacheName, key, beanData);
     }
     getBeanCache().put(key, beanData);
     if (naturalKey != null) {
       String naturalKey = calculateNaturalKey(beanData);
       if (naturalKey != null) {
-        if (natLog.isLoggable(Level.DEBUG)) {
-          natLog.log(Level.DEBUG, " PUT {0}({1}, {2})", cacheName, naturalKey, key);
+        if (natLog.isLoggable(DEBUG)) {
+          natLog.log(DEBUG, " PUT {0}({1}, {2})", cacheName, naturalKey, key);
         }
         naturalKeyCache.put(naturalKey, key);
       }
@@ -575,13 +576,13 @@ final class BeanDescriptorCacheHelp<T> {
   private T beanCacheGetInternal(String key, Boolean readOnly, PersistenceContext context) {
     CachedBeanData data = (CachedBeanData) getBeanCache().get(key);
     if (data == null) {
-      if (beanLog.isLoggable(Level.TRACE)) {
-        beanLog.log(Level.TRACE, "   GET {0}({1}) - cache miss", cacheName, key);
+      if (beanLog.isLoggable(TRACE)) {
+        beanLog.log(TRACE, "   GET {0}({1}) - cache miss", cacheName, key);
       }
       return null;
     }
-    if (beanLog.isLoggable(Level.TRACE)) {
-      beanLog.log(Level.TRACE, "   GET {0}({1}) - hit", cacheName, key);
+    if (beanLog.isLoggable(TRACE)) {
+      beanLog.log(TRACE, "   GET {0}({1}) - hit", cacheName, key);
     }
     return convertToBean(key, readOnly, context, data);
   }
@@ -591,8 +592,8 @@ final class BeanDescriptorCacheHelp<T> {
     if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
       Object bean = data.getSharableBean();
       if (bean != null) {
-        if (beanLog.isLoggable(Level.TRACE)) {
-          beanLog.log(Level.TRACE, "   GET {0}({1}) - hit shared bean", cacheName, id);
+        if (beanLog.isLoggable(TRACE)) {
+          beanLog.log(TRACE, "   GET {0}({1}) - hit shared bean", cacheName, id);
         }
         if (desc.isReadAuditing()) {
           desc.readAuditBean("l2", "", bean);
@@ -680,8 +681,8 @@ final class BeanDescriptorCacheHelp<T> {
    */
   void beanCacheApplyInvalidate(Collection<String> keys) {
     if (beanCache != null) {
-      if (beanLog.isLoggable(Level.DEBUG)) {
-        beanLog.log(Level.DEBUG, "   MREMOVE {0}({1})", cacheName, keys);
+      if (beanLog.isLoggable(DEBUG)) {
+        beanLog.log(DEBUG, "   MREMOVE {0}({1})", cacheName, keys);
       }
       beanCache.removeAll(new HashSet<>(keys));
     }
@@ -700,8 +701,8 @@ final class BeanDescriptorCacheHelp<T> {
     }
 
     Map<Object, Object> hits = getBeanCache().getAll(ebis.keySet());
-    if (beanLog.isLoggable(Level.TRACE)) {
-      beanLog.log(Level.TRACE, "   MLOAD {0}({1}) - got hits ({2})", cacheName, ebis.keySet(), hits.size());
+    if (beanLog.isLoggable(TRACE)) {
+      beanLog.log(TRACE, "   MLOAD {0}({1}) - got hits ({2})", cacheName, ebis.keySet(), hits.size());
     }
 
     Set<EntityBeanIntercept> loaded = new HashSet<>();
@@ -713,19 +714,19 @@ final class BeanDescriptorCacheHelp<T> {
       CachedBeanData cacheData = (CachedBeanData) hit.getValue();
 
       if (lazyLoadProperty > -1 && !cacheData.isLoaded(propertyName)) {
-        if (beanLog.isLoggable(Level.TRACE)) {
-          beanLog.log(Level.TRACE, "   load {0}({1}) - cache miss on property({2})", cacheName, key, propertyName);
+        if (beanLog.isLoggable(TRACE)) {
+          beanLog.log(TRACE, "   load {0}({1}) - cache miss on property({2})", cacheName, key, propertyName);
         }
       } else {
         CachedBeanDataToBean.load(desc, ebi.getOwner(), cacheData, context);
         loaded.add(ebi);
-        if (beanLog.isLoggable(Level.DEBUG)) {
-          beanLog.log(Level.DEBUG, "   load {0}({1}) - hit", cacheName, key);
+        if (beanLog.isLoggable(DEBUG)) {
+          beanLog.log(DEBUG, "   load {0}({1}) - hit", cacheName, key);
         }
       }
     }
-    if (!ebis.isEmpty() && beanLog.isLoggable(Level.TRACE)) {
-      beanLog.log(Level.TRACE, "   load {0}({1}) - cache miss", cacheName, ebis.keySet());
+    if (!ebis.isEmpty() && beanLog.isLoggable(TRACE)) {
+      beanLog.log(TRACE, "   load {0}({1}) - cache miss", cacheName, ebis.keySet());
     }
     return loaded;
   }
@@ -736,21 +737,21 @@ final class BeanDescriptorCacheHelp<T> {
   boolean beanCacheLoad(EntityBean bean, EntityBeanIntercept ebi, String key, PersistenceContext context) {
     CachedBeanData cacheData = (CachedBeanData) getBeanCache().get(key);
     if (cacheData == null) {
-      if (beanLog.isLoggable(Level.TRACE)) {
-        beanLog.log(Level.TRACE, "   LOAD {0}({1}) - cache miss", cacheName, key);
+      if (beanLog.isLoggable(TRACE)) {
+        beanLog.log(TRACE, "   LOAD {0}({1}) - cache miss", cacheName, key);
       }
       return false;
     }
     int lazyLoadProperty = ebi.getLazyLoadPropertyIndex();
     if (lazyLoadProperty > -1 && !cacheData.isLoaded(ebi.getLazyLoadProperty())) {
-      if (beanLog.isLoggable(Level.TRACE)) {
-        beanLog.log(Level.TRACE, "   LOAD {0}({1}) - cache miss on property({2})", cacheName, key, ebi.getLazyLoadProperty());
+      if (beanLog.isLoggable(TRACE)) {
+        beanLog.log(TRACE, "   LOAD {0}({1}) - cache miss on property({2})", cacheName, key, ebi.getLazyLoadProperty());
       }
       return false;
     }
     CachedBeanDataToBean.load(desc, bean, cacheData, context);
-    if (beanLog.isLoggable(Level.DEBUG)) {
-      beanLog.log(Level.DEBUG, "   LOAD {0}({1}) - hit", cacheName, key);
+    if (beanLog.isLoggable(DEBUG)) {
+      beanLog.log(DEBUG, "   LOAD {0}({1}) - hit", cacheName, key);
     }
     return true;
   }
@@ -874,8 +875,8 @@ final class BeanDescriptorCacheHelp<T> {
     if (existingData != null) {
       long currentVersion = existingData.getVersion();
       if (version > 0 && version < currentVersion) {
-        if (beanLog.isLoggable(Level.DEBUG)) {
-          beanLog.log(Level.DEBUG, "   REMOVE {0}({1}) - version conflict old:{2} new:{3}", cacheName, key, currentVersion, version);
+        if (beanLog.isLoggable(DEBUG)) {
+          beanLog.log(DEBUG, "   REMOVE {0}({1}) - version conflict old:{2} new:{3}", cacheName, key, currentVersion, version);
         }
         cache.remove(key);
       } else {
@@ -883,16 +884,16 @@ final class BeanDescriptorCacheHelp<T> {
           version = currentVersion;
         }
         CachedBeanData newData = existingData.update(changes, version);
-        if (beanLog.isLoggable(Level.DEBUG)) {
-          beanLog.log(Level.DEBUG, "   UPDATE {0}({1})  changes:{2}", cacheName, key, changes);
+        if (beanLog.isLoggable(DEBUG)) {
+          beanLog.log(DEBUG, "   UPDATE {0}({1})  changes:{2}", cacheName, key, changes);
         }
         cache.put(key, newData);
       }
       if (updateNaturalKey) {
         Object oldKey = calculateNaturalKey(existingData);
         if (oldKey != null) {
-          if (natLog.isLoggable(Level.DEBUG)) {
-            natLog.log(Level.DEBUG, ".. update {0} REMOVE({1}) - old key for ({2})", cacheName, oldKey, key);
+          if (natLog.isLoggable(DEBUG)) {
+            natLog.log(DEBUG, ".. update {0} REMOVE({1}) - old key for ({2})", cacheName, oldKey, key);
           }
           naturalKeyCache.remove(oldKey);
         }

@@ -2,7 +2,8 @@ package io.ebeaninternal.server.logger;
 
 import io.ebeaninternal.api.SpiLogger;
 
-import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.TRACE;
 
 final class DSpiLogger implements SpiLogger {
 
@@ -14,21 +15,21 @@ final class DSpiLogger implements SpiLogger {
 
   @Override
   public boolean isDebug() {
-    return logger.isLoggable(Level.DEBUG);
+    return logger.isLoggable(DEBUG);
   }
 
   @Override
   public boolean isTrace() {
-    return logger.isLoggable(Level.TRACE);
+    return logger.isLoggable(TRACE);
   }
 
   @Override
   public void debug(String msg) {
-    logger.log(Level.DEBUG, msg);
+    logger.log(DEBUG, msg);
   }
 
   @Override
   public void trace(String msg) {
-    logger.log(Level.TRACE, msg);
+    logger.log(TRACE, msg);
   }
 }

@@ -7,7 +7,6 @@ import io.ebean.util.JdbcClose;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,6 +17,9 @@ import java.util.NavigableSet;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Database sequence based IdGenerator.
@@ -120,7 +122,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
   protected void loadInBackground(final int requestSize) {
     if (currentlyBackgroundLoading.get()) {
       // skip as already background loading
-      log.log(Level.DEBUG, "... skip background sequence load (another load in progress)");
+      log.log(DEBUG, "... skip background sequence load (another load in progress)");
       return;
     }
     currentlyBackgroundLoading.set(true);
@@ -161,7 +163,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
     } catch (SQLException e) {
       if (e.getMessage().contains("Database is already closed")) {
         String msg = "Error getting SEQ when DB shutting down " + e.getMessage();
-        log.log(Level.ERROR, msg);
+        log.log(ERROR, msg);
         System.out.println(msg);
         return Collections.emptyList();
       } else {

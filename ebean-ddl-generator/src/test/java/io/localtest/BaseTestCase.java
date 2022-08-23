@@ -7,8 +7,9 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 
-import java.lang.System.Logger.Level;
 import java.sql.Types;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 public abstract class BaseTestCase {
 
@@ -35,7 +36,7 @@ public abstract class BaseTestCase {
       // First try, if we get the default server. If this fails, all tests will fail.
       DB.getDefault();
     } catch (Throwable e) {
-      logger.log(Level.ERROR, "Fatal error while getting ebean-server. Exiting...", e);
+      logger.log(ERROR, "Fatal error while getting ebean-server. Exiting...", e);
       System.exit(1);
     }
   }

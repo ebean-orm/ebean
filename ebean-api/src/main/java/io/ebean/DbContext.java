@@ -4,10 +4,11 @@ import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.datasource.DataSourceConfigurationException;
 
 import javax.persistence.PersistenceException;
-import java.lang.System.Logger.Level;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Holds Database instances.
@@ -52,7 +53,7 @@ final class DbContext {
       throw new DataSourceConfigurationException(msg, e);
 
     } catch (Throwable e) {
-      log.log(Level.ERROR, "Error trying to create the default Database", e);
+      log.log(ERROR, "Error trying to create the default Database", e);
       throw new RuntimeException(e);
     }
   }

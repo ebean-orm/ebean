@@ -14,13 +14,14 @@ import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.executor.DefaultBackgroundExecutor;
 
 import javax.persistence.PersistenceException;
-import java.lang.System.Logger.Level;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ServiceLoader;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Default Server side implementation of ServerFactory.
@@ -107,7 +108,7 @@ public final class DefaultContainer implements SpiContainer {
         startServer(online, server);
       }
       DbOffline.reset();
-      log.log(Level.INFO, "Started database[{0}] platform[{1}] in {2}ms", config.getName(), config.getDatabasePlatform().getPlatform(), System.currentTimeMillis() - start);
+      log.log(INFO, "Started database[{0}] platform[{1}] in {2}ms", config.getName(), config.getDatabasePlatform().getPlatform(), System.currentTimeMillis() - start);
       return server;
     } finally {
       lock.unlock();
@@ -136,7 +137,7 @@ public final class DefaultContainer implements SpiContainer {
   private void checkMissingModulePathProvides() {
     URL servicesFile = ClassLoader.getSystemResource("META-INF/services/io.ebean.config.EntityClassRegister");
     if (servicesFile != null) {
-      log.log(Level.ERROR, "module-info.java is probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause. EntityClassRegister exists but was not service loaded.");
+      log.log(ERROR, "module-info.java is probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause. EntityClassRegister exists but was not service loaded.");
     }
   }
 
@@ -214,7 +215,7 @@ public final class DefaultContainer implements SpiContainer {
    */
   private void setDataSource(DatabaseConfig config) {
     if (isOfflineMode(config)) {
-      log.log(Level.DEBUG, "... DbOffline using platform [{0}]", DbOffline.getPlatform());
+      log.log(DEBUG, "... DbOffline using platform [{0}]", DbOffline.getPlatform());
     } else {
       InitDataSource.init(config);
     }
@@ -250,7 +251,7 @@ public final class DefaultContainer implements SpiContainer {
     }
     try (Connection connection = config.getDataSource().getConnection()) {
       if (connection.getAutoCommit()) {
-        log.log(Level.WARNING, "DataSource [{0}] has autoCommit defaulting to true!", config.getName());
+        log.log(WARNING, "DataSource [{0}] has autoCommit defaulting to true!", config.getName());
       }
       return true;
     } catch (SQLException ex) {

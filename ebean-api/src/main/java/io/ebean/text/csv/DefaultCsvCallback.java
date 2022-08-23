@@ -4,7 +4,8 @@ import io.ebean.Database;
 import io.ebean.EbeanVersion;
 import io.ebean.Transaction;
 
-import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Provides the default implementation of CsvCallback.
@@ -129,7 +130,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
     // related beans (e.g. customer -> customer.billingAddress
     server.save(bean, transaction);
     if (logInfoFrequency > 0 && (row % logInfoFrequency == 0)) {
-      log.log(Level.DEBUG, "processed {0} rows", row);
+      log.log(DEBUG, "processed {0} rows", row);
     }
   }
 
@@ -140,7 +141,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
   public void end(int row) {
     commitTransactionIfCreated();
     exeTime = System.currentTimeMillis() - startTime;
-    log.log(Level.INFO, "Csv finished, rows[{0}] exeMillis[{1}]", row, exeTime);
+    log.log(INFO, "Csv finished, rows[{0}] exeMillis[{1}]", row, exeTime);
   }
 
   /**

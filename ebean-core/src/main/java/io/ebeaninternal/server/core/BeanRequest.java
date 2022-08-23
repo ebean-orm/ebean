@@ -6,7 +6,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 
-import java.lang.System.Logger.Level;
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Base class for find and persist requests.
@@ -63,7 +63,7 @@ public abstract class BeanRequest {
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means
         // that the connection is broken (and the dataSource and db will cleanup)
-        CoreLog.log.log(Level.ERROR, "Error trying to rollback a transaction (after a prior exception thrown)", e);
+        CoreLog.log.log(ERROR, "Error trying to rollback a transaction (after a prior exception thrown)", e);
       }
     }
   }

@@ -8,13 +8,15 @@ import io.ebeaninternal.api.DbOffline;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Create a DatabasePlatform from the configuration.
@@ -39,7 +41,7 @@ public class DatabasePlatformFactory {
     try {
       String offlinePlatform = DbOffline.getPlatform();
       if (offlinePlatform != null) {
-        CoreLog.log.log(Level.INFO, "offline platform [{0}]", offlinePlatform);
+        CoreLog.log.log(INFO, "offline platform [{0}]", offlinePlatform);
         return byDatabaseName(offlinePlatform);
       }
       if (config.getDatabasePlatformName() != null) {
@@ -88,7 +90,7 @@ public class DatabasePlatformFactory {
     String dbProductName = metaData.getDatabaseProductName().toLowerCase();
     final int majorVersion = metaData.getDatabaseMajorVersion();
     final int minorVersion = metaData.getDatabaseMinorVersion();
-    CoreLog.log.log(Level.DEBUG, "platform for productName[{0}] version[{1}.{2}]", dbProductName, majorVersion, minorVersion);
+    CoreLog.log.log(DEBUG, "platform for productName[{0}] version[{1}.{2}]", dbProductName, majorVersion, minorVersion);
     for (DatabasePlatformProvider provider : providers) {
       if (provider.matchByProductName(dbProductName)) {
         return provider.create(majorVersion, minorVersion, metaData, connection);

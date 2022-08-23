@@ -51,7 +51,6 @@ import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -65,6 +64,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static java.lang.System.Logger.Level.*;
 import static java.util.Spliterators.spliteratorUnknownSize;
 import static java.util.stream.StreamSupport.stream;
 
@@ -331,7 +331,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (config.isQueryPlanCapture()) {
       long secs = config.getQueryPlanCapturePeriodSecs();
       if (secs > 10) {
-        log.log(Level.INFO, "capture query plan enabled, every {0}secs", secs);
+        log.log(INFO, "capture query plan enabled, every {0}secs", secs);
         backgroundExecutor.scheduleWithFixedDelay(this::collectQueryPlans, secs, secs, TimeUnit.SECONDS);
       }
     }
@@ -379,7 +379,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Shutdown the services like threads and DataSource.
    */
   private void shutdownInternal(boolean shutdownDataSource, boolean deregisterDriver) {
-    log.log(Level.TRACE, "shutting down instance {0}", serverName);
+    log.log(TRACE, "shutting down instance {0}", serverName);
     if (shutdown) {
       // already shutdown
       return;
@@ -408,7 +408,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       try {
         plugin.shutdown();
       } catch (Exception e) {
-        log.log(Level.ERROR, "Error when shutting down plugin", e);
+        log.log(ERROR, "Error when shutting down plugin", e);
       }
     }
   }
@@ -2075,7 +2075,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
             try {
               serverCacheManager.clearLocal(Class.forName(cache));
             } catch (Exception e) {
-              log.log(Level.ERROR, "Error clearing local cache for type " + cache, e);
+              log.log(ERROR, "Error clearing local cache for type " + cache, e);
             }
           }
         }

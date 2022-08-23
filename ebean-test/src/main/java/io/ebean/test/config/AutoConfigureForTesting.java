@@ -8,8 +8,10 @@ import io.ebean.test.config.platform.PlatformAutoConfig;
 import io.ebean.test.config.provider.ProviderAutoConfig;
 import io.ebean.test.containers.DockerHost;
 
-import java.lang.System.Logger.Level;
 import java.util.Properties;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Automatically configure ServerConfig for testing purposes.
@@ -38,7 +40,7 @@ public class AutoConfigureForTesting implements AutoConfigure {
       io.avaje.config.Config.asConfiguration().evalModify(properties);
     }
     if (!config.isDefaultServer()) {
-      log.log(Level.INFO, "skip automatic testing config on non-default server name:{0} register:{1}", config.getName(), config.isRegister());
+      log.log(INFO, "skip automatic testing config on non-default server name:{0} register:{1}", config.getName(), config.isRegister());
       return;
     }
     if (isExtraServer(config, properties)) {
@@ -46,7 +48,7 @@ public class AutoConfigureForTesting implements AutoConfigure {
       return;
     }
     String testPlatform = properties.getProperty("ebean.test.platform");
-    log.log(Level.DEBUG, "automatic testing config - with ebean.test.platform:{0} name:{1} environmentDb:{2}", testPlatform, config.getName(), environmentDb);
+    log.log(DEBUG, "automatic testing config - with ebean.test.platform:{0} name:{1} environmentDb:{2}", testPlatform, config.getName(), environmentDb);
     if (RunOnceMarker.isRun()) {
       setupPlatform(environmentDb, config);
     }

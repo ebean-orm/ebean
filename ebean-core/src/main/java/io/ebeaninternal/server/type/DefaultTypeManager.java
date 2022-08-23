@@ -29,7 +29,6 @@ import org.joda.time.LocalTime;
 import javax.persistence.AttributeConverter;
 import javax.persistence.EnumType;
 import java.io.File;
-import java.lang.System.Logger.Level;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -44,6 +43,8 @@ import java.sql.Types;
 import java.time.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Default implementation of TypeManager.
@@ -219,10 +220,10 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void logAdd(ScalarType<?> scalarType) {
-    if (log.isLoggable(Level.TRACE)) {
+    if (log.isLoggable(TRACE)) {
       String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
       msg += " for [" + scalarType.getType().getName() + "]";
-      log.log(Level.TRACE, msg);
+      log.log(TRACE, msg);
     }
   }
 
@@ -675,7 +676,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
         add(scalarType);
       } catch (Exception e) {
-        log.log(Level.ERROR, "Error loading ScalarType [" + cls.getName() + "]", e);
+        log.log(ERROR, "Error loading ScalarType [" + cls.getName() + "]", e);
       }
     }
   }
@@ -706,10 +707,10 @@ public final class DefaultTypeManager implements TypeManager {
         }
         ScalarTypeConverter converter = foundType.getDeclaredConstructor().newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
-        log.log(Level.DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
+        log.log(DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
       } catch (Exception e) {
-        log.log(Level.ERROR, "Error registering ScalarTypeConverter [" + foundType.getName() + "]", e);
+        log.log(ERROR, "Error registering ScalarTypeConverter [" + foundType.getName() + "]", e);
       }
     }
   }
@@ -730,10 +731,10 @@ public final class DefaultTypeManager implements TypeManager {
         }
         AttributeConverter converter = foundType.getDeclaredConstructor().newInstance();
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
-        log.log(Level.DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
+        log.log(DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
       } catch (Exception e) {
-        log.log(Level.ERROR, "Error registering AttributeConverter [" + foundType.getName() + "]", e);
+        log.log(ERROR, "Error registering AttributeConverter [" + foundType.getName() + "]", e);
       }
     }
   }
@@ -805,7 +806,7 @@ public final class DefaultTypeManager implements TypeManager {
     // detect if Joda classes are in the classpath
     if (config.getClassLoadConfig().isJodaTimePresent()) {
       // Joda classes are in the classpath so register the types
-      log.log(Level.DEBUG, "Registering Joda data types");
+      log.log(DEBUG, "Registering Joda data types");
       addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(jsonDateTime));
       addType(DateTime.class, new ScalarTypeJodaDateTime(jsonDateTime));
       if (config.getDatabasePlatform().supportsNativeJavaTime()) {

@@ -5,11 +5,12 @@ import io.ebean.Database;
 import io.ebean.config.ContainerConfig;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
-import java.lang.System.Logger.Level;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Manages the cluster service.
@@ -112,8 +113,8 @@ public class ClusterManager implements ServerLookup {
    */
   public void broadcast(RemoteTransactionEvent event) {
     if (broadcast != null) {
-      if (clusterLogger.isLoggable(Level.DEBUG)) {
-        clusterLogger.log(Level.DEBUG, "sending: {0}", event);
+      if (clusterLogger.isLoggable(DEBUG)) {
+        clusterLogger.log(DEBUG, "sending: {0}", event);
       }
       broadcast.broadcast(event);
     }

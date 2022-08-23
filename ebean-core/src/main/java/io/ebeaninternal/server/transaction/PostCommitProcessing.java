@@ -11,9 +11,10 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
-import java.lang.System.Logger.Level;
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Performs post commit processing using a background thread.
@@ -104,8 +105,8 @@ final class PostCommitProcessing {
   private void notifyCluster() {
     if (remoteTransactionEvent != null && !remoteTransactionEvent.isEmpty()) {
       // send the interesting events to the cluster
-      if (log.isLoggable(Level.DEBUG)) {
-        log.log(Level.DEBUG, "Cluster Send: {0}", remoteTransactionEvent);
+      if (log.isLoggable(DEBUG)) {
+        log.log(DEBUG, "Cluster Send: {0}", remoteTransactionEvent);
       }
       clusterManager.broadcast(remoteTransactionEvent);
     }

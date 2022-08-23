@@ -3,12 +3,13 @@ package io.ebean.platform.h2;
 import io.avaje.applog.AppLog;
 import org.h2.api.Trigger;
 
-import java.lang.System.Logger.Level;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * H2 database trigger used to populate history tables to support the @History feature.
@@ -72,7 +73,7 @@ public class H2HistoryTrigger implements Trigger {
     insertSql.append(");");
 
     this.insertHistorySql = insertSql.toString();
-    log.log(Level.DEBUG, "History table insert sql: {0}", insertHistorySql);
+    log.log(DEBUG, "History table insert sql: {0}", insertHistorySql);
   }
 
   @Override

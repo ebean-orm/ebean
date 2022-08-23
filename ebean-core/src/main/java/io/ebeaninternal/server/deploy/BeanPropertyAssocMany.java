@@ -24,8 +24,9 @@ import io.ebeaninternal.server.query.SqlBeanLoad;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.System.Logger.Level;
 import java.util.*;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Property mapped to a List Set or Map.
@@ -668,7 +669,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         }
       } catch (PersistenceException e) {
         // not found as individual scalar properties
-        CoreLog.log.log(Level.ERROR, "Could not find a exported property?", e);
+        CoreLog.log.log(ERROR, "Could not find a exported property?", e);
       }
     } else {
       if (idProp != null) {
@@ -963,7 +964,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         setValue(bean, collection);
       }
     } catch (Exception e) {
-      CoreLog.log.log(Level.ERROR, "Error setting value from L2 cache", e);
+      CoreLog.log.log(ERROR, "Error setting value from L2 cache", e);
     }
   }
 
@@ -976,7 +977,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       }
       return jsonWriteCollection(collection);
     } catch (Exception e) {
-      CoreLog.log.log(Level.ERROR, "Error building value element collection json for L2 cache", e);
+      CoreLog.log.log(ERROR, "Error building value element collection json for L2 cache", e);
       return null;
     }
   }

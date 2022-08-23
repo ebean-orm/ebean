@@ -12,8 +12,9 @@ import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
-import java.lang.System.Logger.Level;
 import java.util.*;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Factory for SqlTree.
@@ -385,7 +386,7 @@ public final class SqlTreeBuilder {
   private void addPropertyToSubQuery(SqlTreeProperties selectProps, STreeType desc, String propName, String path) {
     STreeProperty p = desc.findPropertyWithDynamic(propName, path);
     if (p == null) {
-      log.log(Level.ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
+      log.log(ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
       return;
     } else if (p instanceof STreePropertyAssoc && p.isEmbedded()) {
       // if the property is embedded we need to lookup the real column name
@@ -420,13 +421,13 @@ public final class SqlTreeBuilder {
           if (p != null) {
             selectProps.add(p);
           } else {
-            log.log(Level.ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
+            log.log(ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
           }
         } else if (p.isEmbedded() || (p instanceof STreePropertyAssoc && !queryProps.isIncludedBeanJoin(p.name()))) {
           // add the embedded bean or the *ToOne assoc bean.  We skip the check that the *ToOne propName maps to Id property ...
           selectProps.add(p);
         } else {
-          log.log(Level.ERROR, "property [{0}] expected to be an embedded or *ToOne bean for query - excluding it.", p.fullName());
+          log.log(ERROR, "property [{0}] expected to be an embedded or *ToOne bean for query - excluding it.", p.fullName());
         }
       }
 
@@ -435,7 +436,7 @@ public final class SqlTreeBuilder {
       // sub class hierarchy if required
       STreeProperty p = desc.findPropertyWithDynamic(propName, queryProps.getPath());
       if (p == null) {
-        log.log(Level.ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
+        log.log(ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
         p = desc.findProperty("id");
         selectProps.add(p);
 

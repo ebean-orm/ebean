@@ -57,8 +57,9 @@ import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
 
-import java.lang.System.Logger.Level;
 import java.util.*;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Used to extend the DatabaseConfig with additional objects used to configure and
@@ -433,7 +434,7 @@ public final class InternalConfiguration {
       externalTransactionManager = new JtaTransactionManager();
     }
     if (externalTransactionManager != null) {
-      log.log(Level.INFO, "Using Transaction Manager {0}", externalTransactionManager.getClass());
+      log.log(INFO, "Using Transaction Manager {0}", externalTransactionManager.getClass());
       return new ExternalTransactionScopeManager(externalTransactionManager);
     } else {
       return new DefaultTransactionScopeManager();
@@ -523,7 +524,7 @@ public final class InternalConfiguration {
       if (iterator.hasNext()) {
         // use the cacheFactory (via classpath service loader)
         plugin = iterator.next();
-        log.log(Level.DEBUG, "using ServerCacheFactory {0}", plugin.getClass());
+        log.log(DEBUG, "using ServerCacheFactory {0}", plugin.getClass());
       } else {
         // use the built in default l2 caching which is local cache based
         localL2Caching = true;
@@ -613,7 +614,7 @@ public final class InternalConfiguration {
     @Override
     public void execute(boolean online) {
       if (online && ddlRun) {
-        CoreLog.log.log(Level.ERROR, "Configured to run DDL but ebean-ddl-generator is not in the classpath (or ebean-test in the test classpath?)");
+        CoreLog.log.log(ERROR, "Configured to run DDL but ebean-ddl-generator is not in the classpath (or ebean-test in the test classpath?)");
       }
     }
   }
