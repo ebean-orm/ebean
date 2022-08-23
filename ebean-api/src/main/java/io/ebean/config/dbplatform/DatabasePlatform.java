@@ -670,8 +670,8 @@ public class DatabasePlatform {
   }
 
   private boolean isQuote(char ch) {
-    for (char identifer : QUOTED_IDENTIFIERS) {
-      if (identifer == ch) {
+    for (char identifier : QUOTED_IDENTIFIERS) {
+      if (identifier == ch) {
         return true;
       }
     }
