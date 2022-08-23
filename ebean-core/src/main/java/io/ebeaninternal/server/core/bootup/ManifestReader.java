@@ -3,7 +3,6 @@ package io.ebeaninternal.server.core.bootup;
 import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.util.UrlHelper;
-import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +14,14 @@ import java.util.Set;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * Reads all the META-INF/ebean.mf resources with the package locations of entity beans.
  */
 class ManifestReader {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final Set<String> packageSet = new HashSet<>();
   private final ClassLoader classLoader;
@@ -55,7 +56,6 @@ class ManifestReader {
    * Read all the specific manifest files and return the set of packages containing type query beans.
    */
   private Set<String> read(ClassLoader classLoader, String resourcePath) {
-
     try {
       Enumeration<URL> resources = classLoader.getResources(resourcePath);
       while (resources.hasMoreElements()) {
@@ -64,7 +64,7 @@ class ManifestReader {
         }
       }
     } catch (IOException e) {
-      log.warn("Error reading " + resourcePath + " manifest resources", e);
+      log.log(WARNING, "Error reading " + resourcePath + " manifest resources", e);
     }
     return packageSet;
   }
@@ -73,7 +73,6 @@ class ManifestReader {
    * Read the entity packages from the manifest.
    */
   private void read(Manifest manifest) throws IOException {
-
     Attributes attributes = manifest.getMainAttributes();
     String agentOnlyUse = attributes.getValue("agent-use-only");
     if (agentOnlyUse == null || !"true".equalsIgnoreCase(agentOnlyUse.trim())) {

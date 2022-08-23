@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.System.Logger.Level.ERROR;
 import static java.util.Collections.emptyList;
 
 public final class CQueryPlanManager implements QueryPlanManager {
@@ -64,7 +65,7 @@ public final class CQueryPlanManager implements QueryPlanManager {
       }
       return req.plans();
     } catch (SQLException e) {
-      CoreLog.log.error("Error during query plan collection", e);
+      CoreLog.log.log(ERROR, "Error during query plan collection", e);
       return emptyList();
     }
   }

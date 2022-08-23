@@ -2,20 +2,21 @@ package io.ebean;
 
 import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.datasource.DataSourceConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Holds Database instances.
  */
 final class DbContext {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean");
+  private static final System.Logger log = EbeanVersion.log;
+
   static {
     EbeanVersion.getVersion();
   }
@@ -52,7 +53,7 @@ final class DbContext {
       throw new DataSourceConfigurationException(msg, e);
 
     } catch (Throwable e) {
-      log.error("Error trying to create the default Database", e);
+      log.log(ERROR, "Error trying to create the default Database", e);
       throw new RuntimeException(e);
     }
   }

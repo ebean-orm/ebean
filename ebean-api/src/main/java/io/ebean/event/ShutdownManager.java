@@ -1,9 +1,8 @@
 package io.ebean.event;
 
 import io.ebean.Database;
+import io.ebean.EbeanVersion;
 import io.ebean.service.SpiContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -13,6 +12,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.*;
+
 /**
  * Manages the shutdown of Ebean.
  * <p>
@@ -20,13 +21,14 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class ShutdownManager {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean");
+  private static final System.Logger log = EbeanVersion.log;
   private static final ReentrantLock lock = new ReentrantLock();
   private static final List<Database> databases = new ArrayList<>();
   private static final ShutdownHook shutdownHook = new ShutdownHook();
 
   private static boolean stopping;
   private static SpiContainer container;
+
   static {
     // Register the Shutdown hook
     registerShutdownHook();
@@ -120,8 +122,8 @@ public final class ShutdownManager {
         // Already run shutdown...
         return;
       }
-      if (log.isDebugEnabled()) {
-        log.debug("Ebean shutting down");
+      if (log.isLoggable(DEBUG)) {
+        log.log(DEBUG, "Ebean shutting down");
       }
       stopping = true;
       deregisterShutdownHook();
@@ -133,7 +135,7 @@ public final class ShutdownManager {
           Runnable r = (Runnable) ClassUtil.newInstance(shutdownRunner);
           r.run();
         } catch (Exception e) {
-          log.error("Error running custom shutdown runnable", e);
+          log.log(ERROR, "Error running custom shutdown runnable", e);
         }
       }
 
@@ -147,7 +149,7 @@ public final class ShutdownManager {
         try {
           server.shutdown();
         } catch (Exception ex) {
-          log.error("Error executing shutdown runnable", ex);
+          log.log(ERROR, "Error executing shutdown runnable", ex);
           ex.printStackTrace();
         }
       }
@@ -165,10 +167,10 @@ public final class ShutdownManager {
     while (drivers.hasMoreElements()) {
       Driver driver = drivers.nextElement();
       try {
-        log.info("De-registering jdbc driver: " + driver);
+        log.log(INFO, "De-registering jdbc driver: " + driver);
         DriverManager.deregisterDriver(driver);
       } catch (SQLException e) {
-        log.error("Error de-registering driver " + driver, e);
+        log.log(ERROR, "Error de-registering driver " + driver, e);
       }
     }
   }
@@ -204,6 +206,7 @@ public final class ShutdownManager {
     private ShutdownHook() {
       super("EbeanHook");
     }
+
     @Override
     public void run() {
       ShutdownManager.shutdown();

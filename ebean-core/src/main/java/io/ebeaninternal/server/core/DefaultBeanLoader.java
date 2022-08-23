@@ -12,18 +12,19 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
-import org.slf4j.Logger;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
  */
 final class DefaultBeanLoader {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final DefaultServer server;
   private final boolean onIterateUseExtraTxn;
@@ -108,8 +109,8 @@ final class DefaultBeanLoader {
     server.findOne(query, null);
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
-        if (log.isDebugEnabled()) {
-          log.debug("BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
+        if (log.isLoggable(DEBUG)) {
+          log.log(DEBUG, "BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
         }
       } else if (useManyIdCache) {
         parentDesc.cacheManyPropPut(many, beanCollection, parentId);

@@ -17,6 +17,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Read only transaction expected to use autoCommit connection and for implicit use only.
  * <p>
@@ -483,7 +485,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     } catch (Exception ex) {
       // the connection pool will automatically remove the
       // connection if it does not pass the test
-      CoreLog.log.error("Error closing connection", ex);
+      CoreLog.log.log(ERROR, "Error closing connection", ex);
     }
     connection = null;
     active = false;

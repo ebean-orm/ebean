@@ -1,26 +1,28 @@
 package io.ebeaninternal.server.readaudit;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import io.avaje.applog.AppLog;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.text.json.EJson;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import io.ebeaninternal.api.CoreLog;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
+
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Default implementation of ReadAuditLogger that writes the event in JSON format to standard loggers.
  */
 public class DefaultReadAuditLogger implements ReadAuditLogger {
 
-  private static final Logger queryLogger = LoggerFactory.getLogger("io.ebean.ReadAuditQuery");
-  private static final Logger auditLogger = LoggerFactory.getLogger("io.ebean.ReadAudit");
+  private static final System.Logger queryLogger = AppLog.getLogger("io.ebean.ReadAuditQuery");
+  private static final System.Logger auditLogger = AppLog.getLogger("io.ebean.ReadAudit");
 
   protected final JsonFactory jsonFactory = new JsonFactory();
   protected int defaultQueryBuffer = 500;
@@ -48,9 +50,9 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       }
       gen.writeEndObject();
       gen.flush();
-      queryLogger.info(writer.toString());
+      queryLogger.log(INFO, writer.toString());
     } catch (IOException e) {
-      CoreLog.log.error("Error writing Read audit event", e);
+      CoreLog.log.log(ERROR, "Error writing Read audit event", e);
     }
   }
 
@@ -75,9 +77,9 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
       StringWriter writer = new StringWriter(defaultReadBuffer);
       JsonGenerator gen = jsonFactory.createGenerator(writer);
       writeDetails(gen, event);
-      auditLogger.info(writer.toString());
+      auditLogger.log(INFO, writer.toString());
     } catch (IOException e) {
-      CoreLog.log.error("Error writing Read audit event", e);
+      CoreLog.log.log(ERROR, "Error writing Read audit event", e);
     }
   }
 

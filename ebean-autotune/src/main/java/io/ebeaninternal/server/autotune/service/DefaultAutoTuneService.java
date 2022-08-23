@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.autotune.service;
 
+import io.avaje.applog.AppLog;
 import io.ebean.config.AutoTuneConfig;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -7,8 +8,6 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.autotune.AutoTuneService;
 import io.ebeaninternal.server.autotune.model.Autotune;
 import io.ebeaninternal.server.autotune.model.Origin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,12 +15,14 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.*;
+
 /**
  * Implementation of the AutoTuneService which is comprised of profiling and query tuning.
  */
 public class DefaultAutoTuneService implements AutoTuneService {
 
-  private static final Logger logger = LoggerFactory.getLogger(DefaultAutoTuneService.class);
+  private static final System.Logger logger = AppLog.getLogger(DefaultAutoTuneService.class);
 
   private final ReentrantLock lock = new ReentrantLock();
 
@@ -111,7 +112,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
         if (stream != null) {
           loadAutoTuneProfiling(AutoTuneXmlReader.read(stream));
         } else {
-          logger.warn("AutoTune file {} not found - no initial automatic query tuning", tuningFile);
+          logger.log(WARNING, "AutoTune file {0} not found - no initial automatic query tuning", tuningFile);
         }
       } catch (IOException e) {
         throw new IllegalStateException("Error on auto close of " + tuningFile, e);
@@ -120,7 +121,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
   }
 
   private void loadAutoTuneProfiling(Autotune profiling) {
-    logger.info("AutoTune loading {} tuning entries", profiling.getOrigin().size());
+    logger.log(INFO, "AutoTune loading {0} tuning entries", profiling.getOrigin().size());
     for (Origin origin : profiling.getOrigin()) {
       queryTuner.put(origin);
     }
@@ -141,17 +142,17 @@ public class DefaultAutoTuneService implements AutoTuneService {
         event.process();
         if (event.isEmpty()) {
           long exeMillis = System.currentTimeMillis() - start;
-          logger.debug("No query tuning updates for server:{} executionMillis:{}", serverName, exeMillis);
+          logger.log(DEBUG, "No query tuning updates for server:{0} executionMillis:{1}", serverName, exeMillis);
 
         } else {
           // report the query tuning changes that have been made
           runtimeChangeCount += event.getChangeCount();
           event.writeFile(profilingFile + "-" + serverName + "-update");
           long exeMillis = System.currentTimeMillis() - start;
-          logger.info("query tuning updates - new:{} diff:{} for server:{} executionMillis:{}", event.getNewCount(), event.getDiffCount(), serverName, exeMillis);
+          logger.log(INFO, "query tuning updates - new:{0} diff:{1} for server:{2} executionMillis:{3}", event.getNewCount(), event.getDiffCount(), serverName, exeMillis);
         }
       } catch (Throwable e) {
-        logger.error("Error collecting or applying automatic query tuning", e);
+        logger.log(ERROR, "Error collecting or applying automatic query tuning", e);
       }
     } finally {
       lock.unlock();
@@ -172,11 +173,11 @@ public class DefaultAutoTuneService implements AutoTuneService {
         AutoTuneDiffCollection event = new AutoTuneDiffCollection(profiling, queryTuner, false);
         event.process();
         if (event.isEmpty()) {
-          logger.info("No new or diff entries for profiling server:{}", serverName);
+          logger.log(INFO, "No new or diff entries for profiling server:{0}", serverName);
 
         } else {
           event.writeFile(profilingFile + "-" + serverName);
-          logger.info("writing new:{} diff:{} profiling entries for server:{}", event.getNewCount(), event.getDiffCount(), serverName);
+          logger.log(INFO, "writing new:{0} diff:{1} profiling entries for server:{2}", event.getNewCount(), event.getDiffCount(), serverName);
         }
       }
     } finally {
@@ -196,7 +197,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
   private void outputAllTuning() {
 
     if (runtimeChangeCount == 0) {
-      logger.info("no runtime query tuning changes for server:{}", serverName);
+      logger.log(INFO, "no runtime query tuning changes for server:{0}", serverName);
 
     } else {
       AutoTuneAllCollection event = new AutoTuneAllCollection(queryTuner);
@@ -205,12 +206,12 @@ public class DefaultAutoTuneService implements AutoTuneService {
       if (existingTuning.exists()) {
         // rename the existing autotune.xml file (appending 'now')
         if (!existingTuning.renameTo(new File(tuningFile + "." + AutoTuneXmlWriter.now()))) {
-          logger.warn("Failed to rename autotune file [{}]", tuningFile);
+          logger.log(WARNING, "Failed to rename autotune file [{0}]", tuningFile);
         }
       }
 
       event.writeFile(tuningFile, false);
-      logger.info("query tuning detected [{}] changes, writing all [{}] tuning entries for server:{}", runtimeChangeCount, size, serverName);
+      logger.log(INFO, "query tuning detected [{0}] changes, writing all [{1}] tuning entries for server:{2}", runtimeChangeCount, size, serverName);
     }
   }
 
@@ -279,7 +280,7 @@ public class DefaultAutoTuneService implements AutoTuneService {
     } catch (InterruptedException e) {
       // restore the interrupted status
       Thread.currentThread().interrupt();
-      logger.warn("Error while sleeping after System.gc() request.", e);
+      logger.log(WARNING, "Error while sleeping after System.gc() request.", e);
     }
   }
 

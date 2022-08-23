@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * A QueryPlanLogger for SqlServer. It will return the plan as XML, which can be opened in
  * Microsoft SQL Server Management Studio.
@@ -42,13 +44,13 @@ public final class QueryPlanLoggerSqlServer extends QueryPlanLogger {
         return createPlan(plan, bind.toString(), xml);
 
       } catch (SQLException e) {
-        CoreLog.log.warn("Could not log query plan", e);
+        CoreLog.log.log(WARNING, "Could not log query plan", e);
         return null;
       } finally {
         stmt.execute("set statistics xml off");
       }
     } catch (SQLException e) {
-      CoreLog.log.warn("Could not log query plan", e);
+      CoreLog.log.log(WARNING, "Could not log query plan", e);
       return null;
     }
   }

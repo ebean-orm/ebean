@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.cache;
 
+import io.avaje.applog.AppLog;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheRegion;
 import io.ebean.cache.ServerCacheType;
@@ -7,17 +8,18 @@ import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.SpiCacheRegion;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.deploy.DCacheRegion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Manages the bean and query caches.
  */
 public final class DefaultServerCacheManager implements SpiCacheManager {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.REGION");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.cache.REGION");
 
   private final Map<String, SpiCacheRegion> regionMap = new HashMap<>();
   private final ClusterManager clusterManager;
@@ -65,23 +67,23 @@ public final class DefaultServerCacheManager implements SpiCacheManager {
           enabled.add(region.name());
           if (!region.isEnabled()) {
             region.setEnabled(true);
-            log.debug("Cache region[{}] enabled", region.name());
+            log.log(DEBUG, "Cache region[{0}] enabled", region.name());
           }
         } else {
           disabled.add(region.name());
           if (region.isEnabled()) {
             region.setEnabled(false);
-            log.debug("Cache region[{}] disabled", region.name());
+            log.log(DEBUG, "Cache region[{0}] disabled", region.name());
           }
         }
       }
-      log.info("Cache regions enabled:{} disabled:{}", enabled, disabled);
+      log.log(INFO, "Cache regions enabled:{0} disabled:{1}", enabled, disabled);
     }
   }
 
   @Override
   public void setAllRegionsEnabled(boolean enabled) {
-    log.debug("All cache regions enabled[{}]", enabled);
+    log.log(DEBUG, "All cache regions enabled[{0}]", enabled);
     for (SpiCacheRegion region : regionMap.values()) {
       region.setEnabled(enabled);
     }

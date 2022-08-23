@@ -15,8 +15,9 @@ module io.ebean.api {
   requires transitive persistence.api;
   requires transitive io.ebean.annotation;
   requires transitive io.ebean.datasource.api;
-  requires transitive org.slf4j;
+  requires transitive io.avaje.applog;
 
+  requires static org.slf4j;
   requires static io.ebean.types;
   requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;

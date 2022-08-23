@@ -10,6 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * A QueryPlanLogger that prefixes "EXPLAIN " to the query. This works for Postgres, H2 and MySql.
  */
@@ -23,7 +25,7 @@ public final class QueryPlanLoggerExplain extends QueryPlanLogger {
         return readQueryPlan(plan, bind, rset);
       }
     } catch (SQLException e) {
-      CoreLog.log.warn("Could not log query plan", e);
+      CoreLog.log.log(WARNING, "Could not log query plan", e);
       return null;
     }
   }

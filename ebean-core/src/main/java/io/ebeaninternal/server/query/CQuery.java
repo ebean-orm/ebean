@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * An object that represents a SqlSelect statement.
  * <p>
@@ -344,7 +346,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         auditIterateLogMessage();
       }
     } catch (Throwable e) {
-      CoreLog.log.error("Error logging read audit logs", e);
+      CoreLog.log.log(ERROR, "Error logging read audit logs", e);
     }
     try {
       if (dataReader != null) {
@@ -352,7 +354,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         dataReader = null;
       }
     } catch (SQLException e) {
-      CoreLog.log.error("Error closing dataReader", e);
+      CoreLog.log.log(ERROR, "Error closing dataReader", e);
     }
     JdbcClose.close(pstmt);
     pstmt = null;
@@ -548,7 +550,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       }
       transaction().profileEvent(this);
     } catch (Exception e) {
-      CoreLog.log.error("Error updating execution statistics", e);
+      CoreLog.log.log(ERROR, "Error updating execution statistics", e);
     }
   }
 

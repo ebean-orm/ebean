@@ -7,17 +7,18 @@ import io.ebeaninternal.server.core.BindPadding;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Request for loading Associated Many Beans.
  */
 public final class LoadManyRequest extends LoadRequest {
 
-  private static final Logger log = CoreLog.log;
+  private static final System.Logger log = CoreLog.log;
 
   private final List<BeanCollection<?>> batch;
   private final LoadManyBuffer loadContext;
@@ -113,10 +114,10 @@ public final class LoadManyRequest extends LoadRequest {
     // in the +query or +lazy load due to no rows (predicates)
     for (BeanCollection<?> bc : batch) {
       if (bc.checkEmptyLazyLoad()) {
-        if (log.isDebugEnabled()) {
+        if (log.isLoggable(DEBUG)) {
           EntityBean ownerBean = bc.getOwnerBean();
           Object parentId = desc.getId(ownerBean);
-          log.debug("BeanCollection after lazy load was empty. type:" + ownerBean.getClass().getName() + " id:" + parentId + " owner:" + ownerBean);
+          log.log(DEBUG, "BeanCollection after lazy load was empty. type:" + ownerBean.getClass().getName() + " id:" + parentId + " owner:" + ownerBean);
         }
       } else if (loadCache && many.isUseCache()) {
         desc.cacheManyPropPut(many, bc, desc.getId(bc.getOwnerBean()));

@@ -1,32 +1,26 @@
 package io.ebean.config.dbplatform;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.EbeanVersion;
 import io.ebean.Query;
-import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.CustomDbTypeMapping;
 import io.ebean.config.PlatformConfig;
 import io.ebean.util.JdbcClose;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Database platform specific settings.
  */
 public class DatabasePlatform {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean");
+  private static final System.Logger log = EbeanVersion.log;
 
   /**
    * Behavior used when ending a query only transaction (at read committed isolation level).
@@ -60,7 +54,7 @@ public class DatabasePlatform {
    * Can we use native java time API objects in
    * {@link ResultSet#getObject(int, Class)} and
    * {@link PreparedStatement#setObject(int, Object)}.
-   *
+   * <p>
    * Not all drivers (DB2 e.g.) will support this.
    */
   protected boolean supportsNativeJavaTime = true;
@@ -165,7 +159,7 @@ public class DatabasePlatform {
    * want to use quoted identifiers for. The backticks get converted to the
    * appropriate characters in convertQuotedIdentifiers
    */
-  private static final char[] QUOTED_IDENTIFIERS = new char[] { '"', '\'', '[', ']', '`' };
+  private static final char[] QUOTED_IDENTIFIERS = new char[]{'"', '\'', '[', ']', '`'};
 
   /**
    * The non-escaped like clause (to stop slash being escaped on some platforms).
@@ -666,7 +660,7 @@ public class DatabasePlatform {
         if (isQuote(dbName.charAt(dbName.length() - 1))) {
           return openQuote + dbName.substring(1, dbName.length() - 1) + closeQuote;
         } else {
-          log.error("Missing backquote on [" + dbName + "]");
+          log.log(ERROR, "Missing backquote on [" + dbName + "]");
         }
       } else if (allQuotedIdentifiers) {
         return openQuote + dbName + closeQuote;
@@ -729,7 +723,7 @@ public class DatabasePlatform {
 
   protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
     // silently assume the database does not support the "for update" clause.
-    log.info("it seems your database does not support the 'for update' clause");
+    log.log(INFO, "it seems your database does not support the 'for update' clause");
     return sql;
   }
 
@@ -763,7 +757,7 @@ public class DatabasePlatform {
     if (!schemaExists(dbSchema, connection)) {
       Statement query = connection.createStatement();
       try {
-        log.debug("create schema:{}", dbSchema);
+        log.log(DEBUG, "create schema:{0}", dbSchema);
         query.executeUpdate("create schema " + dbSchema);
       } finally {
         JdbcClose.close(query);

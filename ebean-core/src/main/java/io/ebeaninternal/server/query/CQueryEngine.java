@@ -11,16 +11,14 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.JdbcClose;
 import io.ebean.util.StringHelper;
-import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.DiffHelp;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.Binder;
-import org.slf4j.Logger;
+import io.ebeaninternal.server.util.Str;
 
 import javax.persistence.PersistenceException;
 import java.sql.ResultSet;
@@ -32,7 +30,6 @@ import java.util.*;
  */
 public final class CQueryEngine {
 
-  private static final Logger log = CoreLog.log;
   private static final String T0 = "t0";
 
   private final int defaultFetchSizeFindList;
@@ -195,7 +192,6 @@ public final class CQueryEngine {
       }
       if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
-        log.trace("Future fetch already cancelled");
         return null;
       }
       if (request.logSql()) {
@@ -349,7 +345,6 @@ public final class CQueryEngine {
       }
       if (!cquery.prepareBindExecuteQuery()) {
         // query has been cancelled already
-        log.trace("Future fetch already cancelled");
         return null;
       }
       if (request.logSql()) {

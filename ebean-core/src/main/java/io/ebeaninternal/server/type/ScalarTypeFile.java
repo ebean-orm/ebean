@@ -12,6 +12,8 @@ import java.io.*;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * ScalarType for streaming between a File and the database.
  */
@@ -169,14 +171,14 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
         try {
           output.close();
         } catch (IOException e) {
-          CoreLog.log.error("Error when closing outputstream", e);
+          CoreLog.log.log(ERROR, "Error when closing outputStream", e);
         }
       }
       if (input != null) {
         try {
           input.close();
         } catch (IOException e) {
-          CoreLog.log.error("Error when closing inputstream ", e);
+          CoreLog.log.log(ERROR, "Error when closing inputStream ", e);
         }
       }
     }

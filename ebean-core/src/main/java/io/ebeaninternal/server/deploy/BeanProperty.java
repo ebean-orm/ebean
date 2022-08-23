@@ -51,6 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
@@ -1433,7 +1435,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
           objValue = null;
           String msg = "Error trying to use Jackson ObjectMapper to read transient property "
             + fullName() + " - consider marking this property with @JsonIgnore";
-          CoreLog.log.error(msg, e);
+          CoreLog.log.log(ERROR, msg, e);
         }
       }
       if (jsonDeserialize) {

@@ -13,6 +13,8 @@ import javax.persistence.PersistenceException;
 import javax.persistence.Transient;
 import java.lang.reflect.*;
 
+import static java.lang.System.Logger.Level.*;
+
 /**
  * Create the properties for a bean.
  * <p>
@@ -84,7 +86,7 @@ public final class DeployCreateProperties {
             if (replaced != null && !replaced.isTransient()) {
               String msg = "Huh??? property " + prop.getFullBeanName() + " being defined twice";
               msg += " but replaced property was not transient? This is not expected?";
-              CoreLog.log.warn(msg);
+              CoreLog.log.log(WARNING, msg);
             }
           }
         }
@@ -111,7 +113,7 @@ public final class DeployCreateProperties {
         return new DeployBeanPropertySimpleCollection(desc, targetType, manyType);
       }
     } catch (NullPointerException e) {
-      CoreLog.internal.debug("expected non-scalar type {}", e.getMessage());
+      CoreLog.internal.log(DEBUG, "expected non-scalar type {0}", e.getMessage());
     }
     return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
   }
@@ -132,7 +134,7 @@ public final class DeployCreateProperties {
           // not supporting this field (generic type used)
           return null;
         }
-        CoreLog.internal.warn("Could not find parameter type (via reflection) on " + desc.getFullName() + " " + field.getName());
+        CoreLog.internal.log(WARNING, "Could not find parameter type (via reflection) on " + desc.getFullName() + " " + field.getName());
       }
       return createManyType(desc, targetType, manyType);
     }
@@ -151,7 +153,7 @@ public final class DeployCreateProperties {
       return new DeployBeanPropertyAssocOne(desc, propertyType);
 
     } catch (Exception e) {
-      CoreLog.log.error("Error with " + desc + " field:" + field.getName(), e);
+      CoreLog.log.log(ERROR, "Error with " + desc + " field:" + field.getName(), e);
       return null;
     }
   }

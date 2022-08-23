@@ -27,7 +27,6 @@ module io.ebean.core {
   requires io.avaje.classpath.scanner.api;
   requires io.avaje.classpath.scanner;
   requires io.ebean.types;
-  requires org.slf4j;
 
   requires static io.avaje.jsr305x;
   requires static com.fasterxml.jackson.annotation;
