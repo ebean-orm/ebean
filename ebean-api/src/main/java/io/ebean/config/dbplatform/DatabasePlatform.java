@@ -770,19 +770,6 @@ public class DatabasePlatform {
   }
 
   /**
-   * Return true if the table exists.
-   */
-  public boolean tableExists(Connection connection, String catalog, String schema, String table) throws SQLException {
-    DatabaseMetaData metaData = connection.getMetaData();
-    ResultSet tables = metaData.getTables(catalog, schema, table, null);
-    try {
-      return tables.next();
-    } finally {
-      JdbcClose.close(tables);
-    }
-  }
-
-  /**
    * Escapes the like string for this DB-Platform
    */
   public String escapeLikeString(String value) {
