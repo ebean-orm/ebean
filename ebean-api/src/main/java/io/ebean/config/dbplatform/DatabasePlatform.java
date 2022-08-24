@@ -141,11 +141,6 @@ public class DatabasePlatform {
   protected int clobDbType = Types.CLOB;
 
   /**
-   * For Oracle treat empty strings as null.
-   */
-  protected boolean treatEmptyStringsAsNull;
-
-  /**
    * The database platform name.
    */
   protected Platform platform = Platform.GENERIC;
@@ -540,15 +535,6 @@ public class DatabasePlatform {
    */
   public int getClobDbType() {
     return clobDbType;
-  }
-
-  /**
-   * Return true if empty strings should be treated as null.
-   *
-   * @return true, if checks if is treat empty strings as null
-   */
-  public boolean isTreatEmptyStringsAsNull() {
-    return treatEmptyStringsAsNull;
   }
 
   /**
