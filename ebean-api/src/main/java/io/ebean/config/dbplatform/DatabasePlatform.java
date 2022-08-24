@@ -23,23 +23,6 @@ public class DatabasePlatform {
   private static final System.Logger log = EbeanVersion.log;
 
   /**
-   * Behavior used when ending a query only transaction (at read committed isolation level).
-   */
-  public enum OnQueryOnly {
-
-    /**
-     * Rollback the transaction.
-     */
-    ROLLBACK,
-
-    /**
-     * Commit the transaction
-     */
-    COMMIT
-  }
-
-
-  /**
    * Set to true for MySql, no other jdbc drivers need this workaround.
    */
   protected boolean useExtraTransactionOnIterateSecondaryQueries;
@@ -58,11 +41,6 @@ public class DatabasePlatform {
    * Not all drivers (DB2 e.g.) will support this.
    */
   protected boolean supportsNativeJavaTime = true;
-
-  /**
-   * The behaviour used when ending a read only transaction at read committed isolation level.
-   */
-  protected OnQueryOnly onQueryOnly = OnQueryOnly.COMMIT;
 
   /**
    * The open quote used by quoted identifiers.
@@ -407,20 +385,6 @@ public class DatabasePlatform {
    */
   public PlatformIdGenerator createSequenceIdGenerator(BackgroundExecutor be, DataSource ds, int stepSize, String seqName) {
     return null;
-  }
-
-  /**
-   * Return the behaviour to use when ending a read only transaction.
-   */
-  public OnQueryOnly getOnQueryOnly() {
-    return onQueryOnly;
-  }
-
-  /**
-   * Set the behaviour to use when ending a read only transaction.
-   */
-  public void setOnQueryOnly(OnQueryOnly onQueryOnly) {
-    this.onQueryOnly = onQueryOnly;
   }
 
   /**
