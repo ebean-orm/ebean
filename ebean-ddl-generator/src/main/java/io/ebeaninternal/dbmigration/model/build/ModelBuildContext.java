@@ -56,7 +56,7 @@ public class ModelBuildContext {
     if (constraintNaming.getMaxLength() != null) {
       return constraintNaming.getMaxLength();
     }
-    return new DefaultConstraintMaxLength(databasePlatform.getMaxConstraintNameLength());
+    return new DefaultConstraintMaxLength(databasePlatform.maxConstraintNameLength());
   }
 
   /**

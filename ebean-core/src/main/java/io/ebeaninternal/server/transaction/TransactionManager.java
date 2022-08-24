@@ -120,7 +120,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.txnLogger = logManager.txn();
     this.txnDebug = txnLogger.isDebug();
     this.databasePlatform = options.config.getDatabasePlatform();
-    this.supportsSavepointId = databasePlatform.isSupportsSavepointId();
+    this.supportsSavepointId = databasePlatform.supportsSavepointId();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
     this.autoPersistUpdates = options.config.isAutoPersistUpdates();

@@ -14,7 +14,7 @@ public class PlatformTypeConverterTest {
   public void convert_withSuffix_expect_suffix() {
 
     PostgresPlatform pg = new PostgresPlatform();
-    DbPlatformTypeMapping dbTypeMap = pg.getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = pg.dbTypeMap();
 
     PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
 
@@ -30,7 +30,7 @@ public class PlatformTypeConverterTest {
   public void testConvert_given_postgres() throws Exception {
 
     PostgresPlatform pg = new PostgresPlatform();
-    DbPlatformTypeMapping dbTypeMap = pg.getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = pg.dbTypeMap();
 
     PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
 
@@ -52,7 +52,7 @@ public class PlatformTypeConverterTest {
 
 
     H2Platform platform = new H2Platform();
-    DbPlatformTypeMapping dbTypeMap = platform.getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = platform.dbTypeMap();
 
     PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
 
@@ -69,7 +69,7 @@ public class PlatformTypeConverterTest {
   public void testConvertJsonTypes_given_postgres() {
 
     PostgresPlatform platform = new PostgresPlatform();
-    DbPlatformTypeMapping dbTypeMap = platform.getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = platform.dbTypeMap();
 
     PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
 
@@ -84,7 +84,7 @@ public class PlatformTypeConverterTest {
   public void testConvertJsonTypes_given_h2() {
 
     H2Platform platform = new H2Platform();
-    DbPlatformTypeMapping dbTypeMap = platform.getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = platform.dbTypeMap();
 
     PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
 

@@ -116,7 +116,7 @@ public final class InternalConfiguration {
     this.databasePlatform = config.getDatabasePlatform();
     this.expressionFactory = initExpressionFactory(config);
     this.typeManager = new DefaultTypeManager(config, bootupClasses);
-    this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
+    this.multiValueBind = createMultiValueBind(databasePlatform.platform());
     this.deployInherit = new DeployInherit(bootupClasses);
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
     this.deployUtil = new DeployUtil(typeManager, config);
@@ -171,7 +171,7 @@ public final class InternalConfiguration {
    * Create and return the ExpressionFactory based on configuration and database platform.
    */
   private ExpressionFactory initExpressionFactory(DatabaseConfig config) {
-    boolean nativeIlike = config.isExpressionNativeIlike() && databasePlatform.isSupportsNativeIlike();
+    boolean nativeIlike = config.isExpressionNativeIlike() && databasePlatform.supportsNativeIlike();
     return new DefaultExpressionFactory(config.isExpressionEqualsWithNullAsNoop(), nativeIlike);
   }
 
@@ -265,7 +265,7 @@ public final class InternalConfiguration {
 
     DbExpressionHandler jsonHandler = getDbExpressionHandler(databasePlatform);
 
-    DbHistorySupport historySupport = databasePlatform.getHistorySupport();
+    DbHistorySupport historySupport = databasePlatform.historySupport();
     if (historySupport == null) {
       return new Binder(typeManager, logManager, 0, false, jsonHandler, dataTimeZone, multiValueBind);
     }
@@ -321,7 +321,7 @@ public final class InternalConfiguration {
   }
 
   private Platform getPlatform() {
-    return getDatabasePlatform().getPlatform();
+    return getDatabasePlatform().platform();
   }
 
   public DatabasePlatform getDatabasePlatform() {
@@ -577,7 +577,7 @@ public final class InternalConfiguration {
       return QueryPlanManager.NOOP;
     }
     long threshold = config.getQueryPlanThresholdMicros();
-    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.getPlatform()), extraMetrics);
+    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
   }
 
   /**

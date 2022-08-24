@@ -15,7 +15,7 @@ public class SqlserverPlatformTest {
   public void uuid_default() {
 
     platform.configure(new PlatformConfig());
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
 
     assertThat(dbType.renderType(0, 0)).isEqualTo("uniqueidentifier");
   }
@@ -29,7 +29,7 @@ public class SqlserverPlatformTest {
 
     platform.configure(config);
 
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("binary(16)");
   }
 
@@ -41,7 +41,7 @@ public class SqlserverPlatformTest {
 
     platform.configure(config);
 
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("nvarchar(40)");
   }
 }

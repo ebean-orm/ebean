@@ -251,7 +251,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public Platform platform() {
-    return databasePlatform.getPlatform();
+    return databasePlatform.platform();
   }
 
   @Override
@@ -318,7 +318,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         migrationRunner.setDefaultDbSchema(dbSchema);
       }
       migrationRunner.setName(config.getName());
-      Platform platform = config.getDatabasePlatform().getPlatform();
+      Platform platform = config.getDatabasePlatform().platform();
       migrationRunner.setBasePlatform(platform.base().name().toLowerCase());
       migrationRunner.setPlatform(platform.name().toLowerCase());
       migrationRunner.loadProperties(config.getProperties());
@@ -560,7 +560,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     try (Connection connection = dataSource().getConnection()) {
       for (String table : tables) {
         executeSql(connection, databasePlatform.truncateStatement(table));
-        if (databasePlatform.getPlatform().base() == Platform.DB2) {
+        if (databasePlatform.platform().base() == Platform.DB2) {
           // DB2 requires commit after each truncate statement
           connection.commit();
         }

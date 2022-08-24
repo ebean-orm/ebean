@@ -43,13 +43,13 @@ public final class CQueryEngine {
     this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = config.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();
-    this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
-    this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, config.getAsOfSysPeriod());
+    this.forwardOnlyHintOnFindIterate = dbPlatform.forwardOnlyHintOnFindIterate();
+    this.historySupport = new CQueryHistorySupport(dbPlatform.historySupport(), asOfTableMapping, config.getAsOfSysPeriod());
     this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
   }
 
   public int forwardOnlyFetchSize() {
-    Platform base = dbPlatform.getPlatform().base();
+    Platform base = dbPlatform.platform().base();
     return Platform.MYSQL == base ? Integer.MIN_VALUE : 1;
   }
 

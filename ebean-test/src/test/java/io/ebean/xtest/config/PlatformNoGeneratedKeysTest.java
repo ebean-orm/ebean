@@ -92,7 +92,7 @@ public class PlatformNoGeneratedKeysTest {
     config.setName("h2_noGeneratedKeys");
 
     OtherH2Platform platform = new OtherH2Platform();
-    DbIdentity dbIdentity = platform.getDbIdentity();
+    DbIdentity dbIdentity = platform.dbIdentity();
     dbIdentity.setIdType(IdType.IDENTITY);
     dbIdentity.setSupportsIdentity(true);
     dbIdentity.setSupportsGetGeneratedKeys(false);

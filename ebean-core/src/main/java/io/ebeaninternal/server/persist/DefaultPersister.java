@@ -50,7 +50,7 @@ public final class DefaultPersister implements Persister {
     this.server = server;
     this.beanDescriptorManager = descMgr;
     this.persistExecute = new DefaultPersistExecute(binder, server.config().getPersistBatchSize());
-    this.maxInBinding = server.databasePlatform().getMaxInBinding();
+    this.maxInBinding = server.databasePlatform().maxInBinding();
   }
 
   @Override

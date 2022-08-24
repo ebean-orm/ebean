@@ -60,11 +60,11 @@ final class CQueryBuilder {
     this.binder = binder;
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;
-    this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
-    this.sqlLimiter = dbPlatform.getSqlLimiter();
+    this.columnAliasPrefix = dbPlatform.columnAliasPrefix();
+    this.sqlLimiter = dbPlatform.sqlLimiter();
     this.rawSqlHandler = new CQueryBuilderRawSql(sqlLimiter, dbPlatform);
-    this.selectCountWithAlias = dbPlatform.isSelectCountWithAlias();
-    this.selectCountWithColumnAlias = dbPlatform.isSelectCountWithColumnAlias();
+    this.selectCountWithAlias = dbPlatform.selectCountWithAlias();
+    this.selectCountWithColumnAlias = dbPlatform.selectCountWithColumnAlias();
   }
 
   /**
@@ -118,10 +118,10 @@ final class CQueryBuilder {
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
     String alias = alias(rootTableAlias);
     if (sqlTree.noJoins() && !request.query().hasMaxRowsOrFirstRow()) {
-      if (dbPlatform.isSupportsDeleteTableAlias()) {
+      if (dbPlatform.supportsDeleteTableAlias()) {
         // delete from table <alias> ...
         return aliasReplace(buildSqlDelete("delete", request, predicates, sqlTree).getSql(), alias);
-      } else if (isMySql(dbPlatform.getPlatform())) {
+      } else if (isMySql(dbPlatform.platform())) {
         return aliasReplace(buildSqlDelete("delete " + alias, request, predicates, sqlTree).getSql(), alias);
       } else {
         // simple - delete from table ...
@@ -380,7 +380,7 @@ final class CQueryBuilder {
   }
 
   private String nativeQueryPaging(SpiQuery<?> query, String sql) {
-    return dbPlatform.getBasicSqlLimiter().limit(sql, query.getFirstRow(), query.getMaxRows());
+    return dbPlatform.basicSqlLimiter().limit(sql, query.getFirstRow(), query.getMaxRows());
   }
 
   /**
@@ -399,7 +399,7 @@ final class CQueryBuilder {
     try {
       // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable
       // statement here by specifying ResultSet.CONCUR_UPDATABLE
-      PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, dbPlatform.isSupportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
+      PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, dbPlatform.supportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
       predicates.bind(statement, connection);
       ResultSet resultSet = statement.executeQuery();
       ResultSetMetaData metaData = resultSet.getMetaData();

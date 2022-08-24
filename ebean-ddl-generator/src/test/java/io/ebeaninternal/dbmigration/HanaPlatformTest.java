@@ -49,7 +49,7 @@ public class HanaPlatformTest {
 
     HanaPlatform platform = new HanaPlatform();
     platform.configure(new PlatformConfig());
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
 
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar(40)");
   }
@@ -63,7 +63,7 @@ public class HanaPlatformTest {
 
     platform.configure(config);
 
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("varbinary(16)");
   }
 }

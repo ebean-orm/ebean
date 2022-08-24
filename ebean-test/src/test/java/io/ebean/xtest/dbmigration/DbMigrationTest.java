@@ -201,7 +201,7 @@ public class DbMigrationTest extends BaseTestCase {
       System.err.println("FIXME: Oracle history support seems to be broken");
       return;
     }
-    DbHistorySupport history = server().pluginApi().databasePlatform().getHistorySupport();
+    DbHistorySupport history = server().pluginApi().databasePlatform().historySupport();
     if (history == null) {
       return;
     }
