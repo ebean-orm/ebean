@@ -2,7 +2,6 @@ package io.ebean.core.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;
 
@@ -95,6 +94,11 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   Class<T> type();
 
   /**
+   * Return the type this maps to for JSON document stores.
+   */
+  DocPropertyType docType();
+
+  /**
    * Read the value from the resultSet and convert if necessary to the logical
    * bean property value.
    */
@@ -130,6 +134,14 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   T toBeanType(Object value);
 
   /**
+   * Convert the string value to the appropriate java object.
+   * <p>
+   * Mostly used to support CSV, JSON and XML parsing.
+   */
+  @Override
+  T parse(String value);
+
+  /**
    * Convert the type into a string representation.
    */
   String formatValue(T value);
@@ -146,19 +158,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   default String format(Object value) {
     return formatValue((T) value);
   }
-
-  /**
-   * Convert the string value to the appropriate java object.
-   * <p>
-   * Mostly used to support CSV, JSON and XML parsing.
-   */
-  @Override
-  T parse(String value);
-
-  /**
-   * Return the type this maps to for JSON document stores.
-   */
-  DocPropertyType docType();
 
   /**
    * Convert the value into a long version value.
