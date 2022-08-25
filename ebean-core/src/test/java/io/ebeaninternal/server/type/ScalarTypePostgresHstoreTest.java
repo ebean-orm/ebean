@@ -46,16 +46,6 @@ public class ScalarTypePostgresHstoreTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void testParseDateTime() {
-    assertThrows(RuntimeException.class, () -> {
-      Map<String, Object> map = (Map<String, Object>) hstore.convertFromMillis(1234L);
-      assertEquals(1, map.size());
-      assertEquals("rob", map.get("name"));
-    });
-  }
-
-  @Test
   public void testJsonWrite() throws Exception {
     Map<String, Object> map = new LinkedHashMap<>();
     assertEquals("{\"key\":{}}", generateJson(map));

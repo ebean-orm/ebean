@@ -167,15 +167,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   }
 
   /**
-   * Convert the systemTimeMillis into the appropriate java object.
-   * <p>
-   * For non dateTime types this will throw an exception.
-   */
-  default T convertFromMillis(long dateTime) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
    * Read the value from binary input.
    */
   T readData(DataInput dataInput) throws IOException;

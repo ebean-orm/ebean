@@ -85,11 +85,6 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public byte[] convertFromMillis(long systemTimeMillis) {
-    return baseType.convertFromMillis(systemTimeMillis);
-  }
-
-  @Override
   public byte[] read(DataReader reader) throws SQLException {
     byte[] data = baseType.read(reader);
     data = dataEncryptSupport.decrypt(data);

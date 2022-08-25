@@ -59,11 +59,6 @@ class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   }
 
   @Override
-  public BigDecimal convertFromMillis(long systemTimeMillis) {
-    return BigDecimal.valueOf(systemTimeMillis);
-  }
-
-  @Override
   public BigDecimal readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

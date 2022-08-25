@@ -40,12 +40,6 @@ public interface ExpressionPath {
   StringParser stringParser();
 
   /**
-   * For DateTime capable scalar types convert the long systemTimeMillis into
-   * an appropriate java time (Date,Timestamp,Time,Calendar, JODA type etc).
-   */
-  Object parseDateTime(long systemTimeMillis);
-
-  /**
    * Return the underlying JDBC type or 0 if this is not a scalar type.
    */
   int jdbcType();

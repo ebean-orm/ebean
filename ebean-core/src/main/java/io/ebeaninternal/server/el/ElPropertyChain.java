@@ -233,11 +233,6 @@ public final class ElPropertyChain implements ElPropertyValue {
   }
 
   @Override
-  public Object parseDateTime(long systemTimeMillis) {
-    return scalarType.convertFromMillis(systemTimeMillis);
-  }
-
-  @Override
   public StringParser stringParser() {
     return scalarType;
   }

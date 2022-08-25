@@ -110,11 +110,6 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public T convertFromMillis(long systemTimeMillis) {
-    return wrapped.convertFromMillis(systemTimeMillis);
-  }
-
-  @Override
   public T toBeanType(Object value) {
     return wrapped.toBeanType(value);
   }

@@ -68,11 +68,6 @@ final class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public Long convertFromMillis(long systemTimeMillis) {
-    return systemTimeMillis;
-  }
-
-  @Override
   public Long readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

@@ -58,11 +58,6 @@ final class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public Float convertFromMillis(long systemTimeMillis) {
-    return (float) systemTimeMillis;
-  }
-
-  @Override
   public Float readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

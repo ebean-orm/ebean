@@ -77,7 +77,6 @@ abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     }
   }
 
-  @Override
   public T convertFromMillis(long systemTimeMillis) {
     Date ts = new Date(systemTimeMillis);
     return convertFromDate(ts);

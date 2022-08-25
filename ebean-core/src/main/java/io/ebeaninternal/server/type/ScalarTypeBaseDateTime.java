@@ -54,7 +54,6 @@ abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   /**
    * Convert from epoch millis to the value.
    */
-  @Override
   public abstract T convertFromMillis(long systemTimeMillis);
 
   /**

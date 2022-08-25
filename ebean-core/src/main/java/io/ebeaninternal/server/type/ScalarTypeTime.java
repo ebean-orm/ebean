@@ -58,7 +58,6 @@ final class ScalarTypeTime extends ScalarTypeBase<Time> {
     return Time.valueOf(value);
   }
 
-  @Override
   public Time convertFromMillis(long systemTimeMillis) {
     return new Time(systemTimeMillis);
   }

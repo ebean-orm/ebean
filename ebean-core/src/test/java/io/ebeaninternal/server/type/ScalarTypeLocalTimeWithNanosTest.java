@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.text.TextException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -9,7 +8,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalTime;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ScalarTypeLocalTimeWithNanosTest {
 
@@ -72,11 +72,6 @@ public class ScalarTypeLocalTimeWithNanosTest {
     LocalTime localTime = LocalTime.of(9, 23, 45);
     LocalTime val1 = type.parse("09:23:45");
     assertEquals(localTime, val1);
-  }
-
-  @Test
-  public void testConvertFromMillis() {
-    assertThrows(TextException.class, () -> type.convertFromMillis(1234));
   }
 
   @Test
