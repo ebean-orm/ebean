@@ -5,7 +5,6 @@ import io.avaje.lang.Nullable;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.plugin.Property;
-import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
 import javax.persistence.OptimisticLockException;

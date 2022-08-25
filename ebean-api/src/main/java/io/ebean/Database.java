@@ -9,7 +9,6 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
-import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
 import javax.persistence.OptimisticLockException;

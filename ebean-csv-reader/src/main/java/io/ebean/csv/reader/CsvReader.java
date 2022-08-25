@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.text.csv;
+package io.ebean.csv.reader;
 
 import io.ebean.Database;
 import io.ebean.bean.EntityBean;
@@ -6,9 +6,6 @@ import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.text.StringParser;
 import io.ebean.text.TextException;
-import io.ebean.text.csv.CsvCallback;
-import io.ebean.text.csv.CsvReader;
-import io.ebean.text.csv.DefaultCsvCallback;
 
 import java.io.Reader;
 import java.sql.Types;
@@ -24,7 +21,7 @@ import java.util.Locale;
 /**
  * Implementation of the CsvReader
  */
-public class TCsvReader<T> {//implements CsvReader<T> {
+public class CsvReader<T> {
 
   private static final TimeStringParser TIME_PARSER = new TimeStringParser();
 
@@ -52,9 +49,9 @@ public class TCsvReader<T> {//implements CsvReader<T> {
 
   private boolean addPropertiesFromHeader;
 
-  public TCsvReader(Database server, BeanType<T> descriptor) {
+  public CsvReader(Database server, Class<T> type) {
     this.server = server;
-    this.descriptor = descriptor;
+    this.descriptor = server.pluginApi().beanType(type);
   }
 
   ////@Override
@@ -229,7 +226,6 @@ public class TCsvReader<T> {//implements CsvReader<T> {
   private void addPropertiesFromHeader(String[] line) {
     for (String aLine : line) {
       ExpressionPath elProp = descriptor.expressionPath(aLine);
-      //ElPropertyValue elProp = descriptor.elGetValue(aLine);
       if (elProp == null) {
         throw new TextException("Property [" + aLine + "] not found");
       }

@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.text.csv;
+package io.ebean.csv.reader;
 
 // Original name: au.com.bytecode.opencsv.CSVReader
 // rbygrave: Made some Java Generics tweaks to remove warnings

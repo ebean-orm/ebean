@@ -15,7 +15,6 @@ import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
-import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;

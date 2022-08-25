@@ -21,7 +21,6 @@ import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
-import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.SpiQuery.Type;

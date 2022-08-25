@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.text.csv;
+package io.ebean.csv.reader;
 
 import org.junit.jupiter.api.Test;
 

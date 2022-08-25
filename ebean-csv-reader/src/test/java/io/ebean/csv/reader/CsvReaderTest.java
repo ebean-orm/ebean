@@ -1,8 +1,7 @@
-package io.ebeaninternal.server.text.csv;
+package io.ebean.csv.reader;
 
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.plugin.BeanType;
 import io.ebean.util.IOUtils;
 import org.example.Country;
 import org.example.Customer;
@@ -12,7 +11,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.Locale;
 
-class TestCsvReader {
+class CsvReaderTest {
 
   @Test
   void test() throws Exception {
@@ -29,8 +28,7 @@ class TestCsvReader {
     try (Reader reader = IOUtils.newReader(resource.openStream())) {
 
       Database database = DB.getDefault();
-      BeanType<Customer> type = database.pluginApi().beanType(Customer.class);
-      TCsvReader<Customer> csvReader = new TCsvReader<>(database, type);
+      CsvReader<Customer> csvReader = new CsvReader<>(database, Customer.class);
       //CsvReader<Customer> csvReader = DB.getDefault().createCsvReader(Customer.class);
 
       csvReader.setPersistBatchSize(2);

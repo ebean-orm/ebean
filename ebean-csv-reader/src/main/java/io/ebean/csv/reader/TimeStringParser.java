@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.text.csv;
+package io.ebean.csv.reader;
 
 import io.ebean.text.StringParser;
 
