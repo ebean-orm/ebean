@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.text.TextException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -69,11 +68,6 @@ class ScalarTypeYearTest {
   void testParse() {
     Year year = type.parse("2013");
     assertEquals(Year.of(2013), year);
-  }
-
-  @Test
-  void testIsDateTimeCapable() {
-    assertFalse(type.isDateTimeCapable());
   }
 
   @Test

@@ -92,11 +92,6 @@ final class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public Integer jsonRead(JsonParser parser) throws IOException {
     return parser.getIntValue();
   }

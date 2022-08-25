@@ -76,11 +76,6 @@ class ScalarTypeDurationWithNanosTest {
   }
 
   @Test
-  void testIsDateTimeCapable() {
-    assertFalse(type.isDateTimeCapable());
-  }
-
-  @Test
   void testConvertFromMillis() {
     assertThrows(UnsupportedOperationException.class, () -> type.convertFromMillis(1000));
   }

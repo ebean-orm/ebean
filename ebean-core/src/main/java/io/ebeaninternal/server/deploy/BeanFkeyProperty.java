@@ -181,11 +181,6 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public int jdbcType() {
     return 0;
   }

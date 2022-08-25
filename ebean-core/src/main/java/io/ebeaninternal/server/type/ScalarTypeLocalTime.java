@@ -87,11 +87,6 @@ class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public LocalTime convertFromMillis(long systemTimeMillis) {
     throw new TextException("Not Supported");
   }

@@ -6,7 +6,8 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.time.MonthDay;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ScalarTypeMonthDayTest {
 
@@ -46,11 +47,6 @@ public class ScalarTypeMonthDayTest {
 
     assertEquals("--04-29", val1);
     assertEquals(value, monthDay);
-  }
-
-  @Test
-  public void testIsDateTimeCapable() {
-    assertFalse(type.isDateTimeCapable());
   }
 
   @Test

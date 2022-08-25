@@ -161,11 +161,6 @@ abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public T readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

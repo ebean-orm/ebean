@@ -46,12 +46,6 @@ public interface ExpressionPath {
   Object parseDateTime(long systemTimeMillis);
 
   /**
-   * Return true if the last type is "DateTime capable" - can support
-   * {@link #parseDateTime(long)}.
-   */
-  boolean isDateTimeCapable();
-
-  /**
    * Return the underlying JDBC type or 0 if this is not a scalar type.
    */
   int jdbcType();

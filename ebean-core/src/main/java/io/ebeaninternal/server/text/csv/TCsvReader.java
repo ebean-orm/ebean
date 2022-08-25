@@ -123,11 +123,7 @@ public class TCsvReader<T> implements CsvReader<T> {
 
   @Override
   public void addDateTime(String propertyName, String dateTimeFormat, Locale locale) {
-
     ExpressionPath elProp = descriptor.expressionPath(propertyName);
-    if (!elProp.isDateTimeCapable()) {
-      throw new TextException("Property " + propertyName + " is not DateTime capable");
-    }
     if (dateTimeFormat == null) {
       dateTimeFormat = getDefaultDateTimeFormat(elProp.jdbcType());
     }

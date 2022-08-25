@@ -100,11 +100,6 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return scalarType.isDateTimeCapable();
-  }
-
-  @Override
   public boolean isJdbcNative() {
     return false;
   }

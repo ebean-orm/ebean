@@ -95,11 +95,6 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return wrapped.isDateTimeCapable();
-  }
-
-  @Override
   public boolean isJdbcNative() {
     return false;
   }
