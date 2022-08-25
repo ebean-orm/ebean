@@ -229,7 +229,7 @@ public final class ElPropertyChain implements ElPropertyValue {
 
   @Override
   public int jdbcType() {
-    return scalarType == null ? 0 : scalarType.getJdbcType();
+    return scalarType == null ? 0 : scalarType.jdbcType();
   }
 
   @Override

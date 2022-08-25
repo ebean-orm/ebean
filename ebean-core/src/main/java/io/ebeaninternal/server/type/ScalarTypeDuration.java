@@ -104,7 +104,7 @@ class ScalarTypeDuration extends ScalarTypeBase<Duration> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.KEYWORD;
   }
 

@@ -102,7 +102,7 @@ final class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.INTEGER;
   }
 

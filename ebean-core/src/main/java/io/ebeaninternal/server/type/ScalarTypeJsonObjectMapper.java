@@ -70,12 +70,12 @@ final class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public boolean isMutable() {
+    public boolean mutable() {
       return true;
     }
 
     @Override
-    public boolean isJsonMapper() {
+    public boolean jsonMapper() {
       return true;
     }
 
@@ -198,7 +198,7 @@ final class ScalarTypeJsonObjectMapper {
     }
 
     @Override
-    public final DocPropertyType getDocType() {
+    public final DocPropertyType docType() {
       return docType;
     }
 

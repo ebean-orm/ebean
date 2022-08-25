@@ -16,13 +16,13 @@ public class DefaultTypeFactoryTest {
   public void testCreateBoolean() throws Exception {
 
     ScalarType<Boolean> stIntBoolean = defaultTypeFactory.createBoolean("0", "1");
-    assertEquals(Types.INTEGER, stIntBoolean.getJdbcType());
+    assertEquals(Types.INTEGER, stIntBoolean.jdbcType());
 
     stIntBoolean = defaultTypeFactory.createBoolean("1", "2");
-    assertEquals(Types.INTEGER, stIntBoolean.getJdbcType());
+    assertEquals(Types.INTEGER, stIntBoolean.jdbcType());
 
     ScalarType<Boolean> stStringBoolean = defaultTypeFactory.createBoolean("Y", "N");
-    assertEquals(Types.VARCHAR, stStringBoolean.getJdbcType());
+    assertEquals(Types.VARCHAR, stStringBoolean.jdbcType());
 
   }
 }

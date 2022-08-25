@@ -12,7 +12,7 @@ final class ScalarTypePeriod extends ScalarTypeBaseVarchar<Period> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 20;
   }
 

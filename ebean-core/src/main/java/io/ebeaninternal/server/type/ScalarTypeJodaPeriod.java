@@ -12,7 +12,7 @@ final class ScalarTypeJodaPeriod extends ScalarTypeBaseVarchar<Period> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 50;
   }
 

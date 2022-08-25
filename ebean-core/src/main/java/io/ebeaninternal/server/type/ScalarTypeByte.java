@@ -25,7 +25,7 @@ final class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public boolean isBinaryType() {
+  public boolean binary() {
     return true;
   }
 
@@ -71,7 +71,7 @@ final class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.BINARY;
   }
 

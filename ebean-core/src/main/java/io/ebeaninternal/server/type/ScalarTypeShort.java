@@ -87,7 +87,7 @@ final class ScalarTypeShort extends ScalarTypeBase<Short> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.SHORT;
   }
 

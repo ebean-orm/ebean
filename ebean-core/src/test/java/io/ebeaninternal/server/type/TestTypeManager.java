@@ -100,9 +100,9 @@ class TestTypeManager extends BaseTest {
     DefaultTypeManager typeManager = createTypeManager();
 
     ScalarType<?> scalarType = typeManager.getScalarType(Money.class);
-    assertEquals(Types.DECIMAL, scalarType.getJdbcType());
-    assertFalse(scalarType.isJdbcNative());
-    assertEquals(Money.class, scalarType.getType());
+    assertEquals(Types.DECIMAL, scalarType.jdbcType());
+    assertFalse(scalarType.jdbcNative());
+    assertEquals(Money.class, scalarType.type());
   }
 
   @Test

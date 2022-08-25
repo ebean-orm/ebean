@@ -44,7 +44,7 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
   public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
-    String arrayType = getArrayType(type.getJdbcType());
+    String arrayType = getArrayType(type.jdbcType());
     if (arrayType == null) {
       super.bindMultiValues(dataBind, values, type, bindOne);
     } else {

@@ -91,7 +91,7 @@ abstract class ScalarTypeStringBase extends ScalarTypeBase<String> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.TEXT;
   }
 }

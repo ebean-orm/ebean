@@ -11,7 +11,7 @@ public class ScalarTypeJodaPeriodTest {
 
   @Test
   public void getLength() {
-    assertThat(scalarType.getLength()).isEqualTo(50);
+    assertThat(scalarType.length()).isEqualTo(50);
   }
 
   @Test

@@ -39,7 +39,7 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
 
   @Override
   public String toString() {
-    return "ScalarTypeWrapper " + wrapperType + " to " + scalarType.getType();
+    return "ScalarTypeWrapper " + wrapperType + " to " + scalarType.type();
   }
 
   @Override
@@ -48,13 +48,13 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public boolean isBinaryType() {
-    return scalarType.isBinaryType();
+  public boolean binary() {
+    return scalarType.binary();
   }
 
   @Override
-  public boolean isMutable() {
-    return scalarType.isMutable();
+  public boolean mutable() {
+    return scalarType.mutable();
   }
 
   @Override
@@ -85,22 +85,22 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public int getJdbcType() {
-    return scalarType.getJdbcType();
+  public int jdbcType() {
+    return scalarType.jdbcType();
   }
 
   @Override
-  public int getLength() {
-    return scalarType.getLength();
+  public int length() {
+    return scalarType.length();
   }
 
   @Override
-  public Class<B> getType() {
+  public Class<B> type() {
     return wrapperType;
   }
 
   @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     return false;
   }
 
@@ -154,7 +154,7 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
     if (value == null) {
       return nullValue;
     }
-    if (getType().isAssignableFrom(value.getClass())) {
+    if (type().isAssignableFrom(value.getClass())) {
       return (B) value;
     }
     if (value instanceof String) {
@@ -188,8 +188,8 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
-    return scalarType.getDocType();
+  public DocPropertyType docType() {
+    return scalarType.docType();
   }
 
 }

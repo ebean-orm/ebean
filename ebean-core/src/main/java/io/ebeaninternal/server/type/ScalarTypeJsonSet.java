@@ -116,7 +116,7 @@ final class ScalarTypeJsonSet {
     }
 
     @Override
-    public final boolean isJsonMapper() {
+    public final boolean jsonMapper() {
       return keepSource;
     }
 

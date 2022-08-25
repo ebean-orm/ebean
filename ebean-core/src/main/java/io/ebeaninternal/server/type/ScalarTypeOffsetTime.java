@@ -12,7 +12,7 @@ final class ScalarTypeOffsetTime extends ScalarTypeBaseVarchar<OffsetTime> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 25;
   }
 

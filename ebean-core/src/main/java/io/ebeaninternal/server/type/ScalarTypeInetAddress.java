@@ -14,7 +14,7 @@ final class ScalarTypeInetAddress extends ScalarTypeBaseVarchar<InetAddress> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 50;
   }
 

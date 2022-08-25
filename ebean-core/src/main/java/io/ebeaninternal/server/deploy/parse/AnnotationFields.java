@@ -386,7 +386,7 @@ final class AnnotationFields extends AnnotationParser {
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {
     util.checkEncryptKeyManagerDefined(prop.getFullBeanName());
     ScalarType<?> st = prop.getScalarType();
-    if (byte[].class.equals(st.getType())) {
+    if (byte[].class.equals(st.type())) {
       // Always using Java client encryption rather than DB for encryption
       // of binary data (partially as this is not supported on all db's etc)
       // This could be reviewed at a later stage.
@@ -401,7 +401,7 @@ final class AnnotationFields extends AnnotationParser {
       DbEncrypt dbEncrypt = util.getDbPlatform().dbEncrypt();
       if (dbEncrypt != null) {
         // check if we have a DB encryption function for this type
-        int jdbcType = prop.getScalarType().getJdbcType();
+        int jdbcType = prop.getScalarType().jdbcType();
         DbEncryptFunction dbEncryptFunction = dbEncrypt.getDbEncryptFunction(jdbcType);
         if (dbEncryptFunction != null) {
           // Use DB functions to encrypt and decrypt

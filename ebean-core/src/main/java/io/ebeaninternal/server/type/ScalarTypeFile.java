@@ -43,7 +43,7 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public boolean isBinaryType() {
+  public boolean binary() {
     return true;
   }
 
@@ -117,7 +117,7 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.BINARY;
   }
 

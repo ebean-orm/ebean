@@ -91,7 +91,7 @@ final class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.FLOAT;
   }
 

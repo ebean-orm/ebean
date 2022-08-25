@@ -34,7 +34,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   /**
    * Return true for types that do mutation detection based on json content.
    */
-  default boolean isJsonMapper() {
+  default boolean jsonMapper() {
     return false;
   }
 
@@ -42,14 +42,14 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * Return true if this is a binary type and can not support parse() and format() from/to string.
    * This allows Ebean to optimise marshalling types to string.
    */
-  default boolean isBinaryType() {
+  default boolean binary() {
     return false;
   }
 
   /**
    * Return true if this is a mutable scalar type (like hstore).
    */
-  default boolean isMutable() {
+  default boolean mutable() {
     return false;
   }
 
@@ -67,7 +67,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * If a BeanProperty has no explicit length defined then this length should
    * be assigned.
    */
-  default int getLength() {
+  default int length() {
     return 0;
   }
 
@@ -77,7 +77,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * If it is native to JDBC then its values/instances do not need to be
    * converted to and from an associated JDBC type.
    */
-  boolean isJdbcNative();
+  boolean jdbcNative();
 
   /**
    * Return the type as per java.sql.Types that this maps to.
@@ -85,14 +85,14 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * This type should be consistent with the toJdbcType() method in converting
    * the type to the appropriate type for binding to preparedStatements.
    */
-  int getJdbcType();
+  int jdbcType();
 
   /**
    * Return the type that matches the bean property type.
    * <p>
    * This represents the 'logical' type rather than the JDBC type this maps to.
    */
-  Class<T> getType();
+  Class<T> type();
 
   /**
    * Read the value from the resultSet and convert if necessary to the logical
@@ -161,7 +161,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   /**
    * Return the type this maps to for JSON document stores.
    */
-  DocPropertyType getDocType();
+  DocPropertyType docType();
 
   /**
    * Convert the value into a long version value.

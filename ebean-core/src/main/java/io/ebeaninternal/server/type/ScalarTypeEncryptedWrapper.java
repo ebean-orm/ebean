@@ -31,13 +31,13 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public boolean isBinaryType() {
-    return wrapped.isBinaryType();
+  public boolean binary() {
+    return wrapped.binary();
   }
 
   @Override
-  public boolean isMutable() {
-    return wrapped.isMutable();
+  public boolean mutable() {
+    return wrapped.mutable();
   }
 
   @Override
@@ -80,22 +80,22 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public int getJdbcType() {
-    return byteArrayType.getJdbcType();
+  public int jdbcType() {
+    return byteArrayType.jdbcType();
   }
 
   @Override
-  public int getLength() {
-    return byteArrayType.getLength();
+  public int length() {
+    return byteArrayType.length();
   }
 
   @Override
-  public Class<T> getType() {
-    return wrapped.getType();
+  public Class<T> type() {
+    return wrapped.type();
   }
 
   @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     return false;
   }
 
@@ -146,8 +146,8 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public DocPropertyType getDocType() {
-    return wrapped.getDocType();
+  public DocPropertyType docType() {
+    return wrapped.docType();
   }
 
 }

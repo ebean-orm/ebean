@@ -101,7 +101,7 @@ final class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.LONG;
   }
 

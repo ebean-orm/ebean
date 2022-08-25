@@ -18,7 +18,7 @@ public final class ScalarTypeUUIDBinary extends ScalarTypeUUIDBase {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 16;
   }
 

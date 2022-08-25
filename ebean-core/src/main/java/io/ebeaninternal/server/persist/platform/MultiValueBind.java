@@ -44,7 +44,7 @@ public class MultiValueBind {
    */
   public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
     for (Object value : values) {
-      if (!type.isJdbcNative()) {
+      if (!type.jdbcNative()) {
         value = type.toJdbcType(value);
       }
       bindOne.bind(value);

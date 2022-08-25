@@ -145,7 +145,7 @@ public final class Binder {
   public boolean isMultiValueSupported(Class<?> cls) {
     try {
       ScalarType<?> scalarType = getScalarType(cls);
-      return multiValueBind.isTypeSupported(scalarType.getJdbcType());
+      return multiValueBind.isTypeSupported(scalarType.jdbcType());
     } catch (PersistenceException e) {
       return false;
     }
@@ -173,18 +173,18 @@ public final class Binder {
       Collection<?> values = wrapper.getValues();
 
       ScalarType<?> type = getScalarType(wrapper.getType());
-      int dbType = type.getJdbcType();
+      int dbType = type.jdbcType();
       // let the multiValueBind decide what to do with the value
       multiValueBind.bindMultiValues(dataBind, values, type, one -> bindObject(dataBind, one, dbType));
       return values;
 
     } else {
       ScalarType<?> type = getScalarType(value.getClass());
-      if (!type.isJdbcNative()) {
+      if (!type.jdbcNative()) {
         // convert to a JDBC native type
         value = type.toJdbcType(value);
       }
-      bindObject(dataBind, value, type.getJdbcType());
+      bindObject(dataBind, value, type.jdbcType());
       return value;
     }
   }

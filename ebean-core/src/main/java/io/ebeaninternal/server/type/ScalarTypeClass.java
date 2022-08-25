@@ -13,7 +13,7 @@ final class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 255;
   }
 

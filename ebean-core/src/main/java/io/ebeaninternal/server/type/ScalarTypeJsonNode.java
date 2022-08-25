@@ -100,7 +100,7 @@ abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
    * Map is a mutable type. Use the isDirty() method to check for dirty state.
    */
   @Override
-  public boolean isMutable() {
+  public boolean mutable() {
     return true;
   }
 
@@ -196,7 +196,7 @@ abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.OBJECT;
   }
 

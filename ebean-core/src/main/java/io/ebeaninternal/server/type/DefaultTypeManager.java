@@ -215,14 +215,14 @@ public final class DefaultTypeManager implements TypeManager {
    */
   @Override
   public void add(ScalarType<?> scalarType) {
-    typeMap.put(scalarType.getType(), scalarType);
+    typeMap.put(scalarType.type(), scalarType);
     logAdd(scalarType);
   }
 
   private void logAdd(ScalarType<?> scalarType) {
     if (log.isLoggable(TRACE)) {
       String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
-      msg += " for [" + scalarType.getType().getName() + "]";
+      msg += " for [" + scalarType.type().getName() + "]";
       log.log(TRACE, msg);
     }
   }
@@ -410,7 +410,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (genericType instanceof Class<?>) {
       ScalarType<?> found = getScalarType((Class<?>)genericType);
       if (found != null) {
-        return found.getDocType();
+        return found.docType();
       }
     }
     return DocPropertyType.OBJECT;
@@ -468,7 +468,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     scalarType = getScalarType(type);
     if (scalarType != null) {
-      if (jdbcType == 0 || scalarType.getJdbcType() == jdbcType) {
+      if (jdbcType == 0 || scalarType.jdbcType() == jdbcType) {
         // matching type
         return scalarType;
       }
@@ -851,7 +851,7 @@ public final class DefaultTypeManager implements TypeManager {
     databasePlatform.setDbFalseLiteral(booleanType.getDbFalseLiteral());
     // always register Types.BOOLEAN to our boolean type
     nativeMap.put(Types.BOOLEAN, booleanType);
-    if (booleanType.getJdbcType() == Types.BIT) {
+    if (booleanType.jdbcType() == Types.BIT) {
       // for MapBeans ... BIT types are assumed to be booleans
       nativeMap.put(Types.BIT, booleanType);
     }

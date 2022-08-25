@@ -79,7 +79,7 @@ abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements Scalar
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.UUID;
   }
 }

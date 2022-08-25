@@ -27,7 +27,7 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public boolean isBinaryType() {
+  public boolean binary() {
     return true;
   }
 
@@ -38,23 +38,23 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public int getJdbcType() {
-    return baseType.getJdbcType();
+  public int jdbcType() {
+    return baseType.jdbcType();
   }
 
   @Override
-  public int getLength() {
-    return baseType.getLength();
+  public int length() {
+    return baseType.length();
   }
 
   @Override
-  public Class<byte[]> getType() {
+  public Class<byte[]> type() {
     return byte[].class;
   }
 
   @Override
-  public boolean isJdbcNative() {
-    return baseType.isJdbcNative();
+  public boolean jdbcNative() {
+    return baseType.jdbcNative();
   }
 
   @Override
@@ -75,8 +75,8 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
-    return baseType.getDocType();
+  public DocPropertyType docType() {
+    return baseType.docType();
   }
 
   @Override
