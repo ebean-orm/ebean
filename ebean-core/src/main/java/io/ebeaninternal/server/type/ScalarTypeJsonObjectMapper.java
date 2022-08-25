@@ -8,10 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
 import io.ebean.annotation.MutationDetection;
-import io.ebean.core.type.DataBinder;
-import io.ebean.core.type.DataReader;
-import io.ebean.core.type.DocPropertyType;
-import io.ebean.core.type.ScalarType;
+import io.ebean.core.type.*;
 import io.ebean.text.TextException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 

@@ -508,7 +508,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public void loadIgnore(DbReadContext ctx) {
-    scalarType.loadIgnore(ctx.dataReader());
+    ctx.dataReader().incrementPos(1);
   }
 
   @Override

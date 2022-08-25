@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 import io.ebean.text.TextException;
 import io.ebeaninternal.api.CoreLog;
 

@@ -44,11 +44,6 @@ class ScalarTypeNotFound implements ScalarType<Void> {
   }
 
   @Override
-  public void loadIgnore(DataReader reader) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public void bind(DataBinder binder, Void value) throws SQLException {
     throw new UnsupportedOperationException();
   }
@@ -65,11 +60,6 @@ class ScalarTypeNotFound implements ScalarType<Void> {
 
   @Override
   public String formatValue(Void value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String format(Object value) {
     throw new UnsupportedOperationException();
   }
 

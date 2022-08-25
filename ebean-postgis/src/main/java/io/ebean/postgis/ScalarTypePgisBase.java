@@ -87,11 +87,6 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
   }
 
   @Override
-  public void loadIgnore(DataReader reader) {
-    reader.incrementPos(1);
-  }
-
-  @Override
   public Object toJdbcType(Object value) {
     return null;
   }
@@ -103,11 +98,6 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
 
   @Override
   public String formatValue(T value) {
-    return null;
-  }
-
-  @Override
-  public String format(Object value) {
     return null;
   }
 

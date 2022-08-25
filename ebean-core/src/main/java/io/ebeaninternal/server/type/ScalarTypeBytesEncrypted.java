@@ -58,11 +58,6 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public void loadIgnore(DataReader reader) {
-    baseType.loadIgnore(reader);
-  }
-
-  @Override
   public void jsonWrite(JsonGenerator writer, byte[] value) throws IOException {
     writer.writeBinary(value);
   }
@@ -77,11 +72,6 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   @Override
   public DocPropertyType docType() {
     return baseType.docType();
-  }
-
-  @Override
-  public String format(Object v) {
-    throw new RuntimeException("Not used");
   }
 
   @Override

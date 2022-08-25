@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.io.DataInput;
