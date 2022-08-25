@@ -134,7 +134,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.encryptKeyManager = this.config.getEncryptKeyManager();
     this.databasePlatform = this.config.getDatabasePlatform();
     this.multiValueBind = config.getMultiValueBind();
-    this.idBinderFactory = new IdBinderFactory(databasePlatform.isIdInExpandedForm(), multiValueBind);
+    this.idBinderFactory = new IdBinderFactory(databasePlatform.idInExpandedForm(), multiValueBind);
     this.queryPlanTTLSeconds = this.config.getQueryPlanTTLSeconds();
     this.asOfViewSuffix = asOfViewSuffix(databasePlatform, this.config);
     String versionsBetweenSuffix = versionsBetweenSuffix(databasePlatform, this.config);
@@ -142,7 +142,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
     this.namingConvention = this.config.getNamingConvention();
-    this.dbIdentity = config.getDatabasePlatform().getDbIdentity();
+    this.dbIdentity = config.getDatabasePlatform().dbIdentity();
     this.deplyInherit = config.getDeployInherit();
     this.deployUtil = config.getDeployUtil();
     this.typeManager = deployUtil.getTypeManager();
@@ -196,7 +196,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * Return the AsOfViewSuffix based on the DbHistorySupport.
    */
   private String asOfViewSuffix(DatabasePlatform databasePlatform, DatabaseConfig serverConfig) {
-    DbHistorySupport historySupport = databasePlatform.getHistorySupport();
+    DbHistorySupport historySupport = databasePlatform.historySupport();
     // with historySupport returns a simple view suffix or the sql2011 as of timestamp suffix
     return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(serverConfig.getAsOfViewSuffix());
   }
@@ -205,7 +205,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * Return the versions between timestamp suffix based on the DbHistorySupport.
    */
   private String versionsBetweenSuffix(DatabasePlatform databasePlatform, DatabaseConfig serverConfig) {
-    DbHistorySupport historySupport = databasePlatform.getHistorySupport();
+    DbHistorySupport historySupport = databasePlatform.historySupport();
     // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
     return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
   }
@@ -1251,7 +1251,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
         String primaryKeyColumn = desc.getSinglePrimaryKeyColumn();
         seqName = namingConvention.getSequenceName(desc.getBaseTable(), primaryKeyColumn);
       }
-      int stepSize = desc.setIdentitySequenceBatchMode(databasePlatform.isSequenceBatchMode());
+      int stepSize = desc.setIdentitySequenceBatchMode(databasePlatform.sequenceBatchMode());
       desc.setIdGenerator(createSequenceIdGenerator(seqName, stepSize));
     }
   }

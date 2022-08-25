@@ -50,7 +50,7 @@ final class DefaultTypeFactory {
       return createBoolean(trueValue, falseValue);
     }
     // determine based on database platform configuration
-    int booleanDbType = config.getDatabasePlatform().getBooleanDbType();
+    int booleanDbType = config.getDatabasePlatform().booleanDbType();
     if (booleanDbType == Types.BIT) {
       return new ScalarTypeBoolean.BitBoolean();
     }

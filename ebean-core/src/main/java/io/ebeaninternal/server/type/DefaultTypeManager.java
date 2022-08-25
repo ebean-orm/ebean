@@ -167,7 +167,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private PlatformArrayTypeFactory arrayTypeListFactory(DatabasePlatform databasePlatform) {
-    if (databasePlatform.isNativeArrayType()) {
+    if (databasePlatform.nativeArrayType()) {
       return ScalarTypeArrayList.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArrayListH2.factory();
@@ -176,7 +176,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private PlatformArrayTypeFactory arrayTypeSetFactory(DatabasePlatform databasePlatform) {
-    if (databasePlatform.isNativeArrayType()) {
+    if (databasePlatform.nativeArrayType()) {
       return ScalarTypeArraySet.factory();
     } else if (databasePlatform.isPlatform(Platform.H2)) {
       return ScalarTypeArraySetH2.factory();
@@ -834,8 +834,8 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private void initialiseStandard(DatabaseConfig config) {
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
-    int platformClobType = databasePlatform.getClobDbType();
-    int platformBlobType = databasePlatform.getBlobDbType();
+    int platformClobType = databasePlatform.clobDbType();
+    int platformBlobType = databasePlatform.blobDbType();
 
     nativeMap.put(DbPlatformType.HSTORE, hstoreType);
 
@@ -857,7 +857,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
 
     PlatformConfig.DbUuid dbUuid = config.getPlatformConfig().getDbUuid();
-    if (offlineMigrationGeneration || (databasePlatform.isNativeUuidType() && dbUuid.useNativeType())) {
+    if (offlineMigrationGeneration || (databasePlatform.nativeUuidType() && dbUuid.useNativeType())) {
       addType(UUID.class, new ScalarTypeUUIDNative());
     } else {
       // Store UUID as binary(16) or varchar(40)

@@ -398,7 +398,7 @@ final class AnnotationFields extends AnnotationParser {
       return;
     }
     if (dbEncString) {
-      DbEncrypt dbEncrypt = util.getDbPlatform().getDbEncrypt();
+      DbEncrypt dbEncrypt = util.getDbPlatform().dbEncrypt();
       if (dbEncrypt != null) {
         // check if we have a DB encryption function for this type
         int jdbcType = prop.getScalarType().getJdbcType();

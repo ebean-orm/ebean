@@ -209,7 +209,7 @@ public class DefaultDbMigration implements DbMigration {
   public void setPlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
     if (!online) {
-      DbOffline.setPlatform(databasePlatform.getPlatform());
+      DbOffline.setPlatform(databasePlatform.platform());
     }
   }
 
@@ -388,8 +388,8 @@ public class DefaultDbMigration implements DbMigration {
     if (extraDdl != null) {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
-        if (!script.isDrop() && matchPlatform(dbPlatform.getPlatform(), script.getPlatforms())) {
-          if (!checkSkip || dbPlatform.isUseMigrationStoredProcedures()) {
+        if (!script.isDrop() && matchPlatform(dbPlatform.platform(), script.getPlatforms())) {
+          if (!checkSkip || dbPlatform.useMigrationStoredProcedures()) {
             writeExtraDdl(migrationDir, script);
           }
         }

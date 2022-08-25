@@ -13,7 +13,7 @@ public class PlatformDdlBuilder {
    */
   public static PlatformDdl create(DatabasePlatform platform) {
 
-    switch (platform.getPlatform()) {
+    switch (platform.platform()) {
       case H2:
         return new H2Ddl(platform);
       case DB2:

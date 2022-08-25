@@ -288,7 +288,7 @@ public class DatabasePlatform {
   /**
    * Return the platform key.
    */
-  public Platform getPlatform() {
+  public Platform platform() {
     return platform;
   }
 
@@ -298,14 +298,14 @@ public class DatabasePlatform {
    * "generic" is returned when no specific database platform has been set or found.
    * </p>
    */
-  public String getName() {
+  public String name() {
     return platform.name().toLowerCase();
   }
 
   /**
    * Return true if we are using Sequence batch mode rather than STEP.
    */
-  public boolean isSequenceBatchMode() {
+  public boolean sequenceBatchMode() {
     return sequenceBatchMode;
   }
 
@@ -319,52 +319,52 @@ public class DatabasePlatform {
   /**
    * Return true if this database platform supports native ILIKE expression.
    */
-  public boolean isSupportsNativeIlike() {
+  public boolean supportsNativeIlike() {
     return supportsNativeIlike;
   }
 
   /**
    * Return true if the platform supports delete statements with table alias.
    */
-  public boolean isSupportsDeleteTableAlias() {
+  public boolean supportsDeleteTableAlias() {
     return supportsDeleteTableAlias;
   }
 
   /**
-   * Return true if the collation is case sensitive.
+   * Return true if the collation is case-sensitive.
    * <p>
    * This is expected to be used for testing only.
    * </p>
    */
-  public boolean isCaseSensitiveCollation() {
+  public boolean caseSensitiveCollation() {
     return caseSensitiveCollation;
   }
 
   /**
    * Return true if the platform supports SavepointId values.
    */
-  public boolean isSupportsSavepointId() {
+  public boolean supportsSavepointId() {
     return supportsSavepointId;
   }
 
   /**
    * Return true if migrations should use stored procedures.
    */
-  public boolean isUseMigrationStoredProcedures() {
+  public boolean useMigrationStoredProcedures() {
     return useMigrationStoredProcedures;
   }
 
   /**
    * Return true if the platform supports LIMIT with sql update.
    */
-  public boolean isInlineSqlUpdateLimit() {
+  public boolean inlineSqlUpdateLimit() {
     return inlineSqlUpdateLimit;
   }
 
   /**
    * Return the maximum number of bind values this database platform allows or zero for no limit.
    */
-  public int getMaxInBinding() {
+  public int maxInBinding() {
     return maxInBinding;
   }
 
@@ -374,14 +374,14 @@ public class DatabasePlatform {
    * This is used when deriving names of intersection tables.
    * </p>
    */
-  public int getMaxTableNameLength() {
+  public int maxTableNameLength() {
     return maxTableNameLength;
   }
 
   /**
    * Return the maximum constraint name allowed for the platform.
    */
-  public int getMaxConstraintNameLength() {
+  public int maxConstraintNameLength() {
     return maxConstraintNameLength;
   }
 
@@ -426,7 +426,7 @@ public class DatabasePlatform {
   /**
    * Return the DbEncrypt handler for this DB platform.
    */
-  public DbEncrypt getDbEncrypt() {
+  public DbEncrypt dbEncrypt() {
     return dbEncrypt;
   }
 
@@ -440,7 +440,7 @@ public class DatabasePlatform {
   /**
    * Return the history support for this database platform.
    */
-  public DbHistorySupport getHistorySupport() {
+  public DbHistorySupport historySupport() {
     return historySupport;
   }
 
@@ -454,14 +454,14 @@ public class DatabasePlatform {
   /**
    * So no except for Postgres and CockroachDB.
    */
-  public boolean isNativeArrayType() {
+  public boolean nativeArrayType() {
     return false;
   }
 
   /**
    * Return true if the DB supports native UUID.
    */
-  public boolean isNativeUuidType() {
+  public boolean nativeUuidType() {
     return nativeUuidType;
   }
 
@@ -470,21 +470,21 @@ public class DatabasePlatform {
    *
    * @return the db type map
    */
-  public DbPlatformTypeMapping getDbTypeMap() {
+  public DbPlatformTypeMapping dbTypeMap() {
     return dbTypeMap;
   }
 
   /**
    * Return the mapping for DB column default values.
    */
-  public DbDefaultValue getDbDefaultValue() {
+  public DbDefaultValue dbDefaultValue() {
     return dbDefaultValue;
   }
 
   /**
    * Return the column alias prefix.
    */
-  public String getColumnAliasPrefix() {
+  public String columnAliasPrefix() {
     return columnAliasPrefix;
   }
 
@@ -498,21 +498,21 @@ public class DatabasePlatform {
   /**
    * Return the close quote for quoted identifiers.
    */
-  public String getCloseQuote() {
+  public String closeQuote() {
     return closeQuote;
   }
 
   /**
    * Return the open quote for quoted identifiers.
    */
-  public String getOpenQuote() {
+  public String openQuote() {
     return openQuote;
   }
 
   /**
    * Return the JDBC type used to store booleans.
    */
-  public int getBooleanDbType() {
+  public int booleanDbType() {
     return booleanDbType;
   }
 
@@ -523,7 +523,7 @@ public class DatabasePlatform {
    * example.
    * </p>
    */
-  public int getBlobDbType() {
+  public int blobDbType() {
     return blobDbType;
   }
 
@@ -533,7 +533,7 @@ public class DatabasePlatform {
    * This is typically Types.CLOB but for Postgres is Types.VARCHAR.
    * </p>
    */
-  public int getClobDbType() {
+  public int clobDbType() {
     return clobDbType;
   }
 
@@ -542,7 +542,7 @@ public class DatabasePlatform {
    * expanded form of (a=? and b=?) or (a=? and b=?) or ... rather than (a,b) in
    * ((?,?),(?,?),...);
    */
-  public boolean isIdInExpandedForm() {
+  public boolean idInExpandedForm() {
     return idInExpandedForm;
   }
 
@@ -553,7 +553,7 @@ public class DatabasePlatform {
    * This specifically is required for MySql when processing large results.
    * </p>
    */
-  public boolean isForwardOnlyHintOnFindIterate() {
+  public boolean forwardOnlyHintOnFindIterate() {
     return forwardOnlyHintOnFindIterate;
   }
 
@@ -571,7 +571,7 @@ public class DatabasePlatform {
    * This specifically is required for Hana which doesn't support CONCUR_UPDATABLE
    * </p>
    */
-  public boolean isSupportsResultSetConcurrencyModeUpdatable() {
+  public boolean supportsResultSetConcurrencyModeUpdatable() {
     return supportsResultSetConcurrencyModeUpdatable;
   }
 
@@ -591,7 +591,7 @@ public class DatabasePlatform {
    *
    * @return the db identity
    */
-  public DbIdentity getDbIdentity() {
+  public DbIdentity dbIdentity() {
     return dbIdentity;
   }
 
@@ -604,14 +604,14 @@ public class DatabasePlatform {
    *
    * @return the sql limiter
    */
-  public SqlLimiter getSqlLimiter() {
+  public SqlLimiter sqlLimiter() {
     return sqlLimiter;
   }
 
   /**
    * Return the BasicSqlLimiter for limit/offset of SqlQuery queries.
    */
-  public BasicSqlLimiter getBasicSqlLimiter() {
+  public BasicSqlLimiter basicSqlLimiter() {
     return basicSqlLimiter;
   }
 
@@ -680,14 +680,14 @@ public class DatabasePlatform {
   /**
    * Set to true if select count against anonymous view requires an alias.
    */
-  public boolean isSelectCountWithAlias() {
+  public boolean selectCountWithAlias() {
     return selectCountWithAlias;
   }
 
   /**
    * Return true if select count with subquery needs column alias (SQL Server).
    */
-  public boolean isSelectCountWithColumnAlias() {
+  public boolean selectCountWithColumnAlias() {
     return selectCountWithColumnAlias;
   }
 
@@ -718,14 +718,14 @@ public class DatabasePlatform {
    * <p>
    * This may include an escape clause to disable a default escape character.
    */
-  public String getLikeClause(boolean rawLikeExpression) {
+  public String likeClause(boolean rawLikeExpression) {
     return rawLikeExpression ? likeClauseRaw : likeClauseEscaped;
   }
 
   /**
    * Return the platform default JDBC batch mode for persist cascade.
    */
-  public PersistBatch getPersistBatchOnCascade() {
+  public PersistBatch persistBatchOnCascade() {
     return persistBatchOnCascade;
   }
 
@@ -767,19 +767,6 @@ public class DatabasePlatform {
       JdbcClose.close(schemas);
     }
     return false;
-  }
-
-  /**
-   * Return true if the table exists.
-   */
-  public boolean tableExists(Connection connection, String catalog, String schema, String table) throws SQLException {
-    DatabaseMetaData metaData = connection.getMetaData();
-    ResultSet tables = metaData.getTables(catalog, schema, table, null);
-    try {
-      return tables.next();
-    } finally {
-      JdbcClose.close(tables);
-    }
   }
 
   /**

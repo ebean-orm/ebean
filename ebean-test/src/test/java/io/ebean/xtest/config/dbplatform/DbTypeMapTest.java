@@ -20,7 +20,7 @@ class DbTypeMapTest {
   @Test
   void testLookupRender_given_postgresPlatformType() {
     PostgresPlatform pg = new PostgresPlatform();
-    DbPlatformTypeMapping dbTypeMap = pg.getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = pg.dbTypeMap();
 
     assertThat(dbTypeMap.lookup("clob", false).renderType(0, 0)).isEqualTo("text");
     assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("text");
@@ -36,7 +36,7 @@ class DbTypeMapTest {
 
   @Test
   void testLookupRender_given_mysql() {
-    DbPlatformTypeMapping dbTypeMap = new MySqlPlatform().getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = new MySqlPlatform().dbTypeMap();
 
     assertThat(dbTypeMap.lookup("clob", false).renderType(0, 0)).isEqualTo("longtext");
     assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("longtext");
@@ -52,7 +52,7 @@ class DbTypeMapTest {
 
   @Test
   void testLookupRender_given_sqlserver17() {
-    DbPlatformTypeMapping dbTypeMap = new SqlServer17Platform().getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = new SqlServer17Platform().dbTypeMap();
 
     assertThat(dbTypeMap.lookup("clob", false).renderType(0, 0)).isEqualTo("nvarchar(max)");
     assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("nvarchar(max)");
@@ -68,7 +68,7 @@ class DbTypeMapTest {
 
   @Test
   void testLookupRender_given_sqlserver16() {
-    DbPlatformTypeMapping dbTypeMap = new SqlServer16Platform().getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = new SqlServer16Platform().dbTypeMap();
 
     assertThat(dbTypeMap.lookup("clob", false).renderType(0, 0)).isEqualTo("text");
     assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("text");
@@ -84,7 +84,7 @@ class DbTypeMapTest {
 
   @Test
   void testLookupRender_given_oracle() {
-    DbPlatformTypeMapping dbTypeMap = new OraclePlatform().getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = new OraclePlatform().dbTypeMap();
 
     assertThat(dbTypeMap.lookup("clob", false).renderType(0, 0)).isEqualTo("clob");
     assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("clob");
@@ -100,7 +100,7 @@ class DbTypeMapTest {
 
   @Test
   void testLookupRender_given_h2() {
-    DbPlatformTypeMapping dbTypeMap = new H2Platform().getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = new H2Platform().dbTypeMap();
 
     assertThat(dbTypeMap.lookup("clob", false).renderType(0, 0)).isEqualTo("clob");
     assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("clob");
@@ -116,7 +116,7 @@ class DbTypeMapTest {
 
   @Test
   void testLookupRender_given_clickhouse() {
-    DbPlatformTypeMapping dbTypeMap = new ClickHousePlatform().getDbTypeMap();
+    DbPlatformTypeMapping dbTypeMap = new ClickHousePlatform().dbTypeMap();
 
     assertThat(dbTypeMap.lookup("clob", false).renderType(0, 0)).isEqualTo("String");
     assertThat(dbTypeMap.lookup("CLOB", false).renderType(0, 0)).isEqualTo("String");

@@ -2,7 +2,6 @@ package io.ebean.platform.mysql;
 
 import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.platform.mysql.MySqlPlatform;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,7 +14,7 @@ public class MySqlPlatformTest {
     MySqlPlatform platform = new MySqlPlatform();
     platform.configure(new PlatformConfig());
 
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar(40)");
   }
 
@@ -28,7 +27,7 @@ public class MySqlPlatformTest {
     config.setDbUuid(PlatformConfig.DbUuid.AUTO_BINARY);
     platform.configure(config);
 
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("binary(16)");
   }
 

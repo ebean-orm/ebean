@@ -108,7 +108,7 @@ public final class DefaultContainer implements SpiContainer {
         startServer(online, server);
       }
       DbOffline.reset();
-      log.log(INFO, "Started database[{0}] platform[{1}] in {2}ms", config.getName(), config.getDatabasePlatform().getPlatform(), System.currentTimeMillis() - start);
+      log.log(INFO, "Started database[{0}] platform[{1}] in {2}ms", config.getName(), config.getDatabasePlatform().platform(), System.currentTimeMillis() - start);
       return server;
     } finally {
       lock.unlock();

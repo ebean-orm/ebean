@@ -100,7 +100,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public String dbLikeClause(boolean rawLikeExpression) {
-    return server.databasePlatform().getLikeClause(rawLikeExpression);
+    return server.databasePlatform().likeClause(rawLikeExpression);
   }
 
   /**
@@ -761,7 +761,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return true if no MaxRows or use LIMIT in SQL update.
    */
   public boolean isInlineSqlUpdateLimit() {
-    return query.getMaxRows() < 1 || server.databasePlatform().isInlineSqlUpdateLimit();
+    return query.getMaxRows() < 1 || server.databasePlatform().inlineSqlUpdateLimit();
   }
 
   public int forwardOnlyFetchSize() {

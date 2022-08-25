@@ -97,9 +97,9 @@ public class PlatformDdl {
 
   public PlatformDdl(DatabasePlatform platform) {
     this.platform = platform;
-    this.dbIdentity = platform.getDbIdentity();
-    this.dbDefaultValue = platform.getDbDefaultValue();
-    this.typeConverter = new PlatformTypeConverter(platform.getDbTypeMap());
+    this.dbIdentity = platform.dbIdentity();
+    this.dbDefaultValue = platform.dbDefaultValue();
+    this.typeConverter = new PlatformTypeConverter(platform.dbTypeMap());
   }
 
   /**
@@ -719,11 +719,11 @@ public class PlatformDdl {
    * As 36^6 > 31^2, the resulting string is never longer as 6 chars.
    */
   protected String maxConstraintName(String name) {
-    if (name.length() > platform.getMaxConstraintNameLength()) {
+    if (name.length() > platform.maxConstraintNameLength()) {
       int hash = name.hashCode() & 0x7FFFFFFF;
       name = VowelRemover.trim(name, 4);
-      if (name.length() > platform.getMaxConstraintNameLength()) {
-        return name.substring(0, platform.getMaxConstraintNameLength() - 7) + "_" + Integer.toString(hash, 36);
+      if (name.length() > platform.maxConstraintNameLength()) {
+        return name.substring(0, platform.maxConstraintNameLength() - 7) + "_" + Integer.toString(hash, 36);
       }
     }
     return name;

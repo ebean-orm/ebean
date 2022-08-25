@@ -58,7 +58,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     this.createOnly = config.isDdlCreateOnly();
     this.dbSchema = config.getDbSchema();
     final DatabasePlatform databasePlatform = server.databasePlatform();
-    this.platform = databasePlatform.getPlatform();
+    this.platform = databasePlatform.platform();
     this.platformName = platform.base().name();
     if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
       log.log(WARNING, "DDL can't be run on startup with TenantMode " + config.getTenantMode());
@@ -66,7 +66,7 @@ public class DdlGenerator implements SpiDdlGenerator {
       this.useMigrationStoredProcedures = false;
     } else {
       this.runDdl = config.isDdlRun();
-      this.useMigrationStoredProcedures = config.getDatabasePlatform().isUseMigrationStoredProcedures();
+      this.useMigrationStoredProcedures = config.getDatabasePlatform().useMigrationStoredProcedures();
     }
     this.scriptTransform = createScriptTransform(config);
     this.baseDir = initBaseDir();

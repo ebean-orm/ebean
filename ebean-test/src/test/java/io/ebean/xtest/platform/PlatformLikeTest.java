@@ -46,22 +46,22 @@ class PlatformLikeTest {
   @Test
   void rawLike_escapeEmpty() {
     for (DatabasePlatform platform : List.of(h2, pg, pg9, yugabyte, cockroach, mysql, mysql55, maria)) {
-      assertThat(platform.getLikeClause(true)).isEqualTo("like ? escape''");
-      assertThat(platform.getLikeClause(false)).isEqualTo("like ? escape'|'");
+      assertThat(platform.likeClause(true)).isEqualTo("like ? escape''");
+      assertThat(platform.likeClause(false)).isEqualTo("like ? escape'|'");
     }
   }
 
   @Test
   void ansi_rawLike() {
     for (DatabasePlatform platform : List.of(sqlite, sqlAnywhere, sqlServer17, oracle, oracle11, oracle12, hana, db2Luw)) {
-      assertThat(platform.getLikeClause(true)).isEqualTo("like ?");
+      assertThat(platform.likeClause(true)).isEqualTo("like ?");
     }
   }
 
   @Test
   void escapeLike_noEscape() {
     for (DatabasePlatform platform : List.of(sqlite, sqlServer17)) {
-      assertThat(platform.getLikeClause(false)).isEqualTo("like ?");
+      assertThat(platform.likeClause(false)).isEqualTo("like ?");
     }
   }
 
@@ -69,7 +69,7 @@ class PlatformLikeTest {
   @Test
   void ansi_escapeLike() {
     for (DatabasePlatform platform : List.of(sqlAnywhere, oracle, oracle11, oracle12, hana, db2Luw)) {
-      assertThat(platform.getLikeClause(false)).isEqualTo("like ? escape'|'");
+      assertThat(platform.likeClause(false)).isEqualTo("like ? escape'|'");
     }
   }
 
