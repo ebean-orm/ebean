@@ -23,12 +23,14 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
       <version>13.8.2-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
       <version>13.8.2-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>

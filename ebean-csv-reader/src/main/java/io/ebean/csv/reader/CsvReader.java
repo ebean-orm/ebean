@@ -8,22 +8,14 @@ import io.ebean.text.StringParser;
 import io.ebean.text.TextException;
 
 import java.io.Reader;
-import java.sql.Types;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Implementation of the CsvReader
  */
 public class CsvReader<T> {
-
-  private static final TimeStringParser TIME_PARSER = new TimeStringParser();
 
   private final Database server;
 
@@ -37,11 +29,6 @@ public class CsvReader<T> {
 
   private int logInfoFrequency = 1000;
 
-  private String defaultTimeFormat = "HH:mm:ss";
-  private String defaultDateFormat = "yyyy-MM-dd";
-  private String defaultTimestampFormat = "yyyy-MM-dd hh:mm:ss.fffffffff";
-  private Locale defaultLocale = Locale.getDefault();
-
   /**
    * The batch size used for JDBC statement batching.
    */
@@ -54,102 +41,37 @@ public class CsvReader<T> {
     this.descriptor = server.pluginApi().beanType(type);
   }
 
-  ////@Override
-  public void setDefaultLocale(Locale defaultLocale) {
-    this.defaultLocale = defaultLocale;
-  }
-
-  ////@Override
-  public void setDefaultTimeFormat(String defaultTimeFormat) {
-    this.defaultTimeFormat = defaultTimeFormat;
-  }
-
-  ////@Override
-  public void setDefaultDateFormat(String defaultDateFormat) {
-    this.defaultDateFormat = defaultDateFormat;
-  }
-
-  ////@Override
-  public void setDefaultTimestampFormat(String defaultTimestampFormat) {
-    this.defaultTimestampFormat = defaultTimestampFormat;
-  }
-
-  ////@Override
   public void setPersistBatchSize(int persistBatchSize) {
     this.persistBatchSize = persistBatchSize;
   }
 
-  ////@Override
   public void setIgnoreHeader() {
     setHasHeader(true, false);
   }
 
-  ////@Override
   public void setAddPropertiesFromHeader() {
     setHasHeader(true, true);
   }
 
-  //@Override
   public void setHasHeader(boolean hasHeader, boolean addPropertiesFromHeader) {
     this.hasHeader = hasHeader;
     this.addPropertiesFromHeader = addPropertiesFromHeader;
   }
 
-  //@Override
   public void setLogInfoFrequency(int logInfoFrequency) {
     this.logInfoFrequency = logInfoFrequency;
   }
 
-  //@Override
   public void addIgnore() {
     columnList.add(ignoreColumn);
   }
 
-  //@Override
   public void addProperty(String propertyName) {
     addProperty(propertyName, null);
   }
 
-  //@Override
-  public void addDateTime(String propertyName, String dateTimeFormat) {
-    addDateTime(propertyName, dateTimeFormat, Locale.getDefault());
-  }
 
-  //@Override
-  public void addDateTime(String propertyName, String dateTimeFormat, Locale locale) {
-    ExpressionPath elProp = descriptor.expressionPath(propertyName);
-    if (dateTimeFormat == null) {
-      dateTimeFormat = getDefaultDateTimeFormat(elProp.jdbcType());
-    }
-
-    if (locale == null) {
-      locale = defaultLocale;
-    }
-
-    SimpleDateFormat sdf = new SimpleDateFormat(dateTimeFormat, locale);
-    DateTimeParser parser = new DateTimeParser(sdf, dateTimeFormat, elProp);
-
-    CsvColumn column = new CsvColumn(elProp, parser);
-    columnList.add(column);
-  }
-
-  private String getDefaultDateTimeFormat(int jdbcType) {
-    switch (jdbcType) {
-      case Types.TIME:
-        return defaultTimeFormat;
-      case Types.DATE:
-        return defaultDateFormat;
-      case Types.TIMESTAMP:
-        return defaultTimestampFormat;
-
-      default:
-        throw new RuntimeException("Expected java.sql.Types TIME,DATE or TIMESTAMP but got [" + jdbcType + "]");
-    }
-  }
-
-  //@Override
   public void addProperty(String propertyName, StringParser parser) {
-
     ExpressionPath elProp = descriptor.expressionPath(propertyName);
     if (parser == null) {
       parser = elProp.stringParser();
@@ -158,15 +80,12 @@ public class CsvReader<T> {
     columnList.add(column);
   }
 
-  //@Override
   public void process(Reader reader) throws Exception {
     DefaultCsvCallback<T> callback = new DefaultCsvCallback<>(persistBatchSize, logInfoFrequency);
     process(reader, callback);
   }
 
-  //@Override
   public void process(Reader reader, CsvCallback<T> callback) throws Exception {
-
     if (reader == null) {
       throw new NullPointerException("reader is null?");
     }
@@ -224,43 +143,22 @@ public class CsvReader<T> {
   }
 
   private void addPropertiesFromHeader(String[] line) {
-    for (String aLine : line) {
-      ExpressionPath elProp = descriptor.expressionPath(aLine);
+    for (String headerElement : line) {
+      ExpressionPath elProp = descriptor.expressionPath(headerElement);
       if (elProp == null) {
-        throw new TextException("Property [" + aLine + "] not found");
+        throw new TextException("Property [" + headerElement + "] not found");
       }
-
-      if (Types.TIME == elProp.jdbcType()) {
-        addProperty(aLine, TIME_PARSER);
-
-      } else if (isDateTimeType(elProp.jdbcType())) {
-        addDateTime(aLine, null, null);
-
-//      } else if (elProp.isAssocProperty()) {
-//        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.beanProperty();
-//        String idProp = assocOne.descriptor().idBinder().getIdProperty();
-//        addProperty(aLine + "." + idProp);
-      } else {
-        addProperty(aLine);
-      }
+      addProperty(headerElement);
     }
   }
 
-  private boolean isDateTimeType(int t) {
-    return t == Types.TIMESTAMP || t == Types.DATE || t == Types.TIME;
-  }
-
-  @SuppressWarnings("unchecked")
   protected T buildBeanFromLineContent(int row, String[] line) {
-
     try {
       T bean = descriptor.createBean();
-      EntityBean entityBean = (EntityBean)bean;
-
+      EntityBean entityBean = (EntityBean) bean;
       for (int columnPos = 0; columnPos < line.length; columnPos++) {
         convertAndSetColumn(columnPos, line[columnPos], entityBean);
       }
-
       return bean;
 
     } catch (RuntimeException e) {
@@ -270,13 +168,10 @@ public class CsvReader<T> {
   }
 
   protected void convertAndSetColumn(int columnPos, String strValue, EntityBean bean) {
-
     strValue = strValue.trim();
-
     if (strValue.isEmpty()) {
       return;
     }
-
     CsvColumn c = columnList.get(columnPos);
     c.convertAndSet(strValue, bean);
   }
@@ -309,7 +204,6 @@ public class CsvReader<T> {
      * Convert the string to the appropriate value and set it to the bean.
      */
     public void convertAndSet(String strValue, EntityBean bean) {
-
       if (parser != null && path != null) {
         Object value = parser.parse(strValue);
         path.pathSet(bean, value);
@@ -317,32 +211,4 @@ public class CsvReader<T> {
     }
   }
 
-  /**
-   * A StringParser for converting custom date/time/datetime strings into
-   * appropriate java types (Date, Calendar, SQL Date, Time, Timestamp, JODA
-   * etc).
-   */
-  private static class DateTimeParser implements StringParser {
-
-    private final DateFormat dateFormat;
-    private final ExpressionPath path;
-    private final String format;
-
-    DateTimeParser(DateFormat dateFormat, String format, ExpressionPath path) {
-      this.dateFormat = dateFormat;
-      this.path = path;
-      this.format = format;
-    }
-
-    //@Override
-    public Object parse(String value) {
-      try {
-        Date dt = dateFormat.parse(value);
-        return path.parseDateTime(dt.getTime());
-      } catch (ParseException e) {
-        throw new TextException("Error parsing [{}] using format[" + format + "]", value, e);
-      }
-    }
-
-  }
 }
