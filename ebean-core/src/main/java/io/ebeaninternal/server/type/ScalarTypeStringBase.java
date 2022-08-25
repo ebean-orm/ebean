@@ -58,11 +58,6 @@ abstract class ScalarTypeStringBase extends ScalarTypeBase<String> {
   }
 
   @Override
-  public String convertFromMillis(long systemTimeMillis) {
-    return String.valueOf(systemTimeMillis);
-  }
-
-  @Override
   public String readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

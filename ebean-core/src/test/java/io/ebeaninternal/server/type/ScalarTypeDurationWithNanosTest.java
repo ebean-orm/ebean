@@ -76,11 +76,6 @@ class ScalarTypeDurationWithNanosTest {
   }
 
   @Test
-  void testConvertFromMillis() {
-    assertThrows(UnsupportedOperationException.class, () -> type.convertFromMillis(1000));
-  }
-
-  @Test
   void testJsonRead() throws Exception {
     Duration duration = Duration.ofSeconds(323, 1500000);
 

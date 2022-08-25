@@ -191,11 +191,6 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public Object parseDateTime(long systemTimeMillis) {
-    throw new RuntimeException("ElPropertyDeploy only - not implemented");
-  }
-
-  @Override
   public StringParser stringParser() {
     throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }

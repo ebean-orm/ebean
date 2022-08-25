@@ -63,11 +63,6 @@ final class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public BigInteger convertFromMillis(long systemTimeMillis) {
-    return BigInteger.valueOf(systemTimeMillis);
-  }
-
-  @Override
   public BigInteger readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

@@ -120,15 +120,6 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public B convertFromMillis(long systemTimeMillis) {
-    S sv = scalarType.convertFromMillis(systemTimeMillis);
-    if (sv == null) {
-      return nullValue;
-    }
-    return converter.wrapValue(sv);
-  }
-
-  @Override
   public B read(DataReader reader) throws SQLException {
     S sv = scalarType.read(reader);
     if (sv == null) {

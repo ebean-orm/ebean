@@ -88,11 +88,6 @@ class ScalarTypeLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public LocalTime convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not Supported");
-  }
-
-  @Override
   public LocalTime jsonRead(JsonParser parser) throws IOException {
     return LocalTime.parse(parser.getValueAsString());
   }

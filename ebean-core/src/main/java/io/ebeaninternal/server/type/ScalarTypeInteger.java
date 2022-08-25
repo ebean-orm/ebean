@@ -6,7 +6,6 @@ import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarTypeBase;
-import io.ebean.text.TextException;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.io.DataInput;
@@ -85,11 +84,6 @@ final class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   @Override
   public Integer parse(String value) {
     return Integer.valueOf(value);
-  }
-
-  @Override
-  public Integer convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not Supported");
   }
 
   @Override

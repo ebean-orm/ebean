@@ -73,7 +73,6 @@ class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
     return new LocalTime(value);
   }
 
-  @Override
   public LocalTime convertFromMillis(long systemTimeMillis) {
     return new LocalTime(systemTimeMillis, DateTimeZone.getDefault());
   }

@@ -7,7 +7,6 @@ import java.time.LocalDate;
 import java.time.MonthDay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ScalarTypeMonthDayTest {
 
@@ -47,11 +46,6 @@ public class ScalarTypeMonthDayTest {
 
     assertEquals("--04-29", val1);
     assertEquals(value, monthDay);
-  }
-
-  @Test
-  public void testConvertFromMillis() {
-    assertThrows(RuntimeException.class, () -> type.convertFromMillis(1203));
   }
 
   @Test

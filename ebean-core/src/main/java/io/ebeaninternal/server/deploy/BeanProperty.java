@@ -945,11 +945,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return scalarType == null ? 0 : scalarType.jdbcType();
   }
 
-  @Override
-  public Object parseDateTime(long systemTimeMillis) {
-    return scalarType.convertFromMillis(systemTimeMillis);
-  }
-
   /**
    * Return the DB max length (varchar) or precision (decimal).
    */

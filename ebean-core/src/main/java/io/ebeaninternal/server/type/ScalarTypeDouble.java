@@ -58,11 +58,6 @@ final class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public Double convertFromMillis(long systemTimeMillis) {
-    return (double) systemTimeMillis;
-  }
-
-  @Override
   public Double readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
