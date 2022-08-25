@@ -36,9 +36,4 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
     return formatValue((T) value);
   }
 
-  @Override
-  public void loadIgnore(DataReader reader) {
-    reader.incrementPos(1);
-  }
-
 }

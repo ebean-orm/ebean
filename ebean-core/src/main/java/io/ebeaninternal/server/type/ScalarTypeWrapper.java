@@ -135,11 +135,6 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public void loadIgnore(DataReader reader) {
-    reader.incrementPos(1);
-  }
-
-  @Override
   public B read(DataReader reader) throws SQLException {
     S sv = scalarType.read(reader);
     if (sv == null) {

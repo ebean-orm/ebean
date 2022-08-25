@@ -102,12 +102,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   T read(DataReader reader) throws SQLException;
 
   /**
-   * Ignore the reading of this value. Typically, this means moving the index
-   * position in the ResultSet.
-   */
-  void loadIgnore(DataReader reader);
-
-  /**
    * Convert (if necessary) and bind the value to the preparedStatement.
    * <p>
    * value may need to be converted from the logical bean property type to the
