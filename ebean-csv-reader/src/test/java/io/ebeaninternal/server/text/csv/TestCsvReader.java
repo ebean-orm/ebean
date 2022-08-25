@@ -1,28 +1,37 @@
-package org.tests.text.csv;
+package io.ebeaninternal.server.text.csv;
 
 import io.ebean.DB;
-import io.ebean.xtest.base.TransactionalTestCase;
-import io.ebean.text.csv.CsvReader;
+import io.ebean.Database;
+import io.ebean.plugin.BeanType;
 import io.ebean.util.IOUtils;
+import org.example.Country;
+import org.example.Customer;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
 
 import java.io.Reader;
 import java.net.URL;
 import java.util.Locale;
 
-public class TestCsvReader extends TransactionalTestCase {
+class TestCsvReader {
 
   @Test
-  public void test() throws Exception {
+  void test() throws Exception {
 
-    ResetBasicData.reset();
+    Country country = new Country();
+    country.code("NZ");
+    DB.save(country);
+
+    Country au = new Country();
+    au.code("AU");
+    DB.save(au);
 
     URL resource = TestCsvReaderWithCallback.class.getResource("/test1.csv");
-    try (Reader reader =  IOUtils.newReader(resource.openStream())){
+    try (Reader reader = IOUtils.newReader(resource.openStream())) {
 
-      CsvReader<Customer> csvReader = DB.getDefault().createCsvReader(Customer.class);
+      Database database = DB.getDefault();
+      BeanType<Customer> type = database.pluginApi().beanType(Customer.class);
+      TCsvReader<Customer> csvReader = new TCsvReader<>(database, type);
+      //CsvReader<Customer> csvReader = DB.getDefault().createCsvReader(Customer.class);
 
       csvReader.setPersistBatchSize(2);
 

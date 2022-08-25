@@ -785,12 +785,6 @@ public final class DB {
     return getDefault().createUpdate(beanType, ormUpdate);
   }
 
-  /**
-   * Create a CsvReader for a given beanType.
-   */
-  public static <T> CsvReader<T> createCsvReader(Class<T> beanType) {
-    return getDefault().createCsvReader(beanType);
-  }
 
   /**
    * Create a named query.

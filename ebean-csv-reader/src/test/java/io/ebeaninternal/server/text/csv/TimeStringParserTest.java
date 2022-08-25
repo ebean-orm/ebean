@@ -1,14 +1,12 @@
-package org.tests.text.csv;
+package io.ebeaninternal.server.text.csv;
 
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.text.TimeStringParser;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Time;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestTimeStringParser extends BaseTestCase {
+public class TimeStringParserTest {
 
   @Test
   public void testSimple() {

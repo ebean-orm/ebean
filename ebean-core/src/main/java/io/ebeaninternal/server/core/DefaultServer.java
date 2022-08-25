@@ -39,7 +39,6 @@ import io.ebeaninternal.server.grammer.EqlParser;
 import io.ebeaninternal.server.query.*;
 import io.ebeaninternal.server.querydefn.*;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.text.csv.TCsvReader;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import io.ebeaninternal.server.transaction.TransactionManager;
@@ -807,10 +806,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return new ElFilter<>(desc(beanType));
   }
 
-  @Override
-  public <T> CsvReader<T> createCsvReader(Class<T> beanType) {
-    return new TCsvReader<>(this, desc(beanType));
-  }
 
   @Override
   public <T> UpdateQuery<T> update(Class<T> beanType) {

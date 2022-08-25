@@ -356,10 +356,6 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
     return null;
   }
 
-  @Override
-  public <T> CsvReader<T> createCsvReader(Class<T> beanType) {
-    return null;
-  }
 
   @Override
   public <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery) {

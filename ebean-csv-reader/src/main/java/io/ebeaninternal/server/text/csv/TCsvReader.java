@@ -2,16 +2,13 @@ package io.ebeaninternal.server.text.csv;
 
 import io.ebean.Database;
 import io.ebean.bean.EntityBean;
+import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.text.StringParser;
 import io.ebean.text.TextException;
-import io.ebean.text.TimeStringParser;
 import io.ebean.text.csv.CsvCallback;
 import io.ebean.text.csv.CsvReader;
 import io.ebean.text.csv.DefaultCsvCallback;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
-import io.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.Reader;
 import java.sql.Types;
@@ -27,13 +24,13 @@ import java.util.Locale;
 /**
  * Implementation of the CsvReader
  */
-public class TCsvReader<T> implements CsvReader<T> {
+public class TCsvReader<T> {//implements CsvReader<T> {
 
   private static final TimeStringParser TIME_PARSER = new TimeStringParser();
 
   private final Database server;
 
-  private final BeanDescriptor<T> descriptor;
+  private final BeanType<T> descriptor;
 
   private final List<CsvColumn> columnList = new ArrayList<>();
 
@@ -55,73 +52,73 @@ public class TCsvReader<T> implements CsvReader<T> {
 
   private boolean addPropertiesFromHeader;
 
-  public TCsvReader(Database server, BeanDescriptor<T> descriptor) {
+  public TCsvReader(Database server, BeanType<T> descriptor) {
     this.server = server;
     this.descriptor = descriptor;
   }
 
-  @Override
+  ////@Override
   public void setDefaultLocale(Locale defaultLocale) {
     this.defaultLocale = defaultLocale;
   }
 
-  @Override
+  ////@Override
   public void setDefaultTimeFormat(String defaultTimeFormat) {
     this.defaultTimeFormat = defaultTimeFormat;
   }
 
-  @Override
+  ////@Override
   public void setDefaultDateFormat(String defaultDateFormat) {
     this.defaultDateFormat = defaultDateFormat;
   }
 
-  @Override
+  ////@Override
   public void setDefaultTimestampFormat(String defaultTimestampFormat) {
     this.defaultTimestampFormat = defaultTimestampFormat;
   }
 
-  @Override
+  ////@Override
   public void setPersistBatchSize(int persistBatchSize) {
     this.persistBatchSize = persistBatchSize;
   }
 
-  @Override
+  ////@Override
   public void setIgnoreHeader() {
     setHasHeader(true, false);
   }
 
-  @Override
+  ////@Override
   public void setAddPropertiesFromHeader() {
     setHasHeader(true, true);
   }
 
-  @Override
+  //@Override
   public void setHasHeader(boolean hasHeader, boolean addPropertiesFromHeader) {
     this.hasHeader = hasHeader;
     this.addPropertiesFromHeader = addPropertiesFromHeader;
   }
 
-  @Override
+  //@Override
   public void setLogInfoFrequency(int logInfoFrequency) {
     this.logInfoFrequency = logInfoFrequency;
   }
 
-  @Override
+  //@Override
   public void addIgnore() {
     columnList.add(ignoreColumn);
   }
 
-  @Override
+  //@Override
   public void addProperty(String propertyName) {
     addProperty(propertyName, null);
   }
 
-  @Override
+  //@Override
   public void addDateTime(String propertyName, String dateTimeFormat) {
     addDateTime(propertyName, dateTimeFormat, Locale.getDefault());
   }
 
-  @Override
+  //@Override
   public void addDateTime(String propertyName, String dateTimeFormat, Locale locale) {
     ExpressionPath elProp = descriptor.expressionPath(propertyName);
     if (dateTimeFormat == null) {
@@ -153,7 +150,7 @@ public class TCsvReader<T> implements CsvReader<T> {
     }
   }
 
-  @Override
+  //@Override
   public void addProperty(String propertyName, StringParser parser) {
 
     ExpressionPath elProp = descriptor.expressionPath(propertyName);
@@ -164,13 +161,13 @@ public class TCsvReader<T> implements CsvReader<T> {
     columnList.add(column);
   }
 
-  @Override
+  //@Override
   public void process(Reader reader) throws Exception {
     DefaultCsvCallback<T> callback = new DefaultCsvCallback<>(persistBatchSize, logInfoFrequency);
     process(reader, callback);
   }
 
-  @Override
+  //@Override
   public void process(Reader reader, CsvCallback<T> callback) throws Exception {
 
     if (reader == null) {
@@ -231,7 +228,8 @@ public class TCsvReader<T> implements CsvReader<T> {
 
   private void addPropertiesFromHeader(String[] line) {
     for (String aLine : line) {
-      ElPropertyValue elProp = descriptor.elGetValue(aLine);
+      ExpressionPath elProp = descriptor.expressionPath(aLine);
+      //ElPropertyValue elProp = descriptor.elGetValue(aLine);
       if (elProp == null) {
         throw new TextException("Property [" + aLine + "] not found");
       }
@@ -242,10 +240,10 @@ public class TCsvReader<T> implements CsvReader<T> {
       } else if (isDateTimeType(elProp.jdbcType())) {
         addDateTime(aLine, null, null);
 
-      } else if (elProp.isAssocProperty()) {
-        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.beanProperty();
-        String idProp = assocOne.descriptor().idBinder().getIdProperty();
-        addProperty(aLine + "." + idProp);
+//      } else if (elProp.isAssocProperty()) {
+//        BeanPropertyAssocOne<?> assocOne = (BeanPropertyAssocOne<?>) elProp.beanProperty();
+//        String idProp = assocOne.descriptor().idBinder().getIdProperty();
+//        addProperty(aLine + "." + idProp);
       } else {
         addProperty(aLine);
       }
@@ -260,8 +258,8 @@ public class TCsvReader<T> implements CsvReader<T> {
   protected T buildBeanFromLineContent(int row, String[] line) {
 
     try {
-      EntityBean entityBean = descriptor.createEntityBean();
-      T bean = (T) entityBean;
+      T bean = descriptor.createBean();
+      EntityBean entityBean = (EntityBean)bean;
 
       for (int columnPos = 0; columnPos < line.length; columnPos++) {
         convertAndSetColumn(columnPos, line[columnPos], entityBean);
@@ -340,7 +338,7 @@ public class TCsvReader<T> implements CsvReader<T> {
       this.format = format;
     }
 
-    @Override
+    //@Override
     public Object parse(String value) {
       try {
         Date dt = dateFormat.parse(value);

@@ -204,10 +204,6 @@ public interface Database {
    */
   <T> T createEntityBean(Class<T> type);
 
-  /**
-   * Create a CsvReader for a given beanType.
-   */
-  <T> CsvReader<T> createCsvReader(Class<T> beanType);
 
   /**
    * Create an Update query to perform a bulk update.

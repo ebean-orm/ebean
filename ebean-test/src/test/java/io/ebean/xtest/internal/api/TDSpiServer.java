@@ -103,10 +103,6 @@ public class TDSpiServer implements SpiServer {
     return null;
   }
 
-  @Override
-  public <T> CsvReader<T> createCsvReader(Class<T> beanType) {
-    return null;
-  }
 
   @Override
   public <T> UpdateQuery<T> update(Class<T> beanType) {
