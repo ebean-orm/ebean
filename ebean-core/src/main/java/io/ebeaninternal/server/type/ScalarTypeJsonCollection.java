@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 
 import java.io.DataInput;
 import java.io.DataOutput;

@@ -7,6 +7,7 @@ import io.ebean.config.JsonConfig;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 
 import java.io.DataInput;
 import java.io.DataOutput;
