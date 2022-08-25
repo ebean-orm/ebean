@@ -106,7 +106,7 @@ abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   protected abstract String toIsoFormat(T value);
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.DATE;
   }
 

@@ -12,7 +12,7 @@ final class ScalarTypeLocale extends ScalarTypeBaseVarchar<Locale> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 20;
   }
 

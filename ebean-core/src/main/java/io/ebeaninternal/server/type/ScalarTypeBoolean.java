@@ -146,7 +146,7 @@ public final class ScalarTypeBoolean {
     }
 
     @Override
-    public int getLength() {
+    public int length() {
       return 1;
     }
 
@@ -233,7 +233,7 @@ public final class ScalarTypeBoolean {
     }
 
     @Override
-    public int getLength() {
+    public int length() {
       return Math.max(trueValue.length(), falseValue.length());
     }
 
@@ -358,7 +358,7 @@ public final class ScalarTypeBoolean {
     }
 
     @Override
-    public DocPropertyType getDocType() {
+    public DocPropertyType docType() {
       return DocPropertyType.BOOLEAN;
     }
   }

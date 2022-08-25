@@ -28,7 +28,7 @@ class BeanDescriptorElementScalarMap<T> extends BeanDescriptorElement<T> {
     }
     this.scalarTypeKey = props[0].scalarType();
     this.scalarTypeVal = props[1].scalarType();
-    this.stringKey = String.class.equals(scalarTypeKey.getType());
+    this.stringKey = String.class.equals(scalarTypeKey.type());
   }
 
   @Override

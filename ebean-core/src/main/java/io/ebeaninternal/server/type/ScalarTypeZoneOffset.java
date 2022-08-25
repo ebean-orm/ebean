@@ -12,7 +12,7 @@ final class ScalarTypeZoneOffset extends ScalarTypeBaseVarchar<ZoneOffset> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 60;
   }
 

@@ -27,7 +27,7 @@ final class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public boolean isMutable() {
+  public boolean mutable() {
     return true;
   }
 
@@ -114,7 +114,7 @@ final class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.OBJECT;
   }
 }

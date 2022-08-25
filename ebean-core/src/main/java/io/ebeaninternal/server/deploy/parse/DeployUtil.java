@@ -104,7 +104,7 @@ public final class DeployUtil {
       EnumType type = enumerated != null ? enumerated.value() : null;
       ScalarType<?> scalarType = typeManager.createEnumScalarType(enumClass, type);
       prop.setScalarType(scalarType);
-      prop.setDbType(scalarType.getJdbcType());
+      prop.setDbType(scalarType.jdbcType());
     } catch (IllegalStateException e) {
       throw new PersistenceException("Error mapping property " + prop.getFullBeanName() + " - " + e.getMessage());
     }
@@ -126,7 +126,7 @@ public final class DeployUtil {
     ScalarType<?> scalarType = getScalarType(property);
     if (scalarType != null) {
       // set the jdbc type this maps to
-      property.setDbType(scalarType.getJdbcType());
+      property.setDbType(scalarType.jdbcType());
       property.setScalarType(scalarType);
       property.checkPrimitiveBoolean();
     }
@@ -156,7 +156,7 @@ public final class DeployUtil {
    */
   void setDbMap(DeployBeanProperty prop, DbMap dbMap) {
     ScalarType<?> scalarType = typeManager.getDbMapScalarType();
-    int dbType = scalarType.getJdbcType();
+    int dbType = scalarType.jdbcType();
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
     if (dbType == Types.VARCHAR) {
@@ -176,7 +176,7 @@ public final class DeployUtil {
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for @DbArray type for [" + prop.getFullBeanName() + "]");
     }
-    int dbType = scalarType.getJdbcType();
+    int dbType = scalarType.jdbcType();
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
     if (scalarType instanceof ScalarTypeArray) {
@@ -240,7 +240,7 @@ public final class DeployUtil {
   void setLobType(DeployBeanProperty prop) {
     ScalarType<?> scalarType = prop.getScalarType();
     if (scalarType instanceof ScalarTypeWrapper) {
-      int lobType = scalarType.getJdbcType() == Types.VARCHAR ? dbCLOBType : dbBLOBType;
+      int lobType = scalarType.jdbcType() == Types.VARCHAR ? dbCLOBType : dbBLOBType;
       prop.setDbType(lobType);
     } else {
       // is String or byte[] ? used to determine if its a CLOB or BLOB

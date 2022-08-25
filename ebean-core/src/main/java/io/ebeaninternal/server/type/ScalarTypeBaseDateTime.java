@@ -139,7 +139,7 @@ abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.DATETIME;
   }
 

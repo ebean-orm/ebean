@@ -22,7 +22,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   }
 
   @Override
-  public boolean isBinaryType() {
+  public boolean binary() {
     return true;
   }
 
@@ -96,7 +96,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.BINARY;
   }
 }

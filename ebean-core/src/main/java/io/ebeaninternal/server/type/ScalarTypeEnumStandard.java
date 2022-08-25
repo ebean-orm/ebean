@@ -73,7 +73,7 @@ final class ScalarTypeEnumStandard {
     }
 
     @Override
-    public int getLength() {
+    public int length() {
       return length;
     }
 
@@ -248,7 +248,7 @@ final class ScalarTypeEnumStandard {
     }
 
     @Override
-    public DocPropertyType getDocType() {
+    public DocPropertyType docType() {
       return DocPropertyType.ENUM;
     }
 

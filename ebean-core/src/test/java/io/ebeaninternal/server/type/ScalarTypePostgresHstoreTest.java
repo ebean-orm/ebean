@@ -23,7 +23,7 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test
   public void testIsMutable() {
-    assertTrue(hstore.isMutable());
+    assertTrue(hstore.mutable());
   }
 
   @Test

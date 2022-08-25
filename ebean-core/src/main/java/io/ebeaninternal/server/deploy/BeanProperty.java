@@ -416,7 +416,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if the underlying type is mutable.
    */
   public boolean isMutableScalarType() {
-    return scalarType != null && scalarType.isMutable();
+    return scalarType != null && scalarType.mutable();
   }
 
   /**
@@ -703,7 +703,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   private Object cacheDataConvert(Object value) {
-    if (value == null || scalarType.isBinaryType()) {
+    if (value == null || scalarType.binary()) {
       return value;
     } else {
       // convert to string as an optimisation for java object serialisation
@@ -942,7 +942,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public int jdbcType() {
-    return scalarType == null ? 0 : scalarType.getJdbcType();
+    return scalarType == null ? 0 : scalarType.jdbcType();
   }
 
   @Override
@@ -1467,7 +1467,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
     if (mapping.includesProperty(prefix, name)) {
-      DocPropertyType type = scalarType.getDocType();
+      DocPropertyType type = scalarType.docType();
       DocPropertyOptions options = docOptions.copy();
       if (isKeywordType(type, options)) {
         type = DocPropertyType.KEYWORD;

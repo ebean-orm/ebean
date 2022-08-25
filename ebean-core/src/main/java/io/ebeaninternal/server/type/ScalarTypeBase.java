@@ -19,17 +19,17 @@ abstract class ScalarTypeBase<T> implements ScalarType<T> {
   }
 
   @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     return jdbcNative;
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return jdbcType;
   }
 
   @Override
-  public Class<T> getType() {
+  public Class<T> type() {
     return type;
   }
 

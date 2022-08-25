@@ -91,7 +91,7 @@ final class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.DOUBLE;
   }
 

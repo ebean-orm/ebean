@@ -23,7 +23,7 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
   BeanDescriptorElementEmbeddedMap(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, ElementHelp elementHelp) {
     super(owner, deploy, elementHelp);
     this.scalarTypeKey = firstBaseScalarType();
-    this.stringKey = String.class.equals(scalarTypeKey.getType());
+    this.stringKey = String.class.equals(scalarTypeKey.type());
   }
 
   @Override

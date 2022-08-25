@@ -52,7 +52,7 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
    * Consider as a mutable type. Use the isDirty() method to check for dirty state.
    */
   @Override
-  public boolean isMutable() {
+  public boolean mutable() {
     return true;
   }
 
@@ -76,7 +76,7 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return docPropertyType;
   }
 

@@ -12,7 +12,7 @@ final class ScalarTypeCurrency extends ScalarTypeBaseVarchar<Currency> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 3;
   }
 

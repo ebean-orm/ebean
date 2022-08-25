@@ -12,7 +12,7 @@ final class ScalarTypeZoneId extends ScalarTypeBaseVarchar<ZoneId> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 60;
   }
 

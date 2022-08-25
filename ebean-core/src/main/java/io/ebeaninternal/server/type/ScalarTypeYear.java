@@ -92,7 +92,7 @@ final class ScalarTypeYear extends ScalarTypeBase<Year> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.INTEGER;
   }
 

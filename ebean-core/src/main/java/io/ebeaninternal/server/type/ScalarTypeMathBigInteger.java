@@ -96,7 +96,7 @@ final class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.LONG;
   }
 

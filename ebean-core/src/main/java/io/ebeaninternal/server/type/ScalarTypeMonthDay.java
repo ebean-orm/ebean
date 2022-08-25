@@ -111,7 +111,7 @@ final class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.KEYWORD;
   }
 

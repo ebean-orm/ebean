@@ -175,7 +175,7 @@ public class DeployBeanProperty {
     this.propertyType = propertyType;
     this.genericType = null;
     this.scalarType = wrapScalarType(propertyType, scalarType, typeConverter);
-    this.dbType = (scalarType == null) ? 0 : scalarType.getJdbcType();
+    this.dbType = (scalarType == null) ? 0 : scalarType.jdbcType();
   }
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, Type genericType) {
@@ -240,7 +240,7 @@ public class DeployBeanProperty {
    */
   public int getDbLength() {
     if (dbLength == 0 && scalarType != null) {
-      return scalarType.getLength();
+      return scalarType.length();
     }
 
     return dbLength;
@@ -1145,7 +1145,7 @@ public class DeployBeanProperty {
   }
 
   boolean isJsonMapper() {
-    return scalarType != null && scalarType.isJsonMapper();
+    return scalarType != null && scalarType.jsonMapper();
   }
 
   boolean isJsonType() {

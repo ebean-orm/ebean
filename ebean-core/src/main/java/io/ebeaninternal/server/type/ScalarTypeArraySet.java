@@ -71,7 +71,7 @@ class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeA
 
     @Override
     public ScalarType<?> typeForEnum(ScalarType<?> scalarType, boolean nullable) {
-      return new ScalarTypeArraySet(nullable, arrayTypeFor(scalarType), scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
+      return new ScalarTypeArraySet(nullable, arrayTypeFor(scalarType), scalarType.docType(), new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 
@@ -86,7 +86,7 @@ class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeA
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return docPropertyType;
   }
 

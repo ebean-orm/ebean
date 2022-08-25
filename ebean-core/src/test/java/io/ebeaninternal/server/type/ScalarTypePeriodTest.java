@@ -12,7 +12,7 @@ public class ScalarTypePeriodTest {
 
   @Test
   public void getLength() {
-    assertThat(scalarType.getLength()).isEqualTo(20);
+    assertThat(scalarType.length()).isEqualTo(20);
   }
 
   @Test
