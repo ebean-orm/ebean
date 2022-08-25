@@ -75,11 +75,6 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public String format(Object v) {
-    throw new RuntimeException("Not used");
-  }
-
-  @Override
   public String formatValue(byte[] v) {
     throw new RuntimeException("Not used");
   }

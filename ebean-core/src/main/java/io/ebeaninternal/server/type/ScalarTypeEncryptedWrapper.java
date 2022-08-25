@@ -100,12 +100,6 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public String format(Object v) {
-    return formatValue((T) v);
-  }
-
-  @Override
   public String formatValue(T v) {
     return wrapped.formatValue(v);
   }

@@ -64,11 +64,6 @@ class ScalarTypeNotFound implements ScalarType<Void> {
   }
 
   @Override
-  public String format(Object value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public Void parse(String value) {
     throw new UnsupportedOperationException();
   }

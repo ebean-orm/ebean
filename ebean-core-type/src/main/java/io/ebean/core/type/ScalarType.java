@@ -141,8 +141,11 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * <p>
    * This is so that ScalarType also implements the StringFormatter interface.
    */
+  @SuppressWarnings("unchecked")
   @Override
-  String format(Object value);
+  default String format(Object value) {
+    return formatValue((T) value);
+  }
 
   /**
    * Convert the string value to the appropriate java object.

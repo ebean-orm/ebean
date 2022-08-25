@@ -30,10 +30,4 @@ public abstract class ScalarTypeBase<T> implements ScalarType<T> {
     return type;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public String format(Object value) {
-    return formatValue((T) value);
-  }
-
 }

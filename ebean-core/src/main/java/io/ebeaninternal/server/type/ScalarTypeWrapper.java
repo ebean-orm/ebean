@@ -105,12 +105,6 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public String format(Object v) {
-    return formatValue((B) v);
-  }
-
-  @Override
   public String formatValue(B v) {
     S sv = converter.unwrapValue(v);
     return scalarType.formatValue(sv);

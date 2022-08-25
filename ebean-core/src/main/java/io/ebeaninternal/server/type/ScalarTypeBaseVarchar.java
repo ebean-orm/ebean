@@ -89,12 +89,6 @@ abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public String format(Object value) {
-    return formatValue((T) value);
-  }
-
-  @Override
   public T readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

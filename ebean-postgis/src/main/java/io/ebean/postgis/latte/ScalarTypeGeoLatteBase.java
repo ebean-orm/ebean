@@ -93,11 +93,6 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   }
 
   @Override
-  public String format(Object value) {
-    return null;
-  }
-
-  @Override
   public T parse(String value) {
     return null;
   }
