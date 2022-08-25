@@ -164,20 +164,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   DocPropertyType getDocType();
 
   /**
-   * Return true if the type can accept long systemTimeMillis input.
-   * <p>
-   * This is used to determine if it is sensible to use the
-   * {@link #convertFromMillis(long)} method.
-   * <p>
-   * This includes the Date, Calendar, sql Date, Time, Timestamp, JODA types
-   * as well as Long, BigDecimal and String (although it generally is not
-   * expected to parse systemTimeMillis to a String or BigDecimal).
-   */
-  default boolean isDateTimeCapable() {
-    return false;
-  }
-
-  /**
    * Convert the value into a long version value.
    */
   default long asVersion(T value) {

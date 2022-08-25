@@ -63,11 +63,6 @@ final class ScalarTypeTime extends ScalarTypeBase<Time> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public Time readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

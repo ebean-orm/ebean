@@ -67,11 +67,6 @@ final class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public BigInteger readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

@@ -27,11 +27,6 @@ public class ScalarTypePostgresHstoreTest {
   }
 
   @Test
-  public void testIsDateTimeCapable() {
-    assertFalse(hstore.isDateTimeCapable());
-  }
-
-  @Test
   public void testIsDirty() {
     Map<String, Object> emptyMap = new HashMap<>();
     assertTrue(hstore.isDirty(emptyMap));

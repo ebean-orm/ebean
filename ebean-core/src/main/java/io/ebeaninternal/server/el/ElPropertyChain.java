@@ -227,12 +227,6 @@ public final class ElPropertyChain implements ElPropertyValue {
     return lastBeanProperty;
   }
 
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return scalarType != null && scalarType.isDateTimeCapable();
-  }
-
   @Override
   public int jdbcType() {
     return scalarType == null ? 0 : scalarType.getJdbcType();

@@ -11,7 +11,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ScalarTypeInstantTest {
 
@@ -105,12 +106,6 @@ public class ScalarTypeInstantTest {
     String format = type.format(now);
     Instant val1 = type.parse(format);
     assertEquals(now, val1);
-  }
-
-  @Test
-  public void testIsDateTimeCapable() throws Exception {
-
-    assertTrue(type.isDateTimeCapable());
   }
 
   @Test

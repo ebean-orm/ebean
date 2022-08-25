@@ -941,11 +941,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return scalarType != null && scalarType.isDateTimeCapable();
-  }
-
-  @Override
   public int jdbcType() {
     return scalarType == null ? 0 : scalarType.getJdbcType();
   }

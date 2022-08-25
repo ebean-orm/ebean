@@ -78,11 +78,6 @@ public class ScalarTypeLocalTimeTest {
   }
 
   @Test
-  public void testIsDateTimeCapable() {
-    assertFalse(type.isDateTimeCapable());
-  }
-
-  @Test
   public void testConvertFromMillis() {
     assertThrows(TextException.class, () -> type.convertFromMillis(1234));
   }

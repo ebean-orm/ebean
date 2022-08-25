@@ -72,11 +72,6 @@ final class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public Long readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

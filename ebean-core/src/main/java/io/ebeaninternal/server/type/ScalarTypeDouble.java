@@ -62,11 +62,6 @@ final class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public Double readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

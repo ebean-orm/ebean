@@ -53,11 +53,6 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return baseType.isDateTimeCapable();
-  }
-
-  @Override
   public boolean isJdbcNative() {
     return baseType.isJdbcNative();
   }

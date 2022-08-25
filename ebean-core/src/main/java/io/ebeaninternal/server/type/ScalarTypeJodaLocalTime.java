@@ -78,11 +78,6 @@ class ScalarTypeJodaLocalTime extends ScalarTypeBase<LocalTime> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public LocalTime readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

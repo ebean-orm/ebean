@@ -63,11 +63,6 @@ class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public BigDecimal readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;

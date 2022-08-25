@@ -62,11 +62,6 @@ final class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public Float readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
