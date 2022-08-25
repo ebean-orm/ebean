@@ -1,4 +1,6 @@
-package io.ebean.text;
+package io.ebean.csv.reader;
+
+import io.ebean.text.StringParser;
 
 import java.sql.Time;
 

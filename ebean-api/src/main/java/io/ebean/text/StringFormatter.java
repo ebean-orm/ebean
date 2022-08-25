@@ -6,6 +6,7 @@ package io.ebean.text;
  * Basic interface to support CSV, JSON and XML processing.
  * </p>
  */
+@FunctionalInterface
 public interface StringFormatter {
 
   /**

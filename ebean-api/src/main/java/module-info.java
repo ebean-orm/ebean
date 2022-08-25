@@ -40,7 +40,6 @@ module io.ebean.api {
   exports io.ebean.service;
   exports io.ebean.text;
   exports io.ebean.text.json;
-  exports io.ebean.text.csv;
   exports io.ebean.util;
 
 }

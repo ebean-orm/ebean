@@ -1,4 +1,4 @@
-package io.ebean.text.csv;
+package io.ebean.csv.reader;
 
 import io.ebean.Database;
 import io.ebean.EbeanVersion;
@@ -49,6 +49,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
    */
   protected final int persistBatchSize;
 
+  protected boolean getGeneratedKeys = true;
   /**
    * The time the process started.
    */
@@ -164,7 +165,7 @@ public class DefaultCsvCallback<T> implements CsvCallback<T> {
       if (persistBatchSize > 1) {
         transaction.setBatchMode(true);
         transaction.setBatchSize(persistBatchSize);
-        transaction.setGetGeneratedKeys(false);
+        transaction.setGetGeneratedKeys(getGeneratedKeys);
       } else {
         // explicitly turn off JDBC batching in case
         // is has been turned on globally
