@@ -10,7 +10,6 @@ import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
@@ -76,7 +75,6 @@ public class TransactionManager implements SpiTransactionManager {
    * Flag to indicate the default Isolation is READ COMMITTED. This enables us
    * to close queryOnly transactions rather than commit or rollback them.
    */
-  private final OnQueryOnly onQueryOnly;
   private final BackgroundExecutor backgroundExecutor;
   private final ClusterManager clusterManager;
   private final String serverName;
@@ -145,7 +143,6 @@ public class TransactionManager implements SpiTransactionManager {
     this.bulkEventListenerMap = new BulkEventListenerMap(options.config.getBulkTableEventListeners());
     this.prefix = "";
     this.externalTransPrefix = "e";
-    this.onQueryOnly = initOnQueryOnly(options.config.getDatabasePlatform().getOnQueryOnly());
 
     CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
@@ -253,26 +250,6 @@ public class TransactionManager implements SpiTransactionManager {
     return persistBatchOnCascade;
   }
 
-  /**
-   * Return the behaviour to use when a query only transaction is committed.
-   * <p>
-   * There is a potential optimisation available when read committed is the default
-   * isolation level. If it is, then Connections used only for queries do not require
-   * commit or rollback but instead can just be put back into the pool via close().
-   * <p>
-   * If the Isolation level is higher (say SERIALIZABLE) then Connections used
-   * just for queries do need to be committed or rollback after the query.
-   */
-  final OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly) {
-    // first check for a system property 'override'
-    String systemPropertyValue = System.getProperty("ebean.transaction.onqueryonly");
-    if (systemPropertyValue != null) {
-      return OnQueryOnly.valueOf(systemPropertyValue.trim().toUpperCase());
-    }
-    // default to rollback if not defined on the platform
-    return dbPlatformOnQueryOnly == null ? OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
-  }
-
   public final String name() {
     return serverName;
   }
@@ -290,13 +267,6 @@ public class TransactionManager implements SpiTransactionManager {
   @Override
   public final DataSource readOnlyDataSource() {
     return dataSourceSupplier.getReadOnlyDataSource();
-  }
-
-  /**
-   * Defines the type of behavior to use when closing a transaction that was used to query data only.
-   */
-  final OnQueryOnly onQueryOnly() {
-    return onQueryOnly;
   }
 
   /**

@@ -4,7 +4,6 @@ import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.api.*;
@@ -33,154 +32,69 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private static final Object PLACEHOLDER = new Object();
   private static final String illegalStateMessage = "Transaction is Inactive";
 
-  /**
-   * The associated TransactionManager.
-   */
   final TransactionManager manager;
-
-  /**
-   * The transaction id.
-   */
   private final String id;
-
+  private final String logPrefix;
   private final boolean logSql;
   private final boolean logSummary;
-
+  private final boolean explicit;
+  private final boolean onQueryOnlyCommit;
   /**
    * The user defined label to group execution statistics.
    */
   private String label;
-
-  /**
-   * Flag to indicate if this was an explicitly created Transaction.
-   */
-  private final boolean explicit;
-
-  /**
-   * Behaviour for ending query only transactions.
-   */
-  private final OnQueryOnly onQueryOnly;
-
-  /**
-   * The status of the transaction.
-   */
   private boolean active;
-
   private boolean rollbackOnly;
-
   private boolean nestedUseSavepoint;
-
-  /**
-   * The underlying Connection.
-   */
   Connection connection;
-
-  /**
-   * Used to queue up persist requests for batch execution.
-   */
   private BatchControl batchControl;
-
-  /**
-   * The event which holds persisted beans.
-   */
   private TransactionEvent event;
-
-  /**
-   * Holder of the objects fetched to ensure unique objects are used.
-   */
   private SpiPersistenceContext persistenceContext;
-
-  /**
-   * Used to give developers more control over the insert update and delete
-   * functionality.
-   */
   private boolean persistCascade = true;
-
-  /**
-   * Flag used for performance to skip commit or rollback of query only
-   * transactions in read committed transaction isolation.
-   */
   private boolean queryOnly = true;
-
   private boolean localReadOnly;
-
   private Boolean updateAllLoadedProperties;
-
   private boolean oldBatchMode;
-
   private boolean batchMode;
-
   private boolean batchOnCascadeMode;
-
   private int batchSize = -1;
-
   private boolean batchFlushOnQuery = true;
-
   private Boolean batchGetGeneratedKeys;
-
   private Boolean batchFlushOnMixed;
-
-  private final String logPrefix;
-
   private Object tenantId;
-
   /**
    * The depth used by batch processing to help the ordering of statements.
    */
   private int depth;
-
-  /**
-   * Set to true if the connection has autoCommit=true initially.
-   */
   private boolean autoCommit;
-
   private IdentityHashMap<Object, Object> persistingBeans;
-
   private HashSet<Integer> deletingBeansHash;
-
   private HashMap<String, String> m2mIntersectionSave;
-
   private Map<String, Object> userObjects;
-
   private List<TransactionCallback> callbackList;
-
   private boolean batchOnCascadeSet;
-
   private TChangeLogHolder changeLogHolder;
-
   private List<PersistDeferredRelationship> deferredList;
-
   /**
    * The mode for updating doc store indexes for this transaction.
    * Only set when you want to override the default behavior.
    */
   private DocStoreMode docStoreMode;
-
   private int docStoreBatchSize;
-
   /**
    * Explicit control over skipCache.
    */
   private Boolean skipCache;
-
   /**
    * Default skip cache behavior from {@link DatabaseConfig#isSkipCacheAfterWrite()}.
    */
   private final boolean skipCacheAfterWrite;
-
   DocStoreTransaction docStoreTxn;
-
   private ProfileStream profileStream;
-
   private ProfileLocation profileLocation;
-
   private final long startNanos;
-
   private boolean autoPersistUpdates;
 
-  /**
-   * Create a new JdbcTransaction.
-   */
   JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
     try {
       this.active = true;
@@ -191,14 +105,13 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       this.connection = connection;
       this.persistenceContext = new DefaultPersistenceContext();
       this.startNanos = System.nanoTime();
-
       if (manager == null) {
         this.logSql = false;
         this.logSummary = false;
         this.skipCacheAfterWrite = true;
         this.batchMode = false;
         this.batchOnCascadeMode = false;
-        this.onQueryOnly = OnQueryOnly.ROLLBACK;
+        this.onQueryOnlyCommit = false;
       } else {
         this.autoPersistUpdates = explicit && manager.isAutoPersistUpdates();
         this.logSql = manager.isLogSql();
@@ -206,7 +119,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
         this.batchMode = manager.isPersistBatch();
         this.batchOnCascadeMode = manager.isPersistBatchOnCascade();
-        this.onQueryOnly = manager.onQueryOnly();
+        this.onQueryOnlyCommit = true;
       }
 
       checkAutoCommit(connection);
@@ -926,14 +839,14 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private void connectionEndForQueryOnly() {
     try {
       withEachCallback(TransactionCallback::preCommit);
-      if (onQueryOnly == OnQueryOnly.COMMIT) {
+      if (onQueryOnlyCommit) {
         performCommit();
       } else {
         performRollback();
       }
       withEachCallback(TransactionCallback::postCommit);
     } catch (SQLException e) {
-      log.log(ERROR, "Error when ending a query only transaction via " + onQueryOnly, e);
+      log.log(ERROR, "Error when ending a query only transaction", e);
     }
   }
 
