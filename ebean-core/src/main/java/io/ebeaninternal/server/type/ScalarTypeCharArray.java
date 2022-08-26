@@ -75,8 +75,4 @@ final class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
   public char[] jsonRead(JsonParser parser) throws IOException {
     return parser.getValueAsString().toCharArray();
   }
-
-  public void jsonWrite(JsonGenerator ctx, String name, char[] value) throws IOException {
-    ctx.writeStringField(name, String.valueOf(value));
-  }
 }
