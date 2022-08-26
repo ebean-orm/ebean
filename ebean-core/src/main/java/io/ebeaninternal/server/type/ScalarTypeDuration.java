@@ -27,11 +27,11 @@ class ScalarTypeDuration extends ScalarTypeBase<Duration> {
   }
 
   BigDecimal convertToBigDecimal(Duration value) {
-    return (value == null) ? null : DecimalUtils.toDecimal(value);
+    return (value == null) ? null : ScalarTypeUtils.toDecimal(value);
   }
 
   Duration convertFromBigDecimal(BigDecimal value) {
-    return (value == null) ? null : DecimalUtils.toDuration(value);
+    return (value == null) ? null : ScalarTypeUtils.toDuration(value);
   }
 
   @Override

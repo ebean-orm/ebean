@@ -13,7 +13,7 @@ import java.sql.Types;
 import java.time.Instant;
 import java.util.Date;
 
-import static io.ebean.core.type.IsoJsonDateTimeParser.formatIso;
+import static io.ebean.core.type.ScalarTypeUtils.formatInstant;
 
 /**
  * ScalarType for java.util.Date.
@@ -33,7 +33,7 @@ final class ScalarTypeUtilDate {
 
     @Override
     protected String toJsonISO8601(Date value) {
-      return formatIso(value.toInstant());
+      return formatInstant(value.toInstant());
     }
 
     @Override

@@ -69,7 +69,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
    * Convert the value to ISO8601 format.
    */
   protected T fromJsonISO8601(String value) {
-    return convertFromInstant(IsoJsonDateTimeParser.parseIso(value));
+    return convertFromInstant(ScalarTypeUtils.parseInstant(value));
   }
 
   @Override
@@ -95,7 +95,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
    * Helper method that given epoch seconds and nanos return a JSON nanos formatted string.
    */
   protected String toJsonNanos(long epochSecs, int nanos) {
-    return DecimalUtils.toDecimal(epochSecs, nanos);
+    return ScalarTypeUtils.toDecimal(epochSecs, nanos);
   }
 
   @Override
@@ -106,7 +106,7 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
       }
       case VALUE_NUMBER_FLOAT: {
         BigDecimal value = parser.getDecimalValue();
-        Timestamp timestamp = DecimalUtils.toTimestamp(value);
+        Timestamp timestamp = ScalarTypeUtils.toTimestamp(value);
         return convertFromTimestamp(timestamp);
       }
       default: {

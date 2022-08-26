@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class IsoJsonDateTimeParserTest {
 
-  private IsoJsonDateTimeParser parser = new IsoJsonDateTimeParser();
+  private ScalarTypeUtils parser = new ScalarTypeUtils();
 
   @Test
   void parseFormat_when_hasMillis() {
@@ -41,8 +41,8 @@ class IsoJsonDateTimeParserTest {
   }
 
   private void parseAndFormat(String input, String expected) {
-    Instant timestamp = parser.parseIso(input);
-    String format = parser.formatIso(timestamp);
+    Instant timestamp = parser.parseInstant(input);
+    String format = parser.formatInstant(timestamp);
     assertThat(format).isEqualTo(expected);
   }
 }
