@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarTypeBaseVarchar;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.sql.SQLException;

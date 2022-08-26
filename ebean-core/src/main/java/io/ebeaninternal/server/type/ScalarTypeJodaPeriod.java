@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeBaseVarchar;
 import org.joda.time.Period;
 
 /**

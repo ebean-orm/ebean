@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarTypeBaseVarchar;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.io.IOException;
