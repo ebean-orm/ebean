@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.text.json;
+package io.ebeaninternal.server.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;

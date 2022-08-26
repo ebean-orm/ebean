@@ -45,7 +45,7 @@ import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;

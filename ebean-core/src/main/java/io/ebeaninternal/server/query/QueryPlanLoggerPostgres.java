@@ -3,7 +3,7 @@ package io.ebeaninternal.server.query;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryPlan;
-import io.ebeaninternal.server.type.bindcapture.BindCapture;
+import io.ebeaninternal.server.bind.capture.BindCapture;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

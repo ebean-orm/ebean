@@ -1,8 +1,8 @@
-package io.ebeaninternal.server.type;
+package io.ebeaninternal.server.bind;
 
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
-import io.ebeaninternal.server.type.bindcapture.BindCapture;
-import io.ebeaninternal.server.type.bindcapture.BindCaptureStatement;
+import io.ebeaninternal.server.bind.capture.BindCapture;
+import io.ebeaninternal.server.bind.capture.BindCaptureStatement;
 
 /**
  * Special DataBind used to capture bind values for obtaining explain plans.

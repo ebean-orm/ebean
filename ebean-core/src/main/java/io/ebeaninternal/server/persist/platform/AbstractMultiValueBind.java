@@ -2,7 +2,7 @@ package io.ebeaninternal.server.persist.platform;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.bind.DataBind;
 
 import java.sql.SQLException;
 import java.util.Collection;

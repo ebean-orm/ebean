@@ -14,7 +14,7 @@ import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
 
 import java.sql.Connection;

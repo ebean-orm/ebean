@@ -5,7 +5,7 @@ import io.ebean.meta.QueryPlanRequest;
 import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.transaction.TransactionManager;
-import io.ebeaninternal.server.type.bindcapture.BindCapture;
+import io.ebeaninternal.server.bind.capture.BindCapture;
 
 import java.sql.Connection;
 import java.sql.SQLException;

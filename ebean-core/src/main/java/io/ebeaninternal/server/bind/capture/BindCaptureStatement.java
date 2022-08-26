@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type.bindcapture;
+package io.ebeaninternal.server.bind.capture;
 
 import java.io.InputStream;
 import java.io.Reader;
