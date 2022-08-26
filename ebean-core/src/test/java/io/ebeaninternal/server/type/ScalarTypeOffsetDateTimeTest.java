@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.IsoJsonDateTimeParser;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
@@ -122,7 +123,7 @@ public class ScalarTypeOffsetDateTimeTest {
     OffsetDateTime now = OffsetDateTime.now();
     String asJson = typeIso.toJsonISO8601(now);
 
-    OffsetDateTime value = typeIso.fromJsonISO8601(asJson);
+    OffsetDateTime value = typeIso.convertFromInstant(IsoJsonDateTimeParser.parseIso(asJson)); //typeIso.fromJsonISO8601(asJson);
     assertThat(now).isEqualToIgnoringNanos(value);
   }
 }

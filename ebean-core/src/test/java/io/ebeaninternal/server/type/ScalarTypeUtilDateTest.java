@@ -1,9 +1,11 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.IsoJsonDateTimeParser;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +35,8 @@ public class ScalarTypeUtilDateTest {
     Date now = new Date();
     String asJson = typeIso.toJsonISO8601(now);
 
-    Date value = typeIso.fromJsonISO8601(asJson);
+    Instant instant = IsoJsonDateTimeParser.parseIso(asJson);
+    Date value = new java.util.Date(instant.toEpochMilli()); // typeIso.fromJsonISO8601(asJson);
     assertThat(now).isEqualTo(value);
   }
 }

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.DecimalUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;

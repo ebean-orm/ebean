@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.core.type;
 
 /*
  * Copyright 2013 FasterXML.com
@@ -27,7 +27,7 @@ import java.time.Instant;
  * @author Nick Williams
  * @since 2.2.0
  */
-final class DecimalUtils {
+public final class DecimalUtils {
 
   private static final char[] ZEROES = new char[]{'0', '0', '0', '0', '0', '0', '0', '0', '0'};
 
@@ -37,17 +37,17 @@ final class DecimalUtils {
     throw new RuntimeException("DecimalUtils cannot be instantiated.");
   }
 
-  static Duration toDuration(BigDecimal value) {
+  public static Duration toDuration(BigDecimal value) {
     long seconds = value.longValue();
     int nanoseconds = extractNanosecondDecimal(value, seconds);
     return Duration.ofSeconds(seconds, nanoseconds);
   }
 
-  static BigDecimal toDecimal(Duration instant) {
+  public static BigDecimal toDecimal(Duration instant) {
     return new BigDecimal(toDecimal(instant.getSeconds(), instant.getNano()));
   }
 
-  static Timestamp toTimestamp(BigDecimal value) {
+  public static Timestamp toTimestamp(BigDecimal value) {
     long seconds = value.longValue();
     int nanoseconds = extractNanosecondDecimal(value, seconds);
     Timestamp ts = new Timestamp(seconds * 1000);
@@ -55,13 +55,13 @@ final class DecimalUtils {
     return ts;
   }
 
-  static BigDecimal toDecimal(Timestamp instant) {
+  public static BigDecimal toDecimal(Timestamp instant) {
     long millis = instant.getTime();
     long secs = millis / 1000;
     return new BigDecimal(toDecimal(secs, instant.getNanos()));
   }
 
-  static String toDecimal(long seconds, int nanoseconds) {
+  public static String toDecimal(long seconds, int nanoseconds) {
     StringBuilder string = new StringBuilder(Integer.toString(nanoseconds));
     if (string.length() < 9)
       string.insert(0, ZEROES, 0, 9 - string.length());

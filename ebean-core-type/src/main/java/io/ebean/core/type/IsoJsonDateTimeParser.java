@@ -1,21 +1,21 @@
-package io.ebeaninternal.server.type;
+package io.ebean.core.type;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
-final class IsoJsonDateTimeParser {
+public final class IsoJsonDateTimeParser {
 
   private static final DateTimeFormatter ISO_MILLIS = new DateTimeFormatterBuilder()
     .parseCaseInsensitive()
     .appendInstant(3)
     .toFormatter();
 
-  static Instant parseIso(String jsonDateTime) {
+  public static Instant parseIso(String jsonDateTime) {
     return Instant.parse(jsonDateTime);
   }
 
-  static String formatIso(Instant value) {
+  public static String formatIso(Instant value) {
     return ISO_MILLIS.format(value);
   }
 }

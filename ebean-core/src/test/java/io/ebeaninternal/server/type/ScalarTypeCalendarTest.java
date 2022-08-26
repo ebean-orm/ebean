@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.IsoJsonDateTimeParser;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Types;
@@ -17,7 +18,7 @@ public class ScalarTypeCalendarTest {
 
     Calendar instance = Calendar.getInstance();
     String asUtc = type.toJsonISO8601(instance);
-    Calendar calendar = type.fromJsonISO8601(asUtc);
+    Calendar calendar = type.convertFromInstant(IsoJsonDateTimeParser.parseIso(asUtc)); //type.fromJsonISO8601(asUtc);
 
     assertThat(instance).isEqualTo(calendar);
   }

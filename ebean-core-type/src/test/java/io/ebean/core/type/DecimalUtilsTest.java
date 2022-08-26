@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.core.type;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,6 +32,5 @@ class DecimalUtilsTest {
 
     assertEquals(duration, duration1);
     assertEquals("PT5M23.0015S", duration1.toString());
-
   }
 }
