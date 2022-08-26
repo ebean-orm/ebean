@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.deploy.generatedproperty;
 
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 /**

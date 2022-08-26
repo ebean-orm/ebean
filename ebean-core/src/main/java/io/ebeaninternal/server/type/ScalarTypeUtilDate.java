@@ -5,7 +5,7 @@ import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarTypeBaseDate;
 import io.ebean.core.type.ScalarTypeBaseDateTime;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;

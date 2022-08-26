@@ -3,7 +3,7 @@ package io.ebeaninternal.server.type;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.math.BigInteger;
 import java.sql.Types;

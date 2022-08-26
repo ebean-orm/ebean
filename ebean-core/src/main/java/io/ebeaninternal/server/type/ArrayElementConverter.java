@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.math.BigDecimal;
 import java.util.UUID;
