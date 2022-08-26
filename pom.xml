@@ -89,6 +89,7 @@
     <module>ebean-redis</module>
     <module>platforms</module>
     <module>composites</module>
+    <module>ebean-joda-time</module>
     <module>ebean-csv-reader</module>
     <!--    <module>ebean-kotlin</module>-->
 
