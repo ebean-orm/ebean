@@ -61,16 +61,6 @@ final class DecimalUtils {
     return new BigDecimal(toDecimal(secs, instant.getNanos()));
   }
 
-  static Instant toInstant(BigDecimal value) {
-    long seconds = value.longValue();
-    int nanoseconds = extractNanosecondDecimal(value, seconds);
-    return Instant.ofEpochSecond(seconds, nanoseconds);
-  }
-
-  static BigDecimal toDecimal(Instant instant) {
-    return new BigDecimal(toDecimal(instant.getEpochSecond(), instant.getNano()));
-  }
-
   static String toDecimal(long seconds, int nanoseconds) {
     StringBuilder string = new StringBuilder(Integer.toString(nanoseconds));
     if (string.length() < 9)

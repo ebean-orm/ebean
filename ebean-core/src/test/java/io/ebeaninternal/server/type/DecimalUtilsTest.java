@@ -9,29 +9,22 @@ import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class DecimalUtilsTest {
+class DecimalUtilsTest {
 
   @Test
-  public void testToDecimal() throws Exception {
-
+  void testToDecimal() {
     Instant now = Instant.now();
-    BigDecimal value = DecimalUtils.toDecimal(now);
+    Timestamp sourceTimestamp = Timestamp.from(now);
 
-    Instant instant = DecimalUtils.toInstant(value);
-    Timestamp timestamp = DecimalUtils.toTimestamp(value);
-    BigDecimal decimal = DecimalUtils.toDecimal(timestamp);
+    BigDecimal decimal = DecimalUtils.toDecimal(sourceTimestamp);
+    Timestamp timestamp = DecimalUtils.toTimestamp(decimal);
 
-    Instant instant1 = timestamp.toInstant();
-
-    assertEquals(instant, instant1);
-    assertEquals(value, decimal);
-    assertEquals(now, instant);
+    assertEquals(now, timestamp.toInstant());
+    assertEquals(sourceTimestamp, timestamp);
   }
 
   @Test
-  public void testDuration() throws Exception {
-
-
+  void testDuration() {
     Duration duration = Duration.ofSeconds(323, 1500000);
 
     BigDecimal bigDecimal = DecimalUtils.toDecimal(duration);
