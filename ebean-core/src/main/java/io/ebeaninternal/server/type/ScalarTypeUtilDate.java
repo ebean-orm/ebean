@@ -3,6 +3,7 @@ package io.ebeaninternal.server.type;
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarTypeBaseDate;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.sql.SQLException;
@@ -89,7 +90,7 @@ final class ScalarTypeUtilDate {
     }
   }
 
-  static final class DateType extends ScalarTypeBaseDate<java.util.Date> {
+  static final class DateType extends ScalarTypeBaseDate<Date> {
 
     DateType(JsonConfig.Date mode) {
       super(mode, Date.class, false, Types.DATE);

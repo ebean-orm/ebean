@@ -8,6 +8,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.ScalarTypeBaseDate;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 /**

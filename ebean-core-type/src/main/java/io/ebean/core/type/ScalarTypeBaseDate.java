@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.core.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -19,11 +19,11 @@ import java.sql.Types;
 /**
  * Base class for Date types.
  */
-abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
+public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   protected final JsonConfig.Date mode;
 
-  ScalarTypeBaseDate(JsonConfig.Date mode, Class<T> type, boolean jdbcNative, int jdbcType) {
+  public ScalarTypeBaseDate(JsonConfig.Date mode, Class<T> type, boolean jdbcNative, int jdbcType) {
     super(type, jdbcNative, jdbcType);
     this.mode = mode;
   }

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.ScalarTypeBaseDate;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 import org.joda.time.DateMidnight;
 
@@ -11,7 +12,7 @@ import java.sql.Types;
  * ScalarType for Joda DateMidnight. This maps to a JDBC Date.
  */
 @SuppressWarnings("deprecation")
-final class ScalarTypeJodaDateMidnight extends ScalarTypeBaseDate<org.joda.time.DateMidnight> {
+final class ScalarTypeJodaDateMidnight extends ScalarTypeBaseDate<DateMidnight> {
 
   /**
    * Instantiates a new scalar type joda date midnight.
