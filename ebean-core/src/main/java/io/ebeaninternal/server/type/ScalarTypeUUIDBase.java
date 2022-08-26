@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarTypeBase;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.io.DataInput;
 import java.io.DataOutput;

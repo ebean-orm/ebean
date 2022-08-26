@@ -2,7 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.ScalarTypeBaseDateTime;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 import org.joda.time.DateTime;
 
 import java.sql.Timestamp;

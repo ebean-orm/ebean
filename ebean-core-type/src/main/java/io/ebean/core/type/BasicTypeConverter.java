@@ -1,8 +1,5 @@
-package io.ebeaninternal.server.core;
+package io.ebean.core.type;
 
-import io.ebeaninternal.server.type.ScalarTypeUUIDBinary;
-
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -14,14 +11,9 @@ import java.util.Calendar;
 import java.util.UUID;
 
 /**
- * Default implementation of TypeConverter.
- * <p>
- * Converts objects to the required type if required.
- * </p>
+ * Helper to converts objects to the basic types if required.
  */
-public final class BasicTypeConverter implements Serializable {
-
-  private static final long serialVersionUID = 7691463236204070311L;
+public final class BasicTypeConverter {
 
   /**
    * Type code for java.util.Calendar.
@@ -43,7 +35,6 @@ public final class BasicTypeConverter implements Serializable {
    * @param toDataType the dataType as per java.sql.Types.
    */
   public static Object convert(Object value, int toDataType) {
-
     try {
       switch (toDataType) {
         case UTIL_DATE: {
@@ -58,7 +49,8 @@ public final class BasicTypeConverter implements Serializable {
         case Types.INTEGER: {
           return toInteger(value);
         }
-        case Types.BIT: {
+        case Types.BIT:
+        case Types.BOOLEAN: {
           return toBoolean(value);
         }
         case Types.TINYINT: {
@@ -67,23 +59,16 @@ public final class BasicTypeConverter implements Serializable {
         case Types.SMALLINT: {
           return toShort(value);
         }
-        case Types.NUMERIC: {
-          return toBigDecimal(value);
-        }
+        case Types.NUMERIC:
         case Types.DECIMAL: {
           return toBigDecimal(value);
         }
         case Types.REAL: {
           return toFloat(value);
         }
-        case Types.DOUBLE: {
-          return toDouble(value);
-        }
+        case Types.DOUBLE:
         case Types.FLOAT: {
           return toDouble(value);
-        }
-        case Types.BOOLEAN: {
-          return toBoolean(value);
         }
         case Types.TIMESTAMP: {
           return toTimestamp(value);
@@ -91,35 +76,25 @@ public final class BasicTypeConverter implements Serializable {
         case Types.DATE: {
           return toDate(value);
         }
-        case Types.VARCHAR: {
-          return toString(value);
-        }
+        case Types.VARCHAR:
         case Types.CHAR: {
           return toString(value);
         }
-        case Types.OTHER: {
-          return value;
-        }
-        case Types.JAVA_OBJECT: {
-          return value;
-        }
+        case Types.OTHER:
         case Types.BINARY:
         case Types.LONGVARBINARY:
-        case Types.BLOB: {
-          return value;
-        }
+        case Types.BLOB:
+        case Types.JAVA_OBJECT:
         case Types.LONGVARCHAR:
         case Types.CLOB: {
           return value;
         }
         default: {
-          String msg = "Unhandled data type [" + toDataType + "] converting [" + value + "]";
-          throw new RuntimeException(msg);
+          throw new RuntimeException("Unhandled data type - " + toDataType);
         }
       }
     } catch (ClassCastException e) {
-      String m = "ClassCastException converting to data type [" + toDataType + "] value [" + value + "]";
-      throw new RuntimeException(m);
+      throw new RuntimeException("ClassCastException converting to data type: " + toDataType + " value: " + value);
     }
   }
 
@@ -127,7 +102,6 @@ public final class BasicTypeConverter implements Serializable {
    * Convert the value to a String.
    */
   public static String toString(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -137,7 +111,6 @@ public final class BasicTypeConverter implements Serializable {
     if (value instanceof char[]) {
       return String.valueOf((char[]) value);
     }
-
     return value.toString();
   }
 
@@ -145,8 +118,7 @@ public final class BasicTypeConverter implements Serializable {
   /**
    * Convert the value to a Boolean with an explicit String true value.
    */
-  public static Boolean toBoolean(Object value, String dbTrueValue) {
-
+  public static Boolean toBoolean(Object value, String trueValue) {
     if (value == null) {
       return null;
     }
@@ -156,8 +128,7 @@ public final class BasicTypeConverter implements Serializable {
     if (value instanceof Number) {
       return ((Number) value).intValue() == 1;
     }
-    String s = value.toString();
-    return s.equalsIgnoreCase(dbTrueValue);
+    return value.toString().equalsIgnoreCase(trueValue);
   }
 
   /**
@@ -165,14 +136,12 @@ public final class BasicTypeConverter implements Serializable {
    * "true" or "false".
    */
   public static Boolean toBoolean(Object value) {
-
     if (value == null) {
       return null;
     }
     if (value instanceof Boolean) {
       return (Boolean) value;
     }
-
     return Boolean.valueOf(value.toString());
   }
 
@@ -180,7 +149,6 @@ public final class BasicTypeConverter implements Serializable {
    * Convert the value to a UUID.
    */
   public static UUID toUUID(Object value, boolean optimizedBinary) {
-
     if (value == null) {
       return null;
     }
@@ -191,17 +159,15 @@ public final class BasicTypeConverter implements Serializable {
       return UUID.fromString((String) value);
     }
     if (value instanceof byte[]) {
-      return ScalarTypeUUIDBinary.convertFromBytes((byte[]) value, optimizedBinary);
+      return ScalarTypeUtils.uuidFromBytes((byte[]) value, optimizedBinary);
     }
     return UUID.fromString(value.toString());
   }
 
   /**
-   * convert the passed in object to a BigDecimal. It should be another
-   * numeric type.
+   * convert the passed in object to a BigDecimal. It should be another numeric type.
    */
   public static BigDecimal toBigDecimal(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -212,7 +178,6 @@ public final class BasicTypeConverter implements Serializable {
   }
 
   public static Float toFloat(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -226,7 +191,6 @@ public final class BasicTypeConverter implements Serializable {
   }
 
   public static Short toShort(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -240,7 +204,6 @@ public final class BasicTypeConverter implements Serializable {
   }
 
   public static Byte toByte(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -251,11 +214,9 @@ public final class BasicTypeConverter implements Serializable {
   }
 
   /**
-   * convert the passed in object to a Integer. It should be another numeric
-   * type.
+   * convert the passed in object to an Integer.
    */
   public static Integer toInteger(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -269,10 +230,9 @@ public final class BasicTypeConverter implements Serializable {
   }
 
   /**
-   * Convert the object to a Long. It should be another numeric type.
+   * Convert the object to a Long.
    */
   public static Long toLong(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -294,8 +254,7 @@ public final class BasicTypeConverter implements Serializable {
     return Long.valueOf(value.toString());
   }
 
-  public static BigInteger toMathBigInteger(Object value) {
-
+  public static BigInteger toBigInteger(Object value) {
     if (value == null) {
       return null;
     }
@@ -306,10 +265,9 @@ public final class BasicTypeConverter implements Serializable {
   }
 
   /**
-   * Convert the object to a Double. It should be another numberic type.
+   * Convert the object to a Double.
    */
   public static Double toDouble(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -323,56 +281,42 @@ public final class BasicTypeConverter implements Serializable {
   }
 
   /**
-   * convert the passed in object to a Timestamp. It is expected to be a
-   * java.sql.Date really.
+   * convert the passed in object to a Timestamp.
    */
   public static Timestamp toTimestamp(Object value) {
-
     if (value == null) {
       return null;
     }
     if (value instanceof Timestamp) {
       return (Timestamp) value;
-
     } else if (value instanceof java.util.Date) {
       // no nanos here... so hopefully ok
       return new Timestamp(((java.util.Date) value).getTime());
-
     } else if (value instanceof Calendar) {
       return new Timestamp(((Calendar) value).getTime().getTime());
-
     } else if (value instanceof String) {
       return Timestamp.valueOf((String) value);
-
     } else if (value instanceof LocalDateTime) {
       return Timestamp.valueOf((LocalDateTime) value);
-
     } else if (value instanceof Number) {
       return new Timestamp(((Number) value).longValue());
-
     } else {
-      String msg = "Unable to convert [" + value.getClass().getName() + "] into a Timestamp.";
-      throw new RuntimeException(msg);
+      throw new RuntimeException("Unable to convert " + value);
     }
   }
 
   public static java.sql.Time toTime(Object value) {
-
     if (value == null) {
       return null;
     }
     if (value instanceof java.sql.Time) {
       return (java.sql.Time) value;
-
     } else if (value instanceof String) {
       return java.sql.Time.valueOf((String) value);
-
     } else if (value instanceof LocalTime) {
       return java.sql.Time.valueOf((LocalTime) value);
-
     } else {
-      String m = "Unable to convert [" + value.getClass().getName() + "] into a java.sql.Date.";
-      throw new RuntimeException(m);
+      throw new RuntimeException("Unable to convert " + value);
     }
   }
 
@@ -380,31 +324,23 @@ public final class BasicTypeConverter implements Serializable {
    * convert the passed in object to a java sql Date.
    */
   public static java.sql.Date toDate(Object value) {
-
     if (value == null) {
       return null;
     }
     if (value instanceof java.sql.Date) {
       return (java.sql.Date) value;
-
     } else if (value instanceof java.util.Date) {
       return new java.sql.Date(((java.util.Date) value).getTime());
-
     } else if (value instanceof Calendar) {
       return new java.sql.Date(((Calendar) value).getTime().getTime());
-
     } else if (value instanceof String) {
       return java.sql.Date.valueOf((String) value);
-
     } else if (value instanceof Number) {
       return new java.sql.Date(((Number) value).longValue());
-
     } else if (value instanceof LocalDate) {
-      return java.sql.Date.valueOf((LocalDate)value);
-
+      return java.sql.Date.valueOf((LocalDate) value);
     } else {
-      String m = "Unable to convert [" + value.getClass().getName() + "] into a java.sql.Date.";
-      throw new RuntimeException(m);
+      throw new RuntimeException("Unable to convert " + value);
     }
   }
 
@@ -412,7 +348,6 @@ public final class BasicTypeConverter implements Serializable {
    * convert the passed in object to a java sql Date.
    */
   public static java.util.Date toUtilDate(Object value) {
-
     if (value == null) {
       return null;
     }
@@ -420,26 +355,19 @@ public final class BasicTypeConverter implements Serializable {
       // loss of nanos precision
       return new java.util.Date(((java.sql.Timestamp) value).getTime());
     }
-    // DEVNOTE: strictly speaking do I need to convert a java.sql.Date to
-    // java.util.Date? equals() is symmetrical so perhaps this is not
-    // really required?
     if (value instanceof java.sql.Date) {
       return new java.util.Date(((java.sql.Date) value).getTime());
     }
     if (value instanceof java.util.Date) {
       return (java.util.Date) value;
-
     } else if (value instanceof Calendar) {
       return ((Calendar) value).getTime();
-
     } else if (value instanceof String) {
       return new java.util.Date(Timestamp.valueOf((String) value).getTime());
-
     } else if (value instanceof Number) {
       return new java.util.Date(((Number) value).longValue());
-
     } else {
-      throw new RuntimeException("Unable to convert [" + value.getClass().getName() + "] into a java.util.Date");
+      throw new RuntimeException("Unable to convert " + value);
     }
   }
 
@@ -447,37 +375,29 @@ public final class BasicTypeConverter implements Serializable {
    * convert the passed in object to a java sql Date.
    */
   public static Calendar toCalendar(Object value) {
-
     if (value == null) {
       return null;
     }
     if (value instanceof Calendar) {
       return (Calendar) value;
-
     } else if (value instanceof java.util.Date) {
       java.util.Date date = ((java.util.Date) value);
       return toCalendarFromDate(date);
-
     } else if (value instanceof String) {
       java.util.Date date = toUtilDate(value);
       return toCalendarFromDate(date);
-
     } else if (value instanceof Number) {
       long timeMillis = ((Number) value).longValue();
       java.util.Date date = new java.util.Date(timeMillis);
       return toCalendarFromDate(date);
-
     } else {
-      String m = "Unable to convert [" + value.getClass().getName() + "] into a java.util.Date";
-      throw new RuntimeException(m);
+      throw new RuntimeException("Unable to convert " + value);
     }
   }
 
   private static Calendar toCalendarFromDate(java.util.Date date) {
-
     Calendar cal = Calendar.getInstance();
     cal.setTime(date);
-
     return cal;
   }
 
