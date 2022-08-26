@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.ScalarTypeBaseDateTime;
 import io.ebeaninternal.server.core.BasicTypeConverter;
 
 import java.sql.Date;
@@ -11,7 +12,7 @@ import java.sql.Types;
 import java.time.Instant;
 import java.util.Calendar;
 
-import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
+import static io.ebean.core.type.ScalarTypeUtils.formatInstant;
 
 /**
  * ScalarType for java.util.Calendar.
@@ -65,7 +66,7 @@ final class ScalarTypeCalendar extends ScalarTypeBaseDateTime<Calendar> {
 
   @Override
   protected String toJsonISO8601(Calendar value) {
-    return formatIso(value.toInstant());
+    return formatInstant(value.toInstant());
   }
 
   @Override

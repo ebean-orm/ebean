@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.core.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -19,14 +19,19 @@ import java.sql.Types;
 /**
  * Base class for Date types.
  */
-abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
+public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   protected final JsonConfig.Date mode;
 
-  ScalarTypeBaseDate(JsonConfig.Date mode, Class<T> type, boolean jdbcNative, int jdbcType) {
+  public ScalarTypeBaseDate(JsonConfig.Date mode, Class<T> type, boolean jdbcNative, int jdbcType) {
     super(type, jdbcNative, jdbcType);
     this.mode = mode;
   }
+
+  /**
+   * Convert the value to ISO8601 format.
+   */
+  protected abstract String toIsoFormat(T value);
 
   /**
    * Convert the target value to millis.
@@ -54,32 +59,27 @@ abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
 
   @Override
   public T read(DataReader reader) throws SQLException {
-    Date ts = reader.getDate();
-    return ts == null ? null : convertFromDate(ts);
+    final Date date = reader.getDate();
+    return date == null ? null : convertFromDate(date);
   }
 
   @Override
-  public String formatValue(T t) {
-    Date date = convertToDate(t);
-    // format all dates into epoch millis
-    long epochMillis = date.getTime();
-    return Long.toString(epochMillis);
+  public String formatValue(T value) {
+    final Date date = convertToDate(value);
+    return Long.toString(date.getTime());
   }
 
   @Override
   public T parse(String value) {
     try {
-      long epochMillis = Long.parseLong(value);
-      return convertFromDate(new Date(epochMillis));
+      return convertFromDate(new Date(Long.parseLong(value)));
     } catch (NumberFormatException e) {
-      Date date = Date.valueOf(value);
-      return convertFromDate(date);
+      return convertFromDate(Date.valueOf(value));
     }
   }
 
   public T convertFromMillis(long systemTimeMillis) {
-    Date ts = new Date(systemTimeMillis);
-    return convertFromDate(ts);
+    return convertFromDate(new Date(systemTimeMillis));
   }
 
   @Override
@@ -100,11 +100,6 @@ abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     }
   }
 
-  /**
-   * Convert the value to ISO8601 format.
-   */
-  protected abstract String toIsoFormat(T value);
-
   @Override
   public DocPropertyType docType() {
     return DocPropertyType.DATE;
@@ -115,9 +110,7 @@ abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      long val = dataInput.readLong();
-      Date date = new Date(val);
-      return convertFromDate(date);
+      return convertFromDate(new Date(dataInput.readLong()));
     }
   }
 
@@ -127,8 +120,7 @@ abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
       dataOutput.writeBoolean(false);
     } else {
       dataOutput.writeBoolean(true);
-      Date date = convertToDate(value);
-      dataOutput.writeLong(date.getTime());
+      dataOutput.writeLong(convertToDate(value).getTime());
     }
   }
 

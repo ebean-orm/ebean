@@ -3,6 +3,7 @@ package io.ebeaninternal.server.type;
 import java.sql.Date;
 import java.sql.Types;
 
+import io.ebean.core.type.ScalarTypeBaseDate;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 
