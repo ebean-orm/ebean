@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.joda.time;
 
 import java.sql.SQLException;
 import java.sql.Types;

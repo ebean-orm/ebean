@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.joda.time;
 
 import org.joda.time.Period;
 import org.junit.jupiter.api.Test;

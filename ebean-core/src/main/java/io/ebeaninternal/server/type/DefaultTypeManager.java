@@ -147,7 +147,6 @@ public final class DefaultTypeManager implements TypeManager {
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
-    initialiseJodaTypes(config);
     initialiseJacksonTypes(config);
     loadTypesFromProviders(config, objectMapper);
     loadGeoTypeBinder(config);
@@ -261,7 +260,7 @@ public final class DefaultTypeManager implements TypeManager {
     if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
         throw new IllegalStateException(
-          "ScalarType of Joda LocalTime not defined. You need to set DatabaseConfig.jodaLocalTimeMode to"
+          "ScalarType of Joda LocalTime not defined. 1) Check ebean-joda-time dependency has been added  2) Check DatabaseConfig.jodaLocalTimeMode is set to"
             + " either 'normal' or 'utc'.  UTC is the old mode using UTC timezone but local time zone is now preferred as 'normal' mode.");
       }
       found = checkInheritedTypes(type);
@@ -796,36 +795,6 @@ public final class DefaultTypeManager implements TypeManager {
   private void addType(Class<?> clazz, ScalarType<?> scalarType) {
     typeMap.put(clazz, scalarType);
     logicalMap.putIfAbsent(clazz.getSimpleName(), scalarType);
-  }
-
-  /**
-   * Detect if Joda classes are in the classpath and if so register the Joda data types.
-   */
-  @SuppressWarnings("deprecation")
-  private void initialiseJodaTypes(DatabaseConfig config) {
-    // detect if Joda classes are in the classpath
-    if (config.getClassLoadConfig().isJodaTimePresent()) {
-      // Joda classes are in the classpath so register the types
-      log.log(DEBUG, "Registering Joda data types");
-      addType(LocalDateTime.class, new ScalarTypeJodaLocalDateTime(jsonDateTime));
-      addType(DateTime.class, new ScalarTypeJodaDateTime(jsonDateTime));
-      if (config.getDatabasePlatform().supportsNativeJavaTime()) {
-        addType(LocalDate.class, new ScalarTypeJodaLocalDateNative(jsonDate));
-      } else {
-        addType(LocalDate.class, new ScalarTypeJodaLocalDate(jsonDate));
-      }
-      addType(org.joda.time.DateMidnight.class, new ScalarTypeJodaDateMidnight(jsonDate));
-      addType(org.joda.time.Period.class, new ScalarTypeJodaPeriod());
-
-      String jodaLocalTimeMode = config.getJodaLocalTimeMode();
-      if ("normal".equalsIgnoreCase(jodaLocalTimeMode)) {
-        // use the expected/normal local time zone
-        addType(LocalTime.class, new ScalarTypeJodaLocalTime());
-      } else if ("utc".equalsIgnoreCase(jodaLocalTimeMode)) {
-        // use the old UTC based
-        addType(LocalTime.class, new ScalarTypeJodaLocalTimeUTC());
-      }
-    }
   }
 
   /**

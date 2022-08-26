@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.joda.time;
 
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.ScalarTypeBaseDate;

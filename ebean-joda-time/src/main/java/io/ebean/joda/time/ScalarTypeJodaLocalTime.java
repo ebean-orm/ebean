@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.joda.time;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;

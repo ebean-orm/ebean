@@ -1,12 +1,9 @@
-package io.ebeaninternal.server.type;
+package io.ebean.joda.time;
 
-import io.ebean.DB;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.TJodaEntity;
 
 import java.sql.Timestamp;
 
@@ -47,18 +44,5 @@ public class ScalarTypeJodaLocalTimeTest {
 
   }
 
-  @Test
-  public void toJson() {
 
-    LocalTime now = new LocalTime();
-
-    TJodaEntity bean = new TJodaEntity();
-    bean.setId(42);
-    bean.setLocalTime(now);
-
-    String json = DB.json().toJson(bean);
-    TJodaEntity bean1 = DB.json().toBean(TJodaEntity.class, json);
-
-    Assertions.assertEquals(bean1.getLocalTime(), now);
-  }
 }
