@@ -22,6 +22,7 @@ import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.core.EncryptAlias;
 import io.ebeaninternal.server.core.InternString;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenModified;

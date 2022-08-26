@@ -46,7 +46,7 @@ import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
 import io.ebeaninternal.server.query.*;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
-import io.ebeaninternal.server.text.json.DJsonContext;
+import io.ebeaninternal.server.json.DJsonContext;
 import io.ebeaninternal.server.transaction.*;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.TypeManager;

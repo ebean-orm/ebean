@@ -7,6 +7,7 @@ import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.*;

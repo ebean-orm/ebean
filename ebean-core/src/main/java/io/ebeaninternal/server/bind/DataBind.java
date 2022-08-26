@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebeaninternal.server.bind;
 
 import io.ebean.core.type.DataBinder;
 import io.ebeaninternal.api.CoreLog;

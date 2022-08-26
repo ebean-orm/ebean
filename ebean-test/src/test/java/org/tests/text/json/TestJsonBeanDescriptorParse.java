@@ -7,7 +7,7 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.text.json.ReadJson;
+import io.ebeaninternal.server.json.ReadJson;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

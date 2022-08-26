@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type.bindcapture;
+package io.ebeaninternal.server.bind.capture;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

@@ -7,7 +7,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.util.Str;
 
 import javax.persistence.OptimisticLockException;
