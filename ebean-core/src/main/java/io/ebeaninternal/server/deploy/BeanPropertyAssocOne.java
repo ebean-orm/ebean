@@ -768,7 +768,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     if (value == null) {
       writeJson.writeNullField(name);
     } else {
-      if (!writeJson.isParentBean(value)) {
+      if (!writeJson.parentBean(value)) {
         // Hmmm, not writing complex non-entity bean
         if (value instanceof EntityBean) {
           writeJson.beginAssocOne(name, bean);
@@ -785,7 +785,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     if (jsonDeserialize && targetDescriptor != null) {
       T target = (T) value(bean);
       T assocBean = targetDescriptor.jsonRead(readJson, name, target);
-      if (readJson.isIntercept()) {
+      if (readJson.intercept()) {
         setValueIntercept(bean, assocBean);
       } else {
         setValue(bean, assocBean);

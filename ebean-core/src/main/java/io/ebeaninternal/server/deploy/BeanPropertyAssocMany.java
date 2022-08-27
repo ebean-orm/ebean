@@ -998,7 +998,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   private Object jsonReadCollection(String json) throws IOException {
     SpiJsonReader ctx = descriptor.createJsonReader(json);
-    JsonParser parser = ctx.getParser();
+    JsonParser parser = ctx.parser();
     JsonToken event = parser.nextToken();
     if (JsonToken.VALUE_NULL == event) {
       return null;

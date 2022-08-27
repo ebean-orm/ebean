@@ -86,7 +86,7 @@ public final class ReadJson implements SpiJsonReader {
    * Return the persistence context being used if any.
    */
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public PersistenceContext persistenceContext() {
     return persistenceContext;
   }
 
@@ -142,7 +142,7 @@ public final class ReadJson implements SpiJsonReader {
    * Return the objectMapper used for this request.
    */
   @Override
-  public ObjectMapper getObjectMapper() {
+  public ObjectMapper mapper() {
     if (objectMapper == null) {
       throw new IllegalStateException(
         "Jackson ObjectMapper required but has not set. The ObjectMapper can be set on"
@@ -155,7 +155,7 @@ public final class ReadJson implements SpiJsonReader {
    * Return the JsonParser.
    */
   @Override
-  public JsonParser getParser() {
+  public JsonParser parser() {
     return parser;
   }
 
@@ -209,14 +209,14 @@ public final class ReadJson implements SpiJsonReader {
    */
   @Override
   public Object readValueUsingObjectMapper(Class<?> propertyType) throws IOException {
-    return getObjectMapper().readValue(parser, propertyType);
+    return mapper().readValue(parser, propertyType);
   }
 
   /**
    * Do we have to set values via intercept or not.
    */
   @Override
-  public boolean isIntercept() {
+  public boolean intercept() {
     return intercept;
   }
 }

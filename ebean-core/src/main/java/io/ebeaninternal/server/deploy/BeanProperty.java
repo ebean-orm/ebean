@@ -1407,7 +1407,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     JsonToken event = ctx.nextToken();
     if (JsonToken.VALUE_NULL == event) {
       if (jsonDeserialize) {
-        if (ctx.isIntercept()) {
+        if (ctx.intercept()) {
           setValueIntercept(bean, null);
         } else {
           setValue(bean, null);
@@ -1417,7 +1417,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       // expect to read non-null json value
       Object objValue;
       if (scalarType != null) {
-        objValue = scalarType.jsonRead(ctx.getParser());
+        objValue = scalarType.jsonRead(ctx.parser());
       } else {
         try {
           objValue = ctx.readValueUsingObjectMapper(propertyType);
@@ -1430,7 +1430,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
         }
       }
       if (jsonDeserialize) {
-        if (ctx.isIntercept()) {
+        if (ctx.intercept()) {
           setValueIntercept(bean, objValue);
         } else {
           setValue(bean, objValue);

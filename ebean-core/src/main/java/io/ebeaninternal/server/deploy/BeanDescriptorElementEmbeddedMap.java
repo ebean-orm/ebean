@@ -49,7 +49,7 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
 
   @Override
   public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-    JsonParser parser = readJson.getParser();
+    JsonParser parser = readJson.parser();
     ElementCollector add = elementHelp.createCollector();
     do {
       String fieldName = parser.nextFieldName();
