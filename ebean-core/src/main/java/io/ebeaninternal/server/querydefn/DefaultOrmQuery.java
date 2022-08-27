@@ -1714,7 +1714,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final String toString() {
-    return "Query [" + whereExpressions + "]";
+    return "Query " + whereExpressions;
   }
 
   @Override

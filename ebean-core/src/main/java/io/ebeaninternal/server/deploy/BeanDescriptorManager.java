@@ -988,14 +988,14 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private DeployBeanPropertyAssocOne<?> mappedOneToOne(DeployBeanPropertyAssocOne<?> prop, String mappedBy, DeployBeanDescriptor<?> targetDesc) {
     DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
     if (mappedProp == null) {
-      throw new PersistenceException("Error on " + prop.getFullBeanName() + " Can not find mappedBy property [" + targetDesc + "." + mappedBy + "]");
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + " Can not find mappedBy property " + targetDesc + "." + mappedBy);
     }
     if (!(mappedProp instanceof DeployBeanPropertyAssocOne<?>)) {
-      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + targetDesc + "." + mappedBy + "]is not a OneToOne?");
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property " + targetDesc + "." + mappedBy + " is not a OneToOne?");
     }
     DeployBeanPropertyAssocOne<?> mappedAssocOne = (DeployBeanPropertyAssocOne<?>) mappedProp;
     if (!mappedAssocOne.isOneToOne()) {
-      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + targetDesc + "." + mappedBy + "]is not a OneToOne?");
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property " + targetDesc + "." + mappedBy + " is not a OneToOne?");
     }
     return mappedAssocOne;
   }
@@ -1078,10 +1078,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private DeployBeanPropertyAssocOne<?> mappedManyToOne(DeployBeanPropertyAssocMany<?> prop, DeployBeanDescriptor<?> targetDesc, String mappedBy) {
     DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
     if (mappedProp == null) {
-      throw new PersistenceException("Error on " + prop.getFullBeanName() + "  Can not find mappedBy property [" + mappedBy + "] " + "in [" + targetDesc + "]");
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + "  Can not find mappedBy property " + mappedBy + " in " + targetDesc);
     }
     if (!(mappedProp instanceof DeployBeanPropertyAssocOne<?>)) {
-      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + mappedBy + "]is not a ManyToOne?" + "in [" + targetDesc + "]");
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property " + mappedBy + " is not a ManyToOne? in " + targetDesc);
     }
     return (DeployBeanPropertyAssocOne<?>) mappedProp;
   }
@@ -1129,15 +1129,15 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private DeployBeanPropertyAssocMany<?> mappedManyToMany(DeployBeanPropertyAssocMany<?> prop, String mappedBy, DeployBeanDescriptor<?> targetDesc) {
     DeployBeanProperty mappedProp = targetDesc.getBeanProperty(mappedBy);
     if (mappedProp == null) {
-      throw new PersistenceException("Error on " + prop.getFullBeanName() + "  Can not find mappedBy property [" + mappedBy + "] " + "in [" + targetDesc + "]");
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + "  Can not find mappedBy property " + mappedBy + " in " + targetDesc);
     }
     if (!(mappedProp instanceof DeployBeanPropertyAssocMany<?>)) {
-      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + targetDesc + "." + mappedBy + "] is not a ManyToMany?");
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property " + targetDesc + "." + mappedBy + " is not a ManyToMany?");
     }
 
     DeployBeanPropertyAssocMany<?> mappedAssocMany = (DeployBeanPropertyAssocMany<?>) mappedProp;
     if (!mappedAssocMany.isManyToMany()) {
-      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property [" + targetDesc + "." + mappedBy + "] is not a ManyToMany?");
+      throw new PersistenceException("Error on " + prop.getFullBeanName() + ". mappedBy property " + targetDesc + "." + mappedBy + " is not a ManyToMany?");
     }
     return mappedAssocMany;
   }

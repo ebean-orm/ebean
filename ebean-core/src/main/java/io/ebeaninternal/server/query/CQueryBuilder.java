@@ -482,8 +482,8 @@ final class CQueryBuilder {
     } else if (beanProperty.isDiscriminator()) {
       propertyName = SplitName.parent(propertyName);
     } else if (beanProperty instanceof BeanPropertyAssocOne<?>) {
-      String msg = "Column [" + column.getDbColumn() + "] mapped to complex Property[" + propertyName + "]";
-      msg += ". It should be mapped to a simple property (probably the Id property). ";
+      String msg = "Column " + column.getDbColumn() + " mapped to complex property " + propertyName +
+        ". It should be mapped to a simple property (probably the Id property).";
       throw new PersistenceException(msg);
     }
     if (propertyName != null) {

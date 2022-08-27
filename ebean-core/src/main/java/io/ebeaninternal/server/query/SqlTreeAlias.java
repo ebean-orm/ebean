@@ -133,8 +133,7 @@ final class SqlTreeAlias {
       s = aliasMap.get(prefix);
     }
     if (s == null) {
-      String msg = "Could not determine table alias for [" + prefix + "] manyMap[" + manyWhereAliasMap + "] aliasMap[" + aliasMap + "]";
-      throw new RuntimeException(msg);
+      throw new RuntimeException("Could not determine table alias for " + prefix + " manyMap:" + manyWhereAliasMap + " aliasMap:" + aliasMap);
     }
     return s;
   }

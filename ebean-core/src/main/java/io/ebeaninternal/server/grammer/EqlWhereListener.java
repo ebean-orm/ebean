@@ -351,7 +351,7 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
         if (Character.isDigit(firstChar)) {
           return EqlValueType.NUMBER;
         }
-        throw new IllegalArgumentException("Unexpected first character in value [" + valueAsText + "]");
+        throw new IllegalArgumentException("Unexpected first character in value " + valueAsText);
     }
   }
 

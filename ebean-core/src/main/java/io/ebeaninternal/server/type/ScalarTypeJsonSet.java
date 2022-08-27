@@ -74,7 +74,7 @@ final class ScalarTypeJsonSet {
       try {
         return convertElements(EJson.parseSet(value, false));
       } catch (IOException e) {
-        throw new PersistenceException("Failed to parse JSON content as Set: [" + value + "]", e);
+        throw new PersistenceException("Failed to parse JSON content as Set: " + value, e);
       }
     }
   }
@@ -177,7 +177,7 @@ final class ScalarTypeJsonSet {
       try {
         return convertList(EJson.parseList(value));
       } catch (IOException e) {
-        throw new PersistenceException("Failed to parse JSON content as Set: [" + value + "]", e);
+        throw new PersistenceException("Failed to parse JSON content as Set: " + value, e);
       }
     }
 

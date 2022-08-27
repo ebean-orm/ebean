@@ -87,7 +87,7 @@ public final class ScopeTrans {
 
   @Override
   public String toString() {
-    return "ScopeTrans[" + transaction + "]";
+    return "ScopeTrans " + transaction;
   }
 
   /**

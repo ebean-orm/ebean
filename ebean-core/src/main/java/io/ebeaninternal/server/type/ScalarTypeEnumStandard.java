@@ -163,8 +163,7 @@ final class ScalarTypeEnumStandard {
         return null;
       } else {
         if (ordinal < 0 || ordinal >= enumArray.length) {
-          String m = "Unexpected ordinal [" + ordinal + "] out of range [" + enumArray.length + "]";
-          throw new IllegalStateException(m);
+          throw new IllegalStateException("Unexpected ordinal " + ordinal + " out of range " + enumArray.length);
         }
         return enumArray[ordinal];
       }
@@ -196,8 +195,7 @@ final class ScalarTypeEnumStandard {
         ordinal = Integer.parseInt(dbValue.toString());
       }
       if (ordinal < 0 || ordinal >= enumArray.length) {
-        String m = "Unexpected ordinal [" + ordinal + "] out of range [" + enumArray.length + "]";
-        throw new IllegalStateException(m);
+        throw new IllegalStateException("Unexpected ordinal " + ordinal + " out of range " + enumArray.length);
       }
       return enumArray[ordinal];
     }

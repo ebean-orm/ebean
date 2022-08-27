@@ -141,7 +141,7 @@ public final class DeployUtil {
       if (scalarType != null || property.isTransient()) {
         return scalarType;
       }
-      throw new PersistenceException(property.getFullBeanName() + " has no ScalarType - type[" + propType.getName() + "]");
+      throw new PersistenceException(property.getFullBeanName() + " has no ScalarType - type " + propType.getName());
     } catch (IllegalArgumentException e) {
       if (property.isTransient()) {
         // expected for transient properties with unknown/non-mapped types
@@ -174,7 +174,7 @@ public final class DeployUtil {
     Class<?> type = prop.getPropertyType();
     ScalarType<?> scalarType = typeManager.getArrayScalarType(type, prop.getGenericType(), prop.isNullable());
     if (scalarType == null) {
-      throw new RuntimeException("No ScalarType for @DbArray type for [" + prop.getFullBeanName() + "]");
+      throw new RuntimeException("No ScalarType for @DbArray type for " + prop.getFullBeanName());
     }
     int dbType = scalarType.jdbcType();
     prop.setDbType(dbType);
@@ -206,7 +206,7 @@ public final class DeployUtil {
     prop.setMutationDetection(mutationDetection);
     ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
     if (scalarType == null) {
-      throw new RuntimeException("No ScalarType for JSON property [" + prop + "] [" + dbType + "]");
+      throw new RuntimeException("No ScalarType for JSON property " + prop + " dbType:" + dbType);
     }
     prop.setScalarType(scalarType);
     if (dbType == Types.VARCHAR || dbLength > 0) {
@@ -251,7 +251,7 @@ public final class DeployUtil {
       scalarType = typeManager.getScalarType(type, lobType);
       if (scalarType == null) {
         // this should never occur actually
-        throw new RuntimeException("No ScalarType for LOB type [" + type + "] [" + lobType + "]");
+        throw new RuntimeException("No ScalarType for LOB type " + type + " dbType:" + lobType);
       }
       prop.setDbType(lobType);
       prop.setScalarType(scalarType);

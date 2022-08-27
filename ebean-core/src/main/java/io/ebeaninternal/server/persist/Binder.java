@@ -340,9 +340,7 @@ public final class Binder {
       if (data != null) {
         dataClass = data.getClass().getName();
       }
-      String m = "Error with property[" + b.currentPos() + "] dt[" + dataType + "]";
-      m += "data[" + data + "][" + dataClass + "]";
-      throw new PersistenceException(m, e);
+      throw new PersistenceException("Error with property:" + b.currentPos() + " dt:" + dataType + " data:" + data + " " + dataClass, e);
     }
   }
 

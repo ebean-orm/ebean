@@ -129,14 +129,12 @@ public final class CQueryEngine {
     SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
       // log the error to the transaction log
-      String msg = "ERROR executing query, bindLog[" + bindLog + "] error[" + StringHelper.removeNewLines(e.getMessage()) + "]";
-      t.logSummary(msg);
+      t.logSummary("ERROR executing query, bindLog[" + bindLog + "] error:" + StringHelper.removeNewLines(e.getMessage()));
     }
     // ensure 'rollback' is logged if queryOnly transaction
     t.connection();
     // build a decent error message for the exception
-    String m = "Query threw SQLException:" + e.getMessage() + " Bind values:[" + bindLog + "] Query was:" + sql;
-    return dbPlatform.translate(m, e);
+    return dbPlatform.translate("Query threw SQLException:" + e.getMessage() + " Bind values:[" + bindLog + "] Query was:" + sql, e);
   }
 
   /**

@@ -1891,7 +1891,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       }
       BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) other._findBeanProperty(split[0]);
       if (assocProp == null) {
-        throw new IllegalStateException("Unknown property path [" + split[0] + "] from[" + path + "]");
+        throw new IllegalStateException("Unknown property path " + split[0] + " from " + path);
       }
       BeanDescriptor<?> targetDesc = assocProp.targetDescriptor();
       path = split[1];

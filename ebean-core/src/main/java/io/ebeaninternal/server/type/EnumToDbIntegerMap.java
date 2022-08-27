@@ -51,10 +51,8 @@ final class EnumToDbIntegerMap extends EnumToDbValueMap<Integer> {
       return this;
 
     } catch (Exception e) {
-      String msg = "Error converted enum type[" + beanValue.getClass().getName();
-      msg += "] enum value[" + beanValue + "] string value [" + stringDbValue + "]";
-      msg += " to an Integer.";
-      throw new PersistenceException(msg, e);
+      throw new PersistenceException("Error converted enum [" + beanValue.getClass().getName()
+      + "] value[" + beanValue + "] string value [" + stringDbValue + "] to an Integer.", e);
     }
   }
 

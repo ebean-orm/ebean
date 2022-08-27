@@ -142,7 +142,7 @@ public final class BindParamsParser {
       param = params.getParameter(paramName);
     }
     if (param == null) {
-      throw new PersistenceException("Bind value is not set or null for [" + paramName + "] in [" + sql + "]");
+      throw new PersistenceException("Bind value is not set or null for " + paramName + " in " + sql);
     }
     return param;
   }

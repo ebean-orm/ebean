@@ -98,9 +98,9 @@ public interface SpiRawSql extends RawSql {
     @Override
     public String toString() {
       if (!parsed) {
-        return "unparsed[" + unparsedSql + "]";
+        return "unparsed " + unparsedSql;
       }
-      return "select[" + preFrom + "] preWhere[" + preWhere + "] preHaving[" + preHaving + "] orderBy[" + orderBy + "]";
+      return "select:" + preFrom + " preWhere:" + preWhere + " preHaving:" + preHaving + " orderBy:" + orderBy;
     }
 
     public boolean isDistinct() {
@@ -301,8 +301,7 @@ public interface SpiRawSql extends RawSql {
       } else {
         Column column = dbColumnMap.get(dbColumn);
         if (column == null) {
-          String msg = "DB Column [" + dbColumn + "] not found in mapping. Expecting one of [" + dbColumnMap.keySet() + "]";
-          throw new IllegalArgumentException(msg);
+          throw new IllegalArgumentException("DB Column " + dbColumn + " not found in mapping. Expecting one of " + dbColumnMap.keySet());
         }
         column.setPropertyName(propertyName);
       }
@@ -420,8 +419,7 @@ public interface SpiRawSql extends RawSql {
 
       private void checkMapping() {
         if (propertyName == null) {
-          String msg = "No propertyName defined (Column mapping) for dbColumn [" + dbColumn + "]";
-          throw new IllegalStateException(msg);
+          throw new IllegalStateException("No propertyName defined (Column mapping) for dbColumn " + dbColumn);
         }
       }
 

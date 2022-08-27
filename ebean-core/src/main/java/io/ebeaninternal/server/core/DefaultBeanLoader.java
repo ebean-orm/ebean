@@ -229,7 +229,7 @@ final class DefaultBeanLoader {
 
     Object dbBean = query.findOne();
     if (dbBean == null) {
-      throw new EntityNotFoundException("Bean not found during lazy load or refresh." + " id[" + id + "] type[" + desc.type() + "]");
+      throw new EntityNotFoundException("Bean not found during lazy load or refresh. Id:" + id + " type:" + desc.type());
     }
     desc.resetManyProperties(dbBean);
   }

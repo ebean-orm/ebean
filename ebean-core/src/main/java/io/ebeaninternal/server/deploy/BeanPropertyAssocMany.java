@@ -718,7 +718,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         }
       }
     }
-    throw new RuntimeException("Can not find Master [" + beanType + "] in Child[" + targetDesc + "]");
+    throw new RuntimeException("Can not find Master " + beanType + " in Child " + targetDesc);
   }
 
   /**
@@ -734,7 +734,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     }
     String from = descriptor.fullName();
     String to = targetDesc.fullName();
-    throw new PersistenceException(from + ": Could not find mapKey property [" + mapKey + "] on [" + to + "]");
+    throw new PersistenceException(from + ": Could not find mapKey property " + mapKey + " on " + to);
   }
 
   public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, List<Object> excludeDetailIds) {

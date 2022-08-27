@@ -1079,7 +1079,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (list.isEmpty()) {
       return null;
     } else if (list.size() > 1) {
-      throw new NonUniqueResultException("Unique expecting 0 or 1 results but got [" + list.size() + "]");
+      throw new NonUniqueResultException("Unique expecting 0 or 1 results but got " + list.size());
     } else {
       return list.get(0);
     }

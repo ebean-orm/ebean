@@ -26,7 +26,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   @Override
   public String toString() {
-    return "DynamicPropertyFormula[" + parsedFormula + "]";
+    return "DynamicPropertyFormula " + parsedFormula;
   }
 
   @Override

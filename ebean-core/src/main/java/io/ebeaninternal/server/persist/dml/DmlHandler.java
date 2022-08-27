@@ -101,7 +101,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       persistRequest.postExecute();
     } catch (OptimisticLockException e) {
       // add the SQL and bind values to error message
-      String m = e.getMessage() + " sql[" + sql + "] bind[" + bindLog + "]";
+      final String m = e.getMessage() + " sql[" + sql + "] bind[" + bindLog + "]";
       persistRequest.transaction().logSummary("OptimisticLockException:" + m);
       throw new OptimisticLockException(m, null, e.getEntity());
     }

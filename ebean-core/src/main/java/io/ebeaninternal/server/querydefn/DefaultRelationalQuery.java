@@ -121,7 +121,7 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
 
   @Override
   public String toString() {
-    return "SqlQuery [" + query + "]";
+    return "SqlQuery " + query;
   }
 
   @Override

@@ -337,10 +337,10 @@ public final class CQueryPredicates {
     if (idPos <= -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
-        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name();
-        msg += "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById + "]";
-        msg += " must come before the many property [" + manyProp.name() + "] in the orderBy.";
-        msg += " Ebean has automatically modified the orderBy clause to do this.";
+        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name()
+        + "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById
+        + "] must come before the many property [" + manyProp.name() + "] in the orderBy."
+        + " Ebean has automatically modified the orderBy clause to do this.";
         CoreLog.log.log(WARNING, msg);
       }
       // the id needs to come before the manyPropName

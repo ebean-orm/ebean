@@ -30,7 +30,7 @@ public final class ScopedTransaction extends SpiTransactionProxy {
 
   @Override
   public String toString() {
-    return "ScopedTransaction[" + current + "]";
+    return "ScopedTransaction " + current;
   }
 
   /**
