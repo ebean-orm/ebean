@@ -342,7 +342,7 @@ public final class WriteJson implements SpiJsonWriter {
   }
 
   @Override
-  public boolean isParentBean(Object bean) {
+  public boolean parentBean(Object bean) {
     return !parentBeans.isEmpty() && parentBeans.contains(bean);
   }
 

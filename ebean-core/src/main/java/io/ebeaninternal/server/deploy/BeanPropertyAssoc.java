@@ -355,7 +355,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
       mapping.push(nested);
       targetDescriptor.docStoreMapping(mapping, fullName);
       mapping.pop();
-      if (!nested.getChildren().isEmpty()) {
+      if (!nested.children().isEmpty()) {
         mapping.add(nested);
       }
     }

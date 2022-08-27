@@ -323,7 +323,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.jsonHelp = initJsonHelp();
     this.draftHelp = new BeanDescriptorDraftHelp<>(this);
     this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
-    this.docStoreQueueId = docStoreAdapter.getQueueId();
+    this.docStoreQueueId = docStoreAdapter.queueId();
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy
     // then we also need to check every BeanDescriptors in the InheritInfo as
@@ -966,7 +966,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   @Override
   public boolean isDocStoreMapped() {
-    return docStoreAdapter.isMapped();
+    return docStoreAdapter.mapped();
   }
 
   /**
@@ -1072,7 +1072,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * given the transactions requested mode.
    */
   public DocStoreMode docStoreMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
-    return docStoreAdapter.getMode(persistType, txnMode);
+    return docStoreAdapter.mode(persistType, txnMode);
   }
 
   public void docStoreInsert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext bulkUpdate) throws IOException {

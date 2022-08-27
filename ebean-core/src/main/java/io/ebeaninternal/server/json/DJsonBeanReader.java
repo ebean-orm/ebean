@@ -32,7 +32,7 @@ public final class DJsonBeanReader<T> implements JsonBeanReader<T> {
 
   @Override
   public PersistenceContext getPersistenceContext() {
-    return readJson.getPersistenceContext();
+    return readJson.persistenceContext();
   }
 
   @Override

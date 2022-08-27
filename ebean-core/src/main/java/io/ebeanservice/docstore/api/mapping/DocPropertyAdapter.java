@@ -27,7 +27,7 @@ public abstract class DocPropertyAdapter implements DocPropertyVisitor {
 
   @Override
   public void visitBeginObject(DocPropertyMapping property) {
-    pathStack.push(property.getName());
+    pathStack.push(property.name());
   }
 
   @Override
@@ -37,7 +37,7 @@ public abstract class DocPropertyAdapter implements DocPropertyVisitor {
 
   @Override
   public void visitBeginList(DocPropertyMapping property) {
-    pathStack.push(property.getName());
+    pathStack.push(property.name());
   }
 
   @Override

@@ -6,20 +6,14 @@ import io.ebean.docstore.DocMapping;
 /**
  * Mapping for a document stored in a doc store (like ElasticSearch).
  */
-public class DocumentMapping implements DocMapping {
+public final class DocumentMapping implements DocMapping {
 
   protected final String queueId;
-
   protected final String name;
-
   protected final String type;
-
   protected final FetchPath paths;
-
   protected final DocPropertyMapping properties;
-
   protected int shards;
-
   protected int replicas;
 
   public DocumentMapping(String queueId, String name, String type, FetchPath paths, DocPropertyMapping properties, int shards, int replicas) {
@@ -42,63 +36,63 @@ public class DocumentMapping implements DocMapping {
   /**
    * Return the queueId.
    */
-  public String getQueueId() {
+  public String queueId() {
     return queueId;
   }
 
   /**
    * Return the name.
    */
-  public String getName() {
+  public String name() {
     return name;
   }
 
   /**
    * Return the type.
    */
-  public String getType() {
+  public String type() {
     return type;
   }
 
   /**
    * Return the document structure as PathProperties.
    */
-  public FetchPath getPaths() {
+  public FetchPath paths() {
     return paths;
   }
 
   /**
    * Return the document structure with mapping details.
    */
-  public DocPropertyMapping getProperties() {
+  public DocPropertyMapping properties() {
     return properties;
   }
 
   /**
    * Return the number of shards.
    */
-  public int getShards() {
+  public int shards() {
     return shards;
   }
 
   /**
    * Set the number of shards.
    */
-  public void setShards(int shards) {
+  public void shards(int shards) {
     this.shards = shards;
   }
 
   /**
    * Return the number of replicas.
    */
-  public int getReplicas() {
+  public int replicas() {
     return replicas;
   }
 
   /**
    * Set the number of replicas.
    */
-  public void setReplicas(int replicas) {
+  public void replicas(int replicas) {
     this.replicas = replicas;
   }
 }
