@@ -57,31 +57,8 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final DefaultTypeFactory extraTypeFactory;
 
+  private final ScalarType<?> fileType = new ScalarTypeFile();
   private final ScalarType<?> hstoreType = new ScalarTypePostgresHstore();
-  private final ScalarTypeFile fileType = new ScalarTypeFile();
-  private final ScalarType<?> charType = new ScalarTypeChar();
-  private final ScalarType<?> charArrayType = new ScalarTypeCharArray();
-  private final ScalarType<?> longVarcharType = new ScalarTypeLongVarchar();
-  private final ScalarType<?> clobType = new ScalarTypeClob();
-  private final ScalarType<?> byteType = new ScalarTypeByte();
-  private final ScalarType<?> binaryType = new ScalarTypeBytesBinary();
-  private final ScalarType<?> blobType = new ScalarTypeBytesBlob();
-  private final ScalarType<?> varbinaryType = new ScalarTypeBytesVarbinary();
-  private final ScalarType<?> longVarbinaryType = new ScalarTypeBytesLongVarbinary();
-  private final ScalarType<?> shortType = new ScalarTypeShort();
-  private final ScalarType<?> integerType = new ScalarTypeInteger();
-  private final ScalarType<?> longType = new ScalarTypeLong();
-  private final ScalarType<?> doubleType = new ScalarTypeDouble();
-  private final ScalarType<?> floatType = new ScalarTypeFloat();
-  private final ScalarType<?> bigDecimalType = new ScalarTypeBigDecimal();
-  private final ScalarType<?> timeType = new ScalarTypeTime();
-  private final ScalarType<?> urlType = new ScalarTypeURL();
-  private final ScalarType<?> uriType = new ScalarTypeURI();
-  private final ScalarType<?> localeType = new ScalarTypeLocale();
-  private final ScalarType<?> currencyType = new ScalarTypeCurrency();
-  private final ScalarType<?> timeZoneType = new ScalarTypeTimeZone();
-  private final ScalarType<?> stringType = ScalarTypeString.INSTANCE;
-  private final ScalarType<?> classType = new ScalarTypeClass();
 
   private final JsonConfig.DateTime jsonDateTime;
   private final JsonConfig.Date jsonDate;
@@ -143,7 +120,7 @@ public final class DefaultTypeManager implements TypeManager {
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
-    initialiseJacksonTypes(config);
+    initialiseJacksonTypes();
     loadTypesFromProviders(config, objectMapper);
     loadGeoTypeBinder(config);
 
@@ -216,9 +193,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private void logAdd(ScalarType<?> scalarType) {
     if (log.isLoggable(TRACE)) {
-      String msg = "ScalarType register [" + scalarType.getClass().getName() + "]";
-      msg += " for [" + scalarType.type().getName() + "]";
-      log.log(TRACE, msg);
+      log.log(TRACE, "ScalarType register {0} for {1}", scalarType.getClass().getName(), scalarType.type().getName());
     }
   }
 
@@ -266,7 +241,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   /**
    * Checks the typeMap for inherited types.
-   *
+   * <p>
    * If e.g. <code>type</code> is a <code>GregorianCalendar</code>, then this method
    * will check the class hierarchy and will probably return a
    * <code>ScalarTypeCalendar</code> To speed up a second lookup, it will write
@@ -316,7 +291,7 @@ public final class DefaultTypeManager implements TypeManager {
     } else if (type.equals(Set.class)) {
       return getArrayScalarTypeSet(valueType, nullable);
     } else {
-      throw new IllegalStateException("Type [" + type + "] not supported for @DbArray");
+      throw new IllegalStateException("@DbArray does not support type " + type);
     }
   }
 
@@ -671,7 +646,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
         add(scalarType);
       } catch (Exception e) {
-        log.log(ERROR, "Error loading ScalarType [" + cls.getName() + "]", e);
+        log.log(ERROR, "Error loading ScalarType " + cls.getName(), e);
       }
     }
   }
@@ -705,7 +680,7 @@ public final class DefaultTypeManager implements TypeManager {
         log.log(DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
       } catch (Exception e) {
-        log.log(ERROR, "Error registering ScalarTypeConverter [" + foundType.getName() + "]", e);
+        log.log(ERROR, "Error registering ScalarTypeConverter " + foundType.getName(), e);
       }
     }
   }
@@ -729,7 +704,7 @@ public final class DefaultTypeManager implements TypeManager {
         log.log(DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
       } catch (Exception e) {
-        log.log(ERROR, "Error registering AttributeConverter [" + foundType.getName() + "]", e);
+        log.log(ERROR, "Error registering AttributeConverter " + foundType.getName(), e);
       }
     }
   }
@@ -737,7 +712,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Add support for Jackson's JsonNode mapping to Clob, Blob, Varchar, JSON and JSONB.
    */
-  private void initialiseJacksonTypes(DatabaseConfig config) {
+  private void initialiseJacksonTypes() {
     if (objectMapper != null) {
       ObjectMapper mapper = (ObjectMapper) objectMapper;
       jsonNodeClob = new ScalarTypeJsonNode.Clob(mapper);
@@ -808,7 +783,7 @@ public final class DefaultTypeManager implements TypeManager {
     addType(Calendar.class, extraTypeFactory.createCalendar(jsonDateTime));
     addType(BigInteger.class, extraTypeFactory.createMathBigInteger());
 
-    ScalarTypeBool booleanType = extraTypeFactory.createBoolean();
+    final var booleanType = extraTypeFactory.createBoolean();
     addType(Boolean.class, booleanType);
     addType(boolean.class, booleanType);
     // register the boolean literals to the platform for DDL default values
@@ -845,90 +820,98 @@ public final class DefaultTypeManager implements TypeManager {
     }
 
     addType(File.class, fileType);
-    addType(Locale.class, localeType);
-    addType(Currency.class, currencyType);
-    addType(TimeZone.class, timeZoneType);
-    addType(URL.class, urlType);
-    addType(URI.class, uriType);
+    addType(Locale.class, new ScalarTypeLocale());
+    addType(Currency.class, new ScalarTypeCurrency());
+    addType(TimeZone.class, new ScalarTypeTimeZone());
+    addType(URL.class, new ScalarTypeURL());
+    addType(URI.class, new ScalarTypeURI());
 
     // String types
-    addType(char[].class, charArrayType);
-    addType(char.class, charType);
-    addType(String.class, stringType);
-    nativeMap.put(Types.VARCHAR, stringType);
-    nativeMap.put(Types.CHAR, stringType);
-    nativeMap.put(Types.LONGVARCHAR, longVarcharType);
+    addType(char[].class, new ScalarTypeCharArray());
+    addType(char.class, new ScalarTypeChar());
+    addType(String.class, ScalarTypeString.INSTANCE);
+    nativeMap.put(Types.VARCHAR, ScalarTypeString.INSTANCE);
+    nativeMap.put(Types.CHAR, ScalarTypeString.INSTANCE);
+    nativeMap.put(Types.LONGVARCHAR, new ScalarTypeLongVarchar());
 
-    // Class<?>
-    addType(Class.class, classType);
+    addType(Class.class, new ScalarTypeClass());
 
     if (platformClobType == Types.CLOB) {
-      nativeMap.put(Types.CLOB, clobType);
+      nativeMap.put(Types.CLOB, new ScalarTypeClob());
     } else {
       // for Postgres Clobs handled by Varchar ScalarType...
       ScalarType<?> platClobScalarType = nativeMap.get(platformClobType);
       if (platClobScalarType == null) {
-        throw new IllegalArgumentException("Type for dbPlatform clobType [" + clobType + "] not found.");
+        throw new IllegalArgumentException("Not found dbPlatform clobType " + platformClobType);
       }
       nativeMap.put(Types.CLOB, platClobScalarType);
     }
 
     // Binary type
+    final var varbinaryType = new ScalarTypeBytesVarbinary();
     addType(byte[].class, varbinaryType);
-    nativeMap.put(Types.BINARY, binaryType);
     nativeMap.put(Types.VARBINARY, varbinaryType);
-    nativeMap.put(Types.LONGVARBINARY, longVarbinaryType);
+    nativeMap.put(Types.BINARY, new ScalarTypeBytesBinary());
+    nativeMap.put(Types.LONGVARBINARY, new ScalarTypeBytesLongVarbinary());
 
     if (platformBlobType == Types.BLOB) {
-      nativeMap.put(Types.BLOB, blobType);
+      nativeMap.put(Types.BLOB, new ScalarTypeBytesBlob());
     } else {
       // for Postgres Blobs handled by LongVarbinary ScalarType...
       ScalarType<?> platBlobScalarType = nativeMap.get(platformBlobType);
       if (platBlobScalarType == null) {
-        throw new IllegalArgumentException("Type for dbPlatform blobType [" + blobType + "] not found.");
+        throw new IllegalArgumentException("Not found dbPlatform blobType " + platformBlobType);
       }
       nativeMap.put(Types.BLOB, platBlobScalarType);
     }
 
     // Number types
+    final var byteType = new ScalarTypeByte();
     addType(Byte.class, byteType);
     addType(byte.class, byteType);
     nativeMap.put(Types.TINYINT, byteType);
 
+    final var shortType = new ScalarTypeShort();
     addType(Short.class, shortType);
     addType(short.class, shortType);
     nativeMap.put(Types.SMALLINT, shortType);
 
+    final var integerType = new ScalarTypeInteger();
     addType(Integer.class, integerType);
     addType(int.class, integerType);
     nativeMap.put(Types.INTEGER, integerType);
 
+    final var longType = new ScalarTypeLong();
     addType(Long.class, longType);
     addType(long.class, longType);
     nativeMap.put(Types.BIGINT, longType);
 
+    final var doubleType = new ScalarTypeDouble();
     addType(Double.class, doubleType);
     addType(double.class, doubleType);
     nativeMap.put(Types.FLOAT, doubleType);// no this is not a bug
     nativeMap.put(Types.DOUBLE, doubleType);
 
+    final var floatType = new ScalarTypeFloat();
     addType(Float.class, floatType);
     addType(float.class, floatType);
     nativeMap.put(Types.REAL, floatType);// no this is not a bug
 
+    final var bigDecimalType = new ScalarTypeBigDecimal();
     addType(BigDecimal.class, bigDecimalType);
     nativeMap.put(Types.DECIMAL, bigDecimalType);
     nativeMap.put(Types.NUMERIC, bigDecimalType);
 
     // Temporal types
+    final var timeType = new ScalarTypeTime();
     addType(Time.class, timeType);
     nativeMap.put(Types.TIME, timeType);
 
-    ScalarTypeDate dateType = new ScalarTypeDate(jsonDate);
+    final var dateType = new ScalarTypeDate(jsonDate);
     addType(Date.class, dateType);
     nativeMap.put(Types.DATE, dateType);
 
-    ScalarType<?> timestampType = new ScalarTypeTimestamp(jsonDateTime);
+    final var timestampType = new ScalarTypeTimestamp(jsonDateTime);
     addType(Timestamp.class, timestampType);
     nativeMap.put(Types.TIMESTAMP, timestampType);
   }
