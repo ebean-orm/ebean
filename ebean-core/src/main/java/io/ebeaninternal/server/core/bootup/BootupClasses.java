@@ -207,7 +207,7 @@ public class BootupClasses implements Predicate<Class<?>> {
     try {
       return cls.getConstructor().newInstance();
     } catch (NoSuchMethodException e) {
-      log.log(DEBUG, "Ignore/expected - no default constructor: " + e.getMessage());
+      log.log(DEBUG, "Ignore/expected - no default constructor: {0}", e.getMessage());
       return null;
 
     } catch (Exception e) {

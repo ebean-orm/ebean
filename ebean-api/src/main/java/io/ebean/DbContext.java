@@ -16,7 +16,6 @@ import static java.lang.System.Logger.Level.ERROR;
 final class DbContext {
 
   private static final System.Logger log = EbeanVersion.log;
-
   static {
     EbeanVersion.getVersion();
   }
@@ -24,14 +23,9 @@ final class DbContext {
   private static final DbContext INSTANCE = new DbContext();
 
   private final ConcurrentHashMap<String, Database> concMap = new ConcurrentHashMap<>();
-
   private final HashMap<String, Database> syncMap = new HashMap<>();
-
   private final ReentrantLock lock = new ReentrantLock();
 
-  /**
-   * The 'default' Database.
-   */
   private Database defaultDatabase;
 
   private DbContext() {
@@ -70,9 +64,9 @@ final class DbContext {
    */
   Database getDefault() {
     if (defaultDatabase == null) {
-      String msg = "The default Database has not been defined?";
-      msg += " This is normally set via the ebean.datasource.default property.";
-      msg += " Otherwise it should be registered programmatically via registerServer()";
+      String msg = "The default Database has not been defined?"
+        + " This is normally set via the ebean.datasource.default property."
+        + " Otherwise it should be registered programmatically via registerServer()";
       throw new PersistenceException(msg);
     }
     return defaultDatabase;

@@ -122,9 +122,7 @@ public final class ShutdownManager {
         // Already run shutdown...
         return;
       }
-      if (log.isLoggable(DEBUG)) {
-        log.log(DEBUG, "Ebean shutting down");
-      }
+      log.log(DEBUG, "Ebean shutting down");
       stopping = true;
       deregisterShutdownHook();
 

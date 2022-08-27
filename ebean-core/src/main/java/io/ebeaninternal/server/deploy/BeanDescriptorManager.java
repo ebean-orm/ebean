@@ -868,11 +868,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
           if (possibleLower.contains(searchName)) {
             // we have a match
             prop.setMappedBy(possibleMappedBy);
-            if (log.isLoggable(DEBUG)) {
-              String m = "Implicitly found mappedBy for " + targetDesc + "." + prop;
-              m += " by searching for [" + searchName + "] against " + matchSet;
-              log.log(DEBUG, m);
-            }
             return true;
           }
         }

@@ -110,7 +110,7 @@ final class DefaultBeanLoader {
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
         if (log.isLoggable(DEBUG)) {
-          log.log(DEBUG, "BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
+          log.log(DEBUG, "BeanCollection after load was empty. Owner:{0}", beanCollection.getOwnerBean());
         }
       } else if (useManyIdCache) {
         parentDesc.cacheManyPropPut(many, beanCollection, parentId);

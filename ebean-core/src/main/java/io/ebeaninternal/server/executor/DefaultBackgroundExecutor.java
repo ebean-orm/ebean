@@ -28,7 +28,6 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
     this.schedulePool = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix + "-periodic-");
     this.pool = new DaemonExecutorService(shutdownWaitSeconds, namePrefix);
     this.wrapper = wrapper;
-    log.log(DEBUG, "Created backgroundExecutor {0} (schedulePoolSize={1}, shutdownWaitSeconds={2})", namePrefix, schedulePoolSize, shutdownWaitSeconds);
   }
 
   /**
