@@ -314,7 +314,7 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if select all properties was used to ensure the property
    * invoking a lazy load was included in the query.
    */
-  boolean selectAllForLazyLoadProperty();
+  void selectAllForLazyLoadProperty();
 
   /**
    * Set the select properties.

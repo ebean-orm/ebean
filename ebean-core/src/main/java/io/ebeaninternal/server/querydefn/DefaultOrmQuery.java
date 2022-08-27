@@ -442,14 +442,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * included in the query.
    */
   @Override
-  public final boolean selectAllForLazyLoadProperty() {
+  public final void selectAllForLazyLoadProperty() {
     if (lazyLoadProperty != null) {
       if (!detail.containsProperty(lazyLoadProperty)) {
         detail.select("*");
-        return true;
       }
     }
-    return false;
   }
 
   private List<OrmQueryProperties> removeQueryJoins() {
