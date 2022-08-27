@@ -5,7 +5,7 @@ import java.sql.ResultSet;
 
 /**
  * Hold the JDBC PreparedStatement and ResultSet.
- *
+ * <p>
  * These both must be closed properly when done.
  */
 public final class SpiResultSet {

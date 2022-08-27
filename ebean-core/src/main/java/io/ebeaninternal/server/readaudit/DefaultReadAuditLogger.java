@@ -25,8 +25,8 @@ public class DefaultReadAuditLogger implements ReadAuditLogger {
   private static final System.Logger auditLogger = AppLog.getLogger("io.ebean.ReadAudit");
 
   protected final JsonFactory jsonFactory = new JsonFactory();
-  protected int defaultQueryBuffer = 500;
-  protected int defaultReadBuffer = 150;
+  protected final int defaultQueryBuffer = 500;
+  protected final int defaultReadBuffer = 150;
 
   /**
    * Write the query plan details in JSON format to the logger.

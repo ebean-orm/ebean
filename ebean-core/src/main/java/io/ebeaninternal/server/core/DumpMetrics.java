@@ -100,11 +100,7 @@ final class DumpMetrics {
   }
 
   private void logCount(MetaCountMetric metric) {
-
-    StringBuilder sb = new StringBuilder();
-    sb.append(padNameTimed(metric.name())).append(" ");
-    sb.append(" count:").append(pad(metric.count()));
-    out(sb.toString());
+    out(padNameTimed(metric.name()) + " count:" + pad(metric.count()));
   }
 
   private void out(String sb) {

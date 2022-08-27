@@ -46,7 +46,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
-  protected boolean isMatch(T bean) {
+  boolean isMatch(T bean) {
     for (ElMatcher<T> matcher : matches) {
       if (!matcher.isMatch(bean)) {
         return false;

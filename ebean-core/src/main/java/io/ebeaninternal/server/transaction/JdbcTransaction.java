@@ -408,7 +408,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public final void depthDecrement() {
     if (depth != 0) {
-      depth += -1;
+      depth -= 1;
     }
   }
 

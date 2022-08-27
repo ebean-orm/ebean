@@ -232,7 +232,7 @@ public final class OrmQueryDetail implements Serializable {
   /**
    * Add or replace the fetch detail.
    */
-  protected void fetch(OrmQueryProperties chunk) {
+  void fetch(OrmQueryProperties chunk) {
     String path = chunk.getPath();
     if (path == null) {
       baseProps = chunk;

@@ -8,7 +8,7 @@ import io.ebeaninternal.server.json.PathStack;
  */
 public abstract class DocPropertyAdapter implements DocPropertyVisitor {
 
-  protected PathStack pathStack = new PathStack();
+  protected final PathStack pathStack = new PathStack();
 
   @Override
   public void visitProperty(DocPropertyMapping property) {

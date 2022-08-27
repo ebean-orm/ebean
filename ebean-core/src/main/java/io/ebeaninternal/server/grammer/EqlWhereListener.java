@@ -342,7 +342,6 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
       case ':':
         return EqlValueType.NAMED_PARAM;
       case 't':
-        return EqlValueType.BOOL;
       case 'f':
         return EqlValueType.BOOL;
       case '\'':

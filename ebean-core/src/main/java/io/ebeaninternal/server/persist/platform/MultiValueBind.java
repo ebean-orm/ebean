@@ -60,9 +60,7 @@ public class MultiValueBind {
       sb.append(" not");
     }
     sb.append(" in (?");
-    for (int i = 1; i < size; i++) {
-      sb.append(",?");
-    }
+    sb.append(",?".repeat(Math.max(0, size - 1)));
     sb.append(")");
     return sb.toString();
   }

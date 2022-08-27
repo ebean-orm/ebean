@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * This class is a modified version of TypeResolver from https://github.com/jhalterman/typetools
  * which is Apache 2 license.
- *
+ * <p>
  * It is a cut down version removing the lambda support and related sun.misc.Unsafe use etc.
  */
 final class TypeResolver {

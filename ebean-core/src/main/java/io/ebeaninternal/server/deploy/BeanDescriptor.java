@@ -3157,18 +3157,17 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Return true if any mutable properties are dirty.
    */
-  public boolean checkAnyMutableProperties(EntityBeanIntercept ebi) {
+  public void checkAnyMutableProperties(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.propertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
         Object value = beanProperty.getValue(ebi.getOwner());
         if (beanProperty.checkMutable(value, ebi.isDirtyProperty(propertyIndex), ebi)) {
           ebi.markPropertyAsChanged(propertyIndex);
-          return true;
+          return;
         }
       }
     }
-    return false;
   }
 
   public ConcurrencyMode concurrencyMode(EntityBeanIntercept ebi) {

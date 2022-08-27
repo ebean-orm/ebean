@@ -138,7 +138,7 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   /**
    * Maybe hit the bean cache returning true if everything was obtained from the
    * cache (that there were no misses).
-   *
+   * <p>
    * Do this for findList() on many natural keys or many Ids.
    */
   boolean getFromBeanCache();

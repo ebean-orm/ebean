@@ -225,7 +225,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
           stateFile, propNodeId, getNodeIdentifier());
         return false;
       }
-      Integer seq = Integer.valueOf(prop.getProperty("clockSeq")) & 0x3FFF;
+      Integer seq = Integer.parseInt(prop.getProperty("clockSeq")) & 0x3FFF;
       Long ts = Long.valueOf(prop.getProperty("timeStamp"));
       clockSeq.set(seq);
       timeStamp.set(ts);

@@ -411,7 +411,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     return expressionFactory;
   }
 
-  private final void createExtraJoinsToSupportManyWhereClause() {
+  private void createExtraJoinsToSupportManyWhereClause() {
     manyWhereJoins = new ManyWhereJoins();
     if (whereExpressions != null) {
       whereExpressions.containsMany(beanDescriptor, manyWhereJoins);
@@ -1499,12 +1499,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   @SuppressWarnings("unchecked")
   public final <A> List<A> findSingleAttributeList() {
-    return (List<A>) server.findSingleAttributeList(this, transaction);
+    return server.findSingleAttributeList(this, transaction);
   }
 
   @Override
   public final <A> Set<A> findSingleAttributeSet() {
-    return (Set<A>) server.findSingleAttributeSet(this, transaction);
+    return server.findSingleAttributeSet(this, transaction);
   }
 
   @Override

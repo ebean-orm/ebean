@@ -30,7 +30,7 @@ public final class DbMigrationInfo {
     if (scripts.length == 0) {
       return Collections.emptyList();
     } else {
-      return Collections.unmodifiableList(Arrays.asList(scripts));
+      return List.of(scripts);
     }
   }
 

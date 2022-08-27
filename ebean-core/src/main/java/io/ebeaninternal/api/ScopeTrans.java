@@ -93,7 +93,7 @@ public final class ScopeTrans {
   /**
    * Return the current/active transaction.
    */
-  protected SpiTransaction getTransaction() {
+  SpiTransaction getTransaction() {
     return transaction;
   }
 
@@ -124,7 +124,7 @@ public final class ScopeTrans {
     }
   }
 
-  protected void commitTransaction() {
+  void commitTransaction() {
     if (created) {
       transaction.commit();
     } else {
@@ -175,7 +175,7 @@ public final class ScopeTrans {
     return e;
   }
 
-  protected void rollback(Throwable e) {
+  void rollback(Throwable e) {
     if (transaction != null && transaction.isActive()) {
       // transaction is null for NOT_SUPPORTED and sometimes SUPPORTS
       // and Inactive (already rolled back) if nested REQUIRED

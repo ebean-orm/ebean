@@ -8,13 +8,13 @@ import io.ebean.docstore.DocMapping;
  */
 public final class DocumentMapping implements DocMapping {
 
-  protected final String queueId;
-  protected final String name;
-  protected final String type;
-  protected final FetchPath paths;
-  protected final DocPropertyMapping properties;
-  protected int shards;
-  protected int replicas;
+  private final String queueId;
+  private final String name;
+  private final String type;
+  private final FetchPath paths;
+  private final DocPropertyMapping properties;
+  private int shards;
+  private int replicas;
 
   public DocumentMapping(String queueId, String name, String type, FetchPath paths, DocPropertyMapping properties, int shards, int replicas) {
     this.queueId = queueId;

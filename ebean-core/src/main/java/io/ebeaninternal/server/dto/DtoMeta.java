@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Holds property and constructor meta data for a given DTO bean type.
- *
+ * Holds property and constructor meta-data for a given DTO bean type.
+ * <p>
  * Uses this to map a mapping request (columns) to a 'query plan' (constructor and setters).
  */
 final class DtoMeta {
