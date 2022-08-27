@@ -480,10 +480,8 @@ public final class OrmQueryDetail implements Serializable {
     if (create && props == null) {
       props = new OrmQueryProperties(path);
       fetch(props);
-      return props;
-    } else {
-      return props;
     }
+    return props;
   }
 
   /**

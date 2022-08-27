@@ -122,7 +122,6 @@ public final class DJsonContext implements SpiJsonContext {
 
   @Override
   public <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
-
     BeanDescriptor<T> desc = getDescriptor(cls);
     try {
       return desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), false), null, null);
@@ -156,9 +155,9 @@ public final class DJsonContext implements SpiJsonContext {
     toBean(target, parser, null);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <T> void toBean(T target, JsonParser parser, JsonReadOptions options) throws JsonIOException {
-
     BeanDescriptor<T> desc = (BeanDescriptor<T>) getDescriptor(target.getClass());
     try {
       desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), target != null), null, target);
@@ -169,14 +168,12 @@ public final class DJsonContext implements SpiJsonContext {
 
   @Override
   public <T> DJsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
-
     BeanDescriptor<T> desc = getDescriptor(cls);
     return new DJsonBeanReader<>(desc, new ReadJson(desc, parser, options, determineObjectMapper(options), false));
   }
 
   @Override
   public <T> DJsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
-
     BeanDescriptor<T> desc = (BeanDescriptor<T>) beanType;
     SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options), false);
     return new DJsonBeanReader<>(desc, readJson);
@@ -209,7 +206,6 @@ public final class DJsonContext implements SpiJsonContext {
 
   @Override
   public <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options) throws JsonIOException {
-
     BeanDescriptor<T> desc = getDescriptor(cls);
     SpiJsonReader readJson = new ReadJson(desc, src, options, determineObjectMapper(options), false);
     try {
@@ -241,19 +237,16 @@ public final class DJsonContext implements SpiJsonContext {
 
   @Override
   public Object toObject(Type genericType, String json) throws JsonIOException {
-
     return toObject(genericType, createParser(new StringReader(json)));
   }
 
   @Override
   public Object toObject(Type genericType, Reader json) throws JsonIOException {
-
     return toObject(genericType, createParser(json));
   }
 
   @Override
   public Object toObject(Type genericType, JsonParser jsonParser) throws JsonIOException {
-
     TypeInfo info = ParamTypeHelper.getTypeInfo(genericType);
     ManyType manyType = info.getManyType();
     switch (manyType) {
@@ -362,7 +355,6 @@ public final class DJsonContext implements SpiJsonContext {
 
   @SuppressWarnings("unchecked")
   private void toJsonInternal(Object value, JsonGenerator gen, JsonWriteOptions options) throws IOException {
-
     if (value == null) {
       gen.writeNull();
     } else if (value instanceof Number) {
@@ -392,7 +384,6 @@ public final class DJsonContext implements SpiJsonContext {
 
   @Override
   public SpiJsonReader createJsonRead(BeanType<?> beanType, String json) {
-
     BeanDescriptor<?> desc = (BeanDescriptor<?>) beanType;
     JsonParser parser = createParser(new StringReader(json));
     return new ReadJson(desc, parser, null, defaultObjectMapper, false);
@@ -415,7 +406,6 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonGenerator gen, JsonWriteOptions options) throws IOException {
-
     if (key != null) {
       gen.writeFieldName(key);
     }
@@ -429,7 +419,6 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   private void toJsonFromMap(Map<Object, Object> map, JsonGenerator gen, JsonWriteOptions options) throws IOException {
-
     Set<Entry<Object, Object>> entrySet = map.entrySet();
     Iterator<Entry<Object, Object>> it = entrySet.iterator();
 
