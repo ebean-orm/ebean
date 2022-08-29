@@ -3,7 +3,6 @@ package io.ebeaninternal.server.type;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.*;
-import io.ebean.core.type.BasicTypeConverter;
 
 import java.io.DataInput;
 import java.io.DataOutput;

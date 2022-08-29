@@ -7,7 +7,7 @@ import javax.persistence.PersistenceException;
 
 /**
  * Manage scoped (typically thread local) transactions.
- *
+ * <p>
  * These can be nested and internally they are pushed and popped from a stack.
  */
 public final class ScopedTransaction extends SpiTransactionProxy {

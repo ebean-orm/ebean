@@ -161,7 +161,7 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
   /**
    * Convert from the json types to the proper scalar types (uuid, enum, double etc)
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private List convert(List<Object> rawList) {
     List list = new ArrayList(rawList.size());
     for (Object rawVal : rawList) {

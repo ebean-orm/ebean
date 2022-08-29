@@ -334,7 +334,7 @@ public final class CQueryPredicates {
       // orderById is already in the order by clause
       return orderBy;
     }
-    if (idPos <= -1 || idPos >= manyPos) {
+    if (idPos == -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
         String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name()

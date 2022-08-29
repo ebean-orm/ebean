@@ -706,9 +706,7 @@ final class BeanDescriptorCacheHelp<T> {
     }
 
     Set<EntityBeanIntercept> loaded = new HashSet<>();
-    Iterator<Map.Entry<Object, Object>> iterator = hits.entrySet().iterator();
-    while (iterator.hasNext()) {
-      Map.Entry<Object, Object> hit = iterator.next();
+    for (Map.Entry<Object, Object> hit : hits.entrySet()) {
       Object key = hit.getKey();
       EntityBeanIntercept ebi = ebis.remove(key);
       CachedBeanData cacheData = (CachedBeanData) hit.getValue();

@@ -146,12 +146,10 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   /**
    * Helper method to pump bytes from input to output.
    */
-  public long pump(InputStream is, OutputStream out) throws IOException {
-
+  public void pump(InputStream is, OutputStream out) throws IOException {
     long totalBytes = 0;
     InputStream input = null;
     OutputStream output = null;
-
     try {
       input = new BufferedInputStream(is, bufferSize);
       output = new BufferedOutputStream(out, bufferSize);
@@ -162,11 +160,7 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
         output.write(buffer, 0, length);
         totalBytes += length;
       }
-
       output.flush();
-
-      return totalBytes;
-
     } finally {
       if (output != null) {
         try {

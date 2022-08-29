@@ -64,7 +64,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct for unparsed SQL.
      */
-    protected Sql(String unparsedSql) {
+    Sql(String unparsedSql) {
       this.parsed = false;
       this.unparsedSql = unparsedSql;
       this.preFrom = null;
@@ -80,7 +80,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct for parsed SQL.
      */
-    protected Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
+    Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
                   String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
 
       this.unparsedSql = unparsedSql;
@@ -199,7 +199,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct from parsed sql where the columns have been identified.
      */
-    protected ColumnMapping(List<Column> columns) {
+    ColumnMapping(List<Column> columns) {
       this.immutable = false;
       this.parsed = true;
       this.propertyMap = null;
@@ -213,7 +213,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct for unparsed sql.
      */
-    protected ColumnMapping() {
+    ColumnMapping() {
       this.immutable = false;
       this.parsed = false;
       this.propertyMap = null;
@@ -224,7 +224,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct for ResultSet use.
      */
-    protected ColumnMapping(String... propertyNames) {
+    ColumnMapping(String... propertyNames) {
       this.immutable = false;
       this.parsed = false;
       this.propertyMap = null;
@@ -240,7 +240,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct an immutable ColumnMapping based on collected information.
      */
-    protected ColumnMapping(boolean parsed, LinkedHashMap<String, Column> dbColumnMap) {
+    ColumnMapping(boolean parsed, LinkedHashMap<String, Column> dbColumnMap) {
       this.immutable = true;
       this.parsed = parsed;
       this.dbColumnMap = dbColumnMap;
@@ -281,17 +281,14 @@ public interface SpiRawSql extends RawSql {
      *
      * @throws IllegalStateException when a propertyName has not been defined for a column.
      */
-    protected ColumnMapping createImmutableCopy() {
-
+    ColumnMapping createImmutableCopy() {
       for (Column c : dbColumnMap.values()) {
         c.checkMapping();
       }
-
       return new ColumnMapping(parsed, dbColumnMap);
     }
 
-    protected void columnMapping(String dbColumn, String propertyName) {
-
+    void columnMapping(String dbColumn, String propertyName) {
       if (immutable) {
         throw new IllegalStateException("Should never happen");
       }
@@ -330,7 +327,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Return the column mapping.
      */
-    protected Map<String, Column> mapping() {
+    Map<String, Column> mapping() {
       return dbColumnMap;
     }
 

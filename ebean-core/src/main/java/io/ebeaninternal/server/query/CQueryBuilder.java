@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.util.Objects.requireNonNullElse;
+
 /**
  * Generates the SQL SELECT statements taking into account the physical
  * deployment properties.
@@ -411,11 +413,7 @@ final class CQueryBuilder {
         String tableName = lower(metaData.getTableName(i));
         String columnName = lower(metaData.getColumnName(i));
         String path = desc.findBeanPath(schemaName, tableName, columnName);
-        if (path != null) {
-          propertyNames.add(path);
-        } else {
-          propertyNames.add(SpiRawSql.IGNORE_COLUMN);
-        }
+        propertyNames.add(requireNonNullElse(path, SpiRawSql.IGNORE_COLUMN));
       }
       RawSql rawSql = RawSqlBuilder.resultSet(resultSet, propertyNames.toArray(new String[0]));
       query.setRawSql(rawSql);

@@ -145,9 +145,7 @@ public final class IdBinderSimple implements IdBinder {
   @Override
   public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
     List<Object> copy = new ArrayList<>(values);
-    for (int i = 0; i < copy.size(); i++) {
-      copy.set(i, convertSetId(copy.get(i), null));
-    }
+    copy.replaceAll(idValue -> convertSetId(idValue, null));
     request.addBindValue(new MultiValueWrapper(copy));
   }
 

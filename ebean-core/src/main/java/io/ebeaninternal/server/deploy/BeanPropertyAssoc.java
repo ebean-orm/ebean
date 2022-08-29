@@ -366,7 +366,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   public boolean isUpdateable() {
     TableJoinColumn[] columns = tableJoin.columns();
-    if (columns.length <= 0) {
+    if (columns.length == 0) {
       return true;
     }
     for (TableJoinColumn column : columns) {
@@ -383,7 +383,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   public boolean isInsertable() {
     TableJoinColumn[] columns = tableJoin.columns();
-    if (columns.length <= 0) {
+    if (columns.length == 0) {
       return true;
     }
     for (TableJoinColumn column : columns) {

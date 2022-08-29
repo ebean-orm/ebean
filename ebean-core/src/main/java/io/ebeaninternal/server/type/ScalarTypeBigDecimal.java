@@ -63,7 +63,7 @@ class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      return new BigDecimal(dataInput.readDouble());
+      return BigDecimal.valueOf(dataInput.readDouble());
     }
   }
 

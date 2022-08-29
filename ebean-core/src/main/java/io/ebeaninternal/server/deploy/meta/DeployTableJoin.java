@@ -137,7 +137,6 @@ public final class DeployTableJoin {
 
   /**
    * Returns the clause of an extra &#64;Where annotation.
-   * @return
    */
   public String getExtraWhere() {
     return extraWhere;
