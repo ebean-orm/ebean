@@ -33,13 +33,26 @@ public final class ScopedTransaction extends SpiTransactionProxy {
     return "ScopedTransaction " + current;
   }
 
+  @Override
+  public void setNestedUseSavepoint() {
+    current.setNestedUseSavepoint();
+  }
+
+  @Override
+  public boolean isNestedUseSavepoint() {
+    return current.isNestedUseSavepoint();
+  }
+
   /**
    * Push the scope transaction.
    */
   public void push(ScopeTrans scopeTrans) {
-
     if (current != null) {
       stack.push(current);
+      if (current.isNestedUseSavepoint()) {
+        // child scope 'inherits' nestedUseSavepoint
+        scopeTrans.setNestedUseSavepoint();
+      }
     }
     current = scopeTrans;
     transaction = scopeTrans.getTransaction();
