@@ -113,11 +113,8 @@ final class SqlTreeAlias {
     if (prefix == null) {
       return rootTableAlias;
     } else {
-      String s = aliasMap.get(prefix);
-      if (s == null) {
-        return calcAlias(prefix);
-      }
-      return s;
+      String alias = aliasMap.get(prefix);
+      return alias != null ? alias : calcAlias(prefix);
     }
   }
 
@@ -128,14 +125,14 @@ final class SqlTreeAlias {
     if (prefix == null) {
       return rootTableAlias;
     }
-    String s = manyWhereAliasMap.get(prefix);
-    if (s == null) {
-      s = aliasMap.get(prefix);
+    String alias = manyWhereAliasMap.get(prefix);
+    if (alias == null) {
+      alias = aliasMap.get(prefix);
     }
-    if (s == null) {
-      throw new RuntimeException("Could not determine table alias for " + prefix + " manyMap:" + manyWhereAliasMap + " aliasMap:" + aliasMap);
+    if (alias == null) {
+      throw new RuntimeException("Could not determine table alias for " + prefix);
     }
-    return s;
+    return alias;
   }
 
   /**
