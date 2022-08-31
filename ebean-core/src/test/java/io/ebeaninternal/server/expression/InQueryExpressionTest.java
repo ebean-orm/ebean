@@ -1,16 +1,35 @@
 package io.ebeaninternal.server.expression;
 
+import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.api.SpiQuery;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class InQueryExpressionTest extends BaseExpressionTest {
 
-
   private InQueryExpression exp(String propertyName, boolean not, String sql, Object... bindValues) {
     return new InQueryExpression(propertyName, not, sql, Arrays.asList(bindValues));
+  }
+
+  @Test
+  void copy_subQuery_expectNewInstance() {
+    SpiQuery<?> subQuery = mock(SpiQuery.class);
+    var orig = new InQueryExpression("name", subQuery, false);
+    SpiExpression copy = orig.copy();
+    assertThat(copy).isNotSameAs(orig);
+    verify(subQuery).copy();
+  }
+
+  @Test
+  void copy_sqlLiteral_expectSameInstance() {
+    var orig = exp("name", true, "sql", 10);
+    SpiExpression copy = orig.copy();
+    assertThat(copy).isSameAs(orig);
   }
 
   @Test
