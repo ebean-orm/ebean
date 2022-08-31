@@ -76,11 +76,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
-    this(query, query.getExpressionFactory(), parentExprList);
-  }
-
-  DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
-    this(query, expr, parentExprList, new ArrayList<>());
+    this(query, query.getExpressionFactory(), parentExprList, new ArrayList<>());
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
@@ -243,13 +239,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   /**
    * Return a copy of the expression list.
-   * <p>
-   * Each of the expressions are expected to be immutable and safe to reference.
-   * </p>
    */
   public DefaultExpressionList<T> copy(Query<T> query) {
-    DefaultExpressionList<T> copy = new DefaultExpressionList<>(query, expr, null);
-    copy.list.addAll(list);
+    DefaultExpressionList<T> copy = new DefaultExpressionList<>(query, expr, null, new ArrayList<>(list.size()));
+    for (SpiExpression expr : list) {
+      copy.list.add(expr.copy());
+    }
     return copy;
   }
 

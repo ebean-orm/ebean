@@ -412,21 +412,22 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   private void createExtraJoinsToSupportManyWhereClause() {
-    manyWhereJoins = new ManyWhereJoins();
+    final var manyWhere = new ManyWhereJoins();
     if (whereExpressions != null) {
-      whereExpressions.containsMany(beanDescriptor, manyWhereJoins);
+      whereExpressions.containsMany(beanDescriptor, manyWhere);
     }
     if (havingExpressions != null) {
-      havingExpressions.containsMany(beanDescriptor, manyWhereJoins);
+      havingExpressions.containsMany(beanDescriptor, manyWhere);
     }
     if (orderBy != null) {
       for (Property orderProperty : orderBy.getProperties()) {
         ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(orderProperty.getProperty());
         if (elProp != null && elProp.containsFormulaWithJoin()) {
-          manyWhereJoins.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
+          manyWhere.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
         }
       }
     }
+    manyWhereJoins = manyWhere;
   }
 
   /**

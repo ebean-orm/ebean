@@ -110,4 +110,11 @@ public interface SpiExpression extends Expression {
    * Apply property prefix when filterMany expressions included into main query.
    */
   void prefixProperty(String path);
+
+  /**
+   * Return a copy of the expression (as part of creating a query copy).
+   */
+  default SpiExpression copy() {
+    return this;
+  }
 }

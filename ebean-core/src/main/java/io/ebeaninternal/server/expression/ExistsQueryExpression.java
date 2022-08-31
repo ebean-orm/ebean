@@ -28,6 +28,11 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
   }
 
   @Override
+  public SpiExpression copy() {
+    return subQuery == null ? this : new ExistsQueryExpression(subQuery.copy(), not);
+  }
+
+  @Override
   public void prefixProperty(String path) {
     // do nothing
   }
