@@ -424,7 +424,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public boolean isReadOnly() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -436,7 +436,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public void setReadOnly(boolean readOnly) {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -459,7 +459,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public final void setBatchMode(boolean batchMode) {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchMode = batchMode;
@@ -472,7 +472,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public final void setBatchOnCascade(boolean batchMode) {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.batchOnCascadeMode = batchMode;
@@ -666,7 +666,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public final void flush() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     internalBatchFlush();
@@ -707,7 +707,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public final void setPersistenceContext(SpiPersistenceContext context) {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.persistenceContext = context;
@@ -776,7 +776,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public Connection getInternalConnection() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     return connection;
@@ -920,7 +920,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (rollbackOnly) {
       return;
     }
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -945,7 +945,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       rollback();
       return;
     }
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -1014,6 +1014,22 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     this.nestedUseSavepoint = true;
   }
 
+  @Override
+  public void rollbackAndContinue() {
+    if (!active) {
+      throw new IllegalStateException(illegalStateMessage);
+    }
+    internalBatchClear();
+    if (changeLogHolder != null) {
+      changeLogHolder.clear();
+    }
+    try {
+      performRollback();
+    } catch (SQLException ex) {
+      throw new PersistenceException(ex);
+    }
+  }
+
   /**
    * Rollback the transaction.
    */
@@ -1028,7 +1044,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public void rollback(Throwable cause) throws PersistenceException {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -1066,7 +1082,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public void end() throws PersistenceException {
-    if (isActive()) {
+    if (active) {
       rollback();
     }
   }
@@ -1075,7 +1091,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Return true if the transaction is active.
    */
   @Override
-  public boolean isActive() {
+  public final boolean isActive() {
     return active;
   }
 

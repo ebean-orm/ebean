@@ -240,7 +240,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public boolean isReadOnly() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -252,7 +252,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public void setReadOnly(boolean readOnly) {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -403,7 +403,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void setPersistenceContext(SpiPersistenceContext context) {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.persistenceContext = context;
@@ -465,7 +465,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public Connection getInternalConnection() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     return connection;
@@ -508,7 +508,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void commit() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     // expect AutoCommit so just deactivate / put back into pool
@@ -532,6 +532,11 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     throw new IllegalStateException(notExpectedMessage);
   }
 
+  @Override
+  public void rollbackAndContinue() {
+    // do nothing
+  }
+
   /**
    * Rollback the transaction.
    */
@@ -546,7 +551,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void rollback(Throwable cause) throws PersistenceException {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     // expect AutoCommit so it really has already committed

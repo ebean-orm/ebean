@@ -145,6 +145,35 @@ public interface Transaction extends AutoCloseable {
   void rollback(Throwable e) throws PersistenceException;
 
   /**
+   * Performs a rollback on the underlying JDBC connection with the intention of
+   * continuing to use this same transaction and performing a commit or rollback
+   * later to complete the transaction.
+   * <p>
+   * Typically used when catching {@link DuplicateKeyException} where we wish to
+   * rollback work done at that point but carry on processing using the transaction.
+   *
+   * <pre>{@code
+   *
+   *   try (Transaction txn = database.beginTransaction()) {
+   *
+   *     try {
+   *       ...
+   *       database.save(bean);
+   *       database.flush();
+   *     } catch (DuplicateKeyException e) {
+   *       // carry on processing using the transaction
+   *       txn.rollbackAndContinue();
+   *       ...
+   *     }
+   *
+   *     txn.commit();
+   *   }
+   *
+   * }</pre>
+   */
+  void rollbackAndContinue();
+
+  /**
    * Set when we want nested transactions to use Savepoint's.
    * <p>
    * This means that for a nested transaction:
