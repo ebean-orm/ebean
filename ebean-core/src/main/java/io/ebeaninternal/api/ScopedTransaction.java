@@ -112,6 +112,11 @@ public final class ScopedTransaction extends SpiTransactionProxy {
   }
 
   @Override
+  public void rollbackAndContinue() {
+    transaction.rollbackAndContinue();
+  }
+
+  @Override
   public void rollback() throws PersistenceException {
     try {
       current.rollback(null);

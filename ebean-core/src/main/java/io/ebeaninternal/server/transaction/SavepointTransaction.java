@@ -70,6 +70,11 @@ final class SavepointTransaction extends SpiTransactionProxy {
   }
 
   @Override
+  public void rollbackAndContinue() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public void rollback() throws PersistenceException {
     rollbackSavepoint(null);
   }
