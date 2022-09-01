@@ -4,6 +4,8 @@ import io.ebean.*;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.TransactionEvent;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 
@@ -75,9 +77,14 @@ public class TestNestedSubTransaction extends BaseTestCase {
 
       server.save(bean);
 
+      TransactionEvent event0 = ((SpiTransaction) txn0).getEvent();
+
       try (Transaction txn1 = server.beginTransaction()) {
         bean.setName("updateNested");
         server.save(bean);
+
+        TransactionEvent event1 = ((SpiTransaction) txn1).getEvent();
+        assertThat(event1).isNotSameAs(event0);
 
         try (Transaction txn2 = server.beginTransaction()) {
           bean.setName("barney");
