@@ -23,7 +23,6 @@ module io.ebean.test {
   requires transitive com.h2database;
 
   // support testing
-  requires static org.slf4j;
   requires static org.junit.jupiter.api;
   requires static jdk.management;
   requires static io.avaje.jsr305x;

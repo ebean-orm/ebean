@@ -37,7 +37,7 @@ module io.ebean.core {
   requires static java.naming;
   requires static java.validation;
   requires static org.postgresql.jdbc;
-  requires static joda.time;
+  requires static org.joda.time;
 
   exports io.ebeaninternal.server.cache;
 
