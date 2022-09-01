@@ -573,7 +573,7 @@ public class TransactionManager implements SpiTransactionManager {
     } else {
       setToScope = false;
       transaction = txnContainer.current();
-      nestedSavepoint = transaction.isNestedUseSavepoint();
+      nestedSavepoint = txnContainer.isNestedUseSavepoint();
     }
 
     TxType type = txScope.getType();
