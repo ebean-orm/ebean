@@ -92,7 +92,7 @@ public class DbMigrationTest extends BaseTestCase {
     if (isSqlServer() || isMariaDB() || isMySql() || isHana()) {
       runScript("I__create_procs.sql");
     }
-    
+
     if(isDb2()) {
       runScript("I__create_tablespaces.sql");
     }
@@ -297,6 +297,7 @@ public class DbMigrationTest extends BaseTestCase {
       table.setFrom("foo");
       table.setTo("bar");
       table.setIndex("id");
+      table.setTextfield("test");
       tmpServer.save(table);
       table = tmpServer.find(ETable.class).where().eq("index", "id").findOne();
       assert table != null;

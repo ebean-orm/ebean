@@ -39,12 +39,12 @@ public class DB2Ddl extends PlatformDdl {
       return String.format(MOVE_TABLE, tablename.toUpperCase(), tableSpace, indexSpace, lobSpace);
     }
   }
-  
+
   @Override
   public String alterTableAddUniqueConstraint(String tableName, String uqName, String[] columns, String[] nullableColumns) {
     if (nullableColumns == null || nullableColumns.length == 0) {
       return super.alterTableAddUniqueConstraint(tableName, uqName, columns, nullableColumns);
-    }     
+    }
 
     if (uqName == null) {
       throw new NullPointerException();
@@ -66,7 +66,7 @@ public class DB2Ddl extends PlatformDdl {
   public void addTablespace(DdlBuffer apply, String tablespaceName, String indexTablespace, String lobTablespace) {
     apply.append(" in ").append(tablespaceName).append(" index in ").append(indexTablespace).append(" long in ").append(lobTablespace);
   }
-  
+
   @Override
   public void alterTableAddColumn(DdlWrite writer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
 
@@ -209,7 +209,7 @@ public class DB2Ddl extends PlatformDdl {
 
     /**
      * determine, if we need a reorg.
-     * 
+     *
      * See: https://www.ibm.com/docs/en/db2/11.5?topic=statements-alter-table The following is the full list of REORG-recommended
      * ALTER statements that cause a version change and place the table into a REORG-pending state:
      * <ul>
@@ -221,7 +221,7 @@ public class DB2Ddl extends PlatformDdl {
      * Decreasing the length of a VARCHAR or VARGRAPHIC column without truncating trailing blanks from existing data, when no indexes
      * exist on the column
      * </ul>
-     * 
+     *
      */
     private boolean checkReorg(AlterCmd cmd) {
       switch (cmd.getOperation()) {
@@ -230,6 +230,7 @@ public class DB2Ddl extends PlatformDdl {
       case "alter column":
         String alter = cmd.getAlternation();
         return alter.equals("set not null")
+          || alter.equals("drop not null")
           || alter.equals("drop not default")
           || alter.startsWith("set data type"); // note: altering varchar length only is not detected here
       default:
