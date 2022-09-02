@@ -76,6 +76,13 @@ declare exit handler for sql_error_code 261 begin end;
 exec 'drop index ix_migtest_e_basic_indextest6';
 end;
 $$;
+delimiter $$
+do
+begin
+declare exit handler for sql_error_code 261 begin end;
+exec 'drop index ix_table_textfield2';
+end;
+$$;
 -- apply changes
 create column table "migtest_QuOtEd" (
   id                            nvarchar(255) not null,

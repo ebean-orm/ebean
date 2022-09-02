@@ -147,6 +147,13 @@ if exists (select indname from syscat.indexes where indschema = current_schema a
   execute stmt;
 end if;
 end$$;
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_TABLE_TEXTFIELD2') then
+  prepare stmt from 'drop index ix_table_textfield2';
+  execute stmt;
+end if;
+end$$;
 -- apply changes
 create table "migtest_QuOtEd" (
   id                            varchar(255) not null,
@@ -200,9 +207,11 @@ alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string drop not null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
+call sysproc.admin_cmd('reorg table migtest_e_history2');
 alter table migtest_e_history2_history alter column test_string drop not null;
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
+call sysproc.admin_cmd('reorg table migtest_e_history2_history');
 alter table migtest_e_history4 alter column test_number set data type integer;
 call sysproc.admin_cmd('reorg table migtest_e_history4');
 alter table migtest_e_history4_history alter column test_number set data type integer;

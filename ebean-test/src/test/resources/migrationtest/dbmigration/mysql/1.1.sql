@@ -61,7 +61,9 @@ drop trigger table_history_upd;
 drop trigger table_history_del;
 drop view table_with_history;
 -- apply alter tables
+alter table `table` modify textfield varchar(255);
 alter table `table` add column `select` varchar(255);
+alter table `table` add column textfield2 varchar(255);
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -93,7 +95,9 @@ alter table migtest_e_history6 modify test_number2 integer;
 alter table migtest_e_history6_history modify test_number2 integer;
 alter table migtest_e_softdelete add column deleted tinyint(1) default 0 not null;
 alter table migtest_oto_child add column master_id bigint;
+alter table table_history modify textfield varchar(255);
 alter table table_history add column `select` varchar(255);
+alter table table_history add column textfield2 varchar(255);
 -- apply post alter
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
 update migtest_e_basic set new_boolean_field = old_boolean;
@@ -186,12 +190,12 @@ create view table_with_history as select * from `table` union all select * from 
 lock tables `table` write;
 delimiter $$
 create trigger table_history_upd before update on `table` for each row begin
-    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `select`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`select`, OLD.`foreign`);
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `select`, `foreign`, textfield, textfield2) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`select`, OLD.`foreign`, OLD.textfield, OLD.textfield2);
     set NEW.sys_period_start = now(6);
 end$$
 delimiter $$
 create trigger table_history_del before delete on `table` for each row begin
-    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `select`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`select`, OLD.`foreign`);
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `select`, `foreign`, textfield, textfield2) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`select`, OLD.`foreign`, OLD.textfield, OLD.textfield2);
 end$$
 unlock tables;
 alter table `table` add constraint uq_table_select unique  (`select`);
@@ -224,3 +228,4 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_table_textfield2 on `table` (textfield2);
