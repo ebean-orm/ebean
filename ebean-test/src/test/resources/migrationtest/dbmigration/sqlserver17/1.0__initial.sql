@@ -170,6 +170,7 @@ create table [table] (
   [to]                          nvarchar(255),
   [varchar]                     nvarchar(255),
   [foreign]                     nvarchar(255),
+  textfield                     nvarchar(255) not null,
   constraint pk_table primary key ([index])
 );
 

@@ -13,6 +13,7 @@ alter table migtest_e_basic drop index uq_migtest_e_basic_indextest4;
 alter table migtest_e_basic drop index uq_migtest_e_basic_indextest5;
 drop index ix_migtest_e_basic_indextest3 on migtest_e_basic;
 drop index ix_migtest_e_basic_indextest6 on migtest_e_basic;
+drop index ix_table_textfield2 on `table`;
 -- apply changes
 create table `migtest_QuOtEd` (
   id                            varchar(255) not null,

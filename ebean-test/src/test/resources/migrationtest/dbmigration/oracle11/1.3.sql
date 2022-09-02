@@ -88,6 +88,7 @@ end;
 $$;
 drop index ix_migtest_e_basic_indextest3;
 drop index ix_migtest_e_basic_indextest6;
+drop index ix_table_textfield2;
 -- apply changes
 create table "migtest_QuOtEd" (
   id                            varchar2(255) not null,
