@@ -1,11 +1,10 @@
 package io.ebean.spring.txn;
 
+import io.avaje.applog.AppLog;
 import io.ebean.TxScope;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.transaction.TransactionManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
@@ -14,6 +13,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * A Spring-aware {@link ExternalTransactionManager}.
@@ -26,7 +27,7 @@ import java.util.List;
  */
 public class SpringJdbcTransactionManager implements ExternalTransactionManager {
 
-  private static final Logger log = LoggerFactory.getLogger(SpringJdbcTransactionManager.class);
+  private static final System.Logger log = AppLog.getLogger(SpringJdbcTransactionManager.class);
 
   /**
    * The data source.
@@ -153,7 +154,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
 
     @Override
     public void flush() {
-      transaction.flushBatch();
+      transaction.flush();
     }
 
     @Override
@@ -167,12 +168,12 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
     public void afterCompletion(int status) {
       switch (status) {
         case STATUS_COMMITTED:
-          log.debug("Spring Txn [{}] committed", transaction.getId());
+          log.log(DEBUG, "Spring Txn [{0}] committed", transaction.getId());
           transaction.postCommit();
           break;
 
         case STATUS_ROLLED_BACK:
-          log.debug("Spring Txn [{}] rollback", transaction.getId());
+          log.log(DEBUG, "Spring Txn [{0}] rollback", transaction.getId());
           transaction.postRollback(null);
           break;
 
