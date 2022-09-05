@@ -424,9 +424,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public boolean isReadOnly() {
-    if (!active) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     try {
       return connection.isReadOnly();
     } catch (SQLException e) {
@@ -436,9 +433,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public void setReadOnly(boolean readOnly) {
-    if (!active) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     try {
       localReadOnly = readOnly;
       connection.setReadOnly(readOnly);
@@ -459,9 +453,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public final void setBatchMode(boolean batchMode) {
-    if (!active) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     this.batchMode = batchMode;
   }
 
@@ -472,9 +463,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public final void setBatchOnCascade(boolean batchMode) {
-    if (!active) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     this.batchOnCascadeMode = batchMode;
   }
 
@@ -666,9 +654,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public final void flush() {
-    if (!active) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     internalBatchFlush();
   }
 
@@ -707,9 +692,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public final void setPersistenceContext(SpiPersistenceContext context) {
-    if (!active) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     this.persistenceContext = context;
   }
 
@@ -776,9 +758,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public Connection getInternalConnection() {
-    if (!active) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     return connection;
   }
 
@@ -1091,7 +1070,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Return true if the transaction is active.
    */
   @Override
-  public final boolean isActive() {
+  public boolean isActive() {
     return active;
   }
 
