@@ -1,7 +1,6 @@
 package org.example;
 
 import io.ebean.DB;
-import io.ebean.Ebean;
 import io.ebean.Transaction;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,12 +43,12 @@ public class EbeanSpringModuleTest {
   @Test
   public void testInactiveTransaction() {
 
-    Transaction transaction = Ebean.beginTransaction();
+    Transaction transaction = DB.beginTransaction();
     long id;
     try {
       User user = new User();
       user.setName("save with txn 1");
-      Ebean.save(user);
+      DB.save(user);
       transaction.commit();
       id = user.getOid();
     } finally {
@@ -57,7 +56,7 @@ public class EbeanSpringModuleTest {
       //transaction.end();
     }
 
-    Ebean.delete(User.class, id);
+    DB.delete(User.class, id);
   }
 
   @Test

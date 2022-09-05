@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd">
 
 	<!-- Default abstract Ebean Server configuration -->
-	<bean id="defaultEbeanServerConfig" class="io.ebean.config.ServerConfig" abstract="true">
+	<bean id="defaultEbeanServerConfig" class="io.ebean.config.DatabaseConfig" abstract="true">
 		<property name="externalTransactionManager">
 			<bean class="io.ebean.spring.txn.SpringJdbcTransactionManager"/>
 		</property>

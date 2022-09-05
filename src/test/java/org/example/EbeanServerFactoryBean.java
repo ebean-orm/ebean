@@ -1,12 +1,11 @@
 package org.example;
 
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.config.DatabaseConfig;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
-import io.ebean.config.ServerConfig;
 
 /**
  * A Spring FactoryBean for constructing EbeanServer instances.
@@ -14,17 +13,17 @@ import io.ebean.config.ServerConfig;
  * @since 18.05.2009
  * @author E Mc Greal
  */
-public class EbeanServerFactoryBean implements InitializingBean, FactoryBean<EbeanServer> {
+public class EbeanServerFactoryBean implements InitializingBean, FactoryBean<Database> {
 
   /**
    * The Ebean server configuration.
    */
-  private ServerConfig serverConfig;
+  private DatabaseConfig serverConfig;
 
   /**
    * The EbeanServer instance.
    */
-  private EbeanServer ebeanServer;
+  private Database ebeanServer;
 
   public void afterPropertiesSet() throws Exception {
 
@@ -34,15 +33,15 @@ public class EbeanServerFactoryBean implements InitializingBean, FactoryBean<Ebe
 
     serverConfig.setPersistBatch(PersistBatch.ALL);
     // Create the new EbeanServer using the configuration
-    this.ebeanServer = EbeanServerFactory.create(serverConfig);
+    this.ebeanServer = DatabaseFactory.create(serverConfig);
   }
 
-  public EbeanServer getObject() throws Exception {
+  public Database getObject() throws Exception {
     return ebeanServer;
   }
 
-  public Class<? extends EbeanServer> getObjectType() {
-    return EbeanServer.class;
+  public Class<? extends Database> getObjectType() {
+    return Database.class;
   }
 
   /**
@@ -55,14 +54,14 @@ public class EbeanServerFactoryBean implements InitializingBean, FactoryBean<Ebe
   /**
    * Return the server configuration.
    */
-  public ServerConfig getServerConfig() {
+  public DatabaseConfig getServerConfig() {
     return serverConfig;
   }
 
   /**
    * Set the server configuration.
    */
-  public void setServerConfig(ServerConfig serverConfig) {
+  public void setServerConfig(DatabaseConfig serverConfig) {
     this.serverConfig = serverConfig;
   }
 }
