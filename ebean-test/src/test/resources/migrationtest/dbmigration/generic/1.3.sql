@@ -16,6 +16,7 @@ alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
 alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 drop index if exists ix_migtest_e_basic_indextest3;
 drop index if exists ix_migtest_e_basic_indextest6;
+drop index if exists ix_table_textfield2;
 -- apply changes
 create table "migtest_QuOtEd" (
   id                            varchar(255) not null,

@@ -112,6 +112,7 @@
             <column name="&quot;to&quot;" type="varchar"/>
             <column name="&quot;varchar&quot;" type="varchar"/>
             <column name="&quot;foreign&quot;" type="varchar" references="&quot;table&quot;.&quot;index&quot;" foreignKeyName="fk_table_foreign" foreignKeyIndex="ix_table_foreign"/>
+            <column name="textfield" type="varchar" notnull="true"/>
             <uniqueConstraint name="uq_table_to" columnNames="&quot;to&quot;" oneToOne="false" nullableColumns="&quot;to&quot;"/>
             <uniqueConstraint name="uq_table_varchar" columnNames="&quot;varchar&quot;" oneToOne="false" nullableColumns="&quot;varchar&quot;"/>
         </createTable>

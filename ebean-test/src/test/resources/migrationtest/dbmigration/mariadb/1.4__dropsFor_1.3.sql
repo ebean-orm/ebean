@@ -2,6 +2,8 @@
 -- apply changes
 SET @@system_versioning_alter_history = 1;
 -- apply alter tables
+CALL usp_ebean_drop_column('table', 'textfield');
+CALL usp_ebean_drop_column('table', 'textfield2');
 CALL usp_ebean_drop_column('migtest_ckey_detail', 'one_key');
 CALL usp_ebean_drop_column('migtest_ckey_detail', 'two_key');
 CALL usp_ebean_drop_column('migtest_ckey_parent', 'assoc_id');

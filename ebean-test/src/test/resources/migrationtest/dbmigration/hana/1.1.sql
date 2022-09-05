@@ -100,7 +100,9 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table migtest_e_history6 drop system versioning;
 alter table "table" drop system versioning;
 -- apply alter tables
-alter table "table" add ("select" nvarchar(255));
+alter table "table" alter (textfield nvarchar(255));
+alter table "table" add ("select" nvarchar(255),
+   textfield2 nvarchar(255));
 alter table migtest_ckey_detail add (one_key integer,
    two_key nvarchar(127));
 alter table migtest_ckey_parent add (assoc_id integer);
@@ -130,7 +132,9 @@ alter table migtest_e_history6 alter (test_number1 integer default 42 not null,
 alter table migtest_e_history6_history alter (test_number2 integer);
 alter table migtest_e_softdelete add (deleted boolean default false not null);
 alter table migtest_oto_child add (master_id bigint);
-alter table table_history add ("select" nvarchar(255));
+alter table table_history alter (textfield nvarchar(255));
+alter table table_history add ("select" nvarchar(255),
+   textfield2 nvarchar(255));
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 -- cannot create unique index "uq_migtest_e_basic_description" on table "migtest_e_basic" with nullable columns;
@@ -192,3 +196,4 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 -- explicit index "ix_migtest_e_basic_indextest3" for single column "indextest3" of table "migtest_e_basic" is not necessary;
 -- explicit index "ix_migtest_e_basic_indextest6" for single column "indextest6" of table "migtest_e_basic" is not necessary;
+-- explicit index "ix_table_textfield2" for single column "textfield2" of table ""table"" is not necessary;

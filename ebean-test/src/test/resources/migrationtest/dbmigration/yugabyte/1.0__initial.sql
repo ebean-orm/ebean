@@ -156,6 +156,7 @@ create table "table" (
   "to"                          varchar(255),
   "varchar"                     varchar(255),
   "foreign"                     varchar(255),
+  textfield                     varchar(255) not null,
   constraint uq_table_to unique ("to"),
   constraint uq_table_varchar unique ("varchar"),
   constraint pk_table primary key ("index")
@@ -348,6 +349,7 @@ create table table_history(
   "to"                          varchar(255),
   "varchar"                     varchar(255),
   "foreign"                     varchar(255),
+  textfield                     varchar(255),
   sys_period                    tstzrange
 );
 create view table_with_history as select * from "table" union all select * from table_history;
@@ -359,11 +361,11 @@ begin
   lowerTs = lower(OLD.sys_period);
   upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into table_history (sys_period,"index", "from", "to", "varchar", "foreign") values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."foreign");
+    insert into table_history (sys_period,"index", "from", "to", "varchar", "foreign", textfield) values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."foreign", OLD.textfield);
     NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into table_history (sys_period,"index", "from", "to", "varchar", "foreign") values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."foreign");
+    insert into table_history (sys_period,"index", "from", "to", "varchar", "foreign", textfield) values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."foreign", OLD.textfield);
     return old;
   end if;
 end;

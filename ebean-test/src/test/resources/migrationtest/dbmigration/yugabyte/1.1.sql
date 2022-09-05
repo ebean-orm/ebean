@@ -70,7 +70,9 @@ drop function if exists table_history_version();
 
 drop view table_with_history;
 -- apply alter tables
+alter table "table" alter column textfield drop not null;
 alter table "table" add column "select" varchar(255);
+alter table "table" add column textfield2 varchar(255);
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -107,7 +109,9 @@ alter table migtest_e_history6 alter column test_number2 drop not null;
 alter table migtest_e_history6_history alter column test_number2 drop not null;
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 alter table migtest_oto_child add column master_id bigint;
+alter table table_history alter column textfield drop not null;
 alter table table_history add column "select" varchar(255);
+alter table table_history add column textfield2 varchar(255);
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
@@ -274,11 +278,11 @@ begin
   lowerTs = lower(OLD.sys_period);
   upperTs = greatest(lowerTs + '1 microsecond',current_timestamp);
   if (TG_OP = 'UPDATE') then
-    insert into table_history (sys_period,"index", "from", "to", "varchar", "select", "foreign") values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+    insert into table_history (sys_period,"index", "from", "to", "varchar", "select", "foreign", textfield, textfield2) values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign", OLD.textfield, OLD.textfield2);
     NEW.sys_period = tstzrange(upperTs,null);
     return new;
   elsif (TG_OP = 'DELETE') then
-    insert into table_history (sys_period,"index", "from", "to", "varchar", "select", "foreign") values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign");
+    insert into table_history (sys_period,"index", "from", "to", "varchar", "select", "foreign", textfield, textfield2) values (tstzrange(lowerTs,upperTs), OLD."index", OLD."from", OLD."to", OLD."varchar", OLD."select", OLD."foreign", OLD.textfield, OLD.textfield2);
     return old;
   end if;
 end;
@@ -318,3 +322,4 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index if not exists ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index if not exists ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index if not exists ix_table_textfield2 on "table" (textfield2);

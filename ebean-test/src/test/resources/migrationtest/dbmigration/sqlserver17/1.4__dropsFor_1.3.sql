@@ -10,7 +10,12 @@ alter table migtest_e_history drop period for system_time;
 -- alter table migtest_e_history5 set (system_versioning = off (history_table=dbo.migtest_e_history5_history));
 -- history migration goes here
 -- alter table migtest_e_history5 set (system_versioning = on (history_table=dbo.migtest_e_history5_history));
+-- alter table [table] set (system_versioning = off (history_table=dbo.table_history));
+-- history migration goes here
+-- alter table [table] set (system_versioning = on (history_table=dbo.table_history));
 -- apply alter tables
+EXEC usp_ebean_drop_column "table", textfield;
+EXEC usp_ebean_drop_column "table", textfield2;
 EXEC usp_ebean_drop_column migtest_ckey_detail, one_key;
 EXEC usp_ebean_drop_column migtest_ckey_detail, two_key;
 EXEC usp_ebean_drop_column migtest_ckey_parent, assoc_id;

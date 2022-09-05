@@ -151,6 +151,7 @@ create table `table` (
   `to`                          varchar(255),
   `varchar`                     varchar(255),
   `foreign`                     varchar(255),
+  textfield                     varchar(255) not null,
   constraint uq_table_to unique (`to`),
   constraint uq_table_varchar unique (`varchar`),
   constraint pk_table primary key (`index`)
@@ -298,6 +299,7 @@ create table table_history(
   `to`                          varchar(255),
   `varchar`                     varchar(255),
   `foreign`                     varchar(255),
+  textfield                     varchar(255),
   sys_period_start              datetime(6),
   sys_period_end                datetime(6)
 );
@@ -305,12 +307,12 @@ create view table_with_history as select * from `table` union all select * from 
 lock tables `table` write;
 delimiter $$
 create trigger table_history_upd before update on `table` for each row begin
-    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`);
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`, textfield) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`, OLD.textfield);
     set NEW.sys_period_start = now(6);
 end$$
 delimiter $$
 create trigger table_history_del before delete on `table` for each row begin
-    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`);
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`, textfield) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`, OLD.textfield);
 end$$
 unlock tables;
 

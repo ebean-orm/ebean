@@ -126,7 +126,8 @@ create table "table" (
   "from"                        String,
   "to"                          String,
   "varchar"                     String,
-  "foreign"                     String
+  "foreign"                     String,
+  textfield                     String
 ) ENGINE = Log();
 
 create table migtest_mtm_c (

@@ -152,6 +152,7 @@ create table [table] (
   [to]                          varchar(255),
   [varchar]                     varchar(255),
   [foreign]                     varchar(255),
+  textfield                     varchar(255) not null,
   constraint pk_table primary key ([index])
 );
 
