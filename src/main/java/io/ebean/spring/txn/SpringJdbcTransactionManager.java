@@ -21,8 +21,8 @@ import static java.lang.System.Logger.Level.DEBUG;
  * <p>
  * Will look for Spring transactions and use them if they exist.
  *
- * @since 18.05.2009
  * @author E Mc Greal
+ * @since 18.05.2009
  */
 public final class SpringJdbcTransactionManager implements ExternalTransactionManager {
 
