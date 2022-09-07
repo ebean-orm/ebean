@@ -91,6 +91,7 @@
     <module>composites</module>
     <module>ebean-joda-time</module>
     <module>ebean-csv-reader</module>
+    <module>ebean-json-node</module>
     <!--    <module>ebean-kotlin</module>-->
 
   </modules>

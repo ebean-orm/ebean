@@ -2,6 +2,7 @@ package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataReader;
+import io.ebean.core.type.PostgresHelper;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CoreLog;

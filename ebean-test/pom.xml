@@ -111,6 +111,13 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-json-node</artifactId>
+      <version>13.9.3-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
       <version>13.9.3-SNAPSHOT</version>
       <scope>test</scope>

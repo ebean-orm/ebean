@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.annotation.*;
 import io.ebean.config.DatabaseConfig;
@@ -9,9 +8,7 @@ import io.ebean.config.PlatformConfig;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.core.type.DocPropertyType;
-import io.ebean.core.type.ExtraTypeFactory;
-import io.ebean.core.type.ScalarType;
+import io.ebean.core.type.*;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
@@ -51,6 +48,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private static final System.Logger log = CoreLog.internal;
 
+  private final Map<Class<?>, ScalarTypeSet<?>> typeSets = new HashMap<>();
   private final ConcurrentHashMap<Class<?>, ScalarType<?>> typeMap;
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
   private final ConcurrentHashMap<String, ScalarType<?>> logicalMap;
@@ -71,28 +69,7 @@ public final class DefaultTypeManager implements TypeManager {
   private final EnumType defaultEnumType;
   private final DatabasePlatform databasePlatform;
 
-  // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
 
-  /**
-   * Jackson's JsonNode storage to Clob.
-   */
-  private ScalarType<?> jsonNodeClob;
-  /**
-   * Jackson's JsonNode storage to Blob.
-   */
-  private ScalarType<?> jsonNodeBlob;
-  /**
-   * Jackson's JsonNode storage to Varchar.
-   */
-  private ScalarType<?> jsonNodeVarchar;
-  /**
-   * Jackson's JsonNode storage to Postgres JSON or Clob.
-   */
-  private ScalarType<?> jsonNodeJson;
-  /**
-   * Jackson's JsonNode storage to Postgres JSONB or Clob.
-   */
-  private ScalarType<?> jsonNodeJsonb;
 
   private final PlatformArrayTypeFactory arrayTypeListFactory;
   private final PlatformArrayTypeFactory arrayTypeSetFactory;
@@ -120,7 +97,6 @@ public final class DefaultTypeManager implements TypeManager {
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
-    initialiseJacksonTypes();
     loadTypesFromProviders(config, objectMapper);
     loadGeoTypeBinder(config);
 
@@ -160,14 +136,19 @@ public final class DefaultTypeManager implements TypeManager {
    * Load custom scalar types registered via ExtraTypeFactory and ServiceLoader.
    */
   private void loadTypesFromProviders(DatabaseConfig config, Object objectMapper) {
-    ServiceLoader<ExtraTypeFactory> factories = ServiceLoader.load(ExtraTypeFactory.class);
-    Iterator<ExtraTypeFactory> iterator = factories.iterator();
-    if (iterator.hasNext()) {
-      // use the cacheFactory (via classpath service loader)
-      ExtraTypeFactory plugin = iterator.next();
-      List<? extends ScalarType<?>> types = plugin.createTypes(config, objectMapper);
-      for (ScalarType<?> type : types) {
+    for (ExtraTypeFactory plugin : ServiceLoader.load(ExtraTypeFactory.class)) {
+      for (ScalarType<?> type : plugin.createTypes(config, objectMapper)) {
         add(type);
+      }
+    }
+    for (ScalarTypeSetFactory factory : ServiceLoader.load(ScalarTypeSetFactory.class)) {
+      ScalarTypeSet<?> typeSet = factory.createTypeSet(config, objectMapper);
+      if (typeSet != null) {
+        typeSets.put(typeSet.type(), typeSet);
+        ScalarType<?> defaultType = typeSet.defaultType();
+        if (defaultType != null) {
+          typeMap.put(typeSet.type(), defaultType);
+        }
       }
     }
   }
@@ -350,19 +331,9 @@ public final class DefaultTypeManager implements TypeManager {
       }
     }
     if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
-      if (type.equals(JsonNode.class)) {
-        switch (dbType) {
-          case Types.VARCHAR:
-            return jsonNodeVarchar;
-          case Types.BLOB:
-            return jsonNodeBlob;
-          case Types.CLOB:
-            return jsonNodeClob;
-          case DbPlatformType.JSONB:
-            return jsonNodeJsonb;
-          default:
-            return jsonNodeJson;
-        }
+      ScalarTypeSet<?> typeSet = typeSets.get(type);
+      if (typeSet != null) {
+        return typeSet.forType(dbType);
       }
     }
     return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
@@ -709,25 +680,6 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  /**
-   * Add support for Jackson's JsonNode mapping to Clob, Blob, Varchar, JSON and JSONB.
-   */
-  private void initialiseJacksonTypes() {
-    if (objectMapper != null) {
-      ObjectMapper mapper = (ObjectMapper) objectMapper;
-      jsonNodeClob = new ScalarTypeJsonNode.Clob(mapper);
-      jsonNodeBlob = new ScalarTypeJsonNode.Blob(mapper);
-      jsonNodeVarchar = new ScalarTypeJsonNode.Varchar(mapper);
-      jsonNodeJson = jsonNodeClob;  // Default for non-Postgres databases
-      jsonNodeJsonb = jsonNodeClob; // Default for non-Postgres databases
-      if (postgres) {
-        jsonNodeJson = new ScalarTypeJsonNodePostgres.JSON(mapper);
-        jsonNodeJsonb = new ScalarTypeJsonNodePostgres.JSONB(mapper);
-      }
-      // add as default mapping for JsonNode (when not annotated with @DbJson etc)
-      typeMap.put(JsonNode.class, jsonNodeJson);
-    }
-  }
 
   private void initialiseJavaTimeTypes(DatabaseConfig config) {
 

@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.jackson.jsonnode;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -11,11 +11,7 @@ import io.ebean.core.type.ScalarTypeBase;
 import io.ebean.text.TextException;
 import io.ebean.util.IOUtils;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -182,7 +178,8 @@ abstract class ScalarTypeJsonNode extends ScalarTypeBase<JsonNode> {
     if (value == null) {
       dataOutput.writeBoolean(false);
     } else {
-      ScalarHelp.writeUTF(dataOutput, format(value));
+      dataOutput.writeBoolean(true);
+      dataOutput.writeUTF(format(value));
     }
   }
 
