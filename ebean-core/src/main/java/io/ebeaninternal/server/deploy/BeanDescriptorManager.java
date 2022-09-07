@@ -145,7 +145,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.dbIdentity = config.getDatabasePlatform().dbIdentity();
     this.deplyInherit = config.getDeployInherit();
     this.deployUtil = config.getDeployUtil();
-    this.typeManager = deployUtil.getTypeManager();
+    this.typeManager = deployUtil.typeManager();
     this.beanManagerFactory = new BeanManagerFactory(config.getDatabasePlatform());
     this.beanLifecycleAdapterFactory = new BeanLifecycleAdapterFactory(this.config);
     this.persistControllerManager = new PersistControllerManager(bootupClasses);

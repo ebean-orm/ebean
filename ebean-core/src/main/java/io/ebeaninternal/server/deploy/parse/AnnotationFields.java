@@ -301,7 +301,7 @@ final class AnnotationFields extends AnnotationParser {
 
   private void initEncrypt(DeployBeanProperty prop) {
     if (!prop.isTransient()) {
-      EncryptDeploy encryptDeploy = util.getEncryptDeploy(info.getDescriptor().getBaseTableFull(), prop.getDbColumn());
+      EncryptDeploy encryptDeploy = util.encryptDeploy(info.getDescriptor().getBaseTableFull(), prop.getDbColumn());
       if (encryptDeploy == null || encryptDeploy.getMode() == Mode.MODE_ANNOTATION) {
         Encrypted encrypted = get(prop, Encrypted.class);
         if (encrypted != null) {
@@ -398,7 +398,7 @@ final class AnnotationFields extends AnnotationParser {
       return;
     }
     if (dbEncString) {
-      DbEncrypt dbEncrypt = util.getDbPlatform().dbEncrypt();
+      DbEncrypt dbEncrypt = util.dbPlatform().dbEncrypt();
       if (dbEncrypt != null) {
         // check if we have a DB encryption function for this type
         int jdbcType = prop.getScalarType().jdbcType();
@@ -427,7 +427,7 @@ final class AnnotationFields extends AnnotationParser {
 
   private ScalarTypeBytesBase getDbEncryptType(DeployBeanProperty prop) {
     int dbType = prop.isLob() ? Types.BLOB : Types.VARBINARY;
-    return (ScalarTypeBytesBase) util.getTypeManager().type(dbType);
+    return (ScalarTypeBytesBase) util.typeManager().type(dbType);
   }
 
   private DataEncryptSupport createDataEncryptSupport(DeployBeanProperty prop) {

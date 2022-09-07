@@ -60,15 +60,15 @@ public final class DeployUtil {
     this.useValidationNotNull = config.isUseValidationNotNull();
   }
 
-  public TypeManager getTypeManager() {
+  public TypeManager typeManager() {
     return typeManager;
   }
 
-  public DatabasePlatform getDbPlatform() {
+  public DatabasePlatform dbPlatform() {
     return dbPlatform;
   }
 
-  public NamingConvention getNamingConvention() {
+  public NamingConvention namingConvention() {
     return namingConvention;
   }
 
@@ -82,7 +82,7 @@ public final class DeployUtil {
     }
   }
 
-  EncryptDeploy getEncryptDeploy(TableName table, String column) {
+  EncryptDeploy encryptDeploy(TableName table, String column) {
     if (encryptDeployManager == null) {
       return EncryptDeploy.ANNOTATION;
     }
@@ -123,7 +123,7 @@ public final class DeployUtil {
       // this will be an Enum type...
       return;
     }
-    ScalarType<?> scalarType = getScalarType(property);
+    ScalarType<?> scalarType = scalarType(property);
     if (scalarType != null) {
       // set the jdbc type this maps to
       property.setDbType(scalarType.jdbcType());
@@ -132,7 +132,7 @@ public final class DeployUtil {
     }
   }
 
-  private ScalarType<?> getScalarType(DeployBeanProperty property) {
+  private ScalarType<?> scalarType(DeployBeanProperty property) {
     // Note that Temporal types already have dbType
     // set via annotations
     Class<?> propType = property.getPropertyType();
@@ -193,7 +193,7 @@ public final class DeployUtil {
   }
 
   void setDbJsonType(DeployBeanProperty prop, DbJson dbJsonType) {
-    int dbType = getDbJsonStorage(dbJsonType.storage());
+    int dbType = dbJsonStorage(dbJsonType.storage());
     setDbJsonType(prop, dbType, dbJsonType.length(), dbJsonType.mutationDetection());
   }
 
@@ -219,7 +219,7 @@ public final class DeployUtil {
   /**
    * Return the JDBC type for the JSON storage type.
    */
-  private int getDbJsonStorage(DbJsonType dbJsonType) {
+  private int dbJsonStorage(DbJsonType dbJsonType) {
     switch (dbJsonType) {
       case JSONB:
         return DbPlatformType.JSONB;
