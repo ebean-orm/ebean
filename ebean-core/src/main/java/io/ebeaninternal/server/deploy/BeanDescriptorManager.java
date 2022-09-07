@@ -184,12 +184,12 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
   @Override
   public ScalarType<?> scalarType(String cast) {
-    return typeManager.getScalarType(cast);
+    return typeManager.type(cast);
   }
 
   @Override
   public ScalarType<?> scalarType(int jdbcType) {
-    return typeManager.getScalarType(jdbcType);
+    return typeManager.type(jdbcType);
   }
 
   /**
@@ -884,7 +884,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private void makeOrderColumn(DeployBeanPropertyAssocMany<?> oneToMany) {
     DeployBeanDescriptor<?> targetDesc = targetDescriptor(oneToMany);
     DeployOrderColumn orderColumn = oneToMany.getOrderColumn();
-    final ScalarType<?> scalarType = typeManager.getScalarType(Integer.class);
+    final ScalarType<?> scalarType = typeManager.type(Integer.class);
     DeployBeanProperty orderProperty = new DeployBeanProperty(targetDesc, Integer.class, scalarType, null);
     orderProperty.setName(DeployOrderColumn.LOGICAL_NAME);
     orderProperty.setDbColumn(orderColumn.getName());

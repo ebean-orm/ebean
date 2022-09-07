@@ -427,7 +427,7 @@ final class AnnotationFields extends AnnotationParser {
 
   private ScalarTypeBytesBase getDbEncryptType(DeployBeanProperty prop) {
     int dbType = prop.isLob() ? Types.BLOB : Types.VARBINARY;
-    return (ScalarTypeBytesBase) util.getTypeManager().getScalarType(dbType);
+    return (ScalarTypeBytesBase) util.getTypeManager().type(dbType);
   }
 
   private DataEncryptSupport createDataEncryptSupport(DeployBeanProperty prop) {

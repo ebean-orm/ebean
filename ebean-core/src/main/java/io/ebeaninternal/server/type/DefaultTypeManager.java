@@ -171,7 +171,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getScalarType(String cast) {
+  public ScalarType<?> type(String cast) {
     return logicalMap.get(cast);
   }
 
@@ -179,27 +179,27 @@ public final class DefaultTypeManager implements TypeManager {
    * Return the ScalarType for the given jdbc type as per java.sql.Types.
    */
   @Override
-  public ScalarType<?> getScalarType(int jdbcType) {
+  public ScalarType<?> type(int jdbcType) {
     return nativeMap.get(jdbcType);
   }
 
   @Override
-  public ScalarType<?> getScalarType(Type propertyType, Class<?> propertyClass) {
+  public ScalarType<?> type(Type propertyType, Class<?> propertyClass) {
     if (propertyType instanceof ParameterizedType) {
       ParameterizedType pt = (ParameterizedType) propertyType;
       Type rawType = pt.getRawType();
       if (List.class == rawType || Set.class == rawType) {
-        return getArrayScalarType((Class<?>) rawType, propertyType, true);
+        return dbArrayType((Class<?>) rawType, propertyType, true);
       }
     }
-    return getScalarType(propertyClass);
+    return type(propertyClass);
   }
 
   /**
    * This can return null if no matching ScalarType is found.
    */
   @Override
-  public ScalarType<?> getScalarType(Class<?> type) {
+  public ScalarType<?> type(Class<?> type) {
     ScalarType<?> found = typeMap.get(type);
     if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
@@ -247,37 +247,37 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public GeoTypeBinder getGeoTypeBinder() {
+  public GeoTypeBinder geoTypeBinder() {
     return geoTypeBinder;
   }
 
   @Override
-  public ScalarType<?> getDbMapScalarType() {
+  public ScalarType<?> dbMapType() {
     return hstoreSupport() ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR, false);
   }
 
   @Override
-  public ScalarType<?> getArrayScalarType(Class<?> type, Type genericType, boolean nullable) {
-    Type valueType = getValueType(genericType);
+  public ScalarType<?> dbArrayType(Class<?> type, Type genericType, boolean nullable) {
+    Type valueType = valueType(genericType);
     if (type.equals(List.class)) {
-      return getArrayScalarTypeList(valueType, nullable);
+      return dbArrayTypeList(valueType, nullable);
     } else if (type.equals(Set.class)) {
-      return getArrayScalarTypeSet(valueType, nullable);
+      return dbArrayTypeSet(valueType, nullable);
     } else {
       throw new IllegalStateException("@DbArray does not support type " + type);
     }
   }
 
-  private ScalarType<?> getArrayScalarTypeSet(Type valueType, boolean nullable) {
+  private ScalarType<?> dbArrayTypeSet(Type valueType, boolean nullable) {
     if (isEnumType(valueType)) {
-      return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
+      return arrayTypeSetFactory.typeForEnum(enumType(asEnumClass(valueType), null), nullable);
     }
     return arrayTypeSetFactory.typeFor(valueType, nullable);
   }
 
-  private ScalarType<?> getArrayScalarTypeList(Type valueType, boolean nullable) {
+  private ScalarType<?> dbArrayTypeList(Type valueType, boolean nullable) {
     if (isEnumType(valueType)) {
-      return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
+      return arrayTypeListFactory.typeForEnum(enumType(asEnumClass(valueType), null), nullable);
     }
     return arrayTypeListFactory.typeFor(valueType, nullable);
   }
@@ -291,7 +291,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength) {
+  public ScalarType<?> dbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
     Class<?> type = prop.getPropertyType();
     Type genericType = prop.getGenericType();
     boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
@@ -300,7 +300,7 @@ public final class DefaultTypeManager implements TypeManager {
       return ScalarTypeJsonString.typeFor(postgres, dbType);
     }
     if (type.equals(List.class)) {
-      DocPropertyType docType = getDocType(genericType);
+      DocPropertyType docType = docType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable(), jsonManager.keepSource(prop));
       } else {
@@ -308,7 +308,7 @@ public final class DefaultTypeManager implements TypeManager {
       }
     }
     if (type.equals(Set.class)) {
-      DocPropertyType docType = getDocType(genericType);
+      DocPropertyType docType = docType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable(), jsonManager.keepSource(prop));
       } else {
@@ -339,9 +339,9 @@ public final class DefaultTypeManager implements TypeManager {
     return prop.getMetaAnnotation(com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
   }
 
-  private DocPropertyType getDocType(Type genericType) {
+  private DocPropertyType docType(Type genericType) {
     if (genericType instanceof Class<?>) {
-      ScalarType<?> found = getScalarType((Class<?>) genericType);
+      ScalarType<?> found = type((Class<?>) genericType);
       if (found != null) {
         return found.docType();
       }
@@ -357,7 +357,7 @@ public final class DefaultTypeManager implements TypeManager {
     return String.class.equals(typeArg) || Long.class.equals(typeArg);
   }
 
-  private Type getValueType(Type collectionType) {
+  private Type valueType(Type collectionType) {
     return TypeReflectHelper.getValueType(collectionType);
   }
 
@@ -384,7 +384,7 @@ public final class DefaultTypeManager implements TypeManager {
    * different jdbcTypes in a single system.
    */
   @Override
-  public ScalarType<?> getScalarType(Class<?> type, int jdbcType) {
+  public ScalarType<?> type(Class<?> type, int jdbcType) {
     // File is a special Lob so check for that first
     if (File.class.equals(type)) {
       return fileType;
@@ -393,13 +393,13 @@ public final class DefaultTypeManager implements TypeManager {
     // check for Clob, LongVarchar etc ...
     // the reason being that String maps to multiple jdbc types
     // varchar, clob, longVarchar.
-    ScalarType<?> scalarType = getLobTypes(jdbcType);
+    ScalarType<?> scalarType = lobTypes(jdbcType);
     if (scalarType != null) {
       // it is a specific Lob type...
       return scalarType;
     }
 
-    scalarType = getScalarType(type);
+    scalarType = type(type);
     if (scalarType != null) {
       if (jdbcType == 0 || scalarType.jdbcType() == jdbcType) {
         // matching type
@@ -425,8 +425,8 @@ public final class DefaultTypeManager implements TypeManager {
    * types - like String - Varchar, LongVarchar, Clob. For this reason I check
    * for the specific Lob types first before looking for a matching type.
    */
-  private ScalarType<?> getLobTypes(int jdbcType) {
-    return getScalarType(jdbcType);
+  private ScalarType<?> lobTypes(int jdbcType) {
+    return type(jdbcType);
   }
 
   /**
@@ -470,7 +470,7 @@ public final class DefaultTypeManager implements TypeManager {
    * <p>
    * Return null if the EnumValue annotations are not present/used.
    */
-  private ScalarTypeEnum<?> createEnumScalarType2(Class<?> enumType) {
+  private ScalarTypeEnum<?> enumTypeEnumValue(Class<?> enumType) {
     boolean integerType = true;
     Map<String, String> nameValueMap = new LinkedHashMap<>();
     for (Field field : enumType.getDeclaredFields()) {
@@ -499,8 +499,8 @@ public final class DefaultTypeManager implements TypeManager {
    * much shorter codes used in the DB.
    */
   @Override
-  public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType, EnumType type) {
-    ScalarType<?> scalarType = getScalarType(enumType);
+  public ScalarType<?> enumType(Class<? extends Enum<?>> enumType, EnumType type) {
+    ScalarType<?> scalarType = type(enumType);
     if (scalarType instanceof ScalarTypeWrapper) {
       // no override or further mapping required
       return scalarType;
@@ -512,16 +512,16 @@ public final class DefaultTypeManager implements TypeManager {
       }
       return scalarEnum;
     }
-    scalarEnum = createEnumScalarTypePerExtentions(enumType);
+    scalarEnum = enumTypePerExtensions(enumType);
     if (scalarEnum == null) {
       // use JPA normal Enum type (without mapping)
-      scalarEnum = createEnumScalarTypePerSpec(enumType, type);
+      scalarEnum = enumTypePerSpec(enumType, type);
     }
     add(scalarEnum);
     return scalarEnum;
   }
 
-  private ScalarTypeEnum<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
+  private ScalarTypeEnum<?> enumTypePerSpec(Class<?> enumType, EnumType type) {
     if (type == null) {
       if (defaultEnumType == EnumType.ORDINAL) {
         return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
@@ -535,16 +535,16 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private ScalarTypeEnum<?> createEnumScalarTypePerExtentions(Class<? extends Enum<?>> enumType) {
+  private ScalarTypeEnum<?> enumTypePerExtensions(Class<? extends Enum<?>> enumType) {
     for (Method method : enumType.getMethods()) {
       DbEnumValue dbValue = AnnotationUtil.get(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
-        return createEnumScalarTypeDbValue(enumType, method, integerValues, dbValue.length(), dbValue.withConstraint());
+        return enumTypeDbValue(enumType, method, integerValues, dbValue.length(), dbValue.withConstraint());
       }
     }
     // look for EnumValue annotations instead
-    return createEnumScalarType2(enumType);
+    return enumTypeEnumValue(enumType);
   }
 
   /**
@@ -552,7 +552,7 @@ public final class DefaultTypeManager implements TypeManager {
    * <p>
    * Return null if the EnumValue annotations are not present/used.
    */
-  private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
+  private ScalarTypeEnum<?> enumTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
     for (Enum<?> enumConstant : enumType.getEnumConstants()) {
       try {
@@ -634,7 +634,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
         Class<?> logicalType = paramTypes[0];
         Class<?> persistType = paramTypes[1];
-        ScalarType<?> wrappedType = getScalarType(persistType);
+        ScalarType<?> wrappedType = type(persistType);
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
@@ -658,7 +658,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
         Class<?> logicalType = paramTypes[0];
         Class<?> persistType = paramTypes[1];
-        ScalarType<?> wrappedType = getScalarType(persistType);
+        ScalarType<?> wrappedType = type(persistType);
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
@@ -674,8 +674,7 @@ public final class DefaultTypeManager implements TypeManager {
 
 
   private void initialiseJavaTimeTypes(DatabaseConfig config) {
-
-    ZoneId zoneId = getZoneId(config);
+    ZoneId zoneId = zoneId(config);
 
     typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
     addType(java.time.Period.class, new ScalarTypePeriod());
@@ -702,7 +701,7 @@ public final class DefaultTypeManager implements TypeManager {
     addType(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
   }
 
-  private ZoneId getZoneId(DatabaseConfig config) {
+  private ZoneId zoneId(DatabaseConfig config) {
     final String dataTimeZone = config.getDataTimeZone();
     return (dataTimeZone == null) ? ZoneOffset.systemDefault() : TimeZone.getTimeZone(dataTimeZone).toZoneId();
   }
