@@ -159,8 +159,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Register a custom ScalarType.
    */
-  @Override
-  public void add(ScalarType<?> scalarType) {
+  private void add(ScalarType<?> scalarType) {
     typeMap.put(scalarType.type(), scalarType);
     logAdd(scalarType);
   }

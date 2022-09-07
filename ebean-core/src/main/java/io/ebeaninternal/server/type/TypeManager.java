@@ -12,11 +12,6 @@ import java.lang.reflect.Type;
 public interface TypeManager {
 
   /**
-   * Register a ScalarType with the system.
-   */
-  void add(ScalarType<?> scalarType);
-
-  /**
    * Return the scalar type for the given logical type.
    */
   ScalarType<?> getScalarType(String cast);
