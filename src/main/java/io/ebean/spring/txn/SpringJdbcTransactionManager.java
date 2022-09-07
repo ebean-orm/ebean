@@ -20,23 +20,15 @@ import static java.lang.System.Logger.Level.DEBUG;
  * A Spring-aware {@link ExternalTransactionManager}.
  * <p>
  * Will look for Spring transactions and use them if they exist.
- * </p>
  *
  * @since 18.05.2009
  * @author E Mc Greal
  */
-public class SpringJdbcTransactionManager implements ExternalTransactionManager {
+public final class SpringJdbcTransactionManager implements ExternalTransactionManager {
 
   private static final System.Logger log = AppLog.getLogger(SpringJdbcTransactionManager.class);
 
-  /**
-   * The data source.
-   */
   private DataSource dataSource;
-
-  /**
-   * The Ebean transaction manager.
-   */
   private TransactionManager transactionManager;
 
   /**
@@ -59,8 +51,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
   /**
    * Looks for a current Spring managed transaction and wraps/returns that as a Ebean transaction.
    * <p>
-   * Returns null if there is no current spring transaction (lazy loading outside a spring txn etc).
-   * </p>
+   * Returns null if there is no current spring transaction (lazy loading outside a spring txn).
    */
   @Override
   public Object getCurrentTransaction() {
@@ -76,17 +67,17 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
       }
     }
 
-    SpringTxnListener springTxnLister = getSpringTxnListener();
+    SpringTxnListener springTxnLister = listener();
     if (springTxnLister != null) {
       // we have already seen this transaction
-      return springTxnLister.getTransaction();
+      return springTxnLister.transaction();
     } else {
       // This is a new spring transaction that we have not seen before.
       // "wrap" it in a SpringJdbcTransaction for use with Ebean
       SpringJdbcTransaction newTrans = new SpringJdbcTransaction(holder, transactionManager);
 
       // Create and register a Spring TransactionSynchronization for this transaction
-      springTxnLister = createSpringTxnListener(newTrans);
+      springTxnLister = createListener(newTrans);
       TransactionSynchronizationManager.registerSynchronization(springTxnLister);
       return transactionManager.externalBeginTransaction(newTrans, TxScope.required());
     }
@@ -96,9 +87,8 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
    * Search for our specific transaction listener.
    * <p>
    * If it exists then we have already seen and "wrapped" this transaction.
-   * </p>
    */
-  private SpringTxnListener getSpringTxnListener() {
+  private SpringTxnListener listener() {
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       List<TransactionSynchronization> synchronizations = TransactionSynchronizationManager.getSynchronizations();
       if (synchronizations != null) {
@@ -114,25 +104,18 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
   }
 
   /**
-   * Create a listener to register with Spring to enable Ebean to be
-   * notified when transactions commit and rollback.
-   * <p>
-   * This is used by Ebean to notify it's appropriate listeners and maintain it's server
-   * cache etc.
-   * </p>
+   * Create a listener to enable Ebean to be notified when transactions commit and rollback.
    */
-  private SpringTxnListener createSpringTxnListener(SpringJdbcTransaction t) {
-    return new SpringTxnListener(transactionManager, t);
+  private SpringTxnListener createListener(SpringJdbcTransaction transaction) {
+    return new SpringTxnListener(transactionManager, transaction);
   }
 
   /**
-   * A Spring TransactionSynchronization that we register with Spring to get
-   * notified when a Spring managed transaction has been committed or rolled
-   * back.
+   * A Spring TransactionSynchronization that we register with Spring to get notified when
+   * a Spring managed transaction has been committed or rolled back.
    * <p>
-   * When Ebean is notified (of the commit/rollback) it can then manage its
-   * cache, notify BeanPersistListeners etc.
-   * </p>
+   * When Ebean is notified (of the commit/rollback) it can then manage its cache, notify
+   * BeanPersistListeners etc.
    */
   private static class SpringTxnListener extends TransactionSynchronizationAdapter {
 
@@ -145,10 +128,7 @@ public class SpringJdbcTransactionManager implements ExternalTransactionManager 
       this.transaction = t;
     }
 
-    /**
-     * Return the associated Ebean wrapped transaction.
-     */
-    SpringJdbcTransaction getTransaction() {
+    private SpringJdbcTransaction transaction() {
       return transaction;
     }
 

@@ -17,19 +17,17 @@
  * along with Ebean; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
-
 package io.ebean.spring.txn;
-
-import org.springframework.jdbc.datasource.ConnectionHolder;
 
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 import io.ebeaninternal.server.transaction.TransactionManager;
+import org.springframework.jdbc.datasource.ConnectionHolder;
 
-public class SpringJdbcTransaction extends ExternalJdbcTransaction {
+final class SpringJdbcTransaction extends ExternalJdbcTransaction {
 
   private final ConnectionHolder holder;
 
-  public SpringJdbcTransaction(ConnectionHolder holder, TransactionManager manager) {
+  SpringJdbcTransaction(ConnectionHolder holder, TransactionManager manager) {
     super("s" + holder.hashCode(), true, holder.getConnection(), manager);
     this.holder = holder;
   }
@@ -37,9 +35,5 @@ public class SpringJdbcTransaction extends ExternalJdbcTransaction {
   @Override
   public boolean isActive() {
     return holder.isSynchronizedWithTransaction();
-  }
-
-  public ConnectionHolder getConnectionHolder() {
-    return holder;
   }
 }
