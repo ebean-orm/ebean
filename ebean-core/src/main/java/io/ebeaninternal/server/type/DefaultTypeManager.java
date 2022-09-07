@@ -37,6 +37,7 @@ import java.time.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static io.ebean.core.type.PostgresHelper.isPostgresCompatible;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -68,8 +69,6 @@ public final class DefaultTypeManager implements TypeManager {
   private final boolean offlineMigrationGeneration;
   private final EnumType defaultEnumType;
   private final DatabasePlatform databasePlatform;
-
-
 
   private final PlatformArrayTypeFactory arrayTypeListFactory;
   private final PlatformArrayTypeFactory arrayTypeSetFactory;
@@ -153,12 +152,6 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private boolean isPostgresCompatible(DatabasePlatform databasePlatform) {
-    return databasePlatform.isPlatform(Platform.POSTGRES)
-      || databasePlatform.isPlatform(Platform.YUGABYTE)
-      || databasePlatform.isPlatform(Platform.COCKROACH);
-  }
-
   private boolean hstoreSupport() {
     return databasePlatform.isPlatform(Platform.POSTGRES);
   }
@@ -194,10 +187,10 @@ public final class DefaultTypeManager implements TypeManager {
   @Override
   public ScalarType<?> getScalarType(Type propertyType, Class<?> propertyClass) {
     if (propertyType instanceof ParameterizedType) {
-      ParameterizedType pt = (ParameterizedType)propertyType;
+      ParameterizedType pt = (ParameterizedType) propertyType;
       Type rawType = pt.getRawType();
       if (List.class == rawType || Set.class == rawType) {
-        return getArrayScalarType((Class<?>)rawType, propertyType, true);
+        return getArrayScalarType((Class<?>) rawType, propertyType, true);
       }
     }
     return getScalarType(propertyClass);
@@ -241,7 +234,7 @@ public final class DefaultTypeManager implements TypeManager {
         return found;
       }
       // second step - loop through interfaces of this type
-      for (Class<?> iface: parent.getInterfaces()) {
+      for (Class<?> iface : parent.getInterfaces()) {
         found = checkInheritedTypes(iface);
         if (found != null && found != ScalarTypeNotFound.INSTANCE) {
           typeMap.put(type, found); // store type for next lookup
@@ -349,7 +342,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private DocPropertyType getDocType(Type genericType) {
     if (genericType instanceof Class<?>) {
-      ScalarType<?> found = getScalarType((Class<?>)genericType);
+      ScalarType<?> found = getScalarType((Class<?>) genericType);
       if (found != null) {
         return found.docType();
       }
