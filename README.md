@@ -31,7 +31,7 @@ only needs to manage JDBC Transactions).
 
 ## Java modules
 
-The module name is `io.ebean.spring.txn`
+Add `requires io.ebean.spring.txn` to module-info.
 
 ```java
 module foo {
