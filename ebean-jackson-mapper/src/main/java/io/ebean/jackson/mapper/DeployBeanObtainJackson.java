@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.jackson.mapper;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.jackson.mapper;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -24,14 +24,15 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Supports @DbJson properties using Jackson ObjectMapper.
  */
-final class ScalarTypeJsonObjectMapper {
+public final class ScalarJsonJacksonMapper implements ScalarJsonMapper {
 
-  static final Map<Class<?>, AnnotatedClass> jacksonClasses = new ConcurrentHashMap<>();
+  private final Map<Class<?>, AnnotatedClass> jacksonClasses = new ConcurrentHashMap<>();
 
   /**
    * Create and return the appropriate ScalarType.
    */
-  static ScalarType<?> createTypeFor(ScalarJsonRequest req) {
+  @Override
+  public ScalarType<?> createType(ScalarJsonRequest req) {
     AnnotatedClass annotatedClass = annotatedClass(req);
     AnnotatedField field = annotatedField(annotatedClass, req);
     if (req.mode() == MutationDetection.NONE) {
@@ -41,7 +42,7 @@ final class ScalarTypeJsonObjectMapper {
     }
   }
 
-  private static AnnotatedField annotatedField(AnnotatedClass annotatedClass, ScalarJsonRequest req) {
+  private AnnotatedField annotatedField(AnnotatedClass annotatedClass, ScalarJsonRequest req) {
     for (AnnotatedField field : annotatedClass.fields()) {
       if (field.getName().equals(req.name())) {
         return field;
@@ -50,7 +51,7 @@ final class ScalarTypeJsonObjectMapper {
     throw new IllegalStateException("AnnotatedField not found to match " + req.name());
   }
 
-  private static AnnotatedClass annotatedClass(ScalarJsonRequest req) {
+  private AnnotatedClass annotatedClass(ScalarJsonRequest req) {
     return jacksonClasses.computeIfAbsent(req.beanType(), key -> {
       ObjectMapper mapper = (ObjectMapper) req.manager().mapper();
       return new DeployBeanObtainJackson(mapper, req.beanType()).obtain();

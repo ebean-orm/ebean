@@ -72,6 +72,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private final PlatformArrayTypeFactory arrayTypeListFactory;
   private final PlatformArrayTypeFactory arrayTypeSetFactory;
+  private final ScalarJsonMapper jsonMapper;
   private GeoTypeBinder geoTypeBinder;
 
   /**
@@ -93,6 +94,9 @@ public final class DefaultTypeManager implements TypeManager {
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
     this.defaultEnumType = config.getDefaultEnumType();
+
+    ServiceLoader<ScalarJsonMapper> mappers = ServiceLoader.load(ScalarJsonMapper.class);
+    jsonMapper = mappers.findFirst().orElse(null);
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
@@ -377,14 +381,14 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
-    if (objectMapper == null) {
+    if (jsonMapper == null) {
       throw new IllegalArgumentException("Unsupported @DbJson mapping - Jackson ObjectMapper not present for " + prop);
     }
     if (MutationDetection.DEFAULT == prop.getMutationDetection()) {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
     var req = new ScalarJsonRequest(jsonManager, dbType, docType, prop.getDesc().getBeanType(), prop.getMutationDetection(), prop.getName());
-    return ScalarTypeJsonObjectMapper.createTypeFor(req);
+    return jsonMapper.createType(req);
   }
 
   /**

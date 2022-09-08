@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.jackson.mapper;
 
 
 import org.junit.jupiter.api.Test;
