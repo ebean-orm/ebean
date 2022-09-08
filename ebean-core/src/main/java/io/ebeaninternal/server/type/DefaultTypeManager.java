@@ -300,36 +300,21 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(String.class)) {
       return ScalarTypeJsonString.typeFor(postgres, dbType);
     }
-    boolean hasJacksonAnnotations = false;
     if (jsonMapper != null) {
       var markerAnnotation = jsonMapper.markerAnnotation();
-      if (markerAnnotation != null) {
-        hasJacksonAnnotations = !prop.getMetaAnnotations(markerAnnotation).isEmpty();
+      if (markerAnnotation != null && !prop.getMetaAnnotations(markerAnnotation).isEmpty()) {
+        return createJsonObjectMapperType(prop, dbType, docPropertyType(prop, type));
       }
     }
     Type genericType = prop.getGenericType();
-    if (type.equals(List.class)) {
-      DocPropertyType docType = docType(genericType);
-      if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable(), keepSource(prop));
-      } else {
-        return createJsonObjectMapperType(prop, dbType, docType);
-      }
+    if (type.equals(List.class) && isValueTypeSimple(genericType)) {
+      return ScalarTypeJsonList.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
     }
-    if (type.equals(Set.class)) {
-      DocPropertyType docType = docType(genericType);
-      if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
-        return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable(), keepSource(prop));
-      } else {
-        return createJsonObjectMapperType(prop, dbType, docType);
-      }
+    if (type.equals(Set.class) && isValueTypeSimple(genericType)) {
+      return ScalarTypeJsonSet.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
     }
-    if (type.equals(Map.class)) {
-      if (!hasJacksonAnnotations && isMapValueTypeObject(genericType)) {
-        return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource(prop));
-      } else {
-        return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
-      }
+    if (type.equals(Map.class) && isMapValueTypeObject(genericType)) {
+      return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource(prop));
     }
     if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
       ScalarTypeSet<?> typeSet = typeSets.get(type);
@@ -345,6 +330,10 @@ public final class DefaultTypeManager implements TypeManager {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
     return prop.getMutationDetection() == MutationDetection.SOURCE;
+  }
+
+  private DocPropertyType docPropertyType(DeployBeanProperty prop, Class<?> type) {
+    return type.equals(List.class) || type.equals(Set.class) ? docType(prop.getGenericType()) : DocPropertyType.OBJECT;
   }
 
   private DocPropertyType docType(Type genericType) {
