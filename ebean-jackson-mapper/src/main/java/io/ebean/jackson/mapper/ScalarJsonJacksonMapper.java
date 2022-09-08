@@ -54,7 +54,7 @@ public final class ScalarJsonJacksonMapper implements ScalarJsonMapper {
   private AnnotatedClass annotatedClass(ScalarJsonRequest req) {
     return jacksonClasses.computeIfAbsent(req.beanType(), key -> {
       ObjectMapper mapper = (ObjectMapper) req.manager().mapper();
-      return new DeployBeanObtainJackson(mapper, req.beanType()).obtain();
+      return AnnotatedClassUtil.obtain(mapper, req.beanType());
     });
   }
 

@@ -8,20 +8,12 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedClassResolver;
 /**
  * Used to obtain the Jackson AnnotatedClass for a given bean type utlimately to obtain field level Jackson annotations.
  */
-final class DeployBeanObtainJackson<T> {
-
-  private final ObjectMapper objectMapper;
-  private final Class<T> beanType;
-
-  DeployBeanObtainJackson(ObjectMapper objectMapper, Class<T> beanType) {
-    this.objectMapper = objectMapper;
-    this.beanType = beanType;
-  }
+final class AnnotatedClassUtil {
 
   /**
    * Return the Jackson AnnotatedClass for the given bean type.
    */
-  AnnotatedClass obtain() {
+  static AnnotatedClass obtain(ObjectMapper objectMapper, Class<?> beanType) {
     JavaType javaType = objectMapper.getTypeFactory().constructType(beanType);
     return AnnotatedClassResolver.resolve(objectMapper.getDeserializationConfig(), javaType, objectMapper.getDeserializationConfig());
   }
