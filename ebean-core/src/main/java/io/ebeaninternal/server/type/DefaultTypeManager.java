@@ -297,12 +297,17 @@ public final class DefaultTypeManager implements TypeManager {
   @Override
   public ScalarType<?> dbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
     Class<?> type = prop.getPropertyType();
-    Type genericType = prop.getGenericType();
-    boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
-
     if (type.equals(String.class)) {
       return ScalarTypeJsonString.typeFor(postgres, dbType);
     }
+    boolean hasJacksonAnnotations = false;
+    if (jsonMapper != null) {
+      var markerAnnotation = jsonMapper.markerAnnotation();
+      if (markerAnnotation != null) {
+        hasJacksonAnnotations = !prop.getMetaAnnotations(markerAnnotation).isEmpty();
+      }
+    }
+    Type genericType = prop.getGenericType();
     if (type.equals(List.class)) {
       DocPropertyType docType = docType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
@@ -340,14 +345,6 @@ public final class DefaultTypeManager implements TypeManager {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
     return prop.getMutationDetection() == MutationDetection.SOURCE;
-  }
-
-  /**
-   * Returns TRUE, if there is any jackson annotation on that property. All jackson annotations
-   * are annotated with the &#64;JacksonAnnotation meta annotation. So detection is easy.
-   */
-  private boolean checkJacksonAnnotations(DeployBeanProperty prop) {
-    return prop.getMetaAnnotation(com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
   }
 
   private DocPropertyType docType(Type genericType) {

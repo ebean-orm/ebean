@@ -16,6 +16,7 @@ import javax.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Map;
@@ -27,6 +28,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class ScalarJsonJacksonMapper implements ScalarJsonMapper {
 
   private final Map<Class<?>, AnnotatedClass> jacksonClasses = new ConcurrentHashMap<>();
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <A extends Annotation> Class<A> markerAnnotation() {
+    return (Class<A>)com.fasterxml.jackson.annotation.JacksonAnnotation.class;
+  }
 
   /**
    * Create and return the appropriate ScalarType.
