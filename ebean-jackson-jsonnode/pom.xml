@@ -9,7 +9,7 @@
     <version>13.9.3-SNAPSHOT</version>
   </parent>
 
-  <artifactId>ebean-json-node</artifactId>
+  <artifactId>ebean-jackson-jsonnode</artifactId>
 
   <properties>
     <maven.compiler.source>19</maven.compiler.source>

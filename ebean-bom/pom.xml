@@ -118,7 +118,7 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
-        <artifactId>ebean-json-node</artifactId>
+        <artifactId>ebean-jackson-jsonnode</artifactId>
         <version>13.9.3-SNAPSHOT</version>
       </dependency>
 

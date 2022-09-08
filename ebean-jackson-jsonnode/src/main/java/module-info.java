@@ -1,6 +1,6 @@
 import io.ebean.jackson.jsonnode.JsonNodeTypeFactory;
 
-module io.ebean.json.node {
+module io.ebean.jackson.jsonnode {
 
   requires io.ebean.core.type;
   requires com.fasterxml.jackson.core;
