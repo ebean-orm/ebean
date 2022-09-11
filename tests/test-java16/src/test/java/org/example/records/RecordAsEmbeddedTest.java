@@ -24,7 +24,9 @@ public class RecordAsEmbeddedTest {
 
     assert found != null;
 
+    assertThat(found.workAddress()).isEqualTo(new Address("45 work", "workling", "wo"));
     assertThat(found.workAddress().toString()).isEqualTo("Address[line1=45 work, line2=workling, city=wo]");
+    assertThat(found.homeAddress()).isEqualTo(new Address("94 home st", "homeline", "wo"));
     assertThat(found.homeAddress().toString()).isEqualTo("Address[line1=94 home st, line2=homeline, city=wo]");
 
     Contact foundPartial = new QContact()
