@@ -4,7 +4,7 @@
   <parent>
     <artifactId>composites</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.9.3-SNAPSHOT</version>
+    <version>13.9.3</version>
   </parent>
 
   <name>ebean-clickhouse</name>
@@ -16,13 +16,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.9.3-SNAPSHOT</version>
+      <version>13.9.3</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.9.3-SNAPSHOT</version>
+      <version>13.9.3</version>
     </dependency>
 
     <dependency>
@@ -35,14 +35,18 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>13.9.3-SNAPSHOT</version>
+      <version>13.9.3</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-clickhouse</artifactId>
-      <version>13.9.3-SNAPSHOT</version>
+      <version>13.9.3</version>
     </dependency>
 
   </dependencies>
+
+  <scm>
+    <tag>ebean-parent-13.9.3</tag>
+  </scm>
 </project>
