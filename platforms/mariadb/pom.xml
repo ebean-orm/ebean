@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.7.1-FOC6</version>
+    <version>13.7.1-FOC7-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-platform-mariadb</artifactId>
@@ -14,18 +14,18 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.7.1-FOC6</version>
+      <version>13.7.1-FOC7-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-mysql</artifactId>
-      <version>13.7.1-FOC6</version>
+      <version>13.7.1-FOC7-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
 
   <scm>
-    <tag>ebean-parent-13.7.1-FOC6</tag>
+    <tag>ebean-parent-13.6.4-FOC1</tag>
   </scm>
 </project>
