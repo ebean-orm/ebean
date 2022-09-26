@@ -19,7 +19,7 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
  * action (insert/update) and get information about all beans that will be
  * affected by that action. This allows you to do validation and other things on
  * a set of beans.
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  *
  */
@@ -37,7 +37,7 @@ class VisitHandler {
       if (start instanceof EntityBean) {
         visitBean((EntityBean) start, visitor);
       } else {
-        visitMany(start, visitor);
+        visitMany(start, visitor, true);
       }
     }
     visitor.visitEnd();
@@ -62,14 +62,15 @@ class VisitHandler {
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
     for (BeanPropertyAssocMany<?> many : manys) {
       // check that property is loaded and collection should be cascaded to
-      if (ebi.isLoadedProperty(many.propertyIndex()) 
+      if (ebi.isLoadedProperty(many.propertyIndex())
           && !many.isSkipSaveBeanCollection(bean, ebi.isNew())
           && !many.isElementCollection()) {
         Object manyValue = many.getValue(bean);
         if (manyValue != null) {
+
           PersistVisitor propertyVisitor = visitor.visitProperty(many);
           if (propertyVisitor != null) {
-            visitMany(manyValue, propertyVisitor);
+            visitMany(manyValue, propertyVisitor,  many.cascadeInfo().isSave());
             propertyVisitor.visitEnd();
           }
         }
@@ -77,7 +78,7 @@ class VisitHandler {
     }
   }
 
-  private void visitMany(Object many, PersistVisitor visitor) {
+  private void visitMany(Object many, PersistVisitor visitor, boolean cascadeSave) {
     if (!seen.add(many)) {
       return;
     }
@@ -85,8 +86,10 @@ class VisitHandler {
       Collection<?> coll = (Collection<?>) many;
       PersistVisitor collectionVisitor = visitor.visitCollection(coll);
       if (collectionVisitor != null) {
-        for (Object elem : coll) {
-          visitBean((EntityBean) elem, collectionVisitor);
+        if (cascadeSave) {
+          for (Object elem : coll) {
+            visitBean((EntityBean) elem, collectionVisitor);
+          }
         }
         collectionVisitor.visitEnd();
       }
@@ -94,8 +97,10 @@ class VisitHandler {
       Map<?, ?> map = (Map<?, ?>) many;
       PersistVisitor mapVisitor = visitor.visitMap(map);
       if (mapVisitor != null) {
-        for (Object elem : ((Map<?, ?>) many).values()) {
-          visitBean((EntityBean) elem, mapVisitor);
+        if (cascadeSave) {
+          for (Object elem : ((Map<?, ?>) many).values()) {
+            visitBean((EntityBean) elem, mapVisitor);
+          }
         }
         mapVisitor.visitEnd();
       }

@@ -12,7 +12,7 @@ public class MRole {
 
   String roleName;
 
-  @ManyToMany(cascade = CascadeType.ALL)
+  @ManyToMany
   List<MUser> users;
 
   public MRole() {
