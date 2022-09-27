@@ -2,11 +2,7 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.ebean.annotation.DbEnumType;
-import io.ebean.annotation.DbEnumValue;
-import io.ebean.annotation.EnumValue;
-import io.ebean.annotation.MutationDetection;
-import io.ebean.annotation.Platform;
+import io.ebean.annotation.*;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.JsonConfig;
 import io.ebean.config.PlatformConfig;
@@ -164,7 +160,10 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void loadGeoTypeBinder(DatabaseConfig config) {
-    final GeoTypeProvider provider = ServiceUtil.service(GeoTypeProvider.class);
+    GeoTypeProvider provider = config.getServiceObject(GeoTypeProvider.class);
+    if (provider == null) {
+      provider = ServiceUtil.service(GeoTypeProvider.class);
+    }
     if (provider != null) {
       geoTypeBinder = provider.createBinder(config);
     }
@@ -248,10 +247,10 @@ public final class DefaultTypeManager implements TypeManager {
   @Override
   public ScalarType<?> getScalarType(Type propertyType, Class<?> propertyClass) {
     if (propertyType instanceof ParameterizedType) {
-      ParameterizedType pt = (ParameterizedType)propertyType;
+      ParameterizedType pt = (ParameterizedType) propertyType;
       Type rawType = pt.getRawType();
       if (List.class == rawType || Set.class == rawType) {
-        return getArrayScalarType((Class<?>)rawType, propertyType, true);
+        return getArrayScalarType((Class<?>) rawType, propertyType, true);
       }
     }
     return getScalarType(propertyClass);
@@ -277,7 +276,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   /**
    * Checks the typeMap for inherited types.
-   *
+   * <p>
    * If e.g. <code>type</code> is a <code>GregorianCalendar</code>, then this method
    * will check the class hierarchy and will probably return a
    * <code>ScalarTypeCalendar</code> To speed up a second lookup, it will write
@@ -296,7 +295,7 @@ public final class DefaultTypeManager implements TypeManager {
         return found;
       }
       // second step - loop through interfaces of this type
-      for (Class<?> iface: parent.getInterfaces()) {
+      for (Class<?> iface : parent.getInterfaces()) {
         found = checkInheritedTypes(iface);
         if (found != null && found != ScalarTypeNotFound.INSTANCE) {
           typeMap.put(type, found); // store type for next lookup
@@ -414,7 +413,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private DocPropertyType getDocType(Type genericType) {
     if (genericType instanceof Class<?>) {
-      ScalarType<?> found = getScalarType((Class<?>)genericType);
+      ScalarType<?> found = getScalarType((Class<?>) genericType);
       if (found != null) {
         return found.getDocType();
       }

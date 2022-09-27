@@ -4,11 +4,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.cache.*;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.ExternalTransactionManager;
-import io.ebean.config.ProfilingConfig;
-import io.ebean.config.SlowQueryListener;
-import io.ebean.config.TempFileProvider;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.event.changelog.ChangeLogListener;
@@ -146,7 +142,12 @@ public final class InternalConfiguration {
   }
 
   private <S> S service(Class<S> cls) {
-    return ServiceUtil.service(cls);
+    S service = config.getServiceObject(cls);
+    if (service != null) {
+      return service;
+    } else {
+      return ServiceUtil.service(cls);
+    }
   }
 
   private List<XmapEbean> readExternalMapping() {
@@ -249,7 +250,7 @@ public final class InternalConfiguration {
    */
   ReadAuditLogger getReadAuditLogger() {
     ReadAuditLogger found = bootupClasses.getReadAuditLogger();
-    return plugin(found != null ? found : jacksonCorePresent? new DefaultReadAuditLogger(): null);
+    return plugin(found != null ? found : jacksonCorePresent ? new DefaultReadAuditLogger() : null);
   }
 
   /**

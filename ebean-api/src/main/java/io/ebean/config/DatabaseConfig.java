@@ -631,14 +631,6 @@ public class DatabaseConfig {
     return defaultOrderById;
   }
 
-  /**
-   * Put a service object into configuration such that it can be passed to a plugin.
-   * <p>
-   * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
-   */
-  public void putServiceObject(String key, Object configObject) {
-    serviceObject.put(key, configObject);
-  }
 
   /**
    * Return the service object given the key.
@@ -661,6 +653,24 @@ public class DatabaseConfig {
   public void putServiceObject(Object configObject) {
     String key = serviceObjectKey(configObject);
     serviceObject.put(key, configObject);
+  }
+
+  /**
+   * Put a service object into configuration such that it can be passed to a plugin.
+   * <p>
+   * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
+   */
+  public void putServiceObject(String key, Object configObject) {
+    serviceObject.put(key, configObject);
+  }
+
+  /**
+   * Put a service object into configuration such that it can be passed to a plugin.
+   * <p>
+   * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
+   */
+  public <T> void putServiceObject(Class<T> iface, T configObject) {
+    serviceObject.put(serviceObjectKey(iface), configObject);
   }
 
   private String serviceObjectKey(Object configObject) {
