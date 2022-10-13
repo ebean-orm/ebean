@@ -171,6 +171,11 @@ public final class DeployUtil {
    * Set the DbArray type (effectively Postgres only).
    */
   void setDbArray(DeployBeanProperty prop, DbArray dbArray) {
+    if (!dbArray.nullable()) {
+      // Non-nullable ScalarTypeArray's will auto bind null to empty array, we need to
+      // set nullable(false) before the ScalarTypeArray is determined and assigned
+      prop.setNullable(false);
+    }
     Class<?> type = prop.getPropertyType();
     ScalarType<?> scalarType = typeManager.getArrayScalarType(type, prop.getGenericType(), prop.isNullable());
     if (scalarType == null) {

@@ -28,6 +28,8 @@ class TestDbArray_basic extends BaseTestCase {
     DB.find(EArrayBean.class).delete();
     bean.setName("some stuff");
     assertThat(bean.getStatuses()).as("DbArray is auto initialised").isNotNull();
+    assertThat(bean.getIntEnums()).as("DbArray is auto initialised").isNotNull();
+    assertThat(bean.getUids()).as("DbArray is auto initialised").isNotNull();
 
     List<String> phNumbers = bean.getPhoneNumbers();
     phNumbers.add("4321");
@@ -170,7 +172,26 @@ class TestDbArray_basic extends BaseTestCase {
     bean.setOtherIds(null);
 
     DB.save(bean);
-    DB.delete(bean);
+
+    EArrayBean found = DB.find(EArrayBean.class, bean.getId());
+    assertThat(found.getPhoneNumbers()).isNull();
+    assertThat(found.getStatuses()).isEmpty();
+    assertThat(found.getIntEnums()).isEmpty();
+    assertThat(found.getUids()).isEmpty();
+
+    found.setName("some nulls 2");
+    DB.save(found);
+
+    EArrayBean found2 = DB.find(EArrayBean.class)
+      .where()
+      .eq("id", bean.getId())
+      .isNull("phoneNumbers")
+      .findOne();
+
+    assertThat(found2).isNotNull();
+    assertThat(found2.getPhoneNumbers()).isNull();
+
+    DB.delete(found);
   }
 
   @Test

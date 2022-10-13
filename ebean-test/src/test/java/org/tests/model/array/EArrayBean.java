@@ -46,14 +46,14 @@ public class EArrayBean {
   @DbArray
   List<Float> floats;
 
-  @DbArray
-  List<Status> statuses;
+  @DbArray(nullable = false)
+  List<Status> statuses = new ArrayList<>();
 
   @DbArray
   List<VarcharEnum> vcEnums = new ArrayList<>();
 
-  @DbArray
-  List<IntEnum> intEnums = new ArrayList<>();
+  @DbArray @NotNull
+  List<IntEnum> intEnums;
 
   @DbArray
   Set<Status> status2;
