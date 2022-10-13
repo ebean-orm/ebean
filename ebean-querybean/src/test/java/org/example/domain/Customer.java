@@ -46,12 +46,12 @@ public class Customer extends BaseModel {
 
   boolean inactive;
 
-  PhoneNumber phoneNumber;
+  public PhoneNumber phoneNumber;
 
   ValidEmail email;
 
   @Column(length = 100)
-  String name;
+  public String name;
 
   Date registered;
 

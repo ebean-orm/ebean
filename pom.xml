@@ -43,14 +43,14 @@
     <h2database.version>2.1.214</h2database.version>
     <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
-    <ebean-annotation.version>8.2</ebean-annotation.version>
+    <ebean-annotation.version>8.3</ebean-annotation.version>
     <ebean-ddl-runner.version>2.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>13.6.0</ebean-migration.version>
     <ebean-test-containers.version>6.3</ebean-test-containers.version>
     <ebean-datasource.version>8.2</ebean-datasource.version>
-    <ebean-agent.version>13.9.4</ebean-agent.version>
-    <ebean-maven-plugin.version>13.9.4</ebean-maven-plugin.version>
+    <ebean-agent.version>13.10.0</ebean-agent.version>
+    <ebean-maven-plugin.version>13.10.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
