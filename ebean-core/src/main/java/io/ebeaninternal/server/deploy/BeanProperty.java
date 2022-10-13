@@ -927,6 +927,10 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return alreadyDirty || value != null && scalarType.isDirty(value);
   }
 
+  public boolean isArrayType() {
+    return scalarType instanceof ScalarTypeArray;
+  }
+
   /**
    * Return the scalarType.
    */

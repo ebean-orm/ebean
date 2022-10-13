@@ -217,6 +217,8 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       }
       if (prop.isLob()) {
         bindLog.append("[LOB]");
+      } else if (value == null && !prop.isNullable() && prop.isArrayType()) {
+        bindLog.append("[]"); // null bound as empty array
       } else {
         String sv = String.valueOf(value);
         if (sv.length() > 50) {
