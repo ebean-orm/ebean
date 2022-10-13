@@ -1,44 +1,35 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.ModifyAwareType;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.PostgresHelper;
-import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import io.ebean.core.type.ScalarJsonManager;
 
-final class TypeJsonManager {
+final class TypeJsonManager implements ScalarJsonManager {
 
   private final boolean postgres;
-  private final ObjectMapper objectMapper;
+  private final Object mapper;
   private final MutationDetection mutationDetection;
 
-  TypeJsonManager(boolean postgres, Object objectMapper, MutationDetection mutationDetection) {
+  TypeJsonManager(boolean postgres, Object mapper, MutationDetection mutationDetection) {
     this.postgres = postgres;
-    this.objectMapper = (ObjectMapper) objectMapper;
+    this.mapper = mapper;
     this.mutationDetection = mutationDetection;
   }
 
-  MutationDetection mutationDetection() {
+  @Override
+  public MutationDetection mutationDetection() {
     return mutationDetection;
   }
 
-  ObjectMapper objectMapper() {
-    return objectMapper;
+  @Override
+  public Object mapper() {
+    return mapper;
   }
 
-  boolean keepSource(DeployBeanProperty prop) {
-    if (prop.getMutationDetection() == MutationDetection.SOURCE) {
-      return true;
-    } else if (prop.getMutationDetection() == MutationDetection.DEFAULT) {
-      prop.setMutationDetection(mutationDetection);
-      return mutationDetection == MutationDetection.SOURCE;
-    } else {
-      return false;
-    }
-  }
-
-  String postgresType(int dbType) {
+  @Override
+  public String postgresType(int dbType) {
     if (postgres) {
       switch (dbType) {
         case DbPlatformType.JSON:

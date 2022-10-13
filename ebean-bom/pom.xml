@@ -124,6 +124,12 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>ebean-jackson-mapper</artifactId>
+        <version>13.9.3-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-ddl-generator</artifactId>
         <version>13.9.4-SNAPSHOT</version>
       </dependency>

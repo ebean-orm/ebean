@@ -9,6 +9,7 @@ module io.ebean.core {
   uses io.ebean.datasource.DataSourceAlertFactory;
   uses io.ebean.core.type.ExtraTypeFactory;
   uses io.ebean.core.type.ScalarTypeSetFactory;
+  uses io.ebean.core.type.ScalarJsonMapper;
   uses io.ebeanservice.docstore.api.DocStoreFactory;
   uses io.ebean.migration.auto.AutoMigrationRunner;
   uses io.avaje.classpath.scanner.ClassPathScannerFactory;

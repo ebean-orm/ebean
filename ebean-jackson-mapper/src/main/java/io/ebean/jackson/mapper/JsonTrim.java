@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.type;
+package io.ebean.jackson.mapper;
 
 /**
  * Helper that removes whitespace from JSON. Used to normalise Postgres JSONB content.

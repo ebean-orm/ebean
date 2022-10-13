@@ -1,28 +1,19 @@
-package io.ebeaninternal.server.deploy.meta;
+package io.ebean.jackson.mapper;
 
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClassResolver;
-import io.ebean.config.DatabaseConfig;
 
 /**
  * Used to obtain the Jackson AnnotatedClass for a given bean type utlimately to obtain field level Jackson annotations.
  */
-final class DeployBeanObtainJackson<T> {
-
-  private final DatabaseConfig config;
-  private final Class<T> beanType;
-
-  DeployBeanObtainJackson(DatabaseConfig config, Class<T> beanType) {
-    this.config = config;
-    this.beanType = beanType;
-  }
+final class AnnotatedClassUtil {
 
   /**
    * Return the Jackson AnnotatedClass for the given bean type.
    */
-  Object obtain() {
-    ObjectMapper objectMapper = (ObjectMapper) config.getObjectMapper();
+  static AnnotatedClass obtain(ObjectMapper objectMapper, Class<?> beanType) {
     JavaType javaType = objectMapper.getTypeFactory().constructType(beanType);
     return AnnotatedClassResolver.resolve(objectMapper.getDeserializationConfig(), javaType, objectMapper.getDeserializationConfig());
   }
