@@ -2,6 +2,7 @@ package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataReader;
+import io.ebean.core.type.PostgresHelper;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CoreLog;
@@ -37,7 +38,7 @@ public final class Binder {
   public Binder(TypeManager typeManager, SpiLogManager logManager, int asOfBindCount, boolean asOfStandardsBased,
                 DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueBind multiValueBind) {
     this.typeManager = typeManager;
-    this.geoTypeBinder = typeManager.getGeoTypeBinder();
+    this.geoTypeBinder = typeManager.geoTypeBinder();
     this.asOfBindCount = asOfBindCount;
     this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
@@ -153,7 +154,7 @@ public final class Binder {
   }
 
   public ScalarType<?> getScalarType(Class<?> clazz) {
-    ScalarType<?> type = typeManager.getScalarType(clazz);
+    ScalarType<?> type = typeManager.type(clazz);
     if (type == null) {
       throw new PersistenceException("No ScalarType registered for " + clazz);
     }

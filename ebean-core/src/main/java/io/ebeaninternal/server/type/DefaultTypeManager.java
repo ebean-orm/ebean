@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.annotation.*;
 import io.ebean.config.DatabaseConfig;
@@ -9,9 +8,7 @@ import io.ebean.config.PlatformConfig;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.core.type.DocPropertyType;
-import io.ebean.core.type.ExtraTypeFactory;
-import io.ebean.core.type.ScalarType;
+import io.ebean.core.type.*;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
@@ -40,6 +37,7 @@ import java.time.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static io.ebean.core.type.PostgresHelper.isPostgresCompatible;
 import static java.lang.System.Logger.Level.*;
 
 /**
@@ -51,6 +49,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private static final System.Logger log = CoreLog.internal;
 
+  private final Map<Class<?>, ScalarTypeSet<?>> typeSets = new HashMap<>();
   private final ConcurrentHashMap<Class<?>, ScalarType<?>> typeMap;
   private final ConcurrentHashMap<Integer, ScalarType<?>> nativeMap;
   private final ConcurrentHashMap<String, ScalarType<?>> logicalMap;
@@ -70,29 +69,6 @@ public final class DefaultTypeManager implements TypeManager {
   private final boolean offlineMigrationGeneration;
   private final EnumType defaultEnumType;
   private final DatabasePlatform databasePlatform;
-
-  // OPTIONAL ScalarTypes registered if Jackson/JsonNode is in the classpath
-
-  /**
-   * Jackson's JsonNode storage to Clob.
-   */
-  private ScalarType<?> jsonNodeClob;
-  /**
-   * Jackson's JsonNode storage to Blob.
-   */
-  private ScalarType<?> jsonNodeBlob;
-  /**
-   * Jackson's JsonNode storage to Varchar.
-   */
-  private ScalarType<?> jsonNodeVarchar;
-  /**
-   * Jackson's JsonNode storage to Postgres JSON or Clob.
-   */
-  private ScalarType<?> jsonNodeJson;
-  /**
-   * Jackson's JsonNode storage to Postgres JSONB or Clob.
-   */
-  private ScalarType<?> jsonNodeJsonb;
 
   private final PlatformArrayTypeFactory arrayTypeListFactory;
   private final PlatformArrayTypeFactory arrayTypeSetFactory;
@@ -120,7 +96,6 @@ public final class DefaultTypeManager implements TypeManager {
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
-    initialiseJacksonTypes();
     loadTypesFromProviders(config, objectMapper);
     loadGeoTypeBinder(config);
 
@@ -160,22 +135,21 @@ public final class DefaultTypeManager implements TypeManager {
    * Load custom scalar types registered via ExtraTypeFactory and ServiceLoader.
    */
   private void loadTypesFromProviders(DatabaseConfig config, Object objectMapper) {
-    ServiceLoader<ExtraTypeFactory> factories = ServiceLoader.load(ExtraTypeFactory.class);
-    Iterator<ExtraTypeFactory> iterator = factories.iterator();
-    if (iterator.hasNext()) {
-      // use the cacheFactory (via classpath service loader)
-      ExtraTypeFactory plugin = iterator.next();
-      List<? extends ScalarType<?>> types = plugin.createTypes(config, objectMapper);
-      for (ScalarType<?> type : types) {
+    for (ExtraTypeFactory plugin : ServiceLoader.load(ExtraTypeFactory.class)) {
+      for (ScalarType<?> type : plugin.createTypes(config, objectMapper)) {
         add(type);
       }
     }
-  }
-
-  private boolean isPostgresCompatible(DatabasePlatform databasePlatform) {
-    return databasePlatform.isPlatform(Platform.POSTGRES)
-      || databasePlatform.isPlatform(Platform.YUGABYTE)
-      || databasePlatform.isPlatform(Platform.COCKROACH);
+    for (ScalarTypeSetFactory factory : ServiceLoader.load(ScalarTypeSetFactory.class)) {
+      ScalarTypeSet<?> typeSet = factory.createTypeSet(config, objectMapper);
+      if (typeSet != null) {
+        typeSets.put(typeSet.type(), typeSet);
+        ScalarType<?> defaultType = typeSet.defaultType();
+        if (defaultType != null) {
+          typeMap.put(typeSet.type(), defaultType);
+        }
+      }
+    }
   }
 
   private boolean hstoreSupport() {
@@ -185,8 +159,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Register a custom ScalarType.
    */
-  @Override
-  public void add(ScalarType<?> scalarType) {
+  private void add(ScalarType<?> scalarType) {
     typeMap.put(scalarType.type(), scalarType);
     logAdd(scalarType);
   }
@@ -198,7 +171,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getScalarType(String cast) {
+  public ScalarType<?> type(String cast) {
     return logicalMap.get(cast);
   }
 
@@ -206,27 +179,27 @@ public final class DefaultTypeManager implements TypeManager {
    * Return the ScalarType for the given jdbc type as per java.sql.Types.
    */
   @Override
-  public ScalarType<?> getScalarType(int jdbcType) {
+  public ScalarType<?> type(int jdbcType) {
     return nativeMap.get(jdbcType);
   }
 
   @Override
-  public ScalarType<?> getScalarType(Type propertyType, Class<?> propertyClass) {
+  public ScalarType<?> type(Type propertyType, Class<?> propertyClass) {
     if (propertyType instanceof ParameterizedType) {
-      ParameterizedType pt = (ParameterizedType)propertyType;
+      ParameterizedType pt = (ParameterizedType) propertyType;
       Type rawType = pt.getRawType();
       if (List.class == rawType || Set.class == rawType) {
-        return getArrayScalarType((Class<?>)rawType, propertyType, true);
+        return dbArrayType((Class<?>) rawType, propertyType, true);
       }
     }
-    return getScalarType(propertyClass);
+    return type(propertyClass);
   }
 
   /**
    * This can return null if no matching ScalarType is found.
    */
   @Override
-  public ScalarType<?> getScalarType(Class<?> type) {
+  public ScalarType<?> type(Class<?> type) {
     ScalarType<?> found = typeMap.get(type);
     if (found == null) {
       if (type.getName().equals("org.joda.time.LocalTime")) {
@@ -260,7 +233,7 @@ public final class DefaultTypeManager implements TypeManager {
         return found;
       }
       // second step - loop through interfaces of this type
-      for (Class<?> iface: parent.getInterfaces()) {
+      for (Class<?> iface : parent.getInterfaces()) {
         found = checkInheritedTypes(iface);
         if (found != null && found != ScalarTypeNotFound.INSTANCE) {
           typeMap.put(type, found); // store type for next lookup
@@ -274,37 +247,37 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public GeoTypeBinder getGeoTypeBinder() {
+  public GeoTypeBinder geoTypeBinder() {
     return geoTypeBinder;
   }
 
   @Override
-  public ScalarType<?> getDbMapScalarType() {
+  public ScalarType<?> dbMapType() {
     return hstoreSupport() ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR, false);
   }
 
   @Override
-  public ScalarType<?> getArrayScalarType(Class<?> type, Type genericType, boolean nullable) {
-    Type valueType = getValueType(genericType);
+  public ScalarType<?> dbArrayType(Class<?> type, Type genericType, boolean nullable) {
+    Type valueType = valueType(genericType);
     if (type.equals(List.class)) {
-      return getArrayScalarTypeList(valueType, nullable);
+      return dbArrayTypeList(valueType, nullable);
     } else if (type.equals(Set.class)) {
-      return getArrayScalarTypeSet(valueType, nullable);
+      return dbArrayTypeSet(valueType, nullable);
     } else {
       throw new IllegalStateException("@DbArray does not support type " + type);
     }
   }
 
-  private ScalarType<?> getArrayScalarTypeSet(Type valueType, boolean nullable) {
+  private ScalarType<?> dbArrayTypeSet(Type valueType, boolean nullable) {
     if (isEnumType(valueType)) {
-      return arrayTypeSetFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
+      return arrayTypeSetFactory.typeForEnum(enumType(asEnumClass(valueType), null), nullable);
     }
     return arrayTypeSetFactory.typeFor(valueType, nullable);
   }
 
-  private ScalarType<?> getArrayScalarTypeList(Type valueType, boolean nullable) {
+  private ScalarType<?> dbArrayTypeList(Type valueType, boolean nullable) {
     if (isEnumType(valueType)) {
-      return arrayTypeListFactory.typeForEnum(createEnumScalarType(asEnumClass(valueType), null), nullable);
+      return arrayTypeListFactory.typeForEnum(enumType(asEnumClass(valueType), null), nullable);
     }
     return arrayTypeListFactory.typeFor(valueType, nullable);
   }
@@ -318,7 +291,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength) {
+  public ScalarType<?> dbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
     Class<?> type = prop.getPropertyType();
     Type genericType = prop.getGenericType();
     boolean hasJacksonAnnotations = objectMapperPresent && checkJacksonAnnotations(prop);
@@ -327,7 +300,7 @@ public final class DefaultTypeManager implements TypeManager {
       return ScalarTypeJsonString.typeFor(postgres, dbType);
     }
     if (type.equals(List.class)) {
-      DocPropertyType docType = getDocType(genericType);
+      DocPropertyType docType = docType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonList.typeFor(postgres, dbType, docType, prop.isNullable(), jsonManager.keepSource(prop));
       } else {
@@ -335,7 +308,7 @@ public final class DefaultTypeManager implements TypeManager {
       }
     }
     if (type.equals(Set.class)) {
-      DocPropertyType docType = getDocType(genericType);
+      DocPropertyType docType = docType(genericType);
       if (!hasJacksonAnnotations && isValueTypeSimple(genericType)) {
         return ScalarTypeJsonSet.typeFor(postgres, dbType, docType, prop.isNullable(), jsonManager.keepSource(prop));
       } else {
@@ -350,19 +323,9 @@ public final class DefaultTypeManager implements TypeManager {
       }
     }
     if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
-      if (type.equals(JsonNode.class)) {
-        switch (dbType) {
-          case Types.VARCHAR:
-            return jsonNodeVarchar;
-          case Types.BLOB:
-            return jsonNodeBlob;
-          case Types.CLOB:
-            return jsonNodeClob;
-          case DbPlatformType.JSONB:
-            return jsonNodeJsonb;
-          default:
-            return jsonNodeJson;
-        }
+      ScalarTypeSet<?> typeSet = typeSets.get(type);
+      if (typeSet != null) {
+        return typeSet.forType(dbType);
       }
     }
     return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
@@ -376,9 +339,9 @@ public final class DefaultTypeManager implements TypeManager {
     return prop.getMetaAnnotation(com.fasterxml.jackson.annotation.JacksonAnnotation.class) != null;
   }
 
-  private DocPropertyType getDocType(Type genericType) {
+  private DocPropertyType docType(Type genericType) {
     if (genericType instanceof Class<?>) {
-      ScalarType<?> found = getScalarType((Class<?>)genericType);
+      ScalarType<?> found = type((Class<?>) genericType);
       if (found != null) {
         return found.docType();
       }
@@ -394,7 +357,7 @@ public final class DefaultTypeManager implements TypeManager {
     return String.class.equals(typeArg) || Long.class.equals(typeArg);
   }
 
-  private Type getValueType(Type collectionType) {
+  private Type valueType(Type collectionType) {
     return TypeReflectHelper.getValueType(collectionType);
   }
 
@@ -421,7 +384,7 @@ public final class DefaultTypeManager implements TypeManager {
    * different jdbcTypes in a single system.
    */
   @Override
-  public ScalarType<?> getScalarType(Class<?> type, int jdbcType) {
+  public ScalarType<?> type(Class<?> type, int jdbcType) {
     // File is a special Lob so check for that first
     if (File.class.equals(type)) {
       return fileType;
@@ -430,13 +393,13 @@ public final class DefaultTypeManager implements TypeManager {
     // check for Clob, LongVarchar etc ...
     // the reason being that String maps to multiple jdbc types
     // varchar, clob, longVarchar.
-    ScalarType<?> scalarType = getLobTypes(jdbcType);
+    ScalarType<?> scalarType = lobTypes(jdbcType);
     if (scalarType != null) {
       // it is a specific Lob type...
       return scalarType;
     }
 
-    scalarType = getScalarType(type);
+    scalarType = type(type);
     if (scalarType != null) {
       if (jdbcType == 0 || scalarType.jdbcType() == jdbcType) {
         // matching type
@@ -462,8 +425,8 @@ public final class DefaultTypeManager implements TypeManager {
    * types - like String - Varchar, LongVarchar, Clob. For this reason I check
    * for the specific Lob types first before looking for a matching type.
    */
-  private ScalarType<?> getLobTypes(int jdbcType) {
-    return getScalarType(jdbcType);
+  private ScalarType<?> lobTypes(int jdbcType) {
+    return type(jdbcType);
   }
 
   /**
@@ -507,7 +470,7 @@ public final class DefaultTypeManager implements TypeManager {
    * <p>
    * Return null if the EnumValue annotations are not present/used.
    */
-  private ScalarTypeEnum<?> createEnumScalarType2(Class<?> enumType) {
+  private ScalarTypeEnum<?> enumTypeEnumValue(Class<?> enumType) {
     boolean integerType = true;
     Map<String, String> nameValueMap = new LinkedHashMap<>();
     for (Field field : enumType.getDeclaredFields()) {
@@ -536,8 +499,8 @@ public final class DefaultTypeManager implements TypeManager {
    * much shorter codes used in the DB.
    */
   @Override
-  public ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType, EnumType type) {
-    ScalarType<?> scalarType = getScalarType(enumType);
+  public ScalarType<?> enumType(Class<? extends Enum<?>> enumType, EnumType type) {
+    ScalarType<?> scalarType = type(enumType);
     if (scalarType instanceof ScalarTypeWrapper) {
       // no override or further mapping required
       return scalarType;
@@ -549,16 +512,16 @@ public final class DefaultTypeManager implements TypeManager {
       }
       return scalarEnum;
     }
-    scalarEnum = createEnumScalarTypePerExtentions(enumType);
+    scalarEnum = enumTypePerExtensions(enumType);
     if (scalarEnum == null) {
       // use JPA normal Enum type (without mapping)
-      scalarEnum = createEnumScalarTypePerSpec(enumType, type);
+      scalarEnum = enumTypePerSpec(enumType, type);
     }
     add(scalarEnum);
     return scalarEnum;
   }
 
-  private ScalarTypeEnum<?> createEnumScalarTypePerSpec(Class<?> enumType, EnumType type) {
+  private ScalarTypeEnum<?> enumTypePerSpec(Class<?> enumType, EnumType type) {
     if (type == null) {
       if (defaultEnumType == EnumType.ORDINAL) {
         return new ScalarTypeEnumStandard.OrdinalEnum(enumType);
@@ -572,16 +535,16 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private ScalarTypeEnum<?> createEnumScalarTypePerExtentions(Class<? extends Enum<?>> enumType) {
+  private ScalarTypeEnum<?> enumTypePerExtensions(Class<? extends Enum<?>> enumType) {
     for (Method method : enumType.getMethods()) {
       DbEnumValue dbValue = AnnotationUtil.get(method, DbEnumValue.class);
       if (dbValue != null) {
         boolean integerValues = DbEnumType.INTEGER == dbValue.storage();
-        return createEnumScalarTypeDbValue(enumType, method, integerValues, dbValue.length(), dbValue.withConstraint());
+        return enumTypeDbValue(enumType, method, integerValues, dbValue.length(), dbValue.withConstraint());
       }
     }
     // look for EnumValue annotations instead
-    return createEnumScalarType2(enumType);
+    return enumTypeEnumValue(enumType);
   }
 
   /**
@@ -589,7 +552,7 @@ public final class DefaultTypeManager implements TypeManager {
    * <p>
    * Return null if the EnumValue annotations are not present/used.
    */
-  private ScalarTypeEnum<?> createEnumScalarTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
+  private ScalarTypeEnum<?> enumTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
     for (Enum<?> enumConstant : enumType.getEnumConstants()) {
       try {
@@ -671,7 +634,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
         Class<?> logicalType = paramTypes[0];
         Class<?> persistType = paramTypes[1];
-        ScalarType<?> wrappedType = getScalarType(persistType);
+        ScalarType<?> wrappedType = type(persistType);
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
@@ -695,7 +658,7 @@ public final class DefaultTypeManager implements TypeManager {
         }
         Class<?> logicalType = paramTypes[0];
         Class<?> persistType = paramTypes[1];
-        ScalarType<?> wrappedType = getScalarType(persistType);
+        ScalarType<?> wrappedType = type(persistType);
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
@@ -709,29 +672,9 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  /**
-   * Add support for Jackson's JsonNode mapping to Clob, Blob, Varchar, JSON and JSONB.
-   */
-  private void initialiseJacksonTypes() {
-    if (objectMapper != null) {
-      ObjectMapper mapper = (ObjectMapper) objectMapper;
-      jsonNodeClob = new ScalarTypeJsonNode.Clob(mapper);
-      jsonNodeBlob = new ScalarTypeJsonNode.Blob(mapper);
-      jsonNodeVarchar = new ScalarTypeJsonNode.Varchar(mapper);
-      jsonNodeJson = jsonNodeClob;  // Default for non-Postgres databases
-      jsonNodeJsonb = jsonNodeClob; // Default for non-Postgres databases
-      if (postgres) {
-        jsonNodeJson = new ScalarTypeJsonNodePostgres.JSON(mapper);
-        jsonNodeJsonb = new ScalarTypeJsonNodePostgres.JSONB(mapper);
-      }
-      // add as default mapping for JsonNode (when not annotated with @DbJson etc)
-      typeMap.put(JsonNode.class, jsonNodeJson);
-    }
-  }
 
   private void initialiseJavaTimeTypes(DatabaseConfig config) {
-
-    ZoneId zoneId = getZoneId(config);
+    ZoneId zoneId = zoneId(config);
 
     typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
     addType(java.time.Period.class, new ScalarTypePeriod());
@@ -758,7 +701,7 @@ public final class DefaultTypeManager implements TypeManager {
     addType(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
   }
 
-  private ZoneId getZoneId(DatabaseConfig config) {
+  private ZoneId zoneId(DatabaseConfig config) {
     final String dataTimeZone = config.getDataTimeZone();
     return (dataTimeZone == null) ? ZoneOffset.systemDefault() : TimeZone.getTimeZone(dataTimeZone).toZoneId();
   }

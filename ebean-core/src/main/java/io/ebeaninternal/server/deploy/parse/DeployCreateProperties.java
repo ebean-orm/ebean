@@ -108,7 +108,7 @@ public final class DeployCreateProperties {
   @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
     try {
-      ScalarType<?> scalarType = typeManager.getScalarType(targetType);
+      ScalarType<?> scalarType = typeManager.type(targetType);
       if (scalarType != null) {
         return new DeployBeanPropertySimpleCollection(desc, targetType, manyType);
       }
@@ -141,7 +141,7 @@ public final class DeployCreateProperties {
     if (propertyType.isEnum() || propertyType.isPrimitive()) {
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
-    ScalarType<?> scalarType = typeManager.getScalarType(propertyType);
+    ScalarType<?> scalarType = typeManager.type(propertyType);
     if (scalarType != null) {
       return new DeployBeanProperty(desc, propertyType, scalarType, null);
     }

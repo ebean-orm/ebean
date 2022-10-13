@@ -60,15 +60,15 @@ public final class DeployUtil {
     this.useValidationNotNull = config.isUseValidationNotNull();
   }
 
-  public TypeManager getTypeManager() {
+  public TypeManager typeManager() {
     return typeManager;
   }
 
-  public DatabasePlatform getDbPlatform() {
+  public DatabasePlatform dbPlatform() {
     return dbPlatform;
   }
 
-  public NamingConvention getNamingConvention() {
+  public NamingConvention namingConvention() {
     return namingConvention;
   }
 
@@ -82,7 +82,7 @@ public final class DeployUtil {
     }
   }
 
-  EncryptDeploy getEncryptDeploy(TableName table, String column) {
+  EncryptDeploy encryptDeploy(TableName table, String column) {
     if (encryptDeployManager == null) {
       return EncryptDeploy.ANNOTATION;
     }
@@ -102,7 +102,7 @@ public final class DeployUtil {
     try {
       Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) enumType;
       EnumType type = enumerated != null ? enumerated.value() : null;
-      ScalarType<?> scalarType = typeManager.createEnumScalarType(enumClass, type);
+      ScalarType<?> scalarType = typeManager.enumType(enumClass, type);
       prop.setScalarType(scalarType);
       prop.setDbType(scalarType.jdbcType());
     } catch (IllegalStateException e) {
@@ -123,7 +123,7 @@ public final class DeployUtil {
       // this will be an Enum type...
       return;
     }
-    ScalarType<?> scalarType = getScalarType(property);
+    ScalarType<?> scalarType = scalarType(property);
     if (scalarType != null) {
       // set the jdbc type this maps to
       property.setDbType(scalarType.jdbcType());
@@ -132,12 +132,12 @@ public final class DeployUtil {
     }
   }
 
-  private ScalarType<?> getScalarType(DeployBeanProperty property) {
+  private ScalarType<?> scalarType(DeployBeanProperty property) {
     // Note that Temporal types already have dbType
     // set via annotations
     Class<?> propType = property.getPropertyType();
     try {
-      ScalarType<?> scalarType = typeManager.getScalarType(propType, property.getDbType());
+      ScalarType<?> scalarType = typeManager.type(propType, property.getDbType());
       if (scalarType != null || property.isTransient()) {
         return scalarType;
       }
@@ -155,7 +155,7 @@ public final class DeployUtil {
    * Map to Postgres HSTORE type (with fallback to JSON storage in VARCHAR).
    */
   void setDbMap(DeployBeanProperty prop, DbMap dbMap) {
-    ScalarType<?> scalarType = typeManager.getDbMapScalarType();
+    ScalarType<?> scalarType = typeManager.dbMapType();
     int dbType = scalarType.jdbcType();
     prop.setDbType(dbType);
     prop.setScalarType(scalarType);
@@ -177,7 +177,7 @@ public final class DeployUtil {
       prop.setNullable(false);
     }
     Class<?> type = prop.getPropertyType();
-    ScalarType<?> scalarType = typeManager.getArrayScalarType(type, prop.getGenericType(), prop.isNullable());
+    ScalarType<?> scalarType = typeManager.dbArrayType(type, prop.getGenericType(), prop.isNullable());
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for @DbArray type for " + prop.getFullBeanName());
     }
@@ -198,7 +198,7 @@ public final class DeployUtil {
   }
 
   void setDbJsonType(DeployBeanProperty prop, DbJson dbJsonType) {
-    int dbType = getDbJsonStorage(dbJsonType.storage());
+    int dbType = dbJsonStorage(dbJsonType.storage());
     setDbJsonType(prop, dbType, dbJsonType.length(), dbJsonType.mutationDetection());
   }
 
@@ -209,7 +209,7 @@ public final class DeployUtil {
   private void setDbJsonType(DeployBeanProperty prop, int dbType, int dbLength, MutationDetection mutationDetection) {
     prop.setDbType(dbType);
     prop.setMutationDetection(mutationDetection);
-    ScalarType<?> scalarType = typeManager.getJsonScalarType(prop, dbType, dbLength);
+    ScalarType<?> scalarType = typeManager.dbJsonType(prop, dbType, dbLength);
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for JSON property " + prop + " dbType:" + dbType);
     }
@@ -224,7 +224,7 @@ public final class DeployUtil {
   /**
    * Return the JDBC type for the JSON storage type.
    */
-  private int getDbJsonStorage(DbJsonType dbJsonType) {
+  private int dbJsonStorage(DbJsonType dbJsonType) {
     switch (dbJsonType) {
       case JSONB:
         return DbPlatformType.JSONB;
@@ -253,7 +253,7 @@ public final class DeployUtil {
       // this also sets the lob flag on DeployBeanProperty
       int lobType = isClobType(type) ? dbCLOBType : dbBLOBType;
 
-      scalarType = typeManager.getScalarType(type, lobType);
+      scalarType = typeManager.type(type, lobType);
       if (scalarType == null) {
         // this should never occur actually
         throw new RuntimeException("No ScalarType for LOB type " + type + " dbType:" + lobType);

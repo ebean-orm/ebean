@@ -1,5 +1,7 @@
-package io.ebeaninternal.server.type;
+package io.ebean.core.type;
 
+import io.ebean.annotation.Platform;
+import io.ebean.config.dbplatform.DatabasePlatform;
 import org.postgresql.util.PGobject;
 
 import java.sql.SQLException;
@@ -9,12 +11,12 @@ public final class PostgresHelper {
   /**
    * The Postgres JSON DB type.
    */
-  static final String JSON_TYPE = "json";
+  public static final String JSON_TYPE = "json";
 
   /**
    * The Postgres JSONB DB type.
    */
-  static final String JSONB_TYPE = "jsonb";
+  public static final String JSONB_TYPE = "jsonb";
 
   static final String INET_TYPE = "inet";
 
@@ -30,5 +32,14 @@ public final class PostgresHelper {
     pgo.setType(pgType);
     pgo.setValue(rawJson);
     return pgo;
+  }
+
+  /**
+   * Return true if the platform is Postgres or compatible like Yugabyte, Cockroach.
+   */
+  public static boolean isPostgresCompatible(DatabasePlatform databasePlatform) {
+    return databasePlatform.isPlatform(Platform.POSTGRES)
+      || databasePlatform.isPlatform(Platform.YUGABYTE)
+      || databasePlatform.isPlatform(Platform.COCKROACH);
   }
 }

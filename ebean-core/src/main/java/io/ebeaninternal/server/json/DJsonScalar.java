@@ -36,7 +36,7 @@ public final class DJsonScalar {
       gen.writeRaw(']');
 
     } else {
-      ScalarType scalarType = typeManager.getScalarType(value.getClass());
+      ScalarType scalarType = typeManager.type(value.getClass());
       if (scalarType == null) {
         throw new IllegalArgumentException("unhandled type " + value.getClass());
       }

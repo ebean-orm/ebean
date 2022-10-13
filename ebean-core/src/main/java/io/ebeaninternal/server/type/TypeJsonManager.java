@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.ModifyAwareType;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.core.type.PostgresHelper;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 final class TypeJsonManager {

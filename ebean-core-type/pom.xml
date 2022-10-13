@@ -26,6 +26,14 @@
       <optional>true</optional>
     </dependency>
 
+    <!-- Provided scope for Postgres JSON/JSONB support -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.4.1</version>
+      <optional>true</optional>
+    </dependency>
+
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
