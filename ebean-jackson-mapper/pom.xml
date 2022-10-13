@@ -5,7 +5,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.9.3-SNAPSHOT</version>
+    <version>13.9.4-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -16,7 +16,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>13.9.3-SNAPSHOT</version>
+      <version>13.9.4-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 

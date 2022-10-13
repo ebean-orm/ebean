@@ -119,13 +119,13 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-jackson-jsonnode</artifactId>
-        <version>13.9.3-SNAPSHOT</version>
+        <version>13.9.4-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-jackson-mapper</artifactId>
-        <version>13.9.3-SNAPSHOT</version>
+        <version>13.9.4-SNAPSHOT</version>
       </dependency>
 
       <dependency>
