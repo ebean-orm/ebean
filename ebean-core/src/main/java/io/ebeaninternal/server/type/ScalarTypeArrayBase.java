@@ -10,6 +10,8 @@ import java.sql.Types;
 
 abstract class ScalarTypeArrayBase<T> extends ScalarTypeJsonCollection<T> {
 
+  static final Object[] EMPTY_ARRAY = new Object[]{};
+
   ScalarTypeArrayBase(Class<T> type, int dbType, DocPropertyType docPropertyType, boolean nullable) {
     super(type, dbType, docPropertyType, nullable);
   }

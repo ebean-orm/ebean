@@ -16,14 +16,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static java.util.Collections.EMPTY_LIST;
 
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
@@ -136,7 +130,7 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
     if (nullable) {
       binder.setNull(Types.ARRAY);
     } else {
-      binder.setArray(arrayType, toArray(EMPTY_LIST));
+      binder.setArray(arrayType, EMPTY_ARRAY);
     }
   }
 
