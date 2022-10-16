@@ -302,9 +302,12 @@ class TestDbArray_basic extends BaseTestCase {
     List<String> phNumbers = bean.getPhoneNumbers();
     phNumbers.add("4321");
     phNumbers.add("9823");
-    List<BigDecimal> decimals = bean.getDecimals();
+    assertThat(bean.getDecimals()).isNull();
+
+    List<BigDecimal> decimals = new ArrayList<>();
     decimals.add(BigDecimal.valueOf(1.23));
     decimals.add(BigDecimal.valueOf(4.56));
+    bean.setDecimals(decimals);
     DB.save(bean);
     // Data is saved correctly
 
