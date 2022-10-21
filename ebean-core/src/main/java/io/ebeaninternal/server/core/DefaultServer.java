@@ -191,7 +191,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   public void executePlugins(boolean online) {
     if (!config.isDocStoreOnly()) {
-      ddlGenerator.execute(online);
+      ddlGenerator.generateDdl();
     }
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
@@ -302,29 +302,38 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       encryptKeyManager.initialise();
     }
     serverCacheManager.enabledRegions(config.getEnabledL2Regions());
-    start();
-    startQueryPlanCapture();
   }
 
-
+  /**
+   * Start any services after registering with the ClusterManager.
+   */
   @Override
   public void start() {
     if (config.isRunMigration() && TenantMode.DB != config.getTenantMode()) {
-      final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
-      if (migrationRunner == null) {
-        throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
-      }
-      final String dbSchema = config.getDbSchema();
-      if (dbSchema != null) {
-        migrationRunner.setDefaultDbSchema(dbSchema);
-      }
-      migrationRunner.setName(config.getName());
-      Platform platform = config.getDatabasePlatform().platform();
-      migrationRunner.setBasePlatform(platform.base().name().toLowerCase());
-      migrationRunner.setPlatform(platform.name().toLowerCase());
-      migrationRunner.loadProperties(config.getProperties());
-      migrationRunner.run(config.getDataSource());
+      runMigration();
     }
+    startQueryPlanCapture();
+  }
+
+  @Override
+  public void runMigration() {
+    if (!config.isDocStoreOnly()) {
+      ddlGenerator.runDdl();
+    }
+    final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
+    if (migrationRunner == null) {
+      throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
+    }
+    final String dbSchema = config.getDbSchema();
+    if (dbSchema != null) {
+      migrationRunner.setDefaultDbSchema(dbSchema);
+    }
+    migrationRunner.setName(config.getName());
+    Platform platform = config.getDatabasePlatform().platform();
+    migrationRunner.setBasePlatform(platform.base().name().toLowerCase());
+    migrationRunner.setPlatform(platform.name().toLowerCase());
+    migrationRunner.loadProperties(config.getProperties());
+    migrationRunner.run(config.getDataSource());
   }
 
   private void startQueryPlanCapture() {

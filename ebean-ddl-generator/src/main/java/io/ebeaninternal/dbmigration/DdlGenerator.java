@@ -82,18 +82,10 @@ public class DdlGenerator implements SpiDdlGenerator {
     return new File(".");
   }
 
-  @Override
-  public void execute(boolean online) {
-    generateDdl();
-    if (online) {
-      runDdl();
-    }
-  }
-
   /**
    * Generate the DDL drop and create scripts if the properties have been set.
    */
-  protected void generateDdl() {
+  public void generateDdl() {
     if (generateDdl) {
       if (!createOnly) {
         writeDrop(getDropFileName());
@@ -105,7 +97,8 @@ public class DdlGenerator implements SpiDdlGenerator {
   /**
    * Run the DDL drop and DDL create scripts if properties have been set.
    */
-  protected void runDdl() {
+  @Override
+  public void runDdl() {
     if (runDdl) {
       Connection connection = null;
       try {

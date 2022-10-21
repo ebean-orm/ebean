@@ -14,13 +14,6 @@ public interface Plugin {
    * Called just before the server starts indicating if it is coming up in online mode.
    */
   void online(boolean online);
-  
-  /**
-   * Called when server.start is invoked. This may be executed for each tenant.
-   */
-  default void start() {
-    
-  };
 
   /**
    * Called when the server is shutting down.

@@ -10,6 +10,7 @@ public interface SpiDdlGenerator {
    * <p>
    * Run based on on property settings for ebean.ddl.generate and ebean.ddl.run etc.
    */
-  void execute(boolean online);
+  void generateDdl();
 
+  void runDdl();
 }
