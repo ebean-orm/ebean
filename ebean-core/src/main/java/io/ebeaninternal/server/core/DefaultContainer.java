@@ -107,7 +107,7 @@ public final class DefaultContainer implements SpiContainer {
 
       if (!DbOffline.isGenerateMigration()) {
         initServer(online, server);
-        if (online && config.getTenantMode().isDdlEnabled()) {
+        if (online && config.getTenantMode().isDdlEnabled() && !config.skipStart()) {
           server.start();
         }
       }

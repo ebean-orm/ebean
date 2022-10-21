@@ -31,7 +31,7 @@ public class TestInsertDataIntegrityException extends BaseTestCase {
     assertThatThrownBy(() -> DB.save(order))
       .isInstanceOf(DataIntegrityException.class)
       .hasMessageContaining("insert into o_order")
-      .hasMessageContaining(",900000");
+      .hasMessageContaining("900000");
 
   }
 }
