@@ -61,7 +61,7 @@ abstract class AssocOneHelp {
     if (id == null) {
       return null;
     }
-    PersistenceContext pc = ctx.getPersistenceContext();
+    PersistenceContext pc = ctx.persistenceContext();
     Object existing = target.contextGet(pc, id);
     if (existing != null) {
       return existing;

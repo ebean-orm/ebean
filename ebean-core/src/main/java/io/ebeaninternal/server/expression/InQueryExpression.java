@@ -32,6 +32,11 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
   }
 
   @Override
+  public SpiExpression copy() {
+    return subQuery == null ? this : new InQueryExpression(propName, subQuery.copy(), not);
+  }
+
+  @Override
   public void simplify() {
     // do nothing
   }
@@ -43,10 +48,9 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-
     CQuery<?> subQuery = compileSubQuery(request);
-    this.bindParams = subQuery.getPredicates().getWhereExprBindValues();
-    this.sql = subQuery.getGeneratedSql().replace('\n', ' ');
+    this.bindParams = subQuery.predicates().whereExprBindValues();
+    this.sql = subQuery.generatedSql().replace('\n', ' ');
   }
 
   @Override
@@ -71,7 +75,6 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     request.append(" (").append(propName).append(")");
     if (not) {
       request.append(" not");
@@ -83,7 +86,6 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }

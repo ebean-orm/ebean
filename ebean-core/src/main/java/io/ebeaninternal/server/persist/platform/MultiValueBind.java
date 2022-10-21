@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.persist.platform;
 
 import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.bind.DataBind;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -44,7 +44,7 @@ public class MultiValueBind {
    */
   public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
     for (Object value : values) {
-      if (!type.isJdbcNative()) {
+      if (!type.jdbcNative()) {
         value = type.toJdbcType(value);
       }
       bindOne.bind(value);
@@ -60,9 +60,7 @@ public class MultiValueBind {
       sb.append(" not");
     }
     sb.append(" in (?");
-    for (int i = 1; i < size; i++) {
-      sb.append(",?");
-    }
+    sb.append(",?".repeat(Math.max(0, size - 1)));
     sb.append(")");
     return sb.toString();
   }

@@ -41,7 +41,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>1.6</version>
+      <version>2.11.1</version>
       <optional>true</optional>
     </dependency>
 
@@ -107,7 +107,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.6.5</tile>
+            <tile>io.ebean.tile:enhancement:13.10.0</tile>
           </tiles>
         </configuration>
       </plugin>

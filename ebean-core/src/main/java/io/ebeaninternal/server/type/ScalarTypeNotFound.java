@@ -24,27 +24,22 @@ class ScalarTypeNotFound implements ScalarType<Void> {
   private ScalarTypeNotFound() {  }
 
   @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public Class<Void> getType() {
+  public Class<Void> type() {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public Void read(DataReader reader) throws SQLException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void loadIgnore(DataReader reader) {
     throw new UnsupportedOperationException();
   }
 
@@ -69,17 +64,12 @@ class ScalarTypeNotFound implements ScalarType<Void> {
   }
 
   @Override
-  public String format(Object value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public Void parse(String value) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     throw new UnsupportedOperationException();
   }
 

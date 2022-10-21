@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.logger;
 
+import io.avaje.applog.AppLog;
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
-import org.slf4j.LoggerFactory;
 
 /**
  * Default SpiLoggerFactory implementation.
@@ -14,6 +14,6 @@ public final class DLoggerFactory implements SpiLoggerFactory {
    */
   @Override
   public SpiLogger create(String name) {
-    return new DSpiLogger(LoggerFactory.getLogger(name));
+    return new DSpiLogger(AppLog.getLogger(name));
   }
 }

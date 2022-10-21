@@ -301,7 +301,7 @@ final class AnnotationFields extends AnnotationParser {
 
   private void initEncrypt(DeployBeanProperty prop) {
     if (!prop.isTransient()) {
-      EncryptDeploy encryptDeploy = util.getEncryptDeploy(info.getDescriptor().getBaseTableFull(), prop.getDbColumn());
+      EncryptDeploy encryptDeploy = util.encryptDeploy(info.getDescriptor().getBaseTableFull(), prop.getDbColumn());
       if (encryptDeploy == null || encryptDeploy.getMode() == Mode.MODE_ANNOTATION) {
         Encrypted encrypted = get(prop, Encrypted.class);
         if (encrypted != null) {
@@ -386,7 +386,7 @@ final class AnnotationFields extends AnnotationParser {
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {
     util.checkEncryptKeyManagerDefined(prop.getFullBeanName());
     ScalarType<?> st = prop.getScalarType();
-    if (byte[].class.equals(st.getType())) {
+    if (byte[].class.equals(st.type())) {
       // Always using Java client encryption rather than DB for encryption
       // of binary data (partially as this is not supported on all db's etc)
       // This could be reviewed at a later stage.
@@ -398,10 +398,10 @@ final class AnnotationFields extends AnnotationParser {
       return;
     }
     if (dbEncString) {
-      DbEncrypt dbEncrypt = util.getDbPlatform().getDbEncrypt();
+      DbEncrypt dbEncrypt = util.dbPlatform().dbEncrypt();
       if (dbEncrypt != null) {
         // check if we have a DB encryption function for this type
-        int jdbcType = prop.getScalarType().getJdbcType();
+        int jdbcType = prop.getScalarType().jdbcType();
         DbEncryptFunction dbEncryptFunction = dbEncrypt.getDbEncryptFunction(jdbcType);
         if (dbEncryptFunction != null) {
           // Use DB functions to encrypt and decrypt
@@ -427,7 +427,7 @@ final class AnnotationFields extends AnnotationParser {
 
   private ScalarTypeBytesBase getDbEncryptType(DeployBeanProperty prop) {
     int dbType = prop.isLob() ? Types.BLOB : Types.VARBINARY;
-    return (ScalarTypeBytesBase) util.getTypeManager().getScalarType(dbType);
+    return (ScalarTypeBytesBase) util.typeManager().type(dbType);
   }
 
   private DataEncryptSupport createDataEncryptSupport(DeployBeanProperty prop) {

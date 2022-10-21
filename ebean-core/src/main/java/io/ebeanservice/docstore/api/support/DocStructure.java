@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * Document structure for mapping to document store.
  */
-public class DocStructure {
+public final class DocStructure {
 
   /**
    * The full document structure.
@@ -58,11 +58,11 @@ public class DocStructure {
   /**
    * Return the document structure for an embedded path.
    */
-  public FetchPath getEmbedded(String path) {
+  public FetchPath embedded(String path) {
     return embedded.get(path);
   }
 
-  public FetchPath getEmbeddedManyRoot(String path) {
+  public FetchPath embeddedManyRoot(String path) {
     return manyRoot.get(path);
   }
 
@@ -83,7 +83,6 @@ public class DocStructure {
    * Add a PathProperties for an embedded 'many' property (at the root level).
    */
   private void prepare(String prop, BeanPropertyAssoc<?> embProp) {
-
     BeanDescriptor<?> targetDesc = embProp.targetDescriptor();
 
     PathProperties manyRootPath = new PathProperties();

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 import io.ebean.text.TextException;
 
 import java.io.ByteArrayOutputStream;
@@ -22,7 +23,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   }
 
   @Override
-  public boolean isBinaryType() {
+  public boolean binary() {
     return true;
   }
 
@@ -96,7 +97,7 @@ public abstract class ScalarTypeBytesBase extends ScalarTypeBase<byte[]> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.BINARY;
   }
 }

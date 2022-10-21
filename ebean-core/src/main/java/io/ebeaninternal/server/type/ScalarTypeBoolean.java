@@ -6,8 +6,8 @@ import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
-import io.ebean.text.TextException;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.ScalarTypeBase;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -146,7 +146,7 @@ public final class ScalarTypeBoolean {
     }
 
     @Override
-    public int getLength() {
+    public int length() {
       return 1;
     }
 
@@ -233,7 +233,7 @@ public final class ScalarTypeBoolean {
     }
 
     @Override
-    public int getLength() {
+    public int length() {
       return Math.max(trueValue.length(), falseValue.length());
     }
 
@@ -358,7 +358,7 @@ public final class ScalarTypeBoolean {
     }
 
     @Override
-    public DocPropertyType getDocType() {
+    public DocPropertyType docType() {
       return DocPropertyType.BOOLEAN;
     }
   }

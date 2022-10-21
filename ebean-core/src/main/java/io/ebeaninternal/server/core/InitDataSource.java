@@ -105,7 +105,7 @@ final class InitDataSource {
   }
 
   boolean isPostgresAllQuotedIdentifiers() {
-    return config.isAllQuotedIdentifiers() && Platform.POSTGRES == config.getDatabasePlatform().getPlatform().base();
+    return config.isAllQuotedIdentifiers() && Platform.POSTGRES == config.getDatabasePlatform().platform().base();
   }
 
   private DataSource create(DataSourceConfig dsConfig, boolean readOnly) {

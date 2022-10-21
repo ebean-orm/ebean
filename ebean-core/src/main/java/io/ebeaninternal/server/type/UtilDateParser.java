@@ -16,7 +16,7 @@ final class UtilDateParser {
     try {
       return formatter().parse(jsonDateTime);
     } catch (ParseException e) {
-      throw new RuntimeException("Error parsing Date[" + jsonDateTime + "]", e);
+      throw new RuntimeException("Error parsing Date " + jsonDateTime, e);
     }
   }
 

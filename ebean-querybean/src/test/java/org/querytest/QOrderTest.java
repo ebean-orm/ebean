@@ -215,10 +215,9 @@ public class QOrderTest {
   }
 
   private static void setupData() {
-
     customer = new Customer();
-    customer.setName("Fred");
-    customer.setPhoneNumber(new PhoneNumber("Ph1"));
+    customer.name = "Fred";
+    customer.phoneNumber = new PhoneNumber("Ph1");
     customer.save();
 
     order = new Order();

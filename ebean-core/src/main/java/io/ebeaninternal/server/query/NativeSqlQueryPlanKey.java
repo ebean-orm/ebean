@@ -15,7 +15,7 @@ public class NativeSqlQueryPlanKey implements CQueryPlanKey {
 
   @Override
   public String toString() {
-    return getPartialKey();
+    return partialKey();
   }
 
   @Override
@@ -29,7 +29,7 @@ public class NativeSqlQueryPlanKey implements CQueryPlanKey {
    * can be used as a short form proxy for the actual sql.
    */
   @Override
-  public String getPartialKey() {
+  public String partialKey() {
     return hashCode() + "_n";
   }
 

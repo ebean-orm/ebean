@@ -40,30 +40,28 @@ final class CQueryHistorySupport {
   /**
    * Return the 'as of' history view for the given base table.
    */
-  String getAsOfView(String table) {
+  String asOfView(String table) {
     return asOfTableMap.get(table);
   }
 
   /**
    * Return the lower bound column.
    */
-  String getSysPeriodLower(String tableAlias) {
+  String sysPeriodLower(String tableAlias) {
     return dbHistorySupport.getSysPeriodLower(tableAlias, sysPeriod);
   }
 
   /**
    * Return the upper bound column.
    */
-  String getSysPeriodUpper(String tableAlias) {
+  String sysPeriodUpper(String tableAlias) {
     return dbHistorySupport.getSysPeriodUpper(tableAlias, sysPeriod);
   }
 
   /**
    * Return the predicate appended to the end of the query.
-   * <p>
-   * Note used for Oracle total recall etc with the more standard approach.
    */
-  String getAsOfPredicate(String tableAlias) {
+  String asOfPredicate(String tableAlias) {
     return dbHistorySupport.getAsOfPredicate(tableAlias, sysPeriod);
   }
 

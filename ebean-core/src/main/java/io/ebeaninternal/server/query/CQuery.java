@@ -25,6 +25,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * An object that represents a SqlSelect statement.
  * <p>
@@ -188,13 +190,13 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.autoTuneProfiling = profilingListener != null;
     // set the generated sql back to the query
     // so its available to the user...
-    query.setGeneratedSql(queryPlan.getSql());
-    SqlTreePlan sqlTree = queryPlan.getSqlTree();
-    this.rootNode = sqlTree.getRootNode();
-    this.manyProperty = sqlTree.getManyProperty();
-    this.sql = queryPlan.getSql();
+    query.setGeneratedSql(queryPlan.sql());
+    SqlTreePlan sqlTree = queryPlan.sqlTree();
+    this.rootNode = sqlTree.rootNode();
+    this.manyProperty = sqlTree.manyProperty();
+    this.sql = queryPlan.sql();
     this.rawSql = queryPlan.isRawSql();
-    this.logWhereSql = queryPlan.getLogWhereSql();
+    this.logWhereSql = queryPlan.logWhereSql();
     this.desc = request.descriptor();
     this.predicates = predicates;
     if (lazyLoadManyProperty != null) {
@@ -243,20 +245,20 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   }
 
   @Override
-  public DataReader getDataReader() {
+  public DataReader dataReader() {
     return dataReader;
   }
 
   @Override
-  public Mode getQueryMode() {
+  public Mode queryMode() {
     return queryMode;
   }
 
-  public CQueryPredicates getPredicates() {
+  public CQueryPredicates predicates() {
     return predicates;
   }
 
-  SpiOrmQueryRequest<?> getQueryRequest() {
+  SpiOrmQueryRequest<?> request() {
     return request;
   }
 
@@ -314,7 +316,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       if (forwardOnlyHint) {
         // Use forward only hints for large resultSet processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-        pstmt.setFetchSize(Integer.MIN_VALUE);
+        pstmt.setFetchSize(request.forwardOnlyFetchSize());
       } else {
         pstmt = conn.prepareStatement(sql);
       }
@@ -344,7 +346,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         auditIterateLogMessage();
       }
     } catch (Throwable e) {
-      CoreLog.log.error("Error logging read audit logs", e);
+      CoreLog.log.log(ERROR, "Error logging read audit logs", e);
     }
     try {
       if (dataReader != null) {
@@ -352,7 +354,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         dataReader = null;
       }
     } catch (SQLException e) {
-      CoreLog.log.error("Error closing dataReader", e);
+      CoreLog.log.log(ERROR, "Error closing dataReader", e);
     }
     JdbcClose.close(pstmt);
     pstmt = null;
@@ -362,7 +364,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
    * Return the persistence context.
    */
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public PersistenceContext persistenceContext() {
     return request.persistenceContext();
   }
 
@@ -371,7 +373,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     if (lazyLoadParentId != null) {
       if (!lazyLoadParentId.equals(this.lazyLoadParentId)) {
         // get the appropriate parent bean from the persistence context
-        this.lazyLoadParentBean = (EntityBean) lazyLoadManyProperty.descriptor().contextGet(getPersistenceContext(), lazyLoadParentId);
+        this.lazyLoadParentBean = (EntityBean) lazyLoadManyProperty.descriptor().contextGet(persistenceContext(), lazyLoadParentId);
         this.lazyLoadParentId = lazyLoadParentId;
       }
       // add the loadedBean to the appropriate collection of lazyLoadParentBean
@@ -451,7 +453,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     return true;
   }
 
-  long getQueryExecutionTimeMicros() {
+  long queryExecutionTimeMicros() {
     return executionTimeMicros;
   }
 
@@ -546,15 +548,15 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       if (queryPlan.executionTime(executionTimeMicros)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
-      getTransaction().profileEvent(this);
+      transaction().profileEvent(this);
     } catch (Exception e) {
-      CoreLog.log.error("Error updating execution statistics", e);
+      CoreLog.log.log(ERROR, "Error updating execution statistics", e);
     }
   }
 
   @Override
   public void profile() {
-    getTransaction()
+    transaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.getProfileId());
   }
@@ -567,7 +569,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     }
   }
 
-  String getLoadedRowDetail() {
+  String loadedRowDetail() {
     if (manyProperty == null) {
       return String.valueOf(rowCount);
     } else {
@@ -601,30 +603,29 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   /**
    * Return the where predicate for display in the transaction log.
    */
-  String getLogWhereSql() {
+  String logWhereSql() {
     return logWhereSql;
   }
 
-
-  public String getBindLog() {
+  public String bindLog() {
     return bindLog;
   }
 
-  public SpiTransaction getTransaction() {
+  public SpiTransaction transaction() {
     return request.transaction();
   }
 
   /**
    * Return the short bean name.
    */
-  String getBeanName() {
+  String beanName() {
     return desc.name();
   }
 
   /**
    * Return the generated sql.
    */
-  public String getGeneratedSql() {
+  public String generatedSql() {
     return sql;
   }
 
@@ -676,7 +677,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   void auditFind(EntityBean bean) {
     if (bean != null) {
       // only audit when a bean was actually found
-      desc.readAuditBean(queryPlan.getAuditQueryKey(), bindLog, bean);
+      desc.readAuditBean(queryPlan.auditQueryKey(), bindLog, bean);
     }
   }
 
@@ -689,11 +690,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       ReadEvent futureReadEvent = query.getFutureFetchAudit();
       if (futureReadEvent == null) {
         // normal query execution
-        desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditIds);
+        desc.readAuditMany(queryPlan.auditQueryKey(), bindLog, auditIds);
       } else {
         // this query was executed via findFutureList() and the prepare()
         // has already been called so set the details and log
-        futureReadEvent.setQueryKey(queryPlan.getAuditQueryKey());
+        futureReadEvent.setQueryKey(queryPlan.auditQueryKey());
         futureReadEvent.setBindLog(bindLog);
         futureReadEvent.setIds(auditIds);
         desc.readAuditFutureMany(futureReadEvent);
@@ -712,7 +713,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
    * Send the current buffer of findIterate collected ids to the audit log.
    */
   private void auditIterateLogMessage() {
-    desc.readAuditMany(queryPlan.getAuditQueryKey(), bindLog, auditIds);
+    desc.readAuditMany(queryPlan.auditQueryKey(), bindLog, auditIds);
     // create a new list on demand with the next bean/id
     auditIds = null;
   }
@@ -733,7 +734,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   /**
    * Return the underlying PreparedStatement.
    */
-  PreparedStatement getPstmt() {
+  PreparedStatement pstmt() {
     return pstmt;
   }
 
@@ -742,7 +743,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     query.handleLoadError(fullName, e);
   }
 
-  public Set<String> getDependentTables() {
-    return queryPlan.getDependentTables();
+  public Set<String> dependentTables() {
+    return queryPlan.dependentTables();
   }
 }

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.autotune.service;
 
+import io.avaje.applog.AppLog;
 import io.ebean.bean.NodeUsageCollector;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
@@ -7,19 +8,19 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Collects usages statistics for a given node in the object graph.
  */
 public class ProfileOriginNodeUsage {
 
-  private static final Logger logger = LoggerFactory.getLogger(ProfileOriginNodeUsage.class);
+  private static final System.Logger logger = AppLog.getLogger(ProfileOriginNodeUsage.class);
 
   private final ReentrantLock lock = new ReentrantLock();
 
@@ -45,7 +46,7 @@ public class ProfileOriginNodeUsage {
       if (path != null) {
         ElPropertyValue elGetValue = rootDesc.elGetValue(path);
         if (elGetValue == null) {
-          logger.warn("AutoTune: Can't find join for path[" + path + "] for " + rootDesc.name());
+          logger.log(WARNING, "AutoTune: Can't find join for path[" + path + "] for " + rootDesc.name());
           return;
         } else {
           BeanProperty beanProperty = elGetValue.beanProperty();
@@ -61,7 +62,7 @@ public class ProfileOriginNodeUsage {
       for (String propName : aggregateUsed) {
         BeanProperty beanProp = desc.findPropertyFromPath(propName);
         if (beanProp == null) {
-          logger.warn("AutoTune: Can't find property[" + propName + "] for " + desc.name());
+          logger.log(WARNING, "AutoTune: Can't find property[" + propName + "] for " + desc.name());
 
         } else {
           if (beanProp.isId()) {

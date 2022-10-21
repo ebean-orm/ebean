@@ -1,22 +1,23 @@
 package io.ebeaninternal.server.cluster;
 
+import io.avaje.applog.AppLog;
 import io.ebean.Database;
 import io.ebean.config.ContainerConfig;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 /**
  * Manages the cluster service.
  */
 public class ClusterManager implements ServerLookup {
 
-  private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
+  private static final System.Logger clusterLogger = AppLog.getLogger("io.ebean.Cluster");
 
   private final ReentrantLock lock = new ReentrantLock();
 
@@ -112,8 +113,8 @@ public class ClusterManager implements ServerLookup {
    */
   public void broadcast(RemoteTransactionEvent event) {
     if (broadcast != null) {
-      if (clusterLogger.isDebugEnabled()) {
-        clusterLogger.debug("sending: {}", event);
+      if (clusterLogger.isLoggable(DEBUG)) {
+        clusterLogger.log(DEBUG, "sending: {0}", event);
       }
       broadcast.broadcast(event);
     }

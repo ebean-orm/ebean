@@ -24,8 +24,4 @@
     </dependency>
 
   </dependencies>
-
-  <scm>
-    <tag>ebean-parent-13.6.4-FOC1</tag>
-  </scm>
 </project>

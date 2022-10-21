@@ -12,10 +12,10 @@ public final class DeployIdentityMode {
   }
 
   private IdType type;
-  private IdentityGenerated generated;
+  private final IdentityGenerated generated;
   private int start;
   private int increment;
-  private int cache;
+  private final int cache;
   private String sequenceName;
   private boolean platformDefault;
 

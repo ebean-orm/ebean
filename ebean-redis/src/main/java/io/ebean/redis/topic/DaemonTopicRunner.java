@@ -1,13 +1,14 @@
 package io.ebean.redis.topic;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.avaje.applog.AppLog;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Subscribe to redis topic listening for changes.
@@ -18,7 +19,7 @@ import java.util.TimerTask;
  */
 public final class DaemonTopicRunner {
 
-  private static final Logger log = LoggerFactory.getLogger(DaemonTopicRunner.class);
+  private static final System.Logger log = AppLog.getLogger(DaemonTopicRunner.class);
 
   private static final long reconnectWaitMillis = 1000;
 
@@ -49,13 +50,13 @@ public final class DaemonTopicRunner {
       try {
         subscribe();
       } catch (JedisException e) {
-        log.debug("... redis subscribe connection attempt:{} failed:{}", attempts, e.getMessage());
+        log.log(DEBUG, "... redis subscribe connection attempt:{0} failed:{1}", attempts, e.getMessage());
         try {
           // wait a little before retrying
           Thread.sleep(reconnectWaitMillis);
         } catch (InterruptedException e1) {
           Thread.currentThread().interrupt();
-          log.warn("Interrupted redis re-connection wait", e1);
+          log.log(WARNING, "Interrupted redis re-connection wait", e1);
         }
       }
     }
@@ -70,13 +71,13 @@ public final class DaemonTopicRunner {
     try {
       daemonTopic.subscribe(jedis);
     } catch (Exception e) {
-      log.error("Lost connection to topic, starting re-connection loop", e);
+      log.log(ERROR, "Lost connection to topic, starting re-connection loop", e);
       attemptConnections();
     } finally {
       try {
         jedis.close();
       } catch (Exception e) {
-        log.warn("Error closing probably broken Redis connection", e);
+        log.log(WARNING, "Error closing probably broken Redis connection", e);
       }
     }
   }

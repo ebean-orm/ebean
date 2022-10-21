@@ -6,14 +6,15 @@ import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.System.Logger.Level.*;
+
 /**
  * IdGenerator for java util UUID.
- *
+ * <p>
  * It extends the UuidV1RndIdGenerator so that it can generate rfc4122 compliant Type 1 UUIDs.
- *
+ * <p>
  * This generator produces real Type 1 UUIDs (best for sqlserver) - You should use this generator only,
  * if you can guarantee, that mac addess is uniqe or specify 'ebean.uuidNodeId' in your config file.
- * 
  */
 public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
@@ -34,7 +35,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
    * Returns an instance for given file.
    */
   public static UuidV1IdGenerator getInstance(File file, String nodeId) {
-    return INSTANCES.computeIfAbsent(file, f ->new UuidV1IdGenerator(f, nodeId == null ? null : nodeId.toLowerCase()));
+    return INSTANCES.computeIfAbsent(file, f -> new UuidV1IdGenerator(f, nodeId == null ? null : nodeId.toLowerCase()));
   }
 
   /**
@@ -60,7 +61,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
   /**
    * Find hardware ID.
-   *
+   * <p>
    * We check all non-loopback networkinterfaces for valid hardwareAddresses
    * We prefer to take the first non virtual "up" device. If no device (with valid addr) is up,
    * we take the first down device.
@@ -71,21 +72,18 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     while (e.hasMoreElements()) {
       NetworkInterface network = e.nextElement();
       try {
-        log.trace("Probing interface {}", network);
         if (!network.isLoopback()) {
           byte[] addr = network.getHardwareAddress();
           if (validAddr(addr)) {
             if (network.isUp() && !network.isVirtual()) {
-              log.debug("Using interface {}", network);
               return addr;
             } else if (fallbackAddr == null) {
-              log.debug("Using interface {} as fallback", network);
               fallbackAddr = addr;
             }
           }
         }
       } catch (SocketException ex) {
-        log.debug("Skipping {}", network, ex);
+        log.log(DEBUG, "Skipping " + network, ex);
       }
     }
     return fallbackAddr;
@@ -98,7 +96,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     if (addr != null && addr.length >= 6) { // valid addr has 6 bytes
       // check if vendor is != 0x000000 or 0xFFFFFF
       return (addr[0] != 0x00 && addr[1] != 0x00 && addr[2] != 0x00)
-          ||(addr[0] != 0xFF && addr[1] != 0xFF && addr[2] != 0xFF);
+        || (addr[0] != 0xFF && addr[1] != 0xFF && addr[2] != 0xFF);
     }
     return false;
   }
@@ -122,7 +120,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
         // See, if there is an alternative MAC address set.
         nodeId = parseAlternativeNodeId(altNodeId);
         restoreState();
-        log.info("Explicitly using ID {} to generate Type 1 UUIDs", getNodeIdentifier());
+        log.log(INFO, "Explicitly using ID {0} to generate Type 1 UUIDs", getNodeIdentifier());
       }
       UUID uuid = nextId(null);
       long ts = timeStamp.get();
@@ -130,9 +128,9 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
       ts /= MILLIS_TO_UUID;
 
       saveState();
-      log.debug("Saved state: clockSeq {}, timestamp {}, uuid {}, stateFile: {})", clockSeq.get(), new Date(ts), uuid, stateFile);
+      log.log(DEBUG, "Saved state: clockSeq {0}, timestamp {1}, uuid {2}, stateFile: {3})", clockSeq.get(), new Date(ts), uuid, stateFile);
     } catch (IOException e) {
-      log.error("There was a problem while detecting the nodeId. Falling back to random mode. Try using to specify 'ebean.uuidNodeId' property", e);
+      log.log(ERROR, "There was a problem while detecting the nodeId. Falling back to random mode. Try using to specify 'ebean.uuidNodeId' property", e);
       useRandomMode();
     }
   }
@@ -141,7 +139,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
    * Tries to initialize the generator by retrieving the MAC address from
    * hardware. If there is no suitable network interface found, it will fall back
    * to "generate" mode.
-   * 
+   *
    * @throws IOException if state file is not readable or tryGenerateMode also
    *                     fails.
    */
@@ -149,16 +147,16 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     try {
       nodeId = getHardwareId();
     } catch (IOException e) {
-      log.error("Error while reading MAC address. Fall back to 'generate' mode", e);
+      log.log(ERROR, "Error while reading MAC address. Fall back to 'generate' mode", e);
       tryGenerateMode();
     }
 
     if (nodeId != null) {
       restoreState();
-      log.info("Using MAC {} to generate Type 1 UUIDs", getNodeIdentifier());
+      log.log(INFO, "Using MAC {0} to generate Type 1 UUIDs", getNodeIdentifier());
       return;
     }
-    log.warn("No suitable network interface found. Fall back to 'generate' mode");
+    log.log(WARNING, "No suitable network interface found. Fall back to 'generate' mode");
     tryGenerateMode();
   }
 
@@ -168,11 +166,11 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
    */
   private void tryGenerateMode() throws IOException {
     if (restoreState()) {
-      log.info("Using recently generated nodeId {} to generate Type 1 UUIDs", getNodeIdentifier());
+      log.log(INFO, "Using recently generated nodeId {0} to generate Type 1 UUIDs", getNodeIdentifier());
     } else {
       // RFC 4.5 use random portion for node
       nodeId = super.getNodeIdBytes();
-      log.info("Using a newly generated nodeId {} to generate Type 1 UUIDs", getNodeIdentifier());
+      log.log(INFO, "Using a newly generated nodeId {0} to generate Type 1 UUIDs", getNodeIdentifier());
     }
   }
 
@@ -183,7 +181,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
   private void useRandomMode() {
     canSaveState = false;
     nodeId = super.getNodeIdBytes();
-    log.info("Explicitly using a new random ID {} to generate Type 1 UUIDs", getNodeIdentifier());
+    log.log(INFO, "Explicitly using a new random ID {0} to generate Type 1 UUIDs", getNodeIdentifier());
   }
 
   /**
@@ -206,7 +204,6 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
   private boolean restoreState() throws IOException {
     Properties prop = new Properties();
     if (!stateFile.exists()) {
-      log.debug("State file '{}' does not exist", stateFile);
       return false;
     }
     try (InputStream is = new FileInputStream(stateFile)) {
@@ -215,28 +212,27 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
     String propNodeId = prop.getProperty("nodeId");
     if (propNodeId == null || propNodeId.isEmpty()) {
-      log.warn("State file '{}' is incomplete", stateFile);
+      log.log(WARNING, "State file '{0}' is incomplete", stateFile);
       return false; // we cannot restore
     }
     try {
       if (nodeId == null) {
         nodeId = parseAlternativeNodeId(propNodeId);
       } else if (!getNodeIdentifier().equals(propNodeId)) {
-        log.warn(
-            "The nodeId in the state file '{}' has changed from {} to {}. "
-                + "This can happen when MAC address changes or when two containers share the same state file",
-            stateFile, propNodeId, getNodeIdentifier());
+        log.log(WARNING,
+          "The nodeId in the state file '{0}' has changed from {1} to {2}. "
+            + "This can happen when MAC address changes or when two containers share the same state file",
+          stateFile, propNodeId, getNodeIdentifier());
         return false;
       }
-      Integer seq = Integer.valueOf(prop.getProperty("clockSeq")) & 0x3FFF;
+      Integer seq = Integer.parseInt(prop.getProperty("clockSeq")) & 0x3FFF;
       Long ts = Long.valueOf(prop.getProperty("timeStamp"));
       clockSeq.set(seq);
       timeStamp.set(ts);
-      log.debug("State successfully restored: {}", prop);
       return true;
-      
+
     } catch (IllegalArgumentException nfe) {
-      log.error("State file '{}' is corrupt", stateFile, nfe);
+      log.log(ERROR, "State file corrupt: " + stateFile, nfe);
     }
     return false;
   }
@@ -259,9 +255,8 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     }
     try (OutputStream os = new FileOutputStream(stateFile)) {
       prop.store(os, "ebean uuid state file");
-      log.debug("Persisted state to '{}'", stateFile);
     } catch (IOException e) {
-      log.error("Could not persist uuid state to '{}'", stateFile, e);
+      log.log(ERROR, "Could not persist uuid state to: " + stateFile, e);
     }
   }
 

@@ -50,7 +50,7 @@ public final class CQueryPlanStats {
   /**
    * Return the last time this query was executed.
    */
-  long getLastQueryTime() {
+  long lastQueryTime() {
     return lastQueryTime;
   }
 
@@ -66,7 +66,7 @@ public final class CQueryPlanStats {
   }
 
   String reportName(MetricVisitor visitor) {
-    final String tmp = visitor.namingConvention().apply(queryPlan.getName());
+    final String tmp = visitor.namingConvention().apply(queryPlan.name());
     this.reportName = tmp;
     return tmp;
   }
@@ -95,12 +95,12 @@ public final class CQueryPlanStats {
 
     @Override
     public Class<?> type() {
-      return queryPlan.getBeanType();
+      return queryPlan.beanType();
     }
 
     @Override
     public String label() {
-      return queryPlan.getLabel();
+      return queryPlan.label();
     }
 
     @Override
@@ -110,7 +110,7 @@ public final class CQueryPlanStats {
 
     @Override
     public String location() {
-      return queryPlan.getLocation();
+      return queryPlan.location();
     }
 
     @Override
@@ -135,12 +135,12 @@ public final class CQueryPlanStats {
 
     @Override
     public String hash() {
-      return queryPlan.getHash();
+      return queryPlan.hash();
     }
 
     @Override
     public String sql() {
-      return queryPlan.getSql();
+      return queryPlan.sql();
     }
 
     @Override

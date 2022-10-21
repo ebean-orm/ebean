@@ -49,9 +49,9 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * Add this statement to JDBC batch for later execution.
    */
-  public int addBatch() {
+  public void addBatch() {
     this.addBatch = true;
-    return executeStatement(true);
+    executeStatement(true);
   }
 
   /**

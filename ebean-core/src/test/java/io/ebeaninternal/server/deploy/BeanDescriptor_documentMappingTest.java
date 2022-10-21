@@ -18,7 +18,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTest {
 
     DocumentMapping documentMapping = desc.docMapping();
 
-    DocPropertyMapping properties = documentMapping.getProperties();
+    DocPropertyMapping properties = documentMapping.properties();
 
     assertThat(properties).isNotNull();
   }
@@ -30,7 +30,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTest {
 
     DocumentMapping documentMapping = desc.docMapping();
 
-    DocPropertyMapping properties = documentMapping.getProperties();
+    DocPropertyMapping properties = documentMapping.properties();
 
     assertThat(properties).isNotNull();
 
@@ -46,7 +46,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTest {
 
     @Override
     public void visitProperty(DocPropertyMapping property) {
-      sb.append(property.getName() + ",");
+      sb.append(property.name() + ",");
     }
 
     @Override
@@ -62,7 +62,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTest {
 
     @Override
     public void visitBeginObject(DocPropertyMapping property) {
-      sb.append(" object{" + property.getName() + ":");
+      sb.append(" object{" + property.name() + ":");
     }
 
     @Override
@@ -72,7 +72,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTest {
 
     @Override
     public void visitBeginList(DocPropertyMapping property) {
-      sb.append(" nested{" + property.getName() + ": [");
+      sb.append(" nested{" + property.name() + ": [");
     }
 
     @Override

@@ -10,7 +10,7 @@ public final class ExtraJoin {
     this.containsMany = containsMany;
   }
 
-  public STreePropertyAssoc getProperty() {
+  public STreePropertyAssoc property() {
     return property;
   }
 

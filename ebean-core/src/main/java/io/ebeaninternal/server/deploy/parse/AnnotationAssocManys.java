@@ -231,7 +231,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
         dbKeyColumn = mapKeyColumn.name();
       }
 
-      ScalarType<?> keyScalarType = util.getTypeManager().getScalarType(prop.getMapKeyType());
+      ScalarType<?> keyScalarType = util.typeManager().type(prop.getMapKeyType());
 
       DeployBeanProperty keyProp = new DeployBeanProperty(elementDescriptor, elementType, keyScalarType, null);
       setElementProperty(keyProp, "key", dbKeyColumn, sortOrder++);
@@ -243,10 +243,10 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       }
     }
 
-    ScalarType<?> valueScalarType = util.getTypeManager().getScalarType(elementType);
+    ScalarType<?> valueScalarType = util.typeManager().type(elementType);
     if (valueScalarType == null && elementType.isEnum()) {
       Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>)elementType;
-      valueScalarType = util.getTypeManager().createEnumScalarType(enumClass, EnumType.STRING);
+      valueScalarType = util.typeManager().enumType(enumClass, EnumType.STRING);
     }
 
     boolean scalar = true;

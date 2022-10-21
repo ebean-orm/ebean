@@ -20,10 +20,21 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>persistence-api</artifactId>
+        <version>${ebean-persistence-api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-annotation</artifactId>
         <version>${ebean-annotation.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-types</artifactId>
+        <version>${ebean-types.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
@@ -101,7 +112,19 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
-        <artifactId>ebean-dbmigration-runner</artifactId>
+        <artifactId>ebean-joda-time</artifactId>
+        <version>13.10.1-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-jackson-jsonnode</artifactId>
+        <version>13.10.1-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-jackson-mapper</artifactId>
         <version>13.10.1-SNAPSHOT</version>
       </dependency>
 

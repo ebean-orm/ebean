@@ -7,7 +7,7 @@ import java.util.UUID;
 
 /**
  * IdGenerator for java util UUID.
- *
+ * <p>
  * This generator generates a 60bit random UUID according to
  * https://tools.ietf.org/html/rfc4122.html#section-4.4
  * Use this generator if you want truly random UUIDs

@@ -3,10 +3,7 @@ package io.ebeaninternal.server.type;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.core.type.DataBinder;
-import io.ebean.core.type.DataReader;
-import io.ebean.core.type.DocPropertyType;
-import io.ebean.core.type.ScalarType;
+import io.ebean.core.type.*;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareSet;
@@ -74,7 +71,7 @@ final class ScalarTypeJsonSet {
       try {
         return convertElements(EJson.parseSet(value, false));
       } catch (IOException e) {
-        throw new PersistenceException("Failed to parse JSON content as Set: [" + value + "]", e);
+        throw new PersistenceException("Failed to parse JSON content as Set: " + value, e);
       }
     }
   }
@@ -116,7 +113,7 @@ final class ScalarTypeJsonSet {
     }
 
     @Override
-    public final boolean isJsonMapper() {
+    public final boolean jsonMapper() {
       return keepSource;
     }
 
@@ -177,7 +174,7 @@ final class ScalarTypeJsonSet {
       try {
         return convertList(EJson.parseList(value));
       } catch (IOException e) {
-        throw new PersistenceException("Failed to parse JSON content as Set: [" + value + "]", e);
+        throw new PersistenceException("Failed to parse JSON content as Set: " + value, e);
       }
     }
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.JsonConfig;
 import io.ebean.config.dbplatform.ExtraDbTypes;
+import io.ebean.core.type.ScalarTypeBaseDateTime;
 
 import java.io.IOException;
 import java.sql.Timestamp;

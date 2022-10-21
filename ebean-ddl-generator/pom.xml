@@ -57,13 +57,6 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-dbmigration-runner</artifactId>
-      <version>13.10.1-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
       <version>13.10.1-SNAPSHOT</version>
       <scope>test</scope>

@@ -6,45 +6,32 @@ import io.ebean.annotation.DocProperty;
 /**
  * Options for mapping a property for document storage.
  */
-public class DocPropertyOptions {
+public final class DocPropertyOptions {
 
   private Boolean code;
-
   private Boolean sortable;
-
   private Boolean store;
-
   private Float boost;
-
   private String nullValue;
-
   private Boolean includeInAll;
-
   private Boolean enabled;
-
   private Boolean norms;
-
   private Boolean docValues;
-
   private String analyzer;
-
   private String searchAnalyzer;
-
   private String copyTo;
-
   private DocProperty.Option options;
 
   /**
    * Construct with no values set.
    */
   public DocPropertyOptions() {
-
   }
 
   /**
    * Construct as a copy of the source options.
    */
-  protected DocPropertyOptions(DocPropertyOptions source) {
+  DocPropertyOptions(DocPropertyOptions source) {
     this.code = source.code;
     this.sortable = source.sortable;
     this.store = source.store;
@@ -85,11 +72,11 @@ public class DocPropertyOptions {
     return Boolean.TRUE.equals(code);
   }
 
-  public Boolean getCode() {
+  public Boolean code() {
     return code;
   }
 
-  public void setCode(Boolean code) {
+  public void code(Boolean code) {
     this.code = code;
   }
 
@@ -97,91 +84,91 @@ public class DocPropertyOptions {
     return Boolean.TRUE.equals(sortable);
   }
 
-  public Boolean getSortable() {
+  public Boolean sortable() {
     return sortable;
   }
 
-  public void setSortable(Boolean sortable) {
+  public void sortable(Boolean sortable) {
     this.sortable = sortable;
   }
 
-  public Float getBoost() {
+  public Float boost() {
     return boost;
   }
 
-  public void setBoost(Float boost) {
+  public void boost(Float boost) {
     this.boost = boost;
   }
 
-  public String getNullValue() {
+  public String nullValue() {
     return nullValue;
   }
 
-  public void setNullValue(String nullValue) {
+  public void nullValue(String nullValue) {
     this.nullValue = nullValue;
   }
 
-  public Boolean getStore() {
+  public Boolean store() {
     return store;
   }
 
-  public void setStore(Boolean store) {
+  public void store(Boolean store) {
     this.store = store;
   }
 
-  public Boolean getIncludeInAll() {
+  public Boolean includeInAll() {
     return includeInAll;
   }
 
-  public void setIncludeInAll(Boolean includeInAll) {
+  public void includeInAll(Boolean includeInAll) {
     this.includeInAll = includeInAll;
   }
 
-  public Boolean getDocValues() {
+  public Boolean docValues() {
     return docValues;
   }
 
-  public void setDocValues(Boolean docValues) {
+  public void docValues(Boolean docValues) {
     this.docValues = docValues;
   }
 
-  public String getAnalyzer() {
+  public String analyzer() {
     return analyzer;
   }
 
-  public void setAnalyzer(String analyzer) {
+  public void analyzer(String analyzer) {
     this.analyzer = analyzer;
   }
 
-  public String getSearchAnalyzer() {
+  public String searchAnalyzer() {
     return searchAnalyzer;
   }
 
-  public void setSearchAnalyzer(String searchAnalyzer) {
+  public void searchAnalyzer(String searchAnalyzer) {
     this.searchAnalyzer = searchAnalyzer;
   }
 
-  public String getCopyTo() {
+  public String copyTo() {
     return copyTo;
   }
 
-  public void setCopyTo(String copyTo) {
+  public void copyTo(String copyTo) {
     this.copyTo = copyTo;
   }
 
-  public Boolean getEnabled() {
+  public Boolean enabled() {
     return enabled;
   }
 
-  public void setEnabled(Boolean enabled) {
+  public void enabled(Boolean enabled) {
     this.enabled = enabled;
   }
 
-  public Boolean getNorms() {
+  public Boolean norms() {
     return norms;
   }
 
-  public void setNorms(Boolean norms) {
+  public void norms(Boolean norms) {
     this.norms = norms;
   }
 
@@ -192,11 +179,11 @@ public class DocPropertyOptions {
     return options != null && options != DocProperty.Option.DEFAULT;
   }
 
-  public DocProperty.Option getOptions() {
+  public DocProperty.Option options() {
     return options;
   }
 
-  public void setOptions(DocProperty.Option options) {
+  public void options(DocProperty.Option options) {
     this.options = options;
   }
 
@@ -218,7 +205,6 @@ public class DocPropertyOptions {
    * Apply the property level mapping options.
    */
   public void apply(DocProperty docMapping) {
-
     options = docMapping.options();
     if (docMapping.code()) {
       code = true;

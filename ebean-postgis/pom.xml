@@ -50,15 +50,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.4.1</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <!-- expected to be provided -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.33</version>
+      <version>42.5.0</version>
       <scope>provided</scope>
     </dependency>
 

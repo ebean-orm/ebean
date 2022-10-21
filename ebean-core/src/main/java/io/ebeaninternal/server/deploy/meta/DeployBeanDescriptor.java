@@ -164,7 +164,6 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   private DocStoreMode docStoreDelete;
   private DeployBeanProperty idProperty;
   private TableJoin primaryKeyJoin;
-  private Object jacksonAnnotatedClass;
 
   private final Set<Class<?>> interfaces = new HashSet<>();
 
@@ -1148,17 +1147,6 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
       }
       return null;
     }
-  }
-
-  /**
-   * Returns the jackson annotated class, if jackson is present.
-   */
-  @SuppressWarnings("unchecked")
-  Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
-    if (jacksonAnnotatedClass == null) {
-      jacksonAnnotatedClass = new DeployBeanObtainJackson(config, beanType).obtain();
-    }
-    return jacksonAnnotatedClass;
   }
 
   /**
