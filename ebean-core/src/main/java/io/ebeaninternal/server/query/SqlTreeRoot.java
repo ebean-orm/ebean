@@ -29,6 +29,6 @@ interface SqlTreeRoot {
   /**
    * Return a Scalar single attribute reader based on the first property.
    */
-  ScalarDataReader<?> getSingleAttributeReader();
+  ScalarDataReader<?> singleAttributeReader();
 
 }

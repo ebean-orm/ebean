@@ -21,7 +21,7 @@ public class SqlAnywherePlatform extends DatabasePlatform {
     super();
     this.platform = Platform.SQLANYWHERE;
     this.dbIdentity.setIdType(IdType.IDENTITY);
-
+    this.likeClauseRaw = "like ?";
     this.sqlLimiter = new SqlAnywhereLimiter();
     this.dbIdentity.setSupportsGetGeneratedKeys(false);
     this.dbIdentity.setSelectLastInsertedIdTemplate("select @@IDENTITY as X");

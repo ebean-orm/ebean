@@ -1,20 +1,22 @@
 package io.ebean.test.config.provider;
 
+import io.avaje.applog.AppLog;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.CurrentUserProvider;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.EncryptKeyManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Properties;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Auto configuration of User and Tenant providers and Encrypt key manager for testing purposes.
  */
 public class ProviderAutoConfig {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.test");
 
   private final DatabaseConfig config;
   private final Properties properties;
@@ -44,12 +46,12 @@ public class ProviderAutoConfig {
     if (keyManager == null) {
       // Must be 16 Chars for Oracle function
       String keyVal = properties.getProperty("ebean.test.encryptKey", "simple0123456789");
-      log.debug("for testing - using FixedEncryptKeyManager() keyVal:{}", keyVal);
+      log.log(DEBUG, "for testing - using FixedEncryptKeyManager() keyVal:{0}", keyVal);
       config.setEncryptKeyManager(new FixedEncryptKeyManager(keyVal));
     }
 
     if (providerSetFlag > 0) {
-      log.info(msg(providerSetFlag));
+      log.log(INFO, msg(providerSetFlag));
     }
   }
 

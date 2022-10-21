@@ -10,7 +10,7 @@ public final class PostgresMultiValueBind extends AbstractMultiValueBind {
 
   @Override
   public String getInExpression(boolean not, ScalarType<?> type, int size) {
-    int dbType = type.getJdbcType();
+    int dbType = type.jdbcType();
     if (dbType == ExtraDbTypes.UUID) {
       return (not) ? " != all(?::uuid[])" : " = any(?::uuid[])";
     }

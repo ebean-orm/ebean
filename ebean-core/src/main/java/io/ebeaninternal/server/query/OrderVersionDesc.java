@@ -17,7 +17,6 @@ final class OrderVersionDesc implements Comparator<Version<?>>, Serializable {
 
   @Override
   public int compare(Version<?> o1, Version<?> o2) {
-
     Timestamp v1 = o1.getStart();
     if (v1 == null) {
       return 1;

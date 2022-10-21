@@ -5,6 +5,7 @@ package io.ebean.text;
  * <p>
  * Basic interface to support CSV, JSON and XML processing.
  */
+@FunctionalInterface
 public interface StringParser {
 
   /**

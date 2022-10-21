@@ -1,12 +1,15 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.config.JsonConfig;
+import io.ebean.core.type.ScalarTypeBaseDateTime;
 
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+
+import static io.ebean.core.type.ScalarTypeUtils.formatInstant;
 
 /**
  * ScalarType for java.sql.Timestamp.
@@ -27,7 +30,7 @@ final class ScalarTypeOffsetDateTime extends ScalarTypeBaseDateTime<OffsetDateTi
 
   @Override
   protected String toJsonISO8601(OffsetDateTime value) {
-    return value.toInstant().toString();
+    return formatInstant(value.toInstant());
   }
 
   @Override

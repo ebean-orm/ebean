@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeBaseVarchar;
+
 import java.util.Locale;
 
 /**
@@ -12,7 +14,7 @@ final class ScalarTypeLocale extends ScalarTypeBaseVarchar<Locale> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 20;
   }
 

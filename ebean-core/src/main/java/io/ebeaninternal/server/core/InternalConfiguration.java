@@ -34,6 +34,7 @@ import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandlerFactory;
+import io.ebeaninternal.server.json.DJsonContext;
 import io.ebeaninternal.server.logger.DLogManager;
 import io.ebeaninternal.server.logger.DLoggerFactory;
 import io.ebeaninternal.server.persist.Binder;
@@ -43,7 +44,6 @@ import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
 import io.ebeaninternal.server.query.*;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
 import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
-import io.ebeaninternal.server.text.json.DJsonContext;
 import io.ebeaninternal.server.transaction.*;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.TypeManager;
@@ -53,9 +53,10 @@ import io.ebeanservice.docstore.api.DocStoreFactory;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
-import org.slf4j.Logger;
 
 import java.util.*;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Used to extend the DatabaseConfig with additional objects used to configure and
@@ -63,7 +64,7 @@ import java.util.*;
  */
 public final class InternalConfiguration {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final TableModState tableModState;
   private final boolean online;
@@ -114,7 +115,7 @@ public final class InternalConfiguration {
     this.expressionFactory = initExpressionFactory(config);
     this.typeManager = new DefaultTypeManager(config, bootupClasses);
     this.tempFileProvider = config.getTempFileProvider();
-    this.multiValueBind = createMultiValueBind(databasePlatform.getPlatform());
+    this.multiValueBind = createMultiValueBind(databasePlatform.platform());
     this.deployInherit = new DeployInherit(bootupClasses);
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
     this.deployUtil = new DeployUtil(typeManager, config);
@@ -174,7 +175,7 @@ public final class InternalConfiguration {
    * Create and return the ExpressionFactory based on configuration and database platform.
    */
   private ExpressionFactory initExpressionFactory(DatabaseConfig config) {
-    boolean nativeIlike = config.isExpressionNativeIlike() && databasePlatform.isSupportsNativeIlike();
+    boolean nativeIlike = config.isExpressionNativeIlike() && databasePlatform.supportsNativeIlike();
     return new DefaultExpressionFactory(config.isExpressionEqualsWithNullAsNoop(), nativeIlike);
   }
 
@@ -268,7 +269,7 @@ public final class InternalConfiguration {
 
     DbExpressionHandler jsonHandler = getDbExpressionHandler(databasePlatform);
 
-    DbHistorySupport historySupport = databasePlatform.getHistorySupport();
+    DbHistorySupport historySupport = databasePlatform.historySupport();
     if (historySupport == null) {
       return new Binder(typeManager, logManager, 0, false, jsonHandler, dataTimeZone, multiValueBind);
     }
@@ -324,7 +325,7 @@ public final class InternalConfiguration {
   }
 
   private Platform getPlatform() {
-    return getDatabasePlatform().getPlatform();
+    return getDatabasePlatform().platform();
   }
 
   public DatabasePlatform getDatabasePlatform() {
@@ -437,7 +438,7 @@ public final class InternalConfiguration {
       externalTransactionManager = new JtaTransactionManager();
     }
     if (externalTransactionManager != null) {
-      log.info("Using Transaction Manager [" + externalTransactionManager.getClass() + "]");
+      log.log(INFO, "Using Transaction Manager {0}", externalTransactionManager.getClass());
       return new ExternalTransactionScopeManager(externalTransactionManager);
     } else {
       return new DefaultTransactionScopeManager();
@@ -531,7 +532,7 @@ public final class InternalConfiguration {
       if (iterator.hasNext()) {
         // use the cacheFactory (via classpath service loader)
         plugin = iterator.next();
-        log.debug("using ServerCacheFactory {}", plugin.getClass());
+        log.log(DEBUG, "using ServerCacheFactory {0}", plugin.getClass());
       } else {
         // use the built in default l2 caching which is local cache based
         localL2Caching = true;
@@ -584,7 +585,7 @@ public final class InternalConfiguration {
       return QueryPlanManager.NOOP;
     }
     long threshold = config.getQueryPlanThresholdMicros();
-    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.getPlatform()), extraMetrics);
+    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
   }
 
   /**
@@ -602,6 +603,34 @@ public final class InternalConfiguration {
         return new QueryPlanLoggerDb2();
       default:
         return new QueryPlanLoggerExplain();
+    }
+  }
+
+  /**
+   * Return the DDL generator.
+   */
+  public SpiDdlGenerator initDdlGenerator(SpiEbeanServer server) {
+    final SpiDdlGeneratorProvider service = service(SpiDdlGeneratorProvider.class);
+    return service == null ? new NoopDdl(server.config().isDdlRun()) : service.generator(server);
+  }
+
+  private static class NoopDdl implements SpiDdlGenerator {
+    private final boolean ddlRun;
+
+    NoopDdl(boolean ddlRun) {
+      this.ddlRun = ddlRun;
+    }
+
+    @Override
+    public void generateDdl() {
+      // NOP
+    }
+
+    @Override
+    public void runDdl() {
+      if (ddlRun) {
+        CoreLog.log.log(ERROR, "Configured to run DDL but ebean-ddl-generator is not in the classpath (or ebean-test in the test classpath?)");
+      }
     }
   }
 }

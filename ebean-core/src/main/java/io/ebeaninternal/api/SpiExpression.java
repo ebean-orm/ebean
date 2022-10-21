@@ -13,8 +13,8 @@ import java.io.IOException;
  */
 public interface SpiExpression extends Expression {
 
-  static final String SQL_TRUE = "1=1";
-  static final String SQL_FALSE = "1=0";
+  String SQL_TRUE = "1=1";
+  String SQL_FALSE = "1=0";
 
   /**
    * Simplify nested expressions if possible.
@@ -110,4 +110,11 @@ public interface SpiExpression extends Expression {
    * Apply property prefix when filterMany expressions included into main query.
    */
   void prefixProperty(String path);
+
+  /**
+   * Return a copy of the expression (as part of creating a query copy).
+   */
+  default SpiExpression copy() {
+    return this;
+  }
 }

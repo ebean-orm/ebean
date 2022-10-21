@@ -85,7 +85,7 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
     return manyJoin;
   }
 
-  public String getName() {
+  public String name() {
     return prefix;
   }
 
@@ -115,9 +115,9 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
 
         manyToMany = true;
 
-        String alias = ctx.getTableAlias(prefix);
+        String alias = ctx.tableAlias(prefix);
         String[] split = SplitName.split(prefix);
-        String parentAlias = ctx.getTableAlias(split[0]);
+        String parentAlias = ctx.tableAlias(split[0]);
         String alias2 = alias + "z_";
 
         TableJoin manyToManyJoin = manyProp.intersectionTableJoin();
@@ -146,7 +146,7 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
       }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
       if (!oneToOneExported && assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
-        ctx.append(" and ").append(assocBeanProperty.softDeletePredicate(ctx.getTableAlias(prefix)));
+        ctx.append(" and ").append(assocBeanProperty.softDeletePredicate(ctx.tableAlias(prefix)));
       }
     }
 

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.ScalarType;
+import io.ebeaninternal.server.bind.DataBind;
 import org.postgresql.util.PGobject;
 
 import java.sql.SQLException;

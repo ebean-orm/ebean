@@ -114,7 +114,7 @@ class VisitHandler {
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
     for (BeanPropertyAssocOne<?> prop : ones) {
       if (ebi.isLoadedProperty(prop.propertyIndex())) {
-        EntityBean detailBean = prop.getValueAsEntityBean(bean);
+        EntityBean detailBean = prop.valueAsEntityBean(bean);
         if (detailBean != null && !prop.isSaveRecurseSkippable(detailBean) && !prop.isReference(detailBean)) {
           PersistVisitor propertyVisitor = visitor.visitProperty(prop);
           if (propertyVisitor != null) {

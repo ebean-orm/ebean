@@ -10,6 +10,8 @@ import java.sql.Types;
 
 abstract class ScalarTypeArrayBase<T> extends ScalarTypeJsonCollection<T> {
 
+  static final Object[] EMPTY_ARRAY = new Object[]{};
+
   ScalarTypeArrayBase(Class<T> type, int dbType, DocPropertyType docPropertyType, boolean nullable) {
     super(type, dbType, docPropertyType, nullable);
   }
@@ -71,13 +73,13 @@ abstract class ScalarTypeArrayBase<T> extends ScalarTypeJsonCollection<T> {
   protected abstract T fromArray(Object[] array1);
 
   static String arrayTypeFor(ScalarType<?> scalarType) {
-    switch (scalarType.getJdbcType()) {
+    switch (scalarType.jdbcType()) {
       case Types.INTEGER:
         return "integer";
       case Types.VARCHAR:
         return "varchar";
       default:
-        throw new IllegalArgumentException("JdbcType [" + scalarType.getJdbcType() + "] not supported for @DbArray mapping on set.");
+        throw new IllegalArgumentException("JdbcType [" + scalarType.jdbcType() + "] not supported for @DbArray mapping on set.");
     }
   }
 }

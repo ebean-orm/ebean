@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.7.1-FOC8-SNAPSHOT</version>
+  <version>13.10.1-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -39,16 +39,18 @@
 
   <properties>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
-    <jackson.version>2.13.2</jackson.version>
-    <h2database.version>2.1.212</h2database.version>
-    <ebean-annotation.version>8.2</ebean-annotation.version>
+    <jackson.version>2.13.3</jackson.version>
+    <h2database.version>2.1.214</h2database.version>
+    <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
+    <ebean-types.version>3.0</ebean-types.version>
+    <ebean-annotation.version>8.3</ebean-annotation.version>
     <ebean-ddl-runner.version>2.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>13.6.0</ebean-migration.version>
-    <ebean-test-containers.version>6.2</ebean-test-containers.version>
+    <ebean-test-containers.version>6.3</ebean-test-containers.version>
     <ebean-datasource.version>8.2</ebean-datasource.version>
     <ebean-agent.version>13.10.1-FOC1</ebean-agent.version>
-    <ebean-maven-plugin.version>13.7.0</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>13.10.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
@@ -66,13 +68,6 @@
   </build>
 
   <dependencies>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.36</version>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -96,7 +91,6 @@
     <module>ebean-core-type</module>
     <module>ebean-core</module>
     <module>ebean-ddl-generator</module>
-    <module>ebean-dbmigration-runner</module>
     <module>ebean-autotune</module>
     <module>ebean-externalmapping-api</module>
     <module>ebean-externalmapping-xml</module>
@@ -108,6 +102,10 @@
     <module>ebean-redis</module>
     <module>platforms</module>
     <module>composites</module>
+    <module>ebean-joda-time</module>
+    <module>ebean-csv-reader</module>
+    <module>ebean-jackson-jsonnode</module>
+    <module>ebean-jackson-mapper</module>
     <!--    <module>ebean-kotlin</module>-->
 
   </modules>

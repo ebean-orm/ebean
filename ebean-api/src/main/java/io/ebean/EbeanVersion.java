@@ -1,10 +1,14 @@
 package io.ebean;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.avaje.applog.AppLog;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.Properties;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Class to determine the ebean version.
@@ -13,7 +17,7 @@ import java.util.Properties;
  */
 public final class EbeanVersion {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean");
+  public static final System.Logger log = AppLog.getLogger("io.ebean");
 
   /**
    * Maintain the minimum ebean-agent version manually based on required ebean-agent bug fixes.
@@ -21,6 +25,7 @@ public final class EbeanVersion {
   private static final int MIN_AGENT_MAJOR_VERSION = 12;
   private static final int MIN_AGENT_MINOR_VERSION = 12;
   private static String version = "unknown";
+
   static {
     readVersion();
     checkAgentVersion();
@@ -32,12 +37,12 @@ public final class EbeanVersion {
         if (in != null) {
           try (LineNumberReader reader = new LineNumberReader(new InputStreamReader(in))) {
             version = reader.readLine();
+            log.log(INFO, "ebean version: {0}", version);
           }
         }
       }
-      log.info("ebean version: {}", version);
     } catch (IOException e) {
-      log.warn("Could not determine ebean version: {}", e.getMessage());
+      log.log(WARNING, "Could not determine ebean version: {0}", e.getMessage());
     }
   }
 
@@ -49,13 +54,13 @@ public final class EbeanVersion {
           String agentVersion = readVersion(in);
           if (agentVersion != null) {
             if (checkMinAgentVersion(agentVersion)) {
-              log.error("Expected minimum ebean-agent version {}.{}.0 but we have {}, please update the ebean-agent", MIN_AGENT_MAJOR_VERSION, MIN_AGENT_MINOR_VERSION, agentVersion);
+              log.log(ERROR, "Expected minimum ebean-agent version {0}.{1}.0 but we have {2}, please update the ebean-agent", MIN_AGENT_MAJOR_VERSION, MIN_AGENT_MINOR_VERSION, agentVersion);
             }
           }
         }
       }
     } catch (IOException e) {
-      log.warn("Could not check minimum ebean-agent version {}.{}.0 required due to - {}", MIN_AGENT_MAJOR_VERSION, MIN_AGENT_MINOR_VERSION, e.getMessage());
+      log.log(WARNING, "Could not check minimum ebean-agent version {0}.{1}.0 required due to - {2}", MIN_AGENT_MAJOR_VERSION, MIN_AGENT_MINOR_VERSION, e.getMessage());
     }
   }
 

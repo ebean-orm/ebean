@@ -38,7 +38,7 @@ class BeanPropertyAssocManyJsonHelp {
     if (!this.many.jsonDeserialize) {
       return;
     }
-    JsonParser parser = readJson.getParser();
+    JsonParser parser = readJson.parser();
     JsonToken event = parser.nextToken();
     if (JsonToken.VALUE_NULL == event) {
       return;
@@ -50,7 +50,7 @@ class BeanPropertyAssocManyJsonHelp {
     if (JsonToken.START_ARRAY != event && JsonToken.START_OBJECT != event) {
       throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start array or object");
     }
-    if (readJson.isIntercept()) {
+    if (readJson.intercept()) {
       many.setValueIntercept(parentBean, many.jsonReadCollection(readJson, parentBean));
     } else {
       many.setValue(parentBean, many.jsonReadCollection(readJson, parentBean));

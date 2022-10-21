@@ -27,7 +27,7 @@ public interface DbReadContext {
   /**
    * Return the DataReader.
    */
-  DataReader getDataReader();
+  DataReader dataReader();
 
   /**
    * Return true if the query is using supplied SQL rather than generated SQL.
@@ -52,7 +52,7 @@ public interface DbReadContext {
   /**
    * Return the persistence context.
    */
-  PersistenceContext getPersistenceContext();
+  PersistenceContext persistenceContext();
 
   /**
    * Register a reference for lazy loading.
@@ -69,7 +69,6 @@ public interface DbReadContext {
    */
   void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
 
-
   /**
    * Set back the bean that has just been loaded with its id.
    */
@@ -78,7 +77,7 @@ public interface DbReadContext {
   /**
    * Return the query mode.
    */
-  SpiQuery.Mode getQueryMode();
+  SpiQuery.Mode queryMode();
 
   /**
    * Return true if the underlying query is a 'asDraft' query.

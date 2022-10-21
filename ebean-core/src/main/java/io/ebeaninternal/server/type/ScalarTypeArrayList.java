@@ -16,14 +16,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static java.util.Collections.EMPTY_LIST;
 
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
@@ -57,6 +51,9 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
         if (valueType.equals(Integer.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
         }
+        if (valueType.equals(Float.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float4", DocPropertyType.DOUBLE, ArrayElementConverter.FLOAT));
+        }
         if (valueType.equals(Double.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
         }
@@ -74,7 +71,7 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
 
     @Override
     public ScalarTypeArrayList typeForEnum(ScalarType<?> scalarType, boolean nullable) {
-      return new ScalarTypeArrayList(nullable, arrayTypeFor(scalarType), scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
+      return new ScalarTypeArrayList(nullable, arrayTypeFor(scalarType), scalarType.docType(), new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 
@@ -89,7 +86,7 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return docPropertyType;
   }
 
@@ -133,7 +130,7 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
     if (nullable) {
       binder.setNull(Types.ARRAY);
     } else {
-      binder.setArray(arrayType, toArray(EMPTY_LIST));
+      binder.setArray(arrayType, EMPTY_ARRAY);
     }
   }
 
@@ -158,7 +155,7 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
   /**
    * Convert from the json types to the proper scalar types (uuid, enum, double etc)
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({"rawtypes", "unchecked"})
   private List convert(List<Object> rawList) {
     List list = new ArrayList(rawList.size());
     for (Object rawVal : rawList) {

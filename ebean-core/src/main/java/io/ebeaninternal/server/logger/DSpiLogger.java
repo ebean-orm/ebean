@@ -1,33 +1,35 @@
 package io.ebeaninternal.server.logger;
 
 import io.ebeaninternal.api.SpiLogger;
-import org.slf4j.Logger;
+
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.TRACE;
 
 final class DSpiLogger implements SpiLogger {
 
-  private final Logger logger;
+  private final System.Logger logger;
 
-  DSpiLogger(Logger logger) {
+  DSpiLogger(System.Logger logger) {
     this.logger = logger;
   }
 
   @Override
   public boolean isDebug() {
-    return logger.isDebugEnabled();
+    return logger.isLoggable(DEBUG);
   }
 
   @Override
   public boolean isTrace() {
-    return logger.isTraceEnabled();
+    return logger.isLoggable(TRACE);
   }
 
   @Override
   public void debug(String msg) {
-    logger.debug(msg);
+    logger.log(DEBUG, msg);
   }
 
   @Override
   public void trace(String msg) {
-    logger.trace(msg);
+    logger.log(TRACE, msg);
   }
 }

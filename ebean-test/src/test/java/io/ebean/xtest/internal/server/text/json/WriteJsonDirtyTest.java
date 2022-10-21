@@ -6,7 +6,7 @@ import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.json.WriteJson;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;

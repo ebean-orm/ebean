@@ -54,37 +54,37 @@ public class ExtendedServerTest extends BaseTestCase {
   @Test
   public void mockClock() {
 
-    Database server = DB.getDefault();
+    Database database = DB.getDefault();
     final Instant snapshot = Instant.now();
     Instant backedSnapshot = snapshot.minus(1, ChronoUnit.DAYS);
     Clock snapshotClock = Clock.fixed(backedSnapshot, Clock.systemUTC().getZone());
 
-    server.extended().setClock(snapshotClock);
+    database.extended().setClock(snapshotClock);
 
     ResetBasicData.reset();
 
-    int count = server
+    int count = database
       .find(Customer.class)
       .where()
       .gt("cretime", snapshot)
       .findCount();
     assertThat(count).isEqualTo(0);
 
-    int count2 = server
+    int count2 = database
       .find(Customer.class)
       .where()
       .ge("cretime", backedSnapshot)
       .findCount();
     assertThat(count2).isGreaterThan(0);
 
-    int count3 = server
+    int count3 = database
       .find(Customer.class)
       .where()
       .gt("updtime", snapshot)
       .findCount();
     assertThat(count3).isEqualTo(0);
 
-    int count4 = server
+    int count4 = database
       .find(Customer.class)
       .where()
       .ge("updtime", backedSnapshot)

@@ -41,6 +41,6 @@ class H2PlatformTest {
   }
 
   private String defaultDefn(DbType type, DatabasePlatform dbPlatform) {
-    return dbPlatform.getDbTypeMap().get(type).renderType(0, 0);
+    return dbPlatform.dbTypeMap().get(type).renderType(0, 0);
   }
 }

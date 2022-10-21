@@ -15,13 +15,11 @@ import org.tests.rawsql.ACustomer;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestRawSqlParsing extends BaseTestCase {
+class TestRawSqlParsing extends BaseTestCase {
 
   @Test
-  public void test() {
-
+  void test() {
     String sql
       = " select order_id, sum(order_qty*unit_price) as totalAmount"
       + " from o_order_detail "
@@ -35,13 +33,12 @@ public class TestRawSqlParsing extends BaseTestCase {
     Sql rs = ((SpiRawSql)rawSql).getSql();
 
     String s = rs.toString();
-    assertTrue(s.contains("[order_id, sum"));
+    assertThat(s).contains("select:order_id, sum");
   }
 
   @Test
   @ForPlatform(Platform.POSTGRES)
-  public void testDoubleColon() {
-
+  void testDoubleColon() {
     ResetBasicData.reset();
 
     String sql = "select id, name from o_customer where name=:name and MD5(id::text) BETWEEN '00000000000000000000000000000000' AND 'ffffffffffffffffffffffffffffffff'";
@@ -59,8 +56,7 @@ public class TestRawSqlParsing extends BaseTestCase {
   }
 
   @Test
-  public void testWhere() {
-
+  void testWhere() {
     ResetBasicData.reset();
 
     RawSql sql = RawSqlBuilder.parse("SELECT id, name FROM o_customer ${where}").create();
@@ -75,8 +71,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
-  public void testUnion() {
-
+  void testUnion() {
     ResetBasicData.reset();
 
     String sql =
@@ -100,10 +95,9 @@ public class TestRawSqlParsing extends BaseTestCase {
     assertThat(sqlOf(query)).contains(") all_split limit 5 offset 1");
   }
 
-
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
-  public void testUnion_explicitWhere() {
+  void testUnion_explicitWhere() {
     ResetBasicData.reset();
 
     String sql =
@@ -135,7 +129,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
-  public void testUnion_explicitAndhere() {
+  void testUnion_explicitAndhere() {
     ResetBasicData.reset();
 
     String sql =
@@ -167,8 +161,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
-  public void testColumnName2() {
-
+  void testColumnName2() {
     ResetBasicData.reset();
 
     String sql = "select 42 custId, 'bar' customerName from o_customer";
@@ -189,8 +182,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
-  public void testColumnAlias() {
-
+  void testColumnAlias() {
     ResetBasicData.reset();
 
     String sql = "select 43 custId, name as custName from o_customer";
@@ -211,8 +203,7 @@ public class TestRawSqlParsing extends BaseTestCase {
 
   @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
-  public void testColumnNameMapping() {
-
+  void testColumnNameMapping() {
     ResetBasicData.reset();
 
     String sql = "select v.custId, v.customerName from (select id custId, name customerName from o_customer) v";

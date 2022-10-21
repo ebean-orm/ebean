@@ -54,7 +54,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R ieq(String value) {
+  public final R ieq(String value) {
     expr().ieq(_name, value);
     return _root;
   }
@@ -65,7 +65,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R iequalTo(String value) {
+  public final R iequalTo(String value) {
     expr().ieq(_name, value);
     return _root;
   }
@@ -76,7 +76,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R like(String value) {
+  public final R like(String value) {
     expr().like(_name, value);
     return _root;
   }
@@ -87,7 +87,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R startsWith(String value) {
+  public final R startsWith(String value) {
     expr().startsWith(_name, value);
     return _root;
   }
@@ -98,7 +98,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R endsWith(String value) {
+  public final R endsWith(String value) {
     expr().endsWith(_name, value);
     return _root;
   }
@@ -109,7 +109,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R contains(String value) {
+  public final R contains(String value) {
     expr().contains(_name, value);
     return _root;
   }
@@ -120,7 +120,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R ilike(String value) {
+  public final R ilike(String value) {
     expr().ilike(_name, value);
     return _root;
   }
@@ -131,7 +131,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R istartsWith(String value) {
+  public final R istartsWith(String value) {
     expr().istartsWith(_name, value);
     return _root;
   }
@@ -142,7 +142,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R iendsWith(String value) {
+  public final R iendsWith(String value) {
     expr().iendsWith(_name, value);
     return _root;
   }
@@ -153,7 +153,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R icontains(String value) {
+  public final R icontains(String value) {
     expr().icontains(_name, value);
     return _root;
   }
@@ -166,7 +166,7 @@ public abstract class PBaseString<R,T> extends PBaseCompareable<R, String> {
    *
    * @param value the match expression
    */
-  public R match(String value) {
+  public final R match(String value) {
     expr().match(_name, value);
     return _root;
   }

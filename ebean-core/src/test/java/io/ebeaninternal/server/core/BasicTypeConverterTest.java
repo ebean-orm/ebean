@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.core.type.BasicTypeConverter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

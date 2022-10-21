@@ -5,16 +5,16 @@ import io.ebean.Expression;
 import io.ebean.Junction;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+
 public class JunctionExpressionTest extends BaseExpressionTest {
 
   Expression eq(String propName, int value) {
     return Expr.eq(propName, value);
   }
 
-
   DefaultExpressionList<?> exp(Expression... expressions) {
-
-    DefaultExpressionList<Object> list = new DefaultExpressionList<>(null, new DefaultExpressionFactory(true, false), null);
+    DefaultExpressionList<Object> list = new DefaultExpressionList<>(null, new DefaultExpressionFactory(true, false), null, new ArrayList<>());
     for (Expression ex : expressions) {
       list.add(ex);
     }

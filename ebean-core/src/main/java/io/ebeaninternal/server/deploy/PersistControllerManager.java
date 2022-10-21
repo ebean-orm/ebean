@@ -7,6 +7,8 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import java.util.List;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 /**
  * Default implementation for creating BeanControllers.
  */
@@ -28,7 +30,7 @@ final class PersistControllerManager {
   void addPersistControllers(DeployBeanDescriptor<?> deployDesc) {
     for (BeanPersistController c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        CoreLog.log.debug("BeanPersistController on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
+        CoreLog.log.log(DEBUG, "BeanPersistController on[{0}] {1}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addPersistController(c);
       }
     }

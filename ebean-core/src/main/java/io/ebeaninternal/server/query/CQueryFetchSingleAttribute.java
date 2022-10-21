@@ -15,11 +15,11 @@ import io.ebeaninternal.server.type.RsetDataReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Base compiled query request for single attribute queries.
@@ -49,23 +49,23 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
     this.request = request;
     this.queryPlan = queryPlan;
     this.query = request.query();
-    this.sql = queryPlan.getSql();
+    this.sql = queryPlan.sql();
     this.desc = request.descriptor();
     this.predicates = predicates;
     this.containsCounts = containsCounts;
-    this.reader = queryPlan.getSingleAttributeScalarType();
+    this.reader = queryPlan.singleAttributeScalarType();
     query.setGeneratedSql(sql);
   }
 
   /**
    * Return a summary description of this query.
    */
-  String getSummary() {
+  String summary() {
     StringBuilder sb = new StringBuilder(80);
     sb.append("FindAttr exeMicros[").append(executionTimeMicros)
       .append("] rows[").append(rowCount)
       .append("] type[").append(desc.name())
-      .append("] predicates[").append(predicates.getLogWhereSql())
+      .append("] predicates[").append(predicates.logWhereSql())
       .append("] bind[").append(bindLog).append("]");
     return sb.toString();
   }
@@ -77,6 +77,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   /**
    * Execute the query returning the row count.
    */
+  @SuppressWarnings({"rawtypes", "unchecked"})
   void findCollection(Collection result) throws SQLException {
     long startNano = System.nanoTime();
     try {
@@ -94,27 +95,27 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
       if (queryPlan.executionTime(executionTimeMicros)) {
         queryPlan.captureBindForQueryPlan(predicates, executionTimeMicros);
       }
-      getTransaction().profileEvent(this);
+      transaction().profileEvent(this);
     } finally {
       close();
     }
   }
 
-  private SpiTransaction getTransaction() {
+  private SpiTransaction transaction() {
     return request.transaction();
   }
 
   /**
    * Return the bind log.
    */
-  String getBindLog() {
+  String bindLog() {
     return bindLog;
   }
 
   /**
    * Return the generated sql.
    */
-  String getGeneratedSql() {
+  String generatedSql() {
     return sql;
   }
 
@@ -122,7 +123,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
     lock.lock();
     try {
       query.checkCancelled();
-      SpiTransaction t = getTransaction();
+      SpiTransaction t = transaction();
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
       pstmt = conn.prepareStatement(sql);
@@ -154,7 +155,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
         dataReader = null;
       }
     } catch (SQLException e) {
-      CoreLog.log.error("Error closing DataReader", e);
+      CoreLog.log.log(ERROR, "Error closing DataReader", e);
     }
     JdbcClose.close(pstmt);
     pstmt = null;
@@ -162,13 +163,13 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
 
   @Override
   public void profile() {
-    getTransaction()
+    transaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
   }
 
-  Set<String> getDependentTables() {
-    return queryPlan.getDependentTables();
+  Set<String> dependentTables() {
+    return queryPlan.dependentTables();
   }
 
   @Override

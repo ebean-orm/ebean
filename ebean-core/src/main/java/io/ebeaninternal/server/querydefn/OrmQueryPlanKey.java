@@ -33,7 +33,7 @@ final class OrmQueryPlanKey implements CQueryPlanKey {
   }
 
   @Override
-  public String getPartialKey() {
+  public String partialKey() {
     return description;
   }
 

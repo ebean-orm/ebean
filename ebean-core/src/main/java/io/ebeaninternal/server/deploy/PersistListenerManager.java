@@ -7,6 +7,8 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import java.util.List;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 /**
  * Manages the assignment/registration of BeanPersistListener with their
  * respective DeployBeanDescriptor's.
@@ -29,7 +31,7 @@ final class PersistListenerManager {
   <T> void addPersistListeners(DeployBeanDescriptor<T> deployDesc) {
     for (BeanPersistListener listener : list) {
       if (listener.isRegisterFor(deployDesc.getBeanType())) {
-        CoreLog.log.debug("BeanPersistListener on[{}] {}", deployDesc.getFullName(), listener.getClass().getName());
+        CoreLog.log.log(DEBUG, "BeanPersistListener on[{0}] {1}", deployDesc.getFullName(), listener.getClass().getName());
         deployDesc.addPersistListener(listener);
       }
     }

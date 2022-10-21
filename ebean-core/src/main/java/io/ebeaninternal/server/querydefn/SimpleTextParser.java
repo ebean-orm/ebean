@@ -144,12 +144,9 @@ public final class SimpleTextParser {
   private boolean isOperator(char c) {
     switch (c) {
       case '<':
-        return true;
-      case '>':
-        return true;
-      case '=':
-        return true;
       case '!':
+      case '=':
+      case '>':
         return true;
 
       default:

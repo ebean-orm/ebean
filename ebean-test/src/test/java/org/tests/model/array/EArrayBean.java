@@ -42,13 +42,18 @@ public class EArrayBean {
   List<BigDecimal> decimals;
 
   @DbArray
-  List<Status> statuses;
+  List<Double> doubs;
+  @DbArray
+  List<Float> floats;
+
+  @DbArray(nullable = false)
+  List<Status> statuses = new ArrayList<>();
 
   @DbArray
   List<VarcharEnum> vcEnums = new ArrayList<>();
 
-  @DbArray
-  List<IntEnum> intEnums = new ArrayList<>();
+  @DbArray @NotNull
+  List<IntEnum> intEnums;
 
   @DbArray
   Set<Status> status2;
@@ -110,6 +115,22 @@ public class EArrayBean {
 
   public void setDecimals(List<BigDecimal> decimals) {
     this.decimals = decimals;
+  }
+
+  public List<Double> getDoubs() {
+    return doubs;
+  }
+
+  public void setDoubs(List<Double> doubs) {
+    this.doubs = doubs;
+  }
+
+  public List<Float> getFloats() {
+    return floats;
+  }
+
+  public void setFloats(List<Float> floats) {
+    this.floats = floats;
   }
 
   public List<Status> getStatuses() {

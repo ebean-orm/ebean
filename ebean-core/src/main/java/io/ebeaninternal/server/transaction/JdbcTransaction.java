@@ -4,7 +4,6 @@ import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.api.*;
@@ -14,7 +13,6 @@ import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.util.Str;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
-import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;
 import javax.persistence.RollbackException;
@@ -23,163 +21,80 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * JDBC Connection based transaction.
  */
 class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
-  private static final Logger log = CoreLog.log;
+  private static final System.Logger log = CoreLog.log;
   private static final Object PLACEHOLDER = new Object();
   private static final String illegalStateMessage = "Transaction is Inactive";
 
-  /**
-   * The associated TransactionManager.
-   */
   final TransactionManager manager;
-
-  /**
-   * The transaction id.
-   */
   private final String id;
-
+  private final String logPrefix;
   private final boolean logSql;
   private final boolean logSummary;
-
+  private final boolean explicit;
+  private final boolean onQueryOnlyCommit;
   /**
    * The user defined label to group execution statistics.
    */
   private String label;
-
-  /**
-   * Flag to indicate if this was an explicitly created Transaction.
-   */
-  private final boolean explicit;
-
-  /**
-   * Behaviour for ending query only transactions.
-   */
-  private final OnQueryOnly onQueryOnly;
-
-  /**
-   * The status of the transaction.
-   */
   private boolean active;
-
   private boolean rollbackOnly;
-
   private boolean nestedUseSavepoint;
-
-  /**
-   * The underlying Connection.
-   */
   Connection connection;
-
-  /**
-   * Used to queue up persist requests for batch execution.
-   */
   private BatchControl batchControl;
-
-  /**
-   * The event which holds persisted beans.
-   */
   private TransactionEvent event;
-
-  /**
-   * Holder of the objects fetched to ensure unique objects are used.
-   */
   private SpiPersistenceContext persistenceContext;
-
-  /**
-   * Used to give developers more control over the insert update and delete
-   * functionality.
-   */
   private boolean persistCascade = true;
-
-  /**
-   * Flag used for performance to skip commit or rollback of query only
-   * transactions in read committed transaction isolation.
-   */
   private boolean queryOnly = true;
-
   private boolean localReadOnly;
-
   private Boolean updateAllLoadedProperties;
-
   private boolean oldBatchMode;
-
   private boolean batchMode;
-
   private boolean batchOnCascadeMode;
-
   private int batchSize = -1;
-
   private boolean batchFlushOnQuery = true;
-
   private Boolean batchGetGeneratedKeys;
-
   private Boolean batchFlushOnMixed;
-
-  private final String logPrefix;
-
   private Object tenantId;
-
   /**
    * The depth used by batch processing to help the ordering of statements.
    */
   private int depth;
-
-  /**
-   * Set to true if the connection has autoCommit=true initially.
-   */
   private boolean autoCommit;
-
   private IdentityHashMap<Object, Object> persistingBeans;
-
   private HashSet<Integer> deletingBeansHash;
-
   private HashMap<String, String> m2mIntersectionSave;
-
   private Map<String, Object> userObjects;
-
   private List<TransactionCallback> callbackList;
-
   private boolean batchOnCascadeSet;
-
   private TChangeLogHolder changeLogHolder;
-
   private List<PersistDeferredRelationship> deferredList;
-
   /**
    * The mode for updating doc store indexes for this transaction.
    * Only set when you want to override the default behavior.
    */
   private DocStoreMode docStoreMode;
-
   private int docStoreBatchSize;
-
   /**
    * Explicit control over skipCache.
    */
   private Boolean skipCache;
-
   /**
    * Default skip cache behavior from {@link DatabaseConfig#isSkipCacheAfterWrite()}.
    */
   private final boolean skipCacheAfterWrite;
-
   DocStoreTransaction docStoreTxn;
-
   private ProfileStream profileStream;
-
   private ProfileLocation profileLocation;
-
   private final long startNanos;
-
   private boolean autoPersistUpdates;
 
-  /**
-   * Create a new JdbcTransaction.
-   */
   JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
     try {
       this.active = true;
@@ -190,14 +105,13 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       this.connection = connection;
       this.persistenceContext = new DefaultPersistenceContext();
       this.startNanos = System.nanoTime();
-
       if (manager == null) {
         this.logSql = false;
         this.logSummary = false;
         this.skipCacheAfterWrite = true;
         this.batchMode = false;
         this.batchOnCascadeMode = false;
-        this.onQueryOnly = OnQueryOnly.ROLLBACK;
+        this.onQueryOnlyCommit = false;
       } else {
         this.autoPersistUpdates = explicit && manager.isAutoPersistUpdates();
         this.logSql = manager.isLogSql();
@@ -205,7 +119,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
         this.batchMode = manager.isPersistBatch();
         this.batchOnCascadeMode = manager.isPersistBatchOnCascade();
-        this.onQueryOnly = manager.onQueryOnly();
+        this.onQueryOnlyCommit = true;
       }
 
       checkAutoCommit(connection);
@@ -356,7 +270,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         try {
           consumer.accept(callbackList.get(i));
         } catch (Exception e) {
-          log.error("Error executing transaction callback", e);
+          log.log(ERROR, "Error executing transaction callback", e);
         }
       }
     }
@@ -494,7 +408,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public final void depthDecrement() {
     if (depth != 0) {
-      depth += -1;
+      depth -= 1;
     }
   }
 
@@ -510,9 +424,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public boolean isReadOnly() {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     try {
       return connection.isReadOnly();
     } catch (SQLException e) {
@@ -522,9 +433,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public void setReadOnly(boolean readOnly) {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     try {
       localReadOnly = readOnly;
       connection.setReadOnly(readOnly);
@@ -545,9 +453,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public final void setBatchMode(boolean batchMode) {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     this.batchMode = batchMode;
   }
 
@@ -558,9 +463,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public final void setBatchOnCascade(boolean batchMode) {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     this.batchOnCascadeMode = batchMode;
   }
 
@@ -752,9 +654,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public final void flush() {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     internalBatchFlush();
   }
 
@@ -793,9 +692,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public final void setPersistenceContext(SpiPersistenceContext context) {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     this.persistenceContext = context;
   }
 
@@ -862,9 +758,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public Connection getInternalConnection() {
-    if (!isActive()) {
-      throw new IllegalStateException(illegalStateMessage);
-    }
     return connection;
   }
 
@@ -884,7 +777,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         connection.setReadOnly(false);
       }
     } catch (SQLException e) {
-      log.error("Error setting to readOnly?", e);
+      log.log(ERROR, "Error setting to readOnly?", e);
     }
     try {
       if (autoCommit) {
@@ -892,14 +785,14 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         connection.setAutoCommit(true);
       }
     } catch (SQLException e) {
-      log.error("Error setting to readOnly?", e);
+      log.log(ERROR, "Error setting to readOnly?", e);
     }
     try {
       connection.close();
     } catch (Exception ex) {
       // the connection pool will automatically remove the
       // connection if it does not pass the test
-      log.error("Error closing connection", ex);
+      log.log(ERROR, "Error closing connection", ex);
     }
     connection = null;
     active = false;
@@ -925,14 +818,14 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private void connectionEndForQueryOnly() {
     try {
       withEachCallback(TransactionCallback::preCommit);
-      if (onQueryOnly == OnQueryOnly.COMMIT) {
+      if (onQueryOnlyCommit) {
         performCommit();
       } else {
         performRollback();
       }
       withEachCallback(TransactionCallback::postCommit);
     } catch (SQLException e) {
-      log.error("Error when ending a query only transaction via " + onQueryOnly, e);
+      log.log(ERROR, "Error when ending a query only transaction", e);
     }
   }
 
@@ -1009,7 +902,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (rollbackOnly) {
       return;
     }
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -1034,7 +927,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       rollback();
       return;
     }
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -1059,7 +952,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private RuntimeException wrapIfNeeded(Exception e) {
     if (e instanceof PersistenceException) {
       // keep more specific exception if we have it
-      return (PersistenceException)e;
+      return (PersistenceException) e;
     }
     return new RollbackException(e);
   }
@@ -1103,6 +996,22 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     this.nestedUseSavepoint = true;
   }
 
+  @Override
+  public void rollbackAndContinue() {
+    if (!active) {
+      throw new IllegalStateException(illegalStateMessage);
+    }
+    internalBatchClear();
+    if (changeLogHolder != null) {
+      changeLogHolder.clear();
+    }
+    try {
+      performRollback();
+    } catch (SQLException ex) {
+      throw new PersistenceException(ex);
+    }
+  }
+
   /**
    * Rollback the transaction.
    */
@@ -1117,7 +1026,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public void rollback(Throwable cause) throws PersistenceException {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -1155,7 +1064,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   @Override
   public void end() throws PersistenceException {
-    if (isActive()) {
+    if (active) {
       rollback();
     }
   }

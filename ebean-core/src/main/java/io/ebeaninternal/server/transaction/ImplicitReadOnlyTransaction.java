@@ -17,6 +17,8 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Read only transaction expected to use autoCommit connection and for implicit use only.
  * <p>
@@ -238,7 +240,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public boolean isReadOnly() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -250,7 +252,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public void setReadOnly(boolean readOnly) {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     try {
@@ -401,7 +403,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void setPersistenceContext(SpiPersistenceContext context) {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     this.persistenceContext = context;
@@ -463,7 +465,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public Connection getInternalConnection() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     return connection;
@@ -483,7 +485,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     } catch (Exception ex) {
       // the connection pool will automatically remove the
       // connection if it does not pass the test
-      CoreLog.log.error("Error closing connection", ex);
+      CoreLog.log.log(ERROR, "Error closing connection", ex);
     }
     connection = null;
     active = false;
@@ -506,7 +508,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void commit() {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     // expect AutoCommit so just deactivate / put back into pool
@@ -530,6 +532,11 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     throw new IllegalStateException(notExpectedMessage);
   }
 
+  @Override
+  public void rollbackAndContinue() {
+    // do nothing
+  }
+
   /**
    * Rollback the transaction.
    */
@@ -544,7 +551,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void rollback(Throwable cause) throws PersistenceException {
-    if (!isActive()) {
+    if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
     // expect AutoCommit so it really has already committed

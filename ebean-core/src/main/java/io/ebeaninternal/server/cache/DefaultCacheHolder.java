@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.cache;
 
+import io.avaje.applog.AppLog;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.CacheBeanTuning;
 import io.ebean.annotation.CacheQueryTuning;
@@ -7,20 +8,21 @@ import io.ebean.cache.*;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.util.AnnotationUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.TRACE;
+
 /**
  * Manages the construction of caches.
  */
 final class DefaultCacheHolder {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.cache.ALL");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.cache.ALL");
 
   private final ReentrantLock lock = new ReentrantLock();
   private final ConcurrentHashMap<String, ServerCache> allCaches = new ConcurrentHashMap<>();
@@ -89,7 +91,7 @@ final class DefaultCacheHolder {
   }
 
   void clearAll() {
-    log.debug("clearAll");
+    log.log(DEBUG, "clearAll");
     for (ServerCache serverCache : allCaches.values()) {
       serverCache.clear();
     }
@@ -97,7 +99,7 @@ final class DefaultCacheHolder {
 
 
   public void clear(String name) {
-    log.debug("clear {}", name);
+    log.log(DEBUG, "clear {0}", name);
     clearIfExists(key(name, ServerCacheType.QUERY));
     clearIfExists(key(name, ServerCacheType.BEAN));
     clearIfExists(key(name, ServerCacheType.NATURAL_KEY));
@@ -112,7 +114,7 @@ final class DefaultCacheHolder {
   private void clearIfExists(String fullKey) {
     ServerCache cache = allCaches.get(fullKey);
     if (cache != null) {
-      log.trace("clear cache {}", fullKey);
+      log.log(TRACE, "clear cache {0}", fullKey);
       cache.clear();
     }
   }

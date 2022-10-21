@@ -155,7 +155,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    * Return the property value as an entity bean.
    */
   @Override
-  public EntityBean getValueAsEntityBean(EntityBean owner) {
+  public EntityBean valueAsEntityBean(EntityBean owner) {
     return (EntityBean) getValue(owner);
   }
 
@@ -780,7 +780,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     if (value == null) {
       writeJson.writeNullField(name);
     } else {
-      if (!writeJson.isParentBean(value)) {
+      if (!writeJson.parentBean(value)) {
         // Hmmm, not writing complex non-entity bean
         if (value instanceof EntityBean) {
           writeJson.beginAssocOne(name, bean);
@@ -792,12 +792,13 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void jsonRead(SpiJsonReader readJson, EntityBean bean) throws IOException {
     if (jsonDeserialize && targetDescriptor != null) {
       T target = (T) value(bean);
       T assocBean = targetDescriptor.jsonRead(readJson, name, target);
-      if (readJson.isIntercept()) {
+      if (readJson.intercept()) {
         setValueIntercept(bean, assocBean);
       } else {
         setValue(bean, assocBean);

@@ -38,7 +38,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
     this.request = request;
     this.queryPlan = queryPlan;
     this.query = request.query();
-    this.sql = queryPlan.getSql();
+    this.sql = queryPlan.sql();
     this.desc = request.descriptor();
     this.predicates = predicates;
     query.setGeneratedSql(sql);
@@ -47,14 +47,14 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
   /**
    * Return the bind log.
    */
-  public String getBindLog() {
+  public String bindLog() {
     return bindLog;
   }
 
   /**
    * Return the generated sql.
    */
-  public String getGeneratedSql() {
+  public String generatedSql() {
     return sql;
   }
 
@@ -64,7 +64,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
   public int execute() throws SQLException {
     long startNano = System.nanoTime();
     try {
-      SpiTransaction t = getTransaction();
+      SpiTransaction t = transaction();
       profileOffset = t.profileOffset();
       Connection conn = t.getInternalConnection();
       lock.lock();
@@ -97,7 +97,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
     return executionTimeMicros;
   }
 
-  private SpiTransaction getTransaction() {
+  private SpiTransaction transaction() {
     return request.transaction();
   }
 
@@ -111,7 +111,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
 
   @Override
   public void profile() {
-    getTransaction()
+    transaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
   }

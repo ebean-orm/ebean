@@ -24,7 +24,7 @@ public class MySqlDdl extends PlatformDdl {
     this.dropUniqueConstraint = "drop index";
     this.historyDdl = new MySqlHistoryDdl();
     this.inlineComments = true;
-    this.useMigrationStoredProcedures = platform.isUseMigrationStoredProcedures();
+    this.useMigrationStoredProcedures = platform.useMigrationStoredProcedures();
   }
 
   /**

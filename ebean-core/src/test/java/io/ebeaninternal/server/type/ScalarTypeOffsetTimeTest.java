@@ -13,7 +13,7 @@ public class ScalarTypeOffsetTimeTest {
   @Test
   public void testGetLength() throws Exception {
 
-    assertEquals(25, type.getLength());
+    assertEquals(25, type.length());
   }
 
   @Test

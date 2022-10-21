@@ -41,7 +41,7 @@ final class DetermineAggPath {
       }
     }
 
-    throw new IllegalArgumentException("Could not find path in aggregation formula [" + aggregation + "]");
+    throw new IllegalArgumentException("Could not find path in aggregation formula " + aggregation);
   }
 
   private static boolean isNamePart(char ch) {
@@ -94,7 +94,7 @@ final class DetermineAggPath {
           pos = pos + 1;
           continue;
         }
-        throw new IllegalArgumentException("Can not find path to many in aggregation formula [" + aggregation + "]");
+        throw new IllegalArgumentException("Can not find path to many in aggregation formula " + aggregation);
       }
     }
   }

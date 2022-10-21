@@ -9,7 +9,6 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
-import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
 import javax.persistence.OptimisticLockException;
@@ -204,10 +203,6 @@ public interface Database {
    */
   <T> T createEntityBean(Class<T> type);
 
-  /**
-   * Create a CsvReader for a given beanType.
-   */
-  <T> CsvReader<T> createCsvReader(Class<T> beanType);
 
   /**
    * Create an Update query to perform a bulk update.
@@ -847,13 +842,13 @@ public interface Database {
    * Save all the beans.
    */
   int saveAll(Object... beans) throws OptimisticLockException;
-  
+
   /**
    * This will visit all beans in the persist graph on a given object
    * <code>start</code>. It will call the visitor for each dirty bean that would
    * be saved with {@link #save(Object)} or {@link #saveAll(Collection)}. You can
    * use this method to implement custom validations.
-   * 
+   *
    * @param start   could be a bean, a list of beans or a map of beans.
    * @param visitor the visitor
    */
@@ -1529,10 +1524,12 @@ public interface Database {
    * Starts the database and runs db-migration or ddl. Normally the server is
    * started automatically when the teantMode supports ddl-generation and start is
    * not skipped by server config.
-   * 
-   * In a multi tenancy environment, you may have call start multiple times for
+   * <p>
+   * In a multi tenancy environment, you may have call runMigration multiple times for
    * each tenant to initialize the database.
    */
   void start();
+
+  void runMigration();
 
 }

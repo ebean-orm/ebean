@@ -10,10 +10,9 @@ import java.io.IOException;
 /**
  * A 'Delete by Id' request that is send to the document store.
  */
-public class DocStoreDeleteEvent implements DocStoreUpdate {
+public final class DocStoreDeleteEvent implements DocStoreUpdate {
 
   private final BeanType<?> beanType;
-
   private final Object idValue;
 
   public DocStoreDeleteEvent(BeanType<?> beanType, Object idValue) {

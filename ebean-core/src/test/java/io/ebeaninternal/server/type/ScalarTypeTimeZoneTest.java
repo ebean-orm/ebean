@@ -10,6 +10,6 @@ class ScalarTypeTimeZoneTest {
 
   @Test
   void getLength() {
-    assertEquals(32, type.getLength());
+    assertEquals(32, type.length());
   }
 }

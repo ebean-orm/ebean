@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
-import io.ebean.text.TextException;
+import io.ebean.core.type.ScalarTypeBase;
 
 import javax.persistence.EnumType;
 import java.io.DataInput;
@@ -73,7 +73,7 @@ final class ScalarTypeEnumStandard {
     }
 
     @Override
-    public int getLength() {
+    public int length() {
       return length;
     }
 
@@ -163,8 +163,7 @@ final class ScalarTypeEnumStandard {
         return null;
       } else {
         if (ordinal < 0 || ordinal >= enumArray.length) {
-          String m = "Unexpected ordinal [" + ordinal + "] out of range [" + enumArray.length + "]";
-          throw new IllegalStateException(m);
+          throw new IllegalStateException("Unexpected ordinal " + ordinal + " out of range " + enumArray.length);
         }
         return enumArray[ordinal];
       }
@@ -196,8 +195,7 @@ final class ScalarTypeEnumStandard {
         ordinal = Integer.parseInt(dbValue.toString());
       }
       if (ordinal < 0 || ordinal >= enumArray.length) {
-        String m = "Unexpected ordinal [" + ordinal + "] out of range [" + enumArray.length + "]";
-        throw new IllegalStateException(m);
+        throw new IllegalStateException("Unexpected ordinal " + ordinal + " out of range " + enumArray.length);
       }
       return enumArray[ordinal];
     }
@@ -248,7 +246,7 @@ final class ScalarTypeEnumStandard {
     }
 
     @Override
-    public DocPropertyType getDocType() {
+    public DocPropertyType docType() {
       return DocPropertyType.ENUM;
     }
 

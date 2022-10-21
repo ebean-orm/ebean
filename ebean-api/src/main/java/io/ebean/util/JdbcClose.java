@@ -1,19 +1,20 @@
 package io.ebean.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.ebean.EbeanVersion;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * Utility for closing raw Jdbc resources.
  */
 public final class JdbcClose {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean");
+  private static final System.Logger log = EbeanVersion.log;
 
   /**
    * Close the resultSet logging if an error occurs.
@@ -24,7 +25,7 @@ public final class JdbcClose {
         statement.close();
       }
     } catch (SQLException e) {
-      log.warn("Error closing statement", e);
+      log.log(WARNING, "Error closing statement", e);
     }
   }
 
@@ -37,7 +38,7 @@ public final class JdbcClose {
         resultSet.close();
       }
     } catch (SQLException e) {
-      log.warn("Error closing resultSet", e);
+      log.log(WARNING, "Error closing resultSet", e);
     }
   }
 
@@ -50,7 +51,7 @@ public final class JdbcClose {
         connection.close();
       }
     } catch (SQLException e) {
-      log.warn("Error closing connection", e);
+      log.log(WARNING, "Error closing connection", e);
     }
   }
 
@@ -63,7 +64,7 @@ public final class JdbcClose {
         connection.rollback();
       }
     } catch (SQLException e) {
-      log.warn("Error on connection rollback", e);
+      log.log(WARNING, "Error on connection rollback", e);
     }
   }
 
@@ -76,7 +77,7 @@ public final class JdbcClose {
         stmt.cancel();
       }
     } catch (SQLException e) {
-      log.warn("Error on cancelling statement", e);
+      log.log(WARNING, "Error on cancelling statement", e);
     }
   }
 }

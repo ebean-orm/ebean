@@ -19,7 +19,7 @@ class PostgresPlatformTest {
     PostgresPlatform platform = new PostgresPlatform();
     platform.configure(new PlatformConfig());
 
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     String columnDefn = dbType.renderType(0, 0);
 
     assertThat(columnDefn).isEqualTo("uuid");
@@ -85,7 +85,7 @@ class PostgresPlatformTest {
   }
 
   private String defaultDefn(DbType type, DatabasePlatform dbPlatform) {
-    return dbPlatform.getDbTypeMap().get(type).renderType(0, 0);
+    return dbPlatform.dbTypeMap().get(type).renderType(0, 0);
   }
 
 }

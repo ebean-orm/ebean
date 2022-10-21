@@ -78,10 +78,14 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void rollback() throws PersistenceException {
+  public void rollbackAndContinue() {
     // do nothing
   }
 
+  @Override
+  public void rollback() throws PersistenceException {
+    // do nothing
+  }
 
   @Override
   public void rollback(Throwable e) throws PersistenceException {

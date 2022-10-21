@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Property mapped to a List Set or Map.
  */
@@ -332,7 +334,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public void lazyLoadMany(EntityBean current) {
-    EntityBean parentBean = childMasterProperty.getValueAsEntityBean(current);
+    EntityBean parentBean = childMasterProperty.valueAsEntityBean(current);
     if (parentBean != null) {
       addBeanToCollectionWithCreate(parentBean, current, true);
     }
@@ -673,7 +675,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         }
       } catch (PersistenceException e) {
         // not found as individual scalar properties
-        CoreLog.log.error("Could not find a exported property?", e);
+        CoreLog.log.log(ERROR, "Could not find a exported property?", e);
       }
     } else {
       if (idProp != null) {
@@ -722,7 +724,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         }
       }
     }
-    throw new RuntimeException("Can not find Master [" + beanType + "] in Child[" + targetDesc + "]");
+    throw new RuntimeException("Can not find Master " + beanType + " in Child " + targetDesc);
   }
 
   /**
@@ -738,7 +740,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     }
     String from = descriptor.fullName();
     String to = targetDesc.fullName();
-    throw new PersistenceException(from + ": Could not find mapKey property [" + mapKey + "] on [" + to + "]");
+    throw new PersistenceException(from + ": Could not find mapKey property " + mapKey + " on " + to);
   }
 
   public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, List<Object> excludeDetailIds) {
@@ -968,7 +970,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         setValue(bean, collection);
       }
     } catch (Exception e) {
-      CoreLog.log.error("Error setting value from L2 cache", e);
+      CoreLog.log.log(ERROR, "Error setting value from L2 cache", e);
     }
   }
 
@@ -981,7 +983,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       }
       return jsonWriteCollection(collection);
     } catch (Exception e) {
-      CoreLog.log.error("Error building value element collection json for L2 cache", e);
+      CoreLog.log.log(ERROR, "Error building value element collection json for L2 cache", e);
       return null;
     }
   }
@@ -1002,7 +1004,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   private Object jsonReadCollection(String json) throws IOException {
     SpiJsonReader ctx = descriptor.createJsonReader(json);
-    JsonParser parser = ctx.getParser();
+    JsonParser parser = ctx.parser();
     JsonToken event = parser.nextToken();
     if (JsonToken.VALUE_NULL == event) {
       return null;

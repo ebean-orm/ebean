@@ -94,7 +94,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public BeanProperty[] getEncryptedProps() {
+  public BeanProperty[] encryptedProps() {
     if (encryptedProps == null) {
       return null;
     }
@@ -125,13 +125,13 @@ final class DefaultDbSqlContext implements DbSqlContext {
     sb.append(" ").append(type);
     boolean addAsOfOnClause = false;
     if (draftSupport != null) {
-      appendTable(table, draftSupport.getDraftTable(table));
+      appendTable(table, draftSupport.draftTable(table));
     } else if (!historyQuery) {
       sb.append(" ").append(table).append(" ");
     } else {
       // check if there is an associated history table and if so
       // use the unionAll view - we expect an additional predicate to match
-      String asOfView = historySupport.getAsOfView(table);
+      String asOfView = historySupport.asOfView(table);
       appendTable(table, asOfView);
       if (asOfView != null) {
         if (historySupport.isStandardsBased()) {
@@ -161,7 +161,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
       }
     }
     if (addAsOfOnClause) {
-      sb.append(" and ").append(historySupport.getAsOfPredicate(a2));
+      sb.append(" and ").append(historySupport.asOfPredicate(a2));
       asOfTableCount++;
     }
     if (extraWhere != null && !extraWhere.isEmpty()) {
@@ -191,17 +191,17 @@ final class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public String getTableAlias(String prefix) {
-    return alias.getTableAlias(prefix);
+  public String tableAlias(String prefix) {
+    return alias.tableAlias(prefix);
   }
 
   @Override
-  public String getTableAliasManyWhere(String prefix) {
-    return alias.getTableAliasManyWhere(prefix);
+  public String tableAliasManyWhere(String prefix) {
+    return alias.tableAliasManyWhere(prefix);
   }
 
   @Override
-  public String getRelativePrefix(String propName) {
+  public String relativePrefix(String propName) {
     return currentPrefix == null ? propName : currentPrefix + "." + propName;
   }
 
@@ -209,7 +209,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   public void pushTableAlias(String prefix) {
     prefixStack.push(currentPrefix);
     currentPrefix = prefix;
-    tableAliasStack.push(getTableAlias(prefix));
+    tableAliasStack.push(tableAlias(prefix));
   }
 
   @Override
@@ -227,7 +227,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   @Override
   public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String manyWhere) {
     // replace ${ta} placeholder with the real table alias...
-    String tableAlias = manyWhere == null ? tableAliasStack.peek() : getTableAliasManyWhere(manyWhere);
+    String tableAlias = manyWhere == null ? tableAliasStack.peek() : tableAliasManyWhere(manyWhere);
     String converted = sqlFormulaJoin.replace(tableAliasPlaceHolder, tableAlias);
     if (formulaJoins == null) {
       formulaJoins = new HashSet<>();
@@ -272,10 +272,10 @@ final class DefaultDbSqlContext implements DbSqlContext {
   public void appendHistorySysPeriod() {
     String tableAlias = tableAliasStack.peek();
     sb.append(COMMA);
-    sb.append(historySupport.getSysPeriodLower(tableAlias));
+    sb.append(historySupport.sysPeriodLower(tableAlias));
     appendColumnAlias();
     sb.append(COMMA);
-    sb.append(historySupport.getSysPeriodUpper(tableAlias));
+    sb.append(historySupport.sysPeriodUpper(tableAlias));
     appendColumnAlias();
   }
 
@@ -325,7 +325,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public String getContent() {
+  public String content() {
     String s = sb.toString();
     sb = new StringBuilder(STRING_BUILDER_INITIAL_CAPACITY);
     return s;

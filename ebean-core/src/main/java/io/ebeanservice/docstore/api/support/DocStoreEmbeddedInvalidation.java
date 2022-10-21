@@ -9,7 +9,6 @@ import io.ebeanservice.docstore.api.DocStoreUpdates;
 public class DocStoreEmbeddedInvalidation {
 
   protected final String queueId;
-
   protected final String path;
 
   public DocStoreEmbeddedInvalidation(String queueId, String path) {

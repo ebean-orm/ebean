@@ -6,18 +6,19 @@ import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TJodaEntity;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestJodaType extends BaseTestCase {
+class TestJodaType extends BaseTestCase {
 
   @Test
-  public void test() {
-
+  void test() {
     SpiEbeanServer server = (SpiEbeanServer) DB.getDefault();
     BeanDescriptor<TJodaEntity> beanDescriptor = server.descriptor(TJodaEntity.class);
     BeanProperty beanProperty = beanDescriptor.beanProperty("localTime");
@@ -27,8 +28,7 @@ public class TestJodaType extends BaseTestCase {
   }
 
   @Test
-  public void test_insert_find() {
-
+  void test_insert_find() {
     LocalTime now = new LocalTime().withMillisOfSecond(0);
 
     TJodaEntity bean = new TJodaEntity();
@@ -40,4 +40,19 @@ public class TestJodaType extends BaseTestCase {
     assertThat(foundBean.getLocalTime()).isEqualTo(bean.getLocalTime());
   }
 
+  @Test
+  void toJson() {
+    LocalTime now = new LocalTime();
+
+    TJodaEntity bean = new TJodaEntity();
+    bean.setId(42);
+    bean.setLocalTime(now);
+    bean.setLocalDate(LocalDate.parse("2022-04-07"));
+
+    String json = DB.json().toJson(bean);
+    TJodaEntity bean1 = DB.json().toBean(TJodaEntity.class, json);
+
+    assertEquals(bean1.getLocalTime(), now);
+    assertEquals(bean1.getLocalDate(), LocalDate.parse("2022-04-07"));
+  }
 }

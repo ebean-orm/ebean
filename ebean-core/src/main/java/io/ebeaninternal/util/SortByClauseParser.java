@@ -38,7 +38,7 @@ public final class SortByClauseParser {
     }
     String[] words = section.split(" ");
     if (words.length < 1 || words.length > 3) {
-      throw new RuntimeException("Expecting 1 to 3 words in [" + section + "] but got [" + words.length + "]");
+      throw new RuntimeException("Expecting 1 to 3 words in [" + section + "] but got " + words.length);
     }
 
     Boolean nullsHigh = null;
@@ -71,8 +71,7 @@ public final class SortByClauseParser {
     if (SortByClause.NULLSLOW.equalsIgnoreCase(word)) {
       return Boolean.FALSE;
     }
-    String m = "Expecting nullsHigh or nullsLow but got [" + word + "] in [" + rawSortBy + "]";
-    throw new RuntimeException(m);
+    throw new RuntimeException("Expecting nullsHigh or nullsLow but got [" + word + "] in " + rawSortBy);
   }
 
 
@@ -83,8 +82,7 @@ public final class SortByClauseParser {
     if (SortByClause.DESC.equalsIgnoreCase(word)) {
       return false;
     }
-    String m = "Expect ASC or DESC but got [" + word + "] in [" + rawSortBy + "]";
-    throw new RuntimeException(m);
+    throw new RuntimeException("Expect ASC or DESC but got " + word + " in " + rawSortBy);
   }
 
 }

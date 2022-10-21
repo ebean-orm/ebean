@@ -23,7 +23,7 @@ public final class CharMatch {
       return false;
     }
 
-    char ta[] = other.toCharArray();
+    char[] ta = other.toCharArray();
 
     int pos = -1;
     while (++pos < maxLength) {
@@ -42,7 +42,7 @@ public final class CharMatch {
       return false;
     }
 
-    char ta[] = other.toCharArray();
+    char[] ta = other.toCharArray();
 
     int offset = ta.length - maxLength;
     int pos = maxLength;

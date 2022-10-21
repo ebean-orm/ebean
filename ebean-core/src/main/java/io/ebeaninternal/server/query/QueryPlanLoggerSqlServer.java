@@ -3,13 +3,15 @@ package io.ebeaninternal.server.query;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryPlan;
-import io.ebeaninternal.server.type.bindcapture.BindCapture;
+import io.ebeaninternal.server.bind.capture.BindCapture;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * A QueryPlanLogger for SqlServer. It will return the plan as XML, which can be opened in
@@ -24,7 +26,7 @@ public final class QueryPlanLoggerSqlServer extends QueryPlanLogger {
     try (Statement stmt = conn.createStatement()) {
       stmt.execute("set statistics xml on");
       stmt.execute("begin transaction");
-      try (PreparedStatement explainStmt = conn.prepareStatement(plan.getSql())) {
+      try (PreparedStatement explainStmt = conn.prepareStatement(plan.sql())) {
         bind.prepare(explainStmt, conn);
 
         try (ResultSet rset = explainStmt.executeQuery()) {
@@ -42,13 +44,13 @@ public final class QueryPlanLoggerSqlServer extends QueryPlanLogger {
         return createPlan(plan, bind.toString(), xml);
 
       } catch (SQLException e) {
-        CoreLog.log.warn("Could not log query plan", e);
+        CoreLog.log.log(WARNING, "Could not log query plan", e);
         return null;
       } finally {
         stmt.execute("set statistics xml off");
       }
     } catch (SQLException e) {
-      CoreLog.log.warn("Could not log query plan", e);
+      CoreLog.log.log(WARNING, "Could not log query plan", e);
       return null;
     }
   }

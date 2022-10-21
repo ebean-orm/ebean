@@ -9,6 +9,8 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 /**
  * Build the DtoMeta for a bean.
  * <p>
@@ -39,7 +41,7 @@ final class DtoMetaBuilder {
           final String name = propertyName(method.getName());
           properties.add(new DtoMetaProperty(typeManager, dtoType, method, name));
         } catch (Exception e) {
-          CoreLog.log.debug("exclude on " + dtoType + " method " + method, e);
+          CoreLog.log.log(DEBUG, "exclude on " + dtoType + " method " + method, e);
         }
       }
     }
@@ -77,7 +79,7 @@ final class DtoMetaBuilder {
         constructorList.add(new DtoMetaConstructor(typeManager, constructor, dtoType));
       } catch (Exception e) {
         // we don't want that constructor
-        CoreLog.log.debug("exclude on " + dtoType + " constructor " + constructor, e);
+        CoreLog.log.log(DEBUG, "exclude on " + dtoType + " constructor " + constructor, e);
       }
     }
   }

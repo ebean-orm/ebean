@@ -41,9 +41,4 @@
     </profile>
   </profiles>
 
-
-  <scm>
-    <tag>ebean-parent-13.3.1-FOC1</tag>
-    <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
-  </scm>
 </project>

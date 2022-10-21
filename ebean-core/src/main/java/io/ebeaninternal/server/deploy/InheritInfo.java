@@ -197,7 +197,7 @@ public final class InheritInfo {
    * Return the associated InheritInfo for this DB row read.
    */
   public InheritInfo readType(DbReadContext ctx) throws SQLException {
-    return readType(ctx.getDataReader().getString());
+    return readType(ctx.dataReader().getString());
   }
 
   /**
@@ -354,7 +354,7 @@ public final class InheritInfo {
 
   @Override
   public String toString() {
-    return "InheritInfo[" + type.getName() + "] disc[" + discriminatorStringValue + "]";
+    return "InheritInfo " + type.getName() + " disc:" + discriminatorStringValue;
   }
 
 }

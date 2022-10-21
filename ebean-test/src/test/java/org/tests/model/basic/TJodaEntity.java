@@ -1,5 +1,6 @@
 package org.tests.model.basic;
 
+import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 
 import javax.persistence.Entity;
@@ -12,6 +13,7 @@ public class TJodaEntity {
   Integer id;
 
   LocalTime localTime;
+  LocalDate localDate;
 
   public Integer getId() {
     return id;
@@ -29,4 +31,12 @@ public class TJodaEntity {
     this.localTime = localTime;
   }
 
+  public LocalDate getLocalDate() {
+    return localDate;
+  }
+
+  public TJodaEntity setLocalDate(LocalDate localDate) {
+    this.localDate = localDate;
+    return this;
+  }
 }

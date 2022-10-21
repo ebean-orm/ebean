@@ -11,26 +11,26 @@ class OraclePlatformTest {
   @Test
   void columnAliasPrefix_Oracle11Platform() {
     Oracle11Platform platform11 = new Oracle11Platform();
-    assertThat(platform11.getColumnAliasPrefix()).isEqualTo("c");
+    assertThat(platform11.columnAliasPrefix()).isEqualTo("c");
   }
 
   @Test
   void columnAliasPrefix_Oracle12Platform() {
     Oracle12Platform platform12 = new Oracle12Platform();
-    assertThat(platform12.getColumnAliasPrefix()).isEqualTo("c");
+    assertThat(platform12.columnAliasPrefix()).isEqualTo("c");
   }
 
   @Test
   void columnAliasPrefix_OraclePlatform() {
     OraclePlatform platform = new OraclePlatform();
-    assertThat(platform.getColumnAliasPrefix()).isNull();
+    assertThat(platform.columnAliasPrefix()).isNull();
   }
 
   @Test
   void uuid_default() {
     OraclePlatform platform = new OraclePlatform();
     platform.configure(new PlatformConfig());
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("varchar2(40)");
   }
 
@@ -42,7 +42,7 @@ class OraclePlatformTest {
 
     platform.configure(config);
 
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("raw(16)");
   }
 }

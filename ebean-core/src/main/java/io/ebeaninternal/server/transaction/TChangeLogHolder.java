@@ -96,4 +96,7 @@ public final class TChangeLogHolder {
     owner.sendChangeLog(changes);
   }
 
+  void clear() {
+    changes.getChanges().clear();
+  }
 }

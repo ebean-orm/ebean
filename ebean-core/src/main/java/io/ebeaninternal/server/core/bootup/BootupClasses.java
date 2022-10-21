@@ -14,7 +14,6 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.plugin.CustomDeployParser;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
-import org.slf4j.Logger;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Embeddable;
@@ -26,13 +25,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Interesting classes for a EbeanServer such as Embeddable, Entity,
  * ScalarTypes, Finders, Listeners and Controllers.
  */
 public class BootupClasses implements Predicate<Class<?>> {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final List<Class<?>> embeddableList = new ArrayList<>();
   private final List<Class<?>> entityList = new ArrayList<>();
@@ -212,13 +214,13 @@ public class BootupClasses implements Predicate<Class<?>> {
     try {
       return cls.getConstructor().newInstance();
     } catch (NoSuchMethodException e) {
-      log.debug("Ignore/expected - no default constructor: " +e.getMessage());
+      log.log(DEBUG, "Ignore/expected - no default constructor: {0}", e.getMessage());
       return null;
 
     } catch (Exception e) {
       if (logOnException) {
         // not expected but we log and carry on
-        log.error("Error creating " + cls, e);
+        log.log(ERROR, "Error creating " + cls, e);
         return null;
 
       } else {

@@ -1,8 +1,7 @@
 package io.ebeaninternal.extraddl.model;
 
+import io.avaje.applog.AppLog;
 import io.ebean.annotation.Platform;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -11,13 +10,14 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Read ExtraDdl from an XML document.
  */
 public class ExtraDdlXmlReader {
 
-  private static final Logger logger = LoggerFactory.getLogger(ExtraDdlXmlReader.class);
+  private static final System.Logger logger = AppLog.getLogger(ExtraDdlXmlReader.class);
 
   /**
    * Return the combined extra DDL that should be run given the platform name.
@@ -42,7 +42,7 @@ public class ExtraDdlXmlReader {
     StringBuilder sb = new StringBuilder(300);
     for (DdlScript script : read.getDdlScript()) {
       if (script.isDrop() == drops && matchPlatform(platform, script.getPlatforms())) {
-        logger.debug("include script {}", script.getName());
+        logger.log(DEBUG, "include script {}", script.getName());
         String value = script.getValue();
         sb.append(value);
         if (value.lastIndexOf(';') == -1) {

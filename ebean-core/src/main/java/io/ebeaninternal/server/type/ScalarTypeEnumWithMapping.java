@@ -64,7 +64,7 @@ class ScalarTypeEnumWithMapping extends ScalarTypeEnumStandard.EnumBase implemen
    * Return the DB column length for storing the enum value.
    */
   @Override
-  public int getLength() {
+  public int length() {
     return length;
   }
 

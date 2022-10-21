@@ -92,6 +92,6 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
 
   @Override
   public boolean isPersistBatchOnCascade() {
-    return ((SpiEbeanServer) DB.getDefault()).databasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
+    return ((SpiEbeanServer) DB.getDefault()).databasePlatform().persistBatchOnCascade() != PersistBatch.NONE;
   }
 }
