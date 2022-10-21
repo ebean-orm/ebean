@@ -104,10 +104,10 @@ public final class DefaultContainer implements SpiContainer {
       InternalConfiguration c = new InternalConfiguration(online, clusterManager, executor, config, bootupClasses);
       DefaultServer server = new DefaultServer(c, c.cacheManager());
       // generate and run DDL if required plus other plugins
-      
+
       if (!DbOffline.isGenerateMigration()) {
         initServer(online, server);
-        if (online && config.getTenantMode().isDdlEnabled() && !config.skipStart()) {
+        if (online && config.getTenantMode().isDdlEnabled()) {
           server.start();
         }
       }

@@ -774,7 +774,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       if (prio != null) {
         Class<?> base = desc.getBaseBeanType();
         Class<?> child = desc.getBeanType();
-        log.log(DEBUG, "{} overridden by {} with priority {}", base.getName(), child.getName(), prio);
+        log.log(DEBUG, "{0} overridden by {1} with priority {2}", base.getName(), child.getName(), prio);
 
         // check, if we already have found an override for this base and take the one
         // with
@@ -821,7 +821,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
     // output alias map
     if (log.isLoggable(INFO)) {
-      descAliases.forEach((key, value) -> log.log(INFO, "{} alias for {}", key, value));
+      descAliases.forEach((key, value) -> log.log(INFO, "{0} alias for {1}", key, value));
     }
   }
 

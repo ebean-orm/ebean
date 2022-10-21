@@ -635,6 +635,11 @@ public class TDSpiServer implements SpiServer {
 
   @Override
   public void start() {
-    
+
+  }
+
+  @Override
+  public void runMigration() {
+
   }
 }

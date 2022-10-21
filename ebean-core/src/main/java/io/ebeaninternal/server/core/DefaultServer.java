@@ -309,9 +309,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public void start() {
-    if (config.isRunMigration() && TenantMode.DB != config.getTenantMode()) {
+
+    if (TenantMode.DB != config.getTenantMode()) {
       runMigration();
     }
+
     startQueryPlanCapture();
   }
 
@@ -320,20 +322,22 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (!config.isDocStoreOnly()) {
       ddlGenerator.runDdl();
     }
-    final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
-    if (migrationRunner == null) {
-      throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
+    if (config.isRunMigration()) {
+      final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
+      if (migrationRunner == null) {
+        throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
+      }
+      final String dbSchema = config.getDbSchema();
+      if (dbSchema != null) {
+        migrationRunner.setDefaultDbSchema(dbSchema);
+      }
+      migrationRunner.setName(config.getName());
+      Platform platform = config.getDatabasePlatform().platform();
+      migrationRunner.setBasePlatform(platform.base().name().toLowerCase());
+      migrationRunner.setPlatform(platform.name().toLowerCase());
+      migrationRunner.loadProperties(config.getProperties());
+      migrationRunner.run(config.getDataSource());
     }
-    final String dbSchema = config.getDbSchema();
-    if (dbSchema != null) {
-      migrationRunner.setDefaultDbSchema(dbSchema);
-    }
-    migrationRunner.setName(config.getName());
-    Platform platform = config.getDatabasePlatform().platform();
-    migrationRunner.setBasePlatform(platform.base().name().toLowerCase());
-    migrationRunner.setPlatform(platform.name().toLowerCase());
-    migrationRunner.loadProperties(config.getProperties());
-    migrationRunner.run(config.getDataSource());
   }
 
   private void startQueryPlanCapture() {
