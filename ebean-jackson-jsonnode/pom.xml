@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.10.1-FOC3</version>
+    <version>13.10.1-FOC4-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-jackson-jsonnode</artifactId>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>13.10.1-FOC3</version>
+      <version>13.10.1-FOC4-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
