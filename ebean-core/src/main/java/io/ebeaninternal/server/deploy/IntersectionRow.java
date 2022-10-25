@@ -94,7 +94,6 @@ public final class IntersectionRow {
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-
   public SpiSqlUpdate createDeleteChildren(SpiEbeanServer server, String extraWhere) {
     BindParams bindParams = new BindParams();
     StringBuilder sb = new StringBuilder();

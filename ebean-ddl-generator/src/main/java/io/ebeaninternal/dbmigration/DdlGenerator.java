@@ -63,11 +63,10 @@ public class DdlGenerator implements SpiDdlGenerator {
     if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
       log.log(WARNING, "DDL can't be run on startup with TenantMode " + config.getTenantMode());
       this.runDdl = false;
-      this.useMigrationStoredProcedures = false;
     } else {
       this.runDdl = config.isDdlRun();
-      this.useMigrationStoredProcedures = config.getDatabasePlatform().useMigrationStoredProcedures();
     }
+    this.useMigrationStoredProcedures = config.getDatabasePlatform() != null && config.getDatabasePlatform().useMigrationStoredProcedures();
     this.scriptTransform = createScriptTransform(config);
     this.baseDir = initBaseDir();
   }
@@ -82,10 +81,18 @@ public class DdlGenerator implements SpiDdlGenerator {
     return new File(".");
   }
 
+  @Override
+  public void execute(boolean online) {
+    generateDdl();
+    if (online && runDdl) {
+      runDdl();
+    }
+  }
+
   /**
    * Generate the DDL drop and create scripts if the properties have been set.
    */
-  public void generateDdl() {
+  protected void generateDdl() {
     if (generateDdl) {
       if (!createOnly) {
         writeDrop(getDropFileName());
@@ -99,15 +106,13 @@ public class DdlGenerator implements SpiDdlGenerator {
    */
   @Override
   public void runDdl() {
-    if (runDdl) {
-      Connection connection = null;
-      try {
-        connection = obtainConnection();
-        runDdlWith(connection);
-      } finally {
-        JdbcClose.rollback(connection);
-        JdbcClose.close(connection);
-      }
+    Connection connection = null;
+    try {
+      connection = obtainConnection();
+      runDdlWith(connection);
+    } finally {
+      JdbcClose.rollback(connection);
+      JdbcClose.close(connection);
     }
   }
 

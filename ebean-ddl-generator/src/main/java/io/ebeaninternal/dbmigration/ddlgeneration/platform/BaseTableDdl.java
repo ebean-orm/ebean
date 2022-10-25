@@ -208,7 +208,6 @@ public class BaseTableDdl implements TableDdl {
       writeInlineForeignKeys(apply, createTable);
     }
     apply.newLine().append(")");
-
     addTableTableSpaces(apply, createTable);
     addTableStorageEngine(apply, createTable);
     addTableCommentInline(apply, createTable);

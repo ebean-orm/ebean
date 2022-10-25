@@ -1521,15 +1521,7 @@ public interface Database {
   void truncate(Class<?>... beanTypes);
 
   /**
-   * Starts the database and runs db-migration or ddl. Normally the server is
-   * started automatically when the teantMode supports ddl-generation and start is
-   * not skipped by server config.
-   * <p>
-   * In a multi tenancy environment, you may have call runMigration multiple times for
-   * each tenant to initialize the database.
+   * RunDdl manually. This can be used if 'db.ddl.run=false' is set and you plan to run DDL manually.
    */
-  void start();
-
-  void runMigration();
-
+  void runDdl();
 }

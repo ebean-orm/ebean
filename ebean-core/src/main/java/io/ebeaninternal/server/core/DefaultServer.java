@@ -191,7 +191,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   public void executePlugins(boolean online) {
     if (!config.isDocStoreOnly()) {
-      ddlGenerator.generateDdl();
+      ddlGenerator.execute(online);
     }
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
@@ -307,23 +307,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Start any services after registering with the ClusterManager.
    */
-  @Override
   public void start() {
-
-    if (TenantMode.DB != config.getTenantMode()) {
-      runMigration();
-    }
-
-    startQueryPlanCapture();
-  }
-
-  @Override
-  public void runMigration() {
-    if (!config.isDocStoreOnly()) {
-      ddlGenerator.runDdl();
-    }
-    if (config.isRunMigration()) {
-      final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
+    if (config.isRunMigration() && TenantMode.DB != config.getTenantMode()) {
+      AutoMigrationRunner migrationRunner = config.getServiceObject(AutoMigrationRunner.class);
+      if (migrationRunner == null) {
+        migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
+      }
       if (migrationRunner == null) {
         throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
       }
@@ -338,6 +327,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       migrationRunner.loadProperties(config.getProperties());
       migrationRunner.run(config.getDataSource());
     }
+    startQueryPlanCapture();
   }
 
   private void startQueryPlanCapture() {
@@ -2274,5 +2264,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   List<MetaQueryPlan> queryPlanCollectNow(QueryPlanRequest request) {
     return queryPlanManager.collect(request);
+  }
+
+  @Override
+  public void runDdl() {
+    ddlGenerator.runDdl();
   }
 }

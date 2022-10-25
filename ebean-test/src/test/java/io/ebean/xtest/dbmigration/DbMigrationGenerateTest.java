@@ -129,7 +129,6 @@ public class DbMigrationGenerateTest {
     DbOffline.setGenerateMigration();
     Database server = DatabaseFactory.create(config);
     DbOffline.reset();
-    server.start();
     return server;
   }
 

@@ -306,11 +306,6 @@ public class DatabaseConfig {
   private boolean skipDataSourceCheck;
 
   /**
-   * Skip server start (i.e. run DDL/migration on creation).
-   */
-  private boolean skipStart;
-
-  /**
    * The data source (if programmatically provided).
    */
   private DataSource dataSource;
@@ -632,7 +627,7 @@ public class DatabaseConfig {
   }
 
   /**
-   * Put a service object into configuration such that it can be passed to a plugin.
+   * Put a service object into configuration such that it can be used by ebean or a plugin.
    * <p>
    * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
    */
@@ -641,9 +636,22 @@ public class DatabaseConfig {
   }
 
   /**
-   * Put a service object into configuration such that it can be passed to a plugin.
+   * Put a service object into configuration such that it can be used by ebean or a plugin.
    * <p>
    * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
+   * You can also override some SPI objects that should be used for that Database. Currently, the following
+   * objects are possible.
+   * <ul>
+   *   <li>DataSourceAlertFactory (e.g. add different alert factories for different ebean instances)</li>
+   *   <li>DocStoreFactory</li>
+   *   <li>XmapService</li>
+   *   <li>SpiLoggerFactory (e.g. add custom logger for a certain ebean instance)</li>
+   *   <li>AutoTuneServiceProvider</li>
+   *   <li>SpiProfileHandler</li>
+   *   <li>SlowQueryListener (e.g. add custom query listener for a certain ebean instance)</li>
+   *   <li>ServerCacheNotifyPlugin</li>
+   *   <li>SpiDdlGenneratorProvider</li>
+   * </ul>
    */
   public <T> void putServiceObject(Class<T> iface, T configObject) {
     serviceObject.put(serviceObjectKey(iface), configObject);
@@ -657,7 +665,7 @@ public class DatabaseConfig {
   }
 
   /**
-   * Put a service object into configuration such that it can be passed to a plugin.
+   * Put a service object into configuration such that it can be used by ebean or a plugin.
    *
    * <pre>{@code
    *
@@ -682,7 +690,7 @@ public class DatabaseConfig {
   }
 
   /**
-   * Used by plugins to obtain service objects.
+   * Used by ebean or plugins to obtain service objects.
    *
    * <pre>{@code
    *
@@ -1700,20 +1708,6 @@ public class DatabaseConfig {
    */
   public void setSkipDataSourceCheck(boolean skipDataSourceCheck) {
     this.skipDataSourceCheck = skipDataSourceCheck;
-  }
-
-  /**
-   * Return true if the server start should be skipped.
-   */
-  public boolean skipStart() {
-    return skipStart;
-  }
-
-  /**
-   * Set to true to skip the server start.
-   */
-  public void setSkipStart(boolean skipStart) {
-    this.skipStart = skipStart;
   }
 
   /**
@@ -2992,7 +2986,6 @@ public class DatabaseConfig {
     jsonMutationDetection = p.getEnum(MutationDetection.class, "jsonMutationDetection", jsonMutationDetection);
 
     skipDataSourceCheck = p.getBoolean("skipDataSourceCheck", skipDataSourceCheck);
-    skipStart = p.getBoolean("skipStart", skipStart);
     runMigration = p.getBoolean("migration.run", runMigration);
     ddlGenerate = p.getBoolean("ddl.generate", ddlGenerate);
     ddlRun = p.getBoolean("ddl.run", ddlRun);

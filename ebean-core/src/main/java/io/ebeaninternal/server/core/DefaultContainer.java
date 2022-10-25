@@ -104,12 +104,8 @@ public final class DefaultContainer implements SpiContainer {
       InternalConfiguration c = new InternalConfiguration(online, clusterManager, executor, config, bootupClasses);
       DefaultServer server = new DefaultServer(c, c.cacheManager());
       // generate and run DDL if required plus other plugins
-
       if (!DbOffline.isGenerateMigration()) {
-        initServer(online, server);
-        if (online && config.getTenantMode().isDdlEnabled() && !config.skipStart()) {
-          server.start();
-        }
+        startServer(online, server);
       }
       DbOffline.reset();
       log.log(INFO, "Started database[{0}] platform[{1}] in {2}ms", config.getName(), config.getDatabasePlatform().platform(), System.currentTimeMillis() - start);
@@ -145,7 +141,7 @@ public final class DefaultContainer implements SpiContainer {
     }
   }
 
-  private void initServer(boolean online, DefaultServer server) {
+  private void startServer(boolean online, DefaultServer server) {
     server.executePlugins(online);
     // initialise prior to registering with clusterManager
     server.initialise();
@@ -154,6 +150,8 @@ public final class DefaultContainer implements SpiContainer {
         clusterManager.registerServer(server);
       }
     }
+    // start any services after registering with clusterManager
+    server.start();
   }
 
   /**

@@ -115,7 +115,6 @@ public final class CQueryEngine {
             collection = (A) new LinkedHashSet<>(collection);
           }
         }
-
       }
       return collection;
     } catch (SQLException e) {

@@ -220,7 +220,6 @@ public final class DefaultTypeManager implements TypeManager {
     return found != ScalarTypeNotFound.INSTANCE ? found : null; // Do not return ScalarTypeNotFound, otherwise checks will fail
   }
 
-
   /**
    * Checks the typeMap for inherited types.
    * <p>

@@ -78,7 +78,6 @@ public class TestQueryCache extends BaseTestCase {
 
     assertThat(colA_Second).isSameAs(colA_first);
 
-
     List<String> colA_NotDistinct = DB
       .find(EColAB.class)
       .setUseQueryCache(true)

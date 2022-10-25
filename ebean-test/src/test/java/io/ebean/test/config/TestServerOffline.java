@@ -59,7 +59,7 @@ public class TestServerOffline {
 
     public synchronized void initDatabase() {
       if (!initialized) {
-        server.start();
+        server.runDdl();
         initialized = true;
       }
     }
@@ -85,7 +85,7 @@ public class TestServerOffline {
       // that happen on startup
       props.setProperty("datasource.h2_offline.failOnStart", "false");
       props.setProperty("ebean.h2_offline.skipDataSourceCheck", "true");
-      props.setProperty("ebean.h2_offline.skipStart", "true");
+      props.setProperty("ebean.h2_offline.ddl.run", "false");
       DatabaseConfig config = config(props);
 
       LazyDatasourceInitializer alert = new LazyDatasourceInitializer() ;

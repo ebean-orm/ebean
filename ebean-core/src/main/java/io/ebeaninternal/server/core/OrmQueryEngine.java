@@ -34,7 +34,7 @@ public interface OrmQueryEngine {
    */
   <A extends Collection<?>> A findSingleAttributeCollection(OrmQueryRequest<?> request, A collection);
 
-   /**
+  /**
    * Execute the findVersions query.
    */
   <T> List<Version<T>> findVersions(OrmQueryRequest<T> request);
