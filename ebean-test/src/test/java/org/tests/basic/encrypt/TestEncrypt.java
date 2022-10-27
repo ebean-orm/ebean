@@ -1,13 +1,13 @@
 package org.tests.basic.encrypt;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
-import io.ebean.xtest.ForPlatform;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicEncrypt;
@@ -146,6 +146,11 @@ public class TestEncrypt extends BaseTestCase {
 
       List<EBasicEncrypt> list = DB.find(EBasicEncrypt.class).where()
         .eq("description", "moddesc").findList();
+
+      assertEquals(1, list.size());
+
+      list = DB.find(EBasicEncrypt.class).where()
+        .in("description", "moddesc").findList();
 
       assertEquals(1, list.size());
 
