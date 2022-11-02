@@ -233,8 +233,13 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Tune the query by specifying the properties to be loaded on the
-   * 'main' root level entity bean (aka partial object).
+   * Specify the properties to be loaded on the 'main' root level entity bean.
+   * <p>
+   * The resulting entities with be "partially loaded" aka partial objects.
+   * <p>
+   * Alternatively we can use a {@link #select(FetchGroup)} to specify all properties
+   * to load on all parts of the graph.
+   *
    * <pre>{@code
    *
    *   // alias for the customer properties in select()
@@ -245,12 +250,12 @@ public abstract class TQRootBean<T, R> {
    *
    *   List<Customer> customers =
    *     new QCustomer()
-   *       // tune query
+   *       // specify the parts of the graph we want to load
    *       .select(cust.id, cust.name)
    *       .contacts.fetch(contact.firstName, contact.lastName, contact.email)
    *
    *       // predicates
-   *       .id.greaterThan(1)
+   *       .id.gt(1)
    *       .findList();
    *
    * }</pre>
@@ -263,12 +268,23 @@ public abstract class TQRootBean<T, R> {
     return root;
   }
 
-  private Set<String> properties(TQProperty<R>[] properties) {
+  private Set<String> properties(TQColumn[] properties) {
     Set<String> props = new LinkedHashSet<>();
-    for (TQProperty<R> property : properties) {
-      props.add(property.propertyName());
+    for (TQColumn property : properties) {
+      props.add(property.toString());
     }
     return props;
+  }
+
+  /**
+   * Specify the properties to be loaded on the 'main' root level entity bean
+   * also allowing for functions to be used like {@link StdFunctions#max(TQColumn)}.
+   *
+   * @param properties the list of properties to fetch
+   */
+  public final R select(TQColumn... properties) {
+    ((SpiQueryFetch) query).selectProperties(properties(properties));
+    return root;
   }
 
   /**
@@ -496,6 +512,14 @@ public abstract class TQRootBean<T, R> {
    */
   public R setIncludeSoftDeletes() {
     query.setIncludeSoftDeletes();
+    return root;
+  }
+
+  /**
+   * Add an expression to the WHERE or HAVING clause.
+   */
+  public R add(Expression expression) {
+    peekExprList().add(expression);
     return root;
   }
 

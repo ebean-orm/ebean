@@ -7,7 +7,7 @@ import io.ebean.ExpressionList;
  *
  * @param <R> The type of the owning root bean
  */
-public class TQProperty<R> {
+public class TQProperty<R> implements TQColumn {
 
   protected final String _name;
 
@@ -31,6 +31,7 @@ public class TQProperty<R> {
     this._name = TQPath.add(prefix, name);
   }
 
+  @Override
   public String toString() {
     return _name;
   }
