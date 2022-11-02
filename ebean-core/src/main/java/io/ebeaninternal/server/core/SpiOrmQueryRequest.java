@@ -121,7 +121,7 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   <K> Map<K, T> findMap();
 
   /**
-   * Execute the findSingleAttributeList query.
+   * Execute the findSingleAttributeCollection query.
    */
   <A extends Collection<?>> A findSingleAttributeCollection(A collection);
 

@@ -106,23 +106,23 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    return schedulePool.scheduleWithFixedDelay(wrap(logExceptions(task)), initialDelay, delay, unit);
+    return schedulePool.scheduleWithFixedDelay(logExceptions(task), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    return schedulePool.scheduleAtFixedRate(wrap(logExceptions(task)), initialDelay, delay, unit);
+    return schedulePool.scheduleAtFixedRate(logExceptions(task), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-    return schedulePool.schedule(wrap(logExceptions(task)), delay, unit);
+    return schedulePool.schedule(logExceptions(task), delay, unit);
   }
 
   @Override
   public <V> ScheduledFuture<V> schedule(Callable<V> task, long delay, TimeUnit unit) {
     // Note: No "logExceptions" as we expect Future.get() by the invoker
-    return schedulePool.schedule(wrap(task), delay, unit);
+    return schedulePool.schedule(task, delay, unit);
   }
 
   @Override
