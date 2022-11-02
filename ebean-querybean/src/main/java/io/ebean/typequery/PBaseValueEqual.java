@@ -281,7 +281,7 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   }
 
   /**
-   * Is in the result of a subquery. Synonym for in().
+   * Is in the result of a sub-query. Synonym for in().
    *
    * @param subQuery values provided by a subQuery
    * @return the root query bean instance
@@ -291,13 +291,35 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   }
 
   /**
-   * Is NOT in the result of a subquery.
+   * Is NOT in the result of a sub-query.
    *
    * @param subQuery values provided by a subQuery
    * @return the root query bean instance
    */
   public final R notIn(Query<?> subQuery) {
     expr().notIn(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is equal to the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R eq(Query<?> subQuery) {
+    expr().eq(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is not equal to the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R ne(Query<?> subQuery) {
+    expr().ne(_name, subQuery);
     return _root;
   }
 }

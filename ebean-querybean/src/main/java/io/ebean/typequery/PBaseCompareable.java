@@ -1,6 +1,8 @@
 package io.ebean.typequery;
 
 
+import io.ebean.Query;
+
 /**
  * Base property for all comparable types.
  *
@@ -301,4 +303,47 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
     return _root;
   }
 
+  /**
+   * Property is Less Than or Equal To the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R le(Query<?> subQuery) {
+    expr().le(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is Less Than the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R lt(Query<?> subQuery) {
+    expr().lt(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is Greater Than or Equal To the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R ge(Query<?> subQuery) {
+    expr().ge(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is Greater Than the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R gt(Query<?> subQuery) {
+    expr().gt(_name, subQuery);
+    return _root;
+  }
 }

@@ -1,21 +1,11 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.ExampleExpression;
-import io.ebean.Expression;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.Junction;
-import io.ebean.LikeType;
-import io.ebean.Pairs;
-import io.ebean.Query;
+import io.ebean.*;
 import io.ebean.bean.EntityBean;
-import io.ebean.search.Match;
-import io.ebean.search.MultiMatch;
-import io.ebean.search.TextCommonTerms;
-import io.ebean.search.TextQueryString;
-import io.ebean.search.TextSimple;
+import io.ebean.search.*;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.expression.SubQueryExpression.SQOp;
 import io.ebeaninternal.server.grammer.EqlParser;
 
 import java.util.Arrays;
@@ -157,6 +147,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     EqlParser.parseWhere(expressions, list, this, params);
   }
 
+  @Override
+  public Expression eq(String propertyName, Query<?> subQuery) {
+    return new SubQueryExpression(SQOp.EQ, propertyName, (SpiQuery<?>) subQuery);
+  }
+
   /**
    * Equal To - property equal to the given value.
    */
@@ -171,6 +166,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   @Override
   public Expression eqOrNull(String propertyName, Object value) {
     return or(eq(propertyName, value), isNull(propertyName));
+  }
+
+  @Override
+  public Expression ne(String propertyName, Query<?> subQuery) {
+    return new SubQueryExpression(SQOp.NE, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -258,6 +258,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new BetweenPropertyExpression(lowProperty, highProperty, value);
   }
 
+  @Override
+  public Expression gt(String propertyName, Query<?> subQuery) {
+    return new SubQueryExpression(SQOp.GT, propertyName, (SpiQuery<?>) subQuery);
+  }
+
   /**
    * Greater Than - property greater than the given value.
    */
@@ -277,6 +282,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   @Override
   public Expression geOrNull(String propertyName, Object value) {
     return or(ge(propertyName, value), isNull(propertyName));
+  }
+
+  @Override
+  public Expression ge(String propertyName, Query<?> subQuery) {
+    return new SubQueryExpression(SQOp.GE, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -301,12 +311,22 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return or(le(propertyName, value), isNull(propertyName));
   }
 
+  @Override
+  public Expression lt(String propertyName, Query<?> subQuery) {
+    return new SubQueryExpression(SQOp.LT, propertyName, (SpiQuery<?>) subQuery);
+  }
+
   /**
    * Less Than - property less than the given value.
    */
   @Override
   public Expression lt(String propertyName, Object value) {
     return new SimpleExpression(propertyName, Op.LT, value);
+  }
+
+  @Override
+  public Expression le(String propertyName, Query<?> subQuery) {
+    return new SubQueryExpression(SQOp.LE, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -465,7 +485,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression in(String propertyName, Query<?> subQuery) {
-    return new InQueryExpression(propertyName, (SpiQuery<?>) subQuery, false);
+    return new SubQueryExpression(SQOp.IN, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -507,7 +527,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression notIn(String propertyName, Query<?> subQuery) {
-    return new InQueryExpression(propertyName, (SpiQuery<?>) subQuery, true);
+    return new SubQueryExpression(SQOp.NOTIN, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**

@@ -86,7 +86,7 @@ public final class SqlTreeBuilder {
     this.disableLazyLoad = query.isDisableLazyLoading();
     this.readOnly = Boolean.TRUE.equals(query.isReadOnly());
     this.subQuery = Type.SQ_EXISTS == query.getType()
-      || Type.SQ_IN == query.getType()
+      || Type.SQ_EX == query.getType()
       || Type.ID_LIST == query.getType()
       || Type.DELETE == query.getType()
       || query.isCountDistinct();
