@@ -109,7 +109,8 @@ public class TestEncrypt extends BaseTestCase {
     EBasicEncrypt e = new EBasicEncrypt();
     e.setName("testname");
     e.setDescription("testdesc");
-    e.setDob(new Date(System.currentTimeMillis() - 100000));
+    long refTime = System.currentTimeMillis() - 100000;
+    e.setDob(new Date(refTime));
 
     DB.save(e);
 
@@ -157,6 +158,32 @@ public class TestEncrypt extends BaseTestCase {
       list = DB.find(EBasicEncrypt.class).where().startsWith("description", "modde").findList();
 
       assertEquals(1, list.size());
+
+      // Note, we only have "date" precision (See #2878)
+      list = DB.find(EBasicEncrypt.class).where().between("dob",
+        new Date(refTime - 2 * 86400000), new Date(refTime - 1 * 86400000)).findList();
+
+      assertEquals(0, list.size());
+
+      list = DB.find(EBasicEncrypt.class).where().inRange("dob",
+        new Date(refTime - 2 * 86400000), new Date(refTime - 1 * 86400000)).findList();
+
+      assertEquals(0, list.size());
+
+      list = DB.find(EBasicEncrypt.class).where().between("dob",
+        new Date(refTime - 2 * 86400000), new Date(refTime + 1 * 86400000)).findList();
+
+      assertEquals(1, list.size());
+
+      list = DB.find(EBasicEncrypt.class).where().inRange("dob",
+        new Date(refTime - 2 * 86400000), new Date(refTime + 1 * 86400000)).findList();
+
+      assertEquals(1, list.size());
+
+
+      //list = DB.find(EBasicEncrypt.class).where().inRange("dob", new Date(refTime), new Date(refTime+1)).findList();
+
+      //assertEquals(1, list.size());
     }
   }
 
