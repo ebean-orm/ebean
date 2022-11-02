@@ -218,6 +218,16 @@ public class QOrderTest {
   }
 
   @Test
+  void propertyCompare() {
+    Query<Order> query = new QOrder()
+      .orderDate.lt(QOrder.Alias.customer.registered)
+      .query();
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" from o_order t0 join be_customer t1 on t1.id = t0.customer_id where t0.order_date < t1.registered");
+  }
+
+  @Test
   void subQueryExists() {
     Query<OrderDetail> subQuery = new QOrderDetail()
       .alias("od")

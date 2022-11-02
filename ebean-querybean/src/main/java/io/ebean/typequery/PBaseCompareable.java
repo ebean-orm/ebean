@@ -41,6 +41,17 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
   }
 
   /**
+   * Greater than other property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R gt(TQProperty<?> other) {
+    expr().raw(_name + " > " + other.propertyName());
+    return _root;
+  }
+
+  /**
    * Greater than OR Null.
    *
    * @param value the bind value
@@ -59,6 +70,17 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    */
   public final R ge(T value) {
     expr().ge(_name, value);
+    return _root;
+  }
+
+  /**
+   * Greater than or Equal to other property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R ge(TQProperty<?> other) {
+    expr().raw(_name + " >= " + other.propertyName());
     return _root;
   }
 
@@ -85,6 +107,17 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
   }
 
   /**
+   * Less than other property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R lt(TQProperty<?> other) {
+    expr().raw(_name + " < " + other.propertyName());
+    return _root;
+  }
+
+  /**
    * Less than OR Null.
    *
    * @param value the bind value
@@ -103,6 +136,17 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    */
   public final R le(T value) {
     expr().le(_name, value);
+    return _root;
+  }
+
+  /**
+   * Less than or Equal to other property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R le(TQProperty<?> other) {
+    expr().raw(_name + " <= " + other.propertyName());
     return _root;
   }
 
