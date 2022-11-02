@@ -36,7 +36,7 @@ public class TestQueryAlias extends BaseTestCase {
     // where  (myt0.one_key) in (select st0.one_key from ckey_parent st0)
 
     assertThat(sql).contains("ckey_parent myt0");
-    assertThat(sql).contains("(myt0.one_key) in (select st0.one_key from ckey_parent st0)");
+    assertThat(sql).contains("myt0.one_key in (select st0.one_key from ckey_parent st0)");
   }
 
   @IgnorePlatform(Platform.COCKROACH)
@@ -56,7 +56,7 @@ public class TestQueryAlias extends BaseTestCase {
     String sql = pq.getGeneratedSql();
 
     assertThat(sql).contains("ckey_parent myt0");
-    assertThat(sql).contains("(concat(myt0.one_key,myt0.two_key)) in (select concat(st0.one_key,st0.two_key) from ckey_parent st0)");
+    assertThat(sql).contains("concat(myt0.one_key,myt0.two_key) in (select concat(st0.one_key,st0.two_key) from ckey_parent st0)");
   }
 
   @Test
@@ -82,7 +82,7 @@ public class TestQueryAlias extends BaseTestCase {
     // where  (myt0.one_key) in (select st0.one_key from ckey_parent st0)
 
     assertThat(sql).contains("ckey_parent myt0");
-    assertThat(sql).contains("(myt0.one_key) not in (select st0.one_key from ckey_parent st0)");
+    assertThat(sql).contains("myt0.one_key not in (select st0.one_key from ckey_parent st0)");
   }
 
 }

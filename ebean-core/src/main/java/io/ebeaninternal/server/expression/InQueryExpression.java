@@ -75,7 +75,7 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append(" (").append(propName).append(")");
+    request.append(propName);
     if (not) {
       request.append(" not");
     }
