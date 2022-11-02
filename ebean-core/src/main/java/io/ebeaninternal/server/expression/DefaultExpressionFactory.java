@@ -237,6 +237,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return and(le(lowProperty, value), gtOrNull(highProperty, value));
   }
 
+  @Override
+  public Expression inRangeWithProperties(String propertyName, String lowProperty, String highProperty) {
+    return raw(lowProperty + " <= " + propertyName + " and (" + propertyName + " < " + highProperty + " or " + highProperty + " is null)");
+  }
+
   /**
    * Between - property between the two given values.
    */

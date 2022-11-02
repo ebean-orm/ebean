@@ -280,6 +280,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> inRangeWithProperties(String propertyName, String lowProperty, String highProperty) {
+    return exprList.inRangeWithProperties(propertyName, lowProperty, highProperty);
+  }
+
+  @Override
   public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
     return exprList.inRange(propertyName, value1, value2);
   }

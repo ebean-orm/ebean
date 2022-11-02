@@ -2,12 +2,15 @@ package org.querytest;
 
 import io.ebean.DB;
 import io.ebean.FetchGroup;
+import io.ebean.Query;
 import io.ebean.test.LoggedSql;
 import org.example.domain.Customer;
 import org.example.domain.Order;
+import org.example.domain.OrderDetail;
 import org.example.domain.otherpackage.PhoneNumber;
 import org.example.domain.query.QCustomer;
 import org.example.domain.query.QOrder;
+import org.example.domain.query.QOrderDetail;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -212,6 +215,62 @@ public class QOrderTest {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("select t0.id, t0.status, t1.id, t1.email, t1.name from o_order t0 join be_customer t1 on t1.id = t0.customer_id");
 
+  }
+
+  @Test
+  void propertyCompare() {
+    Query<Order> query = new QOrder()
+      .orderDate.lt(QOrder.Alias.customer.registered)
+      .query();
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" from o_order t0 join be_customer t1 on t1.id = t0.customer_id where t0.order_date < t1.registered");
+  }
+
+  @Test
+  void subQueryExists() {
+    Query<OrderDetail> subQuery = new QOrderDetail()
+      .alias("od")
+      .orderQty.gt(10)
+      .id.eq(QOrder.Alias.details.id)
+      //.where().raw("details.id = od.id")
+      .query();
+
+    Query<Order> query = new QOrder()
+      .exists(subQuery)
+      .orderBy("orderDate").query();
+
+    query.findList();
+
+    // select distinct t0.id, t0.status, t0.order_date, t0.ship_date, t0.version, t0.when_created, t0.when_updated, t0.customer_id, t0.shipping_address_id, t0.order_date
+    // from o_order t0
+    // left join o_order_detail t1 on t1.order_id = t0.id
+    // where  exists (select 1 from o_order_detail od where od.order_qty > ? and od.id = t1.id) order by t0.order_date
+    String sql = query.getGeneratedSql();
+    assertThat(sql).contains(" exists (select 1 from o_order_detail od where od.order_qty > ? and od.id = t1.id)");
+  }
+
+  @Test
+  void subQueryNotExists() {
+    Query<OrderDetail> subQuery = new QOrderDetail()
+      .alias("od")
+      .orderQty.gt(10)
+      .id.eq(QOrder.Alias.details.id)
+      //.where().raw("details.id = od.id")
+      .query();
+
+    Query<Order> query = new QOrder()
+      .notExists(subQuery)
+      .orderBy("orderDate")
+      .query();
+    query.findList();
+
+    // select distinct t0.id, t0.status, t0.order_date, t0.ship_date, t0.version, t0.when_created, t0.when_updated, t0.customer_id, t0.shipping_address_id, t0.order_date
+    // from o_order t0
+    // left join o_order_detail t1 on t1.order_id = t0.id
+    // where not exists (select 1 from o_order_detail od where od.order_qty > ? and od.id = t1.id) order by t0.order_date
+    String sql = query.getGeneratedSql();
+    assertThat(sql).contains(" not exists (select 1 from o_order_detail od where od.order_qty > ? and od.id = t1.id)");
   }
 
   private static void setupData() {

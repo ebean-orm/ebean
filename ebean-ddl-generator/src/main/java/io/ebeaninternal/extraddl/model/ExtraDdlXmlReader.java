@@ -42,7 +42,7 @@ public class ExtraDdlXmlReader {
     StringBuilder sb = new StringBuilder(300);
     for (DdlScript script : read.getDdlScript()) {
       if (script.isDrop() == drops && matchPlatform(platform, script.getPlatforms())) {
-        logger.log(DEBUG, "include script {}", script.getName());
+        logger.log(DEBUG, "include script {0}", script.getName());
         String value = script.getValue();
         sb.append(value);
         if (value.lastIndexOf(';') == -1) {
