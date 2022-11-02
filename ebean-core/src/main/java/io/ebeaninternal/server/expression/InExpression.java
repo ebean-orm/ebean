@@ -169,6 +169,7 @@ public final class InExpression extends AbstractExpression implements IdInCommon
       if (prop.isAssocId()) {
         request.append(prop.assocIdInExpr(propName));
         request.append(prop.assocIdInValueExpr(not, bindValues.size()));
+        return;
       }
       if (prop.isDbEncrypted()) {
         String dsql = prop.beanProperty().decryptProperty(propName);
