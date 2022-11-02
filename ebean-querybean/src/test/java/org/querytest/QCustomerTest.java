@@ -155,6 +155,39 @@ public class QCustomerTest {
     }
   }
 
+  @Test
+  void equalTo_byProperty() {
+    Query<Customer> query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .billingAddress.city.eq(QCustomer.Alias.shippingAddress.city)
+      .query();
+
+    query.findList();
+    String generatedSql = query.getGeneratedSql();
+
+    // select t0.id from be_customer t0
+    // left join o_address t2 on t2.id = t0.shipping_address_id
+    // left join o_address t1 on t1.id = t0.billing_address_id
+    // where t1.city = t2.city
+    assertThat(generatedSql).contains("where t1.city = t2.city");
+  }
+
+  @Test
+  void notEqual_byProperty() {
+    Query<Customer> query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .billingAddress.city.ne(QCustomer.Alias.shippingAddress.city)
+      .query();
+
+    query.findList();
+    String generatedSql = query.getGeneratedSql();
+
+    // select t0.id from be_customer t0
+    // left join o_address t2 on t2.id = t0.shipping_address_id
+    // left join o_address t1 on t1.id = t0.billing_address_id
+    // where t1.city <> t2.city
+    assertThat(generatedSql).contains("where t1.city <> t2.city");
+  }
 
   @Test
   public void isEmpty() {

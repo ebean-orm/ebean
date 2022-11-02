@@ -84,6 +84,17 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   }
 
   /**
+   * Is equal to another property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R eq(TQProperty<?> other) {
+    expr().raw(_name + " = " + other.propertyName());
+    return _root;
+  }
+
+  /**
    * Is equal to if value is non-null and otherwise no expression is added to the query.
    * <p>
    * That is, only add the EQUAL TO predicate if the value is not null.
@@ -132,6 +143,17 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
    */
   public final R ne(T value) {
     expr().ne(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is not equal to another property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R ne(TQProperty<?> other) {
+    expr().raw(_name + " <> " + other.propertyName());
     return _root;
   }
 
