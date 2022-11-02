@@ -18,6 +18,20 @@
     </dependency>
 
     <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-test-containers</artifactId>
+      <version>6.3</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.5.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
       <version>1.1</version>
