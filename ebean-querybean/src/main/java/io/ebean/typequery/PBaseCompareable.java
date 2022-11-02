@@ -201,6 +201,29 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
   }
 
   /**
+   * A Property is in Range between 2 other properties.
+   *
+   * <pre>{@code
+   *  var o = QOrder.alias();
+   *
+   *  new QOrder()
+   *    .orderDate.inRangeWith(o.product.startDate, o.product.endDate)
+   *    .findList();
+   *
+   *    // which equates to
+   *    product.startDate <= orderDate and (product.endDate > orderDate or product.endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   */
+  public final R inRangeWith(TQProperty<?> lowProperty, TQProperty<?> highProperty) {
+    expr().inRangeWithProperties(_name, lowProperty.propertyName(), highProperty.propertyName());
+    return _root;
+  }
+
+  /**
    * Between lower and upper values.
    *
    * @param lower the lower bind value

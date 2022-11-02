@@ -891,6 +891,23 @@ public interface ExpressionList<T> {
   ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value);
 
   /**
+   * A Property is in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .orderDate.inRangeWith(QOrder.Alias.product.startDate, QOrder.Alias.product.endDate)
+   *
+   *    // which equates to
+   *    product.startDate <= orderDate and (orderDate < product.endDate or product.endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   */
+  ExpressionList<T> inRangeWithProperties(String propertyName, String lowProperty, String highProperty);
+
+  /**
    * In Range - {@code property >= value1 and property < value2}.
    * <p>
    * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.

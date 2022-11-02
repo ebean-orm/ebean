@@ -834,6 +834,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> inRangeWithProperties(String propertyName, String lowProperty, String highProperty) {
+    return add(expr.inRangeWithProperties(propertyName, lowProperty, highProperty));
+  }
+
+  @Override
   public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
     return add(expr.inRange(propertyName, value1, value2));
   }

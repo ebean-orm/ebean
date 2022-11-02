@@ -666,6 +666,22 @@ public class QCustomerTest {
   }
 
   @Test
+  void query_inRangeWithOtherProperties() {
+    var c = QCustomer.alias();
+
+    Query<Customer> query = new QCustomer()
+      .select(c.id)
+      .name.inRangeWith(c.contacts.firstName, c.contacts.lastName)
+      .query();
+
+    // select distinct t0.id from be_customer t0
+    // left join be_contact t1 on t1.customer_id = t0.id
+    // where t1.first_name <= t0.name and (t0.name < t1.last_name or t1.last_name is null)
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where t1.first_name <= t0.name and (t0.name < t1.last_name or t1.last_name is null)");
+  }
+
+  @Test
   public void query_exists() {
 
     boolean customerExists =

@@ -182,6 +182,23 @@ public interface ExpressionFactory {
   Expression inRangeWith(String lowProperty, String highProperty, Object value);
 
   /**
+   * A Property is in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .orderDate.inRangeWith(QOrder.Alias.product.startDate, QOrder.Alias.product.endDate)
+   *
+   *    // which equates to
+   *    product.startDate <= orderDate and (orderDate < product.endDate or product.endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   */
+  Expression inRangeWithProperties(String propertyName, String lowProperty, String highProperty);
+
+  /**
    * Between - property between the two given values.
    */
   Expression between(String propertyName, Object value1, Object value2);
