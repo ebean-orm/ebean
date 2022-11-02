@@ -181,11 +181,6 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public int jdbcType() {
     return 0;
   }
@@ -193,11 +188,6 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   @Override
   public BeanProperty beanProperty() {
     return null;
-  }
-
-  @Override
-  public Object parseDateTime(long systemTimeMillis) {
-    throw new RuntimeException("ElPropertyDeploy only - not implemented");
   }
 
   @Override

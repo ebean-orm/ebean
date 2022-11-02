@@ -119,7 +119,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
     int firstRow = query.getFirstRow();
     int maxRows = query.getMaxRows();
     if (firstRow > 0 || maxRows > 0) {
-      return server.databasePlatform().getBasicSqlLimiter().limit(sql, firstRow, maxRows);
+      return server.databasePlatform().basicSqlLimiter().limit(sql, firstRow, maxRows);
     }
     return sql;
   }

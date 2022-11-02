@@ -30,6 +30,8 @@ import javax.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Abstract base for properties mapped to an associated bean, list, set or map.
  */
@@ -353,7 +355,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
       mapping.push(nested);
       targetDescriptor.docStoreMapping(mapping, fullName);
       mapping.pop();
-      if (!nested.getChildren().isEmpty()) {
+      if (!nested.children().isEmpty()) {
         mapping.add(nested);
       }
     }
@@ -364,7 +366,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   public boolean isUpdateable() {
     TableJoinColumn[] columns = tableJoin.columns();
-    if (columns.length <= 0) {
+    if (columns.length == 0) {
       return true;
     }
     for (TableJoinColumn column : columns) {
@@ -381,7 +383,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   public boolean isInsertable() {
     TableJoinColumn[] columns = tableJoin.columns();
-    if (columns.length <= 0) {
+    if (columns.length == 0) {
       return true;
     }
     for (TableJoinColumn column : columns) {
@@ -432,7 +434,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     if (!idProp.isEmbedded()) {
       // simple single scalar id
       if (cols.length != 1) {
-        CoreLog.log.error("No Imported Id column for [" + idProp + "] in table [" + join.getTable() + "]");
+        CoreLog.log.log(ERROR, "No Imported Id column for {0} in table {1}", idProp, join.getTable());
         return null;
       } else {
         BeanProperty[] idProps = {idProp};

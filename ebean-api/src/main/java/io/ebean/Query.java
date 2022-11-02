@@ -931,7 +931,7 @@ public interface Query<T> extends CancelableQuery {
   <A> Set<A> findSingleAttributeSet();
 
   /**
-   * Execute a query returning a single value of a single property/column.
+   * Execute a query returning a single value or null for a single property/column.
    * <p>
    * <pre>{@code
    *
@@ -943,6 +943,7 @@ public interface Query<T> extends CancelableQuery {
    *
    * }</pre>
    */
+  @Nullable
   <A> A findSingleAttribute();
 
   /**

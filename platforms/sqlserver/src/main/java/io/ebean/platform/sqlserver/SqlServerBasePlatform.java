@@ -122,7 +122,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
   }
 
   @Override
-  public boolean isUseMigrationStoredProcedures() {
+  public boolean useMigrationStoredProcedures() {
     return true;
   }
 }

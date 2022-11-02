@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
-import io.ebean.text.TextException;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.ScalarTypeBase;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -87,16 +87,6 @@ final class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public Integer convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not Supported");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public Integer jsonRead(JsonParser parser) throws IOException {
     return parser.getIntValue();
   }
@@ -107,7 +97,7 @@ final class ScalarTypeInteger extends ScalarTypeBase<Integer> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.INTEGER;
   }
 

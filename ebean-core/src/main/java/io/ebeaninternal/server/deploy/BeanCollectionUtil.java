@@ -46,7 +46,7 @@ public final class BeanCollectionUtil {
     } else if (o instanceof Collection<?>) {
       return ((Collection<?>) o);
     }
-    throw new PersistenceException("expecting a Map or Collection but got [" + o.getClass().getName() + "]");
+    throw new PersistenceException("expecting a Map or Collection but got " + o.getClass().getName());
   }
 
   /**
@@ -73,6 +73,6 @@ public final class BeanCollectionUtil {
     } else if (o instanceof Collection<?>) {
       return ((Collection<?>) o);
     }
-    throw new PersistenceException("expecting a Map or Collection but got [" + o.getClass().getName() + "]");
+    throw new PersistenceException("expecting a Map or Collection but got " + o.getClass().getName());
   }
 }

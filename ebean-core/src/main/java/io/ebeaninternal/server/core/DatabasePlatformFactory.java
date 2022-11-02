@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
+
 /**
  * Create a DatabasePlatform from the configuration.
  * <p>
@@ -38,7 +41,7 @@ public class DatabasePlatformFactory {
     try {
       String offlinePlatform = DbOffline.getPlatform();
       if (offlinePlatform != null) {
-        CoreLog.log.info("offline platform [{}]", offlinePlatform);
+        CoreLog.log.log(INFO, "offline platform [{0}]", offlinePlatform);
         return byDatabaseName(offlinePlatform);
       }
       if (config.getDatabasePlatformName() != null) {
@@ -87,7 +90,7 @@ public class DatabasePlatformFactory {
     String dbProductName = metaData.getDatabaseProductName().toLowerCase();
     final int majorVersion = metaData.getDatabaseMajorVersion();
     final int minorVersion = metaData.getDatabaseMinorVersion();
-    CoreLog.log.debug("platform for productName[{}] version[{}.{}]", dbProductName, majorVersion, minorVersion);
+    CoreLog.log.log(DEBUG, "platform for productName[{0}] version[{1}.{2}]", dbProductName, majorVersion, minorVersion);
     for (DatabasePlatformProvider provider : providers) {
       if (provider.matchByProductName(dbProductName)) {
         return provider.create(majorVersion, minorVersion, metaData, connection);

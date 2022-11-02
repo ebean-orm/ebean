@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeBaseVarchar;
+
 import java.time.Period;
 
 /**
@@ -12,7 +14,7 @@ final class ScalarTypePeriod extends ScalarTypeBaseVarchar<Period> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 20;
   }
 

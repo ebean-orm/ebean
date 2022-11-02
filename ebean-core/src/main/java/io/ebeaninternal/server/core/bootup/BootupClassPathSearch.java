@@ -4,17 +4,18 @@ import io.avaje.classpath.scanner.ClassPathScanner;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.ClassPathScanners;
-import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Searches for interesting classes such as Entities, Embedded and ScalarTypes.
  */
 public class BootupClassPathSearch {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final List<String> packages;
   private final List<ClassPathScanner> scanners;
@@ -42,7 +43,6 @@ public class BootupClassPathSearch {
    * Search the classPath for the classes we are interested in.
    */
   private BootupClasses getBootupClasses() {
-
     try {
       BootupClasses bc = new BootupClasses();
 
@@ -59,7 +59,7 @@ public class BootupClassPathSearch {
       }
 
       long searchTime = System.currentTimeMillis() - st;
-      log.debug("Classpath search entities[{}] searchTime[{}] in packages[{}]", bc.getEntities().size(), searchTime, packages);
+      log.log(DEBUG, "Classpath search entities[{0}] searchTime[{1}] in packages[{2}]", bc.getEntities().size(), searchTime, packages);
       return bc;
 
     } catch (Exception ex) {

@@ -2,11 +2,13 @@ package io.ebeaninternal.server.persist;
 
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataReader;
+import io.ebean.core.type.PostgresHelper;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.*;
@@ -16,6 +18,8 @@ import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Collection;
 import java.util.List;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Binds bean values to a PreparedStatement.
@@ -34,7 +38,7 @@ public final class Binder {
   public Binder(TypeManager typeManager, SpiLogManager logManager, int asOfBindCount, boolean asOfStandardsBased,
                 DbExpressionHandler dbExpressionHandler, DataTimeZone dataTimeZone, MultiValueBind multiValueBind) {
     this.typeManager = typeManager;
-    this.geoTypeBinder = typeManager.getGeoTypeBinder();
+    this.geoTypeBinder = typeManager.geoTypeBinder();
     this.asOfBindCount = asOfBindCount;
     this.asOfStandardsBased = asOfStandardsBased;
     this.dbExpressionHandler = dbExpressionHandler;
@@ -132,7 +136,7 @@ public final class Binder {
       }
 
     } catch (SQLException ex) {
-      CoreLog.log.warn("error binding parameter [{}][{}]", (dataBind.currentPos() - 1), value);
+      CoreLog.log.log(WARNING, "error binding parameter [{0}][{1}]", (dataBind.currentPos() - 1), value);
       throw ex;
     }
   }
@@ -143,14 +147,14 @@ public final class Binder {
   public boolean isMultiValueSupported(Class<?> cls) {
     try {
       ScalarType<?> scalarType = getScalarType(cls);
-      return multiValueBind.isTypeSupported(scalarType.getJdbcType());
+      return multiValueBind.isTypeSupported(scalarType.jdbcType());
     } catch (PersistenceException e) {
       return false;
     }
   }
 
   public ScalarType<?> getScalarType(Class<?> clazz) {
-    ScalarType<?> type = typeManager.getScalarType(clazz);
+    ScalarType<?> type = typeManager.type(clazz);
     if (type == null) {
       throw new PersistenceException("No ScalarType registered for " + clazz);
     }
@@ -160,30 +164,27 @@ public final class Binder {
   /**
    * Bind an Object with unknown data type.
    */
-  public Object bindObject(DataBind dataBind, Object value) throws SQLException {
+  public void bindObject(DataBind dataBind, Object value) throws SQLException {
     if (value == null) {
       // null of unknown type
       bindObject(dataBind, null, Types.OTHER);
-      return null;
 
     } else if (value instanceof MultiValueWrapper) {
       MultiValueWrapper wrapper = (MultiValueWrapper) value;
       Collection<?> values = wrapper.getValues();
 
       ScalarType<?> type = getScalarType(wrapper.getType());
-      int dbType = type.getJdbcType();
+      int dbType = type.jdbcType();
       // let the multiValueBind decide what to do with the value
       multiValueBind.bindMultiValues(dataBind, values, type, one -> bindObject(dataBind, one, dbType));
-      return values;
 
     } else {
       ScalarType<?> type = getScalarType(value.getClass());
-      if (!type.isJdbcNative()) {
+      if (!type.jdbcNative()) {
         // convert to a JDBC native type
         value = type.toJdbcType(value);
       }
-      bindObject(dataBind, value, type.getJdbcType());
-      return value;
+      bindObject(dataBind, value, type.jdbcType());
     }
   }
 
@@ -337,9 +338,7 @@ public final class Binder {
       if (data != null) {
         dataClass = data.getClass().getName();
       }
-      String m = "Error with property[" + b.currentPos() + "] dt[" + dataType + "]";
-      m += "data[" + data + "][" + dataClass + "]";
-      throw new PersistenceException(m, e);
+      throw new PersistenceException("Error with property:" + b.currentPos() + " dt:" + dataType + " data:" + data + " " + dataClass, e);
     }
   }
 

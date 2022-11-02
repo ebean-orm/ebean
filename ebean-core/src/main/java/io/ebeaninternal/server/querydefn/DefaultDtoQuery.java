@@ -181,7 +181,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Override
   public String toString() {
-    return "DtoQuery [" + sql + "]";
+    return "DtoQuery " + sql;
   }
 
   @Override

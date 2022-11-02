@@ -44,7 +44,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Eagerly fetch this association fetching all the properties.
    */
-  public R fetch() {
+  public final R fetch() {
     ((TQRootBean) _root).query().fetch(_name);
     return _root;
   }
@@ -52,7 +52,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Eagerly fetch this association using a "query join".
    */
-  public R fetchQuery() {
+  public final R fetchQuery() {
     ((TQRootBean) _root).query().fetchQuery(_name);
     return _root;
   }
@@ -61,7 +61,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Eagerly fetch this association using L2 bean cache.
    * Cache misses are populated via fetchQuery().
    */
-  public R fetchCache() {
+  public final R fetchCache() {
     ((TQRootBean) _root).query().fetchCache(_name);
     return _root;
   }
@@ -69,7 +69,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Use lazy loading for fetching this association.
    */
-  public R fetchLazy() {
+  public final R fetchLazy() {
     ((TQRootBean) _root).query().fetchLazy(_name);
     return _root;
   }
@@ -77,7 +77,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Eagerly fetch this association with the properties specified.
    */
-  public R fetch(String properties) {
+  public final R fetch(String properties) {
     ((TQRootBean) _root).query().fetch(_name, properties);
     return _root;
   }
@@ -85,7 +85,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Eagerly fetch this association using a "query join" with the properties specified.
    */
-  public R fetchQuery(String properties) {
+  public final R fetchQuery(String properties) {
     ((TQRootBean) _root).query().fetchQuery(_name, properties);
     return _root;
   }
@@ -94,7 +94,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Eagerly fetch this association using L2 cache with the properties specified.
    * Cache misses are populated via  fetchQuery().
    */
-  public R fetchCache(String properties) {
+  public final R fetchCache(String properties) {
     ((TQRootBean) _root).query().fetchCache(_name, properties);
     return _root;
   }
@@ -103,7 +103,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Deprecated in favor of fetch().
    */
   @Deprecated
-  public R fetchAll() {
+  public final R fetchAll() {
     return fetch();
   }
 
@@ -140,7 +140,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   }
 
   @SafeVarargs
-  private final R fetchWithProperties(FetchConfig config, TQProperty<?>... props) {
+  private R fetchWithProperties(FetchConfig config, TQProperty<?>... props) {
     spiQuery().fetchProperties(_name, properties(props), config);
     return _root;
   }
@@ -148,21 +148,21 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Fetch using the nested FetchGroup.
    */
-  public R fetch(FetchGroup<T> nestedGroup) {
+  public final R fetch(FetchGroup<T> nestedGroup) {
     return fetchNested(nestedGroup, FETCH_DEFAULT);
   }
 
   /**
    * Fetch query using the nested FetchGroup.
    */
-  public R fetchQuery(FetchGroup<T> nestedGroup) {
+  public final R fetchQuery(FetchGroup<T> nestedGroup) {
     return fetchNested(nestedGroup, FETCH_QUERY);
   }
 
   /**
    * Fetch cache using the nested FetchGroup.
    */
-  public R fetchCache(FetchGroup<T> nestedGroup) {
+  public final R fetchCache(FetchGroup<T> nestedGroup) {
     return fetchNested(nestedGroup, FETCH_CACHE);
   }
 
@@ -177,7 +177,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   }
 
   @SafeVarargs
-  private final Set<String> properties(TQProperty<?>... props) {
+  private Set<String> properties(TQProperty<?>... props) {
     Set<String> set = new LinkedHashSet<>();
     for (TQProperty<?> prop : props) {
       set.add(prop.propertyName());
@@ -188,7 +188,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Is equal to by ID property.
    */
-  public R eq(T other) {
+  public final R eq(T other) {
     expr().eq(_name, other);
     return _root;
   }
@@ -196,14 +196,14 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Is equal to by ID property.
    */
-  public R equalTo(T other) {
+  public final R equalTo(T other) {
     return eq(other);
   }
 
   /**
    * Is not equal to by ID property.
    */
-  public R ne(T other) {
+  public final R ne(T other) {
     expr().ne(_name, other);
     return _root;
   }
@@ -211,15 +211,14 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Is not equal to by ID property.
    */
-  public R notEqualTo(T other) {
+  public final R notEqualTo(T other) {
     return ne(other);
   }
 
   /**
    * Apply a filter when fetching these beans.
    */
-  public R filterMany(ExpressionList<T> filter) {
-
+  public final R filterMany(ExpressionList<T> filter) {
     @SuppressWarnings("unchecked")
     ExpressionList<T> expressionList = (ExpressionList<T>) expr().filterMany(_name);
     expressionList.addAll(filter);
@@ -254,7 +253,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
    * @param params      The bind parameter values
    */
-  public R filterMany(String expressions, Object... params) {
+  public final R filterMany(String expressions, Object... params) {
     expr().filterMany(_name, expressions, params);
     return _root;
   }
@@ -268,7 +267,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * This expression only works on OneToMany and ManyToMany properties.
    * </p>
    */
-  public R isEmpty() {
+  public final R isEmpty() {
     expr().isEmpty(_name);
     return _root;
   }
@@ -282,7 +281,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * This expression only works on OneToMany and ManyToMany properties.
    * </p>
    */
-  public R isNotEmpty() {
+  public final R isNotEmpty() {
     expr().isNotEmpty(_name);
     return _root;
   }

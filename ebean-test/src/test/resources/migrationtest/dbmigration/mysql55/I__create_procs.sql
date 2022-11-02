@@ -22,7 +22,7 @@ FETCH curs INTO c_fk_name;
 IF done THEN
 LEAVE read_loop;
 END IF;
-SET @sql = CONCAT('ALTER TABLE ', p_table_name, ' DROP FOREIGN KEY ', c_fk_name);
+SET @sql = CONCAT('ALTER TABLE `', p_table_name, '` DROP FOREIGN KEY ', c_fk_name);
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 END LOOP;
@@ -41,7 +41,7 @@ delimiter $$
 CREATE PROCEDURE usp_ebean_drop_column(IN p_table_name VARCHAR(255), IN p_column_name VARCHAR(255))
 BEGIN
 CALL usp_ebean_drop_foreign_keys(p_table_name, p_column_name);
-SET @sql = CONCAT('ALTER TABLE ', p_table_name, ' DROP COLUMN ', p_column_name);
+SET @sql = CONCAT('ALTER TABLE `', p_table_name, '` DROP COLUMN `', p_column_name, '`');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 END

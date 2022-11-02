@@ -156,6 +156,7 @@ create table "table" (
   "to"                          varchar(255),
   "varchar"                     varchar(255),
   "foreign"                     varchar(255),
+  textfield                     varchar(255) not null,
   constraint uq_table_to unique ("to"),
   constraint uq_table_varchar unique ("varchar"),
   constraint pk_table primary key ("index")
@@ -254,6 +255,7 @@ create table table_history(
   "to"                          varchar(255),
   "varchar"                     varchar(255),
   "foreign"                     varchar(255),
+  textfield                     varchar(255),
   sys_period_start              timestamp,
   sys_period_end                timestamp
 );

@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -52,7 +53,7 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
    * Consider as a mutable type. Use the isDirty() method to check for dirty state.
    */
   @Override
-  public boolean isMutable() {
+  public boolean mutable() {
     return true;
   }
 
@@ -76,7 +77,7 @@ abstract class ScalarTypeJsonCollection<T> extends ScalarTypeBase<T> implements 
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return docPropertyType;
   }
 

@@ -2,6 +2,7 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.SpiTransactionProxy;
+import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.server.util.Str;
 
 import javax.persistence.PersistenceException;
@@ -25,6 +26,7 @@ final class SavepointTransaction extends SpiTransactionProxy {
 
   private boolean rollbackOnly;
   private int state;
+  private TransactionEvent event;
 
   SavepointTransaction(SpiTransaction transaction, TransactionManager manager) throws SQLException {
     this.manager = manager;
@@ -38,6 +40,14 @@ final class SavepointTransaction extends SpiTransactionProxy {
       this.spPrefix = "sp[] ";
     }
     this.logPrefix = transaction.getLogPrefix() + spPrefix;
+  }
+
+  @Override
+  public TransactionEvent getEvent() {
+    if (event == null) {
+      event = new TransactionEvent();
+    }
+    return event;
   }
 
   @Override
@@ -67,6 +77,11 @@ final class SavepointTransaction extends SpiTransactionProxy {
     } else {
       commitSavepoint();
     }
+  }
+
+  @Override
+  public void rollbackAndContinue() {
+    throw new UnsupportedOperationException();
   }
 
   @Override

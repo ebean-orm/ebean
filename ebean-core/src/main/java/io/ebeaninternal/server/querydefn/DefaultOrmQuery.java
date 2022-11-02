@@ -411,22 +411,23 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     return expressionFactory;
   }
 
-  private final void createExtraJoinsToSupportManyWhereClause() {
-    manyWhereJoins = new ManyWhereJoins();
+  private void createExtraJoinsToSupportManyWhereClause() {
+    final var manyWhere = new ManyWhereJoins();
     if (whereExpressions != null) {
-      whereExpressions.containsMany(beanDescriptor, manyWhereJoins);
+      whereExpressions.containsMany(beanDescriptor, manyWhere);
     }
     if (havingExpressions != null) {
-      havingExpressions.containsMany(beanDescriptor, manyWhereJoins);
+      havingExpressions.containsMany(beanDescriptor, manyWhere);
     }
     if (orderBy != null) {
       for (Property orderProperty : orderBy.getProperties()) {
         ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(orderProperty.getProperty());
         if (elProp != null && elProp.containsFormulaWithJoin()) {
-          manyWhereJoins.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
+          manyWhere.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
         }
       }
     }
+    manyWhereJoins = manyWhere;
   }
 
   /**
@@ -442,14 +443,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * included in the query.
    */
   @Override
-  public final boolean selectAllForLazyLoadProperty() {
+  public final void selectAllForLazyLoadProperty() {
     if (lazyLoadProperty != null) {
       if (!detail.containsProperty(lazyLoadProperty)) {
         detail.select("*");
-        return true;
       }
     }
-    return false;
   }
 
   private List<OrmQueryProperties> removeQueryJoins() {
@@ -1499,12 +1498,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   @SuppressWarnings("unchecked")
   public final <A> List<A> findSingleAttributeList() {
-    return (List<A>) server.findSingleAttributeList(this, transaction);
+    return server.findSingleAttributeList(this, transaction);
   }
 
   @Override
   public final <A> Set<A> findSingleAttributeSet() {
-    return (Set<A>) server.findSingleAttributeSet(this, transaction);
+    return server.findSingleAttributeSet(this, transaction);
   }
 
   @Override
@@ -1714,7 +1713,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final String toString() {
-    return "Query [" + whereExpressions + "]";
+    return "Query " + whereExpressions;
   }
 
   @Override

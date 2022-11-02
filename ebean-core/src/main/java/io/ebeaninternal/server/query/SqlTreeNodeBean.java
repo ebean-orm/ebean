@@ -94,7 +94,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.disableLazyLoad = disableLazyLoad || !readIdNormal || desc.isRawSqlBased();
     this.readOnly = readOnly;
     this.partialObject = props.isPartialObject();
-    this.properties = props.getProps();
+    this.properties = props.props();
     this.children = myChildren == null ? Collections.emptyList() : myChildren;
     this.pathMap = createPathMap(prefix, desc);
   }
@@ -248,7 +248,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
         if (ctx.length() > 0) {
           ctx.append(" and");
         }
-        ctx.append(" ").append(ctx.getTableAlias(prefix)).append(".");
+        ctx.append(" ").append(ctx.tableAlias(prefix)).append(".");
         ctx.append(inheritInfo.getWhere());
       }
     }
@@ -263,7 +263,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       if (ctx.length() > 0) {
         ctx.append(" and");
       }
-      String ta = ctx.getTableAlias(prefix);
+      String ta = ctx.tableAlias(prefix);
       ctx.append(" ").append(extraWhere.replace("${ta}", ta));
     }
   }
@@ -280,7 +280,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     ctx.pushJoin(prefix);
     ctx.pushTableAlias(prefix);
 
-    baseTableAlias = ctx.getTableAlias(prefix);
+    baseTableAlias = ctx.tableAlias(prefix);
     // join and return SqlJoinType to use for child joins
     joinType = appendFromBaseTable(ctx, joinType);
     for (STreeProperty property : properties) {
@@ -325,7 +325,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
        appendJoinDiscriminator(ctx);
     }
     if (desc.isSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
-      ctx.append(" and ").append(desc.softDeletePredicate(ctx.getTableAlias(prefix)));
+      ctx.append(" and ").append(desc.softDeletePredicate(ctx.tableAlias(prefix)));
     }
     return sqlJoinType;
   }
@@ -335,9 +335,9 @@ class SqlTreeNodeBean implements SqlTreeNode {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
       if (manyProp.hasJoinTable()) {
 
-        String alias = ctx.getTableAlias(prefix);
+        String alias = ctx.tableAlias(prefix);
         String[] split = SplitName.split(prefix);
-        String parentAlias = ctx.getTableAlias(split[0]);
+        String parentAlias = ctx.tableAlias(split[0]);
         String alias2 = alias + "z_";
 
         // adding the additional join to the intersection table
@@ -354,7 +354,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   void appendJoinDiscriminator(DbSqlContext ctx) {
     if (inheritInfo.getWhere() == null) return;
-    String alias = ctx.getTableAlias(prefix);
+    String alias = ctx.tableAlias(prefix);
     ctx.append(" and ").append(alias).append(".").append(inheritInfo.getWhere());
   }
 

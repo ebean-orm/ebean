@@ -91,7 +91,9 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 -- apply alter tables
+alter table "table" modify textfield null;
 alter table "table" add "select" varchar2(255);
+alter table "table" add textfield2 varchar2(255);
 alter table migtest_ckey_detail add one_key number(10);
 alter table migtest_ckey_detail add two_key varchar2(127);
 alter table migtest_ckey_parent add assoc_id number(10);
@@ -164,3 +166,4 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_table_textfield2 on "table" (textfield2);

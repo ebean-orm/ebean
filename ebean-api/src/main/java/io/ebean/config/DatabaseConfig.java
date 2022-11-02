@@ -3024,7 +3024,7 @@ public class DatabaseConfig {
   public PersistBatch appliedPersistBatchOnCascade() {
     if (persistBatchOnCascade == PersistBatch.INHERIT) {
       // use the platform default (ALL except SQL Server which has NONE)
-      return databasePlatform.getPersistBatchOnCascade();
+      return databasePlatform.persistBatchOnCascade();
     }
     return persistBatchOnCascade;
   }

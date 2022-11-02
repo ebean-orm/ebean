@@ -161,7 +161,9 @@ public class ModelContainer {
         applyChange((AlterForeignKey) change);
       } else if (change instanceof AddTableComment) {
         applyChange((AddTableComment) change);
-      } else if (change instanceof Sql || change instanceof CreateSchema) {
+      } else if (change instanceof CreateSchema) {
+        applyChange((CreateSchema)change);
+      } else if (change instanceof Sql) {
         // do nothing
       } else {
         throw new IllegalArgumentException("No rule for " + change);
@@ -173,7 +175,6 @@ public class ModelContainer {
    * Set the withHistory flag on the associated base table.
    */
   private void applyChange(AddHistoryTable change) {
-
     MTable table = tables.get(change.getBaseTable());
     if (table == null) {
       throw new IllegalStateException("Table [" + change.getBaseTable() + "] does not exist in model?");
@@ -185,7 +186,6 @@ public class ModelContainer {
    * Unset the withHistory flag on the associated base table.
    */
   protected void applyChange(DropHistoryTable change) {
-
     MTable table = tables.get(change.getBaseTable());
     if (table != null) {
       table.setWithHistory(false);
@@ -226,6 +226,10 @@ public class ModelContainer {
     } else {
       table.setComment(change.getComment());
     }
+  }
+
+  protected void applyChange(CreateSchema createSchema) {
+    schemas.add(createSchema.getName());
   }
 
   /**
@@ -426,7 +430,6 @@ public class ModelContainer {
    * Register a drop column on a history tables that has not been applied yet.
    */
   private void registerPendingDropColumn(DropColumn dropColumn) {
-
     MTable table = getTable(dropColumn.getTableName());
     if (table == null) {
       throw new IllegalArgumentException("Table [" + dropColumn.getTableName() + "] not found?");

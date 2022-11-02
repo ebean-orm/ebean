@@ -9,7 +9,6 @@ module io.ebean.test {
   provides io.ebeaninternal.api.SpiLoggerFactory with io.ebean.test.CapturingLoggerFactory;
   provides io.ebean.config.AutoConfigure with io.ebean.test.config.AutoConfigureForTesting;
 
-  requires transitive org.slf4j;
   requires transitive io.ebean.datasource;
   requires transitive io.ebean.core;
   requires transitive io.ebean.ddl.generator;
@@ -20,7 +19,7 @@ module io.ebean.test {
 
   requires transitive io.ebean.test.containers;
   requires transitive org.assertj.core;
-  requires transitive jakarta.xml.bind;
+  requires transitive java.xml.bind;
   requires transitive com.h2database;
 
   // support testing

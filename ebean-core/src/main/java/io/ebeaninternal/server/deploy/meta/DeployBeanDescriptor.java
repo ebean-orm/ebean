@@ -152,7 +152,6 @@ public class DeployBeanDescriptor<T> {
   private DocStoreMode docStoreDelete;
   private DeployBeanProperty idProperty;
   private TableJoin primaryKeyJoin;
-  private Object jacksonAnnotatedClass;
 
   /**
    * Construct the BeanDescriptor.
@@ -1130,14 +1129,4 @@ public class DeployBeanDescriptor<T> {
     }
   }
 
-  /**
-   * Returns the jackson annotated class, if jackson is present.
-   */
-  @SuppressWarnings("unchecked")
-  Object /*AnnotatedClass*/ getJacksonAnnotatedClass() {
-    if (jacksonAnnotatedClass == null) {
-      jacksonAnnotatedClass = new DeployBeanObtainJackson(config, beanType).obtain();
-    }
-    return jacksonAnnotatedClass;
-  }
 }

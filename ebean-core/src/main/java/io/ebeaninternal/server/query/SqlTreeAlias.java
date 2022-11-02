@@ -89,7 +89,7 @@ final class SqlTreeAlias {
       for (String propJoin : embeddedPropertyJoins) {
         String[] split = SplitName.split(propJoin);
         // the table alias of the parent path
-        String alias = getTableAlias(split[0]);
+        String alias = tableAlias(split[0]);
         aliasMap.put(propJoin, alias);
       }
     }
@@ -109,34 +109,30 @@ final class SqlTreeAlias {
   /**
    * Return the table alias for a given property name.
    */
-  String getTableAlias(String prefix) {
+  String tableAlias(String prefix) {
     if (prefix == null) {
       return rootTableAlias;
     } else {
-      String s = aliasMap.get(prefix);
-      if (s == null) {
-        return calcAlias(prefix);
-      }
-      return s;
+      String alias = aliasMap.get(prefix);
+      return alias != null ? alias : calcAlias(prefix);
     }
   }
 
   /**
    * Return an alias using "Many where joins".
    */
-  String getTableAliasManyWhere(String prefix) {
+  String tableAliasManyWhere(String prefix) {
     if (prefix == null) {
       return rootTableAlias;
     }
-    String s = manyWhereAliasMap.get(prefix);
-    if (s == null) {
-      s = aliasMap.get(prefix);
+    String alias = manyWhereAliasMap.get(prefix);
+    if (alias == null) {
+      alias = aliasMap.get(prefix);
     }
-    if (s == null) {
-      String msg = "Could not determine table alias for [" + prefix + "] manyMap[" + manyWhereAliasMap + "] aliasMap[" + aliasMap + "]";
-      throw new RuntimeException(msg);
+    if (alias == null) {
+      throw new RuntimeException("Could not determine table alias for " + prefix);
     }
-    return s;
+    return alias;
   }
 
   /**

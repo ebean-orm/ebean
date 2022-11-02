@@ -5,7 +5,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.ScalarTypeBase;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -48,7 +49,7 @@ final class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
 
   @Override
   public BigInteger toBeanType(Object value) {
-    return BasicTypeConverter.toMathBigInteger(value);
+    return BasicTypeConverter.toBigInteger(value);
   }
 
   @Override
@@ -59,16 +60,6 @@ final class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   @Override
   public BigInteger parse(String value) {
     return new BigInteger(value);
-  }
-
-  @Override
-  public BigInteger convertFromMillis(long systemTimeMillis) {
-    return BigInteger.valueOf(systemTimeMillis);
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return true;
   }
 
   @Override
@@ -101,7 +92,7 @@ final class ScalarTypeMathBigInteger extends ScalarTypeBase<BigInteger> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.LONG;
   }
 

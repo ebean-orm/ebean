@@ -27,7 +27,7 @@ public final class RemoteTableMod implements BinaryWritable {
 
   @Override
   public String toString() {
-    return "TableMod[" + timestamp + "; " + tables + "]";
+    return "TableMod " + timestamp + "; " + tables;
   }
 
   public long getTimestamp() {

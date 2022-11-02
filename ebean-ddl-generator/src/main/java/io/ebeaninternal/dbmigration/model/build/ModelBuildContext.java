@@ -56,7 +56,7 @@ public class ModelBuildContext {
     if (constraintNaming.getMaxLength() != null) {
       return constraintNaming.getMaxLength();
     }
-    return new DefaultConstraintMaxLength(databasePlatform.getMaxConstraintNameLength());
+    return new DefaultConstraintMaxLength(databasePlatform.maxConstraintNameLength());
   }
 
   /**
@@ -158,7 +158,7 @@ public class ModelBuildContext {
     if (p.isLocalEncrypted()) {
       // scalar type potentially wrapping varbinary db type
       ScalarType<Object> scalarType = p.scalarType();
-      int jdbcType = scalarType.getJdbcType();
+      int jdbcType = scalarType.jdbcType();
       return dbTypeMap.get(jdbcType);
     }
 

@@ -2,7 +2,7 @@ package io.ebeaninternal.api;
 
 /**
  * Event codes used in transaction profiling.
- *
+ * <p>
  * These appear in verbose transaction profile logs.
  */
 public interface TxnProfileEventCodes {

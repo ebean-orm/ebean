@@ -3,6 +3,7 @@ package misc.migration.v1_0;
 import io.ebean.annotation.DbComment;
 import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
+import io.ebean.annotation.NotNull;
 
 import javax.persistence.*;
 import java.util.List;
@@ -35,6 +36,17 @@ public class ETable {
 
   @OneToMany(mappedBy = "foreign")
   List<ETable> foreigns;
+
+  @NotNull
+  private String textfield;
+
+  public void setTextfield(String textfield) {
+    this.textfield = textfield;
+  }
+
+  public String getTextfield() {
+    return textfield;
+  }
 
   public String getIndex() {
     return index;

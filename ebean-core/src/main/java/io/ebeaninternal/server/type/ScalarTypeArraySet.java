@@ -15,15 +15,8 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static java.util.Collections.EMPTY_SET;
 
 /**
  * Type mapped for DB ARRAY type (Postgres only effectively).
@@ -71,7 +64,7 @@ class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeA
 
     @Override
     public ScalarType<?> typeForEnum(ScalarType<?> scalarType, boolean nullable) {
-      return new ScalarTypeArraySet(nullable, arrayTypeFor(scalarType), scalarType.getDocType(), new ArrayElementConverter.EnumConverter(scalarType));
+      return new ScalarTypeArraySet(nullable, arrayTypeFor(scalarType), scalarType.docType(), new ArrayElementConverter.EnumConverter(scalarType));
     }
   }
 
@@ -86,7 +79,7 @@ class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeA
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return docPropertyType;
   }
 
@@ -125,7 +118,7 @@ class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeA
     if (nullable) {
       binder.setNull(Types.ARRAY);
     } else {
-      binder.setArray(arrayType, toArray(EMPTY_SET));
+      binder.setArray(arrayType, EMPTY_ARRAY);
     }
   }
 

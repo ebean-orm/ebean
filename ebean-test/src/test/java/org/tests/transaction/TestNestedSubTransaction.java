@@ -1,11 +1,16 @@
 package org.tests.transaction;
 
 import io.ebean.*;
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.TransactionEvent;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,6 +65,34 @@ public class TestNestedSubTransaction extends BaseTestCase {
     }
   }
 
+  @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA, Platform.ORACLE})
+  @Test
+  void nestedNested() {
+    LoggedSql.start();
+    try (Transaction txn0 = DB.beginTransaction()) {
+      runNestedMethod();
+      try (Transaction txnAfter = DB.beginTransaction()) {
+        DB.save(new EBasic("startAfter"));
+      }
+    }
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).contains("insert into e_basic").contains("sp[");
+    assertThat(sql.get(1)).contains("insert into e_basic").doesNotContain("sp[");
+    assertThat(sql.get(2)).contains("insert into e_basic").doesNotContain("sp[");
+  }
+
+  void runNestedMethod() {
+    try (Transaction txn0 = DB.beginTransaction()) {
+      txn0.setNestedUseSavepoint();
+      try (Transaction nested = DB.beginTransaction()) {
+        DB.save(new EBasic("nested in sp"));
+        nested.commit();
+      }
+      DB.save(new EBasic("nested"));
+      txn0.commit();
+    }
+  }
 
   @IgnorePlatform({Platform.SQLSERVER, Platform.MYSQL, Platform.HANA, Platform.ORACLE})
   @Test
@@ -75,9 +108,14 @@ public class TestNestedSubTransaction extends BaseTestCase {
 
       server.save(bean);
 
+      TransactionEvent event0 = ((SpiTransaction) txn0).getEvent();
+
       try (Transaction txn1 = server.beginTransaction()) {
         bean.setName("updateNested");
         server.save(bean);
+
+        TransactionEvent event1 = ((SpiTransaction) txn1).getEvent();
+        assertThat(event1).isNotSameAs(event0);
 
         try (Transaction txn2 = server.beginTransaction()) {
           bean.setName("barney");

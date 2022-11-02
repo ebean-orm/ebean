@@ -30,7 +30,7 @@ public enum SqlJoinType {
    * Return the actual SQL join literal taking into account the current join type and the 'default
    * join type as per deployment cardinality and optionality'.
    */
-  public String getLiteral(SqlJoinType deploymentJoinType) {
+  public String literal(SqlJoinType deploymentJoinType) {
     if (this == SqlJoinType.AUTO) {
       return deploymentJoinType.literal;
     }

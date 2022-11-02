@@ -237,7 +237,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
     }
     buffer.append(rhsTableName);
 
-    int maxTableNameLength = databasePlatform.getMaxTableNameLength();
+    int maxTableNameLength = databasePlatform.maxTableNameLength();
 
     // maxConstraintNameLength is used as the max table name length.
     if (buffer.length() > maxTableNameLength) {

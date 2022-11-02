@@ -174,6 +174,7 @@ create table "table" (
   "to"                          varchar2(255),
   "varchar"                     varchar2(255),
   "foreign"                     varchar2(255),
+  textfield                     varchar2(255) not null,
   constraint uq_table_to unique ("to"),
   constraint uq_table_varchar unique ("varchar"),
   constraint pk_table primary key ("index")

@@ -10,5 +10,6 @@ module io.ebean.autotune {
 
   requires io.ebean.api;
   requires io.ebean.core;
-  requires jakarta.xml.bind;
+  requires java.xml;
+  requires java.xml.bind;
 }

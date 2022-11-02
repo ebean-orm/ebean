@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
+import io.avaje.applog.AppLog;
 import io.ebean.BackgroundExecutor;
 import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
@@ -9,7 +10,6 @@ import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DatabasePlatform.OnQueryOnly;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
@@ -28,8 +28,6 @@ import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -40,6 +38,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Manages transactions.
  * <p>
@@ -47,8 +48,8 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class TransactionManager implements SpiTransactionManager {
 
-  private static final Logger log = CoreLog.log;
-  private static final Logger clusterLogger = LoggerFactory.getLogger("io.ebean.Cluster");
+  private static final System.Logger log = CoreLog.log;
+  private static final System.Logger clusterLogger = AppLog.getLogger("io.ebean.Cluster");
 
   private final SpiServer server;
   private final BeanDescriptorManager beanDescriptorManager;
@@ -74,7 +75,6 @@ public class TransactionManager implements SpiTransactionManager {
    * Flag to indicate the default Isolation is READ COMMITTED. This enables us
    * to close queryOnly transactions rather than commit or rollback them.
    */
-  private final OnQueryOnly onQueryOnly;
   private final BackgroundExecutor backgroundExecutor;
   private final ClusterManager clusterManager;
   private final String serverName;
@@ -118,7 +118,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.txnLogger = logManager.txn();
     this.txnDebug = txnLogger.isDebug();
     this.databasePlatform = options.config.getDatabasePlatform();
-    this.supportsSavepointId = databasePlatform.isSupportsSavepointId();
+    this.supportsSavepointId = databasePlatform.supportsSavepointId();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
     this.autoPersistUpdates = options.config.isAutoPersistUpdates();
@@ -143,7 +143,6 @@ public class TransactionManager implements SpiTransactionManager {
     this.bulkEventListenerMap = new BulkEventListenerMap(options.config.getBulkTableEventListeners());
     this.prefix = "";
     this.externalTransPrefix = "e";
-    this.onQueryOnly = initOnQueryOnly(options.config.getDatabasePlatform().getOnQueryOnly());
 
     CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
@@ -251,26 +250,6 @@ public class TransactionManager implements SpiTransactionManager {
     return persistBatchOnCascade;
   }
 
-  /**
-   * Return the behaviour to use when a query only transaction is committed.
-   * <p>
-   * There is a potential optimisation available when read committed is the default
-   * isolation level. If it is, then Connections used only for queries do not require
-   * commit or rollback but instead can just be put back into the pool via close().
-   * <p>
-   * If the Isolation level is higher (say SERIALIZABLE) then Connections used
-   * just for queries do need to be committed or rollback after the query.
-   */
-  final OnQueryOnly initOnQueryOnly(OnQueryOnly dbPlatformOnQueryOnly) {
-    // first check for a system property 'override'
-    String systemPropertyValue = System.getProperty("ebean.transaction.onqueryonly");
-    if (systemPropertyValue != null) {
-      return OnQueryOnly.valueOf(systemPropertyValue.trim().toUpperCase());
-    }
-    // default to rollback if not defined on the platform
-    return dbPlatformOnQueryOnly == null ? OnQueryOnly.COMMIT : dbPlatformOnQueryOnly;
-  }
-
   public final String name() {
     return serverName;
   }
@@ -288,13 +267,6 @@ public class TransactionManager implements SpiTransactionManager {
   @Override
   public final DataSource readOnlyDataSource() {
     return dataSourceSupplier.getReadOnlyDataSource();
-  }
-
-  /**
-   * Defines the type of behavior to use when closing a transaction that was used to query data only.
-   */
-  final OnQueryOnly onQueryOnly() {
-    return onQueryOnly;
   }
 
   /**
@@ -365,7 +337,7 @@ public class TransactionManager implements SpiTransactionManager {
         txnLogger.debug(msg);
       }
     } catch (Exception ex) {
-      log.error("Error while notifying TransactionEventListener of rollback event", ex);
+      log.log(ERROR, "Error while notifying TransactionEventListener of rollback event", ex);
     }
   }
 
@@ -416,7 +388,7 @@ public class TransactionManager implements SpiTransactionManager {
       postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
     } catch (Exception ex) {
-      log.error("NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
+      log.log(ERROR, "NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
     }
   }
 
@@ -442,8 +414,8 @@ public class TransactionManager implements SpiTransactionManager {
    * Notify local BeanPersistListeners etc of events from another server in the cluster.
    */
   public final void remoteTransactionEvent(RemoteTransactionEvent remoteEvent) {
-    if (clusterLogger.isDebugEnabled()) {
-      clusterLogger.debug("processing {}", remoteEvent);
+    if (clusterLogger.isLoggable(DEBUG)) {
+      clusterLogger.log(DEBUG, "processing {0}", remoteEvent);
     }
     CacheChangeSet changeSet = new CacheChangeSet();
 
@@ -601,7 +573,7 @@ public class TransactionManager implements SpiTransactionManager {
     } else {
       setToScope = false;
       transaction = txnContainer.current();
-      nestedSavepoint = transaction.isNestedUseSavepoint();
+      nestedSavepoint = txnContainer.isNestedUseSavepoint();
     }
 
     TxType type = txScope.getType();

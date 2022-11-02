@@ -14,8 +14,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static java.util.Collections.EMPTY_LIST;
-
 /**
  * H2 database support for DB ARRAY.
  */
@@ -47,6 +45,9 @@ final class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
         }
         if (valueType.equals(Integer.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
+        }
+        if (valueType.equals(Float.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "real", DocPropertyType.DOUBLE, ArrayElementConverter.FLOAT));
         }
         if (valueType.equals(Double.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
@@ -87,7 +88,7 @@ final class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
     if (nullable) {
       binder.setNull(Types.ARRAY);
     } else {
-      binder.setObject(toArray(EMPTY_LIST));
+      binder.setObject(EMPTY_ARRAY);
     }
   }
 }

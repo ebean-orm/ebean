@@ -1,8 +1,8 @@
 package org.tests.query;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;
 
@@ -14,8 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestSubQuery extends BaseTestCase {
 
   @Test
-  public void testId() {
-
+  void testId() {
     ResetBasicData.reset();
 
     List<Integer> productIds = new ArrayList<>();
@@ -26,7 +25,13 @@ public class TestSubQuery extends BaseTestCase {
     Query<Order> sq = DB.find(Order.class).select("id").where()
       .in("details.product.id", productIds).query();
 
-    DB.find(Order.class).where().in("id", sq).findList();
+    Query<Order> query = DB.find(Order.class).where().in("id", sq).query();
+    query.findList();
+    if (isPostgresCompatible()) {
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status, t0.order_date, t0.ship_date, t1.name, t0.cretime, t0.updtime, t0.kcustomer_id from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where  (t0.id) in (select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id and u1.id > 0 where u1.product_id = any(?))");
+    } else {
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status, t0.order_date, t0.ship_date, t1.name, t0.cretime, t0.updtime, t0.kcustomer_id from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where  (t0.id) in (select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id and u1.id > 0 where u1.product_id in (?,?,?))");
+    }
   }
 
   @Test

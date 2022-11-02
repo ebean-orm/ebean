@@ -48,9 +48,7 @@ import java.util.stream.Stream;
 final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
-
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
-
   private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private OrmQueryDetail detail = new OrmQueryDetail();

@@ -20,7 +20,7 @@ class BeanPropertyAssocManyJsonTransient {
    * Use Jackson ObjectMapper to read the transient 'many' property.
    */
   void jsonReadUsingObjectMapper(BeanPropertyAssocMany<?> many, SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-    ObjectMapper mapper = readJson.getObjectMapper();
+    ObjectMapper mapper = readJson.mapper();
     ManyType manyType = many.manyType();
 
     Object value;
@@ -29,11 +29,11 @@ class BeanPropertyAssocManyJsonTransient {
       TypeFactory typeFactory = mapper.getTypeFactory();
       JavaType target = typeFactory.constructType(many.targetType());
       MapType jacksonType = typeFactory.constructMapType(LinkedHashMap.class, TypeFactory.unknownType(), target);
-      value = mapper.readValue(readJson.getParser(), jacksonType);
+      value = mapper.readValue(readJson.parser(), jacksonType);
     } else {
       // read list or set using Jackson object mapper
       CollectionType jacksonType = mapper.getTypeFactory().constructCollectionType(manyType.getCollectionType(), many.targetType());
-      value = mapper.readValue(readJson.getParser(), jacksonType);
+      value = mapper.readValue(readJson.parser(), jacksonType);
     }
     many.setValue(parentBean, value);
   }

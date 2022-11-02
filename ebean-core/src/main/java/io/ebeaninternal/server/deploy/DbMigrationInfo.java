@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public final class DbMigrationInfo {
     if (scripts.length == 0) {
       return Collections.emptyList();
     } else {
-      return Collections.unmodifiableList(Arrays.asList(scripts));
+      return List.of(scripts);
     }
   }
 

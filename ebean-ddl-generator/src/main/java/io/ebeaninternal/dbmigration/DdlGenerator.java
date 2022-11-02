@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration;
 
+import io.avaje.applog.AppLog;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -11,13 +12,13 @@ import io.ebeaninternal.api.SpiDdlGenerator;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Controls the generation and execution of "Create All" and "Drop All" DDL scripts.
@@ -27,7 +28,7 @@ import java.sql.SQLException;
  */
 public class DdlGenerator implements SpiDdlGenerator {
 
-  private static final Logger log = LoggerFactory.getLogger(DdlGenerator.class);
+  private static final System.Logger log = AppLog.getLogger(DdlGenerator.class);
   private static final String[] BUILD_DIRS = {"target", "build"};
 
   private final SpiEbeanServer server;
@@ -57,15 +58,15 @@ public class DdlGenerator implements SpiDdlGenerator {
     this.createOnly = config.isDdlCreateOnly();
     this.dbSchema = config.getDbSchema();
     final DatabasePlatform databasePlatform = server.databasePlatform();
-    this.platform = databasePlatform.getPlatform();
+    this.platform = databasePlatform.platform();
     this.platformName = platform.base().name();
     if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
-      log.warn("DDL can't be run on startup with TenantMode " + config.getTenantMode());
+      log.log(WARNING, "DDL can't be run on startup with TenantMode " + config.getTenantMode());
       this.runDdl = false;
       this.useMigrationStoredProcedures = false;
     } else {
       this.runDdl = config.isDdlRun();
-      this.useMigrationStoredProcedures = config.getDatabasePlatform().isUseMigrationStoredProcedures();
+      this.useMigrationStoredProcedures = config.getDatabasePlatform().useMigrationStoredProcedures();
     }
     this.scriptTransform = createScriptTransform(config);
     this.baseDir = initBaseDir();
@@ -224,7 +225,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     if (sqlScript != null) {
       try (InputStream is = getClassLoader().getResourceAsStream(sqlScript)) {
         if (is == null) {
-          log.warn("sql script {} was not found as a resource", sqlScript);
+          log.log(WARNING, "sql script {0} was not found as a resource", sqlScript);
         } else {
           String content = readContent(IOUtils.newReader(is)); // 'is' is closed
           runScript(connection, false, content, sqlScript);

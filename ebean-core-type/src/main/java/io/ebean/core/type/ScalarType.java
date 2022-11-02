@@ -2,7 +2,6 @@ package io.ebean.core.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;
 
@@ -34,7 +33,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   /**
    * Return true for types that do mutation detection based on json content.
    */
-  default boolean isJsonMapper() {
+  default boolean jsonMapper() {
     return false;
   }
 
@@ -42,14 +41,14 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * Return true if this is a binary type and can not support parse() and format() from/to string.
    * This allows Ebean to optimise marshalling types to string.
    */
-  default boolean isBinaryType() {
+  default boolean binary() {
     return false;
   }
 
   /**
    * Return true if this is a mutable scalar type (like hstore).
    */
-  default boolean isMutable() {
+  default boolean mutable() {
     return false;
   }
 
@@ -67,7 +66,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * If a BeanProperty has no explicit length defined then this length should
    * be assigned.
    */
-  default int getLength() {
+  default int length() {
     return 0;
   }
 
@@ -77,7 +76,7 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * If it is native to JDBC then its values/instances do not need to be
    * converted to and from an associated JDBC type.
    */
-  boolean isJdbcNative();
+  boolean jdbcNative();
 
   /**
    * Return the type as per java.sql.Types that this maps to.
@@ -85,14 +84,19 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * This type should be consistent with the toJdbcType() method in converting
    * the type to the appropriate type for binding to preparedStatements.
    */
-  int getJdbcType();
+  int jdbcType();
 
   /**
    * Return the type that matches the bean property type.
    * <p>
    * This represents the 'logical' type rather than the JDBC type this maps to.
    */
-  Class<T> getType();
+  Class<T> type();
+
+  /**
+   * Return the type this maps to for JSON document stores.
+   */
+  DocPropertyType docType();
 
   /**
    * Read the value from the resultSet and convert if necessary to the logical
@@ -100,12 +104,6 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    */
   @Override
   T read(DataReader reader) throws SQLException;
-
-  /**
-   * Ignore the reading of this value. Typically, this means moving the index
-   * position in the ResultSet.
-   */
-  void loadIgnore(DataReader reader);
 
   /**
    * Convert (if necessary) and bind the value to the preparedStatement.
@@ -136,6 +134,14 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   T toBeanType(Object value);
 
   /**
+   * Convert the string value to the appropriate java object.
+   * <p>
+   * Mostly used to support CSV, JSON and XML parsing.
+   */
+  @Override
+  T parse(String value);
+
+  /**
    * Convert the type into a string representation.
    */
   String formatValue(T value);
@@ -147,49 +153,16 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
    * <p>
    * This is so that ScalarType also implements the StringFormatter interface.
    */
+  @SuppressWarnings("unchecked")
   @Override
-  String format(Object value);
-
-  /**
-   * Convert the string value to the appropriate java object.
-   * <p>
-   * Mostly used to support CSV, JSON and XML parsing.
-   */
-  @Override
-  T parse(String value);
-
-  /**
-   * Return the type this maps to for JSON document stores.
-   */
-  DocPropertyType getDocType();
-
-  /**
-   * Return true if the type can accept long systemTimeMillis input.
-   * <p>
-   * This is used to determine if it is sensible to use the
-   * {@link #convertFromMillis(long)} method.
-   * <p>
-   * This includes the Date, Calendar, sql Date, Time, Timestamp, JODA types
-   * as well as Long, BigDecimal and String (although it generally is not
-   * expected to parse systemTimeMillis to a String or BigDecimal).
-   */
-  default boolean isDateTimeCapable() {
-    return false;
+  default String format(Object value) {
+    return formatValue((T) value);
   }
 
   /**
    * Convert the value into a long version value.
    */
   default long asVersion(T value) {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Convert the systemTimeMillis into the appropriate java object.
-   * <p>
-   * For non dateTime types this will throw an exception.
-   */
-  default T convertFromMillis(long dateTime) {
     throw new UnsupportedOperationException();
   }
 

@@ -9,7 +9,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class TestSqlUpdateExceptions extends BaseTestCase {
+class TestSqlUpdateExceptions extends BaseTestCase {
 
   private String sql = "insert into uuone (id, name, version) values (?,?,?)";
 
@@ -63,7 +63,7 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
   }
 
   @Test
-  public void duplicateKey_inBatch() {
+  void duplicateKey_inBatch() {
     UUID id = UUID.randomUUID();
     assertThrows(DuplicateKeyException.class, () -> {
       try (Transaction transaction = DB.beginTransaction()) {
@@ -85,7 +85,7 @@ public class TestSqlUpdateExceptions extends BaseTestCase {
   }
 
   @Test
-  public void duplicateKey_executeBatch() {
+  void duplicateKey_executeBatch() {
     UUID id = UUID.randomUUID();
     assertThrows(DuplicateKeyException.class, () -> {
       try (Transaction transaction = DB.beginTransaction()) {

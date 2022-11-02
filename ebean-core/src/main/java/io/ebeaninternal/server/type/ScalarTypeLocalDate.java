@@ -8,7 +8,8 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import io.ebean.config.JsonConfig;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.ScalarTypeBaseDate;
+import io.ebean.core.type.BasicTypeConverter;
 
 /**
  * ScalarType for java.time.LocalDate. This maps to a JDBC Date.

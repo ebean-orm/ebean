@@ -7,6 +7,8 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import java.util.List;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 /**
  * Default implementation for creating BeanControllers.
  */
@@ -28,7 +30,7 @@ final class BeanQueryAdapterManager {
   void addQueryAdapter(DeployBeanDescriptor<?> deployDesc) {
     for (BeanQueryAdapter c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        CoreLog.internal.debug("BeanQueryAdapter on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
+        CoreLog.internal.log(DEBUG, "BeanQueryAdapter on[{0}] {1}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addQueryAdapter(c);
       }
     }

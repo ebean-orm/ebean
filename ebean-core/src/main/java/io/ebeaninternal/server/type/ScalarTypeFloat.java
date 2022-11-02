@@ -5,7 +5,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.ScalarTypeBase;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -57,16 +58,6 @@ final class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public Float convertFromMillis(long systemTimeMillis) {
-    return (float) systemTimeMillis;
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public Float readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -96,7 +87,7 @@ final class ScalarTypeFloat extends ScalarTypeBase<Float> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.FLOAT;
   }
 

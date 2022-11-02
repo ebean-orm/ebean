@@ -15,19 +15,13 @@ import java.util.concurrent.locks.ReentrantLock;
 public final class LimitOffsetPagedList<T> implements PagedList<T> {
 
   private final transient SpiEbeanServer server;
-
   private final transient ReentrantLock lock = new ReentrantLock();
-
   private final SpiQuery<T> query;
-
   private final int firstRow;
-
   private final int maxRows;
 
   private int foregroundTotalRowCount = -1;
-
   private Future<Integer> futureRowCount;
-
   private List<T> list;
 
   /**

@@ -1,17 +1,18 @@
 package io.ebeaninternal.server.core;
 
+import io.avaje.applog.AppLog;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.config.SlowQueryEvent;
 import io.ebean.config.SlowQueryListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Default slow query listener implementation that logs a warning message.
  */
 final class DefaultSlowQueryListener implements SlowQueryListener {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.SlowQuery");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.SlowQuery");
 
   @Override
   public void process(SlowQueryEvent event) {
@@ -20,6 +21,6 @@ final class DefaultSlowQueryListener implements SlowQueryListener {
     if (node != null) {
       firstStack = node.getOriginQueryPoint().getTopElement();
     }
-    log.warn("Slow query warning - millis:{} rows:{} caller[{}] sql[{}]", event.getTimeMillis(), event.getRowCount(), firstStack, event.getSql());
+    log.log(WARNING, "Slow query warning - millis:{0} rows:{1} caller[{2}] sql[{3}]", event.getTimeMillis(), event.getRowCount(), firstStack, event.getSql());
   }
 }
