@@ -1,16 +1,18 @@
 package io.ebean.typequery;
 
+import io.ebean.Query.Property;
+
 public final class StdFunctions {
 
-  public static TQColumn max(TQColumn property) {
+  public static Property max(Property property) {
     return new Standard("max(" + property + ")");
   }
 
-  public static TQColumn sum(TQColumn property) {
+  public static Property sum(Property property) {
     return new Standard("sum(" + property + ")");
   }
 
-  public static TQColumn concat(TQColumn property, Object... values) {
+  public static Property concat(Property property, Object... values) {
     StringBuilder expression = new StringBuilder(50);
     expression.append("concat(").append(property.toString());
     for (Object value : values) {
@@ -20,7 +22,7 @@ public final class StdFunctions {
     return new Standard(expression.toString());
   }
 
-  public static TQColumn coalesce(TQColumn property, Object value) {
+  public static Property coalesce(Property property, Object value) {
     StringBuilder expression = new StringBuilder(50);
     expression.append("coalesce(").append(property.toString()).append(",");
     expression.append(sqlStringExpression(value));
@@ -29,14 +31,14 @@ public final class StdFunctions {
   }
 
   private static String sqlStringExpression(Object value) {
-    if (value instanceof TQColumn || value instanceof Number) {
+    if (value instanceof Property || value instanceof Number) {
       return value.toString();
     } else {
       return "'" + value + "'";
     }
   }
 
-  private static class Standard implements TQColumn {
+  private static class Standard implements Property {
 
     private final String expression;
 

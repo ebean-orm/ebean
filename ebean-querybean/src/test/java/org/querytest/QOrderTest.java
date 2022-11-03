@@ -4,7 +4,6 @@ import io.ebean.DB;
 import io.ebean.FetchGroup;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
-import io.ebean.typequery.StdExpressions;
 import org.example.domain.Customer;
 import org.example.domain.Order;
 import org.example.domain.OrderDetail;
@@ -219,6 +218,22 @@ public class QOrderTest {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("select t0.id, t0.status, t1.id, t1.email, t1.name from o_order t0 join be_customer t1 on t1.id = t0.customer_id");
 
+  }
+
+  @Test
+  public void updateQuery() {
+    LoggedSql.start();
+    new QOrder()
+      .status.eq(Order.Status.COMPLETE)
+      .orderDate.gt(new java.sql.Date(System.currentTimeMillis()))
+      .asUpdate()
+      .set(QOrder.Alias.version, 42L)
+      .setNull(QOrder.Alias.orderDate)
+      .update();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update o_order set version=?, order_date=null where status = ? and order_date > ?");
   }
 
   @Test

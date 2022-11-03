@@ -1,13 +1,14 @@
 package io.ebean.typequery;
 
 import io.ebean.ExpressionList;
+import io.ebean.Query;
 
 /**
  * A property used in type query.
  *
  * @param <R> The type of the owning root bean
  */
-public class TQProperty<R> implements TQColumn {
+public class TQProperty<R> implements Query.Property {
 
   protected final String _name;
 

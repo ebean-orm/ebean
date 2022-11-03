@@ -1768,4 +1768,11 @@ public interface Query<T> extends CancelableQuery {
    */
   Query<T> orderById(boolean orderById);
 
+  /**
+   * Type safe query bean properties and expressions (marker interface).
+   * <p>
+   * Implemented by query bean properties and expressions based on those properties.
+   */
+  interface Property {
+  }
 }

@@ -14,7 +14,7 @@ package io.ebean;
  *
  *  int rows = DB.update(Customer.class)
  *      .set("status", Customer.Status.ACTIVE)
- *      .set("updtime", new Timestamp(System.currentTimeMillis()))
+ *      .set("whenUpdated", Instant.now())
  *      .where()
  *      .gt("id", 1000)
  *      .update();
@@ -23,6 +23,20 @@ package io.ebean;
  * <pre>{@code sql
  *
  *   update o_customer set status=?, updtime=? where id > ?
+ *
+ * }</pre>
+ *
+ * <h4>Example: Using query bean</h4>
+ * <pre>{@code
+ *
+ *   var cust = QCustomer.alias();
+ *
+ *   int rows = new QCustomer()
+ *       .id.gt(1000)
+ *       .asUpdate()
+ *       .set(cust.status, Customer.Status.COMPLETE)
+ *       .set(cust.whenUpdated, Instant.now())
+ *       .update();
  *
  * }</pre>
  * <p>
@@ -40,7 +54,7 @@ package io.ebean;
  *
  *   int rows = DB.update(Customer.class)
  *       .set("status", Customer.Status.ACTIVE)
- *       .set("updtime", new Timestamp(System.currentTimeMillis()))
+ *       .set("whenUpdated", Instant.now())
  *       .where()
  *         .eq("status", Customer.Status.NEW)
  *         .eq("billingAddress.country", nz)
@@ -73,7 +87,7 @@ public interface UpdateQuery<T> {
    *
    *   int rows = DB.update(Customer.class)
    *      .set("status", Customer.Status.ACTIVE)
-   *      .set("updtime", new Timestamp(System.currentTimeMillis()))
+   *      .set("whenUpdated", Instant.now())
    *      .where()
    *      .gt("id", 1000)
    *      .update();
@@ -84,6 +98,27 @@ public interface UpdateQuery<T> {
    * @param value    The value to set the property to
    */
   UpdateQuery<T> set(String property, Object value);
+
+  /**
+   * Set the value of a property.
+   * <p>
+   * <pre>{@code
+   *
+   *   var cust = QCustomer.alias();
+   *
+   *   int rows = new QCustomer()
+   *       .id.gt(1000)
+   *       .asUpdate()
+   *       .set(cust.status, Customer.Status.COMPLETE)
+   *       .set(cust.whenUpdated, Instant.now())
+   *       .update();
+   *
+   * }</pre>
+   *
+   * @param property The bean property to be set
+   * @param value    The value to set the property to
+   */
+  UpdateQuery<T> set(Query.Property property, Object value);
 
   /**
    * Set the property to be null.
@@ -101,6 +136,13 @@ public interface UpdateQuery<T> {
    * @param property The property to be set to null.
    */
   UpdateQuery<T> setNull(String property);
+
+  /**
+   * Set the property to be null.
+   *
+   * @param property The bean property to be set
+   */
+  UpdateQuery<T> setNull(Query.Property property);
 
   /**
    * Set using a property expression that does not need any bind values.

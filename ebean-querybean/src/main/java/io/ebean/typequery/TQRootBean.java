@@ -268,9 +268,9 @@ public abstract class TQRootBean<T, R> {
     return root;
   }
 
-  private Set<String> properties(TQColumn[] properties) {
+  private Set<String> properties(Query.Property[] properties) {
     Set<String> props = new LinkedHashSet<>();
-    for (TQColumn property : properties) {
+    for (Query.Property property : properties) {
       props.add(property.toString());
     }
     return props;
@@ -278,11 +278,11 @@ public abstract class TQRootBean<T, R> {
 
   /**
    * Specify the properties to be loaded on the 'main' root level entity bean
-   * also allowing for functions to be used like {@link StdFunctions#max(TQColumn)}.
+   * also allowing for functions to be used like {@link StdFunctions#max(Query.Property)}.
    *
    * @param properties the list of properties to fetch
    */
-  public final R select(TQColumn... properties) {
+  public final R select(Query.Property... properties) {
     ((SpiQueryFetch) query).selectProperties(properties(properties));
     return root;
   }
