@@ -2,7 +2,6 @@ package io.ebeaninternal.server.querydefn;
 
 import io.avaje.lang.NonNullApi;
 import io.ebean.*;
-import io.ebean.OrderBy.Property;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
@@ -420,7 +419,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
       havingExpressions.containsMany(beanDescriptor, manyWhere);
     }
     if (orderBy != null) {
-      for (Property orderProperty : orderBy.getProperties()) {
+      for (OrderBy.Property orderProperty : orderBy.getProperties()) {
         ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(orderProperty.getProperty());
         if (elProp != null && elProp.containsFormulaWithJoin()) {
           manyWhere.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
@@ -460,10 +459,10 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
         for (OrmQueryProperties joinPath : queryJoins) {
           // loop through the orderBy properties and
           // move any ones related to the query join
-          List<Property> properties = orderBy.getProperties();
-          Iterator<Property> it = properties.iterator();
+          List<OrderBy.Property> properties = orderBy.getProperties();
+          Iterator<OrderBy.Property> it = properties.iterator();
           while (it.hasNext()) {
-            Property property = it.next();
+            OrderBy.Property property = it.next();
             if (property.getProperty().startsWith(joinPath.getPath())) {
               // remove this orderBy segment and
               // add it to the secondary join
@@ -1970,7 +1969,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
       havingExpressions.validate(validation);
     }
     if (orderBy != null) {
-      for (Property property : orderBy.getProperties()) {
+      for (OrderBy.Property property : orderBy.getProperties()) {
         validation.validate(property.getProperty());
       }
     }
