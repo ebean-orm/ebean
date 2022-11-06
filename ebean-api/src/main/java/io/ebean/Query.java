@@ -1774,5 +1774,21 @@ public interface Query<T> extends CancelableQuery {
    * Implemented by query bean properties and expressions based on those properties.
    */
   interface Property {
+
+    /**
+     * Return a property given the expression.
+     */
+    static Property of(String expression) {
+      return new SimpleProperty(expression);
+    }
+
+    /**
+     * Return the property in string expression form.
+     * <p>
+     * This is a path to a database column (like "name" or "billingAddress.city") or a function
+     * wrapping a path (like <em>lower(name)</em>, <em>concat(name, '-', billingAddress.city)</em>
+     */
+    @Override
+    String toString();
   }
 }

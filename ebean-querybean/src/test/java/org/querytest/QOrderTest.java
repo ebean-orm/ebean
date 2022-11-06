@@ -17,9 +17,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static io.ebean.typequery.StdExpressions.gt;
-import static io.ebean.typequery.StdExpressions.ilike;
-import static io.ebean.typequery.StdFunctions.*;
+import static io.ebean.StdFunctions.gt;
+import static io.ebean.StdFunctions.ilike;
+import static io.ebean.StdFunctions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class QOrderTest {
