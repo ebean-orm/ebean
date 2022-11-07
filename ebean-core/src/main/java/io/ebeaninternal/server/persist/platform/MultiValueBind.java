@@ -17,15 +17,7 @@ public class MultiValueBind {
   }
 
   Object[] toArray(Collection<?> values, ScalarType<?> type) {
-    if (type.binary()) {
-      byte[][] array = new byte[values.size()][];
-      int i = 0;
-      for (Object value : values) {
-        array[i++] = (byte[])type.toJdbcType(value);
-      }
-      return array;
-    }
-    Object[] array = new Object[values.size()];
+    Object[] array = type.binary() ? new byte[values.size()][] : new Object[values.size()];
     int i = 0;
     for (Object value : values) {
       array[i++] = type.toJdbcType(value);
