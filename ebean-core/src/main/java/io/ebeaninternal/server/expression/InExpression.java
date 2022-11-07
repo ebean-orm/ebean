@@ -95,7 +95,7 @@ public final class InExpression extends AbstractExpression implements IdInCommon
   public void prepareExpression(BeanQueryRequest<?> request) {
     initBindValues();
     if (bindValues.size() > 0) {
-      multiValueSupported = request.isMultiValueSupported((bindValues.get(0)).getClass());
+      multiValueSupported = request.isMultiValueSupported(bindValues.get(0).getClass());
     }
   }
 
@@ -149,7 +149,6 @@ public final class InExpression extends AbstractExpression implements IdInCommon
     // if we have no property, we wrap them in a multi value wrapper.
     // later the binder will decide, which bind strategy to use.
     request.addBindValue(new MultiValueWrapper(values));
-
   }
 
   @Override
@@ -164,7 +163,6 @@ public final class InExpression extends AbstractExpression implements IdInCommon
     }
 
     ElPropertyValue prop = getElProp(request);
-
     if (prop != null) {
       if (prop.isAssocId()) {
         request.append(prop.assocIdInExpr(propName));
@@ -172,15 +170,13 @@ public final class InExpression extends AbstractExpression implements IdInCommon
         return;
       }
       if (prop.isDbEncrypted()) {
-        String dsql = prop.beanProperty().decryptProperty(propName);
-        request.append(dsql);
+        request.append(prop.beanProperty().decryptProperty(propName));
         request.appendInExpression(not, bindValues);
         return;
       }
     }
     request.append(propName);
     request.appendInExpression(not, bindValues);
-
   }
 
   /**
