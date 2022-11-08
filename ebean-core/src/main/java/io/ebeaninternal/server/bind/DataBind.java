@@ -115,88 +115,88 @@ public class DataBind implements DataBinder {
   }
 
   @Override
-  public void setString(String s) throws SQLException {
-    pstmt.setString(++pos, s);
+  public void setString(String value) throws SQLException {
+    pstmt.setString(++pos, value);
   }
 
   @Override
-  public final void setInt(int i) throws SQLException {
-    pstmt.setInt(++pos, i);
+  public final void setInt(int value) throws SQLException {
+    pstmt.setInt(++pos, value);
   }
 
   @Override
-  public final void setLong(long i) throws SQLException {
-    pstmt.setLong(++pos, i);
+  public final void setLong(long value) throws SQLException {
+    pstmt.setLong(++pos, value);
   }
 
   @Override
-  public final void setShort(short i) throws SQLException {
-    pstmt.setShort(++pos, i);
+  public final void setShort(short value) throws SQLException {
+    pstmt.setShort(++pos, value);
   }
 
   @Override
-  public final void setFloat(float i) throws SQLException {
-    pstmt.setFloat(++pos, i);
+  public final void setFloat(float value) throws SQLException {
+    pstmt.setFloat(++pos, value);
   }
 
   @Override
-  public final void setDouble(double i) throws SQLException {
-    pstmt.setDouble(++pos, i);
+  public final void setDouble(double value) throws SQLException {
+    pstmt.setDouble(++pos, value);
   }
 
   @Override
-  public final void setBigDecimal(BigDecimal v) throws SQLException {
-    pstmt.setBigDecimal(++pos, v);
+  public final void setBigDecimal(BigDecimal value) throws SQLException {
+    pstmt.setBigDecimal(++pos, value);
   }
 
   @Override
-  public final void setDate(java.sql.Date v) throws SQLException {
+  public final void setDate(java.sql.Date value) throws SQLException {
     Calendar timeZone = dataTimeZone.getTimeComponentTimeZone();
     if (timeZone != null) {
-      pstmt.setDate(++pos, v, timeZone);
+      pstmt.setDate(++pos, value, timeZone);
     } else {
-      pstmt.setDate(++pos, v);
+      pstmt.setDate(++pos, value);
     }
   }
 
   @Override
-  public final void setTimestamp(Timestamp v) throws SQLException {
+  public final void setTimestamp(Timestamp value) throws SQLException {
     Calendar timeZone = dataTimeZone.getTimeZone();
     if (timeZone != null) {
-      pstmt.setTimestamp(++pos, v, timeZone);
+      pstmt.setTimestamp(++pos, value, timeZone);
     } else {
-      pstmt.setTimestamp(++pos, v);
+      pstmt.setTimestamp(++pos, value);
     }
   }
 
   @Override
-  public final void setTime(Time v) throws SQLException {
+  public final void setTime(Time value) throws SQLException {
     Calendar timeZone = dataTimeZone.getTimeComponentTimeZone();
     if (timeZone != null) {
-      pstmt.setTime(++pos, v, timeZone);
+      pstmt.setTime(++pos, value, timeZone);
     } else {
-      pstmt.setTime(++pos, v);
+      pstmt.setTime(++pos, value);
     }
   }
 
   @Override
-  public void setBoolean(boolean v) throws SQLException {
-    pstmt.setBoolean(++pos, v);
+  public void setBoolean(boolean value) throws SQLException {
+    pstmt.setBoolean(++pos, value);
   }
 
   @Override
-  public void setBytes(byte[] v) throws SQLException {
-    pstmt.setBytes(++pos, v);
+  public void setBytes(byte[] value) throws SQLException {
+    pstmt.setBytes(++pos, value);
   }
 
   @Override
-  public void setByte(byte v) throws SQLException {
-    pstmt.setByte(++pos, v);
+  public void setByte(byte value) throws SQLException {
+    pstmt.setByte(++pos, value);
   }
 
   @Override
-  public void setChar(char v) throws SQLException {
-    pstmt.setString(++pos, String.valueOf(v));
+  public void setChar(char value) throws SQLException {
+    pstmt.setString(++pos, String.valueOf(value));
   }
 
   @Override
@@ -215,20 +215,17 @@ public class DataBind implements DataBinder {
 
   @Override
   public void setBlob(byte[] bytes) throws SQLException {
-    ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-    pstmt.setBinaryStream(++pos, is, bytes.length);
+    pstmt.setBinaryStream(++pos, new ByteArrayInputStream(bytes), bytes.length);
   }
 
   @Override
   public void setClob(String content) throws SQLException {
-    Reader reader = new StringReader(content);
-    pstmt.setCharacterStream(++pos, reader, content.length());
+    pstmt.setCharacterStream(++pos, new StringReader(content), content.length());
   }
 
   @Override
   public void setArray(String arrayType, Object[] elements) throws SQLException {
-    Array array = connection.createArrayOf(arrayType, elements);
-    pstmt.setArray(++pos, array);
+    pstmt.setArray(++pos, connection.createArrayOf(arrayType, elements));
   }
 
 }

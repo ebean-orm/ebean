@@ -33,87 +33,87 @@ public final class BindCaptureStatement extends BindCaptureStatementBase impleme
   }
 
   @Override
-  public void setBoolean(int parameterIndex, boolean x) {
-    capture.add(new BindCaptureTypes.Boolean(parameterIndex, x));
+  public void setBoolean(int parameterIndex, boolean value) {
+    capture.add(new BindCaptureTypes.Boolean(parameterIndex, value));
   }
 
   @Override
-  public void setByte(int parameterIndex, byte x) {
-    capture.add(new BindCaptureTypes.Byte(parameterIndex, x));
+  public void setByte(int parameterIndex, byte value) {
+    capture.add(new BindCaptureTypes.Byte(parameterIndex, value));
   }
 
   @Override
-  public void setShort(int parameterIndex, short x) {
-    capture.add(new BindCaptureTypes.TShort(parameterIndex, x));
+  public void setShort(int parameterIndex, short value) {
+    capture.add(new BindCaptureTypes.TShort(parameterIndex, value));
   }
 
   @Override
-  public void setInt(int parameterIndex, int x) {
-    capture.add(new BindCaptureTypes.TInt(parameterIndex, x));
+  public void setInt(int parameterIndex, int value) {
+    capture.add(new BindCaptureTypes.TInt(parameterIndex, value));
   }
 
   @Override
-  public void setLong(int parameterIndex, long x) {
-    capture.add(new BindCaptureTypes.TLong(parameterIndex, x));
+  public void setLong(int parameterIndex, long value) {
+    capture.add(new BindCaptureTypes.TLong(parameterIndex, value));
   }
 
   @Override
-  public void setFloat(int parameterIndex, float x) {
-    capture.add(new BindCaptureTypes.TFloat(parameterIndex, x));
+  public void setFloat(int parameterIndex, float value) {
+    capture.add(new BindCaptureTypes.TFloat(parameterIndex, value));
   }
 
   @Override
-  public void setDouble(int parameterIndex, double x) {
-    capture.add(new BindCaptureTypes.TDouble(parameterIndex, x));
+  public void setDouble(int parameterIndex, double value) {
+    capture.add(new BindCaptureTypes.TDouble(parameterIndex, value));
   }
 
   @Override
-  public void setBigDecimal(int parameterIndex, BigDecimal x) {
-    capture.add(new BindCaptureTypes.TBigDecimal(parameterIndex, x));
+  public void setBigDecimal(int parameterIndex, BigDecimal value) {
+    capture.add(new BindCaptureTypes.TBigDecimal(parameterIndex, value));
   }
 
   @Override
-  public void setString(int parameterIndex, String x) {
-    capture.add(new BindCaptureTypes.TString(parameterIndex, x));
+  public void setString(int parameterIndex, String value) {
+    capture.add(new BindCaptureTypes.TString(parameterIndex, value));
   }
 
   @Override
-  public void setBytes(int parameterIndex, byte[] x) {
-    capture.add(new BindCaptureTypes.Bytes(parameterIndex, x));
+  public void setBytes(int parameterIndex, byte[] value) {
+    capture.add(new BindCaptureTypes.Bytes(parameterIndex, value));
   }
 
   @Override
-  public void setDate(int parameterIndex, Date x) {
-    capture.add(new BindCaptureTypes.TDate(parameterIndex, x));
+  public void setDate(int parameterIndex, Date value) {
+    capture.add(new BindCaptureTypes.TDate(parameterIndex, value));
   }
 
   @Override
-  public void setTime(int parameterIndex, Time x) {
-    capture.add(new BindCaptureTypes.TTime(parameterIndex, x));
+  public void setTime(int parameterIndex, Time value) {
+    capture.add(new BindCaptureTypes.TTime(parameterIndex, value));
   }
 
   @Override
-  public void setTimestamp(int parameterIndex, Timestamp x) {
-    capture.add(new BindCaptureTypes.TTimestamp(parameterIndex, x, null));
+  public void setTimestamp(int parameterIndex, Timestamp value) {
+    capture.add(new BindCaptureTypes.TTimestamp(parameterIndex, value, null));
   }
 
   @Override
-  public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal) {
-    capture.add(new BindCaptureTypes.TTimestamp(parameterIndex, x, cal));
+  public void setTimestamp(int parameterIndex, Timestamp value, Calendar cal) {
+    capture.add(new BindCaptureTypes.TTimestamp(parameterIndex, value, cal));
   }
 
   @Override
-  public void setObject(int parameterIndex, Object x) {
-    capture.add(new BindCaptureTypes.TObject(parameterIndex, x));
+  public void setObject(int parameterIndex, Object value) {
+    capture.add(new BindCaptureTypes.TObject(parameterIndex, value));
   }
 
   @Override
-  public void setBinaryStream(int parameterIndex, InputStream x, int length) {
+  public void setBinaryStream(int parameterIndex, InputStream value, int length) {
     capture.add(new BindCaptureTypes.BinaryStream(parameterIndex));
   }
 
   @Override
-  public void setCharacterStream(int parameterIndex, Reader reader, int length) {
+  public void setCharacterStream(int parameterIndex, Reader value, int length) {
     capture.add(new BindCaptureTypes.CharacterStream(parameterIndex));
   }
 

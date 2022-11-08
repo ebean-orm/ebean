@@ -65,8 +65,8 @@ class BasePlatformArrayTypeFactoryTest {
     }
 
     @Override
-    public void setString(String s) {
-      setEmptyString = "[]".equals(s);
+    public void setString(String value) {
+      setEmptyString = "[]".equals(value);
     }
 
     @Override
