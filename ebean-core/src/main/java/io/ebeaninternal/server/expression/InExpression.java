@@ -14,17 +14,13 @@ import java.util.*;
 
 public final class InExpression extends AbstractExpression implements IdInCommon {
 
-  private final boolean not;
-
   /**
    * Set to true when adding "1=1" predicate (due to null or empty sourceValues).
    */
   private final boolean empty;
-
+  private final boolean not;
   private final Collection<?> sourceValues;
-
   private List<Object> bindValues;
-
   private boolean multiValueSupported;
 
   InExpression(String propertyName, Collection<?> sourceValues, boolean not) {
@@ -117,7 +113,6 @@ public final class InExpression extends AbstractExpression implements IdInCommon
       }
     }
     ElPropertyValue prop = getElProp(request);
-
     List<Object> values = bindValues;
     if (prop != null && prop.isAssocId()) {
       values = new ArrayList<>();
@@ -132,22 +127,22 @@ public final class InExpression extends AbstractExpression implements IdInCommon
     if (values.isEmpty()) {
       // nothing in in-query
       return;
-    } else if (prop.isDbEncrypted()) {
-      // bind the key as well as the value
-      String encryptKey = prop.beanProperty().encryptKey().getStringValue();
-      request.addBindEncryptKey(encryptKey);
-    } else if (prop.isLocalEncrypted()) {
-      List<Object> encValues = new ArrayList<>(values.size());
-      for (Object value : values) {
-        encValues.add(prop.localEncrypt(value));
-      }
-      // this is most likely binary garbage, so don't add it to the bind log
-      request.addBindEncryptKey(new MultiValueWrapper(encValues));
-      return;
     }
-
-    // if we have no property, we wrap them in a multi value wrapper.
-    // later the binder will decide, which bind strategy to use.
+    if (prop != null) {
+      if (prop.isDbEncrypted()) {
+        // bind the key as well as the value
+        request.addBindEncryptKey(prop.beanProperty().encryptKey().getStringValue());
+      } else if (prop.isLocalEncrypted()) {
+        List<Object> encValues = new ArrayList<>(values.size());
+        for (Object value : values) {
+          encValues.add(prop.localEncrypt(value));
+        }
+        // this is most likely binary garbage, so don't add it to the bind log
+        request.addBindEncryptKey(new MultiValueWrapper(encValues));
+        return;
+      }
+    }
+    // wrap in a multi value wrapper, later the binder will decide the bind strategy to use
     request.addBindValue(new MultiValueWrapper(values));
   }
 

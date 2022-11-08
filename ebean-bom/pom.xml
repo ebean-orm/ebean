@@ -190,6 +190,92 @@
         <artifactId>ebean-redis</artifactId>
         <version>13.10.2-SNAPSHOT</version>
       </dependency>
+      
+      <!-- platforms -->
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-all</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-clickhouse</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-db2</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-h2</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-hana</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-hsqldb</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-mariadb</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-mysql</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-nuodb</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-oracle</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-postgres</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-sqlanywhere</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-sqlite</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-sqlserver</artifactId>
+        <version>13.10.2-SNAPSHOT</version>
+      </dependency>
 
     </dependencies>
 
