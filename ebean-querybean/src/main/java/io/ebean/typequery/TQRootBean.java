@@ -263,14 +263,14 @@ public abstract class TQRootBean<T, R> {
    * @param properties the list of properties to fetch
    */
   @SafeVarargs
-  public final R select(TQProperty<R>... properties) {
+  public final R select(TQProperty<R, ?>... properties) {
     ((SpiQueryFetch) query).selectProperties(properties(properties));
     return root;
   }
 
-  private Set<String> properties(Query.Property[] properties) {
+  private Set<String> properties(Query.Property<?>[] properties) {
     Set<String> props = new LinkedHashSet<>();
-    for (Query.Property property : properties) {
+    for (Query.Property<?> property : properties) {
       props.add(property.toString());
     }
     return props;

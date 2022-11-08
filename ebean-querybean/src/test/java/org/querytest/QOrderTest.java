@@ -261,7 +261,7 @@ public class QOrderTest {
         .add(gt(coalesce(o.customer.version, 0), 42))
         .id.lt(12)
       .endOr()
-      .query();
+     .query();
 
     query.findList();
 

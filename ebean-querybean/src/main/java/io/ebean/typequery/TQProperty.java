@@ -6,12 +6,12 @@ import io.ebean.Query;
 /**
  * A property used in type query.
  *
- * @param <R> The type of the owning root bean
+ * @param <R>  The type of the owning root bean
+ * @param <BT> The base type, one of String, Number, Temporal, Boolean, Object.
  */
-public class TQProperty<R> implements Query.Property {
+public class TQProperty<R, BT> implements Query.Property<BT> {
 
   protected final String _name;
-
   protected final R _root;
 
   /**
@@ -41,7 +41,7 @@ public class TQProperty<R> implements Query.Property {
    * Internal method to return the underlying expression list.
    */
   protected final ExpressionList<?> expr() {
-    return ((TQRootBean<?,?>) _root).peekExprList();
+    return ((TQRootBean<?, ?>) _root).peekExprList();
   }
 
   /**

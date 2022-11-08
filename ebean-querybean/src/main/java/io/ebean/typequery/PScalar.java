@@ -1,13 +1,12 @@
 package io.ebean.typequery;
 
 /**
- * Property for classes that are serialized/deserialized by
- * ScalarType/AttributeConverter.
+ * Property for classes that are serialized/deserialized by ScalarType/AttributeConverter.
  *
  * @param <R> the root query bean type
  * @param <D> the scalar type
  */
-public final class PScalar<R, D> extends PBaseValueEqual<R, D> {
+public final class PScalar<R, D> extends PBaseValueEqual<R, D, Object> {
 
   /**
    * Construct with a property name and root instance.

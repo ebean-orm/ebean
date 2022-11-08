@@ -15,8 +15,7 @@ public class TestStdFunctions {
 
   @Test
   void coalesceLike() {
-    var name = Query.Property.of("name");
-
+    Query.Property<String> name = Query.Property.of("name");
     var query = DB.find(Customer.class)
       .select(coalesce(name, "na").toString())
       .where()

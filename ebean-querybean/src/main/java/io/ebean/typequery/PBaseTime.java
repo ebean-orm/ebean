@@ -3,13 +3,13 @@ package io.ebean.typequery;
 import java.time.temporal.Temporal;
 
 /**
- * Base property for date and date time types.
+ * Base property for time types.
  *
  * @param <R> the root query bean type
- * @param <D> the date time type
+ * @param <T> the number type
  */
 @SuppressWarnings("rawtypes")
-public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareable<R, D, Temporal> {
+public abstract class PBaseTime<R, T extends Comparable> extends PBaseCompareable<R, T, Temporal> {
 
   /**
    * Construct with a property name and root instance.
@@ -17,14 +17,14 @@ public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareabl
    * @param name property name
    * @param root the root query bean instance
    */
-  public PBaseDate(String name, R root) {
-    super(name , root);
+  public PBaseTime(String name, R root) {
+    super(name, root);
   }
 
   /**
    * Construct with additional path prefix.
    */
-  public PBaseDate(String name, R root, String prefix) {
+  public PBaseTime(String name, R root, String prefix) {
     super(name, root, prefix);
   }
 
@@ -34,7 +34,7 @@ public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareabl
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public final R after(D value) {
+  public final R after(T value) {
     expr().gt(_name, value);
     return _root;
   }
@@ -45,7 +45,7 @@ public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareabl
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public final R before(D value) {
+  public final R before(T value) {
     expr().lt(_name, value);
     return _root;
   }

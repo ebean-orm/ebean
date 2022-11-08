@@ -5,7 +5,7 @@ package io.ebean.typequery;
  *
  * @param <R> the root query bean type
  */
-public final class PByteArray<R> extends PBaseValueEqual<R, byte[]> {
+public final class PByteArray<R> extends PBaseValueEqual<R, byte[], Object> {
 
   /**
    * Construct with a property name and root instance.
@@ -23,6 +23,5 @@ public final class PByteArray<R> extends PBaseValueEqual<R, byte[]> {
   public PByteArray(String name, R root, String prefix) {
     super(name, root, prefix);
   }
-
 
 }

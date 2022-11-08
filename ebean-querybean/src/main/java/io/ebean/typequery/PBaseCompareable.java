@@ -6,11 +6,11 @@ import io.ebean.Query;
 /**
  * Base property for all comparable types.
  *
- * @param <R> the root query bean type
- * @param <T> the type of the scalar property
+ * @param <R>  the root query bean type
+ * @param <T>  the type of the scalar property
+ * @param <BT> the base type of the property
  */
-@SuppressWarnings("rawtypes")
-public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
+public abstract class PBaseCompareable<R, T, BT> extends PBaseValueEqual<R, T, BT> {
 
   /**
    * Construct with a property name and root instance.
@@ -44,11 +44,14 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
 
   /**
    * Greater than other property.
+   * <p>
+   * Note that the other property must have the same common "Base type" (String, Number, Temporal, Boolean or Object).
    *
    * @param other the other property to compare
+   *
    * @return the root query bean instance
    */
-  public final R gt(TQProperty<?> other) {
+  public final R gt(TQProperty<?, BT> other) {
     expr().raw(_name + " > " + other.propertyName());
     return _root;
   }
@@ -81,7 +84,7 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    * @param other the other property to compare
    * @return the root query bean instance
    */
-  public final R ge(TQProperty<?> other) {
+  public final R ge(TQProperty<?, BT> other) {
     expr().raw(_name + " >= " + other.propertyName());
     return _root;
   }
@@ -114,7 +117,7 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    * @param other the other property to compare
    * @return the root query bean instance
    */
-  public final R lt(TQProperty<?> other) {
+  public final R lt(TQProperty<?, BT> other) {
     expr().raw(_name + " < " + other.propertyName());
     return _root;
   }
@@ -147,7 +150,7 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    * @param other the other property to compare
    * @return the root query bean instance
    */
-  public final R le(TQProperty<?> other) {
+  public final R le(TQProperty<?, BT> other) {
     expr().raw(_name + " <= " + other.propertyName());
     return _root;
   }
@@ -197,7 +200,7 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    * The most common use of this could be called "effective dating" where 2 date or
    * timestamp columns represent the date range in which
    */
-  public final R inRangeWith(TQProperty<R> highProperty, T value) {
+  public final R inRangeWith(TQProperty<?, BT> highProperty, T value) {
     expr().inRangeWith(_name, highProperty._name, value);
     return _root;
   }
@@ -220,7 +223,7 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    * <p>
    * This is a convenience expression combining a number of simple expressions.
    */
-  public final R inRangeWith(TQProperty<?> lowProperty, TQProperty<?> highProperty) {
+  public final R inRangeWith(TQProperty<?, BT> lowProperty, TQProperty<?, BT> highProperty) {
     expr().inRangeWithProperties(_name, lowProperty.propertyName(), highProperty.propertyName());
     return _root;
   }

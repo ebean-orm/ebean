@@ -9,8 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class StdFunctionsTest {
 
-  final Query.Property foo = Query.Property.of("foo");
-  final Query.Property bar = Query.Property.of("bar");
+  final Query.Property<Number> amount = Query.Property.of("amount");
+  final Query.Property<String> foo = Query.Property.of("foo");
+  final Query.Property<String> bar = Query.Property.of("bar");
 
   @Test
   void testAvg() {
@@ -34,7 +35,7 @@ class StdFunctionsTest {
 
   @Test
   void testSum() {
-    assertThat(sum(foo).toString()).isEqualTo("sum(foo)");
+    assertThat(sum(amount).toString()).isEqualTo("sum(amount)");
   }
 
   @Test
