@@ -4,10 +4,10 @@ package io.ebean.typequery;
  * Base property for number types.
  *
  * @param <R> the root query bean type
- * @param <T> the number type
+ * @param <T> the property type
  */
 @SuppressWarnings("rawtypes")
-public abstract class PBaseNumber<R, T extends Comparable> extends PBaseCompareable<R, T, T> {
+public abstract class PBaseNumber<R, T extends Comparable> extends PBaseComparable<R, T> {
 
   /**
    * Construct with a property name and root instance.

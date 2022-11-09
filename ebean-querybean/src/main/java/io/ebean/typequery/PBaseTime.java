@@ -1,7 +1,5 @@
 package io.ebean.typequery;
 
-import java.time.temporal.Temporal;
-
 /**
  * Base property for time types.
  *
@@ -9,7 +7,7 @@ import java.time.temporal.Temporal;
  * @param <T> the number type
  */
 @SuppressWarnings("rawtypes")
-public abstract class PBaseTime<R, T extends Comparable> extends PBaseCompareable<R, T, Temporal> {
+public abstract class PBaseTime<R, T extends Comparable> extends PBaseComparable<R, T> {
 
   /**
    * Construct with a property name and root instance.

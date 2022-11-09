@@ -364,11 +364,11 @@ public class QOrderTest {
   @Test
   void propertyCompare() {
     Query<Order> query = new QOrder()
-      .orderDate.lt(QOrder.Alias.customer.registered)
+      .orderDate.lt(QOrder.Alias.shipDate) // have to be the exact same type, in this case java.sql.Date
       .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains(" from o_order t0 join be_customer t1 on t1.id = t0.customer_id where t0.order_date < t1.registered");
+    assertThat(query.getGeneratedSql()).contains(" from o_order t0 where t0.order_date < t0.ship_date");
   }
 
   @Test

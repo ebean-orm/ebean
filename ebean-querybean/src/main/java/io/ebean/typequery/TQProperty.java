@@ -6,10 +6,10 @@ import io.ebean.Query;
 /**
  * A property used in type query.
  *
- * @param <R>  The type of the owning root bean
- * @param <BT> The base type, one of String, Number, Temporal, Boolean, Object.
+ * @param <R> The type of the owning root bean
+ * @param <T> The property type
  */
-public class TQProperty<R, BT> implements Query.Property<BT> {
+public class TQProperty<R, T> implements Query.Property<T> {
 
   protected final String _name;
   protected final R _root;

@@ -5,7 +5,7 @@ package io.ebean.typequery;
  *
  * @param <R> the root query bean type
  */
-public abstract class PBaseString<R, T> extends PBaseCompareable<R, T, String> {
+public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
 
   /**
    * Construct with a property name and root instance.

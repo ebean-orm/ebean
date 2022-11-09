@@ -7,7 +7,7 @@ import java.util.UUID;
  *
  * @param <R> the root query bean type
  */
-public final class PUuid<R> extends PBaseValueEqual<R, UUID, Object> {
+public final class PUuid<R> extends PBaseValueEqual<R, UUID> {
 
   /**
    * Construct with a property name and root instance.

@@ -11,7 +11,7 @@ import java.util.Collection;
  * @param <R> the root query bean type
  * @param <T> the number type
  */
-public abstract class PBaseValueEqual<R, T, BT> extends TQPropertyBase<R, BT> {
+public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R, T> {
 
   /**
    * Construct with a property name and root instance.
@@ -89,8 +89,8 @@ public abstract class PBaseValueEqual<R, T, BT> extends TQPropertyBase<R, BT> {
    * @param other the other property to compare
    * @return the root query bean instance
    */
-  public final R eq(TQProperty<?, BT> other) {
-    expr().raw(_name + " = " + other.propertyName());
+  public final R eq(Query.Property<T> other) {
+    expr().raw(_name + " = " + other.toString());
     return _root;
   }
 
@@ -152,8 +152,8 @@ public abstract class PBaseValueEqual<R, T, BT> extends TQPropertyBase<R, BT> {
    * @param other the other property to compare
    * @return the root query bean instance
    */
-  public final R ne(TQProperty<?, BT> other) {
-    expr().raw(_name + " <> " + other.propertyName());
+  public final R ne(Query.Property<T> other) {
+    expr().raw(_name + " <> " + other.toString());
     return _root;
   }
 

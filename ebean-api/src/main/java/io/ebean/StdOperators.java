@@ -2,7 +2,6 @@ package io.ebean;
 
 import io.ebean.Query.Property;
 
-import java.time.temporal.Temporal;
 import java.util.Collection;
 
 @Deprecated(since = "experimental")
@@ -79,15 +78,7 @@ public final class StdOperators {
     return Expr.in(property.toString(), subQuery);
   }
 
-  public static Expression eq(Property<Temporal> property, java.util.Date value) {
-    return Expr.eq(property.toString(), value);
-  }
-
   public static <T> Expression eqOrNull(Property<T> property, T value) {
-    return Expr.factory().eqOrNull(property.toString(), value);
-  }
-
-  public static Expression eqOrNull(Property<Temporal> property, java.util.Date value) {
     return Expr.factory().eqOrNull(property.toString(), value);
   }
 
@@ -99,10 +90,6 @@ public final class StdOperators {
     return Expr.ne(property.toString(), subQuery);
   }
 
-  public static Expression ne(Property<Temporal> property, java.util.Date value) {
-    return Expr.ne(property.toString(), value);
-  }
-
   public static <T> Expression gt(Property<T> property, T value) {
     return Expr.gt(property.toString(), value);
   }
@@ -111,15 +98,7 @@ public final class StdOperators {
     return Expr.gt(property.toString(), subQuery);
   }
 
-  public static Expression gt(Property<Temporal> property, java.util.Date value) {
-    return Expr.gt(property.toString(), value);
-  }
-
   public static <T> Expression gtOrNull(Property<T> property, T value) {
-    return Expr.factory().gtOrNull(property.toString(), value);
-  }
-
-  public static Expression gtOrNull(Property<Temporal> property, java.util.Date value) {
     return Expr.factory().gtOrNull(property.toString(), value);
   }
 
@@ -131,15 +110,7 @@ public final class StdOperators {
     return Expr.ge(property.toString(), subQuery);
   }
 
-  public static Expression ge(Property<Temporal> property, java.util.Date value) {
-    return Expr.ge(property.toString(), value);
-  }
-
   public static <T> Expression geOrNull(Property<T> property, T value) {
-    return Expr.factory().geOrNull(property.toString(), value);
-  }
-
-  public static Expression geOrNull(Property<Temporal> property, java.util.Date value) {
     return Expr.factory().geOrNull(property.toString(), value);
   }
 
@@ -151,15 +122,7 @@ public final class StdOperators {
     return Expr.lt(property.toString(), subQuery);
   }
 
-  public static Expression lt(Property<Temporal> property, java.util.Date value) {
-    return Expr.lt(property.toString(), value);
-  }
-
   public static <T> Expression ltOrNull(Property<T> property, T value) {
-    return Expr.factory().ltOrNull(property.toString(), value);
-  }
-
-  public static Expression ltOrNull(Property<Temporal> property, java.util.Date value) {
     return Expr.factory().ltOrNull(property.toString(), value);
   }
 
@@ -171,15 +134,7 @@ public final class StdOperators {
     return Expr.le(property.toString(), subQuery);
   }
 
-  public static Expression le(Property<Temporal> property, java.util.Date value) {
-    return Expr.le(property.toString(), value);
-  }
-
   public static <T> Expression leOrNull(Property<T> property, T value) {
-    return Expr.factory().leOrNull(property.toString(), value);
-  }
-
-  public static Expression leOrNull(Property<Temporal> property, java.util.Date value) {
     return Expr.factory().leOrNull(property.toString(), value);
   }
 
@@ -187,15 +142,7 @@ public final class StdOperators {
     return Expr.factory().inRange(property.toString(), lowValue, highValue);
   }
 
-  public static Expression inRange(Property<Temporal> property, java.util.Date lowValue, java.util.Date highValue) {
-    return Expr.factory().inRange(property.toString(), lowValue, highValue);
-  }
-
   public static <T> Expression inRange(Property<T> lowProperty, Property<T> highProperty, T value) {
-    return Expr.factory().inRangeWith(lowProperty.toString(), highProperty.toString(), value);
-  }
-
-  public static Expression inRange(Property<Temporal> lowProperty, Property<Temporal> highProperty, java.util.Date value) {
     return Expr.factory().inRangeWith(lowProperty.toString(), highProperty.toString(), value);
   }
 

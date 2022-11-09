@@ -1,6 +1,6 @@
 package io.ebean;
 
-final class SimpleProperty<BT> implements Query.Property<BT> {
+final class SimpleProperty<T> implements Query.Property<T> {
 
   private final String expression;
 

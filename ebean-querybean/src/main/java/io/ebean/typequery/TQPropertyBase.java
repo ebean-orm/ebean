@@ -3,10 +3,10 @@ package io.ebean.typequery;
 /**
  * Base scalar property.
  *
- * @param <R>  The type of the owning root bean
- * @param <BT> The base type of the property
+ * @param <R> The type of the owning root bean
+ * @param <T> The property type
  */
-public abstract class TQPropertyBase<R, BT> extends TQProperty<R, BT> {
+public abstract class TQPropertyBase<R, T> extends TQProperty<R, T> {
 
   /**
    * Construct with a property name and root instance.

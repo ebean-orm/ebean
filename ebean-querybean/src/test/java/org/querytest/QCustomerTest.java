@@ -456,7 +456,7 @@ public class QCustomerTest {
     assertContains(new QCustomer().registered.lt(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.before(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.lessThan(new Date()).query(), " where t0.registered < ?");
-    assertContains(new QCustomer().registered.lt(QCustomer.Alias.whenUpdated).query(), " where t0.registered < t0.when_updated");
+    assertContains(new QCustomer().whenCreated.lt(QCustomer.Alias.whenUpdated).query(), " where t0.when_created < t0.when_updated");
   }
 
   @Test
@@ -464,7 +464,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.le(new Date()).query(), " where t0.registered <= ?");
     assertContains(new QCustomer().registered.lessOrEqualTo(new Date()).query(), " where t0.registered <= ?");
-    assertContains(new QCustomer().registered.le(QCustomer.Alias.whenUpdated).query(), " where t0.registered <= t0.when_updated");
+    assertContains(new QCustomer().whenCreated.le(QCustomer.Alias.whenUpdated).query(), " where t0.when_created <= t0.when_updated");
   }
 
   @Test
@@ -472,7 +472,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.after(new Date()).query(), " where t0.registered > ?");
     assertContains(new QCustomer().registered.gt(new Date()).query(), " where t0.registered > ?");
-    assertContains(new QCustomer().registered.gt(QCustomer.Alias.whenUpdated).query(), " where t0.registered > t0.when_updated");
+    assertContains(new QCustomer().whenCreated.gt(QCustomer.Alias.whenUpdated).query(), " where t0.when_created > t0.when_updated");
     assertContains(new QCustomer().registered.greaterThan(new Date()).query(), " where t0.registered > ?");
   }
 
@@ -482,7 +482,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.ge(new Date()).query(), " where t0.registered >= ?");
     assertContains(new QCustomer().registered.greaterOrEqualTo(new Date()).query(), " where t0.registered >= ?");
-    assertContains(new QCustomer().registered.ge(QCustomer.Alias.whenUpdated).query(), " where t0.registered >= t0.when_updated");
+    assertContains(new QCustomer().whenCreated.ge(QCustomer.Alias.whenUpdated).query(), " where t0.when_created >= t0.when_updated");
   }
 
   private void assertContains(Query<Customer> query, String match) {
@@ -708,7 +708,7 @@ public class QCustomerTest {
 
     new QCustomer()
       .add(in(QCustomer.Alias.name, List.of("foo", "bar")))
-      .add(eq(QCustomer.Alias.currentInet, Inet.of("asd").toString()))
+      .add(eq(QCustomer.Alias.currentInet, Inet.of("127.0.0.1")))
       .findList();
 
     new QCustomer()
