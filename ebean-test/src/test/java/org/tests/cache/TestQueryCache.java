@@ -3,6 +3,8 @@ package org.tests.cache;
 import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
+import io.ebean.annotation.Transactional;
+import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
 import io.ebean.test.LoggedSql;
@@ -159,6 +161,30 @@ public class TestQueryCache extends BaseTestCase {
     assertThat(count2).isEqualTo(count1);
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
+
+
+    LoggedSql.start();
+    findCountNoTxn();
+    sql = LoggedSql.stop();
+    assertThat(sql).hasSize(0);
+
+    LoggedSql.start();
+    findCountTxn();
+    sql = LoggedSql.stop();
+    assertThat(sql).hasSize(0);
+  }
+
+  private void findCountNoTxn() {
+    DB.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "count")
+      .findCount();
+  }
+
+  @Transactional(isolation = TxIsolation.READ_UNCOMMITTED)
+  private void findCountTxn() {
+    findCountNoTxn();
   }
 
   @Test
