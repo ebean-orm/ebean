@@ -278,7 +278,7 @@ public abstract class TQRootBean<T, R> {
 
   /**
    * Specify the properties to be loaded on the 'main' root level entity bean
-   * also allowing for functions to be used like {@link StdFunctions#max(Query.Property)}.
+   * also allowing for functions to be used like {@link StdOperators#max(Query.Property)}.
    *
    * @param properties the list of properties to fetch
    */

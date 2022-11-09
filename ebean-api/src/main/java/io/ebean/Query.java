@@ -1773,16 +1773,16 @@ public interface Query<T> extends CancelableQuery {
    * <p>
    * Implemented by query bean properties and expressions based on those properties.
    * <p>
-   * The base type determines which {@link StdFunctions} can be used on the property.
+   * The base type determines which {@link StdOperators} can be used on the property.
    *
-   * @param <BT> The base type of the property Number, String, Temporal, Boolean or Object.
+   * @param <T> The property type.
    */
-  interface Property<BT> {
+  interface Property<T> {
 
     /**
      * Return a property given the expression.
      */
-    static <BT> Property<BT> of(String expression) {
+    static <T> Property<T> of(String expression) {
       return new SimpleProperty<>(expression);
     }
 

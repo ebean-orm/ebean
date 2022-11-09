@@ -5,7 +5,7 @@ import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
-import static io.ebean.StdFunctions.*;
+import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**

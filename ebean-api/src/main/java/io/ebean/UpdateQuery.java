@@ -118,7 +118,7 @@ public interface UpdateQuery<T> {
    * @param property The bean property to be set
    * @param value    The value to set the property to
    */
-  UpdateQuery<T> set(Query.Property<?> property, Object value);
+  <P> UpdateQuery<T> set(Query.Property<P> property, P value);
 
   /**
    * Set the property to be null.

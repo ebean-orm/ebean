@@ -17,9 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static io.ebean.StdFunctions.gt;
-import static io.ebean.StdFunctions.ilike;
-import static io.ebean.StdFunctions.*;
+import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class QOrderTest {
@@ -227,7 +225,7 @@ public class QOrderTest {
       .status.eq(Order.Status.COMPLETE)
       .orderDate.gt(new java.sql.Date(System.currentTimeMillis()))
       .asUpdate()
-      .set(QOrder.Alias.version, 42L)
+      .set(QOrder.Alias.version, 56L)
       .setNull(QOrder.Alias.orderDate)
       .update();
 
@@ -258,7 +256,7 @@ public class QOrderTest {
     Query<Order> query = new QOrder()
       .select(o.id, o.status)
       .or()
-        .add(gt(coalesce(o.customer.version, 0), 42))
+        .add(gt(coalesce(o.customer.version, 0), 42L))
         .id.lt(12)
       .endOr()
      .query();

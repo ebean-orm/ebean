@@ -15,11 +15,13 @@ import org.junit.jupiter.api.Test;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.domain.query.QAddress.Alias.country;
 import static org.example.domain.query.QAddress.Alias.line1;
@@ -690,6 +692,32 @@ public class QCustomerTest {
         .exists();
 
     assertThat(customerExists).isFalse();
+  }
+
+  @Test
+  void checkingPropertyTypesToEQOperator() {
+
+    QCustomer c = QCustomer.alias();
+
+    new QCustomer()
+      .select(c.version, count(c.id))
+      .version.gt(0)
+      .having()
+      .add(gt(count(c.id), 1))
+      .findList();
+
+    new QCustomer()
+      .add(in(QCustomer.Alias.name, List.of("foo", "bar")))
+      .add(eq(QCustomer.Alias.currentInet, Inet.of("asd").toString()))
+      .findList();
+
+    new QCustomer()
+      //.add(gt(sum(QCustomer.Alias.version), 45))
+      .add(eq(QCustomer.Alias.version, 45L))
+      .add(eq(QCustomer.Alias.name, "junk"))
+      .add(eq(QCustomer.Alias.registered, new Date()))
+      .add(eq(QCustomer.Alias.whenUpdated, new Timestamp(System.currentTimeMillis())))
+      .findList();
   }
 
   @Test
