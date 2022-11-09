@@ -36,12 +36,12 @@ public final class DefaultUpdateQuery<T> implements UpdateQuery<T> {
   }
 
   @Override
-  public UpdateQuery<T> set(Query.Property property, Object value) {
+  public <P> UpdateQuery<T> set(Query.Property<P> property, P value) {
     return set(property.toString(), value);
   }
 
   @Override
-  public UpdateQuery<T> setNull(Query.Property property) {
+  public UpdateQuery<T> setNull(Query.Property<?> property) {
     return setNull(property.toString());
   }
 

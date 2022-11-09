@@ -282,7 +282,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param properties the list of properties to fetch
    */
-  public final R select(Query.Property... properties) {
+  public final R select(Query.Property<?>... properties) {
     ((SpiQueryFetch) query).selectProperties(properties(properties));
     return root;
   }
