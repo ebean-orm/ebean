@@ -111,7 +111,10 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private void loadGeoTypeBinder(DatabaseConfig config) {
-    final GeoTypeProvider provider = ServiceUtil.service(GeoTypeProvider.class);
+    GeoTypeProvider provider = config.getServiceObject(GeoTypeProvider.class);
+    if (provider == null) {
+      provider = ServiceUtil.service(GeoTypeProvider.class);
+    }
     if (provider != null) {
       geoTypeBinder = provider.createBinder(config);
     }

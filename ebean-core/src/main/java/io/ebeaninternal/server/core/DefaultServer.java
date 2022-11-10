@@ -307,7 +307,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   public void start() {
     if (config.isRunMigration() && TenantMode.DB != config.getTenantMode()) {
-      final AutoMigrationRunner migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
+      AutoMigrationRunner migrationRunner = config.getServiceObject(AutoMigrationRunner.class);
+      if (migrationRunner == null) {
+        migrationRunner = ServiceUtil.service(AutoMigrationRunner.class);
+      }
       if (migrationRunner == null) {
         throw new IllegalStateException("No AutoMigrationRunner found. Probably ebean-migration is not in the classpath?");
       }

@@ -144,7 +144,12 @@ public final class InternalConfiguration {
   }
 
   private <S> S service(Class<S> cls) {
-    return ServiceUtil.service(cls);
+    S service = config.getServiceObject(cls);
+    if (service != null) {
+      return service;
+    } else {
+      return ServiceUtil.service(cls);
+    }
   }
 
   private List<XmapEbean> readExternalMapping() {
