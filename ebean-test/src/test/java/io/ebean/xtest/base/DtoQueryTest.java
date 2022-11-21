@@ -18,6 +18,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicLog;
 import org.tests.model.basic.ResetBasicData;
 
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -364,6 +365,38 @@ class DtoQueryTest extends BaseTestCase {
 
     List<DCust2> list = dtoQuery.findList();
     assertThat(list).isNotEmpty();
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  void dto3_setNullByPosition() {
+    ResetBasicData.reset();
+
+    List<DCust3> robs = server().findDto(DCust3.class, "select id, name, nvl(cast(? as int), 42) as totalOrders from o_customer where name like ?")
+      .setNullParameter(1, Types.INTEGER)
+      .setParameter(2, "Rob")
+      .setMaxRows(10)
+      .findList();
+
+    log.info(robs.toString());
+    assertThat(robs).isNotEmpty();
+    assertThat(robs.get(0).getTotalOrders()).isEqualTo(42);
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  void dto3_setNullByName() {
+    ResetBasicData.reset();
+
+    List<DCust3> robs = server().findDto(DCust3.class, "select id, name, nvl(cast(:foo as int), 42) as totalOrders from o_customer where name like :bar")
+      .setNullParameter("foo", Types.INTEGER)
+      .setParameter("bar", "Rob")
+      .setMaxRows(10)
+      .findList();
+
+    log.info(robs.toString());
+    assertThat(robs).isNotEmpty();
+    assertThat(robs.get(0).getTotalOrders()).isEqualTo(42);
   }
 
   @Test

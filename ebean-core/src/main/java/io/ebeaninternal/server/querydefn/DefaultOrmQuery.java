@@ -1544,19 +1544,13 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final Query<T> setParameter(Object value) {
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setNextParameter(value);
+    initBindParams().setNextParameter(value);
     return this;
   }
 
   @Override
   public final Query<T> setParameters(Object... values) {
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setNextParameters(values);
+    initBindParams().setNextParameters(values);
     return this;
   }
 
@@ -1567,10 +1561,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    */
   @Override
   public final Query<T> setParameter(int position, Object value) {
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setParameter(position, value);
+    initBindParams().setParameter(position, value);
     return this;
   }
 
@@ -1586,10 +1577,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
         return this;
       }
     }
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setParameter(name, value);
+    initBindParams().setParameter(name, value);
     return this;
   }
 
@@ -1598,10 +1586,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (namedParams != null) {
       throw new IllegalStateException("setArrayParameter() not supported when EQL parsed query");
     }
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setArrayParameter(name, values);
+    initBindParams().setArrayParameter(name, values);
   }
 
   @Override
@@ -1786,6 +1771,14 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final BindParams getBindParams() {
+    return bindParams;
+  }
+
+  @Override
+  public BindParams initBindParams() {
+    if (bindParams == null) {
+      bindParams = new BindParams();
+    }
     return bindParams;
   }
 

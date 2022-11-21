@@ -760,6 +760,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   BindParams getBindParams();
 
   /**
+   * Return the bind parameters ensuring it is initialised.
+   */
+  BindParams initBindParams();
+
+  /**
    * Replace the query detail. This is used by the AutoTune feature to as a
    * fast way to set the query properties and joins.
    * <p>
