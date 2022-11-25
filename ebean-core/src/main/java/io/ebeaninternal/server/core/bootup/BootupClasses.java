@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core.bootup;
 
 import io.ebean.annotation.DocStore;
+import io.ebean.bean.extend.EntityExtension;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.IdGenerator;
 import io.ebean.config.ScalarTypeConverter;
@@ -38,6 +39,7 @@ public class BootupClasses implements Predicate<Class<?>> {
 
   private final List<Class<?>> embeddableList = new ArrayList<>();
   private final List<Class<?>> entityList = new ArrayList<>();
+  private final List<Class<?>> entityExtensionList = new ArrayList<>();
   private final List<Class<? extends ScalarType<?>>> scalarTypeList = new ArrayList<>();
   private final List<Class<? extends ScalarTypeConverter<?, ?>>> scalarConverterList = new ArrayList<>();
   private final List<Class<? extends AttributeConverter<?, ?>>> attributeConverterList = new ArrayList<>();
@@ -313,6 +315,13 @@ public class BootupClasses implements Predicate<Class<?>> {
   }
 
   /**
+   * Return the list of entity extension classes.
+   */
+  public List<Class<?>> getEntityExtensionList() {
+    return entityExtensionList;
+  }
+
+  /**
    * Return the list of ScalarTypes found.
    */
   public List<Class<? extends ScalarType<?>>> getScalarTypes() {
@@ -339,6 +348,8 @@ public class BootupClasses implements Predicate<Class<?>> {
       embeddableList.add(cls);
     } else if (isEntity(cls)) {
       entityList.add(cls);
+    } else if (isEntityExtension(cls)) {
+      entityExtensionList.add(cls);
     } else {
       return isInterestingInterface(cls);
     }
@@ -452,6 +463,10 @@ public class BootupClasses implements Predicate<Class<?>> {
 
   private boolean isEntity(Class<?> cls) {
     return has(cls, Entity.class) || has(cls, Table.class) || has(cls, DocStore.class);
+  }
+
+  private boolean isEntityExtension(Class<?> cls) {
+    return has(cls, EntityExtension.class);
   }
 
   private boolean isEmbeddable(Class<?> cls) {

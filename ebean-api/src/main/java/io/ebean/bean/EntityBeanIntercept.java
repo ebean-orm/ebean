@@ -552,4 +552,24 @@ public interface EntityBeanIntercept extends Serializable {
    * Update the 'next' mutable info returning the content that was obtained via dirty detection.
    */
   String mutableNext(int propertyIndex);
+
+  /**
+   * Returns the value of the property. Can also return virtual properties.
+   */
+  Object getValue(int propertyIndex);
+
+  /**
+   * Returns the value of the property with intercept access. Can also return virtual properties.
+   */
+  Object getValueIntercept(int propertyIndex);
+
+  /**
+   * Writes the value to the property. Can also write virtual properties.
+   */
+  void setValue(int propertyIndex, Object value);
+
+  /**
+   * Writes the value to the property with intercept access. Can also write virtual properties.
+   */
+  void setValueIntercept(int propertyIndex, Object value);
 }
