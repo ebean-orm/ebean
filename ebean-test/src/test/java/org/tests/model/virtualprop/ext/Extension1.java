@@ -12,7 +12,7 @@ import javax.persistence.OneToOne;
  * This class will add the fields 'virtualExtendOne' and 'firstName' to 'VirtualBase' by EntityExtension
  */
 @EntityExtension(VirtualBase.class)
-public class Extension1 implements EntityBean {
+public class Extension1 {
 
   @OneToOne(mappedBy = "base")
   private VirtualExtendOne virtualExtendOne;

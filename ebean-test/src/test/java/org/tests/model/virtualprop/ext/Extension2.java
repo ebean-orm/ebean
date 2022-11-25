@@ -23,7 +23,7 @@ public class Extension2 {
     return virtualExtendManyToManys;
   }
 
-  public static Extension2 get(VirtualBase found) {
+  public static Extension2 get(AbstractVirtualBase found) {
     throw new NotEnhancedException();
   }
 

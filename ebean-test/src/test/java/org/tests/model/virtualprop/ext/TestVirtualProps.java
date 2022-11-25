@@ -20,8 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Roland Praml, FOCONIS AG
  */
 public class TestVirtualProps {
-  static Database db = createDb();
+  static Database db = DB.getDefault();
 
+  /*
   private static Database createDb() {
     DatabaseConfig config = new DatabaseConfig();
     config.setName("h2");
@@ -29,7 +30,7 @@ public class TestVirtualProps {
     config.setDdlExtra(false);
     config.setPackages(List.of("org.tests.model.virtualprop"));
     return DatabaseFactory.create(config);
-  }
+  }*/
 
   @Test
   void testCreate() {
@@ -149,7 +150,7 @@ public class TestVirtualProps {
     List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("delete from virtual_extend_one where id=?"); // delete OneToOne - why 'id=?' and not 'id = ?'
+    assertThat(sql.get(0)).contains("delete from virtual_extend_one where id = ?"); // delete OneToOne - why 'id=?' and not 'id = ?'
     assertThat(sql.get(1)).contains("delete from kreuztabelle where virtual_base_id = ?"); // intersection table
     assertThat(sql.get(2)).contains("delete from virtual_base where id=?"); // delete entity itself
 
