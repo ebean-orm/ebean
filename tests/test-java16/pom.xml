@@ -52,7 +52,7 @@
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>13.10.1-SNAPSHOT</version>
+              <version>13.10.3-SNAPSHOT</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
@@ -65,7 +65,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.9.4</tile>
+            <tile>io.ebean.tile:enhancement:13.10.1</tile>
           </tiles>
         </configuration>
       </plugin>

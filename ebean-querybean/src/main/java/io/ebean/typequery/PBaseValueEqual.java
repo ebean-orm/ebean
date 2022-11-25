@@ -84,6 +84,17 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   }
 
   /**
+   * Is equal to another property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R eq(TQProperty<?> other) {
+    expr().raw(_name + " = " + other.propertyName());
+    return _root;
+  }
+
+  /**
    * Is equal to if value is non-null and otherwise no expression is added to the query.
    * <p>
    * That is, only add the EQUAL TO predicate if the value is not null.
@@ -132,6 +143,17 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
    */
   public final R ne(T value) {
     expr().ne(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is not equal to another property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R ne(TQProperty<?> other) {
+    expr().raw(_name + " <> " + other.propertyName());
     return _root;
   }
 
@@ -259,7 +281,7 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   }
 
   /**
-   * Is in the result of a subquery. Synonym for in().
+   * Is in the result of a sub-query. Synonym for in().
    *
    * @param subQuery values provided by a subQuery
    * @return the root query bean instance
@@ -269,13 +291,35 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   }
 
   /**
-   * Is NOT in the result of a subquery.
+   * Is NOT in the result of a sub-query.
    *
    * @param subQuery values provided by a subQuery
    * @return the root query bean instance
    */
   public final R notIn(Query<?> subQuery) {
     expr().notIn(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is equal to the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R eq(Query<?> subQuery) {
+    expr().eq(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is not equal to the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R ne(Query<?> subQuery) {
+    expr().ne(_name, subQuery);
     return _root;
   }
 }

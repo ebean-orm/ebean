@@ -2,12 +2,16 @@ package org.querytest;
 
 import io.ebean.DB;
 import io.ebean.FetchGroup;
+import io.ebean.Query;
 import io.ebean.test.LoggedSql;
+import io.ebean.typequery.TQProperty;
 import org.example.domain.Customer;
 import org.example.domain.Order;
+import org.example.domain.OrderDetail;
 import org.example.domain.otherpackage.PhoneNumber;
 import org.example.domain.query.QCustomer;
 import org.example.domain.query.QOrder;
+import org.example.domain.query.QOrderDetail;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -214,6 +218,152 @@ public class QOrderTest {
 
   }
 
+  @Test
+  void geSubQuery() {
+    var subQuery = new QOrder()
+      .select(StdFunctions.max(QOrder.Alias.orderDate))
+      .query();
+
+    var query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .registered.ge(subQuery)
+      .query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered >= (select max(t0.order_date) from o_order t0)");
+  }
+
+  @Test
+  void gtSubQuery() {
+    var subQuery = new QOrder()
+      .select("max(orderDate)")
+      .query();
+
+    var query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .registered.gt(subQuery)
+      .query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered > (select max(t0.order_date) from o_order t0)");
+  }
+
+  @Test
+  void leSubQuery() {
+    var subQuery = new QOrder()
+      .select("max(orderDate)")
+      .query();
+
+    var query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .registered.le(subQuery)
+      .query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered <= (select max(t0.order_date) from o_order t0)");
+  }
+
+  @Test
+  void ltSubQuery() {
+    var subQuery = new QOrder()
+      .select("max(orderDate)")
+      .query();
+
+    var query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .registered.lt(subQuery)
+      .query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered < (select max(t0.order_date) from o_order t0)");
+  }
+
+  @Test
+  void eqSubQuery() {
+    var subQuery = new QOrder()
+      .select("max(orderDate)")
+      .query();
+
+    var query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .registered.eq(subQuery)
+      .query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered = (select max(t0.order_date) from o_order t0)");
+  }
+
+  @Test
+  void neSubQuery() {
+    var subQuery = new QOrder()
+      .select(StdFunctions.max(QOrder.Alias.orderDate))
+      .query();
+
+    var query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .registered.ne(subQuery)
+      .query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered <> (select max(t0.order_date) from o_order t0)");
+  }
+
+  @Test
+  void propertyCompare() {
+    Query<Order> query = new QOrder()
+      .orderDate.lt(QOrder.Alias.customer.registered)
+      .query();
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" from o_order t0 join be_customer t1 on t1.id = t0.customer_id where t0.order_date < t1.registered");
+  }
+
+  @Test
+  void subQueryExists() {
+    Query<OrderDetail> subQuery = new QOrderDetail()
+      .alias("od")
+      .orderQty.gt(10)
+      .id.eq(QOrder.Alias.details.id)
+      //.where().raw("details.id = od.id")
+      .query();
+
+    Query<Order> query = new QOrder()
+      .exists(subQuery)
+      .orderBy("orderDate").query();
+
+    query.findList();
+
+    // select distinct t0.id, t0.status, t0.order_date, t0.ship_date, t0.version, t0.when_created, t0.when_updated, t0.customer_id, t0.shipping_address_id, t0.order_date
+    // from o_order t0
+    // left join o_order_detail t1 on t1.order_id = t0.id
+    // where  exists (select 1 from o_order_detail od where od.order_qty > ? and od.id = t1.id) order by t0.order_date
+    String sql = query.getGeneratedSql();
+    assertThat(sql).contains(" exists (select 1 from o_order_detail od where od.order_qty > ? and od.id = t1.id)");
+  }
+
+  @Test
+  void subQueryNotExists() {
+    Query<OrderDetail> subQuery = new QOrderDetail()
+      .alias("od")
+      .orderQty.gt(10)
+      .id.eq(QOrder.Alias.details.id)
+      //.where().raw("details.id = od.id")
+      .query();
+
+    Query<Order> query = new QOrder()
+      .notExists(subQuery)
+      .orderBy("orderDate")
+      .query();
+    query.findList();
+
+    // select distinct t0.id, t0.status, t0.order_date, t0.ship_date, t0.version, t0.when_created, t0.when_updated, t0.customer_id, t0.shipping_address_id, t0.order_date
+    // from o_order t0
+    // left join o_order_detail t1 on t1.order_id = t0.id
+    // where not exists (select 1 from o_order_detail od where od.order_qty > ? and od.id = t1.id) order by t0.order_date
+    String sql = query.getGeneratedSql();
+    assertThat(sql).contains(" not exists (select 1 from o_order_detail od where od.order_qty > ? and od.id = t1.id)");
+  }
+
   private static void setupData() {
     customer = new Customer();
     customer.name = "Fred";
@@ -223,5 +373,11 @@ public class QOrderTest {
     order = new Order();
     order.setCustomer(customer);
     order.save();
+  }
+
+  static class StdFunctions {
+    static String max(TQProperty<?> prop) {
+      return "max(" + prop + ")";
+    }
   }
 }

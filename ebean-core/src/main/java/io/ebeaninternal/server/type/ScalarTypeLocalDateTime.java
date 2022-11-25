@@ -49,7 +49,7 @@ final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime
 
   @Override
   public LocalDateTime jsonRead(JsonParser parser) throws IOException {
-    return LocalDateTime.parse(parser.getText());
+    return parse(parser.getText());
   }
 
   @Override

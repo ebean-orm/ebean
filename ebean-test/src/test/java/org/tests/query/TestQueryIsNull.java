@@ -28,7 +28,7 @@ public class TestQueryIsNull extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = DB.find(Order.class).select("id, status")
-      .where().eq("status", null).query();
+      .where().eq("status", (String) null).query();
     query.findList();
 
     assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.status is null");

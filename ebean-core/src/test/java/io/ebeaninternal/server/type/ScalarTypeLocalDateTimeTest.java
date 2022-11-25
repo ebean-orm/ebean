@@ -2,17 +2,20 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.JsonConfig;
-
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.TimeZone;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ScalarTypeLocalDateTimeTest {
 
@@ -125,20 +128,35 @@ public class ScalarTypeLocalDateTimeTest {
     LocalDateTime value = typeIso.fromJsonISO8601(asJson);
     assertThat(localDateTime).isEqualToIgnoringNanos(value);
   }
-  
+
   @Test
-  @Disabled("Does not work @github due different timezone")
-  // Expecting actual:
-  //  2018-02-03T03:05:06 (java.time.LocalDateTime)
-  // to have same year, month, day, hour, minute and second as:
-  //  2018-02-03T04:05:06 (java.time.LocalDateTime)
-  public void testParseEbean11() {
+  public void testParseEbean11() throws IOException {
+    ScalarTypeLocalDateTime type = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
+    JsonFactory factory = new JsonFactory();
+    JsonParser parser11 = factory.createParser("1517627106000"); // its a number!
+    JsonParser parser13 = factory.createParser("\"2022-01-01T01:00:00\"");
 
-    ScalarTypeLocalDateTime typeDefault = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
+    // test parsing an ebean 11/13 timestamp, we do not expect an exception
+    LocalDateTime p = type.parse("1517627106000");
+    parser11.nextToken();
+    LocalDateTime q = type.jsonRead(parser11);
+    assertThat(p).isEqualTo(q);
 
-    LocalDateTime fromMillis = typeDefault.parse("1517627106000");
-    LocalDateTime fromIso= typeDefault.parse("2018-02-03T04:05:06");
-    
-    assertThat(fromMillis).isEqualToIgnoringNanos(fromIso);
+    p = type.parse("2022-01-01T01:00:00");
+    parser13.nextToken();
+    q = type.jsonRead(parser13);
+    assertThat(p).isEqualTo(q);
+    TimeZone tz = TimeZone.getDefault();
+    try {
+      // Adjust Timezone to run on build server
+      // Note Millis and Iso have a time offset according to TZ
+      TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
+      LocalDateTime fromMillis = type.parse("0");
+      LocalDateTime fromIso = type.parse("1970-01-01T01:00");
+
+      assertThat(fromMillis).isEqualToIgnoringNanos(fromIso);
+    } finally {
+      TimeZone.setDefault(tz);
+    }
   }
 }

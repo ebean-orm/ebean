@@ -694,6 +694,22 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Add EXISTS sub-query predicate.
+   */
+  public R exists(Query<?> subQuery) {
+    query.where().exists(subQuery);
+    return root;
+  }
+
+  /**
+   * Add NOT EXISTS sub-query predicate.
+   */
+  public R notExists(Query<?> subQuery) {
+    query.where().notExists(subQuery);
+    return root;
+  }
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   public R forUpdate() {

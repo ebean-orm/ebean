@@ -35,7 +35,7 @@ abstract class TransactionFactory {
    */
   final SpiTransaction setIsolationLevel(SpiTransaction t, boolean explicit, int isolationLevel) {
     if (isolationLevel > -1) {
-      Connection connection = t.connection();
+      Connection connection = t.getInternalConnection();
       try {
         connection.setTransactionIsolation(isolationLevel);
       } catch (SQLException e) {

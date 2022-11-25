@@ -831,6 +831,11 @@ public interface ExpressionList<T> {
   ExpressionList<T> addAll(ExpressionList<T> exprList);
 
   /**
+   * Equal To the result of a sub-query.
+   */
+  ExpressionList<T> eq(String propertyName, Query<?> subQuery);
+
+  /**
    * Equal To - property is equal to a given value.
    */
   ExpressionList<T> eq(String propertyName, Object value);
@@ -853,6 +858,11 @@ public interface ExpressionList<T> {
    * Equal To or Null - property is equal to a given value or null.
    */
   ExpressionList<T> eqOrNull(String propertyName, Object value);
+
+  /**
+   * Not Equal To the result of a sub-query.
+   */
+  ExpressionList<T> ne(String propertyName, Query<?> subQuery);
 
   /**
    * Not Equal To - property not equal to the given value.
@@ -891,6 +901,23 @@ public interface ExpressionList<T> {
   ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value);
 
   /**
+   * A Property is in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .orderDate.inRangeWith(QOrder.Alias.product.startDate, QOrder.Alias.product.endDate)
+   *
+   *    // which equates to
+   *    product.startDate <= orderDate and (orderDate < product.endDate or product.endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   */
+  ExpressionList<T> inRangeWithProperties(String propertyName, String lowProperty, String highProperty);
+
+  /**
    * In Range - {@code property >= value1 and property < value2}.
    * <p>
    * Unlike Between inRange is "half open" and usually more useful for use with dates or timestamps.
@@ -909,6 +936,11 @@ public interface ExpressionList<T> {
   ExpressionList<T> betweenProperties(String lowProperty, String highProperty, Object value);
 
   /**
+   * Greater Than the result of a sub-query.
+   */
+  ExpressionList<T> gt(String propertyName, Query<?> subQuery);
+
+  /**
    * Greater Than - property greater than the given value.
    */
   ExpressionList<T> gt(String propertyName, Object value);
@@ -924,10 +956,20 @@ public interface ExpressionList<T> {
   ExpressionList<T> geOrNull(String propertyName, Object value);
 
   /**
+   * Greater Than or Equal to the result of a sub-query.
+   */
+  ExpressionList<T> ge(String propertyName, Query<?> subQuery);
+
+  /**
    * Greater Than or Equal to - property greater than or equal to the given
    * value.
    */
   ExpressionList<T> ge(String propertyName, Object value);
+
+  /**
+   * Less Than the result of a sub-query.
+   */
+  ExpressionList<T> lt(String propertyName, Query<?> subQuery);
 
   /**
    * Less Than - property less than the given value.
@@ -943,6 +985,11 @@ public interface ExpressionList<T> {
    * Less Than or Equal to OR Null - ({@code <= or null }).
    */
   ExpressionList<T> leOrNull(String propertyName, Object value);
+
+  /**
+   * Less Than or Equal to the result of a sub-query.
+   */
+  ExpressionList<T> le(String propertyName, Query<?> subQuery);
 
   /**
    * Less Than or Equal to - property less than or equal to the given value.

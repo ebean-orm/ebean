@@ -8,32 +8,47 @@ import io.ebeaninternal.server.query.CQuery;
 import java.util.List;
 
 /**
- * In expression using a sub query.
+ * Sub-Query expression.
  */
-final class InQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
+final class SubQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
 
-  private final boolean not;
+  enum SQOp {
+    EQ(" = "),
+    NE(" <> "),
+    GT(" > "),
+    GE(" >= "),
+    LT(" < "),
+    LE(" <= "),
+    IN(" in "),
+    NOTIN(" not in ");
+    final String expression;
+    SQOp(String expression) {
+      this.expression = expression;
+    }
+  }
+
+  private final SQOp op;
   private final SpiQuery<?> subQuery;
   private List<Object> bindParams;
   private String sql;
 
-  InQueryExpression(String propertyName, SpiQuery<?> subQuery, boolean not) {
+  SubQueryExpression(SQOp op, String propertyName, SpiQuery<?> subQuery) {
     super(propertyName);
+    this.op = op;
     this.subQuery = subQuery;
-    this.not = not;
   }
 
-  InQueryExpression(String propertyName, boolean not, String sql, List<Object> bindParams) {
+  SubQueryExpression(SQOp op, String propertyName, String sql, List<Object> bindParams) {
     super(propertyName);
+    this.op = op;
     this.subQuery = null;
-    this.not = not;
     this.sql = sql;
     this.bindParams = bindParams;
   }
 
   @Override
   public SpiExpression copy() {
-    return subQuery == null ? this : new InQueryExpression(propName, subQuery.copy(), not);
+    return subQuery == null ? this : new SubQueryExpression(op, propName, subQuery.copy());
   }
 
   @Override
@@ -55,8 +70,8 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
 
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("InQuery[").append(propName)
-      .append(" not:").append(not).append(" sql:").append(sql)
+    builder.append("SubQuery[").append(propName).append(op.expression)
+      .append(" sql:").append(sql)
       .append(" ?:").append(bindParams.size()).append("]");
   }
 
@@ -65,7 +80,7 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
    */
   private CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
     SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.database();
-    return ebeanServer.compileQuery(Type.SQ_IN, subQuery, queryRequest.transaction());
+    return ebeanServer.compileQuery(Type.SQ_EX, subQuery, queryRequest.transaction());
   }
 
   @Override
@@ -75,13 +90,7 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append(" (").append(propName).append(")");
-    if (not) {
-      request.append(" not");
-    }
-    request.append(" in (");
-    request.append(sql);
-    request.append(")");
+    request.append(propName).append(op.expression).append("(").append(sql).append(")");
   }
 
   @Override
@@ -93,7 +102,7 @@ final class InQueryExpression extends AbstractExpression implements UnsupportedD
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
-    InQueryExpression that = (InQueryExpression) other;
+    SubQueryExpression that = (SubQueryExpression) other;
     if (this.bindParams.size() != that.bindParams.size()) {
       return false;
     }

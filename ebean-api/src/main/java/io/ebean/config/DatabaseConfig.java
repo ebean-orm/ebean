@@ -33,13 +33,11 @@ import java.util.function.Function;
  * <p>
  * Used to programmatically construct an Database and optionally register it
  * with the DB singleton.
- * </p>
  * <p>
  * If you just use DB thout this programmatic configuration Ebean will read
  * the application.properties file and take the configuration from there. This usually
  * includes searching the class path and automatically registering any entity
  * classes and listeners etc.
- * </p>
  * <pre>{@code
  *
  * DatabaseConfig config = new DatabaseConfig();
@@ -59,7 +57,6 @@ import java.util.function.Function;
  * <p>
  * Note that DatabaseConfigProvider provides a standard Java ServiceLoader mechanism that can
  * be used to apply configuration to the DatabaseConfig.
- * </p>
  *
  * @author emcgreal
  * @author rbygrave
@@ -644,13 +641,8 @@ public class DatabaseConfig {
    * <ul>
    *   <li>DataSourceAlertFactory (e.g. add different alert factories for different ebean instances)</li>
    *   <li>DocStoreFactory</li>
-   *   <li>XmapService</li>
-   *   <li>SpiLoggerFactory (e.g. add custom logger for a certain ebean instance)</li>
-   *   <li>AutoTuneServiceProvider</li>
-   *   <li>SpiProfileHandler</li>
    *   <li>SlowQueryListener (e.g. add custom query listener for a certain ebean instance)</li>
    *   <li>ServerCacheNotifyPlugin</li>
-   *   <li>SpiDdlGenneratorProvider</li>
    * </ul>
    */
   public <T> void putServiceObject(Class<T> iface, T configObject) {

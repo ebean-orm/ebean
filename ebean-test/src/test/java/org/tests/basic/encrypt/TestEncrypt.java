@@ -1,13 +1,13 @@
 package org.tests.basic.encrypt;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.SqlRow;
-import io.ebean.xtest.ForPlatform;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicEncrypt;
@@ -109,7 +109,8 @@ public class TestEncrypt extends BaseTestCase {
     EBasicEncrypt e = new EBasicEncrypt();
     e.setName("testname");
     e.setDescription("testdesc");
-    e.setDob(new Date(System.currentTimeMillis() - 100000));
+    long refTime = System.currentTimeMillis() - 100000;
+    e.setDob(new Date(refTime));
 
     DB.save(e);
 
@@ -149,9 +150,40 @@ public class TestEncrypt extends BaseTestCase {
 
       assertEquals(1, list.size());
 
+      list = DB.find(EBasicEncrypt.class).where()
+        .in("description", "moddesc").findList();
+
+      assertEquals(1, list.size());
+
       list = DB.find(EBasicEncrypt.class).where().startsWith("description", "modde").findList();
 
       assertEquals(1, list.size());
+
+      // Note, we only have "date" precision (See #2878)
+      list = DB.find(EBasicEncrypt.class).where().between("dob",
+        new Date(refTime - 2 * 86400000), new Date(refTime - 1 * 86400000)).findList();
+
+      assertEquals(0, list.size());
+
+      list = DB.find(EBasicEncrypt.class).where().inRange("dob",
+        new Date(refTime - 2 * 86400000), new Date(refTime - 1 * 86400000)).findList();
+
+      assertEquals(0, list.size());
+
+      list = DB.find(EBasicEncrypt.class).where().between("dob",
+        new Date(refTime - 2 * 86400000), new Date(refTime + 1 * 86400000)).findList();
+
+      assertEquals(1, list.size());
+
+      list = DB.find(EBasicEncrypt.class).where().inRange("dob",
+        new Date(refTime - 2 * 86400000), new Date(refTime + 1 * 86400000)).findList();
+
+      assertEquals(1, list.size());
+
+
+      //list = DB.find(EBasicEncrypt.class).where().inRange("dob", new Date(refTime), new Date(refTime+1)).findList();
+
+      //assertEquals(1, list.size());
     }
   }
 

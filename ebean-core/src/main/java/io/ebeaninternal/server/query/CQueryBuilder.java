@@ -396,7 +396,7 @@ final class CQueryBuilder {
       sql = nativeQueryPaging(query, sql);
     }
     query.setGeneratedSql(sql);
-    Connection connection = request.transaction().connection();
+    Connection connection = request.transaction().getInternalConnection();
     BeanDescriptor<?> desc = request.descriptor();
     try {
       // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable

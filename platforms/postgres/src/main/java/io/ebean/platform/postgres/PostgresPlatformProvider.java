@@ -62,7 +62,9 @@ public class PostgresPlatformProvider implements DatabasePlatformProvider {
           }
         }
       } finally {
-        connection.rollback();
+        if (!connection.getAutoCommit()) {
+          connection.rollback();
+        }
       }
       if (majorVersion <= 9) {
         return new Postgres9Platform();

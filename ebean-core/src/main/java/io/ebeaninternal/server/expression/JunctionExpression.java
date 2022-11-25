@@ -280,6 +280,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> inRangeWithProperties(String propertyName, String lowProperty, String highProperty) {
+    return exprList.inRangeWithProperties(propertyName, lowProperty, highProperty);
+  }
+
+  @Override
   public ExpressionList<T> inRange(String propertyName, Object value1, Object value2) {
     return exprList.inRange(propertyName, value1, value2);
   }
@@ -302,6 +307,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> endsWith(String propertyName, String value) {
     return exprList.endsWith(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> eq(String propertyName, Query<?> subQuery) {
+    return exprList.eq(propertyName, subQuery);
   }
 
   @Override
@@ -638,8 +648,18 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> ge(String propertyName, Query<?> subQuery) {
+    return exprList.ge(propertyName, subQuery);
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
     return exprList.ge(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> gt(String propertyName, Query<?> subQuery) {
+    return exprList.gt(propertyName, subQuery);
   }
 
   @Override
@@ -783,6 +803,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> le(String propertyName, Query<?> subQuery) {
+    return exprList.le(propertyName, subQuery);
+  }
+
+  @Override
   public ExpressionList<T> le(String propertyName, Object value) {
     return exprList.le(propertyName, value);
   }
@@ -790,6 +815,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> like(String propertyName, String value) {
     return exprList.like(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> lt(String propertyName, Query<?> subQuery) {
+    return exprList.lt(propertyName, subQuery);
   }
 
   @Override
@@ -805,6 +835,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> leOrNull(String propertyName, Object value) {
     return exprList.leOrNull(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> ne(String propertyName, Query<?> subQuery) {
+    return exprList.ne(propertyName, subQuery);
   }
 
   @Override
