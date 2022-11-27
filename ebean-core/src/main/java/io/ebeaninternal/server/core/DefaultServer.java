@@ -1307,8 +1307,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     int maxRows = spiQuery.getMaxRows();
-    if (maxRows == 0) {
-      throw new PersistenceException("maxRows must be specified for findPagedList() query");
+    if (maxRows <= 0) {
+      throw new PersistenceException("maxRows must be specified as positive integer for findPagedList() query");
     }
     if (spiQuery.isUseDocStore()) {
       return docStore().findPagedList(createQueryRequest(Type.LIST, query, transaction));

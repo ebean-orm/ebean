@@ -23,7 +23,7 @@ public class TestLimitQuery extends BaseTestCase {
   }
 
   @Test
-  public void testMaxRowsZeroWithFirstRow() {
+  public void testMaxRowsNotSetWithFirstRow() {
 
     ResetBasicData.reset();
 
@@ -31,7 +31,6 @@ public class TestLimitQuery extends BaseTestCase {
       .setAutoTune(false)
       .fetch("details")
       .where().gt("details.id", 0)
-      .setMaxRows(0)
       .setFirstRow(3)
       .order().asc("orderDate");
 
@@ -40,7 +39,7 @@ public class TestLimitQuery extends BaseTestCase {
     String sql = query.getGeneratedSql();
     if (isH2()) {
       assertThat(sql).contains("offset 3");
-      assertThat(sql).contains("limit 0");
+      assertThat(sql).doesNotContain("limit");
     }
   }
 
