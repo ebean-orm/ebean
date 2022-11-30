@@ -162,16 +162,18 @@ public class TestQueryCache extends BaseTestCase {
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
 
-
     LoggedSql.start();
     findCountNoTxn();
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(0);
 
-    LoggedSql.start();
-    findCountTxn();
-    sql = LoggedSql.stop();
-    assertThat(sql).hasSize(0);
+    // Oracle does not support READ_UNCOMMITTED as expected
+    if (!isOracle()) {
+      LoggedSql.start();
+      findCountTxn();
+      sql = LoggedSql.stop();
+      assertThat(sql).hasSize(0);
+    }
   }
 
   private void findCountNoTxn() {
