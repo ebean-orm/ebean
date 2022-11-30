@@ -40,7 +40,7 @@ public class TestLimitQuery extends BaseTestCase {
     String sql = query.getGeneratedSql();
     if (isH2()) {
       assertThat(sql).contains("offset 3");
-      assertThat(sql).contains("limit 0");
+      assertThat(sql).doesNotContain("limit");
     }
   }
 
