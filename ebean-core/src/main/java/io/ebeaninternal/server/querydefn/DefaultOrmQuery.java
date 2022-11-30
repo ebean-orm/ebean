@@ -62,7 +62,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Holds query in structured form.
    */
   private OrmQueryDetail detail;
-  private int maxRows;
+  private int maxRows = -1;
   private int firstRow;
   private boolean disableLazyLoading;
   /**
