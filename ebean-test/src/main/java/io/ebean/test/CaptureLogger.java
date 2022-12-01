@@ -24,24 +24,11 @@ final class CaptureLogger implements SpiLogger {
   }
 
   @Override
-  public boolean isTrace() {
-    return true;
-  }
-
-  @Override
   public void debug(String msg) {
     if (active) {
       messages.add(msg);
     }
     wrapped.debug(msg);
-  }
-
-  @Override
-  public void trace(String msg) {
-    if (active) {
-      messages.add(msg);
-    }
-    wrapped.trace(msg);
   }
 
   List<String> start() {

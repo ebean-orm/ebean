@@ -19,17 +19,8 @@ final class DSpiLogger implements SpiLogger {
   }
 
   @Override
-  public boolean isTrace() {
-    return logger.isLoggable(TRACE);
-  }
-
-  @Override
   public void debug(String msg) {
     logger.log(DEBUG, msg);
   }
 
-  @Override
-  public void trace(String msg) {
-    logger.log(TRACE, msg);
-  }
 }

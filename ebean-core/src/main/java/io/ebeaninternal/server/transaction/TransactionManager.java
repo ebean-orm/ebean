@@ -347,9 +347,6 @@ public class TransactionManager implements SpiTransactionManager {
   @Override
   public final void notifyOfQueryOnly(SpiTransaction transaction) {
     // Nothing that interesting here
-    if (txnLogger.isTrace()) {
-      txnLogger.trace(transaction.getLogPrefix() + "Commit - query only");
-    }
   }
 
   private String formatThrowable(Throwable e) {

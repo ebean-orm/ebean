@@ -35,16 +35,7 @@ public class EbeanServerFactory_ServerConfigStart_Test {
         }
 
         @Override
-        public boolean isTrace() {
-          return false;
-        }
-
-        @Override
         public void debug(String msg) {
-        }
-
-        @Override
-        public void trace(String msg) {
         }
       };
 
