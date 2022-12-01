@@ -3,8 +3,10 @@ package org.tests.query;
 import io.ebean.DB;
 import io.ebean.PagedList;
 import io.ebean.Transaction;
+import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -267,7 +269,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertThat(trimSql(loggedSql.get(1), 3)).contains(" b.id, b.status, b.order_date");
   }
 
-  // @IgnorePlatform(Platform.ORACLE)
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   void test_forUpdate() {
     ResetBasicData.reset();
