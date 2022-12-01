@@ -267,6 +267,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertThat(trimSql(loggedSql.get(1), 3)).contains(" b.id, b.status, b.order_date");
   }
 
+  // @IgnorePlatform(Platform.ORACLE)
   @Test
   void test_forUpdate() {
     ResetBasicData.reset();

@@ -1,19 +1,16 @@
-package io.ebean.platform.db2;
+package io.ebean.config.dbplatform;
 
-import io.ebean.config.dbplatform.SqlLimitRequest;
-import io.ebean.config.dbplatform.SqlLimitResponse;
-import io.ebean.config.dbplatform.SqlLimiter;
-
-public final class Db2SqlLimiter implements SqlLimiter {
+public final class AnsiSqlRowsLimiter implements SqlLimiter {
 
   @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {
-    StringBuilder sb = new StringBuilder(512);
+    String dbSql = request.getDbSql();
+    StringBuilder sb = new StringBuilder(50 + dbSql.length());
     sb.append("select ");
     if (request.isDistinct()) {
       sb.append("distinct ");
     }
-    sb.append(request.getDbSql());
+    sb.append(dbSql);
     int firstRow = request.getFirstRow();
     if (firstRow > 0) {
       sb.append(" offset ").append(firstRow).append(" rows");

@@ -2,11 +2,7 @@ package io.ebean.platform.db2;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.annotation.Platform;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -22,7 +18,7 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
     this.supportsNativeJavaTime = false;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.likeClauseRaw = "like ?";
-    this.sqlLimiter = new Db2SqlLimiter();
+    this.sqlLimiter = new AnsiSqlRowsLimiter();
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);

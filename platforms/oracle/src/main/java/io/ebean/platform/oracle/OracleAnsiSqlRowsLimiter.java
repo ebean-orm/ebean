@@ -26,6 +26,7 @@ final class OracleAnsiSqlRowsLimiter implements SqlLimiter {
     if (maxRows > 0) {
       sb.append(" fetch next ").append(maxRows).append(" rows only");
     }
+    // Oracle does not support FOR UPDATE clause with limit offset
     return new SqlLimitResponse(sb.toString());
   }
 

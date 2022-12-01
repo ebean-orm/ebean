@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestQueryForUpdate extends BaseTestCase {
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate() {
 
     ResetBasicData.reset();
@@ -28,6 +27,28 @@ public class TestQueryForUpdate extends BaseTestCase {
     try (final Transaction transaction = DB.beginTransaction()) {
       query = DB.find(Customer.class)
         .forUpdate()
+        .order().desc("id");
+
+      query.findList();
+    }
+
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).contains("with (updlock)");
+    } else {
+      assertThat(sqlOf(query)).contains("for update");
+    }
+  }
+
+  // @IgnorePlatform(Platform.ORACLE)
+  @Test
+  public void testForUpdate_withLimit() {
+    ResetBasicData.reset();
+
+    Query<Customer> query;
+    try (final Transaction transaction = DB.beginTransaction()) {
+      query = DB.find(Customer.class)
+        .forUpdate()
+        .setMaxRows(3)
         .order().desc("id");
 
       query.findList();
