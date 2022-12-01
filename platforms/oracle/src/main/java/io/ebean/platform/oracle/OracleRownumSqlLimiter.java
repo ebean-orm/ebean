@@ -11,7 +11,6 @@ class OracleRownumSqlLimiter implements SqlLimiter {
 
   @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {
-
     // select *
     // from ( select /*+ FIRST_ROWS(n) */ a.*, ROWNUM rnum
     // from ( your_query_goes_here,

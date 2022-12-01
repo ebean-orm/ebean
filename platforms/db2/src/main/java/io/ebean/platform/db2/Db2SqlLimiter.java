@@ -4,11 +4,10 @@ import io.ebean.config.dbplatform.SqlLimitRequest;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.config.dbplatform.SqlLimiter;
 
-public class Db2SqlLimiter implements SqlLimiter {
+public final class Db2SqlLimiter implements SqlLimiter {
 
   @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {
-
     StringBuilder sb = new StringBuilder(512);
     sb.append("select ");
     if (request.isDistinct()) {
@@ -23,7 +22,6 @@ public class Db2SqlLimiter implements SqlLimiter {
     if (maxRows > 0) {
       sb.append(" fetch next ").append(maxRows).append(" rows only");
     }
-
     String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());
     return new SqlLimitResponse(sql);
   }
