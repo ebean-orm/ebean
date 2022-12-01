@@ -137,10 +137,6 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
     transaction.setDocStoreBatchSize(batchSize);
   }
 
-  @Override
-  public String getLogPrefix() {
-    return transaction.getLogPrefix();
-  }
 
   @Override
   public boolean isLogSql() {
@@ -153,13 +149,18 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void logSql(String msg) {
+  public void logSql(String... msg) {
     transaction.logSql(msg);
   }
 
   @Override
-  public void logSummary(String msg) {
+  public void logSummary(String... msg) {
     transaction.logSummary(msg);
+  }
+
+  @Override
+  public void logTxn(String... args) {
+    transaction.logTxn(args);
   }
 
   @Override

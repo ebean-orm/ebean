@@ -151,7 +151,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
       }
       if (isLogSql()) {
         long micros = (System.nanoTime() - startNano) / 1000L;
-        transaction.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ") --micros(", micros + ")"));
+        transaction.logSql(TrimLogSql.trim(sql), "; --bind(", bindLog, ") --micros(", String.valueOf(micros), ")");
       }
     } finally {
       lock.unlock();

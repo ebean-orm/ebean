@@ -932,16 +932,16 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     String name = beanDescriptor.name();
     switch (type) {
       case INSERT:
-        transaction.logSummary("Inserted [" + name + "] [" + (idValue == null ? "" : idValue) + draft);
+        transaction.logSummary("Inserted [" , name , "] [" , (idValue == null ? "" : idValue.toString()) , draft);
         break;
       case UPDATE:
-        transaction.logSummary("Updated [" + name + "] [" + idValue + draft);
+        transaction.logSummary("Updated [" , name , "] [" , idValue.toString() , draft);
         break;
       case DELETE:
-        transaction.logSummary("Deleted [" + name + "] [" + idValue + draft);
+        transaction.logSummary("Deleted [" , name , "] [" , idValue.toString() , draft);
         break;
       case DELETE_SOFT:
-        transaction.logSummary("SoftDelete [" + name + "] [" + idValue + draft);
+        transaction.logSummary("SoftDelete [" , name , "] [" , idValue.toString() , draft);
         break;
       default:
         break;

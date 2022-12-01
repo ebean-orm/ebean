@@ -33,6 +33,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   private static final String notExpectedMessage = "Not expected on read only transaction";
 
   private final TransactionManager manager;
+  private final SpiTxnLogger logger;
   private final boolean logSql;
   private final boolean logSummary;
 
@@ -61,8 +62,9 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection) {
     this.manager = manager;
-    this.logSql = manager.isLogSql();
-    this.logSummary = manager.isLogSummary();
+    this.logger = manager.loggerReadOnly();
+    this.logSql = logger.isLogSql();
+    this.logSummary = logger.isLogSummary();
     this.active = true;
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
@@ -145,11 +147,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public void setSkipCache(boolean skipCache) {
-  }
-
-  @Override
-  public String getLogPrefix() {
-    return null;
   }
 
   @Override
@@ -433,13 +430,18 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public void logSql(String msg) {
-    manager.log().sql().debug(msg);
+  public void logSql(String... msg) {
+    logger.sql(msg);
   }
 
   @Override
-  public void logSummary(String msg) {
-    manager.log().sum().debug(msg);
+  public void logSummary(String... msg) {
+    logger.sum(msg);
+  }
+
+  @Override
+  public void logTxn(String... args) {
+    // never called
   }
 
   /**

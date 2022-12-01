@@ -313,7 +313,7 @@ public final class BatchControl {
       BatchedBeanHolder[] bsArray = beanHolderArray();
       Arrays.sort(bsArray, depthComparator);
       if (transaction.isLogSummary()) {
-        transaction.logSummary("BatchControl flush " + Arrays.toString(bsArray));
+        transaction.logSummary("BatchControl flush " , Arrays.toString(bsArray));
       }
       for (BatchedBeanHolder beanHolder : bsArray) {
         beanHolder.executeNow();

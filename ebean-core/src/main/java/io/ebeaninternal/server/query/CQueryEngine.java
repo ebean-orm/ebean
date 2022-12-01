@@ -73,7 +73,7 @@ public final class CQueryEngine {
     try {
       int rows = query.execute();
       if (request.logSql()) {
-        request.logSql(Str.add(query.generatedSql(), "; --bind(", query.bindLog(), ") --micros(", query.micros() + ") --rows(", rows + ")"));
+        request.logSql(query.generatedSql(), "; --bind(", query.bindLog(), ") --micros(", query.micros() + ") --rows(", rows + ")");
       }
       return rows;
     } catch (SQLException e) {
@@ -129,7 +129,7 @@ public final class CQueryEngine {
     SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
       // log the error to the transaction log
-      t.logSummary("ERROR executing query, bindLog[" + bindLog + "] error:" + StringHelper.removeNewLines(e.getMessage()));
+      t.logSummary("ERROR executing query, bindLog[", bindLog, "] error:", StringHelper.removeNewLines(e.getMessage()));
     }
     // ensure 'rollback' is logged if queryOnly transaction
     t.connection();
@@ -147,7 +147,7 @@ public final class CQueryEngine {
   }
 
   private <T> void logGeneratedSql(OrmQueryRequest<T> request, String sql, String bindLog, long micros) {
-    request.logSql(Str.add(sql, "; --bind(", bindLog, ") --micros(", micros + ")"));
+    request.logSql(sql, "; --bind(", bindLog, ") --micros(", micros + ")");
   }
 
   /**
@@ -403,7 +403,7 @@ public final class CQueryEngine {
    * Log the generated SQL to the transaction log.
    */
   private void logSql(CQuery<?> query) {
-    query.transaction().logSql(Str.add(query.generatedSql(), "; --bind(", query.bindLog(), ") --micros(", query.micros() + ")"));
+    query.transaction().logSql(query.generatedSql(), "; --bind(", query.bindLog(), ") --micros(", String.valueOf(query.micros()), ")");
   }
 
   /**

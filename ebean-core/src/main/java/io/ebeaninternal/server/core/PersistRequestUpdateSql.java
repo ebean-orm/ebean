@@ -148,7 +148,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   public void logSqlBatchBind() {
     if (transaction.isLogSql()) {
-      transaction.logSql(Str.add(" -- bind(", bindLog, ")"));
+      transaction.logSql(" -- bind(", bindLog, ")");
     }
   }
 
@@ -161,7 +161,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
       persistExecute.collectSqlUpdate(label, startNanos);
     }
     if (transaction.isLogSql() && !batchThisRequest) {
-      transaction.logSql(Str.add(TrimLogSql.trim(updateSql.getGeneratedSql()), "; -- bind(", bindLog, ") rows(", String.valueOf(rowCount), ")"));
+      transaction.logSql(TrimLogSql.trim(updateSql.getGeneratedSql()), "; -- bind(", bindLog, ") rows(", String.valueOf(rowCount), ")");
     }
     if (updateSql.isAutoTableMod()) {
       // add the modification info to the TransactionEvent

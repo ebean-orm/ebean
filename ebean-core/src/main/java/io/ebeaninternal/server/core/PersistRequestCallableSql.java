@@ -1,12 +1,8 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CallableSql;
-import io.ebeaninternal.api.BindParams;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.BindParams.Param;
-import io.ebeaninternal.api.SpiCallableSql;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.persist.PersistExecute;
 
 import java.sql.CallableStatement;
@@ -86,7 +82,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
       persistExecute.collectSqlCall(label, startNanos);
     }
     if (transaction.isLogSummary()) {
-      transaction.logSummary("CallableSql label[" + callableSql.getLabel() + "]" + " rows[" + rowCount + "]" + " bind[" + bindLog + "]");
+      transaction.logSummary("CallableSql label[", callableSql.getLabel(), "] rows[", String.valueOf(rowCount), "] bind[", bindLog, "]");
     }
 
     // register table modifications with the transaction event

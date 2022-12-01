@@ -102,7 +102,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     } catch (OptimisticLockException e) {
       // add the SQL and bind values to error message
       final String m = e.getMessage() + " sql[" + sql + "] bind[" + bindLog + "]";
-      persistRequest.transaction().logSummary("OptimisticLockException:" + m);
+      persistRequest.transaction().logSummary("OptimisticLockException:", m);
       throw new OptimisticLockException(m, null, e.getEntity());
     }
   }
@@ -146,15 +146,15 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       switch (batchedStatus) {
         case BATCHED_FIRST: {
           transaction.logSql(sql);
-          transaction.logSql(Str.add(" -- bind(", bindLog.toString(), ")"));
+          transaction.logSql(" -- bind(", bindLog.toString(), ")");
           return;
         }
         case BATCHED: {
-          transaction.logSql(Str.add(" -- bind(", bindLog.toString(), ")"));
+          transaction.logSql(" -- bind(", bindLog.toString(), ")");
           return;
         }
         default: {
-          transaction.logSql(Str.add(sql, "; -- bind(", bindLog.toString(), ")"));
+          transaction.logSql(sql, "; -- bind(", bindLog.toString(), ")");
         }
       }
     }

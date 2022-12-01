@@ -25,14 +25,14 @@ public class ExternalJdbcTransaction extends JdbcTransaction {
    * </p>
    */
   public ExternalJdbcTransaction(Connection connection) {
-    super(null, true, connection, null);
+    super(true, connection, null);
   }
 
   /**
    * Construct will all explicit parameters.
    */
-  public ExternalJdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
-    super(id, explicit, connection, manager);
+  public ExternalJdbcTransaction(boolean explicit, Connection connection, TransactionManager manager) {
+    super(explicit, connection, manager);
   }
 
   /**

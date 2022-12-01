@@ -21,7 +21,6 @@ final class SavepointTransaction extends SpiTransactionProxy {
   private final TransactionManager manager;
   private final Savepoint savepoint;
   private final Connection connection;
-  private final String logPrefix;
   private final String spPrefix;
 
   private boolean rollbackOnly;
@@ -33,13 +32,12 @@ final class SavepointTransaction extends SpiTransactionProxy {
     this.transaction = transaction;
     this.connection = transaction.getInternalConnection();
     this.savepoint = connection.setSavepoint();
-    if (manager.isTxnDebug()) {
+    if (transaction.isLogSql()) {
       int savepointId = manager.isSupportsSavepointId() ? savepoint.getSavepointId() : 0;
       this.spPrefix = "sp[" + savepointId + "] ";
     } else {
       this.spPrefix = "sp[] ";
     }
-    this.logPrefix = transaction.getLogPrefix() + spPrefix;
   }
 
   @Override
@@ -51,17 +49,12 @@ final class SavepointTransaction extends SpiTransactionProxy {
   }
 
   @Override
-  public String getLogPrefix() {
-    return logPrefix;
-  }
-
-  @Override
-  public void logSql(String msg) {
+  public void logSql(String... msg) {
     transaction.logSql(Str.add(spPrefix, msg));
   }
 
   @Override
-  public void logSummary(String msg) {
+  public void logSummary(String... msg) {
     transaction.logSummary(Str.add(spPrefix, msg));
   }
 
@@ -99,6 +92,7 @@ final class SavepointTransaction extends SpiTransactionProxy {
       connection.releaseSavepoint(savepoint);
       state = STATE_COMMITTED;
       manager.notifyOfCommit(this);
+      transaction.logTxn(spPrefix, "commit");
     } catch (SQLException e) {
       throw new PersistenceException("Error trying to commit/release Savepoint", e);
     }
@@ -109,6 +103,7 @@ final class SavepointTransaction extends SpiTransactionProxy {
       connection.rollback(savepoint);
       state = STATE_ROLLED_BACK;
       manager.notifyOfRollback(this, cause);
+      transaction.logTxn(spPrefix, "rollback");//TODO: Pass the cause
     } catch (SQLException e) {
       throw new PersistenceException("Error trying to rollback Savepoint", e);
     }

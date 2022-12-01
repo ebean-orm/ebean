@@ -691,7 +691,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Log the SQL if the logLevel is appropriate.
    */
-  public void logSql(String sql) {
+  public void logSql(String... sql) {
     transaction.logSql(sql);
   }
 

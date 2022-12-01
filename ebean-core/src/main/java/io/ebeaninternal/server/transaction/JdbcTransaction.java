@@ -11,7 +11,6 @@ import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
-import io.ebeaninternal.server.util.Str;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
 import javax.persistence.PersistenceException;
@@ -33,8 +32,8 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private static final String illegalStateMessage = "Transaction is Inactive";
 
   final TransactionManager manager;
+  private final SpiTxnLogger logger;
   private final String id;
-  private final String logPrefix;
   private final boolean logSql;
   private final boolean logSummary;
   private final boolean explicit;
@@ -95,17 +94,17 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private final long startNanos;
   private boolean autoPersistUpdates;
 
-  JdbcTransaction(String id, boolean explicit, Connection connection, TransactionManager manager) {
+  JdbcTransaction(boolean explicit, Connection connection, TransactionManager manager) {
     try {
       this.active = true;
-      this.id = id;
-      this.logPrefix = deriveLogPrefix(id);
       this.explicit = explicit;
       this.manager = manager;
       this.connection = connection;
       this.persistenceContext = new DefaultPersistenceContext();
       this.startNanos = System.nanoTime();
       if (manager == null) {
+        this.logger = null;
+        this.id = "";
         this.logSql = false;
         this.logSummary = false;
         this.skipCacheAfterWrite = true;
@@ -113,9 +112,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.batchOnCascadeMode = false;
         this.onQueryOnlyCommit = false;
       } else {
+        this.logger = manager.logger();
+        this.id = logger.id();
         this.autoPersistUpdates = explicit && manager.isAutoPersistUpdates();
-        this.logSql = manager.isLogSql();
-        this.logSummary = manager.isLogSummary();
+        this.logSql = logger.isLogSql();
+        this.logSummary = logger.isLogSummary();
         this.skipCacheAfterWrite = manager.isSkipCacheAfterWrite();
         this.batchMode = manager.isPersistBatch();
         this.batchOnCascadeMode = manager.isPersistBatchOnCascade();
@@ -188,16 +189,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     }
   }
 
-  private static String deriveLogPrefix(String id) {
 
-    StringBuilder sb = new StringBuilder();
-    sb.append("txn[");
-    if (id != null) {
-      sb.append(id);
-    }
-    sb.append("] ");
-    return sb.toString();
-  }
 
   @Override
   public final void setAutoPersistUpdates(boolean autoPersistUpdates) {
@@ -226,17 +218,13 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     this.skipCache = skipCache;
   }
 
-  @Override
-  public final String getLogPrefix() {
-    return logPrefix;
-  }
 
   @Override
   public String toString() {
     if (active) {
-      return logPrefix;
+      return id;
     } else {
-      return logPrefix + "(inactive)";
+      return id + "(inactive)";
     }
   }
 
@@ -726,13 +714,18 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final void logSql(String msg) {
-    manager.log().sql().debug(Str.add(logPrefix, msg));
+  public final void logSql(String... msg) {
+    logger.sql(msg);
   }
 
   @Override
-  public final void logSummary(String msg) {
-    manager.log().sum().debug(Str.add(logPrefix, msg));
+  public final void logSummary(String... msg) {
+    logger.sum(msg);
+  }
+
+  @Override
+  public void logTxn(String... args) {
+    logger.txn(args);
   }
 
   /**
@@ -805,9 +798,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   final void notifyCommit() {
     if (manager != null) {
       if (queryOnly) {
+        logger.notifyQueryOnly();
         manager.notifyOfQueryOnly(this);
       } else {
         manager.notifyOfCommit(this);
+        logger.notifyCommit();
       }
     }
   }
@@ -966,6 +961,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         manager.notifyOfQueryOnly(this);
       } else {
         manager.notifyOfRollback(this, cause);
+        logger.notifyRollback(cause);
       }
     }
   }
