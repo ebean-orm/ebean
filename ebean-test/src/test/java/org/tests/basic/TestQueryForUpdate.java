@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryForUpdate extends BaseTestCase {
 
-  @IgnorePlatform({Platform.DB2})
   @Test
   public void testForUpdate() {
 
@@ -36,12 +35,11 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else {
+    } else if (!isDb2()){
       assertThat(sqlOf(query)).contains("for update");
     }
   }
 
-  @IgnorePlatform({Platform.DB2})
   @Test
   public void testForUpdate_withLimit() {
     ResetBasicData.reset();
@@ -58,7 +56,8 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else {
+    } else if (!isOracle() && !isDb2()) {
+      // Oracle does not support FOR UPDATE with FETCH
       assertThat(sqlOf(query)).contains("for update");
     }
   }
