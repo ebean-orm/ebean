@@ -3,7 +3,13 @@ package io.ebean.platform.oracle;
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.annotation.Platform;
-import io.ebean.config.dbplatform.*;
+import io.ebean.config.dbplatform.BasicSqlAnsiLimiter;
+import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.config.dbplatform.DbType;
+import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebean.config.dbplatform.SqlErrorCodes;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -21,7 +27,7 @@ public class OraclePlatform extends DatabasePlatform {
     this.maxTableNameLength = 30;
     this.maxConstraintNameLength = 30;
     this.dbEncrypt = new OracleDbEncrypt();
-    this.sqlLimiter = new AnsiSqlRowsLimiter();
+    this.sqlLimiter = new OracleAnsiSqlRowsLimiter();
     this.basicSqlLimiter = new BasicSqlAnsiLimiter();
     this.historySupport = new OracleDbHistorySupport();
     this.truncateTable = "truncate table %s cascade";

@@ -1,10 +1,10 @@
 package org.tests.basic;
 
 import io.ebean.*;
-import io.ebean.annotation.Platform;
-import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
+import io.ebean.annotation.Platform;
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -41,7 +41,7 @@ public class TestQueryForUpdate extends BaseTestCase {
     }
   }
 
-  @IgnorePlatform({Platform.ORACLE, Platform.DB2})
+  @IgnorePlatform({Platform.DB2})
   @Test
   public void testForUpdate_withLimit() {
     ResetBasicData.reset();
