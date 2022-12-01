@@ -1,10 +1,10 @@
 package org.tests.basic;
 
 import io.ebean.*;
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryForUpdate extends BaseTestCase {
 
+  @IgnorePlatform({Platform.DB2})
   @Test
   public void testForUpdate() {
 
@@ -40,7 +41,7 @@ public class TestQueryForUpdate extends BaseTestCase {
     }
   }
 
-  @IgnorePlatform(Platform.ORACLE)
+  @IgnorePlatform({Platform.ORACLE, Platform.DB2})
   @Test
   public void testForUpdate_withLimit() {
     ResetBasicData.reset();
@@ -63,7 +64,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPCAsReference() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -97,7 +98,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPCAsReference_usingLock() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -132,7 +133,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPC() {
 
     EBasic basic = new EBasic("test PC cache");
@@ -146,7 +147,7 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(basic0).isNotNull();
 
       EBasic basic1 = DB.find(EBasic.class)
-        .setId( basic.getId())
+        .setId(basic.getId())
         .forUpdate()
         .findOne();
 
