@@ -16,7 +16,7 @@ public final class LimitOffsetSqlLimiter implements SqlLimiter {
     sb.append(dbSql);
     int maxRows = request.getMaxRows();
     if (maxRows >= 0) {
-      sb.append(" ").append(LIMIT).append(" ").append(maxRows);
+      sb.append(" limit ").append(maxRows);
     }
     int firstRow = request.getFirstRow();
     if (firstRow > 0) {
