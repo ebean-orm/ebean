@@ -4,12 +4,12 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.10.3-FOC3-SNAPSHOT</version>
+    <version>13.10.3-FOC3</version>
   </parent>
 
   <scm>
     <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
-    <tag>ebean-parent-13.6.4-FOC1</tag>
+    <tag>ebean-parent-13.10.3-FOC3</tag>
   </scm>
 
   <name>ebean external mapping xml</name>
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>13.10.3-FOC3-SNAPSHOT</version>
+      <version>13.10.3-FOC3</version>
     </dependency>
 
     <dependency>
@@ -54,21 +54,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.10.3-FOC3-SNAPSHOT</version>
+      <version>13.10.3-FOC3</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.10.3-FOC3-SNAPSHOT</version>
+      <version>13.10.3-FOC3</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.10.3-FOC3-SNAPSHOT</version>
+      <version>13.10.3-FOC3</version>
       <scope>test</scope>
     </dependency>
 

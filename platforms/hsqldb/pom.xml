@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.10.3-FOC3-SNAPSHOT</version>
+    <version>13.10.3-FOC3</version>
   </parent>
 
   <artifactId>ebean-platform-hsqldb</artifactId>
@@ -14,8 +14,12 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.10.3-FOC3-SNAPSHOT</version>
+      <version>13.10.3-FOC3</version>
     </dependency>
 
   </dependencies>
+
+  <scm>
+    <tag>ebean-parent-13.10.3-FOC3</tag>
+  </scm>
 </project>
