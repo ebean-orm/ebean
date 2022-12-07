@@ -543,8 +543,8 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
   @Override
   public boolean hasDirtyProperty(Set<String> propertyNames) {
     String[] names = owner._ebean_getPropertyNames();
-    int len = getPropertyLength();
-    for (int i = 0; i < len; i++) {
+    int i;
+    for (i = 0; i < names.length; i++) {
       if (isChangedProp(i)) {
         if (propertyNames.contains(names[i])) {
           return true;
@@ -555,6 +555,22 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
         }
       }
     }
+    for (ExtensionAccessor acc : owner._ebean_getExtensionAccessors()) {
+      names = acc.getProperties();
+      for (int j = 0; j < names.length; j++) {
+        if (isChangedProp(i)) {
+          if (propertyNames.contains(names[j])) {
+            return true;
+          }
+        } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
+          if (propertyNames.contains(names[j])) {
+            return true;
+          }
+        }
+        i++;
+      }
+    }
+
     return false;
   }
 
