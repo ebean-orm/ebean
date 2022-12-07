@@ -4,7 +4,6 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.FilerException;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -231,6 +230,15 @@ class ProcessingContext implements Constants {
     }
   }
 
+  private String trimAnnotations(String type) {
+    int pos = type.indexOf("@");
+    if (pos == -1) {
+      return type;
+    }
+    String remainder = type.substring(0, pos) + type.substring(type.indexOf(' ') + 1);
+    return trimAnnotations(remainder);
+  }
+
   PropertyType getPropertyType(VariableElement field) {
 
     TypeMirror typeMirror = field.asType();
@@ -296,9 +304,9 @@ class ProcessingContext implements Constants {
       return result;
     } else {
       if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
-        return new PropertyTypeScalarComparable(typeMirror.toString());
+        return new PropertyTypeScalarComparable(trimAnnotations(typeMirror.toString()));
       } else {
-        return new PropertyTypeScalar(typeMirror.toString());
+        return new PropertyTypeScalar(trimAnnotations(typeMirror.toString()));
       }
     }
   }
