@@ -114,7 +114,12 @@ public class ExtensionAccessors implements Iterable<ExtensionAccessor> {
       throw new UnsupportedOperationException("The extension is already in use and cannot be extended anymore");
     }
     Entry entry = new Entry(prototype);
-    accessors.add(entry);
+    lock.lock();
+    try {
+      accessors.add(entry);
+    } finally {
+      lock.unlock();
+    }
     return entry;
   }
 
