@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>13.10.3-FOC2-SNAPSHOT</version>
+      <version>13.10.3-FOC4-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -26,7 +26,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.10.3-FOC2-SNAPSHOT</version>
+      <version>13.10.3-FOC4-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -52,7 +52,7 @@
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>13.10.3-FOC2-SNAPSHOT</version>
+              <version>13.10.3-FOC4-SNAPSHOT</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
