@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
@@ -60,7 +62,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    * The actual entity bean that 'owns' this intercept.
    */
   private final EntityBean owner;
-  private EntityBean embeddedOwner;
+  private Reference<EntityBean> embeddedOwner;
   private int embeddedOwnerIndex;
   /**
    * One of NEW, REF, UPD.
@@ -145,7 +147,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   @Override
   public Object getEmbeddedOwner() {
-    return embeddedOwner;
+    return embeddedOwner == null ? null : embeddedOwner.get();
   }
 
   @Override
@@ -165,7 +167,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   @Override
   public void setEmbeddedOwner(EntityBean parentBean, int embeddedOwnerIndex) {
-    this.embeddedOwner = parentBean;
+    this.embeddedOwner = new WeakReference<>(parentBean);
     this.embeddedOwnerIndex = embeddedOwnerIndex;
   }
 
@@ -852,9 +854,10 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   public void setDirtyStatus() {
     if (!dirty) {
       dirty = true;
-      if (embeddedOwner != null) {
+      EntityBean embeddedOwnerBean = (EntityBean) getEmbeddedOwner();
+      if (embeddedOwnerBean != null) {
         // Cascade dirty state from Embedded bean to parent bean
-        embeddedOwner._ebean_getIntercept().setEmbeddedDirty(embeddedOwnerIndex);
+        embeddedOwnerBean._ebean_getIntercept().setEmbeddedDirty(embeddedOwnerIndex);
       }
       if (nodeUsageCollector != null) {
         nodeUsageCollector.setModified();
