@@ -515,12 +515,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       if (query.getType() == Type.MAP) {
         mergeCacheHitsToMap(result);
       } else {
-        mergeCacheHitsToList(result);
+        mergeCacheHitsToCollection(result);
       }
     }
   }
 
-  private void mergeCacheHitsToList(BeanCollection<T> result) {
+  private void mergeCacheHitsToCollection(BeanCollection<T> result) {
     for (T hit : cacheBeans) {
       result.internalAdd(hit);
     }
@@ -577,6 +577,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       throw new IllegalStateException("Unknown map key property " + key);
     }
     return property;
+  }
+
+  @Override
+  public Set<T> beanCacheHitsAsSet() {
+    OrderBy<T> orderBy = query.getOrderBy();
+    if (orderBy != null && !orderBy.isEmpty()) {
+      beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
+    }
+    return new LinkedHashSet<>(cacheBeans);
   }
 
   @Override

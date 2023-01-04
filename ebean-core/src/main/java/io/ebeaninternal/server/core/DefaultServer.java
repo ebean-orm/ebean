@@ -1091,7 +1091,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <T> Set<T> findSet(Query<T> query, Transaction transaction) {
-    SpiOrmQueryRequest request = createQueryRequest(Type.SET, query, transaction);
+    SpiOrmQueryRequest request = buildQueryRequest(Type.SET, query, transaction);
+    request.resetBeanCacheAutoMode(false);
+    if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
+      // hit bean cache and got all results from cache
+      return request.beanCacheHitsAsSet();
+    }
+    request.prepareQuery();
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (Set<T>) result;
