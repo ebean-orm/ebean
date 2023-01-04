@@ -1,6 +1,7 @@
 package org.tests.cache;
 
 import io.ebean.DB;
+import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
@@ -53,6 +54,35 @@ public class TestBeanCache extends BaseTestCase {
     sql = LoggedSql.stop();
     assertNotNull(bean2);
     assertThat(sql).isEmpty();
+  }
+
+  @Test
+  public void idsInFindMap() {
+
+    List<OCachedBean> beans = createBeans(Arrays.asList("m0", "m1", "m2", "m3", "m4", "m5", "m6"));
+    List<Long> ids = beans.stream().map(OCachedBean::getId).collect(Collectors.toList());
+    beanCache.clear();
+    beanCache.statistics(true);
+    Query<OCachedBean> query = DB.find(OCachedBean.class).setUseCache(true);
+
+    // Test findIds
+    LoggedSql.start();
+    query.copy()
+      .where().idIn(ids.subList(0, 1))
+      .findMap(); // cache key is: 3/d[{/c1000}]/w[List[IdIn[?1],]]
+    assertThat(LoggedSql.stop().get(0)).contains("in (?)");
+
+    LoggedSql.start();
+    query.copy()
+      .where().idIn(ids.subList(0, 4))
+      .findMap(); // cache key is: 3/d[{/c1000}]/w[List[IdIn[?5],]]
+    assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
+
+    LoggedSql.start();
+    query.copy()
+      .where().idIn(ids.subList(2, 6))
+      .findMap(); // same cache key as above and same SQL above
+    assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
   }
 
   @Test
