@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.InterceptReadOnly;
 import io.ebeaninternal.api.SpiBeanType;
 import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiPersistenceContext;
@@ -279,6 +280,10 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
       Object existing;
       if (useReferences) {
         weakCount++;
+        if (id instanceof EntityBean) {
+          // we are an embedded ID
+          id = cloneEmbeddedId((EntityBean) id);
+        }
         existing = map.put(id, new BeanRef(this, id, bean, queue));
       } else {
         existing = map.put(id, bean);
@@ -288,6 +293,26 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
         ((BeanRef) existing).setReplaced();
         weakCount--;
       }
+    }
+
+    /**
+     * Embedded IDs have an intercept and intercept has a reference to original bean.
+     * So we need to get rid of this reference.
+     */
+    private EntityBean cloneEmbeddedId(EntityBean src) {
+      if (src._ebean_getIntercept() instanceof InterceptReadOnly) {
+        return src; // no need to clone.
+      }
+      EntityBean dst = (EntityBean) src._ebean_newInstanceReadOnly();
+      // copy all fields
+      int i = src._ebean_getPropertyNames().length;
+      while (--i >= 0) {
+        dst._ebean_setField(i, src._ebean_getField(i));
+      }
+      // now, the clone should be equal.
+      assert src.equals(dst);
+      assert src.hashCode() == dst.hashCode();
+      return dst;
     }
 
     private int size() {
