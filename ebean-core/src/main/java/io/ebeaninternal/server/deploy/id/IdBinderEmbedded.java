@@ -317,7 +317,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public Object read(DbReadContext ctx) throws SQLException {
-    EntityBean embId = idDesc.createEntityBean();
+    EntityBean embId = idDesc.createEntityBean2(true);
     boolean nullValue = true;
     for (BeanProperty prop : props) {
       Object value = prop.read(ctx);

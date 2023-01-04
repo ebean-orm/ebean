@@ -32,7 +32,7 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
 
   @Override
   Object read(DataReader reader) throws SQLException {
-    EntityBean embeddedBean = property.targetDescriptor.createEntityBean();
+    EntityBean embeddedBean = property.targetDescriptor.createEntityBean2(true);
     boolean notNull = false;
     for (BeanProperty property : property.embeddedProps) {
       Object value = property.readSet(reader, embeddedBean);
