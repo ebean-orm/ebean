@@ -160,6 +160,8 @@ public final class DefaultContainer implements SpiContainer {
    */
   private BootupClasses bootupClasses(DatabaseConfig config) {
     BootupClasses bootup = bootupClasses1(config);
+    bootup.addServerConfigStartup(config.getServerConfigStartupListeners());
+    bootup.runServerConfigStartup(config);
     bootup.addIdGenerators(config.getIdGenerators());
     bootup.addPersistControllers(config.getPersistControllers());
     bootup.addPostLoaders(config.getPostLoaders());
@@ -167,9 +169,7 @@ public final class DefaultContainer implements SpiContainer {
     bootup.addFindControllers(config.getFindControllers());
     bootup.addPersistListeners(config.getPersistListeners());
     bootup.addQueryAdapters(config.getQueryAdapters());
-    bootup.addServerConfigStartup(config.getServerConfigStartupListeners());
     bootup.addChangeLogInstances(config);
-    bootup.runServerConfigStartup(config);
     return bootup;
   }
 
