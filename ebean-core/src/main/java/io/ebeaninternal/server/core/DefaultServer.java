@@ -1099,7 +1099,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <T> Set<T> findSet(Query<T> query, Transaction transaction) {
-    SpiOrmQueryRequest request = createQueryRequest(Type.SET, query, transaction);
+    SpiOrmQueryRequest request = buildQueryRequest(Type.SET, query, transaction);
+    request.resetBeanCacheAutoMode(false);
+    if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
+      // hit bean cache and got all results from cache
+      return request.beanCacheHitsAsSet();
+    }
+    request.prepareQuery();
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (Set<T>) result;
@@ -1115,12 +1121,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <K, T> Map<K, T> findMap(Query<T> query, @Nullable Transaction transaction) {
-    SpiOrmQueryRequest request = createQueryRequest(Type.MAP, query, transaction);
+    SpiOrmQueryRequest request = buildQueryRequest(Type.MAP, query, transaction);
     request.resetBeanCacheAutoMode(false);
     if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
       // hit bean cache and got all results from cache
       return request.beanCacheHitsAsMap();
     }
+    request.prepareQuery();
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (Map<K, T>) result;
