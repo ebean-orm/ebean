@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.10.3-FOC5</version>
+    <version>13.10.3-FOC6-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -15,14 +15,14 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
-    <tag>ebean-parent-13.10.3-FOC5</tag>
+    <tag>ebean-parent-13.6.4-FOC1</tag>
   </scm>
 
   <dependencies>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.10.3-FOC5</version>
+      <version>13.10.3-FOC6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.10.3-FOC5</version>
+      <version>13.10.3-FOC6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -52,13 +52,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>13.10.3-FOC5</version>
+      <version>13.10.3-FOC6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>13.10.3-FOC5</version>
+      <version>13.10.3-FOC6-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -149,21 +149,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.10.3-FOC5</version>
+      <version>13.10.3-FOC6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>13.10.3-FOC5</version>
+      <version>13.10.3-FOC6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>13.10.3-FOC5</version>
+      <version>13.10.3-FOC6-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
