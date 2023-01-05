@@ -14,6 +14,11 @@
 -- not supported: alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
 -- not supported: alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
 -- not supported: alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
+-- not supported: alter table migtest_mtm_c_migtest_mtm_m drop constraint if exists fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c;
+-- not supported: alter table migtest_mtm_c_migtest_mtm_m drop constraint if exists fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m;
+-- not supported: alter table migtest_mtm_m_migtest_mtm_c drop constraint if exists fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m;
+-- not supported: alter table migtest_mtm_m_migtest_mtm_c drop constraint if exists fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c;
+-- not supported: alter table migtest_mtm_m_phone_numbers drop constraint if exists fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id;
 drop index if exists ix_migtest_e_basic_indextest3;
 drop index if exists ix_migtest_e_basic_indextest6;
 drop index if exists ix_table_textfield2;
