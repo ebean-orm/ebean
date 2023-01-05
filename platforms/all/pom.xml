@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.10.3-FOC5-SNAPSHOT</version>
+    <version>13.10.3-FOC5</version>
   </parent>
 
   <artifactId>ebean-platform-all</artifactId>
@@ -14,68 +14,72 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-clickhouse</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-db2</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-hana</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-hsqldb</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-mysql</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-mariadb</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-nuodb</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-oracle</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlanywhere</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlite</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>13.10.3-FOC5-SNAPSHOT</version>
+      <version>13.10.3-FOC5</version>
     </dependency>
 
   </dependencies>
+
+  <scm>
+    <tag>ebean-parent-13.10.3-FOC5</tag>
+  </scm>
 </project>
