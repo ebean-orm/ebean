@@ -29,7 +29,7 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
     serverConfig.add(new EbasicBulkListener());
   }
 
-  public static class EbasicBulkListener implements BulkTableEventListener {
+  private static class EbasicBulkListener implements BulkTableEventListener {
 
     final Set<String> s = new HashSet<>();
 
@@ -49,7 +49,7 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
 
   }
 
-  public static class EbasicPersistList extends AbstractBeanPersistListener {
+  private static class EbasicPersistList extends AbstractBeanPersistListener {
 
     @Override
     public boolean isRegisterFor(Class<?> cls) {

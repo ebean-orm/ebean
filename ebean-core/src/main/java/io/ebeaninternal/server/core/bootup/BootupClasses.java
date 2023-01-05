@@ -342,8 +342,9 @@ public class BootupClasses implements Predicate<Class<?>> {
    */
   @SuppressWarnings("unchecked")
   private boolean isInterestingInterface(Class<?> cls) {
-    if (Modifier.isAbstract(cls.getModifiers())) {
-      // do not include abstract classes as we can
+    if (Modifier.isAbstract(cls.getModifiers())
+      || !(Modifier.isPublic(cls.getModifiers()) || Modifier.isProtected(cls.getModifiers()))) {
+      // do not include abstract and non pupbic/protected classes as we can
       // not instantiate them
       return false;
     }

@@ -189,7 +189,7 @@ public class TestChangeLog extends BaseTestCase {
     return DatabaseFactory.create(config);
   }
 
-  public static class TDChangeLogPrepare implements ChangeLogPrepare {
+  static class TDChangeLogPrepare implements ChangeLogPrepare {
     @Override
     public boolean prepare(ChangeSet changes) {
       changes.setUserId("appUser1");
@@ -198,7 +198,7 @@ public class TestChangeLog extends BaseTestCase {
     }
   }
 
-  public static class TDChangeLogListener implements ChangeLogListener {
+  static class TDChangeLogListener implements ChangeLogListener {
 
     ObjectMapper objectMapper = new ObjectMapper();
 
@@ -226,7 +226,7 @@ public class TestChangeLog extends BaseTestCase {
 
   }
 
-  public static class TDChangeLogRegister implements ChangeLogRegister {
+  static class TDChangeLogRegister implements ChangeLogRegister {
 
     @Override
     public ChangeLogFilter getChangeFilter(Class<?> beanType) {

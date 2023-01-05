@@ -1,16 +1,17 @@
-package org.tests.model.controller;
+package io.ebean.xtest.event;
 
 import io.ebean.bean.BeanCollection;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.plugin.BeanType;
+import org.tests.model.controller.FindControllerMain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TestBeanFindController implements BeanFindController {
+class TestBeanFindController implements BeanFindController {
 
   @Override
   public boolean isRegisterFor(final Class<?> cls) {
