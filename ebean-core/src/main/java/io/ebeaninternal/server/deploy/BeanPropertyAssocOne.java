@@ -655,7 +655,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void setValue(EntityBean bean, Object value) {
     super.setValue(bean, value);
-    if (embedded && value instanceof EntityBean) {
+    if (!id && embedded && value instanceof EntityBean) {
       setEmbeddedOwner(bean, value);
     }
   }
@@ -663,7 +663,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void setValueIntercept(EntityBean bean, Object value) {
     super.setValueIntercept(bean, value);
-    if (embedded && value instanceof EntityBean) {
+    if (!id && embedded && value instanceof EntityBean) {
       setEmbeddedOwner(bean, value);
     }
   }
@@ -675,8 +675,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     Object emb = getValue(owner);
     if (emb != null) {
       EntityBean embeddedBean = (EntityBean) emb;
-      embeddedBean._ebean_getIntercept().setEmbeddedOwner(owner, propertyIndex);
       targetDescriptor.setAllLoaded(embeddedBean);
+      if (!id) {
+        embeddedBean._ebean_getIntercept().setEmbeddedOwner(owner, propertyIndex);
+      }
     }
   }
 
