@@ -16,6 +16,7 @@ import org.tests.model.basic.OCachedBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -179,6 +180,80 @@ public class TestBeanCache extends BaseTestCase {
 
     assertBeanCacheHitMiss(1, 2);
     assertThat(list).hasSize(3);
+    sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    if (isH2()) {
+      // fetch the misses from DB
+      assertSql(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?,?,?,?,?)");
+    }
+  }
+
+  @Test
+  public void testFindSet() {
+
+    List<OCachedBean> beans = createBeans(Arrays.asList("z0", "z1", "z2"));
+    List<Long> ids = beans.stream().map(OCachedBean::getId).collect(Collectors.toList());
+
+    beanCache.clear();
+    beanCache.statistics(true);
+
+    LoggedSql.start();
+
+    log.info("All misses (0 of 3) ...");
+    Set<OCachedBean> set = DB.find(OCachedBean.class)
+      .where().idIn(ids)
+      .setUseCache(true)
+      .findSet();
+
+    assertThat(set).hasSize(3);
+    assertBeanCacheHitMiss(0, 3);
+    List<String> sql = LoggedSql.collect();
+    assertThat(sql).hasSize(1);
+    if (isH2()) {
+      assertSql(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?,?,?,?,?)");
+    }
+
+    log.info("All hits (3 of 3) ...");
+    set = DB.find(OCachedBean.class)
+      .where().idIn(ids)
+      .setUseCache(true)
+      .findSet();
+
+    assertBeanCacheHitMiss(3, 0);
+    assertThat(set).hasSize(3);
+    sql = LoggedSql.collect();
+    assertThat(sql).hasSize(0); // no misses
+
+    // remove a bean so that we get a "partial" hit (2 out of 3 in cache)
+    beanCache.remove(beans.get(0).getId().toString());
+
+    log.info("Partial hits (2 of 3) ...");
+    set = DB.find(OCachedBean.class)
+      .where().idIn(ids)
+      .setUseCache(true)
+      .findSet();
+
+    assertBeanCacheHitMiss(2, 1);
+    assertThat(set).hasSize(3);
+    sql = LoggedSql.collect();
+    assertThat(sql).hasSize(1);
+    if (isH2()) {
+      // fetch the miss from DB
+      assertSql(sql.get(0)).contains("from o_cached_bean t0 where t0.id in (?)");
+    }
+
+    // remove beans so that we get a "partial" hit (1 out of 3 in cache)
+    beanCache.remove(beans.get(1).getId().toString());
+    beanCache.remove(beans.get(2).getId().toString());
+
+    log.info("Partial hits (1 of 3) ...");
+    set = DB.find(OCachedBean.class)
+      .where().idIn(ids)
+      .setUseCache(true)
+      .findSet();
+
+    assertBeanCacheHitMiss(1, 2);
+    assertThat(set).hasSize(3);
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     if (isH2()) {
