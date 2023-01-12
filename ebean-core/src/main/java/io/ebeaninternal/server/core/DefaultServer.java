@@ -1600,11 +1600,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void visitSave(Object start, PersistVisitor visitor) {
-    new VisitHandler(descriptorManager).visit(start, visitor);
-  }
-
-  @Override
   public void markAsDirty(Object bean) {
     if (!(bean instanceof EntityBean)) {
       throw new IllegalArgumentException("This bean is not an EntityBean?");

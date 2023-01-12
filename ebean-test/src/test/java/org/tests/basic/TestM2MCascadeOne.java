@@ -1,13 +1,11 @@
 package org.tests.basic;
 
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestM2MCascadeOne extends BaseTestCase {
 
@@ -32,43 +30,8 @@ public class TestM2MCascadeOne extends BaseTestCase {
     u1.addRole(r0);
     u1.addRole(r1);
 
-    TPersistVisitor tv = new TPersistVisitor();
-    DB.visitSave(u1, tv);
-    assertThat(tv.toString()).isEqualTo("<root>\n"
-      + "  <bean type='MUser' newOrDirty='false'>\n"
-      + "    <property name='roles'>\n"
-      + "      <collection size='2'>\n"
-      + "        <bean type='MRole' newOrDirty='false'/>\n"
-      + "        <bean type='MRole' newOrDirty='true'/>\n"
-      + "      </collection>\n"
-      + "    </property>\n"
-      + "  </bean>\n"
-      + "</root>\n");
-
-
     DB.save(u1);
 
-    u1 = DB.find(MUser.class, u.getUserid());
-
-    tv = new TPersistVisitor();
-    DB.visitSave(u1, tv);
-    // collection is unloaded
-    assertThat(tv.toString()).isEqualTo("<root>\n"
-      + "  <bean type='MUser' newOrDirty='false'/>\n"
-      + "</root>\n");
-
-    r1 = DB.find(MRole.class, r1.getRoleid());
-    tv = new TPersistVisitor();
-    r1.getUsers().add(new MUser());
-
-    DB.visitSave(r1, tv);
-    assertThat(tv.toString()).isEqualTo("<root>\n"
-      + "  <bean type='MRole' newOrDirty='false'>\n"
-      + "    <property name='users'>\n"
-      + "      <collection size='2'/>\n"
-      + "    </property>\n"
-      + "  </bean>\n"
-      + "</root>\n");
   }
 
   @Test

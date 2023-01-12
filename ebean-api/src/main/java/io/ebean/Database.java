@@ -844,17 +844,6 @@ public interface Database {
   int saveAll(Object... beans) throws OptimisticLockException;
 
   /**
-   * This will visit all beans in the persist graph on a given object
-   * <code>start</code>. It will call the visitor for each dirty bean that would
-   * be saved with {@link #save(Object)} or {@link #saveAll(Collection)}. You can
-   * use this method to implement custom validations.
-   *
-   * @param start   could be a bean, a list of beans or a map of beans.
-   * @param visitor the visitor
-   */
-  void visitSave(Object start, PersistVisitor visitor);
-
-  /**
    * Delete the bean.
    * <p>
    * This will return true if the bean was deleted successfully or JDBC batch is being used.

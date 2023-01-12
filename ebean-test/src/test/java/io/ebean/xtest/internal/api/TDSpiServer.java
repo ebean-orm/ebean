@@ -279,11 +279,6 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public void visitSave(Object start, PersistVisitor visitor) {
-
-  }
-
-  @Override
   public boolean delete(Object bean) throws OptimisticLockException {
     return false;
   }
