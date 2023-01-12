@@ -613,12 +613,24 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  /**
+   * Add table join with explicit table alias.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
+    if (sqlFormulaJoin != null) {
+      ctx.appendFormulaJoin(sqlFormulaJoin, joinType, a1);
+    }
+    return super.addJoin(joinType, a1, a2, ctx);
+  }
+
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (!isTransient && !primaryKeyExport) {
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
-        ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
+        String alias = ctx.tableAliasManyWhere(manyWhere);
+        ctx.appendFormulaJoin(sqlFormulaJoin, joinType, alias);
       }
     }
   }
