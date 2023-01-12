@@ -6,6 +6,7 @@ import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.plugin.BeanType;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import org.junit.jupiter.api.Test;
 import org.tests.model.virtualprop.VirtualBase;
@@ -19,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Demo, how to use virtual properties. Note: that there is
  * @author Roland Praml, FOCONIS AG
  */
-public class TestVirtualProps {
+public class TestVirtualProps extends BaseTestCase {
   static Database db = DB.getDefault();
 
   /*
@@ -127,7 +128,11 @@ public class TestVirtualProps {
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
 //    assertThat(sql.get(0)).contains("select t0.id, t0.data, concat('Your name is ', t0.data), t1.id from virtual_base t0 left join virtual_extend_one t1 on t1.id = t0.id where t0.id = ?");
-    assertThat(sql.get(1)).contains("select int_.virtual_base_id, t0.id, t0.data from virtual_extend_many_to_many t0 left join kreuztabelle int_ on int_.virtual_extend_many_to_many_id = t0.id where (int_.virtual_base_id) in (?)");
+    if (isPostgresCompatible()) {
+      assertThat(sql.get(1)).contains("select int_.virtual_base_id, t0.id, t0.data from virtual_extend_many_to_many t0 left join kreuztabelle int_ on int_.virtual_extend_many_to_many_id = t0.id where (int_.virtual_base_id) = any(?)");
+    } else {
+      assertThat(sql.get(1)).contains("select int_.virtual_base_id, t0.id, t0.data from virtual_extend_many_to_many t0 left join kreuztabelle int_ on int_.virtual_extend_many_to_many_id = t0.id where (int_.virtual_base_id) in (?)");
+    }
     DB.find(VirtualBase.class).delete();
     DB.find(VirtualExtendManyToMany.class).delete();
   }
