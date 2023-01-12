@@ -1,8 +1,8 @@
 package org.tests.model.onetoone;
 
-import io.ebean.annotation.Formula;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Version;
 import java.util.UUID;
 
 @Entity
@@ -48,5 +48,4 @@ public class OtoUPrimeExtra {
   public void setVersion(Long version) {
     this.version = version;
   }
-
 }

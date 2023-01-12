@@ -76,7 +76,6 @@ public class TestBeanCache extends BaseTestCase {
       assertThat(LoggedSql.stop().get(0)).contains("in (?)");
     }
 
-
     LoggedSql.start();
     query.copy()
       .where().idIn(ids.subList(0, 4))
@@ -96,7 +95,6 @@ public class TestBeanCache extends BaseTestCase {
     } else {
       assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
     }
-
   }
 
   @Test
