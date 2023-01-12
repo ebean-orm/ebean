@@ -1,8 +1,10 @@
 package org.tests.basic;
 
+import io.ebean.annotation.Platform;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -22,6 +24,7 @@ public class TestLimitQuery extends BaseTestCase {
     rob();
   }
 
+  @IgnorePlatform({Platform.MYSQL, Platform.MARIADB})
   @Test
   public void testMaxRowsZeroWithFirstRow() {
 
@@ -40,7 +43,7 @@ public class TestLimitQuery extends BaseTestCase {
     String sql = query.getGeneratedSql();
     if (isH2()) {
       assertThat(sql).contains("offset 3");
-      assertThat(sql).contains("limit 0");
+      assertThat(sql).doesNotContain("limit");
     }
   }
 

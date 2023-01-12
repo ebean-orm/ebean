@@ -5,6 +5,7 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -19,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestQueryForUpdate extends BaseTestCase {
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate() {
 
     ResetBasicData.reset();
@@ -35,13 +35,35 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else {
+    } else if (!isDb2()){
       assertThat(sqlOf(query)).contains("for update");
     }
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  public void testForUpdate_withLimit() {
+    ResetBasicData.reset();
+
+    Query<Customer> query;
+    try (final Transaction transaction = DB.beginTransaction()) {
+      query = DB.find(Customer.class)
+        .forUpdate()
+        .setMaxRows(3)
+        .order().desc("id");
+
+      query.findList();
+    }
+
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (!isOracle() && !isDb2()) {
+      // Oracle does not support FOR UPDATE with FETCH
+      assertThat(sqlOf(query)).contains("for update");
+    }
+  }
+
+  @Test
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPCAsReference() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -75,7 +97,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPCAsReference_usingLock() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -110,7 +132,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPC() {
 
     EBasic basic = new EBasic("test PC cache");
@@ -124,7 +146,7 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(basic0).isNotNull();
 
       EBasic basic1 = DB.find(EBasic.class)
-        .setId( basic.getId())
+        .setId(basic.getId())
         .forUpdate()
         .findOne();
 

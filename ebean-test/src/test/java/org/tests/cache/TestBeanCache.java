@@ -70,19 +70,33 @@ public class TestBeanCache extends BaseTestCase {
     query.copy()
       .where().idIn(ids.subList(0, 1))
       .findMap(); // cache key is: 3/d[{/c1000}]/w[List[IdIn[?1],]]
-    assertThat(LoggedSql.stop().get(0)).contains("in (?)");
+    if (isPostgresCompatible()) {
+      assertThat(LoggedSql.stop().get(0)).contains("t0.id = any(?)");
+    } else {
+      assertThat(LoggedSql.stop().get(0)).contains("in (?)");
+    }
+
 
     LoggedSql.start();
     query.copy()
       .where().idIn(ids.subList(0, 4))
       .findMap(); // cache key is: 3/d[{/c1000}]/w[List[IdIn[?5],]]
-    assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
+    if (isPostgresCompatible()) {
+      assertThat(LoggedSql.stop().get(0)).contains("t0.id = any(?)");
+    } else {
+      assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
+    }
 
     LoggedSql.start();
     query.copy()
       .where().idIn(ids.subList(2, 6))
       .findMap(); // same cache key as above and same SQL above
-    assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
+    if (isPostgresCompatible()) {
+      assertThat(LoggedSql.stop().get(0)).contains("t0.id = any(?)");
+    } else {
+      assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
+    }
+
   }
 
   @Test

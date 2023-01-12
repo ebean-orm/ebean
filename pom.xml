@@ -50,7 +50,7 @@
     <ebean-test-containers.version>6.3</ebean-test-containers.version>
     <ebean-datasource.version>8.4</ebean-datasource.version>
     <ebean-agent.version>13.10.3-FOC3</ebean-agent.version>
-    <ebean-maven-plugin.version>13.10.2</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>13.11.1</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 

@@ -3,6 +3,8 @@ package org.example.domain;
 import io.ebean.annotation.DbArray;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +18,11 @@ import java.util.Map;
 public class Contact extends BaseModel {
 
   @DbArray
-  List<String> phoneNumbers = new ArrayList<>();
+  List<@Size(max=20) String> phoneNumbers = new ArrayList<>();
+
+  @ElementCollection
+  @Size(max=10)
+  List<@Size(max=20) String> paths;
 
   @Column(length = 50)
   String firstName;
@@ -36,7 +42,7 @@ public class Contact extends BaseModel {
   Customer customer;
 
   @OneToMany(mappedBy = "contact")
-  List<ContactNote> notes;
+  List<@NotNull ContactNote> notes;
 
   @OneToMany(cascade = CascadeType.PERSIST)
   @MapKey(name = "key")

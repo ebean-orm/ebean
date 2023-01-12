@@ -146,6 +146,15 @@ class ProcessingContext implements Constants {
     }
   }
 
+  private String trimAnnotations(String type) {
+    int pos = type.indexOf("@");
+    if (pos == -1) {
+      return type;
+    }
+    String remainder = type.substring(0, pos) + type.substring(type.indexOf(' ') + 1);
+    return trimAnnotations(remainder);
+  }
+
   /**
    * Gather all the fields (properties) for the given bean element.
    */
@@ -159,7 +168,6 @@ class ProcessingContext implements Constants {
    * Recursively gather all the fields (properties) for the given bean element.
    */
   private void gatherProperties(List<VariableElement> fields, Element element) {
-
     TypeElement typeElement = (TypeElement) element;
     TypeMirror superclass = typeElement.getSuperclass();
     Element mappedSuper = typeUtils.asElement(superclass);
@@ -253,9 +261,17 @@ class ProcessingContext implements Constants {
   }
 
   PropertyType getPropertyType(VariableElement field) {
-
-    TypeMirror typeMirror = field.asType();
-
+    if (dbJsonField(field)) {
+      return propertyTypeMap.getDbJsonType();
+    }
+    if (dbArrayField(field)) {
+      // get generic parameter type
+      DeclaredType declaredType = (DeclaredType) field.asType();
+      String fullType = typeDef(declaredType.getTypeArguments().get(0));
+      String shortName = langShortType(Split.shortName(fullType));
+      return new PropertyTypeArray(fullType, shortName);
+    }
+    final TypeMirror typeMirror = field.asType();
     TypeMirror currentType = typeMirror;
     while (currentType != null) {
       PropertyType type = propertyTypeMap.getType(typeDef(currentType));
@@ -266,18 +282,6 @@ class ProcessingContext implements Constants {
       // go up in class hierarchy
       TypeElement fieldType = (TypeElement) typeUtils.asElement(currentType);
       currentType = (fieldType == null) ? null : fieldType.getSuperclass();
-    }
-
-    if (dbJsonField(field)) {
-      return propertyTypeMap.getDbJsonType();
-    }
-
-    if (dbArrayField(field)) {
-      // get generic parameter type
-      DeclaredType declaredType = (DeclaredType) typeMirror;
-      String fullType = typeDef(declaredType.getTypeArguments().get(0));
-      String shortName = langShortType(Split.shortName(fullType));
-      return new PropertyTypeArray(fullType, shortName);
     }
 
     Element fieldType = typeUtils.asElement(typeMirror);
@@ -324,9 +328,9 @@ class ProcessingContext implements Constants {
     }
 
     if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
-      return new PropertyTypeScalarComparable(typeMirror.toString());
+      return new PropertyTypeScalarComparable(trimAnnotations(typeMirror.toString()));
     } else {
-      return new PropertyTypeScalar(typeMirror.toString());
+      return new PropertyTypeScalar(trimAnnotations(typeMirror.toString()));
     }
   }
 
@@ -383,7 +387,6 @@ class ProcessingContext implements Constants {
    * Create the QAssoc PropertyType.
    */
   private PropertyType createPropertyTypeAssoc(String fullName) {
-
     String[] split = Split.split(fullName);
     String propertyName = "QAssoc" + split[1];
     String packageName = packageAppend(split[0]);
@@ -436,7 +439,6 @@ class ProcessingContext implements Constants {
    * Register an entity with optional dbName.
    */
   void addEntity(String beanFullName, String dbName) {
-
     loaded.add(beanFullName);
     final String pkg = packageOf(beanFullName);
     if (pkg != null) {

@@ -65,7 +65,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   /**
    * Flag to mark this is the id property.
    */
-  private final boolean id;
+  protected final boolean id;
   private final boolean importedPrimaryKey;
   /**
    * Flag to make this as a dummy property for unidirecitonal relationships.
