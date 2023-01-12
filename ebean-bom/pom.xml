@@ -196,7 +196,7 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-all</artifactId>
-        <version>13.11.2-SNAPSHOT</version>
+        <version>13.11.2-FOC3-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -226,7 +226,7 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-hsqldb</artifactId>
-        <version>13.11.2-SNAPSHOT</version>
+        <version>13.11.2-FOC3-SNAPSHOT</version>
       </dependency>
 
       <dependency>
@@ -262,7 +262,7 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-sqlanywhere</artifactId>
-        <version>13.11.2-SNAPSHOT</version>
+        <version>13.11.2-FOC3-SNAPSHOT</version>
       </dependency>
 
       <dependency>
