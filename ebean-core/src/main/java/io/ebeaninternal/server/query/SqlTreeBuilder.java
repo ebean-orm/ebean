@@ -172,7 +172,7 @@ public final class SqlTreeBuilder {
     String[] split = idCols.split(",");
     for (String col : split) {
       col = col.trim();
-      if (!dbOrderBy.contains(col)) {
+      if (!DbOrderByTrim.contains(dbOrderBy, col)) {
         sb.append(", ").append(col);
       }
     }

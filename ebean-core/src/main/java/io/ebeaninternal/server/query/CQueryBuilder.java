@@ -585,16 +585,11 @@ final class CQueryBuilder {
         }
         if (distinct && dbOrderBy != null) {
           // add the orderBy columns to the select clause (due to distinct)
-          final OrderBy<?> orderBy = query.getOrderBy();
-          if (orderBy != null && orderBy.supportsSelect()) {
-            String trimmed = DbOrderByTrim.trim(dbOrderBy);
-            if (query.isSingleAttribute() && select.selectSql().startsWith(trimmed)) {
-              // NOP, already in SQL
-              // TODO: what to do if we select("id").orderBy("prop,id")?
-              // Can we live with a query like "select t0.id, t0.prop, t0.id from"
-              // or should we elliminate the second "t0.id" from select
-            } else {
-              sb.append(", ").append(trimmed);
+          String[] tokens = DbOrderByTrim.trim(dbOrderBy).split(",");
+          for (String token : tokens) {
+            token = token.trim();
+            if (!DbOrderByTrim.contains(select.selectSql(), token)) {
+              sb.append(", ").append(token);
             }
           }
         }
@@ -643,7 +638,7 @@ final class CQueryBuilder {
     private void appendHistoryAsOfPredicate() {
       if (query.isAsOfBaseTable()) {
         query.incrementAsOfTableCount();
-        if (!historySupport.isStandardsBased()){
+        if (!historySupport.isStandardsBased()) {
           appendAndOrWhere();
           sb.append(historySupport.asOfPredicate(request.baseTableAlias()));
         }

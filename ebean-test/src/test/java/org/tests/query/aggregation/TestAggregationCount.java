@@ -149,9 +149,9 @@ public class TestAggregationCount extends BaseTestCase {
 
     String sql = sqlOf(query, 5);
     if (isH2()) {
-      assertThat(sql).contains("select distinct t0.id, t0.name, count(u1.id), sum(u1.my_units), sum(u1.my_units * u1.amount), sum(u1.my_units), t0.name from tevent_one t0 ");
+      assertThat(sql).contains("select distinct t0.id, t0.name, count(u1.id), sum(u1.my_units), sum(u1.my_units * u1.amount) from tevent_one t0 ");
     } else if (isPostgresCompatible()) {
-      assertThat(sql).contains("t0.name, count(u1.id), sum(u1.my_units), sum(u1.my_units * u1.amount), sum(u1.my_units), t0.name from tevent_one t0 ");
+      assertThat(sql).contains("t0.name, count(u1.id), sum(u1.my_units), sum(u1.my_units * u1.amount) from tevent_one t0 ");
     }
     assertThat(sql).contains("from tevent_one t0 join tevent_many u1 on u1.event_id = t0.id ");
     assertThat(sql).contains(" group by t0.id, t0.name ");
