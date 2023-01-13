@@ -51,6 +51,11 @@
         <alterTable name="migtest_mtm_m" tablespace="$TABLESPACE_DEFAULT" indexTablespace="$TABLESPACE_DEFAULT" lobTablespace="$TABLESPACE_DEFAULT"/>
         <addUniqueConstraint constraintName="uq_m12_otoc72" tableName="migtest_oto_child" columnNames="name" oneToOne="false" nullableColumns="name" platforms="MYSQL"/>
         <addUniqueConstraint constraintName="uq_migtest_oto_master_name" tableName="migtest_oto_master" columnNames="name" oneToOne="false" nullableColumns="name" platforms="MYSQL"/>
+        <alterForeignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" tableName="migtest_mtm_c_migtest_mtm_m"/>
+        <alterForeignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" tableName="migtest_mtm_c_migtest_mtm_m"/>
+        <alterForeignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" tableName="migtest_mtm_m_migtest_mtm_c"/>
+        <alterForeignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" tableName="migtest_mtm_m_migtest_mtm_c"/>
+        <alterForeignKey name="fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" tableName="migtest_mtm_m_phone_numbers"/>
         <createIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic" columns="indextest1"/>
         <createIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic" columns="indextest5"/>
         <createIndex indexName="ix_migtest_quoted_status1" tableName="&quot;migtest_QuOtEd&quot;" columns="status1"/>

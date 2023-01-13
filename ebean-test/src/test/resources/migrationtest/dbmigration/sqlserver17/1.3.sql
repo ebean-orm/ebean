@@ -19,6 +19,11 @@ IF OBJECT_ID('uq_migtest_e_basic_indextest4', 'UQ') IS NOT NULL alter table migt
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest5') drop index uq_migtest_e_basic_indextest5 ON migtest_e_basic;
 IF OBJECT_ID('uq_migtest_e_basic_indextest5', 'UQ') IS NOT NULL alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
 IF OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
+IF OBJECT_ID('fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c', 'F') IS NOT NULL alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c;
+IF OBJECT_ID('fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m', 'F') IS NOT NULL alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m;
+IF OBJECT_ID('fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m', 'F') IS NOT NULL alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m;
+IF OBJECT_ID('fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c', 'F') IS NOT NULL alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c;
+IF OBJECT_ID('fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id', 'F') IS NOT NULL alter table migtest_mtm_m_phone_numbers drop constraint fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest3') drop index ix_migtest_e_basic_indextest3 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest6') drop index ix_migtest_e_basic_indextest6 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('"table"','U') AND name = 'ix_table_textfield2') drop index ix_table_textfield2 ON "table";

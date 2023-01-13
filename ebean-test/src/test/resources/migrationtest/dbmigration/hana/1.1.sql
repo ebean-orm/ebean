@@ -37,6 +37,9 @@ declare exit handler for sql_error_code 397 begin end;
 exec 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
 end;
 $$;
+alter table drop_main_drop_ref_many drop constraint  fk_drop_main_drop_ref_many_drop_main;
+alter table drop_main_drop_ref_many drop constraint  fk_drop_main_drop_ref_many_drop_ref_many;
+alter table drop_ref_one drop constraint  fk_drop_ref_one_parent_id;
 delimiter $$
 do
 begin

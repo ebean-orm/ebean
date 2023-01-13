@@ -7,6 +7,9 @@
 -- not supported: alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 -- not supported: alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
 -- not supported: alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
+-- not supported: alter table drop_main_drop_ref_many drop constraint if exists fk_drop_main_drop_ref_many_drop_main;
+-- not supported: alter table drop_main_drop_ref_many drop constraint if exists fk_drop_main_drop_ref_many_drop_ref_many;
+-- not supported: alter table drop_ref_one drop constraint if exists fk_drop_ref_one_parent_id;
 drop index if exists ix_migtest_e_basic_indextest1;
 drop index if exists ix_migtest_e_basic_indextest5;
 drop index if exists ix_migtest_quoted_status1;
