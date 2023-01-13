@@ -57,7 +57,21 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
   }
 
+  @Test
+  public void testOrderByOnPropWithDistinct() {
+    Query<EBasicTree> query = DB.find(EBasicTree.class)
+      .fetch("children")
+      .where().eq("children.ref.status", EBasic.Status.ACTIVE).query();
 
+    query.findList();
+    // we expect t2.name in this query
+    assertSql(query).startsWith("select distinct t0.id, t0.parent_id, t0.ref_id, t1.id, t1.parent_id, t1.ref_id, t2.name "
+      + "from e_basic_tree t0 "
+      + "left join e_basic_tree t1 on t1.parent_id = t0.id "
+      + "join e_basic_tree u1 on u1.parent_id = t0.id "
+      + "join e_basic u2 on u2.id = u1.ref_id left "
+      + "join e_basic t2 on t2.id = t1.ref_id where u2.status = ? order by t0.id, t2.name");
+  }
   @Test
   public void testOrderByWithDistinct() {
     Query<MUser> query = DB.find(MUser.class);
