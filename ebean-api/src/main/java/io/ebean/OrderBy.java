@@ -232,18 +232,6 @@ public class OrderBy<T> implements Serializable {
   }
 
   /**
-   * Return true if this order by can be used in select clause.
-   */
-  public boolean supportsSelect() {
-    for (Property property : list) {
-      if (!property.supportsSelect()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
    * A property and its ascending descending order.
    */
   public static class Property implements Serializable {
@@ -403,12 +391,6 @@ public class OrderBy<T> implements Serializable {
       this.ascending = ascending;
     }
 
-    /**
-     * Support use in select clause if no collation or nulls ordering.
-     */
-    boolean supportsSelect() {
-      return nulls == null;
-    }
   }
 
   private void parse(String orderByClause) {
