@@ -1,12 +1,18 @@
 package org.tests.query.orderby;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.*;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.EBasic;
+import org.tests.model.basic.EBasicTree;
+import org.tests.model.basic.MRole;
+import org.tests.model.basic.MUser;
+import org.tests.model.basic.MUserType;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 import java.util.Set;
@@ -65,13 +71,23 @@ public class TestOrderByWithDistinct extends BaseTestCase {
 
     query.findList();
     // we expect t2.name in this query
-    assertSql(query).startsWith("select distinct t0.id, t0.parent_id, t0.ref_id, t1.id, t1.parent_id, t1.ref_id, t2.name "
-      + "from e_basic_tree t0 "
-      + "left join e_basic_tree t1 on t1.parent_id = t0.id "
-      + "join e_basic_tree u1 on u1.parent_id = t0.id "
-      + "join e_basic u2 on u2.id = u1.ref_id left "
-      + "join e_basic t2 on t2.id = t1.ref_id where u2.status = ? order by t0.id, t2.name");
+    if (platformDistinctOn()) {
+      assertSql(query).startsWith("select distinct on (t0.id, t2.name, t1.id) t0.id, t0.parent_id, t0.ref_id, t1.id, t1.parent_id, t1.ref_id, t2.name "
+        + "from e_basic_tree t0 "
+        + "left join e_basic_tree t1 on t1.parent_id = t0.id "
+        + "join e_basic_tree u1 on u1.parent_id = t0.id "
+        + "join e_basic u2 on u2.id = u1.ref_id left "
+        + "join e_basic t2 on t2.id = t1.ref_id where u2.status = ? order by t0.id, t2.name");
+    } else {
+      assertSql(query).startsWith("select distinct t0.id, t0.parent_id, t0.ref_id, t1.id, t1.parent_id, t1.ref_id, t2.name "
+        + "from e_basic_tree t0 "
+        + "left join e_basic_tree t1 on t1.parent_id = t0.id "
+        + "join e_basic_tree u1 on u1.parent_id = t0.id "
+        + "join e_basic u2 on u2.id = u1.ref_id left "
+        + "join e_basic t2 on t2.id = t1.ref_id where u2.status = ? order by t0.id, t2.name");
+    }
   }
+
   @Test
   public void testOrderByWithDistinct() {
     Query<MUser> query = DB.find(MUser.class);
@@ -86,9 +102,9 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       assertSql(query).contains("from muser t0 limit 1000");
     }
     query = DB.find(MUser.class)
-        .where()
-        .eq("roles.roleName", "A")
-        .query();
+      .where()
+      .eq("roles.roleName", "A")
+      .query();
     query.findList();
     assertSql(query).doesNotContain("order by");
     assertSql(query).contains("select distinct");
@@ -103,12 +119,12 @@ public class TestOrderByWithDistinct extends BaseTestCase {
   @Test
   public void test() {
     /*
-		 * Original conversation:
-		 * https://groups.google.com/forum/?fromgroups=#!topic/ebean/uuvi1btdCDQ%5B1-25-false%5D
-		 *
-		 * This test exposes what may be a general problem with columns required by the order by phrase being omitted from the select.
-		 * I'm not sure this exposes all causes of the problem.
-		 */
+     * Original conversation:
+     * https://groups.google.com/forum/?fromgroups=#!topic/ebean/uuvi1btdCDQ%5B1-25-false%5D
+     *
+     * This test exposes what may be a general problem with columns required by the order by phrase being omitted from the select.
+     * I'm not sure this exposes all causes of the problem.
+     */
 
     MUserType ut = new MUserType("md");
     DB.save(ut);
