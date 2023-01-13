@@ -359,7 +359,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .findList();
 
     List<String> loggedSql = LoggedSql.stop();
-    if (isYugabyte()) {
+    if (isPostgresCompatible()) {
       // TBD
     } else {
       assertThat(loggedSql.get(0)).contains("select distinct t0.id "
@@ -374,7 +374,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .findList();
 
     loggedSql = LoggedSql.stop();
-    if (isYugabyte()) {
+    if (isPostgresCompatible()) {
       // TBD
     } else {
       assertThat(loggedSql.get(0)).contains("select distinct t0.id "
