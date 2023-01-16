@@ -53,6 +53,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private boolean queryOnly = true;
   private boolean localReadOnly;
   private Boolean updateAllLoadedProperties;
+  private boolean overwriteGeneratedProperties = true;
   private boolean oldBatchMode;
   private boolean batchMode;
   private boolean batchOnCascadeMode;
@@ -450,6 +451,16 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public final Boolean isUpdateAllLoadedProperties() {
     return updateAllLoadedProperties;
+  }
+
+  @Override
+  public void setOverwriteGeneratedProperties(boolean overwriteGeneratedProperties) {
+    this.overwriteGeneratedProperties = overwriteGeneratedProperties;
+  }
+
+  @Override
+  public boolean isOverwriteGeneratedProperties() {
+    return overwriteGeneratedProperties;
   }
 
   @Override
