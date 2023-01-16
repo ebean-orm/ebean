@@ -261,6 +261,12 @@ public interface Transaction extends AutoCloseable {
   void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties);
 
   /**
+   * If set to false (default is true) generated propertes are only set, if it is the version property or have a null value.
+   * This may be useful in backup & restore scenarios, if you want set WhenCreated/WhenModified.
+   */
+  void setOverwriteGeneratedProperties(boolean overwriteGeneratedProperties);
+
+  /**
    * Set if the L2 cache should be skipped for "find by id" and "find by natural key" queries.
    * <p>
    * By default {@link DatabaseConfig#isSkipCacheAfterWrite()} is true and that means that for
