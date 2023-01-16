@@ -272,7 +272,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       } else {
         // @WhenModified set without invoking interception
         Object oldVal = prop.getValue(entityBean);
-        if (transaction.isOverwriteGeneratedProperties() || oldVal == null) { // version handled above
+        if (transaction == null || transaction.isOverwriteGeneratedProperties() || oldVal == null) { // version handled above
           Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
           prop.setValueChanged(entityBean, value);
           intercept.setOldValue(prop.propertyIndex(), oldVal);
@@ -283,7 +283,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      if (transaction.isOverwriteGeneratedProperties() || prop.isVersion()) {
+      if (transaction == null || transaction.isOverwriteGeneratedProperties() || prop.isVersion()) {
         Object oldVal = intercept.getOrigValue(prop.propertyIndex());
         prop.setValue(entityBean, oldVal);
       }
@@ -292,7 +292,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void onInsertGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
-      if (transaction.isOverwriteGeneratedProperties() || prop.isVersion() || prop.getValue(entityBean) == null) {
+      if (transaction == null || transaction.isOverwriteGeneratedProperties() || prop.isVersion() || prop.getValue(entityBean) == null) {
         Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
         prop.setValueChanged(entityBean, value);
       }
