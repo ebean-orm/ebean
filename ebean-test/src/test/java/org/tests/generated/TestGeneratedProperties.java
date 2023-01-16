@@ -1,9 +1,12 @@
 package org.tests.generated;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.Transaction;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.EGenProps;
+
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -46,5 +49,43 @@ public class TestGeneratedProperties extends BaseTestCase {
     assertThat(bean.getInstantCreated().toEpochMilli()).isEqualTo(bean.getLongCreated());
 
     DB.delete(bean);
+  }
+
+  @Test
+  public void test_update_no_overwrite() {
+    EGenProps bean = new EGenProps();
+    bean.setName("updating");
+    DB.save(bean);
+
+    bean = DB.find(EGenProps.class, bean.getId());
+    bean.setInstantCreated(Instant.parse("2022-01-01T00:00:00Z"));
+    bean.setInstantUpdated(Instant.parse("2022-01-02T00:00:00Z"));
+    try (Transaction txn = DB.beginTransaction()) {
+      txn.setOverwriteGeneratedProperties(false);
+      DB.save(bean);
+      txn.commit();
+    }
+
+    bean = DB.find(EGenProps.class, bean.getId());
+    assertThat(bean.getInstantCreated()).isEqualTo(Instant.parse("2022-01-01T00:00:00Z"));
+    assertThat(bean.getInstantUpdated()).isEqualTo(Instant.parse("2022-01-02T00:00:00Z"));
+  }
+
+  @Test
+  public void test_insert_no_overwrite() {
+    EGenProps bean = new EGenProps();
+    try (Transaction txn = DB.beginTransaction()) {
+      txn.setOverwriteGeneratedProperties(false);
+      bean.setName("inserting");
+      bean.setInstantCreated(Instant.parse("2022-01-01T00:00:00Z"));
+      bean.setInstantUpdated(Instant.parse("2022-01-02T00:00:00Z"));
+      DB.save(bean);
+      txn.commit();
+    }
+
+
+    bean = DB.find(EGenProps.class, bean.getId());
+    assertThat(bean.getInstantCreated()).isEqualTo(Instant.parse("2022-01-01T00:00:00Z"));
+    assertThat(bean.getInstantUpdated()).isEqualTo(Instant.parse("2022-01-02T00:00:00Z"));
   }
 }
