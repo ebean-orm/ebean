@@ -120,7 +120,7 @@ public final class LoadManyRequest extends LoadRequest {
           log.log(DEBUG, "BeanCollection after lazy load was empty. type:{0} id:{1} owner:{2}", ownerBean.getClass().getName(), parentId, ownerBean);
         }
       } else if (loadCache && many.isUseCache()) {
-        desc.cacheManyPropPut(many, bc, desc.getId(bc.getOwnerBean()));
+        desc.cacheManyPropPut(many, bc, desc.cacheKeyForBean(bc.getOwnerBean()));
       }
     }
   }

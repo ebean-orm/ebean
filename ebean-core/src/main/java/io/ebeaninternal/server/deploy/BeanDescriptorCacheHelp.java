@@ -226,13 +226,12 @@ final class BeanDescriptorCacheHelp<T> {
     queryCache.put(id, entry);
   }
 
-
-  void manyPropRemove(String propertyName, Object parentId) {
+  void manyPropRemove(String propertyName, String parentKey) {
     ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
     if (manyLog.isLoggable(TRACE)) {
-      manyLog.log(TRACE, "   REMOVE {0}({1}).{2}", cacheName, parentId, propertyName);
+      manyLog.log(TRACE, "   REMOVE {0}({1}).{2}", cacheName, parentKey, propertyName);
     }
-    collectionIdsCache.remove(parentId);
+    collectionIdsCache.remove(parentKey);
   }
 
   void manyPropClear(String propertyName) {
@@ -246,15 +245,15 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Return the CachedManyIds for a given bean many property. Returns null if not in the cache.
    */
-  private CachedManyIds manyPropGet(Object parentId, String propertyName) {
+  private CachedManyIds manyPropGet(String propertyName, String parentKey) {
     ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, propertyName);
-    CachedManyIds entry = (CachedManyIds) collectionIdsCache.get(parentId);
+    CachedManyIds entry = (CachedManyIds) collectionIdsCache.get(parentKey);
     if (entry == null) {
       if (manyLog.isLoggable(TRACE)) {
-        manyLog.log(TRACE, "   GET {0}({1}).{2} - cache miss", cacheName, parentId, propertyName);
+        manyLog.log(TRACE, "   GET {0}({1}).{2} - cache miss", cacheName, parentKey, propertyName);
       }
     } else if (manyLog.isLoggable(DEBUG)) {
-      manyLog.log(DEBUG, "   GET {0}({1}).{2} - hit", cacheName, parentId, propertyName);
+      manyLog.log(DEBUG, "   GET {0}({1}).{2} - hit", cacheName, parentKey, propertyName);
     }
     return entry;
   }
@@ -262,12 +261,12 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Try to load the bean collection from cache return true if successful.
    */
-  boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
+  boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey, Boolean readOnly) {
     if (many.isElementCollection()) {
       // held as part of the bean cache so skip
       return false;
     }
-    CachedManyIds entry = manyPropGet(parentId, many.name());
+    CachedManyIds entry = manyPropGet(many.name(), parentKey);
     if (entry == null) {
       // not in cache so return unsuccessful
       return false;
@@ -293,9 +292,9 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Put the beanCollection into the cache.
    */
-  void manyPropPut(BeanPropertyAssocMany<?> many, Object details, Object parentId) {
+  void manyPropPut(BeanPropertyAssocMany<?> many, Object details, String parentKey) {
     if (many.isElementCollection()) {
-      CachedBeanData data = (CachedBeanData) beanCache.get(parentId);
+      CachedBeanData data = (CachedBeanData) beanCache.get(parentKey);
       if (data != null) {
         try {
           // add as JSON to bean cache
@@ -305,9 +304,9 @@ final class BeanDescriptorCacheHelp<T> {
 
           CachedBeanData newData = data.update(changes, data.getVersion());
           if (beanLog.isLoggable(DEBUG)) {
-            beanLog.log(DEBUG, "   UPDATE {0}({1})  changes:{2}", cacheName, parentId, changes);
+            beanLog.log(DEBUG, "   UPDATE {0}({1})  changes:{2}", cacheName, parentKey, changes);
           }
-          beanCache.put(parentId, newData);
+          beanCache.put(parentKey, newData);
         } catch (IOException e) {
           log.log(ERROR, "Error updating L2 cache", e);
         }
@@ -315,17 +314,17 @@ final class BeanDescriptorCacheHelp<T> {
     } else {
       CachedManyIds entry = createManyIds(many, details);
       if (entry != null) {
-        cachePutManyIds(parentId, many.name(), entry);
+        cachePutManyIds(many.name(), parentKey, entry);
       }
     }
   }
 
-  void cachePutManyIds(Object parentId, String manyName, CachedManyIds entry) {
+  void cachePutManyIds(String manyName, String parentKey, CachedManyIds entry) {
     ServerCache collectionIdsCache = cacheManager.getCollectionIdsCache(beanType, manyName);
     if (manyLog.isLoggable(DEBUG)) {
-      manyLog.log(DEBUG, "   PUT {0}({1}).{2} - ids:{3}", cacheName, parentId, manyName, entry);
+      manyLog.log(DEBUG, "   PUT {0}({1}).{2} - ids:{3}", cacheName, parentKey, manyName, entry);
     }
-    collectionIdsCache.put(parentId, entry);
+    collectionIdsCache.put(parentKey, entry);
   }
 
   private CachedManyIds createManyIds(BeanPropertyAssocMany<?> many, Object details) {
@@ -828,7 +827,8 @@ final class BeanDescriptorCacheHelp<T> {
           Object details = many.getValue(updateRequest.entityBean());
           CachedManyIds entry = createManyIds(many, details);
           if (entry != null) {
-            changeSet.addManyPut(desc, many.name(), id, entry);
+            final String parentKey = desc.cacheKey(id);
+            changeSet.addManyPut(desc, many.name(), parentKey, entry);
           }
         }
       }

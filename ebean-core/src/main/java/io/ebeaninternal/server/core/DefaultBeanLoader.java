@@ -72,7 +72,8 @@ final class DefaultBeanLoader {
       if (ebi.isReadOnly()) {
         readOnly = Boolean.TRUE;
       }
-      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentId, readOnly)) {
+      final String parentKey = parentDesc.cacheKey(parentId);
+      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentKey, readOnly)) {
         return;
       }
     }
@@ -113,7 +114,8 @@ final class DefaultBeanLoader {
           log.log(DEBUG, "BeanCollection after load was empty. Owner:{0}", beanCollection.getOwnerBean());
         }
       } else if (useManyIdCache) {
-        parentDesc.cacheManyPropPut(many, beanCollection, parentId);
+        final String parentKey = parentDesc.cacheKey(parentId);
+        parentDesc.cacheManyPropPut(many, beanCollection, parentKey);
       }
     }
   }
