@@ -38,8 +38,10 @@ public class ProviderAutoConfig {
 
     CurrentTenantProvider tenantProvider = config.getCurrentTenantProvider();
     if (tenantProvider == null) {
-      providerSetFlag += 2;
-      config.setCurrentTenantProvider(new WhoTenantProvider());
+      if (Boolean.parseBoolean(properties.getProperty("ebean.test.registerTestTenantProvider", "true"))) {
+        providerSetFlag += 2;
+        config.setCurrentTenantProvider(new WhoTenantProvider());
+      }
     }
 
     EncryptKeyManager keyManager = config.getEncryptKeyManager();
