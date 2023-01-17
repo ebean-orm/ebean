@@ -62,6 +62,11 @@ declare exit handler for sql_error_code 397 begin end;
 exec 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
 end;
 $$;
+alter table migtest_mtm_c_migtest_mtm_m drop constraint  fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c;
+alter table migtest_mtm_c_migtest_mtm_m drop constraint  fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m;
+alter table migtest_mtm_m_migtest_mtm_c drop constraint  fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m;
+alter table migtest_mtm_m_migtest_mtm_c drop constraint  fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c;
+alter table migtest_mtm_m_phone_numbers drop constraint  fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id;
 delimiter $$
 do
 begin
