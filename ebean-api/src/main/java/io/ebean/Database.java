@@ -1110,7 +1110,7 @@ public interface Database {
   /**
    * Same as {@link #checkUniqueness(Object)}. but with given transaction.
    */
-  Set<Property> checkUniqueness(Object bean, Transaction transaction);
+  Set<Property> checkUniqueness(Object bean, Transaction transaction, boolean useQueryCache, boolean skipClean);
 
   /**
    * Marks the entity bean as dirty.
