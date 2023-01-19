@@ -465,10 +465,9 @@ final class AnnotationFields extends AnnotationParser {
       if (!gen.generator().isEmpty()) {
         // use a custom IdGenerator
         PlatformIdGenerator idGenerator = generatedPropFactory.getIdGenerator(gen.generator());
-        if (idGenerator == null) {
-          throw new IllegalStateException("No custom IdGenerator registered with name " + gen.generator());
+        if (idGenerator != null) {
+          descriptor.setCustomIdGenerator(idGenerator);
         }
-        descriptor.setCustomIdGenerator(idGenerator);
       } else if (prop.getPropertyType().equals(UUID.class)) {
         descriptor.setUuidGenerator();
       }
