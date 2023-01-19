@@ -1009,6 +1009,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private <T> T findId(Query<T> query, @Nullable Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(Type.BEAN);
+    SpiOrmQueryRequest<T> request = null;
     if (SpiQuery.Mode.NORMAL == spiQuery.getMode() && !spiQuery.isForceHitDatabase()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
@@ -1031,16 +1032,36 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
           }
         }
       }
-      if (spiQuery.isBeanCacheGet() && (t == null || !t.isSkipCache())) {
-        // Hit the L2 bean cache
-        T bean = desc.cacheBeanGet(id, spiQuery.isReadOnly(), pc);
-        if (bean != null) {
-          return bean;
+      if (t == null || !t.isSkipCache()) {
+        if (spiQuery.getUseQueryCache() != CacheMode.OFF) {
+          request = buildQueryRequest(spiQuery, transaction);
+          if (request.isQueryCacheActive()) {
+            // Hit the  query cache
+            request.prepareQuery();
+            T bean = request.getFromQueryCache();
+            if (bean != null) {
+              return bean;
+            }
+          }
+        }
+        if (spiQuery.isBeanCacheGet()) {
+          // Hit the L2 bean cache
+          T bean = desc.cacheBeanGet(id, spiQuery.isReadOnly(), pc);
+          if (bean != null) {
+            if (request != null && request.isQueryCachePut()) {
+              // copy bean from the L2 cache to the faster query cache, if caching is enabled
+              request.prepareQuery();
+              request.putToQueryCache(bean);
+            }
+            return bean;
+          }
         }
       }
     }
 
-    SpiOrmQueryRequest<T> request = buildQueryRequest(spiQuery, transaction);
+    if (request == null) {
+      request = buildQueryRequest(spiQuery, transaction);
+    }
     request.prepareQuery();
     if (request.isUseDocStore()) {
       return docStore().find(request);

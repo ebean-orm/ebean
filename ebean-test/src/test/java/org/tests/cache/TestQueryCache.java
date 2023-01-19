@@ -3,12 +3,14 @@ package org.tests.cache;
 import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
+import io.ebean.Query;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -300,6 +302,92 @@ public class TestQueryCache extends BaseTestCase {
     assertThat(count0).isEqualTo(count1);
     assertThat(sql).hasSize(1); // try recache as first query - second "ON" query must fetch it.
 
+  }
+
+  /**
+   * This test primarily checks, if the query cache on findById will work properly.
+   *
+   * It also checks some special cases, if query + bean cache are combined with other queries.
+   * It is important to know, that a "findId" query, that is not yet compiled will use the bean cache.
+   */
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testFindByIdWihtBothCaches() {
+
+    ResetBasicData.reset();
+
+    List<Object> ids = DB.find(Customer.class).setMaxRows(5).findIds();
+    Customer c = DB.find(Customer.class).setMaxRows(1).findOne();
+
+    DB.getDefault().pluginApi().cacheManager().clearAll();
+
+    ServerCache bc = DB.getDefault().pluginApi().cacheManager().beanCache(Customer.class);
+    ServerCache qc = DB.getDefault().pluginApi().cacheManager().queryCache(Customer.class);
+    bc.statistics(true);
+    qc.statistics(true);
+
+    // 1. load the bean cache with some beans
+    DB.find(Customer.class).where().idIn(ids).findList();
+
+    Query<Customer> q = DB.find(Customer.class).setUseQueryCache(true).setUseCache(true).setReadOnly(true);
+    LoggedSql.start();
+    Customer c1 = q.copy().where().eq("name", c.getName()).findOne();
+    Customer c2 = q.copy().where().eq("name", c.getName()).findOne();
+    assertThat(LoggedSql.stop()).hasSize(1);
+
+    assertTrue(DB.beanState(c1).isReadOnly());
+    assertTrue(DB.beanState(c2).isReadOnly());
+    assertThat(c1).isSameAs(c2);
+    assertThat(bc.statistics(true).getHitCount()).isEqualTo(0);
+    assertThat(qc.statistics(true).getHitCount()).isEqualTo(1);
+
+
+    LoggedSql.start();
+    c1 = q.copy().where().eq("id", c.getId()).findOne();
+    c2 = q.copy().where().eq("id", c.getId()).findOne();
+    assertThat(LoggedSql.stop()).isEmpty();
+    assertThat(c1).isNotSameAs(c2);
+
+    LoggedSql.start();
+    c1 = q.copy().setId(c.getId()).findOne();
+    c2 = q.copy().setId(c.getId()).findOne();
+    assertThat(LoggedSql.stop()).isEmpty();
+    assertThat(c1).isNotSameAs(c2);
+
+    LoggedSql.start();
+    List<Customer> l1 = q.copy().where().idIn(ids.subList(0,2)).findList();
+    List<Customer> l2 = q.copy().where().idIn(ids.subList(0,2)).findList();
+    assertThat(LoggedSql.stop()).isEmpty();
+    assertThat(l1).hasSize(2).isNotSameAs(l2);
+
+    assertThat(bc.statistics(true).getHitCount()).isEqualTo(8); // 4x findOne and 2x findList with 2 elements
+    assertThat(qc.statistics(true).getHitCount()).isEqualTo(0);
+    // Note: The ID queries are immediately handled by the BeanCache, because the underlying queries are never compiled
+    // and so they have no query plan, which is required for cache access.
+    //
+    // So we clear the cache and try it again
+    DB.getDefault().pluginApi().cacheManager().clearAll();
+
+    LoggedSql.start();
+    c1 = q.copy().where().eq("id", c.getId()).findOne();
+    c2 = q.copy().where().eq("id", c.getId()).findOne();
+    assertThat(LoggedSql.stop()).hasSize(1);
+    assertThat(c1).isSameAs(c2);
+
+    LoggedSql.start();
+    c1 = q.copy().setId(c.getId()).findOne();
+    c2 = q.copy().setId(c.getId()).findOne();
+    assertThat(LoggedSql.stop()).isEmpty(); // setId(..) query has same queryPlan as eq("id", ..)
+    assertThat(c1).isSameAs(c2);
+
+    LoggedSql.start();
+    l1 = q.copy().where().idIn(1, 2).findList();
+    l2 = q.copy().where().idIn(1, 2).findList();
+    assertThat(LoggedSql.stop()).hasSize(1); // we have to hit DB for bean#2
+    assertThat(l1).hasSize(2).isSameAs(l2);
+
+    assertThat(bc.statistics(true).getHitCount()).isEqualTo(1); // findList can get one bean from bc
+    assertThat(qc.statistics(true).getHitCount()).isEqualTo(4); // 6 queries, 2 of them hit db
   }
 
   @Test
