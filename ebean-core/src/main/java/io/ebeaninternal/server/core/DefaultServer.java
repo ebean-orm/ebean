@@ -1101,15 +1101,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> Set<T> findSet(Query<T> query, Transaction transaction) {
     SpiOrmQueryRequest request = buildQueryRequest(Type.SET, query, transaction);
     request.resetBeanCacheAutoMode(false);
+    if (request.isQueryCacheActive()) {
+      request.prepareQuery();
+      Object result = request.getFromQueryCache();
+      if (result != null) {
+        return (Set<T>) result;
+      }
+    }
     if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
       // hit bean cache and got all results from cache
       return request.beanCacheHitsAsSet();
     }
     request.prepareQuery();
-    Object result = request.getFromQueryCache();
-    if (result != null) {
-      return (Set<T>) result;
-    }
     try {
       request.initTransIfRequired();
       return request.findSet();
@@ -1122,16 +1125,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @SuppressWarnings({"unchecked", "rawtypes"})
   public <K, T> Map<K, T> findMap(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest request = buildQueryRequest(Type.MAP, query, transaction);
+    if (request.isQueryCacheActive()) {
+      request.prepareQuery();
+      Object result = request.getFromQueryCache();
+      if (result != null) {
+        return (Map<K, T>) result;
+      }
+    }
     request.resetBeanCacheAutoMode(false);
     if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
       // hit bean cache and got all results from cache
       return request.beanCacheHitsAsMap();
     }
     request.prepareQuery();
-    Object result = request.getFromQueryCache();
-    if (result != null) {
-      return (Map<K, T>) result;
-    }
     try {
       request.initTransIfRequired();
       return request.findMap();
@@ -1408,15 +1414,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private <T> List<T> findList(Query<T> query, @Nullable Transaction transaction, boolean findOne) {
     SpiOrmQueryRequest<T> request = buildQueryRequest(Type.LIST, query, transaction);
     request.resetBeanCacheAutoMode(findOne);
+    if (request.isQueryCacheActive()) {
+      request.prepareQuery();
+      Object result = request.getFromQueryCache();
+      if (result != null) {
+        return (List<T>) result;
+      }
+    }
     if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
       // hit bean cache and got all results from cache
       return request.beanCacheHits();
     }
     request.prepareQuery();
-    Object result = request.getFromQueryCache();
-    if (result != null) {
-      return (List<T>) result;
-    }
     if (request.isUseDocStore()) {
       return docStore().findList(request);
     }
