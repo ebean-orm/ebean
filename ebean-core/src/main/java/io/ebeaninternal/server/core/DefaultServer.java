@@ -989,40 +989,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   /**
-   * Try to get the object out of the persistence context.
-   */
-  @Nullable
-  @SuppressWarnings("unchecked")
-  private <T> T findIdCheckPersistenceContextAndCache(@Nullable Transaction transaction, SpiQuery<T> query, Object id) {
-    SpiTransaction t = (SpiTransaction) transaction;
-    if (t == null) {
-      t = currentServerTransaction();
-    }
-    BeanDescriptor<T> desc = query.getBeanDescriptor();
-    id = desc.convertId(id);
-    PersistenceContext pc = null;
-    if (t != null && useTransactionPersistenceContext(query)) {
-      // first look in the transaction scoped persistence context
-      pc = t.getPersistenceContext();
-      if (pc != null) {
-        WithOption o = desc.contextGetWithOption(pc, id);
-        if (o != null) {
-          if (o.isDeleted()) {
-            // Bean was previously deleted in the same transaction / persistence context
-            return null;
-          }
-          return (T) o.getBean();
-        }
-      }
-    }
-    if (!query.isBeanCacheGet() || (t != null && t.isSkipCache())) {
-      return null;
-    }
-    // Hit the L2 bean cache
-    return desc.cacheBeanGet(id, query.isReadOnly(), pc);
-  }
-
-  /**
    * Return true if transactions PersistenceContext should be used.
    */
   private <T> boolean useTransactionPersistenceContext(SpiQuery<T> query) {
@@ -1046,11 +1012,34 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (SpiQuery.Mode.NORMAL == spiQuery.getMode() && !spiQuery.isForceHitDatabase()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
-      T bean = findIdCheckPersistenceContextAndCache(transaction, spiQuery, spiQuery.getId());
-      if (bean != null) {
-        return bean;
+      SpiTransaction t = (SpiTransaction) transaction;
+      if (t == null) {
+        t = currentServerTransaction();
+      }
+      BeanDescriptor<T> desc = spiQuery.getBeanDescriptor();
+      Object id = desc.convertId(spiQuery.getId());
+      PersistenceContext pc = null;
+      if (t != null && useTransactionPersistenceContext(spiQuery)) {
+        // first look in the transaction scoped persistence context
+        pc = t.getPersistenceContext();
+        if (pc != null) {
+          WithOption o = desc.contextGetWithOption(pc, id);
+          if (o != null) {
+            // We have found a hit. This could be also one with o.deleted() == true
+            // if bean was previously deleted in the same transaction / persistence context
+            return (T) o.getBean();
+          }
+        }
+      }
+      if (spiQuery.isBeanCacheGet() && (t == null || !t.isSkipCache())) {
+        // Hit the L2 bean cache
+        T bean = desc.cacheBeanGet(id, spiQuery.isReadOnly(), pc);
+        if (bean != null) {
+          return bean;
+        }
       }
     }
+
     SpiOrmQueryRequest<T> request = buildQueryRequest(spiQuery, transaction);
     request.prepareQuery();
     if (request.isUseDocStore()) {
