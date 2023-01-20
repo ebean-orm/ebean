@@ -58,6 +58,7 @@ public final class DLoadContext implements LoadContext {
   private final ProfilingListener profilingListener;
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
   private final PersistenceContext persistenceContext;
+  boolean useReferences;
   private List<OrmQueryProperties> secQuery;
   private Object tenantId;
 
@@ -118,7 +119,6 @@ public final class DLoadContext implements LoadContext {
       this.origin = null;
       this.relativePath = null;
     }
-
     // initialise rootBeanContext after origin and relativePath have been set
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, null);
     registerSecondaryQueries(secondaryQueries);
@@ -154,6 +154,11 @@ public final class DLoadContext implements LoadContext {
         registerSecondaryQuery(lazyJoin);
       }
     }
+  }
+
+  @Override
+  public void useReferences(boolean useReferences) {
+    this.useReferences = useReferences;
   }
 
   /**
