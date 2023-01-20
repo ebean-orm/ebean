@@ -4,7 +4,6 @@ import io.ebean.QueryIterator;
 import io.ebean.core.type.DataReader;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.dto.DtoColumn;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
@@ -31,11 +30,13 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   private final DtoQueryEngine queryEngine;
   private DtoQueryPlan plan;
   private DataReader dataReader;
+  private SpiOrmQueryRequest<?> ormRequest;
 
-  DtoQueryRequest(SpiEbeanServer server, DtoQueryEngine engine, SpiDtoQuery<T> query) {
+  DtoQueryRequest(SpiEbeanServer server, DtoQueryEngine engine, SpiDtoQuery<T> query, SpiOrmQueryRequest<?> ormRequest) {
     super(server, query, query.getTransaction());
     this.queryEngine = engine;
     this.query = query;
+    this.ormRequest = ormRequest;
     query.obtainLocation();
   }
 
@@ -43,20 +44,16 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
    * Prepare and execute the SQL using the Binder.
    */
   @Override
-  public void executeSql(Binder binder, SpiQuery.Type type) throws SQLException {
+  public void executeSql(Binder binder) throws SQLException {
     startNano = System.nanoTime();
-    SpiQuery<?> ormQuery = query.getOrmQuery();
-    if (ormQuery != null) {
-      ormQuery.setType(type);
-      ormQuery.setManualId();
-
-      query.setCancelableQuery(ormQuery);
+    if (ormRequest != null) {
       // execute the underlying ORM query returning the ResultSet
-      SpiResultSet result = server.findResultSet(ormQuery, transaction);
+      query.setCancelableQuery(query.getOrmQuery());
+      ormRequest.initTransIfRequired();
+      SpiResultSet result = ormRequest.findResultSet();
       this.pstmt = result.getStatement();
-      this.sql = ormQuery.getGeneratedSql();
-      setResultSet(result.getResultSet(), ormQuery.getQueryPlanKey());
-
+      this.sql = ormRequest.query().getGeneratedSql();
+      setResultSet(result.getResultSet(), ormRequest.query().getQueryPlanKey());
     } else {
       // native SQL query execution
       executeAsSql(binder);
@@ -153,6 +150,20 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
       }
     }
     return columnLabel;
+  }
+
+  public List<T> getFromQueryCache() {
+    if (ormRequest != null) {
+      return ormRequest.getFromQueryCache();
+    } else {
+      return null;
+    }
+  }
+
+  public void putToQueryCache(List<T> result) {
+    if (ormRequest != null && ormRequest.isQueryCachePut()) {
+      ormRequest.putToQueryCache(result);
+    }
   }
 
 }

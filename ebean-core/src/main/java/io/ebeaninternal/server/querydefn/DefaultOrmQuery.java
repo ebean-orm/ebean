@@ -164,6 +164,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private String nativeSql;
   private boolean orderById;
   private ProfileLocation profileLocation;
+  private Class<?> dtoType = Object.class; // default: Object saves some null-checks.
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
@@ -1180,7 +1181,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // so queryPlanHash is calculated well before this method is called
     BindValuesKey bindKey = new BindValuesKey();
     queryBindKey(bindKey);
-    return new HashQuery(queryPlanKey, bindKey);
+    return new HashQuery(queryPlanKey, bindKey, dtoType);
   }
 
   @Override
@@ -1641,6 +1642,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (detail != null && detail.hasSelectClause()) {
       this.manualId = true;
     }
+  }
+
+  @Override
+  public void setDtoType(Class<?> dtoType) {
+    this.dtoType = dtoType;
   }
 
   /**
