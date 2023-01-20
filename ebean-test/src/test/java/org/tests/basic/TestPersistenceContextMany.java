@@ -33,8 +33,7 @@ public class TestPersistenceContextMany extends BaseTestCase {
     @Size(max = 255)
     private String someData;
 
-    @OneToMany(cascade = CascadeType.REFRESH)
-    //@Where(clause = "1=1")
+    @OneToMany(cascade = CascadeType.ALL)
     private List<TestModel3Many1> many1;
 
     public int getId() {
@@ -52,6 +51,10 @@ public class TestPersistenceContextMany extends BaseTestCase {
     public String getSomeData() {
       return someData;
     }
+
+    public List<TestModel3Many1> getMany1() {
+      return many1;
+    }
   }
 
   @Entity
@@ -65,9 +68,12 @@ public class TestPersistenceContextMany extends BaseTestCase {
   @Inheritance
   @DiscriminatorValue("B")
   public static class TestModel3B extends TestModel3 {
-    @OneToMany(cascade = CascadeType.REFRESH)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<TestModel3Many2> many2;
 
+    public List<TestModel3Many2> getMany2() {
+      return many2;
+    }
   }
 
   @Entity
@@ -109,8 +115,16 @@ public class TestPersistenceContextMany extends BaseTestCase {
     // 10 mio TestModel - each needs about 1/4 kbytes -> 2,5 GB in total
     List<TestModel3> batch = new ArrayList<>();
     for (int i = 0; i < 1_000_000; i++) {
+      TestModel3 m;
+      if (i == 5) {
+        m = new TestModel3A();
+      } else {
+        m = new TestModel3B();
+        ((TestModel3B) m).getMany2().add(new TestModel3Many2());
+        ((TestModel3B) m).getMany2().add(new TestModel3Many2());
+      }
+      m.getMany1().add(new TestModel3Many1());
 
-      TestModel3 m = i == 5 ? new TestModel3A() : new TestModel3B(); // produces "off-by-one"
       m.setSomeData(base + i); // ensure we have not duplicates
       batch.add(m);
       if (i % 1000 == 0) {
@@ -147,6 +161,17 @@ public class TestPersistenceContextMany extends BaseTestCase {
       i.incrementAndGet();
     });
     System.out.println("Read " + i + " entries");
+
+    i.set(0);
+    System.out.println("Doing findEach with lazyLoad");
+    DB.find(TestModel3.class).select("*").findEach(c -> {
+      i.incrementAndGet();
+      i.addAndGet(c.getMany1().size());
+      if (c instanceof TestModel3B) {
+        i.addAndGet(((TestModel3B) c).getMany2().size());
+      }
+    });
+    System.out.println("Read " + i + " entries"); // 3999998 is correct
 
     i.set(0);
     System.out.println("Doing findStream");
