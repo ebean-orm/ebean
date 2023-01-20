@@ -314,7 +314,7 @@ public class DtoQuery2Test extends BaseTestCase {
       // we don't CARE what the nested SQL is in that the jdbc metaData
       // for the column names/labels comes from the top most select
       + "    select id as num_with, name as name_for_me from o_customer "
-      + ")";
+      + ") a";
 
     List<DCustCamelCols0> list = server().findDto(DCustCamelCols0.class,
         sql)

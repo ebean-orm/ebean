@@ -5,18 +5,18 @@ import io.ebean.Model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "T_OBJECT")
+@Table(name = "ea_object")
 public class EaObject extends Model {
 
   @Id
-  @Column(name = "OBJECT_ID", nullable = false)
+  @Column(name = "object_id", nullable = false)
   @GeneratedValue(
     strategy = GenerationType.AUTO,
     generator = "t_object_sequence_generator"
   )
   @SequenceGenerator(
     name = "t_object_sequence_generator",
-    sequenceName = "OBJECT_ID_SEQ"
+    sequenceName = "object_id_seq"
   )
   long id;
 
