@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.11.2-SNAPSHOT</version>
+    <version>13.11.2</version>
   </parent>
 
   <artifactId>ebean-platform-hana</artifactId>
@@ -14,8 +14,12 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.11.2-SNAPSHOT</version>
+      <version>13.11.2</version>
     </dependency>
 
   </dependencies>
+
+  <scm>
+    <tag>ebean-parent-13.11.2</tag>
+  </scm>
 </project>
