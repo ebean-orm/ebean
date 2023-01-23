@@ -8,6 +8,7 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebean.config.ProfilingConfig;
 import io.ebean.config.SlowQueryListener;
+import io.ebean.config.TempFileProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.event.changelog.ChangeLogListener;
