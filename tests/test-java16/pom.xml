@@ -8,13 +8,14 @@
 
   <properties>
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+    <ebean.version>13.11.3-SNAPSHOT</ebean.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>13.11.3-SNAPSHOT</version>
+      <version>${ebean.version}</version>
     </dependency>
 
     <dependency>
@@ -26,7 +27,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.11.3-SNAPSHOT</version>
+      <version>${ebean.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -52,7 +53,7 @@
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>13.11.2-FOC4-SNAPSHOT</version>
+              <version>${ebean.version}</version>
             </path>
           </annotationProcessorPaths>
         </configuration>

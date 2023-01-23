@@ -5,9 +5,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-/**
- * @author Jonas P&ouml;hler, FOCONIS AG
- */
 @Entity
 @Table(name = "drop_ref_one")
 public class DropRefOne {

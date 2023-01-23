@@ -205,7 +205,8 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
           EntityBean ownerBean = bc.getOwnerBean();
           BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
-          if (parentDesc.cacheManyPropLoad(context.property, bc, parentId, context.parent.isReadOnly())) {
+          final String parentKey = parentDesc.cacheKey(parentId);
+          if (parentDesc.cacheManyPropLoad(context.property, bc, parentKey, context.parent.isReadOnly())) {
             // we loaded the bean collection from cache so remove it from the buffer
             for (int i = 0; i < list.size(); i++) {
               // find it using instance equality - avoiding equals() and potential deadlock issue

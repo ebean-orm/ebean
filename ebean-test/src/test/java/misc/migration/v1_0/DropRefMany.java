@@ -7,9 +7,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.util.List;
 
-/**
- * @author Jonas P&ouml;hler, FOCONIS AG
- */
 @Entity
 @Table(name = "drop_ref_many")
 public class DropRefMany {

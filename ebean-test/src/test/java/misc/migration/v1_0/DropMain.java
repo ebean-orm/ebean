@@ -1,15 +1,12 @@
 package misc.migration.v1_0;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.List;
 
 /**
+ * Test-model referencing two other tables, which gets dropped for migration test in order to check for correct table drop
+ * procedure (first drop foreign keys, then the tables).
+ *
  * @author Jonas P&ouml;hler, FOCONIS AG
  */
 @Entity

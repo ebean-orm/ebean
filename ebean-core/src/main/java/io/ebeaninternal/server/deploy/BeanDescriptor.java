@@ -1202,26 +1202,26 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Try to load the beanCollection from cache return true if successful.
    */
-  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
-    return cacheHelp.manyPropLoad(many, bc, parentId, readOnly);
+  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey, Boolean readOnly) {
+    return cacheHelp.manyPropLoad(many, bc, parentKey, readOnly);
   }
 
   /**
    * Put the beanCollection into the cache.
    */
-  public void cacheManyPropPut(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId) {
-    cacheHelp.manyPropPut(many, bc, parentId);
+  public void cacheManyPropPut(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey) {
+    cacheHelp.manyPropPut(many, bc, parentKey);
   }
 
   /**
    * Update the bean collection entry in the cache.
    */
-  public void cacheManyPropPut(String name, Object parentId, CachedManyIds entry) {
-    cacheHelp.cachePutManyIds(parentId, name, entry);
+  public void cacheManyPropPut(String name, String parentKey, CachedManyIds entry) {
+    cacheHelp.cachePutManyIds(name, parentKey, entry);
   }
 
-  public void cacheManyPropRemove(String propertyName, Object parentId) {
-    cacheHelp.manyPropRemove(propertyName, parentId);
+  public void cacheManyPropRemove(String propertyName, String parentKey) {
+    cacheHelp.manyPropRemove(propertyName, parentKey);
   }
 
   public void cacheManyPropClear(String propertyName) {
@@ -2089,7 +2089,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Return the cache key for the given bean (based on id value).
    */
-  String cacheKeyForBean(EntityBean bean) {
+  public String cacheKeyForBean(EntityBean bean) {
     return cacheKey(idProperty.getValue(bean));
   }
 
@@ -2104,11 +2104,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public Object id(Object bean) {
     return getId((EntityBean) bean);
   }
-
-//  @Override
-//  public Object beanId(T bean) {
-//    return getId((EntityBean) bean);
-//  }
 
   /**
    * Return the Id value for the bean with embeddedId beans converted into maps.

@@ -197,7 +197,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         if (assocBean != null) {
           Object parentId = targetDescriptor.id(assocBean);
           if (parentId != null) {
-            changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), parentId);
+            final String parentKey = targetDescriptor.cacheKey(parentId);
+            changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), parentKey);
           }
         }
       }
