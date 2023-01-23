@@ -12,18 +12,19 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
-import org.slf4j.Logger;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
  */
 final class DefaultBeanLoader {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final DefaultServer server;
   private final boolean onIterateUseExtraTxn;
@@ -71,7 +72,8 @@ final class DefaultBeanLoader {
       if (ebi.isReadOnly()) {
         readOnly = Boolean.TRUE;
       }
-      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentId, readOnly)) {
+      final String parentKey = parentDesc.cacheKey(parentId);
+      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentKey, readOnly)) {
         return;
       }
     }
@@ -108,11 +110,12 @@ final class DefaultBeanLoader {
     server.findOne(query, null);
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
-        if (log.isDebugEnabled()) {
-          log.debug("BeanCollection after load was empty. Owner:" + beanCollection.getOwnerBean());
+        if (log.isLoggable(DEBUG)) {
+          log.log(DEBUG, "BeanCollection after load was empty. Owner:{0}", beanCollection.getOwnerBean());
         }
       } else if (useManyIdCache) {
-        parentDesc.cacheManyPropPut(many, beanCollection, parentId);
+        final String parentKey = parentDesc.cacheKey(parentId);
+        parentDesc.cacheManyPropPut(many, beanCollection, parentKey);
       }
     }
   }
@@ -199,7 +202,7 @@ final class DefaultBeanLoader {
     query.setLazyLoadProperty(ebi.getLazyLoadProperty());
     if (draft) {
       query.asDraft();
-    } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN) {
+    } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN && desc.isSoftDelete()) {
       query.setIncludeSoftDeletes();
     }
     if (embeddedOwnerIndex > -1) {
@@ -228,7 +231,7 @@ final class DefaultBeanLoader {
 
     Object dbBean = query.findOne();
     if (dbBean == null) {
-      throw new EntityNotFoundException("Bean not found during lazy load or refresh." + " id[" + id + "] type[" + desc.type() + "]");
+      throw new EntityNotFoundException("Bean not found during lazy load or refresh. Id:" + id + " type:" + desc.type());
     }
     desc.resetManyProperties(dbBean);
   }

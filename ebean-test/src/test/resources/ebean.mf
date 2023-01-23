@@ -4,4 +4,5 @@ entity-packages: org,misc
 transactional-packages: org
 querybean-packages: none
 synthetic: true
+allow-nullable-dbarray: true
 

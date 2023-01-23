@@ -33,7 +33,7 @@ BEGIN
   FETCH NEXT FROM index_cursor INTO @indexName
   WHILE @@FETCH_STATUS = 0
     BEGIN
-      set @sql = 'drop index ' + @indexName + ' on ' + @tableName;
+      set @sql = 'drop index ' + @indexName + ' on [' + @tableName + ']';
       EXECUTE(@sql);
 
       FETCH NEXT FROM index_cursor INTO @indexName
@@ -55,7 +55,7 @@ BEGIN
     join sys.columns t2 on t1.object_id = t2.default_object_id
     where t1.parent_object_id = OBJECT_ID(@tableName) and t2.name = @columnName;
 
-  if @tmp is not null EXEC('alter table ' + @tableName +' drop constraint ' + @tmp);
+  if @tmp is not null EXEC('alter table [' + @tableName +'] drop constraint ' + @tmp);
 END
 GO
 
@@ -82,7 +82,7 @@ BEGIN
   FETCH NEXT FROM name_cursor INTO @constraintName
   WHILE @@FETCH_STATUS = 0
     BEGIN
-      set @sql = 'alter table ' + @tableName + ' drop constraint ' + @constraintName;
+      set @sql = 'alter table [' + @tableName + '] drop constraint ' + @constraintName;
       EXECUTE(@sql);
 
       FETCH NEXT FROM name_cursor INTO @constraintName
@@ -104,7 +104,7 @@ BEGIN
   EXEC usp_ebean_drop_default_constraint @tableName, @columnName;
   EXEC usp_ebean_drop_constraints @tableName, @columnName;
 
-  set @sql = 'alter table ' + @tableName + ' drop column ' + @columnName;
+  set @sql = 'alter table [' + @tableName + '] drop column [' + @columnName + ']';
   EXECUTE(@sql);
 END
 GO

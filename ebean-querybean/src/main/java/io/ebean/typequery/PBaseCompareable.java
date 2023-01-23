@@ -1,6 +1,8 @@
 package io.ebean.typequery;
 
 
+import io.ebean.Query;
+
 /**
  * Base property for all comparable types.
  *
@@ -41,6 +43,17 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
   }
 
   /**
+   * Greater than other property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R gt(TQProperty<?> other) {
+    expr().raw(_name + " > " + other.propertyName());
+    return _root;
+  }
+
+  /**
    * Greater than OR Null.
    *
    * @param value the bind value
@@ -59,6 +72,17 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    */
   public final R ge(T value) {
     expr().ge(_name, value);
+    return _root;
+  }
+
+  /**
+   * Greater than or Equal to other property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R ge(TQProperty<?> other) {
+    expr().raw(_name + " >= " + other.propertyName());
     return _root;
   }
 
@@ -85,6 +109,17 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
   }
 
   /**
+   * Less than other property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R lt(TQProperty<?> other) {
+    expr().raw(_name + " < " + other.propertyName());
+    return _root;
+  }
+
+  /**
    * Less than OR Null.
    *
    * @param value the bind value
@@ -103,6 +138,17 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    */
   public final R le(T value) {
     expr().le(_name, value);
+    return _root;
+  }
+
+  /**
+   * Less than or Equal to other property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R le(TQProperty<?> other) {
+    expr().raw(_name + " <= " + other.propertyName());
     return _root;
   }
 
@@ -153,6 +199,29 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
    */
   public final R inRangeWith(TQProperty<R> highProperty, T value) {
     expr().inRangeWith(_name, highProperty._name, value);
+    return _root;
+  }
+
+  /**
+   * A Property is in Range between 2 other properties.
+   *
+   * <pre>{@code
+   *  var o = QOrder.alias();
+   *
+   *  new QOrder()
+   *    .orderDate.inRangeWith(o.product.startDate, o.product.endDate)
+   *    .findList();
+   *
+   *    // which equates to
+   *    product.startDate <= orderDate and (product.endDate > orderDate or product.endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   */
+  public final R inRangeWith(TQProperty<?> lowProperty, TQProperty<?> highProperty) {
+    expr().inRangeWithProperties(_name, lowProperty.propertyName(), highProperty.propertyName());
     return _root;
   }
 
@@ -234,4 +303,47 @@ public class PBaseCompareable<R, T> extends PBaseValueEqual<R, T> {
     return _root;
   }
 
+  /**
+   * Property is Less Than or Equal To the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R le(Query<?> subQuery) {
+    expr().le(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is Less Than the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R lt(Query<?> subQuery) {
+    expr().lt(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is Greater Than or Equal To the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R ge(Query<?> subQuery) {
+    expr().ge(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is Greater Than the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R gt(Query<?> subQuery) {
+    expr().gt(_name, subQuery);
+    return _root;
+  }
 }

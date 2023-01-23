@@ -1,20 +1,20 @@
 package io.ebean.test.config.platform;
 
+import io.avaje.applog.AppLog;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.test.containers.ContainerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static java.lang.System.Logger.Level.*;
 import static java.util.concurrent.CompletableFuture.allOf;
 import static java.util.concurrent.CompletableFuture.runAsync;
 
 public class PlatformAutoConfig {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.test");
 
   /**
    * Known platforms we can setup locally or via docker container.
@@ -62,7 +62,7 @@ public class PlatformAutoConfig {
 
       Config config = new Config(db, platform, databaseName, this.config);
       platformSetup.setupExtraDbDataSource(config);
-      log.debug("configured dataSource for extraDb name:{} url:{}", db, this.config.getDataSourceConfig().getUrl());
+      log.log(DEBUG, "configured dataSource for extraDb name:{0} url:{1}", db, this.config.getDataSourceConfig().getUrl());
     }
   }
 
@@ -92,9 +92,9 @@ public class PlatformAutoConfig {
     Properties dockerProperties = platformSetup.setup(config);
     if (!dockerProperties.isEmpty()) {
       if (isDebug()) {
-        log.info("Docker properties: {}", dockerProperties);
+        log.log(INFO, "Docker properties: {0}", dockerProperties);
       } else {
-        log.debug("Docker properties: {}", dockerProperties);
+        log.log(DEBUG, "Docker properties: {0}", dockerProperties);
       }
       // start the docker container with appropriate configuration
       new ContainerFactory(dockerProperties, config.getDockerPlatform()).startContainers();
@@ -130,7 +130,7 @@ public class PlatformAutoConfig {
     }
     this.platformSetup = KNOWN_PLATFORMS.get(platform);
     if (platformSetup == null) {
-      log.warn("unknown platform {} - skipping platform setup", platform);
+      log.log(WARNING, "unknown platform {0} - skipping platform setup", platform);
     }
     return platformSetup != null;
   }

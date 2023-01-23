@@ -1,8 +1,10 @@
 package org.tests.basic;
 
+import io.ebean.Query;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
+import io.ebeaninternal.api.SpiQuery;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.Customer;
@@ -15,6 +17,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 class TestLoadBeanCache extends BaseTestCase {
+
+  @Test
+  void loadBeanCache_false() {
+    Query<Country> query = DB.find(Country.class).setLoadBeanCache(false);
+
+    SpiQuery<?> spiQuery = (SpiQuery<?>) query;
+    assertThat(spiQuery.isBeanCachePut()).isFalse();
+  }
 
   @Test
   void testLoad() {

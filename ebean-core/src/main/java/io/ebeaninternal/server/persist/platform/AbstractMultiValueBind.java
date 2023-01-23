@@ -2,30 +2,12 @@ package io.ebeaninternal.server.persist.platform;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.bind.DataBind;
 
 import java.sql.SQLException;
 import java.util.Collection;
 
-import static java.sql.Types.BIGINT;
-import static java.sql.Types.BIT;
-import static java.sql.Types.BOOLEAN;
-import static java.sql.Types.CHAR;
-import static java.sql.Types.DATE;
-import static java.sql.Types.DECIMAL;
-import static java.sql.Types.DOUBLE;
-import static java.sql.Types.FLOAT;
-import static java.sql.Types.INTEGER;
-import static java.sql.Types.NCHAR;
-import static java.sql.Types.NUMERIC;
-import static java.sql.Types.NVARCHAR;
-import static java.sql.Types.REAL;
-import static java.sql.Types.SMALLINT;
-import static java.sql.Types.TIMESTAMP;
-import static java.sql.Types.TIMESTAMP_WITH_TIMEZONE;
-import static java.sql.Types.TIME_WITH_TIMEZONE;
-import static java.sql.Types.TINYINT;
-import static java.sql.Types.VARCHAR;
+import static java.sql.Types.*;
 
 /**
  * Base MultiValueBind for platform specific support.
@@ -44,7 +26,7 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
 
   @Override
   public void bindMultiValues(DataBind dataBind, Collection<?> values, ScalarType<?> type, BindOne bindOne) throws SQLException {
-    String arrayType = getArrayType(type.getJdbcType());
+    String arrayType = getArrayType(type.jdbcType());
     if (arrayType == null) {
       super.bindMultiValues(dataBind, values, type, bindOne);
     } else {
@@ -86,6 +68,8 @@ abstract class AbstractMultiValueBind extends MultiValueBind {
       case ExtraDbTypes.UUID: // Postgres cast to uuid[]
       case ExtraDbTypes.INET: // Postgres cast to inet[]
         return "varchar";
+      case VARBINARY:
+        return "bytea";
 
       default:
         return null;

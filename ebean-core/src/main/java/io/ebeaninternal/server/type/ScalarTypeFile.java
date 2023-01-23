@@ -5,12 +5,15 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 import io.ebean.text.TextException;
 import io.ebeaninternal.api.CoreLog;
 
 import java.io.*;
 import java.sql.SQLException;
 import java.sql.Types;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * ScalarType for streaming between a File and the database.
@@ -41,7 +44,7 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public boolean isBinaryType() {
+  public boolean binary() {
     return true;
   }
 
@@ -115,7 +118,7 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.BINARY;
   }
 
@@ -127,16 +130,6 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   @Override
   public File parse(String value) {
     throw new TextException("Not supported");
-  }
-
-  @Override
-  public File convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not supported");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
   }
 
   @Override
@@ -153,12 +146,10 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   /**
    * Helper method to pump bytes from input to output.
    */
-  public long pump(InputStream is, OutputStream out) throws IOException {
-
+  public void pump(InputStream is, OutputStream out) throws IOException {
     long totalBytes = 0;
     InputStream input = null;
     OutputStream output = null;
-
     try {
       input = new BufferedInputStream(is, bufferSize);
       output = new BufferedOutputStream(out, bufferSize);
@@ -169,24 +160,20 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
         output.write(buffer, 0, length);
         totalBytes += length;
       }
-
       output.flush();
-
-      return totalBytes;
-
     } finally {
       if (output != null) {
         try {
           output.close();
         } catch (IOException e) {
-          CoreLog.log.error("Error when closing outputstream", e);
+          CoreLog.log.log(ERROR, "Error when closing outputStream", e);
         }
       }
       if (input != null) {
         try {
           input.close();
         } catch (IOException e) {
-          CoreLog.log.error("Error when closing inputstream ", e);
+          CoreLog.log.log(ERROR, "Error when closing inputStream ", e);
         }
       }
     }

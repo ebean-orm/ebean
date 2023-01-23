@@ -113,7 +113,7 @@ public class PostgresPlatform extends DatabasePlatform {
    * So we can generate varchar[], int[], uuid[] column definitions and use the associated scalar types.
    */
   @Override
-  public boolean isNativeArrayType() {
+  public boolean nativeArrayType() {
     return true;
   }
 
@@ -147,40 +147,4 @@ public class PostgresPlatform extends DatabasePlatform {
     }
     return FOR_UPDATE;
   }
-
-  @Override
-  public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
-    try (PreparedStatement statement = connection.prepareStatement("select count(*) from pg_inherits i WHERE  i.inhparent = ?::regclass")) {
-      statement.setString(1, table);
-      try (ResultSet resultSet = statement.executeQuery()) {
-        return resultSet.next() && resultSet.getInt(1) > 0;
-      }
-    }
-  }
-
-  /**
-   * Return SQL using built in partition helper functions to create some initial partitions.
-   * <p>
-   * Only use this if extra-ddl doesn't have some initial partitions defined (which it should).
-   */
-  @Override
-  public String tablePartitionInit(String tableName, PartitionMode mode) {
-    // default partition required pg11 but this is only used for testing but bumped test docker container to pg14 by default
-    String[] schemaTable = SplitName.split(tableName);
-
-    String baseTable;
-    String plusSchema;
-    if (schemaTable[0] == null) {
-      plusSchema = "";
-      baseTable = tableName;
-    } else {
-      // table in an explicit schema
-      plusSchema = ",'" + schemaTable[0] + "'";
-      baseTable = schemaTable[1];
-    }
-    return
-      "create table " + tableName + "_default" + " partition of " + tableName + " default;\n" +
-        "select partition('" + mode.name().toLowerCase() + "','" + baseTable + "',1" + plusSchema + ");";
-  }
-
 }

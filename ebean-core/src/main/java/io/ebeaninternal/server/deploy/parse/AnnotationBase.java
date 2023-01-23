@@ -52,9 +52,9 @@ abstract class AnnotationBase {
 
   AnnotationBase(DeployUtil util) {
     this.util = util;
-    this.databasePlatform = util.getDbPlatform();
-    this.platform = databasePlatform.getPlatform();
-    this.namingConvention = util.getNamingConvention();
+    this.databasePlatform = util.dbPlatform();
+    this.platform = databasePlatform.platform();
+    this.namingConvention = util.namingConvention();
   }
 
   /**

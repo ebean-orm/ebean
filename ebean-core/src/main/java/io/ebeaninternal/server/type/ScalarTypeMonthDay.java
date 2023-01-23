@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -79,16 +80,6 @@ final class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
-  public MonthDay convertFromMillis(long dateTime) {
-    throw new RuntimeException("Not supported on this type");
-  }
-
-  @Override
   public MonthDay readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -121,7 +112,7 @@ final class ScalarTypeMonthDay extends ScalarTypeBase<MonthDay> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.KEYWORD;
   }
 

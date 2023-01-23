@@ -2,7 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.SqlQuery;
 import io.ebean.SqlRow;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.math.BigDecimal;
 import java.sql.Date;

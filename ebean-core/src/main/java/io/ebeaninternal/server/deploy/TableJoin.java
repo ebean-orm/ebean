@@ -34,7 +34,7 @@ public final class TableJoin {
   private final int queryHash;
 
   private final PropertyForeignKey foreignKey;
-  
+
   private final String extraWhere;
 
   public TableJoin(DeployTableJoin deploy) {
@@ -135,21 +135,21 @@ public final class TableJoin {
 
   public void addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx, String predicate) {
     String[] names = SplitName.split(prefix);
-    String a1 = ctx.getTableAlias(names[0]);
-    String a2 = ctx.getTableAlias(prefix);
+    String a1 = ctx.tableAlias(names[0]);
+    String a2 = ctx.tableAlias(prefix);
     addJoin(joinType, a1, a2, ctx);
     ctx.append(" and ").append(a2).append(predicate);
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
     String[] names = SplitName.split(prefix);
-    String a1 = ctx.getTableAlias(names[0]);
-    String a2 = ctx.getTableAlias(prefix);
+    String a1 = ctx.tableAlias(names[0]);
+    String a2 = ctx.tableAlias(prefix);
     return addJoin(joinType, a1, a2, ctx);
   }
 
   public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
-    String joinLiteral = joinType.getLiteral(type);
+    String joinLiteral = joinType.literal(type);
     ctx.addJoin(joinLiteral, table, columns(), a1, a2, extraWhere);
     return joinType.autoToOuter(type);
   }

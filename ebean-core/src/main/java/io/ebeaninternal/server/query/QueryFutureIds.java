@@ -19,11 +19,11 @@ public final class QueryFutureIds<T> extends BaseFuture<List<Object>> implements
     this.call = call;
   }
 
-  public FutureTask<List<Object>> getFutureTask() {
+  public FutureTask<List<Object>> futureTask() {
     return futureTask;
   }
 
-  public Transaction getTransaction() {
+  public Transaction transaction() {
     return call.transaction;
   }
 

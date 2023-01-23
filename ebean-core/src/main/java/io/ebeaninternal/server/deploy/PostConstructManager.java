@@ -7,6 +7,8 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import java.util.List;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 /**
  * Default implementation for creating BeanControllers.
  */
@@ -28,7 +30,7 @@ final class PostConstructManager {
   void addPostConstructListeners(DeployBeanDescriptor<?> deployDesc) {
     for (BeanPostConstructListener c : list) {
       if (c.isRegisterFor(deployDesc.getBeanType())) {
-        CoreLog.log.debug("BeanPostLoad on[{}] {}", deployDesc.getFullName(), c.getClass().getName());
+        CoreLog.log.log(DEBUG, "BeanPostLoad on[{0}] {1}", deployDesc.getFullName(), c.getClass().getName());
         deployDesc.addPostConstructListener(c);
       }
     }

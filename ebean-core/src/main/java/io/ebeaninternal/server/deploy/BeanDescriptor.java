@@ -45,7 +45,7 @@ import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
@@ -54,7 +54,6 @@ import io.ebeanservice.docstore.api.DocStoreUpdates;
 import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
-import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -68,13 +67,15 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Describes Beans including their deployment information.
  */
 public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   public enum EntityType {
     ORM, EMBEDDED, VIEW, SQL, DOC
@@ -322,7 +323,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.jsonHelp = initJsonHelp();
     this.draftHelp = new BeanDescriptorDraftHelp<>(this);
     this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
-    this.docStoreQueueId = docStoreAdapter.getQueueId();
+    this.docStoreQueueId = docStoreAdapter.queueId();
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy
     // then we also need to check every BeanDescriptors in the InheritInfo as
@@ -494,9 +495,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * as they are used to get the imported and exported properties.
    */
   void initialiseId(BeanDescriptorInitContext initContext) {
-    if (log.isTraceEnabled()) {
-      log.trace("BeanDescriptor initialise " + fullName);
-    }
     if (draftable) {
       initContext.addDraft(baseTable, draftTable);
     }
@@ -795,7 +793,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       changeJson.flush();
       return beanChange(ChangeType.UPDATE, request.beanId(), changeJson.newJson(), changeJson.oldJson());
     } catch (RuntimeException e) {
-      log.error("Failed to write ChangeLog entry for update", e);
+      log.log(ERROR, "Failed to write ChangeLog entry for update", e);
       return null;
     }
   }
@@ -811,7 +809,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       jsonWriter.flush();
       return beanChange(ChangeType.INSERT, request.beanId(), writer.toString(), null);
     } catch (IOException e) {
-      log.error("Failed to write ChangeLog entry for insert", e);
+      log.log(ERROR, "Failed to write ChangeLog entry for insert", e);
       return null;
     }
   }
@@ -968,7 +966,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   @Override
   public boolean isDocStoreMapped() {
-    return docStoreAdapter.isMapped();
+    return docStoreAdapter.mapped();
   }
 
   /**
@@ -1074,7 +1072,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * given the transactions requested mode.
    */
   public DocStoreMode docStoreMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
-    return docStoreAdapter.getMode(persistType, txnMode);
+    return docStoreAdapter.mode(persistType, txnMode);
   }
 
   public void docStoreInsert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext bulkUpdate) throws IOException {
@@ -1204,26 +1202,26 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Try to load the beanCollection from cache return true if successful.
    */
-  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId, Boolean readOnly) {
-    return cacheHelp.manyPropLoad(many, bc, parentId, readOnly);
+  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey, Boolean readOnly) {
+    return cacheHelp.manyPropLoad(many, bc, parentKey, readOnly);
   }
 
   /**
    * Put the beanCollection into the cache.
    */
-  public void cacheManyPropPut(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, Object parentId) {
-    cacheHelp.manyPropPut(many, bc, parentId);
+  public void cacheManyPropPut(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey) {
+    cacheHelp.manyPropPut(many, bc, parentKey);
   }
 
   /**
    * Update the bean collection entry in the cache.
    */
-  public void cacheManyPropPut(String name, Object parentId, CachedManyIds entry) {
-    cacheHelp.cachePutManyIds(parentId, name, entry);
+  public void cacheManyPropPut(String name, String parentKey, CachedManyIds entry) {
+    cacheHelp.cachePutManyIds(name, parentKey, entry);
   }
 
-  public void cacheManyPropRemove(String propertyName, Object parentId) {
-    cacheHelp.manyPropRemove(propertyName, parentId);
+  public void cacheManyPropRemove(String propertyName, String parentKey) {
+    cacheHelp.manyPropRemove(propertyName, parentKey);
   }
 
   public void cacheManyPropClear(String propertyName) {
@@ -1468,7 +1466,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
-      if (request.includeHash(queryPlan.getHash())) {
+      if (request.includeHash(queryPlan.hash())) {
         queryPlan.queryPlanInit(request.thresholdMicros());
         list.add(queryPlan.createMeta(null, null));
       }
@@ -1482,7 +1480,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     iudMetrics.visit(visitor);
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (!queryPlan.isEmptyStats()) {
-        visitor.visitQuery(queryPlan.getSnapshot(visitor.reset()));
+        visitor.visitQuery(queryPlan.visit(visitor));
       }
     }
   }
@@ -1500,7 +1498,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Trim query plans not used since the passed in epoch time.
    */
   void trimQueryPlans(long unusedSince) {
-    queryPlanCache.values().removeIf(queryPlan -> queryPlan.getLastQueryTime() < unusedSince);
+    queryPlanCache.values().removeIf(queryPlan -> queryPlan.lastQueryTime() < unusedSince);
   }
 
   /**
@@ -1893,7 +1891,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       }
       BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) other._findBeanProperty(split[0]);
       if (assocProp == null) {
-        throw new IllegalStateException("Unknown property path [" + split[0] + "] from[" + path + "]");
+        throw new IllegalStateException("Unknown property path " + split[0] + " from " + path);
       }
       BeanDescriptor<?> targetDesc = assocProp.targetDescriptor();
       path = split[1];
@@ -2098,7 +2096,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Return the cache key for the given bean (based on id value).
    */
-  String cacheKeyForBean(EntityBean bean) {
+  public String cacheKeyForBean(EntityBean bean) {
     return cacheKey(idProperty.getValue(bean));
   }
 
@@ -2113,11 +2111,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public Object id(Object bean) {
     return getId((EntityBean) bean);
   }
-
-//  @Override
-//  public Object beanId(T bean) {
-//    return getId((EntityBean) bean);
-//  }
 
   /**
    * Return the Id value for the bean with embeddedId beans converted into maps.
@@ -2291,11 +2284,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private ElComparator<T> createPropertyComparator(SortByClause.Property sortProp) {
     ElPropertyValue elGetValue = elGetValue(sortProp.getName());
     if (elGetValue == null) {
-      log.error("Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
+      log.log(ERROR, "Sort property [" + sortProp + "] not found in " + beanType + ". Cannot sort.");
       return new ElComparatorNoop<>();
     }
     if (elGetValue.isAssocMany()) {
-      log.error("Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
+      log.log(ERROR, "Sort property [" + sortProp + "] in " + beanType + " is a many-property. Cannot sort.");
       return new ElComparatorNoop<>();
     }
     Boolean nullsHigh = sortProp.getNullsHigh();
@@ -2771,7 +2764,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void markAsDeleted(EntityBean bean) {
     if (softDeleteProperty == null) {
       Object id = getId(bean);
-      log.info("(Lazy) loading unsuccessful for type:{} id:{} - expecting when bean has been deleted", name(), id);
+      log.log(INFO, "(Lazy) loading unsuccessful for type:{0} id:{1} - expecting when bean has been deleted", name(), id);
       bean._ebean_getIntercept().setLazyLoadFailure(id);
     } else {
       softDeleteValue(bean);
@@ -3140,9 +3133,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
-   * Check for mutable scalar types and mark as dirty if necessary.
+   * Check all mutable scalar types and mark as dirty if necessary.
    */
-  public void checkMutableProperties(EntityBeanIntercept ebi) {
+  public void checkAllMutableProperties(EntityBeanIntercept ebi) {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.propertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
@@ -3151,6 +3144,22 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
           ebi.markPropertyAsChanged(propertyIndex);
+        }
+      }
+    }
+  }
+
+  /**
+   * Return true if any mutable properties are dirty.
+   */
+  public void checkAnyMutableProperties(EntityBeanIntercept ebi) {
+    for (BeanProperty beanProperty : propertiesMutable) {
+      int propertyIndex = beanProperty.propertyIndex();
+      if (ebi.isLoadedProperty(propertyIndex)) {
+        Object value = beanProperty.getValue(ebi.getOwner());
+        if (beanProperty.checkMutable(value, ebi.isDirtyProperty(propertyIndex), ebi)) {
+          ebi.markPropertyAsChanged(propertyIndex);
+          return;
         }
       }
     }

@@ -1,8 +1,8 @@
 package org.tests.query;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;
 
@@ -14,8 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestSubQuery extends BaseTestCase {
 
   @Test
-  public void testId() {
-
+  void testId() {
     ResetBasicData.reset();
 
     List<Integer> productIds = new ArrayList<>();
@@ -26,7 +25,13 @@ public class TestSubQuery extends BaseTestCase {
     Query<Order> sq = DB.find(Order.class).select("id").where()
       .in("details.product.id", productIds).query();
 
-    DB.find(Order.class).where().in("id", sq).findList();
+    Query<Order> query = DB.find(Order.class).where().in("id", sq).query();
+    query.findList();
+    if (isPostgresCompatible()) {
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status, t0.order_date, t0.ship_date, t1.name, t0.cretime, t0.updtime, t0.kcustomer_id from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.id in (select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id and u1.id > 0 where u1.product_id = any(?))");
+    } else {
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status, t0.order_date, t0.ship_date, t1.name, t0.cretime, t0.updtime, t0.kcustomer_id from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.id in (select distinct t0.id from o_order t0 join o_order_detail u1 on u1.order_id = t0.id and u1.id > 0 where u1.product_id in (?,?,?))");
+    }
   }
 
   @Test
@@ -79,9 +84,9 @@ public class TestSubQuery extends BaseTestCase {
     query.findSingleAttribute();
 
     if (isPostgresCompatible()) {
-      assertThat(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + debugSq.getGeneratedSql() + ")");
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where t0.id in (" + debugSq.getGeneratedSql() + ")");
     } else {
-      assertSql(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where  (t0.id) in (" + trimSql(debugSq.getGeneratedSql()) + ")");
+      assertSql(query.getGeneratedSql()).isEqualTo("select t0.ship_date from o_order t0 where t0.id in (" + trimSql(debugSq.getGeneratedSql()) + ")");
     }
   }
 
@@ -102,7 +107,7 @@ public class TestSubQuery extends BaseTestCase {
     Query<Order> query = DB.find(Order.class).select("status").where().isIn("shipDate", sq).query();
     query.findSingleAttribute();
     assertSql(query.getGeneratedSql())
-        .isEqualTo("select t0.status from o_order t0 where  (t0.ship_date) in (" + trimSql(debugSq.getGeneratedSql()) + ")");
+        .isEqualTo("select t0.status from o_order t0 where t0.ship_date in (" + trimSql(debugSq.getGeneratedSql()) + ")");
   }
 
   /**
@@ -126,7 +131,7 @@ public class TestSubQuery extends BaseTestCase {
     query.findSingleAttribute();
 
     assertSql(query.getGeneratedSql())
-        .isEqualTo("select t0.ship_time from or_order_ship t0 where  (t0.id) in (" + trimSql(debugSq.getGeneratedSql()) + ")");
+        .isEqualTo("select t0.ship_time from or_order_ship t0 where t0.id in (" + trimSql(debugSq.getGeneratedSql()) + ")");
   }
 
   public void testCompositeKey() {
@@ -187,7 +192,7 @@ public class TestSubQuery extends BaseTestCase {
     // TODO: If, after bugfixing, the system still join against vehicle I do not
     // know now, in our case, it is not necessary if not
     // using it in the where clause
-    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id )";
+    String golden = "t0.id in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id )";
     assertThat(sql).contains(golden);
 
   }
@@ -208,7 +213,7 @@ public class TestSubQuery extends BaseTestCase {
     pq.findList();
 
     String sql = pq.getGeneratedSql();
-    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id  where t1.license_number = ? )";
+    String golden = "t0.id in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id  where t1.license_number = ? )";
     assertThat(sql).contains(golden);
   }
 
@@ -230,7 +235,7 @@ public class TestSubQuery extends BaseTestCase {
 
     String sql = pq.getGeneratedSql();
 
-    String golden = "(t0.id) in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id )";
+    String golden = "t0.id in (select t0.vehicle_id from vehicle_driver t0 left join vehicle t1 on t1.id = t0.vehicle_id )";
     assertThat(sql).contains(golden);
   }
 }

@@ -21,7 +21,7 @@ public final class DeleteByIdMap {
 
   @Override
   public String toString() {
-    return "DeleteById[" + beanMap.values() + "]";
+    return "DeleteById " + beanMap.values();
   }
 
   public void notifyCache(CacheChangeSet changeSet) {

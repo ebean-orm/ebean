@@ -20,7 +20,7 @@ public interface SpiJsonWriter extends JsonWriter {
   /**
    * Return true if the value is a parent bean.
    */
-  boolean isParentBean(Object value);
+  boolean parentBean(Object value);
 
   /**
    * Start an assoc one path.

@@ -1,7 +1,7 @@
 package org.tests.basic.encrypt;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicEncryptClient;
 
@@ -49,6 +49,16 @@ public class TestEncryptClientSide extends BaseTestCase {
 
     assertThat(found).isNotNull();
     assertThat(found.getDescription()).isEqualTo("goodbye");
+
+    found = DB.find(EBasicEncryptClient.class)
+      .where()
+      .in("description", "goodbye")
+      .in("status", EBasicEncryptClient.Status.TWO)
+      .in("dob", today)
+      .findOne();
+    assertThat(found).isNotNull();
+    assertThat(found.getDescription()).isEqualTo("goodbye");
+
 
     DB.delete(found);
   }

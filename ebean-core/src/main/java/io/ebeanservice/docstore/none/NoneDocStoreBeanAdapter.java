@@ -19,7 +19,7 @@ public final class NoneDocStoreBeanAdapter<T> extends DocStoreBeanBaseAdapter<T>
   }
 
   @Override
-  public boolean isMapped() {
+  public boolean mapped() {
     return false;
   }
 

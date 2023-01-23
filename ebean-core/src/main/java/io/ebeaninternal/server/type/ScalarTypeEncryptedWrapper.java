@@ -31,18 +31,13 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public long asVersion(T value) {
-    throw new RuntimeException("not supported");
+  public boolean binary() {
+    return wrapped.binary();
   }
 
   @Override
-  public boolean isBinaryType() {
-    return wrapped.isBinaryType();
-  }
-
-  @Override
-  public boolean isMutable() {
-    return wrapped.isMutable();
+  public boolean mutable() {
+    return wrapped.mutable();
   }
 
   @Override
@@ -85,39 +80,23 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public int getJdbcType() {
-    return byteArrayType.getJdbcType();
+  public int jdbcType() {
+    return byteArrayType.jdbcType();
   }
 
   @Override
-  public int getLength() {
-    return byteArrayType.getLength();
+  public int length() {
+    return byteArrayType.length();
   }
 
   @Override
-  public Class<T> getType() {
-    return wrapped.getType();
+  public Class<T> type() {
+    return wrapped.type();
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return wrapped.isDateTimeCapable();
-  }
-
-  @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     return false;
-  }
-
-  @Override
-  public void loadIgnore(DataReader dataReader) {
-    wrapped.loadIgnore(dataReader);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public String format(Object v) {
-    return formatValue((T) v);
   }
 
   @Override
@@ -128,11 +107,6 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   @Override
   public T parse(String value) {
     return wrapped.parse(value);
-  }
-
-  @Override
-  public T convertFromMillis(long systemTimeMillis) {
-    return wrapped.convertFromMillis(systemTimeMillis);
   }
 
   @Override
@@ -156,8 +130,8 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public DocPropertyType getDocType() {
-    return wrapped.getDocType();
+  public DocPropertyType docType() {
+    return wrapped.docType();
   }
 
 }

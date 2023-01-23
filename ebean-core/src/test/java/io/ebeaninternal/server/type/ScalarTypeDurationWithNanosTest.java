@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.text.TextException;
+import io.ebean.core.type.ScalarTypeUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -12,13 +12,12 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ScalarTypeDurationWithNanosTest {
+class ScalarTypeDurationWithNanosTest {
 
   ScalarTypeDurationWithNanos type = new ScalarTypeDurationWithNanos();
 
   @Test
-  public void testReadData() throws Exception {
-
+  void testReadData() throws Exception {
     Duration duration = Duration.ofSeconds(323, 1500000);
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -40,10 +39,9 @@ public class ScalarTypeDurationWithNanosTest {
   }
 
   @Test
-  public void testToJdbcType() throws Exception {
-
+  void testToJdbcType() throws Exception {
     Duration duration = Duration.ofSeconds(323, 1500000);
-    BigDecimal bigDecimal = DecimalUtils.toDecimal(duration);
+    BigDecimal bigDecimal = ScalarTypeUtils.toDecimal(duration);
 
     Object val1 = type.toJdbcType(duration);
     Object val2 = type.toJdbcType(bigDecimal);
@@ -53,10 +51,9 @@ public class ScalarTypeDurationWithNanosTest {
   }
 
   @Test
-  public void testToBeanType() throws Exception {
-
+  void testToBeanType() throws Exception {
     Duration duration = Duration.ofSeconds(323, 1500000);
-    BigDecimal bigDecimal = DecimalUtils.toDecimal(duration);
+    BigDecimal bigDecimal = ScalarTypeUtils.toDecimal(duration);
 
     Duration val1 = type.toBeanType(duration);
     Duration val2 = type.toBeanType(bigDecimal);
@@ -66,32 +63,21 @@ public class ScalarTypeDurationWithNanosTest {
   }
 
   @Test
-  public void testFormatValue() throws Exception {
-
+  void testFormatValue() {
     Duration duration = Duration.ofSeconds(323, 1500000);
     String formatValue = type.formatValue(duration);
     assertEquals("PT5M23.0015S", formatValue);
   }
 
   @Test
-  public void testParse() {
+  void testParse() {
     Duration duration = Duration.ofSeconds(323, 1500000);
     Duration val1 = type.parse("PT5M23.0015S");
     assertEquals(duration, val1);
   }
 
   @Test
-  public void testIsDateTimeCapable() {
-    assertFalse(type.isDateTimeCapable());
-  }
-
-  @Test
-  public void testConvertFromMillis() {
-    assertThrows(TextException.class, () -> type.convertFromMillis(1000));
-  }
-
-  @Test
-  public void testJsonRead() throws Exception {
+  void testJsonRead() throws Exception {
     Duration duration = Duration.ofSeconds(323, 1500000);
 
     JsonTester<Duration> jsonTester = new JsonTester<>(type);

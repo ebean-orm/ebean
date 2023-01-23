@@ -39,23 +39,22 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
 
   @Override
   public String toString() {
-    return "ScalarTypeWrapper " + wrapperType + " to " + scalarType.getType();
+    return "ScalarTypeWrapper " + wrapperType + " to " + scalarType.type();
   }
 
   @Override
   public long asVersion(B value) {
-    S unwrapValue = converter.unwrapValue(value);
-    return scalarType.asVersion(unwrapValue);
+    return scalarType.asVersion(converter.unwrapValue(value));
   }
 
   @Override
-  public boolean isBinaryType() {
-    return scalarType.isBinaryType();
+  public boolean binary() {
+    return scalarType.binary();
   }
 
   @Override
-  public boolean isMutable() {
-    return scalarType.isMutable();
+  public boolean mutable() {
+    return scalarType.mutable();
   }
 
   @Override
@@ -86,34 +85,23 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public int getJdbcType() {
-    return scalarType.getJdbcType();
+  public int jdbcType() {
+    return scalarType.jdbcType();
   }
 
   @Override
-  public int getLength() {
-    return scalarType.getLength();
+  public int length() {
+    return scalarType.length();
   }
 
   @Override
-  public Class<B> getType() {
+  public Class<B> type() {
     return wrapperType;
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return scalarType.isDateTimeCapable();
-  }
-
-  @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     return false;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public String format(Object v) {
-    return formatValue((B) v);
   }
 
   @Override
@@ -132,20 +120,6 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public B convertFromMillis(long systemTimeMillis) {
-    S sv = scalarType.convertFromMillis(systemTimeMillis);
-    if (sv == null) {
-      return nullValue;
-    }
-    return converter.wrapValue(sv);
-  }
-
-  @Override
-  public void loadIgnore(DataReader reader) {
-    reader.incrementPos(1);
-  }
-
-  @Override
   public B read(DataReader reader) throws SQLException {
     S sv = scalarType.read(reader);
     if (sv == null) {
@@ -160,7 +134,7 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
     if (value == null) {
       return nullValue;
     }
-    if (getType().isAssignableFrom(value.getClass())) {
+    if (type().isAssignableFrom(value.getClass())) {
       return (B) value;
     }
     if (value instanceof String) {
@@ -194,8 +168,8 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
-    return scalarType.getDocType();
+  public DocPropertyType docType() {
+    return scalarType.docType();
   }
 
 }

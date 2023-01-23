@@ -4,7 +4,7 @@ import javax.persistence.Embeddable;
 import java.util.Objects;
 
 @Embeddable
-public class UserInterestLiveKey {
+public final class UserInterestLiveKey {
 
   private long userId;
   private long liveId;
@@ -14,13 +14,20 @@ public class UserInterestLiveKey {
     this.liveId = liveId;
   }
 
+  public long userId() {
+    return userId;
+  }
+
+  public long liveId() {
+    return liveId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     UserInterestLiveKey that = (UserInterestLiveKey) o;
-    return userId == that.userId &&
-      liveId == that.liveId;
+    return userId == that.userId && liveId == that.liveId;
   }
 
   @Override

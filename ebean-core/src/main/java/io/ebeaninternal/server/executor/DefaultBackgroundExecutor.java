@@ -1,13 +1,13 @@
 package io.ebeaninternal.server.executor;
 
+import io.avaje.applog.AppLog;
 import io.avaje.lang.NonNullApi;
 import io.ebean.config.BackgroundExecutorWrapper;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 
 import java.util.concurrent.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * The default implementation of the BackgroundExecutor.
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 @NonNullApi
 public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.BackgroundExecutor");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.BackgroundExecutor");
 
   private final ScheduledExecutorService schedulePool;
   private final DaemonExecutorService pool;
@@ -28,7 +28,6 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
     this.schedulePool = new DaemonScheduleThreadPool(schedulePoolSize, shutdownWaitSeconds, namePrefix + "-periodic-");
     this.pool = new DaemonExecutorService(shutdownWaitSeconds, namePrefix);
     this.wrapper = wrapper;
-    log.debug("Created backgroundExecutor {} (schedulePoolSize={}, shutdownWaitSeconds={})", namePrefix, schedulePoolSize, shutdownWaitSeconds);
   }
 
   /**
@@ -59,20 +58,20 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
    * This is used in methods that accepts a <code>Runnable</code> and return
    * either <code>void</code> or <code>ScheduledFuture</code>, as there is
    * normally no Future.get() call.
-   *
+   * <p>
    * Note: When submitting a <code>Callable</code>, you must check
    * <code>Future.get()</code> for exceptions.
    */
   private Runnable logExceptions(Runnable task) {
     long queued = System.nanoTime();
-    log.trace("Queued {}", task);
+    log.log(TRACE, "Queued {0}", task);
     return () -> {
       try {
-        if (log.isTraceEnabled()) {
+        if (log.isLoggable(TRACE)) {
           long start = System.nanoTime();
-          log.trace("Start {} (delay time {} us)", task, (start - queued) / 1000L);
+          log.log(TRACE, "Start {0} (delay time {1} us)", task, (start - queued) / 1000L);
           task.run();
-          log.trace("Stop {} (exec time {} us)", task, (System.nanoTime() - start) / 1000L);
+          log.log(TRACE, "Stop {0} (exec time {1} us)", task, (System.nanoTime() - start) / 1000L);
         } else {
           task.run();
         }
@@ -80,7 +79,7 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
         // log any exception here. Note they will not bubble up to the calling user
         // unless Future.get() is checked. (Which is almost never done on scheduled
         // background executions)
-        log.error("Error while executing the task {}", task, t);
+        log.log(ERROR, "Error while executing the task " + task, t);
         throw t;
       }
     };
@@ -107,31 +106,31 @@ public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   @Override
   public ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    return schedulePool.scheduleWithFixedDelay(wrap(logExceptions(task)), initialDelay, delay, unit);
+    return schedulePool.scheduleWithFixedDelay(logExceptions(task), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> scheduleAtFixedRate(Runnable task, long initialDelay, long delay, TimeUnit unit) {
-    return schedulePool.scheduleAtFixedRate(wrap(logExceptions(task)), initialDelay, delay, unit);
+    return schedulePool.scheduleAtFixedRate(logExceptions(task), initialDelay, delay, unit);
   }
 
   @Override
   public ScheduledFuture<?> schedule(Runnable task, long delay, TimeUnit unit) {
-    return schedulePool.schedule(wrap(logExceptions(task)), delay, unit);
+    return schedulePool.schedule(logExceptions(task), delay, unit);
   }
 
   @Override
   public <V> ScheduledFuture<V> schedule(Callable<V> task, long delay, TimeUnit unit) {
     // Note: No "logExceptions" as we expect Future.get() by the invoker
-    return schedulePool.schedule(wrap(task), delay, unit);
+    return schedulePool.schedule(task, delay, unit);
   }
 
   @Override
   public void shutdown() {
-    log.trace("BackgroundExecutor shutting down");
+    log.log(TRACE, "BackgroundExecutor shutting down");
     schedulePool.shutdown();
     pool.shutdown();
-    log.debug("BackgroundExecutor stopped");
+    log.log(DEBUG, "BackgroundExecutor stopped");
   }
 
 }

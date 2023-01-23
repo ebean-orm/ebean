@@ -135,6 +135,41 @@ end if;
 end$$;
 delimiter $$
 begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_MTM_C_MIGTEST_MTM_M_MIGTEST_MTM_C' and ucase(tabname) = 'MIGTEST_MTM_C_MIGTEST_MTM_M') then
+  prepare stmt from 'alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_MTM_C_MIGTEST_MTM_M_MIGTEST_MTM_M' and ucase(tabname) = 'MIGTEST_MTM_C_MIGTEST_MTM_M') then
+  prepare stmt from 'alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_MTM_M_MIGTEST_MTM_C_MIGTEST_MTM_M' and ucase(tabname) = 'MIGTEST_MTM_M_MIGTEST_MTM_C') then
+  prepare stmt from 'alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_MTM_M_MIGTEST_MTM_C_MIGTEST_MTM_C' and ucase(tabname) = 'MIGTEST_MTM_M_MIGTEST_MTM_C') then
+  prepare stmt from 'alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_MTM_M_PHONE_NUMBERS_MIGTEST_MTM_M_ID' and ucase(tabname) = 'MIGTEST_MTM_M_PHONE_NUMBERS') then
+  prepare stmt from 'alter table migtest_mtm_m_phone_numbers drop constraint fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
 if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MIGTEST_E_BASIC_INDEXTEST3') then
   prepare stmt from 'drop index ix_migtest_e_basic_indextest3';
   execute stmt;
@@ -144,6 +179,13 @@ delimiter $$
 begin
 if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MIGTEST_E_BASIC_INDEXTEST6') then
   prepare stmt from 'drop index ix_migtest_e_basic_indextest6';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_TABLE_TEXTFIELD2') then
+  prepare stmt from 'drop index ix_table_textfield2';
   execute stmt;
 end if;
 end$$;
@@ -200,9 +242,11 @@ alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string drop not null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
+call sysproc.admin_cmd('reorg table migtest_e_history2');
 alter table migtest_e_history2_history alter column test_string drop not null;
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
+call sysproc.admin_cmd('reorg table migtest_e_history2_history');
 alter table migtest_e_history4 alter column test_number set data type integer;
 call sysproc.admin_cmd('reorg table migtest_e_history4');
 alter table migtest_e_history4_history alter column test_number set data type integer;

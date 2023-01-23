@@ -22,9 +22,6 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   private int estimateCapacity;
   private int rows;
 
-  /**
-   * Create the BeanFindRequest.
-   */
   RelationalQueryRequest(SpiEbeanServer server, RelationalQueryEngine engine, SqlQuery q, Transaction t) {
     super(server, (SpiSqlBinding) q, t);
     this.queryEngine = engine;

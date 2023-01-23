@@ -22,48 +22,24 @@ class ScalarTypeNotFound implements ScalarType<Void> {
 
   public static final ScalarTypeNotFound INSTANCE = new ScalarTypeNotFound();
   private ScalarTypeNotFound() {  }
+
   @Override
-  public boolean isBinaryType() {
+  public boolean jdbcNative() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean isMutable() {
+  public int jdbcType() {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public boolean isDirty(Object value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int getLength() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isJdbcNative() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public int getJdbcType() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Class<Void> getType() {
+  public Class<Void> type() {
     throw new UnsupportedOperationException();
   }
 
   @Override
   public Void read(DataReader reader) throws SQLException {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void loadIgnore(DataReader reader) {
     throw new UnsupportedOperationException();
   }
 
@@ -88,32 +64,12 @@ class ScalarTypeNotFound implements ScalarType<Void> {
   }
 
   @Override
-  public String format(Object value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public Void parse(String value) {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public DocPropertyType getDocType() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public long asVersion(Void value) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public Void convertFromMillis(long dateTime) {
+  public DocPropertyType docType() {
     throw new UnsupportedOperationException();
   }
 

@@ -30,7 +30,7 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
     FutureRowCount<Customer> futureRowCount = query.findFutureCount();
 
     QueryFutureRowCount<Customer> internalRowCount = (QueryFutureRowCount<Customer>) futureRowCount;
-    Transaction t = internalRowCount.getTransaction();
+    Transaction t = internalRowCount.transaction();
 
     try {
       futureRowCount.get();
@@ -57,7 +57,7 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
     FutureIds<Customer> futureIds = query.findFutureIds();
 
     QueryFutureIds<Customer> internalFuture = (QueryFutureIds<Customer>) futureIds;
-    Transaction t = internalFuture.getTransaction();
+    Transaction t = internalFuture.transaction();
 
     try {
       internalFuture.get();
@@ -85,7 +85,7 @@ public class TestFutureRowCountErrorHandling extends BaseTestCase {
     FutureList<Customer> futureList = query.findFutureList();
 
     QueryFutureList<Customer> internalFuture = (QueryFutureList<Customer>) futureList;
-    Transaction t = internalFuture.getTransaction();
+    Transaction t = internalFuture.transaction();
 
     try {
       internalFuture.get();

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.text.TextException;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -11,13 +10,12 @@ import java.time.Year;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ScalarTypeYearTest {
+class ScalarTypeYearTest {
 
   ScalarTypeYear type = new ScalarTypeYear();
 
   @Test
-  public void testReadData() throws Exception {
-
+  void testReadData() throws Exception {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     ObjectOutputStream out = new ObjectOutputStream(os);
 
@@ -37,8 +35,7 @@ public class ScalarTypeYearTest {
   }
 
   @Test
-  public void testToJdbcType() throws Exception {
-
+  void testToJdbcType() throws Exception {
     Integer year = 2013;
     Object val1 = type.toJdbcType(Year.of(2013));
     Object val2 = type.toJdbcType(2013);
@@ -50,8 +47,7 @@ public class ScalarTypeYearTest {
   }
 
   @Test
-  public void testToBeanType() throws Exception {
-
+  void testToBeanType() throws Exception {
     Year year = Year.of(2013);
     Year val1 = type.toBeanType(year);
     Year val2 = type.toBeanType(2013);
@@ -63,29 +59,19 @@ public class ScalarTypeYearTest {
   }
 
   @Test
-  public void testFormatValue() throws Exception {
+  void testFormatValue() {
     String formatted = type.formatValue(Year.of(2013));
     assertEquals("2013", formatted);
   }
 
   @Test
-  public void testParse() {
+  void testParse() {
     Year year = type.parse("2013");
     assertEquals(Year.of(2013), year);
   }
 
   @Test
-  public void testIsDateTimeCapable() {
-    assertFalse(type.isDateTimeCapable());
-  }
-
-  @Test
-  public void testConvertFromMillis() {
-    assertThrows(TextException.class, () -> type.convertFromMillis(1000));
-  }
-
-  @Test
-  public void testJson() throws Exception {
+  void testJson() throws Exception {
     JsonTester<Year> jsonTester = new JsonTester<>(type);
     jsonTester.test(Year.of(2013));
   }

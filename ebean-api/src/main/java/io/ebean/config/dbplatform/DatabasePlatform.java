@@ -1,49 +1,26 @@
 package io.ebean.config.dbplatform;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.EbeanVersion;
 import io.ebean.Query;
-import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.CustomDbTypeMapping;
 import io.ebean.config.PlatformConfig;
 import io.ebean.util.JdbcClose;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Types;
+import java.sql.*;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Database platform specific settings.
  */
 public class DatabasePlatform {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean");
-
-  /**
-   * Behavior used when ending a query only transaction (at read committed isolation level).
-   */
-  public enum OnQueryOnly {
-
-    /**
-     * Rollback the transaction.
-     */
-    ROLLBACK,
-
-    /**
-     * Commit the transaction
-     */
-    COMMIT
-  }
-
+  private static final System.Logger log = EbeanVersion.log;
 
   /**
    * Set to true for MySql, no other jdbc drivers need this workaround.
@@ -60,15 +37,10 @@ public class DatabasePlatform {
    * Can we use native java time API objects in
    * {@link ResultSet#getObject(int, Class)} and
    * {@link PreparedStatement#setObject(int, Object)}.
-   *
+   * <p>
    * Not all drivers (DB2 e.g.) will support this.
    */
   protected boolean supportsNativeJavaTime = true;
-
-  /**
-   * The behaviour used when ending a read only transaction at read committed isolation level.
-   */
-  protected OnQueryOnly onQueryOnly = OnQueryOnly.COMMIT;
 
   /**
    * The open quote used by quoted identifiers.
@@ -147,11 +119,6 @@ public class DatabasePlatform {
   protected int clobDbType = Types.CLOB;
 
   /**
-   * For Oracle treat empty strings as null.
-   */
-  protected boolean treatEmptyStringsAsNull;
-
-  /**
    * The database platform name.
    */
   protected Platform platform = Platform.GENERIC;
@@ -165,7 +132,7 @@ public class DatabasePlatform {
    * want to use quoted identifiers for. The backticks get converted to the
    * appropriate characters in convertQuotedIdentifiers
    */
-  private static final char[] QUOTED_IDENTIFIERS = new char[] { '"', '\'', '[', ']', '`' };
+  private static final char[] QUOTED_IDENTIFIERS = new char[]{'"', '\'', '[', ']', '`'};
 
   /**
    * The non-escaped like clause (to stop slash being escaped on some platforms).
@@ -299,7 +266,7 @@ public class DatabasePlatform {
   /**
    * Return the platform key.
    */
-  public Platform getPlatform() {
+  public Platform platform() {
     return platform;
   }
 
@@ -309,14 +276,14 @@ public class DatabasePlatform {
    * "generic" is returned when no specific database platform has been set or found.
    * </p>
    */
-  public String getName() {
+  public String name() {
     return platform.name().toLowerCase();
   }
 
   /**
    * Return true if we are using Sequence batch mode rather than STEP.
    */
-  public boolean isSequenceBatchMode() {
+  public boolean sequenceBatchMode() {
     return sequenceBatchMode;
   }
 
@@ -330,52 +297,52 @@ public class DatabasePlatform {
   /**
    * Return true if this database platform supports native ILIKE expression.
    */
-  public boolean isSupportsNativeIlike() {
+  public boolean supportsNativeIlike() {
     return supportsNativeIlike;
   }
 
   /**
    * Return true if the platform supports delete statements with table alias.
    */
-  public boolean isSupportsDeleteTableAlias() {
+  public boolean supportsDeleteTableAlias() {
     return supportsDeleteTableAlias;
   }
 
   /**
-   * Return true if the collation is case sensitive.
+   * Return true if the collation is case-sensitive.
    * <p>
    * This is expected to be used for testing only.
    * </p>
    */
-  public boolean isCaseSensitiveCollation() {
+  public boolean caseSensitiveCollation() {
     return caseSensitiveCollation;
   }
 
   /**
    * Return true if the platform supports SavepointId values.
    */
-  public boolean isSupportsSavepointId() {
+  public boolean supportsSavepointId() {
     return supportsSavepointId;
   }
 
   /**
    * Return true if migrations should use stored procedures.
    */
-  public boolean isUseMigrationStoredProcedures() {
+  public boolean useMigrationStoredProcedures() {
     return useMigrationStoredProcedures;
   }
 
   /**
    * Return true if the platform supports LIMIT with sql update.
    */
-  public boolean isInlineSqlUpdateLimit() {
+  public boolean inlineSqlUpdateLimit() {
     return inlineSqlUpdateLimit;
   }
 
   /**
    * Return the maximum number of bind values this database platform allows or zero for no limit.
    */
-  public int getMaxInBinding() {
+  public int maxInBinding() {
     return maxInBinding;
   }
 
@@ -385,14 +352,14 @@ public class DatabasePlatform {
    * This is used when deriving names of intersection tables.
    * </p>
    */
-  public int getMaxTableNameLength() {
+  public int maxTableNameLength() {
     return maxTableNameLength;
   }
 
   /**
    * Return the maximum constraint name allowed for the platform.
    */
-  public int getMaxConstraintNameLength() {
+  public int maxConstraintNameLength() {
     return maxConstraintNameLength;
   }
 
@@ -421,23 +388,9 @@ public class DatabasePlatform {
   }
 
   /**
-   * Return the behaviour to use when ending a read only transaction.
-   */
-  public OnQueryOnly getOnQueryOnly() {
-    return onQueryOnly;
-  }
-
-  /**
-   * Set the behaviour to use when ending a read only transaction.
-   */
-  public void setOnQueryOnly(OnQueryOnly onQueryOnly) {
-    this.onQueryOnly = onQueryOnly;
-  }
-
-  /**
    * Return the DbEncrypt handler for this DB platform.
    */
-  public DbEncrypt getDbEncrypt() {
+  public DbEncrypt dbEncrypt() {
     return dbEncrypt;
   }
 
@@ -451,7 +404,7 @@ public class DatabasePlatform {
   /**
    * Return the history support for this database platform.
    */
-  public DbHistorySupport getHistorySupport() {
+  public DbHistorySupport historySupport() {
     return historySupport;
   }
 
@@ -465,14 +418,14 @@ public class DatabasePlatform {
   /**
    * So no except for Postgres and CockroachDB.
    */
-  public boolean isNativeArrayType() {
+  public boolean nativeArrayType() {
     return false;
   }
 
   /**
    * Return true if the DB supports native UUID.
    */
-  public boolean isNativeUuidType() {
+  public boolean nativeUuidType() {
     return nativeUuidType;
   }
 
@@ -481,21 +434,21 @@ public class DatabasePlatform {
    *
    * @return the db type map
    */
-  public DbPlatformTypeMapping getDbTypeMap() {
+  public DbPlatformTypeMapping dbTypeMap() {
     return dbTypeMap;
   }
 
   /**
    * Return the mapping for DB column default values.
    */
-  public DbDefaultValue getDbDefaultValue() {
+  public DbDefaultValue dbDefaultValue() {
     return dbDefaultValue;
   }
 
   /**
    * Return the column alias prefix.
    */
-  public String getColumnAliasPrefix() {
+  public String columnAliasPrefix() {
     return columnAliasPrefix;
   }
 
@@ -509,21 +462,21 @@ public class DatabasePlatform {
   /**
    * Return the close quote for quoted identifiers.
    */
-  public String getCloseQuote() {
+  public String closeQuote() {
     return closeQuote;
   }
 
   /**
    * Return the open quote for quoted identifiers.
    */
-  public String getOpenQuote() {
+  public String openQuote() {
     return openQuote;
   }
 
   /**
    * Return the JDBC type used to store booleans.
    */
-  public int getBooleanDbType() {
+  public int booleanDbType() {
     return booleanDbType;
   }
 
@@ -534,7 +487,7 @@ public class DatabasePlatform {
    * example.
    * </p>
    */
-  public int getBlobDbType() {
+  public int blobDbType() {
     return blobDbType;
   }
 
@@ -544,17 +497,8 @@ public class DatabasePlatform {
    * This is typically Types.CLOB but for Postgres is Types.VARCHAR.
    * </p>
    */
-  public int getClobDbType() {
+  public int clobDbType() {
     return clobDbType;
-  }
-
-  /**
-   * Return true if empty strings should be treated as null.
-   *
-   * @return true, if checks if is treat empty strings as null
-   */
-  public boolean isTreatEmptyStringsAsNull() {
-    return treatEmptyStringsAsNull;
   }
 
   /**
@@ -562,7 +506,7 @@ public class DatabasePlatform {
    * expanded form of (a=? and b=?) or (a=? and b=?) or ... rather than (a,b) in
    * ((?,?),(?,?),...);
    */
-  public boolean isIdInExpandedForm() {
+  public boolean idInExpandedForm() {
     return idInExpandedForm;
   }
 
@@ -573,7 +517,7 @@ public class DatabasePlatform {
    * This specifically is required for MySql when processing large results.
    * </p>
    */
-  public boolean isForwardOnlyHintOnFindIterate() {
+  public boolean forwardOnlyHintOnFindIterate() {
     return forwardOnlyHintOnFindIterate;
   }
 
@@ -591,7 +535,7 @@ public class DatabasePlatform {
    * This specifically is required for Hana which doesn't support CONCUR_UPDATABLE
    * </p>
    */
-  public boolean isSupportsResultSetConcurrencyModeUpdatable() {
+  public boolean supportsResultSetConcurrencyModeUpdatable() {
     return supportsResultSetConcurrencyModeUpdatable;
   }
 
@@ -611,7 +555,7 @@ public class DatabasePlatform {
    *
    * @return the db identity
    */
-  public DbIdentity getDbIdentity() {
+  public DbIdentity dbIdentity() {
     return dbIdentity;
   }
 
@@ -624,14 +568,14 @@ public class DatabasePlatform {
    *
    * @return the sql limiter
    */
-  public SqlLimiter getSqlLimiter() {
+  public SqlLimiter sqlLimiter() {
     return sqlLimiter;
   }
 
   /**
    * Return the BasicSqlLimiter for limit/offset of SqlQuery queries.
    */
-  public BasicSqlLimiter getBasicSqlLimiter() {
+  public BasicSqlLimiter basicSqlLimiter() {
     return basicSqlLimiter;
   }
 
@@ -666,7 +610,7 @@ public class DatabasePlatform {
         if (isQuote(dbName.charAt(dbName.length() - 1))) {
           return openQuote + dbName.substring(1, dbName.length() - 1) + closeQuote;
         } else {
-          log.error("Missing backquote on [" + dbName + "]");
+          log.log(ERROR, "Missing backquote on [" + dbName + "]");
         }
       } else if (allQuotedIdentifiers) {
         return openQuote + dbName + closeQuote;
@@ -676,8 +620,8 @@ public class DatabasePlatform {
   }
 
   private boolean isQuote(char ch) {
-    for (char identifer : QUOTED_IDENTIFIERS) {
-      if (identifer == ch) {
+    for (char identifier : QUOTED_IDENTIFIERS) {
+      if (identifier == ch) {
         return true;
       }
     }
@@ -700,14 +644,14 @@ public class DatabasePlatform {
   /**
    * Set to true if select count against anonymous view requires an alias.
    */
-  public boolean isSelectCountWithAlias() {
+  public boolean selectCountWithAlias() {
     return selectCountWithAlias;
   }
 
   /**
    * Return true if select count with subquery needs column alias (SQL Server).
    */
-  public boolean isSelectCountWithColumnAlias() {
+  public boolean selectCountWithColumnAlias() {
     return selectCountWithColumnAlias;
   }
 
@@ -729,7 +673,7 @@ public class DatabasePlatform {
 
   protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
     // silently assume the database does not support the "for update" clause.
-    log.info("it seems your database does not support the 'for update' clause");
+    log.log(INFO, "it seems your database does not support the 'for update' clause");
     return sql;
   }
 
@@ -738,14 +682,14 @@ public class DatabasePlatform {
    * <p>
    * This may include an escape clause to disable a default escape character.
    */
-  public String getLikeClause(boolean rawLikeExpression) {
+  public String likeClause(boolean rawLikeExpression) {
     return rawLikeExpression ? likeClauseRaw : likeClauseEscaped;
   }
 
   /**
    * Return the platform default JDBC batch mode for persist cascade.
    */
-  public PersistBatch getPersistBatchOnCascade() {
+  public PersistBatch persistBatchOnCascade() {
     return persistBatchOnCascade;
   }
 
@@ -763,7 +707,7 @@ public class DatabasePlatform {
     if (!schemaExists(dbSchema, connection)) {
       Statement query = connection.createStatement();
       try {
-        log.debug("create schema:{}", dbSchema);
+        log.log(DEBUG, "create schema:{0}", dbSchema);
         query.executeUpdate("create schema " + dbSchema);
       } finally {
         JdbcClose.close(query);
@@ -787,33 +731,6 @@ public class DatabasePlatform {
       JdbcClose.close(schemas);
     }
     return false;
-  }
-
-  /**
-   * Return true if the table exists.
-   */
-  public boolean tableExists(Connection connection, String catalog, String schema, String table) throws SQLException {
-    DatabaseMetaData metaData = connection.getMetaData();
-    ResultSet tables = metaData.getTables(catalog, schema, table, null);
-    try {
-      return tables.next();
-    } finally {
-      JdbcClose.close(tables);
-    }
-  }
-
-  /**
-   * Return true if partitions exist for the given table.
-   */
-  public boolean tablePartitionsExist(Connection connection, String table) throws SQLException {
-    return true;
-  }
-
-  /**
-   * Return the SQL to create an initial partition for the given table.
-   */
-  public String tablePartitionInit(String tableName, PartitionMode mode) {
-    return null;
   }
 
   /**

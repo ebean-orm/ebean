@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.ScalarType;
+import io.ebeaninternal.server.bind.DataBind;
 import org.postgresql.util.PGobject;
 
 import java.sql.SQLException;
@@ -64,8 +65,8 @@ class BasePlatformArrayTypeFactoryTest {
     }
 
     @Override
-    public void setString(String s) {
-      setEmptyString = "[]".equals(s);
+    public void setString(String value) {
+      setEmptyString = "[]".equals(value);
     }
 
     @Override

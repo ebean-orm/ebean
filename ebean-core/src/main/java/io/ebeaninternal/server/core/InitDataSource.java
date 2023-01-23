@@ -105,7 +105,7 @@ final class InitDataSource {
   }
 
   boolean isPostgresAllQuotedIdentifiers() {
-    return config.isAllQuotedIdentifiers() && Platform.POSTGRES == config.getDatabasePlatform().getPlatform().base();
+    return config.isAllQuotedIdentifiers() && Platform.POSTGRES == config.getDatabasePlatform().platform().base();
   }
 
   private DataSource create(DataSourceConfig dsConfig, boolean readOnly) {
@@ -117,7 +117,10 @@ final class InitDataSource {
    * Attach DataSourceAlert via service loader if present.
    */
   private void attachAlert(DataSourceConfig dsConfig) {
-    DataSourceAlertFactory alertFactory = ServiceUtil.service(DataSourceAlertFactory.class);
+    DataSourceAlertFactory alertFactory = config.getServiceObject(DataSourceAlertFactory.class);
+    if (alertFactory == null) {
+      alertFactory = ServiceUtil.service(DataSourceAlertFactory.class);
+    }
     if (alertFactory != null) {
       dsConfig.setAlert(alertFactory.createAlert());
     }

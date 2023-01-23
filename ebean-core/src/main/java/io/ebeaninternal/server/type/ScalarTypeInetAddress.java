@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeBaseVarchar;
 import io.ebean.text.TextException;
 
 import java.net.InetAddress;
@@ -14,7 +15,7 @@ final class ScalarTypeInetAddress extends ScalarTypeBaseVarchar<InetAddress> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 50;
   }
 

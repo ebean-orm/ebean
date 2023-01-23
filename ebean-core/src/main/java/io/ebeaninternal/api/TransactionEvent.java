@@ -139,7 +139,7 @@ public final class TransactionEvent implements Serializable {
 
   /**
    * Return the CacheChangeSet that we add cache notification messages to.
-   *
+   * <p>
    * We want to add to this change set as we process requests allowing the
    * PersistRequestBean to be garbage collected for large transactions.
    */

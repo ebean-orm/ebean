@@ -126,7 +126,7 @@ final class SaveManyBeans extends SaveManyBase {
       // performance optimisation for large collections
       targetDescriptor.preAllocateIds(collection.size());
     }
-    if (!insertedParent && many.isOrphanRemoval() && request.isForcedUpdate()) {
+    if (forcedUpdateOrphanRemoval()) {
       // collect the Id's (to exclude from deleteManyDetails)
       List<Object> detailIds = collectIds(collection, targetDescriptor, isMap);
       // deleting missing children - children not in our collected detailIds
@@ -138,6 +138,10 @@ final class SaveManyBeans extends SaveManyBase {
       resetModifyState();
     }
     transaction.depth(-1);
+  }
+
+  private boolean forcedUpdateOrphanRemoval() {
+    return !insertedParent && many.isOrphanRemoval() && request.isForcedUpdate();
   }
 
   private void saveAllBeans(final BeanProperty orderColumn) {
@@ -314,7 +318,7 @@ final class SaveManyBeans extends SaveManyBase {
           if (transaction.isLogSummary()) {
             transaction.logSummary(m);
           }
-          CoreLog.log.warn(m);
+          CoreLog.log.log(System.Logger.Level.WARNING, m);
         } else {
           if (!many.hasImportedId(otherBean)) {
             throw new PersistenceException("ManyToMany bean " + otherBean + " does not have an Id value.");
@@ -340,7 +344,7 @@ final class SaveManyBeans extends SaveManyBase {
       return;
     }
     if (!(value instanceof BeanCollection<?>)) {
-      if (!insertedParent && cascade && isChangedProperty()) {
+      if (!forcedUpdateOrphanRemoval() && (!insertedParent && cascade && isChangedProperty())) {
         persister.addToFlushQueue(many.deleteByParentId(request.beanId(), null), transaction, 0);
         insertAllChildren = true;
       }

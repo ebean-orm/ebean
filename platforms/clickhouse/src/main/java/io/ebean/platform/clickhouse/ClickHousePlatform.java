@@ -48,7 +48,7 @@ public class ClickHousePlatform extends DatabasePlatform {
   }
 
   @Override
-  public boolean isNativeArrayType() {
+  public boolean nativeArrayType() {
     return true;
   }
 

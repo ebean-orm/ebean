@@ -50,7 +50,6 @@ public final class ManyWhereJoins implements Serializable {
    * Add a many where join.
    */
   public void add(ElPropertyDeploy elProp) {
-
     String join = elProp.elPrefix();
     BeanProperty p = elProp.beanProperty();
     if (p instanceof BeanPropertyAssocMany<?>) {
@@ -111,7 +110,6 @@ public final class ManyWhereJoins implements Serializable {
    * Return the set of property names for the many where joins.
    */
   public TreeSet<String> getPropertyNames() {
-
     TreeSet<String> propertyNames = new TreeSet<>();
     for (PropertyJoin join : joins.values()) {
       propertyNames.add(join.getProperty());

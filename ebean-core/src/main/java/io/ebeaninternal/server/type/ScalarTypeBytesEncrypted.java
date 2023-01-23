@@ -27,23 +27,8 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public long asVersion(byte[] value) {
-    throw new RuntimeException("not supported");
-  }
-
-  @Override
-  public boolean isBinaryType() {
+  public boolean binary() {
     return true;
-  }
-
-  @Override
-  public boolean isMutable() {
-    return false;
-  }
-
-  @Override
-  public boolean isDirty(Object value) {
-    return false;
   }
 
   @Override
@@ -53,33 +38,23 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public int getJdbcType() {
-    return baseType.getJdbcType();
+  public int jdbcType() {
+    return baseType.jdbcType();
   }
 
   @Override
-  public int getLength() {
-    return baseType.getLength();
+  public int length() {
+    return baseType.length();
   }
 
   @Override
-  public Class<byte[]> getType() {
+  public Class<byte[]> type() {
     return byte[].class;
   }
 
   @Override
-  public boolean isDateTimeCapable() {
-    return baseType.isDateTimeCapable();
-  }
-
-  @Override
-  public boolean isJdbcNative() {
-    return baseType.isJdbcNative();
-  }
-
-  @Override
-  public void loadIgnore(DataReader reader) {
-    baseType.loadIgnore(reader);
+  public boolean jdbcNative() {
+    return baseType.jdbcNative();
   }
 
   @Override
@@ -95,13 +70,8 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
-    return baseType.getDocType();
-  }
-
-  @Override
-  public String format(Object v) {
-    throw new RuntimeException("Not used");
+  public DocPropertyType docType() {
+    return baseType.docType();
   }
 
   @Override
@@ -112,11 +82,6 @@ public final class ScalarTypeBytesEncrypted implements ScalarType<byte[]> {
   @Override
   public byte[] parse(String value) {
     return baseType.parse(value);
-  }
-
-  @Override
-  public byte[] convertFromMillis(long systemTimeMillis) {
-    return baseType.convertFromMillis(systemTimeMillis);
   }
 
   @Override

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.6.4-SNAPSHOT</version>
+    <version>13.11.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core-type</artifactId>
@@ -16,7 +16,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.6.4-SNAPSHOT</version>
+      <version>13.11.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -24,6 +24,21 @@
       <artifactId>jackson-core</artifactId>
       <version>${jackson.version}</version>
       <optional>true</optional>
+    </dependency>
+
+    <!-- Provided scope for Postgres JSON/JSONB support -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.4.3</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>junit</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

@@ -17,31 +17,30 @@ import javax.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
-/**
- * Main Finder implementation.
- */
 public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
-  /**
-   * Find using predicates
-   */
   private final CQueryEngine queryEngine;
-
   private final Binder binder;
+  private final int forwardOnlyFetchSize;
 
   /**
    * Create the Finder.
    */
   public DefaultOrmQueryEngine(CQueryEngine queryEngine, Binder binder) {
     this.queryEngine = queryEngine;
+    this.forwardOnlyFetchSize = queryEngine.forwardOnlyFetchSize();
     this.binder = binder;
   }
 
   @Override
   public <T> PersistenceException translate(OrmQueryRequest<T> request, String bindLog, String sql, SQLException e) {
     return queryEngine.translate(request, bindLog, sql, e);
+  }
+
+  @Override
+  public int forwardOnlyFetchSize() {
+    return forwardOnlyFetchSize;
   }
 
   @Override
@@ -53,7 +52,6 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
    * Flushes the jdbc batch by default unless explicitly turned off on the transaction.
    */
   private <T> void flushJdbcBatchOnQuery(OrmQueryRequest<T> request) {
-
     SpiTransaction t = request.transaction();
     if (t.isFlushOnQuery()) {
       // before we perform a query, we need to flush any
@@ -65,14 +63,12 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
   @Override
   public <T> int delete(OrmQueryRequest<T> request) {
-
     flushJdbcBatchOnQuery(request);
     return queryEngine.delete(request);
   }
 
   @Override
   public <T> int update(OrmQueryRequest<T> request) {
-
     flushJdbcBatchOnQuery(request);
     return queryEngine.update(request);
   }
@@ -85,14 +81,12 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
   @Override
   public <T> int findCount(OrmQueryRequest<T> request) {
-
     flushJdbcBatchOnQuery(request);
     return queryEngine.findCount(request);
   }
 
   @Override
   public <A> List<A> findIds(OrmQueryRequest<?> request) {
-
     flushJdbcBatchOnQuery(request);
     return queryEngine.findIds(request);
   }
@@ -112,16 +106,13 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
 
   @Override
   public <T> List<Version<T>> findVersions(OrmQueryRequest<T> request) {
-
     flushJdbcBatchOnQuery(request);
     return queryEngine.findVersions(request);
   }
 
   @Override
   public <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
-
     flushJdbcBatchOnQuery(request);
-
     BeanFindController finder = request.finder();
 
     BeanCollection<T> result;
@@ -131,13 +122,11 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
     } else {
       result = queryEngine.findMany(request);
     }
-
     if (finder != null) {
       result = finder.postProcessMany(request, result);
     }
 
     SpiQuery<T> query = request.query();
-
     if (result != null && request.isBeanCachePutMany()) {
       // load the individual beans into the bean cache
       BeanDescriptor<T> descriptor = request.descriptor();
@@ -146,7 +135,6 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
     }
 
     request.mergeCacheHits(result);
-
     if (request.isQueryCachePut()) {
       // load the query result into the query cache
       result.setReadOnly(true);
@@ -155,7 +143,6 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
         result = result.getShallowCopy();
       }
     }
-
     return result;
   }
 
@@ -164,9 +151,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
    */
   @Override
   public <T> T findId(OrmQueryRequest<T> request) {
-
     flushJdbcBatchOnQuery(request);
-
     BeanFindController finder = request.finder();
 
     T result;
@@ -175,15 +160,12 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
     } else {
       result = queryEngine.find(request);
     }
-
     if (finder != null) {
       result = finder.postProcess(request, result);
     }
-
     if (result != null && request.isBeanCachePut()) {
       request.descriptor().cacheBeanPut((EntityBean) result);
     }
-
     return result;
   }
 

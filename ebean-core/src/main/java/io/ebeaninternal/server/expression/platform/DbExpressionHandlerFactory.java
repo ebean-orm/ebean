@@ -10,7 +10,7 @@ public final class DbExpressionHandlerFactory {
    * Create and return the appropriate platform specific handing of expressions.
    */
   public static DbExpressionHandler from(DatabasePlatform databasePlatform) {
-    Platform platform = databasePlatform.getPlatform().base();
+    Platform platform = databasePlatform.platform().base();
     switch (platform) {
       case H2:
         return new H2DbExpression();

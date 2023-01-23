@@ -51,7 +51,7 @@ public class DocStoreDeleteEventTest {
     DocStoreUpdates updates = new DocStoreUpdates();
     event.addToQueue(updates);
 
-    List<DocStoreQueueEntry> queueEntries = updates.getQueueEntries();
+    List<DocStoreQueueEntry> queueEntries = updates.queueEntries();
     assertThat(queueEntries).hasSize(1);
 
     DocStoreQueueEntry entry = queueEntries.get(0);

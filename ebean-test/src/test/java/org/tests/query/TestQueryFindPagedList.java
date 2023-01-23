@@ -1,9 +1,10 @@
 package org.tests.query;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.PagedList;
+import io.ebean.Transaction;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -69,11 +70,12 @@ public class TestQueryFindPagedList extends BaseTestCase {
       .setMaxRows(3)
       .findPagedList();
 
-    Future<Integer> rowCount = pagedList.getFutureCount();
+    pagedList.loadCount();
     List<Order> orders = pagedList.getList();
 
     // these are each getting the total row count
     int totalRowCount = pagedList.getTotalCount();
+    Future<Integer> rowCount = pagedList.getFutureCount();
     Integer totalRowCountWithTimeout = rowCount.get(30, TimeUnit.SECONDS);
     Integer totalRowCountViaFuture = rowCount.get();
 
@@ -263,5 +265,28 @@ public class TestQueryFindPagedList extends BaseTestCase {
     assertEquals(2, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("select count(*) from o_order b where b.id > 0");
     assertThat(trimSql(loggedSql.get(1), 3)).contains(" b.id, b.status, b.order_date");
+  }
+
+  @Test
+  void test_forUpdate() {
+    ResetBasicData.reset();
+
+    try (Transaction txn = DB.beginTransaction()) {
+      PagedList<Order> pagedList = DB.find(Order.class).forUpdate().setMaxRows(2).findPagedList();
+
+      LoggedSql.start();
+      int totalCount = pagedList.getTotalCount();
+      assertThat(totalCount).isGreaterThan(2);
+
+      List<Order> list = pagedList.getList();
+      assertThat(list).hasSize(2);
+
+      List<String> sql = LoggedSql.stop();
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("select count(*) from o_order t0;");
+      if (isH2() || isPostgresCompatible()) {
+        assertThat(sql.get(1)).contains(" limit 2 for update;");
+      }
+    }
   }
 }

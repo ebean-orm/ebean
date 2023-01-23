@@ -15,7 +15,6 @@ import org.tests.model.basic.ECustomId;
 import org.tests.model.controller.FindControllerMain;
 import org.tests.model.controller.SoftRefA;
 import org.tests.model.controller.SoftRefB;
-import org.tests.model.controller.TestBeanFindController;
 
 import java.util.List;
 

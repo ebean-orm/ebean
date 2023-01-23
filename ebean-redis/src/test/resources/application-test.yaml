@@ -2,6 +2,7 @@ ebean:
   dumpMetricsOnShutdown: true
   dumpMetricsOptions: sql,hash,loc
   test:
+    registerTestTenantProvider: false
     redis: latest
 #    shutdown: stop # stop | remove
     platform: h2 # h2, postgres, mysql, oracle, sqlserver, sqlite

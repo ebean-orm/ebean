@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.util.Objects.requireNonNullElse;
+
 /**
  * Generates the SQL SELECT statements taking into account the physical
  * deployment properties.
@@ -60,11 +62,11 @@ final class CQueryBuilder {
     this.binder = binder;
     this.draftSupport = draftSupport;
     this.historySupport = historySupport;
-    this.columnAliasPrefix = dbPlatform.getColumnAliasPrefix();
-    this.sqlLimiter = dbPlatform.getSqlLimiter();
+    this.columnAliasPrefix = dbPlatform.columnAliasPrefix();
+    this.sqlLimiter = dbPlatform.sqlLimiter();
     this.rawSqlHandler = new CQueryBuilderRawSql(sqlLimiter, dbPlatform);
-    this.selectCountWithAlias = dbPlatform.isSelectCountWithAlias();
-    this.selectCountWithColumnAlias = dbPlatform.isSelectCountWithColumnAlias();
+    this.selectCountWithAlias = dbPlatform.selectCountWithAlias();
+    this.selectCountWithColumnAlias = dbPlatform.selectCountWithColumnAlias();
   }
 
   /**
@@ -110,7 +112,7 @@ final class CQueryBuilder {
       sql = buildUpdateSql(request, rootTableAlias, predicates, sqlTree);
     }
     // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.logWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryUpdate(request, predicates, queryPlan);
   }
@@ -118,10 +120,10 @@ final class CQueryBuilder {
   private <T> String buildDeleteSql(OrmQueryRequest<T> request, String rootTableAlias, CQueryPredicates predicates, SqlTree sqlTree) {
     String alias = alias(rootTableAlias);
     if (sqlTree.noJoins() && !request.query().hasMaxRowsOrFirstRow()) {
-      if (dbPlatform.isSupportsDeleteTableAlias()) {
+      if (dbPlatform.supportsDeleteTableAlias()) {
         // delete from table <alias> ...
         return aliasReplace(buildSqlDelete("delete", request, predicates, sqlTree).getSql(), alias);
-      } else if (isMySql(dbPlatform.getPlatform())) {
+      } else if (isMySql(dbPlatform.platform())) {
         return aliasReplace(buildSqlDelete("delete " + alias, request, predicates, sqlTree).getSql(), alias);
       } else {
         // simple - delete from table ...
@@ -149,7 +151,7 @@ final class CQueryBuilder {
     if (rootTableAlias != null) {
       sb.append(" ").append(rootTableAlias);
     }
-    sb.append(" set ").append(predicates.getDbUpdateClause());
+    sb.append(" set ").append(predicates.dbUpdateClause());
     String updateClause = sb.toString();
     if (sqlTree.noJoins() && request.isInlineSqlUpdateLimit()) {
       // simple - update table set ... where ...
@@ -178,7 +180,6 @@ final class CQueryBuilder {
 
   CQueryFetchSingleAttribute buildFetchAttributeQuery(OrmQueryRequest<?> request) {
     SpiQuery<?> query = request.query();
-    query.setSingleAttribute();
     if (!query.isIncludeSoftDeletes()) {
       BeanDescriptor<?> desc = request.descriptor();
       if (desc.isSoftDelete()) {
@@ -197,7 +198,7 @@ final class CQueryBuilder {
     SqlTree sqlTree = createSqlTree(request, predicates);
     SqlLimitResponse s = buildSql(null, request, predicates, sqlTree);
 
-    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree.plan(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, s.getSql(), sqlTree.plan(), predicates.logWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryFetchSingleAttribute(request, predicates, queryPlan, query.isCountDistinct());
   }
@@ -218,14 +219,14 @@ final class CQueryBuilder {
   /**
    * Return the history support if this query needs it (is a 'as of' type query).
    */
-  <T> CQueryHistorySupport getHistorySupport(SpiQuery<T> query) {
+  <T> CQueryHistorySupport historySupport(SpiQuery<T> query) {
     return query.getTemporalMode().isHistory() ? historySupport : null;
   }
 
   /**
    * Return the draft support (or null) for a 'asDraft' query.
    */
-  <T> CQueryDraftSupport getDraftSupport(SpiQuery<T> query) {
+  <T> CQueryDraftSupport draftSupport(SpiQuery<T> query) {
     return query.getTemporalMode() == SpiQuery.TemporalMode.DRAFT ? draftSupport : null;
   }
 
@@ -288,7 +289,7 @@ final class CQueryBuilder {
       }
     }
     // cache the query plan
-    queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.getLogWhereSql());
+    queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.logWhereSql());
     request.putQueryPlan(queryPlan);
     return new CQueryRowCount(queryPlan, request, predicates);
   }
@@ -341,14 +342,14 @@ final class CQueryBuilder {
     SqlLimitResponse res = buildSql(null, request, predicates, sqlTree);
     boolean rawSql = request.isRawSql();
     if (rawSql) {
-      queryPlan = new CQueryPlanRawSql(request, res, sqlTree, predicates.getLogWhereSql());
+      queryPlan = new CQueryPlanRawSql(request, res, sqlTree, predicates.logWhereSql());
     } else {
-      queryPlan = new CQueryPlan(request, res, sqlTree.plan(), false, predicates.getLogWhereSql());
+      queryPlan = new CQueryPlan(request, res, sqlTree.plan(), false, predicates.logWhereSql());
     }
     BeanDescriptor<T> desc = request.descriptor();
     if (desc.isReadAuditing()) {
       // log the query plan based bean type (i.e. ignoring query disabling for logging the sql/plan)
-      desc.readAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.fullName(), queryPlan.getAuditQueryKey(), queryPlan.getSql()));
+      desc.readAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.fullName(), queryPlan.auditQueryKey(), queryPlan.sql()));
     }
     // cache the query plan because we can reuse it and also
     // gather query performance statistics based on it.
@@ -381,7 +382,7 @@ final class CQueryBuilder {
   }
 
   private String nativeQueryPaging(SpiQuery<?> query, String sql) {
-    return dbPlatform.getBasicSqlLimiter().limit(sql, query.getFirstRow(), query.getMaxRows());
+    return dbPlatform.basicSqlLimiter().limit(sql, query.getFirstRow(), query.getMaxRows());
   }
 
   /**
@@ -395,12 +396,12 @@ final class CQueryBuilder {
       sql = nativeQueryPaging(query, sql);
     }
     query.setGeneratedSql(sql);
-    Connection connection = request.transaction().connection();
+    Connection connection = request.transaction().getInternalConnection();
     BeanDescriptor<?> desc = request.descriptor();
     try {
       // For SqlServer we need either "selectMethod=cursor" in the connection string or fetch explicitly a cursorable
       // statement here by specifying ResultSet.CONCUR_UPDATABLE
-      PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, dbPlatform.isSupportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
+      PreparedStatement statement = connection.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, dbPlatform.supportsResultSetConcurrencyModeUpdatable() ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY);
       predicates.bind(statement, connection);
       ResultSet resultSet = statement.executeQuery();
       ResultSetMetaData metaData = resultSet.getMetaData();
@@ -412,11 +413,7 @@ final class CQueryBuilder {
         String tableName = lower(metaData.getTableName(i));
         String columnName = lower(metaData.getColumnName(i));
         String path = desc.findBeanPath(schemaName, tableName, columnName);
-        if (path != null) {
-          propertyNames.add(path);
-        } else {
-          propertyNames.add(SpiRawSql.IGNORE_COLUMN);
-        }
+        propertyNames.add(requireNonNullElse(path, SpiRawSql.IGNORE_COLUMN));
       }
       RawSql rawSql = RawSqlBuilder.resultSet(resultSet, propertyNames.toArray(new String[0]));
       query.setRawSql(rawSql);
@@ -483,8 +480,8 @@ final class CQueryBuilder {
     } else if (beanProperty.isDiscriminator()) {
       propertyName = SplitName.parent(propertyName);
     } else if (beanProperty instanceof BeanPropertyAssocOne<?>) {
-      String msg = "Column [" + column.getDbColumn() + "] mapped to complex Property[" + propertyName + "]";
-      msg += ". It should be mapped to a simple property (probably the Id property). ";
+      String msg = "Column " + column.getDbColumn() + " mapped to complex property " + propertyName +
+        ". It should be mapped to a simple property (probably the Id property).";
       throw new PersistenceException(msg);
     }
     if (propertyName != null) {
@@ -553,7 +550,7 @@ final class CQueryBuilder {
       this.select = select;
       this.updateStatement = updateStatement;
       this.distinct = query.isDistinct() || select.isSqlDistinct();
-      this.dbOrderBy = predicates.getDbOrderBy();
+      this.dbOrderBy = predicates.dbOrderBy();
       this.countSingleAttribute = query.isCountDistinct() && query.isSingleAttribute();
     }
 
@@ -561,7 +558,7 @@ final class CQueryBuilder {
       if (selectClause != null) {
         sb.append(selectClause);
       } else {
-        useSqlLimiter = (query.hasMaxRowsOrFirstRow() && select.getManyProperty() == null);
+        useSqlLimiter = (query.hasMaxRowsOrFirstRow() && (select.manyProperty() == null || query.isSingleAttribute()));
         if (!useSqlLimiter) {
           appendSelectDistinct();
         }
@@ -579,25 +576,20 @@ final class CQueryBuilder {
               sb.append("t0.").append(idProp.dbColumn()).append(", ");
             }
           }
-          sb.append(select.getSelectSql()).append(" as attribute_");
+          sb.append(select.selectSql()).append(" as attribute_");
         } else {
-          sb.append(select.getSelectSql());
+          sb.append(select.selectSql());
         }
         if (request.isInlineCountDistinct()) {
           sb.append(")");
         }
         if (distinct && dbOrderBy != null) {
           // add the orderBy columns to the select clause (due to distinct)
-          final OrderBy<?> orderBy = query.getOrderBy();
-          if (orderBy != null && orderBy.supportsSelect()) {
-            String trimmed = DbOrderByTrim.trim(dbOrderBy);
-            if (query.isSingleAttribute() && select.getSelectSql().startsWith(trimmed)) {
-              // NOP, already in SQL
-              // TODO: what to do if we select("id").orderBy("prop,id")?
-              // Can we live with a query like "select t0.id, t0.prop, t0.id from"
-              // or should we elliminate the second "t0.id" from select
-            } else {
-              sb.append(", ").append(trimmed);
+          String[] tokens = DbOrderByTrim.trim(dbOrderBy).split(",");
+          for (String token : tokens) {
+            token = token.trim();
+            if (!DbOrderByTrim.contains(select.selectSql(), token)) {
+              sb.append(", ").append(token);
             }
           }
         }
@@ -611,7 +603,7 @@ final class CQueryBuilder {
           sb.append("count(");
         }
         sb.append("distinct ");
-        String distinctOn = select.getDistinctOn();
+        String distinctOn = select.distinctOn();
         if (distinctOn != null) {
           sb.append("on (").append(distinctOn).append(") ");
         }
@@ -621,7 +613,7 @@ final class CQueryBuilder {
     private void appendFrom() {
       if (selectClause == null || !selectClause.startsWith("update")) {
         sb.append(" from ");
-        sb.append(select.getFromSql());
+        sb.append(select.fromSql());
       }
     }
 
@@ -635,7 +627,7 @@ final class CQueryBuilder {
     }
 
     private void appendInheritanceWhere() {
-      String inheritanceWhere = select.getInheritanceWhereSql();
+      String inheritanceWhere = select.inheritanceWhereSql();
       if (!inheritanceWhere.isEmpty()) {
         sb.append(" where");
         sb.append(inheritanceWhere);
@@ -646,9 +638,9 @@ final class CQueryBuilder {
     private void appendHistoryAsOfPredicate() {
       if (query.isAsOfBaseTable()) {
         query.incrementAsOfTableCount();
-        if (!historySupport.isStandardsBased()){
+        if (!historySupport.isStandardsBased()) {
           appendAndOrWhere();
-          sb.append(historySupport.getAsOfPredicate(request.baseTableAlias()));
+          sb.append(historySupport.asOfPredicate(request.baseTableAlias()));
         }
       }
     }
@@ -697,16 +689,16 @@ final class CQueryBuilder {
       appendInheritanceWhere();
       appendHistoryAsOfPredicate();
       appendFindId();
-      appendToWhere(predicates.getDbWhere());
-      appendToWhere(predicates.getDbFilterMany());
+      appendToWhere(predicates.dbWhere());
+      appendToWhere(predicates.dbFilterMany());
       if (!query.isIncludeSoftDeletes()) {
         appendSoftDelete();
       }
-      String groupBy = select.getGroupBy();
+      String groupBy = select.groupBy();
       if (groupBy != null) {
         sb.append(" group by ").append(groupBy);
       }
-      String dbHaving = predicates.getDbHaving();
+      String dbHaving = predicates.dbHaving();
       if (hasValue(dbHaving)) {
         sb.append(" having ").append(dbHaving);
       }

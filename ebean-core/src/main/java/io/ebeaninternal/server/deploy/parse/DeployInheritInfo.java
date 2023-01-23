@@ -255,7 +255,7 @@ public final class DeployInheritInfo implements Comparable<DeployInheritInfo> {
   public String toString() {
     String root = parent == null ? null : parent.getName();
     String name = type == null ? null : type.getName();
-    return "InheritInfo[" + name + "]" + " root[" + root + "]" + " disValue[" + discriminatorStringValue + "]";
+    return "InheritInfo " + name + " root:" + root + " disc:" + discriminatorStringValue;
   }
 
   @Override

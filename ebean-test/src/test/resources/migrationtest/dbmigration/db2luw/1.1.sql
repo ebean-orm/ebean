@@ -65,6 +65,27 @@ end if;
 end$$;
 delimiter $$
 begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_MAIN_DROP_REF_MANY_DROP_MAIN' and ucase(tabname) = 'DROP_MAIN_DROP_REF_MANY') then
+  prepare stmt from 'alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_main';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_MAIN_DROP_REF_MANY_DROP_REF_MANY' and ucase(tabname) = 'DROP_MAIN_DROP_REF_MANY') then
+  prepare stmt from 'alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_ref_many';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_REF_ONE_PARENT_ID' and ucase(tabname) = 'DROP_REF_ONE') then
+  prepare stmt from 'alter table drop_ref_one drop constraint fk_drop_ref_one_parent_id';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
 if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MIGTEST_E_BASIC_INDEXTEST1') then
   prepare stmt from 'drop index ix_migtest_e_basic_indextest1';
   execute stmt;
@@ -130,7 +151,10 @@ alter table "table" drop versioning;
 CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_C','TESTTS','TESTTS','TESTTS','','','','','','MOVE');
 CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_MTM_M','TSMASTER','TSMASTER','TSMASTER','','','','','','MOVE');
 -- apply alter tables
+alter table "table" alter column textfield drop not null;
 alter table "table" add column "select" varchar(255);
+alter table "table" add column textfield2 varchar(255);
+call sysproc.admin_cmd('reorg table "table"');
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;
@@ -180,11 +204,13 @@ alter table migtest_e_history6_history alter column test_number2 drop not null;
 call sysproc.admin_cmd('reorg table migtest_e_history6_history');
 alter table migtest_e_softdelete add column deleted boolean default false not null;
 alter table migtest_oto_child add column master_id bigint;
+alter table table_history alter column textfield drop not null;
 alter table table_history add column "select" varchar(255);
+alter table table_history add column textfield2 varchar(255);
+call sysproc.admin_cmd('reorg table table_history');
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 create unique index uq_migtest_e_basic_description on migtest_e_basic(description) exclude null keys;
--- NOTE: table has @History - special migration may be necessary
 update migtest_e_basic set new_boolean_field = old_boolean;
 
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
@@ -233,3 +259,4 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_table_textfield2 on "table" (textfield2);

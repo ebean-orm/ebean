@@ -62,17 +62,17 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
 
 
   @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     return true;
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return jdbcType;
   }
 
   @Override
-  public Class<T> getType() {
+  public Class<T> type() {
     return cls;
   }
 
@@ -84,31 +84,6 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
   @Override
   public void writeData(DataOutput dataOutput, T v) {
 
-  }
-
-  @Override
-  public boolean isBinaryType() {
-    return false;
-  }
-
-  @Override
-  public boolean isMutable() {
-    return false;
-  }
-
-  @Override
-  public boolean isDirty(Object value) {
-    return false;
-  }
-
-  @Override
-  public int getLength() {
-    return 0;
-  }
-
-  @Override
-  public void loadIgnore(DataReader reader) {
-    reader.incrementPos(1);
   }
 
   @Override
@@ -127,35 +102,14 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
   }
 
   @Override
-  public String format(Object value) {
-    return null;
-  }
-
-  @Override
   public T parse(String value) {
     return null;
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return null;
   }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
-  public long asVersion(T value) {
-    return 0;
-  }
-
-  @Override
-  public T convertFromMillis(long dateTime) {
-    return null;
-  }
-
 
   @Override
   public T jsonRead(JsonParser parser) {

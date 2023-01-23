@@ -1,6 +1,6 @@
 package io.ebeanservice.docstore.api.mapping;
 
-import io.ebeaninternal.server.text.json.PathStack;
+import io.ebeaninternal.server.json.PathStack;
 
 /**
  * Adapter for DocPropertyVisitor that does not do anything.
@@ -8,7 +8,7 @@ import io.ebeaninternal.server.text.json.PathStack;
  */
 public abstract class DocPropertyAdapter implements DocPropertyVisitor {
 
-  protected PathStack pathStack = new PathStack();
+  protected final PathStack pathStack = new PathStack();
 
   @Override
   public void visitProperty(DocPropertyMapping property) {
@@ -27,7 +27,7 @@ public abstract class DocPropertyAdapter implements DocPropertyVisitor {
 
   @Override
   public void visitBeginObject(DocPropertyMapping property) {
-    pathStack.push(property.getName());
+    pathStack.push(property.name());
   }
 
   @Override
@@ -37,7 +37,7 @@ public abstract class DocPropertyAdapter implements DocPropertyVisitor {
 
   @Override
   public void visitBeginList(DocPropertyMapping property) {
-    pathStack.push(property.getName());
+    pathStack.push(property.name());
   }
 
   @Override

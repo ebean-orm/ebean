@@ -5,6 +5,8 @@ import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import org.domain.Person;
 import org.domain.RCust;
+import org.domain.UChild;
+import org.domain.UParent;
 import org.domain.query.QPerson;
 import org.domain.query.QRCust;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,32 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class IntegrationTest {
+
+  @Test
+  void uuid_getPut() {
+    UParent b0 = new UParent("b0");
+    b0.children().add(new UChild(b0,"b0c0"));
+    b0.children().add(new UChild(b0,"b0c1"));
+    b0.save();
+
+    ServerCache beanCache = DB.cacheManager().beanCache(UParent.class);
+    beanCache.clear();
+    beanCache.statistics(true);
+
+    UParent found0 = DB.find(UParent.class, b0.id());
+    assertThat(found0.name()).isEqualTo("b0");
+
+    List<UChild> children = found0.children();
+    assertThat(children).hasSize(2);
+
+    UParent found1 = DB.find(UParent.class, b0.id());
+    assertThat(found1.name()).isEqualTo("b0");
+
+    DB.delete(found1);
+
+    ServerCacheStatistics stats1 = beanCache.statistics(true);
+    assertThat(stats1.getHitCount()).isEqualTo(1);
+  }
 
   @Test
   void mget_when_emptyCollectionOfIds() {

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.meta.MetaQueryMetric;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.TimedMetric;
 import io.ebean.metric.TimedMetricStats;
 
@@ -13,6 +14,7 @@ public final class CQueryPlanStats {
   private final TimedMetric timedMetric;
   private boolean collected;
   private long lastQueryTime;
+  private String reportName;
 
   /**
    * Construct for a given query plan.
@@ -48,18 +50,25 @@ public final class CQueryPlanStats {
   /**
    * Return the last time this query was executed.
    */
-  long getLastQueryTime() {
+  long lastQueryTime() {
     return lastQueryTime;
   }
 
   /**
    * Return a Snapshot of the query execution statistics potentially resetting the internal counters.
    */
-  Snapshot getSnapshot(boolean reset) {
-    TimedMetricStats collect = timedMetric.collect(reset);
-    Snapshot snapshot = new Snapshot(collected, queryPlan, collect);
+  Snapshot visit(MetricVisitor visitor) {
+    TimedMetricStats collect = timedMetric.collect(visitor.reset());
+    String name = reportName != null ? reportName : reportName(visitor);
+    Snapshot snapshot = new Snapshot(name, collected, queryPlan, collect);
     collected = true;
     return snapshot;
+  }
+
+  String reportName(MetricVisitor visitor) {
+    final String tmp = visitor.namingConvention().apply(queryPlan.name());
+    this.reportName = tmp;
+    return tmp;
   }
 
   /**
@@ -67,11 +76,13 @@ public final class CQueryPlanStats {
    */
   static class Snapshot implements MetaQueryMetric {
 
+    private final String name;
     private final boolean collected;
     private final CQueryPlan queryPlan;
     private final TimedMetricStats metrics;
 
-    Snapshot(boolean collected, CQueryPlan queryPlan, TimedMetricStats metrics) {
+    Snapshot(String name, boolean collected, CQueryPlan queryPlan, TimedMetricStats metrics) {
+      this.name = name;
       this.collected = collected;
       this.queryPlan = queryPlan;
       this.metrics = metrics;
@@ -84,22 +95,22 @@ public final class CQueryPlanStats {
 
     @Override
     public Class<?> type() {
-      return queryPlan.getBeanType();
+      return queryPlan.beanType();
     }
 
     @Override
     public String label() {
-      return queryPlan.getLabel();
+      return queryPlan.label();
     }
 
     @Override
     public String name() {
-      return queryPlan.getName();
+      return name;
     }
 
     @Override
     public String location() {
-      return queryPlan.getLocation();
+      return queryPlan.location();
     }
 
     @Override
@@ -124,12 +135,12 @@ public final class CQueryPlanStats {
 
     @Override
     public String hash() {
-      return queryPlan.getHash();
+      return queryPlan.hash();
     }
 
     @Override
     public String sql() {
-      return queryPlan.getSql();
+      return queryPlan.sql();
     }
 
     @Override

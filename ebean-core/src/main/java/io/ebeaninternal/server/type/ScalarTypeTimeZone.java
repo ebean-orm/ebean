@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeBaseVarchar;
+
 import java.util.TimeZone;
 
 /**
@@ -12,8 +14,8 @@ final class ScalarTypeTimeZone extends ScalarTypeBaseVarchar<TimeZone> {
   }
 
   @Override
-  public int getLength() {
-    return 20;
+  public int length() {
+    return 32;
   }
 
   @Override

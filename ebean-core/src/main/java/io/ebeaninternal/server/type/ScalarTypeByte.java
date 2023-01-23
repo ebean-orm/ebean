@@ -5,8 +5,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 import io.ebean.text.TextException;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
@@ -25,7 +26,7 @@ final class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public boolean isBinaryType() {
+  public boolean binary() {
     return true;
   }
 
@@ -71,7 +72,7 @@ final class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.BINARY;
   }
 
@@ -83,16 +84,6 @@ final class ScalarTypeByte extends ScalarTypeBase<Byte> {
   @Override
   public Byte parse(String value) {
     throw new TextException("Not supported");
-  }
-
-  @Override
-  public Byte convertFromMillis(long systemTimeMillis) {
-    throw new TextException("Not Supported");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
   }
 
   @Override

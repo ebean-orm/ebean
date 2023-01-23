@@ -4,14 +4,15 @@ import io.ebean.ProfileLocation;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarDataReader;
+import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
-import io.ebeaninternal.server.type.DataBind;
-import io.ebeaninternal.server.type.DataBindCapture;
+import io.ebeaninternal.server.bind.DataBind;
+import io.ebeaninternal.server.bind.DataBindCapture;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.util.Md5;
 import io.ebeaninternal.server.util.Str;
@@ -21,6 +22,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Represents a query for a given SQL statement.
@@ -91,7 +94,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.sqlTree = sqlTree;
     this.rawSql = rawSql;
     this.logWhereSql = logWhereSql;
-    this.encryptedProps = sqlTree.getEncryptedProps();
+    this.encryptedProps = sqlTree.encryptedProps();
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCapture(query);
@@ -116,7 +119,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.sqlTree = sqlTree;
     this.rawSql = false;
     this.logWhereSql = logWhereSql;
-    this.encryptedProps = sqlTree.getEncryptedProps();
+    this.encryptedProps = sqlTree.encryptedProps();
     this.stats = new CQueryPlanStats(this);
     this.dependentTables = sqlTree.dependentTables();
     this.bindCapture = initBindCaptureRaw(sql, query);
@@ -156,39 +159,39 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   @Override
-  public final Class<?> getBeanType() {
+  public final Class<?> beanType() {
     return beanType;
   }
 
   @Override
-  public final String getName() {
+  public final String name() {
     return name;
   }
 
   @Override
-  public final String getHash() {
+  public final String hash() {
     return hash;
   }
 
   @Override
-  public final String getSql() {
+  public final String sql() {
     return sql;
   }
 
   @Override
-  public final ProfileLocation getProfileLocation() {
+  public final ProfileLocation profileLocation() {
     return profileLocation;
   }
 
-  public final String getLabel() {
+  public final String label() {
     return label;
   }
 
-  public final Set<String> getDependentTables() {
+  public final Set<String> dependentTables() {
     return dependentTables;
   }
 
-  public final String getLocation() {
+  public final String location() {
     return location;
   }
 
@@ -199,7 +202,7 @@ public class CQueryPlan implements SpiQueryPlan {
 
   @Override
   public final DQueryPlanOutput createMeta(String bind, String planString) {
-    return new DQueryPlanOutput(getBeanType(), name, hash, sql, profileLocation, bind, planString);
+    return new DQueryPlanOutput(beanType(), name, hash, sql, profileLocation, bind, planString);
   }
 
   public DataReader createDataReader(ResultSet rset) {
@@ -229,14 +232,14 @@ public class CQueryPlan implements SpiQueryPlan {
     return dataBind;
   }
 
-  final int getAsOfTableCount() {
+  final int asOfTableCount() {
     return asOfTableCount;
   }
 
   /**
    * Return a key used in audit logging to identify the query.
    */
-  final String getAuditQueryKey() {
+  final String auditQueryKey() {
     if (auditQueryHash == null) {
       // volatile object assignment (so happy for multithreaded access)
       auditQueryHash = calcAuditQueryKey();
@@ -246,10 +249,10 @@ public class CQueryPlan implements SpiQueryPlan {
 
   private String calcAuditQueryKey() {
     // rawSql needs to include the MD5 hash of the sql
-    return rawSql ? planKey.getPartialKey() + "_" + hash : planKey.getPartialKey();
+    return rawSql ? planKey.partialKey() + "_" + hash : planKey.partialKey();
   }
 
-  final SqlTreePlan getSqlTree() {
+  final SqlTreePlan sqlTree() {
     return sqlTree;
   }
 
@@ -257,7 +260,7 @@ public class CQueryPlan implements SpiQueryPlan {
     return rawSql;
   }
 
-  final String getLogWhereSql() {
+  final String logWhereSql() {
     return logWhereSql;
   }
 
@@ -279,19 +282,19 @@ public class CQueryPlan implements SpiQueryPlan {
   /**
    * Return a copy of the current query statistics.
    */
-  public final Snapshot getSnapshot(boolean reset) {
-    return stats.getSnapshot(reset);
+  public final Snapshot visit(MetricVisitor visitor) {
+    return stats.visit(visitor);
   }
 
   /**
    * Return the time this query plan was last used.
    */
-  public final long getLastQueryTime() {
-    return stats.getLastQueryTime();
+  public final long lastQueryTime() {
+    return stats.lastQueryTime();
   }
 
-  final ScalarDataReader<?> getSingleAttributeScalarType() {
-    return sqlTree.getRootNode().getSingleAttributeReader();
+  final ScalarDataReader<?> singleAttributeScalarType() {
+    return sqlTree.rootNode().singleAttributeReader();
   }
 
   /**
@@ -312,7 +315,7 @@ public class CQueryPlan implements SpiQueryPlan {
       predicates.bind(capture);
       bindCapture.setBind(capture.bindCapture(), executionTimeMicros, startNanos);
     } catch (SQLException e) {
-      CoreLog.log.error("Error capturing bind values", e);
+      CoreLog.log.log(ERROR, "Error capturing bind values", e);
     }
   }
 }

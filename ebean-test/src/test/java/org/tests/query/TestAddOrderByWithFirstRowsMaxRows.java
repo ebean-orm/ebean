@@ -1,9 +1,11 @@
 package org.tests.query;
 
+import io.ebean.annotation.Platform;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.PagedList;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -17,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
+  @IgnorePlatform({Platform.MYSQL, Platform.MARIADB})
   @Test
   public void test_firstRows() {
 

@@ -1,5 +1,6 @@
 package io.ebean.xtest.base;
 
+import io.ebean.meta.MetricNamingMatch;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DtoQuery;
@@ -17,6 +18,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasicLog;
 import org.tests.model.basic.ResetBasicData;
 
+import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DtoQueryTest extends BaseTestCase {
+class DtoQueryTest extends BaseTestCase {
 
   private static final Logger log = LoggerFactory.getLogger(DtoQueryTest.class);
 
@@ -32,8 +34,7 @@ public class DtoQueryTest extends BaseTestCase {
   private final AtomicInteger rowCount = new AtomicInteger();
 
   @Test
-  public void dto_findList_constructorMatch() {
-
+  void dto_findList_constructorMatch() {
     ResetBasicData.reset();
     resetAllMetrics();
 
@@ -57,8 +58,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_findEach_constructorMatch() {
-
+  void dto_findEach_constructorMatch() {
     ResetBasicData.reset();
 
     LoggedSql.start();
@@ -71,8 +71,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_findEachWhile_constructorMatch() {
-
+  void dto_findEachWhile_constructorMatch() {
     ResetBasicData.reset();
 
     LoggedSql.start();
@@ -93,7 +92,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_findEachBatch() {
+  void dto_findEachBatch() {
     seedData(); // 15 rows inserted to fetch
 
     resetFindEachCounts();
@@ -145,8 +144,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_findOneEmpty() {
-
+  void dto_findOneEmpty() {
     ResetBasicData.reset();
 
     Optional<DCust> rob = server().findDto(DCust.class, "select id, name from o_customer where name = :name")
@@ -163,8 +161,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_findOne() {
-
+  void dto_findOne() {
     ResetBasicData.reset();
 
     DCust fiona = server().findDto(DCust.class, "select id, name from o_customer where name = :name")
@@ -181,7 +178,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void setParameter() {
+  void setParameter() {
     ResetBasicData.reset();
 
     final List<DCust> list =
@@ -195,7 +192,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void setParameters() {
+  void setParameters() {
     ResetBasicData.reset();
 
     final List<DCust> list =
@@ -208,8 +205,7 @@ public class DtoQueryTest extends BaseTestCase {
 
   @ForPlatform(Platform.POSTGRES)
   @Test
-  public void dto_bindList_usingPostrgesAnyWithPositionedParameter() {
-
+  void dto_bindList_usingPostrgesAnyWithPositionedParameter() {
     ResetBasicData.reset();
 
     LoggedSql.start();
@@ -243,8 +239,7 @@ public class DtoQueryTest extends BaseTestCase {
 
   @ForPlatform(Platform.POSTGRES)
   @Test
-  public void sql_bindListParam_usingPostrgesAnyWithPositionedParameter() {
-
+  void sql_bindListParam_usingPostrgesAnyWithPositionedParameter() {
     ResetBasicData.reset();
 
     List<Integer> ids = Arrays.asList(1, 2);
@@ -264,8 +259,7 @@ public class DtoQueryTest extends BaseTestCase {
 
   @ForPlatform(Platform.POSTGRES)
   @Test
-  public void sqlUpdate_bindListParam_usingPostrgesAnyWithPositionedParameter() {
-
+  void sqlUpdate_bindListParam_usingPostrgesAnyWithPositionedParameter() {
     ResetBasicData.reset();
 
     List<Integer> ids = Arrays.asList(999999999, 999999998);
@@ -279,16 +273,12 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_queryPlanHits() {
-
+  void dto_queryPlanHits() {
     ResetBasicData.reset();
-
     resetAllMetrics();
 
     String[] names = {"Rob", "Fiona", "Shrek"};
-
     for (String name : names) {
-
       List<DCust> custs = server().findDto(DCust.class, "select c3.id, c3.name from o_customer c3 where c3.name = :name")
         .setLabel("basic")
         .setParameter("name", name)
@@ -298,7 +288,7 @@ public class DtoQueryTest extends BaseTestCase {
     }
 
     // collect without reset
-    BasicMetricVisitor basic = new BasicMetricVisitor(false, true, true, true);
+    BasicMetricVisitor basic = new BasicMetricVisitor("db", MetricNamingMatch.INSTANCE, false, true, true, true);
     server().metaInfo().visitMetrics(basic);
 
     List<MetaQueryMetric> stats = basic.queryMetrics();
@@ -308,7 +298,6 @@ public class DtoQueryTest extends BaseTestCase {
     assertThat(queryMetric.label()).isEqualTo("basic");
     assertThat(queryMetric.count()).isEqualTo(3);
     assertThat(queryMetric.name()).isEqualTo("dto.DCust_basic");
-
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")
       .setLabel("basic2")
@@ -322,11 +311,12 @@ public class DtoQueryTest extends BaseTestCase {
 
     log.info("stats " + stats);
 
+    String asJson = metric2.asJson().withHash(false).withNewLine(false).json();
+    assertThat(asJson).contains("dto.DCust_basic2");
   }
 
   @Test
-  public void dto_findList_relaxedMode() {
-
+  void dto_findList_relaxedMode() {
     ResetBasicData.reset();
 
     List<DCust3> list = server().findDto(DCust3.class, "select id, name, 42 as total, '42' as something_we_cannot_map from o_customer")
@@ -338,8 +328,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_findList_relaxedMode_defaultConstructor() {
-
+  void dto_findList_relaxedMode_defaultConstructor() {
     ResetBasicData.reset();
 
     List<DCust2> list = server().findDto(DCust2.class, "select id, '42' as something_we_cannot_map, name from o_customer")
@@ -351,8 +340,7 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_findList_constructorPlusMatch() {
-
+  void dto_findList_constructorPlusMatch() {
     ResetBasicData.reset();
 
     String sql = "select c.id, c.name, count(o.id) as totalOrders " +
@@ -370,20 +358,49 @@ public class DtoQueryTest extends BaseTestCase {
   }
 
   @Test
-  public void dto_findList_setters() {
-
+  void dto_findList_setters() {
     ResetBasicData.reset();
 
     DtoQuery<DCust2> dtoQuery = server().findDto(DCust2.class, "select id, name from o_customer");
 
     List<DCust2> list = dtoQuery.findList();
-
     assertThat(list).isNotEmpty();
   }
 
+  @ForPlatform(Platform.H2)
   @Test
-  public void dto3_findList_constructorMatch() {
+  void dto3_setNullByPosition() {
+    ResetBasicData.reset();
 
+    List<DCust3> robs = server().findDto(DCust3.class, "select id, name, nvl(cast(? as int), 42) as totalOrders from o_customer where name like ?")
+      .setNullParameter(1, Types.INTEGER)
+      .setParameter(2, "Rob")
+      .setMaxRows(10)
+      .findList();
+
+    log.info(robs.toString());
+    assertThat(robs).isNotEmpty();
+    assertThat(robs.get(0).getTotalOrders()).isEqualTo(42);
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  void dto3_setNullByName() {
+    ResetBasicData.reset();
+
+    List<DCust3> robs = server().findDto(DCust3.class, "select id, name, nvl(cast(:foo as int), 42) as totalOrders from o_customer where name like :bar")
+      .setNullParameter("foo", Types.INTEGER)
+      .setParameter("bar", "Rob")
+      .setMaxRows(10)
+      .findList();
+
+    log.info(robs.toString());
+    assertThat(robs).isNotEmpty();
+    assertThat(robs.get(0).getTotalOrders()).isEqualTo(42);
+  }
+
+  @Test
+  void dto3_findList_constructorMatch() {
     ResetBasicData.reset();
 
     List<DCust3> robs = server().findDto(DCust3.class, "select id, name, 42 as totalOrders from o_customer where name like ?")
@@ -391,20 +408,17 @@ public class DtoQueryTest extends BaseTestCase {
       .setMaxRows(10)
       .findList();
 
-
     log.info(robs.toString());
     assertThat(robs).isNotEmpty();
   }
 
   @Test
-  public void dto3_findList_settersMatch() {
-
+  void dto3_findList_settersMatch() {
     ResetBasicData.reset();
 
     List<DCust3> robs = server().findDto(DCust3.class, "select id, name from o_customer where name = :name")
       .setParameter("name", "Rob")
       .findList();
-
 
     log.info(robs.toString());
     assertThat(robs).isNotEmpty();

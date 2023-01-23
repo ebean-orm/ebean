@@ -1,23 +1,25 @@
 package io.ebean.test.config.platform;
 
+import io.avaje.applog.AppLog;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.ebean.test.containers.DockerHost;
 
 import java.util.Properties;
+
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Config for a database / datasource with associated DDL mode and Docker configuration.
  */
 class Config {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean.test");
+  private static final System.Logger log = AppLog.getLogger("io.ebean.test");
 
   /**
    * Common optional docker parameters that we just transfer to docker properties.
    */
-  private static final String[] DOCKER_TEST_PARAMS = {"fastStartMode", "inMemory", "initSqlFile", "seedSqlFile", "adminUser", "adminPassword", "extraDb", "extraDb.dbName", "extraDb.username", "extraDb.password", "extraDb.initSqlFile", "extraDb.seedSqlFile"};
+  private static final String[] DOCKER_TEST_PARAMS = {"fastStartMode", "inMemory", "initSqlFile", "seedSqlFile", "adminUser", "adminPassword", "extraDb", "extraDb.dbName", "extraDb.username", "extraDb.password", "extraDb.extensions", "extraDb.initSqlFile", "extraDb.seedSqlFile"};
   private static final String[] DOCKER_PLATFORM_PARAMS = {"containerName", "image", "internalPort", "startMode", "shutdownMode", "maxReadyAttempts", "tmpfs", "collation", "characterSet"};
 
   private static final String DDL_MODE_OPTIONS = "dropCreate, create, none, migration, createOnly or migrationDropCreate";
@@ -38,7 +40,6 @@ class Config {
   private final DatabaseConfig config;
   private boolean containerDropCreate;
   private final Properties dockerProperties = new Properties();
-  private final DockerHost dockerHost = new DockerHost();
 
   Config(String db, String platform, String databaseName, DatabaseConfig config) {
     this.db = db;
@@ -193,8 +194,7 @@ class Config {
     ds.setDriver(driverClass);
     config.setDataSourceConfig(ds);
 
-    log.info("Using jdbc settings - username:{} url:{} driver:{}", ds.getUsername(), ds.getUrl(), ds.getDriver());
-
+    log.log(INFO, "Using jdbc settings - username:{0} url:{1} driver:{2}", ds.getUsername(), ds.getUrl(), ds.getDriver());
     if (driverClass != null) {
       try {
         Class.forName(driverClass);
@@ -224,17 +224,24 @@ class Config {
     properties.setProperty(dsKey, val);
   }
 
-  void setUrl(String urlPattern) {
-    String val = getKey("url", urlPattern);
+  private void setUrl(String key, String urlPattern) {
+    String val = getKey(key, urlPattern);
     val = val.replace("${host}", host());
     val = val.replace("${port}", String.valueOf(port));
     val = val.replace("${databaseName}", databaseName);
     this.url = val;
   }
 
+  void setUrl(String urlPattern) {
+    setUrl("url", urlPattern);
+  }
+
+  void setExtraUrl(String urlPattern) {
+    setUrl("extraDb.url", urlPattern);
+  }
+
   String host() {
-    String explicitDockerHost = getKey("dockerHost", null);
-    return getKey("host", dockerHost.dockerHost(explicitDockerHost));
+    return getKey("host", getKey("dockerHost", DockerHost.host()));
   }
 
   /**
@@ -343,9 +350,17 @@ class Config {
 
   void setExtensions(String defaultValue) {
     // ebean.test.postgres.extensions=hstore,pgcrypto
-    String val = getKey("extensions", defaultValue);
+    setExtensionsInternal("extensions", defaultValue);
+  }
+
+  void setExtraExtensions(String defaultValue) {
+    setExtensionsInternal("extraDb.extensions", defaultValue);
+  }
+
+  void setExtensionsInternal(String key, String defaultValue) {
+    String val = getKey(key, defaultValue);
     if (val != null) {
-      dockerProperties.setProperty(dockerKey("extensions"), trimExtensions(val));
+      dockerProperties.setProperty(dockerKey(key), trimExtensions(val));
     }
   }
 
@@ -369,10 +384,6 @@ class Config {
   }
 
   private void initDockerProperties() {
-    if (dockerHost.runningInDocker()) {
-      // tell ebean-docker-test we are not using localhost (for jdbc DB setup commands)
-      dockerProperties.setProperty(dockerKey("host"), dockerHost.dockerHost());
-    }
     dockerProperties.setProperty(dockerKey("port"), String.valueOf(port));
     dockerProperties.setProperty(dockerKey("dbName"), databaseName);
     if (schema != null) {

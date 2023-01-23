@@ -2,6 +2,8 @@
 -- apply changes
 SET @@system_versioning_alter_history = 1;
 -- apply alter tables
+alter table `table` drop column textfield;
+alter table `table` drop column textfield2;
 alter table migtest_ckey_detail drop column one_key;
 alter table migtest_ckey_detail drop column two_key;
 alter table migtest_ckey_parent drop column assoc_id;

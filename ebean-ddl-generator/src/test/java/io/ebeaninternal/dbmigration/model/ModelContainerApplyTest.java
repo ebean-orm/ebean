@@ -1,11 +1,7 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.ebean.migration.MigrationVersion;
-import io.ebeaninternal.dbmigration.migration.AddColumn;
-import io.ebeaninternal.dbmigration.migration.ChangeSet;
-import io.ebeaninternal.dbmigration.migration.CreateTable;
-import io.ebeaninternal.dbmigration.migration.DropColumn;
-import io.ebeaninternal.dbmigration.migration.Migration;
+import io.ebeaninternal.dbmigration.migration.*;
 import io.ebeaninternal.dbmigration.migrationreader.MigrationXmlReader;
 import org.junit.jupiter.api.Test;
 
@@ -13,11 +9,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ModelContainerApplyTest {
+class ModelContainerApplyTest {
 
   @Test
-  public void testApply() {
-
+  void testApply() {
     Migration migration = MigrationXmlReader.read("/container/test-create-table.xml");
 
     List<ChangeSet> changeSets = migration.getChangeSet();
@@ -39,5 +34,26 @@ public class ModelContainerApplyTest {
     assertThat(foo.getTablespaceMeta().getLobTablespace()).isEqualTo("db2;fooLobSpace;");
     assertThat(foo.isWithHistory()).isEqualTo(false);
     assertThat(foo.allColumns()).extracting("name").contains("col1", "col3", "added_to_foo");
+  }
+
+  @Test
+  void createSchema() {
+    CreateSchema createSchema = new CreateSchema();
+    createSchema.setName("foo");
+
+    Migration migration = newMigration(createSchema);
+
+    ModelContainer model = new ModelContainer();
+    model.apply(migration, MigrationVersion.parse("1.1"));
+
+    assertThat(model.getSchemas()).contains("foo");
+  }
+
+  private Migration newMigration(Object change) {
+    ChangeSet changeSet = new ChangeSet();
+    changeSet.getChangeSetChildren().add(change);
+    Migration migration = new Migration();
+    migration.getChangeSet().add(changeSet);
+    return migration;
   }
 }

@@ -6,6 +6,7 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareMap;
@@ -27,7 +28,7 @@ final class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public boolean isMutable() {
+  public boolean mutable() {
     return true;
   }
 
@@ -83,16 +84,6 @@ final class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public Map convertFromMillis(long dateTime) {
-    throw new RuntimeException("Should never be called");
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return false;
-  }
-
-  @Override
   public Map readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
@@ -124,7 +115,7 @@ final class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.OBJECT;
   }
 }

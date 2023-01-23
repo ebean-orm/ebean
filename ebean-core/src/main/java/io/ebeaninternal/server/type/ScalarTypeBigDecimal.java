@@ -5,7 +5,8 @@ import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.ScalarTypeBase;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -58,21 +59,11 @@ class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   }
 
   @Override
-  public BigDecimal convertFromMillis(long systemTimeMillis) {
-    return BigDecimal.valueOf(systemTimeMillis);
-  }
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return true;
-  }
-
-  @Override
   public BigDecimal readData(DataInput dataInput) throws IOException {
     if (!dataInput.readBoolean()) {
       return null;
     } else {
-      return new BigDecimal(dataInput.readDouble());
+      return BigDecimal.valueOf(dataInput.readDouble());
     }
   }
 
@@ -97,7 +88,7 @@ class ScalarTypeBigDecimal extends ScalarTypeBase<BigDecimal> {
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return DocPropertyType.DOUBLE;
   }
 

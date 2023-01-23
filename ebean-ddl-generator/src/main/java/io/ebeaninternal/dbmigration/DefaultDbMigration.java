@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration;
 
+import io.avaje.applog.AppLog;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.Platform;
@@ -21,8 +22,6 @@ import io.ebeaninternal.dbmigration.model.*;
 import io.ebeaninternal.extraddl.model.DdlScript;
 import io.ebeaninternal.extraddl.model.ExtraDdl;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,6 +32,7 @@ import java.util.Properties;
 import java.util.ServiceLoader;
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Generates DB Migration xml and sql scripts.
@@ -57,7 +57,7 @@ import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
  */
 public class DefaultDbMigration implements DbMigration {
 
-  protected static final Logger logger = LoggerFactory.getLogger("io.ebean.GenerateMigration");
+  protected static final System.Logger logger = AppLog.getLogger("io.ebean.GenerateMigration");
   private static final String initialVersion = "1.0";
   private static final String GENERATED_COMMENT = "THIS IS A GENERATED FILE - DO NOT MODIFY";
 
@@ -209,7 +209,7 @@ public class DefaultDbMigration implements DbMigration {
   public void setPlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
     if (!online) {
-      DbOffline.setPlatform(databasePlatform.getPlatform());
+      DbOffline.setPlatform(databasePlatform.platform());
     }
   }
 
@@ -388,8 +388,8 @@ public class DefaultDbMigration implements DbMigration {
     if (extraDdl != null) {
       List<DdlScript> ddlScript = extraDdl.getDdlScript();
       for (DdlScript script : ddlScript) {
-        if (!script.isDrop() && matchPlatform(dbPlatform.getPlatform(), script.getPlatforms())) {
-          if (!checkSkip || dbPlatform.isUseMigrationStoredProcedures()) {
+        if (!script.isDrop() && matchPlatform(dbPlatform.platform(), script.getPlatforms())) {
+          if (!checkSkip || dbPlatform.useMigrationStoredProcedures()) {
             writeExtraDdl(migrationDir, script);
           }
         }
@@ -402,7 +402,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void writeExtraDdl(File migrationDir, DdlScript script) throws IOException {
     String fullName = repeatableMigrationName(script.isInit(), script.getName());
-    logger.debug("writing repeatable script {}", fullName);
+    logger.log(DEBUG, "writing repeatable script {0}", fullName);
     File file = new File(migrationDir, fullName);
     try (Writer writer = IOUtils.newWriter(file)) {
       writer.write(script.getValue());
@@ -419,7 +419,7 @@ public class DefaultDbMigration implements DbMigration {
     if (logToSystemOut) {
       System.out.println("DbMigration> " + message);
     } else {
-      logger.error(message);
+      logger.log(ERROR, message);
     }
   }
 
@@ -430,7 +430,7 @@ public class DefaultDbMigration implements DbMigration {
     if (logToSystemOut) {
       System.out.println("DbMigration> " + message);
     } else {
-      logger.info(message);
+      logger.log(INFO, message);
     }
   }
 
@@ -792,7 +792,7 @@ public class DefaultDbMigration implements DbMigration {
       case SQLSERVER:
         throw new IllegalArgumentException("Please choose the more specific SQLSERVER16 or SQLSERVER17 platform. Refer to issue #1340 for details");
       case DB2:
-        logger.warn("Using DB2LegacyPlatform. It is recommended to migrate to db2luw/db2zos/db2fori. Refer to issue #2514 for details");
+        logger.log(WARNING, "Using DB2LegacyPlatform. It is recommended to migrate to db2luw/db2zos/db2fori. Refer to issue #2514 for details");
       case GENERIC:
         return new DatabasePlatform();
       default:

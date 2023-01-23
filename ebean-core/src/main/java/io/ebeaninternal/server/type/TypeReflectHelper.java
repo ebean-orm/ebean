@@ -56,7 +56,7 @@ public final class TypeReflectHelper {
         if (upperBounds != null && upperBounds.length == 1) {
           return getClass(upperBounds[0]);
         }
-        throw new IllegalArgumentException("Don't know how to determine Class from Type [" + type + "]");
+        throw new IllegalArgumentException("Don't know how to determine Class from type " + type);
       }
       return (Class<?>) type;
     }

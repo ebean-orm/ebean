@@ -130,6 +130,11 @@ public interface DtoQuery<T> extends CancelableQuery {
   DtoQuery<T> setParameter(String name, Object value);
 
   /**
+   * Bind the named parameter to SQL NULL.
+   */
+  DtoQuery<T> setNullParameter(String name, int jdbcType);
+
+  /**
    * Bind the named multi-value array parameter which we would use with Postgres ANY.
    * <p>
    * For Postgres this binds an ARRAY rather than expands into multiple bind values.
@@ -140,6 +145,11 @@ public interface DtoQuery<T> extends CancelableQuery {
    * Bind the parameter by its index position (1 based like JDBC).
    */
   DtoQuery<T> setParameter(int position, Object value);
+
+  /**
+   * Set a positioned parameter to SQL NULL.
+   */
+  DtoQuery<T> setNullParameter(int position, int jdbcType);
 
   /**
    * Set the index of the first row of the results to return.

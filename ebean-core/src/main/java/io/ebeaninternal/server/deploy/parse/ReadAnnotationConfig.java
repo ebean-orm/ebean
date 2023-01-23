@@ -106,10 +106,7 @@ final class ReadAnnotationConfig {
     if (javaxValidation != null && javaxValidation.isValidationNotNull(property)) {
       return true;
     }
-    if (jakartaValidation != null && jakartaValidation.isValidationNotNull(property)) {
-      return true;
-    }
-    return false;
+    return jakartaValidation != null && jakartaValidation.isValidationNotNull(property);
   }
 
   /**

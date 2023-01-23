@@ -142,7 +142,7 @@ public final class BindParamsParser {
       param = params.getParameter(paramName);
     }
     if (param == null) {
-      throw new PersistenceException("Bind value is not set or null for [" + paramName + "] in [" + sql + "]");
+      throw new PersistenceException("Bind value is not set or null for " + paramName + " in " + sql);
     }
     return param;
   }
@@ -172,8 +172,7 @@ public final class BindParamsParser {
 
   private void addCollectionParams(OrderedList orderedList, Param param, Collection<?> inValue) {
     // Chop up Collection parameter into a number of individual parameters
-    Collection<?> collection = inValue;
-    for (int c = 0; c < collection.size(); c++) {
+    for (int c = 0; c < inValue.size(); c++) {
       if (c > 0) {
         orderedList.appendSql(",");
       }

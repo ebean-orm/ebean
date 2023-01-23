@@ -27,7 +27,7 @@ public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   public FilterExpressionList(FilterExprPath pathPrefix, ExpressionFactory expr, Query<T> rootQuery) {
-    super(null, expr, null);
+    super(null, expr, null, new ArrayList<>());
     this.pathPrefix = pathPrefix;
     this.rootQuery = rootQuery;
   }
