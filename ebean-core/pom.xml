@@ -39,12 +39,6 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-api</artifactId>
-      <version>13.11.3-SNAPSHOT</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
       <artifactId>ebean-migration-auto</artifactId>
       <version>${ebean-migration-auto.version}</version>
     </dependency>
