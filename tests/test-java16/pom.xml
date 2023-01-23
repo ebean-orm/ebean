@@ -6,9 +6,17 @@
   <artifactId>test-java16</artifactId>
   <version>1.0</version>
 
+  <parent>
+    <groupId>io.ebean</groupId>
+    <artifactId>tests</artifactId>
+    <version>1.0</version>
+  </parent>
+
+
+  <packaging>pom</packaging>
+
   <properties>
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
-    <ebean.version>13.11.3-SNAPSHOT</ebean.version>
   </properties>
 
   <dependencies>

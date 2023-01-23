@@ -2,10 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.avaje</groupId>
-    <artifactId>java8-oss</artifactId>
-    <version>3.3</version>
-    <relativePath />
+    <groupId>io.ebean</groupId>
+    <artifactId>ebean-parent</artifactId>
+    <version>13.11.3-SNAPSHOT</version>
   </parent>
 
   <groupId>io.ebean</groupId>
@@ -18,7 +17,18 @@
 
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip>
+    <ebean.version>${project.parent.version}</ebean.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-bom</artifactId>
+        <version>${ebean.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <profiles>
     <profile>
