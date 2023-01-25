@@ -2206,7 +2206,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public Set<Property> checkUniqueness(Object bean) {
-    return checkUniqueness(bean, null, true, true);
+    return checkUniqueness(bean, null, false, false);
   }
 
   @Override
