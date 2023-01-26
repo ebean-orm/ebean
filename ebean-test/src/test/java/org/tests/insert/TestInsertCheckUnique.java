@@ -1,9 +1,9 @@
 package org.tests.insert;
 
+import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
 import io.ebean.plugin.Property;
-import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.draftable.Document;
@@ -28,18 +28,18 @@ public class TestInsertCheckUnique extends BaseTestCase {
       doc1.setTitle("AUniqueKey_duplicateCheck");
       doc1.setBody("one");
 
-      assertThat(DB.checkUniqueness(doc1, null, true, false)).isEmpty();
+      assertThat(DB.checkUniqueness(doc1)).isEmpty();
       doc1.save();
 
       Document doc2 = new Document();
       doc2.setTitle("AUniqueKey_duplicateCheck");
       doc2.setBody("clashes with doc1");
 
-      assertThat(DB.checkUniqueness(doc2, null, true, false)).isEmpty();
+      assertThat(DB.checkUniqueness(doc2)).isEmpty();
 
       DB.getDefault().publish(doc1.getClass(), doc1.getId());
 
-      assertThat(DB.checkUniqueness(doc2, null, true, false).toString()).contains("title");
+      assertThat(DB.checkUniqueness(doc2).toString()).contains("title");
     }
   }
 
@@ -94,19 +94,19 @@ public class TestInsertCheckUnique extends BaseTestCase {
 
         StringBuilder msg = new StringBuilder();
 
-        properties.forEach((it) -> {
+        properties.forEach((it)-> {
           Object propertyValue = it.value(doc2);
           String propertyName = it.name();
-          msg.append(" property[" + propertyName + "] value[" + propertyValue + "]");
+          msg.append(" property["+propertyName+"] value["+propertyValue+"]");
         });
 
-        System.out.println("uniqueProperties > " + uniqueProperties);
+        System.out.println("uniqueProperties > "+uniqueProperties);
         System.out.println("      custom msg > " + msg.toString());
 
       }
 
 
-      assertThat(DB.checkUniqueness(doc2, null, true, false).toString()).contains("title");
+      assertThat(DB.checkUniqueness(doc2).toString()).contains("title");
     }
   }
 }
