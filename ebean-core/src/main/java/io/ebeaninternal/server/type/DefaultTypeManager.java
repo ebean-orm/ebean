@@ -195,14 +195,6 @@ public final class DefaultTypeManager implements TypeManager {
 
   @Override
   public ScalarType<?> type(DeployProperty prop) {
-    /*if (jsonMapper != null) {
-      var markerAnnotation = jsonMapper.markerAnnotation();
-      if (markerAnnotation != null && !prop.getMetaAnnotations(markerAnnotation).isEmpty()) {
-        return createJsonObjectMapperType(prop, dbType, docPropertyType(prop, type));
-      }
-    }
-    var req = new ScalarJsonRequest(jsonManager, dbType, docType, prop.getDesc().getBeanType(), prop.getMutationDetection(), prop.getName());
-    return jsonMapper.createType(req);*/
     Type propertyType = prop.getGenericType();
     if (propertyType instanceof ParameterizedType) {
       ParameterizedType pt = (ParameterizedType) propertyType;
