@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -37,30 +37,44 @@ final class DtoMetaProperty implements DtoReadSet {
     this.name = name;
     if (writeMethod != null) {
       this.setter = lookupMethodHandle(dtoType, writeMethod);
+      Field field = findField(dtoType, name);
       DeployProperty deployProp = new DtoMetaDeployProperty(name,
         dtoType,
         propertyType(writeMethod),
         propertyClass(writeMethod),
-        getMetaAnnotations(dtoType, writeMethod, name, annotationFilter),
+        field == null ? Collections.emptySet() : AnnotationUtil.metaFindAllFor(field, annotationFilter),
         writeMethod);
-      List<DbJson> json = deployProp.getMetaAnnotations(DbJson.class);
-      if (!json.isEmpty()) {
-        this.scalarType = typeManager.dbJsonType(deployProp, DeployUtil.dbJsonStorage(json.get(0).storage()), json.get(0).length());
-      } else {
-        List<DbJsonB> jsonB = deployProp.getMetaAnnotations(DbJsonB.class);
-        if (!jsonB.isEmpty()) {
-          this.scalarType = typeManager.dbJsonType(deployProp, DbPlatformType.JSONB, jsonB.get(0).length());
-        } else {
-          this.scalarType = typeManager.type(deployProp);
-        }
-      }
+      scalarType = getScalarType(typeManager, deployProp);
     } else {
       this.scalarType = null;
       this.setter = null;
     }
   }
 
-  private Set<Annotation> getMetaAnnotations(Class<?> dtoType, Method writeMethod, String name, Set<Class<?>> annotationFilter) {
+  private ScalarType<?> getScalarType(TypeManager typeManager, DeployProperty deployProp) {
+    final ScalarType<?> scalarType;
+
+    List<DbJson> json = deployProp.getMetaAnnotations(DbJson.class);
+    if (!json.isEmpty()) {
+      return typeManager.dbJsonType(deployProp, DeployUtil.dbJsonStorage(json.get(0).storage()), json.get(0).length());
+    }
+    List<DbJsonB> jsonB = deployProp.getMetaAnnotations(DbJsonB.class);
+    if (!jsonB.isEmpty()) {
+      return typeManager.dbJsonType(deployProp, DbPlatformType.JSONB, jsonB.get(0).length());
+    }
+    if (typeManager.jsonMarkerAnnotation() != null
+      && !deployProp.getMetaAnnotations(typeManager.jsonMarkerAnnotation()).isEmpty()) {
+      return typeManager.dbJsonType(deployProp, DbPlatformType.JSON, 0);
+    }
+    return typeManager.type(deployProp);
+
+
+  }
+
+  /**
+   * Find all annotations on fields and methods.
+   */
+  private Set<Annotation> findMetaAnnotations(Class<?> dtoType, Method writeMethod, String name, Set<Class<?>> annotationFilter) {
     Field field = findField(dtoType, name);
     if (field != null) {
       Set<Annotation> metaAnnotations = AnnotationUtil.metaFindAllFor(field, annotationFilter);
@@ -71,6 +85,9 @@ final class DtoMetaProperty implements DtoReadSet {
     }
   }
 
+  /**
+   * Find field in class with same name
+   */
   private Field findField(Class<?> type, String name) {
     while (type != Object.class && type != null) {
       try {
