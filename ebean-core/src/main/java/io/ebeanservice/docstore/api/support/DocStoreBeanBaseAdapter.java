@@ -196,24 +196,24 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
         update = DocStoreMode.UPDATE;
       }
     }
-    embeddedInvalidation.add(getEmbeddedInvalidation(queueId, path, properties));
+    embeddedInvalidation.add(embeddedInvalidation(queueId, path, properties));
   }
 
   /**
    * Return the DsInvalidationListener based on the properties, path.
    */
-  protected DocStoreEmbeddedInvalidation getEmbeddedInvalidation(String queueId, String path, Set<String> properties) {
+  protected DocStoreEmbeddedInvalidation embeddedInvalidation(String queueId, String path, Set<String> properties) {
     if (properties.contains("*")) {
       return new DocStoreEmbeddedInvalidation(queueId, path);
     } else {
-      return new DocStoreEmbeddedInvalidationProperties(queueId, path, getPropertyPositions(properties));
+      return new DocStoreEmbeddedInvalidationProperties(queueId, path, propertyPositions(properties));
     }
   }
 
   /**
    * Return the property names as property index positions.
    */
-  protected int[] getPropertyPositions(Set<String> properties) {
+  protected int[] propertyPositions(Set<String> properties) {
     List<Integer> posList = new ArrayList<>();
     for (String property : properties) {
       BeanProperty prop = desc.beanProperty(property);
@@ -244,10 +244,10 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
     if (pathProps == null) {
       pathProps = new PathProperties();
     }
-    return getDocStructure(pathProps, includeByDefault);
+    return docStructure(pathProps, includeByDefault);
   }
 
-  protected DocStructure getDocStructure(PathProperties pathProps, final boolean includeByDefault) {
+  protected DocStructure docStructure(PathProperties pathProps, final boolean includeByDefault) {
     final DocStructure docStructure = new DocStructure(pathProps);
     BeanProperty[] properties = desc.propertiesNonTransient();
     for (BeanProperty property : properties) {
@@ -267,35 +267,35 @@ public abstract class DocStoreBeanBaseAdapter<T> implements DocStoreBeanAdapter<
 
   @Override
   public FetchPath embedded(String path) {
-    return docStructure.getEmbedded(path);
+    return docStructure.embedded(path);
   }
 
   @Override
   public FetchPath embeddedManyRoot(String path) {
-    return docStructure.getEmbeddedManyRoot(path);
+    return docStructure.embeddedManyRoot(path);
   }
 
   @Override
-  public boolean isMapped() {
+  public boolean mapped() {
     return mapped;
   }
 
   @Override
-  public String getQueueId() {
+  public String queueId() {
     return queueId;
   }
 
   @Override
-  public DocStoreMode getMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
+  public DocStoreMode mode(PersistRequest.Type persistType, DocStoreMode txnMode) {
     if (txnMode == null) {
-      return getMode(persistType);
+      return mode(persistType);
     } else if (txnMode == DocStoreMode.IGNORE) {
       return DocStoreMode.IGNORE;
     }
-    return mapped ? txnMode : getMode(persistType);
+    return mapped ? txnMode : mode(persistType);
   }
 
-  private DocStoreMode getMode(PersistRequest.Type persistType) {
+  private DocStoreMode mode(PersistRequest.Type persistType) {
     switch (persistType) {
       case INSERT:
         return insert;

@@ -15,7 +15,10 @@ import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-import io.ebeaninternal.server.expression.*;
+import io.ebeaninternal.server.expression.DefaultExpressionList;
+import io.ebeaninternal.server.expression.IdInExpression;
+import io.ebeaninternal.server.expression.InExpression;
+import io.ebeaninternal.server.expression.SimpleExpression;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
@@ -408,22 +411,23 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     return expressionFactory;
   }
 
-  private final void createExtraJoinsToSupportManyWhereClause() {
-    manyWhereJoins = new ManyWhereJoins();
+  private void createExtraJoinsToSupportManyWhereClause() {
+    final var manyWhere = new ManyWhereJoins();
     if (whereExpressions != null) {
-      whereExpressions.containsMany(beanDescriptor, manyWhereJoins);
+      whereExpressions.containsMany(beanDescriptor, manyWhere);
     }
     if (havingExpressions != null) {
-      havingExpressions.containsMany(beanDescriptor, manyWhereJoins);
+      havingExpressions.containsMany(beanDescriptor, manyWhere);
     }
     if (orderBy != null) {
       for (Property orderProperty : orderBy.getProperties()) {
         ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(orderProperty.getProperty());
         if (elProp != null && elProp.containsFormulaWithJoin()) {
-          manyWhereJoins.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
+          manyWhere.addFormulaWithJoin(elProp.elPrefix(), elProp.name());
         }
       }
     }
+    manyWhereJoins = manyWhere;
   }
 
   /**
@@ -439,14 +443,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * included in the query.
    */
   @Override
-  public final boolean selectAllForLazyLoadProperty() {
+  public final void selectAllForLazyLoadProperty() {
     if (lazyLoadProperty != null) {
       if (!detail.containsProperty(lazyLoadProperty)) {
         detail.select("*");
-        return true;
       }
     }
-    return false;
   }
 
   private List<OrmQueryProperties> removeQueryJoins() {
@@ -504,7 +506,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (Mode.LAZYLOAD_MANY == mode) {
       return false;
     } else {
-      return !hasMaxRowsOrFirstRow() || isRawSql();
+      return singleAttribute || !hasMaxRowsOrFirstRow() || isRawSql();
     }
   }
 
@@ -593,6 +595,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // clear select and fetch joins
     detail.clear();
     select(beanDescriptor.idSelect());
+    singleAttribute = true;
   }
 
   @Override
@@ -636,7 +639,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
       if (singleExpression instanceof IdInExpression) {
         return new CacheIdLookupMany<>((IdInExpression) singleExpression);
       } else if (singleExpression instanceof InExpression) {
-        InExpression in = (InExpression)singleExpression;
+        InExpression in = (InExpression) singleExpression;
         if (in.property().equals(beanDescriptor.idName())) {
           return new CacheIdLookupMany<>(in);
         }
@@ -704,6 +707,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public SpiQuery<T> copy(SpiEbeanServer server) {
+    // forUpdate is NOT copied - see #2762
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<>(beanDescriptor, server, expressionFactory);
     copy.transaction = transaction;
     copy.m2mIncludeJoin = m2mIncludeJoin;
@@ -744,7 +748,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.usageProfiling = usageProfiling;
     copy.autoTune = autoTune;
     copy.parentNode = parentNode;
-    copy.forUpdate = forUpdate;
     copy.rawSql = rawSql;
     setCancelableQuery(copy); // required to cancel findId query
     return copy;
@@ -1270,7 +1273,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final Query<T> setLoadBeanCache(boolean loadBeanCache) {
-    this.useBeanCache = CacheMode.PUT;
+    this.useBeanCache = loadBeanCache ? CacheMode.PUT : CacheMode.OFF;
     return this;
   }
 
@@ -1495,13 +1498,14 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   @SuppressWarnings("unchecked")
   public final <A> List<A> findSingleAttributeList() {
-    return (List<A>) server.findSingleAttributeList(this, transaction);
+    return server.findSingleAttributeList(this, transaction);
   }
 
   @Override
   public final <A> Set<A> findSingleAttributeSet() {
-    return (Set<A>) server.findSingleAttributeSet(this, transaction);
+    return server.findSingleAttributeSet(this, transaction);
   }
+
   @Override
   public final <A> A findSingleAttribute() {
     List<A> list = findSingleAttributeList();
@@ -1540,19 +1544,13 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final Query<T> setParameter(Object value) {
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setNextParameter(value);
+    initBindParams().setNextParameter(value);
     return this;
   }
 
   @Override
   public final Query<T> setParameters(Object... values) {
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setNextParameters(values);
+    initBindParams().setNextParameters(values);
     return this;
   }
 
@@ -1563,10 +1561,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    */
   @Override
   public final Query<T> setParameter(int position, Object value) {
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setParameter(position, value);
+    initBindParams().setParameter(position, value);
     return this;
   }
 
@@ -1582,10 +1577,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
         return this;
       }
     }
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setParameter(name, value);
+    initBindParams().setParameter(name, value);
     return this;
   }
 
@@ -1594,10 +1586,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (namedParams != null) {
       throw new IllegalStateException("setArrayParameter() not supported when EQL parsed query");
     }
-    if (bindParams == null) {
-      bindParams = new BindParams();
-    }
-    bindParams.setArrayParameter(name, values);
+    initBindParams().setArrayParameter(name, values);
   }
 
   @Override
@@ -1709,7 +1698,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final String toString() {
-    return "Query [" + whereExpressions + "]";
+    return "Query " + whereExpressions;
   }
 
   @Override
@@ -1782,6 +1771,14 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final BindParams getBindParams() {
+    return bindParams;
+  }
+
+  @Override
+  public BindParams initBindParams() {
+    if (bindParams == null) {
+      bindParams = new BindParams();
+    }
     return bindParams;
   }
 

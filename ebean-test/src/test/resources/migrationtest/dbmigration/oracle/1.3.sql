@@ -86,8 +86,14 @@ exception
   when expected_error then null;
 end;
 $$;
+alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_mgtst_mtm_c_mgtst_mt_93awga;
+alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_mgtst_mtm_c_mgtst_mt_93awgk;
+alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_mgtst_mtm_m_mgtst_mt_ggi34k;
+alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_mgtst_mtm_m_mgtst_mt_ggi34a;
+alter table migtest_mtm_m_phone_numbers drop constraint fk_mgtst_mtm_m_phn_nmbr_s8neid;
 drop index ix_migtest_e_basic_indextest3;
 drop index ix_migtest_e_basic_indextest6;
+drop index ix_table_textfield2;
 -- apply changes
 create table "migtest_QuOtEd" (
   id                            varchar2(255) not null,

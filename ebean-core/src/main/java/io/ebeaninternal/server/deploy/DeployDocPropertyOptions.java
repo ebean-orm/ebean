@@ -33,7 +33,7 @@ public final class DeployDocPropertyOptions {
    */
   public void setDocSortable(DocSortable doc) {
     createOptions();
-    mapping.setSortable(true);
+    mapping.sortable(true);
     setStore(doc.store());
     setBoost(doc.boost());
     setNullValue(doc.nullValue());
@@ -44,7 +44,7 @@ public final class DeployDocPropertyOptions {
    */
   public void setDocCode(DocCode doc) {
     createOptions();
-    mapping.setCode(true);
+    mapping.code(true);
     setStore(doc.store());
     setBoost(doc.boost());
     setNullValue(doc.nullValue());
@@ -52,19 +52,19 @@ public final class DeployDocPropertyOptions {
 
   private void setNullValue(String value) {
     if (!value.isEmpty()) {
-      mapping.setNullValue(value);
+      mapping.nullValue(value);
     }
   }
 
   private void setBoost(float boost) {
     if (Float.compare(boost, 1.0F) != 0) {
-      mapping.setBoost(boost);
+      mapping.boost(boost);
     }
   }
 
   private void setStore(boolean store) {
     if (store) {
-      mapping.setStore(true);
+      mapping.store(true);
     }
   }
 

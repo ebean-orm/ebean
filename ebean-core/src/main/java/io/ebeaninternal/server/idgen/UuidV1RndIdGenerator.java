@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.idgen;
 
+import io.avaje.applog.AppLog;
 import io.ebean.Transaction;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 
@@ -9,25 +10,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * IdGenerator for (pseudo) type 1 UUIDs.
- *
+ * <p>
  * This implementation generates a type 1 UUID according to
  * https://tools.ietf.org/html/rfc4122.html#section-4.2
  * but has no persistence storage. It generates a new random 47 bit node ID with every
  * UUID.
- *
+ * <p>
  * Use this, if you want randomness in your UUIDs but want to take advantage of index
  * optimizations of the database. It may be good with AUTO_BINARY_OPTIMIZED and MySql.
- *
+ * <p>
  * See: https://www.percona.com/blog/2014/12/19/store-uuid-optimized-way/
  */
 public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
-  protected static final Logger log = LoggerFactory.getLogger("io.ebean.IDGEN");
+  protected static final System.Logger log = AppLog.getLogger("io.ebean.IDGEN");
 
   // UUID epoch 1582-10-15 00:00:00 and the Unix epoch 1970-01-01 00:00:00.
   protected static final long UUID_EPOCH_OFFSET = 0x01B21DD213814000L;
@@ -41,16 +41,16 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
   private final SecureRandom numberGenerator = new SecureRandom();
 
-  protected AtomicLong timeStamp = new AtomicLong(currentUuidTime());
+  protected final AtomicLong timeStamp = new AtomicLong(currentUuidTime());
 
-  private AtomicLong nanoToMilliOffset = new AtomicLong(currentUuidTime());
+  private final AtomicLong nanoToMilliOffset = new AtomicLong(currentUuidTime());
 
   private final ReentrantLock lock = new ReentrantLock();
 
 
   /**
    * Returns the uuid epoch.
-   *
+   * <p>
    * This is the number of 100ns intervals since 1582-10-15 00:00:00
    */
   private static long currentUuidTime() {
@@ -106,7 +106,7 @@ public class UuidV1RndIdGenerator implements PlatformIdGenerator {
 
         delta = current - last;
         if (delta < -10000 * 20000) {
-          log.info("Clock skew of {} ms detected", delta / -10000);
+          log.log(INFO, "Clock skew of {0} ms detected", delta / -10000);
           // The clock was adjusted back about 2 seconds, or we were generating a lot of ids too fast
           // if so, we try to set the current as last and also increment the clockSeq.
           lock.lock();

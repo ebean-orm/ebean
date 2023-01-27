@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
+import io.ebean.core.type.PostgresHelper;
 
 import java.sql.SQLException;
 

@@ -10,7 +10,7 @@ import java.util.List;
  * Collection of document store updates that are either sent to the document store
  * or queued for future processing
  */
-public class DocStoreUpdates {
+public final class DocStoreUpdates {
 
   /**
    * Persist inserts and updates.
@@ -87,28 +87,28 @@ public class DocStoreUpdates {
   /**
    * Return the persist insert and update requests to be sent to the document store.
    */
-  public List<DocStoreUpdate> getPersistEvents() {
+  public List<DocStoreUpdate> persistEvents() {
     return persistEvents;
   }
 
   /**
    * Return delete events.
    */
-  public List<DocStoreUpdate> getDeleteEvents() {
+  public List<DocStoreUpdate> deleteEvents() {
     return deleteEvents;
   }
 
   /**
    * Return the list of nested update events.
    */
-  public List<DocStoreQueueEntry> getNestedEvents() {
+  public List<DocStoreQueueEntry> nestedEvents() {
     return nestedEvents;
   }
 
   /**
    * Return the entries for sending to the queue.
    */
-  public List<DocStoreQueueEntry> getQueueEntries() {
+  public List<DocStoreQueueEntry> queueEntries() {
     return queueEntries;
   }
 

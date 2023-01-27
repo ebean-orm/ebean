@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface SpiJsonReader {
 
-  PersistenceContext getPersistenceContext();
+  PersistenceContext persistenceContext();
 
   SpiJsonReader forJson(JsonParser moreJson);
 
@@ -20,9 +20,9 @@ public interface SpiJsonReader {
 
   Object persistenceContextPutIfAbsent(Object id, EntityBean bean, BeanDescriptor<?> beanDesc);
 
-  ObjectMapper getObjectMapper();
+  ObjectMapper mapper();
 
-  JsonParser getParser();
+  JsonParser parser();
 
   JsonToken nextToken() throws IOException;
 
@@ -33,4 +33,6 @@ public interface SpiJsonReader {
   void beanVisitor(Object bean, Map<String, Object> unmappedProperties);
 
   Object readValueUsingObjectMapper(Class<?> propertyType) throws IOException;
+
+  boolean intercept();
 }

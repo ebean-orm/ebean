@@ -5,13 +5,14 @@ import io.ebean.meta.QueryPlanRequest;
 import io.ebean.metric.TimedMetric;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.transaction.TransactionManager;
-import io.ebeaninternal.server.type.bindcapture.BindCapture;
+import io.ebeaninternal.server.bind.capture.BindCapture;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static java.lang.System.Logger.Level.ERROR;
 import static java.util.Collections.emptyList;
 
 public final class CQueryPlanManager implements QueryPlanManager {
@@ -62,9 +63,9 @@ public final class CQueryPlanManager implements QueryPlanManager {
       while (req.hasNext()) {
         req.nextCapture();
       }
-      return req.getPlans();
+      return req.plans();
     } catch (SQLException e) {
-      CoreLog.log.error("Error during query plan collection", e);
+      CoreLog.log.log(ERROR, "Error during query plan collection", e);
       return emptyList();
     }
   }

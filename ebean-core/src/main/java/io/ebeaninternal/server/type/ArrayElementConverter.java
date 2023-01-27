@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -17,7 +17,7 @@ interface ArrayElementConverter<T> {
   T fromSerialized(Object rawValue);
 
   /**
-   * Convert the array element from it's DB array form.
+   * Convert the array element from its DB array form.
    */
   T fromDbArray(Object rawValue);
 
@@ -25,31 +25,12 @@ interface ArrayElementConverter<T> {
     return objects;
   }
 
-  /**
-   * The UUID converter implementation.
-   */
   ArrayElementConverter<UUID> UUID = new UuidConverter();
-
-  /**
-   * The String converter implementation.
-   */
   ArrayElementConverter<String> STRING = new StringConverter();
-
-  /**
-   * The Long converter implementation.
-   */
   ArrayElementConverter<Long> LONG = new LongConverter();
-
-  /**
-   * The Integer converter implementation.
-   */
   ArrayElementConverter<Integer> INTEGER = new IntegerConverter();
-
-  /**
-   * The Double converter implementation.
-   */
   ArrayElementConverter<Double> DOUBLE = new DoubleConverter();
-
+  ArrayElementConverter<Float> FLOAT = new FloatConverter();
   ArrayElementConverter<BigDecimal> BIG_DECIMAL = new BigDecimalConverter();
 
   class LongConverter implements ArrayElementConverter<Long> {
@@ -82,6 +63,23 @@ interface ArrayElementConverter<T> {
         return (Integer) rawValue;
       } else {
         return ((Number) rawValue).intValue();
+      }
+    }
+  }
+
+  class FloatConverter implements ArrayElementConverter<Float> {
+
+    @Override
+    public Float fromSerialized(Object rawValue) {
+      return fromDbArray(rawValue);
+    }
+
+    @Override
+    public Float fromDbArray(Object rawValue) {
+      if (rawValue instanceof Float) {
+        return (Float) rawValue;
+      } else {
+        return ((Number) rawValue).floatValue();
       }
     }
   }

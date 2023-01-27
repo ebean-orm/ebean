@@ -142,7 +142,9 @@ public final class NaturalKeyQueryData<T> {
    */
   private boolean matchProperties() {
     if (naturalKey.isSingleProperty()) {
-      naturalKey.matchSingleProperty((inProperty != null) ? inProperty : eqList.get(0).property);
+      if (naturalKey.matchSingleProperty((inProperty != null) ? inProperty : eqList.get(0).property)) {
+        return true;
+      }
     }
 
     // multiple properties case

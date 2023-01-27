@@ -318,7 +318,7 @@ final class SaveManyBeans extends SaveManyBase {
           if (transaction.isLogSummary()) {
             transaction.logSummary(m);
           }
-          CoreLog.log.warn(m);
+          CoreLog.log.log(System.Logger.Level.WARNING, m);
         } else {
           if (!many.hasImportedId(otherBean)) {
             throw new PersistenceException("ManyToMany bean " + otherBean + " does not have an Id value.");

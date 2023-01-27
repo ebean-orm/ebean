@@ -342,7 +342,6 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
       case ':':
         return EqlValueType.NAMED_PARAM;
       case 't':
-        return EqlValueType.BOOL;
       case 'f':
         return EqlValueType.BOOL;
       case '\'':
@@ -351,7 +350,7 @@ abstract class EqlWhereListener<T> extends EQLBaseListener {
         if (Character.isDigit(firstChar)) {
           return EqlValueType.NUMBER;
         }
-        throw new IllegalArgumentException("Unexpected first character in value [" + valueAsText + "]");
+        throw new IllegalArgumentException("Unexpected first character in value " + valueAsText);
     }
   }
 

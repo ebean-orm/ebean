@@ -76,11 +76,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
-    this(query, query.getExpressionFactory(), parentExprList);
-  }
-
-  DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
-    this(query, expr, parentExprList, new ArrayList<>());
+    this(query, query.getExpressionFactory(), parentExprList, new ArrayList<>());
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
@@ -243,13 +239,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   /**
    * Return a copy of the expression list.
-   * <p>
-   * Each of the expressions are expected to be immutable and safe to reference.
-   * </p>
    */
   public DefaultExpressionList<T> copy(Query<T> query) {
-    DefaultExpressionList<T> copy = new DefaultExpressionList<>(query, expr, null);
-    copy.list.addAll(list);
+    DefaultExpressionList<T> copy = new DefaultExpressionList<>(query, expr, null, new ArrayList<>(list.size()));
+    for (SpiExpression expr : list) {
+      copy.list.add(expr.copy());
+    }
     return copy;
   }
 
@@ -794,8 +789,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> eq(String propertyName, Query<?> subQuery) {
+    return add(expr.eq(propertyName, subQuery));
+  }
+
+  @Override
   public ExpressionList<T> eq(String propertyName, Object value) {
     return add(expr.eq(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> eqIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.eq(propertyName, value));
   }
 
   @Override
@@ -811,6 +816,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> ine(String propertyName, String value) {
     return add(expr.ine(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> ne(String propertyName, Query<?> subQuery) {
+    return add(expr.ne(propertyName, subQuery));
   }
 
   @Override
@@ -831,6 +841,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value) {
     return add(expr.inRangeWith(lowProperty, highProperty, value));
+  }
+
+  @Override
+  public ExpressionList<T> inRangeWithProperties(String propertyName, String lowProperty, String highProperty) {
+    return add(expr.inRangeWithProperties(propertyName, lowProperty, highProperty));
   }
 
   @Override
@@ -859,9 +874,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> ge(String propertyName, Query<?> subQuery) {
+    return add(expr.ge(propertyName, subQuery));
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
-    add(expr.ge(propertyName, value));
-    return this;
+    return add(expr.ge(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> gt(String propertyName, Query<?> subQuery) {
+    return add(expr.gt(propertyName, subQuery));
   }
 
   @Override
@@ -871,14 +895,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> gtOrNull(String propertyName, Object value) {
-    add(expr.gtOrNull(propertyName, value));
-    return this;
+    return add(expr.gtOrNull(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> geOrNull(String propertyName, Object value) {
-    add(expr.geOrNull(propertyName, value));
-    return this;
+    return add(expr.geOrNull(propertyName, value));
   }
 
   @Override
@@ -995,6 +1017,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> le(String propertyName, Query<?> subQuery) {
+    return add(expr.le(propertyName, subQuery));
+  }
+
+  @Override
   public ExpressionList<T> le(String propertyName, Object value) {
     return add(expr.le(propertyName, value));
   }
@@ -1012,6 +1039,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> like(String propertyName, String value) {
     return add(expr.like(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> lt(String propertyName, Query<?> subQuery) {
+    return add(expr.lt(propertyName, subQuery));
   }
 
   @Override

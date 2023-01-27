@@ -4,7 +4,6 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.FilerException;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
@@ -84,7 +83,7 @@ class ProcessingContext implements Constants {
   private List<String> loadedPrefixEntities = new ArrayList<>();
 
   /**
-   * The package for the generated ModuleInfoLoader.
+   * The package for the generated EntityClassRegister.
    */
   private String factoryPackage;
 
@@ -126,7 +125,6 @@ class ProcessingContext implements Constants {
    * Recursively gather all the fields (properties) for the given bean element.
    */
   private void gatherProperties(List<VariableElement> fields, Element element) {
-
     TypeElement typeElement = (TypeElement) element;
     TypeMirror superclass = typeElement.getSuperclass();
     Element mappedSuper = typeUtils.asElement(superclass);
@@ -231,10 +229,26 @@ class ProcessingContext implements Constants {
     }
   }
 
+  private String trimAnnotations(String type) {
+    int pos = type.indexOf("@");
+    if (pos == -1) {
+      return type;
+    }
+    String remainder = type.substring(0, pos) + type.substring(type.indexOf(' ') + 1);
+    return trimAnnotations(remainder);
+  }
+
   PropertyType getPropertyType(VariableElement field) {
-
-    TypeMirror typeMirror = field.asType();
-
+    if (dbJsonField(field)) {
+      return propertyTypeMap.getDbJsonType();
+    }
+    if (dbArrayField(field)) {
+      // get generic parameter type
+      DeclaredType declaredType = (DeclaredType) field.asType();
+      String fullType = typeDef(declaredType.getTypeArguments().get(0));
+      return new PropertyTypeArray(fullType, Split.shortName(fullType));
+    }
+    final TypeMirror typeMirror = field.asType();
     TypeMirror currentType = typeMirror;
     while (currentType != null) {
       PropertyType type = propertyTypeMap.getType(typeDef(currentType));
@@ -247,17 +261,6 @@ class ProcessingContext implements Constants {
       currentType = (fieldType == null) ? null : fieldType.getSuperclass();
     }
 
-    if (dbJsonField(field)) {
-      return propertyTypeMap.getDbJsonType();
-    }
-
-    if (dbArrayField(field)) {
-      // get generic parameter type
-      DeclaredType declaredType = (DeclaredType) typeMirror;
-      String fullType = typeDef(declaredType.getTypeArguments().get(0));
-      return new PropertyTypeArray(fullType, Split.shortName(fullType));
-    }
-
     Element fieldType = typeUtils.asElement(typeMirror);
     if (fieldType == null) {
       return null;
@@ -265,7 +268,6 @@ class ProcessingContext implements Constants {
 
     // workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=544288
     fieldType = elementUtils.getTypeElement(fieldType.toString());
-
     if (fieldType.getKind() == ElementKind.ENUM) {
       String fullType = typeDef(typeMirror);
       return new PropertyTypeEnum(fullType, Split.shortName(fullType));
@@ -296,9 +298,9 @@ class ProcessingContext implements Constants {
       return result;
     } else {
       if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
-        return new PropertyTypeScalarComparable(typeMirror.toString());
+        return new PropertyTypeScalarComparable(trimAnnotations(typeMirror.toString()));
       } else {
-        return new PropertyTypeScalar(typeMirror.toString());
+        return new PropertyTypeScalar(trimAnnotations(typeMirror.toString()));
       }
     }
   }
@@ -358,7 +360,6 @@ class ProcessingContext implements Constants {
    * Create the QAssoc PropertyType.
    */
   private PropertyType createPropertyTypeAssoc(String fullName) {
-
     String[] split = Split.split(fullName);
     String propertyName = "QAssoc" + split[1];
     String packageName = packageAppend(split[0]);
@@ -415,7 +416,6 @@ class ProcessingContext implements Constants {
    * Register an entity with optional dbName.
    */
   void addEntity(String beanFullName, String dbName) {
-
     loaded.add(beanFullName);
     final String pkg = packageOf(beanFullName);
     if (pkg != null) {
@@ -516,8 +516,8 @@ class ProcessingContext implements Constants {
   }
 
   /**
-   * Return the class name of the generated ModuleInfoLoader
-   * (such that we can read the current meta data for partial compile).
+   * Return the class name of the generated EntityClassRegister
+   * (such that we can read the current metadata for partial compile).
    */
   String loadMetaInfServices() {
     try {

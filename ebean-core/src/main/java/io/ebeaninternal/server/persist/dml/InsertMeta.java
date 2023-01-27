@@ -38,7 +38,7 @@ final class InsertMeta {
   private final Platform platform;
 
   InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
-    this.platform = dbPlatform.getPlatform();
+    this.platform = dbPlatform.platform();
     this.discriminator = getDiscriminator(desc);
     this.id = id;
     this.all = all;
@@ -69,7 +69,7 @@ final class InsertMeta {
         this.supportsSelectLastInsertedId = false;
       } else {
         this.identityDbColumns = new String[]{id.getIdentityColumn()};
-        this.supportsGetGeneratedKeys = dbPlatform.getDbIdentity().isSupportsGetGeneratedKeys();
+        this.supportsGetGeneratedKeys = dbPlatform.dbIdentity().isSupportsGetGeneratedKeys();
         this.supportsSelectLastInsertedId = desc.supportsSelectLastInsertedId();
       }
       this.sqlNullId = genSql(true, tableName, false);

@@ -1,9 +1,11 @@
+
 [![Build](https://github.com/ebean-orm/ebean/actions/workflows/build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/build.yml)
 [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ebean-orm/ebean/blob/master/LICENSE)
 [![Multi-JDK Build](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml)
 [![JDK 18-ea](https://github.com/ebean-orm/ebean/actions/workflows/jdk-18-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-18-ea.yml)
 
+##### Build with database platforms
 [![H2Database](https://github.com/ebean-orm/ebean/actions/workflows/h2database.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/h2database.yml)
 [![Postgres](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml)
 [![MySql](https://github.com/ebean-orm/ebean/actions/workflows/mysql.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mysql.yml)
@@ -13,15 +15,42 @@
 [![Yugabyte](https://github.com/ebean-orm/ebean/actions/workflows/yugabyte.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/yugabyte.yml)
 
 
-#### Builds against EA (Early Access) versions of Java (19, Loom, panama etc)
-
+##### Build with Java Early Access versions
 [![ebean EA](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml)
 [![datasource EA](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml)
 [![migration EA](https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml)
 [![test-docker EA](https://github.com/ebean-orm/ebean-test-docker/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-test-docker/actions/workflows/jdk-ea.yml)
 [![ebean-agent EA](https://github.com/ebean-orm/ebean-agent/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-agent/actions/workflows/jdk-ea.yml)
 
+----------------------
 
+# Ebean ORM for Java & Kotlin
+
+**Multiple abstraction levels**: Ebean provides multiple levels of query abstraction [ORM Queries, mixed with SQL](https://ebean.io/docs/intro/queries/orm-query), [DTO Queries](https://ebean.io/docs/intro/queries/dto-query), [SqlQuery and JDBC](https://ebean.io/docs/intro/queries/sql-query).
+Work at the highest level of abstraction and drop down levels as needed.
+
+**Database migrations**: Built in [DB migration](https://ebean.io/docs/db-migrations/) generation and running. Support for "rebase" migrations as well as repeatable, init and 'normal' migrations.
+
+**Awesome SQL**: Ebean produces SQL that you would hand craft yourself. Use great SQL, never generate SQL cartesian product, always honor relational limit/offset.
+
+**Automated query tuning**: For ORM queries Ebean can profile the object graph being used and either [automatically tune the query](https://ebean.io/docs/query/background/autotune).
+
+**Docker test containers**: [Docker test containers](https://ebean.io/docs/testing/) for all the supported databases. Get 100% test coverage on all the features of the database we use.
+
+**Type safe queries**: We can build queries using type safe [query beans](https://ebean.io/docs/query/query-beans). IDE auto-complete when writing queries, compile time checking and it's FUN.
+
+**Performance isn't optional**: Optimise queries to only fetch what we need (partial objects). Automatically avoid N+1 via a smart load context.
+
+#### Benefits of ORM
+
+* Automatically avoid N+1
+* L2 caching to reduce database load
+* Queries mixing database and L2 cache
+* Automatically tune ORM queries
+* Elasticsearch for search or L3 cache
+
+
+----------------------
 # Sponsors
 <table>
   <tbody>
@@ -51,13 +80,14 @@
 </table>
 
 ## Need help?
-Post questions or issues to the Ebean google group - https://groups.google.com/forum/#!forum/ebean
+Post questions or issues to the [Ebean google group](https://groups.google.com/forum/#!forum/ebean)
+or [github discussions](https://github.com/ebean-orm/ebean/discussions)
 
 ## Documentation
 Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
 ## Maven central
-[Maven central - io.ebean](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.ebean%22%20)
+[Maven central - g:io.ebean](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.ebean%22%20)
 
 ## Building Ebean from source
 

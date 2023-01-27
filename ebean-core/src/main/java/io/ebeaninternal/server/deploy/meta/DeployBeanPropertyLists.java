@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * Helper object to classify BeanProperties into appropriate lists.
  */
@@ -222,7 +224,7 @@ public final class DeployBeanPropertyLists {
           if (versionProperty == null) {
             versionProperty = prop;
           } else {
-            CoreLog.internal.warn("Multiple @Version properties - property " + prop.fullName() + " not treated as a version property");
+            CoreLog.internal.log(WARNING, "Multiple @Version properties - property " + prop.fullName() + " not treated as a version property");
           }
         } else if (prop.isDraftDirty()) {
           draftDirty = prop;

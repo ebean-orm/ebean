@@ -23,12 +23,7 @@ public class ScalarTypePostgresHstoreTest {
 
   @Test
   public void testIsMutable() {
-    assertTrue(hstore.isMutable());
-  }
-
-  @Test
-  public void testIsDateTimeCapable() {
-    assertFalse(hstore.isDateTimeCapable());
+    assertTrue(hstore.mutable());
   }
 
   @Test
@@ -48,16 +43,6 @@ public class ScalarTypePostgresHstoreTest {
     Map<String, Object> map = (Map<String, Object>) hstore.parse("{\"name\":\"rob\"}");
     assertEquals(1, map.size());
     assertEquals("rob", map.get("name"));
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testParseDateTime() {
-    assertThrows(RuntimeException.class, () -> {
-      Map<String, Object> map = (Map<String, Object>) hstore.convertFromMillis(1234L);
-      assertEquals(1, map.size());
-      assertEquals("rob", map.get("name"));
-    });
   }
 
   @Test

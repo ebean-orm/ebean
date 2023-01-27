@@ -32,7 +32,7 @@ final class FormulaPropertyPath {
     int openBracket = formula.indexOf('(');
     int closeBracket = formula.lastIndexOf(')');
     if (openBracket == -1 || closeBracket == -1) {
-      throw new IllegalStateException("Unable to parse formula [" + formula + "]");
+      throw new IllegalStateException("Unable to parse formula " + formula);
     }
     outerFunction = formula.substring(0, openBracket).trim();
     internalExpression = trimDistinct(formula.substring(openBracket + 1, closeBracket));

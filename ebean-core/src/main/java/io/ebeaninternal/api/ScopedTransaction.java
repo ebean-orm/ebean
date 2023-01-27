@@ -7,7 +7,7 @@ import javax.persistence.PersistenceException;
 
 /**
  * Manage scoped (typically thread local) transactions.
- *
+ * <p>
  * These can be nested and internally they are pushed and popped from a stack.
  */
 public final class ScopedTransaction extends SpiTransactionProxy {
@@ -30,16 +30,29 @@ public final class ScopedTransaction extends SpiTransactionProxy {
 
   @Override
   public String toString() {
-    return "ScopedTransaction[" + current + "]";
+    return "ScopedTransaction " + current;
+  }
+
+  @Override
+  public void setNestedUseSavepoint() {
+    current.setNestedUseSavepoint();
+  }
+
+  @Override
+  public boolean isNestedUseSavepoint() {
+    return current.isNestedUseSavepoint();
   }
 
   /**
    * Push the scope transaction.
    */
   public void push(ScopeTrans scopeTrans) {
-
     if (current != null) {
       stack.push(current);
+      if (current.isNestedUseSavepoint()) {
+        // child scope 'inherits' nestedUseSavepoint
+        scopeTrans.setNestedUseSavepoint();
+      }
     }
     current = scopeTrans;
     transaction = scopeTrans.getTransaction();
@@ -109,6 +122,11 @@ public final class ScopedTransaction extends SpiTransactionProxy {
     } finally {
       clearScope();
     }
+  }
+
+  @Override
+  public void rollbackAndContinue() {
+    transaction.rollbackAndContinue();
   }
 
   @Override

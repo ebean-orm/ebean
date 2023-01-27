@@ -5,17 +5,13 @@ import io.ebean.Query.LockWait;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 public class HanaPlatform extends DatabasePlatform {
 
   public HanaPlatform() {
     this.platform = Platform.HANA;
-    this.sqlLimiter = new HanaSqlLimiter();
+    this.sqlLimiter = new LimitOffsetSqlLimiter();
     this.persistBatchOnCascade = PersistBatch.NONE;
     this.supportsResultSetConcurrencyModeUpdatable = false;
     this.historySupport = new HanaHistorySupport();
@@ -93,7 +89,7 @@ public class HanaPlatform extends DatabasePlatform {
   }
 
   @Override
-  public boolean isUseMigrationStoredProcedures() {
+  public boolean useMigrationStoredProcedures() {
     return true;
   }
 }

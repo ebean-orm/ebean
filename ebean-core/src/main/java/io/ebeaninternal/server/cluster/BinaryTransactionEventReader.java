@@ -32,7 +32,7 @@ public class BinaryTransactionEventReader {
     String serverName = dataInput.readUTF();
     SpiEbeanServer server = (SpiEbeanServer) serverLookup.getServer(serverName);
     if (server == null) {
-      throw new IllegalStateException("EbeanServer not found for name [" + serverName + "]");
+      throw new IllegalStateException("Database not found for name " + serverName);
     }
     RemoteTransactionEvent event =  new RemoteTransactionEvent(server);
     event.readBinary(dataInput);

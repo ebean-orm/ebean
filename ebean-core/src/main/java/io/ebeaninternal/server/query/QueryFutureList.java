@@ -23,11 +23,11 @@ public final class QueryFutureList<T> extends BaseFuture<List<T>> implements Fut
     this.call = call;
   }
 
-  public FutureTask<List<T>> getFutureTask() {
+  public FutureTask<List<T>> futureTask() {
     return futureTask;
   }
 
-  public Transaction getTransaction() {
+  public Transaction transaction() {
     return call.transaction;
   }
 

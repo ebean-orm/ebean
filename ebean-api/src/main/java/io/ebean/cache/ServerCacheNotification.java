@@ -6,7 +6,6 @@ import java.util.Set;
  * Notification event that dependent tables have been modified.
  * <p>
  * This is sent to other interested servers (in the cluster).
- * </p>
  */
 public class ServerCacheNotification {
 

@@ -1,5 +1,6 @@
 package io.ebean.typequery;
 
+import io.avaje.lang.Nullable;
 import io.ebean.Query;
 
 import java.util.Collection;
@@ -83,6 +84,36 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   }
 
   /**
+   * Is equal to another property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R eq(TQProperty<?> other) {
+    expr().raw(_name + " = " + other.propertyName());
+    return _root;
+  }
+
+  /**
+   * Is equal to if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * That is, only add the EQUAL TO predicate if the value is not null.
+   * <p>
+   * This is the EQUAL TO equivalent to {@link #inOrEmpty(Collection)} where the expression/predicate
+   * is only added to the query when the value is non-null.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>eqIfPresent()</code> rather than having a separate if block.
+   *
+   * @param value the equal to bind value
+   * @return the root query bean instance
+   */
+  public final R eqIfPresent(@Nullable T value) {
+    expr().eqIfPresent(_name, value);
+    return _root;
+  }
+
+  /**
    * Is equal to or Null.
    *
    * @param value the equal to bind value
@@ -112,6 +143,17 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
    */
   public final R ne(T value) {
     expr().ne(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is not equal to another property.
+   *
+   * @param other the other property to compare
+   * @return the root query bean instance
+   */
+  public final R ne(TQProperty<?> other) {
+    expr().raw(_name + " <> " + other.propertyName());
     return _root;
   }
 
@@ -239,12 +281,45 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
   }
 
   /**
-   * Is in the result of a subquery. Synonym for in().
+   * Is in the result of a sub-query. Synonym for in().
    *
    * @param subQuery values provided by a subQuery
    * @return the root query bean instance
    */
   public final R isIn(Query<?> subQuery) {
     return in(subQuery);
+  }
+
+  /**
+   * Is NOT in the result of a sub-query.
+   *
+   * @param subQuery values provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R notIn(Query<?> subQuery) {
+    expr().notIn(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is equal to the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R eq(Query<?> subQuery) {
+    expr().eq(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * Property is not equal to the result of a sub-query.
+   *
+   * @param subQuery value provided by a subQuery
+   * @return the root query bean instance
+   */
+  public final R ne(Query<?> subQuery) {
+    expr().ne(_name, subQuery);
+    return _root;
   }
 }

@@ -17,11 +17,11 @@ public final class QueryFutureRowCount<T> extends BaseFuture<Integer> implements
     this.call = call;
   }
 
-  public FutureTask<Integer> getFutureTask() {
+  public FutureTask<Integer> futureTask() {
     return futureTask;
   }
 
-  public Transaction getTransaction() {
+  public Transaction transaction() {
     return call.transaction;
   }
 

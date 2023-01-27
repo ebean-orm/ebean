@@ -13,8 +13,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static java.util.Collections.EMPTY_SET;
-
 /**
  * H2 database support for DB ARRAY.
  */
@@ -84,7 +82,7 @@ final class ScalarTypeArraySetH2 extends ScalarTypeArraySet {
     if (nullable) {
       binder.setNull(Types.ARRAY);
     } else {
-      binder.setObject(toArray(EMPTY_SET));
+      binder.setObject(EMPTY_ARRAY);
     }
   }
 }

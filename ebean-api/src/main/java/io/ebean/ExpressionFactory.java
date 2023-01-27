@@ -118,6 +118,11 @@ public interface ExpressionFactory {
   Expression arrayIsNotEmpty(String propertyName);
 
   /**
+   * Equal To the result of a sub-query.
+   */
+  Expression eq(String propertyName, Query<?> subQuery);
+
+  /**
    * Equal To - property equal to the given value.
    */
   Expression eq(String propertyName, Object value);
@@ -126,6 +131,11 @@ public interface ExpressionFactory {
    * Equal To or Null - property equal to the given value or null.
    */
   Expression eqOrNull(String propertyName, Object value);
+
+  /**
+   * Not Equal To the result of a sub-query.
+   */
+  Expression ne(String propertyName, Query<?> subQuery);
 
   /**
    * Not Equal To - property not equal to the given value.
@@ -182,6 +192,23 @@ public interface ExpressionFactory {
   Expression inRangeWith(String lowProperty, String highProperty, Object value);
 
   /**
+   * A Property is in Range between 2 properties.
+   *
+   * <pre>{@code
+   *
+   *    .orderDate.inRangeWith(QOrder.Alias.product.startDate, QOrder.Alias.product.endDate)
+   *
+   *    // which equates to
+   *    product.startDate <= orderDate and (orderDate < product.endDate or product.endDate is null)
+   *
+   * }</pre>
+   *
+   * <p>
+   * This is a convenience expression combining a number of simple expressions.
+   */
+  Expression inRangeWithProperties(String propertyName, String lowProperty, String highProperty);
+
+  /**
    * Between - property between the two given values.
    */
   Expression between(String propertyName, Object value1, Object value2);
@@ -208,9 +235,19 @@ public interface ExpressionFactory {
   Expression geOrNull(String propertyName, Object value);
 
   /**
+   * Greater Than the result of a sub-query.
+   */
+  Expression gt(String propertyName, Query<?> subQuery);
+
+  /**
    * Greater Than - property greater than the given value.
    */
   Expression gt(String propertyName, Object value);
+
+  /**
+   * Greater Than or Equal to the result of a sub-query.
+   */
+  Expression ge(String propertyName, Query<?> subQuery);
 
   /**
    * Greater Than or Equal to - property greater than or equal to the given
@@ -235,9 +272,19 @@ public interface ExpressionFactory {
   Expression leOrNull(String propertyName, Object value);
 
   /**
+   * Less Than the result of a sub-query.
+   */
+  Expression lt(String propertyName, Query<?> subQuery);
+
+  /**
    * Less Than - property less than the given value.
    */
   Expression lt(String propertyName, Object value);
+
+  /**
+   * Less Than or Equal to the result of a sub-query.
+   */
+  Expression le(String propertyName, Query<?> subQuery);
 
   /**
    * Less Than or Equal to - property less than or equal to the given value.

@@ -53,7 +53,7 @@ public final class SqlTreeProperties {
     }
   }
 
-  public STreeProperty[] getProps() {
+  public STreeProperty[] props() {
     return propsList.toArray(new STreeProperty[0]);
   }
 

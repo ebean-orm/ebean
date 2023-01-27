@@ -24,6 +24,8 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Wraps the objects involved in executing a Query.
  */
@@ -98,7 +100,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public String dbLikeClause(boolean rawLikeExpression) {
-    return server.databasePlatform().getLikeClause(rawLikeExpression);
+    return server.databasePlatform().likeClause(rawLikeExpression);
   }
 
   /**
@@ -244,7 +246,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         // Just log this and carry on. A previous exception has been
         // thrown and if this rollback throws exception it likely means
         // that the connection is broken (and the dataSource and db will cleanup)
-        CoreLog.log.error("Error trying to rollback a transaction (after a prior exception thrown)", e);
+        CoreLog.log.log(ERROR, "Error trying to rollback a transaction (after a prior exception thrown)", e);
       }
     }
   }
@@ -458,8 +460,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Return the many property that is fetched in the query or null if there is not one.
    */
-  public BeanPropertyAssocMany<?> manyProperty() {
-    return manyProperty;
+  public BeanPropertyAssocMany<?> manyPropertyForOrderBy() {
+    return query.isSingleAttribute() ? null : manyProperty;
   }
 
   /**
@@ -513,12 +515,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       if (query.getType() == Type.MAP) {
         mergeCacheHitsToMap(result);
       } else {
-        mergeCacheHitsToList(result);
+        mergeCacheHitsToCollection(result);
       }
     }
   }
 
-  private void mergeCacheHitsToList(BeanCollection<T> result) {
+  private void mergeCacheHitsToCollection(BeanCollection<T> result) {
     for (T hit : cacheBeans) {
       result.internalAdd(hit);
     }
@@ -575,6 +577,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       throw new IllegalStateException("Unknown map key property " + key);
     }
     return property;
+  }
+
+  @Override
+  public Set<T> beanCacheHitsAsSet() {
+    OrderBy<T> orderBy = query.getOrderBy();
+    if (orderBy != null && !orderBy.isEmpty()) {
+      beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
+    }
+    return new LinkedHashSet<>(cacheBeans);
   }
 
   @Override
@@ -639,7 +650,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         for (T bean : actualDetails) {
           ids.add(beanDescriptor.idForJson(bean));
         }
-        beanDescriptor.readAuditMany(queryPlanKey.getPartialKey(), "l2-query-cache", ids);
+        beanDescriptor.readAuditMany(queryPlanKey.partialKey(), "l2-query-cache", ids);
       }
     }
     if (Boolean.FALSE.equals(query.isReadOnly())) {
@@ -759,6 +770,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Return true if no MaxRows or use LIMIT in SQL update.
    */
   public boolean isInlineSqlUpdateLimit() {
-    return query.getMaxRows() < 1 || server.databasePlatform().isInlineSqlUpdateLimit();
+    return query.getMaxRows() < 1 || server.databasePlatform().inlineSqlUpdateLimit();
+  }
+
+  public int forwardOnlyFetchSize() {
+    return queryEngine.forwardOnlyFetchSize();
   }
 }

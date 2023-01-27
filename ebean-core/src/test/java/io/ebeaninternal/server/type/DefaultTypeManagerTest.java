@@ -46,14 +46,14 @@ public class DefaultTypeManagerTest {
   public void enumDayMonth_builtIn_overrideAsString() {
     DefaultTypeManager typeManager = create();
 
-    ScalarType<?> type = typeManager.createEnumScalarType(Month.class, null);
+    ScalarType<?> type = typeManager.enumType(Month.class, null);
     assertThat(type).isInstanceOf(ScalarTypeEnumWithMapping.class).as("built in type");
 
     // mapped explicitly as JPA EnumType.STRING
-    type = typeManager.createEnumScalarType(Month.class, EnumType.STRING);
+    type = typeManager.enumType(Month.class, EnumType.STRING);
     assertThat(type).isInstanceOf(ScalarTypeEnumStandard.StringEnum.class).as("override built in type");
     try {
-      typeManager.createEnumScalarType(Month.class, EnumType.ORDINAL);
+      typeManager.enumType(Month.class, EnumType.ORDINAL);
       assertThat(true).isFalse().as("never get here");
 
     } catch (IllegalStateException e) {
@@ -66,10 +66,10 @@ public class DefaultTypeManagerTest {
     DefaultTypeManager typeManager = create();
 
     // mapped explicitly as JPA EnumType.STRING
-    ScalarType<?> type = typeManager.createEnumScalarType(Month.class, EnumType.ORDINAL);
+    ScalarType<?> type = typeManager.enumType(Month.class, EnumType.ORDINAL);
     assertThat(type).isInstanceOf(ScalarTypeEnumStandard.OrdinalEnum.class).as("override built in type");
     try {
-      typeManager.createEnumScalarType(Month.class, EnumType.STRING);
+      typeManager.enumType(Month.class, EnumType.STRING);
       assertThat(true).isFalse().as("never get here");
     } catch (IllegalStateException e) {
       assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
@@ -80,14 +80,14 @@ public class DefaultTypeManagerTest {
   public void enumDayOfWeek_builtIn_overrideAsString() {
     DefaultTypeManager typeManager = create();
 
-    ScalarType<?> type = typeManager.createEnumScalarType(DayOfWeek.class, null);
+    ScalarType<?> type = typeManager.enumType(DayOfWeek.class, null);
     assertThat(type).isInstanceOf(ScalarTypeEnumWithMapping.class).as("built in type");
 
     // mapped explicitly as JPA EnumType.STRING
-    type = typeManager.createEnumScalarType(DayOfWeek.class, EnumType.STRING);
+    type = typeManager.enumType(DayOfWeek.class, EnumType.STRING);
     assertThat(type).isInstanceOf(ScalarTypeEnumStandard.StringEnum.class).as("override built in type");
     try {
-      typeManager.createEnumScalarType(DayOfWeek.class, EnumType.ORDINAL);
+      typeManager.enumType(DayOfWeek.class, EnumType.ORDINAL);
       assertThat(true).isFalse().as("never get here");
     } catch (IllegalStateException e) {
       assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
@@ -99,10 +99,10 @@ public class DefaultTypeManagerTest {
     DefaultTypeManager typeManager = create();
 
     // mapped explicitly as JPA EnumType.STRING
-    ScalarType<?> type = typeManager.createEnumScalarType(DayOfWeek.class, EnumType.ORDINAL);
+    ScalarType<?> type = typeManager.enumType(DayOfWeek.class, EnumType.ORDINAL);
     assertThat(type).isInstanceOf(ScalarTypeEnumStandard.OrdinalEnum.class).as("override built in type");
     try {
-      typeManager.createEnumScalarType(DayOfWeek.class, EnumType.STRING);
+      typeManager.enumType(DayOfWeek.class, EnumType.STRING);
       assertThat(true).isFalse().as("never get here");
     } catch (IllegalStateException e) {
       assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
@@ -113,19 +113,19 @@ public class DefaultTypeManagerTest {
   public void createEnumScalarTypePerExtentions() {
     DefaultTypeManager typeManager = create();
 
-    ScalarType<?> type = typeManager.createEnumScalarType(VarcharEnum.class, EnumType.ORDINAL);
+    ScalarType<?> type = typeManager.enumType(VarcharEnum.class, EnumType.ORDINAL);
     assertThat(type).isInstanceOf(ScalarTypeEnumWithMapping.class);
     // withConstraint false
     assertThat(((ScalarTypeEnumWithMapping) type).getDbCheckConstraintValues()).isNull();
 
-    type = typeManager.createEnumScalarType(IntEnum.class, EnumType.ORDINAL);
+    type = typeManager.enumType(IntEnum.class, EnumType.ORDINAL);
     assertThat(type).isInstanceOf(ScalarTypeEnumWithMapping.class);
     ScalarTypeEnumWithMapping enumWithMapping = (ScalarTypeEnumWithMapping) type;
     // withConstraint true
     assertThat(enumWithMapping.getDbCheckConstraintValues()).hasSize(3);
     assertThat(enumWithMapping.getDbCheckConstraintValues()).contains("100", "101", "102");
 
-    type = typeManager.createEnumScalarType(Car.Size.class, EnumType.ORDINAL);
+    type = typeManager.enumType(Car.Size.class, EnumType.ORDINAL);
     assertThat(type).isInstanceOf(ScalarTypeEnumWithMapping.class);
     enumWithMapping = (ScalarTypeEnumWithMapping) type;
     // withConstraint true

@@ -38,7 +38,7 @@ public class TestSelfParent extends BaseTestCase {
     DB.save(child21);
     DB.save(child22);
 
-    List<SelfParent> roots = DB.find(SelfParent.class).where().eq("parent", null).findList();
+    List<SelfParent> roots = DB.find(SelfParent.class).where().eq("parent", (String) null).findList();
 
     assertEquals(1, roots.size());
 

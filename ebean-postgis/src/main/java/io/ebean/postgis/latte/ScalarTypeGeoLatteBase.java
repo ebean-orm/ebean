@@ -28,17 +28,17 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   }
 
   @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     return true;
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return jdbcType;
   }
 
   @Override
-  public Class<T> getType() {
+  public Class<T> type() {
     return cls;
   }
 
@@ -78,11 +78,6 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   }
 
   @Override
-  public void loadIgnore(DataReader reader) {
-    reader.incrementPos(1);
-  }
-
-  @Override
   public Object toJdbcType(Object value) {
     return null;
   }
@@ -98,17 +93,12 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   }
 
   @Override
-  public String format(Object value) {
-    return null;
-  }
-
-  @Override
   public T parse(String value) {
     return null;
   }
 
   @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return null;
   }
 

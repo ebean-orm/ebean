@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.6.6-SNAPSHOT</version>
+    <version>13.11.3-SNAPSHOT</version>
   </parent>
 
   <name>ebean api</name>
@@ -13,21 +13,23 @@
 
   <dependencies>
 
-    <!--
-    Projects are expected to explicit depend on version
-    of slf4j that they want to use
-    -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.36</version>
-      <scope>provided</scope>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-applog</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <!-- exclude avaje-applog-slf4j to direct logging to something else -->
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-applog-slf4j</artifactId>
+      <version>1.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>2.1</version>
+      <version>2.4</version>
     </dependency>
 
     <!--
@@ -43,25 +45,33 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>persistence-api</artifactId>
-      <version>2.2.5</version>
+      <version>${ebean-persistence-api.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-annotation</artifactId>
-      <version>8.0</version>
+      <version>${ebean-annotation.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-types</artifactId>
-      <version>2.2</version>
+      <version>${ebean-types.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource-api</artifactId>
       <version>${ebean-datasource.version}</version>
+    </dependency>
+
+    <!-- Support MdcBackgroundExecutorWrapper -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.36</version>
+      <optional>true</optional>
     </dependency>
 
     <!-- Jackson core used internally by Ebean -->

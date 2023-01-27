@@ -13,7 +13,7 @@ public class ScalarTypeZoneIdTest {
   @Test
   public void testGetLength() throws Exception {
 
-    assertEquals(60, type.getLength());
+    assertEquals(60, type.length());
   }
 
   @Test

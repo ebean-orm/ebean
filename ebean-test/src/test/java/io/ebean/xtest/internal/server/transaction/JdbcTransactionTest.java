@@ -105,4 +105,25 @@ public class JdbcTransactionTest {
       assertThat(postCommitCallCount.get()).isEqualTo(2);     // postcommit executed twice
     }
   }
+
+  @Test
+  public void testFlushInCallback() {
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setBatchMode(true);
+      DB.currentTransaction().register(
+        new TransactionCallbackAdapter() {
+
+          @Override
+          public void preCommit() {
+            EBasic basic = new EBasic("binner1");
+            DB.save(basic);
+          }
+        }
+      );
+      EBasic basic = new EBasic("bouter1");
+      DB.save(basic);
+      transaction.commit();     // transaction will fail if recursive post-commit is failing
+    }
+    assertThat(DB.find(EBasic.class).where().eq("name", "binner1").exists()).isTrue();
+  }
 }

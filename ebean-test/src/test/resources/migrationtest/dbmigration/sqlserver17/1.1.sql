@@ -9,6 +9,9 @@ IF OBJECT_ID('uq_migtest_e_basic_indextest2', 'UQ') IS NOT NULL alter table migt
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest6') drop index uq_migtest_e_basic_indextest6 ON migtest_e_basic;
 IF OBJECT_ID('uq_migtest_e_basic_indextest6', 'UQ') IS NOT NULL alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
 IF OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
+IF OBJECT_ID('fk_drop_main_drop_ref_many_drop_main', 'F') IS NOT NULL alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_main;
+IF OBJECT_ID('fk_drop_main_drop_ref_many_drop_ref_many', 'F') IS NOT NULL alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_ref_many;
+IF OBJECT_ID('fk_drop_ref_one_parent_id', 'F') IS NOT NULL alter table drop_ref_one drop constraint fk_drop_ref_one_parent_id;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest1') drop index ix_migtest_e_basic_indextest1 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest5') drop index ix_migtest_e_basic_indextest5 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('"migtest_QuOtEd"','U') AND name = 'ix_migtest_quoted_status1') drop index ix_migtest_quoted_status1 ON "migtest_QuOtEd";
@@ -67,7 +70,9 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 -- history migration goes here
 -- alter table [table] set (system_versioning = on (history_table=dbo.table_history));
 -- apply alter tables
+alter table [table] alter column textfield nvarchar(255);
 alter table [table] add [select] nvarchar(255);
+alter table [table] add textfield2 nvarchar(255);
 alter table migtest_ckey_detail add one_key integer;
 alter table migtest_ckey_detail add two_key nvarchar(127);
 alter table migtest_ckey_parent add assoc_id integer;
@@ -102,7 +107,6 @@ alter table migtest_oto_child add master_id numeric(19);
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
--- NOTE: table has @History - special migration may be necessary
 update migtest_e_basic set new_boolean_field = old_boolean;
 
 alter table migtest_e_basic add constraint ck_migtest_e_basic_progress check ( progress in (0,1,2));
@@ -145,3 +149,4 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_table_textfield2 on [table] (textfield2);

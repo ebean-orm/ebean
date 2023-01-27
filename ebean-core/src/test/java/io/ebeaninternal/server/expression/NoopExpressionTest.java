@@ -27,9 +27,9 @@ public class NoopExpressionTest extends BaseExpressionTest {
     initTables();
     Query<Customer> query = DB.find(Customer.class)
       .select("id")
-      .where().eq("name", null)
+      .where().eq("name", (String) null)
       .add(NoopExpression.INSTANCE)
-      .ne("status", null)
+      .ne("status", (String) null)
       .query();
 
     query.findList();

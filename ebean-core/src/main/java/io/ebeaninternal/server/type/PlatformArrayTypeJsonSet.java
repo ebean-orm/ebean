@@ -36,6 +36,6 @@ class PlatformArrayTypeJsonSet implements PlatformArrayTypeFactory {
   @Override
   public ScalarType<?> typeForEnum(ScalarType<?> scalarType, boolean nullable) {
     final ArrayElementConverter.EnumConverter converter = new ArrayElementConverter.EnumConverter(scalarType);
-    return new ScalarTypeJsonSet.VarcharWithConverter(scalarType.getDocType(), nullable, false, converter);
+    return new ScalarTypeJsonSet.VarcharWithConverter(scalarType.docType(), nullable, false, converter);
   }
 }

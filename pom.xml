@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.6.6-SNAPSHOT</version>
+  <version>13.11.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -39,26 +39,22 @@
 
   <properties>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
-    <jackson.version>2.13.2</jackson.version>
-    <h2database.version>2.1.212</h2database.version>
-    <ebean-ddl-runner.version>2.0</ebean-ddl-runner.version>
+    <jackson.version>2.14.0</jackson.version>
+    <h2database.version>2.1.214</h2database.version>
+    <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
+    <ebean-types.version>3.0</ebean-types.version>
+    <ebean-annotation.version>8.3</ebean-annotation.version>
+    <ebean-ddl-runner.version>2.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>13.6.0</ebean-migration.version>
-    <ebean-test-containers.version>6.2</ebean-test-containers.version>
-    <ebean-datasource.version>8.0</ebean-datasource.version>
-    <ebean-agent.version>13.6.5</ebean-agent.version>
-    <ebean-maven-plugin.version>13.6.5</ebean-maven-plugin.version>
+    <ebean-test-containers.version>6.3</ebean-test-containers.version>
+    <ebean-datasource.version>8.4</ebean-datasource.version>
+    <ebean-agent.version>13.11.2</ebean-agent.version>
+    <ebean-maven-plugin.version>13.11.2</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
   <dependencies>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.36</version>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -93,6 +89,10 @@
     <module>ebean-redis</module>
     <module>platforms</module>
     <module>composites</module>
+    <module>ebean-joda-time</module>
+    <module>ebean-csv-reader</module>
+    <module>ebean-jackson-jsonnode</module>
+    <module>ebean-jackson-mapper</module>
     <!--    <module>ebean-kotlin</module>-->
 
   </modules>

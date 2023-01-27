@@ -130,6 +130,26 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
+  public DtoQuery<T> setNullParameter(String name, int jdbcType) {
+    if (ormQuery != null) {
+      ormQuery.initBindParams().setNullParameter(name, jdbcType);
+    } else {
+      bindParams.setNullParameter(name, jdbcType);
+    }
+    return this;
+  }
+
+  @Override
+  public DtoQuery<T> setNullParameter(int position, int jdbcType) {
+    if (ormQuery != null) {
+      ormQuery.initBindParams().setNullParameter(position, jdbcType);
+    } else {
+      bindParams.setNullParameter(position, jdbcType);
+    }
+    return this;
+  }
+
+  @Override
   public DtoQuery<T> setParameter(int position, Object value) {
     if (ormQuery != null) {
       ormQuery.setParameter(position, value);
@@ -181,7 +201,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Override
   public String toString() {
-    return "DtoQuery [" + sql + "]";
+    return "DtoQuery " + sql;
   }
 
   @Override

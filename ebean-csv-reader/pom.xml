@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>13.11.3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>ebean-csv-reader</artifactId>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-api</artifactId>
+      <version>13.11.3-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-core</artifactId>
+      <version>13.11.3-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-test</artifactId>
+      <version>13.11.3-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>junit</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <!-- for testing -->
+      <plugin>
+        <groupId>io.repaint.maven</groupId>
+        <artifactId>tiles-maven-plugin</artifactId>
+        <version>2.24</version>
+        <extensions>true</extensions>
+        <configuration>
+          <tiles>
+            <tile>io.ebean.tile:enhancement:13.10.1</tile>
+          </tiles>
+        </configuration>
+      </plugin>
+
+    </plugins>
+
+  </build>
+</project>

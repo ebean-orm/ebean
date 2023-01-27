@@ -1,16 +1,15 @@
 package org.tests.insert;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DuplicateKeyException;
 import io.ebean.annotation.Transactional;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.draftable.Document;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,14 +91,8 @@ public class TestInsertDuplicateKey extends BaseTestCase {
       DB.getDefault().currentTransaction().flush();
     } catch (DuplicateKeyException e) {
       log.info("duplicate failed but just continue" + e.getMessage());
-      try {
-        // typically we would use transaction.commitAndContinue()
-        // ... this is a rollback and continue type scenario
-        // ... more sensible to use a second transaction that do this
-        DB.getDefault().currentTransaction().connection().rollback();
-      } catch (SQLException e1) {
-        e1.printStackTrace();
-      }
+      // rollback and continue using the transaction
+      DB.getDefault().currentTransaction().rollbackAndContinue();
     }
 
     Document doc0 = new Document();

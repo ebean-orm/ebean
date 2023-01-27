@@ -54,6 +54,28 @@ create table migtest_fk_set_null (
   constraint pk_migtest_fk_set_null primary key (id)
 );
 
+create table drop_main (
+  id                            integer auto_increment not null,
+  constraint pk_drop_main primary key (id)
+);
+
+create table drop_main_drop_ref_many (
+  drop_main_id                  integer not null,
+  drop_ref_many_id              integer not null,
+  constraint pk_drop_main_drop_ref_many primary key (drop_main_id,drop_ref_many_id)
+);
+
+create table drop_ref_many (
+  id                            integer auto_increment not null,
+  constraint pk_drop_ref_many primary key (id)
+);
+
+create table drop_ref_one (
+  id                            integer auto_increment not null,
+  parent_id                     integer,
+  constraint pk_drop_ref_one primary key (id)
+);
+
 create table migtest_e_basic (
   id                            integer auto_increment not null,
   status                        varchar(1),
@@ -151,6 +173,7 @@ create table `table` (
   `to`                          varchar(255),
   `varchar`                     varchar(255),
   `foreign`                     varchar(255),
+  textfield                     varchar(255) not null,
   constraint uq_table_to unique (`to`),
   constraint uq_table_varchar unique (`varchar`),
   constraint pk_table primary key (`index`)
@@ -298,6 +321,7 @@ create table table_history(
   `to`                          varchar(255),
   `varchar`                     varchar(255),
   `foreign`                     varchar(255),
+  textfield                     varchar(255),
   sys_period_start              datetime(6),
   sys_period_end                datetime(6)
 );
@@ -305,12 +329,12 @@ create view table_with_history as select * from `table` union all select * from 
 lock tables `table` write;
 delimiter $$
 create trigger table_history_upd before update on `table` for each row begin
-    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`);
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`, textfield) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`, OLD.textfield);
     set NEW.sys_period_start = now(6);
 end$$
 delimiter $$
 create trigger table_history_del before delete on `table` for each row begin
-    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`);
+    insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `foreign`, textfield) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`foreign`, OLD.textfield);
 end$$
 unlock tables;
 
@@ -320,6 +344,15 @@ alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id forei
 
 create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
+
+create index ix_drop_main_drop_ref_many_drop_main on drop_main_drop_ref_many (drop_main_id);
+alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_main foreign key (drop_main_id) references drop_main (id) on delete restrict on update restrict;
+
+create index ix_drop_main_drop_ref_many_drop_ref_many on drop_main_drop_ref_many (drop_ref_many_id);
+alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_ref_many foreign key (drop_ref_many_id) references drop_ref_many (id) on delete restrict on update restrict;
+
+create index ix_drop_ref_one_parent_id on drop_ref_one (parent_id);
+alter table drop_ref_one add constraint fk_drop_ref_one_parent_id foreign key (parent_id) references drop_main (id) on delete restrict on update restrict;
 
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;

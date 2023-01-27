@@ -19,8 +19,11 @@ class CourseRecordEntityTest {
       .findOneOrEmpty();
 
     assertThat(found).isPresent();
-    assertThat(found.get().id()).isEqualTo(42L);
-    assertThat(found.get().notes()).isEqualTo("Record");
+    CourseRecordEntity courseRecord = found.get();
+    assertThat(courseRecord.id()).isEqualTo(42L);
+    assertThat(courseRecord.notes()).isEqualTo("Record");
+    assertThat(courseRecord).isEqualTo(courseRecord);
+    assertThat(courseRecord.toString()).isEqualTo("CourseRecordEntity[id=42, name=SuppliedId, notes=Record]");
   }
 
   @Test
@@ -35,6 +38,10 @@ class CourseRecordEntityTest {
       .findOneOrEmpty();
 
     assertThat(second).isPresent();
-    assertThat(second.get().notes()).isEqualTo("Record with generated id");
+    CourseRecordEntity courseRecord = second.get();
+    assertThat(courseRecord.notes()).isEqualTo("Record with generated id");
+
+    assertThat(courseRecord).isEqualTo(new CourseRecordEntity(1000, "Second", "Record with generated id"));
+    assertThat(courseRecord.toString()).isEqualTo("CourseRecordEntity[id=1000, name=Second, notes=Record with generated id]");
   }
 }

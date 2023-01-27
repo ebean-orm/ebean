@@ -5,7 +5,13 @@ import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.config.dbplatform.DbType;
+import io.ebean.test.containers.PostgresContainer;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 
 import static io.ebean.Query.LockType.*;
 import static io.ebean.Query.LockWait.*;
@@ -14,12 +20,44 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class PostgresPlatformTest {
 
+  /**
+   * Let's just run this test manually.
+   */
+  @Disabled
+  @Test
+  void platformDetection() throws SQLException {
+    PostgresContainer container = PostgresContainer.builder("15")
+      .containerName("pg15_ebeanTest")
+      .dbName("unit")
+      .port(0) // use a random port
+      .build();
+
+    container.startWithDropCreate();
+
+    try (Connection connection = container.createConnection()) {
+      connection.setAutoCommit(true);
+      DatabaseMetaData metaData = connection.getMetaData();
+
+      PostgresPlatformProvider platformProvider = new PostgresPlatformProvider();
+
+      DatabasePlatform platform = platformProvider.create(15, 0, metaData, connection);
+      assertThat(platform.name()).isEqualTo("postgres");
+
+      connection.setAutoCommit(false);
+      DatabasePlatform platform2 = platformProvider.create(15, 0, metaData, connection);
+      assertThat(platform2.name()).isEqualTo("postgres");
+
+    } finally {
+      container.stopRemove();
+    }
+  }
+
   @Test
   void testUuidType() {
     PostgresPlatform platform = new PostgresPlatform();
     platform.configure(new PlatformConfig());
 
-    DbPlatformType dbType = platform.getDbTypeMap().get(DbPlatformType.UUID);
+    DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     String columnDefn = dbType.renderType(0, 0);
 
     assertThat(columnDefn).isEqualTo("uuid");
@@ -85,7 +123,7 @@ class PostgresPlatformTest {
   }
 
   private String defaultDefn(DbType type, DatabasePlatform dbPlatform) {
-    return dbPlatform.getDbTypeMap().get(type).renderType(0, 0);
+    return dbPlatform.dbTypeMap().get(type).renderType(0, 0);
   }
 
 }

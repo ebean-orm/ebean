@@ -155,6 +155,39 @@ public class QCustomerTest {
     }
   }
 
+  @Test
+  void equalTo_byProperty() {
+    Query<Customer> query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .billingAddress.city.eq(QCustomer.Alias.shippingAddress.city)
+      .query();
+
+    query.findList();
+    String generatedSql = query.getGeneratedSql();
+
+    // select t0.id from be_customer t0
+    // left join o_address t2 on t2.id = t0.shipping_address_id
+    // left join o_address t1 on t1.id = t0.billing_address_id
+    // where t1.city = t2.city
+    assertThat(generatedSql).contains("where t1.city = t2.city");
+  }
+
+  @Test
+  void notEqual_byProperty() {
+    Query<Customer> query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .billingAddress.city.ne(QCustomer.Alias.shippingAddress.city)
+      .query();
+
+    query.findList();
+    String generatedSql = query.getGeneratedSql();
+
+    // select t0.id from be_customer t0
+    // left join o_address t2 on t2.id = t0.shipping_address_id
+    // left join o_address t1 on t1.id = t0.billing_address_id
+    // where t1.city <> t2.city
+    assertThat(generatedSql).contains("where t1.city <> t2.city");
+  }
 
   @Test
   public void isEmpty() {
@@ -421,6 +454,7 @@ public class QCustomerTest {
     assertContains(new QCustomer().registered.lt(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.before(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.lessThan(new Date()).query(), " where t0.registered < ?");
+    assertContains(new QCustomer().registered.lt(QCustomer.Alias.whenUpdated).query(), " where t0.registered < t0.when_updated");
   }
 
   @Test
@@ -428,6 +462,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.le(new Date()).query(), " where t0.registered <= ?");
     assertContains(new QCustomer().registered.lessOrEqualTo(new Date()).query(), " where t0.registered <= ?");
+    assertContains(new QCustomer().registered.le(QCustomer.Alias.whenUpdated).query(), " where t0.registered <= t0.when_updated");
   }
 
   @Test
@@ -435,6 +470,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.after(new Date()).query(), " where t0.registered > ?");
     assertContains(new QCustomer().registered.gt(new Date()).query(), " where t0.registered > ?");
+    assertContains(new QCustomer().registered.gt(QCustomer.Alias.whenUpdated).query(), " where t0.registered > t0.when_updated");
     assertContains(new QCustomer().registered.greaterThan(new Date()).query(), " where t0.registered > ?");
   }
 
@@ -444,6 +480,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.ge(new Date()).query(), " where t0.registered >= ?");
     assertContains(new QCustomer().registered.greaterOrEqualTo(new Date()).query(), " where t0.registered >= ?");
+    assertContains(new QCustomer().registered.ge(QCustomer.Alias.whenUpdated).query(), " where t0.registered >= t0.when_updated");
   }
 
   private void assertContains(Query<Customer> query, String match) {
@@ -626,6 +663,22 @@ public class QCustomerTest {
     new QContact()
       .firstName.inRangeWith(lastName, "B")
       .findList();
+  }
+
+  @Test
+  void query_inRangeWithOtherProperties() {
+    var c = QCustomer.alias();
+
+    Query<Customer> query = new QCustomer()
+      .select(c.id)
+      .name.inRangeWith(c.contacts.firstName, c.contacts.lastName)
+      .query();
+
+    // select distinct t0.id from be_customer t0
+    // left join be_contact t1 on t1.customer_id = t0.id
+    // where t1.first_name <= t0.name and (t0.name < t1.last_name or t1.last_name is null)
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where t1.first_name <= t0.name and (t0.name < t1.last_name or t1.last_name is null)");
   }
 
   @Test

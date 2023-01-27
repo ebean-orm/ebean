@@ -25,12 +25,10 @@ final class CQueryBuilderRawSql {
    * Build the full SQL Select statement for the request.
    */
   SqlLimitResponse buildSql(OrmQueryRequest<?> request, CQueryPredicates predicates, SpiRawSql.Sql rsql) {
-
     if (rsql == null) {
       // this is a ResultSet based RawSql query - just use some placeholder for the SQL
       return new SqlLimitResponse(CQueryPlan.RESULT_SET_BASED_RAW_SQL);
     }
-
     if (!rsql.isParsed()) {
       String sql = rsql.getUnparsedSql();
       BindParams bindParams = request.query().getBindParams();
@@ -41,16 +39,13 @@ final class CQueryBuilderRawSql {
       return new SqlLimitResponse(sql);
     }
 
-    String orderBy = getOrderBy(predicates, rsql);
-
+    String orderBy = orderBy(predicates, rsql);
     // build the actual sql String
     String sql = buildMainQuery(orderBy, request, predicates, rsql);
-
     SpiQuery<?> query = request.query();
     if (query.hasMaxRowsOrFirstRow() && sqlLimiter != null) {
       // wrap with a limit offset or ROW_NUMBER() etc
       return sqlLimiter.limit(new OrmQueryLimitRequest(sql, orderBy, query, dbPlatform, rsql.isDistinct() || query.isDistinct()));
-
     } else {
       // add back select keyword (it was removed to support sqlQueryLimiter)
       String prefix = "select " + (rsql.isDistinct() ? "distinct " : "");
@@ -86,7 +81,7 @@ final class CQueryBuilderRawSql {
       dynamicWhere = descriptor.idBinderIdSql(null);
     }
 
-    String dbWhere = predicates.getDbWhere();
+    String dbWhere = predicates.dbWhere();
     if (hasValue(dbWhere)) {
       if (dynamicWhere == null) {
         dynamicWhere = dbWhere;
@@ -109,7 +104,7 @@ final class CQueryBuilderRawSql {
       sb.append(preHaving).append(" ");
     }
 
-    String dbHaving = predicates.getDbHaving();
+    String dbHaving = predicates.dbHaving();
     if (hasValue(dbHaving)) {
       if (sql.isAndHavingExpr()) {
         sb.append(" and ");
@@ -128,8 +123,8 @@ final class CQueryBuilderRawSql {
     return s != null && !s.isEmpty();
   }
 
-  private String getOrderBy(CQueryPredicates predicates, SpiRawSql.Sql sql) {
-    String orderBy = predicates.getDbOrderBy();
+  private String orderBy(CQueryPredicates predicates, SpiRawSql.Sql sql) {
+    String orderBy = predicates.dbOrderBy();
     if (orderBy != null) {
       return orderBy;
     } else {

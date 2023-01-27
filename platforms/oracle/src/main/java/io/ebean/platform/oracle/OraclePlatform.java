@@ -38,7 +38,6 @@ public class OraclePlatform extends DatabasePlatform {
     this.dbDefaultValue.setFalse("0");
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("current_timestamp");
-    this.treatEmptyStringsAsNull = true;
     this.likeClauseRaw = "like ?";
 
     this.exceptionTranslator =

@@ -694,6 +694,22 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Add EXISTS sub-query predicate.
+   */
+  public R exists(Query<?> subQuery) {
+    query.where().exists(subQuery);
+    return root;
+  }
+
+  /**
+   * Add NOT EXISTS sub-query predicate.
+   */
+  public R notExists(Query<?> subQuery) {
+    query.where().notExists(subQuery);
+    return root;
+  }
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   public R forUpdate() {
@@ -852,9 +868,11 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * When set to true all the beans from this query are loaded into the bean
-   * cache.
+   * Deprecated migrate to setBeanCacheMode() or setUseCache().
+   * <p>
+   * When set to true all the beans from this query are loaded into the bean cache.
    */
+  @Deprecated
   public R setLoadBeanCache(boolean loadBeanCache) {
     query.setLoadBeanCache(loadBeanCache);
     return root;
@@ -1765,7 +1783,7 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Execute the query returning a single value for a single property.
+   * Execute the query returning a single value or null for a single property.
    * <p>
    * <h3>Example</h3>
    * <pre>{@code
@@ -1777,8 +1795,9 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    *
-   * @return the list of values for the selected property
+   * @return a single value or null for the selected property
    */
+  @Nullable
   public <A> A findSingleAttribute() {
     return query.findSingleAttribute();
   }

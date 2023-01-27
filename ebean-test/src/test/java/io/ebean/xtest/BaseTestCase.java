@@ -168,7 +168,15 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformCaseSensitive() {
-    return spiEbeanServer().databasePlatform().isCaseSensitiveCollation();
+    return spiEbeanServer().databasePlatform().caseSensitiveCollation();
+  }
+
+  public boolean isLimitOffset() {
+    return isH2() || isPostgresCompatible() || isMySql() || isMariaDB();
+  }
+
+  public boolean isAnsiSqlLimit() {
+    return isOracle() || isDb2();
   }
 
   /**
@@ -240,7 +248,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformBooleanNative() {
-    return Types.BOOLEAN == spiEbeanServer().databasePlatform().getBooleanDbType();
+    return Types.BOOLEAN == spiEbeanServer().databasePlatform().booleanDbType();
   }
 
   public boolean isPlatformOrderNullsSupport() {
@@ -248,11 +256,11 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformSupportsDeleteTableAlias() {
-    return spiEbeanServer().databasePlatform().isSupportsDeleteTableAlias();
+    return spiEbeanServer().databasePlatform().supportsDeleteTableAlias();
   }
 
   public boolean isPersistBatchOnCascade() {
-    return spiEbeanServer().databasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
+    return spiEbeanServer().databasePlatform().persistBatchOnCascade() != PersistBatch.NONE;
   }
 
   /**
@@ -271,11 +279,11 @@ public abstract class BaseTestCase {
   }
 
   protected Platform platform() {
-    return spiEbeanServer().databasePlatform().getPlatform().base();
+    return spiEbeanServer().databasePlatform().platform().base();
   }
 
   protected IdType idType() {
-    return spiEbeanServer().databasePlatform().getDbIdentity().getIdType();
+    return spiEbeanServer().databasePlatform().dbIdentity().getIdType();
   }
 
   protected SpiEbeanServer spiEbeanServer() {

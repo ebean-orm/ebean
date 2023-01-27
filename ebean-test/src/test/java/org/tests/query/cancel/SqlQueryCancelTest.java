@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  *
  * @author Roland Praml, FOCONIS AG
  */
-public class SqlQueryCancelTest extends BaseTestCase {
+class SqlQueryCancelTest extends BaseTestCase {
 
   private final int timing = 20;
 
@@ -191,17 +191,13 @@ public class SqlQueryCancelTest extends BaseTestCase {
   }
 
   @Test
-  public void cancelOrmDtoDuringIterate() {
+  void cancelOrmDtoDuringIterate() {
     DtoQuery<EBasicDto> query = DB.find(EBasic.class).select("id,status").asDto(EBasicDto.class);
 
     QueryIterator<EBasicDto> iter = query.findIterate();
     assertThat(iter.hasNext()).isTrue();
     query.cancel();
-    if (isMariaDB()) {
-      assertThrows(PersistenceException.class, iter::next);
-    } else {
-      assertThat(iter.next()).isNotNull();
-    }
+    assertThat(iter.next()).isNotNull();
 
     // We might have 100 entities in a buffer. So we must iterate through all.
     assertThatThrownBy(() -> {

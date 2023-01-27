@@ -3,6 +3,8 @@ package org.tests.cache;
 import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
+import io.ebean.annotation.Transactional;
+import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
 import io.ebean.test.LoggedSql;
@@ -91,12 +93,12 @@ public class TestQueryCache extends BaseTestCase {
     // ensure that findCount & findSingleAttribute use different
     // slots in cache. If not a "Cannot cast List to int" should happen.
     int count = DB
-        .find(EColAB.class)
-        .setUseQueryCache(true)
-        .select("columnA")
-        .where()
-        .eq("columnB", "SingleAttribute")
-        .findCount();
+      .find(EColAB.class)
+      .setUseQueryCache(true)
+      .select("columnA")
+      .where()
+      .eq("columnB", "SingleAttribute")
+      .findCount();
     assertThat(count).isEqualTo(2);
   }
 
@@ -159,6 +161,32 @@ public class TestQueryCache extends BaseTestCase {
     assertThat(count2).isEqualTo(count1);
     sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
+
+    LoggedSql.start();
+    findCountNoTxn();
+    sql = LoggedSql.stop();
+    assertThat(sql).hasSize(0);
+
+    // Oracle does not support READ_UNCOMMITTED as expected
+    if (!isOracle()) {
+      LoggedSql.start();
+      findCountTxn();
+      sql = LoggedSql.stop();
+      assertThat(sql).hasSize(0);
+    }
+  }
+
+  private void findCountNoTxn() {
+    DB.find(EColAB.class)
+      .setUseQueryCache(CacheMode.ON)
+      .where()
+      .eq("columnB", "count")
+      .findCount();
+  }
+
+  @Transactional(isolation = TxIsolation.READ_UNCOMMITTED)
+  private void findCountTxn() {
+    findCountNoTxn();
   }
 
   @Test
@@ -305,7 +333,7 @@ public class TestQueryCache extends BaseTestCase {
     assertSame(list, list2B);
 
     List<Customer> list3 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
-        .ilike("name", "Rob").findList();
+      .ilike("name", "Rob").findList();
 
     assertNotSame(list, list3);
     BeanCollection<Customer> bc3 = (BeanCollection<Customer>) list3;
@@ -349,10 +377,10 @@ public class TestQueryCache extends BaseTestCase {
     // and now, ensure that we hit the database
     LoggedSql.start();
     colA_second = DB.find(EColAB.class)
-        .setUseQueryCache(CacheMode.PUT)
-        .where()
-        .eq("columnB", "someId")
-        .findIds();
+      .setUseQueryCache(CacheMode.PUT)
+      .where()
+      .eq("columnB", "someId")
+      .findIds();
     sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
@@ -361,15 +389,15 @@ public class TestQueryCache extends BaseTestCase {
   @Test
   public void findCountDifferentQueriesBit() {
     DB.getDefault().pluginApi().cacheManager().clearAll();
-    differentFindCount(q->q.bitwiseAny("id",1), q->q.bitwiseAny("id",0));
-    differentFindCount(q->q.bitwiseAll("id",1), q->q.bitwiseAll("id",0));
+    differentFindCount(q -> q.bitwiseAny("id", 1), q -> q.bitwiseAny("id", 0));
+    differentFindCount(q -> q.bitwiseAll("id", 1), q -> q.bitwiseAll("id", 0));
     // differentFindCount(q->q.bitwiseNot("id",1), q->q.bitwiseNot("id",0)); NOT 1 == AND 1 = 0
-    differentFindCount(q->q.bitwiseAnd("id",1, 0), q->q.bitwiseAnd("id",1, 1));
+    differentFindCount(q -> q.bitwiseAnd("id", 1, 0), q -> q.bitwiseAnd("id", 1, 1));
 
-    differentFindCount(q->q.bitwiseAnd("id",2, 0), q->q.bitwiseAnd("id",4, 0));
-    differentFindCount(q->q.bitwiseAnd("id",2, 1), q->q.bitwiseAnd("id",4, 1));
+    differentFindCount(q -> q.bitwiseAnd("id", 2, 0), q -> q.bitwiseAnd("id", 4, 0));
+    differentFindCount(q -> q.bitwiseAnd("id", 2, 1), q -> q.bitwiseAnd("id", 4, 1));
     // Will produce hash collision
-    differentFindCount(q->q.bitwiseAnd("id",10, 0), q->q.bitwiseAnd("id",0, 928210));
+    differentFindCount(q -> q.bitwiseAnd("id", 10, 0), q -> q.bitwiseAnd("id", 0, 928210));
 
   }
 
