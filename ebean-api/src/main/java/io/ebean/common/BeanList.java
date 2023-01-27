@@ -13,14 +13,14 @@ import java.util.ListIterator;
 /**
  * List capable of lazy loading and modification awareness.
  */
-public final class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, BeanCollectionAdd {
+public class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, BeanCollectionAdd {
 
   private static final long serialVersionUID = 1L;
 
   /**
    * The underlying List implementation.
    */
-  private List<E> list;
+  List<E> list;
 
   /**
    * Specify the underlying List implementation.
@@ -131,7 +131,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     }
   }
 
-  private void init() {
+  void init() {
     lock.lock();
     try {
       if (list == null) {
