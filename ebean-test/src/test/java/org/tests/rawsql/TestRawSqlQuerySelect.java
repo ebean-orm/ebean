@@ -24,6 +24,7 @@ public class TestRawSqlQuerySelect extends BaseTestCase {
     RawSql rawSql = RawSqlBuilder.parse("select id, name, anniversary, city from (select c.id, c.name, c.anniversary, a.city from o_customer c left join o_address a ON a.id = c.billing_address_id order by c.id) w").create();
 
     var query = DB.find(SampleReport.class);
+    query.setRawSql(rawSql);
     query.setMaxRows(10);
 
     List<SampleReport> list = query.findList();
@@ -31,11 +32,10 @@ public class TestRawSqlQuerySelect extends BaseTestCase {
 
     String sumSql = "COUNT(1)::Long AS count, SUM(id) AS sum";
 
-    query.setRawSql(rawSql);
     //query.select(sumSql);
     query.select(FetchGroup.of(SampleReport.class, sumSql));
-
     query.asDto(QuerySumResponse.class);
+
     var countSum = query.findOneOrEmpty().orElseThrow();
     //assertThat((countSum instanceof QuerySumResponse));
   }
