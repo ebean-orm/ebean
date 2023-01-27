@@ -165,6 +165,13 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
   Collection<?> getActualEntries();
 
   /**
+   * Returns entries, that were lazily added at the end of the list. Might be null.
+   */
+  default Collection<E> getLazyAddedEntries() {
+    return null;
+  }
+
+  /**
    * return true if there are real rows held. Return false is this is using
    * Deferred fetch to lazy load the rows and the rows have not yet been
    * fetched.
