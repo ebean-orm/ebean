@@ -239,14 +239,20 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     var attachment1 = new Attachment();
     attachment1.setName("File1");
     var attachment2 = new Attachment();
-    attachment1.setName("File2");
+    attachment2.setName("File2");
+    var attachment3 = new Attachment();
+    attachment3.setName("File3");
     var goods = new GoodsEntity();
     goods.setName("goods1");
     goods.setAttachments(List.of(attachment1, attachment2));
 
+    LoggedSql.start();
+
     DB.save(goods);
 
     var marshaledGoods = DB.json().toBean(GoodsEntity.class, DB.json().toJson(goods));
+    marshaledGoods.getAttachments().add(attachment3);
+
     var persistedGoods = DB.find(GoodsEntity.class, goods.getId());
 
     // this forces insert and throws exception due primary key conflict
@@ -269,5 +275,13 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     } catch (Exception e) {
       logger.error("Insert instead update", e);
     }
+    var persistedGoods2 = DB.find(GoodsEntity.class, goods.getId());
+    assertThat(persistedGoods2.getAttachments()).hasSize(3);
+
+    var sql = LoggedSql.collect();
+
+    LoggedSql.stop();
+
+    System.out.println(String.join("\n",sql));
   }
 }
