@@ -5,7 +5,7 @@ import io.ebean.meta.MetricVisitor;
 /**
  * Metric for timed events like transaction execution times.
  */
-public interface TimedMetric {
+public interface TimedMetric extends Metric {
 
   /**
    * Add a time event (usually in microseconds).
@@ -37,8 +37,4 @@ public interface TimedMetric {
    */
   TimedMetricStats collect(boolean reset);
 
-  /**
-   * Visit non empty metrics.
-   */
-  void visit(MetricVisitor visitor);
 }

@@ -5,7 +5,7 @@ import io.ebean.meta.MetricVisitor;
 /**
  * Metric for timed events like transaction execution times.
  */
-public interface CountMetric {
+public interface CountMetric extends Metric {
 
   /**
    * Add to the counter.
@@ -32,8 +32,4 @@ public interface CountMetric {
    */
   void reset();
 
-  /**
-   * Visit non empty metrics.
-   */
-  void visit(MetricVisitor visitor);
 }
