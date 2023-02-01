@@ -41,6 +41,11 @@ public final class DeployCreateProperties {
     createProperties(desc, desc.getBeanType(), 0);
     for (ExtensionAccessor info : ExtensionAccessors.read(desc.getBeanType())) {
       createProperties(desc, info.getType(), 0);
+      for (DeployBeanProperty prop : desc.propertiesAll()) {
+         if (prop.getOwningType() == info.getType()) {
+           prop.setOwningType(desc.getBeanType());
+         }
+      }
     }
 
     desc.sortProperties();

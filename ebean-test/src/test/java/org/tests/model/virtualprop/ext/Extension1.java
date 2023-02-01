@@ -1,42 +1,26 @@
 package org.tests.model.virtualprop.ext;
 
-import io.ebean.annotation.Formula;
-import io.ebean.bean.EntityBean;
 import io.ebean.bean.NotEnhancedException;
 import io.ebean.bean.extend.EntityExtension;
-import org.tests.model.virtualprop.VirtualBase;
-
-import javax.persistence.OneToOne;
+import org.tests.model.virtualprop.AbstractVirtualBase;
 
 /**
- * This class will add the fields 'virtualExtendOne' and 'firstName' to 'VirtualBase' by EntityExtension
+ * This class will add the field 'ext' to 'VirtualBaseA' by EntityExtension
  */
-@EntityExtension(VirtualBase.class)
+@EntityExtension(AbstractVirtualBase.class)
 public class Extension1 {
 
-  @OneToOne(mappedBy = "base")
-  private VirtualExtendOne virtualExtendOne;
+  private String ext;
 
-  @Formula(select = "concat('Your name is ', ${ta}.data)")
-  private String firstName;
+  public String getExt() {
+    return ext;
+  }
 
-  public static Extension1 get(VirtualBase found) {
+  public void setExt(String ext) {
+    this.ext = ext;
+  }
+
+  public static Extension1 get(AbstractVirtualBase base) {
     throw new NotEnhancedException();
-  }
-
-  public VirtualExtendOne getVirtualExtendOne() {
-    return virtualExtendOne;
-  }
-
-  public void setVirtualExtendOne(VirtualExtendOne virtualExtendOne) {
-    this.virtualExtendOne = virtualExtendOne;
-  }
-
-  public String getFirstName() {
-    return firstName;
-  }
-
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
   }
 }

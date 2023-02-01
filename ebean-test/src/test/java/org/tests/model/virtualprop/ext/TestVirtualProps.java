@@ -2,14 +2,13 @@ package org.tests.model.virtualprop.ext;
 
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.plugin.BeanType;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import org.junit.jupiter.api.Test;
 import org.tests.model.virtualprop.VirtualBase;
+import org.tests.model.virtualprop.VirtualBaseA;
 
 import java.util.List;
 
@@ -59,7 +58,7 @@ public class TestVirtualProps extends BaseTestCase {
     prop.pathSet(found, ext);
     db.save(found);
 
-    Extension1 other = Extension1.get(found);
+    Extension3 other = Extension3.get(found);
     assertThat(other.getVirtualExtendOne().getData()).isEqualTo("bar");
     other.setFirstName("test");
 
@@ -84,7 +83,6 @@ public class TestVirtualProps extends BaseTestCase {
 
   @Test
   void testCreateMany() {
-
 
     VirtualBase base1 = new VirtualBase();
     base1.setData("Foo");
@@ -139,6 +137,7 @@ public class TestVirtualProps extends BaseTestCase {
 
   @Test
   void testCreateDelete() {
+
     VirtualBase base = new VirtualBase();
     base.setData("Master");
     db.save(base);
@@ -159,5 +158,24 @@ public class TestVirtualProps extends BaseTestCase {
     assertThat(sql.get(1)).contains("delete from kreuztabelle where virtual_base_id = ?"); // intersection table
     assertThat(sql.get(2)).contains("delete from virtual_base where id=?"); // delete entity itself
 
+  }
+
+  @Test
+  void testInheritance() {
+
+    VirtualBaseA base = new VirtualBaseA();
+    base.setData("Master");
+    Extension1.get(base).setExt("ext");
+    //db.save(base);
+
+    Extension4.get(base).setExtA("extA");
+    db.save(base);
+
+    LoggedSql.start();
+    VirtualBaseA found = db.find(VirtualBaseA.class).where().eq("extA", "extA").findOne();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.kind, t0.id, t0.data, t0.num, t0.ext, t0.ext_a from virtual_base_inherit t0 where t0.kind = 'A' and t0.ext_a = ?");
   }
 }

@@ -4,6 +4,7 @@ import io.ebean.bean.NotEnhancedException;
 import io.ebean.bean.extend.EntityExtension;
 import org.tests.model.virtualprop.AbstractVirtualBase;
 import org.tests.model.virtualprop.VirtualBase;
+import org.tests.model.virtualprop.VirtualBaseA;
 
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -12,7 +13,7 @@ import java.util.List;
 /**
  * This class will add the fields 'virtualExtendManyToManys' to 'AbstractVirtualBase' by EntityExtension
  */
-@EntityExtension(AbstractVirtualBase.class)
+@EntityExtension(VirtualBase.class)
 public class Extension2 {
 
   @ManyToMany
@@ -23,9 +24,7 @@ public class Extension2 {
     return virtualExtendManyToManys;
   }
 
-  public static Extension2 get(AbstractVirtualBase found) {
+  public static Extension2 get(VirtualBase found) {
     throw new NotEnhancedException();
   }
-
-
 }
