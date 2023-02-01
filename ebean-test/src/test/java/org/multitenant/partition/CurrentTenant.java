@@ -1,6 +1,7 @@
 package org.multitenant.partition;
 
 import io.ebean.config.CurrentTenantProvider;
+import io.ebean.test.UserContext;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -18,6 +19,6 @@ class CurrentTenant implements CurrentTenantProvider {
   @Override
   public String currentId() {
     callCounter.incrementAndGet();
-    return UserContext.get().getTenantId();
+    return String.valueOf(UserContext.currentTenantId());
   }
 }

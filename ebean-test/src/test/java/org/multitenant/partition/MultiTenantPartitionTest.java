@@ -5,6 +5,7 @@ import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantMode;
 import io.ebean.test.LoggedSql;
+import io.ebean.test.UserContext;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
