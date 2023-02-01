@@ -8,8 +8,8 @@ import io.ebean.meta.MetaQueryPlan;
 public interface SpiDbQueryPlan extends MetaQueryPlan {
 
   /**
-   * Extend with queryTimeMicros and captureCount.
+   * Extend with queryTimeMicros, captureCount and tenantId.
    */
-  SpiDbQueryPlan with(long queryTimeMicros, long captureCount);
+  SpiDbQueryPlan with(long queryTimeMicros, long captureCount, Object tenantId);
 
 }

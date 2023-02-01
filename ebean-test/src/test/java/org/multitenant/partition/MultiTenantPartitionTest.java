@@ -4,11 +4,15 @@ import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantMode;
+import io.ebean.meta.MetaQueryPlan;
+import io.ebean.meta.QueryPlanInit;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.test.LoggedSql;
 import io.ebean.test.UserContext;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,6 +80,35 @@ class MultiTenantPartitionTest extends BaseTestCase {
 
     LoggedSql.stop();
   }
+
+  @Test
+  void queryPlanCapture() throws InterruptedException {
+    // change query plan threshold to 100 micros
+
+    QueryPlanRequest request = new QueryPlanRequest();
+    request.maxCount(1_000);
+    request.maxTimeMillis(10_000);
+    server().metaInfo().queryPlanCollectNow(request);
+
+    QueryPlanInit init = new QueryPlanInit();
+    init.setAll(true);
+    init.thresholdMicros(1);
+    server().metaInfo().queryPlanInit(init);
+
+    // run queries again
+    UserContext.set("rob", "ten_1");
+    Customer.find.all();
+
+    UserContext.set("fred", "ten_2");
+    Customer.find.byId(2);
+
+    // obtains db query plans ...
+    List<MetaQueryPlan> plans0 = server().metaInfo().queryPlanCollectNow(request);
+    assertThat(plans0).isNotEmpty();
+
+    assertThat(plans0).extracting(MetaQueryPlan::tenantId).containsExactlyInAnyOrder("ten_1", "ten_2");
+  }
+
 
   @Test
   void deleteById() {
