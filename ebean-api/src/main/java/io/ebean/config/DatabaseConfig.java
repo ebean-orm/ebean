@@ -445,6 +445,8 @@ public class DatabaseConfig {
   private int backgroundExecutorShutdownSecs = 30;
   private BackgroundExecutorWrapper backgroundExecutorWrapper = new MdcBackgroundExecutorWrapper();
 
+  private boolean tenantPartitionedCache;
+
   // defaults for the L2 bean caching
 
   private int cacheMaxSize = 10000;
@@ -1501,6 +1503,21 @@ public class DatabaseConfig {
    */
   public void setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper) {
     this.backgroundExecutorWrapper = backgroundExecutorWrapper;
+  }
+
+  /**
+   * Returns, if the caches are partitioned by tenant.
+   */
+  public boolean isTenantPartitionedCache() {
+    return tenantPartitionedCache;
+  }
+
+  /**
+   * Sets the tenant partitioning mode for caches. This means, caches are created on demand,
+   * but they may not get invalidated across tenant boundaries   *
+   */
+  public void setTenantPartitionedCache(boolean tenantPartitionedCache) {
+    this.tenantPartitionedCache = tenantPartitionedCache;
   }
 
   /**
@@ -2988,6 +3005,15 @@ public class DatabaseConfig {
     ddlStrictMode = p.getBoolean("ddl.strictMode", ddlStrictMode);
     ddlPlaceholders = p.get("ddl.placeholders", ddlPlaceholders);
     ddlHeader = p.get("ddl.header", ddlHeader);
+
+    tenantPartitionedCache = p.getBoolean("tenantPartitionedCache", tenantPartitionedCache);
+
+    cacheMaxIdleTime = p.getInt("cacheMaxIdleTime", cacheMaxIdleTime);
+    cacheMaxSize = p.getInt("cacheMaxSize", cacheMaxSize);
+    cacheMaxTimeToLive = p.getInt("cacheMaxTimeToLive", cacheMaxTimeToLive);
+    queryCacheMaxIdleTime = p.getInt("queryCacheMaxIdleTime", queryCacheMaxIdleTime);
+    queryCacheMaxSize = p.getInt("queryCacheMaxSize", queryCacheMaxSize);
+    queryCacheMaxTimeToLive = p.getInt("queryCacheMaxTimeToLive", queryCacheMaxTimeToLive);
 
     // read tenant-configuration from config:
     // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION
