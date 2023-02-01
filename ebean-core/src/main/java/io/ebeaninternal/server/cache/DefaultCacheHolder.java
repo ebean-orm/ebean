@@ -32,6 +32,7 @@ final class DefaultCacheHolder {
   private final ServerCacheOptions queryDefault;
   private final CurrentTenantProvider tenantProvider;
   private final QueryCacheEntryValidate queryCacheEntryValidate;
+  private final boolean tenantPartitionedCache;
 
   DefaultCacheHolder(CacheManagerOptions builder) {
     this.cacheFactory = builder.getCacheFactory();
@@ -39,6 +40,7 @@ final class DefaultCacheHolder {
     this.queryDefault = builder.getQueryDefault();
     this.tenantProvider = builder.getCurrentTenantProvider();
     this.queryCacheEntryValidate = builder.getQueryCacheEntryValidate();
+    this.tenantPartitionedCache = builder.isTenantPartitionedCache();
   }
 
   void visitMetrics(MetricVisitor visitor) {
@@ -61,11 +63,18 @@ final class DefaultCacheHolder {
   }
 
   private String key(String beanName, String collectionProperty, ServerCacheType type) {
-    if (collectionProperty != null) {
-      return beanName + "." + collectionProperty + type.code();
-    } else {
-      return beanName + type.code();
+    StringBuilder sb = new StringBuilder(beanName.length() + 64);
+    sb.append(beanName);
+    if (tenantPartitionedCache) {
+      sb.append('.');
+      sb.append(tenantProvider.currentId());
     }
+    if (collectionProperty != null) {
+      sb.append('.');
+      sb.append(collectionProperty);
+    }
+    sb.append(type.code());
+    return sb.toString();
   }
 
   /**
@@ -87,7 +96,8 @@ final class DefaultCacheHolder {
         lock.unlock();
       }
     }
-    return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, tenantProvider, queryCacheEntryValidate));
+    return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options,
+      tenantPartitionedCache ? null : tenantProvider, queryCacheEntryValidate));
   }
 
   void clearAll() {
@@ -147,4 +157,7 @@ final class DefaultCacheHolder {
     return beanDefault.copy(nearCache);
   }
 
+  boolean isTenantPartitionedCache() {
+    return tenantPartitionedCache;
+  }
 }
