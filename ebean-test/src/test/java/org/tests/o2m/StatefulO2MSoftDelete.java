@@ -34,7 +34,10 @@ public class StatefulO2MSoftDelete extends BaseTestCase {
 
     DB.update(goodsFromDB);
     var updateSql = LoggedSql.stop();
-    updateSql.forEach(System.out::println);
     updateSql.forEach(sql -> assertThat(sql).doesNotContain("delete from workflow_entity"));
+    if (isH2()) {
+      assertThat(updateSql.get(4)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
+      assertThat(updateSql.get(6)).contains("update workflow_entity set when_modified=?, deleted=? where id=?");
+    }
   }
 }

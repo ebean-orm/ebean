@@ -861,7 +861,7 @@ public final class DefaultPersister implements Persister {
     SpiTransaction t = request.transaction();
     EntityBean orphanForRemoval = request.importedOrphanForRemoval();
     if (orphanForRemoval != null) {
-      delete(orphanForRemoval, request.transaction(), true);
+      delete(orphanForRemoval, request.transaction(), false);
     }
 
     // exported ones with cascade save
