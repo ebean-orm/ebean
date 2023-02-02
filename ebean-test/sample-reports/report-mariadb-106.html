@@ -1,0 +1,465 @@
+<!DOCTYPE html><html lang='en'>
+<head>
+<title>Ebean metrics report for mariadb-106</title><style type='text/css'>
+@charset "UTF-8";
+.sortable th {
+  cursor: pointer;
+}
+
+.sortable th::after, .sortable th::before {
+  transition: color 0.1s ease-in-out;
+  font-size: 1.2em;
+  color: transparent;
+}
+.sortable tr.sortHdr th::after {
+  margin-left: 3px;
+  content: "▸";
+}
+.sortable tr.sortHdr th:hover::after {
+  color: inherit;
+}
+.sortable tr.sortHdr th.dir-d::after {
+  color: inherit;
+  content: "▾";
+}
+.sortable tr.sortHdr th.dir-u::after {
+  color: inherit;
+  content: "▴";
+}
+
+.sortable .number {
+	text-align: right;
+	white-space: nowrap;
+}
+.sortable .hash {
+	white-space: nowrap;
+}
+/* raw number display */
+.sortable .number div:nth-child(2) {
+	display: none;
+}
+#raw:checked ~ div .sortable .number div:nth-child(1) {
+	display: none;
+}
+#raw:checked ~ div .sortable .number div:nth-child(2) {
+	display: block;
+}
+
+.sortable .filtered {
+	display: none;
+}
+.sortable {
+  --stripe-color: #e4e4e4;
+  --th-color: #fff;
+  --th-bg: #808080;
+  --td-color: #000;
+  --td-on-stripe-color: #000;
+  border-spacing: 0;
+  min-width: 640px;
+}
+.sortable tbody tr:nth-child(odd) {
+  background-color: var(--stripe-color);
+  color: var(--td-on-stripe-color);
+}
+.sortable th {
+  background: var(--th-bg);
+  color: var(--th-color);
+  font-weight: normal;
+  text-align: left;
+  text-transform: capitalize;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.sortable td {
+  color: var(--td-color);
+}
+.sortable td,
+.sortable th {
+  padding: 5px;
+}
+
+body {
+  font-size: 14px;
+}
+
+p {
+  line-height: 1.7em;
+}
+
+code {
+  font-family: monospace;
+  background: #eee;
+  padding: 5px;
+  border-radius: 2px;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.plan {	display : none; }
+
+#plans:checked ~ div table tbody tr td code {
+	display: block;
+	white-space: pre-wrap;
+}
+
+.bind {	display : none; }
+#binds:checked ~ div table tbody tr td i {
+	display: block;
+	white-space: pre-wrap;
+}
+#tab0:checked ~ figure .tab0, #tab1:checked ~ figure .tab1, #tab2:checked ~ figure .tab2, #tab3:checked ~ figure .tab3, #tab4:checked ~ figure .tab4{display: block;}
+#tab0:checked ~ nav label[for='tab0'], #tab1:checked ~ nav label[for='tab1'], #tab2:checked ~ nav label[for='tab2'], #tab3:checked ~ nav label[for='tab3'], #tab4:checked ~ nav label[for='tab4']{background: white; color: #111; position: relative;}
+.tabbed figure {display: block; margin-left: 0; border-bottom: 1px solid silver; clear: both;}
+.tabbed > input, .tabbed figure > div {display: none;}
+.tabbed figure>div {width: 100%;}
+nav label {float: left; padding: 15px 15px; border: 1px solid silver; background: #ef781b; color: #eee;}
+nav label:hover {background: #888;}
+</style></head>
+<body><h1>Ebean metrics report for mariadb-106</h1><input type='checkbox' id='raw'> display raw values<br><input type='checkbox' id='binds'> display query plan bind values<br><input type='checkbox' id='plans'> display query plan details<br><div class='tabbed'>
+  <input id='tab0' type='radio'  name='tabs' checked='checked'/>
+  <input id='tab1' type='radio'  name='tabs'/>
+  <input id='tab2' type='radio'  name='tabs'/>
+  <input id='tab3' type='radio'  name='tabs'/>
+  <input id='tab4' type='radio'  name='tabs'/>
+  <nav>
+    <label for='tab0'>Actions</label>
+    <label for='tab1'>Query metrics</label>
+    <label for='tab2'>Timed metrics</label>
+    <label for='tab3'>Count Metrics</label>
+    <label for='tab4'>Query plans</label>
+  </nav>
+  <figure>
+    <div class='tab0'><table class='sortable'>
+<thead>
+<tr class='sortHdr'><th>Name</th>
+<th>Value</th>
+</tr></thead><tbody>
+<tr><td>initRequest.thresholdMicros</td><td><input name='initRequest.thresholdMicros' value='2' onchange='updateValue(this)'/></td></tr>
+<tr><td>initRequest.isAll</td><td><input name='initRequest.isAll' value='1' onchange='updateValue(this)'/></td></tr>
+<tr><td>&nbsp;</td><td><button name='initRequest.apply' value='1' onclick='updateValue(this)'>Start capturing</button></td></tr>
+<tr><td>queryRequest.maxCount</td><td><input name='queryRequest.maxCount' value='10' onchange='updateValue(this)'/></td></tr>
+<tr><td>queryRequest.maxTimeMillis</td><td><input name='queryRequest.maxTimeMillis' value='30000' onchange='updateValue(this)'/></td></tr>
+<tr><td>queryRequest.since</td><td><input name='queryRequest.since' value='0' onchange='updateValue(this)'/></td></tr>
+<tr><td>current time</td><td class='number'>1675339786795</td></tr>
+<tr><td>&nbsp;</td><td><button name='queryRequest.apply' value='1' onclick='updateValue(this)'>Collect plans</button></td></tr>
+<tr><td>&nbsp;</td><td><button name='clearCaches' value='1' onclick='updateValue(this)'>Clear caches</button></td></tr>
+<tr><td>&nbsp;</td><td><button name='resetMetrics' value='1' onclick='updateValue(this)'>Reset all metrics</button></td></tr>
+</tbody><tbody class='filtered'></tbody></table>
+<h2>Usage:</h2><ol>
+<li>Set initRequest.thresholdMicros to the value, you want to capture</li>
+<li>Add hashes or set initRequest.isAll = 1 (default)</li>
+<li>Click 'Start capturing'</li>
+<li>Do the action, which executes the query/queries you want to inspect</li>
+<li>Click 'Collect plans' to collect the query-plans</li>
+</ol>
+</div>
+    <div class='tab1'><table class='sortable'>
+<thead>
+<tr class='sortHdr'><th>type</th>
+<th></th>
+<th></th>
+<th></th>
+<th>count</th>
+<th>total</th>
+<th>mean</th>
+<th>max</th>
+<th>sql</th>
+<th>hash</th>
+</tr><tr class='filterHdr'><th><select/></th>
+<th><select/></th>
+<th><select/></th>
+<th><select/></th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+</tr></thead><tbody>
+<tr><td>orm</td><td>CustomerFinder</td><td>namesStartingWith</td><td>&nbsp;</td><td class='number'>1</td><td class='number' data-sort='515'><div>515 µs</div><div>515</div></td><td class='number' data-sort='515'><div>515 µs</div><div>515</div></td><td class='number' data-sort='515'><div>515 µs</div><div>515</div></td><td>select name from o_customer where name like ? order by name</td><td class='hash'><input type='checkbox' name='hash.25c7fe502c5a20ebe5b13db21e70e6a9' onchange='updateValue(this)' checked='checked'> 25c7fe502c5a20ebe5b13db21e70e6a9</td></tr>
+<tr><td>orm</td><td>Customer</td><td>findList</td><td>&nbsp;</td><td class='number'>1</td><td class='number' data-sort='3683'><div>3,68 ms</div><div>3683</div></td><td class='number' data-sort='3683'><div>3,68 ms</div><div>3683</div></td><td class='number' data-sort='3683'><div>3,68 ms</div><div>3683</div></td><td>select t0.id, t0.status, t0.name, t0.smallnote, t0.anniversary, t0.cretime, t0.updtime, t0.version, t0.billing_address_id, t0.shipping_address_id from o_customer t0</td><td class='hash'><input type='checkbox' name='hash.abbf1022a928ad38083aeb72da10a936' onchange='updateValue(this)' checked='checked'> abbf1022a928ad38083aeb72da10a936</td></tr>
+<tr><td>orm</td><td>CustomerFinder</td><td>byNameStatus</td><td>&nbsp;</td><td class='number'>1</td><td class='number' data-sort='689'><div>689 µs</div><div>689</div></td><td class='number' data-sort='689'><div>689 µs</div><div>689</div></td><td class='number' data-sort='689'><div>689 µs</div><div>689</div></td><td>select t0.id, t0.status, t0.name, t0.smallnote, t0.anniversary, t0.cretime, t0.updtime, t0.version, t0.billing_address_id, t0.shipping_address_id from o_customer t0 where (t0.status = ? and lower(t0.name) like ? escape&#39;|&#39; ) order by t0.name</td><td class='hash'><input type='checkbox' name='hash.de3affa5b4bff07e19c1c012590dcde6' onchange='updateValue(this)' checked='checked'> de3affa5b4bff07e19c1c012590dcde6</td></tr>
+<tr><td>orm</td><td>CustomerFinder</td><td>updateNames</td><td>&nbsp;</td><td class='number'>1</td><td class='number' data-sort='433'><div>433 µs</div><div>433</div></td><td class='number' data-sort='433'><div>433 µs</div><div>433</div></td><td class='number' data-sort='433'><div>433 µs</div><div>433</div></td><td>update o_customer set name=?, version = version + 1 where id &gt; ?</td><td class='hash'><input type='checkbox' name='hash.5d05304e44ad6f7b2f1ac04db07407f3' onchange='updateValue(this)' checked='checked'> 5d05304e44ad6f7b2f1ac04db07407f3</td></tr>
+<tr><td>orm</td><td>CustomerFinder</td><td>totalCount</td><td>&nbsp;</td><td class='number'>1</td><td class='number' data-sort='288'><div>288 µs</div><div>288</div></td><td class='number' data-sort='288'><div>288 µs</div><div>288</div></td><td class='number' data-sort='288'><div>288 µs</div><div>288</div></td><td>select count(*) from o_customer t0</td><td class='hash'><input type='checkbox' name='hash.1c7fd652b396c412977198fadd76b115' onchange='updateValue(this)' checked='checked'> 1c7fd652b396c412977198fadd76b115</td></tr>
+<tr><td>orm</td><td>Customer</td><td>someDeleteQuery</td><td>&nbsp;</td><td class='number'>1</td><td class='number' data-sort='312'><div>312 µs</div><div>312</div></td><td class='number' data-sort='312'><div>312 µs</div><div>312</div></td><td class='number' data-sort='312'><div>312 µs</div><div>312</div></td><td>select t0.id from o_customer t0 where t0.name = ?</td><td class='hash'><input type='checkbox' name='hash.7cc206becaf1d9a8a403d7f693bd104a' onchange='updateValue(this)' checked='checked'> 7cc206becaf1d9a8a403d7f693bd104a</td></tr>
+</tbody><tbody class='filtered'></tbody></table>
+</div>
+    <div class='tab2'><table class='sortable'>
+<thead>
+<tr class='sortHdr'><th>type</th>
+<th></th>
+<th></th>
+<th></th>
+<th>count</th>
+<th>total</th>
+<th>mean</th>
+<th>max</th>
+</tr><tr class='filterHdr'><th><select/></th>
+<th><select/></th>
+<th><select/></th>
+<th><select/></th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+</tr></thead><tbody>
+<tr><td>txn</td><td>main</td><td>&nbsp;</td><td>&nbsp;</td><td class='number'>2</td><td class='number' data-sort='2636'><div>2,64 ms</div><div>2636</div></td><td class='number' data-sort='1318'><div>1,32 ms</div><div>1318</div></td><td class='number' data-sort='1885'><div>1,89 ms</div><div>1885</div></td></tr>
+<tr><td>txn</td><td>readonly</td><td>&nbsp;</td><td>&nbsp;</td><td class='number'>4</td><td class='number' data-sort='16412'><div>16,4 ms</div><div>16412</div></td><td class='number' data-sort='4103'><div>4,10 ms</div><div>4103</div></td><td class='number' data-sort='7089'><div>7,09 ms</div><div>7089</div></td></tr>
+<tr><td>ebean</td><td>queryplan</td><td>bindcapture</td><td>&nbsp;</td><td class='number'>4</td><td class='number' data-sort='987'><div>987 µs</div><div>987</div></td><td class='number' data-sort='246'><div>246 µs</div><div>246</div></td><td class='number' data-sort='843'><div>843 µs</div><div>843</div></td></tr>
+<tr><td>ebean</td><td>queryplan</td><td>collect</td><td>&nbsp;</td><td class='number'>4</td><td class='number' data-sort='1841'><div>1,84 ms</div><div>1841</div></td><td class='number' data-sort='460'><div>460 µs</div><div>460</div></td><td class='number' data-sort='540'><div>540 µs</div><div>540</div></td></tr>
+</tbody><tbody class='filtered'></tbody></table>
+</div>
+    <div class='tab3'><table class='sortable'>
+<thead>
+<tr class='sortHdr'><th>type</th>
+<th></th>
+<th></th>
+<th></th>
+<th>count</th>
+</tr><tr class='filterHdr'><th><select/></th>
+<th><select/></th>
+<th><select/></th>
+<th><select/></th>
+<th>&nbsp;</th>
+</tr></thead><tbody>
+<tr><td>l2n</td><td>Customer</td><td>B</td><td>hit</td><td class='number'>3</td></tr>
+<tr><td>l2n</td><td>Customer</td><td>B</td><td>put</td><td class='number'>4</td></tr>
+</tbody><tbody class='filtered'></tbody></table>
+</div>
+    <div class='tab4'><table class='sortable'>
+<thead>
+<tr class='sortHdr'><th>type</th>
+<th>count</th>
+<th>micros</th>
+<th>sql</th>
+<th>hash</th>
+</tr><tr class='filterHdr'><th><select/></th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+<th>&nbsp;</th>
+</tr></thead><tbody>
+<tr><td>Customer</td><td class='number'>1</td><td class='number' data-sort='3683'><div>3,68 ms</div><div>3683</div></td><td>select t0.id, t0.status, t0.name, t0.smallnote, t0.anniversary, t0.cretime, t0.updtime, t0.version, t0.billing_address_id, t0.shipping_address_id from o_customer t0<br><i class='bind'>[]</i><code class='plan'>id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	t0	ALL	null	null	null	null	4	</code></td><td class='hash'><input type='checkbox' name='hash.abbf1022a928ad38083aeb72da10a936' onchange='updateValue(this)' checked='checked'> abbf1022a928ad38083aeb72da10a936</td></tr>
+<tr><td>Customer</td><td class='number'>1</td><td class='number' data-sort='515'><div>515 µs</div><div>515</div></td><td>select name from o_customer where name like ? order by name<br><i class='bind'>[F%]</i><code class='plan'>id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	o_customer	ALL	null	null	null	null	4	Using where; Using filesort</code></td><td class='hash'><input type='checkbox' name='hash.25c7fe502c5a20ebe5b13db21e70e6a9' onchange='updateValue(this)' checked='checked'> 25c7fe502c5a20ebe5b13db21e70e6a9</td></tr>
+<tr><td>Customer</td><td class='number'>1</td><td class='number' data-sort='288'><div>288 µs</div><div>288</div></td><td>select count(*) from o_customer t0<br><i class='bind'>[]</i><code class='plan'>id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	t0	index	null	ix_o_customer_billing_address_id	5	null	4	Using index</code></td><td class='hash'><input type='checkbox' name='hash.1c7fd652b396c412977198fadd76b115' onchange='updateValue(this)' checked='checked'> 1c7fd652b396c412977198fadd76b115</td></tr>
+<tr><td>Customer</td><td class='number'>1</td><td class='number' data-sort='689'><div>689 µs</div><div>689</div></td><td>select t0.id, t0.status, t0.name, t0.smallnote, t0.anniversary, t0.cretime, t0.updtime, t0.version, t0.billing_address_id, t0.shipping_address_id from o_customer t0 where (t0.status = ? and lower(t0.name) like ? escape&#39;|&#39; ) order by t0.name<br><i class='bind'>[A, rob%]</i><code class='plan'>id	select_type	table	type	possible_keys	key	key_len	ref	rows	Extra
+1	SIMPLE	t0	ALL	null	null	null	null	4	Using where; Using filesort</code></td><td class='hash'><input type='checkbox' name='hash.de3affa5b4bff07e19c1c012590dcde6' onchange='updateValue(this)' checked='checked'> de3affa5b4bff07e19c1c012590dcde6</td></tr>
+</tbody><tbody class='filtered'></tbody></table>
+</div>
+  </figure>
+</div>
+<script>/**
+ * The sort code is adapted from https://github.com/tofsjonas/sortable
+ * Copyleft 2017 Jonas Earendel
+ * License: http://unlicense.org
+ */
+
+ (function() { // start closure
+function findElementRecursive(element, tag) {
+ 	return !element ? null : element.nodeName === tag ? element : findElementRecursive(element.parentNode, tag)
+}
+
+function getValue(element) {
+	return element.getAttribute('data-sort') || element.innerText
+}
+
+document.addEventListener('click', function (e) {
+	try {
+		var descending_th_class = ' dir-d '
+		var ascending_th_class = ' dir-u '
+		var ascending_table_sort_class = 'asc'
+		var regex_dir = / dir-(u|d) /
+		var element = findElementRecursive(e.target, 'TH')
+		var tr = findElementRecursive(element, 'TR')
+		var table = findElementRecursive(tr, 'TABLE')
+
+		function reClassify(element, dir) {
+			element.className = element.className.replace(regex_dir, '') + dir
+		}
+
+		if (table && tr && tr.className == 'sortHdr') {
+			var column_index
+			var nodes = tr.cells
+			// Reset thead cells and get column index
+			for (var i = 0; i < nodes.length; i++) {
+				if (nodes[i] === element) {
+					column_index = i
+				} else {
+					reClassify(nodes[i], '')
+				}
+			}
+			var dir = descending_th_class
+
+			// Check if we're sorting ascending or descending
+			if (element.className.indexOf(descending_th_class) !== -1
+				|| (table.className.indexOf(ascending_table_sort_class) !== -1
+					&& element.className.indexOf(ascending_th_class) == -1)) {
+				dir = ascending_th_class
+			}
+
+			// Update the `th` class accordingly
+			reClassify(element, dir)
+
+			// Get the array rows in an array, so we can sort them...
+			var rows = [].slice.call(table.tBodies[0].rows, 0)
+			var reverse = dir === ascending_th_class
+
+			// Sort them using Array.prototype.sort()
+			rows.sort(function (a, b) {
+				var x = getValue((reverse ? a : b).cells[column_index])
+				var y = getValue((reverse ? b : a).cells[column_index])
+				return x.length && y.length && !isNaN(x - y) ? x - y : x.localeCompare(y)
+			})
+
+			// Make a clone without content
+			var clone_tbody = table.tBodies[0].cloneNode()
+			// Fill it with the sorted values
+			while (rows.length) {
+				clone_tbody.appendChild(rows.splice(0, 1)[0])
+			}
+			// And finally replace the unsorted table with the sorted one
+			table.replaceChild(clone_tbody, table.tBodies[0])
+		}
+	} catch (error) {
+		console.log(error)
+	}
+})
+
+function getIndex(collection, element) {
+	for (var i = 0; i < collection.length; i++) {
+		if (collection[i] === element) return i;
+	}
+	return -1;
+}
+
+function updateFilterValues() {
+	for (var i = 0; i < filters.length; i++) {
+		var filter = filters[i];
+		var table = findElementRecursive(filter, 'TABLE')
+		var cell = findElementRecursive(filter, 'TH')
+		var tr = findElementRecursive(filter, 'TR')
+		var idx = getIndex(tr.cells, cell)
+		var option = document.createElement("option");
+		option.text = "-";
+		[].slice.call(filter.options, 0).forEach(e => e.remove());
+		filter.add(option);
+		var set = new Set();
+		const rows = table.tBodies[0].rows;
+		for (var k = 0; k < rows.length; k++) {
+			const txt = rows[k].cells[idx].innerText;
+			if (txt) set.add(txt);
+		}
+		Array.from(set).sort().forEach(item => {
+			var option = document.createElement("option");
+			option.text = item;
+			filter.add(option);
+		});
+	}
+}
+function matchFilter(row, filters) {
+	for (var i = 0; i < filters.length; i++) {
+		var filter = filters[i];
+		if (filter.value != "-") {
+			if (row.cells[filter.getAttribute('data-idx')].innerText != filter.value) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+function applyFilters(filter) {
+	var table = findElementRecursive(filter, 'TABLE')
+	var filters = table.getElementsByTagName("SELECT");
+	var tBody = table.tBodies[0];
+	var spareBody = table.tBodies[1];
+
+	var rows = [].slice.call(tBody.rows, 0).concat([].slice.call(spareBody.rows));
+	var clone_tbody = tBody.cloneNode()
+	var clone_sparebody = spareBody.cloneNode()
+	// Fill it with the sorted values
+	while (rows.length) {
+		var row = rows.splice(0, 1)[0];
+		if (matchFilter(row, filters)) {
+			clone_tbody.appendChild(row);
+		} else {
+			clone_sparebody.appendChild(row);
+		}
+	}
+
+	table.replaceChild(clone_tbody, tBody)
+	table.replaceChild(clone_sparebody, spareBody)
+}
+
+function initFilter(filter) {
+	var table = findElementRecursive(filter, 'TABLE')
+	var cell = findElementRecursive(filter, 'TH')
+	var tr = findElementRecursive(filter, 'TR')
+	var idx = getIndex(tr.cells, cell)
+
+	var spare = document.createElement("table");
+	spare.style="display:none";
+	cell.appendChild(spare);
+	filter.onchange = evt => applyFilters(evt.target)
+	filter.setAttribute('data-idx', idx)
+
+	var option = document.createElement("option");
+	option.text = "-";
+	[].slice.call(filter.options, 0).forEach(e => e.remove());
+	filter.add(option);
+	var set = new Set();
+	const rows = table.tBodies[0].rows;
+	for (var k = 0; k < rows.length; k++) {
+		const txt = rows[k].cells[idx].innerText;
+		if (txt) set.add(txt);
+	}
+	Array.from(set).sort().forEach(item => {
+		var option = document.createElement("option");
+		option.text = item;
+		filter.add(option);
+	});
+}
+
+var filters = document.getElementsByTagName("SELECT")
+for (var i = 0; i < filters.length; i++) initFilter(filters[i]);
+})();
+
+/**
+ * used to communicate with 'configure' endpoint
+ */
+function updateValue(element) {
+	var xmlhttp = new XMLHttpRequest();
+	xmlhttp.onreadystatechange = function() {
+		if (this.readyState == 4) {
+			if (this.status == 200) {
+				if (this.responseText == "OK") {
+					return;
+				}
+				if (this.responseText == "REFRESH") {
+					if (confirm("Action executed successfully. Reload pages?")) {
+						document.location.reload();
+					}
+					return;
+				}
+			}
+			alert("An error occured: " + this.responseText);
+		}
+	};
+	xmlhttp.open("POST", "configure", false);
+	xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+	var value = element.value;
+	if (element.type == 'checkbox') {
+		value = element.checked ? 1 : 0;
+	}
+	xmlhttp.send(JSON.stringify([{'name' : element.name , 'value' : value}]));
+
+}
+</script></body></html>
