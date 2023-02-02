@@ -195,12 +195,6 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
-        <artifactId>ebean-all</artifactId>
-        <version>13.11.3-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.ebean</groupId>
         <artifactId>ebean-clickhouse</artifactId>
         <version>13.11.3-SNAPSHOT</version>
       </dependency>
@@ -220,12 +214,6 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-hana</artifactId>
-        <version>13.11.3-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.ebean</groupId>
-        <artifactId>ebean-hsqldb</artifactId>
         <version>13.11.3-SNAPSHOT</version>
       </dependency>
 
@@ -256,12 +244,6 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-postgres</artifactId>
-        <version>13.11.3-SNAPSHOT</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.ebean</groupId>
-        <artifactId>ebean-sqlanywhere</artifactId>
         <version>13.11.3-SNAPSHOT</version>
       </dependency>
 
