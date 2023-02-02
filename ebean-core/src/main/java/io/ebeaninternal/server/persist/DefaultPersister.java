@@ -1079,7 +1079,7 @@ public final class DefaultPersister implements Persister {
   private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
     Object origValue = request.getOrigValue(prop);
     if (origValue instanceof EntityBean) {
-      delete((EntityBean) origValue, request.transaction(), true);
+      delete((EntityBean) origValue, request.transaction(), false);
     }
   }
 
