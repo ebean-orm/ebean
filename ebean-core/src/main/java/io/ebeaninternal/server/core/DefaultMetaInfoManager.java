@@ -46,6 +46,11 @@ final class DefaultMetaInfoManager implements MetaInfoManager {
   }
 
   @Override
+  public MetricReportGenerator createReportGenerator() {
+    return new HtmlMetricReportGenerator(server);
+  }
+
+  @Override
   public void resetAllMetrics() {
     server.visitMetrics(new ResetVisitor());
   }

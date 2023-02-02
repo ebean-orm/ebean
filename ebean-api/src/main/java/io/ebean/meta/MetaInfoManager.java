@@ -64,5 +64,9 @@ public interface MetaInfoManager {
    */
   List<MetaQueryPlan> queryPlanCollectNow(QueryPlanRequest request);
 
+  /**
+   * Creates a new MetricReportGenerator. This can be used to embed in your web-application
+   */
+  MetricReportGenerator createReportGenerator();
 
 }

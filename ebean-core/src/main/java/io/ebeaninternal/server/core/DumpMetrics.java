@@ -7,6 +7,12 @@ import io.ebean.meta.ServerMetrics;
 import io.ebean.meta.SortMetric;
 import io.ebeaninternal.api.SpiEbeanServer;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 
@@ -19,6 +25,7 @@ final class DumpMetrics {
   private boolean dumpHash;
   private boolean dumpSql;
   private boolean dumpLoc;
+  private boolean dumpHtml;
 
   private Comparator<MetaTimedMetric> sortBy = SortMetric.NAME;
 
@@ -32,6 +39,7 @@ final class DumpMetrics {
       dumpLoc = options.contains("loc");
       dumpSql = options.contains("sql");
       dumpHash = options.contains("hash");
+      dumpHtml = options.contains("html");
       for (int i = 5; i < 10; i++) {
         width = Math.max(width, optionWidth(i * 10));
       }
@@ -72,7 +80,16 @@ final class DumpMetrics {
   }
 
   void dump() {
-
+    if (dumpHtml) {
+      File file = new File("metric-report-" + server.name() + "-"
+        + DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss.SSS").format(LocalDateTime.now()) + ".html");
+      try (OutputStream out = new FileOutputStream(file)) {
+        server.metaInfo().createReportGenerator().writeReport(out);
+        out("html report written to: " + file.getAbsolutePath() + "\n");
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
     out("-- Dumping metrics for " + server.name() + " -- ");
     ServerMetrics serverMetrics = server.metaInfo().collectMetrics();
 

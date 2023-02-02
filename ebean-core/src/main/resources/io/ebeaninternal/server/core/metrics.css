@@ -1,0 +1,112 @@
+@charset "UTF-8";
+.sortable th {
+  cursor: pointer;
+}
+
+.sortable th::after, .sortable th::before {
+  transition: color 0.1s ease-in-out;
+  font-size: 1.2em;
+  color: transparent;
+}
+.sortable tr.sortHdr th::after {
+  margin-left: 3px;
+  content: "▸";
+}
+.sortable tr.sortHdr th:hover::after {
+  color: inherit;
+}
+.sortable tr.sortHdr th.dir-d::after {
+  color: inherit;
+  content: "▾";
+}
+.sortable tr.sortHdr th.dir-u::after {
+  color: inherit;
+  content: "▴";
+}
+
+.sortable .number {
+	text-align: right;
+	white-space: nowrap;
+}
+.sortable .hash {
+	white-space: nowrap;
+}
+/* raw number display */
+.sortable .number div:nth-child(2) {
+	display: none;
+}
+#raw:checked ~ div .sortable .number div:nth-child(1) {
+	display: none;
+}
+#raw:checked ~ div .sortable .number div:nth-child(2) {
+	display: block;
+}
+
+.sortable .filtered {
+	display: none;
+}
+.sortable {
+  --stripe-color: #e4e4e4;
+  --th-color: #fff;
+  --th-bg: #808080;
+  --td-color: #000;
+  --td-on-stripe-color: #000;
+  border-spacing: 0;
+  min-width: 640px;
+}
+.sortable tbody tr:nth-child(odd) {
+  background-color: var(--stripe-color);
+  color: var(--td-on-stripe-color);
+}
+.sortable th {
+  background: var(--th-bg);
+  color: var(--th-color);
+  font-weight: normal;
+  text-align: left;
+  text-transform: capitalize;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+
+.sortable td {
+  color: var(--td-color);
+}
+.sortable td,
+.sortable th {
+  padding: 5px;
+}
+
+body {
+  font-size: 14px;
+}
+
+p {
+  line-height: 1.7em;
+}
+
+code {
+  font-family: monospace;
+  background: #eee;
+  padding: 5px;
+  border-radius: 2px;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: -apple-system, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.plan {	display : none; }
+
+#plans:checked ~ div table tbody tr td code {
+	display: block;
+	white-space: pre-wrap;
+}
+
+.bind {	display : none; }
+#binds:checked ~ div table tbody tr td i {
+	display: block;
+	white-space: pre-wrap;
+}
