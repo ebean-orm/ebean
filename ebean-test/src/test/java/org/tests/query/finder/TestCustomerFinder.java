@@ -1,17 +1,22 @@
 package org.tests.query.finder;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.*;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.ResetBasicData;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -162,6 +167,31 @@ public class TestCustomerFinder extends BaseTestCase {
 
     List<String> names = Customer.find.namesStartingWith("F");
     assertThat(names).isNotEmpty();
+  }
+
+
+  @Test
+  @Disabled // run manually to generate sample report
+  public void test_report_queryPlans() throws IOException {
+
+    ResetBasicData.reset();
+
+    // change default collect query plan threshold to 200 micros
+    MetricReportGenerator generator = server().metaInfo().createReportGenerator();
+    generator.configure(List.of(
+      new MetricReportValue("initRequest.isAll", 1),
+      new MetricReportValue("initRequest.thresholdMicros", 2),
+      new MetricReportValue("initRequest.apply", 1)));
+
+    // the server has some plans
+    runQueries();
+
+    generator.configure(List.of(new MetricReportValue("queryRequest.apply", 2)));
+
+    File file = new File("sample-reports/report-" + server().name() + ".html");
+    try (OutputStream out = new FileOutputStream(file)) {
+      generator.writeReport(out);
+    }
   }
 
   @Test
