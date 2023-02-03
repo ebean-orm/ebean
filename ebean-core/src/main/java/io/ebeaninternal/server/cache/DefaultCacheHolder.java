@@ -58,8 +58,27 @@ final class DefaultCacheHolder {
     return getCacheInternal(beanType, ServerCacheType.COLLECTION_IDS, collectionProperty);
   }
 
+  private String key(String beanName) {
+    if (tenantPartitionedCache) {
+      StringBuilder sb = new StringBuilder(beanName.length() + 64);
+      sb.append(beanName);
+      sb.append('.');
+      sb.append(tenantProvider.currentId());
+      return sb.toString();
+    } else {
+      return beanName;
+    }
+  }
+
   private String key(String beanName, ServerCacheType type) {
-    return beanName + type.code();
+    StringBuilder sb = new StringBuilder(beanName.length() + 64);
+    sb.append(beanName);
+    if (tenantPartitionedCache) {
+      sb.append('.');
+      sb.append(tenantProvider.currentId());
+    }
+    sb.append(type.code());
+    return sb.toString();
   }
 
   private String key(String beanName, String collectionProperty, ServerCacheType type) {
@@ -91,13 +110,17 @@ final class DefaultCacheHolder {
     if (type == ServerCacheType.COLLECTION_IDS) {
       lock.lock();
       try {
-        collectIdCaches.computeIfAbsent(beanType.getName(), s -> new ConcurrentSkipListSet<>()).add(key);
+        collectIdCaches.computeIfAbsent(key(beanType.getName()), s -> new ConcurrentSkipListSet<>()).add(key);
       } finally {
         lock.unlock();
       }
     }
-    return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options,
-      tenantPartitionedCache ? null : tenantProvider, queryCacheEntryValidate));
+    if (tenantPartitionedCache) {
+      return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, null, queryCacheEntryValidate));
+    } else {
+      return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, tenantProvider, queryCacheEntryValidate));
+    }
+
   }
 
   void clearAll() {
@@ -113,7 +136,7 @@ final class DefaultCacheHolder {
     clearIfExists(key(name, ServerCacheType.QUERY));
     clearIfExists(key(name, ServerCacheType.BEAN));
     clearIfExists(key(name, ServerCacheType.NATURAL_KEY));
-    Set<String> keys = collectIdCaches.get(name);
+    Set<String> keys = collectIdCaches.get(key(name));
     if (keys != null) {
       for (String collectionIdKey : keys) {
         clearIfExists(collectionIdKey);
