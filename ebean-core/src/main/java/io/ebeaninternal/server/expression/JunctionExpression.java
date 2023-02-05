@@ -1068,4 +1068,9 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
     }
     return null;
   }
+
+  @Override
+  public ExpressionList<T> clear() {
+    return exprList.clear();
+  }
 }

@@ -99,6 +99,14 @@ public class DefaultExpressionListTest extends BaseExpressionTest {
       .isSameByBind(spi(exp().eq("a", 10).eq("b", 20)))).isFalse();
   }
 
+  @Test
+  public void isSameWithClear() {
+    DefaultExpressionList<?> exp1 = spi(exp().eq("a", 10).eq("b", 20).clear().eq("c", 30));
+    DefaultExpressionList<?> exp2 = spi(exp().eq("c", 30));
+    same(exp1, exp2);
+    assertThat(exp1.isSameByBind(exp2)).isTrue();
+  }
+  
   @SuppressWarnings("unchecked")
   @Test
   void copy() {
