@@ -141,7 +141,7 @@ final class DefaultBeanLoader {
     final List<?> list = executeQuery(loadRequest, query);
     final LoadBeanRequest.Result result = loadRequest.postLoad(list);
     if (result.markedDeleted() && CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
-      String msg = MessageFormat.format("Loaded bean marked as deleted for missedIds:{0} loadedIds:{1} sql:{2} list:{3}", result.missedIds(), result.loadedIds(), query.getGeneratedSql(), list);
+      String msg = MessageFormat.format("Loaded bean marked as deleted for {0} missedIds:{1} loadedIds:{2} sql:{3} list:{4}", loadRequest.beanType(), result.missedIds(), result.loadedIds(), query.getGeneratedSql(), list);
       CoreLog.markedAsDeleted.log(DEBUG, msg, new RuntimeException("LoadBeanRequest markedAsDeleted"));
     }
   }
