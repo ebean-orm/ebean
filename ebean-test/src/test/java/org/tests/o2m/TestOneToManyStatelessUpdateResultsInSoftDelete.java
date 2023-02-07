@@ -5,12 +5,10 @@ import io.ebean.DB;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
-import org.tests.o2m.dm.GoodsEntity;
-import org.tests.o2m.dm.PersonEntity;
-import org.tests.o2m.dm.WorkflowEntity;
-import org.tests.o2m.dm.WorkflowOperationEntity;
+import org.tests.o2m.dm.*;
 
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -234,5 +232,56 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
       var readGoods = mapper.readValue(writer.toString(), GoodsEntity.class);
       assertThat(readGoods.getWorkflowEntity().getOperations()).hasSize(0);
     }
+  }
+
+  @Test
+  void setArrayListDoInsertInsteadUpdate() {
+    var attachment1 = new Attachment();
+    attachment1.setName("File1");
+    var attachment2 = new Attachment();
+    attachment2.setName("File2");
+    var attachment3 = new Attachment();
+    attachment3.setName("File3");
+    var goods = new GoodsEntity();
+    goods.setName("goods1");
+    goods.setAttachments(List.of(attachment1, attachment2));
+
+    LoggedSql.start();
+
+    DB.save(goods);
+
+    var marshaledGoods = DB.json().toBean(GoodsEntity.class, DB.json().toJson(goods));
+    marshaledGoods.getAttachments().add(attachment3);
+
+    var persistedGoods = DB.find(GoodsEntity.class, goods.getId());
+
+    // this forces insert and throws exception due primary key conflict
+    persistedGoods.setAttachments(marshaledGoods.getAttachments());
+    try {
+      logger.info("Saving goods with set new attachments list");
+      DB.save(persistedGoods);
+    } catch (Exception e) {
+      logger.error("Insert instead update", e);
+    }
+
+    persistedGoods = DB.find(GoodsEntity.class, goods.getId());
+
+    // this works good
+    persistedGoods.getAttachments().clear();
+    persistedGoods.getAttachments().addAll(marshaledGoods.getAttachments());
+    try {
+      logger.info("Saving goods with clear/added attachments");
+        DB.save(persistedGoods);
+    } catch (Exception e) {
+      logger.error("Insert instead update", e);
+    }
+    var persistedGoods2 = DB.find(GoodsEntity.class, goods.getId());
+    assertThat(persistedGoods2.getAttachments()).hasSize(3);
+
+    var sql = LoggedSql.collect();
+
+    LoggedSql.stop();
+
+    System.out.println(String.join("\n",sql));
   }
 }
