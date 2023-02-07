@@ -14,10 +14,11 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import javax.persistence.EntityNotFoundException;
+import java.text.MessageFormat;
 import java.util.List;
 import java.util.Set;
 
-import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
@@ -137,8 +138,12 @@ final class DefaultBeanLoader {
 
     SpiQuery<?> query = server.createQuery(loadRequest.beanType());
     loadRequest.configureQuery(query, idList);
-    List<?> list = executeQuery(loadRequest, query);
-    loadRequest.postLoad(list);
+    final List<?> list = executeQuery(loadRequest, query);
+    final LoadBeanRequest.Result result = loadRequest.postLoad(list);
+    if (result.markedDeleted() && CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
+      String msg = MessageFormat.format("Loaded bean marked as deleted for missedIds:{0} loadedIds:{1} sql:{2} list:{3}", result.missedIds(), result.loadedIds(), query.getGeneratedSql(), list);
+      CoreLog.markedAsDeleted.log(DEBUG, msg, new RuntimeException("LoadBeanRequest markedAsDeleted"));
+    }
   }
 
   /**
