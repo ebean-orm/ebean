@@ -37,6 +37,7 @@ final class SaveManyBeans extends SaveManyBase {
   private final boolean hasOrderColumn;
   private int sortOrder;
   private boolean insertAllChildren;
+  private boolean forceOrphanRemoval;
 
   SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(persister, insertedParent, many, parentBean, request);
@@ -141,7 +142,7 @@ final class SaveManyBeans extends SaveManyBase {
   }
 
   private boolean forcedUpdateOrphanRemoval() {
-    return !insertedParent && many.isOrphanRemoval() && request.isForcedUpdate();
+    return !insertedParent && many.isOrphanRemoval() && (forceOrphanRemoval || request.isForcedUpdate());
   }
 
   private void saveAllBeans(final BeanProperty orderColumn) {
@@ -228,8 +229,10 @@ final class SaveManyBeans extends SaveManyBase {
       if (detailBean instanceof EntityBean) {
         Object id = targetDescriptor.id(detailBean);
         if (!isNullOrZero(id)) {
-          // remember the Id (other details not in the collection) will be removed
-          detailIds.add(id);
+          if (!forceOrphanRemoval || !((EntityBean)detailBean)._ebean_getIntercept().isNew()) {
+            // remember the Id (other details not in the collection) will be removed
+            detailIds.add(id);
+          }
         }
       }
     }
@@ -369,6 +372,8 @@ final class SaveManyBeans extends SaveManyBase {
             }
           }
         }
+      } else {
+        forceOrphanRemoval = !insertedParent && isChangedProperty();
       }
     }
   }

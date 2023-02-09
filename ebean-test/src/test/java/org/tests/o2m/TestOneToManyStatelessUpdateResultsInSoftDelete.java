@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.tests.o2m.dm.*;
 
 import java.io.StringWriter;
-import java.sql.SQLException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -240,48 +239,56 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     attachment1.setName("File1");
     var attachment2 = new Attachment();
     attachment2.setName("File2");
-    var attachment3 = new Attachment();
-    attachment3.setName("File3");
+
     var goods = new GoodsEntity();
     goods.setName("goods1");
     goods.setAttachments(List.of(attachment1, attachment2));
 
-    LoggedSql.start();
-
     DB.save(goods);
 
-    var marshaledGoods = DB.json().toBean(GoodsEntity.class, DB.json().toJson(goods));
-    marshaledGoods.getAttachments().add(attachment3);
+    String goodAsJson = DB.json().toJson(goods);
+    var marshaledGoods = DB.json().toBean(GoodsEntity.class, goodAsJson);
+    var attachment3a = new Attachment();
+    attachment3a.setName("File3");
+    marshaledGoods.getAttachments().add(attachment3a);
 
     var persistedGoods = DB.find(GoodsEntity.class, goods.getId());
 
-    // this forces insert and throws exception due primary key conflict
+    // this was not deleting orphans and so the inserts throw exception due primary key conflict
     persistedGoods.setAttachments(marshaledGoods.getAttachments());
+    LoggedSql.start();
     try {
       logger.info("Saving goods with set new attachments list");
       DB.save(persistedGoods);
     } catch (Exception e) {
       logger.error("Insert instead update", e);
     }
+    var sql = LoggedSql.collect();
+    assertThat(sql.get(0)).contains("delete from attachment where goods_entity_id = ?");
 
     persistedGoods = DB.find(GoodsEntity.class, goods.getId());
 
-    // this works good
+    // this works good using .clear() and .addAll()
+    // because here we are mutating the collection, it detects the
+    // orphan removals occurring via the .clear()
+    marshaledGoods = DB.json().toBean(GoodsEntity.class, goodAsJson);
+    var attachment3b = new Attachment();
+    attachment3b.setName("File3");
+    marshaledGoods.getAttachments().add(attachment3b);
+
     persistedGoods.getAttachments().clear();
     persistedGoods.getAttachments().addAll(marshaledGoods.getAttachments());
+    LoggedSql.collect();
     try {
       logger.info("Saving goods with clear/added attachments");
-        DB.save(persistedGoods);
+      DB.save(persistedGoods);
     } catch (Exception e) {
       logger.error("Insert instead update", e);
     }
+    sql = LoggedSql.stop();
+    assertThat(sql.get(0)).contains("delete from attachment where id=?");
+
     var persistedGoods2 = DB.find(GoodsEntity.class, goods.getId());
     assertThat(persistedGoods2.getAttachments()).hasSize(3);
-
-    var sql = LoggedSql.collect();
-
-    LoggedSql.stop();
-
-    System.out.println(String.join("\n",sql));
   }
 }
