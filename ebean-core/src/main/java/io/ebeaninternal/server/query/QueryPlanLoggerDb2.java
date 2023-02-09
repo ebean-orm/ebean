@@ -2,6 +2,7 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.util.IOUtils;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryPlan;
@@ -15,6 +16,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Map;
 import java.util.Random;
 
 import static java.lang.System.Logger.Level.WARNING;
@@ -40,23 +42,27 @@ public final class QueryPlanLoggerDb2 extends QueryPlanLogger {
 
   private Random rnd = new Random();
 
-  private final String schemaPrefix;
-  private final String schemaParam;
+  private final String schema;
 
-  private final String getQuerySql;
+  private final boolean create;
 
-  public QueryPlanLoggerDb2(String schema) {
+  private final String getPlanSql;
+
+  public QueryPlanLoggerDb2(String opts) {
+    String template = readReasource("QueryPlanLoggerDb2.sql");
+    Map<String, String> map = StringHelper.delimitedToMap(opts, ";", "=");
+    String schema = map.get("schema");
+    create = !"false" .equals(map.get("create")); // default is create
     if (schema == null || schema.isEmpty()) {
-      this.schemaPrefix = "";
-      this.schemaParam = "CURRENT SCHEMA";
+      this.schema = null;
+      this.getPlanSql = template.replace("${SCHEMA}", "");
     } else {
-      this.schemaPrefix = schema + ".";
-      this.schemaParam = "'" + schema + "'";
+      this.schema = schema;
+      this.getPlanSql = template.replace("${SCHEMA}", schema + ".");
     }
-    this.getQuerySql = readReasource("QueryPlanLoggerDb2.sql", schemaPrefix);
   }
 
-  private String readReasource(String resName, String schemaPrefix) {
+  private String readReasource(String resName) {
     try (InputStream stream = getClass().getResourceAsStream(resName)) {
       if (stream == null) {
         throw new IllegalStateException("Could not find resource " + resName);
@@ -64,7 +70,7 @@ public final class QueryPlanLoggerDb2 extends QueryPlanLogger {
       BufferedReader reader = IOUtils.newReader(stream);
       StringBuilder sb = new StringBuilder();
       reader.lines().forEach(line -> sb.append(line).append('\n'));
-      return sb.toString().replace("${SCHEMA}", schemaPrefix);
+      return sb.toString();
     } catch (IOException e) {
       throw new IllegalStateException("Could not read resource " + resName, e);
     }
@@ -73,15 +79,24 @@ public final class QueryPlanLoggerDb2 extends QueryPlanLogger {
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
     try (Statement stmt = conn.createStatement()) {
-
-      // create explain tables if neccessary
-      stmt.execute("BEGIN\n"
-        + "IF NOT EXISTS (SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA = " + schemaParam + " AND TABNAME = 'EXPLAIN_STREAM') THEN\n"
-        + "  call SYSPROC.SYSINSTALLOBJECTS( 'EXPLAIN', 'C' , '', " + schemaParam + " );\n"
-        + "END IF;\n"
-        + "END");
-
-      conn.commit();
+      if (create) {
+        if (schema == null) {
+          // create explain tables if neccessary
+          stmt.execute("BEGIN\n"
+            + "IF NOT EXISTS (SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA = CURRENT USER AND TABNAME = 'EXPLAIN_STREAM') THEN\n"
+            + "  call SYSPROC.SYSINSTALLOBJECTS( 'EXPLAIN', 'C' , '', CURRENT USER );\n"
+            + "END IF;\n"
+            + "END");
+        } else {
+          stmt.execute("BEGIN\n"
+            + "IF NOT EXISTS (SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA = '" + schema + "' AND TABNAME = 'EXPLAIN_STREAM') THEN\n"
+            + "  call SYSPROC.SYSINSTALLOBJECTS( 'EXPLAIN', 'C' , '', '" + schema + "' );\n"
+            + "END IF;\n"
+            + "END");
+        }
+        conn.commit();
+      }
+      String oldSchema = null;
       try {
         int queryNo = rnd.nextInt(Integer.MAX_VALUE);
 
@@ -90,13 +105,20 @@ public final class QueryPlanLoggerDb2 extends QueryPlanLogger {
           bind.prepare(explainStmt, conn);
           explainStmt.execute();
         }
-        try (PreparedStatement pstmt = conn.prepareStatement(getQuerySql)) {
+        if (schema == null) {
+          oldSchema = conn.getSchema();
+          stmt.execute("set schema current user");
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(getPlanSql)) {
           pstmt.setInt(1, queryNo);
           try (ResultSet rset = pstmt.executeQuery()) {
             return readQueryPlan(plan, bind, rset);
           }
         }
       } finally {
+        if (oldSchema != null) {
+          conn.setSchema(oldSchema);
+        }
         // do not keep query plans in DB
         conn.rollback();
       }

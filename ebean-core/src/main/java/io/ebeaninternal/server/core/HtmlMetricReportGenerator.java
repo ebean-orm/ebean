@@ -258,10 +258,10 @@ public class HtmlMetricReportGenerator implements MetricReportGenerator {
    */
   protected void queryPlansTab(Html html) {
     HtmlTab tab = html.tab("Query plans");
-    tab.startTable("type?", /*"tenant?",*/ "count", "micros", "sql", "hash");
+    tab.startTable("type?", "tenant?", "count", "micros", "sql", "hash");
     for (MetaQueryPlan queryPlan : queryPlans) {
       tab.tableRow(queryPlan.beanType().getSimpleName(),
-        // queryPlan.tenantId(), TODO: Add tenant later.
+        queryPlan.tenantId(),
         queryPlan.captureCount(),
         micros(queryPlan.queryTimeMicros()),
         queryPlan(queryPlan.sql(), queryPlan.bind(), queryPlan.plan()),
@@ -411,6 +411,11 @@ public class HtmlMetricReportGenerator implements MetricReportGenerator {
     Hash(String hash, boolean checked) {
       this.hash = hash;
       this.checked = checked;
+    }
+
+    @Override
+    public String toString() {
+      return hash;
     }
   }
 

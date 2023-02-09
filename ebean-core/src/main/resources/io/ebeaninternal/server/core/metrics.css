@@ -74,6 +74,7 @@
 .sortable td,
 .sortable th {
   padding: 5px;
+  overflow-wrap: anywhere;
 }
 
 body {
