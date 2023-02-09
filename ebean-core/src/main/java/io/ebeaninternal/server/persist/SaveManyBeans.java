@@ -362,7 +362,9 @@ final class SaveManyBeans extends SaveManyBase {
       if (!hasOrderColumn) {
         c.modifyReset();
       }
-      if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
+      if (modifyRemovals == null || modifyRemovals.isEmpty()) {
+        forceOrphanRemoval = !insertedParent && isChangedProperty();
+      } else {
         for (Object removedBean : modifyRemovals) {
           if (removedBean instanceof EntityBean) {
             EntityBean eb = (EntityBean) removedBean;
@@ -372,8 +374,6 @@ final class SaveManyBeans extends SaveManyBase {
             }
           }
         }
-      } else {
-        forceOrphanRemoval = !insertedParent && isChangedProperty();
       }
     }
   }
