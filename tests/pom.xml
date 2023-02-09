@@ -18,7 +18,7 @@
 
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip>
-    <ebean.version>13.11.3-FOC8-SNAPSHOT</ebean.version>
+    <ebean.version>13.11.3-FOC9-SNAPSHOT</ebean.version>
   </properties>
 
   <dependencyManagement>
