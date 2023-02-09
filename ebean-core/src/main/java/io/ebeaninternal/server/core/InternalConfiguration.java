@@ -605,7 +605,7 @@ public final class InternalConfiguration {
       case ORACLE:
         return new QueryPlanLoggerOracle();
       case DB2:
-        return new QueryPlanLoggerDb2();
+        return new QueryPlanLoggerDb2(null);
       default:
         return new QueryPlanLoggerExplain();
     }

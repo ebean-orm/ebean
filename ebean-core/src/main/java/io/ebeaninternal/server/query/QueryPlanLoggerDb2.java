@@ -1,12 +1,20 @@
 
 package io.ebeaninternal.server.query;
 
+import io.ebean.util.IOUtils;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.bind.capture.BindCapture;
 
-import java.sql.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Random;
 
 import static java.lang.System.Logger.Level.WARNING;
@@ -32,23 +40,69 @@ public final class QueryPlanLoggerDb2 extends QueryPlanLogger {
 
   private Random rnd = new Random();
 
+  private final String schemaPrefix;
+  private final String schemaParam;
+
+  private final String getQuerySql;
+
+  public QueryPlanLoggerDb2(String schema) {
+    if (schema == null || schema.isEmpty()) {
+      this.schemaPrefix = "";
+      this.schemaParam = "CURRENT SCHEMA";
+    } else {
+      this.schemaPrefix = schema + ".";
+      this.schemaParam = "'" + schema + "'";
+    }
+    this.getQuerySql = readReasource("QueryPlanLoggerDb2.sql", schemaPrefix);
+  }
+
+  private String readReasource(String resName, String schemaPrefix) {
+    try (InputStream stream = getClass().getResourceAsStream(resName)) {
+      if (stream == null) {
+        throw new IllegalStateException("Could not find resource " + resName);
+      }
+      BufferedReader reader = IOUtils.newReader(stream);
+      StringBuilder sb = new StringBuilder();
+      reader.lines().forEach(line -> sb.append(line).append('\n'));
+      return sb.toString().replace("${SCHEMA}", schemaPrefix);
+    } catch (IOException e) {
+      throw new IllegalStateException("Could not read resource " + resName, e);
+    }
+  }
+
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
     try (Statement stmt = conn.createStatement()) {
-      int queryNo = rnd.nextInt(Integer.MAX_VALUE);
-      try (PreparedStatement explainStmt = conn
-        .prepareStatement("EXPLAIN PLAN SET QUERYNO=" + queryNo + " FOR " + plan.sql())) {
-        bind.prepare(explainStmt, conn);
-        explainStmt.execute();
-      }
 
-      try (ResultSet rset = stmt.executeQuery("select * from EXPLAIN_STATEMENT where QUERYNO=" + queryNo)) {
-        return readQueryPlan(plan, bind, rset);
+      // create explain tables if neccessary
+      stmt.execute("BEGIN\n"
+        + "IF NOT EXISTS (SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA = " + schemaParam + " AND TABNAME = 'EXPLAIN_STREAM') THEN\n"
+        + "  call SYSPROC.SYSINSTALLOBJECTS( 'EXPLAIN', 'C' , '', " + schemaParam + " );\n"
+        + "END IF;\n"
+        + "END");
+
+      conn.commit();
+      try {
+        int queryNo = rnd.nextInt(Integer.MAX_VALUE);
+
+        try (PreparedStatement explainStmt = conn
+          .prepareStatement("EXPLAIN PLAN SET QUERYNO=" + queryNo + " FOR " + plan.sql())) {
+          bind.prepare(explainStmt, conn);
+          explainStmt.execute();
+        }
+        try (PreparedStatement pstmt = conn.prepareStatement(getQuerySql)) {
+          pstmt.setInt(1, queryNo);
+          try (ResultSet rset = pstmt.executeQuery()) {
+            return readQueryPlan(plan, bind, rset);
+          }
+        }
+      } finally {
+        // do not keep query plans in DB
+        conn.rollback();
       }
     } catch (SQLException e) {
       CoreLog.log.log(WARNING, "Could not log query plan", e);
       return null;
     }
   }
-
 }

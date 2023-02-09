@@ -64,15 +64,6 @@
     create index ix_ebasic_jmjb_gin2 on ebasic_json_map_json_b using gin(content jsonb_path_ops);
   </ddl-script>
 
-  <ddl-script name="db2 explain tables" platforms="db2">
-delimiter $$
-BEGIN
-IF NOT EXISTS (SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA = CURRENT SCHEMA AND TABNAME = 'EXPLAIN_STREAM') THEN
-call SYSPROC.SYSINSTALLOBJECTS( 'EXPLAIN', 'C' , '', CURRENT SCHEMA );
-END IF;
-END;$$
-  </ddl-script>
-  
   <ddl-script name="create tablespaces" platforms="db2luw" init="true">
 delimiter $$
 BEGIN 
