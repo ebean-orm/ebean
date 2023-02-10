@@ -324,7 +324,6 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
       logger.error("Insert instead update", e);
     }
     sql = LoggedSql.stop();
-    assertThat(sql).hasSize(9);
     assertThat(sql.get(0)).contains("delete from attachment where id=?");
     assertThat(sql.get(1)).contains(" -- bind(");
     assertThat(sql.get(2)).contains(" -- bind(");
@@ -333,6 +332,7 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     assertThat(sql.get(5)).contains(" -- bind(");
     assertThat(sql.get(6)).contains(" -- bind(");
     if (isH2() || isPostgresCompatible()) { // using identity, not using sequence
+      assertThat(sql).hasSize(9);
       assertThat(sql.get(7)).contains("insert into attachment (goods_entity_id, name, ");
       assertThat(sql.get(8)).contains(" -- bind(");
     }
