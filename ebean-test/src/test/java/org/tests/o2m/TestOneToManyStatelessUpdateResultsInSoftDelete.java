@@ -137,7 +137,14 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     assertThat(goodsAfterInsert.getWorkflowEntity().getOperations()).hasSize(1);
     goodsAfterInsert.getWorkflowEntity().setOperations(List.of());
 
+    LoggedSql.start();
     DB.save(goodsAfterInsert);
+    var sql = LoggedSql.collect();
+    if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
+      assertThat(sql).hasSize(2);
+      assertThat(sql.get(0)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
+    }
+
     assertThat(goodsAfterInsert.getWorkflowEntity().getOperations()).isEmpty();
     assertThat(DB.find(GoodsEntity.class, goods.getId()).getWorkflowEntity().getOperations()).isEmpty();
 
@@ -154,12 +161,27 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
 
     // Using save() throws io.ebean.DuplicateKeyException: Error when batch flush on sql: insert into workflow_entity ...
     // Must be an update() and not save() for this to be a "stateless update"
+    LoggedSql.collect();
     DB.update(goodsStateless);
+    sql = LoggedSql.collect();
+    assertThat(sql).isNotEmpty();
+    if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
+      assertThat(sql).hasSize(7);
+      assertThat(sql.get(0)).contains("update workflow_entity set when_modified=? where id=?");
+      assertThat(sql.get(1)).contains(" -- bind(");
+      assertThat(sql.get(2)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
+      assertThat(sql.get(3)).contains(" -- bind(");
+      assertThat(sql.get(4)).contains("insert into workflow_operation_entity (name, version, when_created, when_modified");
+      assertThat(sql.get(5)).contains(" -- bind(");
+      assertThat(sql.get(6)).contains("update goods_entity set when_modified=?, workflow_entity_id=? where id=?");
+    }
 
     var ops = workflow.getOperations();
     // shouldn't contain deleted operations
     assertThat(ops).hasSize(1);
     assertThat(goodsStateless.getWorkflowEntity().getOperations().get(0).getId()).isNotEqualTo(operation1.getId());
+
+    LoggedSql.stop();
   }
 
   @Test
@@ -194,17 +216,23 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     // uncommenting this lines makes the test pass
     //assertThat(goodsStateless.getWorkflowEntity().getOperations().size()).isEqualTo(0);
 
-    var sql = LoggedSql.stop();
-    sql.forEach(System.out::println);
-
-    System.out.println("BEFORE TRY");
-    LoggedSql.start();
+    var sql = LoggedSql.collect();
+    if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
+      assertThat(sql).hasSize(5);
+      assertThat(sql.get(0)).contains("update workflow_entity set when_modified=? where id=?");
+      assertThat(sql.get(1)).contains(" -- bind(");
+      assertThat(sql.get(2)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
+      assertThat(sql.get(3)).contains(" -- bind(");
+      assertThat(sql.get(4)).contains("update goods_entity set when_modified=?, workflow_entity_id=? where id=?");
+    }
 
     try (var writer = new StringWriter()) {
       var mapper = new ObjectMapper();
       mapper.writeValue(writer, goodsStateless);
       sql = LoggedSql.stop();
-      sql.forEach(System.out::println);
+      // queries fired to load the object graph for writing as json
+      assertThat(sql).hasSize(7);
+      sql.forEach(s -> assertThat(s).startsWith("select "));
       /*
       select t0.id, t0.name, t0.workflow_entity_id, t0.version, t0.when_created, t0.when_modified from goods_entity t0 where t0.id = ?; --bind(4, ) --micros(161)
       select t0.id, t0.name, t0.version, t0.when_created, t0.when_modified, t0.created_by, t0.updated_by, t0.workflow_entity_id from goods_entity t0 where t0.id = ?; --bind(4, ) --micros(525)
@@ -227,7 +255,8 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
 
       writer.flush();
       var serialized = writer.toString();
-      System.out.println(serialized);
+      // System.out.println(serialized);
+      assertThat(serialized).isNotEmpty();
       var readGoods = mapper.readValue(writer.toString(), GoodsEntity.class);
       assertThat(readGoods.getWorkflowEntity().getOperations()).hasSize(0);
     }
@@ -264,7 +293,16 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
       logger.error("Insert instead update", e);
     }
     var sql = LoggedSql.collect();
+    assertThat(sql).isNotEmpty();
     assertThat(sql.get(0)).contains("delete from attachment where goods_entity_id = ?");
+    assertThat(sql.get(1)).contains(" -- bind(");
+    assertThat(sql.get(2)).contains("insert into attachment (id, goods_entity_id, name, ");
+    assertThat(sql.get(3)).contains(" -- bind(");
+    assertThat(sql.get(4)).contains(" -- bind(");
+    if (isH2() || isPostgresCompatible() || isMySql()) { // i.e. using identity, not using sequence
+      assertThat(sql.get(5)).contains("insert into attachment (goods_entity_id, name,");
+      assertThat(sql.get(6)).contains(" -- bind(");
+    }
 
     persistedGoods = DB.find(GoodsEntity.class, goods.getId());
 
@@ -286,7 +324,18 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
       logger.error("Insert instead update", e);
     }
     sql = LoggedSql.stop();
+    assertThat(sql).hasSize(9);
     assertThat(sql.get(0)).contains("delete from attachment where id=?");
+    assertThat(sql.get(1)).contains(" -- bind(");
+    assertThat(sql.get(2)).contains(" -- bind(");
+    assertThat(sql.get(3)).contains(" -- bind(");
+    assertThat(sql.get(4)).contains("insert into attachment (id, goods_entity_id, name,");
+    assertThat(sql.get(5)).contains(" -- bind(");
+    assertThat(sql.get(6)).contains(" -- bind(");
+    if (isH2() || isPostgresCompatible()) { // using identity, not using sequence
+      assertThat(sql.get(7)).contains("insert into attachment (goods_entity_id, name, ");
+      assertThat(sql.get(8)).contains(" -- bind(");
+    }
 
     var persistedGoods2 = DB.find(GoodsEntity.class, goods.getId());
     assertThat(persistedGoods2.getAttachments()).hasSize(3);
