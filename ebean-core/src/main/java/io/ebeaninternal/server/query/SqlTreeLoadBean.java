@@ -5,6 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.core.type.ScalarDataReader;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.deploy.DbReadContext;
@@ -13,6 +14,8 @@ import io.ebeaninternal.server.deploy.id.IdBinder;
 
 import java.sql.SQLException;
 import java.util.Map;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Normal bean included in the query.
@@ -211,6 +214,9 @@ class SqlTreeLoadBean implements SqlTreeLoad {
         contextBean = ((STreePropertyAssocOne)nodeBeanProp).valueAsEntityBean(parentBean);
         if (contextBean != null) {
           desc.markAsDeleted(contextBean);
+          if (CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
+            CoreLog.markedAsDeleted.log(DEBUG, contextBean + " contextBean markedAsDeleted", new RuntimeException(contextBean + " contextBean markedAsDeleted"));
+          }
         }
       }
     }

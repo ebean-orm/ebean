@@ -861,7 +861,7 @@ public final class DefaultPersister implements Persister {
     SpiTransaction t = request.transaction();
     EntityBean orphanForRemoval = request.importedOrphanForRemoval();
     if (orphanForRemoval != null) {
-      delete(orphanForRemoval, request.transaction(), true);
+      delete(orphanForRemoval, request.transaction(), false);
     }
 
     // exported ones with cascade save
@@ -1079,7 +1079,7 @@ public final class DefaultPersister implements Persister {
   private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
     Object origValue = request.getOrigValue(prop);
     if (origValue instanceof EntityBean) {
-      delete((EntityBean) origValue, request.transaction(), true);
+      delete((EntityBean) origValue, request.transaction(), false);
     }
   }
 
