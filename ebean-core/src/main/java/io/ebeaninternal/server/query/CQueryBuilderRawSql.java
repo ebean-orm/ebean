@@ -64,7 +64,7 @@ final class CQueryBuilderRawSql {
         if (!first) {
           sb.append(", ");
         }
-        sb.append(selectProperty.replace("::Long", "::BIGINT"));
+        sb.append(selectProperty);
         first = false;
       }
     } else {
