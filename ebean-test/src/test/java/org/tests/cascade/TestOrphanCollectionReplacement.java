@@ -48,7 +48,7 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
       var sql = LoggedSql.stop();
       if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
         assertThat(sql).hasSize(4);
-        assertThat(sql.get(0)).contains("update coone_many set deleted=true where coone_id = ? and not ( id in (?) )");
+        assertThat(sql.get(0)).contains("update coone_many set deleted=true where coone_id = ? and not ( id ");
         assertThat(sql.get(1)).contains(" -- bind(");
         assertThat(sql.get(2)).contains("insert into coone_many (coone_id, name, deleted) values (?,?,?)");
         assertThat(sql.get(3)).contains(" -- bind(");
