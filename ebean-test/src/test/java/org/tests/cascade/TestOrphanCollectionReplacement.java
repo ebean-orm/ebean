@@ -1,6 +1,7 @@
 package org.tests.cascade;
 
 import io.ebean.DB;
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestOrphanCollectionReplacement extends BaseTestCase {
@@ -41,7 +43,16 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
       updatedRoles.addAll(List.of(role));
       fetchedParent.setChildren(updatedRoles);
 
+      LoggedSql.start();
       DB.save(fetchedParent);
+      var sql = LoggedSql.stop();
+      if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
+        assertThat(sql).hasSize(4);
+        assertThat(sql.get(0)).contains("update coone_many set deleted=true where coone_id = ? and not ( id in (?) )");
+        assertThat(sql.get(1)).contains(" -- bind(");
+        assertThat(sql.get(2)).contains("insert into coone_many (coone_id, name, deleted) values (?,?,?)");
+        assertThat(sql.get(3)).contains(" -- bind(");
+      }
     }
 
     COOne fetchedUser2 = DB.find(COOne.class, parentId);
