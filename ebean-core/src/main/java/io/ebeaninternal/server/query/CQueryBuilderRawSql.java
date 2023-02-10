@@ -8,6 +8,7 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
+import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.util.BindParamsParser;
 
@@ -56,7 +57,19 @@ final class CQueryBuilderRawSql {
 
   private String buildMainQuery(String orderBy, OrmQueryRequest<?> request, CQueryPredicates predicates, SpiRawSql.Sql sql) {
     StringBuilder sb = new StringBuilder();
-    sb.append(sql.getPreFrom());
+    OrmQueryProperties ormQueryProperties = request.query().getDetail().getChunk(null, false);
+    if (ormQueryProperties.hasSelectClause()) {
+      boolean first = true;
+      for (String selectProperty : ormQueryProperties.getIncluded()) {
+        if (!first) {
+          sb.append(", ");
+        }
+        sb.append(selectProperty.replace("::Long", "::BIGINT"));
+        first = false;
+      }
+    } else {
+      sb.append(sql.getPreFrom());
+    }
     sb.append(" ");
 
     String s = sql.getPreWhere();
