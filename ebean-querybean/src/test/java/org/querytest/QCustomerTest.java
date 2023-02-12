@@ -857,10 +857,20 @@ public class QCustomerTest {
     cust.setName("testFetchByScalarValue");
     cust.setPhoneNumber(new PhoneNumber("+18005555555"));
     cust.save();
-    assertThat(new QCustomer()
+
+    var customer = new QCustomer()
       .name.eq("testFetchByScalarValue")
       .phoneNumber.eq(new PhoneNumber("+18005555555"))
-      .findOne()).isNotNull();
+      .findOne();
+
+    assertThat(customer).isNotNull();
+
+    var customers = new QCustomer()
+      .name.eq("testFetchByScalarValue")
+      .phoneNumber.eq(new PhoneNumber("+18005555555"))
+      .findList();
+
+    assertThat(customers).hasSize(1);
   }
 
 
