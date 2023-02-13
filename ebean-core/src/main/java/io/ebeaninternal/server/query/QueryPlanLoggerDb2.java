@@ -46,24 +46,27 @@ public final class QueryPlanLoggerDb2 extends QueryPlanLogger {
 
   private final boolean create;
 
-  private final String getPlanSql;
+  private static final String GET_PLAN_TEMPLATE = readReasource("QueryPlanLoggerDb2.sql");
+
+  private static final String CREATE_TEMPLATE = "BEGIN\n"
+    + "IF NOT EXISTS (SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA = ${SCHEMA} AND TABNAME = 'EXPLAIN_STREAM') THEN\n"
+    + "  CALL SYSPROC.SYSINSTALLOBJECTS( 'EXPLAIN', 'C' , '', ${SCHEMA} );\n"
+    + "END IF;\n"
+    + "END";
 
   public QueryPlanLoggerDb2(String opts) {
-    String template = readReasource("QueryPlanLoggerDb2.sql");
     Map<String, String> map = StringHelper.delimitedToMap(opts, ";", "=");
-    String schema = map.get("schema");
     create = !"false" .equals(map.get("create")); // default is create
+    String schema = map.get("schema"); // should be null or SYSTOOLS
     if (schema == null || schema.isEmpty()) {
       this.schema = null;
-      this.getPlanSql = template.replace("${SCHEMA}", "");
     } else {
-      this.schema = schema;
-      this.getPlanSql = template.replace("${SCHEMA}", schema + ".");
+      this.schema = schema.toUpperCase();
     }
   }
 
-  private String readReasource(String resName) {
-    try (InputStream stream = getClass().getResourceAsStream(resName)) {
+  private static String readReasource(String resName) {
+    try (InputStream stream = QueryPlanLoggerDb2.class.getResourceAsStream(resName)) {
       if (stream == null) {
         throw new IllegalStateException("Could not find resource " + resName);
       }
@@ -80,47 +83,36 @@ public final class QueryPlanLoggerDb2 extends QueryPlanLogger {
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
     try (Statement stmt = conn.createStatement()) {
       if (create) {
+        // create explain tables if neccessary
         if (schema == null) {
-          // create explain tables if neccessary
-          stmt.execute("BEGIN\n"
-            + "IF NOT EXISTS (SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA = CURRENT USER AND TABNAME = 'EXPLAIN_STREAM') THEN\n"
-            + "  call SYSPROC.SYSINSTALLOBJECTS( 'EXPLAIN', 'C' , '', CURRENT USER );\n"
-            + "END IF;\n"
-            + "END");
+          stmt.execute(CREATE_TEMPLATE.replace("${SCHEMA}", "CURRENT USER"));
         } else {
-          stmt.execute("BEGIN\n"
-            + "IF NOT EXISTS (SELECT * FROM SYSCAT.TABLES WHERE TABSCHEMA = '" + schema + "' AND TABNAME = 'EXPLAIN_STREAM') THEN\n"
-            + "  call SYSPROC.SYSINSTALLOBJECTS( 'EXPLAIN', 'C' , '', '" + schema + "' );\n"
-            + "END IF;\n"
-            + "END");
+          stmt.execute(CREATE_TEMPLATE.replace("${SCHEMA}", "'" + schema + "'"));
         }
         conn.commit();
       }
-      String oldSchema = null;
+
       try {
         int queryNo = rnd.nextInt(Integer.MAX_VALUE);
 
-        try (PreparedStatement explainStmt = conn
-          .prepareStatement("EXPLAIN PLAN SET QUERYNO=" + queryNo + " FOR " + plan.sql())) {
+        String sql = "EXPLAIN PLAN SET QUERYNO = " + queryNo + " FOR " + plan.sql();
+        try (PreparedStatement explainStmt = conn.prepareStatement(sql)) {
           bind.prepare(explainStmt, conn);
           explainStmt.execute();
         }
-        if (schema == null) {
-          oldSchema = conn.getSchema();
-          stmt.execute("set schema current user");
-        }
-        try (PreparedStatement pstmt = conn.prepareStatement(getPlanSql)) {
+
+        sql = schema == null
+          ? GET_PLAN_TEMPLATE.replace("${SCHEMA}", conn.getMetaData().getUserName().toUpperCase())
+          : GET_PLAN_TEMPLATE.replace("${SCHEMA}", schema);
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
           pstmt.setInt(1, queryNo);
           try (ResultSet rset = pstmt.executeQuery()) {
             return readQueryPlan(plan, bind, rset);
           }
         }
       } finally {
-        if (oldSchema != null) {
-          conn.setSchema(oldSchema);
-        }
-        // do not keep query plans in DB
-        conn.rollback();
+        conn.rollback(); // do not keep query plans in DB
       }
     } catch (SQLException e) {
       CoreLog.log.log(WARNING, "Could not log query plan", e);

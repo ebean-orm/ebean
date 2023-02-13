@@ -6,7 +6,7 @@ SELECT 1 operator_id
      , CAST('001' AS VARCHAR(1000)) path
      , max(explain_time) explain_time
      , 0
-  FROM ${SCHEMA}EXPLAIN_OPERATOR O
+  FROM ${SCHEMA}.EXPLAIN_OPERATOR O
  WHERE O.EXPLAIN_REQUESTER = SESSION_USER
 
 UNION ALL
@@ -17,7 +17,7 @@ SELECT s.source_id
      , tree.explain_time
      , POSITION('/' || LPAD(CAST(s.source_id AS VARCHAR(3)), 3, '0')  || '/' IN path USING OCTETS)
   FROM tree
-     , ${SCHEMA}EXPLAIN_STREAM S
+     , ${SCHEMA}.EXPLAIN_STREAM S
  WHERE s.target_id    = tree.operator_id
    AND s.explain_time = tree.explain_time
    AND S.Object_Name IS NULL
@@ -103,19 +103,19 @@ SELECT CAST(tree.operator_id as VARCHAR(254)) ID
                     , MIN(CAST(ROUND(stream_count,0) AS BIGINT)) total_rows
                     , CAST(LISTAGG(object_name) AS VARCHAR(50)) object_name
                     , explain_time
-                 FROM ${SCHEMA}EXPLAIN_STREAM
+                 FROM ${SCHEMA}.EXPLAIN_STREAM
                 WHERE explain_time = (SELECT MAX(explain_time)
-                                        FROM ${SCHEMA}EXPLAIN_OPERATOR
+                                        FROM ${SCHEMA}.EXPLAIN_OPERATOR
                                        WHERE EXPLAIN_REQUESTER = SESSION_USER
                                      )
                 GROUP BY target_id, explain_time
               ) I
-         LEFT JOIN ${SCHEMA}EXPLAIN_STREAM O
+         LEFT JOIN ${SCHEMA}.EXPLAIN_STREAM O
            ON (    I.target_id=o.source_id
                AND I.explain_time = o.explain_time
                AND O.EXPLAIN_REQUESTER = SESSION_USER
               )
-         LEFT JOIN ${SCHEMA}EXPLAIN_ACTUALS act
+         LEFT JOIN ${SCHEMA}.EXPLAIN_ACTUALS act
            ON (    act.operator_id  = i.target_id
                AND act.explain_time = i.explain_time
                AND act.explain_requester = SESSION_USER
@@ -125,7 +125,7 @@ SELECT CAST(tree.operator_id as VARCHAR(254)) ID
     ON (    s.target_id    = tree.operator_id
         AND s.explain_time = tree.explain_time
        )
-  LEFT JOIN ${SCHEMA}EXPLAIN_OPERATOR O
+  LEFT JOIN ${SCHEMA}.EXPLAIN_OPERATOR O
     ON (    o.operator_id  = tree.operator_id
         AND o.explain_time = tree.explain_time
         AND o.explain_requester = SESSION_USER
@@ -151,7 +151,7 @@ SELECT CAST(tree.operator_id as VARCHAR(254)) ID
                            , ' ') argument
                   , operator_id
                   , explain_time
-               FROM ${SCHEMA}EXPLAIN_ARGUMENT EA
+               FROM ${SCHEMA}.EXPLAIN_ARGUMENT EA
               WHERE argument_type IN ('AGGMODE'   -- GRPBY
                                      , 'UNIQUE', 'TRUNCSRT' -- SORT
                                      , 'SCANDIR' -- IXSCAN, TBSCAN
@@ -203,8 +203,8 @@ SELECT CAST (LPAD(CASE WHEN operator_id = LAG  (operator_id)
                                 ELSE '9'
                END pred_order
              , operator_id id_order
-          FROM ${SCHEMA}EXPLAIN_PREDICATE p
-         WHERE explain_time = (SELECT max(explain_time) FROM ${SCHEMA}EXPLAIN_STATEMENT WHERE queryno = ?)
+          FROM ${SCHEMA}.EXPLAIN_PREDICATE p
+         WHERE explain_time = (SELECT max(explain_time) FROM ${SCHEMA}.EXPLAIN_STATEMENT WHERE queryno = ?)
        )
 )
 ORDER BY path
