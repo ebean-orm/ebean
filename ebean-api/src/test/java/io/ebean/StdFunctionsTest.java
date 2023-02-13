@@ -66,4 +66,13 @@ class StdFunctionsTest {
     assertThat(coalesce(foo, "banana").toString()).isEqualTo("coalesce(foo,'banana')");
   }
 
+  @Test
+  void testCoalesceWithQuoted() {
+    assertThat(coalesce(foo, "ba'nana").toString()).isEqualTo("coalesce(foo,'ba''nana')");
+  }
+
+  @Test
+  void testConcatWithQuoted() {
+    assertThat(concat(foo, "ba'nana").toString()).isEqualTo("concat(foo,'ba''nana')");
+  }
 }
