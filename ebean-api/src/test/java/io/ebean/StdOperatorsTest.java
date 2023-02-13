@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class StdFunctionsTest {
+class StdOperatorsTest {
 
   final Query.Property<Number> amount = Query.Property.of("amount");
   final Query.Property<String> foo = Query.Property.of("foo");
