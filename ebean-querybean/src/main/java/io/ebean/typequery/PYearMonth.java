@@ -7,7 +7,7 @@ import java.time.YearMonth;
  *
  * @param <R> the root query bean type
  */
-public final class PYearMonth<R> extends PBaseDate<R,YearMonth> {
+public final class PYearMonth<R> extends PBaseDate<R, YearMonth> {
 
   /**
    * Construct with a property name and root instance.

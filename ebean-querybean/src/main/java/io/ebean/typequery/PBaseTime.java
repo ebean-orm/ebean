@@ -1,13 +1,13 @@
 package io.ebean.typequery;
 
 /**
- * Base property for date and date time types.
+ * Base property for time types.
  *
  * @param <R> the root query bean type
- * @param <T> the scalar type
+ * @param <T> the number type
  */
 @SuppressWarnings("rawtypes")
-public abstract class PBaseDate<R, T extends Comparable> extends PBaseComparable<R, T> {
+public abstract class PBaseTime<R, T extends Comparable> extends PBaseComparable<R, T> {
 
   /**
    * Construct with a property name and root instance.
@@ -15,14 +15,14 @@ public abstract class PBaseDate<R, T extends Comparable> extends PBaseComparable
    * @param name property name
    * @param root the root query bean instance
    */
-  public PBaseDate(String name, R root) {
-    super(name , root);
+  public PBaseTime(String name, R root) {
+    super(name, root);
   }
 
   /**
    * Construct with additional path prefix.
    */
-  public PBaseDate(String name, R root, String prefix) {
+  public PBaseTime(String name, R root, String prefix) {
     super(name, root, prefix);
   }
 

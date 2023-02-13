@@ -1768,4 +1768,31 @@ public interface Query<T> extends CancelableQuery {
    */
   Query<T> orderById(boolean orderById);
 
+  /**
+   * Type safe query bean properties and expressions (marker interface).
+   * <p>
+   * Implemented by query bean properties and expressions based on those properties.
+   * <p>
+   * The base type determines which {@link StdOperators} can be used on the property.
+   *
+   * @param <T> The property type.
+   */
+  interface Property<T> {
+
+    /**
+     * Return a property given the expression.
+     */
+    static <T> Property<T> of(String expression) {
+      return new SimpleProperty<>(expression);
+    }
+
+    /**
+     * Return the property in string expression form.
+     * <p>
+     * This is a path to a database column (like "name" or "billingAddress.city") or a function
+     * wrapping a path (like <em>lower(name)</em>, <em>concat(name, '-', billingAddress.city)</em>
+     */
+    @Override
+    String toString();
+  }
 }
