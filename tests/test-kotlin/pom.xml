@@ -17,7 +17,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <ebean.version>13.11.3-FOC10-SNAPSHOT</ebean.version>
+    <ebean.version>13.11.3-FOC11-SNAPSHOT</ebean.version>
     <ebean-maven-plugin.version>13.3.0</ebean-maven-plugin.version>
     <kotlin.version>1.6.0</kotlin.version>
     <jackson.version>2.12.1</jackson.version>
