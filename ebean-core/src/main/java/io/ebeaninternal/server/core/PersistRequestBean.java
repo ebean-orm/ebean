@@ -928,20 +928,20 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private void logSummaryMessage() {
-    String draft = (beanDescriptor.isDraftable() && !publish) ? "] draft[true]" : "]";
+    String draft = (beanDescriptor.isDraftable() && !publish) ? " draft[true]" : "";
     String name = beanDescriptor.name();
     switch (type) {
       case INSERT:
-        transaction.logSummary("Inserted [" , name , "] [" , (idValue == null ? "" : idValue.toString()) , draft);
+        transaction.logSummary("Inserted [{0}] [{1}]{2}", name, (idValue == null ? "" : idValue), draft);
         break;
       case UPDATE:
-        transaction.logSummary("Updated [" , name , "] [" , idValue.toString() , draft);
+        transaction.logSummary("Updated [{0}] [{1}]{2}", name, idValue , draft);
         break;
       case DELETE:
-        transaction.logSummary("Deleted [" , name , "] [" , idValue.toString() , draft);
+        transaction.logSummary("Deleted [{0}] [{1}]{2}", name, idValue , draft);
         break;
       case DELETE_SOFT:
-        transaction.logSummary("SoftDelete [" , name , "] [" , idValue.toString() , draft);
+        transaction.logSummary("SoftDelete [{0}] [{1}]{2}", name, idValue , draft);
         break;
       default:
         break;

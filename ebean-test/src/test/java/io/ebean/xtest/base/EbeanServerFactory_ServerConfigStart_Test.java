@@ -35,7 +35,7 @@ public class EbeanServerFactory_ServerConfigStart_Test {
         }
 
         @Override
-        public void debug(String msg) {
+        public void debug(String msg, Object... args) {
         }
       };
 

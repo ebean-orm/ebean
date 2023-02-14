@@ -8,7 +8,6 @@ import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
 import io.ebeaninternal.server.bind.DataBind;
-import io.ebeaninternal.server.util.Str;
 
 import javax.persistence.OptimisticLockException;
 import java.sql.Connection;
@@ -102,7 +101,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     } catch (OptimisticLockException e) {
       // add the SQL and bind values to error message
       final String m = e.getMessage() + " sql[" + sql + "] bind[" + bindLog + "]";
-      persistRequest.transaction().logSummary("OptimisticLockException:", m);
+      persistRequest.transaction().logSummary("OptimisticLockException:{0}", m);
       throw new OptimisticLockException(m, null, e.getEntity());
     }
   }
@@ -146,15 +145,15 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       switch (batchedStatus) {
         case BATCHED_FIRST: {
           transaction.logSql(sql);
-          transaction.logSql(" -- bind(", bindLog.toString(), ")");
+          transaction.logSql(" -- bind({0})", bindLog);
           return;
         }
         case BATCHED: {
-          transaction.logSql(" -- bind(", bindLog.toString(), ")");
+          transaction.logSql(" -- bind({0})", bindLog);
           return;
         }
         default: {
-          transaction.logSql(sql, "; -- bind(", bindLog.toString(), ")");
+          transaction.logSql("{0}; -- bind({1})", sql, bindLog);
         }
       }
     }

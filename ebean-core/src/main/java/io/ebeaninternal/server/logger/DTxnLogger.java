@@ -36,18 +36,18 @@ final class DTxnLogger implements SpiTxnLogger {
   }
 
   @Override
-  public void sql(String[] msg) {
-    sql.debug(Str.add(logPrefix, msg));
+  public void sql(String msg, Object... args) {
+    sql.debug(Str.add(logPrefix, msg), args);
   }
 
   @Override
-  public void sum(String[] msg) {
-    sum.debug(Str.add(logPrefix, msg));
+  public void sum(String msg, Object... args) {
+    sum.debug(Str.add(logPrefix, msg), args);
   }
 
   @Override
-  public void txn(String[] msg) {
-    txn.debug(Str.add(logPrefix, msg));
+  public void txn(String msg, Object... args) {
+    txn.debug(Str.add(logPrefix, msg), args);
   }
 
   @Override

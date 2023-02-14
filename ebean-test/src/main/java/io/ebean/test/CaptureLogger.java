@@ -2,6 +2,7 @@ package io.ebean.test;
 
 import io.ebeaninternal.api.SpiLogger;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,11 +25,11 @@ final class CaptureLogger implements SpiLogger {
   }
 
   @Override
-  public void debug(String msg) {
+  public void debug(String msg, Object... args) {
     if (active) {
-      messages.add(msg);
+      messages.add(MessageFormat.format(msg, args));
     }
-    wrapped.debug(msg);
+    wrapped.debug(msg, args);
   }
 
   List<String> start() {

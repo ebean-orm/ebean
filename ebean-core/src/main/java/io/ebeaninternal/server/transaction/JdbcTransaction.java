@@ -714,18 +714,18 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final void logSql(String... msg) {
-    logger.sql(msg);
+  public void logSql(String msg, Object... args) {
+    logger.sql(msg, args);
   }
 
   @Override
-  public final void logSummary(String... msg) {
-    logger.sum(msg);
+  public final void logSummary(String msg, Object... args) {
+    logger.sum(msg, args);
   }
 
   @Override
-  public void logTxn(String... args) {
-    logger.txn(args);
+  public void logTxn(String msg, Object... args) {
+    logger.txn(msg, args);
   }
 
   /**

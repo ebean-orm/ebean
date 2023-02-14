@@ -82,7 +82,7 @@ public final class PersistRequestCallableSql extends PersistRequest {
       persistExecute.collectSqlCall(label, startNanos);
     }
     if (transaction.isLogSummary()) {
-      transaction.logSummary("CallableSql label[", callableSql.getLabel(), "] rows[", String.valueOf(rowCount), "] bind[", bindLog, "]");
+      transaction.logSummary("CallableSql label[{0}] rows[{1}] bind[{2}]", callableSql.getLabel(), rowCount, bindLog);
     }
 
     // register table modifications with the transaction event

@@ -49,13 +49,13 @@ final class SavepointTransaction extends SpiTransactionProxy {
   }
 
   @Override
-  public void logSql(String... msg) {
-    transaction.logSql(Str.add(spPrefix, msg));
+  public void logSql(String msg, Object... args) {
+    transaction.logSql(Str.add(spPrefix, msg), args);
   }
 
   @Override
-  public void logSummary(String... msg) {
-    transaction.logSummary(Str.add(spPrefix, msg));
+  public void logSummary(String msg, Object... args) {
+    transaction.logSummary(Str.add(spPrefix, msg), args);
   }
 
   @Override
@@ -92,7 +92,7 @@ final class SavepointTransaction extends SpiTransactionProxy {
       connection.releaseSavepoint(savepoint);
       state = STATE_COMMITTED;
       manager.notifyOfCommit(this);
-      transaction.logTxn(spPrefix, "commit");
+      transaction.logTxn(spPrefix + "commit");
     } catch (SQLException e) {
       throw new PersistenceException("Error trying to commit/release Savepoint", e);
     }
@@ -103,7 +103,7 @@ final class SavepointTransaction extends SpiTransactionProxy {
       connection.rollback(savepoint);
       state = STATE_ROLLED_BACK;
       manager.notifyOfRollback(this, cause);
-      transaction.logTxn(spPrefix, "rollback");//TODO: Pass the cause
+      transaction.logTxn(spPrefix + "rollback");//TODO: Pass the cause
     } catch (SQLException e) {
       throw new PersistenceException("Error trying to rollback Savepoint", e);
     }

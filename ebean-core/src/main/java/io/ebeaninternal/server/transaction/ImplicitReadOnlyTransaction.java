@@ -430,17 +430,17 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public void logSql(String... msg) {
-    logger.sql(msg);
+  public void logSql(String msg, Object... args) {
+    logger.sql(msg, args);
   }
 
   @Override
-  public void logSummary(String... msg) {
-    logger.sum(msg);
+  public void logSummary(String msg, Object... args) {
+    logger.sum(msg, args);
   }
 
   @Override
-  public void logTxn(String... args) {
+  public void logTxn(String msg, Object... args) {
     // never called
   }
 

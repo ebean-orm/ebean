@@ -20,17 +20,17 @@ public interface SpiTxnLogger {
   /**
    * Log a SQL message.
    */
-  void sql(String[] msg);
+  void sql(String msg, Object... args);
 
   /**
    * Log a Summary message.
    */
-  void sum(String[] msg);
+  void sum(String msg, Object... args);
 
   /**
    * Log a Transaction message.
    */
-  void txn(String[] args);
+  void txn(String msg, Object... args);
 
   /**
    * Transaction Committed.

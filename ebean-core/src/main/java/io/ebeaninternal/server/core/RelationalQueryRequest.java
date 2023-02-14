@@ -123,7 +123,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   public void logSummary() {
     if (transaction.isLogSummary()) {
       long micros = (System.nanoTime() - startNano) / 1000L;
-      transaction.logSummary("SqlQuery  rows[", String.valueOf(rows), "] micros[", String.valueOf(micros), "] bind[", bindLog, "]");
+      transaction.logSummary("SqlQuery  rows[{0}] micros[{1}] bind[{2}]", rows, micros, bindLog);
     }
   }
 

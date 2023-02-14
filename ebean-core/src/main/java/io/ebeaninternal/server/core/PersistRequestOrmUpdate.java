@@ -83,7 +83,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
     OrmUpdateType ormUpdateType = ormUpdate.getOrmUpdateType();
     String tableName = ormUpdate.getBaseTable();
     if (transaction.isLogSummary()) {
-      transaction.logSummary(ormUpdateType.toString(), " table[", tableName, "] rows[", String.valueOf(rowCount), "] bind[", bindLog, "]");
+      transaction.logSummary("{0} table[{1}] rows[{2}] bind[{3}]", ormUpdateType, tableName, rowCount, bindLog);
     }
     if (ormUpdate.isNotifyCache()) {
       // add the modification info to the TransactionEvent

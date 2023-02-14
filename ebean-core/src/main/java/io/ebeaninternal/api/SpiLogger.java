@@ -17,6 +17,6 @@ public interface SpiLogger {
   /**
    * Log a debug level message.
    */
-  void debug(String msg);
+  void debug(String msg, Object... args);
 
 }
