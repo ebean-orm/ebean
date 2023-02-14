@@ -1,3 +1,6 @@
+[![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-spring-txn/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean-spring-txn)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ebean-orm/ebean-spring-txn/blob/master/LICENSE)
+
 ebean-spring-txn
 =====================
 
