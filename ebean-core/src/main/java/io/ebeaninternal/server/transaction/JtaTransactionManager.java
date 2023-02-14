@@ -105,8 +105,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     // This is a transaction that Ebean has not seen before.
 
     // "wrap" it in a Ebean specific JtaTransaction
-    String txnId = String.valueOf(System.currentTimeMillis());
-    JtaTransaction newTrans = new JtaTransaction(txnId, true, ut, dataSource(), transactionManager);
+    JtaTransaction newTrans = new JtaTransaction( true, ut, dataSource(), transactionManager);
 
     // create and register transaction listener
     JtaTxnListener txnListener = createJtaTxnListener(newTrans);
