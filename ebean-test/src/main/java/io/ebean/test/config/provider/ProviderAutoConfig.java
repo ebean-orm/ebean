@@ -27,7 +27,6 @@ public class ProviderAutoConfig {
   }
 
   public void run() {
-
     int providerSetFlag = 0;
 
     CurrentUserProvider provider = config.getCurrentUserProvider();
