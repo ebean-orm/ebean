@@ -12,8 +12,8 @@
 [![MariaDB](https://github.com/ebean-orm/ebean/actions/workflows/mariadb.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mariadb.yml)
 [![Oracle](https://github.com/ebean-orm/ebean/actions/workflows/oracle.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/oracle.yml)
 [![SqlServer](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver.yml)
+[![DB2 LUW](https://github.com/ebean-orm/ebean/actions/workflows/db2luw.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/db2luw.yml)
 [![Yugabyte](https://github.com/ebean-orm/ebean/actions/workflows/yugabyte.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/yugabyte.yml)
-
 
 ##### Build with Java Early Access versions
 [![ebean EA](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml)
