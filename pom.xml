@@ -48,7 +48,7 @@
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>13.7.0</ebean-migration.version>
     <ebean-test-containers.version>6.3</ebean-test-containers.version>
-    <ebean-datasource.version>8.4</ebean-datasource.version>
+    <ebean-datasource.version>8.5</ebean-datasource.version>
     <ebean-agent.version>13.12.0</ebean-agent.version>
     <ebean-maven-plugin.version>13.12.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
