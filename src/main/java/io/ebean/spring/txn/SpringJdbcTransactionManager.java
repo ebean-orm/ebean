@@ -7,7 +7,6 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import javax.persistence.PersistenceException;
@@ -91,12 +90,10 @@ public final class SpringJdbcTransactionManager implements ExternalTransactionMa
   private SpringTxnListener listener() {
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       List<TransactionSynchronization> synchronizations = TransactionSynchronizationManager.getSynchronizations();
-      if (synchronizations != null) {
-        // search for our specific listener
-        for (TransactionSynchronization synchronization : synchronizations) {
-          if (synchronization instanceof SpringTxnListener) {
-            return (SpringTxnListener) synchronization;
-          }
+      // search for our specific listener
+      for (TransactionSynchronization synchronization : synchronizations) {
+        if (synchronization instanceof SpringTxnListener) {
+          return (SpringTxnListener) synchronization;
         }
       }
     }
@@ -117,7 +114,7 @@ public final class SpringJdbcTransactionManager implements ExternalTransactionMa
    * When Ebean is notified (of the commit/rollback) it can then manage its cache, notify
    * BeanPersistListeners etc.
    */
-  private static class SpringTxnListener extends TransactionSynchronizationAdapter {
+  private static class SpringTxnListener implements TransactionSynchronization {
 
     private final TransactionManager transactionManager;
 
