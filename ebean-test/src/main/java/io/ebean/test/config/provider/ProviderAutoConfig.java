@@ -38,7 +38,7 @@ public class ProviderAutoConfig {
 
     CurrentTenantProvider tenantProvider = config.getCurrentTenantProvider();
     if (tenantProvider == null) {
-      if (Boolean.parseBoolean(properties.getProperty("ebean.test.registerTestTenantProvider", "true"))) {
+      if (Boolean.parseBoolean(properties.getProperty("ebean.test.registerTestTenantProvider", "false"))) {
         providerSetFlag += 2;
         config.setCurrentTenantProvider(new WhoTenantProvider());
       }
