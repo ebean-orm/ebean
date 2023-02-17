@@ -9,7 +9,7 @@ final class SpringJdbcTransaction extends ExternalJdbcTransaction {
   private final ConnectionHolder holder;
 
   SpringJdbcTransaction(ConnectionHolder holder, TransactionManager manager) {
-    super("s" + holder.hashCode(), true, holder.getConnection(), manager);
+    super(true, holder.getConnection(), manager);
     this.holder = holder;
   }
 
