@@ -44,7 +44,7 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>persistence-api</artifactId>
+      <artifactId>jakarta-persistence-api</artifactId>
       <version>${ebean-persistence-api.version}</version>
     </dependency>
 
