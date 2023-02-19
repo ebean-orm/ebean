@@ -146,6 +146,9 @@
                 <replace file="${project.basedir}/ebean-api/src/main/java/module-info.java"
                          token=" persistence.api" value=" jakarta.persistence.api"/>
 
+                <replace file="${project.basedir}/ebean-api/src/main/java/module-info.java"
+                         token=" javax.servlet.api;" value=" jakarta.servlet;"/>
+
                 <!-- replace imports and package to jakarta in java sources -->
                 <replace dir="${project.basedir}">
                   <include name="**/*.java"/>
@@ -162,6 +165,24 @@
                                  value="requires transitive jakarta.xml.bind"/>
 
                 </replace>
+
+                <replace dir="${project.basedir}/ebean-api/src/main/java/io/ebean/event">
+                  <include name="**/*.java"/>
+                  <replacefilter token="javax.servlet"
+                                 value="jakarta.servlet"/>
+
+                </replace>
+
+                <!-- Currently getting compile error jakarta.cdi module not found ? -->
+<!--                <replace file="${project.basedir}/ebean-core/src/main/java/module-info.java"-->
+<!--                         token=" javax.transaction;" value=" jakarta.transaction;"/>-->
+
+<!--                <replace dir="${project.basedir}/ebean-core/src/main/java/io/ebeaninternal/server/transaction">-->
+<!--                  <include name="**/*.java"/>-->
+<!--                  <replacefilter token="javax.transaction"-->
+<!--                                 value="jakarta.transaction"/>-->
+<!--                </replace>-->
+
               </target>
             </configuration>
           </execution>
