@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.13.1-SNAPSHOT</version>
+    <version>${revision}</version>
   </parent>
 
   <name>kotlin querybean generator</name>
