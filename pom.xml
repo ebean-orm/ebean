@@ -41,7 +41,7 @@
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.14.0</jackson.version>
     <h2database.version>2.1.214</h2database.version>
-    <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
+    <ebean-persistence-api.version>3.0-RC1</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
     <ebean-annotation.version>8.3</ebean-annotation.version>
     <ebean-ddl-runner.version>2.2</ebean-ddl-runner.version>
@@ -118,6 +118,57 @@
       </modules>
     </profile>
   </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>3.1.0</version>
+        <inherited>false</inherited>
+        <executions>
+          <execution>
+            <id>javax2jakarta</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <echo>${project.basedir}</echo>
+
+                <replace file="${project.basedir}/ebean-api/pom.xml"
+                         token="artifactId>persistence-api"
+                         value="artifactId>jakarta-persistence-api"/>
+                <replace file="${project.basedir}/ebean-bom/pom.xml"
+                         token="artifactId>persistence-api"
+                         value="artifactId>jakarta-persistence-api"/>
+
+                <replace file="${project.basedir}/ebean-api/src/main/java/module-info.java"
+                         token=" persistence.api" value=" jakarta.persistence.api"/>
+
+                <!-- replace imports and package to jakarta in java sources -->
+                <replace dir="${project.basedir}">
+                  <include name="**/*.java"/>
+                  <include name="**/*.kt"/>
+
+                  <replacefilter token="javax.persistence."
+                                 value="jakarta.persistence."/>
+                  <replacefilter token="javax.xml.bind"
+                                 value="jakarta.xml.bind"/>
+
+                  <replacefilter token="requires java.xml.bind"
+                                 value="requires jakarta.xml.bind"/>
+                  <replacefilter token="requires transitive java.xml.bind"
+                                 value="requires transitive jakarta.xml.bind"/>
+
+                </replace>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
 
