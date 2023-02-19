@@ -107,7 +107,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.10.1</tile>
+            <tile>io.ebean.tile:enhancement:13.12.0</tile>
           </tiles>
         </configuration>
       </plugin>
