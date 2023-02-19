@@ -17,7 +17,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.13.1-SNAPSHOT</version>
+      <version>${revision}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -63,21 +63,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.13.1-SNAPSHOT</version>
+      <version>${revision}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>13.13.1-SNAPSHOT</version>
+      <version>${revision}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.13.1-SNAPSHOT</version>
+      <version>${revision}</version>
       <scope>test</scope>
     </dependency>
 

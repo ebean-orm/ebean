@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>13.13.1-SNAPSHOT</version>
+      <version>${revision}</version>
       <scope>provided</scope>
     </dependency>
 
