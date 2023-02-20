@@ -23,7 +23,7 @@ final class ScalarTypeJodaDateMidnight extends ScalarTypeBaseDate<DateMidnight> 
 
   @Override
   protected String toIsoFormat(DateMidnight value) {
-    return value.toString();
+    return value.toLocalDate().toString();
   }
 
   @Override

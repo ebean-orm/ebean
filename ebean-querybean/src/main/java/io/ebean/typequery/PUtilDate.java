@@ -7,7 +7,7 @@ import java.util.Date;
  *
  * @param <R> the root query bean type
  */
-public final class PUtilDate<R> extends PBaseDate<R,Date> {
+public final class PUtilDate<R> extends PBaseDate<R, Date> {
 
   /**
    * Construct with a property name and root instance.

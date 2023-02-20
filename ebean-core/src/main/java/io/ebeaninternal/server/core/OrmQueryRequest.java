@@ -229,6 +229,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       persistenceContext.beginIterate();
     }
     loadContext = new DLoadContext(this, secondaryQueries);
+    loadContext.useReferences(Type.ITERATE == query.getType());
   }
 
   /**
@@ -700,8 +701,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   /**
    * Log the SQL if the logLevel is appropriate.
    */
-  public void logSql(String sql) {
-    transaction.logSql(sql);
+  public void logSql(String msg, Object... args) {
+    transaction.logSql(msg, args);
   }
 
   /**

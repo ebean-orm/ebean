@@ -2,10 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>tests</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>${revision}</version>
+  </parent>
 
-  <groupId>io.ebean</groupId>
   <artifactId>test-java16</artifactId>
-  <version>1.0</version>
 
   <properties>
     <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
@@ -15,7 +18,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>13.11.4-SNAPSHOT</version>
+      <version>${revision}</version>
     </dependency>
 
     <dependency>
@@ -27,7 +30,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.11.4-SNAPSHOT</version>
+      <version>${revision}</version>
       <scope>test</scope>
     </dependency>
 
@@ -53,7 +56,7 @@
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>13.11.4-SNAPSHOT</version>
+              <version>${revision}</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
@@ -66,7 +69,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.10.1</tile>
+            <tile>io.ebean.tile:enhancement:13.12.0</tile>
           </tiles>
         </configuration>
       </plugin>

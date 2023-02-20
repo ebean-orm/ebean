@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.11.4-SNAPSHOT</version>
+  <version>${revision}</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -38,6 +38,7 @@
   </developers>
 
   <properties>
+    <revision>13.13.1-SNAPSHOT</revision>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.14.0</jackson.version>
     <h2database.version>2.1.214</h2database.version>
@@ -46,11 +47,11 @@
     <ebean-annotation.version>8.3</ebean-annotation.version>
     <ebean-ddl-runner.version>2.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
-    <ebean-migration.version>13.6.0</ebean-migration.version>
+    <ebean-migration.version>13.7.0</ebean-migration.version>
     <ebean-test-containers.version>6.3</ebean-test-containers.version>
-    <ebean-datasource.version>8.4</ebean-datasource.version>
-    <ebean-agent.version>13.11.3</ebean-agent.version>
-    <ebean-maven-plugin.version>13.11.3</ebean-maven-plugin.version>
+    <ebean-datasource.version>8.5</ebean-datasource.version>
+    <ebean-agent.version>13.13.0</ebean-agent.version>
+    <ebean-maven-plugin.version>13.13.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
