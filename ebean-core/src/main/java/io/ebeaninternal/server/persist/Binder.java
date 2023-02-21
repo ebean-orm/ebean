@@ -44,7 +44,7 @@ public final class Binder {
     this.dbExpressionHandler = dbExpressionHandler;
     this.dataTimeZone = dataTimeZone;
     this.multiValueBind = multiValueBind;
-    this.enableBindLog = logManager.sql().isDebug();
+    this.enableBindLog = logManager.enableBindLog();
   }
 
   /**

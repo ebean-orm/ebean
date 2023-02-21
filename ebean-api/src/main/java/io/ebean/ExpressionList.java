@@ -1730,4 +1730,8 @@ public interface ExpressionList<T> {
    */
   ExpressionList<T> endNot();
 
+  /**
+   * Clears the current expression list.
+   */
+  ExpressionList<T> clear();
 }

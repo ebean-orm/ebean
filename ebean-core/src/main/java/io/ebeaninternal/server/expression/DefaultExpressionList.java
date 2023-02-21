@@ -1268,4 +1268,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     }
     return null;
   }
+
+  @Override
+  public ExpressionList<T> clear() {
+    list.clear();
+    return this;
+  }
 }

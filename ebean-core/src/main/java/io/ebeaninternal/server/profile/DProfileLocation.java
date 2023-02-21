@@ -1,13 +1,15 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
+import io.ebean.util.StackWalkFilter;
+
+import java.util.stream.Stream;
 
 /**
  * Default profile location that uses stack trace.
  */
 class DProfileLocation implements ProfileLocation {
 
-  private static final String IO_EBEAN = "io.ebean";
   private static final String UNKNOWN = "unknown";
 
   private String fullLocation;
@@ -88,14 +90,14 @@ class DProfileLocation implements ProfileLocation {
   }
 
   private String create() {
-    // relatively expensive but we only do it once per profile location
-    StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-    for (int i = 3; i < trace.length; i++) {
-      if (!trace[i].getClassName().startsWith(IO_EBEAN)) {
-        return withLineNumber(trace[i].toString());
-      }
-    }
-    return UNKNOWN;
+    return StackWalker.getInstance().walk(this::filter);
+  }
+
+  private String filter(Stream<StackWalker.StackFrame> frames) {
+    return frames.filter(StackWalkFilter.filter())
+      .findFirst()
+      .map(line -> withLineNumber(line.toString()))
+      .orElse(UNKNOWN);
   }
 
   private String withLineNumber(String traceLine) {

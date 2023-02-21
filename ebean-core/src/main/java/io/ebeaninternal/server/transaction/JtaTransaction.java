@@ -20,8 +20,8 @@ public final class JtaTransaction extends JdbcTransaction {
   /**
    * Create the JtaTransaction.
    */
-  public JtaTransaction(String id, boolean explicit, UserTransaction utx, DataSource ds, TransactionManager manager) {
-    super(id, explicit, null, manager);
+  public JtaTransaction(boolean explicit, UserTransaction utx, DataSource ds, TransactionManager manager) {
+    super(explicit, null, manager);
     userTransaction = utx;
     try {
       newTransaction = userTransaction.getStatus() == Status.STATUS_NO_TRANSACTION;

@@ -6,10 +6,7 @@ import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Request for loading ManyToOne and OneToOne relationships.
@@ -103,7 +100,7 @@ public final class LoadBeanRequest extends LoadRequest {
   /**
    * Load the beans into the L2 cache if that is requested and check for load failures due to deletes.
    */
-  public void postLoad(List<?> list) {
+  public Result postLoad(List<?> list) {
     Set<Object> loadedIds = new HashSet<>();
     BeanDescriptor<?> desc = loadBuffer.descriptor();
     // collect Ids and maybe load bean cache
@@ -114,6 +111,7 @@ public final class LoadBeanRequest extends LoadRequest {
       desc.cacheBeanPutAll(list);
     }
     if (lazyLoadProperty != null) {
+      Set<Object> missedIds = new HashSet<>();
       for (EntityBeanIntercept ebi : batch) {
         // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
         // necessary but allow processing to continue until it is accessed by client code
@@ -121,8 +119,36 @@ public final class LoadBeanRequest extends LoadRequest {
         if (!loadedIds.contains(id)) {
           // assume this is logically deleted (hence not found)
           desc.markAsDeleted(ebi.getOwner());
+          missedIds.add(id);
         }
       }
+      return new Result(loadedIds, missedIds);
+    }
+    return EMPTY_RESULT;
+  }
+
+  static final Result EMPTY_RESULT = new Result(Collections.emptySet(),Collections.emptySet());
+
+  public static class Result {
+
+    private final Set<Object> loadedIds;
+    private final Set<Object> missedIds;
+
+    Result(Set<Object> loadedIds, Set<Object> missedIds) {
+      this.loadedIds = loadedIds;
+      this.missedIds = missedIds;
+    }
+
+    public boolean markedDeleted() {
+      return !missedIds.isEmpty();
+    }
+
+    public Set<Object> missedIds() {
+      return missedIds;
+    }
+
+    public Set<Object> loadedIds() {
+      return loadedIds;
     }
   }
 }

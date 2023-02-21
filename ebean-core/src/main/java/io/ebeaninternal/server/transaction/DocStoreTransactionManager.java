@@ -25,11 +25,11 @@ public final class DocStoreTransactionManager extends TransactionManager {
 
   @Override
   public SpiTransaction createReadOnlyTransaction(Object tenantId) {
-    return new DocStoreOnlyTransaction("", false, this);
+    return new DocStoreOnlyTransaction(false, this);
   }
 
   @Override
   protected SpiTransaction createTransaction(boolean explicit, Connection c) {
-    return new DocStoreOnlyTransaction(nextTxnId(), explicit, this);
+    return new DocStoreOnlyTransaction(explicit, this);
   }
 }

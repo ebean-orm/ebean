@@ -3,7 +3,6 @@ package io.ebeaninternal.server.core;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.PersistExecute;
 import io.ebeaninternal.server.persist.TrimLogSql;
@@ -148,7 +147,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   public void logSqlBatchBind() {
     if (transaction.isLogSql()) {
-      transaction.logSql(Str.add(" -- bind(", bindLog, ")"));
+      transaction.logSql(" -- bind({0})", bindLog);
     }
   }
 
@@ -161,7 +160,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
       persistExecute.collectSqlUpdate(label, startNanos);
     }
     if (transaction.isLogSql() && !batchThisRequest) {
-      transaction.logSql(Str.add(TrimLogSql.trim(updateSql.getGeneratedSql()), "; -- bind(", bindLog, ") rows(", String.valueOf(rowCount), ")"));
+      transaction.logSql("{0}; -- bind({1}) rows({2})", TrimLogSql.trim(updateSql.getGeneratedSql()), bindLog, rowCount);
     }
     if (updateSql.isAutoTableMod()) {
       // add the modification info to the TransactionEvent

@@ -4,7 +4,6 @@ import io.ebean.DB;
 import io.ebean.FetchGroup;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
-import io.ebean.typequery.TQProperty;
 import org.example.domain.Customer;
 import org.example.domain.Order;
 import org.example.domain.OrderDetail;
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class QOrderTest {
@@ -219,13 +219,66 @@ public class QOrderTest {
   }
 
   @Test
+  public void updateQuery() {
+    LoggedSql.start();
+    new QOrder()
+      .status.eq(Order.Status.COMPLETE)
+      .orderDate.gt(new java.sql.Date(System.currentTimeMillis()))
+      .asUpdate()
+      .set(QOrder.Alias.version, 56L)
+      .setNull(QOrder.Alias.orderDate)
+      .update();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("update o_order set version=?, order_date=null where status = ? and order_date > ?");
+  }
+
+  @Test
+  public void stdExpression_iLikeConcatCoalesce() {
+    QOrder o = QOrder.alias();
+
+    // LOWER(CONCAT(COALESCE(a.name, ""), ":", a.description)) LIKE LOWER(:param)
+    Query<Order> query = new QOrder()
+      .select(o.id, o.status)
+      .add(ilike(concat(coalesce(o.customer.name, "Not-Provided"), ":", o.status), "rob"))
+      .query();
+
+    query.findList();
+    String generatedSql = query.getGeneratedSql();
+    assertThat(generatedSql).contains("where lower(concat(coalesce(t1.name,'Not-Provided'),':',t0.status)) like ? escape''");
+  }
+
+  @Test
+  public void stdExpression_gtCoalesce() {
+    QOrder o = QOrder.alias();
+
+    Query<Order> query = new QOrder()
+      .select(o.id, o.status)
+      .or()
+        .add(gt(coalesce(o.customer.version, 0), 42L))
+        .id.lt(12)
+      .endOr()
+     .query();
+
+    query.findList();
+
+    String sql = query.getGeneratedSql();
+    assertThat(sql).contains(" where (coalesce(t1.version,0) > ? or t0.id < ?)");
+    assertThat(sql).isEqualTo("select t0.id, t0.status from o_order t0 join be_customer t1 on t1.id = t0.customer_id where (coalesce(t1.version,0) > ? or t0.id < ?)");
+  }
+
+  @Test
   void geSubQuery() {
+    var c = QCustomer.alias();
+    var o = QOrder.alias();
+
     var subQuery = new QOrder()
-      .select(StdFunctions.max(QOrder.Alias.orderDate))
+      .select(max(o.orderDate))
       .query();
 
     var query = new QCustomer()
-      .select(QCustomer.Alias.id)
+      .select(c.id)
       .registered.ge(subQuery)
       .query();
     query.findList();
@@ -236,22 +289,22 @@ public class QOrderTest {
   @Test
   void gtSubQuery() {
     var subQuery = new QOrder()
-      .select("max(orderDate)")
+      .select(sum(QOrder.Alias.version))
       .query();
 
     var query = new QCustomer()
       .select(QCustomer.Alias.id)
-      .registered.gt(subQuery)
+      .version.gt(subQuery)
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered > (select max(t0.order_date) from o_order t0)");
+    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.version > (select sum(t0.version) from o_order t0)");
   }
 
   @Test
   void leSubQuery() {
     var subQuery = new QOrder()
-      .select("max(orderDate)")
+      .select(max(QOrder.Alias.orderDate))
       .query();
 
     var query = new QCustomer()
@@ -266,7 +319,7 @@ public class QOrderTest {
   @Test
   void ltSubQuery() {
     var subQuery = new QOrder()
-      .select("max(orderDate)")
+      .select(max(QOrder.Alias.orderDate))
       .query();
 
     var query = new QCustomer()
@@ -296,7 +349,7 @@ public class QOrderTest {
   @Test
   void neSubQuery() {
     var subQuery = new QOrder()
-      .select(StdFunctions.max(QOrder.Alias.orderDate))
+      .select(max(QOrder.Alias.orderDate))
       .query();
 
     var query = new QCustomer()
@@ -311,11 +364,11 @@ public class QOrderTest {
   @Test
   void propertyCompare() {
     Query<Order> query = new QOrder()
-      .orderDate.lt(QOrder.Alias.customer.registered)
+      .orderDate.lt(QOrder.Alias.shipDate) // have to be the exact same type, in this case java.sql.Date
       .query();
 
     query.findList();
-    assertThat(query.getGeneratedSql()).contains(" from o_order t0 join be_customer t1 on t1.id = t0.customer_id where t0.order_date < t1.registered");
+    assertThat(query.getGeneratedSql()).contains(" from o_order t0 where t0.order_date < t0.ship_date");
   }
 
   @Test
@@ -375,9 +428,4 @@ public class QOrderTest {
     order.save();
   }
 
-  static class StdFunctions {
-    static String max(TQProperty<?> prop) {
-      return "max(" + prop + ")";
-    }
-  }
 }

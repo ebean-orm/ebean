@@ -43,9 +43,6 @@ abstract class TransactionFactory {
         throw new PersistenceException(e);
       }
     }
-    if (explicit && manager.log().txn().isTrace()) {
-      manager.log().txn().trace(t.getLogPrefix() + "Begin");
-    }
     return t;
   }
 }

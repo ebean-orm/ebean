@@ -275,7 +275,7 @@ class SimpleQueryBeanWriter {
     writer.append("   * ").append(comment).eol();
     writer.append("   */").eol();
     writer.append("  @SafeVarargs @SuppressWarnings(\"varargs\")").eol();
-    writer.append("  public final R fetch%s(TQProperty<Q%s>... properties) {", fetchType, origShortName).eol();
+    writer.append("  public final R fetch%s(TQProperty<Q%s,?>... properties) {", fetchType, origShortName).eol();
     writer.append("    return fetch%sProperties(properties);", fetchType).eol();
     writer.append("  }").eol();
     writer.eol();

@@ -2,7 +2,7 @@ package io.ebean.test.config.provider;
 
 import io.ebean.config.EncryptKey;
 
-class FixedEncryptKey implements EncryptKey {
+final class FixedEncryptKey implements EncryptKey {
 
   private final String key;
 
@@ -14,6 +14,5 @@ class FixedEncryptKey implements EncryptKey {
   public String getStringValue() {
     return key;
   }
-
 
 }

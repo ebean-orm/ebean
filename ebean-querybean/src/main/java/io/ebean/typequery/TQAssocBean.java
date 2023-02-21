@@ -17,7 +17,7 @@ import java.util.Set;
  * @param <R> the specific root query bean type (e.g. QCustomer)
  */
 @SuppressWarnings("rawtypes")
-public abstract class TQAssocBean<T, R> extends TQProperty<R> {
+public abstract class TQAssocBean<T, R> extends TQProperty<R, Object> {
 
   private static final FetchConfig FETCH_DEFAULT = FetchConfig.ofDefault();
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
@@ -111,7 +111,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Eagerly fetch this association fetching some of the properties.
    */
   @SafeVarargs
-  protected final R fetchProperties(TQProperty<?>... props) {
+  protected final R fetchProperties(TQProperty<?, ?>... props) {
     return fetchWithProperties(FETCH_DEFAULT, props);
   }
 
@@ -119,7 +119,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Eagerly fetch query this association fetching some of the properties.
    */
   @SafeVarargs
-  protected final R fetchQueryProperties(TQProperty<?>... props) {
+  protected final R fetchQueryProperties(TQProperty<?, ?>... props) {
     return fetchWithProperties(FETCH_QUERY, props);
   }
 
@@ -127,7 +127,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Eagerly fetch this association using L2 bean cache.
    */
   @SafeVarargs
-  protected final R fetchCacheProperties(TQProperty<?>... props) {
+  protected final R fetchCacheProperties(TQProperty<?, ?>... props) {
     return fetchWithProperties(FETCH_CACHE, props);
   }
 
@@ -135,12 +135,12 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Eagerly fetch query this association fetching some of the properties.
    */
   @SafeVarargs
-  protected final R fetchLazyProperties(TQProperty<?>... props) {
+  protected final R fetchLazyProperties(TQProperty<?, ?>... props) {
     return fetchWithProperties(FETCH_LAZY, props);
   }
 
   @SafeVarargs
-  private R fetchWithProperties(FetchConfig config, TQProperty<?>... props) {
+  private R fetchWithProperties(FetchConfig config, TQProperty<?, ?>... props) {
     spiQuery().fetchProperties(_name, properties(props), config);
     return _root;
   }
@@ -173,13 +173,13 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   }
 
   private SpiQueryFetch spiQuery() {
-    return (SpiQueryFetch)((TQRootBean) _root).query();
+    return (SpiQueryFetch) ((TQRootBean) _root).query();
   }
 
   @SafeVarargs
-  private Set<String> properties(TQProperty<?>... props) {
+  private Set<String> properties(TQProperty<?, ?>... props) {
     Set<String> set = new LinkedHashSet<>();
-    for (TQProperty<?> prop : props) {
+    for (TQProperty<?, ?> prop : props) {
       set.add(prop.propertyName());
     }
     return set;

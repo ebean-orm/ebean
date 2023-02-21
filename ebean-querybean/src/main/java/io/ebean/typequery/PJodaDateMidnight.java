@@ -7,7 +7,7 @@ import org.joda.time.DateMidnight;
  *
  * @param <R> the root query bean type
  */
-public final class PJodaDateMidnight<R> extends PBaseDate<R,DateMidnight> {
+public final class PJodaDateMidnight<R> extends PBaseDate<R, DateMidnight> {
 
   /**
    * Construct with a property name and root instance.

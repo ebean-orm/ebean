@@ -2,6 +2,7 @@ package io.ebean.bean;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.List;
 
 import static io.ebean.util.EncodeB64.enc;
 
@@ -27,19 +28,26 @@ public final class CallStack implements Serializable, CallOrigin {
 
   private final String zeroHash;
   private final String pathHash;
-  private final StackTraceElement[] callStack;
+  private final Object[] callStack;
   private final int hc;
 
-  public CallStack(StackTraceElement[] callStack, int zeroHash, int pathHash) {
+  public CallStack(Object[] callStack, int zeroHash, int pathHash) {
     this.callStack = callStack;
+    this.hc = computeHashCode();
     this.zeroHash = enc(zeroHash);
     this.pathHash = enc(pathHash);
+  }
+
+  public CallStack(List<StackWalker.StackFrame> frames) {
+    this.callStack = frames.toArray(new Object[0]);
     this.hc = computeHashCode();
+    this.zeroHash = enc(callStack[0].hashCode());
+    this.pathHash = enc(hc);
   }
 
   private int computeHashCode() {
     int hc = 0;
-    for (StackTraceElement element : callStack) {
+    for (Object element : callStack) {
       hc = 92821 * hc + element.hashCode();
     }
     return hc;

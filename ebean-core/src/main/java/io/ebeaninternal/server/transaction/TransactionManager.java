@@ -36,7 +36,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
@@ -63,8 +62,6 @@ public class TransactionManager implements SpiTransactionManager {
    * Prefix for transaction id's (logging).
    */
   final String prefix;
-  private final String externalTransPrefix;
-  private final AtomicLong counter = new AtomicLong(1000L);
 
   /**
    * The dataSource of connections.
@@ -96,8 +93,6 @@ public class TransactionManager implements SpiTransactionManager {
   private final boolean skipCacheAfterWrite;
   private final TransactionFactory transactionFactory;
   private final SpiLogManager logManager;
-  private final SpiLogger txnLogger;
-  private final boolean txnDebug;
   private final DatabasePlatform databasePlatform;
   private final SpiProfileHandler profileHandler;
   private final TimedMetric txnMain;
@@ -115,8 +110,6 @@ public class TransactionManager implements SpiTransactionManager {
   public TransactionManager(TransactionManagerOptions options) {
     this.server = options.server;
     this.logManager = options.logManager;
-    this.txnLogger = logManager.txn();
-    this.txnDebug = txnLogger.isDebug();
     this.databasePlatform = options.config.getDatabasePlatform();
     this.supportsSavepointId = databasePlatform.supportsSavepointId();
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
@@ -142,7 +135,6 @@ public class TransactionManager implements SpiTransactionManager {
     this.profileHandler = options.profileHandler;
     this.bulkEventListenerMap = new BulkEventListenerMap(options.config.getBulkTableEventListeners());
     this.prefix = "";
-    this.externalTransPrefix = "e";
 
     CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
     this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
@@ -273,14 +265,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Wrap the externally supplied Connection.
    */
   public SpiTransaction wrapExternalConnection(Connection c) {
-    return wrapExternalConnection(externalTransPrefix + c.hashCode(), c);
-  }
-
-  /**
-   * Wrap an externally supplied Connection with a known transaction id.
-   */
-  private SpiTransaction wrapExternalConnection(String id, Connection c) {
-    ExternalJdbcTransaction t = new ExternalJdbcTransaction(id, true, c, this);
+    ExternalJdbcTransaction t = new ExternalJdbcTransaction(true, c, this);
     // set the default batch mode
     t.setBatchMode(persistBatch);
     t.setBatchOnCascade(persistBatchOnCascade);
@@ -313,14 +298,7 @@ public class TransactionManager implements SpiTransactionManager {
    * Create a new transaction.
    */
   SpiTransaction createTransaction(boolean explicit, Connection c) {
-    return new JdbcTransaction(nextTxnId(), explicit, c, this);
-  }
-
-  /**
-   * Return the next transaction id.
-   */
-  String nextTxnId() {
-    return txnDebug ? prefix + counter.incrementAndGet() : prefix;
+    return new JdbcTransaction(explicit, c, this);
   }
 
   /**
@@ -328,17 +306,7 @@ public class TransactionManager implements SpiTransactionManager {
    */
   @Override
   public final void notifyOfRollback(SpiTransaction transaction, Throwable cause) {
-    try {
-      if (txnLogger.isDebug()) {
-        String msg = transaction.getLogPrefix() + "Rollback";
-        if (cause != null) {
-          msg += " error: " + formatThrowable(cause);
-        }
-        txnLogger.debug(msg);
-      }
-    } catch (Exception ex) {
-      log.log(ERROR, "Error while notifying TransactionEventListener of rollback event", ex);
-    }
+    // Do nothing now
   }
 
   /**
@@ -347,32 +315,6 @@ public class TransactionManager implements SpiTransactionManager {
   @Override
   public final void notifyOfQueryOnly(SpiTransaction transaction) {
     // Nothing that interesting here
-    if (txnLogger.isTrace()) {
-      txnLogger.trace(transaction.getLogPrefix() + "Commit - query only");
-    }
-  }
-
-  private String formatThrowable(Throwable e) {
-    if (e == null) {
-      return "";
-    }
-    StringBuilder sb = new StringBuilder();
-    formatThrowable(e, sb);
-    return sb.toString();
-  }
-
-  private void formatThrowable(Throwable e, StringBuilder sb) {
-    sb.append(e.toString());
-    StackTraceElement[] stackTrace = e.getStackTrace();
-    if (stackTrace.length > 0) {
-      sb.append(" stack0: ");
-      sb.append(stackTrace[0]);
-    }
-    Throwable cause = e.getCause();
-    if (cause != null) {
-      sb.append(" cause: ");
-      formatThrowable(cause, sb);
-    }
   }
 
   /**
@@ -381,9 +323,6 @@ public class TransactionManager implements SpiTransactionManager {
   @Override
   public final void notifyOfCommit(SpiTransaction transaction) {
     try {
-      if (txnLogger.isDebug()) {
-        txnLogger.debug(transaction.getLogPrefix() + "Commit");
-      }
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
       postCommit.notifyLocalCache();
       backgroundExecutor.execute(postCommit.backgroundNotify());
@@ -676,23 +615,16 @@ public class TransactionManager implements SpiTransactionManager {
     }
   }
 
-  /**
-   * Return true if Transaction debug is on.
-   */
-  public final boolean isTxnDebug() {
-    return txnDebug;
+  public SpiTxnLogger logger() {
+    return logManager.logger();
+  }
+
+  public SpiTxnLogger loggerReadOnly() {
+    return logManager.readOnlyLogger();
   }
 
   public final SpiLogManager log() {
     return logManager;
-  }
-
-  public final boolean isLogSql() {
-    return logManager.sql().isDebug();
-  }
-
-  public final boolean isLogSummary() {
-    return logManager.sum().isDebug();
   }
 
   /**
@@ -704,4 +636,5 @@ public class TransactionManager implements SpiTransactionManager {
       server.updateAll(dirtyBeans, transaction);
     }
   }
+
 }

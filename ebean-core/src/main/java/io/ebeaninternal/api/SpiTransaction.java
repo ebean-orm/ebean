@@ -27,10 +27,6 @@ public interface SpiTransaction extends Transaction {
    */
   String getLabel();
 
-  /**
-   * Return the string prefix with the transaction id and label used in logging.
-   */
-  String getLogPrefix();
 
   /**
    * Return true if generated SQL and Bind values should be logged to the
@@ -47,12 +43,17 @@ public interface SpiTransaction extends Transaction {
   /**
    * Log a message to the SQL logger.
    */
-  void logSql(String msg);
+  void logSql(String msg, Object... args);
 
   /**
-   * Log a message to the SUMMARY logger.
+   * Log a summary message to the SUMMARY logger.
    */
-  void logSummary(String msg);
+  void logSummary(String msg, Object... args);
+
+  /**
+   * Log a transaction message to the transaction logger.
+   */
+  void logTxn(String msg, Object... args);
 
   /**
    * Register a "Deferred Relationship" that requires an additional update later.

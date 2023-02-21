@@ -31,6 +31,13 @@ public final class Expr {
   }
 
   /**
+   * Return the underlying expression factory.
+   */
+  public static ExpressionFactory factory() {
+    return DB.expressionFactory();
+  }
+
+  /**
    * Equal To - property equal to the given value.
    */
   public static Expression eq(String propertyName, Object value) {
