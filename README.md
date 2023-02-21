@@ -3,7 +3,6 @@
 [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/FOCONIS/ebean/blob/master/LICENSE)
 [![Multi-JDK Build](https://github.com/FOCONIS/ebean/actions/workflows/multi-jdk-build.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/multi-jdk-build.yml)
-[![JDK 18-ea](https://github.com/FOCONIS/ebean/actions/workflows/jdk-18-ea.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/jdk-18-ea.yml)
 
 ##### Build with database platforms
 [![H2Database](https://github.com/FOCONIS/ebean/actions/workflows/h2database.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/h2database.yml)
@@ -12,6 +11,7 @@
 [![MariaDB](https://github.com/FOCONIS/ebean/actions/workflows/mariadb.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/mariadb.yml)
 [![Oracle](https://github.com/FOCONIS/ebean/actions/workflows/oracle.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/oracle.yml)
 [![SqlServer](https://github.com/FOCONIS/ebean/actions/workflows/sqlserver.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/sqlserver.yml)
+[![DB2 LUW](https://github.com/FOCONIS/ebean/actions/workflows/db2luw.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/db2luw.yml)
 [![Yugabyte](https://github.com/FOCONIS/ebean/actions/workflows/yugabyte.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/yugabyte.yml)
 
 

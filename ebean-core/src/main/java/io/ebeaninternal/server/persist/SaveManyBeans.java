@@ -27,8 +27,9 @@ final class SaveManyBeans extends SaveManyBase {
   private final boolean untouchedBeanCollection;
   private final Collection<?> collection;
   private final boolean hasOrderColumn;
+  private final boolean forcedUpdate;
   private int sortOrder;
-  private boolean insertAllChildren;
+  private boolean forceOrphanRemoval;
 
   SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(persister, insertedParent, many, parentBean, request);
@@ -41,6 +42,7 @@ final class SaveManyBeans extends SaveManyBase {
     this.untouchedBeanCollection = untouchedBeanCollection();
     this.collection = cascade ? BeanCollectionUtil.getActualEntries(value) : null;
     this.hasOrderColumn = many.hasOrderColumn();
+    this.forcedUpdate = request.isForcedUpdate();
   }
 
   /**
@@ -135,10 +137,8 @@ final class SaveManyBeans extends SaveManyBase {
       targetDescriptor.preAllocateIds(collection.size());
     }
     if (forcedUpdateOrphanRemoval()) {
-      // collect the Id's (to exclude from deleteManyDetails)
-      List<Object> detailIds = collectIds(collection, targetDescriptor, isMap);
-      // deleting missing children - children not in our collected detailIds
-      persister.deleteManyDetails(transaction, many.descriptor(), parentBean, many, detailIds, deleteMode);
+      // deleting orphans, anything not in our detailsIds
+      persister.deleteManyDetails(transaction, many.descriptor(), parentBean, many, detailIds(), deleteMode);
     }
     transaction.depth(+1);
     saveAllBeans(orderColumn);
@@ -149,7 +149,7 @@ final class SaveManyBeans extends SaveManyBase {
   }
 
   private boolean forcedUpdateOrphanRemoval() {
-    return !insertedParent && many.isOrphanRemoval() && request.isForcedUpdate();
+    return !insertedParent && many.isOrphanRemoval() && (forceOrphanRemoval || forcedUpdate);
   }
 
   private void saveAllBeans(final BeanProperty orderColumn) {
@@ -185,10 +185,6 @@ final class SaveManyBeans extends SaveManyBase {
             skipSavingThisBean = false;
             // set the parent bean to detailBean
             many.setJoinValuesToChild(parentBean, detail, mapKeyValue);
-          } else if (insertAllChildren) {
-            ebi.setNew();
-            skipSavingThisBean = false;
-            many.setJoinValuesToChild(parentBean, detail, mapKeyValue);
           } else {
             skipSavingThisBean = saveRecurseSkippable;
           }
@@ -223,12 +219,10 @@ final class SaveManyBeans extends SaveManyBase {
   }
 
   /**
-   * Collect the Id values of the details to remove 'missing children' for stateless updates.
+   * Return the Id values of beans we know are being updated (any others are orphans)
    */
-  private List<Object> collectIds(Collection<?> collection, BeanDescriptor<?> targetDescriptor, boolean isMap) {
-    List<Object> detailIds = new ArrayList<>();
-    // stateless update with deleteMissingChildren so first
-    // collect the Id values to remove the 'missing children'
+  private List<Object> detailIds() {
+    final var detailIds = new ArrayList<>();
     for (Object detailBean : collection) {
       if (isMap) {
         detailBean = ((Map.Entry<?, ?>) detailBean).getValue();
@@ -236,8 +230,10 @@ final class SaveManyBeans extends SaveManyBase {
       if (detailBean instanceof EntityBean) {
         Object id = targetDescriptor.id(detailBean);
         if (!isNullOrZero(id)) {
-          // remember the Id (other details not in the collection) will be removed
-          detailIds.add(id);
+          if (forcedUpdate || !((EntityBean) detailBean)._ebean_getIntercept().isNew()) {
+            // Id of bean that will be updated, exclude it from orphan removal
+            detailIds.add(id);
+          }
         }
       }
     }
@@ -269,8 +265,7 @@ final class SaveManyBeans extends SaveManyBase {
   }
 
   private void saveAssocManyIntersection(boolean queue) {
-    boolean forcedUpdate = request.isForcedUpdate();
-    boolean vanillaCollection = !(value instanceof BeanCollection<?>);
+    final boolean vanillaCollection = !(value instanceof BeanCollection<?>);
     if (vanillaCollection || forcedUpdate) {
       // delete all intersection rows and then treat all
       // beans in the collection as additions
@@ -347,6 +342,7 @@ final class SaveManyBeans extends SaveManyBase {
             if (queue) {
               transaction.depth(-100);
             }
+            throw new PersistenceException("ManyToMany bean does not have an Id value? " + otherBean);
           } else {
             // build a intersection row for 'insert'
             IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);
@@ -369,10 +365,7 @@ final class SaveManyBeans extends SaveManyBase {
       return;
     }
     if (!(value instanceof BeanCollection<?>)) {
-      if (!forcedUpdateOrphanRemoval() && (!insertedParent && cascade && isChangedProperty())) {
-        persister.addToFlushQueue(many.deleteByParentId(request.beanId(), null), transaction, 0);
-        insertAllChildren = true;
-      }
+      forceOrphanRemoval = !insertedParent && isChangedProperty();
     } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
       Set<?> modifyRemovals = c.getModifyRemovals();
@@ -384,7 +377,9 @@ final class SaveManyBeans extends SaveManyBase {
       if (!hasOrderColumn) {
         c.modifyReset();
       }
-      if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
+      if (modifyRemovals == null || modifyRemovals.isEmpty()) {
+        forceOrphanRemoval = !insertedParent && isChangedProperty();
+      } else {
         for (Object removedBean : modifyRemovals) {
           if (removedBean instanceof EntityBean) {
             EntityBean eb = (EntityBean) removedBean;

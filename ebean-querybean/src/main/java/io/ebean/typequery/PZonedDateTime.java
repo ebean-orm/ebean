@@ -7,7 +7,7 @@ import java.time.ZonedDateTime;
  *
  * @param <R> the root query bean type
  */
-public final class PZonedDateTime<R> extends PBaseCompareable<R, ZonedDateTime> {
+public final class PZonedDateTime<R> extends PBaseDate<R, ZonedDateTime> {
 
   /**
    * Construct with a property name and root instance.
@@ -26,25 +26,4 @@ public final class PZonedDateTime<R> extends PBaseCompareable<R, ZonedDateTime> 
     super(name, root, prefix);
   }
 
-  /**
-   * Same as greater than.
-   *
-   * @param value the equal to bind value
-   * @return the root query bean instance
-   */
-  public R after(ZonedDateTime value) {
-    expr().gt(_name, value);
-    return _root;
-  }
-
-  /**
-   * Same as less than.
-   *
-   * @param value the equal to bind value
-   * @return the root query bean instance
-   */
-  public R before(ZonedDateTime value) {
-    expr().lt(_name, value);
-    return _root;
-  }
 }

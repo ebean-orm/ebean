@@ -5,7 +5,6 @@ import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
 
 import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.TRACE;
 
 /**
  * Create a logger that captures the SQL and register it for later access in tests.
@@ -38,18 +37,8 @@ public class CapturingLoggerFactory implements SpiLoggerFactory {
     }
 
     @Override
-    public boolean isTrace() {
-      return logger.isLoggable(TRACE);
-    }
-
-    @Override
-    public void debug(String msg) {
-      logger.log(DEBUG, msg);
-    }
-
-    @Override
-    public void trace(String msg) {
-      logger.log(TRACE, msg);
+    public void debug(String msg, Object... args) {
+      logger.log(DEBUG, msg, args);
     }
   }
 }

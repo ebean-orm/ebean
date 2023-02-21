@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ProfileLocationTest {
+class ProfileLocationTest {
 
   private static final ProfileLocation loc = ProfileLocation.create(12, "foo");
   private static final ProfileLocation locB = ProfileLocation.create();
@@ -17,7 +17,7 @@ public class ProfileLocationTest {
   }
 
   @Test
-  public void test_obtain() {
+  void test_obtain() {
     assertThat(doIt()).isTrue();
     assertThat(loc.fullLocation()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt(ProfileLocationTest.java:16)");
     assertThat(loc.location()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt");
@@ -30,13 +30,12 @@ public class ProfileLocationTest {
   }
 
   @Test
-  public void test_add() {
+  void test_add() {
     loc.add(100);
   }
 
   @Test
-  public void test_constructor() {
-
+  void test_constructor() {
     Other other = new Other();
     other.hashCode();
 

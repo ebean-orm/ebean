@@ -672,7 +672,7 @@ public final class DefaultPersister implements Persister {
         if (idList != null) {
           q.where().idIn(idList);
           if (t.isLogSummary()) {
-            t.logSummary("-- DeleteById of " + descriptor.name() + " ids[" + idList + "] requires fetch of foreign key values");
+            t.logSummary("-- DeleteById of {0} ids[{1}] requires fetch of foreign key values", descriptor.name(), idList);
           }
           List<?> beanList = server.findList(q, t);
           deleteCascade(beanList, t, deleteMode, false);
@@ -681,7 +681,7 @@ public final class DefaultPersister implements Persister {
         } else {
           q.where().idEq(id);
           if (t.isLogSummary()) {
-            t.logSummary("-- DeleteById of " + descriptor.name() + " id[" + id + "] requires fetch of foreign key values");
+            t.logSummary("-- DeleteById of {0} id[{1}] requires fetch of foreign key values", descriptor.name(), id);
           }
           EntityBean bean = (EntityBean) server.findOne(q, t);
           if (bean == null) {
@@ -741,7 +741,7 @@ public final class DefaultPersister implements Persister {
       for (BeanPropertyAssocMany<?> many : manys) {
         SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
         if (t.isLogSummary()) {
-          t.logSummary("-- Deleting intersection table entries: " + many.fullName());
+          t.logSummary("-- Deleting intersection table entries: {0}", many.fullName());
         }
         executeSqlUpdate(sqlDelete, t);
       }
@@ -751,9 +751,9 @@ public final class DefaultPersister implements Persister {
     SqlUpdate deleteById = descriptor.deleteById(id, idList, deleteMode);
     if (t.isLogSummary()) {
       if (idList != null) {
-        t.logSummary("-- Deleting " + descriptor.name() + " Ids: " + idList);
+        t.logSummary("-- Deleting {0} Ids: {1}", descriptor.name(), idList);
       } else {
-        t.logSummary("-- Deleting " + descriptor.name() + " Id: " + id);
+        t.logSummary("-- Deleting {0} Id: {1}", descriptor.name(), id);
       }
     }
 
@@ -861,7 +861,7 @@ public final class DefaultPersister implements Persister {
     SpiTransaction t = request.transaction();
     EntityBean orphanForRemoval = request.importedOrphanForRemoval();
     if (orphanForRemoval != null) {
-      delete(orphanForRemoval, request.transaction(), true);
+      delete(orphanForRemoval, request.transaction(), false);
     }
 
     // exported ones with cascade save
@@ -1082,7 +1082,7 @@ public final class DefaultPersister implements Persister {
   private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
     Object origValue = request.getOrigValue(prop);
     if (origValue instanceof EntityBean) {
-      delete((EntityBean) origValue, request.transaction(), true);
+      delete((EntityBean) origValue, request.transaction(), false);
     }
   }
 

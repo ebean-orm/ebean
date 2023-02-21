@@ -1,8 +1,7 @@
 package io.ebean.typequery;
 
 /**
- * Property for classes that are serialized/deserialized by
- * ScalarType/AttributeConverter.
+ * Property for classes that are serialized/deserialized by ScalarType/AttributeConverter.
  *
  * @param <R> the root query bean type
  * @param <D> the scalar type

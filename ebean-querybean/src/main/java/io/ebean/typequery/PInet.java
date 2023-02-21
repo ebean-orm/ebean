@@ -7,7 +7,7 @@ import io.ebean.types.Inet;
  *
  * @param <R> the root query bean type
  */
-public final class PInet<R> extends PBaseValueEqual<R, Inet> {
+public final class PInet<R> extends PBaseString<R, Inet> {
 
   /**
    * Construct with a property name and root instance.

@@ -2,10 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.avaje</groupId>
-    <artifactId>java8-oss</artifactId>
-    <version>3.9</version>
-    <relativePath/>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>${revision}</version>
   </parent>
 
   <artifactId>ebean-kotlin</artifactId>
@@ -28,7 +27,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>${ebean.version}</version>
+      <version>${revision}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -50,7 +49,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>${ebean.version}</version>
+      <version>${revision}</version>
       <scope>test</scope>
     </dependency>
 
@@ -92,7 +91,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.10.1</tile>
+            <tile>io.ebean.tile:enhancement:13.12.0</tile>
           </tiles>
         </configuration>
       </plugin>

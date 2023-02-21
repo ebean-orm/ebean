@@ -4,8 +4,9 @@ package io.ebean.typequery;
  * Base scalar property.
  *
  * @param <R> The type of the owning root bean
+ * @param <T> The property type
  */
-public class TQPropertyBase<R> extends TQProperty<R> {
+public abstract class TQPropertyBase<R, T> extends TQProperty<R, T> {
 
   /**
    * Construct with a property name and root instance.
