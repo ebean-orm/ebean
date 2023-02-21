@@ -1,5 +1,6 @@
 package io.ebean.common;
 
+import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 
@@ -71,27 +72,35 @@ public class BeanListLazyAdd<E> extends BeanList<E> {
     return true;
   }
 
+
+  @Override
+  public void loadFrom(BeanCollection<?> other) {
+    super.loadFrom(other);
+    if (lazyAddedEntries != null) {
+      list.addAll(lazyAddedEntries);
+      lazyAddedEntries = null;
+    }
+  }
+
   /**
    * on init, this happens on all accessor methods except on 'add' and addAll,
    * we add the lazy added entries at the end of the list
    */
   @Override
-  void init() {
-    lock.lock();
-    try {
-      if (list == null) {
-        if (disableLazyLoad) {
-          list = lazyAddedEntries == null ? new ArrayList<>() : lazyAddedEntries;
-        } else {
-          lazyLoadCollection(false);
-          if (lazyAddedEntries != null) {
-            list.addAll(lazyAddedEntries);
-          }
-        }
+  protected void initList(boolean skipLoad, boolean onlyIds) {
+    if (skipLoad) {
+      if (lazyAddedEntries != null) {
+        list = lazyAddedEntries;
+        lazyAddedEntries = null;
+      } else {
+        list = new ArrayList<>();
       }
-      lazyAddedEntries = null;
-    } finally {
-      lock.unlock();
+    } else {
+      lazyLoadCollection(onlyIds);
+      if (lazyAddedEntries != null) {
+        list.addAll(lazyAddedEntries);
+        lazyAddedEntries = null;
+      }
     }
   }
 
@@ -103,5 +112,18 @@ public class BeanListLazyAdd<E> extends BeanList<E> {
   @Override
   public boolean isSkipSave() {
     return lazyAddedEntries == null && super.isSkipSave();
+  }
+
+  public boolean checkEmptyLazyLoad() {
+    if (list != null) {
+      return false;
+    } else if (lazyAddedEntries == null) {
+      list = new ArrayList<>();
+      return true;
+    } else {
+      list = lazyAddedEntries;
+      lazyAddedEntries = null;
+      return false;
+    }
   }
 }

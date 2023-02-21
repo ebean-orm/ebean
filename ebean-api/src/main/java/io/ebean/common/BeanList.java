@@ -116,15 +116,19 @@ public class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, B
     }
   }
 
+  protected void initList(boolean skipLoad, boolean onlyIds) {
+    if (skipLoad) {
+      list = new ArrayList<>();
+    } else {
+      lazyLoadCollection(onlyIds);
+    }
+  }
+
   private void initClear() {
     lock.lock();
     try {
       if (list == null) {
-        if (!disableLazyLoad && modifyListening) {
-          lazyLoadCollection(true);
-        } else {
-          list = new ArrayList<>();
-        }
+        initList(disableLazyLoad || !modifyListening, true);
       }
     } finally {
       lock.unlock();
@@ -135,11 +139,7 @@ public class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, B
     lock.lock();
     try {
       if (list == null) {
-        if (disableLazyLoad) {
-          list = new ArrayList<>();
-        } else {
-          lazyLoadCollection(false);
-        }
+        initList(disableLazyLoad, false);
       }
     } finally {
       lock.unlock();
