@@ -38,7 +38,7 @@
   </developers>
 
   <properties>
-    <revision>13.13.1-SNAPSHOT</revision>
+    <revision>13.13.1-FOC1-SNAPSHOT</revision>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.14.0</jackson.version>
     <h2database.version>2.1.214</h2database.version>
@@ -50,7 +50,7 @@
     <ebean-migration.version>13.7.0</ebean-migration.version>
     <ebean-test-containers.version>6.3</ebean-test-containers.version>
     <ebean-datasource.version>8.5</ebean-datasource.version>
-    <ebean-agent.version>13.10.3-FOC4</ebean-agent.version>
+    <ebean-agent.version>13.13.1-FOC1-SNAPSHOT</ebean-agent.version>
     <ebean-maven-plugin.version>13.13.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>

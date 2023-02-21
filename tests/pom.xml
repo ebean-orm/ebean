@@ -15,18 +15,7 @@
 
   <properties>
     <maven.deploy.skip>true</maven.deploy.skip>
-    <ebean.version>${revision}</ebean.version>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>io.ebean</groupId>
-        <artifactId>ebean-bom</artifactId>
-        <version>${ebean.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <profiles>
     <profile>
