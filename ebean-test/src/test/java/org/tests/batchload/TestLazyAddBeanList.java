@@ -1,6 +1,8 @@
 package org.tests.batchload;
 
 import io.ebean.DB;
+import io.ebean.ExpressionList;
+import io.ebean.Transaction;
 import io.ebean.common.BeanList;
 import io.ebean.common.BeanListLazyAdd;
 import io.ebean.test.LoggedSql;
@@ -132,6 +134,47 @@ public class TestLazyAddBeanList extends BaseTestCase {
 
     assertThat(sql.get(0)).contains("from o_customer t0 left join contact t1 ");
     assertThat(sql).hasSize(1);
+  }
+
+  @Test
+  public void testBatch() {
+    for (int i = 0; i < 10; i++) {
+      Customer bcust = new Customer();
+      bcust.setName("batch " + i);
+      //bcust.getContacts().add(new Contact("Noemi","Praml"));
+      DB.save(bcust);
+    }
+
+    LoggedSql.start();
+    List<Customer> custs = DB.find(Customer.class).where().startsWith("name", "batch").findList();
+    assertThat(custs).hasSize(10);
+    assertThat(LoggedSql.stop()).hasSize(1);
+
+
+    LoggedSql.start();
+    for (Customer cust : custs) {
+      cust.getContacts().addAll(Arrays.asList(
+        new Contact(cust.getName() + " jim", "slim"),
+        new Contact(cust.getName() + " joe", "big")));
+    }
+    assertThat(LoggedSql.stop()).isEmpty();
+
+    LoggedSql.start();
+    custs.get(0).getContacts().size(); // trigger batch load
+    assertThat(LoggedSql.stop()).hasSize(1);
+
+    LoggedSql.start();
+    DB.saveAll(custs);
+    assertThat(LoggedSql.stop()).hasSize(21);
+
+    LoggedSql.start();
+    custs = DB.find(Customer.class).where().startsWith("name", "batch").findList();
+    assertThat(custs).hasSize(10);
+
+    for (Customer cust : custs) {
+      assertThat(cust.getContacts()).hasSize(2).extracting(Contact::getFirstName).containsExactlyInAnyOrder(cust.getName() + " jim", cust.getName() + " joe");
+    }
+    assertThat(LoggedSql.stop()).hasSize(2);
   }
 
 }
