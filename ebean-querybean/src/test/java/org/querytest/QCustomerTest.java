@@ -369,6 +369,17 @@ public class QCustomerTest {
   }
 
   @Test
+  public void testTwoDiffQueryTypes_expect_NoLineNumbers() {
+    new QCustomer()
+      .id.isIn(34L)
+      .findList();
+
+    new QContact()
+      .email.isNull()
+      .findList();
+  }
+
+  @Test
   public void testQueryBoolean() {
 
     new QCustomer()
