@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>${revision}</version>
+    <version>13.13.1</version>
   </parent>
 
   <artifactId>platforms</artifactId>

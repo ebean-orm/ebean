@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>${revision}</version>
+  <version>13.13.1</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -38,7 +38,6 @@
   </developers>
 
   <properties>
-    <revision>13.13.1-SNAPSHOT</revision>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.14.0</jackson.version>
     <h2database.version>2.1.214</h2database.version>
