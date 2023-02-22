@@ -17,7 +17,6 @@ import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.GeoTypeProvider;
 import io.ebeaninternal.server.core.ServiceUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployProperty;
 
 import javax.persistence.AttributeConverter;
@@ -40,7 +39,9 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static io.ebean.core.type.PostgresHelper.isPostgresCompatible;
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.TRACE;
 
 /**
  * Default implementation of TypeManager.
@@ -98,8 +99,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.defaultEnumType = config.getDefaultEnumType();
     this.fileType = new ScalarTypeFile(config.getTempFileProvider());
 
-    ServiceLoader<ScalarJsonMapper> mappers = ServiceLoader.load(ScalarJsonMapper.class);
-    jsonMapper = mappers.findFirst().orElse(null);
+    jsonMapper = findJsonMapper();
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
@@ -111,6 +111,26 @@ public final class DefaultTypeManager implements TypeManager {
       initialiseScalarConverters(bootupClasses);
       initialiseAttributeConverters(bootupClasses);
     }
+  }
+
+  /**
+   * Searches the JsonMapper and checks if markerAnnotation is on class path.
+   */
+  private static ScalarJsonMapper findJsonMapper() {
+    ServiceLoader<ScalarJsonMapper> mappers = ServiceLoader.load(ScalarJsonMapper.class);
+    ScalarJsonMapper mapper = mappers.findFirst().orElse(null);
+    if (mapper != null) {
+      try {
+        if (mapper.markerAnnotation() != null) {
+          return mapper;
+        } else {
+          log.log(System.Logger.Level.WARNING, "Not using {0}, because markerAnnotation is null", mapper.getClass().getName());
+        }
+      } catch (NoClassDefFoundError e) {
+        log.log(System.Logger.Level.WARNING, "Not using {0}, because markerAnnotation is inacessible ({1})", mapper.getClass().getName(), e.getMessage());
+      }
+    }
+    return null;
   }
 
   private void loadGeoTypeBinder(DatabaseConfig config) {

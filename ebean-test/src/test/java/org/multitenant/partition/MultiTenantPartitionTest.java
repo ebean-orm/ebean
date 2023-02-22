@@ -12,7 +12,6 @@ import io.ebean.test.UserContext;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Customer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,12 +26,13 @@ class MultiTenantPartitionTest extends BaseTestCase {
   static List<MtTenant> tenants() {
     List<MtTenant> tenants = new ArrayList<>();
     for (int i = 0; i < 5; i++) {
-      tenants.add(new MtTenant("ten_"+i, names[i], names[i]+"@foo.com".toLowerCase()));
+      tenants.add(new MtTenant("ten_" + i, names[i], names[i] + "@foo.com".toLowerCase()));
     }
     return tenants;
   }
 
   private static final Database server = init();
+
   static {
     server.saveAll(tenants());
   }
@@ -88,25 +88,30 @@ class MultiTenantPartitionTest extends BaseTestCase {
     QueryPlanRequest request = new QueryPlanRequest();
     request.maxCount(1_000);
     request.maxTimeMillis(10_000);
-    server().metaInfo().queryPlanCollectNow(request);
+    server.metaInfo().queryPlanCollectNow(request);
 
     QueryPlanInit init = new QueryPlanInit();
     init.setAll(true);
     init.thresholdMicros(1);
-    server().metaInfo().queryPlanInit(init);
+    server.metaInfo().queryPlanInit(init);
+    try {
+      // run queries again
+      UserContext.set("rob", "ten_1");
+      server.find(MtTenant.class).findList();
 
-    // run queries again
-    UserContext.set("rob", "ten_1");
-    Customer.find.all();
+      UserContext.set("fred", "ten_2");
+      server.find(MtTenant.class, 2);
 
-    UserContext.set("fred", "ten_2");
-    Customer.find.byId(2);
+      // obtains db query plans ...
+      List<MetaQueryPlan> plans0 = server.metaInfo().queryPlanCollectNow(request);
+      assertThat(plans0).isNotEmpty();
 
-    // obtains db query plans ...
-    List<MetaQueryPlan> plans0 = server().metaInfo().queryPlanCollectNow(request);
-    assertThat(plans0).isNotEmpty();
-
-    assertThat(plans0).extracting(MetaQueryPlan::tenantId).containsExactlyInAnyOrder("ten_1", "ten_2");
+      assertThat(plans0).extracting(MetaQueryPlan::tenantId).containsExactlyInAnyOrder("ten_1", "ten_2");
+    } finally {
+      // disable capturing, as it may affect other tests
+      init.thresholdMicros(Long.MAX_VALUE);
+      server.metaInfo().queryPlanInit(init);
+    }
   }
 
 

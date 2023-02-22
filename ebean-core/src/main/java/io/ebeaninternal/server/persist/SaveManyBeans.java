@@ -342,7 +342,6 @@ final class SaveManyBeans extends SaveManyBase {
             if (queue) {
               transaction.depth(-100);
             }
-            throw new PersistenceException("ManyToMany bean does not have an Id value? " + otherBean);
           } else {
             // build a intersection row for 'insert'
             IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);
