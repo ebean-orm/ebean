@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>${revision}</version>
+    <version>13.13.1-FOC1-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-platform-all</artifactId>
@@ -14,67 +14,67 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-clickhouse</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-db2</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-hana</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-hsqldb</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-mysql</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-mariadb</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-nuodb</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-oracle</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlanywhere</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlite</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>${revision}</version>
+      <version>13.13.1-FOC1-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
