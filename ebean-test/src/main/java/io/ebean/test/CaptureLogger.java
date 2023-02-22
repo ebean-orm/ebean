@@ -27,7 +27,11 @@ final class CaptureLogger implements SpiLogger {
   @Override
   public void debug(String msg, Object... args) {
     if (active) {
-      messages.add(MessageFormat.format(msg, args));
+      if (args != null && args.length > 0) {
+        messages.add(MessageFormat.format(msg, args));
+      } else {
+        messages.add(msg);
+      }
     }
     wrapped.debug(msg, args);
   }
