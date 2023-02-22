@@ -1,10 +1,7 @@
 package io.ebean.test;
 
 import io.ebeaninternal.api.SpiLogger;
-import io.ebeaninternal.api.SpiLoggerFactory;
-import io.ebeaninternal.server.logger.DLoggerFactory;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.commons.logging.LoggerFactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,7 +9,7 @@ public class TestCaptureLogger {
 
   @Test
   void testDefaultLogger() {
-    SpiLogger logger = new DLoggerFactory().create("io.ebean.test.loggerTest");
+    SpiLogger logger = new CapturingLoggerFactory().create("io.ebean.test.loggerTest");
     doSomeLogs(logger);
 
     CaptureLogger captureLogger = new CaptureLogger(logger);
