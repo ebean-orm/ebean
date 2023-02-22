@@ -951,9 +951,12 @@ public interface ExpressionList<T> {
   ExpressionList<T> gtOrNull(String propertyName, Object value);
 
   /**
-   * Greater Than or Equal to OR Null - ({@code >= or null }).
+   * Is GREATER THAN if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>gtIfPresent()</code> rather than having a separate if block.
    */
-  ExpressionList<T> geOrNull(String propertyName, Object value);
+  ExpressionList<T> gtIfPresent(String propertyName, @Nullable Object value);
 
   /**
    * Greater Than or Equal to the result of a sub-query.
@@ -965,6 +968,20 @@ public interface ExpressionList<T> {
    * value.
    */
   ExpressionList<T> ge(String propertyName, Object value);
+
+  /**
+   * Greater Than or Equal to OR Null - ({@code >= or null }).
+   */
+  ExpressionList<T> geOrNull(String propertyName, Object value);
+
+
+  /**
+   * Is GREATER THAN OR EQUAL TO if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>geIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> geIfPresent(String propertyName, @Nullable Object value);
 
   /**
    * Less Than the result of a sub-query.
@@ -982,9 +999,12 @@ public interface ExpressionList<T> {
   ExpressionList<T> ltOrNull(String propertyName, Object value);
 
   /**
-   * Less Than or Equal to OR Null - ({@code <= or null }).
+   * Is LESS THAN if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>ltIfPresent()</code> rather than having a separate if block.
    */
-  ExpressionList<T> leOrNull(String propertyName, Object value);
+  ExpressionList<T> ltIfPresent(String propertyName, @Nullable Object value);
 
   /**
    * Less Than or Equal to the result of a sub-query.
@@ -995,6 +1015,19 @@ public interface ExpressionList<T> {
    * Less Than or Equal to - property less than or equal to the given value.
    */
   ExpressionList<T> le(String propertyName, Object value);
+
+  /**
+   * Less Than or Equal to OR Null - ({@code <= or null }).
+   */
+  ExpressionList<T> leOrNull(String propertyName, Object value);
+
+  /**
+   * Is LESS THAN OR EQUAL TO if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>leIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> leIfPresent(String propertyName, @Nullable Object value);
 
   /**
    * Is Null - property is null.

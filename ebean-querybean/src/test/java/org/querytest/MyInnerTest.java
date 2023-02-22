@@ -7,7 +7,6 @@ import org.example.domain.query.QMyInner;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -45,9 +44,33 @@ class MyInnerTest {
 
     assertThat(found4).isNotNull();
 
+    MyInner found5 =  new QMyInner()
+      .id.lt(99)
+      .one.gtIfPresent(null)
+      .one.geIfPresent(null)
+      .one.ltIfPresent(null)
+      .one.leIfPresent(null)
+      .description.eqIfPresent("foo")
+      .findOne();
+
+    assertThat(found5).isNotNull();
+
+    MyInner found6 =  new QMyInner()
+      .id.lt(99)
+      .one.gtIfPresent("o")
+      .one.geIfPresent("o")
+      .one.ltIfPresent("oz")
+      .one.leIfPresent("oz")
+      .id.gt(1)
+      .findOne();
+
+    assertThat(found6).isNotNull();
+
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(4);
     assertThat(sql.get(0)).contains("select t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.one = ?;");
     assertThat(sql.get(1)).contains("select t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.description = ?;");
+    assertThat(sql.get(2)).contains("select t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.id < ? and t0.description = ?;");
+    assertThat(sql.get(3)).contains("select t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.id < ? and t0.one > ? and t0.one >= ? and t0.one < ? and t0.one <= ? and t0.id > ?;");
   }
 }

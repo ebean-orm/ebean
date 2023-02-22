@@ -1,6 +1,7 @@
 package io.ebean.typequery;
 
 
+import io.avaje.lang.Nullable;
 import io.ebean.Query;
 
 /**
@@ -66,6 +67,23 @@ public abstract class PBaseComparable<R, T> extends PBaseValueEqual<R, T> {
   }
 
   /**
+   * Is greater than if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * That is, only add the GREATER THAN predicate if the value is not null.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>gtIfPresent()</code> rather than having a separate if block.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R gtIfPresent(@Nullable T value) {
+    expr().gtIfPresent(_name, value);
+    return _root;
+  }
+
+
+  /**
    * Greater than or Equal to.
    *
    * @param value the bind value
@@ -95,6 +113,22 @@ public abstract class PBaseComparable<R, T> extends PBaseValueEqual<R, T> {
    */
   public final R geOrNull(T value) {
     expr().geOrNull(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is greater than or equal to if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * That is, only add the GREATER THAN OR EQUAL TO predicate if the value is not null.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>geIfPresent()</code> rather than having a separate if block.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R geIfPresent(@Nullable T value) {
+    expr().geIfPresent(_name, value);
     return _root;
   }
 
@@ -132,6 +166,22 @@ public abstract class PBaseComparable<R, T> extends PBaseValueEqual<R, T> {
   }
 
   /**
+   * Is less than if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * That is, only add the LESS THAN predicate if the value is not null.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>ltIfPresent()</code> rather than having a separate if block.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R ltIfPresent(@Nullable T value) {
+    expr().ltIfPresent(_name, value);
+    return _root;
+  }
+
+  /**
    * Less than or Equal to.
    *
    * @param value the bind value
@@ -161,6 +211,22 @@ public abstract class PBaseComparable<R, T> extends PBaseValueEqual<R, T> {
    */
   public final R leOrNull(T value) {
     expr().leOrNull(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is less than or equal to if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * That is, only add the LESS THAN OR EQUAL TO predicate if the value is not null.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>leIfPresent()</code> rather than having a separate if block.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R leIfPresent(@Nullable T value) {
+    expr().leIfPresent(_name, value);
     return _root;
   }
 

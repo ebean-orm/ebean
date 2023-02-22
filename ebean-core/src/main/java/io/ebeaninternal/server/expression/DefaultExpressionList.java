@@ -904,6 +904,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> gtIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.gt(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> geIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.ge(propertyName, value));
+  }
+
+  @Override
   public ExpressionList<T> icontains(String propertyName, String value) {
     return add(expr.icontains(propertyName, value));
   }
@@ -1059,6 +1069,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> leOrNull(String propertyName, Object value) {
     return add(expr.leOrNull(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> ltIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.lt(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> leIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.le(propertyName, value));
   }
 
   @Override
