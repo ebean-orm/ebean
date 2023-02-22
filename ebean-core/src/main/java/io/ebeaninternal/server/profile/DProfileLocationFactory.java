@@ -11,7 +11,12 @@ public final class DProfileLocationFactory implements SpiProfileLocationFactory 
 
   @Override
   public ProfileLocation create() {
-    return new DProfileLocation();
+    return new DProfileLocation(false);
+  }
+
+  @Override
+  public ProfileLocation createWithLine() {
+    return new DProfileLocation(true);
   }
 
   @Override

@@ -12,12 +12,14 @@ class DProfileLocation implements ProfileLocation {
 
   private static final String UNKNOWN = "unknown";
 
+  private final boolean withLine;
   private String fullLocation;
   private String location;
   private String label;
   private int traceCount;
 
-  DProfileLocation() {
+  DProfileLocation(boolean withLine) {
+    this.withLine = withLine;
   }
 
   @Override
@@ -37,7 +39,7 @@ class DProfileLocation implements ProfileLocation {
       return false;
     }
     final String loc = create();
-    final String location = UtilLocation.loc(loc);
+    final String location = UtilLocation.loc(loc, withLine);
     this.label = UtilLocation.label(location);
     this.location = location;
     this.fullLocation = loc;
