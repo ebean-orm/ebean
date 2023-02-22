@@ -15,18 +15,9 @@ class DProfileLocation implements ProfileLocation {
   private String fullLocation;
   private String location;
   private String label;
-  private final int lineNumber;
   private int traceCount;
 
   DProfileLocation() {
-    this(0);
-  }
-
-  /**
-   * Create with a given line number.
-   */
-  DProfileLocation(int lineNumber) {
-    this.lineNumber = lineNumber;
   }
 
   @Override
@@ -96,19 +87,8 @@ class DProfileLocation implements ProfileLocation {
   private String filter(Stream<StackWalker.StackFrame> frames) {
     return frames.filter(StackWalkFilter.filter())
       .findFirst()
-      .map(line -> withLineNumber(line.toString()))
+      .map(Object::toString)
       .orElse(UNKNOWN);
   }
 
-  private String withLineNumber(String traceLine) {
-    if (lineNumber == 0) {
-      return traceLine;
-    } else if (traceLine.endsWith(":1)")) {
-      return traceLine.substring(0, traceLine.length() - 3) + ":" + lineNumber + ")";
-    } else if (traceLine.contains(":")) {
-      return traceLine;
-    } else {
-      return traceLine.substring(0, traceLine.length() - 1) + ":" + lineNumber + ")";
-    }
-  }
 }

@@ -15,8 +15,7 @@ final class DTimedProfileLocation extends DProfileLocation implements TimedProfi
   private String fullName;
   private String reportName;
 
-  DTimedProfileLocation(int lineNumber, String label, TimedMetric timedMetric) {
-    super(lineNumber);
+  DTimedProfileLocation(String label, TimedMetric timedMetric) {
     this.label = label;
     this.timedMetric = timedMetric;
     this.overrideMetricName = "".equals(label);

@@ -16,7 +16,7 @@ class BasicProfileLocationTest {
 
   @Test
   void metricNameFromOverride() {
-    DTimedProfileLocation loc = new DTimedProfileLocation(12, "", MetricFactory.get().createTimedMetric("a.b.c"));
+    DTimedProfileLocation loc = new DTimedProfileLocation("", MetricFactory.get().createTimedMetric("a.b.c"));
     loc.initWith("foo.label");
     loc.add(42);
 
@@ -39,7 +39,7 @@ class BasicProfileLocationTest {
 
   @Test
   void metricNameFromTimed() {
-    DTimedProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric("a.b.c"));
+    DTimedProfileLocation loc = new DTimedProfileLocation("foo", MetricFactory.get().createTimedMetric("a.b.c"));
     loc.add(42);
 
     BasicMetricVisitor visitor = new BasicMetricVisitor("v", naming);
@@ -52,7 +52,7 @@ class BasicProfileLocationTest {
 
   @Test
   void obtain() {
-    DProfileLocation loc = new DTimedProfileLocation(12, "foo", MetricFactory.get().createTimedMetric("junk"));
+    DProfileLocation loc = new DTimedProfileLocation("foo", MetricFactory.get().createTimedMetric("junk"));
 
     assertThat(loc.obtain()).isTrue();
     assertThat(loc.fullLocation()).endsWith("org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:725)");
