@@ -31,7 +31,7 @@ class TestStdFunctions {
     assertThat(query.getGeneratedSql()).contains("select coalesce(t0.name,'na') from o_customer t0 where coalesce(t0.name,'na') like ?");
   }
 
-  @IgnorePlatform({Platform.DB2})
+  @IgnorePlatform({Platform.DB2, Platform.ORACLE})
   @Test
   void concatEq() {
     var name = Query.Property.of("name");
@@ -45,5 +45,21 @@ class TestStdFunctions {
 
     query.findSingleAttributeList();
     assertThat(query.getGeneratedSql()).contains("select concat(t0.name,'na',t0.status) from o_customer t0 where concat(t0.name,'na',t0.status) = ?");
+  }
+
+  @IgnorePlatform({Platform.DB2})
+  @Test
+  void concatEqOnly2() {
+    var name = Query.Property.of("name");
+    var status = Query.Property.of("status");
+
+    var query = DB.find(Customer.class)
+      .select(concat(name, status).toString())
+      .where()
+      .add(eq(concat(name, "na"), "foo"))
+      .query();
+
+    query.findSingleAttributeList();
+    assertThat(query.getGeneratedSql()).contains("select concat(t0.name,t0.status) from o_customer t0 where concat(t0.name,'na') = ?");
   }
 }
