@@ -2,6 +2,7 @@ package org.querytest;
 
 import io.ebean.*;
 import io.ebean.annotation.Transactional;
+import io.ebean.test.LoggedSql;
 import io.ebean.types.Inet;
 import org.example.domain.*;
 import org.example.domain.otherpackage.PhoneNumber;
@@ -315,10 +316,11 @@ public class QCustomerTest {
 
   @Test
   public void testAssocOne() {
-
+    DB.getDefault();
     Address address = new Address();
     address.setId(41L);
 
+    LoggedSql.start();
     new QCustomer()
       .billingAddress.eq(address)
       .findList();
@@ -334,6 +336,85 @@ public class QCustomerTest {
     new QCustomer()
       .billingAddress.notEqualTo(address)
       .findList();
+
+    new QCustomer()
+      .billingAddress.eqIfPresent(address)
+      .name.isNull()
+      .findList();
+
+    new QCustomer()
+      .billingAddress.eqIfPresent(null)
+      .name.isNull()
+      .findList();
+
+
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(6);
+    assertThat(sql.get(0)).contains("where t0.billing_address_id = ?");
+    assertThat(sql.get(1)).contains("where t0.billing_address_id = ?");
+    assertThat(sql.get(2)).contains("where t0.billing_address_id <> ?");
+    assertThat(sql.get(3)).contains("where t0.billing_address_id <> ?");
+    assertThat(sql.get(4)).contains("where t0.billing_address_id = ? and t0.name is null");
+    assertThat(sql.get(5)).contains("where t0.name is null");
+  }
+
+  @Test
+  public void testAssocOne_in() {
+    DB.getDefault();
+    Address address = new Address();
+    address.setId(41L);
+    Address address2 = new Address();
+    address2.setId(41L);
+
+    LoggedSql.start();
+    new QCustomer()
+      .billingAddress.in(address, address2)
+      .findList();
+
+    new QCustomer()
+      .billingAddress.in(List.of(address, address2))
+      .findList();
+
+    new QCustomer()
+      .billingAddress.inOrEmpty(List.of(address, address2))
+      .name.isNull()
+      .findList();
+
+    new QCustomer()
+      .billingAddress.inOrEmpty(List.of())
+      .name.isNull()
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(4);
+    assertThat(sql.get(0)).contains("where t0.billing_address_id in (?,?)");
+    assertThat(sql.get(1)).contains("where t0.billing_address_id in (?,?)");
+    assertThat(sql.get(2)).contains("where t0.billing_address_id in (?,?) and t0.name is null");
+    assertThat(sql.get(3)).contains("where t0.name is null");
+  }
+
+  @Test
+  public void testAssocOne_notIn() {
+    DB.getDefault();
+    Address address = new Address();
+    address.setId(41L);
+    Address address2 = new Address();
+    address2.setId(41L);
+
+    LoggedSql.start();
+    new QCustomer()
+      .billingAddress.notIn(address, address2)
+      .findList();
+
+    new QCustomer()
+      .billingAddress.notIn(List.of(address, address2))
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("where t0.billing_address_id not in (?,?)");
+    assertThat(sql.get(1)).contains("where t0.billing_address_id not in (?,?)");
   }
 
   @Test
