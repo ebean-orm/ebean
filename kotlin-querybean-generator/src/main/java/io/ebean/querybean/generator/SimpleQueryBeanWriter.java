@@ -236,7 +236,11 @@ class SimpleQueryBeanWriter {
     importTypes.remove(Constants.DATABASE);
     importTypes.remove(Constants.FETCHGROUP);
     importTypes.remove(Constants.QUERY);
-    importTypes.add(Constants.TQASSOCBEAN);
+    if (embeddable) {
+      importTypes.add(Constants.TQASSOC);
+    } else {
+      importTypes.add(Constants.TQASSOCBEAN);
+    }
     if (isEntity()) {
       importTypes.add(Constants.TQPROPERTY);
       importTypes.add(origDestPackage + ".Q" + origShortName);
@@ -280,7 +284,6 @@ class SimpleQueryBeanWriter {
 
   private void writeAssocBeanFetch() {
     if (isEntity()) {
-      lang().fetch(writer, origShortName);
       //if (implementsInterface != null) {
       //  writeAssocBeanExpression(false, "eq", "Is equal to by ID property.");
       //  writeAssocBeanExpression(true, "eqIfPresent", "Is equal to by ID property if the value is not null, if null no expression is added.");
@@ -340,7 +343,11 @@ class SimpleQueryBeanWriter {
       writer.append(" */").eol();
       writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      lang().beginAssocClass(writer, shortName, shortInnerName);
+      if (embeddable) {
+        writer.append("class Q%s<R> : TQAssoc<%s,R> {", shortName, shortInnerName).eol();
+      } else {
+        writer.append("class Q%s<R> : TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName, origShortName).eol();
+      }
 
     } else {
       writer.append("/**").eol();
