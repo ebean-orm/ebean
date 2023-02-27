@@ -6,7 +6,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.13.1-FOC2-SNAPSHOT</version>
+    <version>13.13.1-FOC3-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-kotlin</artifactId>
@@ -31,14 +31,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.13.1-FOC2-SNAPSHOT</version>
+      <version>13.13.1-FOC3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.13.1-FOC2-SNAPSHOT</version>
+      <version>13.13.1-FOC3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
