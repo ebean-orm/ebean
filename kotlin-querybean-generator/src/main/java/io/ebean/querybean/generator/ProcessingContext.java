@@ -334,7 +334,7 @@ class ProcessingContext implements Constants {
     }
   }
 
-  private Element asElement(TypeMirror argType) {
+  Element asElement(TypeMirror argType) {
     if (argType.getKind() == TypeKind.WILDCARD) {
       argType = ((WildcardType) argType).getExtendsBound();
     }

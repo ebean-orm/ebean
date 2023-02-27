@@ -31,4 +31,7 @@ interface Constants {
   String MODULEINFO = "io.ebean.config.ModuleInfo";
   String METAINF_MANIFEST = "META-INF/ebean-generated-info.mf";
   String METAINF_SERVICES_MODULELOADER = "META-INF/services/io.ebean.config.EntityClassRegister";
+
+  String AVAJE_LANG_NULLABLE = "io.avaje.lang.Nullable";
+  String JAVA_COLLECTION = "java.util.Collection";
 }
