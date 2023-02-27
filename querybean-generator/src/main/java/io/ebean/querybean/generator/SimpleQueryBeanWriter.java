@@ -296,8 +296,8 @@ class SimpleQueryBeanWriter {
         writeAssocBeanExpression(false, "eq", "Is equal to by ID property.");
         writeAssocBeanExpression(true, "eqIfPresent", "Is equal to by ID property if the value is not null, if null no expression is added.");
         writeAssocBeanExpression(false, "in", "IN the given values.", implementsInterfaceShortName + "...", "in");
-        writeAssocBeanExpression(false, "inBy", "IN the given interface values.", "Collection<" + implementsInterfaceShortName + ">", "in");
-        writeAssocBeanExpression(true, "inOrEmptyBy", "IN the given interface values if the collection is not empty. No expression is added if the collection is empty..", "Collection<" + implementsInterfaceShortName + ">", "inOrEmpty");
+        writeAssocBeanExpression(false, "inBy", "IN the given interface values.", "Collection<? extends " + implementsInterfaceShortName + ">", "in");
+        writeAssocBeanExpression(true, "inOrEmptyBy", "IN the given interface values if the collection is not empty. No expression is added if the collection is empty..", "Collection<? extends " + implementsInterfaceShortName + ">", "inOrEmpty");
       }
     }
   }
@@ -309,11 +309,12 @@ class SimpleQueryBeanWriter {
   private void writeAssocBeanExpression(boolean nullable, String expression, String comment, String param, String actualExpression) {
     final String nullableAnnotation = nullable ? "@Nullable " : "";
     String values = expression.startsWith("in") ? "values" : "value";
+    String castVarargs = expression.equals("in") ? "(Object[])" : "";
     writer.append("  /**").eol();
     writer.append("   * ").append(comment).eol();
     writer.append("   */").eol();
     writer.append("  public final R %s(%s%s %s) {", expression, nullableAnnotation, param, values).eol();
-    writer.append("    expr().%s(_name, %s);", actualExpression, values).eol();
+    writer.append("    expr().%s(_name, %s%s);", actualExpression, castVarargs, values).eol();
     writer.append("    return _root;").eol();
     writer.append("  }").eol();
     writer.eol();
