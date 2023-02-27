@@ -541,4 +541,8 @@ class ProcessingContext implements Constants {
     }
     return null;
   }
+
+  Element asElement(TypeMirror mirror) {
+    return typeUtils.asElement(mirror);
+  }
 }
