@@ -368,9 +368,9 @@ class SimpleQueryBeanWriter {
       writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       if (embeddable) {
-        writer.append("public class Q%s<R> extends TQAssoc<%s,R> {", shortName, shortInnerName).eol();
+        writer.append("public final class Q%s<R> extends TQAssoc<%s,R> {", shortName, shortInnerName).eol();
       } else {
-        writer.append("public class Q%s<R> extends TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName, origShortName).eol();
+        writer.append("public final class Q%s<R> extends TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName, origShortName).eol();
       }
     } else {
       writer.append("/**").eol();
@@ -380,7 +380,7 @@ class SimpleQueryBeanWriter {
       writer.append(" */").eol();
       writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      writer.append("public class Q%s extends TQRootBean<%1$s,Q%1$s> {", shortName).eol();
+      writer.append("public final class Q%s extends TQRootBean<%1$s,Q%1$s> {", shortName).eol();
     }
 
     writer.eol();
