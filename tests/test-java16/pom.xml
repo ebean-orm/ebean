@@ -52,7 +52,7 @@
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>13.13.1</version>
+              <version>13.13.2</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
