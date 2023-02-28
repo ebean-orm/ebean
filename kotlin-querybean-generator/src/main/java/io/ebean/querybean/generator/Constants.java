@@ -7,6 +7,7 @@ interface Constants {
   String GENERATED = "io.ebean.typequery.Generated";
 
   String MAPPED_SUPERCLASS = "javax.persistence.MappedSuperclass";
+  String DISCRIMINATOR_VALUE = "javax.persistence.DiscriminatorValue";
   String INHERITANCE = "javax.persistence.Inheritance";
   String ENTITY = "javax.persistence.Entity";
   String EMBEDDABLE = "javax.persistence.Embeddable";
