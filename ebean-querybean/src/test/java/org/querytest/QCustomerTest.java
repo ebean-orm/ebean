@@ -591,25 +591,7 @@ public class QCustomerTest {
       .findList();
   }
 
-  @Test
-  public void query_setInheritType() {
 
-    ACat cat = new ACat("C1");
-    cat.save();
-
-    ACat cat2 = new ACat("C2");
-    cat2.save();
-
-    ADog dog = new ADog("D1", "D878");
-    dog.save();
-
-    List<Animal> animals = new QAnimal()
-      .id.greaterOrEqualTo(1L)
-      .setInheritType(ACat.class)
-      .findList();
-
-    System.out.println(animals);
-  }
 
   @Test
   public void select_assocManyToOne() {
