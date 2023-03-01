@@ -4,7 +4,7 @@
   <parent>
     <artifactId>composites</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.14.1-SNAPSHOT</version>
+    <version>13.14.1-FOC1-SNAPSHOT</version>
   </parent>
 
   <name>ebean (all platforms)</name>
@@ -16,31 +16,31 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.14.1-SNAPSHOT</version>
+      <version>13.14.1-FOC1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.14.1-SNAPSHOT</version>
+      <version>13.14.1-FOC1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-joda-time</artifactId>
-      <version>13.14.1-SNAPSHOT</version>
+      <version>13.14.1-FOC1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-jsonnode</artifactId>
-      <version>13.14.1-SNAPSHOT</version>
+      <version>13.14.1-FOC1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-mapper</artifactId>
-      <version>13.14.1-SNAPSHOT</version>
+      <version>13.14.1-FOC1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -53,13 +53,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>13.14.1-SNAPSHOT</version>
+      <version>13.14.1-FOC1-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>13.14.1-SNAPSHOT</version>
+      <version>13.14.1-FOC1-SNAPSHOT</version>
     </dependency>
 
   </dependencies>
