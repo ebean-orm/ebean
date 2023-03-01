@@ -31,22 +31,41 @@ We @foconis use this command to release.
 mvn release:prepare release:perform -Darguments="-Dgpg.skip -DskipTests" -Pfoconis
 ```
 
+### Build releases for github and/or jakarta
 
+First, checkout latest release commit with
+```bash
+git checkout HEAD~1
+```
 
-    mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=13.6.0-FOC2-SNAPSHOT
+Build github release:
 
-    mvn release:prepare release:perform -Darguments="-Dgpg.skip -DskipTests" -Pfoconis
+```bash
+mvn clean source:jar deploy -DskipTests -Pgithub -T 8
+```
 
-    # RELEASE klappt nun, sollte es failen, ist wie folgt vorzugehen:
-    # um bei einen Fehler zu release ist dann ins target/checkout Verzeichnis zu gehen und
-    mvn clean source:jar install org.apache.maven.plugins:maven-deploy-plugin:deploy -DskipTests
-    # auszuführen. Aber auch das failed bei Kotlin.
+Switch to Jakarta:
 
-    # nach dem Release müssen die Versionen in ebean-kotlin/pom.xml, tests/test-java16/pom.xml und tests/test-kotlin/pom.xml manuell angepasst werden
+```bash
+export EBEAN_VERSION=$(grep "<version>13" pom.xml | awk -F '[<>]' '{print $3}')
+# first, set to snapshot, because of kotlin
+mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=${EBEAN_VERSION}-SNAPSHOT -Pjdk16plus -Pjdk15less
+mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=${EBEAN_VERSION}-jakarta -Pjdk16plus -Pjdk15less
+./javax-to-jakarta.sh
+mvn clean source:jar deploy -DskipTests -Pfoconis -T 8
+mvn clean source:jar deploy -DskipTests -Pgithub -T 8
+# do not commit, switch back to master
+git switch -f master
+```
 
-    # auf gitHub Packages soll manuell deployed werden
-    # commit mit dem Release Tag auschecken
-    mvn deploy -Pgithub
+## Fix POMs after release
+
+After a release, you may have to fix poms with
+
+```bash
+mvn versions:update-parent -DallowSnapshots=true -DgenerateBackupPoms=false -Pjdk16plus -Pjdk15less
+```
+
     # wenn es Probleme mit Versionen gibt, dann manuell ebean-kotlin/pom.xml, tests/test-java16/pom.xml und tests/test-kotlin/pom.xml, usw. anpassen
     # wenn es bei kotlin-querybean-generator krachts, dann den Modul auskommentieren oder Modul auslassen und mit ... -rf :NÄCHSTE-MODUL weitermachen
 
