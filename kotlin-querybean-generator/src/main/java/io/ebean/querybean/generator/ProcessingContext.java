@@ -224,7 +224,7 @@ class ProcessingContext implements Constants {
   }
 
   private boolean isMappedSuperOrInheritance(Element mappedSuper) {
-    return hasAnnotations(mappedSuper, MAPPED_SUPERCLASS, INHERITANCE);
+    return hasAnnotations(mappedSuper, MAPPED_SUPERCLASS, INHERITANCE, DISCRIMINATOR_VALUE);
   }
 
   private boolean isEntityOrEmbedded(Element mappedSuper) {
@@ -334,7 +334,7 @@ class ProcessingContext implements Constants {
     }
   }
 
-  private Element asElement(TypeMirror argType) {
+  Element asElement(TypeMirror argType) {
     if (argType.getKind() == TypeKind.WILDCARD) {
       argType = ((WildcardType) argType).getExtendsBound();
     }

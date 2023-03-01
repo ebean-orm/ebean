@@ -678,6 +678,16 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> gtIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : exprList.gt(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> geIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : exprList.ge(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> having() {
     throw new IllegalStateException("having() not allowed on Junction expression list");
   }
@@ -835,6 +845,16 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> leOrNull(String propertyName, Object value) {
     return exprList.leOrNull(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> ltIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : exprList.lt(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> leIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : exprList.le(propertyName, value);
   }
 
   @Override

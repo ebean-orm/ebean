@@ -11,7 +11,7 @@
   <artifactId>test-java16</artifactId>
 
   <properties>
-    <maven-compiler-plugin.version>3.10.1</maven-compiler-plugin.version>
+    <java.release>16</java.release>
   </properties>
 
   <dependencies>
@@ -47,16 +47,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
         <configuration>
-          <release>16</release>
-          <source>16</source>
-          <target>16</target>
           <annotationProcessorPaths>
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>13.13.1-FOC3-SNAPSHOT</version>
+              <version>13.14.1-SNAPSHOT</version>
             </path>
           </annotationProcessorPaths>
         </configuration>
@@ -65,11 +61,11 @@
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.24</version>
+        <version>2.34</version>
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.12.0</tile>
+            <tile>io.ebean.tile:enhancement:13.13.2</tile>
           </tiles>
         </configuration>
       </plugin>

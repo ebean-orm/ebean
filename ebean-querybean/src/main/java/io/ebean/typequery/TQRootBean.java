@@ -930,7 +930,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Specify the PersistenceContextScope to use for this query.
    * <p>
-   * When this is not set the 'default' configured on {@link io.ebean.config.ServerConfig#setPersistenceContextScope(PersistenceContextScope)}
+   * When this is not set the 'default' configured on {@link io.ebean.config.DatabaseConfig#setPersistenceContextScope(PersistenceContextScope)}
    * is used - this value defaults to {@link io.ebean.PersistenceContextScope#TRANSACTION}.
    * <p>
    * Note that the same persistence Context is used for subsequent lazy loading and query join queries.
@@ -2117,12 +2117,10 @@ public abstract class TQRootBean<T, R> {
    * Return the current expression list that expressions should be added to.
    */
   protected ExpressionList<T> peekExprList() {
-
     if (textMode) {
       // return the current text expression list
       return _peekText();
     }
-
     if (whereStack == null) {
       whereStack = new ArrayStack<>();
       whereStack.push(query.where());

@@ -10,10 +10,12 @@ class ProfileLocationTest {
   private static final ProfileLocation loc = ProfileLocation.create(12, "foo");
   private static final ProfileLocation locB = ProfileLocation.create();
   private static final ProfileLocation loc2 = ProfileLocation.create();
-
+  private static final ProfileLocation locWithLine = ProfileLocation.createWithLine();
   private boolean doIt() {
     locB.obtain(); // simulate a location moving by line number only
-    return loc.obtain();
+    boolean result = loc.obtain();
+    locWithLine.obtain();
+    return result;
   }
 
   @Test
@@ -27,6 +29,16 @@ class ProfileLocationTest {
     assertThat(locB.fullLocation()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt(ProfileLocationTest.java:15)");
     assertThat(locB.location()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt");
     assertThat(locB.label()).isEqualTo("ProfileLocationTest.doIt");
+  }
+
+  @Test
+  void test_obtainWithLine() {
+    doIt();
+
+    // same hash even when the line number has changed
+    assertThat(locWithLine.fullLocation()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt(ProfileLocationTest.java:17)");
+    assertThat(locWithLine.location()).isEqualTo("org.tests.profile.ProfileLocationTest.doIt:17");
+    assertThat(locWithLine.label()).isEqualTo("ProfileLocationTest.doIt:17");
   }
 
   @Test

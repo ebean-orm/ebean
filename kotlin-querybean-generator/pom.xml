@@ -113,7 +113,7 @@
                 <annotationProcessorPath>
                   <groupId>io.ebean</groupId>
                   <artifactId>kotlin-querybean-generator</artifactId>
-                  <version>13.13.0</version>
+                  <version>13.13.3-RC1</version>
                 </annotationProcessorPath>
               </annotationProcessorPaths>
             </configuration>
