@@ -101,36 +101,16 @@
             </goals>
           </execution>
           <execution>
-            <id>test-kapt</id>
-            <goals>
-              <goal>test-kapt</goal>
-            </goals>
-            <configuration>
-              <sourceDirs>
-                <sourceDir>src/test/kotlin</sourceDir>
-              </sourceDirs>
-              <annotationProcessorPaths>
-                <annotationProcessorPath>
-                  <groupId>io.ebean</groupId>
-                  <artifactId>kotlin-querybean-generator</artifactId>
-                  <version>13.13.3-RC1</version>
-                </annotationProcessorPath>
-              </annotationProcessorPaths>
-            </configuration>
-          </execution>
-          <execution>
             <id>compile</id>
             <phase>compile</phase>
             <goals>
               <goal>compile</goal>
             </goals>
-            <configuration>
-              <sourceDirs>
-                <source>src/main/java</source>
-                <source>target/generated-sources/kapt/test</source>
-                <source>target/generated-sources/kaptKotlin/test</source>
-              </sourceDirs>
-            </configuration>
+<!--            <configuration>-->
+<!--              <sourceDirs>-->
+<!--                <source>src/main/java</source>-->
+<!--              </sourceDirs>-->
+<!--            </configuration>-->
           </execution>
         </executions>
         <configuration>
