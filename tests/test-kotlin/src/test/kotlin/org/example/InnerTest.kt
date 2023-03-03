@@ -1,4 +1,4 @@
-package org.example.otherpackage
+package org.example
 
 import io.ebean.DB
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
