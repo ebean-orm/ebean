@@ -30,7 +30,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.14.1-FOC1-SNAPSHOT</version>
+      <version>13.14.1-FOC2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
