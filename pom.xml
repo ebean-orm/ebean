@@ -93,6 +93,7 @@
     <module>ebean-csv-reader</module>
     <module>ebean-jackson-jsonnode</module>
     <module>ebean-jackson-mapper</module>
+    <module>ebean-spring-txn</module>
     <!--    <module>ebean-kotlin</module>-->
 
   </modules>
