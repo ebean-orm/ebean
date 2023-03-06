@@ -38,9 +38,16 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean</artifactId>
+      <artifactId>ebean-core</artifactId>
       <version>13.13.0</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-h2</artifactId>
+      <version>13.13.0</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
