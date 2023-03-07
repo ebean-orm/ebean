@@ -191,6 +191,12 @@
         <version>13.14.1-SNAPSHOT</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-spring-txn</artifactId>
+        <version>13.14.1-SNAPSHOT</version>
+      </dependency>
+
       <!-- platforms -->
 
       <dependency>
