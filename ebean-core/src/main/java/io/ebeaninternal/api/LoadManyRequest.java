@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Request for loading Associated Many Beans.
@@ -22,26 +23,29 @@ public final class LoadManyRequest extends LoadRequest {
   private final LoadManyBuffer loadContext;
   private final boolean onlyIds;
   private final boolean loadCache;
+  private final BeanCollection<?> originCollection;
+  private boolean originIncluded;
 
   /**
    * Construct for lazy loading.
    */
-  public LoadManyRequest(LoadManyBuffer loadContext, boolean onlyIds, boolean loadCache) {
-    this(loadContext, null, true, onlyIds, loadCache);
+  public LoadManyRequest(LoadManyBuffer loadContext, boolean onlyIds, boolean loadCache, BeanCollection<?> originCollection) {
+    super(null, true);
+    this.loadContext = loadContext;
+    this.onlyIds = onlyIds;
+    this.loadCache = loadCache;
+    this.originCollection = originCollection;
   }
 
   /**
    * Construct for secondary query.
    */
   public LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest) {
-    this(loadContext, parentRequest, false, false, false);
-  }
-
-  private LoadManyRequest(LoadManyBuffer loadContext, OrmQueryRequest<?> parentRequest, boolean lazy, boolean onlyIds, boolean loadCache) {
-    super(parentRequest, lazy);
+    super(parentRequest, false);
     this.loadContext = loadContext;
-    this.onlyIds = onlyIds;
-    this.loadCache = loadCache;
+    this.onlyIds = false;
+    this.loadCache = false;
+    this.originCollection = null;
   }
 
   @Override
@@ -59,9 +63,17 @@ public final class LoadManyRequest extends LoadRequest {
     for (int i = 0; i < loadContext.size(); i++) {
       BeanCollection<?> bc = loadContext.get(i);
       if (bc != null) {
+        if (lazy && !originIncluded && bc == originCollection) {
+          originIncluded = true;
+        }
         idList.add(many.parentId(bc.getOwnerBean()));
         bc.setLoader(server); // don't use the load buffer again
       }
+    }
+    if (originCollection != null && !originIncluded) {
+      CoreLog.log.log(INFO, "Batch lazy loading including origin collection - size:{0}", idList.size());
+      idList.add(many.parentId(originCollection.getOwnerBean()));
+      originCollection.setLoader(server); // don't use the load buffer again
     }
     if (many.targetDescriptor().isPadInExpression()) {
       BindPadding.padIds(idList);

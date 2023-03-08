@@ -212,7 +212,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
           }
         }
 
-        context.parent.getEbeanServer().loadMany(new LoadManyRequest(this, onlyIds, useCache));
+        context.parent.getEbeanServer().loadMany(new LoadManyRequest(this, onlyIds, useCache, bc));
         // clear the buffer as all entries have been loaded
         clear();
       } finally {
