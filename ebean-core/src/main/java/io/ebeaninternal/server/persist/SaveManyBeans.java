@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Saves the details for a OneToMany or ManyToMany relationship (entity beans).
@@ -309,11 +310,11 @@ final class SaveManyBeans extends SaveManyBase {
         EntityBean otherBean = (EntityBean) other;
         // the object from the 'other' side of the ManyToMany
         if (deletions != null && deletions.remove(otherBean)) {
-          String m = "Inserting and Deleting same object? " + otherBean;
+          String msg = "Inserting and Deleting same object? " + otherBean;
           if (transaction.isLogSummary()) {
-            transaction.logSummary(m);
+            transaction.logSummary(msg);
           }
-          CoreLog.log.log(System.Logger.Level.WARNING, m);
+          CoreLog.log.log(WARNING, msg);
         } else {
           if (!many.hasImportedId(otherBean)) {
             throw new PersistenceException("ManyToMany bean does not have an Id value? " + otherBean);
