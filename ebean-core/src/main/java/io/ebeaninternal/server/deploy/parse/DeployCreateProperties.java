@@ -9,8 +9,7 @@ import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.meta.*;
 import io.ebeaninternal.server.type.TypeManager;
 
-import javax.persistence.PersistenceException;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.lang.reflect.*;
 
 import static java.lang.System.Logger.Level.*;
@@ -105,20 +104,18 @@ public final class DeployCreateProperties {
     }
   }
 
-  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
     try {
       ScalarType<?> scalarType = typeManager.type(targetType);
       if (scalarType != null) {
-        return new DeployBeanPropertySimpleCollection(desc, targetType, manyType);
+        return new DeployBeanPropertySimpleCollection<>(desc, targetType, manyType);
       }
     } catch (NullPointerException e) {
       CoreLog.internal.log(DEBUG, "expected non-scalar type {0}", e.getMessage());
     }
-    return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
+    return new DeployBeanPropertyAssocMany<>(desc, targetType, manyType);
   }
 
-  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
     Class<?> propertyType = field.getType();
     if (isSpecialScalarType(field)) {
@@ -149,9 +146,11 @@ public final class DeployCreateProperties {
       // return with no ScalarType (still support JSON features)
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
+    if (AnnotationUtil.has(field, Convert.class)) {
+      throw new IllegalStateException("No AttributeConverter registered for type " + propertyType + " at " + desc.getFullName() + "." + field.getName());
+    }
     try {
-      return new DeployBeanPropertyAssocOne(desc, propertyType);
-
+      return new DeployBeanPropertyAssocOne<>(desc, propertyType);
     } catch (Exception e) {
       CoreLog.log.log(ERROR, "Error with " + desc + " field:" + field.getName(), e);
       return null;
