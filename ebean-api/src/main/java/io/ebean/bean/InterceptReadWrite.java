@@ -690,7 +690,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       if (beanLoader == null) {
         final Database database = DB.byName(ebeanServerName);
         if (database == null) {
-          throw new PersistenceException("Database [" + ebeanServerName + "] was not found?");
+          throw new PersistenceException(ebeanServerName == null ? "No registered default server" : "Database [" + ebeanServerName + "] is not registered");
         }
         // For stand alone reference bean or after deserialisation lazy load
         // using the ebeanServer. Synchronise only on the bean.
