@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.14.1-SNAPSHOT</version>
+    <version>13.14.1</version>
   </parent>
 
   <artifactId>ebean-platform-sqlserver</artifactId>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.14.1-SNAPSHOT</version>
+      <version>13.14.1</version>
     </dependency>
 
     <dependency>
