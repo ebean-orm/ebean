@@ -16,7 +16,7 @@
     <maven.compiler.target>11</maven.compiler.target>
 
     <ebean-maven-plugin.version>13.13.0</ebean-maven-plugin.version>
-    <kotlin.version>1.7.22</kotlin.version>
+    <kotlin.version>1.8.10</kotlin.version>
     <jackson.version>2.12.1</jackson.version>
   </properties>
 
