@@ -2395,10 +2395,13 @@ public class DatabaseConfig {
 
   /**
    * Deprecated - migrate to classes().
+   * <p>
+   * Sorry if returning Set rather than List breaks code but it feels safer to
+   * do that than a subtle change to return a shallow copy which you will not detect.
    */
   @Deprecated
-  public List<Class<?>> getClasses() {
-    return new ArrayList<>(classes);
+  public Set<Class<?>> getClasses() {
+    return classes;
   }
 
   /**
