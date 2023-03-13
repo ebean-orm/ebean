@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.14.2-SNAPSHOT</version>
+  <version>13.15.0</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -49,8 +49,8 @@
     <ebean-migration.version>13.7.0</ebean-migration.version>
     <ebean-test-containers.version>6.3</ebean-test-containers.version>
     <ebean-datasource.version>8.5</ebean-datasource.version>
-    <ebean-agent.version>13.14.1</ebean-agent.version>
-    <ebean-maven-plugin.version>13.14.1</ebean-maven-plugin.version>
+    <ebean-agent.version>13.15.0</ebean-agent.version>
+    <ebean-maven-plugin.version>13.15.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
