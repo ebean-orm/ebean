@@ -1,10 +1,10 @@
 package org.tests.rawsql;
 
 import io.ebean.*;
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -21,7 +21,6 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
 
   @Test
   public void test() {
-
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select r.id, r.name from o_customer r ")
@@ -42,8 +41,35 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     LoggedSql.start();
     assertThat(query.findCount()).isEqualTo(list.size());
     List<String>sql = LoggedSql.stop();
-    assertThat(sql.get(0)).startsWith("select count(*) from ( select r.id, r.name from o_customer r");
+    assertThat(sql.get(0)).startsWith("select count(*) from ( select r.id from o_customer r");
     assertThat(sql.get(0)).doesNotContain("order by");
+  }
+
+  @Test
+  public void testFindCount_when_idPropertyNotMapped() {
+    ResetBasicData.reset();
+
+    // mapping does not include the id column & property
+    RawSql rawSql = RawSqlBuilder.parse("select r.name, r.status from o_customer r ")
+      .columnMapping("r.name", "name")
+      .columnMapping("r.status", "status")
+      .create();
+
+    Query<Customer> query = DB.find(Customer.class);
+    query.setRawSql(rawSql);
+    query.where().ilike("name", "r%").orderBy("name");
+
+    LoggedSql.start();
+    List<Customer> list = query.findList();
+    assertNotNull(list);
+
+    // check also select count(*)
+    assertThat(query.findCount()).isEqualTo(list.size());
+    List<String>sql = LoggedSql.stop();
+    assertThat(sql.get(0)).startsWith("select r.name, r.status from o_customer r  where lower(r.name) like ?");
+    assertThat(sql.get(0)).contains(" order by r.name");
+    assertThat(sql.get(1)).startsWith("select count(*) from ( select r.name, r.status from o_customer r  where lower(r.name) like ?");
+    assertThat(sql.get(1)).doesNotContain("order by");
   }
 
   @Test
@@ -158,7 +184,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     LoggedSql.start();
     query.findCount();
     List<String>sql = LoggedSql.stop();
-    assertThat(sql.get(0)).startsWith("select count(*) from ( select o.id, o.order_date, o.ship_date from o_order o");
+    assertThat(sql.get(0)).startsWith("select count(*) from ( select o.id from o_order o");
     assertThat(sql.get(0)).doesNotContain("order by");
   }
 
@@ -193,7 +219,7 @@ public class TestRawSqlOrmQuery extends BaseTestCase {
     LoggedSql.start();
     query.findCount();
     List<String>sql = LoggedSql.stop();
-    assertThat(sql.get(0)).startsWith("select count(*) from ( select o.id, o.order_date, o.ship_date from o_order o");
+    assertThat(sql.get(0)).startsWith("select count(*) from ( select o.id from o_order o");
     assertThat(sql.get(0)).doesNotContain("order by");
   }
 
