@@ -13,15 +13,14 @@ import org.tests.rawsql.transport.SampleReport;
 
 import java.util.List;
 
-public class TestRawSqlQuerySelect extends BaseTestCase {
+class TestRawSqlQuerySelect extends BaseTestCase {
 
   @Test
-  public void testRawSQL() {
-
+  void testRawSQL() {
     ResetBasicData.reset();
 
     RawSql rawSql = RawSqlBuilder.parse("select id, name, anniversary, city from (select c.id, c.name, c.anniversary, a.city from o_customer c left join o_address a ON a.id = c.billing_address_id order by c.id) w").create();
-    String sumSql = "COUNT(1)::BIGINT AS count, SUM(id)::DOUBLE PRECISION AS sum";
+    String sumSql = "COUNT(1) AS count, SUM(id) AS sum";
 
     var query = DB.find(SampleReport.class);
     query.setRawSql(rawSql);
