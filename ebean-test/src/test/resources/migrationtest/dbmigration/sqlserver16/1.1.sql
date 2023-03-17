@@ -23,18 +23,18 @@ create table migtest_e_user (
 
 create table migtest_mtm_c_migtest_mtm_m (
   migtest_mtm_c_id              integer not null,
-  migtest_mtm_m_id              numeric(19) not null,
+  migtest_mtm_m_id              bigint not null,
   constraint pk_migtest_mtm_c_migtest_mtm_m primary key (migtest_mtm_c_id,migtest_mtm_m_id)
 );
 
 create table migtest_mtm_m_migtest_mtm_c (
-  migtest_mtm_m_id              numeric(19) not null,
+  migtest_mtm_m_id              bigint not null,
   migtest_mtm_c_id              integer not null,
   constraint pk_migtest_mtm_m_migtest_mtm_c primary key (migtest_mtm_m_id,migtest_mtm_c_id)
 );
 
 create table migtest_mtm_m_phone_numbers (
-  migtest_mtm_m_id              numeric(19) not null,
+  migtest_mtm_m_id              bigint not null,
   value                         varchar(255) not null
 );
 
@@ -88,21 +88,21 @@ alter table migtest_e_basic add new_boolean_field bit default 1 not null;
 alter table migtest_e_basic add new_boolean_field2 bit default 1 not null;
 alter table migtest_e_basic add progress integer default 0 not null;
 alter table migtest_e_basic add new_integer integer default 42 not null;
-alter table migtest_e_history alter column test_string numeric(19);
+alter table migtest_e_history alter column test_string bigint;
 EXEC usp_ebean_drop_default_constraint migtest_e_history2, test_string;
 alter table migtest_e_history2 alter column test_string varchar(255) not null;
 alter table migtest_e_history2 add default 'unknown' for test_string;
 alter table migtest_e_history2 add test_string2 varchar(255);
 alter table migtest_e_history2 add test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2 add new_column varchar(20);
-alter table migtest_e_history4 alter column test_number numeric(19);
+alter table migtest_e_history4 alter column test_number bigint;
 alter table migtest_e_history5 add test_boolean bit default 0 not null;
 EXEC usp_ebean_drop_default_constraint migtest_e_history6, test_number1;
 alter table migtest_e_history6 alter column test_number1 integer not null;
 alter table migtest_e_history6 add default 42 for test_number1;
 alter table migtest_e_history6 alter column test_number2 integer;
 alter table migtest_e_softdelete add deleted bit default 0 not null;
-alter table migtest_oto_child add master_id numeric(19);
+alter table migtest_oto_child add master_id bigint;
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
