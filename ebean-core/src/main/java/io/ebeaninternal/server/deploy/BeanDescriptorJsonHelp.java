@@ -133,7 +133,12 @@ final class BeanDescriptorJsonHelp<T> {
         String key = parser.getCurrentName();
         BeanProperty p = desc.beanProperty(key);
         if (p != null) {
-          p.jsonRead(readJson, bean);
+          if (p.isVersion() && readJson.update() ) {
+            // skip version prop during update
+            p.jsonRead(readJson);
+          } else {
+            p.jsonRead(readJson, bean);
+          }
         } else {
           // read an unmapped property
           if (unmappedProperties == null) {
