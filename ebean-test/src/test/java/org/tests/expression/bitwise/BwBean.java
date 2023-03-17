@@ -2,7 +2,6 @@ package org.tests.expression.bitwise;
 
 import io.ebean.Model;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Version;
@@ -15,8 +14,6 @@ public class BwBean extends Model {
 
   String name;
 
-  // sqlserver wants integer type for bitwise AND operator
-  @Column(columnDefinition = "integer")
   long flags;
 
   @Version
