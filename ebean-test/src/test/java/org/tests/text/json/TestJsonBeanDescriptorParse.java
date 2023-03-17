@@ -12,14 +12,19 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
+import org.tests.model.basic.Contact;
+import org.tests.model.basic.ContactNote;
 import org.tests.model.basic.Customer;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Comparator;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestJsonBeanDescriptorParse extends BaseTestCase {
 
@@ -32,6 +37,17 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     address.setLine1("foo");
     DB.save(address);
     customer.setBillingAddress(address);
+
+    Contact alfred = new Contact("Alfred", "P");
+    alfred.setId(789); // set some deterministic id
+    ContactNote note = new ContactNote("Drinks", "Order 100l beer");
+    note.setId(890);
+    alfred.getNotes().add(note);
+    customer.getContacts().add(alfred);
+    Contact anton = new Contact("Anton", "P");
+    anton.setId(790);
+    anton.getNotes().add(new ContactNote("Equipment", "Organize barbecue"));
+    customer.getContacts().add(anton);
     DB.save(customer);
   }
 
@@ -57,6 +73,38 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     assertTrue(loadedProps.contains("id"));
     assertTrue(loadedProps.contains("name"));
     assertThat(beanState.dirtyValues()).isEmpty();
+  }
+
+  @Test
+  public void testJsonManyUpdate() throws IOException {
+
+    Customer customer = DB.find(Customer.class, 234);
+    String json =
+      "{\"contacts\": [ "
+        + "  {\"id\": 789, \"lastName\": \"Praml\", \"notes\": ["
+        + "    {\"id\": 890,\"title\": \"Beer\",\"note\": \"Order 200l beer\",\"version\": 17},"
+        + "    {\"title\": \"Food\",\"note\": \"Order 20 steaks\"}"
+        + "  ]},"
+        + "  {\"id\": 790, \"firstName\": \"Anton\",  \"lastName\": null, \"notes\" : null } "
+        + "]}";
+    DB.json().toBean(customer, json);
+    DB.save(customer);
+
+    customer = DB.find(Customer.class, 234);
+    assertThat(customer.getContacts()).hasSize(2);
+    customer.getContacts().sort(Comparator.comparing(Contact::getId));
+
+    Contact contact = customer.getContacts().get(0);
+    assertThat(contact.getFirstName()).isEqualTo("Alfred");
+    assertThat(contact.getLastName()).isEqualTo("Praml");
+    assertThat(contact.getNotes()).hasSize(2).extracting(ContactNote::getNote)
+      .containsExactlyInAnyOrder("Order 200l beer", "Order 20 steaks");
+
+    contact = customer.getContacts().get(1);
+    assertThat(contact.getFirstName()).isEqualTo("Anton");
+    assertThat(contact.getLastName()).isEqualTo(null);
+    assertThat(contact.getNotes()).hasSize(1);
+
   }
 
   @Test

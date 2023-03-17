@@ -811,14 +811,20 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void jsonRead(SpiJsonReader readJson, EntityBean bean) throws IOException {
     if (jsonDeserialize && targetDescriptor != null) {
-      T target = (T) value(bean);
+      // CHECKME: may we skip reading the object from the json stream?
+      T target = readJson.update() ? (T) value(bean) : null;
       T assocBean = targetDescriptor.jsonRead(readJson, name, target);
-      if (readJson.intercept()) {
+      if (readJson.update()) {
         setValueIntercept(bean, assocBean);
       } else {
         setValue(bean, assocBean);
       }
     }
+  }
+
+  @Override
+  public Object jsonRead(SpiJsonReader readJson) throws IOException {
+    return targetDescriptor.jsonRead(readJson, name, null);
   }
 
   public boolean isReference(Object detailBean) {
