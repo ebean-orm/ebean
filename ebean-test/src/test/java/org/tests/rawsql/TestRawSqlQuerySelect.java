@@ -1,7 +1,6 @@
 package org.tests.rawsql;
 
 import io.ebean.DB;
-import io.ebean.FetchGroup;
 import io.ebean.RawSql;
 import io.ebean.RawSqlBuilder;
 import io.ebean.xtest.BaseTestCase;
@@ -19,7 +18,7 @@ class TestRawSqlQuerySelect extends BaseTestCase {
   void testRawSQL() {
     ResetBasicData.reset();
 
-    RawSql rawSql = RawSqlBuilder.parse("select id, name, anniversary, city from (select c.id, c.name, c.anniversary, a.city from o_customer c left join o_address a ON a.id = c.billing_address_id order by c.id) w").create();
+    RawSql rawSql = RawSqlBuilder.parse("select id, name, anniversary, city from (select c.id, c.name, c.anniversary, a.city from o_customer c left join o_address a ON a.id = c.billing_address_id) w").create();
     String sumSql = "COUNT(1) AS count, SUM(id) AS sum";
 
     var query = DB.find(SampleReport.class);
@@ -32,7 +31,7 @@ class TestRawSqlQuerySelect extends BaseTestCase {
     var countSum = DB.find(SampleReport.class)
       .setRawSql(rawSql)
       //.select(sumSql)
-      .select(FetchGroup.of(SampleReport.class, sumSql))
+      .select(sumSql)
       .setMaxRows(10)
       .asDto(QuerySumResponse.class)
       .findOne();

@@ -5,12 +5,7 @@ import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -59,7 +54,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.dbDefaultValue.setNow("SYSUTCDATETIME()");
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
-    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("numeric", 19));
+    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("bigint", false));
     dbTypeMap.put(DbType.REAL, new DbPlatformType("float(16)"));
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float(32)"));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
