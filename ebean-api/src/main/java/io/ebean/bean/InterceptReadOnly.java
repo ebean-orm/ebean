@@ -25,6 +25,11 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
+  public String toString() {
+    return "InterceptReadOnly{" + owner + '}';
+  }
+
+  @Override
   public EntityBean getOwner() {
     return owner;
   }

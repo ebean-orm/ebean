@@ -126,6 +126,11 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
+    public String toString() {
+      return "LoadBuffer@" + hashCode();
+    }
+
+    @Override
     public Lock lock() {
       bufferLock.lock();
       return bufferLock;
