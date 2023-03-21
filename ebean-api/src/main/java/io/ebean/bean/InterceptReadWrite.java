@@ -114,6 +114,25 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
+  public String toString() {
+    return "InterceptReadWrite{state=" + state +
+      (dirty ? " dirty;" : "") +
+      (forceUpdate ? " forceUpdate;" : "") +
+      (readOnly ? " readOnly;" : "") +
+      (disableLazyLoad ? " disableLazyLoad;" : "") +
+      (lazyLoadFailure ? " lazyLoadFailure;" : "") +
+      (fullyLoadedBean ? " fullyLoadedBean;" : "") +
+      (loadedFromCache ? " loadedFromCache;" : "") +
+      ", pc=" + System.identityHashCode(persistenceContext) +
+      ", flags=" + Arrays.toString(flags) +
+      (lazyLoadProperty > -1 ? (", lazyLoadProperty=" + lazyLoadProperty) : "") +
+      ", loader=" + beanLoader +
+      (ownerId != null ? (", ownerId=" + ownerId) : "") +
+      ", owner=" + owner +
+      '}';
+  }
+
+  @Override
   public EntityBean getOwner() {
     return owner;
   }
@@ -718,7 +737,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
     if (lazyLoadFailure) {
       // failed when batch lazy loaded by another bean in the batch
-      throw new EntityNotFoundException("(Lazy) loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted");
+      throw new EntityNotFoundException("(Lazy) loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted. BeanLoader: " + beanLoader);
     }
     if (lazyLoadProperty == -1) {
       lazyLoadProperty = loadProperty;

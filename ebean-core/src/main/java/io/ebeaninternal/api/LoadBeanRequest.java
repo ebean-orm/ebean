@@ -62,9 +62,9 @@ public final class LoadBeanRequest extends LoadRequest {
   /**
    * Return the list of Id values for the beans in the lazy load buffer.
    */
-  public List<Object> getIdList() {
-    List<Object> idList = new ArrayList<>();
-    BeanDescriptor<?> desc = loadBuffer.descriptor();
+  public List<Object> ids() {
+    final List<Object> idList = new ArrayList<>(batch.size());
+    final BeanDescriptor<?> desc = loadBuffer.descriptor();
     for (EntityBeanIntercept ebi : batch) {
       idList.add(desc.getId(ebi.getOwner()));
     }
@@ -111,6 +111,7 @@ public final class LoadBeanRequest extends LoadRequest {
       desc.cacheBeanPutAll(list);
     }
     if (lazyLoadProperty != null) {
+      List<EntityBeanIntercept> missed = new ArrayList<>();
       Set<Object> missedIds = new HashSet<>();
       for (EntityBeanIntercept ebi : batch) {
         // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
@@ -120,23 +121,26 @@ public final class LoadBeanRequest extends LoadRequest {
           // assume this is logically deleted (hence not found)
           desc.markAsDeleted(ebi.getOwner());
           missedIds.add(id);
+          missed.add(ebi);
         }
       }
-      return new Result(loadedIds, missedIds);
+      return new Result(loadedIds, missedIds, missed);
     }
     return EMPTY_RESULT;
   }
 
-  static final Result EMPTY_RESULT = new Result(Collections.emptySet(),Collections.emptySet());
+  static final Result EMPTY_RESULT = new Result(Collections.emptySet(),Collections.emptySet(), Collections.emptyList());
 
   public static class Result {
 
     private final Set<Object> loadedIds;
     private final Set<Object> missedIds;
+    private final List<EntityBeanIntercept> missed;
 
-    Result(Set<Object> loadedIds, Set<Object> missedIds) {
+    Result(Set<Object> loadedIds, Set<Object> missedIds, List<EntityBeanIntercept> missed) {
       this.loadedIds = loadedIds;
       this.missedIds = missedIds;
+      this.missed = missed;
     }
 
     public boolean markedDeleted() {
@@ -149,6 +153,10 @@ public final class LoadBeanRequest extends LoadRequest {
 
     public Set<Object> loadedIds() {
       return loadedIds;
+    }
+
+    public List<EntityBeanIntercept> missed() {
+      return missed;
     }
   }
 }
