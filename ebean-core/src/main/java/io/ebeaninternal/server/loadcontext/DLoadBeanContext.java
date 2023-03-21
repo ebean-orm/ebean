@@ -191,6 +191,9 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
 
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
+      assert bufferLock.isHeldByCurrentThread();
+      assert bufferLock.isLocked();
+
       // A lock is effectively held by EntityBeanIntercept.loadBean()
       if (context.desc.lazyLoadMany(ebi, context)) {
         // lazy load property was a Many
