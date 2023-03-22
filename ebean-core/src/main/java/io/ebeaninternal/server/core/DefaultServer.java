@@ -962,13 +962,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (transaction == null) {
       transaction = currentServerTransaction();
     }
-    query.setDefaultRawSqlIfRequired();
-    if (query.isAutoTunable() && !autoTuneService.tuneQuery(query)) {
-      // use deployment FetchType.LAZY/EAGER annotations
-      // to define the 'default' select clause
-      query.setDefaultSelectClause();
+    if (!query.isRawSql()) {
+      query.setDefaultRawSqlIfRequired();
+      if (query.isAutoTunable() && !autoTuneService.tuneQuery(query)) {
+        // use deployment FetchType.LAZY/EAGER annotations
+        // to define the 'default' select clause
+        query.setDefaultSelectClause();
+      }
+      query.selectAllForLazyLoadProperty();
     }
-    query.selectAllForLazyLoadProperty();
     ProfileLocation profileLocation = query.getProfileLocation();
     if (profileLocation != null) {
       profileLocation.obtain();
