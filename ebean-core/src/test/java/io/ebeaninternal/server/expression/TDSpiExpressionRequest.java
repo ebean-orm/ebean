@@ -24,7 +24,7 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public DbExpressionHandler getDbPlatformHandler() {
+  public DbExpressionHandler platformHandler() {
     return null;
   }
 
@@ -34,12 +34,12 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public BeanDescriptor<?> getBeanDescriptor() {
+  public BeanDescriptor<?> descriptor() {
     return descriptor;
   }
 
   @Override
-  public SpiOrmQueryRequest<?> getQueryRequest() {
+  public SpiOrmQueryRequest<?> queryRequest() {
     return null;
   }
 
@@ -72,12 +72,12 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public String getSql() {
+  public String sql() {
     return sql.toString();
   }
 
   @Override
-  public ArrayList<Object> getBindValues() {
+  public ArrayList<Object> bindValues() {
     return null;
   }
 

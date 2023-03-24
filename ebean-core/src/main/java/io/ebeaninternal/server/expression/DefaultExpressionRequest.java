@@ -67,7 +67,7 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public DbExpressionHandler getDbPlatformHandler() {
+  public DbExpressionHandler platformHandler() {
     return binder.getDbExpressionHandler();
   }
 
@@ -101,12 +101,12 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public BeanDescriptor<?> getBeanDescriptor() {
+  public BeanDescriptor<?> descriptor() {
     return beanDescriptor;
   }
 
   @Override
-  public SpiOrmQueryRequest<?> getQueryRequest() {
+  public SpiOrmQueryRequest<?> queryRequest() {
     return queryRequest;
   }
 
@@ -162,17 +162,17 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
     }
   }
 
-  public String getBindLog() {
+  public String bindLog() {
     return bindLog == null ? "" : bindLog.toString();
   }
 
   @Override
-  public String getSql() {
+  public String sql() {
     return sql.toString();
   }
 
   @Override
-  public List<Object> getBindValues() {
+  public List<Object> bindValues() {
     return bindValues;
   }
 

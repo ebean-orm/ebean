@@ -185,7 +185,7 @@ public final class CQueryPredicates {
         dbOrderBy = deployParser.parse(logicalOrderBy);
       }
       // create a copy of the includes required to support the orderBy
-      orderByIncludes = new HashSet<>(deployParser.getIncludes());
+      orderByIncludes = new HashSet<>(deployParser.includes());
     }
     SpiExpressionList<?> whereExp = query.getWhereExpressions();
     if (whereExp != null) {
@@ -212,7 +212,7 @@ public final class CQueryPredicates {
       }
     }
     if (buildSql) {
-      predicateIncludes = deployParser.getIncludes();
+      predicateIncludes = deployParser.includes();
     }
   }
 
@@ -303,7 +303,7 @@ public final class CQueryPredicates {
    * Return the bind values for the where expression.
    */
   public List<Object> whereExprBindValues() {
-    return where == null ? Collections.emptyList() : where.getBindValues();
+    return where == null ? Collections.emptyList() : where.bindValues();
   }
 
   /**

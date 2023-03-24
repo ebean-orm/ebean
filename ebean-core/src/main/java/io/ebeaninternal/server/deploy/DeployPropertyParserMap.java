@@ -19,7 +19,7 @@ public class DeployPropertyParserMap extends DeployParser {
    * Returns null for raw sql queries.
    */
   @Override
-  public Set<String> getIncludes() {
+  public Set<String> includes() {
     return Collections.emptySet();
   }
 

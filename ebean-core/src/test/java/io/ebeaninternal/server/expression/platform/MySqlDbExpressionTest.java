@@ -15,6 +15,6 @@ public class MySqlDbExpressionTest {
   public void testJson() {
     SpiExpressionRequest request = new DefaultExpressionRequest(null);
     expression.json(request, "jsonproperty", "path", Op.EQ, "val");
-    assertEquals("(jsonproperty ->> '$.path') = ?", request.getSql());
+    assertEquals("(jsonproperty ->> '$.path') = ?", request.sql());
   }
 }

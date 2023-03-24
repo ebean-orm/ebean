@@ -19,7 +19,7 @@ public final class DeployUpdateParser extends DeployParser {
    * Return null as not used for updates.
    */
   @Override
-  public Set<String> getIncludes() {
+  public Set<String> includes() {
     return null;
   }
 

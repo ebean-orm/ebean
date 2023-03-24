@@ -37,12 +37,12 @@ public final class DeployPropertyParser extends DeployParser {
   /**
    * Return the first property found by the parser.
    */
-  public ElPropertyDeploy getFirstProp() {
+  public ElPropertyDeploy firstProp() {
     return firstProp;
   }
 
   @Override
-  public Set<String> getIncludes() {
+  public Set<String> includes() {
     return includes;
   }
 

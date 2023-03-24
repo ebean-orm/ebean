@@ -66,34 +66,29 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
       return;
     }
     // Bind the ID values including EmbeddedId and multiple ID
-    DefaultExpressionRequest r = (DefaultExpressionRequest) request;
-    BeanDescriptor<?> descriptor = r.getBeanDescriptor();
-    IdBinder idBinder = descriptor.idBinder();
-    idBinder.addIdInBindValues(request, idCollection);
+    request.descriptor().idBinder().addIdInBindValues(request, idCollection);
   }
 
   /**
    * For use with deleting non-attached detail beans during stateless update.
    */
   public void addSqlNoAlias(SpiExpressionRequest request) {
-    DefaultExpressionRequest r = (DefaultExpressionRequest) request;
-    BeanDescriptor<?> descriptor = r.getBeanDescriptor();
-    IdBinder idBinder = descriptor.idBinder();
     if (idCollection.isEmpty()) {
       request.append(SQL_FALSE); // append false for this stage
     } else {
+      final BeanDescriptor<?> descriptor = request.descriptor();
       request.property(descriptor.idBinder().getBindIdInSql(null));
-      request.append(idBinder.getIdInValueExpr(false, idCollection.size()));
+      request.append(descriptor.idBinder().getIdInValueExpr(false, idCollection.size()));
     }
   }
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    BeanDescriptor<?> descriptor = request.getBeanDescriptor();
-    IdBinder idBinder = descriptor.idBinder();
     if (idCollection.isEmpty()) {
       request.append(SQL_FALSE); // append false for this stage
     } else {
+      final BeanDescriptor<?> descriptor = request.descriptor();
+      final IdBinder idBinder = descriptor.idBinder();
       if (idBinder.isComplexId()) {
         request.parse(descriptor.idBinderInLHSSql());
         request.append(idBinder.getIdInValueExpr(false, idCollection.size()));

@@ -89,7 +89,7 @@ final class InPairsExpression extends AbstractExpression {
       request.append(not ? SQL_TRUE : SQL_FALSE);
       return;
     }
-    request.parse(request.getDbPlatformHandler().concat(property0, separator, property1, suffix));
+    request.parse(request.platformHandler().concat(property0, separator, property1, suffix));
     request.appendInExpression(not, concatBindValues);
   }
 

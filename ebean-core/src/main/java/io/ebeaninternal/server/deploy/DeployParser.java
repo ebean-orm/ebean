@@ -51,7 +51,7 @@ public abstract class DeployParser {
   /**
    * Return the join includes.
    */
-  public abstract Set<String> getIncludes();
+  public abstract Set<String> includes();
 
   public void setEncrypted(boolean encrypted) {
     this.encrypted = encrypted;
