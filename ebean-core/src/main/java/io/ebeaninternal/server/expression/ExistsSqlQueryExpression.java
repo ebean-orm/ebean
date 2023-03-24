@@ -2,34 +2,20 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.*;
-import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.query.CQuery;
 
-import java.util.List;
+import java.util.Arrays;
 
-final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreExpression {
+final class ExistsSqlQueryExpression implements SpiExpression, UnsupportedDocStoreExpression {
 
   private final boolean not;
-  private final SpiQuery<?> subQuery;
-  private List<Object> bindParams;
-  private String sql;
+  private final String subQuery;
+  private final Object[] bindParams;
 
-  ExistsQueryExpression(SpiQuery<?> subQuery, boolean not) {
+  ExistsSqlQueryExpression(boolean not, String subQuery, Object[] bindParams) {
+    this.not = not;
     this.subQuery = subQuery;
-    this.not = not;
-  }
-
-  ExistsQueryExpression(boolean not, String sql, List<Object> bindParams) {
-    this.not = not;
-    this.sql = sql;
     this.bindParams = bindParams;
-    this.subQuery = null;
-  }
-
-  @Override
-  public SpiExpression copy() {
-    return subQuery == null ? this : new ExistsQueryExpression(subQuery.copy(), not);
   }
 
   @Override
@@ -61,9 +47,7 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
 
   @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
-    CQuery<?> subQuery = compileSubQuery(request);
-    this.bindParams = subQuery.predicates().whereExprBindValues();
-    this.sql = subQuery.generatedSql().replace('\n', ' ');
+    // do nothing
   }
 
   @Override
@@ -71,23 +55,17 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
     return this;
   }
 
-  /**
-   * Compile/build the sub query.
-   */
-  CQuery<?> compileSubQuery(BeanQueryRequest<?> queryRequest) {
-    SpiEbeanServer ebeanServer = (SpiEbeanServer) queryRequest.database();
-    return ebeanServer.compileQuery(Type.SQ_EXISTS, subQuery, queryRequest.transaction());
-  }
-
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("ExistsQuery[").append(" not:").append(not);
-    builder.append(" sql:").append(sql).append(" ?:").append(bindParams.size()).append("]");
+    builder.append("ExistsSqlQuery[").append(" not:").append(not);
+    builder.append(" sql:").append(subQuery).append(" ?:").append(bindParams.length).append("]");
   }
 
   @Override
   public void queryBindKey(BindValuesKey key) {
-    subQuery.queryBindKey(key);
+    for (Object value : bindParams) {
+      key.add(value);
+    }
   }
 
   @Override
@@ -95,7 +73,7 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
     if (not) {
       request.append("not ");
     }
-    request.append("exists (").parse(sql).append(")");
+    request.append("exists (").parse(subQuery).append(")");
   }
 
   @Override
@@ -107,16 +85,8 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
 
   @Override
   public boolean isSameByBind(SpiExpression other) {
-    ExistsQueryExpression that = (ExistsQueryExpression) other;
-    if (this.bindParams.size() != that.bindParams.size()) {
-      return false;
-    }
-    for (int i = 0; i < bindParams.size(); i++) {
-      if (!bindParams.get(i).equals(that.bindParams.get(i))) {
-        return false;
-      }
-    }
-    return true;
+    final ExistsSqlQueryExpression that = (ExistsSqlQueryExpression) other;
+    return Arrays.equals(bindParams, that.bindParams);
   }
 
   @Override

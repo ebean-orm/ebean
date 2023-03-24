@@ -734,6 +734,28 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * EXISTS using a SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R exists(String sqlSubQuery, Object... bindValues) {
+    query().where().exists(sqlSubQuery, bindValues);
+    return root;
+  }
+
+  /**
+   * Not EXISTS using a SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R notExists(String sqlSubQuery, Object... bindValues) {
+    query().where().notExists(sqlSubQuery, bindValues);
+    return root;
+  }
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   public R forUpdate() {

@@ -1142,6 +1142,94 @@ public interface ExpressionList<T> {
   ExpressionList<T> inPairs(Pairs pairs);
 
   /**
+   * EXISTS a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> exists(String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Not EXISTS a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> notExists(String sqlSubQuery, Object... bindValues);
+
+  /**
+   * IN a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> inSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Not IN a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> notInSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Equal To a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> eqSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Not Equal To a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> neSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Greater Than a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> gtSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Greater Than or Equal To a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> geSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Less Than a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> ltSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Less Than or Equal To a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  ExpressionList<T> leSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
    * In - using a subQuery.
    */
   ExpressionList<T> in(String propertyName, Query<?> subQuery);

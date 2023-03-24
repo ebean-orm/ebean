@@ -1,12 +1,12 @@
 package org.tests.query;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.Query;
-import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -186,5 +186,94 @@ public class TestWhereRawClause extends BaseTestCase {
       .raw("unitPrice > ? and product.id > ?", 2, 3)
       .findList();
 
+  }
+
+  @Test
+  void testSqlSubQueryExists() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+    DB.find(Order.class)
+      .select("id")
+      .where()
+      .exists("select 1 from o_order_detail od where od.order_qty > ? and od.order_id = t0.id", 10)
+      .findList();
+
+    DB.find(Order.class)
+      .select("id")
+      .where()
+      .notExists("select 1 from o_order_detail od where od.order_qty > ? and od.order_id = t0.id", 10)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select t0.id from o_order t0 where exists (select 1 from o_order_detail od where od.order_qty > ? and od.order_id = t0.id)");
+    assertThat(sql.get(1)).contains("select t0.id from o_order t0 where not exists (select 1 from o_order_detail od where od.order_qty > ? and od.order_id = t0.id)");
+  }
+
+  @Test
+  void testSqlSubQueryExpressions() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+    DB.find(Customer.class)
+      .select("name")
+      .where()
+      .inSubQuery("id", "select c.id as id from o_customer c")
+      .findList();
+
+    DB.find(Customer.class)
+      .select("name")
+      .where()
+      .notInSubQuery("id", "select c.id as id from o_customer c")
+      .findList();
+
+    DB.find(Customer.class)
+      .select("name")
+      .where()
+      .eqSubQuery("id", "select c.id as id from o_customer c where c.name = ?", "Rob")
+      .findList();
+
+    DB.find(Customer.class)
+      .select("name")
+      .where()
+      .neSubQuery("id", "select c.id as id from o_customer c where c.name = ?", "Rob")
+      .findList();
+
+    DB.find(Customer.class)
+      .select("name")
+      .where()
+      .gtSubQuery("id", "select c.id as id from o_customer c where c.name = ?", "Rob")
+      .findList();
+
+    DB.find(Customer.class)
+      .select("name")
+      .where()
+      .geSubQuery("id", "select c.id as id from o_customer c where c.name = ?", "Rob")
+      .findList();
+
+    DB.find(Customer.class)
+      .select("name")
+      .where()
+      .ltSubQuery("id", "select c.id as id from o_customer c where c.name = ?", "Rob")
+      .findList();
+
+    DB.find(Customer.class)
+      .select("name")
+      .where()
+      .leSubQuery("id", "select c.id as id from o_customer c where c.name = ? and 1 = ?", "Rob", 1)
+      .like("name", "R%")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(8);
+    assertThat(sql.get(0)).contains("select t0.id, t0.name from o_customer t0 where t0.id in (select c.id as id from o_customer c)");
+    assertThat(sql.get(1)).contains("select t0.id, t0.name from o_customer t0 where t0.id not in (select c.id as id from o_customer c)");
+    assertThat(sql.get(2)).contains("select t0.id, t0.name from o_customer t0 where t0.id = (select c.id as id from o_customer c where c.name = ?)");
+    assertThat(sql.get(3)).contains("select t0.id, t0.name from o_customer t0 where t0.id <> (select c.id as id from o_customer c where c.name = ?)");
+    assertThat(sql.get(4)).contains("select t0.id, t0.name from o_customer t0 where t0.id > (select c.id as id from o_customer c where c.name = ?)");
+    assertThat(sql.get(5)).contains("select t0.id, t0.name from o_customer t0 where t0.id >= (select c.id as id from o_customer c where c.name = ?)");
+    assertThat(sql.get(6)).contains("select t0.id, t0.name from o_customer t0 where t0.id < (select c.id as id from o_customer c where c.name = ?)");
+    assertThat(sql.get(7)).contains("select t0.id, t0.name from o_customer t0 where t0.id <= (select c.id as id from o_customer c where c.name = ? and 1 = ?)");
   }
 }
