@@ -16,12 +16,12 @@ final class HanaDbExpression extends BaseDbExpression {
 
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
-    request.append("json_value(").parse(propName).append(", '$.").append(path).append("')").append(operator.bind());
+    request.append("json_value(").property(propName).append(", '$.").append(path).append("')").append(operator.bind());
   }
 
   @Override
   public void arrayIsEmpty(SpiExpressionRequest request, String propName, boolean empty) {
-    request.append("cardinality(").parse(propName).append(")");
+    request.append("cardinality(").property(propName).append(")");
     if (empty) {
       request.append(" = 0");
     } else {
@@ -50,7 +50,7 @@ final class HanaDbExpression extends BaseDbExpression {
       if (!contains) {
         request.append(" not ");
       }
-      request.append(" member of ").parse(propName).append(")");
+      request.append(" member of ").property(propName).append(")");
     }
   }
 

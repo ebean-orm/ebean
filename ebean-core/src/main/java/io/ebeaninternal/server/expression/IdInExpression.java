@@ -82,9 +82,8 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
     if (idCollection.isEmpty()) {
       request.append(SQL_FALSE); // append false for this stage
     } else {
-      request.parse(descriptor.idBinder().getBindIdInSql(null));
-      String inClause = idBinder.getIdInValueExpr(false, idCollection.size());
-      request.append(inClause);
+      request.property(descriptor.idBinder().getBindIdInSql(null));
+      request.append(idBinder.getIdInValueExpr(false, idCollection.size()));
     }
   }
 
@@ -99,7 +98,7 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
         request.parse(descriptor.idBinderInLHSSql());
         request.append(idBinder.getIdInValueExpr(false, idCollection.size()));
       } else {
-        request.parse(idBinder.getBeanProperty().name());
+        request.property(idBinder.getBeanProperty().name());
         request.appendInExpression(false, idCollection);
       }
     }

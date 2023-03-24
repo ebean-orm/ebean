@@ -44,9 +44,9 @@ final class LikeExpression extends AbstractValueExpression {
       pname = prop.beanProperty().decryptProperty(propName);
     }
     if (caseInsensitive) {
-      request.append("lower(").parse(pname).append(")");
+      request.append("lower(").property(pname).append(")");
     } else {
-      request.parse(pname);
+      request.property(pname);
     }
     if (type == LikeType.EQUAL_TO) {
       request.append(" = ?");

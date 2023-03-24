@@ -46,7 +46,7 @@ public abstract class DeployParser {
 
   protected abstract String convertWord();
 
-  public abstract String getDeployWord(String expression);
+  public abstract String deployWord(String expression);
 
   /**
    * Return the join includes.
@@ -57,14 +57,26 @@ public abstract class DeployParser {
     this.encrypted = encrypted;
   }
 
-  public String parse(String source) {
-    if (source == null) {
+  /**
+   * Fast path parse() which first checks that the source is a bean property.
+   */
+  public String property(String expression) {
+    String deployWord = deployWord(expression);
+    if (deployWord != null) {
+      return deployWord;
+    }
+    // fallback to use parse()
+    return parse(expression);
+  }
+
+  public String parse(String expression) {
+    if (expression == null) {
       return null;
     }
     pos = -1;
-    this.source = source;
-    this.sourceLength = source.length();
-    this.sb = new StringBuilder(source.length() + 20);
+    this.source = expression;
+    this.sourceLength = expression.length();
+    this.sb = new StringBuilder(expression.length() + 20);
     while (nextWord()) {
       if (skipWordConvert()) {
         sb.append(word);

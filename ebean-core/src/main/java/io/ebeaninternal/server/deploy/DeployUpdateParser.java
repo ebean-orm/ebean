@@ -25,7 +25,7 @@ public final class DeployUpdateParser extends DeployParser {
 
   @Override
   public String convertWord() {
-    String dbWord = getDeployWord(word);
+    String dbWord = deployWord(word);
     if (dbWord != null) {
       return dbWord;
     }
@@ -62,7 +62,7 @@ public final class DeployUpdateParser extends DeployParser {
       start = dotPos + 1;
       String remainder = currentWord.substring(start);
 
-      String dbWord = getDeployWord(remainder);
+      String dbWord = deployWord(remainder);
       if (dbWord != null) {
         // we have found a match for the remainder
         localBuffer.append(dbWord);
@@ -72,7 +72,7 @@ public final class DeployUpdateParser extends DeployParser {
   }
 
   @Override
-  public String getDeployWord(String expression) {
+  public String deployWord(String expression) {
     if (expression.equalsIgnoreCase(beanDescriptor.name())) {
       return beanDescriptor.baseTable();
     }

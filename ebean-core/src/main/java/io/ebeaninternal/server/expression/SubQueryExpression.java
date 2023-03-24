@@ -90,7 +90,7 @@ final class SubQueryExpression extends AbstractExpression implements Unsupported
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.parse(propName).append(op.expression).append("(").parse(sql).append(")");
+    request.property(propName).append(op.expression).append("(").parse(sql).append(")");
   }
 
   @Override

@@ -18,10 +18,10 @@ final class PostgresDbExpression extends BaseDbExpression {
     String[] paths = path.split("\\.");
     if (paths.length == 1) {
       // (t0.content ->> 'title') = 'Some value'
-      request.append("(").parse(propName).append(" ->> '").append(path).append("')");
+      request.append("(").property(propName).append(" ->> '").append(path).append("')");
     } else {
       // (t0.content #>> '{path,inner}') = 'Some value'
-      request.append("(").parse(propName).append(" #>> '{");
+      request.append("(").property(propName).append(" #>> '{");
       for (int i = 0; i < paths.length; i++) {
         if (i > 0) {
           request.append(",");
@@ -38,7 +38,7 @@ final class PostgresDbExpression extends BaseDbExpression {
     if (!contains) {
       request.append("not (");
     }
-    request.parse(propName).append(" @> array[?");
+    request.property(propName).append(" @> array[?");
     for (int i = 1; i < values.length; i++) {
       request.append(",?");
     }
@@ -50,7 +50,7 @@ final class PostgresDbExpression extends BaseDbExpression {
 
   @Override
   public void arrayIsEmpty(SpiExpressionRequest request, String propName, boolean empty) {
-    request.append("coalesce(cardinality(").parse(propName).append("),0)");
+    request.append("coalesce(cardinality(").property(propName).append("),0)");
     if (empty) {
       request.append(" = 0");
     } else {

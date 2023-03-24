@@ -109,7 +109,7 @@ public final class SimpleExpression extends AbstractValueExpression {
         return;
       }
     }
-    request.parse(propName).append(type.bind());
+    request.property(propName).append(type.bind());
   }
 
   /**

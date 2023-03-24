@@ -73,7 +73,7 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
 
   @Override
   public String parseDeploy(String logicalProp) {
-    String s = deployParser.getDeployWord(logicalProp);
+    String s = deployParser.deployWord(logicalProp);
     return s == null ? logicalProp : s;
   }
 
@@ -114,8 +114,18 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
    * Append text the underlying sql expression.
    */
   @Override
-  public SpiExpressionRequest append(String sqlExpression) {
-    sql.append(sqlExpression);
+  public SpiExpressionRequest append(String expression) {
+    sql.append(expression);
+    return this;
+  }
+
+  @Override
+  public SpiExpressionRequest property(String expression) {
+    if (deployParser == null) {
+      sql.append(expression);
+    } else {
+      sql.append(deployParser.property(expression));
+    }
     return this;
   }
 

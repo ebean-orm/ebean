@@ -25,12 +25,12 @@ public class DeployPropertyParserMap extends DeployParser {
 
   @Override
   public String convertWord() {
-    String r = getDeployWord(word);
+    String r = deployWord(word);
     return r == null ? word : r;
   }
 
   @Override
-  public String getDeployWord(String expression) {
+  public String deployWord(String expression) {
     return map.get(expression);
   }
 

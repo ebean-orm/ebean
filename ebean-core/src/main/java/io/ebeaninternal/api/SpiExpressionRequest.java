@@ -32,14 +32,22 @@ public interface SpiExpressionRequest {
   SpiOrmQueryRequest<?> getQueryRequest();
 
   /**
-   * Append to the expression sql.
+   * Append to the expression sql without any parsing.
    */
-  SpiExpressionRequest append(String sql);
+  SpiExpressionRequest append(String expression);
+
+  /**
+   * Append to the expression sql with logical property parsing to db columns with logical path prefix.
+   * <p>
+   * This is a fast path case when expression is a bean property path and falls back to using parse()
+   * when that isn't the case.
+   */
+  SpiExpressionRequest property(String expression);
 
   /**
    * Append to the expression sql with logical property parsing to db columns with logical path prefix.
    */
-  SpiExpressionRequest parse(String sql);
+  SpiExpressionRequest parse(String expression);
 
   /**
    * Add an encryption key to bind to this request.

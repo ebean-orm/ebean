@@ -41,7 +41,7 @@ final class NativeILikeExpression extends AbstractExpression {
     if (prop != null && prop.isDbEncrypted()) {
       pname = prop.beanProperty().decryptProperty(propName);
     }
-    request.parse(pname).append(" ilike ?");
+    request.property(pname).append(" ilike ?");
   }
 
   /**

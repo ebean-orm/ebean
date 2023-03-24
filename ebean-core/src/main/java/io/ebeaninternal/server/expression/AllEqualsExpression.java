@@ -76,7 +76,7 @@ final class AllEqualsExpression extends NonPrepareExpression {
       if (count > 0) {
         request.append("and ");
       }
-      request.parse(name(propName));
+      request.property(name(propName));
       if (value == null) {
         request.append(" is null ");
       } else {

@@ -169,7 +169,7 @@ public final class InExpression extends AbstractExpression implements IdInCommon
         return;
       }
     }
-    request.parse(propName);
+    request.property(propName);
     request.appendInExpression(not, bindValues);
   }
 
