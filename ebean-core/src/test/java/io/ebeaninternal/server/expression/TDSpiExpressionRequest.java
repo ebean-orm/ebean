@@ -50,6 +50,12 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
+  public SpiExpressionRequest parse(String expression) {
+    sql.append(expression);
+    return this;
+  }
+
+  @Override
   public void addBindEncryptKey(Object encryptKey) {
 
   }

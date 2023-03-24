@@ -2,12 +2,12 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.bind.DataBind;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -73,7 +73,6 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
 
   @Override
   public String parseDeploy(String logicalProp) {
-
     String s = deployParser.getDeployWord(logicalProp);
     return s == null ? logicalProp : s;
   }
@@ -117,6 +116,16 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
   @Override
   public SpiExpressionRequest append(String sqlExpression) {
     sql.append(sqlExpression);
+    return this;
+  }
+
+  @Override
+  public SpiExpressionRequest parse(String expression) {
+    if (deployParser == null) {
+      sql.append(expression);
+    } else {
+      sql.append(deployParser.parse(expression));
+    }
     return this;
   }
 

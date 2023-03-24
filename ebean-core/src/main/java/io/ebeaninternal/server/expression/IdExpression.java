@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
@@ -62,11 +58,9 @@ final class IdExpression extends NonPrepareExpression implements SpiExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     DefaultExpressionRequest r = (DefaultExpressionRequest) request;
     String idSql = r.getBeanDescriptor().idBinderIdSql(null);
-
-    request.append(idSql);
+    request.parse(idSql);
   }
 
   /**

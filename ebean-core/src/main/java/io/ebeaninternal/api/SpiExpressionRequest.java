@@ -37,6 +37,11 @@ public interface SpiExpressionRequest {
   SpiExpressionRequest append(String sql);
 
   /**
+   * Append to the expression sql with logical property parsing to db columns with logical path prefix.
+   */
+  SpiExpressionRequest parse(String sql);
+
+  /**
    * Add an encryption key to bind to this request.
    */
   void addBindEncryptKey(Object encryptKey);

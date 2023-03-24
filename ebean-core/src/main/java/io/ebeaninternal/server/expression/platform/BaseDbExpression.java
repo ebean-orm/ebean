@@ -11,7 +11,7 @@ abstract class BaseDbExpression implements DbExpressionHandler {
   @Override
   public void bitwise(SpiExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare, long match) {
     String bitOp = bitOp(operator);
-    request.append("(").append(propName).append(" ").append(bitOp).append(" ? ").append(compare).append(" ?)");
+    request.append("(").parse(propName).append(" ").append(bitOp).append(" ? ").append(compare).append(" ?)");
   }
 
   private String bitOp(BitwiseOp operator) {
@@ -30,7 +30,7 @@ abstract class BaseDbExpression implements DbExpressionHandler {
    */
   protected void bitwiseFunction(SpiExpressionRequest request, String propName, BitwiseOp operator, String compare) {
     String funcName = functionName(operator);
-    request.append(funcName).append("(").append(propName).append(", ?) ").append(compare).append(" ?");
+    request.append(funcName).append("(").parse(propName).append(", ?) ").append(compare).append(" ?");
   }
 
   protected String functionName(BitwiseOp operator) {

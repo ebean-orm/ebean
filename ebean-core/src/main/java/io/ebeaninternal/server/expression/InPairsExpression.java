@@ -85,14 +85,11 @@ final class InPairsExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     if (entries.isEmpty()) {
-      String expr = not ? SQL_TRUE : SQL_FALSE;
-      request.append(expr);
+      request.append(not ? SQL_TRUE : SQL_FALSE);
       return;
     }
-
-    request.append(request.getDbPlatformHandler().concat(property0, separator, property1, suffix));
+    request.parse(request.getDbPlatformHandler().concat(property0, separator, property1, suffix));
     request.appendInExpression(not, concatBindValues);
   }
 

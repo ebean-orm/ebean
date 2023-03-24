@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 
@@ -80,7 +76,7 @@ final class AllEqualsExpression extends NonPrepareExpression {
       if (count > 0) {
         request.append("and ");
       }
-      request.append(name(propName));
+      request.parse(name(propName));
       if (value == null) {
         request.append(" is null ");
       } else {
