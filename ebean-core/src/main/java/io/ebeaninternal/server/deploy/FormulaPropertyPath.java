@@ -5,6 +5,7 @@ import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.query.STreeProperty;
 
 import java.sql.Types;
+import java.util.Set;
 
 final class FormulaPropertyPath {
 
@@ -18,6 +19,7 @@ final class FormulaPropertyPath {
   private final String internalExpression;
   private final ElPropertyDeploy firstProp;
   private final String parsedAggregation;
+  private final Set<String> includes;
   private boolean countDistinct;
   private String cast;
   private String alias;
@@ -47,6 +49,7 @@ final class FormulaPropertyPath {
       // fetch("machineStats", "sum(hours), sum(totalKms)")
       parsed = parsed.replace("${}", "${" + path + "}");
     }
+    this.includes = parser.includes();
     this.parsedAggregation = buildFormula(parsed);
     this.firstProp = parser.firstProp();
   }
@@ -129,7 +132,7 @@ final class FormulaPropertyPath {
   @SuppressWarnings("rawtypes")
   private DynamicPropertyAggregationFormula createManyToOne(BeanProperty property) {
     String logicalName = logicalName();
-    return new DynamicPropertyAggregationFormulaMTO((BeanPropertyAssocOne) property, logicalName, parsedAggregation, isAggregate(), target(logicalName), alias);
+    return new DynamicPropertyAggregationFormulaMTO((BeanPropertyAssocOne) property, logicalName, parsedAggregation, isAggregate(), target(logicalName), alias, includes);
   }
 
   private BeanProperty target(String logicalName) {
