@@ -127,7 +127,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * iteration is fine.
    */
   public int secondaryQueriesMinBatchSize() {
-    return loadContext.getSecondaryQueriesMinBatchSize();
+    return loadContext.secondaryQueriesMinBatchSize();
   }
 
   /**
