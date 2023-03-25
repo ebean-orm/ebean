@@ -15,7 +15,7 @@ public class HanaDbExpressionTest {
     SpiExpressionRequest request = new DefaultExpressionRequest(null);
     expression.arrayContains(request, "arrayproperty", true, "v1", "v2", "v3");
     assertEquals("(? member of arrayproperty) and (? member of arrayproperty) and (? member of arrayproperty)",
-        request.getSql());
+        request.sql());
   }
 
   @Test
@@ -24,28 +24,28 @@ public class HanaDbExpressionTest {
     expression.arrayContains(request, "arrayproperty", false, "v1", "v2", "v3");
     assertEquals(
         "(? not  member of arrayproperty) and (? not  member of arrayproperty) and (? not  member of arrayproperty)",
-        request.getSql());
+        request.sql());
   }
 
   @Test
   public void testArrayContainsEmpty() {
     SpiExpressionRequest request = new DefaultExpressionRequest(null);
     expression.arrayContains(request, "arrayproperty", true);
-    assertEquals("", request.getSql());
+    assertEquals("", request.sql());
   }
 
   @Test
   public void testArrayIsEmpty() {
     SpiExpressionRequest request = new DefaultExpressionRequest(null);
     expression.arrayIsEmpty(request, "arrayproperty", true);
-    assertEquals("cardinality(arrayproperty) = 0", request.getSql());
+    assertEquals("cardinality(arrayproperty) = 0", request.sql());
   }
 
   @Test
   public void testArrayIsNotEmpty() {
     SpiExpressionRequest request = new DefaultExpressionRequest(null);
     expression.arrayIsEmpty(request, "arrayproperty", false);
-    assertEquals("cardinality(arrayproperty) <> 0", request.getSql());
+    assertEquals("cardinality(arrayproperty) <> 0", request.sql());
   }
 
   @Test
@@ -64,6 +64,6 @@ public class HanaDbExpressionTest {
   public void testJson() {
     SpiExpressionRequest request = new DefaultExpressionRequest(null);
     expression.json(request, "jsonproperty", "path", Op.EQ, "val");
-    assertEquals("json_value(jsonproperty, '$.path') = ?", request.getSql());
+    assertEquals("json_value(jsonproperty, '$.path') = ?", request.sql());
   }
 }

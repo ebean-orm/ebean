@@ -416,8 +416,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public String assocIsEmpty(SpiExpressionRequest request, String path) {
     boolean softDelete = targetDescriptor.isSoftDelete();
     boolean needsX2Table = softDelete || extraWhere() != null;
-    StringBuilder sb = new StringBuilder(50);
-    SpiQuery<?> query = request.getQueryRequest().query();
+    StringBuilder sb = new StringBuilder(50).append("from "); // use from to stop parsing on table name
+    SpiQuery<?> query = request.queryRequest().query();
     if (hasJoinTable()) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
