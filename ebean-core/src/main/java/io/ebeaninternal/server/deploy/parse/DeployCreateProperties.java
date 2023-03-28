@@ -94,7 +94,7 @@ public final class DeployCreateProperties {
 
             DeployBeanProperty replaced = desc.addBeanProperty(prop);
             if (replaced != null && !replaced.isTransient()) {
-              String msg = "Huh??? property " + prop.getFullBeanName() + " being defined twice";
+              String msg = "Huh??? property " + prop + " being defined twice";
               msg += " but replaced property was not transient? This is not expected?";
               CoreLog.log.log(WARNING, msg);
             }

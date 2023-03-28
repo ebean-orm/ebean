@@ -176,7 +176,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
 
   private void checkSelfManyToMany(DeployBeanPropertyAssocMany<?> prop) {
     if (prop.getTargetType().equals(descriptor.getBeanType())) {
-      throw new IllegalStateException("@ManyToMany mapping for " + prop.getFullBeanName() + " requires explicit @JoinTable with joinColumns & inverseJoinColumns. Refer issue #2157");
+      throw new IllegalStateException("@ManyToMany mapping for " + prop + " requires explicit @JoinTable with joinColumns & inverseJoinColumns. Refer issue #2157");
     }
   }
 
@@ -275,8 +275,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       elementDescriptor.addBeanProperty(valueProp);
     }
 
-    elementDescriptor.setName(prop.getFullBeanName());
-
+    elementDescriptor.setName(prop.toString());
     factory.createUnidirectional(elementDescriptor, prop.getOwningType(), beanTable, prop.getTableJoin());
     prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType(), scalar));
   }

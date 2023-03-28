@@ -223,10 +223,6 @@ public class DeployBeanProperty implements DeployProperty, DeployBeanPropertyMet
       || AnnotationUtil.has(field, WhoCreated.class));
   }
 
-  public String getFullBeanName() {
-    return desc.getFullName() + "." + name;
-  }
-
   public DeployBeanDescriptor<?> getDesc() {
     return desc;
   }
