@@ -41,14 +41,14 @@ public final class CallStack implements Serializable, CallOrigin {
   public CallStack(List<StackWalker.StackFrame> frames) {
     this.callStack = frames.toArray(new Object[0]);
     this.hc = computeHashCode();
-    this.zeroHash = enc(callStack[0].hashCode());
+    this.zeroHash = enc(callStack[0].toString().hashCode());
     this.pathHash = enc(hc);
   }
 
   private int computeHashCode() {
     int hc = 0;
     for (Object element : callStack) {
-      hc = 92821 * hc + element.hashCode();
+      hc = 92821 * hc + element.toString().hashCode();
     }
     return hc;
   }
