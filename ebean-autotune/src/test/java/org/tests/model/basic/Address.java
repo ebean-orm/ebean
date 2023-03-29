@@ -1,16 +1,20 @@
 package org.tests.model.basic;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "address")
+@Table(name = "o_address")
 public class Address extends BaseModel {
 
   String line1;
   String line2;
   String city;
+
+  public Address(String line1, String city) {
+    this.line1 = line1;
+    this.city = city;
+  }
 
   public String getLine1() {
     return line1;

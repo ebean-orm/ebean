@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<autotune xmlns="http://ebean-orm.github.io/xml/ns/autotune">
+  <origin key="BmouL7.Bn_jgL.BNY1QD" beanType="org.tests.model.basic.Order" detail="select (orderDate) fetch customer (name,note)" original="">
+    <callStack>org.tests.autofetch.MainAutoQueryTune1.tuneJoin(MainAutoQueryTune1.java:27)
+      org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:725)
+      org.junit.jupiter.engine.execution.MethodInvocation.proceed(MethodInvocation.java:60)
+      org.junit.jupiter.engine.execution.InvocationInterceptorChain$ValidatingInvocation.proceed(InvocationInterceptorChain.java:131)
+      org.junit.jupiter.engine.extension.TimeoutExtension.intercept(TimeoutExtension.java:149)
+      org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestableMethod(TimeoutExtension.java:140)
+      org.junit.jupiter.engine.extension.TimeoutExtension.interceptTestMethod(TimeoutExtension.java:84)
+      org.junit.jupiter.engine.execution.ExecutableInvoker$ReflectiveInterceptorCall.lambda$ofVoidMethod$0(ExecutableInvoker.java:115)
+      org.junit.jupiter.engine.execution.ExecutableInvoker.lambda$invoke$0(ExecutableInvoker.java:105)
+      org.junit.jupiter.engine.execution.InvocationInterceptorChain$InterceptedInvocation.proceed(InvocationInterceptorChain.java:106)</callStack>
+  </origin>
+</autotune>

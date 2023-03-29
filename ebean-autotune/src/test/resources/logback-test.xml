@@ -12,10 +12,11 @@
     <appender-ref ref="STDOUT"/>
   </root>
 
+  <logger name="io.ebeaninternal" level="DEBUG"/>
   <logger name="io.ebean.docker" level="TRACE"/>
   <!--  <logger name="io.ebean.DDL" level="DEBUG"/>-->
-  <!--  <logger name="io.ebean.SQL" level="TRACE"/>-->
+    <logger name="io.ebean.SQL" level="TRACE"/>
   <!--  <logger name="io.ebean.TXN" level="TRACE"/>-->
-  <!--  <logger name="io.ebean.SUM" level="TRACE"/>-->
+    <logger name="io.ebean.SUM" level="TRACE"/>
 
 </configuration>
