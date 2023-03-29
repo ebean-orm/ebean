@@ -354,47 +354,32 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void shutdown() {
-    lock.lock();
-    try {
-      shutdownInternal(true, false);
-    } finally {
-      lock.unlock();
-    }
+    shutdown(true, false);
   }
 
-  /**
-   * Shutting down manually.
-   */
   @Override
   public void shutdown(boolean shutdownDataSource, boolean deregisterDriver) {
     lock.lock();
     try {
       ShutdownManager.unregisterDatabase(this);
-      shutdownInternal(shutdownDataSource, deregisterDriver);
+      log.log(TRACE, "shutting down instance {0}", serverName);
+      if (shutdown) {
+        // already shutdown
+        return;
+      }
+      shutdownPlugins();
+      autoTuneService.shutdown();
+      // shutdown background threads
+      backgroundExecutor.shutdown();
+      // shutdown DataSource (if its an Ebean one)
+      transactionManager.shutdown(shutdownDataSource, deregisterDriver);
+      dumpMetrics();
+      shutdown = true;
+      if (shutdownDataSource) {
+        config.setDataSource(null);
+      }
     } finally {
       lock.unlock();
-    }
-  }
-
-  /**
-   * Shutdown the services like threads and DataSource.
-   */
-  private void shutdownInternal(boolean shutdownDataSource, boolean deregisterDriver) {
-    log.log(TRACE, "shutting down instance {0}", serverName);
-    if (shutdown) {
-      // already shutdown
-      return;
-    }
-    shutdownPlugins();
-    autoTuneService.shutdown();
-    // shutdown background threads
-    backgroundExecutor.shutdown();
-    // shutdown DataSource (if its an Ebean one)
-    transactionManager.shutdown(shutdownDataSource, deregisterDriver);
-    dumpMetrics();
-    shutdown = true;
-    if (shutdownDataSource) {
-      config.setDataSource(null);
     }
   }
 
