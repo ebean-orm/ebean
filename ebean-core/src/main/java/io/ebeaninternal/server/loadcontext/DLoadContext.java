@@ -2,24 +2,11 @@ package io.ebeaninternal.server.loadcontext;
 
 import io.ebean.CacheMode;
 import io.ebean.ProfileLocation;
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.CallOrigin;
-import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.ObjectGraphNode;
-import io.ebean.bean.ObjectGraphOrigin;
-import io.ebean.bean.PersistenceContext;
-import io.ebeaninternal.api.LoadContext;
-import io.ebeaninternal.api.LoadSecondaryQuery;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.api.SpiQuerySecondary;
+import io.ebean.bean.*;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
+import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
@@ -113,8 +100,8 @@ public final class DLoadContext implements LoadContext {
 
     ObjectGraphNode parentNode = query.getParentNode();
     if (parentNode != null) {
-      this.origin = parentNode.getOriginQueryPoint();
-      this.relativePath = parentNode.getPath();
+      this.origin = parentNode.origin();
+      this.relativePath = parentNode.path();
     } else {
       this.origin = null;
       this.relativePath = null;

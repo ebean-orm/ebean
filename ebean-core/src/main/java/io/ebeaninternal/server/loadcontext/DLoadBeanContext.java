@@ -165,7 +165,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return context.serverName;
     }
 

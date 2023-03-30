@@ -122,7 +122,7 @@ public class BaseQueryTuner {
 
     if (queryTuning) {
       // get current "tuned fetch" for this query point
-      TunedQueryInfo tuneInfo = tunedQueryInfoMap.get(origin.getOriginQueryPoint().getKey());
+      TunedQueryInfo tuneInfo = tunedQueryInfoMap.get(origin.origin().key());
       return tuneInfo != null && tuneInfo.tuneQuery(query);
     }
     return false;

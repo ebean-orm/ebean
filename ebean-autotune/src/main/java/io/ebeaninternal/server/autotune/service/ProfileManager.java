@@ -46,9 +46,9 @@ public class ProfileManager implements ProfilingListener {
 
   @Override
   public boolean isProfileRequest(ObjectGraphNode origin, SpiQuery<?> query) {
-    ProfileOrigin profileOrigin = profileMap.get(origin.getOriginQueryPoint().getKey());
+    ProfileOrigin profileOrigin = profileMap.get(origin.origin().key());
     if (profileOrigin == null) {
-      profileMap.put(origin.getOriginQueryPoint().getKey(), createProfileOrigin(origin, query));
+      profileMap.put(origin.origin().key(), createProfileOrigin(origin, query));
       return true;
     } else {
       return profileOrigin.isProfile();
@@ -62,7 +62,7 @@ public class ProfileManager implements ProfilingListener {
    * query detail that is specified in the code (as the query might already be manually optimised).
    */
   private ProfileOrigin createProfileOrigin(ObjectGraphNode origin, SpiQuery<?> query) {
-    ProfileOrigin profileOrigin = new ProfileOrigin(origin.getOriginQueryPoint(), queryTuningAddVersion, profilingBase, profilingRate);
+    ProfileOrigin profileOrigin = new ProfileOrigin(origin.origin(), queryTuningAddVersion, profilingBase, profilingRate);
     // set the current query detail (fetch group) so that we can compare against profiling for new entries
     profileOrigin.setOriginalQuery(query.getDetail().asString());
     return profileOrigin;
@@ -76,7 +76,7 @@ public class ProfileManager implements ProfilingListener {
   @Override
   public void collectQueryInfo(ObjectGraphNode node, long beans, long micros) {
     if (node != null) {
-      ObjectGraphOrigin origin = node.getOriginQueryPoint();
+      ObjectGraphOrigin origin = node.origin();
       if (origin != null) {
         ProfileOrigin stats = getProfileOrigin(origin);
         stats.collectQueryInfo(node, beans, micros);
@@ -92,14 +92,14 @@ public class ProfileManager implements ProfilingListener {
    */
   @Override
   public void collectNodeUsage(NodeUsageCollector.State usageCollector) {
-    ProfileOrigin profileOrigin = getProfileOrigin(usageCollector.node().getOriginQueryPoint());
+    ProfileOrigin profileOrigin = getProfileOrigin(usageCollector.node().origin());
     profileOrigin.collectUsageInfo(usageCollector);
   }
 
   private ProfileOrigin getProfileOrigin(ObjectGraphOrigin originQueryPoint) {
     lock.lock();
     try {
-      return profileMap.computeIfAbsent(originQueryPoint.getKey(), k -> new ProfileOrigin(originQueryPoint, queryTuningAddVersion, profilingBase, profilingRate));
+      return profileMap.computeIfAbsent(originQueryPoint.key(), k -> new ProfileOrigin(originQueryPoint, queryTuningAddVersion, profilingBase, profilingRate));
     } finally {
       lock.unlock();
     }
@@ -111,7 +111,7 @@ public class ProfileManager implements ProfilingListener {
   public AutoTuneCollection profilingCollection(boolean reset) {
     AutoTuneCollection req = new AutoTuneCollection();
     for (ProfileOrigin origin : profileMap.values()) {
-      BeanDescriptor<?> desc = server.descriptorById(origin.getOrigin().getBeanType());
+      BeanDescriptor<?> desc = server.descriptorById(origin.getOrigin().beanType());
       if (desc != null) {
         origin.profilingCollection(desc, req, reset);
       }

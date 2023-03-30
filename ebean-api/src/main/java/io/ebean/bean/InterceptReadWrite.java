@@ -192,13 +192,13 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   public void setBeanLoader(BeanLoader beanLoader, PersistenceContext ctx) {
     this.beanLoader = beanLoader;
     this.persistenceContext = ctx;
-    this.ebeanServerName = beanLoader.getName();
+    this.ebeanServerName = beanLoader.name();
   }
 
   @Override
   public void setBeanLoader(BeanLoader beanLoader) {
     this.beanLoader = beanLoader;
-    this.ebeanServerName = beanLoader.getName();
+    this.ebeanServerName = beanLoader.name();
   }
 
   @Override

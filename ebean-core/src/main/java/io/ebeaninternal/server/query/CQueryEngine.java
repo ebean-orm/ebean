@@ -415,10 +415,10 @@ public final class CQueryEngine {
     String lazyLoadProp = query.getLazyLoadProperty();
     ObjectGraphNode node = query.getParentNode();
     String originKey;
-    if (node == null || node.getOriginQueryPoint() == null) {
+    if (node == null || node.origin() == null) {
       originKey = null;
     } else {
-      originKey = node.getOriginQueryPoint().getKey();
+      originKey = node.origin().key();
     }
 
     StringBuilder msg = new StringBuilder(200);
@@ -459,10 +459,10 @@ public final class CQueryEngine {
     ObjectGraphNode node = query.getParentNode();
 
     String originKey;
-    if (node == null || node.getOriginQueryPoint() == null) {
+    if (node == null || node.origin() == null) {
       originKey = null;
     } else {
-      originKey = node.getOriginQueryPoint().getKey();
+      originKey = node.origin().key();
     }
 
     StringBuilder msg = new StringBuilder(200);
