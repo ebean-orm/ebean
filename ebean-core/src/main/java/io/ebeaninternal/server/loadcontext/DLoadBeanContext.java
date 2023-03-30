@@ -154,7 +154,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     public void add(EntityBeanIntercept ebi) {
       if (persistenceContext == null) {
         // get persistenceContext from first loaded bean into the buffer
-        persistenceContext = ebi.getPersistenceContext();
+        persistenceContext = ebi.persistenceContext();
       }
       batch.add(ebi);
     }
@@ -200,7 +200,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
         // re-add to the batch and lazy load from DB skipping l2 cache
         batch.add(ebi);
       } else if (context.hitCache) {
-        Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(batch, persistenceContext, ebi.getLazyLoadPropertyIndex(), ebi.getLazyLoadProperty());
+        Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(batch, persistenceContext, ebi.lazyLoadPropertyIndex(), ebi.lazyLoadProperty());
         batch.removeAll(hits);
         if (batch.isEmpty() || hits.contains(ebi)) {
           // successfully hit the L2 cache so don't invoke DB lazy loading

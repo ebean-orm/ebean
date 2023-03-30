@@ -37,7 +37,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanSet<?>) {
       BeanSet<?> beanSet = (BeanSet<?>) bc;
-      if (beanSet.getActualSet() == null) {
+      if (beanSet.actualSet() == null) {
         beanSet.setActualSet(new LinkedHashSet<>());
       }
       return beanSet;
@@ -90,7 +90,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
     } else if (current instanceof BeanSet<?>) {
       // normally this case, replace just the underlying list
       BeanSet<?> currentBeanSet = (BeanSet<?>) current;
-      currentBeanSet.setActualSet(newBeanSet.getActualSet());
+      currentBeanSet.setActualSet(newBeanSet.actualSet());
       currentBeanSet.setModifyListening(many.modifyListenMode());
 
     } else {
@@ -113,7 +113,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
           return;
         }
       }
-      set = bc.getActualSet();
+      set = bc.actualSet();
     } else {
       set = (Set<?>) collection;
     }

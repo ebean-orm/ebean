@@ -271,9 +271,9 @@ final class BeanDescriptorCacheHelp<T> {
       // not in cache so return unsuccessful
       return false;
     }
-    EntityBean ownerBean = bc.getOwnerBean();
+    EntityBean ownerBean = bc.owner();
     EntityBeanIntercept ebi = ownerBean._ebean_getIntercept();
-    PersistenceContext persistenceContext = ebi.getPersistenceContext();
+    PersistenceContext persistenceContext = ebi.persistenceContext();
     BeanDescriptor<?> targetDescriptor = many.targetDescriptor();
 
     List<Object> idList = entry.getIdList();
@@ -696,7 +696,7 @@ final class BeanDescriptorCacheHelp<T> {
   Set<EntityBeanIntercept> beanCacheLoadAll(Set<EntityBeanIntercept> batch, PersistenceContext context, int lazyLoadProperty, String propertyName) {
     Map<Object, EntityBeanIntercept> ebis = new HashMap<>();
     for (EntityBeanIntercept ebi : batch) {
-      ebis.put(desc.cacheKeyForBean(ebi.getOwner()), ebi);
+      ebis.put(desc.cacheKeyForBean(ebi.owner()), ebi);
     }
 
     Map<Object, Object> hits = getBeanCache().getAll(ebis.keySet());
@@ -715,7 +715,7 @@ final class BeanDescriptorCacheHelp<T> {
           beanLog.log(TRACE, "   load {0}({1}) - cache miss on property({2})", cacheName, key, propertyName);
         }
       } else {
-        CachedBeanDataToBean.load(desc, ebi.getOwner(), cacheData, context);
+        CachedBeanDataToBean.load(desc, ebi.owner(), cacheData, context);
         loaded.add(ebi);
         if (beanLog.isLoggable(DEBUG)) {
           beanLog.log(DEBUG, "   load {0}({1}) - hit", cacheName, key);
@@ -739,10 +739,10 @@ final class BeanDescriptorCacheHelp<T> {
       }
       return false;
     }
-    int lazyLoadProperty = ebi.getLazyLoadPropertyIndex();
-    if (lazyLoadProperty > -1 && !cacheData.isLoaded(ebi.getLazyLoadProperty())) {
+    int lazyLoadProperty = ebi.lazyLoadPropertyIndex();
+    if (lazyLoadProperty > -1 && !cacheData.isLoaded(ebi.lazyLoadProperty())) {
       if (beanLog.isLoggable(TRACE)) {
-        beanLog.log(TRACE, "   LOAD {0}({1}) - cache miss on property({2})", cacheName, key, ebi.getLazyLoadProperty());
+        beanLog.log(TRACE, "   LOAD {0}({1}) - cache miss on property({2})", cacheName, key, ebi.lazyLoadProperty());
       }
       return false;
     }

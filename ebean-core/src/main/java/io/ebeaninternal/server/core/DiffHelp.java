@@ -40,7 +40,7 @@ public final class DiffHelp {
       }
     }
     if (oldBean == null) {
-      return ((EntityBean) newBean)._ebean_getIntercept().getDirtyValues();
+      return ((EntityBean) newBean)._ebean_getIntercept().dirtyValues();
     }
     return desc.diff((EntityBean) newBean, (EntityBean) oldBean);
   }

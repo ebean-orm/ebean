@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.loadcontext;
 
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.BeanCollectionLoader;
-import io.ebean.bean.EntityBean;
-import io.ebean.bean.ObjectGraphNode;
-import io.ebean.bean.PersistenceContext;
+import io.ebean.bean.*;
 import io.ebeaninternal.api.LoadManyBuffer;
 import io.ebeaninternal.api.LoadManyContext;
 import io.ebeaninternal.api.LoadManyRequest;
@@ -198,7 +194,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
       try {
         boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
         if (useCache) {
-          EntityBean ownerBean = bc.getOwnerBean();
+          EntityBean ownerBean = bc.owner();
           BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
           final String parentKey = parentDesc.cacheKey(parentId);
