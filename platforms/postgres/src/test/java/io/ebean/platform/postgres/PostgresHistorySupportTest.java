@@ -1,37 +1,32 @@
-package io.ebean.xtest.config.dbplatform;
+package io.ebean.platform.postgres;
 
-import io.ebean.platform.postgres.PostgresHistorySupport;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class PostgresHistorySupportTest {
+class PostgresHistorySupportTest {
 
-  private PostgresHistorySupport support = new PostgresHistorySupport();
+  private final PostgresHistorySupport support = new PostgresHistorySupport();
 
   @Test
-  public void getBindCount() throws Exception {
-
+  void getBindCount() {
     assertEquals(support.getBindCount(), 1);
   }
 
   @Test
-  public void getAsOfPredicate() throws Exception {
-
+  void getAsOfPredicate() {
     String asOfPredicate = support.getAsOfPredicate("t0", "sys_period");
     assertEquals(asOfPredicate, "t0.sys_period @> ?::timestamptz");
   }
 
   @Test
-  public void getSysPeriodLower() throws Exception {
-
+  void getSysPeriodLower() {
     String lower = support.getSysPeriodLower("t0", "sys_period");
     assertEquals(lower, "lower(t0.sys_period)");
   }
 
   @Test
-  public void getSysPeriodUpper() throws Exception {
-
+  void getSysPeriodUpper() {
     String upper = support.getSysPeriodUpper("t0", "sys_period");
     assertEquals(upper, "upper(t0.sys_period)");
   }
