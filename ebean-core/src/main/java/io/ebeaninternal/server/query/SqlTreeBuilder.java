@@ -49,6 +49,7 @@ public final class SqlTreeBuilder {
   private SqlTreeNode rootNode;
   private boolean sqlDistinct;
   private final boolean distinctNoLobs;
+  private final SqlTreeCommon common;
 
   /**
    * Construct for RawSql query.
@@ -70,6 +71,7 @@ public final class SqlTreeBuilder {
     this.manyWhereJoins = null;
     this.alias = null;
     this.ctx = null;
+    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, null);
   }
 
   /**
@@ -102,6 +104,7 @@ public final class SqlTreeBuilder {
     CQueryDraftSupport draftSupport = builder.draftSupport(query);
     String colAlias = subQuery ? null : columnAliasPrefix;
     this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate);
+    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, includeJoin);
   }
 
   /**
@@ -306,13 +309,13 @@ public final class SqlTreeBuilder {
       if (baseTable == null) {
         baseTable = desc.baseTable(temporalMode);
       }
-      return new SqlTreeNodeRoot(desc, props, myList, withId, includeJoin, lazyLoadMany, temporalMode, disableLazyLoad, readOnly, sqlDistinct, baseTable);
+      return new SqlTreeNodeRoot(desc, props, myList, withId, lazyLoadMany, common, sqlDistinct, baseTable);
 
     } else if (prop instanceof STreePropertyAssocMany) {
-      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, withId(), temporalMode, disableLazyLoad, readOnly);
+      return new SqlTreeNodeManyRoot(prefix, (STreePropertyAssocMany) prop, props, myList, withId(), common);
 
     } else {
-      return new SqlTreeNodeBean(prefix, prop, props, myList, withId(), temporalMode, disableLazyLoad, readOnly);
+      return new SqlTreeNodeBean(prefix, prop, props, myList, withId(), common);
     }
   }
 

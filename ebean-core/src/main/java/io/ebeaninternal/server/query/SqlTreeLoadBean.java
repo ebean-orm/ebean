@@ -189,8 +189,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
         contextBean = localBean;
       } else {
         // bean already exists in persistenceContext
-
-        if (queryMode.isLoadContextBean()) {
+        if (ctx.isLoadContextBean()) {
           // if explicitly set loadContextBean to true, then reload
           localBean = contextBean;
         } else if (!contextBean._ebean_getIntercept().isFullyLoadedBean()) {
