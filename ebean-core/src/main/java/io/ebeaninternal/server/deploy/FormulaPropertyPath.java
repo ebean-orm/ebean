@@ -48,7 +48,7 @@ final class FormulaPropertyPath {
       parsed = parsed.replace("${}", "${" + path + "}");
     }
     this.parsedAggregation = buildFormula(parsed);
-    this.firstProp = parser.getFirstProp();
+    this.firstProp = parser.firstProp();
   }
 
   private void parseSuffix(String suffix) {

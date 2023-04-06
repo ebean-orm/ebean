@@ -661,7 +661,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   @Override
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
-    ObjectGraphNode node = request.loadContext().getObjectGraphNode(prefix);
+    ObjectGraphNode node = request.loadContext().objectGraphNode(prefix);
     ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListener));
   }
 

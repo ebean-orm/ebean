@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
@@ -57,7 +53,7 @@ final class RawExpression extends NonPrepareExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append(sql);
+    request.parse(sql);
   }
 
   /**

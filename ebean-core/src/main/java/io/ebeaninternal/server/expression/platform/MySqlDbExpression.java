@@ -10,8 +10,7 @@ final class MySqlDbExpression extends BasicDbExpression {
 
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
-    request.append("(").append(propName).append(" ->> '$.").append(path).append("')");
-    request.append(operator.bind());
+    request.append("(").property(propName).append(" ->> '$.").append(path).append("')").append(operator.bind());
   }
 
 }

@@ -12,33 +12,18 @@ import java.util.List;
  */
 final class SubQueryExpression extends AbstractExpression implements UnsupportedDocStoreExpression {
 
-  enum SQOp {
-    EQ(" = "),
-    NE(" <> "),
-    GT(" > "),
-    GE(" >= "),
-    LT(" < "),
-    LE(" <= "),
-    IN(" in "),
-    NOTIN(" not in ");
-    final String expression;
-    SQOp(String expression) {
-      this.expression = expression;
-    }
-  }
-
-  private final SQOp op;
+  private final SubQueryOp op;
   private final SpiQuery<?> subQuery;
   private List<Object> bindParams;
   private String sql;
 
-  SubQueryExpression(SQOp op, String propertyName, SpiQuery<?> subQuery) {
+  SubQueryExpression(SubQueryOp op, String propertyName, SpiQuery<?> subQuery) {
     super(propertyName);
     this.op = op;
     this.subQuery = subQuery;
   }
 
-  SubQueryExpression(SQOp op, String propertyName, String sql, List<Object> bindParams) {
+  SubQueryExpression(SubQueryOp op, String propertyName, String sql, List<Object> bindParams) {
     super(propertyName);
     this.op = op;
     this.subQuery = null;
@@ -90,7 +75,7 @@ final class SubQueryExpression extends AbstractExpression implements Unsupported
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append(propName).append(op.expression).append("(").append(sql).append(")");
+    request.property(propName).append(op.expression).append("(").parse(sql).append(")");
   }
 
   @Override

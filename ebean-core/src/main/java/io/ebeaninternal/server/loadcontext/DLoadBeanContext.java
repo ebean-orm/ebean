@@ -71,7 +71,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     if (currentBuffer.isFull()) {
       currentBuffer = createBuffer(batchSize);
     }
-    ebi.setBeanLoader(currentBuffer, getPersistenceContext());
+    ebi.setBeanLoader(currentBuffer, persistenceContext());
     currentBuffer.add(ebi);
   }
 
@@ -93,7 +93,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       if (bufferList != null) {
         for (LoadBuffer loadBuffer : bufferList) {
           if (!loadBuffer.batch.isEmpty()) {
-            parent.getEbeanServer().loadBean(new LoadBeanRequest(loadBuffer, parentRequest));
+            parent.server().loadBean(new LoadBeanRequest(loadBuffer, parentRequest));
           }
           if (forEach) {
             clear();
@@ -165,7 +165,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
-    public String getName() {
+    public String name() {
       return context.serverName;
     }
 

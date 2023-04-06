@@ -52,7 +52,7 @@ final class BetweenExpression extends AbstractExpression {
     if (prop != null && prop.isDbEncrypted()) {
       pname = prop.beanProperty().decryptProperty(propName);
     }
-    request.append(pname).append(_BETWEEN);
+    request.property(pname).append(_BETWEEN);
   }
 
   @Override
