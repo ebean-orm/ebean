@@ -66,13 +66,13 @@ public final class LoadManyRequest extends LoadRequest {
         if (lazy && !originIncluded && bc == originCollection) {
           originIncluded = true;
         }
-        idList.add(many.parentId(bc.getOwnerBean()));
+        idList.add(many.parentId(bc.owner()));
         bc.setLoader(server); // don't use the load buffer again
       }
     }
     if (originCollection != null && !originIncluded) {
       CoreLog.log.log(INFO, "Batch lazy loading including origin collection - size:{0}", idList.size());
-      idList.add(many.parentId(originCollection.getOwnerBean()));
+      idList.add(many.parentId(originCollection.owner()));
       originCollection.setLoader(server); // don't use the load buffer again
     }
     if (many.targetDescriptor().isPadInExpression()) {
@@ -129,12 +129,12 @@ public final class LoadManyRequest extends LoadRequest {
       if (bc != null) {
         if (bc.checkEmptyLazyLoad()) {
           if (log.isLoggable(DEBUG)) {
-            EntityBean ownerBean = bc.getOwnerBean();
+            EntityBean ownerBean = bc.owner();
             Object parentId = desc.getId(ownerBean);
             log.log(DEBUG, "BeanCollection after lazy load was empty. type:{0} id:{1} owner:{2}", ownerBean.getClass().getName(), parentId, ownerBean);
           }
         } else if (loadCache && many.isUseCache()) {
-          desc.cacheManyPropPut(many, bc, desc.cacheKeyForBean(bc.getOwnerBean()));
+          desc.cacheManyPropPut(many, bc, desc.cacheKeyForBean(bc.owner()));
         }
       }
     }

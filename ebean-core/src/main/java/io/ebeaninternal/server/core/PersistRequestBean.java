@@ -281,7 +281,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      Object oldVal = intercept.getOrigValue(prop.propertyIndex());
+      Object oldVal = intercept.origValue(prop.propertyIndex());
       prop.setValue(entityBean, oldVal);
     }
   }
@@ -372,12 +372,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   @Override
   public Set<String> loadedProperties() {
-    return intercept.getLoadedPropertyNames();
+    return intercept.loadedPropertyNames();
   }
 
   @Override
   public Set<String> updatedProperties() {
-    return intercept.getDirtyPropertyNames();
+    return intercept.dirtyPropertyNames();
   }
 
   /**
@@ -410,7 +410,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   @Override
   public Map<String, ValuePair> updatedValues() {
-    return intercept.getDirtyValues();
+    return intercept.dirtyValues();
   }
 
   /**
@@ -713,7 +713,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the original / old value for the given property.
    */
   public Object getOrigValue(BeanProperty prop) {
-    return intercept.getOrigValue(prop.propertyIndex());
+    return intercept.origValue(prop.propertyIndex());
   }
 
   @Override
@@ -867,7 +867,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     boolean isChangeLog = beanDescriptor.isChangeLog();
     if (type == Type.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
       // get the dirty properties for update notification to the doc store
-      dirtyProperties = intercept.getDirtyProperties();
+      dirtyProperties = intercept.dirtyProperties();
     }
     if (isChangeLog) {
       changeLog();
@@ -1142,9 +1142,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public String updatePlanHash() {
     StringBuilder key;
     if (determineUpdateAllLoadedProperties()) {
-      key = intercept.getLoadedPropertyKey();
+      key = intercept.loadedPropertyKey();
     } else {
-      key = intercept.getDirtyPropertyKey();
+      key = intercept.dirtyPropertyKey();
     }
     BeanProperty versionProperty = beanDescriptor.versionProperty();
     if (versionProperty != null) {
@@ -1237,7 +1237,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void docStorePersist() {
     idValue = beanDescriptor.getId(entityBean);
     if (type == Type.UPDATE) {
-      dirtyProperties = intercept.getDirtyProperties();
+      dirtyProperties = intercept.dirtyProperties();
     }
     // processing now so set IGNORE (unlike DB + DocStore processing with post-commit)
     docStoreMode = DocStoreMode.IGNORE;

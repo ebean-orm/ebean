@@ -134,7 +134,7 @@ public class ProfileOrigin {
    */
   public void collectQueryInfo(ObjectGraphNode node, long beansLoaded, long micros) {
 
-    String key = node.getPath();
+    String key = node.path();
     if (key == null) {
       key = "";
     }
@@ -153,7 +153,7 @@ public class ProfileOrigin {
    */
   public void collectUsageInfo(NodeUsageCollector.State profile) {
     if (!profile.isEmpty()) {
-      getNodeStats(profile.node().getPath()).collectUsageInfo(profile);
+      getNodeStats(profile.node().path()).collectUsageInfo(profile);
     }
   }
 

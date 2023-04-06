@@ -17,12 +17,12 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return the 'owning' entity bean.
    */
-  EntityBean getOwner();
+  EntityBean owner();
 
   /**
    * Return the persistenceContext.
    */
-  PersistenceContext getPersistenceContext();
+  PersistenceContext persistenceContext();
 
   /**
    * Set the persistenceContext.
@@ -37,7 +37,7 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return the ownerId (IdClass).
    */
-  Object getOwnerId();
+  Object ownerId();
 
   /**
    * Set the ownerId (IdClass).
@@ -47,12 +47,12 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return the owning bean for an embedded bean.
    */
-  Object getEmbeddedOwner();
+  Object embeddedOwner();
 
   /**
    * Return the property index (for the parent) of this embedded bean.
    */
-  int getEmbeddedOwnerIndex();
+  int embeddedOwnerIndex();
 
   /**
    * Clear the getter callback.
@@ -229,7 +229,7 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return the original value that was changed via an update.
    */
-  Object getOrigValue(int propertyIndex);
+  Object origValue(int propertyIndex);
 
   /**
    * Finds the index position of a given property. Returns -1 if the
@@ -240,12 +240,12 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return the property name for the given property.
    */
-  String getProperty(int propertyIndex);
+  String property(int propertyIndex);
 
   /**
    * Return the number of properties.
    */
-  int getPropertyLength();
+  int propertyLength();
 
   /**
    * Set the loaded state of the property given it's name.
@@ -321,17 +321,17 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return the set of property names for a partially loaded bean.
    */
-  Set<String> getLoadedPropertyNames();
+  Set<String> loadedPropertyNames();
 
   /**
    * Return the array of flags indicating the dirty properties.
    */
-  boolean[] getDirtyProperties();
+  boolean[] dirtyProperties();
 
   /**
    * Return the set of dirty properties.
    */
-  Set<String> getDirtyPropertyNames();
+  Set<String> dirtyPropertyNames();
 
   /**
    * Recursively add dirty properties.
@@ -346,7 +346,7 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return a map of dirty properties with their new and old values.
    */
-  Map<String, ValuePair> getDirtyValues();
+  Map<String, ValuePair> dirtyValues();
 
   /**
    * Recursively add dirty properties.
@@ -361,7 +361,7 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return a dirty property hash taking into account embedded beans.
    */
-  StringBuilder getDirtyPropertyKey();
+  StringBuilder dirtyPropertyKey();
 
   /**
    * Add and return a dirty property hash.
@@ -371,22 +371,22 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return a loaded property hash.
    */
-  StringBuilder getLoadedPropertyKey();
+  StringBuilder loadedPropertyKey();
 
   /**
    * Return the loaded state for all the properties.
    */
-  boolean[] getLoaded();
+  boolean[] loaded();
 
   /**
    * Return the index of the property that triggered the lazy load.
    */
-  int getLazyLoadPropertyIndex();
+  int lazyLoadPropertyIndex();
 
   /**
    * Return the property that triggered the lazy load.
    */
-  String getLazyLoadProperty();
+  String lazyLoadProperty();
 
   /**
    * Load the bean when it is a reference.
@@ -497,7 +497,7 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Return the sort order value for an order column.
    */
-  int getSortOrder();
+  int sortOrder();
 
   /**
    * Set the sort order value for an order column.
@@ -522,7 +522,7 @@ public interface EntityBeanIntercept extends Serializable {
   /**
    * Returns the loadErrors.
    */
-  Map<String, Exception> getLoadErrors();
+  Map<String, Exception> loadErrors();
 
   /**
    * Return true if the property has its changed state set.

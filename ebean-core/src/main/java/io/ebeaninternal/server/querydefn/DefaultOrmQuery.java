@@ -377,10 +377,10 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final String getOriginKey() {
-    if (parentNode == null || parentNode.getOriginQueryPoint() == null) {
+    if (parentNode == null || parentNode.origin() == null) {
       return null;
     } else {
-      return parentNode.getOriginQueryPoint().getKey();
+      return parentNode.origin().key();
     }
   }
 

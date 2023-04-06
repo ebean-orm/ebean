@@ -23,7 +23,7 @@ public final class LoadBeanRequest extends LoadRequest {
    * Construct for lazy load request.
    */
   public LoadBeanRequest(LoadBeanBuffer loadBuffer, EntityBeanIntercept ebi, boolean loadCache) {
-    this(loadBuffer, null, true, ebi.getLazyLoadProperty(), ebi.isLoaded(), loadCache || ebi.isLoadedFromCache());
+    this(loadBuffer, null, true, ebi.lazyLoadProperty(), ebi.isLoaded(), loadCache || ebi.isLoadedFromCache());
   }
 
   /**
@@ -66,7 +66,7 @@ public final class LoadBeanRequest extends LoadRequest {
     final List<Object> idList = new ArrayList<>(batch.size());
     final BeanDescriptor<?> desc = loadBuffer.descriptor();
     for (EntityBeanIntercept ebi : batch) {
-      idList.add(desc.getId(ebi.getOwner()));
+      idList.add(desc.getId(ebi.owner()));
     }
     return idList;
   }
@@ -116,10 +116,10 @@ public final class LoadBeanRequest extends LoadRequest {
       for (EntityBeanIntercept ebi : batch) {
         // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
         // necessary but allow processing to continue until it is accessed by client code
-        Object id = desc.getId(ebi.getOwner());
+        Object id = desc.getId(ebi.owner());
         if (!loadedIds.contains(id)) {
           // assume this is logically deleted (hence not found)
-          desc.markAsDeleted(ebi.getOwner());
+          desc.markAsDeleted(ebi.owner());
           missedIds.add(id);
           missed.add(ebi);
         }

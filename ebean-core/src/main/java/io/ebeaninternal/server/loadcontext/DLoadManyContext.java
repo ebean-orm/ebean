@@ -194,7 +194,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
       try {
         boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
         if (useCache) {
-          EntityBean ownerBean = bc.getOwnerBean();
+          EntityBean ownerBean = bc.owner();
           BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
           final String parentKey = parentDesc.cacheKey(parentId);

@@ -875,7 +875,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
     // publish from each draft to live bean creating new live beans as required
     draftVal.size();
-    Collection<T> actualDetails = draftVal.getActualDetails();
+    Collection<T> actualDetails = draftVal.actualDetails();
     for (T bean : actualDetails) {
       Object id = targetDescriptor.id(bean);
       T liveBean = liveBeansAsMap.remove(id);
@@ -904,7 +904,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   @SuppressWarnings("unchecked")
   private Map<Object, T> liveBeansAsMap(BeanCollection<?> liveVal) {
     liveVal.size();
-    Collection<?> liveBeans = liveVal.getActualDetails();
+    Collection<?> liveBeans = liveVal.actualDetails();
     Map<Object, T> liveMap = new LinkedHashMap<>();
     for (Object liveBean : liveBeans) {
       Object id = targetDescriptor.id(liveBean);

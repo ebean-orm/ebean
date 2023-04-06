@@ -100,8 +100,8 @@ public final class DLoadContext implements LoadContext {
 
     ObjectGraphNode parentNode = query.getParentNode();
     if (parentNode != null) {
-      this.origin = parentNode.getOriginQueryPoint();
-      this.relativePath = parentNode.getPath();
+      this.origin = parentNode.origin();
+      this.relativePath = parentNode.path();
     } else {
       this.origin = null;
       this.relativePath = null;

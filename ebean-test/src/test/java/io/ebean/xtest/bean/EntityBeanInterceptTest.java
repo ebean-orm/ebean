@@ -1,9 +1,9 @@
 package io.ebean.xtest.bean;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.compositekeys.db.AuditInfo;
 import org.tests.model.basic.Customer;
@@ -120,7 +120,7 @@ public class EntityBeanInterceptTest extends BaseTestCase {
   }
 
   private int findProperty(String name, EntityBeanIntercept eb) {
-    final String[] names = eb.getOwner()._ebean_getPropertyNames();
+    final String[] names = eb.owner()._ebean_getPropertyNames();
     for (int i = 0; i < names.length; i++) {
       if (names[i].equals(name)) {
         return i;

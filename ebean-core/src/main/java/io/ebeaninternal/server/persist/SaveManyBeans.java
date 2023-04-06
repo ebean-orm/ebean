@@ -6,18 +6,10 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeaninternal.server.deploy.BeanCollectionUtil;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.BeanProperty;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
-import io.ebeaninternal.server.deploy.IntersectionRow;
+import io.ebeaninternal.server.deploy.*;
 
 import javax.persistence.PersistenceException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 import static java.lang.System.Logger.Level.WARNING;
@@ -165,7 +157,7 @@ final class SaveManyBeans extends SaveManyBase {
         } else {
           int originalOrder = 0;
           if (orderColumn != null) {
-            originalOrder = detail._ebean_getIntercept().getSortOrder();
+            originalOrder = detail._ebean_getIntercept().sortOrder();
             if (sortOrder != originalOrder) {
               detail._ebean_intercept().setSortOrder(sortOrder);
               ebi.setDirty(true);
@@ -285,10 +277,10 @@ final class SaveManyBeans extends SaveManyBase {
       // BeanCollection so get the additions/deletions
       BeanCollection<?> manyValue = (BeanCollection<?>) value;
       if (setListenMode(manyValue, many)) {
-        additions = manyValue.getActualDetails();
+        additions = manyValue.actualDetails();
       } else {
-        additions = manyValue.getModifyAdditions();
-        deletions = manyValue.getModifyRemovals();
+        additions = manyValue.modifyAdditions();
+        deletions = manyValue.modifyRemovals();
       }
       // reset so the changes are only processed once
       manyValue.modifyReset();
@@ -343,7 +335,7 @@ final class SaveManyBeans extends SaveManyBase {
       forceOrphanRemoval = !insertedParent && isChangedProperty();
     } else {
       BeanCollection<?> c = (BeanCollection<?>) value;
-      Set<?> modifyRemovals = c.getModifyRemovals();
+      Set<?> modifyRemovals = c.modifyRemovals();
       if (insertedParent) {
         // after insert set the modify listening mode for private owned etc
         c.setModifyListening(many.modifyListenMode());
@@ -372,7 +364,7 @@ final class SaveManyBeans extends SaveManyBase {
    * Check if we need to set the listen mode (on new collections persisted for the first time).
    */
   private boolean setListenMode(BeanCollection<?> manyValue, BeanPropertyAssocMany<?> prop) {
-    BeanCollection.ModifyListenMode mode = manyValue.getModifyListening();
+    BeanCollection.ModifyListenMode mode = manyValue.modifyListening();
     if (mode == null) {
       // new collection persisted for the first time
       manyValue.setModifyListening(prop.modifyListenMode());

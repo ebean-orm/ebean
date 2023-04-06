@@ -1,10 +1,10 @@
 package org.tests.query;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiQuery;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
@@ -52,7 +52,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
 
     SpiQuery<?> sq = (SpiQuery<?>) q;
     ObjectGraphNode parentNode = sq.getParentNode();
-    ObjectGraphOrigin origin = parentNode.getOriginQueryPoint();
+    ObjectGraphOrigin origin = parentNode.origin();
     assertThat(origin).isNotNull();
     // MetaAutoFetchStatistic metaAutoFetchStatistic =
     // ((DefaultOrmQuery<?>)q).getMetaAutoFetchStatistic();
