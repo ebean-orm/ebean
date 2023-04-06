@@ -6,9 +6,9 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 /**
  * Postgres pgp_sym_encrypt pgp_sym_decrypt based encryption support.
  */
-public class PostgresDbEncrypt extends AbstractDbEncrypt {
+final class PostgresDbEncrypt extends AbstractDbEncrypt {
 
-  public PostgresDbEncrypt() {
+  PostgresDbEncrypt() {
     this.varcharEncryptFunction = new PgVarcharFunction();
     this.dateEncryptFunction = new PgDateFunction();
   }

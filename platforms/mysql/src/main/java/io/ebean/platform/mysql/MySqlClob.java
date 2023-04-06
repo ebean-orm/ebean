@@ -9,18 +9,17 @@ import io.ebean.config.dbplatform.DbPlatformType;
  * If no deployment length is defined longtext is used.
  * </p>
  */
-public class MySqlClob extends DbPlatformType {
+final class MySqlClob extends DbPlatformType {
 
   private static final int POWER_2_16 = 65536;
   private static final int POWER_2_24 = 16777216;
 
-  public MySqlClob() {
+  MySqlClob() {
     super("text");
   }
 
   @Override
   public String renderType(int deployLength, int deployScale) {
-
     if (deployLength >= POWER_2_24) {
       return "longtext";
     }
