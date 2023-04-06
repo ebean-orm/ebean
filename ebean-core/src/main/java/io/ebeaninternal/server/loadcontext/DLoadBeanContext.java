@@ -190,6 +190,11 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
+    public boolean isCache() {
+      return context.cache;
+    }
+
+    @Override
     public void loadBean(EntityBeanIntercept ebi) {
       // A lock is effectively held by EntityBeanIntercept.loadBean()
       if (context.desc.lazyLoadMany(ebi, context)) {
