@@ -17,7 +17,7 @@ final class DB2RowNumberBasicLimiter implements BasicSqlLimiter {
     if (lastRow > 0) {
       lastRow += firstRow;
     }
-    sb.append("select * from (select row_number() over() rn, a.* from (");
+    sb.append("select * from (select row_number() over() a.*, rn from (");
     sb.append(dbSql).append(") a ");
     if (lastRow > 0) {
       sb.append(" where rn <= ").append(lastRow);

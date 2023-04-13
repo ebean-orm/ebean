@@ -18,7 +18,7 @@ final class DB2RowNumberSqlLimiter implements SqlLimiter {
       lastRow += firstRow;
     }
 
-    sb.append("select * from (select row_number() over() rn, a.* from (select ");
+    sb.append("select * from (select row_number() over() a.*, rn from (select ");
     if (request.isDistinct()) {
       sb.append("distinct ");
     }
