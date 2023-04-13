@@ -47,7 +47,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    */
   private static final byte FLAG_MUTABLE_HASH_SET = 16;
 
-  private transient final ReentrantLock lock = new ReentrantLock();
+  private final ReentrantLock lock = new ReentrantLock();
   private transient NodeUsageCollector nodeUsageCollector;
   private transient PersistenceContext persistenceContext;
   private transient BeanLoader beanLoader;
