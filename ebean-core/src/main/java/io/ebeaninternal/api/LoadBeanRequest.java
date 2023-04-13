@@ -77,7 +77,7 @@ public final class LoadBeanRequest extends LoadRequest {
   public void configureQuery(SpiQuery<?> query, List<Object> idList) {
     query.setMode(Mode.LAZYLOAD_BEAN);
     query.setPersistenceContext(loadBuffer.persistenceContext());
-    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
+    query.setLoadDescription(mode(), description());
     if (lazy) {
       query.setLazyLoadBatchSize(loadBuffer.batchSize());
       if (alreadyLoaded) {
@@ -95,6 +95,10 @@ public final class LoadBeanRequest extends LoadRequest {
     } else {
       query.where().idIn(idList);
     }
+  }
+
+  private String mode() {
+    return lazy ? "+lazy" : loadBuffer.isCache() ? "+cache" : "+query";
   }
 
   /**
