@@ -4,7 +4,7 @@
   <parent>
     <artifactId>composites</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.17.1-SNAPSHOT</version>
+    <version>13.17.1</version>
   </parent>
 
   <name>ebean-cockroach</name>
@@ -16,13 +16,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.17.1-SNAPSHOT</version>
+      <version>13.17.1</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.17.1-SNAPSHOT</version>
+      <version>13.17.1</version>
     </dependency>
 
     <dependency>
@@ -35,13 +35,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>13.17.1-SNAPSHOT</version>
+      <version>13.17.1</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>13.17.1-SNAPSHOT</version>
+      <version>13.17.1</version>
     </dependency>
 
   </dependencies>
