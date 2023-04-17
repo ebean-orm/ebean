@@ -49,6 +49,12 @@
       <version>${ebean-datasource.version}</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-migration</artifactId>
+      <version>${ebean-migration.version}</version>
+    </dependency>
+
     <!-- Technically optional but most expected to use query beans -->
     <dependency>
       <groupId>io.ebean</groupId>
