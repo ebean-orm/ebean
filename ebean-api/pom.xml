@@ -26,12 +26,6 @@
       <version>1.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>avaje-config</artifactId>
-      <version>2.4</version>
-    </dependency>
-
     <!--
     Class retention Nonnull and Nullable annotations
     to assist with IDE auto-completion with Ebean API
@@ -40,6 +34,12 @@
       <groupId>io.avaje</groupId>
       <artifactId>avaje-lang</artifactId>
       <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-config</artifactId>
+      <version>3.1</version>
     </dependency>
 
     <dependency>
