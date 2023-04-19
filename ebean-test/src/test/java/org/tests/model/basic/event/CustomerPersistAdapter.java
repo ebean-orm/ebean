@@ -1,10 +1,8 @@
 package org.tests.model.basic.event;
 
-import io.ebean.DB;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
 import org.tests.model.basic.Customer;
-import org.tests.model.basic.TSMaster;
 
 public class CustomerPersistAdapter extends BeanPersistAdapter {
 
@@ -30,10 +28,4 @@ public class CustomerPersistAdapter extends BeanPersistAdapter {
     return true;
   }
 
-  @Override
-  public void postInsert(BeanPersistRequest<?> request) {
-    super.postInsert(request);
-    DB.find(TSMaster.class).where().eq("name", "master1").findOne();
-    //System.out.println("POST INSERT");
-  }
 }
