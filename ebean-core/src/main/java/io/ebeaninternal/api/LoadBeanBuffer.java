@@ -24,4 +24,6 @@ public interface LoadBeanBuffer {
   void configureQuery(SpiQuery<?> query, String lazyLoadProperty);
 
   boolean isCache();
+
+  void loadingStarted();
 }
