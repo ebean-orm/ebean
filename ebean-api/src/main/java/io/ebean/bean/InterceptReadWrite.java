@@ -128,7 +128,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       (lazyLoadProperty > -1 ? (", lazyLoadProperty=" + lazyLoadProperty) : "") +
       ", loader=" + beanLoader +
       (ownerId != null ? (", ownerId=" + ownerId) : "") +
-      ", owner=" + owner +
       '}';
   }
 
