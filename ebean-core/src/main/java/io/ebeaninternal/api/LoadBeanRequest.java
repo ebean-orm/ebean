@@ -56,6 +56,7 @@ public final class LoadBeanRequest extends LoadRequest {
    * Return the batch of beans to actually load.
    */
   public Set<EntityBeanIntercept> batch() {
+    loadBuffer.loadingStarted();
     return batch;
   }
 

@@ -5,10 +5,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
-import io.ebeaninternal.api.LoadBeanBuffer;
-import io.ebeaninternal.api.LoadBeanContext;
-import io.ebeaninternal.api.LoadBeanRequest;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -18,8 +15,11 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * ToOne bean load context.
@@ -156,6 +156,11 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
         // get persistenceContext from first loaded bean into the buffer
         persistenceContext = ebi.persistenceContext();
       }
+      if (loadingStarted.get()) {
+        if (CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
+          CoreLog.markedAsDeleted.log(DEBUG, "Adding to batch after loadingStarted(1)", new RuntimeException("Adding to batch after load(1"));
+        }
+      }
       batch.add(ebi);
     }
 
@@ -194,6 +199,13 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       return context.cache;
     }
 
+    private final AtomicBoolean loadingStarted = new AtomicBoolean();
+
+    @Override
+    public void loadingStarted() {
+      loadingStarted.set(true);
+    }
+
     @Override
     public void loadBean(EntityBeanIntercept ebi) {
       // A lock is effectively held by EntityBeanIntercept.loadBean()
@@ -203,6 +215,11 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       }
       if (!batch.contains(ebi)) {
         // re-add to the batch and lazy load from DB skipping l2 cache
+        if (loadingStarted.get()) {
+          if (CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
+            CoreLog.markedAsDeleted.log(DEBUG, "Adding to batch after loadingStarted(2)", new RuntimeException("Adding to batch after load(2"));
+          }
+        }
         batch.add(ebi);
       } else if (context.hitCache) {
         Set<EntityBeanIntercept> hits = context.desc.cacheBeanLoadAll(batch, persistenceContext, ebi.lazyLoadPropertyIndex(), ebi.lazyLoadProperty());
@@ -216,6 +233,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       LoadBeanRequest req = new LoadBeanRequest(this, ebi, context.hitCache);
       context.desc.ebeanServer().loadBean(req);
       batch.clear();
+      loadingStarted.set(false);
     }
   }
 
