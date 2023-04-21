@@ -26,11 +26,13 @@ public class DeployPropertyParserTest extends BaseTest {
 
   @Test
   public void depth1_path() {
+    Assertions.assertThat(parser().property("billingAddress.city")).isEqualTo("${billingAddress}city");
     Assertions.assertThat(parser().parse("billingAddress.city")).isEqualTo("${billingAddress}city");
   }
 
   @Test
   public void depth2_path() {
+    Assertions.assertThat(parser().property("max(billingAddress.country.name)")).isEqualTo("max(${billingAddress.country}name)");
     Assertions.assertThat(parser().parse("max(billingAddress.country.name)")).isEqualTo("max(${billingAddress.country}name)");
   }
 
@@ -69,6 +71,7 @@ public class DeployPropertyParserTest extends BaseTest {
 
   @Test
   public void unknown_path() {
+    Assertions.assertThat(parser().property(" foo ")).isEqualTo(" foo ");
     Assertions.assertThat(parser().parse(" foo ")).isEqualTo(" foo ");
   }
 

@@ -35,12 +35,12 @@ abstract class DLoadBaseContext {
 
   DLoadBaseContext(DLoadContext parent, BeanDescriptor<?> desc, String path, OrmQueryProperties queryProps) {
     this.parent = parent;
-    this.serverName = parent.getEbeanServer().name();
+    this.serverName = parent.server().name();
     this.desc = desc;
     this.queryProps = queryProps;
-    this.fullPath = parent.getFullPath(path);
+    this.fullPath = parent.fullPath(path);
     this.hitCache = parent.isBeanCacheGet() && desc.isBeanCaching();
-    this.objectGraphNode = parent.getObjectGraphNode(path);
+    this.objectGraphNode = parent.objectGraphNode(path);
     this.queryFetch = queryProps != null && queryProps.isQueryFetch();
     this.batchSize = parent.batchSize(queryProps);
   }
@@ -50,14 +50,14 @@ abstract class DLoadBaseContext {
    * set onto the secondary query.
    */
   void setLabel(SpiQuery<?> query) {
-    String label = parent.getPlanLabel();
+    String label = parent.planLabel();
     if (label != null) {
-      query.setProfilePath(label, fullPath, parent.getProfileLocation());
+      query.setProfilePath(label, fullPath + "(" + query.getLoadMode() + ")", parent.profileLocation());
     }
   }
 
-  PersistenceContext getPersistenceContext() {
-    return parent.getPersistenceContext();
+  PersistenceContext persistenceContext() {
+    return parent.persistenceContext();
   }
 
 }

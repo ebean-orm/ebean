@@ -975,7 +975,7 @@ public final class DefaultPersister implements Persister {
           if (deleteMode.isHard() || many.isTargetSoftDelete()) {
             Object details = many.getValue(parentBean);
             if (details instanceof BeanCollection<?>) {
-              Set<?> modifyRemovals = ((BeanCollection<?>) details).getModifyRemovals();
+              Set<?> modifyRemovals = ((BeanCollection<?>) details).modifyRemovals();
               if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
                 // delete the orphans that have been removed from the collection
                 for (Object detail : modifyRemovals) {

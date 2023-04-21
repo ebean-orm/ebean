@@ -413,7 +413,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public Object getCacheDataValueOrig(EntityBeanIntercept ebi) {
-    return cacheDataConvert(ebi.getOrigValue(propertyIndex));
+    return cacheDataConvert(ebi.origValue(propertyIndex));
   }
 
   @Override

@@ -5,7 +5,7 @@ import io.ebean.config.dbplatform.DbStandardHistorySupport;
 /**
  * History support for MariaDB.
  */
-public class MariaDbHistorySupport extends DbStandardHistorySupport {
+final class MariaDbHistorySupport extends DbStandardHistorySupport {
 
     /**
      * Return the ' as of timestamp ?' clause appended after the table name.

@@ -143,7 +143,7 @@ public final class ShutdownManager {
       }
       // shutdown any registered servers that have not
       // already been shutdown manually
-      for (Database server : databases) {
+      for (Database server : new ArrayList<>(databases)) {
         try {
           server.shutdown();
         } catch (Exception ex) {

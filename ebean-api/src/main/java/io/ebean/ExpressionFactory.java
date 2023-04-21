@@ -1,10 +1,6 @@
 package io.ebean;
 
-import io.ebean.search.Match;
-import io.ebean.search.MultiMatch;
-import io.ebean.search.TextCommonTerms;
-import io.ebean.search.TextQueryString;
-import io.ebean.search.TextSimple;
+import io.ebean.search.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -422,6 +418,94 @@ public interface ExpressionFactory {
    * }</pre>
    */
   Expression inOrEmpty(String propertyName, Collection<?> values);
+
+  /**
+   * EXISTS a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression exists(String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Not EXISTS a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression notExists(String sqlSubQuery, Object... bindValues);
+
+  /**
+   * IN a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression inSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Not IN a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression notInSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Equal To a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression eqSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Not Equal To a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression neSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Greater Than or Equal To a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression geSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Greater Than a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression gtSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Less Than or Equal To a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression leSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
+
+  /**
+   * Less Than a raw SQL SubQuery.
+   *
+   * @param propertyName The bean property
+   * @param sqlSubQuery  The SQL SubQuery
+   * @param bindValues   Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  Expression ltSubQuery(String propertyName, String sqlSubQuery, Object... bindValues);
 
   /**
    * Not In - property has a value in the array of values.

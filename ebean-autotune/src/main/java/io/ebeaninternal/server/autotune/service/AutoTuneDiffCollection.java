@@ -97,7 +97,7 @@ public class AutoTuneDiffCollection {
     OrmQueryDetail profileDetail = entry.getDetail();
 
     // compare with the existing query tuning entry
-    OrmQueryDetail tuneDetail = queryTuner.get(point.getKey());
+    OrmQueryDetail tuneDetail = queryTuner.get(point.key());
     if (tuneDetail == null) {
       addToDocumentNewEntry(entry, point);
 
@@ -145,10 +145,10 @@ public class AutoTuneDiffCollection {
   private Origin createOrigin(AutoTuneCollection.Entry entry, ObjectGraphOrigin point, String query) {
 
     Origin origin = new Origin();
-    origin.setKey(point.getKey());
-    origin.setBeanType(point.getBeanType());
+    origin.setKey(point.key());
+    origin.setBeanType(point.beanType());
     origin.setDetail(entry.getDetail().asString());
-    origin.setCallStack(point.getCallOrigin().getFullDescription());
+    origin.setCallStack(point.callOrigin().description());
     origin.setOriginal(query);
 
     if (updateTuning) {

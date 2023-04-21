@@ -17,8 +17,8 @@ import javax.persistence.PersistenceException;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.System.Logger.Level.*;
@@ -121,7 +121,7 @@ public final class DefaultContainer implements SpiContainer {
         configProvider.apply(config);
       }
     }
-    if (config.isAutoLoadModuleInfo()) {
+    if (config.isLoadModuleInfo()) {
       // auto register entity classes
       boolean found = false;
       for (EntityClassRegister loader : ServiceLoader.load(EntityClassRegister.class)) {
@@ -178,10 +178,10 @@ public final class DefaultContainer implements SpiContainer {
    * Get the class based entities, scalarTypes, Listeners etc.
    */
   private BootupClasses bootupClasses1(DatabaseConfig config) {
-    List<Class<?>> entityClasses = config.getClasses();
-    if (config.isDisableClasspathSearch() || (entityClasses != null && !entityClasses.isEmpty())) {
+    Set<Class<?>> classes = config.classes();
+    if (config.isDisableClasspathSearch() || (classes != null && !classes.isEmpty())) {
       // use classes we explicitly added via configuration
-      return new BootupClasses(entityClasses);
+      return new BootupClasses(classes);
     }
     return BootupClassPathSearch.search(config);
   }

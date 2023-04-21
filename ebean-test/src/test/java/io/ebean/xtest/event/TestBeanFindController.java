@@ -43,7 +43,7 @@ class TestBeanFindController implements BeanFindController {
     Map<Class<?>, List<Integer>> elementsMap = new HashMap<>();
     Map<Class<?>, Map<Integer, FindControllerMain>> controllerLookup = new HashMap<>();
 
-    for (Object entry : result.getActualEntries()) {
+    for (Object entry : result.actualEntries()) {
       FindControllerMain findControllerMain = (FindControllerMain) entry;
       Class<?> beanType = beanTypeFor(findControllerMain.getTargetTableName(), request);
 

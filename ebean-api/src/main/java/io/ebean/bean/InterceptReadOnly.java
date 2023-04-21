@@ -24,12 +24,17 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public EntityBean getOwner() {
+  public String toString() {
+    return "InterceptReadOnly{" + owner + '}';
+  }
+
+  @Override
+  public EntityBean owner() {
     return owner;
   }
 
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public PersistenceContext persistenceContext() {
     return null;
   }
 
@@ -44,7 +49,7 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public Object getOwnerId() {
+  public Object ownerId() {
     return null;
   }
 
@@ -54,12 +59,12 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public Object getEmbeddedOwner() {
+  public Object embeddedOwner() {
     return null;
   }
 
   @Override
-  public int getEmbeddedOwnerIndex() {
+  public int embeddedOwnerIndex() {
     return 0;
   }
 
@@ -224,8 +229,23 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public Object getOrigValue(int propertyIndex) {
+  public Object origValue(int propertyIndex) {
     return null;
+  }
+
+  @Override
+  public int findProperty(String propertyName) {
+    return 0;
+  }
+
+  @Override
+  public String property(int propertyIndex) {
+    return null;
+  }
+
+  @Override
+  public int propertyLength() {
+    return 0;
   }
 
   @Override
@@ -299,17 +319,17 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public Set<String> getLoadedPropertyNames() {
+  public Set<String> loadedPropertyNames() {
     return Collections.emptySet();
   }
 
   @Override
-  public boolean[] getDirtyProperties() {
+  public boolean[] dirtyProperties() {
     return new boolean[0];
   }
 
   @Override
-  public Set<String> getDirtyPropertyNames() {
+  public Set<String> dirtyPropertyNames() {
     return Collections.emptySet();
   }
 
@@ -324,7 +344,7 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public Map<String, ValuePair> getDirtyValues() {
+  public Map<String, ValuePair> dirtyValues() {
     return Collections.emptyMap();
   }
 
@@ -339,7 +359,7 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public StringBuilder getDirtyPropertyKey() {
+  public StringBuilder dirtyPropertyKey() {
     return null;
   }
 
@@ -349,22 +369,22 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public StringBuilder getLoadedPropertyKey() {
+  public StringBuilder loadedPropertyKey() {
     return null;
   }
 
   @Override
-  public boolean[] getLoaded() {
+  public boolean[] loaded() {
     return new boolean[0];
   }
 
   @Override
-  public int getLazyLoadPropertyIndex() {
+  public int lazyLoadPropertyIndex() {
     return 0;
   }
 
   @Override
-  public String getLazyLoadProperty() {
+  public String lazyLoadProperty() {
     return null;
   }
 
@@ -474,7 +494,7 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public int getSortOrder() {
+  public int sortOrder() {
     return 0;
   }
 
@@ -499,7 +519,7 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
   }
 
   @Override
-  public Map<String, Exception> getLoadErrors() {
+  public Map<String, Exception> loadErrors() {
     return null;
   }
 

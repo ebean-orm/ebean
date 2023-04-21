@@ -130,7 +130,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * iteration is fine.
    */
   public int secondaryQueriesMinBatchSize() {
-    return loadContext.getSecondaryQueriesMinBatchSize();
+    return loadContext.secondaryQueriesMinBatchSize();
   }
 
   /**
@@ -558,7 +558,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       OrderBy<T> orderBy = query.getOrderBy();
       if (orderBy != null && !orderBy.isEmpty()) {
         // in memory sort after merging the cache hits with the DB hits
-        beanDescriptor.sort(((BeanList<T>) result).getActualList(), orderBy.toStringFormat());
+        beanDescriptor.sort(((BeanList<T>) result).actualList(), orderBy.toStringFormat());
       }
     }
   }
@@ -688,7 +688,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (cached != null && isAuditReads() && readAuditQueryType()) {
       if (cached instanceof BeanCollection) {
         // raw sql can't use L2 cache so normal queries only in here
-        Collection<T> actualDetails = ((BeanCollection<T>) cached).getActualDetails();
+        Collection<T> actualDetails = ((BeanCollection<T>) cached).actualDetails();
         List<Object> ids = new ArrayList<>(actualDetails.size());
         for (T bean : actualDetails) {
           ids.add(beanDescriptor.idForJson(bean));
@@ -699,7 +699,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (Boolean.FALSE.equals(query.isReadOnly())) {
       // return shallow copies if readonly is explicitly set to false
       if (cached instanceof BeanCollection) {
-        cached = ((BeanCollection<?>) cached).getShallowCopy();
+        cached = ((BeanCollection<?>) cached).shallowCopy();
       } else if (cached instanceof List) {
         cached = new CopyOnFirstWriteList<>((List<?>) cached);
       } else if (cached instanceof Set) {

@@ -43,6 +43,8 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   private final ReentrantLock lock = new ReentrantLock();
 
+  private final boolean loadContextBean;
+
   /**
    * The resultSet rows read.
    */
@@ -182,6 +184,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.queryPlan = queryPlan;
     this.query = request.query();
     this.queryMode = query.getMode();
+    this.loadContextBean = queryMode.isLoadContextBean() || query.getForUpdateLockType() != null;
     this.lazyLoadManyProperty = query.getLazyLoadMany();
     this.readOnly = request.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
@@ -218,6 +221,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       }
       return BeanCollectionHelpFactory.create(manyType, request);
     }
+  }
+
+  @Override
+  public boolean isLoadContextBean() {
+    return loadContextBean;
   }
 
   @Override
@@ -661,7 +669,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   @Override
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
-    ObjectGraphNode node = request.loadContext().getObjectGraphNode(prefix);
+    ObjectGraphNode node = request.loadContext().objectGraphNode(prefix);
     ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListener));
   }
 

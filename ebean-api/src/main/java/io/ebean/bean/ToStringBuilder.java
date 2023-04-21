@@ -1,7 +1,5 @@
 package io.ebean.bean;
 
-import io.ebean.common.BeanMap;
-
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;

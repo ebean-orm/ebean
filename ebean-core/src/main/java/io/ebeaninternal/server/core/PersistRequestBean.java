@@ -9,12 +9,25 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.changelog.BeanChange;
-import io.ebeaninternal.api.*;
+import io.ebeaninternal.api.ConcurrencyMode;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiProfileTransactionEvent;
+import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.server.cache.CacheChangeSet;
-import io.ebeaninternal.server.deploy.*;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanManager;
+import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
-import io.ebeaninternal.server.persist.*;
+import io.ebeaninternal.server.persist.BatchControl;
+import io.ebeaninternal.server.persist.BatchedSqlException;
+import io.ebeaninternal.server.persist.DeleteMode;
+import io.ebeaninternal.server.persist.Flags;
+import io.ebeaninternal.server.persist.PersistExecute;
+import io.ebeaninternal.server.persist.SaveMany;
 import io.ebeaninternal.server.transaction.BeanPersistIdMap;
 import io.ebeanservice.docstore.api.DocStoreUpdate;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
@@ -25,7 +38,11 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * PersistRequest for insert update or delete of a bean.
@@ -378,12 +395,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   @Override
   public Set<String> loadedProperties() {
-    return intercept.getLoadedPropertyNames();
+    return intercept.loadedPropertyNames();
   }
 
   @Override
   public Set<String> updatedProperties() {
-    return intercept.getDirtyPropertyNames();
+    return intercept.dirtyPropertyNames();
   }
 
   /**
@@ -416,7 +433,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   @Override
   public Map<String, ValuePair> updatedValues() {
-    return intercept.getDirtyValues();
+    return intercept.dirtyValues();
   }
 
   /**
@@ -719,7 +736,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the original / old value for the given property.
    */
   public Object getOrigValue(BeanProperty prop) {
-    return intercept.getOrigValue(prop.propertyIndex());
+    return intercept.origValue(prop.propertyIndex());
   }
 
   @Override
@@ -873,7 +890,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     boolean isChangeLog = beanDescriptor.isChangeLog();
     if (type == Type.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
       // get the dirty properties for update notification to the doc store
-      dirtyProperties = intercept.getDirtyProperties();
+      dirtyProperties = intercept.dirtyProperties();
     }
     if (isChangeLog) {
       changeLog();
@@ -1148,9 +1165,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public String updatePlanHash() {
     StringBuilder key;
     if (determineUpdateAllLoadedProperties()) {
-      key = intercept.getLoadedPropertyKey();
+      key = intercept.loadedPropertyKey();
     } else {
-      key = intercept.getDirtyPropertyKey();
+      key = intercept.dirtyPropertyKey();
     }
     BeanProperty versionProperty = beanDescriptor.versionProperty();
     if (versionProperty != null) {
@@ -1243,7 +1260,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void docStorePersist() {
     idValue = beanDescriptor.getId(entityBean);
     if (type == Type.UPDATE) {
-      dirtyProperties = intercept.getDirtyProperties();
+      dirtyProperties = intercept.dirtyProperties();
     }
     // processing now so set IGNORE (unlike DB + DocStore processing with post-commit)
     docStoreMode = DocStoreMode.IGNORE;

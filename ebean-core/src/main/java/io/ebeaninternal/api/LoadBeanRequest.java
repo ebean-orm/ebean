@@ -23,7 +23,7 @@ public final class LoadBeanRequest extends LoadRequest {
    * Construct for lazy load request.
    */
   public LoadBeanRequest(LoadBeanBuffer loadBuffer, EntityBeanIntercept ebi, boolean loadCache) {
-    this(loadBuffer, null, true, ebi.getLazyLoadProperty(), ebi.isLoaded(), loadCache || ebi.isLoadedFromCache());
+    this(loadBuffer, null, true, ebi.lazyLoadProperty(), ebi.isLoaded(), loadCache || ebi.isLoadedFromCache());
   }
 
   /**
@@ -56,17 +56,18 @@ public final class LoadBeanRequest extends LoadRequest {
    * Return the batch of beans to actually load.
    */
   public Set<EntityBeanIntercept> batch() {
+    loadBuffer.loadingStarted();
     return batch;
   }
 
   /**
    * Return the list of Id values for the beans in the lazy load buffer.
    */
-  public List<Object> getIdList() {
-    List<Object> idList = new ArrayList<>();
-    BeanDescriptor<?> desc = loadBuffer.descriptor();
+  public List<Object> ids() {
+    final List<Object> idList = new ArrayList<>(batch.size());
+    final BeanDescriptor<?> desc = loadBuffer.descriptor();
     for (EntityBeanIntercept ebi : batch) {
-      idList.add(desc.getId(ebi.getOwner()));
+      idList.add(desc.getId(ebi.owner()));
     }
     return idList;
   }
@@ -77,7 +78,7 @@ public final class LoadBeanRequest extends LoadRequest {
   public void configureQuery(SpiQuery<?> query, List<Object> idList) {
     query.setMode(Mode.LAZYLOAD_BEAN);
     query.setPersistenceContext(loadBuffer.persistenceContext());
-    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
+    query.setLoadDescription(mode(), description());
     if (lazy) {
       query.setLazyLoadBatchSize(loadBuffer.batchSize());
       if (alreadyLoaded) {
@@ -97,6 +98,10 @@ public final class LoadBeanRequest extends LoadRequest {
     }
   }
 
+  private String mode() {
+    return lazy ? "+lazy" : loadBuffer.isCache() ? "+cache" : "+query";
+  }
+
   /**
    * Load the beans into the L2 cache if that is requested and check for load failures due to deletes.
    */
@@ -111,32 +116,36 @@ public final class LoadBeanRequest extends LoadRequest {
       desc.cacheBeanPutAll(list);
     }
     if (lazyLoadProperty != null) {
+      List<EntityBeanIntercept> missed = new ArrayList<>();
       Set<Object> missedIds = new HashSet<>();
       for (EntityBeanIntercept ebi : batch) {
         // check if the underlying row in DB was deleted. Mark the bean as 'failed' if
         // necessary but allow processing to continue until it is accessed by client code
-        Object id = desc.getId(ebi.getOwner());
+        Object id = desc.getId(ebi.owner());
         if (!loadedIds.contains(id)) {
           // assume this is logically deleted (hence not found)
-          desc.markAsDeleted(ebi.getOwner());
+          desc.markAsDeleted(ebi.owner());
           missedIds.add(id);
+          missed.add(ebi);
         }
       }
-      return new Result(loadedIds, missedIds);
+      return new Result(loadedIds, missedIds, missed);
     }
     return EMPTY_RESULT;
   }
 
-  static final Result EMPTY_RESULT = new Result(Collections.emptySet(),Collections.emptySet());
+  static final Result EMPTY_RESULT = new Result(Collections.emptySet(),Collections.emptySet(), Collections.emptyList());
 
   public static class Result {
 
     private final Set<Object> loadedIds;
     private final Set<Object> missedIds;
+    private final List<EntityBeanIntercept> missed;
 
-    Result(Set<Object> loadedIds, Set<Object> missedIds) {
+    Result(Set<Object> loadedIds, Set<Object> missedIds, List<EntityBeanIntercept> missed) {
       this.loadedIds = loadedIds;
       this.missedIds = missedIds;
+      this.missed = missed;
     }
 
     public boolean markedDeleted() {
@@ -149,6 +158,10 @@ public final class LoadBeanRequest extends LoadRequest {
 
     public Set<Object> loadedIds() {
       return loadedIds;
+    }
+
+    public List<EntityBeanIntercept> missed() {
+      return missed;
     }
   }
 }

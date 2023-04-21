@@ -82,9 +82,9 @@ public final class IntersectionRow {
       idIn.addSqlNoAlias(er);
       idIn.addBindValues(er);
       sb.append(" and not ( ");
-      sb.append(er.getSql());
+      sb.append(er.sql());
       sb.append(" ) ");
-      List<Object> bindValues = er.getBindValues();
+      List<Object> bindValues = er.bindValues();
       for (Object bindValue : bindValues) {
         bindParams.setParameter(++count, bindValue);
       }

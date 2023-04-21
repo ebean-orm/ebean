@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>3.9</version>
+    <version>3.10</version>
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.14.1-SNAPSHOT</version>
+  <version>13.17.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -38,6 +38,9 @@
   </developers>
 
   <properties>
+    <nexus.staging.stagingRepositoryId>ebeanCore</nexus.staging.stagingRepositoryId>
+    <nexus.staging.keepStagingRepositoryOnFailure>true</nexus.staging.keepStagingRepositoryOnFailure>
+    <nexus.staging.skipStagingRepositoryClose>true</nexus.staging.skipStagingRepositoryClose>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.14.0</jackson.version>
     <h2database.version>2.1.214</h2database.version>
@@ -50,7 +53,7 @@
     <ebean-test-containers.version>6.3</ebean-test-containers.version>
     <ebean-datasource.version>8.5</ebean-datasource.version>
     <ebean-agent.version>13.13.1-FOC2</ebean-agent.version>
-    <ebean-maven-plugin.version>13.14.0</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>13.17.2</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
@@ -106,6 +109,7 @@
     <module>ebean-csv-reader</module>
     <module>ebean-jackson-jsonnode</module>
     <module>ebean-jackson-mapper</module>
+    <module>ebean-spring-txn</module>
     <!--    <module>ebean-kotlin</module>-->
 
   </modules>

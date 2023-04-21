@@ -29,6 +29,7 @@ import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
 import io.ebeaninternal.server.cache.CachedManyIds;
@@ -45,7 +46,6 @@ import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
@@ -350,9 +350,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       this.idPropertyIndex = (idProperty == null) ? -1 : ebi.findProperty(idProperty.name());
       this.versionPropertyIndex = (versionProperty == null) ? -1 : ebi.findProperty(versionProperty.name());
       this.unloadProperties = derivePropertiesToUnload(prototypeEntityBean);
-      this.propertiesIndex = new BeanProperty[ebi.getPropertyLength()];
+      this.propertiesIndex = new BeanProperty[ebi.propertyLength()];
       for (int i = 0; i < propertiesIndex.length; i++) {
-        propertiesIndex[i] = propMap.get(ebi.getProperty(i));
+        propertiesIndex[i] = propMap.get(ebi.property(i));
       }
     }
     idSelect = initIdSelect();
@@ -400,7 +400,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * These properties need to be unloaded when populating beans for queries.
    */
   private int[] derivePropertiesToUnload(EntityBean prototypeEntityBean) {
-    boolean[] loaded = prototypeEntityBean._ebean_getIntercept().getLoaded();
+    boolean[] loaded = prototypeEntityBean._ebean_getIntercept().loaded();
     int[] props = new int[loaded.length];
     int pos = 0;
     // collect the positions of the properties initialised in the default constructor.
@@ -711,7 +711,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void merge(EntityBean bean, EntityBean existing) {
     EntityBeanIntercept fromEbi = bean._ebean_getIntercept();
     EntityBeanIntercept toEbi = existing._ebean_getIntercept();
-    int propertyLength = toEbi.getPropertyLength();
+    int propertyLength = toEbi.propertyLength();
     String[] names = properties();
     for (int i = 0; i < propertyLength; i++) {
       if (fromEbi.isLoadedProperty(i)) {
@@ -2210,12 +2210,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   public boolean lazyLoadMany(EntityBeanIntercept ebi, LoadBeanContext parent) {
-    int lazyLoadProperty = ebi.getLazyLoadPropertyIndex();
+    int lazyLoadProperty = ebi.lazyLoadPropertyIndex();
     if (lazyLoadProperty == -1) {
       return false;
     }
     if (inheritInfo != null) {
-      return descOf(ebi.getOwner().getClass()).lazyLoadMany(ebi, lazyLoadProperty, parent);
+      return descOf(ebi.owner().getClass()).lazyLoadMany(ebi, lazyLoadProperty, parent);
     }
     return lazyLoadMany(ebi, lazyLoadProperty, parent);
   }
@@ -2234,7 +2234,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     BeanProperty lazyLoadBeanProp = propertiesIndex[lazyLoadProperty];
     if (lazyLoadBeanProp instanceof BeanPropertyAssocMany<?>) {
       BeanPropertyAssocMany<?> manyProp = (BeanPropertyAssocMany<?>) lazyLoadBeanProp;
-      final BeanCollection<?> collection = manyProp.createReference(ebi.getOwner());
+      final BeanCollection<?> collection = manyProp.createReference(ebi.owner());
       ebi.setLoadedLazy();
       if (loadBeanContext != null) {
         loadBeanContext.register(manyProp, collection);
@@ -3069,7 +3069,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       // not using Id generator so just base on isLoaded()
       return !ebi.isLoaded();
     }
-    if (!hasIdValue(ebi.getOwner())) {
+    if (!hasIdValue(ebi.owner())) {
       // No Id property means it must be an insert
       return true;
     }
@@ -3132,7 +3132,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.propertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
-        Object value = beanProperty.getValue(ebi.getOwner());
+        Object value = beanProperty.getValue(ebi.owner());
         if (beanProperty.checkMutable(value, ebi.isDirtyProperty(propertyIndex), ebi)) {
           // mutable scalar value which is considered dirty so mark
           // it as such so that it is included in an update
@@ -3149,7 +3149,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     for (BeanProperty beanProperty : propertiesMutable) {
       int propertyIndex = beanProperty.propertyIndex();
       if (ebi.isLoadedProperty(propertyIndex)) {
-        Object value = beanProperty.getValue(ebi.getOwner());
+        Object value = beanProperty.getValue(ebi.owner());
         if (beanProperty.checkMutable(value, ebi.isDirtyProperty(propertyIndex), ebi)) {
           ebi.markPropertyAsChanged(propertyIndex);
           return;

@@ -413,4 +413,48 @@ public abstract class PBaseComparable<R, T> extends PBaseValueEqual<R, T> {
     expr().gt(_name, subQuery);
     return _root;
   }
+
+  /**
+   * Less Than or Equal To a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R leSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().leSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Less Than a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R ltSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().ltSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Greater Than or Equal To a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R geSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().geSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Greater Than a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R gtSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().gtSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
 }

@@ -1,21 +1,10 @@
 package org.tests.model.basic;
 
-import io.ebean.Model;
-import io.ebean.annotation.WhenModified;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Version;
-import java.sql.Timestamp;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "o_order")
 public class Order extends BaseModel {
 
   public enum Status {
@@ -32,7 +21,11 @@ public class Order extends BaseModel {
   LocalDate orderDate;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
-  Customer customer;
+  final Customer customer;
+
+  public Order(Customer customer) {
+    this.customer = customer;
+  }
 
   public Status getStatus() {
     return status;
@@ -54,7 +47,4 @@ public class Order extends BaseModel {
     return customer;
   }
 
-  public void setCustomer(Customer customer) {
-    this.customer = customer;
-  }
 }

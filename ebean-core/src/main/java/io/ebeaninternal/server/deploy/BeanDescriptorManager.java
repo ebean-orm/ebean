@@ -980,7 +980,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     // define the TableJoin
     DeployTableJoin oneToManyJoin = oneToMany.getTableJoin();
     if (!oneToManyJoin.hasJoinColumns()) {
-      throw new RuntimeException("No join columns");
+      throw new RuntimeException("No join columns found to satisfy the relationship " + oneToMany);
     }
     createUnidirectional(targetDesc, owningType, beanTable, oneToManyJoin);
   }

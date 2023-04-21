@@ -378,10 +378,10 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final String getOriginKey() {
-    if (parentNode == null || parentNode.getOriginQueryPoint() == null) {
+    if (parentNode == null || parentNode.origin() == null) {
       return null;
     } else {
-      return parentNode.getOriginQueryPoint().getKey();
+      return parentNode.origin().key();
     }
   }
 
@@ -592,10 +592,17 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    */
   @Override
   public final void setSelectId() {
-    // clear select and fetch joins
-    detail.clear();
-    select(beanDescriptor.idSelect());
-    singleAttribute = true;
+    if (rawSql != null) {
+      String column = rawSql.mapToColumn(beanDescriptor.idSelect());
+      if (column != null) {
+        select(column);
+      }
+    } else {
+      // clear select and fetch joins
+      detail.clear();
+      select(beanDescriptor.idSelect());
+      singleAttribute = true;
+    }
   }
 
   @Override

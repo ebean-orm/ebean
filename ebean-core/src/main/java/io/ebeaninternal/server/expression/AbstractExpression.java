@@ -2,11 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
@@ -102,6 +98,6 @@ abstract class AbstractExpression implements SpiExpression {
   }
 
   protected final ElPropertyValue getElProp(SpiExpressionRequest request) {
-    return request.getBeanDescriptor().elGetValue(propName);
+    return request.descriptor().elGetValue(propName);
   }
 }

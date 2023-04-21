@@ -1,8 +1,6 @@
-package io.ebean.querybean.generator
+package org.example.domain
 
-import org.example.domain.Address
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 
 class AddressTest {

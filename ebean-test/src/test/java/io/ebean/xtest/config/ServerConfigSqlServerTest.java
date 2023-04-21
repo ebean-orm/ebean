@@ -3,9 +3,9 @@ package io.ebean.xtest.config;
 
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
-import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
@@ -36,7 +36,7 @@ public class ServerConfigSqlServerTest {
 
     config.setDefaultServer(false);
     config.setRegister(false);
-    config.getClasses().add(EBasicVer.class);
+    config.addClass(EBasicVer.class);
 
     Database sqlServer = DatabaseFactory.create(config);
 
@@ -77,7 +77,7 @@ public class ServerConfigSqlServerTest {
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.loadFromProperties(props);
-    config.getClasses().add(EBasicVer.class);
+    config.addClass(EBasicVer.class);
 
     Database sqlServer = DatabaseFactory.create(config);
 
@@ -103,7 +103,7 @@ public class ServerConfigSqlServerTest {
     config.setName(name); // match dataSource
     config.setDatabasePlatformName("sqlserver16");
     config.loadFromProperties(props);
-    config.getClasses().add(EBasicVer.class);
+    config.addClass(EBasicVer.class);
 
     Database sqlServer = DatabaseFactory.create(config);
 
