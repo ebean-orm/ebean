@@ -6,7 +6,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.14.1-FOC3-SNAPSHOT</version>
+    <version>13.14.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-kotlin</artifactId>
