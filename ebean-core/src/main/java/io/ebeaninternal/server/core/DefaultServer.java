@@ -472,6 +472,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       backgroundExecutor.shutdown();
       // shutdown DataSource (if its an Ebean one)
       transactionManager.shutdown(shutdownDataSource, deregisterDriver);
+      tempFileProvider.shutdown();
+
       dumpMetrics();
       shutdown = true;
       if (shutdownDataSource) {

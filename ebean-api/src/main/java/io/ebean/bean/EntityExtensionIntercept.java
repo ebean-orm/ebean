@@ -21,13 +21,13 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public EntityBean getOwner() {
-    return base.getOwner();
+  public EntityBean owner() {
+    return base.owner();
   }
 
   @Override
-  public PersistenceContext getPersistenceContext() {
-    return base.getPersistenceContext();
+  public PersistenceContext persistenceContext() {
+    return base.persistenceContext();
   }
 
   @Override
@@ -41,8 +41,8 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public Object getOwnerId() {
-    return base.getOwnerId();
+  public Object ownerId() {
+    return base.ownerId();
   }
 
   @Override
@@ -51,13 +51,13 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public Object getEmbeddedOwner() {
-    return base.getEmbeddedOwner();
+  public Object embeddedOwner() {
+    return base.embeddedOwner();
   }
 
   @Override
-  public int getEmbeddedOwnerIndex() {
-    return base.getEmbeddedOwnerIndex();
+  public int embeddedOwnerIndex() {
+    return base.embeddedOwnerIndex();
   }
 
   @Override
@@ -221,8 +221,8 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public Object getOrigValue(int propertyIndex) {
-    return base.getOrigValue(propertyIndex + offset);
+  public Object origValue(int propertyIndex) {
+    return base.origValue(propertyIndex + offset);
   }
 
   @Override
@@ -231,13 +231,13 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public String getProperty(int propertyIndex) {
-    return base.getProperty(propertyIndex + offset);
+  public String property(int propertyIndex) {
+    return base.property(propertyIndex + offset);
   }
 
   @Override
-  public int getPropertyLength() {
-    return base.getPropertyLength();
+  public int propertyLength() {
+    return base.propertyLength();
   }
 
   @Override
@@ -311,18 +311,18 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public Set<String> getLoadedPropertyNames() {
-    return base.getLoadedPropertyNames();
+  public Set<String> loadedPropertyNames() {
+    return base.loadedPropertyNames();
   }
 
   @Override
-  public boolean[] getDirtyProperties() {
-    return base.getDirtyProperties();
+  public boolean[] dirtyProperties() {
+    return base.dirtyProperties();
   }
 
   @Override
-  public Set<String> getDirtyPropertyNames() {
-    return base.getDirtyPropertyNames();
+  public Set<String> dirtyPropertyNames() {
+    return base.dirtyPropertyNames();
   }
 
   @Override
@@ -336,8 +336,8 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public Map<String, ValuePair> getDirtyValues() {
-    return base.getDirtyValues();
+  public Map<String, ValuePair> dirtyValues() {
+    return base.dirtyValues();
   }
 
   @Override
@@ -351,8 +351,8 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public StringBuilder getDirtyPropertyKey() {
-    return base.getDirtyPropertyKey();
+  public StringBuilder dirtyPropertyKey() {
+    return base.dirtyPropertyKey();
   }
 
   @Override
@@ -361,23 +361,23 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public StringBuilder getLoadedPropertyKey() {
-    return base.getLoadedPropertyKey();
+  public StringBuilder loadedPropertyKey() {
+    return base.loadedPropertyKey();
   }
 
   @Override
-  public boolean[] getLoaded() {
-    return base.getLoaded();
+  public boolean[] loaded() {
+    return base.loaded();
   }
 
   @Override
-  public int getLazyLoadPropertyIndex() {
-    return base.getLazyLoadPropertyIndex() - offset;
+  public int lazyLoadPropertyIndex() {
+    return base.lazyLoadPropertyIndex() - offset;
   }
 
   @Override
-  public String getLazyLoadProperty() {
-    return base.getLazyLoadProperty();
+  public String lazyLoadProperty() {
+    return base.lazyLoadProperty();
   }
 
   @Override
@@ -486,8 +486,8 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public int getSortOrder() {
-    return base.getSortOrder();
+  public int sortOrder() {
+    return base.sortOrder();
   }
 
   @Override
@@ -511,8 +511,8 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public Map<String, Exception> getLoadErrors() {
-    return base.getLoadErrors();
+  public Map<String, Exception> loadErrors() {
+    return base.loadErrors();
   }
 
   @Override
@@ -541,13 +541,13 @@ public class EntityExtensionIntercept implements EntityBeanIntercept {
   }
 
   @Override
-  public Object getValue(int propertyIndex) {
-    return base.getValue(propertyIndex + offset);
+  public Object value(int propertyIndex) {
+    return base.value(propertyIndex + offset);
   }
 
   @Override
-  public Object getValueIntercept(int propertyIndex) {
-    return base.getValueIntercept(propertyIndex + offset);
+  public Object valueIntercept(int propertyIndex) {
+    return base.valueIntercept(propertyIndex + offset);
   }
 
   @Override

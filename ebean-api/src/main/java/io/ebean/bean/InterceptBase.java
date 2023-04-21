@@ -51,7 +51,7 @@ public abstract class InterceptBase implements EntityBeanIntercept {
   }
 
   @Override
-  public String getProperty(int propertyIndex) {
+  public String property(int propertyIndex) {
     if (propertyIndex == -1) {
       return null;
     }
@@ -65,14 +65,13 @@ public abstract class InterceptBase implements EntityBeanIntercept {
   }
 
   @Override
-  public int getPropertyLength() {
+  public int propertyLength() {
     return owner._ebean_getPropertyNames().length
       + owner._ebean_getExtensionAccessors().getPropertyLength();
   }
 
-
   @Override
-  public Object getValue(int index) {
+  public Object value(int index) {
     ExtensionAccessor accessor = findAccessor(index);
     if (accessor == null) {
       return owner._ebean_getField(index);
@@ -83,7 +82,7 @@ public abstract class InterceptBase implements EntityBeanIntercept {
   }
 
   @Override
-  public Object getValueIntercept(int index) {
+  public Object valueIntercept(int index) {
     ExtensionAccessor accessor = findAccessor(index);
     if (accessor == null) {
       return owner._ebean_getFieldIntercept(index);

@@ -1,12 +1,24 @@
 package io.ebeaninternal.server.idgen;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.*;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * IdGenerator for java util UUID.
@@ -212,7 +224,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
     String propNodeId = prop.getProperty("nodeId");
     if (propNodeId == null || propNodeId.isEmpty()) {
-      log.log(WARNING, "State file '{0}' is incomplete", stateFile);
+      log.log(WARNING, "State file ''{0}'' is incomplete", stateFile);
       return false; // we cannot restore
     }
     try {
@@ -220,7 +232,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
         nodeId = parseAlternativeNodeId(propNodeId);
       } else if (!getNodeIdentifier().equals(propNodeId)) {
         log.log(WARNING,
-          "The nodeId in the state file '{0}' has changed from {1} to {2}. "
+          "The nodeId in the state file ''{0}'' has changed from {1} to {2}. "
             + "This can happen when MAC address changes or when two containers share the same state file",
           stateFile, propNodeId, getNodeIdentifier());
         return false;

@@ -233,22 +233,7 @@ public class InterceptReadOnly extends InterceptBase implements EntityBeanInterc
     return null;
   }
 
-  @Override
-  public int findProperty(String propertyName) {
-    return 0;
-  }
-
-  @Override
-  public String property(int propertyIndex) {
-    return null;
-  }
-
-  @Override
-  public int propertyLength() {
-    return 0;
-  }
-
-  @Override
+   @Override
   public void setPropertyLoaded(String propertyName, boolean loaded) {
 
   }

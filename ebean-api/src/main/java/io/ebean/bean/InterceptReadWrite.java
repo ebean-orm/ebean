@@ -101,7 +101,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
    */
   public InterceptReadWrite(Object ownerBean) {
     super((EntityBean) ownerBean);
-    this.flags = new byte[super.getPropertyLength()];
+    this.flags = new byte[super.propertyLength()];
   }
 
   /**
@@ -226,7 +226,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
     }
     if (mutableInfo != null) {
       for (int i = 0; i < mutableInfo.length; i++) {
-        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(getValue(i))) {
+        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(value(i))) {
           dirty = true;
           break;
         }
@@ -411,25 +411,6 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
   }
 
   @Override
-  public int findProperty(String propertyName) {
-    final String[] names = owner._ebean_getPropertyNames();
-    for (int i = 0; i < names.length; i++) {
-      if (names[i].equals(propertyName)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  @Override
-  public String property(int propertyIndex) {
-    if (propertyIndex == -1) {
-      return null;
-    }
-    return owner._ebean_getPropertyName(propertyIndex);
-  }
-
-  @Override
   public int propertyLength() {
     return flags.length;
   }
@@ -570,8 +551,8 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
         props.add((prefix == null ? property(i) : prefix + property(i)));
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) getValue(i);
-        embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, getProperty(i) + ".");
+        EntityBean embeddedBean = (EntityBean) value(i);
+        embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, property(i) + ".");
       }
     }
   }
@@ -625,7 +606,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
       if (isChangedProp(i)) {
         // the property has been changed on this bean
         final String propName = (prefix == null ? property(i) : prefix + property(i));
-        final Object newVal = getValue(i);;
+        final Object newVal = value(i);;
         final Object oldVal = origValue(i);
         if (notEqual(oldVal, newVal)) {
           dirtyValues.put(propName, new ValuePair(newVal, oldVal));
@@ -644,7 +625,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
     for (int i = 0; i < len; i++) {
       if (isChangedProp(i)) {
         // the property has been changed on this bean
-        final Object newVal = getValue(i);
+        final Object newVal = value(i);
         final Object oldVal = origValue(i);
         if (notEqual(oldVal, newVal)) {
           visitor.visit(i, newVal, oldVal);
@@ -1052,7 +1033,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
   public boolean isChangedProp(int i) {
     if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
       return true;
-    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(getValue(i))) {
+    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(value(i))) {
       return false;
     } else {
       // mark for change
