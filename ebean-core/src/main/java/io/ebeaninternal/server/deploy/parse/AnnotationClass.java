@@ -1,11 +1,20 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.annotation.Cache;
+import io.ebean.annotation.DbComment;
+import io.ebean.annotation.DbPartition;
+import io.ebean.annotation.DocStore;
+import io.ebean.annotation.Draftable;
+import io.ebean.annotation.DraftableElement;
+import io.ebean.annotation.History;
+import io.ebean.annotation.Identity;
 import io.ebean.annotation.Index;
-import io.ebean.annotation.*;
-import io.ebean.annotation.ext.EntityImplements;
-import io.ebean.annotation.ext.EntityOverride;
+import io.ebean.annotation.InvalidateQueryCache;
+import io.ebean.annotation.ReadAudit;
+import io.ebean.annotation.StorageEngine;
+import io.ebean.annotation.Tablespace;
+import io.ebean.annotation.View;
 import io.ebean.config.TableName;
-import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
@@ -14,8 +23,14 @@ import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.TablespaceMeta;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.*;
-import java.util.Set;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.IdClass;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import static io.ebean.util.AnnotationUtil.typeGet;
 import static java.lang.System.Logger.Level.ERROR;
@@ -72,7 +87,7 @@ final class AnnotationClass extends AnnotationParser {
    */
   private void setTableName() {
     if (descriptor.isBaseTableType()) {
-      Class<?> beanType = descriptor.getBaseBeanType();
+      Class<?> beanType = descriptor.getBeanType();
       InheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null) {
         beanType = inheritInfo.getRoot().getType();
@@ -187,18 +202,6 @@ final class AnnotationClass extends AnnotationParser {
     }
     for (NamedQuery namedQuery : annotationClassNamedQuery(cls)) {
       descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
-    }
-
-    Set<EntityImplements> entityImplements = AnnotationUtil.typeGetAll(cls, EntityImplements.class);
-    for (EntityImplements ann : entityImplements) {
-      for (Class<?> iface : ann.value()) {
-        descriptor.addInterface(iface);
-      }
-    }
-
-    EntityOverride entityOverride = AnnotationUtil.typeGet(cls, EntityOverride.class);
-    if (entityOverride != null) {
-      descriptor.setOverridePriority(entityOverride.priority());
     }
   }
 

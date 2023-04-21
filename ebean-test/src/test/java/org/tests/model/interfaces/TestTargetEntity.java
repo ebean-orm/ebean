@@ -30,7 +30,7 @@ public class TestTargetEntity extends BaseTestCase {
   private Person setup() {
     Address address = new Address("street");
     DB.save(address);
-    Person person = DB.getDefault().createEntityBean(Person.class);
+    Person person = new Person();
     person.setDefaultAddress(address);
     DB.save(person);
     return person;

@@ -6,8 +6,16 @@ import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
-import io.ebean.config.*;
-import io.ebean.config.dbplatform.*;
+import io.ebean.config.BeanNotEnhancedException;
+import io.ebean.config.DatabaseConfig;
+import io.ebean.config.EncryptKey;
+import io.ebean.config.EncryptKeyManager;
+import io.ebean.config.NamingConvention;
+import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.DbHistorySupport;
+import io.ebean.config.dbplatform.DbIdentity;
+import io.ebean.config.dbplatform.IdType;
+import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.core.type.ScalarType;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeLogListener;
@@ -18,7 +26,12 @@ import io.ebean.meta.MetricVisitor;
 import io.ebean.meta.QueryPlanInit;
 import io.ebean.plugin.BeanType;
 import io.ebean.util.AnnotationUtil;
-import io.ebeaninternal.api.*;
+import io.ebeaninternal.api.ConcurrencyMode;
+import io.ebeaninternal.api.CoreLog;
+import io.ebeaninternal.api.SpiBeanType;
+import io.ebeaninternal.api.SpiBeanTypeManager;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.TransactionEventTable;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.SpiCacheManager;
 import io.ebeaninternal.server.core.InternString;
@@ -28,8 +41,21 @@ import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 import io.ebeaninternal.server.deploy.id.IdBinderEmbedded;
 import io.ebeaninternal.server.deploy.id.IdBinderFactory;
-import io.ebeaninternal.server.deploy.meta.*;
-import io.ebeaninternal.server.deploy.parse.*;
+import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
+import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocMany;
+import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
+import io.ebeaninternal.server.deploy.meta.DeployBeanTable;
+import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
+import io.ebeaninternal.server.deploy.meta.DeployOrderColumn;
+import io.ebeaninternal.server.deploy.meta.DeployTableJoin;
+import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
+import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
+import io.ebeaninternal.server.deploy.parse.DeployInherit;
+import io.ebeaninternal.server.deploy.parse.DeployUtil;
+import io.ebeaninternal.server.deploy.parse.ReadAnnotations;
+import io.ebeaninternal.server.deploy.parse.TransientProperties;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
@@ -49,10 +75,19 @@ import javax.sql.DataSource;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.DEBUG;
+import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.INFO;
 
 /**
  * Creates BeanDescriptors.
@@ -89,13 +124,11 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final BootupClasses bootupClasses;
   private final String serverName;
   private final List<BeanDescriptor<?>> elementDescriptors = new ArrayList<>();
-  private final Map<String, BeanTable> beanTableMap = new HashMap<>();
-
   private final Set<String> managedTables = new HashSet<>();
+  private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<>();
   private final Map<String, BeanDescriptor<?>> descMap = new HashMap<>();
   private final Map<String, BeanDescriptor<?>> descQueueMap = new HashMap<>();
   private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<>();
-  private final Map<String, String> descAliases = new HashMap<>();
   private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<>();
   private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<>();
   private final DbIdentity dbIdentity;
@@ -121,7 +154,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final Map<String, String> draftTableMap = new HashMap<>();
 
   // temporary collections used during startup and then cleared
-  private Map<String, DeployBeanInfo<?>> deployInfoMap = new HashMap<>();
+  private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<>();
   private Set<Class<?>> embeddedIdTypes = new HashSet<>();
   private List<DeployBeanInfo<?>> embeddedBeans = new ArrayList<>();
 
@@ -241,21 +274,12 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
   @Override
   public <T> BeanDescriptor<T> descriptor(Class<T> entityType) {
-    BeanDescriptor<T> ret = descriptorByClassName(entityType.getName());
-    if (ret == null) {
-      for (Class<?> iface : entityType.getInterfaces()) {
-        ret = descriptorByClassName(iface.getName());
-        if (ret != null) {
-          return ret;
-        }
-      }
-    }
-    return ret;
+    return (BeanDescriptor<T>) descMap.get(entityType.getName());
   }
 
   @SuppressWarnings("unchecked")
   public <T> BeanDescriptor<T> descriptorByClassName(String entityClassName) {
-    return (BeanDescriptor<T>) descMap.get(resolveAlias(entityClassName));
+    return (BeanDescriptor<T>) descMap.get(entityClassName);
   }
 
   @Override
@@ -301,7 +325,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     try {
       createListeners();
       readEntityDeploymentInitial();
-      readOverridesAndAliases();
       readXmlMapping(mappings);
       readEntityBeanTable();
       readEntityDeploymentAssociations();
@@ -352,7 +375,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       return;
     }
 
-    DeployBeanInfo<?> info = deploy(entityClass);
+    DeployBeanInfo<?> info = deployInfoMap.get(entityClass);
     if (info == null) {
       log.log(ERROR, "No entity bean for ebean.xml entry " + entityClassName);
 
@@ -565,7 +588,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   public BeanTable beanTable(Class<?> type) {
-    return beanTableMap.get(resolveAlias(type.getName()));
+    return beanTableMap.get(type);
   }
 
   /**
@@ -603,12 +626,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   private BeanManager<?> beanManager(String beanClassName) {
-    return beanManagerMap.get(resolveAlias(beanClassName));
-  }
-
-  private String resolveAlias(String name) {
-    String altName = descAliases.get(name);
-    return altName == null ? name : altName;
+    return beanManagerMap.get(beanClassName);
   }
 
   /**
@@ -633,7 +651,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    */
   @SuppressWarnings("unchecked")
   public <T> DeployBeanInfo<T> deploy(Class<T> cls) {
-    return (DeployBeanInfo<T>) deployInfoMap.get(resolveAlias(cls.getName()));
+    return (DeployBeanInfo<T>) deployInfoMap.get(cls);
   }
 
   private void registerDescriptor(DeployBeanInfo<?> info) {
@@ -666,7 +684,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     }
     for (Class<?> entityClass : bootupClasses.getEntities()) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
-      deployInfoMap.put(entityClass.getName(), info);
+      deployInfoMap.put(entityClass, info);
       Class<?> embeddedIdType = info.getEmbeddedIdType();
       if (embeddedIdType != null) {
         embeddedIdTypes.add(embeddedIdType);
@@ -674,7 +692,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     }
     for (Class<?> entityClass : bootupClasses.getEmbeddables()) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
-      deployInfoMap.put(entityClass.getName(), info);
+      deployInfoMap.put(entityClass, info);
       if (embeddedIdTypes.contains(entityClass)) {
         // register embeddedId types early - scalar properties only
         // and needed for creating BeanTables (id properties)
@@ -700,7 +718,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private void readEntityBeanTable() {
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       BeanTable beanTable = createBeanTable(info);
-      beanTableMap.put(beanTable.getBeanType().getName(), beanTable);
+      beanTableMap.put(beanTable.getBeanType(), beanTable);
       if (beanTable.getBaseTable() != null) {
         managedTables.add(beanTable.getBaseTable());
       }
@@ -727,7 +745,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       DeployBeanDescriptor<?> descriptor = info.getDescriptor();
       InheritInfo inheritInfo = descriptor.getInheritInfo();
       if (inheritInfo != null && !inheritInfo.isRoot()) {
-        DeployBeanInfo<?> rootBeanInfo = deploy(inheritInfo.getRoot().getType());
+        DeployBeanInfo<?> rootBeanInfo = deployInfoMap.get(inheritInfo.getRoot().getType());
         PlatformIdGenerator rootIdGen = rootBeanInfo.getDescriptor().getIdGenerator();
         if (rootIdGen != null) {
           descriptor.setIdGenerator(rootIdGen);
@@ -769,78 +787,12 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   /**
-   * Finds the overrides by priority. Computes a map with the base class as key
-   * and the descriptor, that shoud replace that class. Modifies the deployInfoMap
-   * and descAliases accordingly.
-   */
-  private void readOverridesAndAliases() {
-    Map<Class<?>, DeployBeanInfo<?>> overrides = new HashMap<>();
-
-    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      DeployBeanDescriptor<?> desc = info.getDescriptor();
-      Integer prio = desc.getOverridePriority();
-      if (prio != null) {
-        Class<?> base = desc.getBaseBeanType();
-        Class<?> child = desc.getBeanType();
-        log.log(DEBUG, "{0} overridden by {1} with priority {2}", base.getName(), child.getName(), prio);
-
-        // check, if we already have found an override for this base and take the one
-        // with
-        // lowest prio
-        DeployBeanInfo<?> override = overrides.get(base);
-        if (override == null) {
-          overrides.put(base, info);
-        } else {
-          int delta = override.getDescriptor().getOverridePriority().compareTo(prio);
-          if (delta > 0) {
-            overrides.put(base, info);
-          } else if (delta == 0) {
-            throw new IllegalStateException("There are two or more implementations for " + base.getName()
-              + " with priority " + prio + ". Conflicting entity: " + desc.getBeanType().getName() + " - "
-              + override.getDescriptor().getBeanType().getName());
-          }
-        }
-      }
-    }
-
-    overrides.forEach((key, value) -> {
-      deployInfoMap.remove(key.getName()); // remove the original descriptor
-
-      DeployBeanDescriptor<?> newDesc = value.getDescriptor();
-      newDesc.setOverridePriority(null); // clear priority (so no discard will occur)
-
-      deployInfoMap.put(newDesc.getBeanType().getName(), value);
-      descAliases.put(key.getName(), newDesc.getBeanType().getName());
-    });
-
-
-    // remove all left overrides classes (they are discarded)
-    deployInfoMap.values().removeIf(info -> info.getDescriptor().getOverridePriority() != null);
-
-    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      for (Class<?> iface : info.getDescriptor().getInterfaces()) {
-        String conflict = descAliases.put(iface.getName(), info.getDescriptor().getBeanType().getName());
-        if (conflict != null) {
-          throw new IllegalStateException("There are two or more implementations for " + iface
-            + ". Conflicting entity: " + conflict + " - " + info.getDescriptor().getBeanType().getName());
-        }
-      }
-    }
-
-    // output alias map
-    if (log.isLoggable(INFO)) {
-      descAliases.forEach((key, value) -> log.log(INFO, "{0} alias for {1}", key, value));
-    }
-  }
-
-
-  /**
    * Sets the inheritance info.
    */
   private void setInheritanceInfo(DeployBeanInfo<?> info) {
     for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
       if (!oneProp.isTransient()) {
-        DeployBeanInfo<?> assoc = deploy(oneProp.getTargetType());
+        DeployBeanInfo<?> assoc = deployInfoMap.get(oneProp.getTargetType());
         if (assoc != null) {
           oneProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
         }
@@ -848,7 +800,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     }
     for (DeployBeanPropertyAssocMany<?> manyProp : info.getDescriptor().propertiesAssocMany()) {
       if (!manyProp.isTransient()) {
-        DeployBeanInfo<?> assoc = deploy(manyProp.getTargetType());
+        DeployBeanInfo<?> assoc = deployInfoMap.get(manyProp.getTargetType());
         if (assoc != null) {
           manyProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
         }
@@ -905,7 +857,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
   private DeployBeanDescriptor<?> targetDescriptor(DeployBeanPropertyAssoc<?> prop) {
     Class<?> targetType = prop.getTargetType();
-    DeployBeanInfo<?> info = deploy(targetType);
+    DeployBeanInfo<?> info = deployInfoMap.get(targetType);
     if (info == null) {
       throw new PersistenceException("Can not find descriptor [" + targetType + "] for " + prop.getFullBeanName());
     }
@@ -992,7 +944,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     final InheritInfo targetInheritInfo = targetDesc.getInheritInfo();
     if (targetInheritInfo != null) {
       for (InheritInfo child : targetInheritInfo.getChildren()) {
-        final DeployBeanDescriptor<?> childDescriptor = deploy(child.getType()).getDescriptor();
+        final DeployBeanDescriptor<?> childDescriptor = deployInfoMap.get(child.getType()).getDescriptor();
         childDescriptor.setOrderColumn(orderProperty);
       }
     }
@@ -1257,6 +1209,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     // set bean controller, finder and listener
     setBeanControllerFinderListener(desc);
     deplyInherit.process(desc);
+    desc.checkInheritanceMapping();
 
     createProperties.createProperties(desc);
     DeployBeanInfo<T> info = new DeployBeanInfo<>(deployUtil, desc);
