@@ -5,7 +5,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.17.3-FOC1-SNAPSHOT</version>
+    <version>13.17.3-FOC2-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-java16</artifactId>
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>13.17.3-FOC1-SNAPSHOT</version>
+      <version>13.17.3-FOC2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -30,7 +30,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.17.3-FOC1-SNAPSHOT</version>
+      <version>13.17.3-FOC2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
