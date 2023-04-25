@@ -2255,4 +2255,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   List<MetaQueryPlan> queryPlanCollectNow(QueryPlanRequest request) {
     return queryPlanManager.collect(request);
   }
+
+  @Override
+  public void runDdl() {
+    ddlGenerator.runDdl();
+  }
 }
