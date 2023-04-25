@@ -212,7 +212,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
     String propNodeId = prop.getProperty("nodeId");
     if (propNodeId == null || propNodeId.isEmpty()) {
-      log.log(WARNING, "State file '{0}' is incomplete", stateFile);
+      log.log(WARNING, "State file ''{0}'' is incomplete", stateFile);
       return false; // we cannot restore
     }
     try {
@@ -220,7 +220,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
         nodeId = parseAlternativeNodeId(propNodeId);
       } else if (!getNodeIdentifier().equals(propNodeId)) {
         log.log(WARNING,
-          "The nodeId in the state file '{0}' has changed from {1} to {2}. "
+          "The nodeId in the state file ''{0}'' has changed from {1} to {2}. "
             + "This can happen when MAC address changes or when two containers share the same state file",
           stateFile, propNodeId, getNodeIdentifier());
         return false;
