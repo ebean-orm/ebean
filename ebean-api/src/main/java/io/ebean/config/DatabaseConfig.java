@@ -16,8 +16,8 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.plugin.CustomDeployParser;
 import io.ebean.meta.MetricNamingMatch;
+import io.ebean.plugin.CustomDeployParser;
 import io.ebean.util.StringHelper;
 
 import javax.persistence.EnumType;

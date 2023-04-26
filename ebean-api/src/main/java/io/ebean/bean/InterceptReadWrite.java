@@ -551,7 +551,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
         props.add((prefix == null ? property(i) : prefix + property(i)));
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) value(i);
+        final EntityBean embeddedBean = (EntityBean) value(i);
         embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, property(i) + ".");
       }
     }
@@ -606,7 +606,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
       if (isChangedProp(i)) {
         // the property has been changed on this bean
         final String propName = (prefix == null ? property(i) : prefix + property(i));
-        final Object newVal = value(i);;
+        final Object newVal = value(i);
         final Object oldVal = origValue(i);
         if (notEqual(oldVal, newVal)) {
           dirtyValues.put(propName, new ValuePair(newVal, oldVal));

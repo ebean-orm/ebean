@@ -142,7 +142,7 @@ public class BaseTableDdl implements TableDdl {
 
     private void handleStrictError(String tableName, String columnName) {
       if (strictMode) {
-        String message = "DB Migration of non-null column with no default value specified for: " + tableName + "." + columnName+" Use @DbDefault to specify a default value or disable strict mode for migration";
+        String message = "DB Migration of non-null column with no default value specified for: " + tableName + "." + columnName+" Use @DbDefault to specify a default value or specify dbMigration.setStrictMode(false)";
         throw new IllegalArgumentException(message);
       }
     }

@@ -1,19 +1,7 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.annotation.Cache;
-import io.ebean.annotation.DbComment;
-import io.ebean.annotation.DbPartition;
-import io.ebean.annotation.DocStore;
-import io.ebean.annotation.Draftable;
-import io.ebean.annotation.DraftableElement;
-import io.ebean.annotation.History;
-import io.ebean.annotation.Identity;
 import io.ebean.annotation.Index;
-import io.ebean.annotation.InvalidateQueryCache;
-import io.ebean.annotation.ReadAudit;
-import io.ebean.annotation.StorageEngine;
-import io.ebean.annotation.Tablespace;
-import io.ebean.annotation.View;
+import io.ebean.annotation.*;
 import io.ebean.config.TableName;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
@@ -23,14 +11,7 @@ import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.TablespaceMeta;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.IdClass;
-import javax.persistence.NamedQuery;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import static io.ebean.util.AnnotationUtil.typeGet;
 import static java.lang.System.Logger.Level.ERROR;
