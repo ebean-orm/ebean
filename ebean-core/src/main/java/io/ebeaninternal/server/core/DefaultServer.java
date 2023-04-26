@@ -2190,6 +2190,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Checks, if any property is dirty.
    */
   private boolean isAnyPropertyDirty(EntityBean entityBean, BeanProperty[] props) {
+    if (entityBean._ebean_getIntercept().isNew()) {
+      return true;
+    }
     for (BeanProperty prop : props) {
       if (entityBean._ebean_getIntercept().isDirtyProperty(prop.propertyIndex())) {
         return true;
