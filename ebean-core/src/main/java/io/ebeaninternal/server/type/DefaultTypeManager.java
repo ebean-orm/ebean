@@ -39,9 +39,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static io.ebean.core.type.PostgresHelper.isPostgresCompatible;
-import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.ERROR;
-import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Default implementation of TypeManager.

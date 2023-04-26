@@ -1114,6 +1114,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
+   * Returns true, if this M2M beanproperty has a jointable, where the jointable is managed by an other entity.
+   */
+  public boolean isTableManaged() {
+    return tableManaged;
+  }
+
+  /**
    * Returns true, if we must create a m2m join table.
    */
   public boolean createJoinTable() {
@@ -1123,10 +1130,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     } else {
       return false;
     }
-  }
-
-  public boolean isTableManaged() {
-    return tableManaged;
   }
 
   public IntersectionFactoryHelp getIntersectionFactory() {

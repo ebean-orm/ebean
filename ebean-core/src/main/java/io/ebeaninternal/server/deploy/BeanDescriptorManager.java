@@ -238,6 +238,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <T> BeanDescriptor<T> descriptor(Class<T> entityType) {
     return (BeanDescriptor<T>) descMap.get(entityType.getName());
   }
@@ -1174,7 +1175,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     // set bean controller, finder and listener
     setBeanControllerFinderListener(desc);
     deplyInherit.process(desc);
-    desc.checkInheritanceMapping();
 
     createProperties.createProperties(desc);
     DeployBeanInfo<T> info = new DeployBeanInfo<>(deployUtil, desc);
@@ -1457,7 +1457,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     String baseTable = prop.getDesc().getBaseTable();
     DeployTableJoin inverse = prop.getTableJoin().createInverse(baseTable);
     TableJoin inverseJoin = new TableJoin(inverse, prop.getForeignKey());
-    DeployBeanInfo<?> target = deploy(prop.getTargetType());
+    DeployBeanInfo<?> target = deployInfoMap.get(prop.getTargetType());
     target.setPrimaryKeyJoin(inverseJoin);
   }
 

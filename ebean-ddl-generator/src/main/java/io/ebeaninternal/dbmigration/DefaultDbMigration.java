@@ -1,14 +1,10 @@
 package io.ebeaninternal.dbmigration;
 
 import io.avaje.applog.AppLog;
-import io.avaje.classpath.scanner.core.Location;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.Platform;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DbConstraintNaming;
-import io.ebean.config.PlatformConfig;
-import io.ebean.config.PropertiesWrapper;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatformProvider;
 import io.ebean.dbmigration.DbMigration;

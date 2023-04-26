@@ -97,10 +97,6 @@ public class DbMigrationTest extends BaseTestCase {
       runScript("I__create_tablespaces.sql");
     }
 
-    if(isDb2()) {
-      runScript("I__create_tablespaces.sql");
-    }
-
     if (!isOracle()) {
       // oracle.getMetaData is too slow. So skip this test
       assertThat(getTables()).doesNotContain("migtest_QuOtEd");
