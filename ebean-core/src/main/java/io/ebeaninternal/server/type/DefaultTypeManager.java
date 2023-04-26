@@ -95,8 +95,7 @@ public final class DefaultTypeManager implements TypeManager {
     this.offlineMigrationGeneration = DbOffline.isGenerateMigration();
     this.defaultEnumType = config.getDefaultEnumType();
 
-    ServiceLoader<ScalarJsonMapper> mappers = ServiceLoader.load(ScalarJsonMapper.class);
-    jsonMapper = mappers.findFirst().orElse(null);
+    jsonMapper = findJsonMapper();
 
     initialiseStandard(config);
     initialiseJavaTimeTypes(config);
@@ -108,6 +107,26 @@ public final class DefaultTypeManager implements TypeManager {
       initialiseScalarConverters(bootupClasses);
       initialiseAttributeConverters(bootupClasses);
     }
+  }
+
+  /**
+   * Searches the JsonMapper and checks if markerAnnotation is on class path.
+   */
+  private static ScalarJsonMapper findJsonMapper() {
+    ServiceLoader<ScalarJsonMapper> mappers = ServiceLoader.load(ScalarJsonMapper.class);
+    ScalarJsonMapper mapper = mappers.findFirst().orElse(null);
+    if (mapper != null) {
+      try {
+        if (mapper.markerAnnotation() != null) {
+          return mapper;
+        } else {
+          log.log(System.Logger.Level.WARNING, "Not using {0}, because markerAnnotation is null", mapper.getClass().getName());
+        }
+      } catch (NoClassDefFoundError e) {
+        log.log(System.Logger.Level.WARNING, "Not using {0}, because markerAnnotation is inacessible ({1})", mapper.getClass().getName(), e.getMessage());
+      }
+    }
+    return null;
   }
 
   private void loadGeoTypeBinder(DatabaseConfig config) {
