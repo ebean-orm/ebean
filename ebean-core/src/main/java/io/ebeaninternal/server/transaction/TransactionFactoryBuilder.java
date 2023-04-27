@@ -27,4 +27,8 @@ final class TransactionFactoryBuilder {
       }
     }
   }
+
+  static TransactionFactory lazy(TransactionFactory delegate) {
+    return new TransactionFactoryLazy(delegate);
+  }
 }

@@ -137,7 +137,10 @@ public class TransactionManager implements SpiTransactionManager {
     this.prefix = "";
 
     CurrentTenantProvider tenantProvider = options.config.getCurrentTenantProvider();
-    this.transactionFactory = TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider);
+    this.transactionFactory =
+      TransactionFactoryBuilder.lazy(
+        TransactionFactoryBuilder.build(this, dataSourceSupplier, tenantProvider)
+      );
 
     MetricFactory metricFactory = MetricFactory.get();
     this.txnMain = metricFactory.createTimedMetric("txn.main");
