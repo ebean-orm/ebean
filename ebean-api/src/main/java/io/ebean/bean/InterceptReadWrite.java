@@ -114,7 +114,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
 
   @Override
   public String toString() {
-    return "InterceptReadWrite{state=" + state +
+    return "InterceptReadWrite@" + hashCode() + "{state=" + state +
       (dirty ? " dirty;" : "") +
       (forceUpdate ? " forceUpdate;" : "") +
       (readOnly ? " readOnly;" : "") +
