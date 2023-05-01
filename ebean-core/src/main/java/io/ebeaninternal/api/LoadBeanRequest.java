@@ -8,6 +8,8 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.util.*;
 
+import static java.lang.System.Logger.Level.DEBUG;
+
 /**
  * Request for loading ManyToOne and OneToOne relationships.
  */
@@ -18,12 +20,13 @@ public final class LoadBeanRequest extends LoadRequest {
   private final String lazyLoadProperty;
   private final boolean loadCache;
   private final boolean alreadyLoaded;
-
+  private String triggerEbi;
   /**
    * Construct for lazy load request.
    */
   public LoadBeanRequest(LoadBeanBuffer loadBuffer, EntityBeanIntercept ebi, boolean loadCache) {
     this(loadBuffer, null, true, ebi.lazyLoadProperty(), ebi.isLoaded(), loadCache || ebi.isLoadedFromCache());
+    this.triggerEbi = String.valueOf(ebi);
   }
 
   /**
@@ -105,7 +108,8 @@ public final class LoadBeanRequest extends LoadRequest {
   /**
    * Load the beans into the L2 cache if that is requested and check for load failures due to deletes.
    */
-  public Result postLoad(List<?> list) {
+  public Result postLoad(List<?> list, List<Object> queryIds) {
+    loadBuffer.loadingStopped();
     Set<Object> loadedIds = new HashSet<>();
     BeanDescriptor<?> desc = loadBuffer.descriptor();
     // collect Ids and maybe load bean cache
@@ -123,10 +127,17 @@ public final class LoadBeanRequest extends LoadRequest {
         // necessary but allow processing to continue until it is accessed by client code
         Object id = desc.getId(ebi.owner());
         if (!loadedIds.contains(id)) {
-          // assume this is logically deleted (hence not found)
-          desc.markAsDeleted(ebi.owner());
-          missedIds.add(id);
-          missed.add(ebi);
+          if (queryIds.contains(id)) {
+            // assume this is logically deleted (hence not found)
+            desc.markAsDeleted(ebi.owner());
+          } else {
+            // unexpected, added to batch during loading
+            missedIds.add(id);
+            missed.add(ebi);
+          }
+        }
+        if (!missed.isEmpty()) {
+          CoreLog.markedAsDeleted.log(DEBUG, "Loaded bean batch triggered by ebi:{0} property:{1}", triggerEbi, lazyLoadProperty);
         }
       }
       return new Result(loadedIds, missedIds, missed);
@@ -148,7 +159,7 @@ public final class LoadBeanRequest extends LoadRequest {
       this.missed = missed;
     }
 
-    public boolean markedDeleted() {
+    public boolean hasMisses() {
       return !missedIds.isEmpty();
     }
 

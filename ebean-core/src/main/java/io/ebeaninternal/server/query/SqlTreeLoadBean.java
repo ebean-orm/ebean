@@ -247,7 +247,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
       return queryMode == Mode.LAZYLOAD_MANY && isRoot();
     }
 
-    private EntityBean getContextBean() {
+    private EntityBean contextBean() {
       return contextBean;
     }
 
@@ -358,7 +358,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
     final EntityBean perform() throws SQLException {
       initialise();
       if (isLazyLoadManyRoot()) {
-        return getContextBean();
+        return contextBean();
       }
       postLoad();
       setBeanToParent();

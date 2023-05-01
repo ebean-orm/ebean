@@ -26,4 +26,6 @@ public interface LoadBeanBuffer {
   boolean isCache();
 
   void loadingStarted();
+
+  void loadingStopped();
 }
