@@ -115,7 +115,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   @Override
   public String toString() {
-    return "InterceptReadWrite{state=" + state +
+    return "InterceptReadWrite@" + hashCode() + "{state=" + state +
       (dirty ? " dirty;" : "") +
       (forceUpdate ? " forceUpdate;" : "") +
       (readOnly ? " readOnly;" : "") +
