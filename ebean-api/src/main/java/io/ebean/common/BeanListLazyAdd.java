@@ -105,8 +105,12 @@ public class BeanListLazyAdd<E> extends BeanList<E> {
   }
 
   @Override
-  public List<E> getLazyAddedEntries() {
-    return lazyAddedEntries;
+  public List<E> getLazyAddedEntries(boolean reset) {
+    List<E> ret = lazyAddedEntries;
+    if (reset) {
+      lazyAddedEntries = null;
+    }
+    return ret;
   }
 
   @Override

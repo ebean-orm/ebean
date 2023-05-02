@@ -1,8 +1,6 @@
 package org.tests.batchload;
 
 import io.ebean.DB;
-import io.ebean.ExpressionList;
-import io.ebean.Transaction;
 import io.ebean.common.BeanList;
 import io.ebean.common.BeanListLazyAdd;
 import io.ebean.test.LoggedSql;
@@ -73,6 +71,8 @@ public class TestLazyAddBeanList extends BaseTestCase {
     assertThat(sql.get(1)).contains("bind(jim,slim,");
     assertThat(sql.get(2)).contains("bind(joe,big,");
     assertThat(sql).hasSize(3);
+
+    assertThat(cust.getContacts()).hasSize(2);
 
     List<String> list = DB.find(Customer.class)
       .fetch("contacts", "firstName")
