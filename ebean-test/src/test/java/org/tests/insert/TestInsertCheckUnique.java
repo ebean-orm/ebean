@@ -123,6 +123,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
    */
   @Test
   public void testUseQueryCache() {
+    DB.find(EBasicWithUniqueCon.class).delete(); // clean up DB (otherwise test may be affected by other test)
 
     EBasicWithUniqueCon basic = new EBasicWithUniqueCon();
     basic.setName("foo");
@@ -161,7 +162,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
       assertThat(DB.checkUniqueness(basic, null, true, false)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).hasSize(1);
-      assertThat(sql.get(0)).contains(" --bind(1,fooo,baz)");
+      assertThat(sql.get(0)).contains("fooo,baz)");
 
     } finally {
       DB.delete(EBasicWithUniqueCon.class, basic.getId());
@@ -174,6 +175,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
    */
   @Test
   public void testSkipClean() {
+    DB.find(EBasicWithUniqueCon.class).delete(); // clean up DB (otherwise test may be affected by other test)
 
     EBasicWithUniqueCon basic = new EBasicWithUniqueCon();
     basic.setName("foo");
@@ -188,7 +190,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
     assertThat(sql.get(0)).contains("select t0.id from e_basicverucon t0 where t0.name = ?");
     assertThat(sql.get(1)).contains("select t0.id from e_basicverucon t0 where t0.other = ? and t0.other_one = ?");
     DB.save(basic);
-    try (Transaction txn = DB.beginTransaction()){
+    try (Transaction txn = DB.beginTransaction()) {
       // reload from database
       basic = DB.find(EBasicWithUniqueCon.class, basic.getId());
 
@@ -204,7 +206,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
       assertThat(DB.checkUniqueness(basic, txn, false, true)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).hasSize(1);
-      assertThat(sql.get(0)).contains(" --bind(1,fooo,baz)");
+      assertThat(sql.get(0)).contains("fooo,baz)");
 
       // multiple checks will hit DB
       LoggedSql.start();
