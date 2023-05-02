@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration;
 
 import io.avaje.applog.AppLog;
+import io.avaje.classpath.scanner.core.Location;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.Platform;
@@ -133,7 +134,7 @@ public class DefaultDbMigration implements DbMigration {
       migrationInitPath = props.get("migration.migrationInitPath", migrationInitPath);
       pathToResources = props.get("migration.pathToResources", pathToResources);
       addForeignKeySkipCheck = props.getBoolean("migration.addForeignKeySkipCheck", addForeignKeySkipCheck);
-      applyPrefix = props.get("migration.applyPrefix",applyPrefix);
+      applyPrefix = props.get("migration.applyPrefix", applyPrefix);
       databasePlatform = props.createInstance(DatabasePlatform.class, "migration.databasePlatform", databasePlatform);
       generatePendingDrop = props.get("migration.generatePendingDrop", generatePendingDrop);
       includeBuiltInPartitioning = props.getBoolean("migration.includeBuiltInPartitioning", includeBuiltInPartitioning);
@@ -141,9 +142,9 @@ public class DefaultDbMigration implements DbMigration {
       includeIndex = props.getBoolean("migration.includeIndex", includeIndex);
       lockTimeoutSeconds = props.getInt("migration.lockTimeoutSeconds", lockTimeoutSeconds);
       logToSystemOut = props.getBoolean("migration.logToSystemOut", logToSystemOut);
-      modelPath  = props.get("migration.modelPath", modelPath);
+      modelPath = props.get("migration.modelPath", modelPath);
       modelSuffix = props.get("migration.modelSuffix", modelSuffix);
-      name  = props.get("migration.name", name);
+      name = props.get("migration.name", name);
       online = props.getBoolean("migration.online", online);
       vanillaPlatform = props.getBoolean("migration.vanillaPlatform", vanillaPlatform);
       version = props.get("migration.version", version);
