@@ -191,7 +191,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
 
-
   @Override
   public final void setAutoPersistUpdates(boolean autoPersistUpdates) {
     this.autoPersistUpdates = autoPersistUpdates;
@@ -252,7 +251,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     callbackList.add(callback);
   }
 
-  private void withEachCallback(Consumer<TransactionCallback> consumer) {
+  private void withEachCallbackFailSilent(Consumer<TransactionCallback> consumer) {
     if (callbackList != null) {
       // using old style loop to cater for case when new callbacks are added recursively (as otherwise iterator fails fast)
       for (int i = 0; i < callbackList.size(); i++) {
@@ -260,17 +259,27 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
           consumer.accept(callbackList.get(i));
         } catch (Exception e) {
           log.log(ERROR, "Error executing transaction callback", e);
+          throw wrapIfNeeded(e);
         }
       }
     }
   }
 
+  private void withEachCallback(Consumer<TransactionCallback> consumer) {
+    if (callbackList != null) {
+      // using old style loop to cater for case when new callbacks are added recursively (as otherwise iterator fails fast)
+      for (int i = 0; i < callbackList.size(); i++) {
+        consumer.accept(callbackList.get(i));
+      }
+    }
+  }
+
   private void firePreRollback() {
-    withEachCallback(TransactionCallback::preRollback);
+    withEachCallbackFailSilent(TransactionCallback::preRollback);
   }
 
   private void firePostRollback() {
-    withEachCallback(TransactionCallback::postRollback);
+    withEachCallbackFailSilent(TransactionCallback::postRollback);
     if (changeLogHolder != null) {
       changeLogHolder.postRollback();
     }
