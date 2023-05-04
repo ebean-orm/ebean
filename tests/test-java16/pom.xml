@@ -5,7 +5,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.17.3-FOC4-SNAPSHOT</version>
+    <version>13.17.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-java16</artifactId>
