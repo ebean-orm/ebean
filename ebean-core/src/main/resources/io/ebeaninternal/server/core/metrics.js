@@ -124,20 +124,31 @@ function applyFilters(filter) {
 	var spareBody = table.tBodies[1];
 
 	var rows = [].slice.call(tBody.rows, 0).concat([].slice.call(spareBody.rows));
-	var clone_tbody = tBody.cloneNode()
-	var clone_sparebody = spareBody.cloneNode()
+
+	var hits = [];
+	var misses = [];
 	// Fill it with the sorted values
 	while (rows.length) {
 		var row = rows.splice(0, 1)[0];
 		if (matchFilter(row, filters)) {
-			clone_tbody.appendChild(row);
+			hits.push(row);
 		} else {
-			clone_sparebody.appendChild(row);
+			misses.push(row);
 		}
+	}
+
+	var clone_tbody = tBody.cloneNode()
+	var clone_sparebody = spareBody.cloneNode()
+	while (hits.length) {
+		clone_tbody.appendChild(hits.splice(0, 1)[0])
+	}
+	while (misses.length) {
+		clone_sparebody.appendChild(misses.splice(0, 1)[0])
 	}
 
 	table.replaceChild(clone_tbody, tBody)
 	table.replaceChild(clone_sparebody, spareBody)
+
 }
 
 function initFilter(filter) {
