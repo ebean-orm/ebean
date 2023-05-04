@@ -385,7 +385,10 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         this.lazyLoadParentId = lazyLoadParentId;
       }
       // add the loadedBean to the appropriate collection of lazyLoadParentBean
-      lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean, true);
+      if (lazyLoadParentBean != null) {
+        // Note: parentBean can be null, when GC ran between construction of query and building the retrieved bean
+        lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean, true);
+      }
     }
   }
 
