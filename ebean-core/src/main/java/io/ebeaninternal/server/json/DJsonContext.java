@@ -1,44 +1,28 @@
 package io.ebeaninternal.server.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.PrettyPrinter;
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import io.ebean.FetchPath;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.JsonConfig;
 import io.ebean.plugin.BeanType;
-import io.ebean.text.json.EJson;
-import io.ebean.text.json.JsonIOException;
-import io.ebean.text.json.JsonReadOptions;
-import io.ebean.text.json.JsonWriteBeanVisitor;
-import io.ebean.text.json.JsonWriteOptions;
+import io.ebean.plugin.Property;
+import io.ebean.text.json.*;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.type.TypeManager;
 import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.ManyType;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Default implementation of JsonContext.
@@ -161,6 +145,21 @@ public final class DJsonContext implements SpiJsonContext {
     BeanDescriptor<T> desc = (BeanDescriptor<T>) getDescriptor(target.getClass());
     try {
       desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), target != null), null, target);
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
+  }
+
+  @Override
+  public <T> T readProperty(Property property, JsonParser parser) {
+    return readProperty(property, parser, null);
+  }
+
+  @Override
+  public <T> T readProperty(Property property, JsonParser parser, JsonReadOptions options) {
+    BeanProperty prop = (BeanProperty) property;
+    try {
+      return (T) prop.jsonRead(new ReadJson(prop.descriptor(), parser, options, determineObjectMapper(options), false));
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -351,6 +350,22 @@ public final class DJsonContext implements SpiJsonContext {
       throw new JsonIOException(e);
     }
     return writer.toString();
+  }
+
+  @Override
+  public void writeProperty(Property property, Object bean, JsonGenerator generator) throws JsonIOException {
+    writeProperty(property, bean, generator, null);
+  }
+
+  @Override
+  public void writeProperty(Property property, Object bean, JsonGenerator gen, JsonWriteOptions options) throws JsonIOException {
+    BeanProperty prop = (BeanProperty) property;
+    WriteJson writeJson = createWriteJson(gen, options);
+    try {
+      prop.jsonWrite(writeJson, (EntityBean) bean);
+    } catch (IOException e) {
+      throw new JsonIOException(e);
+    }
   }
 
   @SuppressWarnings("unchecked")

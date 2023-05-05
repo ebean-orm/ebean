@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.FetchPath;
 import io.ebean.plugin.BeanType;
+import io.ebean.plugin.Property;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -106,6 +107,18 @@ public interface JsonContext {
    * @throws JsonIOException When IOException occurs
    */
   <T> void toBean(T target, String json, JsonReadOptions options) throws JsonIOException;
+
+  /**
+   * Read json parser input and returns the property value.
+   * This can be used to read a single property (e.g. ID property) from a JSON stream
+   */
+  <T> T readProperty(Property property, JsonParser parser);
+
+  /**
+   * Read json parser input and returns the property value.<br>
+   * See {@link #readProperty(Property, JsonParser)} for details
+   */
+  <T> T readProperty(Property property, JsonParser parser, JsonReadOptions options);
 
   /**
    * Create and return a new bean reading for the bean type given the JSON options and source.
@@ -256,6 +269,16 @@ public interface JsonContext {
    * @throws JsonIOException When IOException occurs
    */
   String toJson(Object value, JsonWriteOptions options) throws JsonIOException;
+
+  /**
+   * Writes a single property of the current bean to generator.
+   */
+  void writeProperty(Property property, Object bean, JsonGenerator generator) throws JsonIOException;
+
+  /**
+   * Writes a single property of the current bean to generator.
+   */
+  void writeProperty(Property property, Object bean, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException;
 
   /**
    * Return true if the type is known as an Entity bean or a List Set or
