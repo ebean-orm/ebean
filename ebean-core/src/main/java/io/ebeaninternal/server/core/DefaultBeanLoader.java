@@ -14,12 +14,9 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import javax.persistence.EntityNotFoundException;
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.Set;
 
 import static java.lang.System.Logger.Level.DEBUG;
-import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
@@ -126,30 +123,12 @@ final class DefaultBeanLoader {
    * Load a batch of beans for +query or +lazy loading.
    */
   void loadBean(LoadBeanRequest loadRequest) {
-    final Set<EntityBeanIntercept> batch = loadRequest.batch();
-    if (batch.isEmpty()) {
+    if (loadRequest.checkEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
-
-    final String batchBefore = String.valueOf(batch);
-    final List<Object> ids = loadRequest.ids();
-    if (ids.isEmpty()) {
-      // this should never happen given the batch is not empty
-      CoreLog.internal.log(ERROR, "No Ids when loading Batch buffer");
-      return;
-    }
-
     final SpiQuery<?> query = server.createQuery(loadRequest.beanType());
-    loadRequest.configureQuery(query, ids);
-    final List<?> list = executeQuery(loadRequest, query);
-    final LoadBeanRequest.Result result = loadRequest.postLoad(list, ids);
-    if (result.hasMisses() && CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
-      CoreLog.markedAsDeleted.log(DEBUG, "Loaded bean batch BEFORE {0}", batchBefore);
-      CoreLog.markedAsDeleted.log(DEBUG, "Loaded bean batch AFTER {0}", batch);
-      String msg = MessageFormat.format("Bean added to batch during load for {0} missedIds:{1} ids:{2} loadedIds:{3} sql:{4} missed:{5}",
-        loadRequest.beanType(), result.missedIds(), ids, result.loadedIds(), query.getGeneratedSql(), result.missed());
-      CoreLog.markedAsDeleted.log(DEBUG, msg, new RuntimeException("LoadBeanRequest - Bean added to batch during load"));
-    }
+    loadRequest.configureQuery(query);
+    loadRequest.postLoad(executeQuery(loadRequest, query));
   }
 
   /**
