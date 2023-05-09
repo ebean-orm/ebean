@@ -6,7 +6,11 @@ import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.util.*;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.lang.System.Logger.Level.DEBUG;
 
@@ -21,6 +25,9 @@ public final class LoadBeanRequest extends LoadRequest {
   private final boolean loadCache;
   private final boolean alreadyLoaded;
   private String triggerEbi;
+  private String batchBefore;
+  private List<Object> queryIds;
+
   /**
    * Construct for lazy load request.
    */
@@ -56,17 +63,19 @@ public final class LoadBeanRequest extends LoadRequest {
   }
 
   /**
-   * Return the batch of beans to actually load.
+   * Return true if the batch is empty.
    */
-  public Set<EntityBeanIntercept> batch() {
+  public boolean checkEmpty() {
     loadBuffer.loadingStarted();
-    return batch;
+    batchBefore = String.valueOf(batch);
+    queryIds = ids();
+    return batch.isEmpty();
   }
 
   /**
    * Return the list of Id values for the beans in the lazy load buffer.
    */
-  public List<Object> ids() {
+  private List<Object> ids() {
     final List<Object> idList = new ArrayList<>(batch.size());
     final BeanDescriptor<?> desc = loadBuffer.descriptor();
     for (EntityBeanIntercept ebi : batch) {
@@ -78,7 +87,7 @@ public final class LoadBeanRequest extends LoadRequest {
   /**
    * Configure the query for lazy loading execution.
    */
-  public void configureQuery(SpiQuery<?> query, List<Object> idList) {
+  public void configureQuery(SpiQuery<?> query) {
     query.setMode(Mode.LAZYLOAD_BEAN);
     query.setPersistenceContext(loadBuffer.persistenceContext());
     query.setLoadDescription(mode(), description());
@@ -94,10 +103,10 @@ public final class LoadBeanRequest extends LoadRequest {
     if (loadCache) {
       query.setBeanCacheMode(CacheMode.PUT);
     }
-    if (idList.size() == 1) {
-      query.where().idEq(idList.get(0));
+    if (queryIds.size() == 1) {
+      query.where().idEq(queryIds.get(0));
     } else {
-      query.where().idIn(idList);
+      query.where().idIn(queryIds);
     }
   }
 
@@ -108,7 +117,7 @@ public final class LoadBeanRequest extends LoadRequest {
   /**
    * Load the beans into the L2 cache if that is requested and check for load failures due to deletes.
    */
-  public Result postLoad(List<?> list, List<Object> queryIds) {
+  public void postLoad(List<?> list) {
     loadBuffer.loadingStopped();
     Set<Object> loadedIds = new HashSet<>();
     BeanDescriptor<?> desc = loadBuffer.descriptor();
@@ -137,42 +146,16 @@ public final class LoadBeanRequest extends LoadRequest {
           }
         }
         if (!missed.isEmpty()) {
-          CoreLog.markedAsDeleted.log(DEBUG, "Loaded bean batch triggered by ebi:{0} property:{1}", triggerEbi, lazyLoadProperty);
+          if (CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
+            CoreLog.markedAsDeleted.log(DEBUG, "Loaded bean batch triggered by ebi:{0} property:{1}", triggerEbi, lazyLoadProperty);
+            CoreLog.markedAsDeleted.log(DEBUG, "Loaded bean batch BEFORE {0}", batchBefore);
+            CoreLog.markedAsDeleted.log(DEBUG, "Loaded bean batch AFTER {0}", batch);
+            String msg = MessageFormat.format("Bean added to batch during load for {0} missedIds:{1} queryIds:{2} missed:{3}",
+              beanType(), missedIds, queryIds, missed);
+            CoreLog.markedAsDeleted.log(DEBUG, msg, new RuntimeException("LoadBeanRequest - Bean added to batch during load"));
+          }
         }
       }
-      return new Result(loadedIds, missedIds, missed);
-    }
-    return EMPTY_RESULT;
-  }
-
-  static final Result EMPTY_RESULT = new Result(Collections.emptySet(),Collections.emptySet(), Collections.emptyList());
-
-  public static class Result {
-
-    private final Set<Object> loadedIds;
-    private final Set<Object> missedIds;
-    private final List<EntityBeanIntercept> missed;
-
-    Result(Set<Object> loadedIds, Set<Object> missedIds, List<EntityBeanIntercept> missed) {
-      this.loadedIds = loadedIds;
-      this.missedIds = missedIds;
-      this.missed = missed;
-    }
-
-    public boolean hasMisses() {
-      return !missedIds.isEmpty();
-    }
-
-    public Set<Object> missedIds() {
-      return missedIds;
-    }
-
-    public Set<Object> loadedIds() {
-      return loadedIds;
-    }
-
-    public List<EntityBeanIntercept> missed() {
-      return missed;
     }
   }
 }
