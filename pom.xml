@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.17.3-SNAPSHOT</version>
+  <version>13.18.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -42,7 +42,7 @@
     <nexus.staging.keepStagingRepositoryOnFailure>true</nexus.staging.keepStagingRepositoryOnFailure>
     <nexus.staging.skipStagingRepositoryClose>true</nexus.staging.skipStagingRepositoryClose>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
-    <jackson.version>2.14.0</jackson.version>
+    <jackson.version>2.15.0</jackson.version>
     <h2database.version>2.1.214</h2database.version>
     <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
@@ -50,10 +50,10 @@
     <ebean-ddl-runner.version>2.2</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>13.7.0</ebean-migration.version>
-    <ebean-test-containers.version>6.3</ebean-test-containers.version>
+    <ebean-test-containers.version>6.7</ebean-test-containers.version>
     <ebean-datasource.version>8.5</ebean-datasource.version>
-    <ebean-agent.version>13.17.2</ebean-agent.version>
-    <ebean-maven-plugin.version>13.17.2</ebean-maven-plugin.version>
+    <ebean-agent.version>13.17.3</ebean-agent.version>
+    <ebean-maven-plugin.version>13.17.3</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 

@@ -137,7 +137,7 @@ public final class DefaultContainer implements SpiContainer {
   private void checkMissingModulePathProvides() {
     URL servicesFile = ClassLoader.getSystemResource("META-INF/services/io.ebean.config.EntityClassRegister");
     if (servicesFile != null) {
-      log.log(ERROR, "module-info.java is probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause. EntityClassRegister exists but was not service loaded.");
+      log.log(ERROR, "module-info.java is probably missing ''provides io.ebean.config.EntityClassRegister with EbeanEntityRegister'' clause. EntityClassRegister exists but was not service loaded.");
     }
   }
 

@@ -11,6 +11,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -71,6 +72,9 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     if (currentBuffer.isFull()) {
       currentBuffer = createBuffer(batchSize);
     }
+    if (currentBuffer.addWhenLoading()) {
+      CoreLog.markedAsDeleted.log(DEBUG, "Adding " + ebi + " to batch " + currentBuffer + " after loadingStarted(1)", new RuntimeException("Adding to batch after load(1)"));
+    }
     ebi.setBeanLoader(currentBuffer, persistenceContext());
     currentBuffer.add(ebi);
   }
@@ -117,6 +121,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     private final DLoadBeanContext context;
     private final int batchSize;
     private final Set<EntityBeanIntercept> batch;
+    private final Instant whenCreated = Instant.now();
     private PersistenceContext persistenceContext;
 
     LoadBuffer(DLoadBeanContext context, int batchSize) {
@@ -127,7 +132,8 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
 
     @Override
     public String toString() {
-      return "LoadBuffer@" + hashCode();
+      return "LoadBuffer@" + hashCode() + ":" + whenCreated + ":size=" + batch.size()
+        +":locked=" +bufferLock.isLocked()+ "/currentThread=" + bufferLock.isHeldByCurrentThread();
     }
 
     @Override
@@ -148,6 +154,10 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       return batchSize == batch.size();
     }
 
+    final boolean addWhenLoading() {
+      return loadingStarted.get() && CoreLog.markedAsDeleted.isLoggable(DEBUG);
+    }
+
     /**
      * Add the bean to the load buffer.
      */
@@ -155,11 +165,6 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       if (persistenceContext == null) {
         // get persistenceContext from first loaded bean into the buffer
         persistenceContext = ebi.persistenceContext();
-      }
-      if (loadingStarted.get()) {
-        if (CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
-          CoreLog.markedAsDeleted.log(DEBUG, "Adding to batch after loadingStarted(1)", new RuntimeException("Adding to batch after load(1"));
-        }
       }
       batch.add(ebi);
     }
@@ -207,6 +212,11 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     }
 
     @Override
+    public void loadingStopped() {
+      loadingStarted.set(false);
+    }
+
+    @Override
     public void loadBean(EntityBeanIntercept ebi) {
       // A lock is effectively held by EntityBeanIntercept.loadBean()
       if (context.desc.lazyLoadMany(ebi, context)) {
@@ -217,7 +227,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
         // re-add to the batch and lazy load from DB skipping l2 cache
         if (loadingStarted.get()) {
           if (CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
-            CoreLog.markedAsDeleted.log(DEBUG, "Adding to batch after loadingStarted(2)", new RuntimeException("Adding to batch after load(2"));
+            CoreLog.markedAsDeleted.log(DEBUG, "Adding " + ebi + "to batch " + this + "after loadingStarted(2) ", new RuntimeException("Adding to batch after load(2"));
           }
         }
         batch.add(ebi);
@@ -230,10 +240,8 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
         }
       }
 
-      LoadBeanRequest req = new LoadBeanRequest(this, ebi, context.hitCache);
-      context.desc.ebeanServer().loadBean(req);
+      context.desc.ebeanServer().loadBean(new LoadBeanRequest(this, ebi, context.hitCache));
       batch.clear();
-      loadingStarted.set(false);
     }
   }
 
