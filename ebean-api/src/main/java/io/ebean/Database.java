@@ -1106,14 +1106,14 @@ public interface Database {
    * @return a set of Properties if constraint validation was detected or empty list.
    */
   default Set<Property> checkUniqueness(Object bean) {
-    return checkUniqueness(bean, null, false, false);
+    return checkUniqueness(bean, null, false, true);
   }
 
   /**
    * Same as {@link #checkUniqueness(Object)}. but with given transaction.
    */
   default Set<Property> checkUniqueness(Object bean, Transaction transaction) {
-    return checkUniqueness(bean, transaction, false, false);
+    return checkUniqueness(bean, transaction, false, true);
   }
 
   /**
