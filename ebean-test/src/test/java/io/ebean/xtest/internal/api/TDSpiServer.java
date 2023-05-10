@@ -399,11 +399,6 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public Set<Property> checkUniqueness(Object bean) {
-    return null;
-  }
-
-  @Override
   public Set<Property> checkUniqueness(Object bean, Transaction transaction, boolean useQueryCache, boolean skipClean) {
     return null;
   }

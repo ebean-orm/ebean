@@ -2154,11 +2154,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Set<Property> checkUniqueness(Object bean) {
-    return checkUniqueness(bean, null, false, false);
-  }
-
-  @Override
   public Set<Property> checkUniqueness(Object bean, @Nullable Transaction transaction, boolean useQueryCache, boolean skipClean) {
     EntityBean entityBean = checkEntityBean(bean);
     BeanDescriptor<?> beanDesc = descriptor(entityBean.getClass());
