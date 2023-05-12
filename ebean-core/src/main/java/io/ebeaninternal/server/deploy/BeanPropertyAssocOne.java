@@ -30,10 +30,9 @@ import io.ebeaninternal.server.query.SqlJoinType;
 import javax.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 
 /**
  * Property mapped to a joined bean.
@@ -844,6 +843,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
     EntityBean beanValue = valueAsEntityBean(bean);
     EntityBean existingValue = valueAsEntityBean(existing);
+
+    if (beanValue != null && existingValue != null) {
+      Object beanId = targetDescriptor.id(beanValue);
+      Object existingId = targetDescriptor.id(existingValue);
+      if (!isNullOrZero(beanId) && !isNullOrZero(existingId) && !Objects.equals(beanId, existingId)) {
+        existingValue = null;
+      }
+    }
 
     setValueIntercept(existing, mergeHelp.mergeBeans(targetDescriptor, beanValue, existingValue));
 
