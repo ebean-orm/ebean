@@ -19,7 +19,7 @@ public final class BeanPropertySimpleCollection<T> extends BeanPropertyAssocMany
   }
 
   @Override
-  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean, Object collectionValue) throws IOException {
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     return elementDescriptor.jsonReadCollection(readJson, parentBean);
   }
 }

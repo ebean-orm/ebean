@@ -811,20 +811,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void jsonRead(SpiJsonReader readJson, EntityBean bean) throws IOException {
     if (jsonDeserialize && targetDescriptor != null) {
-      // CHECKME: may we skip reading the object from the json stream?
-      T target = readJson.update() ? (T) value(bean) : null;
-      T assocBean = targetDescriptor.jsonRead(readJson, name, target);
-      if (readJson.update()) {
-        setValueIntercept(bean, assocBean);
-      } else {
-        setValue(bean, assocBean);
-      }
+      T assocBean = targetDescriptor.jsonRead(readJson, name);
+      setValue(bean, assocBean);
     }
-  }
-
-  @Override
-  public Object jsonRead(SpiJsonReader readJson) throws IOException {
-    return targetDescriptor.jsonRead(readJson, name, null);
   }
 
   public boolean isReference(Object detailBean) {
@@ -847,6 +836,18 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         beanProperty.setValue(child, parent);
       }
     }
+  }
+
+  @Override
+  public void merge(EntityBean bean, EntityBean existing, BeanMergeHelp mergeHelp) {
+    mergeHelp.pushPath(name);
+
+    EntityBean beanValue = valueAsEntityBean(bean);
+    EntityBean existingValue = valueAsEntityBean(existing);
+
+    setValueIntercept(existing, mergeHelp.mergeBeans(targetDescriptor, beanValue, existingValue));
+
+    mergeHelp.popPath();
   }
 
   public boolean hasCircularImportedId(BeanDescriptor<?> sourceDesc) {

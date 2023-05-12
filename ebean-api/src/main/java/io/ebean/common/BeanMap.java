@@ -187,7 +187,10 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    * Returns the map entrySet.
    */
   @Override
-  public Collection<?> actualEntries() {
+  public Collection<?> actualEntries(boolean load) {
+    if (load) {
+      init();
+    }
     return map.entrySet();
   }
 
