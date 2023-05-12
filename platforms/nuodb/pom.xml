@@ -4,7 +4,7 @@
   <parent>
     <artifactId>platforms</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.17.3-FOC6-SNAPSHOT</version>
+    <version>13.17.3-FOC6</version>
   </parent>
 
   <artifactId>ebean-platform-nuodb</artifactId>
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.17.3-FOC6-SNAPSHOT</version>
+      <version>13.17.3-FOC6</version>
     </dependency>
 
   </dependencies>
