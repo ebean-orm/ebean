@@ -2,12 +2,7 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import io.ebean.core.type.DataBinder;
-import io.ebean.core.type.DataReader;
-import io.ebean.core.type.DocPropertyType;
-import io.ebean.core.type.ScalarTypeBase;
-import io.ebean.core.type.BasicTypeConverter;
+import io.ebean.core.type.*;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -348,8 +343,8 @@ public final class ScalarTypeBoolean {
     }
 
     @Override
-    public Boolean jsonRead(JsonParser parser) {
-      return JsonToken.VALUE_TRUE == parser.getCurrentToken() ? Boolean.TRUE : Boolean.FALSE;
+    public Boolean jsonRead(JsonParser parser) throws IOException {
+      return parser.getValueAsBoolean();
     }
 
     @Override
