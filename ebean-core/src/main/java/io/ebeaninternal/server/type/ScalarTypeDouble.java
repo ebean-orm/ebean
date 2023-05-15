@@ -78,7 +78,7 @@ final class ScalarTypeDouble extends ScalarTypeBase<Double> {
 
   @Override
   public Double jsonRead(JsonParser parser) throws IOException {
-    return parser.getDoubleValue();
+    return parser.getValueAsDouble();
   }
 
   @Override
