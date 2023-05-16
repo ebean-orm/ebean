@@ -5,32 +5,11 @@ import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.core.type.ScalarTypeUtils;
-import io.ebean.meta.BasicMetricVisitor;
-import io.ebean.meta.MetaCountMetric;
-import io.ebean.meta.MetaInfoManager;
-import io.ebean.meta.MetaQueryMetric;
-import io.ebean.meta.MetaQueryPlan;
-import io.ebean.meta.MetaTimedMetric;
-import io.ebean.meta.MetricNamingMatch;
-import io.ebean.meta.MetricReportGenerator;
-import io.ebean.meta.MetricReportValue;
-import io.ebean.meta.QueryPlanInit;
-import io.ebean.meta.QueryPlanRequest;
+import io.ebean.meta.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -258,13 +237,15 @@ public class HtmlMetricReportGenerator implements MetricReportGenerator {
    */
   protected void queryPlansTab(Html html) {
     HtmlTab tab = html.tab("Query plans");
-    tab.startTable("type?", "tenant?", "count", "micros", "sql", "hash");
+    tab.startTable("type?", "tenant?", "count", "micros", "sql", "whenCaptured", "captureMicros","hash");
     for (MetaQueryPlan queryPlan : queryPlans) {
       tab.tableRow(queryPlan.beanType().getSimpleName(),
         queryPlan.tenantId(),
         queryPlan.captureCount(),
         micros(queryPlan.queryTimeMicros()),
         queryPlan(queryPlan.sql(), queryPlan.bind(), queryPlan.plan()),
+        queryPlan.whenCaptured(),
+        queryPlan.captureMicros(),
         hash(queryPlan.hash()));
     }
     tab.endTable();
