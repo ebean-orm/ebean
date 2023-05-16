@@ -756,7 +756,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public Object value(Object bean) {
-    return getValue((EntityBean) bean);
+    return getValueIntercept((EntityBean) bean);
   }
 
   /**
