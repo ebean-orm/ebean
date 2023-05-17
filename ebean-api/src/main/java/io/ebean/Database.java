@@ -35,7 +35,7 @@ import java.util.concurrent.Callable;
  * <h5>The 'default' Database</h5>
  * <p>
  * One Database can be designated as the 'default' or 'primary' Database
- * (see {@link DatabaseConfig#setDefaultServer(boolean)}. Many methods on DB
+ * (see {@link DatabaseConfig#setDefaultServer(boolean)}). Many methods on DB
  * such as {@link DB#find(Class)} etc are actually just a convenient way to
  * call methods on the 'default/primary' Database.
  *
@@ -120,6 +120,7 @@ public interface Database {
   /**
    * Return the associated read only DataSource for this Database instance (can be null).
    */
+  @Nullable
   DataSource readOnlyDataSource();
 
   /**
@@ -166,13 +167,15 @@ public interface Database {
   /**
    * Return the BeanState for a given entity bean.
    * <p>
-   * This will return null if the bean is not an enhanced entity bean.
+   * This will throw an IllegalArgumentException if the bean is not an enhanced entity bean.
    */
   BeanState beanState(Object bean);
 
   /**
    * Return the value of the Id property for a given bean.
+   * This can be null, if the bean has no id set or no id property at all.
    */
+  @Nullable
   Object beanId(Object bean);
 
   /**
@@ -343,12 +346,13 @@ public interface Database {
    * Return the next unique identity value for a given bean type.
    * <p>
    * This will only work when a IdGenerator is on the bean such as for beans
-   * that use a DB sequence or UUID.
+   * that use a DB sequence or UUID. Otherwise, <code>null</code> is returned.
    * <p>
    * For DB's supporting getGeneratedKeys and sequences such as Oracle10 you do
    * not need to use this method generally. It is made available for more
    * complex cases where it is useful to get an ID prior to some processing.
    */
+  @Nullable
   Object nextId(Class<?> beanType);
 
   /**
@@ -636,6 +640,7 @@ public interface Database {
   /**
    * Returns the current transaction or null if there is no current transaction in scope.
    */
+  @Nullable
   Transaction currentTransaction();
 
   /**
@@ -866,7 +871,7 @@ public interface Database {
    * the bean does not exist then this returns false indicating that nothing was
    * deleted. However, if JDBC batch mode is used then this always returns true.
    */
-  boolean delete(Object bean, Transaction transaction) throws OptimisticLockException;
+  boolean delete(Object bean, @Nullable Transaction transaction) throws OptimisticLockException;
 
   /**
    * Delete a bean permanently without soft delete.
@@ -876,7 +881,7 @@ public interface Database {
   /**
    * Delete a bean permanently without soft delete using an explicit transaction.
    */
-  boolean deletePermanent(Object bean, Transaction transaction) throws OptimisticLockException;
+  boolean deletePermanent(Object bean, @Nullable Transaction transaction) throws OptimisticLockException;
 
   /**
    * Delete all the beans in the collection permanently without soft delete.
@@ -886,7 +891,7 @@ public interface Database {
   /**
    * Delete all the beans in the collection permanently without soft delete using an explicit transaction.
    */
-  int deleteAllPermanent(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+  int deleteAllPermanent(Collection<?> beans, @Nullable Transaction transaction) throws OptimisticLockException;
 
   /**
    * Delete the bean given its type and id.
@@ -896,7 +901,7 @@ public interface Database {
   /**
    * Delete the bean given its type and id with an explicit transaction.
    */
-  int delete(Class<?> beanType, Object id, Transaction transaction);
+  int delete(Class<?> beanType, Object id, @Nullable Transaction transaction);
 
   /**
    * Delete permanent given the bean type and id.
@@ -906,7 +911,7 @@ public interface Database {
   /**
    * Delete permanent given the bean type and id with an explicit transaction.
    */
-  int deletePermanent(Class<?> beanType, Object id, Transaction transaction);
+  int deletePermanent(Class<?> beanType, Object id, @Nullable Transaction transaction);
 
   /**
    * Delete all the beans in the collection.
@@ -916,7 +921,7 @@ public interface Database {
   /**
    * Delete all the beans in the collection using an explicit transaction.
    */
-  int deleteAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+  int deleteAll(Collection<?> beans, @Nullable Transaction transaction) throws OptimisticLockException;
 
   /**
    * Delete several beans given their type and id values.
@@ -926,7 +931,7 @@ public interface Database {
   /**
    * Delete several beans given their type and id values with an explicit transaction.
    */
-  int deleteAll(Class<?> beanType, Collection<?> ids, Transaction transaction);
+  int deleteAll(Class<?> beanType, Collection<?> ids, @Nullable Transaction transaction);
 
   /**
    * Delete permanent for several beans given their type and id values.
@@ -936,7 +941,7 @@ public interface Database {
   /**
    * Delete permanent for several beans given their type and id values with an explicit transaction.
    */
-  int deleteAllPermanent(Class<?> beanType, Collection<?> ids, Transaction transaction);
+  int deleteAllPermanent(Class<?> beanType, Collection<?> ids, @Nullable Transaction transaction);
 
   /**
    * Execute a Sql Update Delete or Insert statement. This returns the number of
@@ -987,7 +992,7 @@ public interface Database {
    * Execute a ORM insert update or delete statement with an explicit
    * transaction.
    */
-  int execute(Update<?> update, Transaction transaction);
+  int execute(Update<?> update, @Nullable Transaction transaction);
 
   /**
    * For making calls to stored procedures.
@@ -1048,17 +1053,17 @@ public interface Database {
    * @param transaction the transaction to use (can be null)
    */
   @Nullable
-  <T> T find(Class<T> beanType, Object id, Transaction transaction);
+  <T> T find(Class<T> beanType, Object id, @Nullable Transaction transaction);
 
   /**
    * Insert or update a bean with an explicit transaction.
    */
-  void save(Object bean, Transaction transaction) throws OptimisticLockException;
+  void save(Object bean, @Nullable Transaction transaction) throws OptimisticLockException;
 
   /**
    * Save all the beans in the collection with an explicit transaction.
    */
-  int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+  int saveAll(Collection<?> beans, @Nullable Transaction transaction) throws OptimisticLockException;
 
   /**
    * This method checks the uniqueness of a bean. I.e. if the save will work. It will return the
@@ -1110,7 +1115,7 @@ public interface Database {
   /**
    * Same as {@link #checkUniqueness(Object)}. but with given transaction.
    */
-  Set<Property> checkUniqueness(Object bean, Transaction transaction);
+  Set<Property> checkUniqueness(Object bean, @Nullable Transaction transaction);
 
   /**
    * Marks the entity bean as dirty.
@@ -1159,7 +1164,7 @@ public interface Database {
   /**
    * Update a bean additionally specifying a transaction.
    */
-  void update(Object bean, Transaction transaction) throws OptimisticLockException;
+  void update(Object bean, @Nullable Transaction transaction) throws OptimisticLockException;
 
   /**
    * Update a collection of beans. If there is no current transaction one is created and used to
@@ -1170,7 +1175,7 @@ public interface Database {
   /**
    * Update a collection of beans with an explicit transaction.
    */
-  void updateAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException;
+  void updateAll(Collection<?> beans, @Nullable Transaction transaction) throws OptimisticLockException;
 
   /**
    * Merge the bean using the default merge options (no paths specified, default delete).
@@ -1193,7 +1198,7 @@ public interface Database {
    * @param bean    The bean to merge
    * @param options The options to control the merge
    */
-  void merge(Object bean, MergeOptions options, Transaction transaction);
+  void merge(Object bean, MergeOptions options, @Nullable Transaction transaction);
 
   /**
    * Insert the bean.
@@ -1207,7 +1212,7 @@ public interface Database {
   /**
    * Insert the bean with a transaction.
    */
-  void insert(Object bean, Transaction transaction);
+  void insert(Object bean, @Nullable Transaction transaction);
 
   /**
    * Insert a collection of beans. If there is no current transaction one is created and used to
@@ -1218,17 +1223,17 @@ public interface Database {
   /**
    * Insert a collection of beans with an explicit transaction.
    */
-  void insertAll(Collection<?> beans, Transaction transaction);
+  void insertAll(Collection<?> beans, @Nullable Transaction transaction);
 
   /**
    * Execute explicitly passing a transaction.
    */
-  int execute(SqlUpdate updSql, Transaction transaction);
+  int execute(SqlUpdate updSql, @Nullable Transaction transaction);
 
   /**
    * Execute explicitly passing a transaction.
    */
-  int execute(CallableSql callableSql, Transaction transaction);
+  int execute(CallableSql callableSql, @Nullable Transaction transaction);
 
   /**
    * Execute a Runnable in a Transaction with an explicit scope.
@@ -1390,7 +1395,7 @@ public interface Database {
    * @param transaction the transaction the publish process should use (can be null)
    */
   @Nullable
-  <T> T publish(Class<T> beanType, Object id, Transaction transaction);
+  <T> T publish(Class<T> beanType, Object id, @Nullable Transaction transaction);
 
   /**
    * Publish a single bean given its type and id returning the resulting live bean.
@@ -1414,7 +1419,7 @@ public interface Database {
    * @param query       the query used to select the draft beans to publish
    * @param transaction the transaction the publish process should use (can be null)
    */
-  <T> List<T> publish(Query<T> query, Transaction transaction);
+  <T> List<T> publish(Query<T> query, @Nullable Transaction transaction);
 
   /**
    * Publish the beans that match the query returning the resulting published beans.
@@ -1439,7 +1444,7 @@ public interface Database {
    * @param transaction the transaction the restore process should use (can be null)
    */
   @Nullable
-  <T> T draftRestore(Class<T> beanType, Object id, Transaction transaction);
+  <T> T draftRestore(Class<T> beanType, Object id, @Nullable Transaction transaction);
 
   /**
    * Restore the draft bean back to the live state.
@@ -1464,7 +1469,7 @@ public interface Database {
    * @param query       the query used to select the draft beans to restore
    * @param transaction the transaction the restore process should use (can be null)
    */
-  <T> List<T> draftRestore(Query<T> query, Transaction transaction);
+  <T> List<T> draftRestore(Query<T> query, @Nullable Transaction transaction);
 
   /**
    * Restore the draft beans matching the query back to the live state.

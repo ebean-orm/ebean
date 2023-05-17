@@ -2,30 +2,7 @@ package io.ebeaninternal.server.query;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
-import io.ebean.CacheMode;
-import io.ebean.CountDistinctOrder;
-import io.ebean.Database;
-import io.ebean.DtoQuery;
-import io.ebean.Expression;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.FetchConfig;
-import io.ebean.FetchGroup;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.OrderBy;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.ProfileLocation;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.QueryType;
-import io.ebean.RawSql;
-import io.ebean.Transaction;
-import io.ebean.UpdateQuery;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
@@ -331,7 +308,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public int delete(Transaction transaction) {
+  public int delete(@Nullable Transaction transaction) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -341,7 +318,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public int update(Transaction transaction) {
+  public int update(@Nullable Transaction transaction) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 

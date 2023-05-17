@@ -1072,7 +1072,7 @@ public interface Query<T> extends CancelableQuery {
    *
    * @return the number of beans/rows that were deleted.
    */
-  int delete(Transaction transaction);
+  int delete(@Nullable Transaction transaction);
 
   /**
    * Execute the UpdateQuery returning the number of rows updated.
@@ -1086,7 +1086,7 @@ public interface Query<T> extends CancelableQuery {
    *
    * @return the number of beans/rows updated.
    */
-  int update(Transaction transaction);
+  int update(@Nullable Transaction transaction);
 
   /**
    * Return the count of entities this query should return.
