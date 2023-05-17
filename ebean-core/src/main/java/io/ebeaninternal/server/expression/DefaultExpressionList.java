@@ -343,7 +343,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public int delete(Transaction transaction) {
+  public int delete(@Nullable Transaction transaction) {
     return query.delete(transaction);
   }
 
@@ -353,7 +353,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public int update(Transaction transaction) {
+  public int update(@Nullable Transaction transaction) {
     return query.update(transaction);
   }
 

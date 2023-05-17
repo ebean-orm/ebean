@@ -592,11 +592,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> T createEntityBean(Class<T> type) {
-    final BeanDescriptor<T> desc = descriptor(type);
-    if (desc == null) {
-      throw new IllegalArgumentException("No bean type " + type.getName() + " registered");
-    }
-    return desc.createBean();
+    return descriptor(type).createBean();
   }
 
   /**
@@ -636,7 +632,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // we actually need to do a query because we don't know the type without the discriminator
     // value, just select the id property and discriminator column (auto added)
-    return find(type).select(idProp.name()).setId(id).findOne();
+    T bean = find(type).select(idProp.name()).setId(id).findOne();
+    if (bean == null) {
+      throw new NullPointerException("Could not find reference bean " + id + " for " + desc);
+    }
+    return bean;
   }
 
   @Override
@@ -753,7 +753,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void flush() {
-    currentTransaction().flush();
+    Objects.requireNonNull(currentTransaction()," no currentTransaction").flush();
   }
 
   @Override
@@ -826,7 +826,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> T mergeBeans(T bean, T existing, BeanMergeOptions options) {
+  public <T> T mergeBeans(T bean, T existing, @Nullable BeanMergeOptions options) {
     BeanDescriptor<?> desc = desc(bean.getClass());
     return (T) desc.mergeBeans(checkEntityBean(bean), (EntityBean) existing, options);
   }
@@ -1083,7 +1083,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction) {
+  public <T> Optional<T> findOneOrEmpty(Query<T> query, @Nullable Transaction transaction) {
     return Optional.ofNullable(findOne(query, transaction));
   }
 
@@ -1116,7 +1116,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   @SuppressWarnings({"unchecked", "rawtypes"})
-  public <T> Set<T> findSet(Query<T> query, Transaction transaction) {
+  public <T> Set<T> findSet(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest request = buildQueryRequest(Type.SET, query, transaction);
     request.resetBeanCacheAutoMode(false);
     if (request.isQueryCacheActive()) {
@@ -1166,7 +1166,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction) {
+  public <A, T> List<A> findSingleAttributeList(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = buildQueryRequest(Type.ATTRIBUTE, query, transaction);
     request.query().setSingleAttribute();
     request.prepareQuery();
@@ -1184,7 +1184,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A, T> Set<A> findSingleAttributeSet(Query<T> query, Transaction transaction) {
+  public <A, T> Set<A> findSingleAttributeSet(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = buildQueryRequest(Type.ATTRIBUTE_SET, query, transaction);
     request.query().setSingleAttribute();
     request.prepareQuery();
@@ -1230,7 +1230,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> boolean exists(Query<T> ormQuery, Transaction transaction) {
+  public <T> boolean exists(Query<T> ormQuery, @Nullable Transaction transaction) {
     Query<T> ormQueryCopy = ormQuery.copy().setMaxRows(1);
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.EXISTS, ormQueryCopy, transaction);
     List<Object> ids = request.getFromQueryCache();
@@ -1246,13 +1246,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <A, T> List<A> findIds(Query<T> query, Transaction transaction) {
+  public <A, T> List<A> findIds(Query<T> query, @Nullable Transaction transaction) {
     return findIdsWithCopy(((SpiQuery<T>) query).copy(), transaction);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction transaction) {
+  public <A, T> List<A> findIdsWithCopy(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query, transaction);
     Object result = request.getFromQueryCache();
     if (result != null) {
@@ -1271,7 +1271,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> int delete(Query<T> query, Transaction transaction) {
+  public <T> int delete(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.DELETE, query, transaction);
     try {
       request.initTransIfRequired();
@@ -1294,7 +1294,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> int update(Query<T> query, Transaction transaction) {
+  public <T> int update(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.UPDATE, query, transaction);
     try {
       request.initTransIfRequired();
@@ -1306,7 +1306,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction) {
+  public <T> FutureRowCount<T> findFutureCount(Query<T> query, @Nullable Transaction transaction) {
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
     copy.setFutureFetch(true);
     Transaction newTxn = createTransaction();
@@ -1316,7 +1316,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction) {
+  public <T> FutureIds<T> findFutureIds(Query<T> query, @Nullable Transaction transaction) {
     SpiQuery<T> copy = ((SpiQuery<T>) query).copy();
     copy.setFutureFetch(true);
     Transaction newTxn = createTransaction();
@@ -1326,7 +1326,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction) {
+  public <T> FutureList<T> findFutureList(Query<T> query, @Nullable Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query.copy();
     spiQuery.setFutureFetch(true);
     // FutureList query always run in it's own persistence content
@@ -1343,7 +1343,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction) {
+  public <T> PagedList<T> findPagedList(Query<T> query, @Nullable Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     int maxRows = spiQuery.getMaxRows();
     if (maxRows == 0) {
@@ -1356,7 +1356,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction) {
+  public <T> QueryIterator<T> findIterate(Query<T> query, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
     try {
       request.initTransIfRequired();
@@ -1368,7 +1368,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> Stream<T> findStream(Query<T> query, Transaction transaction) {
+  public <T> Stream<T> findStream(Query<T> query, @Nullable Transaction transaction) {
     return toStream(findIterate(query, transaction));
   }
 
@@ -1377,7 +1377,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction) {
+  public <T> void findEach(Query<T> query, Consumer<T> consumer, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
     if (request.isUseDocStore()) {
       docStore().findEach(request, consumer);
@@ -1389,7 +1389,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> void findEach(Query<T> query, int batch, Consumer<List<T>> consumer, Transaction transaction) {
+  public <T> void findEach(Query<T> query, int batch, Consumer<List<T>> consumer, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
 //    if (request.isUseDocStore()) {
 //      docStore().findEach(request, consumer);
@@ -1401,7 +1401,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction) {
+  public <T> void findEachWhile(Query<T> query, Predicate<T> consumer, @Nullable Transaction transaction) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query, transaction);
     if (request.isUseDocStore()) {
       docStore().findEachWhile(request, consumer);
@@ -1424,7 +1424,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> List<T> findList(Query<T> query, Transaction transaction) {
+  public <T> List<T> findList(Query<T> query, @Nullable Transaction transaction) {
     return findList(query, transaction, false);
   }
 
@@ -1457,7 +1457,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Nullable
   @Override
-  public SqlRow findOne(SqlQuery query, Transaction transaction) {
+  public SqlRow findOne(SqlQuery query, @Nullable Transaction transaction) {
     // no findId() method for SqlQuery...
     // a query that is expected to return either 0 or 1 rows
     List<SqlRow> list = findList(query, transaction);
@@ -1465,7 +1465,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void findEach(SqlQuery query, Consumer<SqlRow> consumer, Transaction transaction) {
+  public void findEach(SqlQuery query, Consumer<SqlRow> consumer, @Nullable Transaction transaction) {
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
     try {
       request.initTransIfRequired();
@@ -1476,7 +1476,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void findEachWhile(SqlQuery query, Predicate<SqlRow> consumer, Transaction transaction) {
+  public void findEachWhile(SqlQuery query, Predicate<SqlRow> consumer, @Nullable Transaction transaction) {
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
     try {
       request.initTransIfRequired();
@@ -1487,7 +1487,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public List<SqlRow> findList(SqlQuery query, Transaction transaction) {
+  public List<SqlRow> findList(SqlQuery query, @Nullable Transaction transaction) {
     RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
     try {
       request.initTransIfRequired();
@@ -1757,7 +1757,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public int saveAll(Collection<?> beans, Transaction transaction) throws OptimisticLockException {
+  public int saveAll(Collection<?> beans, @Nullable Transaction transaction) throws OptimisticLockException {
     return saveAllInternal(beans, transaction);
   }
 
@@ -2033,7 +2033,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> BeanDescriptor<T> descriptor(Class<T> beanClass) {
-    return descriptorManager.descriptor(beanClass);
+    BeanDescriptor<T> desc = descriptorManager.descriptor(beanClass);
+    if (desc == null) {
+      throw new IllegalArgumentException("No bean type " + beanClass.getName() + " registered");
+    }
+    return desc;
   }
 
   /**

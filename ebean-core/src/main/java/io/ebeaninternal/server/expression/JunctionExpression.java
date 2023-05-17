@@ -333,7 +333,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public int delete(Transaction transaction) {
+  public int delete(@Nullable Transaction transaction) {
     return exprList.delete(transaction);
   }
 
@@ -343,7 +343,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public int update(Transaction transaction) {
+  public int update(@Nullable Transaction transaction) {
     return exprList.update(transaction);
   }
 

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
@@ -1410,7 +1411,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final int delete(Transaction transaction) {
+  public final int delete(@Nullable Transaction transaction) {
     return server.delete(this, transaction);
   }
 
@@ -1420,7 +1421,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final int update(Transaction transaction) {
+  public final int update(@Nullable Transaction transaction) {
     return server.update(this, transaction);
   }
 
