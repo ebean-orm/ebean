@@ -203,7 +203,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @SuppressWarnings("rawtypes")
   public Collection rawCollection(EntityBean bean) {
-    return help.underlying(value(bean));
+    return help.underlying(getValue(bean));
   }
 
   /**
@@ -211,11 +211,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public void merge(EntityBean bean, EntityBean existing) {
-    Object existingCollection = value(existing);
+    Object existingCollection = getValue(existing);
     if (existingCollection instanceof BeanCollection<?>) {
       BeanCollection<?> toBC = (BeanCollection<?>) existingCollection;
       if (!toBC.isPopulated()) {
-        Object fromCollection = value(bean);
+        Object fromCollection = getValue(bean);
         if (fromCollection instanceof BeanCollection<?>) {
           BeanCollection<?> fromBC = (BeanCollection<?>) fromCollection;
           if (fromBC.isPopulated()) {
