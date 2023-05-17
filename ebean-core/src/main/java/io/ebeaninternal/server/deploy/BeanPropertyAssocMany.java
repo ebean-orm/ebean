@@ -206,7 +206,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @SuppressWarnings("rawtypes")
   public Collection rawCollection(EntityBean bean) {
-    return help.underlying(value(bean));
+    return help.underlying(getValue(bean));
   }
 
   /**
@@ -216,7 +216,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public void merge(EntityBean bean, EntityBean existing, BeanMergeHelp mergeHelp) {
     mergeHelp.pushPath(name);
     Object fromCollection = beanCollection(bean);
-    Object existingCollection = value(existing);
+    Object existingCollection = getValue(existing);
     if (fromCollection instanceof BeanCollection) {
       BeanCollection fromBC = (BeanCollection) fromCollection;
 
