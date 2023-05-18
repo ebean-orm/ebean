@@ -9,10 +9,7 @@ import io.ebean.text.json.JsonContext;
 
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
