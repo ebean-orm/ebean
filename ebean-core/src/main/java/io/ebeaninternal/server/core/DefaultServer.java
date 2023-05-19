@@ -2171,7 +2171,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (idProperty == null) {
       return Collections.emptySet();
     }
-    Object id = idProperty.value(entityBean);
+    Object id = idProperty.getValue(entityBean);
     if (entityBean._ebean_getIntercept().isNew() && id != null) {
       // Primary Key is changeable only on new models - so skip check if we are not new
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
@@ -2199,10 +2199,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     ExpressionList<?> exprList = query.where();
     if (!entityBean._ebean_getIntercept().isNew()) {
       // if model is not new, exclude ourself.
-      exprList.ne(idProperty.name(), idProperty.value(entityBean));
+      exprList.ne(idProperty.name(), idProperty.getValue(entityBean));
     }
-    for (Property prop : props) {
-      Object value = prop.value(entityBean);
+    for (BeanProperty prop : props) {
+      Object value = prop.getValue(entityBean);
       if (value == null) {
         return null;
       }
