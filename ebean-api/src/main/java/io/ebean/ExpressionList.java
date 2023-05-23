@@ -404,6 +404,7 @@ public interface ExpressionList<T> {
    *
    * }</pre>
    */
+  @Nullable
   default <A> A findSingleAttribute() {
     List<A> list = findSingleAttributeList();
     return !list.isEmpty() ? list.get(0) : null;
