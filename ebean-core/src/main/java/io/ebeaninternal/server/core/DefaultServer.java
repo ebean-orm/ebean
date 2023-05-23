@@ -45,6 +45,7 @@ import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
@@ -630,7 +631,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // we actually need to do a query because we don't know the type without the discriminator
     // value, just select the id property and discriminator column (auto added)
-    return find(type).select(idProp.name()).setId(id).findOne();
+    T bean = find(type).select(idProp.name()).setId(id).findOne();
+    if (bean == null) {
+      throw new EntityNotFoundException("Could not find reference bean " + id + " for " + desc);
+    }
+    return bean;
   }
 
   @Override
