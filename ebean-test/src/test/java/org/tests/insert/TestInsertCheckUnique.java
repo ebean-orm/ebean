@@ -104,7 +104,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
         });
 
         System.out.println("uniqueProperties > " + uniqueProperties);
-        System.out.println("      custom msg > " + msg.toString());
+        System.out.println("      custom msg > " + msg);
 
       }
 

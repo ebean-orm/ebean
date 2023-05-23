@@ -170,20 +170,20 @@ public class TestCustomerFinder extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    // change default collect query plan threshold to 200 micros
+    // change default collect query plan threshold to 20 micros
     QueryPlanInit init0 = new QueryPlanInit();
     init0.setAll(true);
-    init0.thresholdMicros(2);
+    init0.thresholdMicros(20);
     final List<MetaQueryPlan> plans = server().metaInfo().queryPlanInit(init0);
     assertThat(plans.size()).isGreaterThan(1);
 
     // the server has some plans
     runQueries();
 
-    // change query plan threshold to 100 micros
+    // change query plan threshold to 10 micros
     QueryPlanInit init = new QueryPlanInit();
     init.setAll(true);
-    init.thresholdMicros(1);
+    init.thresholdMicros(10);
     final List<MetaQueryPlan> appliedToPlans = server().metaInfo().queryPlanInit(init);
     assertThat(appliedToPlans.size()).isGreaterThan(4);
 
@@ -212,9 +212,9 @@ public class TestCustomerFinder extends BaseTestCase {
     List<MetaQueryPlan> plans0 = server().metaInfo().queryPlanCollectNow(request);
     assertThat(plans0).isNotEmpty();
 
-    for (MetaQueryPlan plan : plans) {
-      logger.info("queryPlan label:{}, queryTimeMicros:{} loc:{} sql:{} bind:{} plan:{}",
-        plan.label(), plan.queryTimeMicros(), plan.profileLocation(),
+    for (MetaQueryPlan plan : plans0) {
+      logger.info("queryPlan label:{}, queryTimeMicros:{} captureMicros:{} whenCaptured:{} captureCount:{} loc:{} sql:{} bind:{} plan:{}",
+        plan.label(), plan.queryTimeMicros(), plan.captureMicros(), plan.whenCaptured(), plan.captureCount(), plan.profileLocation(),
         plan.sql(), plan.bind(), plan.plan());
       System.out.println(plan);
     }

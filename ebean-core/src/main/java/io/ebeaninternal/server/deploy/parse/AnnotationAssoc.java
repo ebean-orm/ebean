@@ -23,7 +23,7 @@ abstract class AnnotationAssoc extends AnnotationParser {
   void setBeanTable(DeployBeanPropertyAssoc<?> prop) {
     BeanTable assoc = getBeanTable(prop);
     if (assoc == null) {
-      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(prop.getTargetType(), prop.getFullBeanName()));
+      throw new BeanNotRegisteredException(errorMsgMissingBeanTable(prop.getTargetType(), prop.toString()));
     }
     prop.setBeanTable(assoc);
   }

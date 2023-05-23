@@ -22,3 +22,4 @@ find . -type f -name '*.kt' -exec sed -i '' -e 's|jakarta\.persistence\.|javax\.
 find . -type f -name '*.java' -exec sed -i '' -e 's|jakarta\.xml\.bind|javax\.xml\.bind|g' {} +
 find . -type f -name '*.kt' -exec sed -i '' -e 's|jakarta\.xml\.bind|javax\.xml\.bind|g' {} +
 
+find . -type f -name '*.java' -exec sed -i '' -e 's|jakarta\.transaction\.|javax\.transaction\.|g' {} +

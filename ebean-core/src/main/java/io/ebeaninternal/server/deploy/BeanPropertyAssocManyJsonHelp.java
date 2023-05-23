@@ -51,7 +51,7 @@ class BeanPropertyAssocManyJsonHelp {
       throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start array or object");
     }
     if (readJson.update()) {
-      many.setValueIntercept(parentBean, many.jsonReadCollection(readJson, parentBean, many.value(parentBean)));
+      many.setValueIntercept(parentBean, many.jsonReadCollection(readJson, parentBean, many.getValue(parentBean)));
     } else {
       many.setValue(parentBean, many.jsonReadCollection(readJson, parentBean, null));
     }
