@@ -242,7 +242,7 @@ public interface ExpressionList<T> {
    *
    * @return the number of rows that were deleted.
    */
-  int delete(@Nullable Transaction transaction);
+  int delete(Transaction transaction);
 
   /**
    * Execute as a update query.
@@ -258,7 +258,7 @@ public interface ExpressionList<T> {
    * @return the number of rows that were updated.
    * @see UpdateQuery
    */
-  int update(@Nullable Transaction transaction);
+  int update(Transaction transaction);
 
   /**
    * Execute the query returning true if a row is found.
@@ -404,7 +404,6 @@ public interface ExpressionList<T> {
    *
    * }</pre>
    */
-  @Nullable
   default <A> A findSingleAttribute() {
     List<A> list = findSingleAttributeList();
     return !list.isEmpty() ? list.get(0) : null;
