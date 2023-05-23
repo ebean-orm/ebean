@@ -126,13 +126,13 @@ public final class DB {
    * Return the next identity value for a given bean type.
    * <p>
    * This will only work when a IdGenerator is on this bean type such as a DB
-   * sequence or UUID. Otherwise, <code>null</code> is returned.
+   * sequence or UUID. (Otherwise <code>null</code> is returned. However, this
+   * method declared as <code>NonNull</code>, as this is the default use case)
    * <p>
    * For DB's supporting getGeneratedKeys and sequences such as Oracle10 you do
    * not need to use this method generally. It is made available for more
    * complex cases where it is useful to get an ID prior to some processing.
    */
-  @Nullable
   public static Object nextId(Class<?> beanType) {
     return getDefault().nextId(beanType);
   }
@@ -312,7 +312,7 @@ public final class DB {
    * Mark the current transaction as rollback only.
    */
   public static void setRollbackOnly() {
-    Objects.requireNonNull(currentTransaction(),"no currentTransaction").setRollbackOnly();
+    Objects.requireNonNull(currentTransaction(), "no currentTransaction").setRollbackOnly();
   }
 
   /**

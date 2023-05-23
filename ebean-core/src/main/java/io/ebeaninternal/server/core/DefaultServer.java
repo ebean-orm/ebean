@@ -586,7 +586,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> T createEntityBean(Class<T> type) {
-    return descriptor(type).createBean();
+    final BeanDescriptor<T> desc = descriptor(type);
+    if (desc == null) {
+      throw new IllegalArgumentException("No bean type " + type.getName() + " registered");
+    }
+    return desc.createBean();
   }
 
   /**
@@ -626,11 +630,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // we actually need to do a query because we don't know the type without the discriminator
     // value, just select the id property and discriminator column (auto added)
-    T bean = find(type).select(idProp.name()).setId(id).findOne();
-    if (bean == null) {
-      throw new NullPointerException("Could not find reference bean " + id + " for " + desc);
-    }
-    return bean;
+    return find(type).select(idProp.name()).setId(id).findOne();
   }
 
   @Override
@@ -747,7 +747,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public void flush() {
-    Objects.requireNonNull(currentTransaction()," no currentTransaction").flush();
+    currentTransaction().flush();
   }
 
   @Override
@@ -1991,11 +1991,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> BeanDescriptor<T> descriptor(Class<T> beanClass) {
-    BeanDescriptor<T> desc = descriptorManager.descriptor(beanClass);
-    if (desc == null) {
-      throw new IllegalArgumentException("No bean type " + beanClass.getName() + " registered");
-    }
-    return desc;
+    return descriptorManager.descriptor(beanClass);
   }
 
   /**

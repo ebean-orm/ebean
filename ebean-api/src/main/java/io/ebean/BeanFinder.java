@@ -2,7 +2,6 @@ package io.ebean;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -64,7 +63,6 @@ public abstract class BeanFinder<I,T> {
   /**
    * Return the current transaction.
    */
-  @Nullable
   public Transaction currentTransaction() {
     return db().currentTransaction();
   }

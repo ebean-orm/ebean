@@ -120,7 +120,6 @@ public interface Database {
   /**
    * Return the associated read only DataSource for this Database instance (can be null).
    */
-  @Nullable
   DataSource readOnlyDataSource();
 
   /**
@@ -343,16 +342,16 @@ public interface Database {
   <T> Query<T> findNative(Class<T> beanType, String nativeSql);
 
   /**
-   * Return the next unique identity value for a given bean type.
+   * Return the next identity value for a given bean type.
    * <p>
-   * This will only work when a IdGenerator is on the bean such as for beans
-   * that use a DB sequence or UUID. Otherwise, <code>null</code> is returned.
+   * This will only work when a IdGenerator is on this bean type such as a DB
+   * sequence or UUID. (Otherwise <code>null</code> is returned. However, this
+   * method declared as <code>NonNull</code>, as this is the default use case)
    * <p>
    * For DB's supporting getGeneratedKeys and sequences such as Oracle10 you do
    * not need to use this method generally. It is made available for more
    * complex cases where it is useful to get an ID prior to some processing.
    */
-  @Nullable
   Object nextId(Class<?> beanType);
 
   /**
@@ -640,7 +639,6 @@ public interface Database {
   /**
    * Returns the current transaction or null if there is no current transaction in scope.
    */
-  @Nullable
   Transaction currentTransaction();
 
   /**

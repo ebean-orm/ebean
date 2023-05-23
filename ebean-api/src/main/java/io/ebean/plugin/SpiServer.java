@@ -1,5 +1,7 @@
 package io.ebean.plugin;
 
+import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.Database;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
@@ -11,6 +13,7 @@ import java.util.List;
 /**
  * Extensions to Database API made available to plugins.
  */
+@NonNullApi
 public interface SpiServer extends Database {
 
   /**
@@ -31,11 +34,13 @@ public interface SpiServer extends Database {
   /**
    * Return the bean type for a given entity bean class.
    */
+  @Nullable
   <T> BeanType<T> beanType(Class<T> beanClass);
 
   /**
    * Return the bean types mapped to the given base table.
    */
+  @Nullable
   List<? extends BeanType<?>> beanTypes(String baseTableName);
 
   /**
