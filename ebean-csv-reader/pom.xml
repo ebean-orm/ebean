@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.17.3-FOC10</version>
+    <version>13.17.3-FOC11-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-csv-reader</artifactId>
@@ -14,21 +14,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.17.3-FOC10</version>
+      <version>13.17.3-FOC11-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.17.3-FOC10</version>
+      <version>13.17.3-FOC11-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.17.3-FOC10</version>
+      <version>13.17.3-FOC11-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
