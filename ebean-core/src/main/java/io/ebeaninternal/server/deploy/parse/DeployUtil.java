@@ -106,7 +106,7 @@ public final class DeployUtil {
       prop.setScalarType(scalarType);
       prop.setDbType(scalarType.jdbcType());
     } catch (IllegalStateException e) {
-      throw new PersistenceException("Error mapping property " + prop.getFullBeanName() + " - " + e.getMessage());
+      throw new PersistenceException("Error mapping property " + prop + " - " + e.getMessage());
     }
   }
 
@@ -141,7 +141,7 @@ public final class DeployUtil {
       if (scalarType != null || property.isTransient()) {
         return scalarType;
       }
-      throw new PersistenceException(property.getFullBeanName() + " has no ScalarType - type " + propType.getName());
+      throw new PersistenceException(property + " has no ScalarType - type " + propType.getName());
     } catch (IllegalArgumentException e) {
       if (property.isTransient()) {
         // expected for transient properties with unknown/non-mapped types
@@ -179,7 +179,7 @@ public final class DeployUtil {
     Class<?> type = prop.getPropertyType();
     ScalarType<?> scalarType = typeManager.dbArrayType(type, prop.getGenericType(), prop.isNullable());
     if (scalarType == null) {
-      throw new RuntimeException("No ScalarType for @DbArray type for " + prop.getFullBeanName());
+      throw new RuntimeException("No ScalarType for @DbArray type for " + prop);
     }
     int dbType = scalarType.jdbcType();
     prop.setDbType(dbType);
