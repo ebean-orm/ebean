@@ -399,6 +399,11 @@ class Config {
   }
 
   private void setDockerOptionalParameters() {
+    String mirror = properties.getProperty("ebean.test.containers.mirror");
+    if (mirror != null) {
+      // use a image mirror (when not running locally, i.e. CI)
+      dockerProperties.setProperty("ebean.test.containers.mirror", mirror);
+    }
     // check for shutdown mode on all containers
     String mode = properties.getProperty("ebean.test.shutdownMode");
     if (mode != null) {

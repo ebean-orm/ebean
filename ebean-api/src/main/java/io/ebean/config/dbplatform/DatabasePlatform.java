@@ -673,7 +673,7 @@ public class DatabasePlatform {
 
   protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
     // silently assume the database does not support the "for update" clause.
-    log.log(INFO, "it seems your database does not support the 'for update' clause");
+    log.log(INFO, "it seems your database does not support the ''for update'' clause");
     return sql;
   }
 

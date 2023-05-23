@@ -539,7 +539,7 @@ public final class DefaultTypeManager implements TypeManager {
     ScalarTypeEnum<?> scalarEnum = (ScalarTypeEnum<?>) scalarType;
     if (scalarEnum != null && !scalarEnum.isOverrideBy(type)) {
       if (type != null && !scalarEnum.isCompatible(type)) {
-        throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 different modes when only one is supported (ORDINAL, STRING or an Ebean mapping)");
+        throw new IllegalStateException("Error mapping Enum type:" + enumType + " It is mapped using 2 of (ORDINAL, STRING or an Ebean mapping) when only one is supported.");
       }
       return scalarEnum;
     }
