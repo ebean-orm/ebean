@@ -1,9 +1,6 @@
 package io.ebeaninternal.server.dto;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Holds property and constructor meta-data for a given DTO bean type.
@@ -18,7 +15,7 @@ final class DtoMeta {
   private final DtoMetaConstructor defaultConstructor;
   private final DtoMetaConstructor maxArgConstructor;
 
-  DtoMeta(Class<?> dtoType, List<DtoMetaConstructor> constructors, List<DtoMetaProperty> properties) {
+  DtoMeta(Class<?> dtoType, Collection<DtoMetaConstructor> constructors, List<DtoMetaProperty> properties) {
     this.dtoType = dtoType;
     for (DtoMetaProperty property : properties) {
       propMap.put(property.getName().toUpperCase(), property);
@@ -27,7 +24,7 @@ final class DtoMeta {
     DtoMetaConstructor defaultConstructor = null;
     DtoMetaConstructor maxArgConstructor = null;
     for (DtoMetaConstructor constructor : constructors) {
-      int args = constructor.getArgCount();
+      int args = constructor.argCount();
       constructorMap.put(args, constructor);
       if (args == 0) {
         defaultConstructor = constructor;
@@ -47,7 +44,7 @@ final class DtoMeta {
     if (constructor != null) {
       return new DtoQueryPlanConstructor(request, constructor);
     }
-    if (maxArgConstructor != null && colLen > maxArgConstructor.getArgCount()) {
+    if (maxArgConstructor != null && colLen > maxArgConstructor.argCount()) {
       // maxArgConst + setters
       return matchMaxArgPlusSetters(request);
     }
@@ -61,7 +58,7 @@ final class DtoMeta {
   }
 
   private DtoQueryPlanConPlus matchMaxArgPlusSetters(DtoMappingRequest request) {
-    DtoReadSet[] setterProps = request.mapArgPlusSetters(this, maxArgConstructor.getArgCount());
+    DtoReadSet[] setterProps = request.mapArgPlusSetters(this, maxArgConstructor.argCount());
     return new DtoQueryPlanConPlus(request, maxArgConstructor, setterProps);
   }
 
