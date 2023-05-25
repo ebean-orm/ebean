@@ -9,6 +9,7 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.toList;
 
@@ -16,6 +17,8 @@ import static java.util.stream.Collectors.toList;
  * Postgres specific DDL.
  */
 public class PostgresDdl extends PlatformDdl {
+
+  private static final Pattern PLAIN_VARCHAR = Pattern.compile("(varchar\\()(\\d+)(\\))");
 
   private static final String dropIndexConcurrentlyIfExists = "drop index concurrently if exists ";
 
@@ -74,9 +77,20 @@ public class PostgresDdl extends PlatformDdl {
   @Override
   protected void alterColumnType(DdlWrite writer, AlterColumn alter) {
     String type = convert(alter.getType());
-    alterTable(writer, alter.getTableName()).append(alterColumn, alter.getColumnName())
-      .append(columnSetType).append(type)
-      .append(" using ").append(alter.getColumnName()).append("::").append(type);
+    var alterTable = alterTable(writer, alter.getTableName())
+      .append(alterColumn, alter.getColumnName())
+      .append(columnSetType).append(type);
+    if (useCast(type, alter.getCurrentType())) {
+      alterTable.append(" using ").append(alter.getColumnName()).append("::").append(type);
+    }
+  }
+
+  static boolean useCast(String newType, String currentType) {
+    return currentType == null || !isPlainVarchar(newType) || !isPlainVarchar(currentType);
+  }
+
+  static boolean isPlainVarchar(String type) {
+    return PLAIN_VARCHAR.matcher(type).matches();
   }
 
   @Override

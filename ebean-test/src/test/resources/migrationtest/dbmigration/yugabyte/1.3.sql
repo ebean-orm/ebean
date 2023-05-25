@@ -68,7 +68,7 @@ update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 -- apply alter tables
 alter table migtest_e_basic alter column status drop default;
 alter table migtest_e_basic alter column status drop not null;
-alter table migtest_e_basic alter column status2 type varchar(1) using status2::varchar(1);
+alter table migtest_e_basic alter column status2 type varchar(1);
 alter table migtest_e_basic alter column status2 set default 'N';
 alter table migtest_e_basic alter column status2 set not null;
 alter table migtest_e_basic alter column a_lob type varchar(255) using a_lob::varchar(255);

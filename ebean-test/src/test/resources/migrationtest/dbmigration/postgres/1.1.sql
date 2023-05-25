@@ -86,7 +86,7 @@ alter table migtest_ckey_detail add column if not exists two_key varchar(127);
 alter table migtest_ckey_parent add column if not exists assoc_id integer;
 alter table migtest_e_basic alter column status set default 'A';
 alter table migtest_e_basic alter column status set not null;
-alter table migtest_e_basic alter column status2 type varchar(127) using status2::varchar(127);
+alter table migtest_e_basic alter column status2 type varchar(127);
 alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 alter table migtest_e_basic alter column a_lob drop default;
