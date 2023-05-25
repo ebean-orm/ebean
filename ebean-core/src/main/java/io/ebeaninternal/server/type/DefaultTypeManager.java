@@ -17,6 +17,7 @@ import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.GeoTypeProvider;
 import io.ebeaninternal.server.core.ServiceUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployProperty;
 
 import javax.persistence.AttributeConverter;
@@ -404,7 +405,11 @@ public final class DefaultTypeManager implements TypeManager {
     if (MutationDetection.DEFAULT == prop.getMutationDetection()) {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
-    var req = new ScalarJsonRequest(jsonManager, dbType, docType, prop.getOwnerType(), prop.getMutationDetection(), prop.getName());
+    Class<?> type = prop.getOwnerType();
+    if (prop instanceof DeployBeanProperty) {
+      type = ((DeployBeanProperty) prop).getField().getDeclaringClass();
+    }
+    var req = new ScalarJsonRequest(jsonManager, dbType, docType, type, prop.getMutationDetection(), prop.getName());
     return jsonMapper.createType(req);
   }
 
