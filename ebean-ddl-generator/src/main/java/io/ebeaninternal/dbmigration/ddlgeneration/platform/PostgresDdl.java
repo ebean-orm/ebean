@@ -9,7 +9,6 @@ import io.ebeaninternal.dbmigration.migration.Column;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -31,6 +30,7 @@ public class PostgresDdl extends PlatformDdl {
     this.columnSetNull = "drop not null";
     this.addForeignKeySkipCheck = " not valid";
     this.indexConcurrent = "concurrently ";
+    this.addColumn = "add column if not exists";
   }
 
   @Override
