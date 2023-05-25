@@ -33,6 +33,7 @@ public class PostgresDdl extends PlatformDdl {
     this.columnSetNull = "drop not null";
     this.addForeignKeySkipCheck = " not valid";
     this.indexConcurrent = "concurrently ";
+    this.addColumn = "add column if not exists";
   }
 
   @Override

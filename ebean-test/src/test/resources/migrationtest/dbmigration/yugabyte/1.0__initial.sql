@@ -210,12 +210,12 @@ create table migtest_oto_master (
 );
 
 -- apply alter tables
-alter table "table" add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history2 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history3 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history4 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history5 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history6 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table "table" add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history2 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history3 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history4 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history5 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history6 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
 -- apply post alter
 create table migtest_e_history2_history(
   id                            integer,
