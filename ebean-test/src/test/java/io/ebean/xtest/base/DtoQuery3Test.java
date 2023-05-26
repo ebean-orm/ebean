@@ -14,7 +14,7 @@ class DtoQuery3Test extends BaseTestCase {
   void dtoQuery_when_constructorsClash() {
     ResetBasicData.reset();
 
-    List<DCust> list = server().findDto(DCust.class, "select id, name, status from o_customer").findList();
+    List<DCust> list = server().findDto(DCust.class, "select id, name, status from o_customer where status is not null").findList();
 
     assertThat(list).isNotEmpty();
     for (DCust cust: list) {

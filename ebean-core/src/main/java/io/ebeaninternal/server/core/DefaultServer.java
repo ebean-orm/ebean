@@ -51,8 +51,8 @@ import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Clock;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -560,9 +560,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private void executeSql(Connection connection, @Nullable String sql) throws SQLException {
     if (sql != null) {
-      try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+      try (Statement stmt = connection.createStatement()) {
         transactionManager.log().sql().debug(sql);
-        stmt.execute();
+        stmt.execute(sql);
       }
     }
   }
