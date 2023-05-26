@@ -28,13 +28,11 @@ public final class DtoBeanManager {
    * Return the descriptor for the given DTO bean class.
    */
   @SuppressWarnings("unchecked")
-  public <T> DtoBeanDescriptor<T> getDescriptor(Class<T> dtoType) {
-
+  public <T> DtoBeanDescriptor<T> descriptor(Class<T> dtoType) {
     return descriptorMap.computeIfAbsent(dtoType, this::createDescriptor);
   }
 
   private <T> DtoBeanDescriptor createDescriptor(Class<T> dtoType) {
-
     try {
       DtoMeta meta = new DtoMetaBuilder(dtoType, typeManager).build();
       return new DtoBeanDescriptor<>(dtoType, meta, namedQueries(dtoType));

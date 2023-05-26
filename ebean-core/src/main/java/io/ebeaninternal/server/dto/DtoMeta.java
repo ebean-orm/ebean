@@ -18,7 +18,7 @@ final class DtoMeta {
   DtoMeta(Class<?> dtoType, Collection<DtoMetaConstructor> constructors, List<DtoMetaProperty> properties) {
     this.dtoType = dtoType;
     for (DtoMetaProperty property : properties) {
-      propMap.put(property.getName().toUpperCase(), property);
+      propMap.put(property.name().toUpperCase(), property);
     }
     int maxArg = 0;
     DtoMetaConstructor defaultConstructor = null;
@@ -38,7 +38,7 @@ final class DtoMeta {
   }
 
   public DtoQueryPlan match(DtoMappingRequest request) {
-    DtoColumn[] cols = request.getColumnMeta();
+    DtoColumn[] cols = request.columnMeta();
     int colLen = cols.length;
     DtoMetaConstructor constructor = constructorMap.get(colLen);
     if (constructor != null) {

@@ -882,13 +882,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> DtoQuery<T> findDto(Class<T> dtoType, String sql) {
-    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, sql.trim());
   }
 
   @Override
   public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
-    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
     String sql = descriptor.getNamedRawSql(namedQuery);
     if (sql == null) {
       throw new PersistenceException("No named query called " + namedQuery + " for bean:" + dtoType.getName());
@@ -898,7 +898,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> DtoQuery<T> findDto(Class<T> dtoType, SpiQuery<?> ormQuery) {
-    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, ormQuery);
   }
 
