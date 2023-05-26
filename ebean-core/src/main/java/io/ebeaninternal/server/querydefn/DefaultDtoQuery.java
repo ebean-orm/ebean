@@ -69,7 +69,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Override
   public DtoQueryPlan getQueryPlan(Object planKey) {
-    return descriptor.getQueryPlan(planKey);
+    return descriptor.queryPlan(planKey);
   }
 
   @Override
@@ -206,7 +206,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Override
   public Class<T> getType() {
-    return descriptor.getType();
+    return descriptor.type();
   }
 
   @Override
