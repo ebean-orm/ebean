@@ -49,11 +49,11 @@
     <ebean-annotation.version>8.3</ebean-annotation.version>
     <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
-    <ebean-migration.version>13.8.0</ebean-migration.version>
+    <ebean-migration.version>13.9.0</ebean-migration.version>
     <ebean-test-containers.version>6.7</ebean-test-containers.version>
     <ebean-datasource.version>8.5</ebean-datasource.version>
-    <ebean-agent.version>13.17.3</ebean-agent.version>
-    <ebean-maven-plugin.version>13.17.3</ebean-maven-plugin.version>
+    <ebean-agent.version>13.18.0</ebean-agent.version>
+    <ebean-maven-plugin.version>13.18.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
