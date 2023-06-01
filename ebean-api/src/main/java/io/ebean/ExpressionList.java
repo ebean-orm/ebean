@@ -96,12 +96,6 @@ public interface ExpressionList<T> {
   OrderBy<T> orderBy();
 
   /**
-   * Deprecated migrate to {@link #orderBy(String)}
-   */
-  @Deprecated
-  Query<T> setOrderBy(String orderBy);
-
-  /**
    * Apply the path properties to the query replacing the select and fetch clauses.
    */
   Query<T> apply(FetchPath fetchPath);
