@@ -101,14 +101,6 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
   }
 
   /**
-   * Deprecated in favor of fetch().
-   */
-  @Deprecated
-  public final R fetchAll() {
-    return fetch();
-  }
-
-  /**
    * Eagerly fetch this association loading the specified properties.
    */
   @SafeVarargs @SuppressWarnings("varargs")
