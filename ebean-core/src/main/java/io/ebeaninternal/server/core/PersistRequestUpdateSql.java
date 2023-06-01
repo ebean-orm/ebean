@@ -65,7 +65,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    * Add this request to BatchControl to flush later.
    */
   public void addToFlushQueue(int pos) {
-    BatchControl control = transaction.getBatchControl();
+    BatchControl control = transaction.batchControl();
     if (control == null) {
       control = persistExecute.createBatchControl(transaction);
     }
@@ -167,13 +167,13 @@ public final class PersistRequestUpdateSql extends PersistRequest {
       // this is used to invalidate cached objects etc
       switch (sqlType) {
         case SQL_INSERT:
-          transaction.getEvent().add(tableName, true, false, false);
+          transaction.event().add(tableName, true, false, false);
           break;
         case SQL_UPDATE:
-          transaction.getEvent().add(tableName, false, true, false);
+          transaction.event().add(tableName, false, true, false);
           break;
         case SQL_DELETE:
-          transaction.getEvent().add(tableName, false, false, true);
+          transaction.event().add(tableName, false, false, true);
           break;
         case SQL_UNKNOWN:
           transaction.markNotQueryOnly();

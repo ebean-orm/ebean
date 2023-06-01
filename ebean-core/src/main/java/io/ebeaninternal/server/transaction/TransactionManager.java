@@ -334,7 +334,7 @@ public class TransactionManager implements SpiTransactionManager {
   public final void externalModification(TransactionEventTable tableEvent) {
     SpiTransaction t = active();
     if (t != null) {
-      t.getEvent().add(tableEvent);
+      t.event().add(tableEvent);
     } else {
       externalModificationEvent(tableEvent);
     }

@@ -40,14 +40,14 @@ public final class BeanCacheResult<T> {
     /**
      * Return the natural key or id value.
      */
-    public Object getKey() {
+    public Object key() {
       return key;
     }
 
     /**
      * Return the bean.
      */
-    public T getBean() {
+    public T bean() {
       return bean;
     }
   }

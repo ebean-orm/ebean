@@ -29,7 +29,7 @@ public final class SpiExpressionValidation {
   /**
    * Return the set of properties considered as having unknown paths.
    */
-  public Set<String> getUnknownProperties() {
+  public Set<String> unknownProperties() {
     return unknown;
   }
 

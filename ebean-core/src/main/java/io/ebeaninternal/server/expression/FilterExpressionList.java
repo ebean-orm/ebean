@@ -21,7 +21,7 @@ public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
   private String orderByClause;
 
   public FilterExpressionList(FilterExprPath pathPrefix, FilterExpressionList<T> original) {
-    super(null, original.expr, null, original.getUnderlyingList());
+    super(null, original.expr, null, original.underlyingList());
     this.pathPrefix = pathPrefix;
     this.rootQuery = original.rootQuery;
   }

@@ -25,7 +25,7 @@ public class PrepareDocNestedTest extends BaseTest {
     DefaultExpressionList<?> exp = (DefaultExpressionList<?>) where;
     PrepareDocNested.prepare(exp, getBeanDescriptor(Order.class));
 
-    List<SpiExpression> underlyingList = exp.getUnderlyingList();
+    List<SpiExpression> underlyingList = exp.underlyingList();
     assertEquals(underlyingList.size(), 1);
     assertEquals(exp.allDocNestedPath, "details");
   }
@@ -43,7 +43,7 @@ public class PrepareDocNestedTest extends BaseTest {
     DefaultExpressionList<?> exp = (DefaultExpressionList<?>) where;
     PrepareDocNested.prepare(exp, getBeanDescriptor(Order.class));
 
-    List<SpiExpression> underlyingList = exp.getUnderlyingList();
+    List<SpiExpression> underlyingList = exp.underlyingList();
     assertEquals(underlyingList.size(), 2);
     assertEquals(exp.allDocNestedPath, "details");
   }
@@ -62,7 +62,7 @@ public class PrepareDocNestedTest extends BaseTest {
     DefaultExpressionList<?> exp = (DefaultExpressionList<?>) where;
     PrepareDocNested.prepare(exp, getBeanDescriptor(Order.class));
 
-    List<SpiExpression> underlyingList = exp.getUnderlyingList();
+    List<SpiExpression> underlyingList = exp.underlyingList();
     assertEquals(underlyingList.size(), 2);
     assertNull(exp.allDocNestedPath);
 
@@ -84,12 +84,12 @@ public class PrepareDocNestedTest extends BaseTest {
     DefaultExpressionList<?> exp = (DefaultExpressionList<?>) where;
     PrepareDocNested.prepare(exp, getBeanDescriptor(Order.class));
 
-    List<SpiExpression> underlyingList = exp.getUnderlyingList();
+    List<SpiExpression> underlyingList = exp.underlyingList();
     assertEquals(underlyingList.size(), 1);
     assertNull(exp.allDocNestedPath);
 
     JunctionExpression<?> junction = (JunctionExpression<?>) underlyingList.get(0);
-    List<SpiExpression> junctionUnderlying = junction.exprList.getUnderlyingList();
+    List<SpiExpression> junctionUnderlying = junction.exprList.underlyingList();
     JunctionExpression<?> nestedNestedPath = (JunctionExpression<?>) junctionUnderlying.get(1);
     assertEquals(nestedNestedPath.exprList.allDocNestedPath, "details");
   }
@@ -107,7 +107,7 @@ public class PrepareDocNestedTest extends BaseTest {
     DefaultExpressionList<?> exp = (DefaultExpressionList<?>) where;
     PrepareDocNested.prepare(exp, getBeanDescriptor(Order.class));
 
-    List<SpiExpression> underlyingList = exp.getUnderlyingList();
+    List<SpiExpression> underlyingList = exp.underlyingList();
     assertEquals(underlyingList.size(), 2);
     assertNull(exp.allDocNestedPath);
 
@@ -135,7 +135,7 @@ public class PrepareDocNestedTest extends BaseTest {
     DefaultExpressionList<?> exp = (DefaultExpressionList<?>) where;
     PrepareDocNested.prepare(exp, getBeanDescriptor(Order.class));
 
-    List<SpiExpression> underlyingList = exp.getUnderlyingList();
+    List<SpiExpression> underlyingList = exp.underlyingList();
     assertEquals(underlyingList.size(), 5);
     assertNull(exp.allDocNestedPath);
 

@@ -89,7 +89,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     SpiTransaction currentEbeanTransaction = scope.inScope();
     if (currentEbeanTransaction != null) {
       // NOT expecting this so log WARNING
-      log.log(WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.getId());
+      log.log(WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.id());
       return currentEbeanTransaction;
     }
 
@@ -182,25 +182,25 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     public void afterCompletion(int status) {
       switch (status) {
         case Status.STATUS_COMMITTED:
-          log.log(DEBUG, "Jta Txn [{0}] committed", transaction.getId());
+          log.log(DEBUG, "Jta Txn [{0}] committed", transaction.id());
           transaction.postCommit();
           // Remove this transaction object as it is completed
           transactionManager.scope().clearExternal();
           break;
 
         case Status.STATUS_ROLLEDBACK:
-          log.log(DEBUG, "Jta Txn [{0}] rollback", transaction.getId());
+          log.log(DEBUG, "Jta Txn [{0}] rollback", transaction.id());
           transaction.postRollback(null);
           // Remove this transaction object as it is completed
           transactionManager.scope().clearExternal();
           break;
 
         default:
-          log.log(DEBUG, "Jta Txn [{0}] status:{1}", transaction.getId(), status);
+          log.log(DEBUG, "Jta Txn [{0}] status:{1}", transaction.id(), status);
       }
 
       // No matter the completion status of the transaction, we release the connection we got from the pool.
-      JdbcClose.close(transaction.getInternalConnection());
+      JdbcClose.close(transaction.internalConnection());
     }
   }
 

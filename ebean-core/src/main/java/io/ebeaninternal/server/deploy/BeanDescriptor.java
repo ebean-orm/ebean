@@ -1618,7 +1618,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the many property included in the query or null if one is not.
    */
   public BeanPropertyAssocMany<?> manyProperty(SpiQuery<?> query) {
-    OrmQueryDetail detail = query.getDetail();
+    OrmQueryDetail detail = query.detail();
     for (BeanPropertyAssocMany<?> many : propertiesMany) {
       if (detail.includesPath(many.name())) {
         return many;

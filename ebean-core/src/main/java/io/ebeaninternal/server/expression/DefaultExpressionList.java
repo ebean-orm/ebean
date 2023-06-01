@@ -558,12 +558,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> addAll(ExpressionList<T> exprList) {
     SpiExpressionList<T> spiList = (SpiExpressionList<T>) exprList;
-    list.addAll(spiList.getUnderlyingList());
+    list.addAll(spiList.underlyingList());
     return this;
   }
 
   @Override
-  public List<SpiExpression> getUnderlyingList() {
+  public List<SpiExpression> underlyingList() {
     return list;
   }
 

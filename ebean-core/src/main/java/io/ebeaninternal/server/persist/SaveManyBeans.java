@@ -179,7 +179,7 @@ final class SaveManyBeans extends SaveManyBase {
           if (hasOrderColumn && !clearedParent) {
             // Clear the parent bean from the PersistenceContext (L1 cache), because the order of referenced beans might have changed
             final BeanDescriptor<?> beanDescriptor = many.descriptor();
-            beanDescriptor.contextClear(transaction.getPersistenceContext(), beanDescriptor.getId(parentBean));
+            beanDescriptor.contextClear(transaction.persistenceContext(), beanDescriptor.getId(parentBean));
             clearedParent = true;
           }
         }

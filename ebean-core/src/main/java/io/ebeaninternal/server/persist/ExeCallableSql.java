@@ -60,7 +60,7 @@ final class ExeCallableSql {
     SpiTransaction t = request.transaction();
 
     String sql = callableSql.getSql();
-    BindParams bindParams = callableSql.getBindParams();
+    BindParams bindParams = callableSql.bindParams();
 
     // process named parameters if required
     sql = BindParamsParser.parse(bindParams, sql);
@@ -80,7 +80,7 @@ final class ExeCallableSql {
     }
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, cstmt, t.getInternalConnection());
+      bindLog = binder.bind(bindParams, cstmt, t.internalConnection());
     }
     request.setBindLog(bindLog);
     // required to read OUT params later
