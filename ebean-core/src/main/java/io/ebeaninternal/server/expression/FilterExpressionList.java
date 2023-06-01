@@ -131,18 +131,12 @@ public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
-  public OrderBy<T> order() {
-    return rootQuery.order();
+  public OrderBy<T> orderBy() {
+    return rootQuery.orderBy();
   }
 
   @Override
   public ExpressionList<T> orderBy(String orderByClause) {
-    this.orderByClause = orderByClause;
-    return this;
-  }
-
-  @Override
-  public ExpressionList<T> order(String orderByClause) {
     this.orderByClause = orderByClause;
     return this;
   }
