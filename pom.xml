@@ -91,7 +91,6 @@
     <module>composites</module>
     <module>ebean-jackson-mapper</module>
     <module>ebean-spring-txn</module>
-    <!--    <module>ebean-kotlin</module>-->
 
   </modules>
 
