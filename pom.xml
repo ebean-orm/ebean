@@ -110,7 +110,6 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>ebean-kotlin</module>
         <module>tests</module>
       </modules>
     </profile>
