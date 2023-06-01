@@ -66,7 +66,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Bind to the statement returning the DataBind.
    */
   DataBind bind(PreparedStatement stmt) {
-    return new DataBind(persistRequest.dataTimeZone(), stmt, transaction.getInternalConnection());
+    return new DataBind(persistRequest.dataTimeZone(), stmt, transaction.internalConnection());
   }
 
   /**
@@ -234,7 +234,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
   PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
-    Connection conn = t.getInternalConnection();
+    Connection conn = t.internalConnection();
     if (genKeys) {
       // the Id generated is always the first column
       // Required to stop Oracle10 giving us Oracle rowId??
@@ -249,7 +249,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Return a prepared statement taking into account batch requirements.
    */
   PreparedStatement getPstmtBatch(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
-    BatchedPstmtHolder batch = t.getBatchControl().pstmtHolder();
+    BatchedPstmtHolder batch = t.batchControl().pstmtHolder();
     batchedPstmt = batch.batchedPstmt(sql);
     if (batchedPstmt != null) {
       batchedStatus = batchedPstmt.isEmpty() ? BATCHED_FIRST : BATCHED;

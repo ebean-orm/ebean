@@ -89,13 +89,13 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
     try {
       SpiTransaction t = transaction();
       profileOffset = t.profileOffset();
-      Connection conn = t.getInternalConnection();
+      Connection conn = t.internalConnection();
       lock.lock();
       try {
         query.checkCancelled();
         pstmt = conn.prepareStatement(sql);
-        if (query.getTimeout() > 0) {
-          pstmt.setQueryTimeout(query.getTimeout());
+        if (query.timeout() > 0) {
+          pstmt.setQueryTimeout(query.timeout());
         }
         bindLog = predicates.bind(pstmt, conn);
       } finally {
@@ -137,7 +137,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId());
   }
 
   Set<String> dependentTables() {

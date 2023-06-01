@@ -76,7 +76,7 @@ public final class CQueryPredicates {
     this.binder = binder;
     this.request = request;
     this.query = request.query();
-    this.bindParams = query.getBindParams();
+    this.bindParams = query.bindParams();
     this.idValue = query.getId();
   }
 
@@ -85,15 +85,15 @@ public final class CQueryPredicates {
   }
 
   public String bind(DataBind dataBind) throws SQLException {
-    OrmUpdateProperties updateProperties = query.getUpdateProperties();
+    OrmUpdateProperties updateProperties = query.updateProperties();
     if (updateProperties != null) {
       // bind the update set clause
       updateProperties.bind(binder, dataBind);
     }
     if (query.isVersionsBetween() && binder.isAsOfStandardsBased()) {
       // sql2011 based versions between timestamp syntax
-      Timestamp start = query.getVersionStart();
-      Timestamp end = query.getVersionEnd();
+      Timestamp start = query.versionStart();
+      Timestamp end = query.versionEnd();
       dataBind.append("between ").append(start).append(" and ").append(end);
       binder.bindObject(dataBind, start);
       binder.bindObject(dataBind, end);
@@ -137,7 +137,7 @@ public final class CQueryPredicates {
 
   private void buildUpdateClause(boolean buildSql, DeployParser deployParser) {
     if (buildSql) {
-      OrmUpdateProperties updateProperties = query.getUpdateProperties();
+      OrmUpdateProperties updateProperties = query.updateProperties();
       if (updateProperties != null) {
         dbUpdateClause = updateProperties.buildSetClause(deployParser);
       }
@@ -159,14 +159,14 @@ public final class CQueryPredicates {
     if (!buildSql && bindParams != null && bindParams.requiresNamedParamsPrepare()) {
       if (query.isNativeSql()) {
         // convert named params into positioned params
-        String sql = query.getNativeSql();
+        String sql = query.nativeSql();
         BindParamsParser.parse(bindParams, sql);
 
       } else if (query.isRawSql()) {
         // RawSql query hit cached query plan. Need to convert
         // named parameters into positioned parameters so that
         // the named parameters are bound
-        SpiRawSql.Sql sql = query.getRawSql().getSql();
+        SpiRawSql.Sql sql = query.rawSql().getSql();
         String s = sql.isParsed() ? sql.getPreWhere() : sql.getUnparsedSql();
         BindParamsParser.parse(bindParams, s);
       }
@@ -187,7 +187,7 @@ public final class CQueryPredicates {
       // create a copy of the includes required to support the orderBy
       orderByIncludes = new HashSet<>(deployParser.includes());
     }
-    SpiExpressionList<?> whereExp = query.getWhereExpressions();
+    SpiExpressionList<?> whereExp = query.whereExpressions();
     if (whereExp != null) {
       this.where = new DefaultExpressionRequest(request, deployParser, binder, whereExp);
       if (buildSql) {
@@ -195,7 +195,7 @@ public final class CQueryPredicates {
       }
     }
     if (manyProperty != null) {
-      OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.name(), false);
+      OrmQueryProperties chunk = query.detail().getChunk(manyProperty.name(), false);
       SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
       if (filterManyExpr != null) {
         this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
@@ -204,7 +204,7 @@ public final class CQueryPredicates {
         }
       }
     }
-    SpiExpressionList<?> havingExpr = query.getHavingExpressions();
+    SpiExpressionList<?> havingExpr = query.havingExpressions();
     if (havingExpr != null) {
       this.having = new DefaultExpressionRequest(request, deployParser, binder, havingExpr);
       if (buildSql) {

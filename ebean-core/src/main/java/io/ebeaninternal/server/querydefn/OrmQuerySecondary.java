@@ -24,7 +24,7 @@ final class OrmQuerySecondary implements SpiQuerySecondary {
    * Return a list of path/properties that are query join loaded.
    */
   @Override
-  public List<OrmQueryProperties> getQueryJoins() {
+  public List<OrmQueryProperties> queryJoins() {
     return queryJoins;
   }
 
@@ -32,7 +32,7 @@ final class OrmQuerySecondary implements SpiQuerySecondary {
    * Return the list of path/properties that are lazy loaded.
    */
   @Override
-  public List<OrmQueryProperties> getLazyJoins() {
+  public List<OrmQueryProperties> lazyJoins() {
     return lazyJoins;
   }
 }

@@ -755,7 +755,7 @@ final class BeanDescriptorCacheHelp<T> {
 
   void cacheUpdateQuery(boolean update, SpiTransaction transaction) {
     if (invalidateQueryCache || cacheNotifyOnAll || (!update && cacheNotifyOnDelete)) {
-      transaction.getEvent().add(desc.baseTable(), false, update, !update);
+      transaction.event().add(desc.baseTable(), false, update, !update);
     }
   }
 

@@ -611,7 +611,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     PersistenceContext pc = null;
     SpiTransaction t = transactionManager.active();
     if (t != null) {
-      pc = t.getPersistenceContext();
+      pc = t.persistenceContext();
       Object existing = desc.contextGet(pc, id);
       if (existing != null) {
         return (T) existing;
@@ -904,7 +904,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction) {
-    SpiOrmQueryRequest<?> request = createQueryRequest(ormQuery.getType(), ormQuery, transaction);
+    SpiOrmQueryRequest<?> request = createQueryRequest(ormQuery.type(), ormQuery, transaction);
     request.initTransIfRequired();
     return request.findResultSet();
   }
@@ -965,12 +965,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
       query.selectAllForLazyLoadProperty();
     }
-    ProfileLocation profileLocation = query.getProfileLocation();
+    ProfileLocation profileLocation = query.profileLocation();
     if (profileLocation != null) {
       profileLocation.obtain();
     }
     // if determine cost and no origin for AutoTune
-    if (query.getParentNode() == null) {
+    if (query.parentNode() == null) {
       query.setOrigin(createCallOrigin());
     }
     return new OrmQueryRequest<>(this, queryEngine, query, (SpiTransaction) transaction);
@@ -986,12 +986,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (t == null) {
       t = currentServerTransaction();
     }
-    BeanDescriptor<T> desc = query.getBeanDescriptor();
+    BeanDescriptor<T> desc = query.descriptor();
     id = desc.convertId(id);
     PersistenceContext pc = null;
     if (t != null && useTransactionPersistenceContext(query)) {
       // first look in the transaction scoped persistence context
-      pc = t.getPersistenceContext();
+      pc = t.persistenceContext();
       if (pc != null) {
         WithOption o = desc.contextGetWithOption(pc, id);
         if (o != null) {
@@ -1022,7 +1022,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public PersistenceContextScope persistenceContextScope(SpiQuery<?> query) {
-    PersistenceContextScope scope = query.getPersistenceContextScope();
+    PersistenceContextScope scope = query.persistenceContextScope();
     return (scope != null) ? scope : defaultPersistenceContextScope;
   }
 
@@ -1031,7 +1031,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private <T> T findId(Query<T> query, @Nullable Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(Type.BEAN);
-    if (SpiQuery.Mode.NORMAL == spiQuery.getMode() && !spiQuery.isForceHitDatabase()) {
+    if (SpiQuery.Mode.NORMAL == spiQuery.mode() && !spiQuery.isForceHitDatabase()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
       T bean = findIdCheckPersistenceContextAndCache(transaction, spiQuery, spiQuery.getId());
@@ -2158,7 +2158,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
     if (timeMicros > slowQueryMicros && slowQueryListener != null) {
-      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
+      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.parentNode()));
     }
   }
 

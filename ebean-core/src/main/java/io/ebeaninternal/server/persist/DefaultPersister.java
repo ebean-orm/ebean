@@ -72,7 +72,7 @@ public final class DefaultPersister implements Persister {
   @Override
   public int executeOrmUpdate(Update<?> update, Transaction t) {
     SpiUpdate<?> ormUpdate = (SpiUpdate<?>) update;
-    BeanManager<?> mgr = beanManager(ormUpdate.getBeanType());
+    BeanManager<?> mgr = beanManager(ormUpdate.beanType());
     return executeOrQueue(new PersistRequestOrmUpdate(server, mgr, ormUpdate, (SpiTransaction) t, persistExecute));
   }
 
@@ -97,7 +97,7 @@ public final class DefaultPersister implements Persister {
 
   @Override
   public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
-    BatchControl batchControl = transaction.getBatchControl();
+    BatchControl batchControl = transaction.batchControl();
     try {
       return batchControl.execute(sqlUpdate.getGeneratedSql(), sqlUpdate.isGetGeneratedKeys());
     } catch (SQLException e) {
@@ -761,14 +761,14 @@ public final class DefaultPersister implements Persister {
     notifyDeleteById(descriptor, id, idList, transaction);
     deleteById.setAutoTableMod(false);
     if (idList != null) {
-      t.getEvent().addDeleteByIdList(descriptor, idList);
+      t.event().addDeleteByIdList(descriptor, idList);
     } else {
-      t.getEvent().addDeleteById(descriptor, id);
+      t.event().addDeleteById(descriptor, id);
     }
     int rows = executeSqlUpdate(deleteById, t);
 
     // Delete from the persistence context so that it can't be fetched again later
-    PersistenceContext persistenceContext = t.getPersistenceContext();
+    PersistenceContext persistenceContext = t.persistenceContext();
     if (idList != null) {
       for (Object idValue : idList) {
         descriptor.contextDeleted(persistenceContext, idValue);

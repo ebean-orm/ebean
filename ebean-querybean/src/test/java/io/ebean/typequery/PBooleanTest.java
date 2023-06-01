@@ -85,7 +85,7 @@ public class PBooleanTest {
 
   private SimpleExpression getExpression(QCustomer customer) {
     DefaultExpressionList<Customer> where = (DefaultExpressionList<Customer>)customer.query().where();
-    return (SimpleExpression)where.getUnderlyingList().get(0);
+    return (SimpleExpression)where.underlyingList().get(0);
   }
 
 
