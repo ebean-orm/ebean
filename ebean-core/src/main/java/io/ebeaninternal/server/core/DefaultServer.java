@@ -889,7 +889,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
     DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
-    String sql = descriptor.getNamedRawSql(namedQuery);
+    String sql = descriptor.namedRawSql(namedQuery);
     if (sql == null) {
       throw new PersistenceException("No named query called " + namedQuery + " for bean:" + dtoType.getName());
     }

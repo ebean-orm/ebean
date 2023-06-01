@@ -17,7 +17,7 @@ class TransactionFactoryBasic extends TransactionFactory {
 
   TransactionFactoryBasic(TransactionManager manager, DataSourceSupplier dataSourceSupplier) {
     super(manager);
-    this.dataSource = dataSourceSupplier.getDataSource();
+    this.dataSource = dataSourceSupplier.dataSource();
   }
 
   @Override

@@ -30,7 +30,7 @@ final class TransactionFactoryTenantWithRead extends TransactionFactoryTenant {
         // obtain the tenantId if the DataSource requires it
         tenantId = dataSourceSupplier.currentTenantId();
       }
-      connection = dataSourceSupplier.getReadOnlyConnection(tenantId);
+      connection = dataSourceSupplier.readOnlyConnection(tenantId);
       return new ImplicitReadOnlyTransaction(manager, connection, tenantId);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);

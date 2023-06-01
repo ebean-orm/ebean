@@ -53,9 +53,9 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
       query.setCancelableQuery(ormQuery);
       // execute the underlying ORM query returning the ResultSet
       SpiResultSet result = server.findResultSet(ormQuery, transaction);
-      this.pstmt = result.getStatement();
+      this.pstmt = result.statement();
       this.sql = ormQuery.getGeneratedSql();
-      setResultSet(result.getResultSet(), ormQuery.queryPlanKey());
+      setResultSet(result.resultSet(), ormQuery.queryPlanKey());
 
     } else {
       // native SQL query execution

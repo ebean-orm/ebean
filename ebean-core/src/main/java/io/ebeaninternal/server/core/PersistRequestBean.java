@@ -547,7 +547,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * <p>
    * Takes into account the class type and id value.
    */
-  private Integer getBeanHash() {
+  private Integer beanHash() {
     if (beanHash == null) {
       Object id = beanDescriptor.getId(entityBean);
       int hc = 92821 * bean.getClass().getName().hashCode();
@@ -560,7 +560,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   public void registerDeleteBean() {
-    Integer hash = getBeanHash();
+    Integer hash = beanHash();
     transaction.registerDeleteBean(hash);
   }
 
@@ -568,7 +568,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (transaction == null) {
       return false;
     } else {
-      Integer hash = getBeanHash();
+      Integer hash = beanHash();
       return transaction.isRegisteredDeleteBean(hash);
     }
   }
@@ -712,7 +712,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the original / old value for the given property.
    */
-  public Object getOrigValue(BeanProperty prop) {
+  public Object origValue(BeanProperty prop) {
     return intercept.origValue(prop.propertyIndex());
   }
 
@@ -1360,7 +1360,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set an orphan bean that needs to be deleted AFTER the request has persisted.
    */
   public void setImportedOrphanForRemoval(BeanPropertyAssocOne<?> prop) {
-    Object orphan = getOrigValue(prop);
+    Object orphan = origValue(prop);
     if (orphan instanceof EntityBean) {
       orphanBean = (EntityBean) orphan;
     }
@@ -1373,7 +1373,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   /**
    * Return the SQL used to fetch the last inserted id value.
    */
-  public String getSelectLastInsertedId() {
+  public String selectLastInsertedId() {
     return beanDescriptor.selectLastInsertedId(publish);
   }
 

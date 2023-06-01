@@ -248,17 +248,17 @@ public class TransactionManager implements SpiTransactionManager {
 
   @Override
   public final Connection queryPlanConnection() throws SQLException {
-    return dataSourceSupplier.getConnection(null);
+    return dataSourceSupplier.connection(null);
   }
 
   @Override
   public final DataSource dataSource() {
-    return dataSourceSupplier.getDataSource();
+    return dataSourceSupplier.dataSource();
   }
 
   @Override
   public final DataSource readOnlyDataSource() {
-    return dataSourceSupplier.getReadOnlyDataSource();
+    return dataSourceSupplier.readOnlyDataSource();
   }
 
   /**

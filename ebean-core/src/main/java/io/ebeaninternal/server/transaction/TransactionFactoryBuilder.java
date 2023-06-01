@@ -12,7 +12,7 @@ final class TransactionFactoryBuilder {
    */
   static TransactionFactory build(TransactionManager manager, DataSourceSupplier dataSourceSupplier, CurrentTenantProvider tenantProvider) {
 
-    boolean hasReadOnlyDataSource = dataSourceSupplier.getReadOnlyDataSource() != null;
+    boolean hasReadOnlyDataSource = dataSourceSupplier.readOnlyDataSource() != null;
     if (tenantProvider == null) {
       if (hasReadOnlyDataSource) {
         return new TransactionFactoryBasicWithRead(manager, dataSourceSupplier);

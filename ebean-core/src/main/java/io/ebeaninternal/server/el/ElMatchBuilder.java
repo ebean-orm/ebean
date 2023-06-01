@@ -76,7 +76,6 @@ final class ElMatchBuilder {
 
     @Override
     public boolean isMatch(T bean) {
-
       String v = (String) elGetValue.pathGet(bean);
       return charMatch.startsWith(v);
     }
@@ -97,7 +96,6 @@ final class ElMatchBuilder {
 
     @Override
     public boolean isMatch(T bean) {
-
       String v = (String) elGetValue.pathGet(bean);
       return charMatch.endsWith(v);
     }
