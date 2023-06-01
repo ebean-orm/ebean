@@ -914,17 +914,6 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Deprecated migrate to setBeanCacheMode() or setUseCache().
-   * <p>
-   * When set to true all the beans from this query are loaded into the bean cache.
-   */
-  @Deprecated
-  public R setLoadBeanCache(boolean loadBeanCache) {
-    query.setLoadBeanCache(loadBeanCache);
-    return root;
-  }
-
-  /**
    * Set the property to use as keys for a map.
    * <p>
    * If no property is set then the id property is used.

@@ -1277,12 +1277,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final Query<T> setLoadBeanCache(boolean loadBeanCache) {
-    this.useBeanCache = loadBeanCache ? CacheMode.PUT : CacheMode.OFF;
-    return this;
-  }
-
-  @Override
   public final Query<T> setTimeout(int secs) {
     this.timeout = secs;
     return this;
