@@ -17,7 +17,7 @@ public interface DataSourceSupplier {
    * <p>
    * This should take into account multi-tenancy and the current tenantId.
    */
-  DataSource getDataSource();
+  DataSource dataSource();
 
   /**
    * Return the read only DataSource to use for the current request.
@@ -25,7 +25,7 @@ public interface DataSourceSupplier {
    * This can return null meaning that no read only DataSource (with autoCommit)
    * is available for use so normal transactions with explicit commit should be used.
    */
-  DataSource getReadOnlyDataSource();
+  DataSource readOnlyDataSource();
 
   /**
    * Obtain the current TenantId *IF* it is required for the DataSource.
@@ -38,7 +38,7 @@ public interface DataSourceSupplier {
    * @param tenantId Most often null but well supplied indicates a multi-tenant lazy loading query
    * @return the connection to use
    */
-  Connection getConnection(Object tenantId) throws SQLException;
+  Connection connection(Object tenantId) throws SQLException;
 
   /**
    * Return a connection from the read only DataSource taking into account a tenantId for multi-tenant lazy loading.
@@ -46,7 +46,7 @@ public interface DataSourceSupplier {
    * @param tenantId Most often null but well supplied indicates a multi-tenant lazy loading query
    * @return the connection to use
    */
-  Connection getReadOnlyConnection(Object tenantId) throws SQLException;
+  Connection readOnlyConnection(Object tenantId) throws SQLException;
 
   /**
    * Shutdown the datasource de-registering the JDBC driver if requested.

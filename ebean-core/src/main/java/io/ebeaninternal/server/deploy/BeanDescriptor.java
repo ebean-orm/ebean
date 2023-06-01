@@ -2355,7 +2355,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       ElPropertyDeploy fk = elDeployCache.get(propName);
       if (fk instanceof BeanFkeyProperty) {
         // propertyDeploy chain for foreign key column
-        return ((BeanFkeyProperty) fk).create(chain.getExpression(), chain.isContainsMany());
+        return ((BeanFkeyProperty) fk).create(chain.expression(), chain.isContainsMany());
       }
     }
     int basePos = propName.indexOf('.');
@@ -2375,7 +2375,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       return property;
     }
     if (property == null) {
-      throw new PersistenceException("No property found for [" + propName + "] in expression " + chain.getExpression());
+      throw new PersistenceException("No property found for [" + propName + "] in expression " + chain.expression());
     }
     if (property.containsMany()) {
       chain.setContainsMany();

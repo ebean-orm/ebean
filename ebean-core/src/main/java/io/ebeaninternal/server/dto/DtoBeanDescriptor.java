@@ -46,7 +46,7 @@ public final class DtoBeanDescriptor<T> {
   /**
    * Return the named RawSql query.
    */
-  public String getNamedRawSql(String name) {
+  public String namedRawSql(String name) {
     return namedQueries.get(name);
   }
 

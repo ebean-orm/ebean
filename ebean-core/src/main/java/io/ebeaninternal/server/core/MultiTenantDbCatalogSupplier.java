@@ -41,22 +41,22 @@ final class MultiTenantDbCatalogSupplier implements DataSourceSupplier {
   }
 
   @Override
-  public DataSource getDataSource() {
+  public DataSource dataSource() {
     return catalogDataSource;
   }
 
   @Override
-  public DataSource getReadOnlyDataSource() {
+  public DataSource readOnlyDataSource() {
     return readOnly;
   }
 
   @Override
-  public Connection getConnection(Object tenantId) throws SQLException {
+  public Connection connection(Object tenantId) throws SQLException {
     return catalogDataSource.getConnectionForTenant(tenantId);
   }
 
   @Override
-  public Connection getReadOnlyConnection(Object tenantId) throws SQLException {
+  public Connection readOnlyConnection(Object tenantId) throws SQLException {
     return readOnly.getConnectionForTenant(tenantId);
   }
 

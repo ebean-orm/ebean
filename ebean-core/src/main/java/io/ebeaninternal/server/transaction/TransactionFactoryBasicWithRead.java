@@ -22,7 +22,7 @@ final class TransactionFactoryBasicWithRead extends TransactionFactoryBasic {
 
   TransactionFactoryBasicWithRead(TransactionManager manager, DataSourceSupplier dataSourceSupplier) {
     super(manager, dataSourceSupplier);
-    this.readOnlyDataSource = dataSourceSupplier.getReadOnlyDataSource();
+    this.readOnlyDataSource = dataSourceSupplier.readOnlyDataSource();
   }
 
   @Override
