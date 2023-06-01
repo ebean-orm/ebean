@@ -81,9 +81,6 @@
     <module>ebean-core-type</module>
     <module>ebean-core</module>
     <module>ebean-ddl-generator</module>
-    <module>ebean-autotune</module>
-    <module>ebean-externalmapping-api</module>
-    <module>ebean-externalmapping-xml</module>
     <module>ebean-test</module>
     <module>querybean-generator</module>
     <module>kotlin-querybean-generator</module>
@@ -92,9 +89,6 @@
     <module>ebean-redis</module>
     <module>platforms</module>
     <module>composites</module>
-    <module>ebean-joda-time</module>
-    <module>ebean-csv-reader</module>
-    <module>ebean-jackson-jsonnode</module>
     <module>ebean-jackson-mapper</module>
     <module>ebean-spring-txn</module>
     <!--    <module>ebean-kotlin</module>-->
