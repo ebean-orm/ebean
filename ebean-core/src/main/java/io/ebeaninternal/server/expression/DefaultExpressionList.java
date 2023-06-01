@@ -313,11 +313,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> setOrderBy(String orderBy) {
-    return query.order(orderBy);
-  }
-
-  @Override
   public Query<T> orderById(boolean orderById) {
     return query.orderById(orderById);
   }

@@ -981,11 +981,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public Query<T> setOrderBy(String orderBy) {
-    return exprList.setOrderBy(orderBy);
-  }
-
-  @Override
   public Query<T> setUseCache(boolean useCache) {
     return exprList.setUseCache(useCache);
   }
