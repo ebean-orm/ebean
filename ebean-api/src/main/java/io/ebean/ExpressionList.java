@@ -54,14 +54,12 @@ public interface ExpressionList<T> {
   Query<T> orderById(boolean orderById);
 
   /**
-   * Set the order by clause replacing the existing order by clause if there is
-   * one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
+   * Deprecated migrate to {@link #orderBy(String)}
    */
-  ExpressionList<T> order(String orderByClause);
+  @Deprecated(since = "13.19")
+  default ExpressionList<T> order(String orderByClause) {
+    return orderBy(orderByClause);
+  }
 
   /**
    * Set the order by clause replacing the existing order by clause if there is
@@ -74,15 +72,12 @@ public interface ExpressionList<T> {
   ExpressionList<T> orderBy(String orderBy);
 
   /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * <p>
-   * This is the same as <code>orderBy()</code>
+   * Deprecated migrate to orderBy().
    */
-  OrderBy<T> order();
+  @Deprecated
+  default OrderBy<T> order() {
+    return orderBy();
+  }
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
