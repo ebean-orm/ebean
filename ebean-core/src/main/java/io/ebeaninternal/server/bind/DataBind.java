@@ -5,7 +5,10 @@ import io.ebean.core.type.DataBinder;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
@@ -103,7 +106,7 @@ public class DataBind implements DataBinder {
     }
   }
 
-  private void closeInputStreams() {
+  public void closeInputStreams() {
     if (inputStreams != null) {
       for (InputStream inputStream : inputStreams) {
         try {

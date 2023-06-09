@@ -197,6 +197,8 @@ public class DatabasePlatform {
 
   protected boolean supportsNativeIlike;
 
+  protected BindValidatorFactory bindValidatorFactory;
+
   protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
 
   /**
@@ -299,6 +301,13 @@ public class DatabasePlatform {
    */
   public boolean supportsNativeIlike() {
     return supportsNativeIlike;
+  }
+
+  /**
+   * Return the bindValidatorFactory for this platform.
+   */
+  public BindValidatorFactory getBindValidatorFactory() {
+    return bindValidatorFactory;
   }
 
   /**

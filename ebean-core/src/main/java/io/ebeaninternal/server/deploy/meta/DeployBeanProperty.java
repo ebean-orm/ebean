@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.meta;
 
 import io.ebean.annotation.*;
 import io.ebean.config.ScalarTypeConverter;
+import io.ebean.config.dbplatform.BindValidator;
 import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
@@ -168,6 +169,7 @@ public class DeployBeanProperty {
   private String dbComment;
   private String dbColumnDefault;
   private List<DbMigrationInfo> dbMigrationInfos;
+  private BindValidator bindValidator;
   private Set<Annotation> metaAnnotations;
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, ScalarType<?> scalarType, ScalarTypeConverter<?, ?> typeConverter) {
@@ -1036,6 +1038,20 @@ public class DeployBeanProperty {
    */
   public void setElementProperty() {
     this.elementProperty = true;
+  }
+
+  /**
+   * Returns the bind validator for this property.
+   */
+  public BindValidator getBindValidator() {
+    return bindValidator;
+  }
+
+  /**
+   * Sets the bind validator for this property.
+   */
+  public void setBindValidator(BindValidator bindValidator) {
+    this.bindValidator = bindValidator;
   }
 
   public void initMetaAnnotations(Set<Class<?>> metaAnnotationsFilter) {

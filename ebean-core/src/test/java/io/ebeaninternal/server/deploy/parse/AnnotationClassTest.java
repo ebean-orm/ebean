@@ -48,7 +48,7 @@ public class AnnotationClassTest {
     DeployUtil deployUtil = new DeployUtil(new DefaultTypeManager(config, new BootupClasses()), config);
 
     DeployBeanInfo deployBeanInfo = new DeployBeanInfo(deployUtil, new DeployBeanDescriptor<>(null, null, null));
-    ReadAnnotationConfig readAnnotationConfig = new ReadAnnotationConfig(new GeneratedPropertyFactory(true, new DatabaseConfig(), Collections.emptyList()), "","", new DatabaseConfig());
+    ReadAnnotationConfig readAnnotationConfig = new ReadAnnotationConfig(new GeneratedPropertyFactory(true, new DatabaseConfig(), Collections.emptyList()), "","", new DatabaseConfig(), null);
     return new AnnotationClass(deployBeanInfo, readAnnotationConfig);
   }
 

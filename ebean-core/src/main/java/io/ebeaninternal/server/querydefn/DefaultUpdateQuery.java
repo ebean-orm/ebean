@@ -4,6 +4,7 @@ import io.ebean.ExpressionList;
 import io.ebean.ProfileLocation;
 import io.ebean.Query;
 import io.ebean.UpdateQuery;
+import io.ebean.config.dbplatform.BindValidator;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -30,7 +31,8 @@ public final class DefaultUpdateQuery<T> implements UpdateQuery<T> {
     } else {
       final BeanProperty beanProperty = descriptor.beanProperty(property);
       final ScalarType<Object> scalarType = (beanProperty == null) ? null: beanProperty.scalarType();
-      values.set(property, value, scalarType);
+      final BindValidator bindValidator = (beanProperty == null) ? null: beanProperty.bindValidator();
+      values.set(property, value, scalarType, bindValidator);
     }
     return this;
   }
