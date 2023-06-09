@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.bind;
 
+import io.ebean.config.dbplatform.InputStreamInfo;
 import io.ebean.core.type.DataBinder;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.timezone.DataTimeZone;
@@ -15,6 +16,7 @@ import static java.lang.System.Logger.Level.WARNING;
 
 public class DataBind implements DataBinder {
 
+  private static final Object UNBOUND = new Object();
   private final DataTimeZone dataTimeZone;
   private final PreparedStatement pstmt;
   private final Connection connection;
@@ -22,6 +24,8 @@ public class DataBind implements DataBinder {
   private List<InputStream> inputStreams;
   protected int pos;
   private String json;
+
+  private Object lastObject = UNBOUND;
 
   public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt, Connection connection) {
     this.dataTimeZone = dataTimeZone;
@@ -65,16 +69,19 @@ public class DataBind implements DataBinder {
   @Override
   public void setObject(Object value) throws SQLException {
     pstmt.setObject(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public final void setObject(Object value, int sqlType) throws SQLException {
     pstmt.setObject(++pos, value, sqlType);
+    lastObject = value;
   }
 
   @Override
   public void setNull(int jdbcType) throws SQLException {
     pstmt.setNull(++pos, jdbcType);
+    lastObject = null;
   }
 
   @Override
@@ -117,36 +124,43 @@ public class DataBind implements DataBinder {
   @Override
   public void setString(String value) throws SQLException {
     pstmt.setString(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public final void setInt(int value) throws SQLException {
     pstmt.setInt(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public final void setLong(long value) throws SQLException {
     pstmt.setLong(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public final void setShort(short value) throws SQLException {
     pstmt.setShort(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public final void setFloat(float value) throws SQLException {
     pstmt.setFloat(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public final void setDouble(double value) throws SQLException {
     pstmt.setDouble(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public final void setBigDecimal(BigDecimal value) throws SQLException {
     pstmt.setBigDecimal(++pos, value);
+    lastObject = value;
   }
 
   @Override
@@ -157,6 +171,7 @@ public class DataBind implements DataBinder {
     } else {
       pstmt.setDate(++pos, value);
     }
+    lastObject = value;
   }
 
   @Override
@@ -167,6 +182,7 @@ public class DataBind implements DataBinder {
     } else {
       pstmt.setTimestamp(++pos, value);
     }
+    lastObject = value;
   }
 
   @Override
@@ -177,26 +193,31 @@ public class DataBind implements DataBinder {
     } else {
       pstmt.setTime(++pos, value);
     }
+    lastObject = value;
   }
 
   @Override
   public void setBoolean(boolean value) throws SQLException {
     pstmt.setBoolean(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public void setBytes(byte[] value) throws SQLException {
     pstmt.setBytes(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public void setByte(byte value) throws SQLException {
     pstmt.setByte(++pos, value);
+    lastObject = value;
   }
 
   @Override
   public void setChar(char value) throws SQLException {
     pstmt.setString(++pos, String.valueOf(value));
+    lastObject = value;
   }
 
   @Override
@@ -211,21 +232,34 @@ public class DataBind implements DataBinder {
     }
     inputStreams.add(inputStream);
     pstmt.setBinaryStream(++pos, inputStream, length);
+    lastObject = new InputStreamInfo(inputStream, length);
   }
 
   @Override
   public void setBlob(byte[] bytes) throws SQLException {
     pstmt.setBinaryStream(++pos, new ByteArrayInputStream(bytes), bytes.length);
+    lastObject = bytes;
   }
 
   @Override
   public void setClob(String content) throws SQLException {
     pstmt.setCharacterStream(++pos, new StringReader(content), content.length());
+    lastObject = content;
   }
 
   @Override
   public void setArray(String arrayType, Object[] elements) throws SQLException {
     pstmt.setArray(++pos, connection.createArrayOf(arrayType, elements));
+    lastObject = elements;
   }
 
+  @Override
+  public Object popLastObject() {
+    Object ret = lastObject;
+    lastObject = UNBOUND;
+    if (ret == UNBOUND) {
+      throw new IllegalStateException("No object bound");
+    }
+    return ret;
+  }
 }

@@ -174,4 +174,9 @@ public interface DataBinder {
    */
   String popJson();
 
+  /**
+   * Returns the last bound object (e.g. for BindValidation)
+   */
+  Object popLastObject();
+
 }
