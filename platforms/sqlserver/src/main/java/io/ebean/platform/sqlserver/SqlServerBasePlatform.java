@@ -64,14 +64,15 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime2"));
     dbTypeMap.put(DbType.LOCALDATETIME, new DbPlatformType("datetime2"));
     // UTF8 aware types - overwritten in SqlServer16 platform
-    dbTypeMap.put(DbType.CHAR, new DbPlatformType("nchar", 1));
-    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
+    dbTypeMap.put(DbType.CHAR, new SqlServerPlatformType("nchar", 1, 4000));
+    dbTypeMap.put(DbType.VARCHAR, new SqlServerPlatformType("nvarchar", 255, 4000));
+    dbTypeMap.put(DbType.LONGVARCHAR, new SqlServerPlatformType("nvarchar", Integer.MAX_VALUE, 4000));
+    dbTypeMap.put(DbType.CLOB, new SqlServerPlatformType("nvarchar", Integer.MAX_VALUE, 4000));
+    dbTypeMap.put(DbType.JSON, new SqlServerPlatformType("nvarchar", Integer.MAX_VALUE, 4000));
+    dbTypeMap.put(DbType.JSONB, new SqlServerPlatformType("nvarchar", Integer.MAX_VALUE, 4000));
+    dbTypeMap.put(DbType.BLOB, new SqlServerPlatformType("varbinary", Integer.MAX_VALUE, 8000));
+    dbTypeMap.put(DbType.LONGVARBINARY, new SqlServerPlatformType("varbinary", Integer.MAX_VALUE, 8000));
+
   }
 
   @Override
