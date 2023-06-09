@@ -30,14 +30,11 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
   }
 
   @Override
-  public PGgeometryLW bind(DataBinder binder, T value) throws SQLException {
+  public void bind(DataBinder binder, T value) throws SQLException {
     if (value == null) {
       binder.setNull(Types.NULL);
-      return null;
     } else {
-      PGgeometryLW rawValue = new PGgeometryLW(value);
-      binder.setObject(rawValue);
-      return rawValue;
+      binder.setObject(new PGgeometryLW(value));
     }
   }
 
