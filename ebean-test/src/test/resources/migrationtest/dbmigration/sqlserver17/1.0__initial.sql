@@ -94,7 +94,7 @@ create table migtest_e_basic (
   name                          nvarchar(127),
   description                   nvarchar(127),
   description_file              image,
-  json_list                     nvarchar(max),
+  json_list                     nvarchar(16384),
   a_lob                         nvarchar(255) default 'X' not null,
   some_date                     datetime2,
   old_boolean                   bit default 0 not null,

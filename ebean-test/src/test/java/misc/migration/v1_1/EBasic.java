@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "migtest_e_basic")
-@Index(columnNames  = { "status" , "indextest1"}, unique = true)
+@Index(columnNames = {"status", "indextest1"}, unique = true)
 public class EBasic {
 
   public enum Status {
@@ -45,22 +45,22 @@ public class EBasic {
   @DbDefault("A")
   Status status;
 
-  @Size(max=127)
+  @Size(max = 127)
   String status2;
 
   @Index(unique = true)
-  @Size(max=127)
+  @Size(max = 127)
   String name;
 
-  @DbMigration(preAlter = { "-- db2 does not support parial null indices :( - so we have to clean",
-      "update ${table} set status = 'N' where id = 1" }, platforms = Platform.DB2)
+  @DbMigration(preAlter = {"-- db2 does not support parial null indices :( - so we have to clean",
+    "update ${table} set status = 'N' where id = 1"}, platforms = Platform.DB2)
   @DbMigration(preAlter = "-- rename all collisions")
   @Column(unique = true)
   @Size(max = 127)
   String description;
 
   @DbJson
-  @Column(columnDefinition = "db2;clob(16K) inline length 500 compact;")
+  @Column(columnDefinition = "db2;clob(16K) inline length 500 compact;", length = 16 * 1024)
   List<String> jsonList;
 
   @Column(columnDefinition = "db2;clob(16K) inline length 500 not logged;", nullable = true)
@@ -85,26 +85,26 @@ public class EBasic {
   @DbDefault("true")
   boolean newBooleanField2;
 
-  @Size(max=127)
+  @Size(max = 127)
   String indextest1;
 
-  @Size(max=127)
+  @Size(max = 127)
   String indextest2;
 
   @Index
-  @Size(max=127)
+  @Size(max = 127)
   String indextest3;
 
   @Index(unique = true)
-  @Size(max=127)
+  @Size(max = 127)
   String indextest4;
 
   @Index(unique = true)
-  @Size(max=127)
+  @Size(max = 127)
   String indextest5;
 
   @Index(unique = false)
-  @Size(max=127)
+  @Size(max = 127)
   String indextest6;
 
   @NotNull
@@ -115,7 +115,7 @@ public class EBasic {
   int newInteger;
 
   @ManyToOne
-  @DbMigration(preAlter= "insert into migtest_e_user (id) select distinct user_id from migtest_e_basic") // ensure all users exist
+  @DbMigration(preAlter = "insert into migtest_e_user (id) select distinct user_id from migtest_e_basic") // ensure all users exist
   EUser user;
 
   public EBasic() {

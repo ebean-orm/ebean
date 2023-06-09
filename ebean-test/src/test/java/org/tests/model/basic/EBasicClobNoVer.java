@@ -17,7 +17,7 @@ public class EBasicClobNoVer {
    */
   @Lob
   // Required for largeValueInsert-test. DB2 allows by default only 1MB
-  @Column(columnDefinition = "db2;clob(2M);", length = 2* 1024*1024)
+  @Column(columnDefinition = "db2;clob(2M);", length = 2 * 1024 * 1024)
   private String description;
 
   @OneToMany

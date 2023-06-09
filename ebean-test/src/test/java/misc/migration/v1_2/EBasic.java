@@ -33,10 +33,10 @@ public class EBasic {
   @NotNull
   Status status2;
 
-  @Size(max=127)
+  @Size(max = 127)
   String name;
 
-  @Size(max=127)
+  @Size(max = 127)
   String description;
 
   @Lob
@@ -44,6 +44,7 @@ public class EBasic {
   File descriptionFile;
 
   @DbJson
+  @Size(max = 16 * 1024)
   @Column(columnDefinition = "db2;clob(16K) inline length 500 compact;")
   List<String> jsonList;
 
@@ -64,25 +65,25 @@ public class EBasic {
 
   // test add & remove indices
   @Index
-  @Size(max=127)
+  @Size(max = 127)
   String indextest1;
 
   @Index(unique = true)
-  @Size(max=127)
+  @Size(max = 127)
   String indextest2;
 
-  @Size(max=127)
+  @Size(max = 127)
   String indextest3;
 
-  @Size(max=127)
+  @Size(max = 127)
   String indextest4;
 
   @Index(unique = false)
-  @Size(max=127)
+  @Size(max = 127)
   String indextest5;
 
   @Index(unique = true)
-  @Size(max=127)
+  @Size(max = 127)
   String indextest6;
 
   @NotNull

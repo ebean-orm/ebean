@@ -47,7 +47,7 @@ public class EBasic {
   @Column(columnDefinition = "db2;blob(64M);")
   File descriptionFile;
 
-  @DbJson
+  @DbJson(length = 16 * 1024)
   @Column(columnDefinition = "db2;clob(16K) inline length 500 compact;")
   List<String> jsonList;
 
