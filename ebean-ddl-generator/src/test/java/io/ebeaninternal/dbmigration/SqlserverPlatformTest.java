@@ -19,7 +19,7 @@ public class SqlserverPlatformTest {
     PlatformDdl ddl = PlatformDdlBuilder.create(platform);
 
     assertThat(ddl.convert("clob")).isEqualTo("nvarchar(max)");
-    assertThat(ddl.convert("blob")).isEqualTo("image");
+    assertThat(ddl.convert("blob")).isEqualTo("varbinary(max)");
     assertThat(ddl.convert("json")).isEqualTo("nvarchar(max)");
     assertThat(ddl.convert("jsonb")).isEqualTo("nvarchar(max)");
 

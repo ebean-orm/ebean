@@ -17,7 +17,8 @@ public class SqlServerPlatformType extends DbPlatformType {
 
   @Override
   protected void renderLengthScale(int deployLength, int deployScale, StringBuilder sb) {
-    if (deployLength > maxLength) {
+    int len = deployLength != 0 ? deployLength : getDefaultLength();
+    if (len > maxLength) {
       sb.append("(max)");
     } else {
       super.renderLengthScale(deployLength, deployScale, sb);
