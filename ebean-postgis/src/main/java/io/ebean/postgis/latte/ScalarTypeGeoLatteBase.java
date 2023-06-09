@@ -43,12 +43,15 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
   }
 
   @Override
-  public void bind(DataBinder binder, T value) throws SQLException {
+  public PGgeometryLW bind(DataBinder binder, T value) throws SQLException {
     if (value == null) {
       binder.setNull(Types.OTHER);
+      return null;
     } else {
       String wkt = Wkt.newEncoder(Wkt.Dialect.POSTGIS_EWKT_1).encode(value);
-      binder.setObject(new PGgeometryLW(wkt));
+      PGgeometryLW rawValue = new PGgeometryLW(wkt);
+      binder.setObject(rawValue);
+      return rawValue;
     }
   }
 
