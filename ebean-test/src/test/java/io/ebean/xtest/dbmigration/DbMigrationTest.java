@@ -83,6 +83,10 @@ public class DbMigrationTest extends BaseTestCase {
       "`migtest_QuOtEd`",
       "migtest_QuOtEd",
       "\"migtest_QuOtEd\"",
+      "drop_main",
+      "drop_ref_many",
+      "drop_ref_one",
+      "drop_main_drop_ref_many",
       "table",
       "\"table\"",
       "`table`");

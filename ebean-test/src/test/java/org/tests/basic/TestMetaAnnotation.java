@@ -49,7 +49,6 @@ public class TestMetaAnnotation extends BaseTestCase {
    * This test writes 101 spaces to "line1" which is annotated with &#64;Size(max=100).
    */
   @Test
-//  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2, Platform.YUGABYTE}) // pg & mssql does not fail if string is too long.
   public void testWrite101SpacesToLine1() {
 
     Address address = new Address();
