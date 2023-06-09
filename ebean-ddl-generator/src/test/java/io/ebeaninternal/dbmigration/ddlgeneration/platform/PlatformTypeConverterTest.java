@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.config.dbplatform.DbPlatformTypeMapping;
 import io.ebean.platform.h2.H2Platform;
+import io.ebean.platform.mariadb.MariaDbPlatform;
 import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.util.PlatformTypeConverter;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,9 @@ public class PlatformTypeConverterTest {
     PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
 
     assertThat(converter.convert("varchar(10)")).isEqualTo("varchar(10)");
+    assertThat(converter.convert("json")).isEqualTo("json");
+    assertThat(converter.convert("json(8000)")).isEqualTo("json");
+    assertThat(converter.convert("json(20000)")).isEqualTo("json");
     assertThat(converter.convert("decimal(10,2)")).isEqualTo("decimal(10,2)");
     assertThat(converter.convert("clob")).isEqualTo("text");
     assertThat(converter.convert("blob")).isEqualTo("bytea");
@@ -57,6 +61,9 @@ public class PlatformTypeConverterTest {
     PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
 
     assertThat(converter.convert("varchar(10)")).isEqualTo("varchar(10)");
+    assertThat(converter.convert("json")).isEqualTo("clob");
+    assertThat(converter.convert("json(8000)")).isEqualTo("varchar(8000)");
+    assertThat(converter.convert("json(20000)")).isEqualTo("clob(20000)");
     assertThat(converter.convert("decimal(10,2)")).isEqualTo("decimal(10,2)");
     assertThat(converter.convert("clob")).isEqualTo("clob");
     assertThat(converter.convert("blob")).isEqualTo("blob");
@@ -65,6 +72,29 @@ public class PlatformTypeConverterTest {
     assertThat(converter.convert("funky")).isEqualTo("funky"); // unknown
   }
 
+  @Test
+  public void testConvert_given_mariadb() throws Exception {
+
+
+    MariaDbPlatform platform = new MariaDbPlatform();
+    DbPlatformTypeMapping dbTypeMap = platform.dbTypeMap();
+
+    PlatformTypeConverter converter = new PlatformTypeConverter(dbTypeMap);
+
+    assertThat(converter.convert("varchar(10)")).isEqualTo("varchar(10)");
+    assertThat(converter.convert("json")).isEqualTo("json");
+    assertThat(converter.convert("json(4000)")).isEqualTo("json");
+    assertThat(converter.convert("json(8000)")).isEqualTo("json");
+    assertThat(converter.convert("json(20000)")).isEqualTo("json");
+    assertThat(converter.convert("json(100000)")).isEqualTo("json");
+    assertThat(converter.convert("json(100000000)")).isEqualTo("json");
+    assertThat(converter.convert("decimal(10,2)")).isEqualTo("decimal(10,2)");
+    assertThat(converter.convert("clob")).isEqualTo("longtext");
+    assertThat(converter.convert("blob")).isEqualTo("longblob");
+    assertThat(converter.convert("tinyint")).isEqualTo("tinyint");
+    assertThat(converter.convert("integer(8)")).isEqualTo("integer(8)");
+    assertThat(converter.convert("funky")).isEqualTo("funky"); // unknown
+  }
   @Test
   public void testConvertJsonTypes_given_postgres() {
 

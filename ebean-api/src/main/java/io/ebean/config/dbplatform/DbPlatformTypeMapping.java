@@ -134,7 +134,7 @@ public class DbPlatformTypeMapping {
   /**
    * Lookup the platform specific DbType given the standard sql type name.
    */
-  public DbPlatformType lookup(String name, boolean withScale) {
+  public DbPlatformType lookup(String name, int scale) {
     DbType type = lookup.byName(name);
     if (type == null) {
       throw new IllegalArgumentException("Unknown type [" + name + "] - not standard sql type");
@@ -148,19 +148,19 @@ public class DbPlatformTypeMapping {
       case JSONVARCHAR:
         return get(DbType.VARCHAR);
       case JSON:
-        return getJsonType(DbType.JSON, withScale);
+        return getJsonType(DbType.JSON, scale);
       case JSONB:
-        return getJsonType(DbType.JSONB, withScale);
+        return getJsonType(DbType.JSONB, scale);
       default:
         return get(type);
     }
   }
 
-  private DbPlatformType getJsonType(DbType type, boolean withScale) {
+  private DbPlatformType getJsonType(DbType type, int scale) {
     DbPlatformType dbType = get(type);
     if (dbType == JSON_CLOB_PLACEHOLDER) {
       // if we have scale that implies this maps to varchar
-      return withScale ? get(DbType.VARCHAR) : get(DbType.CLOB);
+      return scale <= 8000 && scale != 0 ? get(DbType.VARCHAR) : get(DbType.CLOB);
     }
     if (dbType == JSON_BLOB_PLACEHOLDER) {
       return get(DbType.BLOB);

@@ -47,18 +47,17 @@ public class PlatformTypeConverter {
     String suffix = close + 1 < columnDefinition.length() ? columnDefinition.substring(close + 1) : "";
     String type = columnDefinition.substring(0, open);
     try {
-      DbPlatformType dbType = platformTypes.lookup(type, true);
       int comma = columnDefinition.indexOf(',', open);
       if (comma > -1) {
         // scale and precision - decimal(10,4)
         int scale = Integer.parseInt(columnDefinition.substring(open + 1, comma));
         int precision = Integer.parseInt(columnDefinition.substring(comma + 1, close));
-        return dbType.renderType(scale, precision) + suffix;
+        return platformTypes.lookup(type, scale).renderType(scale, precision) + suffix;
 
       } else {
         // scale - varchar(10)
         int scale = Integer.parseInt(columnDefinition.substring(open + 1, close));
-        return dbType.renderType(scale, -1) + suffix;
+        return platformTypes.lookup(type, scale).renderType(scale, -1) + suffix;
       }
 
     } catch (IllegalArgumentException e) {
@@ -73,7 +72,7 @@ public class PlatformTypeConverter {
   protected String convertNoScale(String columnDefinition) {
 
     try {
-      DbPlatformType dbType = platformTypes.lookup(columnDefinition, false);
+      DbPlatformType dbType = platformTypes.lookup(columnDefinition, 0);
       return dbType.renderType(0, 0);
 
     } catch (IllegalArgumentException e) {

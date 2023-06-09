@@ -4,12 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.Query.LockWait;
 import io.ebean.annotation.Platform;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
 
@@ -41,6 +36,7 @@ public class NuoDbPlatform extends DatabasePlatform {
         .build();
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
+    dbTypeMap.put(DbType.CLOB, new DbPlatformType("clob", false));
   }
 
   @Override
