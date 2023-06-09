@@ -17,17 +17,18 @@
       <version>13.19.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-test-containers</artifactId>
-      <version>6.3</version>
-      <scope>test</scope>
-    </dependency>
-
+    <!-- provide postgres for PGObject access -->
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>42.5.1</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-test-containers</artifactId>
+      <version>6.3</version>
       <scope>test</scope>
     </dependency>
 

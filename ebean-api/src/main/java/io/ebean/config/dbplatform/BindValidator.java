@@ -13,4 +13,5 @@ public interface BindValidator {
    * The validate method should throw a DataBindException, if the value is invalid.
    */
   void validate(Object value) throws DataBindException;
+
 }

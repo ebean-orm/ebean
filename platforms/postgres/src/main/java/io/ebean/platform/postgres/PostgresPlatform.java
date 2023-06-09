@@ -2,22 +2,11 @@ package io.ebean.platform.postgres;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
-import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebean.util.SplitName;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Types;
 
 /**
@@ -87,6 +76,7 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.CLOB, dbTypeText);
     dbTypeMap.put(DbType.LONGVARBINARY, dbBytea);
     dbTypeMap.put(DbType.LONGVARCHAR, dbTypeText);
+    bindValidatorFactory = new BasicBindValidatorFactory();
   }
 
   @Override

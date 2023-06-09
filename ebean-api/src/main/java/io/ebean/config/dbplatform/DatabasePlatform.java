@@ -197,7 +197,7 @@ public class DatabasePlatform {
 
   protected boolean supportsNativeIlike;
 
-  protected BindValidatorFactory bindValidatorFactory;
+  protected BindValidatorFactory bindValidatorFactory = new BasicBindValidatorFactory();
 
   protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
 
@@ -308,6 +308,10 @@ public class DatabasePlatform {
    */
   public BindValidatorFactory getBindValidatorFactory() {
     return bindValidatorFactory;
+  }
+
+  public void setBindValidatorFactory(BindValidatorFactory bindValidatorFactory) {
+    this.bindValidatorFactory = bindValidatorFactory;
   }
 
   /**

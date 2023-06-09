@@ -1,9 +1,9 @@
 package org.tests.basic;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.metaannotation.SizeMedium;
@@ -49,14 +49,15 @@ public class TestMetaAnnotation extends BaseTestCase {
    * This test writes 101 spaces to "line1" which is annotated with &#64;Size(max=100).
    */
   @Test
-  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2, Platform.YUGABYTE}) // pg & mssql does not fail if string is too long.
+//  @IgnorePlatform({Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2, Platform.YUGABYTE}) // pg & mssql does not fail if string is too long.
   public void testWrite101SpacesToLine1() {
 
     Address address = new Address();
     address.setLine1(spaces101);
     try {
       DB.save(address);
-      fail("Test failed, Could insert a too long string");
+      address = DB.find(Address.class, address.getId());
+      fail("Test failed, Could insert a too long string. DB contains " + address.getLine1().length() + " chars");
     } catch (PersistenceException e) {
       assertTrue(true);
     }
