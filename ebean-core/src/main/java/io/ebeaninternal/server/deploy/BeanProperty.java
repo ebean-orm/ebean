@@ -558,9 +558,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @SuppressWarnings("unchecked")
   public void bind(DataBind b, Object value) throws SQLException {
     try {
-      Object rawValue = scalarType.bind(b, value);
+      scalarType.bind(b, value);
       if (bindValidator != null) {
-        bindValidator.validate(rawValue);
+        bindValidator.validate(b.popLastObject());
       }
     } catch (Throwable t) {
       // in case of an error, we must close all input streams

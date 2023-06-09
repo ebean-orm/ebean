@@ -77,9 +77,9 @@ public final class OrmUpdateProperties {
     public void bind(Binder binder, DataBind dataBind) throws SQLException {
       try {
         if (scalarType != null) {
-          Object rawValue = scalarType.bind(dataBind, value);
+          scalarType.bind(dataBind, value);
           if (bindValidator != null) {
-            bindValidator.validate(rawValue);
+            bindValidator.validate(dataBind.popLastObject());
           }
         } else {
           binder.bindObject(dataBind, value);
