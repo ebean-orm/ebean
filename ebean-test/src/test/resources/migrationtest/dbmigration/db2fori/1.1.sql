@@ -65,27 +65,6 @@ end if;
 end$$;
 delimiter $$
 begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_MAIN_DROP_REF_MANY_DROP_MAIN' and ucase(tabname) = 'DROP_MAIN_DROP_REF_MANY') then
-  prepare stmt from 'alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_main';
-  execute stmt;
-end if;
-end$$;
-delimiter $$
-begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_MAIN_DROP_REF_MANY_DROP_REF_MANY' and ucase(tabname) = 'DROP_MAIN_DROP_REF_MANY') then
-  prepare stmt from 'alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_ref_many';
-  execute stmt;
-end if;
-end$$;
-delimiter $$
-begin
-if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_REF_ONE_PARENT_ID' and ucase(tabname) = 'DROP_REF_ONE') then
-  prepare stmt from 'alter table drop_ref_one drop constraint fk_drop_ref_one_parent_id';
-  execute stmt;
-end if;
-end$$;
-delimiter $$
-begin
 if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MIGTEST_E_BASIC_INDEXTEST1') then
   prepare stmt from 'drop index ix_migtest_e_basic_indextest1';
   execute stmt;

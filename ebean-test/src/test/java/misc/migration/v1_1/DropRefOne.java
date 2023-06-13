@@ -1,4 +1,4 @@
-package misc.migration.v1_0;
+package misc.migration.v1_1;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

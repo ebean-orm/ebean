@@ -113,6 +113,13 @@ create trigger table_history_upd
   before update or delete on "table"
   for each row execute procedure table_history_version();
 
+drop table if exists drop_main cascade;
+drop sequence if exists drop_main_seq;
+drop table if exists drop_main_drop_ref_many cascade;
+drop table if exists drop_ref_many cascade;
+drop sequence if exists drop_ref_many_seq;
+drop table if exists drop_ref_one cascade;
+drop sequence if exists drop_ref_one_seq;
 drop table if exists migtest_e_user cascade;
 drop sequence if exists migtest_e_user_seq;
 drop table if exists migtest_mtm_c_migtest_mtm_m cascade;

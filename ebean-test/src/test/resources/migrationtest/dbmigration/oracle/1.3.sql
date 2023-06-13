@@ -86,6 +86,9 @@ exception
   when expected_error then null;
 end;
 $$;
+alter table drop_main_drop_ref_many drop constraint fk_drp_mn_drp_rf_mny_drp_mn;
+alter table drop_main_drop_ref_many drop constraint fk_drp_mn_drp_rf_mny_dr_joeslj;
+alter table drop_ref_one drop constraint fk_drop_ref_one_parent_id;
 alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_mgtst_mtm_c_mgtst_mt_93awga;
 alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_mgtst_mtm_c_mgtst_mt_93awgk;
 alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_mgtst_mtm_m_mgtst_mt_ggi34k;
