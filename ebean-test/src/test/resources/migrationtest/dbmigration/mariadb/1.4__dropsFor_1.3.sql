@@ -20,6 +20,13 @@ CALL usp_ebean_drop_column('migtest_e_history5', 'test_boolean');
 CALL usp_ebean_drop_column('migtest_e_softdelete', 'deleted');
 CALL usp_ebean_drop_column('migtest_oto_child', 'master_id');
 -- apply post alter
+drop table if exists drop_main;
+drop sequence if exists drop_main_seq;
+drop table if exists drop_main_drop_ref_many;
+drop table if exists drop_ref_many;
+drop sequence if exists drop_ref_many_seq;
+drop table if exists drop_ref_one;
+drop sequence if exists drop_ref_one_seq;
 drop table if exists migtest_e_user;
 drop sequence if exists migtest_e_user_seq;
 drop table if exists migtest_mtm_c_migtest_mtm_m;

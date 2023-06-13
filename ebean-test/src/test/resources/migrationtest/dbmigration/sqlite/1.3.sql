@@ -14,6 +14,9 @@
 -- not supported: alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
 -- not supported: alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
 -- not supported: alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
+-- not supported: alter table drop_main_drop_ref_many drop constraint if exists fk_drop_main_drop_ref_many_drop_main;
+-- not supported: alter table drop_main_drop_ref_many drop constraint if exists fk_drop_main_drop_ref_many_drop_ref_many;
+-- not supported: alter table drop_ref_one drop constraint if exists fk_drop_ref_one_parent_id;
 -- not supported: alter table migtest_mtm_c_migtest_mtm_m drop constraint if exists fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c;
 -- not supported: alter table migtest_mtm_c_migtest_mtm_m drop constraint if exists fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m;
 -- not supported: alter table migtest_mtm_m_migtest_mtm_c drop constraint if exists fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m;

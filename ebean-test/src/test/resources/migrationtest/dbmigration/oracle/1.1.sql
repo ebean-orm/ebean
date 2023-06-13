@@ -52,9 +52,6 @@ exception
   when expected_error then null;
 end;
 $$;
-alter table drop_main_drop_ref_many drop constraint fk_drp_mn_drp_rf_mny_drp_mn;
-alter table drop_main_drop_ref_many drop constraint fk_drp_mn_drp_rf_mny_dr_joeslj;
-alter table drop_ref_one drop constraint fk_drop_ref_one_parent_id;
 drop index ix_migtest_e_basic_indextest1;
 drop index ix_migtest_e_basic_indextest5;
 drop index ix_migtest_quoted_status1;
