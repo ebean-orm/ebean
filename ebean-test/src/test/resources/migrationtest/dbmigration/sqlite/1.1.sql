@@ -11,6 +11,31 @@ drop index if exists ix_migtest_e_basic_indextest1;
 drop index if exists ix_migtest_e_basic_indextest5;
 drop index if exists ix_migtest_quoted_status1;
 -- apply changes
+create table drop_main (
+  id                            integer not null,
+  constraint pk_drop_main primary key (id)
+);
+
+create table drop_main_drop_ref_many (
+  drop_main_id                  integer not null,
+  drop_ref_many_id              integer not null,
+  constraint pk_drop_main_drop_ref_many primary key (drop_main_id,drop_ref_many_id),
+  foreign key (drop_main_id) references drop_main (id) on delete restrict on update restrict,
+  foreign key (drop_ref_many_id) references drop_ref_many (id) on delete restrict on update restrict
+);
+
+create table drop_ref_many (
+  id                            integer not null,
+  constraint pk_drop_ref_many primary key (id)
+);
+
+create table drop_ref_one (
+  id                            integer not null,
+  parent_id                     integer,
+  constraint pk_drop_ref_one primary key (id),
+  foreign key (parent_id) references drop_main (id) on delete restrict on update restrict
+);
+
 create table migtest_e_test_binary (
   id                            integer not null,
   test_byte16                   varbinary(16),
