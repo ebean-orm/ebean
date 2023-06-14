@@ -56,6 +56,106 @@ drop index ix_migtest_e_basic_indextest1;
 drop index ix_migtest_e_basic_indextest5;
 drop index ix_migtest_quoted_status1;
 -- apply changes
+create table migtest_e_test_binary (
+  id                            number(10) not null,
+  test_byte16                   raw(16),
+  test_byte256                  raw(256),
+  test_byte512                  raw(512),
+  test_byte1k                   raw(1024),
+  test_byte2k                   blob,
+  test_byte4k                   blob,
+  test_byte8k                   blob,
+  test_byte16k                  blob,
+  test_byte32k                  blob,
+  test_byte64k                  blob,
+  test_byte128k                 blob,
+  test_byte256k                 blob,
+  test_byte512k                 blob,
+  test_byte1m                   blob,
+  test_byte2m                   blob,
+  test_byte4m                   blob,
+  test_byte8m                   blob,
+  test_byte16m                  blob,
+  test_byte32m                  blob,
+  constraint pk_migtest_e_test_binary primary key (id)
+);
+create sequence migtest_e_test_binary_seq;
+
+create table migtest_e_test_json (
+  id                            number(10) not null,
+  json255                       varchar2(255),
+  json256                       varchar2(256),
+  json512                       varchar2(512),
+  json1k                        varchar2(1024),
+  json2k                        varchar2(2048),
+  json4k                        clob,
+  json8k                        clob,
+  json16k                       clob,
+  json32k                       clob,
+  json64k                       clob,
+  json128k                      clob,
+  json256k                      clob,
+  json512k                      clob,
+  json1m                        clob,
+  json2m                        clob,
+  json4m                        clob,
+  json8m                        clob,
+  json16m                       clob,
+  json32m                       clob,
+  constraint pk_migtest_e_test_json primary key (id)
+);
+create sequence migtest_e_test_json_seq;
+
+create table migtest_e_test_lob (
+  id                            number(10) not null,
+  lob255                        clob,
+  lob256                        clob,
+  lob512                        clob,
+  lob1k                         clob,
+  lob2k                         clob,
+  lob4k                         clob,
+  lob8k                         clob,
+  lob16k                        clob,
+  lob32k                        clob,
+  lob64k                        clob,
+  lob128k                       clob,
+  lob256k                       clob,
+  lob512k                       clob,
+  lob1m                         clob,
+  lob2m                         clob,
+  lob4m                         clob,
+  lob8m                         clob,
+  lob16m                        clob,
+  lob32m                        clob,
+  constraint pk_migtest_e_test_lob primary key (id)
+);
+create sequence migtest_e_test_lob_seq;
+
+create table migtest_e_test_varchar (
+  id                            number(10) not null,
+  varchar255                    varchar2(255),
+  varchar256                    varchar2(256),
+  varchar512                    varchar2(512),
+  varchar1k                     varchar2(1024),
+  varchar2k                     varchar2(2048),
+  varchar4k                     clob,
+  varchar8k                     clob,
+  varchar16k                    clob,
+  varchar32k                    clob,
+  varchar64k                    clob,
+  varchar128k                   clob,
+  varchar256k                   clob,
+  varchar512k                   clob,
+  varchar1m                     clob,
+  varchar2m                     clob,
+  varchar4m                     clob,
+  varchar8m                     clob,
+  varchar16m                    clob,
+  varchar32m                    clob,
+  constraint pk_migtest_e_test_varchar primary key (id)
+);
+create sequence migtest_e_test_varchar_seq;
+
 create table migtest_e_user (
   id                            number(10) not null,
   constraint pk_migtest_e_user primary key (id)

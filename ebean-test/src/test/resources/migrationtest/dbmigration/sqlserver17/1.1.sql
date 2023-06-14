@@ -13,6 +13,106 @@ IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_b
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest5') drop index ix_migtest_e_basic_indextest5 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('"migtest_QuOtEd"','U') AND name = 'ix_migtest_quoted_status1') drop index ix_migtest_quoted_status1 ON "migtest_QuOtEd";
 -- apply changes
+create table migtest_e_test_binary (
+  id                            integer not null,
+  test_byte16                   varbinary(16),
+  test_byte256                  varbinary(256),
+  test_byte512                  varbinary(512),
+  test_byte1k                   varbinary(1024),
+  test_byte2k                   varbinary(2048),
+  test_byte4k                   varbinary(4096),
+  test_byte8k                   varbinary(max),
+  test_byte16k                  varbinary(max),
+  test_byte32k                  varbinary(max),
+  test_byte64k                  varbinary(max),
+  test_byte128k                 varbinary(max),
+  test_byte256k                 varbinary(max),
+  test_byte512k                 varbinary(max),
+  test_byte1m                   varbinary(max),
+  test_byte2m                   varbinary(max),
+  test_byte4m                   varbinary(max),
+  test_byte8m                   varbinary(max),
+  test_byte16m                  varbinary(max),
+  test_byte32m                  varbinary(max),
+  constraint pk_migtest_e_test_binary primary key (id)
+);
+create sequence migtest_e_test_binary_seq as bigint start with 1;
+
+create table migtest_e_test_json (
+  id                            integer not null,
+  json255                       nvarchar(255),
+  json256                       nvarchar(256),
+  json512                       nvarchar(512),
+  json1k                        nvarchar(1024),
+  json2k                        nvarchar(2048),
+  json4k                        nvarchar(max),
+  json8k                        nvarchar(max),
+  json16k                       nvarchar(max),
+  json32k                       nvarchar(max),
+  json64k                       nvarchar(max),
+  json128k                      nvarchar(max),
+  json256k                      nvarchar(max),
+  json512k                      nvarchar(max),
+  json1m                        nvarchar(max),
+  json2m                        nvarchar(max),
+  json4m                        nvarchar(max),
+  json8m                        nvarchar(max),
+  json16m                       nvarchar(max),
+  json32m                       nvarchar(max),
+  constraint pk_migtest_e_test_json primary key (id)
+);
+create sequence migtest_e_test_json_seq as bigint start with 1;
+
+create table migtest_e_test_lob (
+  id                            integer not null,
+  lob255                        nvarchar(max),
+  lob256                        nvarchar(max),
+  lob512                        nvarchar(max),
+  lob1k                         nvarchar(max),
+  lob2k                         nvarchar(max),
+  lob4k                         nvarchar(max),
+  lob8k                         nvarchar(max),
+  lob16k                        nvarchar(max),
+  lob32k                        nvarchar(max),
+  lob64k                        nvarchar(max),
+  lob128k                       nvarchar(max),
+  lob256k                       nvarchar(max),
+  lob512k                       nvarchar(max),
+  lob1m                         nvarchar(max),
+  lob2m                         nvarchar(max),
+  lob4m                         nvarchar(max),
+  lob8m                         nvarchar(max),
+  lob16m                        nvarchar(max),
+  lob32m                        nvarchar(max),
+  constraint pk_migtest_e_test_lob primary key (id)
+);
+create sequence migtest_e_test_lob_seq as bigint start with 1;
+
+create table migtest_e_test_varchar (
+  id                            integer not null,
+  varchar255                    nvarchar(255),
+  varchar256                    nvarchar(256),
+  varchar512                    nvarchar(512),
+  varchar1k                     nvarchar(1024),
+  varchar2k                     nvarchar(2048),
+  varchar4k                     nvarchar(max),
+  varchar8k                     nvarchar(max),
+  varchar16k                    nvarchar(max),
+  varchar32k                    nvarchar(max),
+  varchar64k                    nvarchar(max),
+  varchar128k                   nvarchar(max),
+  varchar256k                   nvarchar(max),
+  varchar512k                   nvarchar(max),
+  varchar1m                     nvarchar(max),
+  varchar2m                     nvarchar(max),
+  varchar4m                     nvarchar(max),
+  varchar8m                     nvarchar(max),
+  varchar16m                    nvarchar(max),
+  varchar32m                    nvarchar(max),
+  constraint pk_migtest_e_test_varchar primary key (id)
+);
+create sequence migtest_e_test_varchar_seq as bigint start with 1;
+
 create table migtest_e_user (
   id                            integer not null,
   constraint pk_migtest_e_user primary key (id)

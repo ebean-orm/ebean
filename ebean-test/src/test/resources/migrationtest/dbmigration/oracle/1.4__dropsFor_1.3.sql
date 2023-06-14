@@ -51,6 +51,50 @@ exception
   when expected_error then null;
 end;
 $$;
+drop table migtest_e_test_binary cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_test_binary_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table migtest_e_test_json cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_test_json_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table migtest_e_test_lob cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_test_lob_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table migtest_e_test_varchar cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_test_varchar_seq';
+exception
+  when expected_error then null;
+end;
+$$;
 drop table migtest_e_user cascade constraints purge;
 delimiter $$
 declare

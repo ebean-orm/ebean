@@ -93,7 +93,7 @@ create table migtest_e_basic (
   status2                       nvarchar(1) default 'N' not null,
   name                          nvarchar(127),
   description                   nvarchar(127),
-  description_file              image,
+  description_file              varbinary(max),
   json_list                     nvarchar(max),
   a_lob                         nvarchar(255) default 'X' not null,
   some_date                     datetime2,

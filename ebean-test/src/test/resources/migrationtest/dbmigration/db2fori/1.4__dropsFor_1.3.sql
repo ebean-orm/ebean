@@ -73,6 +73,38 @@ if exists (select seqschema from syscat.sequences where seqschema = current_sche
   execute stmt;
 end if;
 end$$;
+drop table migtest_e_test_binary;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'MIGTEST_E_TEST_BINARY_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_test_binary_seq';
+  execute stmt;
+end if;
+end$$;
+drop table migtest_e_test_json;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'MIGTEST_E_TEST_JSON_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_test_json_seq';
+  execute stmt;
+end if;
+end$$;
+drop table migtest_e_test_lob;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'MIGTEST_E_TEST_LOB_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_test_lob_seq';
+  execute stmt;
+end if;
+end$$;
+drop table migtest_e_test_varchar;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'MIGTEST_E_TEST_VARCHAR_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_test_varchar_seq';
+  execute stmt;
+end if;
+end$$;
 drop table migtest_e_user;
 delimiter $$
 begin

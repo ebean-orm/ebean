@@ -82,7 +82,7 @@ create table migtest_e_basic (
   status2                       varchar(1) default 'N' not null,
   name                          varchar(127),
   description                   varchar(127),
-  description_file              binary(4500),
+  description_file              long binary,
   json_list                     long varchar,
   a_lob                         varchar(255) default 'X' not null,
   some_date                     timestamp,

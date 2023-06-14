@@ -8,6 +8,102 @@ drop index ix_migtest_e_basic_indextest1 on migtest_e_basic;
 drop index ix_migtest_e_basic_indextest5 on migtest_e_basic;
 drop index ix_migtest_quoted_status1 on `migtest_QuOtEd`;
 -- apply changes
+create table migtest_e_test_binary (
+  id                            integer auto_increment not null,
+  test_byte16                   varbinary(16),
+  test_byte256                  varbinary(256),
+  test_byte512                  varbinary(512),
+  test_byte1k                   varbinary(1024),
+  test_byte2k                   varbinary(2048),
+  test_byte4k                   varbinary(4096),
+  test_byte8k                   blob,
+  test_byte16k                  blob,
+  test_byte32k                  blob,
+  test_byte64k                  mediumblob,
+  test_byte128k                 mediumblob,
+  test_byte256k                 mediumblob,
+  test_byte512k                 mediumblob,
+  test_byte1m                   mediumblob,
+  test_byte2m                   mediumblob,
+  test_byte4m                   mediumblob,
+  test_byte8m                   mediumblob,
+  test_byte16m                  longblob,
+  test_byte32m                  longblob,
+  constraint pk_migtest_e_test_binary primary key (id)
+);
+
+create table migtest_e_test_json (
+  id                            integer auto_increment not null,
+  json255                       json,
+  json256                       json,
+  json512                       json,
+  json1k                        json,
+  json2k                        json,
+  json4k                        json,
+  json8k                        json,
+  json16k                       json,
+  json32k                       json,
+  json64k                       json,
+  json128k                      json,
+  json256k                      json,
+  json512k                      json,
+  json1m                        json,
+  json2m                        json,
+  json4m                        json,
+  json8m                        json,
+  json16m                       json,
+  json32m                       json,
+  constraint pk_migtest_e_test_json primary key (id)
+);
+
+create table migtest_e_test_lob (
+  id                            integer auto_increment not null,
+  lob255                        longtext,
+  lob256                        longtext,
+  lob512                        longtext,
+  lob1k                         longtext,
+  lob2k                         longtext,
+  lob4k                         longtext,
+  lob8k                         longtext,
+  lob16k                        longtext,
+  lob32k                        longtext,
+  lob64k                        longtext,
+  lob128k                       longtext,
+  lob256k                       longtext,
+  lob512k                       longtext,
+  lob1m                         longtext,
+  lob2m                         longtext,
+  lob4m                         longtext,
+  lob8m                         longtext,
+  lob16m                        longtext,
+  lob32m                        longtext,
+  constraint pk_migtest_e_test_lob primary key (id)
+);
+
+create table migtest_e_test_varchar (
+  id                            integer auto_increment not null,
+  varchar255                    varchar(255),
+  varchar256                    varchar(256),
+  varchar512                    varchar(512),
+  varchar1k                     varchar(1024),
+  varchar2k                     varchar(2048),
+  varchar4k                     text,
+  varchar8k                     varchar(8193),
+  varchar16k                    text,
+  varchar32k                    text,
+  varchar64k                    mediumtext,
+  varchar128k                   mediumtext,
+  varchar256k                   mediumtext,
+  varchar512k                   mediumtext,
+  varchar1m                     mediumtext,
+  varchar2m                     mediumtext,
+  varchar4m                     mediumtext,
+  varchar8m                     mediumtext,
+  varchar16m                    longtext,
+  varchar32m                    longtext,
+  constraint pk_migtest_e_test_varchar primary key (id)
+);
+
 create table migtest_e_user (
   id                            integer auto_increment not null,
   constraint pk_migtest_e_user primary key (id)

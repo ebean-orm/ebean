@@ -79,6 +79,94 @@
             <column name="textfield2" type="varchar"/>
         </addColumn>
         <addUniqueConstraint constraintName="uq_table_select" tableName="&quot;table&quot;" columnNames="&quot;select&quot;" oneToOne="false" nullableColumns="&quot;select&quot;"/>
+        <createTable name="migtest_e_test_binary" pkName="pk_migtest_e_test_binary">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="test_byte16" type="varbinary(16)"/>
+            <column name="test_byte256" type="varbinary(256)"/>
+            <column name="test_byte512" type="varbinary(512)"/>
+            <column name="test_byte1k" type="varbinary(1024)"/>
+            <column name="test_byte2k" type="varbinary(2048)"/>
+            <column name="test_byte4k" type="varbinary(4096)"/>
+            <column name="test_byte8k" type="varbinary(8192)"/>
+            <column name="test_byte16k" type="varbinary(16384)"/>
+            <column name="test_byte32k" type="varbinary(32768)"/>
+            <column name="test_byte64k" type="varbinary(65536)"/>
+            <column name="test_byte128k" type="varbinary(131072)"/>
+            <column name="test_byte256k" type="varbinary(262144)"/>
+            <column name="test_byte512k" type="varbinary(524288)"/>
+            <column name="test_byte1m" type="varbinary(1048576)"/>
+            <column name="test_byte2m" type="varbinary(2097152)"/>
+            <column name="test_byte4m" type="varbinary(4194304)"/>
+            <column name="test_byte8m" type="varbinary(8388608)"/>
+            <column name="test_byte16m" type="varbinary(16777216)"/>
+            <column name="test_byte32m" type="varbinary(33554432)"/>
+        </createTable>
+        <createTable name="migtest_e_test_json" pkName="pk_migtest_e_test_json">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="json255" type="json(255)"/>
+            <column name="json256" type="json(256)"/>
+            <column name="json512" type="json(512)"/>
+            <column name="json1k" type="json(1024)"/>
+            <column name="json2k" type="json(2048)"/>
+            <column name="json4k" type="json(4096)"/>
+            <column name="json8k" type="json(8192)"/>
+            <column name="json16k" type="json(16384)"/>
+            <column name="json32k" type="json(32768)"/>
+            <column name="json64k" type="json(65536)"/>
+            <column name="json128k" type="json(131072)"/>
+            <column name="json256k" type="json(262144)"/>
+            <column name="json512k" type="json(524288)"/>
+            <column name="json1m" type="json(1048576)"/>
+            <column name="json2m" type="json(2097152)"/>
+            <column name="json4m" type="json(4194304)"/>
+            <column name="json8m" type="json(8388608)"/>
+            <column name="json16m" type="json(16777216)"/>
+            <column name="json32m" type="json(33554432)"/>
+        </createTable>
+        <createTable name="migtest_e_test_lob" pkName="pk_migtest_e_test_lob">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="lob255" type="clob"/>
+            <column name="lob256" type="clob"/>
+            <column name="lob512" type="clob"/>
+            <column name="lob1k" type="clob"/>
+            <column name="lob2k" type="clob"/>
+            <column name="lob4k" type="clob"/>
+            <column name="lob8k" type="clob"/>
+            <column name="lob16k" type="clob"/>
+            <column name="lob32k" type="clob"/>
+            <column name="lob64k" type="clob"/>
+            <column name="lob128k" type="clob"/>
+            <column name="lob256k" type="clob"/>
+            <column name="lob512k" type="clob"/>
+            <column name="lob1m" type="clob"/>
+            <column name="lob2m" type="clob"/>
+            <column name="lob4m" type="clob"/>
+            <column name="lob8m" type="clob"/>
+            <column name="lob16m" type="clob"/>
+            <column name="lob32m" type="clob"/>
+        </createTable>
+        <createTable name="migtest_e_test_varchar" pkName="pk_migtest_e_test_varchar">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="varchar255" type="varchar(255)"/>
+            <column name="varchar256" type="varchar(256)"/>
+            <column name="varchar512" type="varchar(512)"/>
+            <column name="varchar1k" type="varchar(1024)"/>
+            <column name="varchar2k" type="varchar(2048)"/>
+            <column name="varchar4k" type="varchar(4096)"/>
+            <column name="varchar8k" type="mariadb,mysql;varchar(8193);varchar(8192)"/>
+            <column name="varchar16k" type="varchar(16384)"/>
+            <column name="varchar32k" type="varchar(32768)"/>
+            <column name="varchar64k" type="varchar(65536)"/>
+            <column name="varchar128k" type="varchar(131072)"/>
+            <column name="varchar256k" type="varchar(262144)"/>
+            <column name="varchar512k" type="varchar(524288)"/>
+            <column name="varchar1m" type="varchar(1048576)"/>
+            <column name="varchar2m" type="varchar(2097152)"/>
+            <column name="varchar4m" type="varchar(4194304)"/>
+            <column name="varchar8m" type="varchar(8388608)"/>
+            <column name="varchar16m" type="varchar(16777216)"/>
+            <column name="varchar32m" type="varchar(33554432)"/>
+        </createTable>
         <createTable name="migtest_e_user" pkName="pk_migtest_e_user">
             <column name="id" type="integer" primaryKey="true"/>
         </createTable>
