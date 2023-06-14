@@ -62,7 +62,7 @@ class DbTypeMapTest {
     assertThat(dbTypeMap.lookup("json", false).renderType(0, 0)).isEqualTo("nvarchar(max)");
     assertThat(dbTypeMap.lookup("jsonb", false).renderType(0, 0)).isEqualTo("nvarchar(max)");
     assertThat(dbTypeMap.lookup("jsonclob", false).renderType(0, 0)).isEqualTo("nvarchar(max)");
-    assertThat(dbTypeMap.lookup("jsonblob", false).renderType(0, 0)).isEqualTo("image");
+    assertThat(dbTypeMap.lookup("jsonblob", false).renderType(0, 0)).isEqualTo("varbinary(max)");
     assertThat(dbTypeMap.lookup("jsonvarchar", false).renderType(200, 0)).isEqualTo("nvarchar(200)");
   }
 
