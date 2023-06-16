@@ -129,6 +129,10 @@ final class AnnotationClass extends AnnotationParser {
       for (UniqueConstraint c : uniqueConstraints) {
         descriptor.addIndex(new IndexDefinition(c.name(), convertColumnNames(c.columnNames())));
       }
+      for (javax.persistence.Index index : table.indexes()) {
+        final String[] cols = index.columnList().split(",");
+        descriptor.addIndex(new IndexDefinition(index.name(), convertColumnNames(cols), index.unique()));
+      }
     }
     StorageEngine storage = typeGet(cls, StorageEngine.class);
     if (storage != null) {
