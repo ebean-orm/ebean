@@ -32,6 +32,11 @@ public class DbConstraintNamingTest {
   }
 
   @Test
+  public void testIndexNameWithSpaces() {
+    assertThat(naming.indexName("foo", new String[]{"name", "other desc"})).isEqualTo("ix_foo_name_other_desc");
+  }
+
+  @Test
   public void testDefaultToLower() {
     assertThat(naming.normaliseTable("SCH.FOO_BAR]")).isEqualTo("foo_bar");
   }

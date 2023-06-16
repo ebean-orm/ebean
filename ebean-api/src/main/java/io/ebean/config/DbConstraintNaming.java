@@ -144,7 +144,7 @@ public class DbConstraintNaming {
       }
       sb.append(normaliseColumn(columns[i]));
     }
-    return sb.toString();
+    return sb.toString().replace(" ", "_");
   }
 
   /**
