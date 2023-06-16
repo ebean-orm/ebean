@@ -80,7 +80,7 @@ alter table migtest_e_basic add default 'X' for a_lob;
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, user_id;
 alter table migtest_e_basic alter column user_id integer not null;
 alter table migtest_e_basic add default 23 for user_id;
-alter table migtest_e_basic add description_file image;
+alter table migtest_e_basic add description_file varbinary(max);
 alter table migtest_e_basic add old_boolean bit default 0 not null;
 alter table migtest_e_basic add old_boolean2 bit;
 alter table migtest_e_basic add eref_id integer;

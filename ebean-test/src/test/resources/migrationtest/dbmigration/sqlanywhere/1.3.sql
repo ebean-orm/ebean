@@ -63,7 +63,7 @@ alter table migtest_e_basic alter column a_lob set default 'X';
 alter table migtest_e_basic alter column a_lob set not null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
-alter table migtest_e_basic add column description_file binary(4500);
+alter table migtest_e_basic add column description_file long binary;
 alter table migtest_e_basic add column old_boolean bit default false not null;
 alter table migtest_e_basic add column old_boolean2 bit;
 alter table migtest_e_basic add column eref_id integer;

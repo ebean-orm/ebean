@@ -35,6 +35,102 @@ create table drop_ref_one (
   constraint pk_drop_ref_one primary key (id)
 );
 
+create table migtest_e_test_binary (
+  id                            integer identity(1,1) not null,
+  test_byte16                   image,
+  test_byte256                  image,
+  test_byte512                  image,
+  test_byte1k                   image,
+  test_byte2k                   image,
+  test_byte4k                   image,
+  test_byte8k                   image,
+  test_byte16k                  image,
+  test_byte32k                  image,
+  test_byte64k                  image,
+  test_byte128k                 image,
+  test_byte256k                 image,
+  test_byte512k                 image,
+  test_byte1m                   image,
+  test_byte2m                   image,
+  test_byte4m                   image,
+  test_byte8m                   image,
+  test_byte16m                  image,
+  test_byte32m                  image,
+  constraint pk_migtest_e_test_binary primary key (id)
+);
+
+create table migtest_e_test_json (
+  id                            integer identity(1,1) not null,
+  json255                       text,
+  json256                       text,
+  json512                       text,
+  json1k                        text,
+  json2k                        text,
+  json4k                        text,
+  json8k                        text,
+  json16k                       text,
+  json32k                       text,
+  json64k                       text,
+  json128k                      text,
+  json256k                      text,
+  json512k                      text,
+  json1m                        text,
+  json2m                        text,
+  json4m                        text,
+  json8m                        text,
+  json16m                       text,
+  json32m                       text,
+  constraint pk_migtest_e_test_json primary key (id)
+);
+
+create table migtest_e_test_lob (
+  id                            integer identity(1,1) not null,
+  lob255                        text,
+  lob256                        text,
+  lob512                        text,
+  lob1k                         text,
+  lob2k                         text,
+  lob4k                         text,
+  lob8k                         text,
+  lob16k                        text,
+  lob32k                        text,
+  lob64k                        text,
+  lob128k                       text,
+  lob256k                       text,
+  lob512k                       text,
+  lob1m                         text,
+  lob2m                         text,
+  lob4m                         text,
+  lob8m                         text,
+  lob16m                        text,
+  lob32m                        text,
+  constraint pk_migtest_e_test_lob primary key (id)
+);
+
+create table migtest_e_test_varchar (
+  id                            integer identity(1,1) not null,
+  varchar255                    varchar(255),
+  varchar256                    varchar(256),
+  varchar512                    varchar(512),
+  varchar1k                     varchar(1024),
+  varchar2k                     varchar(2048),
+  varchar4k                     varchar(4096),
+  varchar8k                     text,
+  varchar16k                    text,
+  varchar32k                    text,
+  varchar64k                    text,
+  varchar128k                   text,
+  varchar256k                   text,
+  varchar512k                   text,
+  varchar1m                     text,
+  varchar2m                     text,
+  varchar4m                     text,
+  varchar8m                     text,
+  varchar16m                    text,
+  varchar32m                    text,
+  constraint pk_migtest_e_test_varchar primary key (id)
+);
+
 create table migtest_e_user (
   id                            integer identity(1,1) not null,
   constraint pk_migtest_e_user primary key (id)
