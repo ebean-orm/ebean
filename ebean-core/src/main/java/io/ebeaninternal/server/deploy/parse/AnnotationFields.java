@@ -4,10 +4,7 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.*;
 import io.ebean.config.EncryptDeploy;
 import io.ebean.config.EncryptDeploy.Mode;
-import io.ebean.config.dbplatform.DbEncrypt;
-import io.ebean.config.dbplatform.DbEncryptFunction;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebean.config.dbplatform.*;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
 import io.ebeaninternal.server.deploy.IndexDefinition;
@@ -153,6 +150,7 @@ final class AnnotationFields extends AnnotationParser {
     for (Index index : annotationIndexes(prop)) {
       addIndex(prop, index);
     }
+    initBindValidator(prop);
   }
 
   private void initIdentity(DeployBeanProperty prop) {
@@ -310,6 +308,18 @@ final class AnnotationFields extends AnnotationParser {
       } else if (Mode.MODE_ENCRYPT == encryptDeploy.getMode()) {
         setEncryption(prop, encryptDeploy.isDbEncrypt(), encryptDeploy.getDbLength());
       }
+    }
+  }
+
+  private void initBindValidator(DeployBeanProperty prop) {
+    if (!prop.isTransient() && readConfig.bindValidatorFatory() != null) {
+      PropertyDefinition meta = new PropertyDefinition(
+        prop.getDbType(),
+        prop.getDbLength(),
+        prop.getDesc().getBaseTable(),
+        prop.getDbColumn(),
+        prop.getDbColumnDefn());
+      prop.setBindValidator(readConfig.bindValidatorFatory().create(meta));
     }
   }
 

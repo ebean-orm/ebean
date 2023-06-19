@@ -5,6 +5,7 @@ import io.ebean.annotation.Formula;
 import io.ebean.annotation.Where;
 import io.ebean.config.ClassLoadConfig;
 import io.ebean.config.DatabaseConfig;
+import io.ebean.config.dbplatform.BindValidatorFactory;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
@@ -30,8 +31,9 @@ final class ReadAnnotationConfig {
   private final ReadValidationAnnotations javaxValidation;
   private final ReadValidationAnnotations jakartaValidation;
   private final Set<Class<?>> metaAnnotations = new HashSet<>();
+  private final BindValidatorFactory bindValidatorFatory;
 
-  ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config) {
+  ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config, BindValidatorFactory bindValidatorFatory) {
     this.generatedPropFactory = generatedPropFactory;
     this.asOfViewSuffix = asOfViewSuffix;
     this.versionsBetweenSuffix = versionsBetweenSuffix;
@@ -51,6 +53,7 @@ final class ReadAnnotationConfig {
     this.metaAnnotations.add(Aggregation.class);
     this.javaxValidation = javaxValidationAnnotations ? new ReadValidationAnnotationsJavax(this) : null;
     this.jakartaValidation = jakartaValidationAnnotations ? new ReadValidationAnnotationsJakarta(this) : null;
+    this.bindValidatorFatory = bindValidatorFatory;
     if (jacksonAnnotations) {
       InitMetaJacksonAnnotation.init(this);
     }
@@ -123,4 +126,7 @@ final class ReadAnnotationConfig {
     return maxSize;
   }
 
+  BindValidatorFactory bindValidatorFatory() {
+    return bindValidatorFatory;
+  }
 }

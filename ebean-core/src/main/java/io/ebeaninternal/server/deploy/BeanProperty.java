@@ -7,6 +7,7 @@ import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.MutableValueInfo;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
+import io.ebean.config.dbplatform.BindValidator;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataReader;
@@ -166,6 +167,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   private final String dbComment;
   private final DbEncryptFunction dbEncryptFunction;
+  private final BindValidator bindValidator;
   private int deployOrder;
   final boolean jsonSerialize;
   final boolean jsonDeserialize;
@@ -248,6 +250,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);
     this.elPrefix = deploy.getElPrefix();
     this.softDelete = deploy.isSoftDelete();
+    this.bindValidator = deploy.getBindValidator();
     if (softDelete) {
       ScalarTypeBoolean.BooleanBase boolType = (ScalarTypeBoolean.BooleanBase) scalarType;
       this.softDeleteDbSet = dbColumn + "=" + boolType.getDbTrueLiteral();
@@ -345,6 +348,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
     this.jsonSerialize = source.jsonSerialize;
     this.jsonDeserialize = source.jsonDeserialize;
+    this.bindValidator = source.bindValidator;
   }
 
   /**
@@ -553,7 +557,17 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @SuppressWarnings("unchecked")
   public void bind(DataBind b, Object value) throws SQLException {
-    scalarType.bind(b, value);
+    try {
+      scalarType.bind(b, value);
+      if (bindValidator != null) {
+        bindValidator.validate(b.popLastObject());
+      }
+    } catch (Throwable t) {
+      // in case of an error, we must close all input streams
+      b.closeInputStreams();
+      throw t;
+    }
+
   }
 
   @SuppressWarnings(value = "unchecked")
@@ -938,6 +952,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @SuppressWarnings(value = "unchecked")
   public ScalarType<Object> scalarType() {
     return scalarType;
+  }
+
+  /**
+   * Return the bindValidator.
+   */
+  public BindValidator bindValidator() {
+    return bindValidator;
   }
 
   @Override

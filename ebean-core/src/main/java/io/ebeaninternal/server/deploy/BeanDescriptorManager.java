@@ -138,7 +138,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.queryPlanTTLSeconds = this.config.getQueryPlanTTLSeconds();
     this.asOfViewSuffix = asOfViewSuffix(databasePlatform, this.config);
     String versionsBetweenSuffix = versionsBetweenSuffix(databasePlatform, this.config);
-    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix, this.config);
+    this.readAnnotations = new ReadAnnotations(config.getGeneratedPropertyFactory(), asOfViewSuffix, versionsBetweenSuffix, this.config, this.databasePlatform.getBindValidatorFactory());
     this.bootupClasses = config.getBootupClasses();
     this.createProperties = config.getDeployCreateProperties();
     this.namingConvention = this.config.getNamingConvention();

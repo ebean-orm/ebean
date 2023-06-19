@@ -1,9 +1,10 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.config.dbplatform.BindValidator;
 import io.ebean.core.type.ScalarType;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.bind.DataBind;
 
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
@@ -54,10 +55,12 @@ public final class OrmUpdateProperties {
 
     final Object value;
     final ScalarType<Object> scalarType;
+    private final BindValidator bindValidator;
 
-    SimpleValue(Object value, ScalarType<Object> scalarType) {
+    SimpleValue(Object value, ScalarType<Object> scalarType, BindValidator bindValidator) {
       this.value = value;
       this.scalarType = scalarType;
+      this.bindValidator = bindValidator;
     }
 
     @Override
@@ -72,12 +75,20 @@ public final class OrmUpdateProperties {
 
     @Override
     public void bind(Binder binder, DataBind dataBind) throws SQLException {
-      if (scalarType != null) {
-        scalarType.bind(dataBind, value);
-      } else {
-        binder.bindObject(dataBind, value);
+      try {
+        if (scalarType != null) {
+          scalarType.bind(dataBind, value);
+          if (bindValidator != null) {
+            bindValidator.validate(dataBind.popLastObject());
+          }
+        } else {
+          binder.bindObject(dataBind, value);
+        }
+        dataBind.append(value).append(",");
+      } catch (Throwable t) {
+        dataBind.closeInputStreams();
+        throw t;
       }
-      dataBind.append(value).append(",");
     }
   }
 
@@ -121,8 +132,8 @@ public final class OrmUpdateProperties {
    */
   private final LinkedHashMap<String, Value> values = new LinkedHashMap<>();
 
-  public void set(String propertyName, Object value, ScalarType<Object> scalarType) {
-    values.put(propertyName, new SimpleValue(value, scalarType));
+  public void set(String propertyName, Object value, ScalarType<Object> scalarType, BindValidator bindValidator) {
+    values.put(propertyName, new SimpleValue(value, scalarType, bindValidator));
   }
 
   public void setNull(String propertyName) {

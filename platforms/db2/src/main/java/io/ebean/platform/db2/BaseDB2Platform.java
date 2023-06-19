@@ -15,6 +15,7 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
   public BaseDB2Platform() {
     super();
     this.platform = Platform.DB2;
+    this.bindValidatorFactory = new Utf8BindValidatorFactory();
     this.supportsNativeJavaTime = false;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.likeClauseRaw = "like ?";

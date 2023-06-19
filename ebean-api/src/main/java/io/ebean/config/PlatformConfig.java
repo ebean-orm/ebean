@@ -1,6 +1,7 @@
 package io.ebean.config;
 
 import io.ebean.annotation.Platform;
+import io.ebean.config.dbplatform.BindValidatorFactory;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.util.StringHelper;
@@ -23,6 +24,11 @@ public class PlatformConfig {
   private boolean forUpdateNoKey;
 
   private DbConstraintNaming constraintNaming;
+
+  /**
+   * The BindValidatorFactory to use.
+   */
+  private BindValidatorFactory bindValidatorFactory;
 
   /**
    * Flag set when a supplied constraintNaming is used.
@@ -96,6 +102,7 @@ public class PlatformConfig {
     this.allQuotedIdentifiers = platformConfig.allQuotedIdentifiers;
     this.databaseInetAddressVarchar = platformConfig.databaseInetAddressVarchar;
     this.customDbTypeMappings = platformConfig.customDbTypeMappings;
+    this.bindValidatorFactory = platformConfig.bindValidatorFactory;
     this.constraintNaming = new DbConstraintNaming(!allQuotedIdentifiers);
   }
 
@@ -325,6 +332,21 @@ public class PlatformConfig {
     return customDbTypeMappings;
   }
 
+  /**
+   * Set the bindValidatorFactory.
+   */
+  public void setBindValidatorFactory(BindValidatorFactory bindValidatorFactory) {
+    this.bindValidatorFactory = bindValidatorFactory;
+  }
+
+  /**
+   * Return the bindValidatorFactory for this platform.
+   */
+  public BindValidatorFactory getBindValidatorFactory() {
+    return bindValidatorFactory;
+  }
+
+
   public void loadSettings(PropertiesWrapper p) {
 
     idType = p.getEnum(IdType.class, "idType", idType);
@@ -335,6 +357,7 @@ public class PlatformConfig {
     databaseInetAddressVarchar = p.getBoolean("databaseInetAddressVarchar", databaseInetAddressVarchar);
     caseSensitiveCollation = p.getBoolean("caseSensitiveCollation", caseSensitiveCollation);
     useMigrationStoredProcedures = p.getBoolean("useMigrationStoredProcedures", useMigrationStoredProcedures);
+    bindValidatorFactory = p.createInstance(BindValidatorFactory.class, "bindValidatorFactory", bindValidatorFactory);
 
     DbUuid dbUuid = p.getEnum(DbUuid.class, "dbuuid", null);
     if (dbUuid != null) {

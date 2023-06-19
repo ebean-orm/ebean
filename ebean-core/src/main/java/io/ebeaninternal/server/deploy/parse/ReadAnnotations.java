@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.config.DatabaseConfig;
+import io.ebean.config.dbplatform.BindValidatorFactory;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 
@@ -12,8 +13,8 @@ public final class ReadAnnotations {
 
   private final ReadAnnotationConfig readConfig;
 
-  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config) {
-    this.readConfig = new ReadAnnotationConfig(generatedPropFactory, asOfViewSuffix, versionsBetweenSuffix, config);
+  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config, BindValidatorFactory bindValidatorFatory) {
+    this.readConfig = new ReadAnnotationConfig(generatedPropFactory, asOfViewSuffix, versionsBetweenSuffix, config, bindValidatorFatory);
   }
 
   /**

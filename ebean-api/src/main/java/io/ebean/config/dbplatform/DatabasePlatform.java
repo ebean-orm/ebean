@@ -197,6 +197,8 @@ public class DatabasePlatform {
 
   protected boolean supportsNativeIlike;
 
+  protected BindValidatorFactory bindValidatorFactory = new DefaultBindValidatorFactory();
+
   protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
 
   /**
@@ -219,6 +221,9 @@ public class DatabasePlatform {
     this.sequenceBatchSize = config.getDatabaseSequenceBatchSize();
     this.caseSensitiveCollation = config.isCaseSensitiveCollation();
     this.useMigrationStoredProcedures = config.isUseMigrationStoredProcedures();
+    if (config.getBindValidatorFactory() != null) {
+      this.bindValidatorFactory = config.getBindValidatorFactory();
+    }
     configureIdType(config.getIdType());
     configure(config, config.isAllQuotedIdentifiers());
   }
@@ -299,6 +304,20 @@ public class DatabasePlatform {
    */
   public boolean supportsNativeIlike() {
     return supportsNativeIlike;
+  }
+
+  /**
+   * Return the bindValidatorFactory for this platform.
+   */
+  public BindValidatorFactory getBindValidatorFactory() {
+    return bindValidatorFactory;
+  }
+
+  /**
+   * Set the bindValidatorFactory.
+   */
+  public void setBindValidatorFactory(BindValidatorFactory bindValidatorFactory) {
+    this.bindValidatorFactory = bindValidatorFactory;
   }
 
   /**

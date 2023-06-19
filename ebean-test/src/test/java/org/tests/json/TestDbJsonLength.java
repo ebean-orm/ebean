@@ -1,14 +1,18 @@
 package org.tests.json;
 
 import io.ebean.DB;
-import io.ebean.DataIntegrityException;
-import org.assertj.core.api.SoftAssertions;
+import io.ebean.DataBindException;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
+import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.EBasicJsonMap;
 
+import java.util.List;
 import java.util.Map;
 
-class TestDbJsonLength {
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
+class TestDbJsonLength extends BaseTestCase {
 
 
     /**
@@ -31,22 +35,39 @@ class TestDbJsonLength {
     bean.setName("b1");
     bean.setContent(Map.of("string", s));
 
-    SoftAssertions softly = new SoftAssertions();
-
-    softly.assertThatThrownBy(() -> {
+    assertThatThrownBy(() -> {
+      // we expect, that we can NOT save the bean, this is ensured by the bind validator.
       DB.save(bean);
-    }).isInstanceOf(DataIntegrityException.class);
-
-
-    if (bean.getId() != null) {
-      // we expect, that we could NOT save the bean, but this is not true for sqlServer.
-      // we will get a javax.persistence.PersistenceException: Error loading on org.tests.model.json.EBasicJsonMap.content
-      // when we try to load the bean back from DB
-      DB.find(EBasicJsonMap.class, bean.getId());
-    }
-
-    softly.assertAll();
+    }).isInstanceOf(DataBindException.class);
 
   }
+
+
+  /**
+   * Tests the UTF8 validation.
+   */
+  @Test
+  void testUtf8() {
+
+    String s = new String(new char[40]).replace('\0', '€');
+
+    EBasicJsonList bean = new EBasicJsonList();
+    bean.setName("b1");
+    bean.setTags(List.of(s));
+
+    if (isDb2()) {
+      // by default, DB2 uses bytes in varchar, so an '€' symbol needs 3 bytes
+      assertThatThrownBy(() -> {
+        // we expect, that we can NOT save the bean, this is ensured by the bind validator.
+        DB.save(bean);
+      }).isInstanceOf(DataBindException.class);
+    } else {
+      DB.save(bean);
+    }
+
+
+  }
+
+
 
 }
