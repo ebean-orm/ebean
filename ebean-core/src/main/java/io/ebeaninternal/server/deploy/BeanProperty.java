@@ -1,16 +1,20 @@
 package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.DataIntegrityException;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.MutableValueInfo;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
+import io.ebean.config.LengthCheck;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.InputStreamInfo;
 import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
@@ -46,6 +50,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
@@ -554,6 +559,22 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @SuppressWarnings("unchecked")
   public void bind(DataBind b, Object value) throws SQLException {
     scalarType.bind(b, value);
+
+    if (needsLengthCheck()) {
+      LengthCheck lengthCheck = descriptor().config().getLengthCheck();
+      if (lengthCheck != LengthCheck.OFF) {
+        Object obj = b.popLastObject();
+        long l = getLength(obj, lengthCheck == LengthCheck.UTF8);
+        if (l > dbLength) {
+          b.closeInputStreams();
+          String s = String.valueOf(value); // take original bind value here.
+          if (s.length() > 100) {
+            s = s.substring(0, 97) + "...";
+          }
+          throw new DataIntegrityException("Cannot bind value '" + s + "' (effective length=" + l + ") to column '" + dbColumn + "' (length=" + dbLength + ")");
+        }
+      }
+    }
   }
 
   @SuppressWarnings(value = "unchecked")
@@ -563,6 +584,43 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   public Object readData(DataInput dataInput) throws IOException {
     return scalarType.readData(dataInput);
+  }
+
+  /**
+   * Returns, if this property needs a length check.
+   */
+  boolean needsLengthCheck() {
+    if (dbLength == 0) {
+      return false;
+    }
+    switch (dbType) {
+      case Types.VARCHAR:
+      case Types.BLOB:
+      case ExtraDbTypes.JSON:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Returns the length of <code>obj</code>. Note: for UTF8 strings -1 will be retuned, if the string length is lower than 1/4th of db length
+   */
+  private long getLength(Object obj, boolean utf8) {
+    if (obj instanceof String) {
+      String s = (String) obj;
+      if (utf8) {
+        return s.length() * 4 <= dbLength ? -1 : s.getBytes(StandardCharsets.UTF_8).length;
+      } else {
+        return s.length();
+      }
+    } else if (obj instanceof byte[]) {
+      return ((byte[]) obj).length;
+    } else if (obj instanceof InputStreamInfo) {
+      return ((InputStreamInfo) obj).length();
+    } else {
+      return -1;
+    }
   }
 
   @Override

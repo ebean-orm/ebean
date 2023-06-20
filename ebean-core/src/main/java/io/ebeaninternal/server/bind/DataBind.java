@@ -19,7 +19,6 @@ import static java.lang.System.Logger.Level.WARNING;
 
 public class DataBind implements DataBinder {
 
-  private static final Object UNBOUND = new Object();
   private final DataTimeZone dataTimeZone;
   private final PreparedStatement pstmt;
   private final Connection connection;
@@ -28,7 +27,7 @@ public class DataBind implements DataBinder {
   protected int pos;
   private String json;
 
-  private Object lastObject = UNBOUND;
+  private Object lastObject = null;
 
   public DataBind(DataTimeZone dataTimeZone, PreparedStatement pstmt, Connection connection) {
     this.dataTimeZone = dataTimeZone;
@@ -259,10 +258,7 @@ public class DataBind implements DataBinder {
   @Override
   public Object popLastObject() {
     Object ret = lastObject;
-    lastObject = UNBOUND;
-    if (ret == UNBOUND) {
-      throw new IllegalStateException("No object bound");
-    }
+    lastObject = null;
     return ret;
   }
 }
