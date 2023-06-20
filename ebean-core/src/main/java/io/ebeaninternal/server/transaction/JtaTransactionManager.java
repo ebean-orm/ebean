@@ -52,7 +52,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     return transactionManager.dataSource();
   }
 
-  private TransactionSynchronizationRegistry getSyncRegistry() {
+  private TransactionSynchronizationRegistry registry() {
     try {
       InitialContext ctx = new InitialContext();
       return (TransactionSynchronizationRegistry) ctx.lookup("java:comp/TransactionSynchronizationRegistry");
@@ -61,7 +61,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     }
   }
 
-  private UserTransaction getUserTransaction() {
+  private UserTransaction userTransaction() {
     try {
       InitialContext ctx = new InitialContext();
       return (UserTransaction) ctx.lookup("java:comp/UserTransaction");
@@ -78,11 +78,16 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
    */
   @Override
   public Object getCurrentTransaction() {
-    TransactionSynchronizationRegistry syncRegistry = getSyncRegistry();
-    SpiTransaction t = (SpiTransaction) syncRegistry.getResource(EBEAN_TXN_RESOURCE);
-    if (t != null) {
-      // we have already seen this transaction
-      return t;
+    TransactionSynchronizationRegistry syncRegistry = registry();
+    try {
+      SpiTransaction t = (SpiTransaction) syncRegistry.getResource(EBEAN_TXN_RESOURCE);
+      if (t != null) {
+        // we have already seen this transaction
+        return t;
+      }
+    } catch (Exception e) {
+      // deem that there is no current transaction
+      return null;
     }
 
     // check current Ebean transaction
@@ -93,7 +98,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
       return currentEbeanTransaction;
     }
 
-    UserTransaction ut = getUserTransaction();
+    UserTransaction ut = userTransaction();
     if (ut == null) {
       // no current JTA transaction
       if (log.isLoggable(DEBUG)) {
