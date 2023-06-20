@@ -79,10 +79,15 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
   @Override
   public Object getCurrentTransaction() {
     TransactionSynchronizationRegistry syncRegistry = getSyncRegistry();
-    SpiTransaction t = (SpiTransaction) syncRegistry.getResource(EBEAN_TXN_RESOURCE);
-    if (t != null) {
-      // we have already seen this transaction
-      return t;
+    try {
+      SpiTransaction t = (SpiTransaction) syncRegistry.getResource(EBEAN_TXN_RESOURCE);
+      if (t != null) {
+        // we have already seen this transaction
+        return t;
+      }
+    } catch (Exception e) {
+      // deem that there is no current transaction
+      return null;
     }
 
     // check current Ebean transaction
