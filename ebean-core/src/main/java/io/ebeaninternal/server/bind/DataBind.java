@@ -132,37 +132,37 @@ public class DataBind implements DataBinder {
   @Override
   public final void setInt(int value) throws SQLException {
     pstmt.setInt(++pos, value);
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
   public final void setLong(long value) throws SQLException {
     pstmt.setLong(++pos, value);
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
   public final void setShort(short value) throws SQLException {
     pstmt.setShort(++pos, value);
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
   public final void setFloat(float value) throws SQLException {
     pstmt.setFloat(++pos, value);
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
   public final void setDouble(double value) throws SQLException {
     pstmt.setDouble(++pos, value);
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
   public final void setBigDecimal(BigDecimal value) throws SQLException {
     pstmt.setBigDecimal(++pos, value);
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
@@ -173,7 +173,7 @@ public class DataBind implements DataBinder {
     } else {
       pstmt.setDate(++pos, value);
     }
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
@@ -184,7 +184,7 @@ public class DataBind implements DataBinder {
     } else {
       pstmt.setTimestamp(++pos, value);
     }
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
@@ -195,13 +195,13 @@ public class DataBind implements DataBinder {
     } else {
       pstmt.setTime(++pos, value);
     }
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
   public void setBoolean(boolean value) throws SQLException {
     pstmt.setBoolean(++pos, value);
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
@@ -213,13 +213,13 @@ public class DataBind implements DataBinder {
   @Override
   public void setByte(byte value) throws SQLException {
     pstmt.setByte(++pos, value);
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
   public void setChar(char value) throws SQLException {
     pstmt.setString(++pos, String.valueOf(value));
-    lastObject = value;
+    lastObject = null;
   }
 
   @Override
@@ -252,7 +252,7 @@ public class DataBind implements DataBinder {
   @Override
   public void setArray(String arrayType, Object[] elements) throws SQLException {
     pstmt.setArray(++pos, connection.createArrayOf(arrayType, elements));
-    lastObject = elements;
+    lastObject = null;
   }
 
   @Override

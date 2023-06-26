@@ -171,6 +171,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   private final String dbComment;
   private final DbEncryptFunction dbEncryptFunction;
+  private final BindMaxLength bindMaxLength;
   private int deployOrder;
   final boolean jsonSerialize;
   final boolean jsonDeserialize;
@@ -263,6 +264,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     }
     this.jsonSerialize = deploy.isJsonSerialize();
     this.jsonDeserialize = deploy.isJsonDeserialize();
+    this.bindMaxLength = deploy.bindMaxLength();
   }
 
   private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
@@ -350,6 +352,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
     this.jsonSerialize = source.jsonSerialize;
     this.jsonDeserialize = source.jsonDeserialize;
+    this.bindMaxLength = source.bindMaxLength;
   }
 
   /**
@@ -559,20 +562,16 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @SuppressWarnings("unchecked")
   public void bind(DataBind b, Object value) throws SQLException {
     scalarType.bind(b, value);
-
-    if (needsLengthCheck()) {
-      LengthCheck lengthCheck = descriptor().config().getLengthCheck();
-      if (lengthCheck != LengthCheck.OFF) {
-        Object obj = b.popLastObject();
-        long l = getLength(obj, lengthCheck == LengthCheck.UTF8);
-        if (l > dbLength) {
-          b.closeInputStreams();
-          String s = String.valueOf(value); // take original bind value here.
-          if (s.length() > 100) {
-            s = s.substring(0, 97) + "...";
-          }
-          throw new DataIntegrityException("Cannot bind value '" + s + "' (effective length=" + l + ") to column '" + dbColumn + "' (length=" + dbLength + ")");
+    if (bindMaxLength != null) {
+      Object obj = b.popLastObject();
+      long length = bindMaxLength.length(dbLength, obj);
+      if (length > dbLength) {
+        b.closeInputStreams();
+        String s = String.valueOf(value); // take original bind value here.
+        if (s.length() > 50) {
+          s = s.substring(0, 47) + "...";
         }
+        throw new DataIntegrityException("Cannot bind value '" + s + "' (effective length=" + length + ") to column '" + dbColumn + "' (length=" + dbLength + ")");
       }
     }
   }
@@ -584,43 +583,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   public Object readData(DataInput dataInput) throws IOException {
     return scalarType.readData(dataInput);
-  }
-
-  /**
-   * Returns, if this property needs a length check.
-   */
-  boolean needsLengthCheck() {
-    if (dbLength == 0) {
-      return false;
-    }
-    switch (dbType) {
-      case Types.VARCHAR:
-      case Types.BLOB:
-      case ExtraDbTypes.JSON:
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  /**
-   * Returns the length of <code>obj</code>. Note: for UTF8 strings -1 will be retuned, if the string length is lower than 1/4th of db length
-   */
-  private long getLength(Object obj, boolean utf8) {
-    if (obj instanceof String) {
-      String s = (String) obj;
-      if (utf8) {
-        return s.length() * 4 <= dbLength ? -1 : s.getBytes(StandardCharsets.UTF_8).length;
-      } else {
-        return s.length();
-      }
-    } else if (obj instanceof byte[]) {
-      return ((byte[]) obj).length;
-    } else if (obj instanceof InputStreamInfo) {
-      return ((InputStreamInfo) obj).length();
-    } else {
-      return -1;
-    }
   }
 
   @Override

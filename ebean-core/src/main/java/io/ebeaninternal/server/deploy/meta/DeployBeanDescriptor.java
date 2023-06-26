@@ -139,6 +139,10 @@ public class DeployBeanDescriptor<T> {
     this.beanType = beanType;
   }
 
+  public BindMaxLength bindMaxLength() {
+    return manager.bindMaxLength();
+  }
+
   /**
    * Set the IdClass to use.
    */

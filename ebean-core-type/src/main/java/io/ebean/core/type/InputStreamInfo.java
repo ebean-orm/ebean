@@ -7,9 +7,9 @@ import java.io.InputStream;
  *
  * @author Roland Praml, FOCONIS AG
  */
-public class InputStreamInfo {
-  private final InputStream stream;
+public final class InputStreamInfo {
 
+  private final InputStream stream;
   private final long length;
 
   public InputStreamInfo(InputStream stream, long length) {
