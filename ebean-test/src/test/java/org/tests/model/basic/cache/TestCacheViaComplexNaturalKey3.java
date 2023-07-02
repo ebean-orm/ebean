@@ -445,6 +445,6 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     assertThat(tuples.entries()).hasSize(3);
     assertThat(list).hasSize(3);
-    assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (sku,code) in ((?,?),(?,?),(?,?)) order by t0.sku desc;");
+    assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in ((?,?),(?,?),(?,?)) order by t0.sku desc;");
   }
 }
