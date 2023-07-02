@@ -1,5 +1,6 @@
 package org.tests.model.basic.cache;
 
+import io.ebean.InTuples;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
@@ -419,6 +420,31 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     } else {
       assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,':',t0.code,'-foo')");
     }
+  }
 
+  @Test
+  public void findList_inTuples_noCache() {
+    setup();
+
+    InTuples tuples = InTuples.of("sku", "code")
+      .add("2", 1000)
+      .add("2", 1001)
+      .add("3", 1000);
+
+    LoggedSql.start();
+
+    List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
+      .where()
+      .eq("store", "def")
+      .inTuples(tuples)
+      .setUseCache(false)
+      .orderBy("sku desc")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(tuples.entries()).hasSize(3);
+    assertThat(list).hasSize(3);
+    assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (sku,code) in ((?,?),(?,?),(?,?)) order by t0.sku desc;");
   }
 }
