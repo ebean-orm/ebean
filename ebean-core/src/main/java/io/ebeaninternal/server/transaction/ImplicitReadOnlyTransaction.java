@@ -32,6 +32,10 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   private static final String illegalStateMessage = "Transaction is Inactive";
   private static final String notExpectedMessage = "Not expected on read only transaction";
 
+  /**
+   * Set false when using autoCommit (as a performance optimisation for the read-only case).
+   */
+  private final boolean useCommit;
   private final TransactionManager manager;
   private final SpiTxnLogger logger;
   private final boolean logSql;
@@ -60,7 +64,8 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   /**
    * Create without a tenantId.
    */
-  ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection) {
+  ImplicitReadOnlyTransaction(boolean useCommit, TransactionManager manager, Connection connection) {
+    this.useCommit = useCommit;
     this.manager = manager;
     this.logger = manager.loggerReadOnly();
     this.logSql = logger.isLogSql();
@@ -75,7 +80,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * Create with a tenantId.
    */
   ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection, Object tenantId) {
-    this(manager, connection);
+    this(true, manager, connection);
     this.tenantId = tenantId;
   }
 
@@ -505,13 +510,17 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     // do nothing, expect AutoCommit
   }
 
-  /**
-   * Commit the transaction.
-   */
   @Override
   public void commit() {
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
+    }
+    if (useCommit) {
+      try {
+        connection.commit();
+      } catch (SQLException e) {
+        throw new PersistenceException(e);
+      }
     }
     // expect AutoCommit so just deactivate / put back into pool
     deactivate();
@@ -556,6 +565,13 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
+    if (useCommit) {
+      try {
+        connection.rollback();
+      } catch (SQLException e) {
+        throw new PersistenceException(e);
+      }
+    }
     // expect AutoCommit so it really has already committed
     deactivate();
   }
@@ -565,7 +581,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void end() throws PersistenceException {
-    if (isActive()) {
+    if (active) {
       rollback();
     }
   }

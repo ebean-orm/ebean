@@ -30,7 +30,7 @@ final class TransactionFactoryBasicWithRead extends TransactionFactoryBasic {
     Connection connection = null;
     try {
       connection = useMaster ? dataSource.getConnection() : readOnlyDataSource.getConnection();
-      return new ImplicitReadOnlyTransaction(manager, connection);
+      return new ImplicitReadOnlyTransaction(useMaster, manager, connection);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
       throw ex;

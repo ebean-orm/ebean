@@ -25,7 +25,7 @@ class TransactionFactoryBasic extends TransactionFactory {
     Connection connection = null;
     try {
       connection = dataSource.getConnection();
-      return new ImplicitReadOnlyTransaction(manager, connection);
+      return new ImplicitReadOnlyTransaction(true, manager, connection);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
       throw ex;
