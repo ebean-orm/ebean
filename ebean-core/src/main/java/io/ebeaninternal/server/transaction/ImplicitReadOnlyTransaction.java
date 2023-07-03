@@ -65,7 +65,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * Create without a tenantId.
    */
   ImplicitReadOnlyTransaction(boolean useCommit, TransactionManager manager, Connection connection) {
-    this.useCommit = useCommit;
     this.manager = manager;
     this.logger = manager.loggerReadOnly();
     this.logSql = logger.isLogSql();
@@ -74,6 +73,11 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
     this.startNanos = System.nanoTime();
+    try {
+      this.useCommit = useCommit && !connection.getAutoCommit();
+    } catch (SQLException e) {
+      throw new PersistenceException(e);
+    }
   }
 
   /**
