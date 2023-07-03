@@ -18,5 +18,7 @@ public class DB2LegacyPlatform extends BaseDB2Platform {
     this.maxTableNameLength = 18;
     this.maxConstraintNameLength = 18;
     this.persistBatchOnCascade = PersistBatch.NONE;
+    this.basicSqlLimiter = new DB2RowNumberBasicLimiter();
+    this.sqlLimiter = new DB2RowNumberSqlLimiter();
   }
 }
