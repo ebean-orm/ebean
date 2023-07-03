@@ -48,6 +48,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     this.server = server;
     this.descriptor = descriptor;
     this.ormQuery = ormQuery;
+    this.useMaster = ormQuery.isUseMaster();
     this.label = ormQuery.label();
     this.profileLocation = ormQuery.profileLocation();
   }
@@ -86,6 +87,17 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   public DtoQuery<T> usingTransaction(Transaction transaction) {
     this.transaction = transaction;
     return this;
+  }
+
+  @Override
+  public DtoQuery<T> usingMaster() {
+    this.useMaster = true;
+    return this;
+  }
+
+  @Override
+  public boolean isUseMaster() {
+    return useMaster;
   }
 
   @Override

@@ -41,8 +41,12 @@ final class SimpleDataSourceProvider implements DataSourceSupplier {
   }
 
   @Override
-  public Connection readOnlyConnection(Object tenantId) throws SQLException {
-    return readOnlyDataSource.getConnection();
+  public Connection readOnlyConnection(Object tenantId, boolean useMaster) throws SQLException {
+    if (readOnlyDataSource == null || useMaster) {
+      return dataSource.getConnection();
+    } else {
+      return readOnlyDataSource.getConnection();
+    }
   }
 
   @Override

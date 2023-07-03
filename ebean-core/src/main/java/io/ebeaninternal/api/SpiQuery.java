@@ -236,6 +236,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   String planLabel();
 
   /**
+   * Return true if this query should not use the read only data source.
+   */
+  boolean isUseMaster();
+
+  /**
    * Return true if this is a "find by id" query. This includes a check for a single "equal to" expression for the Id.
    */
   boolean isFindById();

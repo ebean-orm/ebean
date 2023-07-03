@@ -235,6 +235,11 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  public Query<T> usingMaster() {
+    throw new RuntimeException("EB102: Not allowed on FetchGroup");
+  }
+
+  @Override
   public <A> List<A> findIds() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
