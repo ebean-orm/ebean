@@ -11,7 +11,6 @@ final class TransactionFactoryBuilder {
    * Build and return based on multi-tenancy and read only DataSource.
    */
   static TransactionFactory build(TransactionManager manager, DataSourceSupplier dataSourceSupplier, CurrentTenantProvider tenantProvider) {
-
     boolean hasReadOnlyDataSource = dataSourceSupplier.readOnlyDataSource() != null;
     if (tenantProvider == null) {
       if (hasReadOnlyDataSource) {

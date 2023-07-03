@@ -48,7 +48,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
       transaction = server.currentServerTransaction();
       if (transaction == null || !transaction.isActive()) {
         // create a local readOnly transaction
-        transaction = server.createReadOnlyTransaction(null);
+        transaction = server.createReadOnlyTransaction(null, query.isUseMaster());
         createdTransaction = true;
       }
     }

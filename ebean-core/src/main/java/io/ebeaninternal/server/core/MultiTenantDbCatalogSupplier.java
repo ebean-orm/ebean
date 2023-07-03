@@ -56,7 +56,10 @@ final class MultiTenantDbCatalogSupplier implements DataSourceSupplier {
   }
 
   @Override
-  public Connection readOnlyConnection(Object tenantId) throws SQLException {
+  public Connection readOnlyConnection(Object tenantId, boolean useMaster) throws SQLException {
+    if (readOnly == null || useMaster) {
+      return catalogDataSource.getConnectionForTenant(tenantId);
+    }
     return readOnly.getConnectionForTenant(tenantId);
   }
 
@@ -103,7 +106,6 @@ final class MultiTenantDbCatalogSupplier implements DataSourceSupplier {
      */
     @Override
     public Connection getConnection() throws SQLException {
-
       Connection connection = dataSource.getConnection();
       connection.setCatalog(tenantCatalog());
       return connection;

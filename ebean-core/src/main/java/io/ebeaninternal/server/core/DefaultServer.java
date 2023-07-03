@@ -2123,8 +2123,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
-    return transactionManager.createReadOnlyTransaction(tenantId);
+  public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
+    return transactionManager.createReadOnlyTransaction(tenantId, useMaster);
   }
 
   /**

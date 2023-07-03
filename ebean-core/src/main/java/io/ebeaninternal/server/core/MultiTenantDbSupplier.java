@@ -43,8 +43,8 @@ final class MultiTenantDbSupplier implements DataSourceSupplier {
   }
 
   @Override
-  public Connection readOnlyConnection(Object tenantId) throws SQLException {
-    throw new SQLException("Not currently supported");
+  public Connection readOnlyConnection(Object tenantId, boolean useMaster) throws SQLException {
+    return dataSourceProvider.dataSource(tenantId).getConnection();
   }
 
   @Override

@@ -715,6 +715,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // forUpdate is NOT copied - see #2762
     DefaultOrmQuery<T> copy = new DefaultOrmQuery<>(beanDescriptor, server, expressionFactory);
     copy.transaction = transaction;
+    copy.useMaster = useMaster;
     copy.m2mIncludeJoin = m2mIncludeJoin;
     copy.profilingListener = profilingListener;
     copy.profileLocation = profileLocation;
@@ -1394,6 +1395,17 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final Query<T> usingDatabase(Database database) {
     this.server = (SpiEbeanServer) database;
     return this;
+  }
+
+  @Override
+  public Query<T> usingMaster() {
+    this.useMaster = true;
+    return this;
+  }
+
+  @Override
+  public boolean isUseMaster() {
+    return useMaster;
   }
 
   @Override

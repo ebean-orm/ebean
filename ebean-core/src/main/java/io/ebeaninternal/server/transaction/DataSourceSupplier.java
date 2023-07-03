@@ -43,10 +43,11 @@ public interface DataSourceSupplier {
   /**
    * Return a connection from the read only DataSource taking into account a tenantId for multi-tenant lazy loading.
    *
-   * @param tenantId Most often null but well supplied indicates a multi-tenant lazy loading query
+   * @param tenantId  Most often null but well supplied indicates a multi-tenant lazy loading query
+   * @param useMaster When true use the master data source
    * @return the connection to use
    */
-  Connection readOnlyConnection(Object tenantId) throws SQLException;
+  Connection readOnlyConnection(Object tenantId, boolean useMaster) throws SQLException;
 
   /**
    * Shutdown the datasource de-registering the JDBC driver if requested.

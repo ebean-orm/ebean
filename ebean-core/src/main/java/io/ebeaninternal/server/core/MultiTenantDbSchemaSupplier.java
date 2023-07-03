@@ -56,8 +56,12 @@ final class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
   }
 
   @Override
-  public Connection readOnlyConnection(Object tenantId) throws SQLException {
-    return readOnly.getConnectionForTenant(tenantId);
+  public Connection readOnlyConnection(Object tenantId, boolean useMaster) throws SQLException {
+    if (readOnly == null || useMaster) {
+      return schemaDataSource.getConnectionForTenant(tenantId);
+    } else {
+      return readOnly.getConnectionForTenant(tenantId);
+    }
   }
 
   @Override
@@ -106,7 +110,6 @@ final class MultiTenantDbSchemaSupplier implements DataSourceSupplier {
      */
     @Override
     public Connection getConnection() throws SQLException {
-
       Connection connection = dataSource.getConnection();
       connection.setSchema(tenantSchema());
       return connection;

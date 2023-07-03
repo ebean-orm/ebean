@@ -26,11 +26,11 @@ final class TransactionFactoryBasicWithRead extends TransactionFactoryBasic {
   }
 
   @Override
-  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
     Connection connection = null;
     try {
-      connection = readOnlyDataSource.getConnection();
-      return new ImplicitReadOnlyTransaction(manager, connection);
+      connection = useMaster ? dataSource.getConnection() : readOnlyDataSource.getConnection();
+      return new ImplicitReadOnlyTransaction(useMaster, manager, connection);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
       throw ex;

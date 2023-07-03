@@ -135,8 +135,9 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * Create a ServerTransaction for query purposes.
    *
    * @param tenantId For multi-tenant lazy loading provide the tenantId to use.
+   * @param useMaster Set to true when the query should use the master data source.
    */
-  SpiTransaction createReadOnlyTransaction(Object tenantId);
+  SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster);
 
   /**
    * An event from another server in the cluster used to notify local

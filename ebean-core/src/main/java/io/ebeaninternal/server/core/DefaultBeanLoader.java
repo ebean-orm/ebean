@@ -137,7 +137,7 @@ final class DefaultBeanLoader {
   private List<?> executeQuery(LoadRequest loadRequest, SpiQuery<?> query) {
     if (onIterateUseExtraTxn && loadRequest.isParentFindIterate()) {
       // MySql - we need a different transaction to execute the secondary query
-      SpiTransaction extraTxn = server.createReadOnlyTransaction(query.tenantId());
+      SpiTransaction extraTxn = server.createReadOnlyTransaction(query.tenantId(), query.isUseMaster());
       try {
         return server.findList(query, extraTxn);
       } finally {

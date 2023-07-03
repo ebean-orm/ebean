@@ -4,6 +4,7 @@ import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 
 import javax.persistence.NonUniqueResultException;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
@@ -684,6 +685,18 @@ public interface Query<T> extends CancelableQuery {
    * Execute the query using the given database.
    */
   Query<T> usingDatabase(Database database);
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  Query<T> usingMaster();
 
   /**
    * Execute the query returning the list of Id's.

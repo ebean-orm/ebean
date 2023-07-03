@@ -6,6 +6,11 @@ package io.ebeaninternal.api;
 public interface SpiSqlBinding extends SpiCancelableQuery {
 
   /**
+   * Return true if this query should not use the read only data source.
+   */
+  boolean isUseMaster();
+
+  /**
    * Return the named or positioned parameters.
    */
   BindParams getBindParams();
