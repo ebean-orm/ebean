@@ -12,6 +12,7 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
@@ -1557,6 +1558,21 @@ public abstract class TQRootBean<T, R> {
    */
   public R usingConnection(Connection connection) {
     query.usingConnection(connection);
+    return root;
+  }
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  public R usingMaster() {
+    query.usingMaster();
     return root;
   }
 
