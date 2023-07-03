@@ -1,6 +1,8 @@
 package org.tests.model.basic.cache;
 
 import io.ebean.InTuples;
+import io.ebean.annotation.Platform;
+import io.ebean.service.SpiInTuples;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
@@ -9,6 +11,7 @@ import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -422,6 +425,7 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     }
   }
 
+  @IgnorePlatform({Platform.SQLSERVER, Platform.DB2})
   @Test
   public void findList_inTuples_noCache() {
     setup();
@@ -443,7 +447,9 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
 
-    assertThat(tuples.entries()).hasSize(3);
+    SpiInTuples spiTuples = (SpiInTuples)tuples;
+    assertThat(spiTuples.properties()).containsOnly("sku", "code");
+    assertThat(spiTuples.entries()).hasSize(3);
     assertThat(list).hasSize(3);
     assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in ((?,?),(?,?),(?,?)) order by t0.sku desc;");
   }

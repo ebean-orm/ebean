@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.InTuples;
+import io.ebean.service.SpiInTuples;
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
@@ -8,18 +9,21 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.util.List;
 
+import static java.util.Objects.requireNonNull;
+
 
 final class InTuplesExpression extends AbstractExpression {
 
   private final boolean not;
   private final String[] properties;
-  private final List<InTuples.Entry> entries;
+  private final List<Object[]> entries;
 
   InTuplesExpression(InTuples pairs, boolean not) {
-    super(pairs.properties()[0]);
-    this.properties = pairs.properties();
+    super("");
+    SpiInTuples inTuples = (SpiInTuples)pairs;
+    this.properties = inTuples.properties();
     // the entries might be modified on cache hit.
-    this.entries = pairs.entries();
+    this.entries = inTuples.entries();
     this.not = not;
   }
 
@@ -35,9 +39,10 @@ final class InTuplesExpression extends AbstractExpression {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
-    for (InTuples.Entry entry : entries) {
-      for (Object val : entry.values()) {
-        request.addBindValue(val);
+    for (Object[] entry : entries) {
+      for (Object value : entry) {
+        requireNonNull(value);
+        request.addBindValue(value);
       }
     }
   }
@@ -48,7 +53,6 @@ final class InTuplesExpression extends AbstractExpression {
       request.append(not ? SQL_TRUE : SQL_FALSE);
       return;
     }
-
     request.append("(");
     for (int i = 0; i < properties.length; i++) {
       if (i > 0) {
@@ -97,9 +101,9 @@ final class InTuplesExpression extends AbstractExpression {
   @Override
   public void queryBindKey(BindValuesKey key) {
     key.add(entries.size());
-    for (InTuples.Entry entry : entries) {
-      for (Object val : entry.values()) {
-        key.add(val);
+    for (Object[] entry : entries) {
+      for (Object value : entry) {
+        key.add(value);
       }
     }
   }

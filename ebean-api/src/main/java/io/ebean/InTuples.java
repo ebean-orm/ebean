@@ -29,28 +29,8 @@ public interface InTuples {
   }
 
   /**
-   * Add a tuple entry.
+   * Add a tuple entry. All values must be non-null.
    */
   InTuples add(Object... values);
 
-  /**
-   * Return the properties of the tuples.
-   */
-  String[] properties();
-
-  /**
-   * Return all the tuple entries.
-   */
-  List<Entry> entries();
-
-  /**
-   * A tuple entry.
-   */
-  interface Entry {
-
-    /**
-     * Return all the values for this entry.
-     */
-    Object[] values();
-  }
 }
