@@ -12,7 +12,7 @@ final class DB2RowNumberBasicLimiter implements BasicSqlLimiter {
     if (firstRow < 1 && maxRows < 1) {
       return dbSql;
     }
-    StringBuilder sb = new StringBuilder(60 + dbSql.length());
+    StringBuilder sb = new StringBuilder(120 + dbSql.length());
     int lastRow = maxRows;
     if (lastRow > 0) {
       lastRow += firstRow;
