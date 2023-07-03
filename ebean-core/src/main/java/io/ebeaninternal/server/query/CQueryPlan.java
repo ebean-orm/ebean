@@ -85,10 +85,10 @@ public class CQueryPlan implements SpiQueryPlan {
     this.beanType = request.descriptor().type();
     this.planKey = request.queryPlanKey();
     SpiQuery<?> query = request.query();
-    this.profileLocation = query.getProfileLocation();
+    this.profileLocation = query.profileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
-    this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType(), request.descriptor().simpleName());
+    this.label = query.planLabel();
+    this.name = deriveName(label, query.type(), request.descriptor().simpleName());
     this.asOfTableCount = query.getAsOfTableCount();
     this.sql = sqlRes.getSql();
     this.sqlTree = sqlTree;
@@ -109,10 +109,10 @@ public class CQueryPlan implements SpiQueryPlan {
     this.dataTimeZone = server.dataTimeZone();
     this.beanType = request.descriptor().type();
     SpiQuery<?> query = request.query();
-    this.profileLocation = query.getProfileLocation();
+    this.profileLocation = query.profileLocation();
     this.location = (profileLocation == null) ? null : profileLocation.location();
-    this.label = query.getPlanLabel();
-    this.name = deriveName(label, query.getType(), request.descriptor().simpleName());
+    this.label = query.planLabel();
+    this.name = deriveName(label, query.type(), request.descriptor().simpleName());
     this.planKey = buildPlanKey(sql, logWhereSql);
     this.asOfTableCount = 0;
     this.sql = sql;
@@ -142,11 +142,11 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   private SpiQueryBindCapture initBindCapture(SpiQuery<?> query) {
-    return query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
+    return query.type().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
   }
 
   private SpiQueryBindCapture initBindCaptureRaw(String sql, SpiQuery<?> query) {
-    return sql.equals(RESULT_SET_BASED_RAW_SQL) || query.getType().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
+    return sql.equals(RESULT_SET_BASED_RAW_SQL) || query.type().isUpdate() ? SpiQueryBindCapture.NOOP : server.createQueryBindCapture(this);
   }
 
   private CQueryPlanKey buildPlanKey(String sql, String logWhereSql) {

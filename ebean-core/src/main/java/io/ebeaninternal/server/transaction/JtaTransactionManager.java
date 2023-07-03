@@ -52,7 +52,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     return transactionManager.dataSource();
   }
 
-  private TransactionSynchronizationRegistry getSyncRegistry() {
+  private TransactionSynchronizationRegistry registry() {
     try {
       InitialContext ctx = new InitialContext();
       return (TransactionSynchronizationRegistry) ctx.lookup("java:comp/TransactionSynchronizationRegistry");
@@ -61,7 +61,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     }
   }
 
-  private UserTransaction getUserTransaction() {
+  private UserTransaction userTransaction() {
     try {
       InitialContext ctx = new InitialContext();
       return (UserTransaction) ctx.lookup("java:comp/UserTransaction");
@@ -78,22 +78,28 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
    */
   @Override
   public Object getCurrentTransaction() {
-    TransactionSynchronizationRegistry syncRegistry = getSyncRegistry();
-    SpiTransaction t = (SpiTransaction) syncRegistry.getResource(EBEAN_TXN_RESOURCE);
-    if (t != null) {
-      // we have already seen this transaction
-      return t;
+    TransactionSynchronizationRegistry syncRegistry;
+    try {
+      syncRegistry = registry();
+      SpiTransaction t = (SpiTransaction) syncRegistry.getResource(EBEAN_TXN_RESOURCE);
+      if (t != null) {
+        // we have already seen this transaction
+        return t;
+      }
+    } catch (Exception e) {
+      // deem that there is no current transaction
+      return null;
     }
 
     // check current Ebean transaction
     SpiTransaction currentEbeanTransaction = scope.inScope();
     if (currentEbeanTransaction != null) {
       // NOT expecting this so log WARNING
-      log.log(WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.getId());
+      log.log(WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.id());
       return currentEbeanTransaction;
     }
 
-    UserTransaction ut = getUserTransaction();
+    UserTransaction ut = userTransaction();
     if (ut == null) {
       // no current JTA transaction
       if (log.isLoggable(DEBUG)) {
@@ -182,25 +188,25 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     public void afterCompletion(int status) {
       switch (status) {
         case Status.STATUS_COMMITTED:
-          log.log(DEBUG, "Jta Txn [{0}] committed", transaction.getId());
+          log.log(DEBUG, "Jta Txn [{0}] committed", transaction.id());
           transaction.postCommit();
           // Remove this transaction object as it is completed
           transactionManager.scope().clearExternal();
           break;
 
         case Status.STATUS_ROLLEDBACK:
-          log.log(DEBUG, "Jta Txn [{0}] rollback", transaction.getId());
+          log.log(DEBUG, "Jta Txn [{0}] rollback", transaction.id());
           transaction.postRollback(null);
           // Remove this transaction object as it is completed
           transactionManager.scope().clearExternal();
           break;
 
         default:
-          log.log(DEBUG, "Jta Txn [{0}] status:{1}", transaction.getId(), status);
+          log.log(DEBUG, "Jta Txn [{0}] status:{1}", transaction.id(), status);
       }
 
       // No matter the completion status of the transaction, we release the connection we got from the pool.
-      JdbcClose.close(transaction.getInternalConnection());
+      JdbcClose.close(transaction.internalConnection());
     }
   }
 

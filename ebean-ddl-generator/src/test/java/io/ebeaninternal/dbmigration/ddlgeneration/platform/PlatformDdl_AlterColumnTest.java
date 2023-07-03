@@ -107,7 +107,7 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = alterColumn(pgDdl, alter);
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
-      + "alter table mytab alter column acol type varchar(50) using acol::varchar(50);\n"
+      + "alter table mytab alter column acol type varchar(50);\n"
       + "alter table mytab alter column acol set default 'hi';\n"
       + "alter table mytab alter column acol set not null;\n");
 

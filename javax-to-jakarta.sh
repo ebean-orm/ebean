@@ -11,6 +11,7 @@ sed -i '' -e 's|artifactId>persistence-api|artifactId>jakarta-persistence-api|g'
 ## adjust module-info
 sed -i '' -e 's| persistence\.api| jakarta\.persistence\.api|g' ebean-api/src/main/java/module-info.java
 sed -i '' -e 's| javax\.servlet\.api| jakarta\.servlet|g' ebean-api/src/main/java/module-info.java
+sed -i '' -e 's| java\.transaction| jakarta\.transaction|g' ebean-core/src/main/java/module-info.java
 
 find . -type f -name 'module-info.java' -exec sed -i '' -e 's|java\.xml\.bind|jakarta\.xml\.bind|g' {} +
 
@@ -21,4 +22,6 @@ find . -type f -name '*.java' -exec sed -i '' -e 's|javax\.persistence\.|jakarta
 find . -type f -name '*.kt' -exec sed -i '' -e 's|javax\.persistence\.|jakarta\.persistence\.|g' {} +
 find . -type f -name '*.java' -exec sed -i '' -e 's|javax\.xml\.bind|jakarta\.xml\.bind|g' {} +
 find . -type f -name '*.kt' -exec sed -i '' -e 's|javax\.xml\.bind|jakarta\.xml\.bind|g' {} +
+
+find . -type f -name '*.java' -exec sed -i '' -e 's|javax\.transaction\.|jakarta\.transaction\.|g' {} +
 

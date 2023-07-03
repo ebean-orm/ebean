@@ -98,12 +98,7 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
 
   @Override
   public String formatValue(T value) {
-    return null;
-  }
-
-  @Override
-  public T parse(String value) {
-    return null;
+    return value.toString();
   }
 
   @Override

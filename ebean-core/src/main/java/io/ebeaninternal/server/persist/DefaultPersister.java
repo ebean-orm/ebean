@@ -72,7 +72,7 @@ public final class DefaultPersister implements Persister {
   @Override
   public int executeOrmUpdate(Update<?> update, Transaction t) {
     SpiUpdate<?> ormUpdate = (SpiUpdate<?>) update;
-    BeanManager<?> mgr = beanManager(ormUpdate.getBeanType());
+    BeanManager<?> mgr = beanManager(ormUpdate.beanType());
     return executeOrQueue(new PersistRequestOrmUpdate(server, mgr, ormUpdate, (SpiTransaction) t, persistExecute));
   }
 
@@ -97,7 +97,7 @@ public final class DefaultPersister implements Persister {
 
   @Override
   public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
-    BatchControl batchControl = transaction.getBatchControl();
+    BatchControl batchControl = transaction.batchControl();
     try {
       return batchControl.execute(sqlUpdate.getGeneratedSql(), sqlUpdate.isGetGeneratedKeys());
     } catch (SQLException e) {
@@ -106,9 +106,9 @@ public final class DefaultPersister implements Persister {
   }
 
   @Override
-  public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue) {
+  public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue, int queuePosition) {
     if (queue) {
-      addToFlushQueue(update, t, 2);
+      addToFlushQueue(update, t, queuePosition);
     } else {
       executeSqlUpdate(update, t);
     }
@@ -761,14 +761,14 @@ public final class DefaultPersister implements Persister {
     notifyDeleteById(descriptor, id, idList, transaction);
     deleteById.setAutoTableMod(false);
     if (idList != null) {
-      t.getEvent().addDeleteByIdList(descriptor, idList);
+      t.event().addDeleteByIdList(descriptor, idList);
     } else {
-      t.getEvent().addDeleteById(descriptor, id);
+      t.event().addDeleteById(descriptor, id);
     }
     int rows = executeSqlUpdate(deleteById, t);
 
     // Delete from the persistence context so that it can't be fetched again later
-    PersistenceContext persistenceContext = t.getPersistenceContext();
+    PersistenceContext persistenceContext = t.persistenceContext();
     if (idList != null) {
       for (Object idValue : idList) {
         descriptor.contextDeleted(persistenceContext, idValue);
@@ -907,7 +907,7 @@ public final class DefaultPersister implements Persister {
   void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean publish, boolean queue) {
     SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many, publish);
     if (queue) {
-      addToFlushQueue(sqlDelete, t, 1);
+      addToFlushQueue(sqlDelete, t, BatchControl.DELETE_QUEUE);
     } else {
       executeSqlUpdate(sqlDelete, t);
     }
@@ -972,7 +972,7 @@ public final class DefaultPersister implements Persister {
           if (deleteMode.isHard() || many.isTargetSoftDelete()) {
             Object details = many.getValue(parentBean);
             if (details instanceof BeanCollection<?>) {
-              Set<?> modifyRemovals = ((BeanCollection<?>) details).getModifyRemovals();
+              Set<?> modifyRemovals = ((BeanCollection<?>) details).modifyRemovals();
               if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
                 // delete the orphans that have been removed from the collection
                 for (Object detail : modifyRemovals) {
@@ -1077,7 +1077,7 @@ public final class DefaultPersister implements Persister {
   }
 
   private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
-    Object origValue = request.getOrigValue(prop);
+    Object origValue = request.origValue(prop);
     if (origValue instanceof EntityBean) {
       delete((EntityBean) origValue, request.transaction(), false);
     }

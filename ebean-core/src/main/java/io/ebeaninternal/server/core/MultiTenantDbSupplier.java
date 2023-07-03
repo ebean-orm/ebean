@@ -27,23 +27,23 @@ final class MultiTenantDbSupplier implements DataSourceSupplier {
   }
 
   @Override
-  public DataSource getReadOnlyDataSource() {
+  public DataSource readOnlyDataSource() {
     // read only datasource not supported with DB per tenant at this stage
     return null;
   }
 
   @Override
-  public DataSource getDataSource() {
+  public DataSource dataSource() {
     return dataSourceProvider.dataSource(tenantProvider.currentId());
   }
 
   @Override
-  public Connection getConnection(Object tenantId) throws SQLException {
+  public Connection connection(Object tenantId) throws SQLException {
     return dataSourceProvider.dataSource(tenantId).getConnection();
   }
 
   @Override
-  public Connection getReadOnlyConnection(Object tenantId) throws SQLException {
+  public Connection readOnlyConnection(Object tenantId) throws SQLException {
     throw new SQLException("Not currently supported");
   }
 

@@ -50,11 +50,11 @@ public final class LoadManyRequest extends LoadRequest {
 
   @Override
   public Class<?> beanType() {
-    return loadContext.getBeanDescriptor().type();
+    return loadContext.descriptor().type();
   }
 
   public String description() {
-    return loadContext.getFullPath();
+    return loadContext.fullPath();
   }
 
   private List<Object> parentIdList(SpiEbeanServer server) {
@@ -66,13 +66,13 @@ public final class LoadManyRequest extends LoadRequest {
         if (lazy && !originIncluded && bc == originCollection) {
           originIncluded = true;
         }
-        idList.add(many.parentId(bc.getOwnerBean()));
+        idList.add(many.parentId(bc.owner()));
         bc.setLoader(server); // don't use the load buffer again
       }
     }
     if (originCollection != null && !originIncluded) {
       CoreLog.log.log(INFO, "Batch lazy loading including origin collection - size:{0}", idList.size());
-      idList.add(many.parentId(originCollection.getOwnerBean()));
+      idList.add(many.parentId(originCollection.owner()));
       originCollection.setLoader(server); // don't use the load buffer again
     }
     if (many.targetDescriptor().isPadInExpression()) {
@@ -82,7 +82,7 @@ public final class LoadManyRequest extends LoadRequest {
   }
 
   private BeanPropertyAssocMany<?> many() {
-    return loadContext.getBeanProperty();
+    return loadContext.beanProperty();
   }
 
   public SpiQuery<?> createQuery(SpiEbeanServer server) {
@@ -90,7 +90,7 @@ public final class LoadManyRequest extends LoadRequest {
     SpiQuery<?> query = many.newQuery(server);
     String orderBy = many.lazyFetchOrderBy();
     if (orderBy != null) {
-      query.order(orderBy);
+      query.orderBy(orderBy);
     }
     String extraWhere = many.extraWhere();
     if (extraWhere != null) {
@@ -100,7 +100,7 @@ public final class LoadManyRequest extends LoadRequest {
     }
     query.setLazyLoadForParents(many);
     many.addWhereParentIdIn(query, parentIdList(server), loadContext.isUseDocStore());
-    query.setPersistenceContext(loadContext.getPersistenceContext());
+    query.setPersistenceContext(loadContext.persistenceContext());
     query.setLoadDescription(lazy ? "+lazy" : "+query", description());
     if (lazy) {
       query.setLazyLoadBatchSize(loadContext.batchSize());
@@ -120,7 +120,7 @@ public final class LoadManyRequest extends LoadRequest {
    * After the query execution check for empty collections and load L2 cache if desired.
    */
   public void postLoad() {
-    BeanDescriptor<?> desc = loadContext.getBeanDescriptor();
+    BeanDescriptor<?> desc = loadContext.descriptor();
     BeanPropertyAssocMany<?> many = many();
     // check for BeanCollection's that where never processed
     // in the +query or +lazy load due to no rows (predicates)
@@ -129,12 +129,12 @@ public final class LoadManyRequest extends LoadRequest {
       if (bc != null) {
         if (bc.checkEmptyLazyLoad()) {
           if (log.isLoggable(DEBUG)) {
-            EntityBean ownerBean = bc.getOwnerBean();
+            EntityBean ownerBean = bc.owner();
             Object parentId = desc.getId(ownerBean);
             log.log(DEBUG, "BeanCollection after lazy load was empty. type:{0} id:{1} owner:{2}", ownerBean.getClass().getName(), parentId, ownerBean);
           }
         } else if (loadCache && many.isUseCache()) {
-          desc.cacheManyPropPut(many, bc, desc.cacheKeyForBean(bc.getOwnerBean()));
+          desc.cacheManyPropPut(many, bc, desc.cacheKeyForBean(bc.owner()));
         }
       }
     }

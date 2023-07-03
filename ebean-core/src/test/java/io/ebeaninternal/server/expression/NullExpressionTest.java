@@ -22,7 +22,7 @@ public class NullExpressionTest extends BaseExpressionTest {
 
     nullExp("id", true).addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("id is not null");
+    assertThat(expReq.sql()).isEqualTo("id is not null");
   }
 
   @Test
@@ -32,7 +32,7 @@ public class NullExpressionTest extends BaseExpressionTest {
 
     nullExp("id", false).addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("id is null");
+    assertThat(expReq.sql()).isEqualTo("id is null");
   }
 
   @Test
@@ -42,7 +42,7 @@ public class NullExpressionTest extends BaseExpressionTest {
 
     nullExp("customer", true).addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("customer.id is not null");
+    assertThat(expReq.sql()).isEqualTo("customer.id is not null");
   }
 
   @Test
@@ -52,7 +52,7 @@ public class NullExpressionTest extends BaseExpressionTest {
 
     nullExp("customer", false).addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("customer.id is null");
+    assertThat(expReq.sql()).isEqualTo("customer.id is null");
   }
 
   @Test

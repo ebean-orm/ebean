@@ -734,6 +734,28 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * EXISTS using a SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R exists(String sqlSubQuery, Object... bindValues) {
+    query().where().exists(sqlSubQuery, bindValues);
+    return root;
+  }
+
+  /**
+   * Not EXISTS using a SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R notExists(String sqlSubQuery, Object... bindValues) {
+    query().where().notExists(sqlSubQuery, bindValues);
+    return root;
+  }
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   public R forUpdate() {
@@ -888,17 +910,6 @@ public abstract class TQRootBean<T, R> {
    */
   public R setLazyLoadBatchSize(int lazyLoadBatchSize) {
     query.setLazyLoadBatchSize(lazyLoadBatchSize);
-    return root;
-  }
-
-  /**
-   * Deprecated migrate to setBeanCacheMode() or setUseCache().
-   * <p>
-   * When set to true all the beans from this query are loaded into the bean cache.
-   */
-  @Deprecated
-  public R setLoadBeanCache(boolean loadBeanCache) {
-    query.setLoadBeanCache(loadBeanCache);
     return root;
   }
 
@@ -1209,6 +1220,14 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * In expression using multiple columns.
+   */
+  public R inTuples(InTuples inTuples) {
+    peekExprList().inTuples(inTuples);
+    return root;
+  }
+
+  /**
    * Marker that can be used to indicate that the order by clause is defined after this.
    * <p>
    * <h2>Example: order by customer name, order date</h2>
@@ -1230,23 +1249,10 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Marker that can be used to indicate that the order by clause is defined after this.
-   * <p>
-   * <h2>Example: order by customer name, order date</h2>
-   * <pre>{@code
-   *   List<Order> orders =
-   *          new QOrder()
-   *            .customer.name.ilike("rob")
-   *            .orderBy()
-   *              .customer.name.asc()
-   *              .orderDate.asc()
-   *            .findList();
-   *
-   * }</pre>
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19")
   public R order() {
-    // Yes this does not actually do anything! We include it because style wise it makes
-    // the query nicer to read and suggests that order by definitions are added after this
     return root;
   }
 
@@ -1263,15 +1269,11 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Set the full raw order by clause replacing the existing order by clause if there is one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
+   * Deprecated migrate to {@link #orderBy(String)}
    */
+  @Deprecated(since = "13.19")
   public R order(String orderByClause) {
-    query.order(orderByClause);
-    return root;
+    return orderBy(orderByClause);
   }
 
   /**

@@ -1,8 +1,8 @@
 package org.tests.unitinternal;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EVanillaCollection;
 import org.tests.model.basic.EVanillaCollectionDetail;
@@ -31,8 +31,8 @@ public class TestVanillaCollectionSet extends BaseTestCase {
 
     BeanCollection<?> bc = (BeanCollection<?>) details;
     assertFalse(bc.isPopulated());
-    assertNotNull(bc.getOwnerBean());
-    assertNotNull(bc.getPropertyName());
+    assertNotNull(bc.owner());
+    assertNotNull(bc.propertyName());
   }
 
 }

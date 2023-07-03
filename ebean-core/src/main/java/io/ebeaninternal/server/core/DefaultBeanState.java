@@ -46,17 +46,17 @@ public final class DefaultBeanState implements BeanState {
 
   @Override
   public Set<String> loadedProps() {
-    return intercept.getLoadedPropertyNames();
+    return intercept.loadedPropertyNames();
   }
 
   @Override
   public Set<String> changedProps() {
-    return intercept.getDirtyPropertyNames();
+    return intercept.dirtyPropertyNames();
   }
 
   @Override
   public Map<String, ValuePair> dirtyValues() {
-    return intercept.getDirtyValues();
+    return intercept.dirtyValues();
   }
 
   @Override
@@ -91,11 +91,11 @@ public final class DefaultBeanState implements BeanState {
 
   @Override
   public Map<String, Exception> loadErrors() {
-    return intercept.getLoadErrors();
+    return intercept.loadErrors();
   }
 
   @Override
   public int sortOrder() {
-    return intercept.getSortOrder();
+    return intercept.sortOrder();
   }
 }

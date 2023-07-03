@@ -87,7 +87,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     DdlHandler postgresHandler = postgresHandler();
     postgresHandler.generate(writer, Helper.getAlterTableAddDbArrayColumn());
 
-    assertThat(writer.toString()).isEqualTo("-- apply alter tables\nalter table foo add column dbarray_added_to_foo varchar[];\n");
+    assertThat(writer.toString()).isEqualTo("-- apply alter tables\nalter table foo add column if not exists dbarray_added_to_foo varchar[];\n");
 
     writer = new DdlWrite();
 
@@ -109,7 +109,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
     DdlWrite writer = new DdlWrite();
 
     postgresHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnWithLength());
-    assertThat(writer.toString()).isEqualTo("-- apply alter tables\nalter table foo add column dbarray_ninety varchar[];\n");
+    assertThat(writer.toString()).isEqualTo("-- apply alter tables\nalter table foo add column if not exists dbarray_ninety varchar[];\n");
 
     writer = new DdlWrite();
     h2Handler().generate(writer, Helper.getAlterTableAddDbArrayColumnWithLength());
@@ -134,7 +134,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
     DdlWrite writer = new DdlWrite();
     postgresHandler().generate(writer, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());
-    assertThat(writer.toString()).isEqualTo("-- apply alter tables\nalter table foo add column dbarray_integer integer[];\n");
+    assertThat(writer.toString()).isEqualTo("-- apply alter tables\nalter table foo add column if not exists dbarray_integer integer[];\n");
 
     writer = new DdlWrite();
     h2Handler().generate(writer, Helper.getAlterTableAddDbArrayColumnIntegerWithLength());

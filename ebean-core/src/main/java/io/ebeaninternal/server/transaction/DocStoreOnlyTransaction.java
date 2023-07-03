@@ -30,7 +30,7 @@ public final class DocStoreOnlyTransaction extends JdbcTransaction {
   }
 
   @Override
-  public Connection getInternalConnection() {
+  public Connection internalConnection() {
     throw new RuntimeException("not supported on DocStoreTransaction");
   }
 

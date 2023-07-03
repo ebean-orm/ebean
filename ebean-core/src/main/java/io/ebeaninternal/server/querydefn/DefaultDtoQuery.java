@@ -48,8 +48,8 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     this.server = server;
     this.descriptor = descriptor;
     this.ormQuery = ormQuery;
-    this.label = ormQuery.getLabel();
-    this.profileLocation = ormQuery.getProfileLocation();
+    this.label = ormQuery.label();
+    this.profileLocation = ormQuery.profileLocation();
   }
 
   /**
@@ -68,8 +68,8 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public DtoQueryPlan getQueryPlan(Object planKey) {
-    return descriptor.getQueryPlan(planKey);
+  public DtoQueryPlan queryPlan(Object planKey) {
+    return descriptor.queryPlan(planKey);
   }
 
   @Override
@@ -205,17 +205,17 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public Class<T> getType() {
-    return descriptor.getType();
+  public Class<T> type() {
+    return descriptor.type();
   }
 
   @Override
-  public SpiQuery<?> getOrmQuery() {
+  public SpiQuery<?> ormQuery() {
     return ormQuery;
   }
 
   @Override
-  public Transaction getTransaction() {
+  public Transaction transaction() {
     return transaction;
   }
 
@@ -243,7 +243,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Nullable
   @Override
-  public String getPlanLabel() {
+  public String planLabel() {
     if (label != null) {
       return label;
     }
@@ -267,7 +267,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public ProfileLocation profileLocation() {
     return profileLocation;
   }
 

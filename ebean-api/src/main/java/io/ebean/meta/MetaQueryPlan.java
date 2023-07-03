@@ -2,6 +2,8 @@ package io.ebean.meta;
 
 import io.ebean.ProfileLocation;
 
+import java.time.Instant;
+
 /**
  * Meta data for captured query plan.
  */
@@ -51,4 +53,14 @@ public interface MetaQueryPlan {
    * Return the total count of times bind capture has occurred.
    */
   long captureCount();
+
+  /**
+   * Return the time taken to capture this plan in microseconds.
+   */
+  long captureMicros();
+
+  /**
+   * Return the instant when the bind values were captured.
+   */
+  Instant whenCaptured();
 }

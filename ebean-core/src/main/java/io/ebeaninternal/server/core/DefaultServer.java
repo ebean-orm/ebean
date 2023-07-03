@@ -45,13 +45,14 @@ import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Clock;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -559,9 +560,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private void executeSql(Connection connection, @Nullable String sql) throws SQLException {
     if (sql != null) {
-      try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+      try (Statement stmt = connection.createStatement()) {
         transactionManager.log().sql().debug(sql);
-        stmt.execute();
+        stmt.execute(sql);
       }
     }
   }
@@ -586,7 +587,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public <T> T createEntityBean(Class<T> type) {
-    return descriptor(type).createBean();
+    final BeanDescriptor<T> desc = descriptor(type);
+    if (desc == null) {
+      throw new IllegalArgumentException("No bean type " + type.getName() + " registered");
+    }
+    return desc.createBean();
   }
 
   /**
@@ -606,7 +611,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     PersistenceContext pc = null;
     SpiTransaction t = transactionManager.active();
     if (t != null) {
-      pc = t.getPersistenceContext();
+      pc = t.persistenceContext();
       Object existing = desc.contextGet(pc, id);
       if (existing != null) {
         return (T) existing;
@@ -626,7 +631,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     // we actually need to do a query because we don't know the type without the discriminator
     // value, just select the id property and discriminator column (auto added)
-    return find(type).select(idProp.name()).setId(id).findOne();
+    T bean = find(type).select(idProp.name()).setId(id).findOne();
+    if (bean == null) {
+      throw new EntityNotFoundException("Could not find reference bean " + id + " for " + desc);
+    }
+    return bean;
   }
 
   @Override
@@ -873,14 +882,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> DtoQuery<T> findDto(Class<T> dtoType, String sql) {
-    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, sql.trim());
   }
 
   @Override
   public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
-    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
-    String sql = descriptor.getNamedRawSql(namedQuery);
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
+    String sql = descriptor.namedRawSql(namedQuery);
     if (sql == null) {
       throw new PersistenceException("No named query called " + namedQuery + " for bean:" + dtoType.getName());
     }
@@ -889,13 +898,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> DtoQuery<T> findDto(Class<T> dtoType, SpiQuery<?> ormQuery) {
-    DtoBeanDescriptor<T> descriptor = dtoBeanManager.getDescriptor(dtoType);
+    DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, ormQuery);
   }
 
   @Override
   public SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction) {
-    SpiOrmQueryRequest<?> request = createQueryRequest(ormQuery.getType(), ormQuery, transaction);
+    SpiOrmQueryRequest<?> request = createQueryRequest(ormQuery.type(), ormQuery, transaction);
     request.initTransIfRequired();
     return request.findResultSet();
   }
@@ -956,12 +965,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
       query.selectAllForLazyLoadProperty();
     }
-    ProfileLocation profileLocation = query.getProfileLocation();
+    ProfileLocation profileLocation = query.profileLocation();
     if (profileLocation != null) {
       profileLocation.obtain();
     }
     // if determine cost and no origin for AutoTune
-    if (query.getParentNode() == null) {
+    if (query.parentNode() == null) {
       query.setOrigin(createCallOrigin());
     }
     return new OrmQueryRequest<>(this, queryEngine, query, (SpiTransaction) transaction);
@@ -977,12 +986,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (t == null) {
       t = currentServerTransaction();
     }
-    BeanDescriptor<T> desc = query.getBeanDescriptor();
+    BeanDescriptor<T> desc = query.descriptor();
     id = desc.convertId(id);
     PersistenceContext pc = null;
     if (t != null && useTransactionPersistenceContext(query)) {
       // first look in the transaction scoped persistence context
-      pc = t.getPersistenceContext();
+      pc = t.persistenceContext();
       if (pc != null) {
         WithOption o = desc.contextGetWithOption(pc, id);
         if (o != null) {
@@ -1013,7 +1022,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    */
   @Override
   public PersistenceContextScope persistenceContextScope(SpiQuery<?> query) {
-    PersistenceContextScope scope = query.getPersistenceContextScope();
+    PersistenceContextScope scope = query.persistenceContextScope();
     return (scope != null) ? scope : defaultPersistenceContextScope;
   }
 
@@ -1022,7 +1031,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private <T> T findId(Query<T> query, @Nullable Transaction transaction) {
     SpiQuery<T> spiQuery = (SpiQuery<T>) query;
     spiQuery.setType(Type.BEAN);
-    if (SpiQuery.Mode.NORMAL == spiQuery.getMode() && !spiQuery.isForceHitDatabase()) {
+    if (SpiQuery.Mode.NORMAL == spiQuery.mode() && !spiQuery.isForceHitDatabase()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
       T bean = findIdCheckPersistenceContextAndCache(transaction, spiQuery, spiQuery.getId());
@@ -2149,7 +2158,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
     if (timeMicros > slowQueryMicros && slowQueryListener != null) {
-      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.getParentNode()));
+      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.parentNode()));
     }
   }
 
@@ -2167,7 +2176,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (idProperty == null) {
       return Collections.emptySet();
     }
-    Object id = idProperty.value(entityBean);
+    Object id = idProperty.getValue(entityBean);
     if (entityBean._ebean_getIntercept().isNew() && id != null) {
       // Primary Key is changeable only on new models - so skip check if we are not new
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
@@ -2195,10 +2204,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     ExpressionList<?> exprList = query.where();
     if (!entityBean._ebean_getIntercept().isNew()) {
       // if model is not new, exclude ourself.
-      exprList.ne(idProperty.name(), idProperty.value(entityBean));
+      exprList.ne(idProperty.name(), idProperty.getValue(entityBean));
     }
-    for (Property prop : props) {
-      Object value = prop.value(entityBean);
+    for (BeanProperty prop : props) {
+      Object value = prop.getValue(entityBean);
       if (value == null) {
         return null;
       }

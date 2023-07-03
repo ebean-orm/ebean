@@ -101,7 +101,7 @@ public interface Persister {
   /**
    * Execute or queue the update.
    */
-  void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue);
+  void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue, int queuePosition);
 
   /**
    * Queue the SqlUpdate for execution with position 0, 1 or 2 defining

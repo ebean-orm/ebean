@@ -5,7 +5,6 @@ import io.ebean.bean.EntityBean;
 import io.ebean.search.*;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.expression.SubQueryExpression.SQOp;
 import io.ebeaninternal.server.grammer.EqlParser;
 
 import java.util.Arrays;
@@ -149,7 +148,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   @Override
   public Expression eq(String propertyName, Query<?> subQuery) {
-    return new SubQueryExpression(SQOp.EQ, propertyName, (SpiQuery<?>) subQuery);
+    return new SubQueryExpression(SubQueryOp.EQ, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -170,7 +169,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   @Override
   public Expression ne(String propertyName, Query<?> subQuery) {
-    return new SubQueryExpression(SQOp.NE, propertyName, (SpiQuery<?>) subQuery);
+    return new SubQueryExpression(SubQueryOp.NE, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -260,7 +259,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   @Override
   public Expression gt(String propertyName, Query<?> subQuery) {
-    return new SubQueryExpression(SQOp.GT, propertyName, (SpiQuery<?>) subQuery);
+    return new SubQueryExpression(SubQueryOp.GT, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -286,7 +285,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   @Override
   public Expression ge(String propertyName, Query<?> subQuery) {
-    return new SubQueryExpression(SQOp.GE, propertyName, (SpiQuery<?>) subQuery);
+    return new SubQueryExpression(SubQueryOp.GE, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -313,7 +312,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   @Override
   public Expression lt(String propertyName, Query<?> subQuery) {
-    return new SubQueryExpression(SQOp.LT, propertyName, (SpiQuery<?>) subQuery);
+    return new SubQueryExpression(SubQueryOp.LT, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -326,7 +325,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
 
   @Override
   public Expression le(String propertyName, Query<?> subQuery) {
-    return new SubQueryExpression(SQOp.LE, propertyName, (SpiQuery<?>) subQuery);
+    return new SubQueryExpression(SubQueryOp.LE, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**
@@ -472,6 +471,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new InPairsExpression(pairs, false);
   }
 
+  @Override
+  public Expression inTuples(InTuples pairs) {
+    return new InTuplesExpression(pairs, false);
+  }
+
   /**
    * In - property has a value in the array of values.
    */
@@ -484,8 +488,64 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    * In - using a subQuery.
    */
   @Override
+  public Expression exists(String subQuery, Object... bindValues) {
+    return new ExistsSqlQueryExpression(false, subQuery, bindValues);
+  }
+
+  /**
+   * In - using a subQuery.
+   */
+  @Override
+  public Expression notExists(String subQuery, Object... bindValues) {
+    return new ExistsSqlQueryExpression(true, subQuery, bindValues);
+  }
+
+  /**
+   * In - using a subQuery.
+   */
+  @Override
   public Expression in(String propertyName, Query<?> subQuery) {
-    return new SubQueryExpression(SQOp.IN, propertyName, (SpiQuery<?>) subQuery);
+    return new SubQueryExpression(SubQueryOp.IN, propertyName, (SpiQuery<?>) subQuery);
+  }
+
+  @Override
+  public Expression inSubQuery(String propertyName, String subQuery, Object... bindValues) {
+    return new SubQueryRawExpression(SubQueryOp.IN, propertyName, subQuery, bindValues);
+  }
+
+  @Override
+  public Expression notInSubQuery(String propertyName, String subQuery, Object... bindValues) {
+    return new SubQueryRawExpression(SubQueryOp.NOTIN, propertyName, subQuery, bindValues);
+  }
+
+  @Override
+  public Expression eqSubQuery(String propertyName, String subQuery, Object... bindValues) {
+    return new SubQueryRawExpression(SubQueryOp.EQ, propertyName, subQuery, bindValues);
+  }
+
+  @Override
+  public Expression neSubQuery(String propertyName, String subQuery, Object... bindValues) {
+    return new SubQueryRawExpression(SubQueryOp.NE, propertyName, subQuery, bindValues);
+  }
+
+  @Override
+  public Expression geSubQuery(String propertyName, String subQuery, Object... bindValues) {
+    return new SubQueryRawExpression(SubQueryOp.GE, propertyName, subQuery, bindValues);
+  }
+
+  @Override
+  public Expression gtSubQuery(String propertyName, String subQuery, Object... bindValues) {
+    return new SubQueryRawExpression(SubQueryOp.GT, propertyName, subQuery, bindValues);
+  }
+
+  @Override
+  public Expression leSubQuery(String propertyName, String subQuery, Object... bindValues) {
+    return new SubQueryRawExpression(SubQueryOp.LE, propertyName, subQuery, bindValues);
+  }
+
+  @Override
+  public Expression ltSubQuery(String propertyName, String subQuery, Object... bindValues) {
+    return new SubQueryRawExpression(SubQueryOp.LT, propertyName, subQuery, bindValues);
   }
 
   /**
@@ -527,7 +587,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public Expression notIn(String propertyName, Query<?> subQuery) {
-    return new SubQueryExpression(SQOp.NOTIN, propertyName, (SpiQuery<?>) subQuery);
+    return new SubQueryExpression(SubQueryOp.NOTIN, propertyName, (SpiQuery<?>) subQuery);
   }
 
   /**

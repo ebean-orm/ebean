@@ -30,7 +30,7 @@ final class SavepointTransaction extends SpiTransactionProxy {
   SavepointTransaction(SpiTransaction transaction, TransactionManager manager) throws SQLException {
     this.manager = manager;
     this.transaction = transaction;
-    this.connection = transaction.getInternalConnection();
+    this.connection = transaction.internalConnection();
     this.savepoint = connection.setSavepoint();
     if (transaction.isLogSql()) {
       int savepointId = manager.isSupportsSavepointId() ? savepoint.getSavepointId() : 0;
@@ -41,7 +41,7 @@ final class SavepointTransaction extends SpiTransactionProxy {
   }
 
   @Override
-  public TransactionEvent getEvent() {
+  public TransactionEvent event() {
     if (event == null) {
       event = new TransactionEvent();
     }

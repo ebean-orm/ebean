@@ -47,7 +47,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    */
   private static final byte FLAG_MUTABLE_HASH_SET = 16;
 
-  private transient final ReentrantLock lock = new ReentrantLock();
+  private final ReentrantLock lock = new ReentrantLock();
   private transient NodeUsageCollector nodeUsageCollector;
   private transient PersistenceContext persistenceContext;
   private transient BeanLoader beanLoader;
@@ -115,7 +115,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   @Override
   public String toString() {
-    return "InterceptReadWrite{state=" + state +
+    return "InterceptReadWrite@" + hashCode() + "{state=" + state +
       (dirty ? " dirty;" : "") +
       (forceUpdate ? " forceUpdate;" : "") +
       (readOnly ? " readOnly;" : "") +
@@ -128,17 +128,16 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       (lazyLoadProperty > -1 ? (", lazyLoadProperty=" + lazyLoadProperty) : "") +
       ", loader=" + beanLoader +
       (ownerId != null ? (", ownerId=" + ownerId) : "") +
-      ", owner=" + owner +
       '}';
   }
 
   @Override
-  public EntityBean getOwner() {
+  public EntityBean owner() {
     return owner;
   }
 
   @Override
-  public PersistenceContext getPersistenceContext() {
+  public PersistenceContext persistenceContext() {
     return persistenceContext;
   }
 
@@ -153,7 +152,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public Object getOwnerId() {
+  public Object ownerId() {
     return ownerId;
   }
 
@@ -163,12 +162,12 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public Object getEmbeddedOwner() {
+  public Object embeddedOwner() {
     return embeddedOwner;
   }
 
   @Override
-  public int getEmbeddedOwnerIndex() {
+  public int embeddedOwnerIndex() {
     return embeddedOwnerIndex;
   }
 
@@ -192,13 +191,13 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   public void setBeanLoader(BeanLoader beanLoader, PersistenceContext ctx) {
     this.beanLoader = beanLoader;
     this.persistenceContext = ctx;
-    this.ebeanServerName = beanLoader.getName();
+    this.ebeanServerName = beanLoader.name();
   }
 
   @Override
   public void setBeanLoader(BeanLoader beanLoader) {
     this.beanLoader = beanLoader;
-    this.ebeanServerName = beanLoader.getName();
+    this.ebeanServerName = beanLoader.name();
   }
 
   @Override
@@ -381,8 +380,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   @Override
   public void setEmbeddedLoaded(Object embeddedBean) {
     if (embeddedBean instanceof EntityBean) {
-      EntityBean eb = (EntityBean) embeddedBean;
-      eb._ebean_getIntercept().setLoaded();
+      ((EntityBean) embeddedBean)._ebean_getIntercept().setLoaded();
     }
   }
 
@@ -402,7 +400,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public Object getOrigValue(int propertyIndex) {
+  public Object origValue(int propertyIndex) {
     if ((flags[propertyIndex] & (FLAG_ORIG_VALUE_SET | FLAG_MUTABLE_HASH_SET)) == FLAG_MUTABLE_HASH_SET) {
       // mutable hash set, but not ORIG_VALUE
       setOriginalValue(propertyIndex, mutableInfo[propertyIndex].get());
@@ -415,7 +413,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   @Override
   public int findProperty(String propertyName) {
-    String[] names = owner._ebean_getPropertyNames();
+    final String[] names = owner._ebean_getPropertyNames();
     for (int i = 0; i < names.length; i++) {
       if (names[i].equals(propertyName)) {
         return i;
@@ -425,7 +423,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public String getProperty(int propertyIndex) {
+  public String property(int propertyIndex) {
     if (propertyIndex == -1) {
       return null;
     }
@@ -433,13 +431,13 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public int getPropertyLength() {
+  public int propertyLength() {
     return flags.length;
   }
 
   @Override
   public void setPropertyLoaded(String propertyName, boolean loaded) {
-    int position = findProperty(propertyName);
+    final int position = findProperty(propertyName);
     if (position == -1) {
       throw new IllegalArgumentException("Property " + propertyName + " not found");
     }
@@ -533,23 +531,23 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public Set<String> getLoadedPropertyNames() {
+  public Set<String> loadedPropertyNames() {
     if (fullyLoadedBean) {
       return null;
     }
-    Set<String> props = new LinkedHashSet<>();
+    final Set<String> props = new LinkedHashSet<>();
     for (int i = 0; i < flags.length; i++) {
       if ((flags[i] & FLAG_LOADED_PROP) != 0) {
-        props.add(getProperty(i));
+        props.add(property(i));
       }
     }
     return props;
   }
 
   @Override
-  public boolean[] getDirtyProperties() {
-    int len = getPropertyLength();
-    boolean[] dirties = new boolean[len];
+  public boolean[] dirtyProperties() {
+    final int len = propertyLength();
+    final boolean[] dirties = new boolean[len];
     for (int i = 0; i < len; i++) {
       // this, or an embedded property has been changed - recurse
       dirties[i] = (flags[i] & (FLAG_CHANGED_PROP + FLAG_EMBEDDED_DIRTY)) != 0;
@@ -558,31 +556,31 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public Set<String> getDirtyPropertyNames() {
-    Set<String> props = new LinkedHashSet<>();
+  public Set<String> dirtyPropertyNames() {
+    final Set<String> props = new LinkedHashSet<>();
     addDirtyPropertyNames(props, null);
     return props;
   }
 
   @Override
   public void addDirtyPropertyNames(Set<String> props, String prefix) {
-    int len = getPropertyLength();
+    final int len = propertyLength();
     for (int i = 0; i < len; i++) {
       if (isChangedProp(i)) {
         // the property has been changed on this bean
-        props.add((prefix == null ? getProperty(i) : prefix + getProperty(i)));
+        props.add((prefix == null ? property(i) : prefix + property(i)));
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
-        embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, getProperty(i) + ".");
+        final EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
+        embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, property(i) + ".");
       }
     }
   }
 
   @Override
   public boolean hasDirtyProperty(Set<String> propertyNames) {
-    String[] names = owner._ebean_getPropertyNames();
-    int len = getPropertyLength();
+    final String[] names = owner._ebean_getPropertyNames();
+    final int len = propertyLength();
     for (int i = 0; i < len; i++) {
       if (isChangedProp(i)) {
         if (propertyNames.contains(names[i])) {
@@ -598,46 +596,46 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public Map<String, ValuePair> getDirtyValues() {
-    Map<String, ValuePair> dirtyValues = new LinkedHashMap<>();
+  public Map<String, ValuePair> dirtyValues() {
+    final Map<String, ValuePair> dirtyValues = new LinkedHashMap<>();
     addDirtyPropertyValues(dirtyValues, null);
     return dirtyValues;
   }
 
   @Override
   public void addDirtyPropertyValues(Map<String, ValuePair> dirtyValues, String prefix) {
-    int len = getPropertyLength();
+    final int len = propertyLength();
     for (int i = 0; i < len; i++) {
       if (isChangedProp(i)) {
         // the property has been changed on this bean
-        String propName = (prefix == null ? getProperty(i) : prefix + getProperty(i));
-        Object newVal = owner._ebean_getField(i);
-        Object oldVal = getOrigValue(i);
+        final String propName = (prefix == null ? property(i) : prefix + property(i));
+        final Object newVal = owner._ebean_getField(i);
+        final Object oldVal = origValue(i);
         if (notEqual(oldVal, newVal)) {
           dirtyValues.put(propName, new ValuePair(newVal, oldVal));
         }
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
-        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(dirtyValues, getProperty(i) + ".");
+        final EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
+        embeddedBean._ebean_getIntercept().addDirtyPropertyValues(dirtyValues, property(i) + ".");
       }
     }
   }
 
   @Override
   public void addDirtyPropertyValues(BeanDiffVisitor visitor) {
-    int len = getPropertyLength();
+    final int len = propertyLength();
     for (int i = 0; i < len; i++) {
       if (isChangedProp(i)) {
         // the property has been changed on this bean
-        Object newVal = owner._ebean_getField(i);
-        Object oldVal = getOrigValue(i);
+        final Object newVal = owner._ebean_getField(i);
+        final Object oldVal = origValue(i);
         if (notEqual(oldVal, newVal)) {
           visitor.visit(i, newVal, oldVal);
         }
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
+        final EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
         visitor.visitPush(i);
         embeddedBean._ebean_getIntercept().addDirtyPropertyValues(visitor);
         visitor.visitPop();
@@ -646,8 +644,8 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public StringBuilder getDirtyPropertyKey() {
-    StringBuilder sb = new StringBuilder();
+  public StringBuilder dirtyPropertyKey() {
+    final StringBuilder sb = new StringBuilder();
     addDirtyPropertyKey(sb);
     return sb;
   }
@@ -657,24 +655,23 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     if (sortOrder > 0) {
       sb.append("s,");
     }
-    int len = getPropertyLength();
+    final int len = propertyLength();
     for (int i = 0; i < len; i++) {
       if ((flags[i] & FLAG_CHANGED_PROP) != 0) { // we do not check against mutablecontent here.
         sb.append(i).append(',');
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
         sb.append(i).append('[');
-        embeddedBean._ebean_getIntercept().addDirtyPropertyKey(sb);
+        ((EntityBean) owner._ebean_getField(i))._ebean_getIntercept().addDirtyPropertyKey(sb);
         sb.append(']');
       }
     }
   }
 
   @Override
-  public StringBuilder getLoadedPropertyKey() {
-    StringBuilder sb = new StringBuilder();
-    int len = getPropertyLength();
+  public StringBuilder loadedPropertyKey() {
+    final StringBuilder sb = new StringBuilder();
+    final int len = propertyLength();
     for (int i = 0; i < len; i++) {
       if (isLoadedProperty(i)) {
         sb.append(i).append(',');
@@ -684,8 +681,8 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public boolean[] getLoaded() {
-    boolean[] ret = new boolean[flags.length];
+  public boolean[] loaded() {
+    final boolean[] ret = new boolean[flags.length];
     for (int i = 0; i < ret.length; i++) {
       ret[i] = (flags[i] & FLAG_LOADED_PROP) != 0;
     }
@@ -693,13 +690,13 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public int getLazyLoadPropertyIndex() {
+  public int lazyLoadPropertyIndex() {
     return lazyLoadProperty;
   }
 
   @Override
-  public String getLazyLoadProperty() {
-    return getProperty(lazyLoadProperty);
+  public String lazyLoadProperty() {
+    return property(lazyLoadProperty);
   }
 
   @Override
@@ -839,7 +836,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       loadBean(propertyIndex);
     }
     if (nodeUsageCollector != null) {
-      nodeUsageCollector.addUsed(getProperty(propertyIndex));
+      nodeUsageCollector.addUsed(property(propertyIndex));
     }
   }
 
@@ -988,7 +985,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public int getSortOrder() {
+  public int sortOrder() {
     return sortOrder;
   }
 
@@ -1017,19 +1014,19 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public Map<String, Exception> getLoadErrors() {
+  public Map<String, Exception> loadErrors() {
     if (loadErrors == null) {
       return Collections.emptyMap();
     }
     Map<String, Exception> ret = null;
-    int len = getPropertyLength();
+    int len = propertyLength();
     for (int i = 0; i < len; i++) {
-      Exception loadError = loadErrors[i];
+      final Exception loadError = loadErrors[i];
       if (loadError != null) {
         if (ret == null) {
           ret = new LinkedHashMap<>();
         }
-        ret.put(getProperty(i), loadError);
+        ret.put(property(i), loadError);
       }
     }
     return ret;

@@ -136,7 +136,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
     try {
       query.checkCancelled();
       prepareSql();
-      Connection conn = transaction.getInternalConnection();
+      Connection conn = transaction.internalConnection();
       pstmt = conn.prepareStatement(sql);
       if (query.getTimeout() > 0) {
         pstmt.setQueryTimeout(query.getTimeout());

@@ -8,15 +8,15 @@ public interface CallOrigin {
   /**
    * Return the top element. Typically the top stack element with class and line.
    */
-  String getTopElement();
+  String top();
 
   /**
    * Return the full description of the call origin.
    */
-  String getFullDescription();
+  String description();
 
   /**
    * Compute and return an origin key based on the query hash.
    */
-  String getOriginKey(int queryHash);
+  String key(int queryHash);
 }

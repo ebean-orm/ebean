@@ -1,10 +1,6 @@
 package io.ebeaninternal.server.loadcontext;
 
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.BeanCollectionLoader;
-import io.ebean.bean.EntityBean;
-import io.ebean.bean.ObjectGraphNode;
-import io.ebean.bean.PersistenceContext;
+import io.ebean.bean.*;
 import io.ebeaninternal.api.LoadManyBuffer;
 import io.ebeaninternal.api.LoadManyContext;
 import io.ebeaninternal.api.LoadManyRequest;
@@ -77,7 +73,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
 
 
   public String getName() {
-    return parent.getEbeanServer().name();
+    return parent.server().name();
   }
 
   public void register(BeanCollection<?> bc) {
@@ -99,7 +95,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
         for (LoadBuffer loadBuffer : bufferList) {
           if (loadBuffer.size() > 0) {
             LoadManyRequest req = new LoadManyRequest(loadBuffer, parentRequest);
-            parent.getEbeanServer().loadMany(req);
+            parent.server().loadMany(req);
           }
         }
         if (forEach) {
@@ -129,7 +125,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
       this.context = context;
       // set the persistence context as at this moment in
       // case it changes as part of a findIterate etc
-      this.persistenceContext = context.getPersistenceContext();
+      this.persistenceContext = context.persistenceContext();
       this.batchSize = batchSize;
     }
 
@@ -158,12 +154,12 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
     abstract void clear();
 
     @Override
-    public BeanPropertyAssocMany<?> getBeanProperty() {
+    public BeanPropertyAssocMany<?> beanProperty() {
       return context.property;
     }
 
     @Override
-    public ObjectGraphNode getObjectGraphNode() {
+    public ObjectGraphNode objectGraphNode() {
       return context.objectGraphNode;
     }
 
@@ -178,17 +174,17 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
     }
 
     @Override
-    public BeanDescriptor<?> getBeanDescriptor() {
+    public BeanDescriptor<?> descriptor() {
       return context.desc;
     }
 
     @Override
-    public PersistenceContext getPersistenceContext() {
+    public PersistenceContext persistenceContext() {
       return persistenceContext;
     }
 
     @Override
-    public String getFullPath() {
+    public String fullPath() {
       return context.fullPath;
     }
 
@@ -198,21 +194,21 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
       try {
         boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
         if (useCache) {
-          EntityBean ownerBean = bc.getOwnerBean();
+          EntityBean ownerBean = bc.owner();
           BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
           final String parentKey = parentDesc.cacheKey(parentId);
           if (parentDesc.cacheManyPropLoad(context.property, bc, parentKey, context.parent.isReadOnly())) {
             // we loaded the bean collection from cache so remove it from the buffer
             if (removeFromBuffer(bc)) {
-              bc.setLoader(context.parent.getEbeanServer());
+              bc.setLoader(context.parent.server());
             }
             // find it using instance equality - avoiding equals() and potential deadlock issue
             return;
           }
         }
 
-        context.parent.getEbeanServer().loadMany(new LoadManyRequest(this, onlyIds, useCache, bc));
+        context.parent.server().loadMany(new LoadManyRequest(this, onlyIds, useCache, bc));
         // clear the buffer as all entries have been loaded
         clear();
       } finally {

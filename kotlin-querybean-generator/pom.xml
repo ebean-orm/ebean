@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.16.1-SNAPSHOT</version>
+    <version>13.20.1-SNAPSHOT</version>
   </parent>
 
   <name>kotlin querybean generator</name>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>13.16.1-SNAPSHOT</version>
+      <version>13.20.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -43,7 +43,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.16.1-SNAPSHOT</version>
+      <version>13.20.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -64,14 +64,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.16.1-SNAPSHOT</version>
+      <version>13.20.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.16.1-SNAPSHOT</version>
+      <version>13.20.1-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -120,7 +120,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
         <executions>
           <execution>
             <id>default-testCompile</id>

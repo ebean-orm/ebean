@@ -4,7 +4,7 @@ import io.ebean.CallableSql;
 
 public interface SpiCallableSql extends CallableSql {
 
-  BindParams getBindParams();
+  BindParams bindParams();
 
-  TransactionEventTable getTransactionEventTable();
+  TransactionEventTable transactionEventTable();
 }

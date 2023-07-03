@@ -1,8 +1,8 @@
 package org.tests.basic;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.cache.ServerCache;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -11,13 +11,13 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Date;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestBeanReferenceRefresh extends BaseTestCase {
+class TestBeanReferenceRefresh extends BaseTestCase {
 
   @Test
-  public void testMe() {
-
+  void testMe() {
     ResetBasicData.reset();
 
     ServerCache beanCache = DB.cacheManager().beanCache(Order.class);
@@ -45,9 +45,7 @@ public class TestBeanReferenceRefresh extends BaseTestCase {
     DB.refresh(order);
 
     Status statusRefresh = order.getStatus();
-    assertEquals(status, statusRefresh);
-
+    assertThat(status).isEqualTo(statusRefresh);
   }
-
 
 }

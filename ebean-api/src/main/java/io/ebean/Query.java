@@ -1372,13 +1372,9 @@ public interface Query<T> extends CancelableQuery {
   Query<T> orderBy(String orderByClause);
 
   /**
-   * Set the order by clause replacing the existing order by clause if there is
-   * one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19")
   default Query<T> order(String orderByClause) {
     return orderBy(orderByClause);
   }
@@ -1395,14 +1391,9 @@ public interface Query<T> extends CancelableQuery {
   OrderBy<T> orderBy();
 
   /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * <p>
-   * This is the same as <code>orderBy()</code>
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19")
   default OrderBy<T> order() {
     return orderBy();
   }
@@ -1413,8 +1404,9 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setOrderBy(OrderBy<T> orderBy);
 
   /**
-   * Set an OrderBy object to replace any existing OrderBy clause.
+   * Deprecated migrate to setOrderBy().
    */
+  @Deprecated(since = "13.19")
   default Query<T> setOrder(OrderBy<T> orderBy) {
     return setOrderBy(orderBy);
   }
@@ -1578,14 +1570,6 @@ public interface Query<T> extends CancelableQuery {
    * When set to true when you want the returned beans to be read only.
    */
   Query<T> setReadOnly(boolean readOnly);
-
-  /**
-   * Deprecated - migrate to use setBeanCacheMode(CacheMode.PUT) or other CacheMode.
-   * <p>
-   * When set to true all the beans from this query are loaded into the bean cache.
-   */
-  @Deprecated
-  Query<T> setLoadBeanCache(boolean loadBeanCache);
 
   /**
    * Set a timeout on this query.

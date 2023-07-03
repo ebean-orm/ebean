@@ -700,7 +700,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the bean cache value for this property using original values.
    */
   public Object getCacheDataValueOrig(EntityBeanIntercept ebi) {
-    return cacheDataConvert(ebi.getOrigValue(propertyIndex));
+    return cacheDataConvert(ebi.origValue(propertyIndex));
   }
 
   private Object cacheDataConvert(Object value) {
@@ -756,7 +756,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public Object value(Object bean) {
-    return getValue((EntityBean) bean);
+    return getValueIntercept((EntityBean) bean);
   }
 
   /**

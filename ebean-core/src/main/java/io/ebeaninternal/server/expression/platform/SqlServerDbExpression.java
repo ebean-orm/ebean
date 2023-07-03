@@ -11,8 +11,7 @@ final class SqlServerDbExpression extends BaseDbExpression {
   @Override
   public void json(final SpiExpressionRequest request, final String propName,
                    final String path, final Op operator, final Object value) {
-    request.append("json_value(").append(propName).append(", '$.").append(path).append("')");
-    request.append(operator.bind());
+    request.append("json_value(").property(propName).append(", '$.").append(path).append("')").append(operator.bind());
   }
 
   @Override

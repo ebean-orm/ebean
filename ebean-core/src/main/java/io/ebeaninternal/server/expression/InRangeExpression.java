@@ -55,7 +55,7 @@ final class InRangeExpression extends AbstractExpression {
     if (prop != null && prop.isDbEncrypted()) {
       pname = prop.beanProperty().decryptProperty(propName);
     }
-    request.append("(").append(pname).append(" >= ? and ").append(pname).append(" < ?)");
+    request.append("(").property(pname).append(" >= ? and ").property(pname).append(" < ?)");
   }
 
   @Override

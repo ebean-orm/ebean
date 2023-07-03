@@ -203,7 +203,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @SuppressWarnings("rawtypes")
   public Collection rawCollection(EntityBean bean) {
-    return help.underlying(value(bean));
+    return help.underlying(getValue(bean));
   }
 
   /**
@@ -211,11 +211,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public void merge(EntityBean bean, EntityBean existing) {
-    Object existingCollection = value(existing);
+    Object existingCollection = getValue(existing);
     if (existingCollection instanceof BeanCollection<?>) {
       BeanCollection<?> toBC = (BeanCollection<?>) existingCollection;
       if (!toBC.isPopulated()) {
-        Object fromCollection = value(bean);
+        Object fromCollection = getValue(bean);
         if (fromCollection instanceof BeanCollection<?>) {
           BeanCollection<?> fromBC = (BeanCollection<?>) fromCollection;
           if (fromBC.isPopulated()) {
@@ -416,16 +416,16 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public String assocIsEmpty(SpiExpressionRequest request, String path) {
     boolean softDelete = targetDescriptor.isSoftDelete();
     boolean needsX2Table = softDelete || extraWhere() != null;
-    StringBuilder sb = new StringBuilder(50);
-    SpiQuery<?> query = request.getQueryRequest().query();
+    StringBuilder sb = new StringBuilder(50).append("from "); // use from to stop parsing on table name
+    SpiQuery<?> query = request.queryRequest().query();
     if (hasJoinTable()) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
-      sb.append(targetDescriptor.baseTable(query.getTemporalMode()));
+      sb.append(targetDescriptor.baseTable(query.temporalMode()));
     }
     if (needsX2Table && hasJoinTable()) {
       sb.append(" x join ");
-      sb.append(targetDescriptor.baseTable(query.getTemporalMode()));
+      sb.append(targetDescriptor.baseTable(query.temporalMode()));
       sb.append(" x2 on ");
       inverseJoin.addJoin("x2", "x", sb);
     } else {
@@ -875,7 +875,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
     // publish from each draft to live bean creating new live beans as required
     draftVal.size();
-    Collection<T> actualDetails = draftVal.getActualDetails();
+    Collection<T> actualDetails = draftVal.actualDetails();
     for (T bean : actualDetails) {
       Object id = targetDescriptor.id(bean);
       T liveBean = liveBeansAsMap.remove(id);
@@ -904,7 +904,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   @SuppressWarnings("unchecked")
   private Map<Object, T> liveBeansAsMap(BeanCollection<?> liveVal) {
     liveVal.size();
-    Collection<?> liveBeans = liveVal.getActualDetails();
+    Collection<?> liveBeans = liveVal.actualDetails();
     Map<Object, T> liveMap = new LinkedHashMap<>();
     for (Object liveBean : liveBeans) {
       Object id = targetDescriptor.id(liveBean);

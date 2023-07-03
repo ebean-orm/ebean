@@ -1,9 +1,9 @@
 package org.tests.cascade;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.BeanCollection;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TSDetail;
 import org.tests.model.basic.TSMaster;
@@ -34,7 +34,7 @@ public class TestPrivateOwned extends BaseTestCase {
     TSDetail removedDetail = details.remove(1);
 
     BeanCollection<?> bc = (BeanCollection<?>) details;
-    Set<?> modifyRemovals = bc.getModifyRemovals();
+    Set<?> modifyRemovals = bc.modifyRemovals();
 
     assertNotNull(modifyRemovals);
     assertTrue(modifyRemovals.size() == 1);

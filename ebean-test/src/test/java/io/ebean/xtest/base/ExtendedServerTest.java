@@ -44,7 +44,7 @@ public class ExtendedServerTest extends BaseTestCase {
 
       // obtain extended API ... such that we can execute the
       // query using an explicit transaction
-      List<Customer> customers = server.extended().findList(query, transaction);
+      List<Customer> customers = query.usingTransaction(transaction).findList();
 
       assertThat(customers).isNotEmpty();
       transaction.commit();

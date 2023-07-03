@@ -67,8 +67,8 @@ public final class ElPropertyChain implements ElPropertyValue {
       this.scalarType = null;
     }
     this.lastElPropertyValue = chain[chain.length - 1];
-    this.placeHolder = getElPlaceHolder(prefix, lastElPropertyValue, false);
-    this.placeHolderEncrypted = getElPlaceHolder(prefix, lastElPropertyValue, true);
+    this.placeHolder = placeHolder(prefix, lastElPropertyValue, false);
+    this.placeHolderEncrypted = placeHolder(prefix, lastElPropertyValue, true);
   }
 
   @Override
@@ -86,7 +86,7 @@ public final class ElPropertyChain implements ElPropertyValue {
     return false;
   }
 
-  private String getElPlaceHolder(String prefix, ElPropertyValue lastElPropertyValue, boolean encrypted) {
+  private String placeHolder(String prefix, ElPropertyValue lastElPropertyValue, boolean encrypted) {
     if (prefix == null) {
       return lastElPropertyValue.elPlaceholder(encrypted);
     }

@@ -3,13 +3,7 @@ package io.ebean.platform.oracle;
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.annotation.Platform;
-import io.ebean.config.dbplatform.BasicSqlAnsiLimiter;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -60,12 +54,17 @@ public class OraclePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("number", 5));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("number", 3));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("number", 16, 3));
-    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar2", 255));
-    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("blob"));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("clob"));
-    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("raw", 255));
-    dbTypeMap.put(DbType.BINARY, new DbPlatformType("raw", 255));
     dbTypeMap.put(DbType.TIME, new DbPlatformType("timestamp"));
+
+    DbPlatformType blob = new DbPlatformType("blob", false);
+    dbTypeMap.put(DbType.BLOB, blob);
+    dbTypeMap.put(DbType.LONGVARBINARY, blob);
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("raw", 255, 2000, blob));
+    dbTypeMap.put(DbType.BINARY, new DbPlatformType("raw", 255, 2000, blob));
+
+    DbPlatformType clob = new DbPlatformType("clob", false);
+    dbTypeMap.put(DbType.LONGVARCHAR, clob);
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar2", 255, 4000, clob));
   }
 
   @Override

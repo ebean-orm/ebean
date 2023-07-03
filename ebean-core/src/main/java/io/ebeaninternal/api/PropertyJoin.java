@@ -18,14 +18,14 @@ public final class PropertyJoin {
   /**
    * Return the property that should be joined.
    */
-  public String getProperty() {
+  public String property() {
     return property;
   }
 
   /**
    * Return true if this join is required to be an outer join.
    */
-  public SqlJoinType getSqlJoinType() {
+  public SqlJoinType sqlJoinType() {
     return joinType;
   }
 

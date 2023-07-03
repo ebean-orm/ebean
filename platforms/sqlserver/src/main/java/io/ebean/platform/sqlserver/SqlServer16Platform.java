@@ -17,12 +17,19 @@ public class SqlServer16Platform extends SqlServerBasePlatform {
     this.dbIdentity.setIdType(IdType.IDENTITY);
 
     // non-utf8 column types
+    DbPlatformType text = new DbPlatformType("text", false);
+    DbPlatformType varchar = new DbPlatformType("varchar", 255, 8000, text);
     dbTypeMap.put(DbType.CHAR, new DbPlatformType("char", 1));
-    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("text"));
-    dbTypeMap.put(DbType.CLOB, new DbPlatformType("text"));
-    dbTypeMap.put(DbType.JSON, new DbPlatformType("text"));
-    dbTypeMap.put(DbType.JSONB, new DbPlatformType("text"));
+    dbTypeMap.put(DbType.VARCHAR, varchar);
+    dbTypeMap.put(DbType.LONGVARCHAR, text);
+    dbTypeMap.put(DbType.CLOB, text);
+    dbTypeMap.put(DbType.JSON, text);
+    dbTypeMap.put(DbType.JSONB, text);
+
+    // old binary type
+    dbTypeMap.put(DbType.BLOB, new DbPlatformType("image", false));
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("image", false));
+    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image", false));
   }
 
 }

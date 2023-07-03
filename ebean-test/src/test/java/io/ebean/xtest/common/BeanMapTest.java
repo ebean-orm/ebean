@@ -43,19 +43,19 @@ public class BeanMapTest {
     map.put("1", object1);
     map.put("4", null);
 
-    assertThat(map.getModifyAdditions()).containsOnly(object1);
-    assertThat(map.getModifyRemovals()).isEmpty();
+    assertThat(map.modifyAdditions()).containsOnly(object1);
+    assertThat(map.modifyRemovals()).isEmpty();
 
     map.put("1", object1);
     map.put("4", null);
-    assertThat(map.getModifyAdditions()).containsOnly(object1);
+    assertThat(map.modifyAdditions()).containsOnly(object1);
 
     map.put("2", object2);
-    assertThat(map.getModifyAdditions()).containsOnly(object1, object2);
+    assertThat(map.modifyAdditions()).containsOnly(object1, object2);
 
     map.remove("1");
-    assertThat(map.getModifyAdditions()).containsOnly(object2);
-    assertThat(map.getModifyRemovals()).isEmpty();
+    assertThat(map.modifyAdditions()).containsOnly(object2);
+    assertThat(map.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -67,8 +67,8 @@ public class BeanMapTest {
     // act
     set.putAll(all());
 
-    assertThat(set.getModifyAdditions()).containsOnly(object1, object2, object3);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object1, object2, object3);
+    assertThat(set.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -83,8 +83,8 @@ public class BeanMapTest {
     assertThat(map.containsValue(object2)).isTrue();
     map.put("2", object2);
 
-    assertThat(map.getModifyAdditions()).containsOnly(object1);
-    assertThat(map.getModifyRemovals()).isEmpty();
+    assertThat(map.modifyAdditions()).containsOnly(object1);
+    assertThat(map.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -96,8 +96,8 @@ public class BeanMapTest {
     // act
     map.putAll(all());
 
-    assertThat(map.getModifyAdditions()).containsOnly(object1);
-    assertThat(map.getModifyRemovals()).isEmpty();
+    assertThat(map.modifyAdditions()).containsOnly(object1);
+    assertThat(map.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -106,14 +106,14 @@ public class BeanMapTest {
     BeanMap<String, Object> map = new BeanMap<>();
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     map.putAll(all());
-    assertThat(map.getModifyAdditions()).containsOnly(object1, object2, object3);
+    assertThat(map.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
     map.remove("2");
     map.remove("3");
 
-    assertThat(map.getModifyAdditions()).containsOnly(object1);
-    assertThat(map.getModifyRemovals()).isEmpty();
+    assertThat(map.modifyAdditions()).containsOnly(object1);
+    assertThat(map.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -122,14 +122,14 @@ public class BeanMapTest {
     BeanMap<String, Object> map = new BeanMap<>();
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     map.putAll(all());
-    assertThat(map.getModifyAdditions()).containsOnly(object1, object2, object3);
+    assertThat(map.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
     map.remove("2");
     map.remove("3");
 
-    assertThat(map.getModifyAdditions()).containsOnly(object1);
-    assertThat(map.getModifyRemovals()).isEmpty();
+    assertThat(map.modifyAdditions()).containsOnly(object1);
+    assertThat(map.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -143,8 +143,8 @@ public class BeanMapTest {
     map.remove("3");
 
     // assert
-    assertThat(map.getModifyAdditions()).isEmpty();
-    assertThat(map.getModifyRemovals()).containsOnly(object2, object3);
+    assertThat(map.modifyAdditions()).isEmpty();
+    assertThat(map.modifyRemovals()).containsOnly(object2, object3);
   }
 
   @Test
@@ -158,8 +158,8 @@ public class BeanMapTest {
     map.remove("3");
 
     // assert
-    assertThat(map.getModifyAdditions()).isEmpty();
-    assertThat(map.getModifyRemovals()).containsOnly(object2, object3);
+    assertThat(map.modifyAdditions()).isEmpty();
+    assertThat(map.modifyRemovals()).containsOnly(object2, object3);
   }
 
   @Test
@@ -172,8 +172,8 @@ public class BeanMapTest {
     map.clear();
 
     //assert
-    assertThat(map.getModifyRemovals()).containsOnly(object1, object2, object3);
-    assertThat(map.getModifyAdditions()).isEmpty();
+    assertThat(map.modifyRemovals()).containsOnly(object1, object2, object3);
+    assertThat(map.modifyAdditions()).isEmpty();
   }
 
   @Test
@@ -187,8 +187,8 @@ public class BeanMapTest {
     map.clear();
 
     //assert
-    assertThat(map.getModifyRemovals()).containsOnly(object1);
-    assertThat(map.getModifyAdditions()).isEmpty();
+    assertThat(map.modifyRemovals()).containsOnly(object1);
+    assertThat(map.modifyAdditions()).isEmpty();
   }
 
   @Test
@@ -229,7 +229,7 @@ public class BeanMapTest {
     assertThat(map).doesNotContainKeys("1");
     assertThat(map.get("1")).isNull();
 
-    assertThat(map.getModifyRemovals()).containsOnly(object1);
+    assertThat(map.modifyRemovals()).containsOnly(object1);
   }
 
   @Test
@@ -245,7 +245,7 @@ public class BeanMapTest {
     assertThat(map).isEmpty();
     assertThat(keySet).isEmpty();
 
-    assertThat(map.getModifyRemovals()).containsOnly(object1, object2);
+    assertThat(map.modifyRemovals()).containsOnly(object1, object2);
   }
 
   @Test
@@ -265,7 +265,7 @@ public class BeanMapTest {
     assertThat(keySet).containsExactly("1", "3");
     assertThat(map).containsKeys("1", "3");
 
-    assertThat(map.getModifyRemovals()).containsOnly(object2);
+    assertThat(map.modifyRemovals()).containsOnly(object2);
   }
 
   @Test
@@ -288,7 +288,7 @@ public class BeanMapTest {
     assertThat(keySet).containsExactly("1", "4");
     assertThat(map).containsKeys("1", "4");
 
-    assertThat(map.getModifyRemovals()).containsOnly(object2, object3, object5);
+    assertThat(map.modifyRemovals()).containsOnly(object2, object3, object5);
   }
 
 
@@ -312,7 +312,7 @@ public class BeanMapTest {
     assertThat(keySet).containsExactly("2", "3", "5");
     assertThat(map).containsKeys("2", "3", "5");
 
-    assertThat(map.getModifyRemovals()).containsOnly(object1, object4);
+    assertThat(map.modifyRemovals()).containsOnly(object1, object4);
   }
 
   @Test
@@ -343,7 +343,7 @@ public class BeanMapTest {
 
     assertThat(entries).isEmpty();
     assertThat(map).isEmpty();
-    assertThat(map.getModifyRemovals()).containsOnly(object1);
+    assertThat(map.modifyRemovals()).containsOnly(object1);
   }
 
   @Test
@@ -360,7 +360,7 @@ public class BeanMapTest {
     assertThat(existed22).isFalse();
 
     assertThat(map).hasSize(4);
-    assertThat(map.getModifyRemovals()).containsOnly(object1);
+    assertThat(map.modifyRemovals()).containsOnly(object1);
   }
 
   @Test
@@ -374,7 +374,7 @@ public class BeanMapTest {
     assertThat(modified).isFalse();
 
     assertThat(map).hasSize(5);
-    assertThat(map.getModifyRemovals()).isNull();
+    assertThat(map.modifyRemovals()).isNull();
   }
 
   @Test
@@ -390,7 +390,7 @@ public class BeanMapTest {
     }
     assertThat(map).hasSize(3);
     assertThat(entries).hasSize(3);
-    assertThat(map.getModifyRemovals()).containsOnly(object2, object5);
+    assertThat(map.modifyRemovals()).containsOnly(object2, object5);
   }
 
   @Test
@@ -401,7 +401,7 @@ public class BeanMapTest {
     entries.removeAll(asList(new AbstractMap.SimpleEntry<>("1", object1), new AbstractMap.SimpleEntry<>("3", object4), new AbstractMap.SimpleEntry<>("4", object4)));
     assertThat(map).hasSize(3);
     assertThat(entries).hasSize(3);
-    assertThat(map.getModifyRemovals()).containsOnly(object1, object4);
+    assertThat(map.modifyRemovals()).containsOnly(object1, object4);
   }
 
   @Test
@@ -412,7 +412,7 @@ public class BeanMapTest {
     entries.retainAll(asList(new AbstractMap.SimpleEntry<>("1", object1), new AbstractMap.SimpleEntry<>("3", object4), new AbstractMap.SimpleEntry<>("4", object4)));
     assertThat(map).hasSize(2);
     assertThat(entries).hasSize(2);
-    assertThat(map.getModifyRemovals()).containsOnly(object2, object3, object5);
+    assertThat(map.modifyRemovals()).containsOnly(object2, object3, object5);
   }
 
   private BeanMap<String, EBasic> newModifyListeningMap() {

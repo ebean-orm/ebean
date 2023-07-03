@@ -26,22 +26,22 @@ final class SimpleDataSourceProvider implements DataSourceSupplier {
   }
 
   @Override
-  public DataSource getDataSource() {
+  public DataSource dataSource() {
     return dataSource;
   }
 
   @Override
-  public DataSource getReadOnlyDataSource() {
+  public DataSource readOnlyDataSource() {
     return readOnlyDataSource;
   }
 
   @Override
-  public Connection getConnection(Object tenantId) throws SQLException {
+  public Connection connection(Object tenantId) throws SQLException {
     return dataSource.getConnection();
   }
 
   @Override
-  public Connection getReadOnlyConnection(Object tenantId) throws SQLException {
+  public Connection readOnlyConnection(Object tenantId) throws SQLException {
     return readOnlyDataSource.getConnection();
   }
 

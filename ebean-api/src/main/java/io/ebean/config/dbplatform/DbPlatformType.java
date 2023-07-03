@@ -29,6 +29,16 @@ public class DbPlatformType implements ExtraDbTypes {
   private final boolean canHaveLength;
 
   /**
+   * The maximum length supported by this platform type. If length is too big, fallback is used.
+   */
+  private final int maxLength;
+
+  /**
+   * Use this platform type if length exceedes
+   */
+  private final DbPlatformType fallback;
+
+  /**
    * Parse a type definition into a DbPlatformType.
    * <p>
    * e.g. "decimal(18,6)"
@@ -54,6 +64,41 @@ public class DbPlatformType implements ExtraDbTypes {
   }
 
   /**
+   * Construct without length, but with a max length limit and a fallback type, that is used if maxLength is exceeded.
+   * This can be used to use <ul>
+   * <li>"longtext" for unspecified length</li>
+   * <li>"text" for length up to 2^16-1</li>
+   * <li>"mediumtext" for length up to 2^24-1</li>
+   * <li>"longtext" else</li>
+   * </ul>
+   */
+  public DbPlatformType(String name, int maxLength, DbPlatformType fallback) {
+    this.name = name;
+    this.defaultLength = 0;
+    this.defaultScale = 0;
+    this.canHaveLength = false;
+    this.maxLength = maxLength;
+    this.fallback = fallback;
+  }
+
+  /**
+   * Construct with a given default length, a max length limit and a fallback type, that is used if maxLength is exceeded.
+   * This can be used to use <ul>
+   * <li>"varchar(255)" for unspecified length</li>
+   * <li>"varchar(N)" for N <= maxLength</li>
+   * <li>"varchar(max)" else</li>
+   * </ul>
+   */
+  public DbPlatformType(String name, int defaultPrecision, int maxLength, DbPlatformType fallback) {
+    this.name = name;
+    this.defaultLength = defaultPrecision;
+    this.defaultScale = 0;
+    this.canHaveLength = true;
+    this.maxLength = maxLength;
+    this.fallback = fallback;
+  }
+
+  /**
    * Construct for Decimal with precision and scale.
    */
   public DbPlatformType(String name, int defaultPrecision, int defaultScale) {
@@ -61,6 +106,8 @@ public class DbPlatformType implements ExtraDbTypes {
     this.defaultLength = defaultPrecision;
     this.defaultScale = defaultScale;
     this.canHaveLength = true;
+    this.maxLength = Integer.MAX_VALUE;
+    this.fallback = null;
   }
 
   /**
@@ -74,6 +121,8 @@ public class DbPlatformType implements ExtraDbTypes {
     this.defaultLength = 0;
     this.defaultScale = 0;
     this.canHaveLength = canHaveLength;
+    this.maxLength = Integer.MAX_VALUE;
+    this.fallback = null;
   }
 
   /**
@@ -124,33 +173,33 @@ public class DbPlatformType implements ExtraDbTypes {
    */
   public String renderType(int deployLength, int deployScale, boolean strict) {
 
-    StringBuilder sb = new StringBuilder();
-    sb.append(name);
-    if (canHaveLength || !strict) {
-      renderLengthScale(deployLength, deployScale, sb);
-    }
+    int len = deployLength != 0 ? deployLength : defaultLength;
+    if (len > maxLength) {
+      return fallback.renderType(deployLength, deployScale, strict);
+    } else {
+      StringBuilder sb = new StringBuilder();
+      sb.append(name);
+      if ((canHaveLength || !strict) && len > 0) {
+        renderLengthScale(len, deployScale, sb);
+      }
 
-    return sb.toString();
+      return sb.toString();
+    }
   }
 
   /**
    * Render the length and scale part of the column definition.
    */
-  protected void renderLengthScale(int deployLength, int deployScale, StringBuilder sb) {
+  protected void renderLengthScale(int len, int deployScale, StringBuilder sb) {
     // see if there is a precision/scale to add (or not)
-    int len = deployLength != 0 ? deployLength : defaultLength;
-    if (len == Integer.MAX_VALUE) {
-      sb.append("(max)"); // TODO: this is sqlserver specific
-    } else if (len > 0) {
-      sb.append("(");
-      sb.append(len);
-      int scale = deployScale != 0 ? deployScale : defaultScale;
-      if (scale > 0) {
-        sb.append(",");
-        sb.append(scale);
-      }
-      sb.append(")");
+    sb.append('(');
+    sb.append(len);
+    int scale = deployScale != 0 ? deployScale : defaultScale;
+    if (scale > 0) {
+      sb.append(',');
+      sb.append(scale);
     }
+    sb.append(')');
   }
 
   /**
