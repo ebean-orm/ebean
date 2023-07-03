@@ -519,15 +519,17 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    if (useCommit) {
-      try {
-        connection.commit();
-      } catch (SQLException e) {
-        throw new PersistenceException(e);
+    try {
+      if (useCommit) {
+        try {
+          connection.commit();
+        } catch (SQLException e) {
+          throw new PersistenceException(e);
+        }
       }
+    } finally {
+      deactivate();
     }
-    // expect AutoCommit so just deactivate / put back into pool
-    deactivate();
   }
 
   /**
@@ -569,15 +571,17 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    if (useCommit) {
-      try {
-        connection.rollback();
-      } catch (SQLException e) {
-        throw new PersistenceException(e);
+    try {
+      if (useCommit) {
+        try {
+          connection.rollback();
+        } catch (SQLException e) {
+          throw new PersistenceException(e);
+        }
       }
+    } finally {
+      deactivate();
     }
-    // expect AutoCommit so it really has already committed
-    deactivate();
   }
 
   /**
