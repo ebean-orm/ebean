@@ -9,7 +9,9 @@ import javax.persistence.Table;
 
 @Cache(readOnly = true)
 @Entity
-@Table(name = "feature_desc", indexes = @Index(columnList = "name, description desc"))
+@Table(name = "feature_desc", indexes = {
+  @Index(columnList = "name, description desc"),
+  @Index(columnList = "name desc")})
 public class FeatureDescription {
 
   @Id
