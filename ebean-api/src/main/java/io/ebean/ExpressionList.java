@@ -1132,6 +1132,11 @@ public interface ExpressionList<T> {
   ExpressionList<T> inPairs(Pairs pairs);
 
   /**
+   * In expression using multiple columns.
+   */
+  ExpressionList<T> inTuples(InTuples pairs);
+
+  /**
    * EXISTS a raw SQL SubQuery.
    *
    * @param sqlSubQuery The SQL SubQuery

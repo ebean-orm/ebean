@@ -711,6 +711,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> inTuples(InTuples pairs) {
+    return exprList.inTuples(pairs);
+  }
+
+  @Override
   public ExpressionList<T> in(String propertyName, Collection<?> values) {
     return exprList.in(propertyName, values);
   }

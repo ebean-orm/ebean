@@ -370,6 +370,11 @@ public interface ExpressionFactory {
   Expression inPairs(Pairs pairs);
 
   /**
+   * In expression using multiple columns.
+   */
+  Expression inTuples(InTuples pairs);
+
+  /**
    * In - property has a value in the array of values.
    */
   Expression in(String propertyName, Object[] values);

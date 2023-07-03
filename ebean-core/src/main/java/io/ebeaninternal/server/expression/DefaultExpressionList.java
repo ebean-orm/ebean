@@ -902,6 +902,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return add(expr.inPairs(pairs));
   }
 
+  @Override
+  public ExpressionList<T> inTuples(InTuples pairs) {
+    return add(expr.inTuples(pairs));
+  }
 
   @Override
   public ExpressionList<T> exists(String sqlSubQuery, Object... bindValues) {

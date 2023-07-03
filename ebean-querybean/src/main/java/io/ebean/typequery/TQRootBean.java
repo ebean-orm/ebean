@@ -1220,6 +1220,14 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * In expression using multiple columns.
+   */
+  public R inTuples(InTuples inTuples) {
+    peekExprList().inTuples(inTuples);
+    return root;
+  }
+
+  /**
    * Marker that can be used to indicate that the order by clause is defined after this.
    * <p>
    * <h2>Example: order by customer name, order date</h2>
