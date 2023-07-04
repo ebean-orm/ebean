@@ -1,9 +1,9 @@
 package io.ebean;
 
-import java.util.List;
-
 /**
  * IN expression using multiple columns.
+ * <p>
+ * Currently this is not supported with SQLServer or DB2.
  * <p>
  * Produces SQL expression in the form of (A,B,C) IN ((a0,b0,c0), (a1,b1,c1), ... )
  * where A,B,C are the properties in the tuples.
