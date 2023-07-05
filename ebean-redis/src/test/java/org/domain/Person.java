@@ -28,6 +28,11 @@ public class Person extends EBase {
 
   String notes;
 
+  /**
+   * Test that KEY and VALUE are now by default not h2database keywords.
+   */
+  String key;
+
   public Person(String name) {
     this.name = name;
     this.status = Status.NEW;
