@@ -32,6 +32,7 @@ class SimpleQueryBeanWriter {
   private boolean writingAssocBean;
 
   private String destPackage;
+  private final String assocPackage;
   private String origDestPackage;
   private String shortName;
   private final String shortInnerName;
@@ -43,7 +44,8 @@ class SimpleQueryBeanWriter {
     this.processingContext = processingContext;
     this.beanFullName = element.getQualifiedName().toString();
     boolean nested = element.getNestingKind().isNested();
-    this.destPackage = Util.packageOf(nested, beanFullName) + ".query";
+    this.destPackage = Util.packageOf(nested, beanFullName) + completePackagePath(processingContext.getDestPackage());
+    this.assocPackage = completePackagePath(processingContext.getAssocDestPackage());
     String sn = Util.shortName(nested, beanFullName);
     this.shortInnerName = Util.shortName(false, sn);
     this.shortName = sn.replace('.', '$');
@@ -437,6 +439,11 @@ class SimpleQueryBeanWriter {
   private Writer createFileWriter() throws IOException {
     JavaFileObject jfo = processingContext.createWriter(destPackage + "." + "Q" + shortName, element);
     return jfo.openWriter();
+  }
+
+
+  private String completePackagePath(String packageName) {
+    return (packageName.equals("") ? packageName : "." + packageName);
   }
 
 }

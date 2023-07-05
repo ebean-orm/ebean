@@ -28,6 +28,14 @@ public class Processor extends AbstractProcessor implements Constants {
   }
 
   @Override
+  public Set<String> getSupportedOptions() {
+    Set<String> options = new LinkedHashSet<>();
+    options.add(DESTINATION_PACKAGE_OPTION);
+    options.add(ASSOC_DESTINATION_PACKAGE_OPTION);
+    return options;
+  }
+
+  @Override
   public Set<String> getSupportedAnnotationTypes() {
     Set<String> annotations = new LinkedHashSet<>();
     annotations.add(ENTITY);

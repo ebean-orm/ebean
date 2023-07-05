@@ -371,9 +371,9 @@ class ProcessingContext implements Constants {
    */
   private String packageAppend(String origPackage) {
     if (origPackage == null) {
-      return "query.assoc";
+      return String.join(".", getDestPackage(), getAssocDestPackage());
     } else {
-      return origPackage + "." + "query.assoc";
+      return origPackage + "." + String.join(".", getDestPackage(), getAssocDestPackage());
     }
   }
 
@@ -540,6 +540,22 @@ class ProcessingContext implements Constants {
       logError(null, "Error reading services file: " + e.getMessage());
     }
     return null;
+  }
+
+  String getDestPackage() {
+    String destPackage = processingEnv.getOptions().getOrDefault(DESTINATION_PACKAGE_OPTION, "query");
+    if(destPackage == null) {
+      destPackage = "";
+    }
+    return destPackage;
+  }
+
+  String getAssocDestPackage() {
+    String destPackage = processingEnv.getOptions().getOrDefault(ASSOC_DESTINATION_PACKAGE_OPTION, "assoc");
+    if(destPackage == null) {
+      destPackage = "";
+    }
+    return destPackage;
   }
 
   Element asElement(TypeMirror mirror) {

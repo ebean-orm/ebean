@@ -37,4 +37,7 @@ interface Constants {
 
   String AVAJE_LANG_NULLABLE = "io.avaje.lang.Nullable";
   String JAVA_COLLECTION = "java.util.Collection";
+
+  String DESTINATION_PACKAGE_OPTION = "querybeanDestPackage";
+  String ASSOC_DESTINATION_PACKAGE_OPTION = "querybeanAssocDestPackage";
 }
