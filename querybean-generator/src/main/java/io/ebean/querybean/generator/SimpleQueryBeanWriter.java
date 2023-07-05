@@ -145,7 +145,7 @@ class SimpleQueryBeanWriter {
   void writeAssocBean() throws IOException {
     writingAssocBean = true;
     origDestPackage = destPackage;
-    destPackage = destPackage + ".assoc";
+    destPackage = destPackage + assocPackage;
     shortName = "Assoc" + shortName;
 
     prepareAssocBeanImports();
