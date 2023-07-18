@@ -19,7 +19,7 @@ public final class QueryPlanLoggerPostgres extends QueryPlanLogger {
 
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
-    String explain = "explain analyze " + plan.sql();
+    String explain = "explain (analyze, buffers) " + plan.sql();
     try (PreparedStatement explainStmt = conn.prepareStatement(explain)) {
       bind.prepare(explainStmt, conn);
       try (ResultSet rset = explainStmt.executeQuery()) {
