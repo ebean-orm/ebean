@@ -1,9 +1,9 @@
 package org.tests.query.joins;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -31,8 +31,8 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     LoggedSql.start();
 
     List<Integer> orderIds = DB.find(Order.class)
-        .where().eq("totalItems", 3)
-        .findIds();
+      .where().eq("totalItems", 3)
+      .findIds();
     assertThat(orderIds).hasSize(2);
 
     List<String> loggedSql = LoggedSql.stop();
@@ -46,8 +46,8 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     LoggedSql.start();
 
     List<Order> orders = DB.find(Order.class)
-        .where().eq("totalItems", 3)
-        .findList();
+      .where().eq("totalItems", 3)
+      .findList();
     assertThat(orders).hasSize(2);
 
     List<String> loggedSql = LoggedSql.stop();
@@ -122,11 +122,11 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     }
     assertThat(shipQuery.getGeneratedSql()).contains(
       "from or_order_ship t0 " +
-      "join o_order u1 on u1.id = t0.order_id " +
-      "join or_order_ship u2 on u2.order_id = u1.id " +
-      "join o_order u3 on u3.id = u2.order_id " +
-      "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bu3 on z_bu3.order_id = u3.id " +
-      "where z_bu3.total_amount is not null");
+        "join o_order u1 on u1.id = t0.order_id " +
+        "join or_order_ship u2 on u2.order_id = u1.id " +
+        "join o_order u3 on u3.id = u2.order_id " +
+        "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bu3 on z_bu3.order_id = u3.id " +
+        "where z_bu3.total_amount is not null");
   }
 
   @Test
@@ -188,9 +188,9 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     LoggedSql.start();
 
     List<Date> orderDates = DB.find(Order.class)
-        .select("orderDate")
-        .where().eq("totalItems", 3)
-        .findSingleAttributeList();
+      .select("orderDate")
+      .where().eq("totalItems", 3)
+      .findSingleAttributeList();
     assertThat(orderDates).hasSize(2);
 
     List<String> sql = LoggedSql.stop();
@@ -205,11 +205,11 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     LoggedSql.start();
 
     Order order = DB.find(Order.class)
-        .select("totalItems")
-        .where().eq("totalItems", 3)
-        .setMaxRows(1)
-        .orderById(true)
-        .findOne();
+      .select("totalItems")
+      .where().eq("totalItems", 3)
+      .setMaxRows(1)
+      .orderById(true)
+      .findOne();
 
     assertThat(order.getTotalItems()).isEqualTo(3);
 
@@ -229,8 +229,8 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     LoggedSql.start();
 
     List<ParentPerson> orderIds = DB.find(ParentPerson.class)
-        .where().eq("totalAge", 3)
-        .findIds();
+      .where().eq("totalAge", 3)
+      .findIds();
 
     List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
@@ -243,10 +243,10 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     LoggedSql.start();
 
     DB.find(ParentPerson.class)
-        .select("identifier")
-        //.where().eq("totalAge", 3)
-        .where().eq("familyName", "foo")
-        .findList();
+      .select("identifier")
+      //.where().eq("totalAge", 3)
+      .where().eq("familyName", "foo")
+      .findList();
 
     List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
@@ -323,12 +323,86 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     LoggedSql.start();
 
     DB.find(ChildPerson.class)
-        .where().eq("parent.totalAge", 3)
-        .findCount();
+      .where().eq("parent.totalAge", 3)
+      .findCount();
 
     List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0)).contains("select count(*) from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
     assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");
   }
+
+  @Test
+  public void test_fetch_only() {
+
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class).select("name").fetch("parent.effectiveBean").findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0)).contains("from child_person t0 "
+      + "left join parent_person t1 on t1.identifier = t0.parent_identifier "
+      + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
+      + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id)");
+  }
+
+  @Test
+  public void test_where_only() {
+
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class).select("name")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0))
+      .contains("from child_person t0 "
+        + "left join parent_person t1 on t1.identifier = t0.parent_identifier "
+        + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
+        + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id) "
+        + "where t2.name = ?");
+  }
+
+  @Test
+  public void test_fetch_one_prop_with_where() {
+
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class).select("name")
+      .fetch("parent", "name")
+      //.fetch("parent.effectiveBean", "name")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0))
+      .contains("from child_person t0 "
+        + "left join parent_person t1 on t1.identifier = t0.parent_identifier "
+        + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
+        + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id)"
+        + " where t2.name = ?"
+      );
+  }
+
+  @Test
+  public void test_fetch_complete_with_where() {
+
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class).select("name")
+      .fetch("parent")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0))
+      .contains("from child_person t0 "
+        + "left join parent_person t1 on t1.identifier = t0.parent_identifier "
+        + "left join (select i2.parent_identifier, count(*) as child_count, sum(i2.age) as child_age from child_person i2 group by i2.parent_identifier) f2 on f2.parent_identifier = t1.identifier "
+        + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
+        + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id) "
+        + "where t2.name = ?");
+  }
+
 }
