@@ -76,26 +76,18 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
    * Collect the query plan using already captured bind values.
    */
   public boolean collectQueryPlan(CQueryPlanRequest request, SpiTransactionManager transactionManager) {
-
-    final BindCapture last;
-    final Object tenant;
-    lock.lock();
-    try {
-      if (bindCapture == null || request.since() < lastBindCapture) {
-        // no bind capture since the last capture
-        return false;
-      }
-      last = this.bindCapture;
-      tenant = this.tenantId;
-    } finally {
-      lock.unlock();
+    if (bindCapture == null || request.since() < lastBindCapture) {
+      // no bind capture since the last capture
+      return false;
     }
 
 
     final Instant whenCaptured = Instant.ofEpochMilli(this.lastBindCapture);
+    final BindCapture last = this.bindCapture;
+    final Object tenantId = this.tenantId;
     final long startNanos = System.nanoTime();
     SpiDbQueryPlan queryPlan;
-    try (Connection connection = transactionManager.queryPlanConnection(tenant)) {
+    try (Connection connection = transactionManager.queryPlanConnection(tenantId)) {
       queryPlan = manager.collectPlan(connection, this.queryPlan, last);
     } catch (SQLException e) {
       CoreLog.log.log(ERROR, "Error during query plan collection", e);
@@ -103,7 +95,7 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
     }
     if (queryPlan != null) {
       final long captureMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
-      request.add(queryPlan.with(queryTimeMicros, captureCount, captureMicros, whenCaptured, tenant));
+      request.add(queryPlan.with(queryTimeMicros, captureCount, captureMicros, whenCaptured, tenantId));
       // effectively turn off bind capture for this plan
       thresholdMicros = Long.MAX_VALUE;
       return true;
