@@ -30,11 +30,7 @@ final class DtoMetaConstructor {
     return MethodType.methodType(void.class, types);
   }
 
-  Class<?>[] getTypes() {
-    return types;
-  }
-
-  int getArgCount() {
+  int argCount() {
     return types.length;
   }
 

@@ -384,7 +384,7 @@ final class AnnotationFields extends AnnotationParser {
   }
 
   private void setEncryption(DeployBeanProperty prop, boolean dbEncString, int dbLen) {
-    util.checkEncryptKeyManagerDefined(prop.getFullBeanName());
+    util.checkEncryptKeyManagerDefined(prop.toString());
     ScalarType<?> st = prop.getScalarType();
     if (byte[].class.equals(st.type())) {
       // Always using Java client encryption rather than DB for encryption
@@ -465,10 +465,9 @@ final class AnnotationFields extends AnnotationParser {
       if (!gen.generator().isEmpty()) {
         // use a custom IdGenerator
         PlatformIdGenerator idGenerator = generatedPropFactory.getIdGenerator(gen.generator());
-        if (idGenerator == null) {
-          throw new IllegalStateException("No custom IdGenerator registered with name " + gen.generator());
+        if (idGenerator != null) {
+          descriptor.setCustomIdGenerator(idGenerator);
         }
-        descriptor.setCustomIdGenerator(idGenerator);
       } else if (prop.getPropertyType().equals(UUID.class)) {
         descriptor.setUuidGenerator();
       }

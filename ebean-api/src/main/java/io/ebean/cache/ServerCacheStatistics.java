@@ -29,6 +29,11 @@ public class ServerCacheStatistics {
 
   protected long evictCount;
 
+  protected long gcCount;
+  protected long idleCount;
+  protected long ttlCount;
+  protected long lruCount;
+
   @Override
   public String toString() {
     //noinspection StringBufferReplaceableByString
@@ -43,6 +48,10 @@ public class ServerCacheStatistics {
     sb.append(" remove:").append(removeCount);
     sb.append(" clear:").append(clearCount);
     sb.append(" evict:").append(evictCount);
+    sb.append(" gc:").append(gcCount);
+    sb.append(" idle:").append(idleCount);
+    sb.append(" ttl:").append(ttlCount);
+    sb.append(" lru:").append(lruCount);
     return sb.toString();
   }
 
@@ -191,4 +200,37 @@ public class ServerCacheStatistics {
     return evictCount;
   }
 
+  /**
+   * Set the count of entries removed by the garbage collection.
+   */
+  public void setGcCount(long gcCount) {
+    this.gcCount = gcCount;
+  }
+
+  /**
+   * Return the count of entries removed by the garbage collection.
+   */
+  public long getGcCount() {
+    return gcCount;
+  }
+
+  public void setIdleCount(long idleCount) {
+    this.idleCount = idleCount;
+  }
+
+  public long getIdleCount() {
+    return idleCount;
+  }
+
+  public void setTtlCount(long ttlCount) {
+    this.ttlCount = ttlCount;
+  }
+
+  public long getTtlCount() {
+    return ttlCount;
+  }
+
+  public void setLruCount(long lruCount) {
+    this.lruCount = lruCount;
+  }
 }

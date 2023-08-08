@@ -21,6 +21,6 @@ public class EHistory6 {
   Integer testNumber1;
 
   @NotNull
-  @DbDefault("7")
+  @DbDefault("7") // required for revert
   Integer testNumber2;
 }

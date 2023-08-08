@@ -49,6 +49,17 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
     return this;
   }
 
+  @Override
+  public SqlQuery usingMaster() {
+    this.useMaster = true;
+    return this;
+  }
+
+  @Override
+  public boolean isUseMaster() {
+    return useMaster;
+  }
+
   private void transaction(Transaction transaction) {
     this.transaction = transaction;
   }

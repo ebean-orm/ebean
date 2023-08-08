@@ -18,7 +18,6 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.util.Str;
 
 import javax.persistence.PersistenceException;
 import java.sql.ResultSet;
@@ -73,7 +72,7 @@ public final class CQueryEngine {
     try {
       int rows = query.execute();
       if (request.logSql()) {
-        request.logSql(Str.add(query.generatedSql(), "; --bind(", query.bindLog(), ") --micros(", query.micros() + ") --rows(", rows + ")"));
+        request.logSql("{0}; --bind({1}) --micros({2}) --rows({3})", query.generatedSql(), query.bindLog(), query.micros(), rows);
       }
       return rows;
     } catch (SQLException e) {
@@ -128,7 +127,7 @@ public final class CQueryEngine {
     SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
       // log the error to the transaction log
-      t.logSummary("ERROR executing query, bindLog[" + bindLog + "] error:" + StringHelper.removeNewLines(e.getMessage()));
+      t.logSummary("ERROR executing query, bindLog[{0}] error:{1}", bindLog, StringHelper.removeNewLines(e.getMessage()));
     }
     // ensure 'rollback' is logged if queryOnly transaction
     t.connection();
@@ -146,7 +145,7 @@ public final class CQueryEngine {
   }
 
   private <T> void logGeneratedSql(OrmQueryRequest<T> request, String sql, String bindLog, long micros) {
-    request.logSql(Str.add(sql, "; --bind(", bindLog, ") --micros(", micros + ")"));
+    request.logSql("{0}; --bind({1}) --micros({2})", sql, bindLog, micros);
   }
 
   /**
@@ -197,7 +196,7 @@ public final class CQueryEngine {
       int iterateBufferSize = request.secondaryQueriesMinBatchSize();
       if (iterateBufferSize < 1) {
         // not set on query joins so check if batch size set on query itself
-        int queryBatch = request.query().getLazyLoadBatchSize();
+        int queryBatch = request.query().lazyLoadBatchSize();
         if (queryBatch > 0) {
           iterateBufferSize = queryBatch;
         } else {
@@ -234,8 +233,8 @@ public final class CQueryEngine {
     SpiQuery<T> query = request.query();
     String sysPeriodLower = getSysPeriodLower(query);
     if (query.isVersionsBetween() && !historySupport.isStandardsBased()) {
-      query.where().lt(sysPeriodLower, query.getVersionEnd());
-      query.where().geOrNull(getSysPeriodUpper(query), query.getVersionStart());
+      query.where().lt(sysPeriodLower, query.versionEnd());
+      query.where().geOrNull(getSysPeriodUpper(query), query.versionStart());
     }
 
     // order by lower sys period desc
@@ -398,7 +397,7 @@ public final class CQueryEngine {
    * Log the generated SQL to the transaction log.
    */
   private void logSql(CQuery<?> query) {
-    query.transaction().logSql(Str.add(query.generatedSql(), "; --bind(", query.bindLog(), ") --micros(", query.micros() + ")"));
+    query.transaction().logSql("{0}; --bind({1}) --micros({2})", query.generatedSql(), query.bindLog(), query.micros());
   }
 
   /**
@@ -406,15 +405,15 @@ public final class CQueryEngine {
    */
   private void logFindBeanSummary(CQuery<?> q) {
     SpiQuery<?> query = q.request().query();
-    String loadMode = query.getLoadMode();
-    String loadDesc = query.getLoadDescription();
-    String lazyLoadProp = query.getLazyLoadProperty();
-    ObjectGraphNode node = query.getParentNode();
+    String loadMode = query.loadMode();
+    String loadDesc = query.loadDescription();
+    String lazyLoadProp = query.lazyLoadProperty();
+    ObjectGraphNode node = query.parentNode();
     String originKey;
-    if (node == null || node.getOriginQueryPoint() == null) {
+    if (node == null || node.origin() == null) {
       originKey = null;
     } else {
-      originKey = node.getOriginQueryPoint().getKey();
+      originKey = node.origin().key();
     }
 
     StringBuilder msg = new StringBuilder(200);
@@ -449,16 +448,16 @@ public final class CQueryEngine {
    */
   private void logFindManySummary(CQuery<?> q) {
     SpiQuery<?> query = q.request().query();
-    String loadMode = query.getLoadMode();
-    String loadDesc = query.getLoadDescription();
-    String lazyLoadProp = query.getLazyLoadProperty();
-    ObjectGraphNode node = query.getParentNode();
+    String loadMode = query.loadMode();
+    String loadDesc = query.loadDescription();
+    String lazyLoadProp = query.lazyLoadProperty();
+    ObjectGraphNode node = query.parentNode();
 
     String originKey;
-    if (node == null || node.getOriginQueryPoint() == null) {
+    if (node == null || node.origin() == null) {
       originKey = null;
     } else {
-      originKey = node.getOriginQueryPoint().getKey();
+      originKey = node.origin().key();
     }
 
     StringBuilder msg = new StringBuilder(200);

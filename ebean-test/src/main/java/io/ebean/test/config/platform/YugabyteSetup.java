@@ -25,7 +25,7 @@ class YugabyteSetup implements PlatformSetup {
     if (!config.isUseDocker()) {
       return new Properties();
     }
-    config.setDockerVersion("2.11.2.0-b89");
+    config.setDockerVersion("2.16.0.1-b7");
     config.setExtensions("pgcrypto");
     return config.getDockerProperties();
   }

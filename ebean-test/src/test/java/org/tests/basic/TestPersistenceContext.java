@@ -165,7 +165,7 @@ public class TestPersistenceContext extends BaseTestCase {
         lastBean[0] = customer;
       });
 
-      SpiPersistenceContext pc = ((SpiTransaction) txn).getPersistenceContext();
+      SpiPersistenceContext pc = ((SpiTransaction) txn).persistenceContext();
       // the first 100 customers using strong references
       assertThat(pc.toString()).contains("Customer=size:5000 (4900 weak)");
       assertThat(pc.toString()).contains("Order=size:100 (100 weak)");

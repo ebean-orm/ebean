@@ -5,7 +5,7 @@ import io.ebean.config.dbplatform.DbViewHistorySupport;
 /**
  * Postgres support for history features.
  */
-public class PostgresHistorySupport extends DbViewHistorySupport {
+final class PostgresHistorySupport extends DbViewHistorySupport {
 
   /**
    * Return 1 as we are using the postgres range type and hence don't need 2 bind variables.
@@ -19,11 +19,9 @@ public class PostgresHistorySupport extends DbViewHistorySupport {
    * Build and return the 'as of' predicate for a given table alias.
    * <p>
    * Each @History entity involved in the query has this predicate added using the related table alias.
-   * </p>
    */
   @Override
   public String getAsOfPredicate(String asOfTableAlias, String asOfSysPeriod) {
-
     // for Postgres we are using the 'timestamp with timezone range' data type
     // as our sys_period column so hence the predicate below
     return asOfTableAlias + "." + asOfSysPeriod + " @> ?::timestamptz";

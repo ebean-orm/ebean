@@ -32,13 +32,13 @@ public final class ReadJson implements SpiJsonReader {
   private final Object objectMapper;
   private final PersistenceContext persistenceContext;
   private final LoadContext loadContext;
-  private final boolean intercept;
+  private final boolean update;
   private final boolean enableLazyLoading;
 
   /**
    * Construct with parser and readOptions.
    */
-  public ReadJson(BeanDescriptor<?> desc, JsonParser parser, JsonReadOptions readOptions, Object objectMapper, boolean intercept) {
+  public ReadJson(BeanDescriptor<?> desc, JsonParser parser, JsonReadOptions readOptions, Object objectMapper, boolean update) {
     this.rootDesc = desc;
     this.parser = parser;
     this.objectMapper = objectMapper;
@@ -48,7 +48,7 @@ public final class ReadJson implements SpiJsonReader {
     // only create visitorMap, pathStack if needed ...
     this.visitorMap = (readOptions == null) ? null : readOptions.getVisitorMap();
     this.pathStack = (visitorMap == null && loadContext == null) ? null : new PathStack();
-    this.intercept = intercept;
+    this.update = update;
   }
 
   /**
@@ -62,7 +62,7 @@ public final class ReadJson implements SpiJsonReader {
     this.objectMapper = source.objectMapper;
     this.persistenceContext = source.persistenceContext;
     this.loadContext = source.loadContext;
-    this.intercept = source.intercept;
+    this.update = source.update;
     this.enableLazyLoading = source.enableLazyLoading;
   }
 
@@ -213,10 +213,10 @@ public final class ReadJson implements SpiJsonReader {
   }
 
   /**
-   * Do we have to set values via intercept or not.
+   * Do we update an existing bean? This meeans we have to set values via intercept and handle collections.
    */
   @Override
-  public boolean intercept() {
-    return intercept;
+  public boolean update() {
+    return update;
   }
 }

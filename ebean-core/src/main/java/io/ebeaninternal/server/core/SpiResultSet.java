@@ -19,11 +19,11 @@ public final class SpiResultSet {
     this.resultSet = resultSet;
   }
 
-  public PreparedStatement getStatement() {
+  public PreparedStatement statement() {
     return statement;
   }
 
-  public ResultSet getResultSet() {
+  public ResultSet resultSet() {
     return resultSet;
   }
 }

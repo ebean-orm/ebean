@@ -43,6 +43,8 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   private final ReentrantLock lock = new ReentrantLock();
 
+  private final boolean loadContextBean;
+
   /**
    * The resultSet rows read.
    */
@@ -181,12 +183,13 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.audit = request.isAuditReads();
     this.queryPlan = queryPlan;
     this.query = request.query();
-    this.queryMode = query.getMode();
-    this.lazyLoadManyProperty = query.getLazyLoadMany();
+    this.queryMode = query.mode();
+    this.loadContextBean = queryMode.isLoadContextBean() || query.getForUpdateLockType() != null;
+    this.lazyLoadManyProperty = query.lazyLoadMany();
     this.readOnly = request.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
-    this.objectGraphNode = query.getParentNode();
-    this.profilingListener = query.getProfilingListener();
+    this.objectGraphNode = query.parentNode();
+    this.profilingListener = query.profilingListener();
     this.autoTuneProfiling = profilingListener != null;
     // set the generated sql back to the query
     // so its available to the user...
@@ -211,13 +214,18 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     if (request.isFindById()) {
       return null;
     } else {
-      SpiQuery.Type manyType = request.query().getType();
+      SpiQuery.Type manyType = request.query().type();
       if (manyType == null) {
         // subQuery compiled for InQueryExpression
         return null;
       }
       return BeanCollectionHelpFactory.create(manyType, request);
     }
+  }
+
+  @Override
+  public boolean isLoadContextBean() {
+    return loadContextBean;
   }
 
   @Override
@@ -304,7 +312,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       SpiTransaction t = request.transaction();
       profileOffset = t.profileOffset();
       if (query.isRawSql()) {
-        ResultSet suppliedResultSet = query.getRawSql().getResultSet();
+        ResultSet suppliedResultSet = query.rawSql().getResultSet();
         if (suppliedResultSet != null) {
           // this is a user supplied ResultSet so use that
           bindLog = "";
@@ -312,7 +320,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         }
       }
 
-      Connection conn = t.getInternalConnection();
+      Connection conn = t.internalConnection();
       if (forwardOnlyHint) {
         // Use forward only hints for large resultSet processing (Issue 56, MySql specific)
         pstmt = conn.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -320,11 +328,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
       } else {
         pstmt = conn.prepareStatement(sql);
       }
-      if (query.getTimeout() > 0) {
-        pstmt.setQueryTimeout(query.getTimeout());
+      if (query.timeout() > 0) {
+        pstmt.setQueryTimeout(query.timeout());
       }
-      if (query.getBufferFetchSizeHint() > 0) {
-        pstmt.setFetchSize(query.getBufferFetchSizeHint());
+      if (query.bufferFetchSizeHint() > 0) {
+        pstmt.setFetchSize(query.bufferFetchSizeHint());
       }
       bindLog = predicates.bind(queryPlan.bindEncryptedProperties(pstmt, conn));
     } finally {
@@ -377,7 +385,10 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
         this.lazyLoadParentId = lazyLoadParentId;
       }
       // add the loadedBean to the appropriate collection of lazyLoadParentBean
-      lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean, true);
+      if (lazyLoadParentBean != null) {
+        // Note: parentBean can be null, when GC ran between construction of query and building the retrieved bean
+        lazyLoadManyProperty.addBeanToCollectionWithCreate(lazyLoadParentBean, bean, true);
+      }
     }
   }
 
@@ -558,7 +569,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.profileId());
   }
 
   QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {
@@ -661,7 +672,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   @Override
   public void profileBean(EntityBeanIntercept ebi, String prefix) {
-    ObjectGraphNode node = request.loadContext().getObjectGraphNode(prefix);
+    ObjectGraphNode node = request.loadContext().objectGraphNode(prefix);
     ebi.setNodeUsageCollector(new NodeUsageCollector(node, profilingListener));
   }
 
@@ -687,7 +698,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   void auditFindMany() {
     if (auditIds != null && !auditIds.isEmpty()) {
       // get the id values of the underlying collection
-      ReadEvent futureReadEvent = query.getFutureFetchAudit();
+      ReadEvent futureReadEvent = query.futureFetchAudit();
       if (futureReadEvent == null) {
         // normal query execution
         desc.readAuditMany(queryPlan.auditQueryKey(), bindLog, auditIds);

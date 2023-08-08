@@ -11,6 +11,10 @@ import java.util.List;
 
 @Entity
 @Table(name = "migtest_e_basic")
+// Note: tablespaces are currently only supported for DB2
+// to be prepared for future (when we support sql server filegroups),
+// we allow to specify the DB-platform here
+@Tablespace(value = "db2;TSTABLES;", index = "db2;INDEXTS;")
 public class EBasic {
 
   public enum Status {
@@ -86,7 +90,7 @@ public class EBasic {
   String indextest6;
 
   @NotNull
-  @DbDefault("23")
+  @DbDefault("23") // required for revert
   int user_id;
 
   public EBasic() {

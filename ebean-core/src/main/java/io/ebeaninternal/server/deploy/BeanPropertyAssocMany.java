@@ -2,6 +2,8 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
@@ -27,6 +29,7 @@ import java.io.StringWriter;
 import java.util.*;
 
 import static java.lang.System.Logger.Level.ERROR;
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Property mapped to a List Set or Map.
@@ -200,7 +203,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @SuppressWarnings("rawtypes")
   public Collection rawCollection(EntityBean bean) {
-    return help.underlying(value(bean));
+    return help.underlying(getValue(bean));
   }
 
   /**
@@ -208,11 +211,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public void merge(EntityBean bean, EntityBean existing) {
-    Object existingCollection = value(existing);
+    Object existingCollection = getValue(existing);
     if (existingCollection instanceof BeanCollection<?>) {
       BeanCollection<?> toBC = (BeanCollection<?>) existingCollection;
       if (!toBC.isPopulated()) {
-        Object fromCollection = value(bean);
+        Object fromCollection = getValue(bean);
         if (fromCollection instanceof BeanCollection<?>) {
           BeanCollection<?> fromBC = (BeanCollection<?>) fromCollection;
           if (fromBC.isPopulated()) {
@@ -413,16 +416,16 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public String assocIsEmpty(SpiExpressionRequest request, String path) {
     boolean softDelete = targetDescriptor.isSoftDelete();
     boolean needsX2Table = softDelete || extraWhere() != null;
-    StringBuilder sb = new StringBuilder(50);
-    SpiQuery<?> query = request.getQueryRequest().query();
+    StringBuilder sb = new StringBuilder(50).append("from "); // use from to stop parsing on table name
+    SpiQuery<?> query = request.queryRequest().query();
     if (hasJoinTable()) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
-      sb.append(targetDescriptor.baseTable(query.getTemporalMode()));
+      sb.append(targetDescriptor.baseTable(query.temporalMode()));
     }
     if (needsX2Table && hasJoinTable()) {
       sb.append(" x join ");
-      sb.append(targetDescriptor.baseTable(query.getTemporalMode()));
+      sb.append(targetDescriptor.baseTable(query.temporalMode()));
       sb.append(" x2 on ");
       inverseJoin.addJoin("x2", "x", sb);
     } else {
@@ -872,7 +875,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
     // publish from each draft to live bean creating new live beans as required
     draftVal.size();
-    Collection<T> actualDetails = draftVal.getActualDetails();
+    Collection<T> actualDetails = draftVal.actualDetails();
     for (T bean : actualDetails) {
       Object id = targetDescriptor.id(bean);
       T liveBean = liveBeansAsMap.remove(id);
@@ -901,7 +904,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   @SuppressWarnings("unchecked")
   private Map<Object, T> liveBeansAsMap(BeanCollection<?> liveVal) {
     liveVal.size();
-    Collection<?> liveBeans = liveVal.getActualDetails();
+    Collection<?> liveBeans = liveVal.actualDetails();
     Map<Object, T> liveMap = new LinkedHashMap<>();
     for (Object liveBean : liveBeans) {
       Object id = targetDescriptor.id(liveBean);
@@ -937,7 +940,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (elementDescriptor != null) {
       elementDescriptor.jsonWriteMapEntry(ctx, entry);
     } else {
-      targetDescriptor.jsonWrite(ctx, (EntityBean)entry.getValue());
+      targetDescriptor.jsonWrite(ctx, (EntityBean) entry.getValue());
     }
   }
 
@@ -1003,7 +1006,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (JsonToken.VALUE_NULL == event) {
       return null;
     }
-    return jsonReadCollection(ctx, null);
+    return jsonReadCollection(ctx, null, null);
   }
 
   /**
@@ -1016,15 +1019,16 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Read the collection (JSON Array) containing entity beans.
    */
-  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean, Object targets) throws IOException {
     if (elementDescriptor != null && elementDescriptor.isJsonReadCollection()) {
       return elementDescriptor.jsonReadCollection(readJson, parentBean);
     }
     BeanCollection<?> collection = createEmpty(parentBean);
     BeanCollectionAdd add = beanCollectionAdd(collection);
+    Map<Object, T> existingBeans = extractBeans(targets);
     do {
-      // CHECKME: Update existing list entry here?
-      EntityBean detailBean = (EntityBean) targetDescriptor.jsonRead(readJson, name, null);
+
+      EntityBean detailBean = getDetailBean(readJson, existingBeans);
       if (detailBean == null) {
         // read the entire array
         break;
@@ -1037,6 +1041,63 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       }
     } while (true);
     return collection;
+  }
+
+  /**
+   * Find bean in the target collection and reuse it for JSON update.
+   */
+  private EntityBean getDetailBean(SpiJsonReader readJson, Map<Object, T> targets) throws IOException {
+    BeanProperty idProperty = targetDescriptor.idProperty();
+    if (targets == null || idProperty == null) {
+      return (EntityBean) targetDescriptor.jsonRead(readJson, name, null);
+    } else {
+      JsonToken token = readJson.parser().nextToken();
+      if (JsonToken.VALUE_NULL == token || JsonToken.END_ARRAY == token) {
+        return null;
+      }
+      // extract the id. We have to buffer the JSON;
+      ObjectNode node = readJson.mapper().readTree(readJson.parser());
+      SpiJsonReader jsonReader = readJson.forJson(node.traverse());
+      JsonNode idNode = node.get(idProperty.name());
+      Object id = idNode == null ? null : idProperty.jsonRead(readJson.forJson(idNode.traverse()));
+      return (EntityBean) targetDescriptor.jsonRead(jsonReader, name, targets.get(id));
+    }
+  }
+
+  /**
+   * Extract beans, that are currently in the target collection. (targets can be a List/Set/Map)
+   */
+  private Map<Object, T> extractBeans(Object targets) {
+    Collection<T> beans;
+
+    if (targets == null) {
+      return null;
+    } else if (targets instanceof Map) {
+      if (((Map<?, T>) targets).isEmpty()) {
+        return null;
+      }
+      beans = ((Map<?, T>) targets).values();
+    } else if (targets instanceof Collection) {
+      if (((Collection<?>) targets).isEmpty()) {
+        return null;
+      }
+      beans = (Collection<T>) targets;
+    } else {
+      CoreLog.log.log(WARNING, "Found non collection value " + targets.getClass().getSimpleName());
+      return null;
+    }
+
+    BeanProperty idProp = targetDescriptor.idProperty();
+    Map<Object, T> ret = new HashMap<>();
+    for (T bean : beans) {
+      if (bean instanceof EntityBean) {
+        Object id = idProp.getValue((EntityBean) bean);
+        if (id != null) {
+          ret.put(id, bean);
+        }
+      }
+    }
+    return ret.isEmpty() ? null : ret;
   }
 
   /**

@@ -1,8 +1,7 @@
 package org.tests.o2m.dm;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class GoodsEntity extends HistoryColumns {
@@ -10,6 +9,9 @@ public class GoodsEntity extends HistoryColumns {
 
   @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
   private WorkflowEntity workflowEntity;
+
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<Attachment> attachments;
 
   public String getName() {
     return name;
@@ -25,5 +27,13 @@ public class GoodsEntity extends HistoryColumns {
 
   public void setWorkflowEntity(WorkflowEntity workflowEntity) {
     this.workflowEntity = workflowEntity;
+  }
+
+  public List<Attachment> getAttachments() {
+    return attachments;
+  }
+
+  public void setAttachments(List<Attachment> attachments) {
+    this.attachments = attachments;
   }
 }

@@ -17,22 +17,6 @@ public interface MetaInfoManager {
   ServerMetrics collectMetrics();
 
   /**
-   * Deprecated migrate to collectMetrics().asJson().
-   */
-  @Deprecated
-  default ServerMetricsAsJson collectMetricsAsJson() {
-    return collectMetrics().asJson();
-  }
-
-  /**
-   * Deprecated migrate to collectMetrics().asData().
-   */
-  @Deprecated
-  default List<MetricData> collectMetricsAsData() {
-    return collectMetrics().asData();
-  }
-
-  /**
    * Visit the metrics resetting and collecting/reporting as desired.
    */
   void visitMetrics(MetricVisitor visitor);

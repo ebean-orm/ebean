@@ -1,11 +1,7 @@
 package io.ebean.platform.mysql;
 
 import io.ebean.Query;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 import java.sql.Types;
 
@@ -48,14 +44,29 @@ public abstract class BaseMySqlPlatform extends DatabasePlatform {
     this.forwardOnlyHintOnFindIterate = true;
     this.booleanDbType = Types.BIT;
 
+    DbPlatformType clob = new DbPlatformType("longtext", 0, // use longtext, if length = 0
+      new DbPlatformType("text", 0xFFFF, // use text up to 2^16-1
+        new DbPlatformType("mediumtext", 0xFFFFFF, // use mediumtext up to 2^24-1
+          new DbPlatformType("longtext", false))));
+
+    DbPlatformType blob = new DbPlatformType("longblob", 0, // use longtext, if length = 0
+      new DbPlatformType("blob", 0xFFFF, // use text up to 2^16-1
+        new DbPlatformType("mediumblob", 0xFFFFFF, // use mediumtext up to 2^24-1
+          new DbPlatformType("longblob", false))));
+
+
+    // CHECME: What would be a good max varchar size?
+    // we use 4000 here, so we do not hit the row limit
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255, 4000, clob));
+
     dbTypeMap.put(DbType.BIT, new DbPlatformType("tinyint(1)"));
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("tinyint(1)"));
     dbTypeMap.put(DbType.TIMESTAMP, new DbPlatformType("datetime(6)"));
     dbTypeMap.put(DbType.LOCALDATETIME, new DbPlatformType("datetime(6)"));
-    dbTypeMap.put(DbType.CLOB, new MySqlClob());
-    dbTypeMap.put(DbType.BLOB, new MySqlBlob());
-    dbTypeMap.put(DbType.BINARY, new DbPlatformType("binary", 255));
-    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
+    dbTypeMap.put(DbType.CLOB, clob);
+    dbTypeMap.put(DbType.BLOB, blob);
+    dbTypeMap.put(DbType.BINARY, new DbPlatformType("binary", 255, 8000, blob));
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255, 8000, blob));
     dbTypeMap.put(DbType.JSON, new DbPlatformType("json", false));
     dbTypeMap.put(DbType.JSONB, new DbPlatformType("json", false));
   }

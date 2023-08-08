@@ -2,7 +2,7 @@ package io.ebean.platform.hana;
 
 import io.ebean.config.dbplatform.DbStandardHistorySupport;
 
-public class HanaHistorySupport extends DbStandardHistorySupport {
+final class HanaHistorySupport extends DbStandardHistorySupport {
 
   @Override
   public String getAsOfViewSuffix(String asOfViewSuffix) {

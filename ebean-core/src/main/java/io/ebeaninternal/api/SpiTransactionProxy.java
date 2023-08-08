@@ -28,8 +28,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public long getStartNanoTime() {
-    return transaction.getStartNanoTime();
+  public long startNanoTime() {
+    return transaction.startNanoTime();
   }
 
   @Override
@@ -38,8 +38,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public String getLabel() {
-    return transaction.getLabel();
+  public String label() {
+    return transaction.label();
   }
 
   @Override
@@ -98,8 +98,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
-    return transaction.getProfileLocation();
+  public ProfileLocation profileLocation() {
+    return transaction.profileLocation();
   }
 
   @Override
@@ -108,18 +108,18 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Object getTenantId() {
-    return transaction.getTenantId();
+  public Object tenantId() {
+    return transaction.tenantId();
   }
 
   @Override
-  public DocStoreTransaction getDocStoreTransaction() {
-    return transaction.getDocStoreTransaction();
+  public DocStoreTransaction docStoreTransaction() {
+    return transaction.docStoreTransaction();
   }
 
   @Override
-  public DocStoreMode getDocStoreMode() {
-    return transaction.getDocStoreMode();
+  public DocStoreMode docStoreMode() {
+    return transaction.docStoreMode();
   }
 
   @Override
@@ -137,10 +137,6 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
     transaction.setDocStoreBatchSize(batchSize);
   }
 
-  @Override
-  public String getLogPrefix() {
-    return transaction.getLogPrefix();
-  }
 
   @Override
   public boolean isLogSql() {
@@ -153,13 +149,18 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void logSql(String msg) {
-    transaction.logSql(msg);
+  public void logSql(String msg, Object... args) {
+    transaction.logSql(msg, args);
   }
 
   @Override
-  public void logSummary(String msg) {
-    transaction.logSummary(msg);
+  public void logSummary(String msg, Object... args) {
+    transaction.logSummary(msg, args);
+  }
+
+  @Override
+  public void logTxn(String msg, Object... args) {
+    transaction.logTxn(msg, args);
   }
 
   @Override
@@ -213,8 +214,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public String getId() {
-    return transaction.getId();
+  public String id() {
+    return transaction.id();
   }
 
   @Override
@@ -358,8 +359,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public TransactionEvent getEvent() {
-    return transaction.getEvent();
+  public TransactionEvent event() {
+    return transaction.event();
   }
 
   @Override
@@ -373,8 +374,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public BatchControl getBatchControl() {
-    return transaction.getBatchControl();
+  public BatchControl batchControl() {
+    return transaction.batchControl();
   }
 
   @Override
@@ -383,8 +384,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public SpiPersistenceContext getPersistenceContext() {
-    return transaction.getPersistenceContext();
+  public SpiPersistenceContext persistenceContext() {
+    return transaction.persistenceContext();
   }
 
   @Override
@@ -393,8 +394,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public Connection getInternalConnection() {
-    return transaction.getInternalConnection();
+  public Connection internalConnection() {
+    return transaction.internalConnection();
   }
 
   @Override

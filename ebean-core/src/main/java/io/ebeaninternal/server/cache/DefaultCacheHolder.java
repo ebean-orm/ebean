@@ -130,7 +130,7 @@ final class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getQueryOptions(Class<?> cls) {
-    CacheQueryTuning tuning = AnnotationUtil.get(cls, CacheQueryTuning.class);
+    CacheQueryTuning tuning = AnnotationUtil.typeGet(cls, CacheQueryTuning.class);
     if (tuning != null) {
       return new ServerCacheOptions(tuning).applyDefaults(queryDefault);
     }
@@ -138,9 +138,9 @@ final class DefaultCacheHolder {
   }
 
   private ServerCacheOptions getBeanOptions(Class<?> cls) {
-    Cache cache = cls.getAnnotation(Cache.class);
+    Cache cache = AnnotationUtil.typeGet(cls, Cache.class);
     boolean nearCache = (cache != null && cache.nearCache());
-    CacheBeanTuning tuning = cls.getAnnotation(CacheBeanTuning.class);
+    CacheBeanTuning tuning = AnnotationUtil.typeGet(cls, CacheBeanTuning.class);
     if (tuning != null) {
       return new ServerCacheOptions(nearCache, tuning).applyDefaults(beanDefault);
     }

@@ -2,48 +2,16 @@ package io.ebeaninternal.server.expression;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
-import io.ebean.CacheMode;
-import io.ebean.CountDistinctOrder;
-import io.ebean.DtoQuery;
-import io.ebean.Expression;
-import io.ebean.ExpressionList;
-import io.ebean.FetchGroup;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.Junction;
-import io.ebean.OrderBy;
-import io.ebean.PagedList;
-import io.ebean.Pairs;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.Transaction;
-import io.ebean.UpdateQuery;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
-import io.ebean.search.Match;
-import io.ebean.search.MultiMatch;
-import io.ebean.search.TextCommonTerms;
-import io.ebean.search.TextQueryString;
-import io.ebean.search.TextSimple;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
-import io.ebeaninternal.api.SpiJunction;
+import io.ebean.search.*;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -678,6 +646,16 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> gtIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : exprList.gt(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> geIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : exprList.ge(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> having() {
     throw new IllegalStateException("having() not allowed on Junction expression list");
   }
@@ -733,6 +711,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> inTuples(InTuples pairs) {
+    return exprList.inTuples(pairs);
+  }
+
+  @Override
   public ExpressionList<T> in(String propertyName, Collection<?> values) {
     return exprList.in(propertyName, values);
   }
@@ -750,6 +733,56 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> in(String propertyName, Query<?> subQuery) {
     return exprList.in(propertyName, subQuery);
+  }
+
+  @Override
+  public ExpressionList<T> exists(String sqlSubQuery, Object... bindValues) {
+    return exprList.exists(sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> notExists(String sqlSubQuery, Object... bindValues) {
+    return exprList.notExists(sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> inSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return exprList.inSubQuery(propertyName, sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> notInSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return exprList.notInSubQuery(propertyName, sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> eqSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return exprList.eqSubQuery(propertyName, sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> neSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return exprList.neSubQuery(propertyName, sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> gtSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return exprList.gtSubQuery(propertyName, sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> geSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return exprList.geSubQuery(propertyName, sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> ltSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return exprList.ltSubQuery(propertyName, sqlSubQuery, bindValues);
+  }
+
+  @Override
+  public ExpressionList<T> leSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return exprList.leSubQuery(propertyName, sqlSubQuery, bindValues);
   }
 
   @Override
@@ -838,6 +871,16 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> ltIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : exprList.lt(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> leIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : exprList.le(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> ne(String propertyName, Query<?> subQuery) {
     return exprList.ne(propertyName, subQuery);
   }
@@ -855,16 +898,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> or(Expression expOne, Expression expTwo) {
     return exprList.or(expOne, expTwo);
-  }
-
-  @Override
-  public OrderBy<T> order() {
-    return exprList.order();
-  }
-
-  @Override
-  public ExpressionList<T> order(String orderByClause) {
-    return exprList.order(orderByClause);
   }
 
   @Override
@@ -940,11 +973,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> setMaxRows(int maxRows) {
     return exprList.setMaxRows(maxRows);
-  }
-
-  @Override
-  public Query<T> setOrderBy(String orderBy) {
-    return exprList.setOrderBy(orderBy);
   }
 
   @Override
@@ -1067,5 +1095,10 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
       return nestedPath;
     }
     return null;
+  }
+
+  @Override
+  public ExpressionList<T> clear() {
+    return exprList.clear();
   }
 }

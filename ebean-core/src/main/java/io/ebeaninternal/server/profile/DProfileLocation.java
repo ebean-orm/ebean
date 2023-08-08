@@ -1,30 +1,25 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
+import io.ebean.util.StackWalkFilter;
+
+import java.util.stream.Stream;
 
 /**
  * Default profile location that uses stack trace.
  */
 class DProfileLocation implements ProfileLocation {
 
-  private static final String IO_EBEAN = "io.ebean";
   private static final String UNKNOWN = "unknown";
 
+  private final boolean withLine;
   private String fullLocation;
   private String location;
   private String label;
-  private final int lineNumber;
   private int traceCount;
 
-  DProfileLocation() {
-    this(0);
-  }
-
-  /**
-   * Create with a given line number.
-   */
-  DProfileLocation(int lineNumber) {
-    this.lineNumber = lineNumber;
+  DProfileLocation(boolean withLine) {
+    this.withLine = withLine;
   }
 
   @Override
@@ -44,7 +39,7 @@ class DProfileLocation implements ProfileLocation {
       return false;
     }
     final String loc = create();
-    final String location = UtilLocation.loc(loc);
+    final String location = UtilLocation.loc(loc, withLine);
     this.label = UtilLocation.label(location);
     this.location = location;
     this.fullLocation = loc;
@@ -88,25 +83,14 @@ class DProfileLocation implements ProfileLocation {
   }
 
   private String create() {
-    // relatively expensive but we only do it once per profile location
-    StackTraceElement[] trace = Thread.currentThread().getStackTrace();
-    for (int i = 3; i < trace.length; i++) {
-      if (!trace[i].getClassName().startsWith(IO_EBEAN)) {
-        return withLineNumber(trace[i].toString());
-      }
-    }
-    return UNKNOWN;
+    return StackWalker.getInstance().walk(this::filter);
   }
 
-  private String withLineNumber(String traceLine) {
-    if (lineNumber == 0) {
-      return traceLine;
-    } else if (traceLine.endsWith(":1)")) {
-      return traceLine.substring(0, traceLine.length() - 3) + ":" + lineNumber + ")";
-    } else if (traceLine.contains(":")) {
-      return traceLine;
-    } else {
-      return traceLine.substring(0, traceLine.length() - 1) + ":" + lineNumber + ")";
-    }
+  private String filter(Stream<StackWalker.StackFrame> frames) {
+    return frames.filter(StackWalkFilter.filter())
+      .findFirst()
+      .map(Object::toString)
+      .orElse(UNKNOWN);
   }
+
 }

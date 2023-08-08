@@ -4,11 +4,14 @@ import io.ebean.annotation.Cache;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Cache(readOnly = true)
 @Entity
-@Table(name = "feature_desc")
+@Table(name = "feature_desc", indexes = {
+  @Index(columnList = "name, description desc"),
+  @Index(columnList = "name desc")})
 public class FeatureDescription {
 
   @Id

@@ -54,28 +54,6 @@ create table migtest_fk_set_null (
   constraint pk_migtest_fk_set_null primary key (id)
 );
 
-create table drop_main (
-  id                            serial not null,
-  constraint pk_drop_main primary key (id)
-);
-
-create table drop_main_drop_ref_many (
-  drop_main_id                  integer not null,
-  drop_ref_many_id              integer not null,
-  constraint pk_drop_main_drop_ref_many primary key (drop_main_id,drop_ref_many_id)
-);
-
-create table drop_ref_many (
-  id                            serial not null,
-  constraint pk_drop_ref_many primary key (id)
-);
-
-create table drop_ref_one (
-  id                            serial not null,
-  parent_id                     integer,
-  constraint pk_drop_ref_one primary key (id)
-);
-
 create table migtest_e_basic (
   id                            serial not null,
   description_file              bytea,
@@ -210,12 +188,12 @@ create table migtest_oto_master (
 );
 
 -- apply alter tables
-alter table "table" add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history2 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history3 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history4 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history5 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
-alter table migtest_e_history6 add column sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table "table" add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history2 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history3 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history4 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history5 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
+alter table migtest_e_history6 add column if not exists sys_period tstzrange not null default tstzrange(current_timestamp, null);
 -- apply post alter
 create table migtest_e_history2_history(like migtest_e_history2);
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
@@ -373,15 +351,6 @@ alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id forei
 
 create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null on update restrict;
-
-create index ix_drop_main_drop_ref_many_drop_main on drop_main_drop_ref_many (drop_main_id);
-alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_main foreign key (drop_main_id) references drop_main (id) on delete restrict on update restrict;
-
-create index ix_drop_main_drop_ref_many_drop_ref_many on drop_main_drop_ref_many (drop_ref_many_id);
-alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_ref_many foreign key (drop_ref_many_id) references drop_ref_many (id) on delete restrict on update restrict;
-
-create index ix_drop_ref_one_parent_id on drop_ref_one (parent_id);
-alter table drop_ref_one add constraint fk_drop_ref_one_parent_id foreign key (parent_id) references drop_main (id) on delete restrict on update restrict;
 
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id) on delete restrict on update restrict;

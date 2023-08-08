@@ -6,7 +6,7 @@ package io.ebean.typequery;
  * @param <R> the root query bean type
  * @param <E> the element type of the DbArray
  */
-public final class PArray<R, E> extends TQPropertyBase<R> {
+public final class PArray<R, E> extends TQPropertyBase<R, E> {
 
   /**
    * Construct with a property name and root instance.
