@@ -246,7 +246,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
-  public String getBaseSql() {
+  public String baseSql() {
     return baseSql;
   }
 
@@ -342,7 +342,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
    * Return the bind parameters.
    */
   @Override
-  public BindParams getBindParams() {
+  public BindParams bindParams() {
     return bindParams;
   }
 

@@ -6,9 +6,9 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 /**
  * MySql aes_encrypt aes_decrypt based encryption support.
  */
-public class MySqlDbEncrypt extends AbstractDbEncrypt {
+final class MySqlDbEncrypt extends AbstractDbEncrypt {
 
-  public MySqlDbEncrypt() {
+  MySqlDbEncrypt() {
     this.varcharEncryptFunction = new MyVarcharFunction();
     this.dateEncryptFunction = new MyDateFunction();
   }

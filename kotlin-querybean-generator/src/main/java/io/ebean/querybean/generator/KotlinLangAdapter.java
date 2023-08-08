@@ -9,12 +9,11 @@ class KotlinLangAdapter implements LangAdapter {
 
   @Override
   public void beginAssocClass(Append writer, String shortName, String origShortName) {
-    writer.append("class Q%s<R> : TQAssocBean<%s,R> {", shortName, origShortName).eol();
+//    writer.append("class Q%s<R> : TQAssocBean<%s,R> {", shortName, origShortName).eol();
   }
 
   @Override
   public void alias(Append writer, String shortName) {
-
     writer.append("  companion object {").eol();
     writer.append("    /**").eol();
     writer.append("     * shared 'Alias' instance used to provide").eol();
@@ -33,7 +32,6 @@ class KotlinLangAdapter implements LangAdapter {
 
   @Override
   public void assocBeanConstructor(Append writer, String shortName) {
-
     writer.append("  constructor(name: String, root: R) : super(name, root)").eol();
     writer.eol();
     writer.append("  constructor(name: String, root: R, prefix: String) : super(name, root, prefix)").eol();
@@ -41,7 +39,6 @@ class KotlinLangAdapter implements LangAdapter {
 
   @Override
   public void fetch(Append writer, String origShortName) {
-
     writeAssocBeanFetch(writer, origShortName, "", "Eagerly fetch this association loading the specified properties.");
     writeAssocBeanFetch(writer, origShortName, "Query", "Eagerly fetch this association using a 'query join' loading the specified properties.");
     writeAssocBeanFetch(writer, origShortName, "Cache", "Eagerly fetch this association using L2 cache.");
@@ -49,26 +46,21 @@ class KotlinLangAdapter implements LangAdapter {
   }
 
   private void writeAssocBeanFetch(Append writer, String origShortName, String fetchType, String comment) {
-
-//    fun fetch(vararg properties: TQProperty<QContact>): R {
+//    fun fetch(vararg properties: TQProperty<QContact,?>): R {
 //      return fetchProperties(*properties)
 //    }
-
     writer.append("  /**").eol();
     writer.append("   * ").append(comment).eol();
     writer.append("   */").eol();
-    writer.append("  fun fetch%s(vararg properties: TQProperty<Q%s>) : R {", fetchType, origShortName).eol();
+    writer.append("  fun fetch%s(vararg properties: TQProperty<Q%s,Any>) : R {", fetchType, origShortName).eol();
     writer.append("    return fetch%sProperties(*properties)", fetchType).eol();
     writer.append("  }").eol();
     writer.eol();
   }
 
-
   @Override
   public void rootBeanConstructor(Append writer, String shortName, String dbName) {
-
     String name = (dbName == null) ? "default" : dbName;
-
     writer.append("  /**").eol();
     writer.append("   * Construct using the %s Database.", name).eol();
     writer.append("   */").eol();
@@ -106,7 +98,6 @@ class KotlinLangAdapter implements LangAdapter {
 
   @Override
   public void fieldDefn(Append writer, String propertyName, String typeDefn)  {
-
     writer.append("  lateinit var %s: ", propertyName);
     if (typeDefn.endsWith(",Integer>")) {
       typeDefn = typeDefn.replace(",Integer>", ",Int>");

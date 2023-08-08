@@ -39,6 +39,9 @@ public class Db2PlatformProvider implements DatabasePlatformProvider {
     if (name.equals("db2luw")) {
       return new DB2LuwPlatform();
     }
+    if (name.equals("db2luw9")) {
+      return new DB2Luw9Platform();
+    }
     throw new IllegalArgumentException("Unknown DB2 platform, expecting db2luw/db2zos/db2fori but got "+ name);
   }
 

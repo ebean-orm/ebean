@@ -61,7 +61,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     this.platform = databasePlatform.platform();
     this.platformName = platform.base().name();
     if (!config.getTenantMode().isDdlEnabled() && config.isDdlRun()) {
-      log.log(WARNING, "DDL can't be run on startup with TenantMode " + config.getTenantMode());
+      log.log(WARNING, "DDL can''t be run on startup with TenantMode " + config.getTenantMode());
       this.runDdl = false;
       this.useMigrationStoredProcedures = false;
     } else {

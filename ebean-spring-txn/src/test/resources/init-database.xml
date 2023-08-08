@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+	                    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+	                    http://www.springframework.org/schema/context
+           				http://www.springframework.org/schema/context/spring-context-2.5.xsd">
+
+	<import resource="classpath:default-ebean-server.xml"/>
+
+	<!-- Transaktionen via Annotation use Springs @Transactional -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+	<context:annotation-config />
+
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.LazyConnectionDataSourceProxy">
+    <constructor-arg>
+      <bean class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="org.h2.Driver" />
+        <property name="url"
+                  value="jdbc:h2:mem:ebean-testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false" />
+      </bean>
+    </constructor-arg>
+  </bean>
+
+	<!--  Transaction Manager -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+
+	<bean id="serverConfig" parent="defaultEbeanServerConfig">
+		<property name="name" value="test"/>
+		<property name="classes">
+			<list>
+				<value>org.example.User</value>
+				<value>org.example.Role</value>
+				<value>org.example.Account</value>
+			</list>
+		</property>
+		<property name="dataSource" ref="dataSource"/>
+
+		<property name="ddlGenerate" value="true"/>
+		<property name="ddlRun" value="true"/>
+	</bean>
+
+	<!-- Ebean server -->
+	<bean id="ebeanServer" class="org.example.EbeanServerFactoryBean">
+		<property name="serverConfig" ref="serverConfig"/>
+	</bean>
+
+	<bean id="userService" class="org.example.UserServiceImpl">
+		<property name="ebeanServer" ref="ebeanServer"/>
+	</bean>
+</beans>

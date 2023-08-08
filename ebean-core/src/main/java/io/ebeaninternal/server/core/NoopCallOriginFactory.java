@@ -10,7 +10,7 @@ final class NoopCallOriginFactory implements CallOriginFactory {
 
   private static final StackTraceElement E0 = new StackTraceElement("none", "none", "none", 0);
 
-  private final CallOrigin COMMON = new CallStack(new StackTraceElement[]{E0}, 0, 0);
+  private final CallOrigin COMMON = new CallStack(new Object[]{E0}, 0, 0);
 
   @Override
   public CallOrigin createCallOrigin() {

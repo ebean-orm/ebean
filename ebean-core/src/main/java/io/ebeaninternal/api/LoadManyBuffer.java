@@ -6,26 +6,40 @@ import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 
-import java.util.List;
-
 /**
  * A buffer of bean collections for batch lazy loading and secondary query loading.
  */
 public interface LoadManyBuffer {
 
-  int getBatchSize();
+  /**
+   * The batch (max) size;
+   */
+  int batchSize();
 
-  List<BeanCollection<?>> getBatch();
+  /**
+   * The actual size.
+   */
+  int size();
 
-  BeanPropertyAssocMany<?> getBeanProperty();
+  /**
+   * Get the <code>i</code>th element from buffer. This can be null.
+   */
+  BeanCollection<?> get(int i);
 
-  ObjectGraphNode getObjectGraphNode();
+  /**
+   * Removes an element from the buffer. This will NOT affect size.
+   */
+  boolean removeFromBuffer(BeanCollection<?> collection);
 
-  BeanDescriptor<?> getBeanDescriptor();
+  BeanPropertyAssocMany<?> beanProperty();
 
-  PersistenceContext getPersistenceContext();
+  ObjectGraphNode objectGraphNode();
 
-  String getFullPath();
+  BeanDescriptor<?> descriptor();
+
+  PersistenceContext persistenceContext();
+
+  String fullPath();
 
   void configureQuery(SpiQuery<?> query);
 

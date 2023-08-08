@@ -11,6 +11,7 @@ ebean-profiling*.xml
 /db
 /mydb.db
 profiling/
+.DS_Store
 
 # Intellij project files
 *.iml

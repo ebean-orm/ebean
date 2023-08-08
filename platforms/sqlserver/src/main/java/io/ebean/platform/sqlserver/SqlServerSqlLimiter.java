@@ -7,7 +7,7 @@ import io.ebean.config.dbplatform.SqlLimiter;
 /**
  * Use ANSI offset rows syntax or top n - SQL Server 2012 onwards.
  */
-public final class SqlServerSqlLimiter implements SqlLimiter {
+final class SqlServerSqlLimiter implements SqlLimiter {
 
   @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {

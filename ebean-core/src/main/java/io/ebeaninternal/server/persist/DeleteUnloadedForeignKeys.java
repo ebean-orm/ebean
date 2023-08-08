@@ -69,7 +69,7 @@ final class DeleteUnloadedForeignKeys {
 
     SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
-      t.logSummary("-- Ebean fetching foreign key values for delete of " + descriptor.name() + " id:" + id);
+      t.logSummary("-- Ebean fetching foreign key values for delete of {0} id:{1}", descriptor.name(), id);
     }
     beanWithForeignKeys = (EntityBean) server.findOne(q, t);
   }

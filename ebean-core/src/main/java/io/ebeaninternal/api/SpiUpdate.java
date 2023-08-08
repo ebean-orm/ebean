@@ -41,32 +41,32 @@ public interface SpiUpdate<T> extends Update<T> {
   /**
    * Return the type of bean being updated.
    */
-  Class<?> getBeanType();
+  Class<?> beanType();
 
   /**
    * Return the label (for metrics collection).
    */
-  String getLabel();
+  String label();
 
   /**
    * Return the type of this - insert, update or delete.
    */
-  OrmUpdateType getOrmUpdateType();
+  OrmUpdateType ormUpdateType();
 
   /**
    * Return the name of the table being modified.
    */
-  String getBaseTable();
+  String baseTable();
 
   /**
    * Return the update statement. This could be either sql or an orm update with bean types and property names.
    */
-  String getUpdateStatement();
+  String updateStatement();
 
   /**
    * Return the timeout in seconds.
    */
-  int getTimeout();
+  int timeout();
 
   /**
    * Return true if the cache should be notified to invalidate objects.
@@ -76,7 +76,7 @@ public interface SpiUpdate<T> extends Update<T> {
   /**
    * Return the bind parameters.
    */
-  BindParams getBindParams();
+  BindParams bindParams();
 
   /**
    * Set the generated sql used.

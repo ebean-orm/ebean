@@ -4,7 +4,20 @@ package io.ebean.test;
  * Use in test code when the CurrentUserProvider and/or CurrentTenantProvider were configured by
  * this ebean-test-config plugin.
  * <p>
- * That is, the ebean-test-config plugin will check if there ia a CurrentUserProvider and if not
+ * This is not automatically available. If you wish to use this class in your Tenant testing, you must set the
+ * application.properties setting to:
+ *
+ * <pre>
+ * ebean.test.registerTestTenantProvider=true
+ * </pre>
+ *
+ * or application-test.yaml:
+ * <pre>
+ *   ebean:
+ *     test:
+ *       registerTestTenantProvider: true
+ * </pre>.
+ * If set to true, the ebean-test-config plugin will check if there is a CurrentUserProvider and if not
  * automatically set one and that provider reads the 'current user' from this UserContext.
  * <pre>{@code
  *

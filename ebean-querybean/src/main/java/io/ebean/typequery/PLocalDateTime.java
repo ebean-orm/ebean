@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
  *
  * @param <R> the root query bean type
  */
-public final class PLocalDateTime<R> extends PBaseDate<R,LocalDateTime> {
+public final class PLocalDateTime<R> extends PBaseDate<R, LocalDateTime> {
 
   /**
    * Construct with a property name and root instance.

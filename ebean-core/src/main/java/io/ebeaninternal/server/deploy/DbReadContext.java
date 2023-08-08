@@ -90,6 +90,14 @@ public interface DbReadContext {
   boolean isDisableLazyLoading();
 
   /**
+   * Return true if the beans that already exist in the persistence context
+   * should have data from the database loaded into them.
+   * <p>
+   * This is the case for REFRESH and forUpdate queries.
+   */
+  boolean isLoadContextBean();
+
+  /**
    * Handles a load error on given property.
    */
   void handleLoadError(String fullName, Exception e);

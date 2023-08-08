@@ -57,18 +57,16 @@ final class NullExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     if (assocMany) {
-      // translate to exists subquery
+      // translate to exists sub-query
       IsEmptyExpression.isEmptySql(request, elProperty, !notNull, propertyPath);
       return;
     }
-
     String nullExpr = notNull ? " is not null" : " is null";
     if (elProperty != null && elProperty.isAssocId()) {
-      request.append(elProperty.assocIdExpression(propName, nullExpr));
+      request.parse(elProperty.assocIdExpression(propName, nullExpr));
     } else {
-      request.append(propName).append(nullExpr);
+      request.property(propName).append(nullExpr);
     }
   }
 

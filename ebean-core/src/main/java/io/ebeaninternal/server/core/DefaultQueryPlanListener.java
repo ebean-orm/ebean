@@ -18,9 +18,9 @@ final class DefaultQueryPlanListener implements QueryPlanListener {
     // better to log this in JSON form?
     String dbName = capture.database().name();
     for (MetaQueryPlan plan : capture.plans()) {
-      log.log(INFO, "queryPlan  db:{0} label:{1} queryTimeMicros:{2} loc:{3} sql:{4} bind:{5} plan:{6}",
-        dbName, plan.label(), plan.queryTimeMicros(), plan.profileLocation(),
-        plan.sql(), plan.bind(), plan.plan());
+      log.log(INFO, "queryPlan  db:{0} label:{1} queryTimeMicros:{2} captureMicros:{3} whenCaptured:{4} captureCount:{5} loc:{6} sql:{7} bind:{8} plan:{9}",
+        dbName, plan.label(), plan.queryTimeMicros(), plan.captureMicros(), plan.whenCaptured(), plan.captureCount(),
+        plan.profileLocation(), plan.sql(), plan.bind(), plan.plan());
     }
   }
 }

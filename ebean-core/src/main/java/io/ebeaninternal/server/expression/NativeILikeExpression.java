@@ -36,14 +36,12 @@ final class NativeILikeExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     String pname = propName;
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
       pname = prop.beanProperty().decryptProperty(propName);
     }
-
-    request.append(pname).append(" ilike ?");
+    request.property(pname).append(" ilike ?");
   }
 
   /**

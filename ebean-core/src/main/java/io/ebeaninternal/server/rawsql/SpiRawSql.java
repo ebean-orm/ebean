@@ -5,13 +5,7 @@ import io.ebean.util.CamelCaseHelper;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Internal service API for Raw Sql.
@@ -31,6 +25,7 @@ public interface SpiRawSql extends RawSql {
 
   SpiRawSql.ColumnMapping getColumnMapping();
 
+  String mapToColumn(String property);
 
   /**
    * Represents the sql part of the query. For parsed RawSql the sql is broken
@@ -363,13 +358,17 @@ public interface SpiRawSql extends RawSql {
      * </p>
      */
     public void tableAliasMapping(String tableAlias, String path) {
-
       String startMatch = tableAlias + ".";
       for (Map.Entry<String, Column> entry : dbColumnMap.entrySet()) {
         if (entry.getKey().startsWith(startMatch)) {
           entry.getValue().tableAliasMapping(path);
         }
       }
+    }
+
+    public String mapToColumn(String property) {
+      final var column = propertyColumnMap.get(property);
+      return column == null ? null : column.getDbColumn();
     }
 
     /**

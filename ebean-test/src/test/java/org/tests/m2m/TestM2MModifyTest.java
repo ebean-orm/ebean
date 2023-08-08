@@ -1,11 +1,12 @@
 package org.tests.m2m;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.MRole;
 import org.tests.model.basic.MUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,5 +52,28 @@ public class TestM2MModifyTest extends BaseTestCase {
 
     roles = u0.getRoles();
     assertThat(roles).hasSize(1);
+  }
+
+  @Test
+  public void test1() {
+    List<MRole> roles = new ArrayList<>();
+    for (int i = 0; i < 56; i++) {
+      MRole r0 = new MRole("mrole" + i);
+      roles.add(r0);
+    }
+
+    DB.saveAll(roles);
+
+    MUser u0 = new MUser("usr0");
+    u0.getRoles().addAll(roles);
+
+    DB.save(u0);
+
+    u0 = DB.find(MUser.class, u0.getUserid());
+
+    u0.getRoles().clear();
+    u0.getRoles().addAll(roles);
+
+    DB.save(u0);
   }
 }
