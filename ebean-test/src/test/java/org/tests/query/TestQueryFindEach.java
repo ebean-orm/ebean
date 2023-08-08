@@ -123,7 +123,7 @@ public class TestQueryFindEach extends BaseTestCase {
         .findList();
 
       SpiTransaction spiTxn = (SpiTransaction) transaction;
-      PersistenceContext pc = spiTxn.getPersistenceContext();
+      PersistenceContext pc = spiTxn.persistenceContext();
       assertThat(pc.size(Customer.class)).isEqualTo(customerList.size());
 
       LoggedSql.start();

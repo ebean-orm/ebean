@@ -24,7 +24,7 @@ public final class DocStoreTransactionManager extends TransactionManager {
   }
 
   @Override
-  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
     return new DocStoreOnlyTransaction(false, this);
   }
 

@@ -33,10 +33,17 @@ public class SqlAnywherePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float(32)"));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
     dbTypeMap.put(DbType.DECIMAL, new DbPlatformType("numeric", 16, 3));
-    dbTypeMap.put(DbType.BLOB, new DbPlatformType("binary(4500)"));
-    dbTypeMap.put(DbType.CLOB, new DbPlatformType("long varchar"));
-    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("long binary"));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("long varchar"));
+
+    DbPlatformType clob = new DbPlatformType("long varchar", false);
+    dbTypeMap.put(DbType.CLOB, clob);
+    dbTypeMap.put(DbType.LONGVARCHAR,clob);
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255, 32767, clob));
+
+    DbPlatformType blob = new DbPlatformType("long binary", false);
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255, 32767, blob));
+    dbTypeMap.put(DbType.LONGVARBINARY, blob);
+    dbTypeMap.put(DbType.BLOB, blob);
+
 
   }
 

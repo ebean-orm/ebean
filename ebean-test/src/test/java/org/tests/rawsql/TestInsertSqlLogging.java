@@ -119,7 +119,7 @@ public class TestInsertSqlLogging extends BaseTestCase {
       update.execute();
       transaction.commit();
 
-      assertFalse(((SpiTransaction) transaction).getEvent().getEventTables().isEmpty());
+      assertFalse(((SpiTransaction) transaction).event().eventTables().isEmpty());
 
     } finally {
       transaction.end();

@@ -16,7 +16,7 @@ public interface LoadContext {
   /**
    * Return the minimum batch size when using QueryIterator with query joins.
    */
-  int getSecondaryQueriesMinBatchSize();
+  int secondaryQueriesMinBatchSize();
 
   /**
    * Execute any secondary (+query) queries if there are any defined.
@@ -29,12 +29,12 @@ public interface LoadContext {
   /**
    * Return the node for a given path which is used by AutoTune profiling.
    */
-  ObjectGraphNode getObjectGraphNode(String path);
+  ObjectGraphNode objectGraphNode(String path);
 
   /**
    * Return the persistence context used by this query and future lazy loading.
    */
-  PersistenceContext getPersistenceContext();
+  PersistenceContext persistenceContext();
 
   /**
    * Register a Bean for lazy loading.

@@ -166,7 +166,7 @@ public class BeanTypeTest {
     SpiQuery<Order> orderQuery = (SpiQuery<Order>) db.find(Order.class);
     beanType(Order.class).docStore().applyPath(orderQuery);
 
-    OrmQueryDetail detail = orderQuery.getDetail();
+    OrmQueryDetail detail = orderQuery.detail();
     assertThat(detail.getChunk("customer", false).getIncluded()).containsExactly("id", "name");
   }
 

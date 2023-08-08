@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 
 import java.util.List;
@@ -10,8 +9,8 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   final STreePropertyAssocMany manyProp;
 
   SqlTreeNodeManyRoot(String prefix, STreePropertyAssocMany prop, SqlTreeProperties props, List<SqlTreeNode> myList,
-                      boolean withId, SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean readOnly) {
-    super(prefix, prop, props, myList, withId, temporalMode, disableLazyLoad, readOnly);
+                      boolean withId, SqlTreeCommon common) {
+    super(prefix, prop, props, myList, withId, common);
     this.manyProp = prop;
   }
 

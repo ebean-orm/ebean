@@ -68,7 +68,7 @@ final class ArrayContainsExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.getDbPlatformHandler().arrayContains(request, propName, contains, values);
+    request.platformHandler().arrayContains(request, propName, contains, values);
   }
 
   @Override

@@ -29,12 +29,12 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
       // same instance from PersistenceContext
       assertSame(bean2, bean3);
 
-      Object bean4 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
+      Object bean4 = transaction.persistenceContext().get(EBasicVer.class, bean.getId());
       assertSame(bean2, bean4);
 
       DB.delete(bean2);
 
-      Object bean5 = transaction.getPersistenceContext().get(EBasicVer.class, bean.getId());
+      Object bean5 = transaction.persistenceContext().get(EBasicVer.class, bean.getId());
       assertNull(bean5);
 
       DB.commitTransaction();

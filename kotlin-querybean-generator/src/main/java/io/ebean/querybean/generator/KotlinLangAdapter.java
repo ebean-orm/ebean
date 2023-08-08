@@ -9,7 +9,7 @@ class KotlinLangAdapter implements LangAdapter {
 
   @Override
   public void beginAssocClass(Append writer, String shortName, String origShortName) {
-    writer.append("class Q%s<R> : TQAssocBean<%s,R> {", shortName, origShortName).eol();
+//    writer.append("class Q%s<R> : TQAssocBean<%s,R> {", shortName, origShortName).eol();
   }
 
   @Override

@@ -36,7 +36,7 @@ public final class BeanCollectionUtil {
       }
       // For maps this is a collection of Map.Entry, otherwise it
       // returns a collection of beans
-      return bc.getActualEntries();
+      return bc.actualEntries();
     }
     if (o instanceof Collection<?>) {
       return ((Collection<?>) o);
@@ -61,7 +61,7 @@ public final class BeanCollectionUtil {
       }
       // For maps this is a collection of Map.Entry, otherwise it
       // returns a collection of beans
-      return bc.getActualDetails();
+      return bc.actualDetails();
     }
     if (o instanceof Map<?, ?>) {
       // yes, we want the entrySet (to set the keys)

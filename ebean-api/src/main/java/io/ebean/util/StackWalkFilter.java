@@ -22,6 +22,7 @@ public final class StackWalkFilter {
     public boolean test(StackWalker.StackFrame stackFrame) {
       return !stackFrame.getClassName().startsWith("io.ebean")
         && !stackFrame.getClassName().startsWith("jdk.")
+        && !stackFrame.getClassName().startsWith("java.")
         && !stackFrame.getMethodName().startsWith("_ebean_");
     }
   }

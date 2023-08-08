@@ -31,7 +31,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
   public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanList<?>) {
       BeanList<?> bl = (BeanList<?>) bc;
-      if (bl.getActualList() == null) {
+      if (bl.actualList() == null) {
         bl.setActualList(new ArrayList<>());
       }
       return bl;
@@ -95,7 +95,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
     } else if (currentList instanceof BeanList<?>) {
       // normally this case, replace just the underlying list
       BeanList<?> currentBeanList = (BeanList<?>) currentList;
-      currentBeanList.setActualList(newBeanList.getActualList());
+      currentBeanList.setActualList(newBeanList.actualList());
       currentBeanList.setModifyListening(many.modifyListenMode());
 
     } else {
@@ -118,7 +118,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
           return;
         }
       }
-      list = beanList.getActualList();
+      list = beanList.actualList();
     } else {
       list = (List<?>) collection;
     }

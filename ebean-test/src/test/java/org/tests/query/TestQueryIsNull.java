@@ -70,6 +70,46 @@ public class TestQueryIsNull extends BaseTestCase {
   }
 
   @Test
+  void ifPresent() {
+    ResetBasicData.reset();
+
+    Query<Order> query = DB.find(Order.class).select("id, status")
+      .where().eqIfPresent("status", null)
+      .gtIfPresent("id", null)
+      .geIfPresent("id", null)
+      .ltIfPresent("id", null)
+      .leIfPresent("id", null)
+      .query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0");
+
+    Query<Order> query1 = DB.find(Order.class).select("id, status")
+      .where().eqIfPresent("status", null)
+      .gtIfPresent("id", 90)
+      .geIfPresent("id", 91)
+      .ltIfPresent("id", 92)
+      .leIfPresent("id", 93)
+      .isNull("shipDate").query();
+    query1.findList();
+
+    assertThat(query1.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.id > ? and t0.id >= ? and t0.id < ? and t0.id <= ? and t0.ship_date is null");
+
+    Query<Order> query2 = DB.find(Order.class).select("id, status")
+      .where()
+      .leIfPresent("id", 93)
+      .isNull("orderDate")
+      .ltIfPresent("id", 92)
+      .geIfPresent("id", 91)
+      .isNull("shipDate")
+      .gtIfPresent("id", 90)
+      .query();
+    query2.findList();
+
+    assertThat(query2.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.id <= ? and t0.order_date is null and t0.id < ? and t0.id >= ? and t0.ship_date is null and t0.id > ?");
+  }
+
+  @Test
   public void isNotNull_when_OneToMany_expect_existsSubquery() {
     ResetBasicData.reset();
 

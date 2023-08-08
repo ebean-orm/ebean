@@ -14,9 +14,9 @@ class TestDefaultCallOriginFactory {
   @Test
   void createCallOrigin() {
     CallOrigin callOrigin = inner();
-    String topElement = callOrigin.getTopElement();
+    String topElement = callOrigin.top();
     assertThat(topElement).contains("org.tests.server.TestDefaultCallOriginFactory.inner(TestDefaultCallOriginFactory.java:23)");
-    assertThat(callOrigin.getFullDescription()).contains("TestDefaultCallOriginFactory.java:16");
+    assertThat(callOrigin.description()).contains("TestDefaultCallOriginFactory.java:16");
   }
 
   private CallOrigin inner() {

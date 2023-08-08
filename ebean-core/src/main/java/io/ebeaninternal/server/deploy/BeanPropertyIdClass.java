@@ -25,12 +25,12 @@ public final class BeanPropertyIdClass extends BeanPropertyAssocOne {
 
   @Override
   public Object getValue(EntityBean bean) {
-    return bean._ebean_getIntercept().getOwnerId();
+    return bean._ebean_getIntercept().ownerId();
   }
 
   @Override
   public Object getValueIntercept(EntityBean bean) {
-    return bean._ebean_getIntercept().getOwnerId();
+    return bean._ebean_getIntercept().ownerId();
   }
 
 }

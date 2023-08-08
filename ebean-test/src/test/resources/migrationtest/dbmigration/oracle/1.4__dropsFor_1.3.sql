@@ -17,6 +17,84 @@ alter table migtest_e_history5 drop column test_boolean;
 alter table migtest_e_softdelete drop column deleted;
 alter table migtest_oto_child drop column master_id;
 -- apply post alter
+drop table drop_main cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence drop_main_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table drop_main_drop_ref_many cascade constraints purge;
+drop table drop_ref_many cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence drop_ref_many_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table drop_ref_one cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence drop_ref_one_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table migtest_e_test_binary cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_test_binary_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table migtest_e_test_json cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_test_json_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table migtest_e_test_lob cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_test_lob_seq';
+exception
+  when expected_error then null;
+end;
+$$;
+drop table migtest_e_test_varchar cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence migtest_e_test_varchar_seq';
+exception
+  when expected_error then null;
+end;
+$$;
 drop table migtest_e_user cascade constraints purge;
 delimiter $$
 declare

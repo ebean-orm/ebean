@@ -48,7 +48,7 @@ final class BitwiseExpression extends AbstractExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
     // Use DB specific expression handling
-    request.getDbPlatformHandler().bitwise(request, propName, operator, flags, compare, match);
+    request.platformHandler().bitwise(request, propName, operator, flags, compare, match);
   }
 
   @Override

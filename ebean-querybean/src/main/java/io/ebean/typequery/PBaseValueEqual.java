@@ -302,6 +302,50 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R, T> {
   }
 
   /**
+   * IN a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R inSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().inSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Not IN a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R notInSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().notInSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Equal To a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R eqSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().eqSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Not Equal To a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R neSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().neSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
    * Property is equal to the result of a sub-query.
    *
    * @param subQuery value provided by a subQuery

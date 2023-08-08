@@ -19,7 +19,7 @@ final class DefaultSlowQueryListener implements SlowQueryListener {
     String firstStack = "";
     ObjectGraphNode node = event.getOriginNode();
     if (node != null) {
-      firstStack = node.getOriginQueryPoint().getTopElement();
+      firstStack = node.origin().top();
     }
     log.log(WARNING, "Slow query warning - millis:{0} rows:{1} caller[{2}] sql[{3}]", event.getTimeMillis(), event.getRowCount(), firstStack, event.getSql());
   }

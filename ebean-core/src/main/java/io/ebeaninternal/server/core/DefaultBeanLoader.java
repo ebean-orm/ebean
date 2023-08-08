@@ -14,11 +14,9 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import javax.persistence.EntityNotFoundException;
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.Set;
 
-import static java.lang.System.Logger.Level.*;
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Helper to handle lazy loading and refreshing of beans.
@@ -41,7 +39,7 @@ final class DefaultBeanLoader {
   }
 
   void loadMany(BeanCollection<?> bc, boolean onlyIds) {
-    loadManyInternal(bc.getOwnerBean(), bc.getPropertyName(), false, onlyIds);
+    loadManyInternal(bc.owner(), bc.propertyName(), false, onlyIds);
   }
 
   void refreshMany(EntityBean parentBean, String propertyName) {
@@ -50,7 +48,7 @@ final class DefaultBeanLoader {
 
   private void loadManyInternal(EntityBean parentBean, String propertyName, boolean refresh, boolean onlyIds) {
     EntityBeanIntercept ebi = parentBean._ebean_getIntercept();
-    PersistenceContext pc = ebi.getPersistenceContext();
+    PersistenceContext pc = ebi.persistenceContext();
     BeanDescriptor<?> parentDesc = server.descriptor(parentBean.getClass());
     BeanPropertyAssocMany<?> many = (BeanPropertyAssocMany<?>) parentDesc.beanProperty(propertyName);
     BeanCollection<?> beanCollection = null;
@@ -59,7 +57,7 @@ final class DefaultBeanLoader {
     Object currentValue = many.getValue(parentBean);
     if (currentValue instanceof BeanCollection<?>) {
       beanCollection = (BeanCollection<?>) currentValue;
-      filterMany = beanCollection.getFilterMany();
+      filterMany = beanCollection.filterMany();
     }
 
     Object parentId = parentDesc.getId(parentBean);
@@ -112,7 +110,7 @@ final class DefaultBeanLoader {
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
         if (log.isLoggable(DEBUG)) {
-          log.log(DEBUG, "BeanCollection after load was empty. Owner:{0}", beanCollection.getOwnerBean());
+          log.log(DEBUG, "BeanCollection after load was empty. Owner:{0}", beanCollection.owner());
         }
       } else if (useManyIdCache) {
         final String parentKey = parentDesc.cacheKey(parentId);
@@ -125,25 +123,12 @@ final class DefaultBeanLoader {
    * Load a batch of beans for +query or +lazy loading.
    */
   void loadBean(LoadBeanRequest loadRequest) {
-    Set<EntityBeanIntercept> batch = loadRequest.batch();
-    if (batch.isEmpty()) {
+    if (loadRequest.checkEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
-
-    List<Object> idList = loadRequest.getIdList();
-    if (idList.isEmpty()) {
-      // everything was loaded from cache
-      return;
-    }
-
-    SpiQuery<?> query = server.createQuery(loadRequest.beanType());
-    loadRequest.configureQuery(query, idList);
-    final List<?> list = executeQuery(loadRequest, query);
-    final LoadBeanRequest.Result result = loadRequest.postLoad(list);
-    if (result.markedDeleted() && CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
-      String msg = MessageFormat.format("Loaded bean marked as deleted for {0} missedIds:{1} loadedIds:{2} sql:{3} list:{4}", loadRequest.beanType(), result.missedIds(), result.loadedIds(), query.getGeneratedSql(), list);
-      CoreLog.markedAsDeleted.log(DEBUG, msg, new RuntimeException("LoadBeanRequest markedAsDeleted"));
-    }
+    final SpiQuery<?> query = server.createQuery(loadRequest.beanType());
+    loadRequest.configureQuery(query);
+    loadRequest.postLoad(executeQuery(loadRequest, query));
   }
 
   /**
@@ -152,7 +137,7 @@ final class DefaultBeanLoader {
   private List<?> executeQuery(LoadRequest loadRequest, SpiQuery<?> query) {
     if (onIterateUseExtraTxn && loadRequest.isParentFindIterate()) {
       // MySql - we need a different transaction to execute the secondary query
-      SpiTransaction extraTxn = server.createReadOnlyTransaction(query.getTenantId());
+      SpiTransaction extraTxn = server.createReadOnlyTransaction(query.tenantId(), query.isUseMaster());
       try {
         return server.findList(query, extraTxn);
       } finally {
@@ -168,12 +153,12 @@ final class DefaultBeanLoader {
   }
 
   void loadBean(EntityBeanIntercept ebi) {
-    refreshBeanInternal(ebi.getOwner(), SpiQuery.Mode.LAZYLOAD_BEAN, -1);
+    refreshBeanInternal(ebi.owner(), SpiQuery.Mode.LAZYLOAD_BEAN, -1);
   }
 
   private void refreshBeanInternal(EntityBean bean, SpiQuery.Mode mode, int embeddedOwnerIndex) {
     EntityBeanIntercept ebi = bean._ebean_getIntercept();
-    PersistenceContext pc = ebi.getPersistenceContext();
+    PersistenceContext pc = ebi.persistenceContext();
     if (Mode.REFRESH_BEAN == mode) {
       // need a new PersistenceContext for REFRESH
       pc = null;
@@ -181,8 +166,8 @@ final class DefaultBeanLoader {
     BeanDescriptor<?> desc = server.descriptor(bean.getClass());
     if (EntityType.EMBEDDED == desc.entityType()) {
       // lazy loading on an embedded bean property
-      EntityBean embeddedOwner = (EntityBean) ebi.getEmbeddedOwner();
-      refreshBeanInternal(embeddedOwner, mode, ebi.getEmbeddedOwnerIndex());
+      EntityBean embeddedOwner = (EntityBean) ebi.embeddedOwner();
+      refreshBeanInternal(embeddedOwner, mode, ebi.embeddedOwnerIndex());
     }
     Object id = desc.getId(bean);
     if (pc == null) {
@@ -204,14 +189,14 @@ final class DefaultBeanLoader {
       }
     }
     SpiQuery<?> query = server.createQuery(desc.type());
-    query.setLazyLoadProperty(ebi.getLazyLoadProperty());
+    query.setLazyLoadProperty(ebi.lazyLoadProperty());
     if (draft) {
       query.asDraft();
     } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN && desc.isSoftDelete()) {
       query.setIncludeSoftDeletes();
     }
     if (embeddedOwnerIndex > -1) {
-      query.select(ebi.getProperty(embeddedOwnerIndex));
+      query.select(ebi.property(embeddedOwnerIndex));
     }
     // don't collect AutoTune usage profiling information
     // as we just copy the data out of these fetched beans

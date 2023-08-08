@@ -4,13 +4,13 @@ Overview of ebean.properties file
 
 ### DbMigration options
 
-You can set individual values for different platforms when generating migrations
+You can set individual values for different platforms when generating migrations.
 
 `dbmigration.platform.<PLATFORM>.databaseSequenceBatchSize`
 For DB's using sequences this is the number of sequence values prefetched.
  
 `dbmigration.platform.<PLATFORM>.dbuuid`
-Control, how UUID generation should work - it affects DDL which column type is generated. Possible values:
+Control, how UUID generation should work - it affects which column type is generated in DDL. Possible values:
 - BINARY enforces binary UUID 
 - VARCHAR enforces varchar UUID
 - BINARY_OPTIMIZED enforces binary-optimized UUID (makes sense only with Type1 ID)
@@ -19,7 +19,7 @@ Control, how UUID generation should work - it affects DDL which column type is g
 - AUTO_VARCHAR (default) use varchar when platform does not support UUID 
 
 `dbmigration.platform.<PLATFORM>.uuidStoreAsBinary`
-Same as setting dbuuid to BINARY
+Same as setting dbuuid to BINARY.
 
 `dbmigration.platform.<PLATFORM>.geometrySRID`
 The Geometry SRID value (default 4326).
@@ -29,7 +29,6 @@ The ID type (IDENTITY, SEQUENCE, GENERATOR, EXTERNAL)
 
 `dbmigration.platform.<PLATFORM>.mapping`
 Adjust the mapping. For example `BOOLEAN=integer(32);BIT=tinyint(3)`
-
 
 `ebean.migration.applyPrefix`
 Set this to "V" to be compatible with FlywayDB.
@@ -50,7 +49,7 @@ Set to true if the DB migration should be generated on server start.
 The version of a pending drop that should be generated as the next migration.
 
 `ebean.migration.includeGeneratedFileComment`
-TODO
+Adds the header about the migration files being generated when true. Reading 'THIS IS A GENERATED FILE - DO NOT MODIFY'
 
 `ebean.migration.metaTable`
 For running migration the DB table that holds migration execution status. Default 'db_migration'
@@ -65,17 +64,17 @@ Subdirectory the model xml files go into. Default 'model'
 Suffix. Default '.model.xml' 
 
 `ebean.migration.name`
-Description text that can be appended to the version to become the ddl script file name
+Description text that can be appended to the version to become the ddl script file name.
  
 `ebean.migration.patchInsertOn`
-migration versions that should be added to history without running.
+Migration versions that should be added to history without running.
 
 `ebean.migration.patchResetChecksumOn`
 migration versions that should have their checksum reset and not run.
 Use this if you get a 'Checksum mismatch' error.
 
 `ebean.migration.placeholders`
-A comma and equals delimited placeholders that are substituted in SQL scripts when running migration (used by DB Migration runner only).
+A comma and equals delimited map of placeholders that are substituted in SQL scripts when running migration (used by DB Migration runner only).
 
 `ebean.migration.platform`
 The database platform to generate migration DDL for.
@@ -90,7 +89,7 @@ The migration version name (typically FlywayDb compatible). Example: 1.1.1_2
 ### Ebean UUID options
 
 `ebean.uuidVersion`
-Controls, how the UUIDs are generated. Possible values
+Controls how the UUIDs are generated. Possible values:
 - VERSION4 (default) generate random V4 UUIDs,
 - VERSION1 generate rfc4122 compliant Type 1 UUIDs (requires a state file)
 - VERSION1RND generate fake Type 1 UUIDs
@@ -98,7 +97,7 @@ Controls, how the UUIDs are generated. Possible values
 Note, that V1 UUIDs in conjunction with AUTO_BINARY_OPTIMIZED will give you the best index performance, but you MUST understand how this works to avoid collisions.
 
 `ebean.uuidStateFile`
-The state file that is Required to generate V1 UUIDs
+The state file that is required to generate V1 UUIDs.
 
 
 ### DocStoreConfig
@@ -107,7 +106,7 @@ The state file that is Required to generate V1 UUIDs
 True when the Document store integration is active/on.
 
 `ebean.docstore.allowAllCertificates`
-Set to true such that the client allows connections to invalid/self signed SSL certificates.
+Set to true such that the client allows connections to invalid/self-signed SSL certificates.
 
 `ebean.docstore.bulkBatchSize`
 The default batch size to use for the Bulk API calls.
@@ -192,7 +191,7 @@ Suffix appended to the base table to derive the view that contains the union of 
 Set to true if the DataSource uses autoCommit. Indicates that Ebean should use autoCommit friendly Transactions and TransactionManager.
 
 `ebean.autoReadOnlyDataSource`
-When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig
+When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
 
 `ebean.autostart`
 Should the server start all

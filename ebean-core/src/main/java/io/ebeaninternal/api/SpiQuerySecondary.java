@@ -12,10 +12,10 @@ public interface SpiQuerySecondary {
   /**
    * Return a list of path/properties that are query join loaded.
    */
-  List<OrmQueryProperties> getQueryJoins();
+  List<OrmQueryProperties> queryJoins();
 
   /**
    * Return the list of path/properties that are lazy loaded.
    */
-  List<OrmQueryProperties> getLazyJoins();
+  List<OrmQueryProperties> lazyJoins();
 }

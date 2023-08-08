@@ -81,7 +81,10 @@ public final class BatchControl {
    */
   private int bufferMax;
 
-  private final Queue[] queues = new Queue[3];
+  private final Queue[] queues = new Queue[2];
+
+  static final int DELETE_QUEUE = 0;
+  static final int INSERT_QUEUE = 1;
 
   /**
    * Create for a given transaction, PersistExecute, default size and getGeneratedKeys.
@@ -265,10 +268,9 @@ public final class BatchControl {
   }
 
   private void flushBuffer(boolean reset) throws BatchedSqlException {
-    flushQueue(queues[0]);
     flushInternal(reset);
-    flushQueue(queues[1]);
-    flushQueue(queues[2]);
+    flushQueue(queues[DELETE_QUEUE]);
+    flushQueue(queues[INSERT_QUEUE]);
   }
 
   private void flushQueue(Queue queue) throws BatchedSqlException {

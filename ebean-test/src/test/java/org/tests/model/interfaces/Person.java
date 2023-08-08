@@ -1,9 +1,7 @@
 package org.tests.model.interfaces;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Version;
+import javax.persistence.*;
+import java.util.List;
 
 @Entity
 public class Person implements IPerson {
@@ -13,6 +11,8 @@ public class Person implements IPerson {
   @Version
   private int version;
 
+  @OneToMany(targetEntity=Address.class)
+  private List<IAddress> addresses;
   @ManyToOne(targetEntity = Address.class)
   private IAddress defaultAddress;
 
@@ -42,4 +42,11 @@ public class Person implements IPerson {
     this.version = version;
   }
 
+  public List<IAddress> getAddresses() {
+    return addresses;
+  }
+
+  public void setAddresses(List<IAddress> addresses) {
+    this.addresses = addresses;
+  }
 }

@@ -28,7 +28,7 @@ public class TestPersistContextClear extends BaseTestCase {
     try {
       ResetBasicData.createOrderCustAndOrder("testPc");
       SpiTransaction spiTxn = (SpiTransaction) t;
-      PersistenceContext pc = spiTxn.getPersistenceContext();
+      PersistenceContext pc = spiTxn.persistenceContext();
 
       // no orders or customers in the PC
       assertEquals(0, pc.size(Order.class));

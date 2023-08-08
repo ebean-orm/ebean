@@ -77,12 +77,12 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
   /**
    * Return the bean that owns this collection.
    */
-  EntityBean getOwnerBean();
+  EntityBean owner();
 
   /**
    * Return the bean property name this collection represents.
    */
-  String getPropertyName();
+  String propertyName();
 
   /**
    * Check after the lazy load that the underlying collection is not null
@@ -99,7 +99,7 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
    * This is so that the filter can be applied on refresh.
    * </p>
    */
-  ExpressionList<?> getFilterMany();
+  ExpressionList<?> filterMany();
 
   /**
    * Set the filter that was used in building this collection.
@@ -154,7 +154,7 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
   /**
    * Returns the underlying collection of beans from the Set, Map or List.
    */
-  Collection<E> getActualDetails();
+  Collection<E> actualDetails();
 
   /**
    * Returns the underlying entries so for Maps this is a collection of
@@ -162,7 +162,7 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
    * <p>
    * For maps this returns the entrySet as we need the keys of the map.
    */
-  Collection<?> getActualEntries();
+  Collection<?> actualEntries();
 
   /**
    * Returns entries, that were lazily added at the end of the list. Might be null.
@@ -202,7 +202,7 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
   /**
    * Return the current modify listening mode. Can be null for on newly created beans.
    */
-  ModifyListenMode getModifyListening();
+  ModifyListenMode modifyListening();
 
   /**
    * Add an object to the additions list.
@@ -224,13 +224,13 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
    * Return the list of objects added to the list set or map. These will used to
    * insert rows into the intersection table of a ManyToMany.
    */
-  Set<E> getModifyAdditions();
+  Set<E> modifyAdditions();
 
   /**
    * Return the list of objects removed from the list set or map. These will
    * used to delete rows from the intersection table of a ManyToMany.
    */
-  Set<E> getModifyRemovals();
+  Set<E> modifyRemovals();
 
   /**
    * Reset the set of additions and deletions. This is called after the
@@ -246,5 +246,5 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
   /**
    * Return a shallow copy of this collection that is modifiable.
    */
-  BeanCollection<E> getShallowCopy();
+  BeanCollection<E> shallowCopy();
 }

@@ -13,7 +13,7 @@ public interface BeanLoader {
   /**
    * Return the name of the associated Database.
    */
-  String getName();
+  String name();
 
   /**
    * Invoke the lazy loading for this bean.

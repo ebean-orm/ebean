@@ -18,6 +18,7 @@ public class AbstractQuery implements SpiCancelableQuery {
   private final ReentrantLock lock = new ReentrantLock();
   private boolean cancelled;
   private CancelableQuery cancelableQuery;
+  protected boolean useMaster;
 
   @Override
   public final void cancel() {

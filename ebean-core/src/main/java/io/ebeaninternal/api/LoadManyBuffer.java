@@ -31,15 +31,15 @@ public interface LoadManyBuffer {
    */
   boolean removeFromBuffer(BeanCollection<?> collection);
 
-  BeanPropertyAssocMany<?> getBeanProperty();
+  BeanPropertyAssocMany<?> beanProperty();
 
-  ObjectGraphNode getObjectGraphNode();
+  ObjectGraphNode objectGraphNode();
 
-  BeanDescriptor<?> getBeanDescriptor();
+  BeanDescriptor<?> descriptor();
 
-  PersistenceContext getPersistenceContext();
+  PersistenceContext persistenceContext();
 
-  String getFullPath();
+  String fullPath();
 
   void configureQuery(SpiQuery<?> query);
 

@@ -19,7 +19,7 @@ public final class DefaultUpdateQuery<T> implements UpdateQuery<T> {
 
   public DefaultUpdateQuery(DefaultOrmQuery<T> query) {
     this.query = query;
-    this.descriptor = query.getBeanDescriptor();
+    this.descriptor = query.descriptor();
     query.setUpdateProperties(values);
   }
 

@@ -35,7 +35,7 @@ import java.util.concurrent.Callable;
  * <h5>The 'default' Database</h5>
  * <p>
  * One Database can be designated as the 'default' or 'primary' Database
- * (see {@link DatabaseConfig#setDefaultServer(boolean)}. Many methods on DB
+ * (see {@link DatabaseConfig#setDefaultServer(boolean)}). Many methods on DB
  * such as {@link DB#find(Class)} etc are actually just a convenient way to
  * call methods on the 'default/primary' Database.
  *
@@ -166,7 +166,7 @@ public interface Database {
   /**
    * Return the BeanState for a given entity bean.
    * <p>
-   * This will return null if the bean is not an enhanced entity bean.
+   * This will throw an IllegalArgumentException if the bean is not an enhanced entity bean.
    */
   BeanState beanState(Object bean);
 

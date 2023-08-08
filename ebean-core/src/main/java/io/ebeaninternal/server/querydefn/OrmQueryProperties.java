@@ -231,7 +231,7 @@ public final class OrmQueryProperties implements Serializable {
     if (filterMany != null) {
       filterMany.applyRowLimits(query);
       SpiExpressionList<?> trimPath = filterMany.trimPath(path.length() + 1);
-      for (SpiExpression spiExpression : trimPath.getUnderlyingList()) {
+      for (SpiExpression spiExpression : trimPath.underlyingList()) {
         query.where().add(spiExpression);
       }
     }
