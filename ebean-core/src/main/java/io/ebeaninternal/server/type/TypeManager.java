@@ -12,46 +12,40 @@ import java.lang.reflect.Type;
 public interface TypeManager {
 
   /**
-   * Register a ScalarType with the system.
-   */
-  void add(ScalarType<?> scalarType);
-
-  /**
    * Return the scalar type for the given logical type.
    */
-  ScalarType<?> getScalarType(String cast);
+  ScalarType<?> type(String cast);
 
   /**
    * Return the ScalarType for a given jdbc type.
    *
    * @param jdbcType as per java.sql.Types
    */
-  ScalarType<?> getScalarType(int jdbcType);
+  ScalarType<?> type(int jdbcType);
 
   /**
    * Return the ScalarType for a given logical type.
    */
-  ScalarType<?> getScalarType(Class<?> type);
+  ScalarType<?> type(Class<?> type);
 
   /**
    * For java.util.Date and java.util.Calendar additionally pass the jdbc type
    * that you would like the ScalarType to map to. This is because these types
    * can map to different java.sql.Types depending on the property.
    */
-  ScalarType<?> getScalarType(Class<?> type, int jdbcType);
+  ScalarType<?> type(Class<?> type, int jdbcType);
 
   /**
    * Find and return the ScalarType taking into account the property type with generics.
    * <p>
    * For example Array based ScalarType for types like {@code List<String>}.
    */
-  ScalarType<?> getScalarType(Type propertyType, Class<?> type);
+  ScalarType<?> type(Type propertyType, Class<?> type);
 
   /**
-   * Create a ScalarType for an Enum using a mapping (rather than JPA Ordinal
-   * or String which has limitations).
+   * Create a ScalarType for an Enum using a mapping (rather than JPA Ordinal or String which has limitations).
    */
-  ScalarType<?> createEnumScalarType(Class<? extends Enum<?>> enumType, EnumType enumerated);
+  ScalarType<?> enumType(Class<? extends Enum<?>> enumType, EnumType enumerated);
 
   /**
    * Return the ScalarType used to handle JSON content.
@@ -59,20 +53,20 @@ public interface TypeManager {
    * Note that type expected to be JsonNode or Map.
    * </p>
    */
-  ScalarType<?> getJsonScalarType(DeployBeanProperty prop, int dbType, int dbLength);
+  ScalarType<?> dbJsonType(DeployBeanProperty prop, int dbType, int dbLength);
 
   /**
    * Return the ScalarType used to handle DB ARRAY.
    */
-  ScalarType<?> getArrayScalarType(Class<?> type, Type genericType, boolean nullable);
+  ScalarType<?> dbArrayType(Class<?> type, Type genericType, boolean nullable);
 
   /**
    * Return the ScalarType used to handle HSTORE (Map<String,String>).
    */
-  ScalarType<?> getDbMapScalarType();
+  ScalarType<?> dbMapType();
 
   /**
    * Return the Geometry type binder if provided.
    */
-  GeoTypeBinder getGeoTypeBinder();
+  GeoTypeBinder geoTypeBinder();
 }

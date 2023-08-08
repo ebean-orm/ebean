@@ -5,17 +5,13 @@ import io.ebean.Query.LockWait;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 public class HanaPlatform extends DatabasePlatform {
 
   public HanaPlatform() {
     this.platform = Platform.HANA;
-    this.sqlLimiter = new HanaSqlLimiter();
+    this.sqlLimiter = new LimitOffsetSqlLimiter();
     this.persistBatchOnCascade = PersistBatch.NONE;
     this.supportsResultSetConcurrencyModeUpdatable = false;
     this.historySupport = new HanaHistorySupport();
@@ -38,9 +34,9 @@ public class HanaPlatform extends DatabasePlatform {
     this.dbTypeMap.put(DbType.BIGINT, new DbPlatformType("bigint", false));
     this.dbTypeMap.put(DbType.BINARY, new DbPlatformType("varbinary", 255));
     this.dbTypeMap.put(DbType.BIT, new DbPlatformType("smallint", false));
-    this.dbTypeMap.put(DbType.BLOB, new DbPlatformType("blob", false));
+
     this.dbTypeMap.put(DbType.CHAR, new DbPlatformType("nvarchar", 255));
-    this.dbTypeMap.put(DbType.CLOB, new DbPlatformType("nclob", false));
+
     this.dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
     this.dbTypeMap.put(DbType.JSONVARCHAR, new DbPlatformType("nvarchar", 255));
     this.dbTypeMap.put(DbType.LINESTRING, new DbPlatformType("st_geometry"));
@@ -54,8 +50,14 @@ public class HanaPlatform extends DatabasePlatform {
     this.dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("smallint", false));
     this.dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint", false));
     this.dbTypeMap.put(DbType.UUID, new DbPlatformType("varchar", 40));
-    this.dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255));
-    this.dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255));
+
+    DbPlatformType nclob = new DbPlatformType("nclob", false);
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255, 5000, nclob));
+    this.dbTypeMap.put(DbType.CLOB, nclob);
+
+    DbPlatformType blob = new DbPlatformType("blob", false);
+    this.dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255, 5000, blob));
+    this.dbTypeMap.put(DbType.BLOB, blob);
   }
 
   @Override
@@ -93,7 +95,7 @@ public class HanaPlatform extends DatabasePlatform {
   }
 
   @Override
-  public boolean isUseMigrationStoredProcedures() {
+  public boolean useMigrationStoredProcedures() {
     return true;
   }
 }

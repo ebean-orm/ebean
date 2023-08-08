@@ -16,7 +16,7 @@ final class SqlTreePlan {
     this.dependentTables = dependentTables;
   }
 
-  SqlTreeRoot getRootNode() {
+  SqlTreeRoot rootNode() {
     return (SqlTreeRoot)rootNode;
   }
 
@@ -24,11 +24,11 @@ final class SqlTreePlan {
    * Return the property that is associated with the many. There can only be one
    * per SqlSelect. This can be null.
    */
-  STreePropertyAssocMany getManyProperty() {
+  STreePropertyAssocMany manyProperty() {
     return manyProperty;
   }
 
-  STreeProperty[] getEncryptedProps() {
+  STreeProperty[] encryptedProps() {
     return encryptedProps;
   }
 

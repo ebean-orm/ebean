@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.6.7-SNAPSHOT</version>
+    <version>13.20.2-SNAPSHOT</version>
   </parent>
 
   <name>ebean bom</name>
@@ -20,10 +20,21 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>persistence-api</artifactId>
+        <version>${ebean-persistence-api.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-annotation</artifactId>
         <version>${ebean-annotation.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-types</artifactId>
+        <version>${ebean-types.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
@@ -78,88 +89,180 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-api</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-core</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-core-type</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-joda-time</artifactId>
+        <version>13.18.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-jackson-jsonnode</artifactId>
+        <version>13.18.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-jackson-mapper</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-ddl-generator</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-externalmapping-api</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.18.0</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-externalmapping-xml</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.18.0</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-autotune</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.18.0</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-querybean</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>querybean-generator</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
         <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>kotlin-querybean-generator</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
         <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-test</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
         <scope>test</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-postgis</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-redis</artifactId>
-        <version>13.6.7-SNAPSHOT</version>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-spring-txn</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <!-- platforms -->
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-clickhouse</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-db2</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-h2</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-hana</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-mariadb</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-mysql</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-nuodb</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-oracle</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-postgres</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-sqlite</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-sqlserver</artifactId>
+        <version>13.20.2-SNAPSHOT</version>
       </dependency>
 
     </dependencies>

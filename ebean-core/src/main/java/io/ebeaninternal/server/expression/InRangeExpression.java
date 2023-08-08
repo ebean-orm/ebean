@@ -3,6 +3,7 @@ package io.ebeaninternal.server.expression;
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
 
@@ -32,13 +33,29 @@ final class InRangeExpression extends AbstractExpression {
 
   @Override
   public void addBindValues(SpiExpressionRequest request) {
+    ElPropertyValue prop = getElProp(request);
+    if (prop != null && prop.isDbEncrypted()) {
+      // bind the key twice, for both values
+      String encryptKey = prop.beanProperty().encryptKey().getStringValue();
+      request.addBindEncryptKey(encryptKey);
+      request.addBindValue(low());
+      request.addBindEncryptKey(encryptKey);
+      request.addBindValue(high());
+      return;
+    }
     request.addBindValue(low());
     request.addBindValue(high());
+
   }
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.append("(").append(propName).append(" >= ? and ").append(propName).append(" < ?)");
+    String pname = propName;
+    ElPropertyValue prop = getElProp(request);
+    if (prop != null && prop.isDbEncrypted()) {
+      pname = prop.beanProperty().decryptProperty(propName);
+    }
+    request.append("(").property(pname).append(" >= ? and ").property(pname).append(" < ?)");
   }
 
   @Override

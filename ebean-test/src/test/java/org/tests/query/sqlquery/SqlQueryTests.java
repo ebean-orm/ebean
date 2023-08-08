@@ -11,6 +11,7 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -22,11 +23,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class SqlQueryTests extends BaseTestCase {
+class SqlQueryTests extends BaseTestCase {
 
   @ForPlatform(Platform.H2)
   @Test
-  public void selectBindNull_byPos() {
+  void selectBindNull_byPos() {
     String sql = "select nvl(cast(? as int), 42)";
     final Long val = DB.sqlQuery(sql)
       .setNullParameter(1, Types.INTEGER)
@@ -38,7 +39,7 @@ public class SqlQueryTests extends BaseTestCase {
 
   @ForPlatform(Platform.H2)
   @Test
-  public void selectBindNull_byName() {
+  void selectBindNull_byName() {
     String sql = "select nvl(cast(:val as int), 42)";
     final Long val = DB.sqlQuery(sql)
       .setNullParameter("val", Types.INTEGER)
@@ -50,7 +51,7 @@ public class SqlQueryTests extends BaseTestCase {
 
   @ForPlatform(Platform.H2)
   @Test
-  public void selectBindNull_usingSetParameter_ByPosition() {
+  void selectBindNull_usingSetParameter_ByPosition() {
     String sql = "select nvl(cast(? as int), 42)";
     final Long val = DB.sqlQuery(sql)
       .setParameter(1, null)
@@ -62,7 +63,7 @@ public class SqlQueryTests extends BaseTestCase {
 
   @ForPlatform(Platform.H2)
   @Test
-  public void selectBindNull_usingSetParameter_byName() {
+  void selectBindNull_usingSetParameter_byName() {
     String sql = "select nvl(cast(:val as int), 42)";
     final Long val = DB.sqlQuery(sql)
       .setParameter("val", null)
@@ -74,8 +75,7 @@ public class SqlQueryTests extends BaseTestCase {
 
   @ForPlatform(Platform.H2)
   @Test
-  public void selectFunction() {
-
+  void selectFunction() {
     String sql = "select length(?)";
     final Long val = DB.sqlQuery(sql).setParameter("NotVeryLong").mapToScalar(Long.class).findOne();
     assertThat(val).isEqualTo(11);
@@ -86,8 +86,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttributeList_decimal() {
-
+  void findSingleAttributeList_decimal() {
     ResetBasicData.reset();
 
     String sql = "select (unit_price * order_qty) from o_order_detail where unit_price > ? order by (unit_price * order_qty) desc";
@@ -101,8 +100,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttributeEach_decimal() {
-
+  void findSingleAttributeEach_decimal() {
     ResetBasicData.reset();
 
     String sql = "select (unit_price * order_qty) from o_order_detail where unit_price > ? order by (unit_price * order_qty) desc";
@@ -123,8 +121,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findSingleDecimal() {
-
+  void findSingleDecimal() {
     ResetBasicData.reset();
 
     String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
@@ -138,8 +135,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttribute_BigDecimal() {
-
+  void findSingleAttribute_BigDecimal() {
     ResetBasicData.reset();
 
     String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
@@ -153,12 +149,10 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findSingleLong() {
-
+  void findSingleLong() {
     ResetBasicData.reset();
 
     String sql = "select count(order_qty) from o_order_detail where unit_price > ?";
-
     long count = DB.sqlQuery(sql)
       .setParameter(1, 2)
       .mapToScalar(Long.class)
@@ -167,14 +161,11 @@ public class SqlQueryTests extends BaseTestCase {
     assertThat(count).isGreaterThan(0);
   }
 
-
   @Test
-  public void findSingleAttribute_long() {
-
+  void findSingleAttribute_long() {
     ResetBasicData.reset();
 
     String sql = "select count(order_qty) from o_order_detail where unit_price > ?";
-
     long count = DB.sqlQuery(sql)
       .setParameter(1, 2)
       .mapToScalar(Long.class).findOne();
@@ -183,17 +174,41 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findSingleAttribute_OffsetDateTime() {
-
+  void findSingleAttribute_OffsetDateTime() {
     ResetBasicData.reset();
 
     String sql = "select min(updtime) from o_order_detail where unit_price > ? and updtime is not null";
-
     OffsetDateTime minCreated = DB.sqlQuery(sql)
       .setParameter(1, 2)
       .mapToScalar(OffsetDateTime.class).findOne();
 
     assertThat(minCreated).isBefore(OffsetDateTime.now());
+  }
+
+  @Test
+  void typeQuery_usingTransaction() throws SQLException {
+    ResetBasicData.reset();
+    boolean h2 = isH2();
+
+    String sql = "select max(unit_price) from o_order_detail where order_qty > ?";
+    try (Transaction transaction = DB.createTransaction()) {
+      String h2SessionId = h2 ? h2SessionId(transaction) : null;
+
+      BigDecimal maxPrice = DB.sqlQuery(sql)
+        .setParameter(1, 2)
+        .mapToScalar(BigDecimal.class)
+        .usingTransaction(transaction)
+        .findOne();
+
+      if (h2) {
+        var result = DB.sqlQuery("select 'hello-'||session_id()")
+          .mapToScalar(String.class)
+          .usingTransaction(transaction)
+          .findOne();
+        assertThat(result).isEqualTo("hello-" + h2SessionId);
+      }
+      assertThat(maxPrice).isNotNull();
+    }
   }
 
   static class CustDto {
@@ -224,13 +239,89 @@ public class SqlQueryTests extends BaseTestCase {
 
   private static final CustMapper CUST_MAPPER = new CustMapper();
 
-  @Test
-  public void findEach_mapper() {
+  private String h2SessionId(Transaction transaction) throws SQLException {
+    if (isH2()) {
+      try (PreparedStatement stmt = transaction.connection().prepareStatement("select session_id()")) {
+        try (ResultSet rset = stmt.executeQuery()) {
+          if (rset.next()) {
+            return rset.getString(1);
+          }
+        }
+      }
+    }
+    return null;
+  }
 
+  @Test
+  void queryUsingMaster() {
     ResetBasicData.reset();
 
     String sql = "select id, name, status from o_customer where name is not null";
+    List<CustDto> custDtos = DB.sqlQuery(sql)
+      .usingMaster()
+      .mapTo(CUST_MAPPER)
+      .findList();
 
+    assertThat(custDtos).isNotEmpty();
+  }
+
+  @Test
+  void queryUsingTransaction() throws SQLException {
+    ResetBasicData.reset();
+    boolean h2 = isH2();
+
+    String sql = h2 ? "select id, name||session_id(), status from o_customer where name is not null"
+      : "select id, name, status from o_customer where name is not null";
+
+    try (Transaction txn = DB.createTransaction()) {
+      String h2SessionId = h2 ? h2SessionId(txn) : null;
+
+      AtomicInteger counter = new AtomicInteger();
+      DB.sqlQuery(sql)
+        .usingTransaction(txn)
+        .mapTo(CUST_MAPPER)
+        .findEach(custDto -> {
+          counter.incrementAndGet();
+          assertThat(custDto.name).isNotNull();
+          if (h2) {
+            assertThat(custDto.name).endsWith(h2SessionId);
+          }
+        });
+
+      assertThat(counter.get()).isGreaterThan(0);
+    }
+  }
+
+  @Test
+  void mapperUsingTransaction() throws SQLException {
+    ResetBasicData.reset();
+    boolean h2 = isH2();
+    String sql = h2 ? "select id, name||session_id() as name, status from o_customer where name is not null"
+      : "select id, name, status from o_customer where name is not null";
+    try (Transaction txn = DB.createTransaction()) {
+      String h2SessionId = h2 ? h2SessionId(txn) : null;
+
+      AtomicInteger counter = new AtomicInteger();
+      DB.sqlQuery(sql)
+        .mapTo(CUST_MAPPER)
+        .usingTransaction(txn)
+        .findEach(custDto -> {
+          counter.incrementAndGet();
+          assertThat(custDto.name).isNotNull();
+          if (h2) {
+            assertThat(custDto.name).endsWith(h2SessionId);
+          }
+        });
+
+      assertThat(counter.get()).isGreaterThan(0);
+    }
+  }
+
+  @Test
+  void findEach_mapper() {
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer where name is not null";
     AtomicInteger counter = new AtomicInteger();
     DB.sqlQuery(sql)
       .mapTo(CUST_MAPPER)
@@ -243,12 +334,10 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findOne_mapper() {
-
+  void findOne_mapper() {
     ResetBasicData.reset();
 
     String sql = "select id, name, status from o_customer where name = ?";
-
     CustDto rob = DB.sqlQuery(sql)
       .setParameter("Rob")
       .mapTo(CUST_MAPPER)
@@ -258,12 +347,10 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findList_mapper() {
-
+  void findList_mapper() {
     ResetBasicData.reset();
 
     String sql = "select id, name, status from o_customer order by name desc";
-
     List<CustDto> dtos = DB.sqlQuery(sql)
       .mapTo(CUST_MAPPER)
       .findList();
@@ -272,12 +359,10 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findEachRow() {
-
+  void findEachRow() {
     ResetBasicData.reset();
 
     String sql = "select id, name, status from o_customer order by name desc";
-
     AtomicLong count = new AtomicLong();
 
     DB.sqlQuery(sql)
@@ -294,12 +379,10 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findOne_mapper_lambda() {
-
+  void findOne_mapper_lambda() {
     ResetBasicData.reset();
 
     String sql = "select max(id) from o_customer where name != ?";
-
     long maxId = DB.sqlQuery(sql)
       .setParameter("Rob")
       .mapTo((resultSet, rowNum) -> resultSet.getLong(1))
@@ -309,8 +392,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void newline_replacedInLogsOnly() {
-
+  void newline_replacedInLogsOnly() {
     ResetBasicData.reset();
 
     String sql = "select * -- \n from o_customer";
@@ -321,8 +403,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void newLineLiteral_replacedInLogsOnly() {
-
+  void newLineLiteral_replacedInLogsOnly() {
     ResetBasicData.reset();
 
     String sql = "select 'hello\nthere' as hello from o_customer";
@@ -335,8 +416,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void firstRowMaxRows() {
-
+  void firstRowMaxRows() {
     ResetBasicData.reset();
 
     SqlQuery sqlQuery = DB.sqlQuery("Select * from o_order");
@@ -362,7 +442,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void firstRow() {
+  void firstRow() {
     if (isPostgresCompatible()) {
 
       ResetBasicData.reset();
@@ -379,8 +459,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void maxRows() {
-
+  void maxRows() {
     ResetBasicData.reset();
 
     SqlQuery sqlQuery = DB.sqlQuery("Select * from o_order order by id");
@@ -400,8 +479,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void maxRows_withParam() {
-
+  void maxRows_withParam() {
     ResetBasicData.reset();
 
     resetAllMetrics();
@@ -428,8 +506,7 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findEachMaxRows() {
-
+  void findEachMaxRows() {
     ResetBasicData.reset();
 
     resetAllMetrics();
@@ -456,14 +533,12 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findEach() {
-
+  void findEach() {
     ResetBasicData.reset();
 
     int expectedRows = DB.find(Order.class).findCount();
 
     final AtomicInteger count = new AtomicInteger();
-
     SqlQuery sqlQuery = DB.sqlQuery("select * from o_order");
     sqlQuery.findEach(bean -> count.incrementAndGet());
 
@@ -471,12 +546,10 @@ public class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
-  public void findEachWhile() {
-
+  void findEachWhile() {
     ResetBasicData.reset();
 
     final AtomicInteger count = new AtomicInteger();
-
     SqlQuery sqlQuery = DB.sqlQuery("select * from o_order order by id");
     sqlQuery.findEachWhile(bean -> {
       count.incrementAndGet();

@@ -21,36 +21,36 @@ create table migtest_ckey_parent (
 );
 
 create table migtest_fk_cascade (
-  id                            numeric(19) identity(1,1) not null,
-  one_id                        numeric(19),
+  id                            bigint identity(1,1) not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_cascade primary key (id)
 );
 
 create table migtest_fk_cascade_one (
-  id                            numeric(19) identity(1,1) not null,
+  id                            bigint identity(1,1) not null,
   constraint pk_migtest_fk_cascade_one primary key (id)
 );
 
 create table migtest_fk_none (
-  id                            numeric(19) identity(1,1) not null,
-  one_id                        numeric(19),
+  id                            bigint identity(1,1) not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_none primary key (id)
 );
 
 create table migtest_fk_none_via_join (
-  id                            numeric(19) identity(1,1) not null,
-  one_id                        numeric(19),
+  id                            bigint identity(1,1) not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_none_via_join primary key (id)
 );
 
 create table migtest_fk_one (
-  id                            numeric(19) identity(1,1) not null,
+  id                            bigint identity(1,1) not null,
   constraint pk_migtest_fk_one primary key (id)
 );
 
 create table migtest_fk_set_null (
-  id                            numeric(19) identity(1,1) not null,
-  one_id                        numeric(19),
+  id                            bigint identity(1,1) not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_set_null primary key (id)
 );
 
@@ -152,6 +152,7 @@ create table [table] (
   [to]                          varchar(255),
   [varchar]                     varchar(255),
   [foreign]                     varchar(255),
+  textfield                     varchar(255) not null,
   constraint pk_table primary key ([index])
 );
 
@@ -162,7 +163,7 @@ create table migtest_mtm_c (
 );
 
 create table migtest_mtm_m (
-  id                            numeric(19) identity(1,1) not null,
+  id                            bigint identity(1,1) not null,
   name                          varchar(255),
   constraint pk_migtest_mtm_m primary key (id)
 );
@@ -174,7 +175,7 @@ create table migtest_oto_child (
 );
 
 create table migtest_oto_master (
-  id                            numeric(19) identity(1,1) not null,
+  id                            bigint identity(1,1) not null,
   name                          varchar(255),
   constraint pk_migtest_oto_master primary key (id)
 );

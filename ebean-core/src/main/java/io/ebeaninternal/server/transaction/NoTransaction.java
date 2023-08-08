@@ -41,7 +41,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public String getLabel() {
+  public String label() {
     return null;
   }
 
@@ -56,7 +56,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public long getStartNanoTime() {
+  public long startNanoTime() {
     // not used
     return System.nanoTime();
   }
@@ -78,10 +78,14 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void rollback() throws PersistenceException {
+  public void rollbackAndContinue() {
     // do nothing
   }
 
+  @Override
+  public void rollback() throws PersistenceException {
+    // do nothing
+  }
 
   @Override
   public void rollback(Throwable e) throws PersistenceException {
@@ -113,10 +117,6 @@ final class NoTransaction implements SpiTransaction {
     // do nothing
   }
 
-  @Override
-  public String getLogPrefix() {
-    return null;
-  }
 
   @Override
   public boolean isLogSql() {
@@ -129,12 +129,17 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void logSql(String msg) {
+  public void logSql(String msg, Object... args) {
 
   }
 
   @Override
-  public void logSummary(String msg) {
+  public void logSummary(String msg, Object... args) {
+
+  }
+
+  @Override
+  public void logTxn(String msg, Object... args) {
 
   }
 
@@ -163,7 +168,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public String getId() {
+  public String id() {
     return null;
   }
 
@@ -173,7 +178,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public DocStoreMode getDocStoreMode() {
+  public DocStoreMode docStoreMode() {
     return null;
   }
 
@@ -312,7 +317,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public TransactionEvent getEvent() {
+  public TransactionEvent event() {
     return null;
   }
 
@@ -327,7 +332,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public BatchControl getBatchControl() {
+  public BatchControl batchControl() {
     return null;
   }
 
@@ -336,7 +341,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public SpiPersistenceContext getPersistenceContext() {
+  public SpiPersistenceContext persistenceContext() {
     return null;
   }
 
@@ -345,7 +350,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public Connection getInternalConnection() {
+  public Connection internalConnection() {
     return null;
   }
 
@@ -393,7 +398,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public DocStoreTransaction getDocStoreTransaction() {
+  public DocStoreTransaction docStoreTransaction() {
     return null;
   }
 
@@ -402,7 +407,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public Object getTenantId() {
+  public Object tenantId() {
     return null;
   }
 
@@ -429,7 +434,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public ProfileLocation profileLocation() {
     return null;
   }
 }

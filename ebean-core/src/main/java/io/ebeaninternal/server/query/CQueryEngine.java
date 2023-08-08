@@ -3,6 +3,7 @@ package io.ebeaninternal.server.query;
 import io.ebean.QueryIterator;
 import io.ebean.ValuePair;
 import io.ebean.Version;
+import io.ebean.annotation.Platform;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
@@ -10,16 +11,13 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.JdbcClose;
 import io.ebean.util.StringHelper;
-import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.DiffHelp;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.Binder;
-import org.slf4j.Logger;
 
 import javax.persistence.PersistenceException;
 import java.sql.ResultSet;
@@ -31,29 +29,27 @@ import java.util.*;
  */
 public final class CQueryEngine {
 
-  private static final Logger log = CoreLog.log;
-
   private static final String T0 = "t0";
 
   private final int defaultFetchSizeFindList;
-
   private final int defaultFetchSizeFindEach;
-
   private final boolean forwardOnlyHintOnFindIterate;
-
   private final CQueryBuilder queryBuilder;
-
   private final CQueryHistorySupport historySupport;
-
   private final DatabasePlatform dbPlatform;
 
   public CQueryEngine(DatabaseConfig config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
     this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = config.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();
-    this.forwardOnlyHintOnFindIterate = dbPlatform.isForwardOnlyHintOnFindIterate();
-    this.historySupport = new CQueryHistorySupport(dbPlatform.getHistorySupport(), asOfTableMapping, config.getAsOfSysPeriod());
+    this.forwardOnlyHintOnFindIterate = dbPlatform.forwardOnlyHintOnFindIterate();
+    this.historySupport = new CQueryHistorySupport(dbPlatform.historySupport(), asOfTableMapping, config.getAsOfSysPeriod());
     this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
+  }
+
+  public int forwardOnlyFetchSize() {
+    Platform base = dbPlatform.platform().base();
+    return Platform.MYSQL == base ? Integer.MIN_VALUE : 1;
   }
 
   public <T> CQuery<T> buildQuery(OrmQueryRequest<T> request) {
@@ -76,11 +72,11 @@ public final class CQueryEngine {
     try {
       int rows = query.execute();
       if (request.logSql()) {
-        request.logSql(Str.add(query.getGeneratedSql(), "; --bind(", query.getBindLog(), ") --micros(", query.micros() + ") --rows(", rows + ")"));
+        request.logSql("{0}; --bind({1}) --micros({2}) --rows({3})", query.generatedSql(), query.bindLog(), query.micros(), rows);
       }
       return rows;
     } catch (SQLException e) {
-      throw translate(request, query.getBindLog(), query.getGeneratedSql(), e);
+      throw translate(request, query.bindLog(), query.generatedSql(), e);
     }
   }
 
@@ -98,13 +94,13 @@ public final class CQueryEngine {
     try {
       rcQuery.findCollection(collection);
       if (request.logSql()) {
-        logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
+        logGeneratedSql(request, rcQuery.generatedSql(), rcQuery.bindLog(), rcQuery.micros());
       }
       if (request.logSummary()) {
-        request.transaction().logSummary(rcQuery.getSummary());
+        request.transaction().logSummary(rcQuery.summary());
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.getDependentTables());
+        request.addDependentTables(rcQuery.dependentTables());
         if (collection instanceof List) {
           collection = (A) Collections.unmodifiableList((List<?>) collection);
           request.putToQueryCache(collection);
@@ -121,7 +117,7 @@ public final class CQueryEngine {
       }
       return collection;
     } catch (SQLException e) {
-      throw translate(request, rcQuery.getBindLog(), rcQuery.getGeneratedSql(), e);
+      throw translate(request, rcQuery.bindLog(), rcQuery.generatedSql(), e);
     }
   }
 
@@ -132,14 +128,12 @@ public final class CQueryEngine {
     SpiTransaction t = request.transaction();
     if (t.isLogSummary()) {
       // log the error to the transaction log
-      String msg = "ERROR executing query, bindLog[" + bindLog + "] error[" + StringHelper.removeNewLines(e.getMessage()) + "]";
-      t.logSummary(msg);
+      t.logSummary("ERROR executing query, bindLog[{0}] error:{1}", bindLog, StringHelper.removeNewLines(e.getMessage()));
     }
     // ensure 'rollback' is logged if queryOnly transaction
     t.connection();
     // build a decent error message for the exception
-    String m = "Query threw SQLException:" + e.getMessage() + " Bind values:[" + bindLog + "] Query was:" + sql;
-    return dbPlatform.translate(m, e);
+    return dbPlatform.translate("Query threw SQLException:" + e.getMessage() + " Bind values:[" + bindLog + "] Query was:" + sql, e);
   }
 
   /**
@@ -152,7 +146,7 @@ public final class CQueryEngine {
   }
 
   private <T> void logGeneratedSql(OrmQueryRequest<T> request, String sql, String bindLog, long micros) {
-    request.logSql(Str.add(sql, "; --bind(", bindLog, ") --micros(", micros + ")"));
+    request.logSql("{0}; --bind({1}) --micros({2})", sql, bindLog, micros);
   }
 
   /**
@@ -164,21 +158,21 @@ public final class CQueryEngine {
     try {
       int count = rcQuery.findCount();
       if (request.logSql()) {
-        logGeneratedSql(request, rcQuery.getGeneratedSql(), rcQuery.getBindLog(), rcQuery.micros());
+        logGeneratedSql(request, rcQuery.generatedSql(), rcQuery.bindLog(), rcQuery.micros());
       }
       if (request.logSummary()) {
-        request.transaction().logSummary(rcQuery.getSummary());
+        request.transaction().logSummary(rcQuery.summary());
       }
       if (request.query().isFutureFetch()) {
         request.transaction().end();
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.getDependentTables());
+        request.addDependentTables(rcQuery.dependentTables());
         request.putToQueryCache(count);
       }
       return count;
     } catch (SQLException e) {
-      throw translate(request, rcQuery.getBindLog(), rcQuery.getGeneratedSql(), e);
+      throw translate(request, rcQuery.bindLog(), rcQuery.generatedSql(), e);
     }
   }
 
@@ -195,7 +189,6 @@ public final class CQueryEngine {
       }
       if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
-        log.trace("Future fetch already cancelled");
         return null;
       }
       if (request.logSql()) {
@@ -205,7 +198,7 @@ public final class CQueryEngine {
       int iterateBufferSize = request.secondaryQueriesMinBatchSize();
       if (iterateBufferSize < 1) {
         // not set on query joins so check if batch size set on query itself
-        int queryBatch = request.query().getLazyLoadBatchSize();
+        int queryBatch = request.query().lazyLoadBatchSize();
         if (queryBatch > 0) {
           iterateBufferSize = queryBatch;
         } else {
@@ -242,8 +235,8 @@ public final class CQueryEngine {
     SpiQuery<T> query = request.query();
     String sysPeriodLower = getSysPeriodLower(query);
     if (query.isVersionsBetween() && !historySupport.isStandardsBased()) {
-      query.where().lt(sysPeriodLower, query.getVersionEnd());
-      query.where().geOrNull(getSysPeriodUpper(query), query.getVersionStart());
+      query.where().lt(sysPeriodLower, query.versionEnd());
+      query.where().geOrNull(getSysPeriodUpper(query), query.versionStart());
     }
 
     // order by lower sys period desc
@@ -271,9 +264,7 @@ public final class CQueryEngine {
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
     } finally {
-      if (cquery != null) {
-        cquery.close();
-      }
+      cquery.close();
     }
   }
 
@@ -299,11 +290,11 @@ public final class CQueryEngine {
   }
 
   private <T> String getSysPeriodLower(SpiQuery<T> query) {
-    return historySupport.getSysPeriodLower(query.getAlias(T0));
+    return historySupport.sysPeriodLower(query.getAlias(T0));
   }
 
   private <T> String getSysPeriodUpper(SpiQuery<T> query) {
-    return historySupport.getSysPeriodUpper(query.getAlias(T0));
+    return historySupport.sysPeriodUpper(query.getAlias(T0));
   }
 
   /**
@@ -331,10 +322,10 @@ public final class CQueryEngine {
       if (request.logSql()) {
         logSql(cquery);
       }
-      return new SpiResultSet(cquery.getPstmt(), resultSet);
+      return new SpiResultSet(cquery.pstmt(), resultSet);
 
     } catch (SQLException e) {
-      JdbcClose.close(cquery.getPstmt());
+      JdbcClose.close(cquery.pstmt());
       throw cquery.createPersistenceException(e);
     }
   }
@@ -351,7 +342,6 @@ public final class CQueryEngine {
       }
       if (!cquery.prepareBindExecuteQuery()) {
         // query has been cancelled already
-        log.trace("Future fetch already cancelled");
         return null;
       }
       if (request.logSql()) {
@@ -366,16 +356,14 @@ public final class CQueryEngine {
       }
       request.executeSecondaryQueries(false);
       if (request.isQueryCachePut()) {
-        request.addDependentTables(cquery.getDependentTables());
+        request.addDependentTables(cquery.dependentTables());
       }
       return beanCollection;
 
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);
     } finally {
-      if (cquery != null) {
-        cquery.close();
-      }
+      cquery.close();
     }
   }
 
@@ -414,23 +402,23 @@ public final class CQueryEngine {
    * Log the generated SQL to the transaction log.
    */
   private void logSql(CQuery<?> query) {
-    query.getTransaction().logSql(Str.add(query.getGeneratedSql(), "; --bind(", query.getBindLog(), ") --micros(", query.micros() + ")"));
+    query.transaction().logSql("{0}; --bind({1}) --micros({2})", query.generatedSql(), query.bindLog(), query.micros());
   }
 
   /**
    * Log the FindById summary to the transaction log.
    */
   private void logFindBeanSummary(CQuery<?> q) {
-    SpiQuery<?> query = q.getQueryRequest().query();
-    String loadMode = query.getLoadMode();
-    String loadDesc = query.getLoadDescription();
-    String lazyLoadProp = query.getLazyLoadProperty();
-    ObjectGraphNode node = query.getParentNode();
+    SpiQuery<?> query = q.request().query();
+    String loadMode = query.loadMode();
+    String loadDesc = query.loadDescription();
+    String lazyLoadProp = query.lazyLoadProperty();
+    ObjectGraphNode node = query.parentNode();
     String originKey;
-    if (node == null || node.getOriginQueryPoint() == null) {
+    if (node == null || node.origin() == null) {
       originKey = null;
     } else {
-      originKey = node.getOriginQueryPoint().getKey();
+      originKey = node.origin().key();
     }
 
     StringBuilder msg = new StringBuilder(200);
@@ -438,7 +426,7 @@ public final class CQueryEngine {
     if (loadMode != null) {
       msg.append("mode[").append(loadMode).append("] ");
     }
-    msg.append("type[").append(q.getBeanName()).append("] ");
+    msg.append("type[").append(q.beanName()).append("] ");
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
@@ -454,27 +442,27 @@ public final class CQueryEngine {
     if (loadDesc != null) {
       msg.append("load[").append(loadDesc).append("] ");
     }
-    msg.append("exeMicros[").append(q.getQueryExecutionTimeMicros());
-    msg.append("] rows[").append(q.getLoadedRowDetail());
-    msg.append("] bind[").append(q.getBindLog()).append("]");
-    q.getTransaction().logSummary(msg.toString());
+    msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
+    msg.append("] rows[").append(q.loadedRowDetail());
+    msg.append("] bind[").append(q.bindLog()).append("]");
+    q.transaction().logSummary(msg.toString());
   }
 
   /**
    * Log the FindMany to the transaction log.
    */
   private void logFindManySummary(CQuery<?> q) {
-    SpiQuery<?> query = q.getQueryRequest().query();
-    String loadMode = query.getLoadMode();
-    String loadDesc = query.getLoadDescription();
-    String lazyLoadProp = query.getLazyLoadProperty();
-    ObjectGraphNode node = query.getParentNode();
+    SpiQuery<?> query = q.request().query();
+    String loadMode = query.loadMode();
+    String loadDesc = query.loadDescription();
+    String lazyLoadProp = query.lazyLoadProperty();
+    ObjectGraphNode node = query.parentNode();
 
     String originKey;
-    if (node == null || node.getOriginQueryPoint() == null) {
+    if (node == null || node.origin() == null) {
       originKey = null;
     } else {
-      originKey = node.getOriginQueryPoint().getKey();
+      originKey = node.origin().key();
     }
 
     StringBuilder msg = new StringBuilder(200);
@@ -482,7 +470,7 @@ public final class CQueryEngine {
     if (loadMode != null) {
       msg.append("mode[").append(loadMode).append("] ");
     }
-    msg.append("type[").append(q.getBeanName()).append("] ");
+    msg.append("type[").append(q.beanName()).append("] ");
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
@@ -498,10 +486,10 @@ public final class CQueryEngine {
     if (loadDesc != null) {
       msg.append("load[").append(loadDesc).append("] ");
     }
-    msg.append("exeMicros[").append(q.getQueryExecutionTimeMicros());
-    msg.append("] rows[").append(q.getLoadedRowDetail());
-    msg.append("] predicates[").append(q.getLogWhereSql());
-    msg.append("] bind[").append(q.getBindLog()).append("]");
-    q.getTransaction().logSummary(msg.toString());
+    msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
+    msg.append("] rows[").append(q.loadedRowDetail());
+    msg.append("] predicates[").append(q.logWhereSql());
+    msg.append("] bind[").append(q.bindLog()).append("]");
+    q.transaction().logSummary(msg.toString());
   }
 }

@@ -107,7 +107,7 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = alterColumn(pgDdl, alter);
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
-      + "alter table mytab alter column acol type varchar(50) using acol::varchar(50);\n"
+      + "alter table mytab alter column acol type varchar(50);\n"
       + "alter table mytab alter column acol set default 'hi';\n"
       + "alter table mytab alter column acol set not null;\n");
 
@@ -175,7 +175,8 @@ public class PlatformDdl_AlterColumnTest {
     sql = alterColumn(db2Ddl, alter);
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab alter column acol drop default;\n"
-      + "alter table mytab alter column acol drop not null;\n");
+      + "alter table mytab alter column acol drop not null;\n"
+      + "call sysproc.admin_cmd('reorg table mytab');\n");
 
   }
 
@@ -319,7 +320,8 @@ public class PlatformDdl_AlterColumnTest {
 
     sql = alterColumn(db2Ddl, alter);
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
-      + "alter table mytab alter column acol drop not null;\n");
+      + "alter table mytab alter column acol drop not null;\n"
+      + "call sysproc.admin_cmd('reorg table mytab');\n");
   }
 
   @Test

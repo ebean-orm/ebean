@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import io.ebean.ExpressionList;
 import io.ebean.ProfileLocation;
+import io.ebean.Query;
 import io.ebean.UpdateQuery;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -18,7 +19,7 @@ public final class DefaultUpdateQuery<T> implements UpdateQuery<T> {
 
   public DefaultUpdateQuery(DefaultOrmQuery<T> query) {
     this.query = query;
-    this.descriptor = query.getBeanDescriptor();
+    this.descriptor = query.descriptor();
     query.setUpdateProperties(values);
   }
 
@@ -32,6 +33,16 @@ public final class DefaultUpdateQuery<T> implements UpdateQuery<T> {
       values.set(property, value, scalarType);
     }
     return this;
+  }
+
+  @Override
+  public <P> UpdateQuery<T> set(Query.Property<P> property, P value) {
+    return set(property.toString(), value);
+  }
+
+  @Override
+  public UpdateQuery<T> setNull(Query.Property<?> property) {
+    return setNull(property.toString());
   }
 
   @Override

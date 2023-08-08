@@ -11,9 +11,7 @@ import java.sql.SQLException;
 final class CQueryIteratorSimple<T> implements QueryIterator<T> {
 
   private final CQuery<T> cquery;
-
   private final OrmQueryRequest<T> request;
-
   private boolean closed;
 
   CQueryIteratorSimple(CQuery<T> cquery, OrmQueryRequest<T> request) {

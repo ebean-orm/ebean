@@ -12,14 +12,11 @@ import java.util.Stack;
 /**
  * Builds the DocumentMapping for a given bean type.
  */
-public class DocMappingBuilder {
+public final class DocMappingBuilder {
 
   private final PathProperties paths;
-
   private final DocStore docStore;
-
   private final Stack<DocPropertyMapping> properties = new Stack<>();
-
   private final Map<String, DocPropertyMapping> map = new LinkedHashMap<>();
 
   /**
@@ -49,12 +46,11 @@ public class DocMappingBuilder {
    * Add the property mapping.
    */
   public void add(DocPropertyMapping docMapping) {
-
     DocPropertyMapping currentParent = properties.peek();
     currentParent.addChild(docMapping);
 
-    String parentName = currentParent.getName();
-    String fullName = SplitName.add(parentName, docMapping.getName());
+    String parentName = currentParent.name();
+    String fullName = SplitName.add(parentName, docMapping.name());
     map.put(fullName, docMapping);
   }
 
@@ -82,7 +78,6 @@ public class DocMappingBuilder {
   }
 
   private void applyFieldMapping(DocMapping docMapping) {
-
     DocPropertyMapping mapping = map.get(docMapping.name());
     if (mapping == null) {
       throw new IllegalStateException("DocMapping for [" + docMapping.name() + "] but property not included in document?");
@@ -94,19 +89,16 @@ public class DocMappingBuilder {
    * Collect the mapping of properties to 'raw' properties for those marked as sortable.
    */
   public Map<String, String> collectSortable() {
-
     DocPropertyMapping peek = properties.peek();
     SortableVisitor visitor = new SortableVisitor();
     peek.visit(visitor);
-
-    return visitor.getSortableMap();
+    return visitor.sortableMap();
   }
 
   /**
    * Create the document mapping.
    */
   public DocumentMapping create(String queueId, String indexName, String indexType) {
-
     int shards = docStore.shards();
     int replicas = docStore.replicas();
     DocPropertyMapping root = properties.peek();
@@ -119,19 +111,18 @@ public class DocMappingBuilder {
    */
   private static class SortableVisitor extends DocPropertyAdapter {
 
-    private Map<String, String> sortableMap = new LinkedHashMap<>();
+    private final Map<String, String> sortableMap = new LinkedHashMap<>();
 
     @Override
     public void visitProperty(DocPropertyMapping property) {
-
-      DocPropertyOptions options = property.getOptions();
+      DocPropertyOptions options = property.options();
       if (options != null && options.isSortable()) {
-        String fullPath = pathStack.peekFullPath(property.getName());
+        String fullPath = pathStack.peekFullPath(property.name());
         sortableMap.put(fullPath, fullPath + ".raw");
       }
     }
 
-    private Map<String, String> getSortableMap() {
+    private Map<String, String> sortableMap() {
       return sortableMap;
     }
   }

@@ -2,51 +2,16 @@ package io.ebeaninternal.server.expression;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
-import io.ebean.CacheMode;
-import io.ebean.CountDistinctOrder;
-import io.ebean.DtoQuery;
-import io.ebean.Expression;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.FetchGroup;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.Junction;
-import io.ebean.OrderBy;
-import io.ebean.PagedList;
-import io.ebean.Pairs;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.Transaction;
-import io.ebean.UpdateQuery;
-import io.ebean.Version;
+import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
-import io.ebean.search.Match;
-import io.ebean.search.MultiMatch;
-import io.ebean.search.TextCommonTerms;
-import io.ebean.search.TextQueryString;
-import io.ebean.search.TextSimple;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionList;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
-import io.ebeaninternal.api.SpiJunction;
+import io.ebean.search.*;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -76,11 +41,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
-    this(query, query.getExpressionFactory(), parentExprList);
-  }
-
-  DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList) {
-    this(query, expr, parentExprList, new ArrayList<>());
+    this(query, query.getExpressionFactory(), parentExprList, new ArrayList<>());
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
@@ -243,13 +204,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   /**
    * Return a copy of the expression list.
-   * <p>
-   * Each of the expressions are expected to be immutable and safe to reference.
-   * </p>
    */
   public DefaultExpressionList<T> copy(Query<T> query) {
-    DefaultExpressionList<T> copy = new DefaultExpressionList<>(query, expr, null);
-    copy.list.addAll(list);
+    DefaultExpressionList<T> copy = new DefaultExpressionList<>(query, expr, null, new ArrayList<>(list.size()));
+    for (SpiExpression expr : list) {
+      copy.list.add(expr.copy());
+    }
     return copy;
   }
 
@@ -331,30 +291,14 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public OrderBy<T> order() {
-    return query.order();
-  }
-
-  @Override
   public OrderBy<T> orderBy() {
-    return query.order();
-  }
-
-  @Override
-  public ExpressionList<T> order(String orderByClause) {
-    query.order(orderByClause);
-    return this;
+    return query.orderBy();
   }
 
   @Override
   public ExpressionList<T> orderBy(String orderBy) {
-    query.order(orderBy);
+    query.orderBy(orderBy);
     return this;
-  }
-
-  @Override
-  public Query<T> setOrderBy(String orderBy) {
-    return query.order(orderBy);
   }
 
   @Override
@@ -614,12 +558,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> addAll(ExpressionList<T> exprList) {
     SpiExpressionList<T> spiList = (SpiExpressionList<T>) exprList;
-    list.addAll(spiList.getUnderlyingList());
+    list.addAll(spiList.underlyingList());
     return this;
   }
 
   @Override
-  public List<SpiExpression> getUnderlyingList() {
+  public List<SpiExpression> underlyingList() {
     return list;
   }
 
@@ -794,6 +738,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> eq(String propertyName, Query<?> subQuery) {
+    return add(expr.eq(propertyName, subQuery));
+  }
+
+  @Override
   public ExpressionList<T> eq(String propertyName, Object value) {
     return add(expr.eq(propertyName, value));
   }
@@ -819,6 +768,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> ne(String propertyName, Query<?> subQuery) {
+    return add(expr.ne(propertyName, subQuery));
+  }
+
+  @Override
   public ExpressionList<T> ne(String propertyName, Object value) {
     return add(expr.ne(propertyName, value));
   }
@@ -836,6 +790,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> inRangeWith(String lowProperty, String highProperty, Object value) {
     return add(expr.inRangeWith(lowProperty, highProperty, value));
+  }
+
+  @Override
+  public ExpressionList<T> inRangeWithProperties(String propertyName, String lowProperty, String highProperty) {
+    return add(expr.inRangeWithProperties(propertyName, lowProperty, highProperty));
   }
 
   @Override
@@ -864,9 +823,18 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> ge(String propertyName, Query<?> subQuery) {
+    return add(expr.ge(propertyName, subQuery));
+  }
+
+  @Override
   public ExpressionList<T> ge(String propertyName, Object value) {
-    add(expr.ge(propertyName, value));
-    return this;
+    return add(expr.ge(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> gt(String propertyName, Query<?> subQuery) {
+    return add(expr.gt(propertyName, subQuery));
   }
 
   @Override
@@ -876,14 +844,22 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public ExpressionList<T> gtOrNull(String propertyName, Object value) {
-    add(expr.gtOrNull(propertyName, value));
-    return this;
+    return add(expr.gtOrNull(propertyName, value));
   }
 
   @Override
   public ExpressionList<T> geOrNull(String propertyName, Object value) {
-    add(expr.geOrNull(propertyName, value));
-    return this;
+    return add(expr.geOrNull(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> gtIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.gt(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> geIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.ge(propertyName, value));
   }
 
   @Override
@@ -924,6 +900,61 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> inPairs(Pairs pairs) {
     return add(expr.inPairs(pairs));
+  }
+
+  @Override
+  public ExpressionList<T> inTuples(InTuples pairs) {
+    return add(expr.inTuples(pairs));
+  }
+
+  @Override
+  public ExpressionList<T> exists(String sqlSubQuery, Object... bindValues) {
+    return add(expr.exists(sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> notExists(String sqlSubQuery, Object... bindValues) {
+    return add(expr.notExists(sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> inSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return add(expr.inSubQuery(propertyName, sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> notInSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return add(expr.notInSubQuery(propertyName, sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> eqSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return add(expr.eqSubQuery(propertyName, sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> neSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return add(expr.neSubQuery(propertyName, sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> gtSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return add(expr.gtSubQuery(propertyName, sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> geSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return add(expr.geSubQuery(propertyName, sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> ltSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return add(expr.ltSubQuery(propertyName, sqlSubQuery, bindValues));
+  }
+
+  @Override
+  public ExpressionList<T> leSubQuery(String propertyName, String sqlSubQuery, Object... bindValues) {
+    return add(expr.leSubQuery(propertyName, sqlSubQuery, bindValues));
   }
 
   @Override
@@ -1000,6 +1031,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> le(String propertyName, Query<?> subQuery) {
+    return add(expr.le(propertyName, subQuery));
+  }
+
+  @Override
   public ExpressionList<T> le(String propertyName, Object value) {
     return add(expr.le(propertyName, value));
   }
@@ -1020,6 +1056,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> lt(String propertyName, Query<?> subQuery) {
+    return add(expr.lt(propertyName, subQuery));
+  }
+
+  @Override
   public ExpressionList<T> lt(String propertyName, Object value) {
     return add(expr.lt(propertyName, value));
   }
@@ -1032,6 +1073,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> leOrNull(String propertyName, Object value) {
     return add(expr.leOrNull(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> ltIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.lt(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> leIfPresent(String propertyName, @Nullable Object value) {
+    return value == null ? this : add(expr.le(propertyName, value));
   }
 
   @Override
@@ -1240,5 +1291,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       return list.get(0).getIdEqualTo(idName);
     }
     return null;
+  }
+
+  @Override
+  public ExpressionList<T> clear() {
+    list.clear();
+    return this;
   }
 }

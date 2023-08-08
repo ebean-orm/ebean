@@ -32,7 +32,12 @@ public class SqlCodeTranslator implements SqlExceptionTranslator {
   }
 
   private DataErrorType getErrorType(SQLException e) {
-    DataErrorType errorType = map.get(e.getSQLState());
+    String sqlState = e.getSQLState();
+    while (sqlState == null && e.getCause() instanceof SQLException) {
+      e = (SQLException)e.getCause();
+      sqlState = e.getSQLState();
+    }
+    DataErrorType errorType = map.get(sqlState);
     if (errorType == null) {
       // fall back to error code
       errorType = map.get(String.valueOf(e.getErrorCode()));

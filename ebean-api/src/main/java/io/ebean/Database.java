@@ -9,7 +9,6 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
-import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
 import javax.persistence.OptimisticLockException;
@@ -36,7 +35,7 @@ import java.util.concurrent.Callable;
  * <h5>The 'default' Database</h5>
  * <p>
  * One Database can be designated as the 'default' or 'primary' Database
- * (see {@link DatabaseConfig#setDefaultServer(boolean)}. Many methods on DB
+ * (see {@link DatabaseConfig#setDefaultServer(boolean)}). Many methods on DB
  * such as {@link DB#find(Class)} etc are actually just a convenient way to
  * call methods on the 'default/primary' Database.
  *
@@ -167,7 +166,7 @@ public interface Database {
   /**
    * Return the BeanState for a given entity bean.
    * <p>
-   * This will return null if the bean is not an enhanced entity bean.
+   * This will throw an IllegalArgumentException if the bean is not an enhanced entity bean.
    */
   BeanState beanState(Object bean);
 
@@ -204,10 +203,6 @@ public interface Database {
    */
   <T> T createEntityBean(Class<T> type);
 
-  /**
-   * Create a CsvReader for a given beanType.
-   */
-  <T> CsvReader<T> createCsvReader(Class<T> beanType);
 
   /**
    * Create an Update query to perform a bulk update.

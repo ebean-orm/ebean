@@ -6,9 +6,9 @@ import io.ebean.config.dbplatform.DbEncryptFunction;
 /**
  * SQL Server EncryptByPassPhrase DecryptByPassPhrase based encryption support.
  */
-public class SqlServerDbEncrypt extends AbstractDbEncrypt {
+final class SqlServerDbEncrypt extends AbstractDbEncrypt {
 
-  public SqlServerDbEncrypt() {
+  SqlServerDbEncrypt() {
     this.varcharEncryptFunction = new VarcharFunction();
     this.dateEncryptFunction = new DateFunction();
   }

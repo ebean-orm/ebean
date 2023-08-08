@@ -10,7 +10,7 @@ import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
-import io.ebeaninternal.server.type.DataBind;
+import io.ebeaninternal.server.bind.DataBind;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -145,9 +145,7 @@ public final class IdBinderSimple implements IdBinder {
   @Override
   public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
     List<Object> copy = new ArrayList<>(values);
-    for (int i = 0; i < copy.size(); i++) {
-      copy.set(i, convertSetId(copy.get(i), null));
-    }
+    copy.replaceAll(idValue -> convertSetId(idValue, null));
     request.addBindValue(new MultiValueWrapper(copy));
   }
 

@@ -66,7 +66,7 @@ final class BeanDescriptorJsonHelp<T> {
 
   @SuppressWarnings("unchecked")
   T jsonRead(SpiJsonReader jsonRead, String path, boolean withInheritance, T target) throws IOException {
-    JsonParser parser = jsonRead.getParser();
+    JsonParser parser = jsonRead.parser();
     //noinspection StatementWithEmptyBody
     if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
       // start object token read by Jackson already
@@ -85,7 +85,7 @@ final class BeanDescriptorJsonHelp<T> {
       return jsonReadObject(jsonRead, path, target);
     }
 
-    ObjectNode node = jsonRead.getObjectMapper().readTree(parser);
+    ObjectNode node = jsonRead.mapper().readTree(parser);
     if (node.isNull()) {
       return null;
     }
@@ -127,13 +127,18 @@ final class BeanDescriptorJsonHelp<T> {
     // unmapped properties, send to JsonReadBeanVisitor later
     Map<String, Object> unmappedProperties = null;
     do {
-      JsonParser parser = readJson.getParser();
+      JsonParser parser = readJson.parser();
       JsonToken event = parser.nextToken();
       if (JsonToken.FIELD_NAME == event) {
         String key = parser.getCurrentName();
         BeanProperty p = desc.beanProperty(key);
         if (p != null) {
-          p.jsonRead(readJson, bean);
+          if (p.isVersion() && readJson.update() ) {
+            // skip version prop during update
+            p.jsonRead(readJson);
+          } else {
+            p.jsonRead(readJson, bean);
+          }
         } else {
           // read an unmapped property
           if (unmappedProperties == null) {

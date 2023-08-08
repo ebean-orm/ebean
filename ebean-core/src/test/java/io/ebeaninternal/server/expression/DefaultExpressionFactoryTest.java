@@ -35,7 +35,7 @@ public class DefaultExpressionFactoryTest {
   public void testEq() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(false, false);
-    Expression expression = factory.eq("name", null);
+    Expression expression = factory.eq("name", (String)null);
     assertThat(expression).isInstanceOf(NullExpression.class);
     assertThat(toQueryPlanHash(expression)).isEqualTo("Null[name]");
   }
@@ -44,7 +44,7 @@ public class DefaultExpressionFactoryTest {
   public void testNe() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(false, false);
-    Expression expression = factory.ne("name", null);
+    Expression expression = factory.ne("name", (String)null);
     assertThat(expression).isInstanceOf(NullExpression.class);
     assertThat(toQueryPlanHash(expression)).isEqualTo("NotNull[name]");
   }
@@ -71,7 +71,7 @@ public class DefaultExpressionFactoryTest {
   public void testEq_with_equalsWithNullAsNoop() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(true, false);
-    Expression expression = factory.eq("name", null);
+    Expression expression = factory.eq("name", (String)null);
     assertThat(expression).isInstanceOf(NoopExpression.class);
   }
 
@@ -79,7 +79,7 @@ public class DefaultExpressionFactoryTest {
   public void testNe_with_equalsWithNullAsNoop() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(true, false);
-    Expression expression = factory.ne("name", null);
+    Expression expression = factory.ne("name", (String)null);
     assertThat(expression).isInstanceOf(NoopExpression.class);
   }
 
@@ -87,7 +87,7 @@ public class DefaultExpressionFactoryTest {
   public void testIeq_with_equalsWithNullAsNoop() {
 
     DefaultExpressionFactory factory = new DefaultExpressionFactory(true, false);
-    Expression expression = factory.ieq("name", null);
+    Expression expression = factory.ieq("name", (String)null);
     assertThat(expression).isInstanceOf(NoopExpression.class);
   }
 }

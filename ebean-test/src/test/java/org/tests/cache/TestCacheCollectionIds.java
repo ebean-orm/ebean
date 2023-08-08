@@ -14,13 +14,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestCacheCollectionIds extends BaseTestCase {
+class TestCacheCollectionIds extends BaseTestCase {
 
-  private ServerCacheManager cacheManager = DB.cacheManager();
+  private final ServerCacheManager cacheManager = DB.cacheManager();
 
   @Test
-  public void test() {
-
+  void test() {
     ResetBasicData.reset();
     awaitL2Cache();
 
@@ -75,7 +74,6 @@ public class TestCacheCollectionIds extends BaseTestCase {
   }
 
   private int fetchCustomer(Integer id) {
-
     Customer customer2 = DB.find(Customer.class, id);
 
     List<Contact> contacts2 = customer2.getContacts();
@@ -91,7 +89,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
    * When updating a ManyToMany relations also the collection cache must be updated.
    */
   @Test
-  public void testUpdatingCollectionCacheForManyToManyRelations() {
+  void testUpdatingCollectionCacheForManyToManyRelations() {
     // arrange
     ResetBasicData.reset();
 
@@ -107,7 +105,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     dummyToLoad.getCountries().size();
 
     ServerCache cachedBeanCountriesCache = cacheManager.collectionIdsCache(OCachedBean.class, "countries");
-    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(cachedBean.getId());
+    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(String.valueOf(cachedBean.getId()));
 
     // confirm the starting data and cache entry
     assertEquals(2, dummyToLoad.getCountries().size());
@@ -124,7 +122,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     // Get the data to assert/check against
     OCachedBean result = DB.find(OCachedBean.class, cachedBean.getId());
-    cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
+    cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(String.valueOf(result.getId()));
 
     // assert that data and cache both show correct data
     assertEquals(1, result.getCountries().size());
@@ -134,7 +132,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
   }
 
   @Test
-  public void testChangingCollectionByEditingConnectedCachedBean() {
+  void testChangingCollectionByEditingConnectedCachedBean() {
     ResetBasicData.reset();
 
     OCachedBean cachedBean = new OCachedBean();
@@ -174,7 +172,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
   }
 
   @Test
-  public void testChangingCollectionByEditingConnectedNotCachedBean() {
+  void testChangingCollectionByEditingConnectedNotCachedBean() {
     ResetBasicData.reset();
 
     OCachedBean cachedBean = new OCachedBean();
@@ -213,13 +211,12 @@ public class TestCacheCollectionIds extends BaseTestCase {
     DB.delete(cachedBean);
   }
 
-
   /**
    * When updating a ManyToMany relations also the collection cache must be updated.
    * Alternate to above test where in this case the bean is dirty - loadedBean.setName("goodbye");.
    */
   @Test
-  public void testUpdatingCollectionCacheForManyToManyRelationsWithUpdatedBean() {
+  void testUpdatingCollectionCacheForManyToManyRelationsWithUpdatedBean() {
     // arrange
     ResetBasicData.reset();
 
@@ -235,7 +232,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
     dummyToLoad.getCountries().size();
 
     ServerCache cachedBeanCountriesCache = cacheManager.collectionIdsCache(OCachedBean.class, "countries");
-    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(cachedBean.getId());
+    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(String.valueOf(cachedBean.getId()));
 
     // confirm the starting data and cache entry
     assertEquals(2, dummyToLoad.getCountries().size());
@@ -253,7 +250,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     // Get the data to assert/check against
     OCachedBean result = DB.find(OCachedBean.class, cachedBean.getId());
-    cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(result.getId());
+    cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(String.valueOf(result.getId()));
 
     // assert that data and cache both show correct data
     assertEquals(1, result.getCountries().size());
@@ -266,7 +263,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
    * When updating a ManyToMany relations also the collection cache must be updated.
    */
   @Test
-  public void testUpdatingCollectionCacheForManyToManyRelationsWithinStatelessUpdate() {
+  void testUpdatingCollectionCacheForManyToManyRelationsWithinStatelessUpdate() {
     // arrange
     ResetBasicData.reset();
 
@@ -289,7 +286,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     // assert that the cache contains the expected entry
     assertEquals(1, cachedBeanCountriesCache.size());
-    CachedManyIds dummyEntry = (CachedManyIds) cachedBeanCountriesCache.get(dummyLoad.getId());
+    CachedManyIds dummyEntry = (CachedManyIds) cachedBeanCountriesCache.get(String.valueOf(dummyLoad.getId()));
     assertNotNull(dummyEntry);
     assertEquals(2, dummyEntry.getIdList().size());
     assertTrue(dummyEntry.getIdList().contains("NZ"));
@@ -307,7 +304,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
 
     assertEquals(1, cachedBeanCountriesCache.size());
 
-    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(update.getId());
+    CachedManyIds cachedManyIds = (CachedManyIds) cachedBeanCountriesCache.get(String.valueOf(update.getId()));
 
     // assert cache updated
     assertEquals(1, cachedManyIds.getIdList().size());
@@ -321,8 +318,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
   }
 
   @Test
-  public void testUpdating_noChange() throws InterruptedException {
-
+  void testUpdating_noChange() throws InterruptedException {
     ResetBasicData.reset();
 
     try (Transaction txn = DB.beginTransaction()) {
@@ -355,7 +351,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
    */
   @Test
   @Disabled
-  public void testClearingCollectionCacheOnORMUpdate() {
+  void testClearingCollectionCacheOnORMUpdate() {
     // arrange
     ResetBasicData.reset();
 
@@ -390,7 +386,7 @@ public class TestCacheCollectionIds extends BaseTestCase {
    */
   @Test
   @Disabled
-  public void testClearingCollectionCacheOnExternalModification() {
+  void testClearingCollectionCacheOnExternalModification() {
     // arrange
     ResetBasicData.reset();
 

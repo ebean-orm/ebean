@@ -4,10 +4,10 @@ package io.ebean.typequery;
  * Base property for date and date time types.
  *
  * @param <R> the root query bean type
- * @param <D> the date time type
+ * @param <T> the scalar type
  */
 @SuppressWarnings("rawtypes")
-public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareable<R, D> {
+public abstract class PBaseDate<R, T extends Comparable> extends PBaseComparable<R, T> {
 
   /**
    * Construct with a property name and root instance.
@@ -32,7 +32,7 @@ public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareabl
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R after(D value) {
+  public final R after(T value) {
     expr().gt(_name, value);
     return _root;
   }
@@ -43,7 +43,7 @@ public abstract class PBaseDate<R, D extends Comparable> extends PBaseCompareabl
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  public R before(D value) {
+  public final R before(T value) {
     expr().lt(_name, value);
     return _root;
   }

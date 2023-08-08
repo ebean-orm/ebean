@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.config.JsonConfig;
 import io.ebean.config.dbplatform.ExtraDbTypes;
+import io.ebean.core.type.ScalarTypeBaseDateTime;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 
 /**
  * ScalarType for java.sql.Timestamp.
@@ -47,7 +49,7 @@ final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime
 
   @Override
   public LocalDateTime jsonRead(JsonParser parser) throws IOException {
-    return LocalDateTime.parse(parser.getText());
+    return parse(parser.getText());
   }
 
   @Override
@@ -62,7 +64,11 @@ final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime
 
   @Override
   public LocalDateTime parse(String value) {
-    return LocalDateTime.parse(value);
+    try {
+      return LocalDateTime.parse(value);
+    } catch (DateTimeParseException pe) {
+      return super.parse(value);
+    }
   }
 
   @Override

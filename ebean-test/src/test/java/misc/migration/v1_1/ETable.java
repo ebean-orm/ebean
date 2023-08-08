@@ -39,4 +39,9 @@ public class ETable {
 
   @OneToMany(mappedBy = "foreign")
   List<ETable> foreigns;
+
+  private String textfield;
+
+  @Index
+  private String textfield2;
 }

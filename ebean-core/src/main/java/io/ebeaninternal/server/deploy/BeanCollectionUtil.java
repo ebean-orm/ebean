@@ -36,17 +36,14 @@ public final class BeanCollectionUtil {
       }
       // For maps this is a collection of Map.Entry, otherwise it
       // returns a collection of beans
-      return bc.getActualEntries();
+      return bc.actualEntries();
     }
-
-    if (o instanceof Map<?, ?>) {
-      // yes, we want the entrySet (to set the keys)
-      return ((Map<?, ?>) o).entrySet();
-
-    } else if (o instanceof Collection<?>) {
+    if (o instanceof Collection<?>) {
       return ((Collection<?>) o);
+    } else if (o instanceof Map<?, ?>) {
+      return ((Map<?, ?>) o).entrySet();
     }
-    throw new PersistenceException("expecting a Map or Collection but got [" + o.getClass().getName() + "]");
+    throw new PersistenceException("expecting a Map or Collection but got " + o.getClass().getName());
   }
 
   /**
@@ -64,7 +61,7 @@ public final class BeanCollectionUtil {
       }
       // For maps this is a collection of Map.Entry, otherwise it
       // returns a collection of beans
-      return bc.getActualDetails();
+      return bc.actualDetails();
     }
     if (o instanceof Map<?, ?>) {
       // yes, we want the entrySet (to set the keys)
@@ -73,6 +70,6 @@ public final class BeanCollectionUtil {
     } else if (o instanceof Collection<?>) {
       return ((Collection<?>) o);
     }
-    throw new PersistenceException("expecting a Map or Collection but got [" + o.getClass().getName() + "]");
+    throw new PersistenceException("expecting a Map or Collection but got " + o.getClass().getName());
   }
 }

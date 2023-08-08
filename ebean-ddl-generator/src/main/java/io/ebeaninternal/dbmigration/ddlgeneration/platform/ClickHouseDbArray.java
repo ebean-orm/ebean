@@ -15,6 +15,7 @@ class ClickHouseDbArray {
     mapping.put("integer[]", "Array(UInt32)");
     mapping.put("bigint[]", "Array(UInt64)");
     mapping.put("float[]", "Array(Float32)");
+    mapping.put("float4[]", "Array(Float32)");
     mapping.put("decimal[]", "Array(Decimal)");
   }
 

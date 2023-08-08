@@ -23,41 +23,41 @@ create table migtest_ckey_parent (
 );
 
 create table migtest_fk_cascade (
-  id                            numeric(19) not null,
-  one_id                        numeric(19),
+  id                            bigint not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_cascade primary key (id)
 );
 create sequence migtest_fk_cascade_seq as bigint start with 1;
 
 create table migtest_fk_cascade_one (
-  id                            numeric(19) not null,
+  id                            bigint not null,
   constraint pk_migtest_fk_cascade_one primary key (id)
 );
 create sequence migtest_fk_cascade_one_seq as bigint start with 1;
 
 create table migtest_fk_none (
-  id                            numeric(19) not null,
-  one_id                        numeric(19),
+  id                            bigint not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_none primary key (id)
 );
 create sequence migtest_fk_none_seq as bigint start with 1;
 
 create table migtest_fk_none_via_join (
-  id                            numeric(19) not null,
-  one_id                        numeric(19),
+  id                            bigint not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_none_via_join primary key (id)
 );
 create sequence migtest_fk_none_via_join_seq as bigint start with 1;
 
 create table migtest_fk_one (
-  id                            numeric(19) not null,
+  id                            bigint not null,
   constraint pk_migtest_fk_one primary key (id)
 );
 create sequence migtest_fk_one_seq as bigint start with 1;
 
 create table migtest_fk_set_null (
-  id                            numeric(19) not null,
-  one_id                        numeric(19),
+  id                            bigint not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_set_null primary key (id)
 );
 create sequence migtest_fk_set_null_seq as bigint start with 1;
@@ -68,7 +68,7 @@ create table migtest_e_basic (
   status2                       nvarchar(1) default 'N' not null,
   name                          nvarchar(127),
   description                   nvarchar(127),
-  description_file              image,
+  description_file              varbinary(max),
   json_list                     nvarchar(max),
   a_lob                         nvarchar(255) default 'X' not null,
   some_date                     datetime2,
@@ -170,6 +170,7 @@ create table [table] (
   [to]                          nvarchar(255),
   [varchar]                     nvarchar(255),
   [foreign]                     nvarchar(255),
+  textfield                     nvarchar(255) not null,
   constraint pk_table primary key ([index])
 );
 
@@ -181,7 +182,7 @@ create table migtest_mtm_c (
 create sequence migtest_mtm_c_seq as bigint start with 1;
 
 create table migtest_mtm_m (
-  id                            numeric(19) not null,
+  id                            bigint not null,
   name                          nvarchar(255),
   constraint pk_migtest_mtm_m primary key (id)
 );
@@ -195,7 +196,7 @@ create table migtest_oto_child (
 create sequence migtest_oto_child_seq as bigint start with 1;
 
 create table migtest_oto_master (
-  id                            numeric(19) not null,
+  id                            bigint not null,
   name                          nvarchar(255),
   constraint pk_migtest_oto_master primary key (id)
 );

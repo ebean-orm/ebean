@@ -9,9 +9,10 @@ import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.meta.*;
 import io.ebeaninternal.server.type.TypeManager;
 
-import javax.persistence.PersistenceException;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import java.lang.reflect.*;
+
+import static java.lang.System.Logger.Level.*;
 
 /**
  * Create the properties for a bean.
@@ -82,9 +83,9 @@ public final class DeployCreateProperties {
 
             DeployBeanProperty replaced = desc.addBeanProperty(prop);
             if (replaced != null && !replaced.isTransient()) {
-              String msg = "Huh??? property " + prop.getFullBeanName() + " being defined twice";
+              String msg = "Huh??? property " + prop + " being defined twice";
               msg += " but replaced property was not transient? This is not expected?";
-              CoreLog.log.warn(msg);
+              CoreLog.log.log(WARNING, msg);
             }
           }
         }
@@ -103,20 +104,18 @@ public final class DeployCreateProperties {
     }
   }
 
-  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createManyType(DeployBeanDescriptor<?> desc, Class<?> targetType, ManyType manyType) {
     try {
-      ScalarType<?> scalarType = typeManager.getScalarType(targetType);
+      ScalarType<?> scalarType = typeManager.type(targetType);
       if (scalarType != null) {
-        return new DeployBeanPropertySimpleCollection(desc, targetType, manyType);
+        return new DeployBeanPropertySimpleCollection<>(desc, targetType, manyType);
       }
     } catch (NullPointerException e) {
-      CoreLog.internal.debug("expected non-scalar type {}", e.getMessage());
+      CoreLog.internal.log(DEBUG, "expected non-scalar type {0}", e.getMessage());
     }
-    return new DeployBeanPropertyAssocMany(desc, targetType, manyType);
+    return new DeployBeanPropertyAssocMany<>(desc, targetType, manyType);
   }
 
-  @SuppressWarnings({"unchecked"})
   private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
     Class<?> propertyType = field.getType();
     if (isSpecialScalarType(field)) {
@@ -132,14 +131,14 @@ public final class DeployCreateProperties {
           // not supporting this field (generic type used)
           return null;
         }
-        CoreLog.internal.warn("Could not find parameter type (via reflection) on " + desc.getFullName() + " " + field.getName());
+        CoreLog.internal.log(WARNING, "Could not find parameter type (via reflection) on " + desc.getFullName() + " " + field.getName());
       }
       return createManyType(desc, targetType, manyType);
     }
     if (propertyType.isEnum() || propertyType.isPrimitive()) {
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
-    ScalarType<?> scalarType = typeManager.getScalarType(propertyType);
+    ScalarType<?> scalarType = typeManager.type(propertyType);
     if (scalarType != null) {
       return new DeployBeanProperty(desc, propertyType, scalarType, null);
     }
@@ -147,11 +146,13 @@ public final class DeployCreateProperties {
       // return with no ScalarType (still support JSON features)
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
+    if (AnnotationUtil.has(field, Convert.class)) {
+      throw new IllegalStateException("No AttributeConverter registered for type " + propertyType + " at " + desc.getFullName() + "." + field.getName());
+    }
     try {
-      return new DeployBeanPropertyAssocOne(desc, propertyType);
-
+      return new DeployBeanPropertyAssocOne<>(desc, propertyType);
     } catch (Exception e) {
-      CoreLog.log.error("Error with " + desc + " field:" + field.getName(), e);
+      CoreLog.log.log(ERROR, "Error with " + desc + " field:" + field.getName(), e);
       return null;
     }
   }

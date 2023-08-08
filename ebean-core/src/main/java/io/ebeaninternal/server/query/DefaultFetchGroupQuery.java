@@ -48,9 +48,7 @@ import java.util.stream.Stream;
 final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
-
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
-
   private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private OrmQueryDetail detail = new OrmQueryDetail();
@@ -233,6 +231,11 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
 
   @Override
   public Query<T> usingDatabase(Database database) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public Query<T> usingMaster() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -499,11 +502,6 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
 
   @Override
   public Query<T> setReadOnly(boolean readOnly) {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public Query<T> setLoadBeanCache(boolean loadBeanCache) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 

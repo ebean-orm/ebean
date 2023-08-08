@@ -25,7 +25,7 @@ final class DtoMetaProperty implements DtoReadSet {
     this.name = name;
     if (writeMethod != null) {
       this.setter = lookupMethodHandle(dtoType, writeMethod);
-      this.scalarType = typeManager.getScalarType(propertyType(writeMethod), propertyClass(writeMethod));
+      this.scalarType = typeManager.type(propertyType(writeMethod), propertyClass(writeMethod));
     } else {
       this.scalarType = null;
       this.setter = null;
@@ -44,7 +44,7 @@ final class DtoMetaProperty implements DtoReadSet {
     return method.getParameterTypes()[0];
   }
 
-  String getName() {
+  String name() {
     return name;
   }
 

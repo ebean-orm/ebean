@@ -6,6 +6,7 @@ import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.ScalarTypeBase;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebean.util.IOUtils;
@@ -123,7 +124,7 @@ abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
    * Map is a mutable type. Use the isDirty() method to check for dirty state.
    */
   @Override
-  public final boolean isMutable() {
+  public final boolean mutable() {
     return true;
   }
 
@@ -136,7 +137,7 @@ abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public final boolean isJsonMapper() {
+  public final boolean jsonMapper() {
     return keepSource;
   }
 
@@ -244,7 +245,7 @@ abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public final DocPropertyType getDocType() {
+  public final DocPropertyType docType() {
     return DocPropertyType.OBJECT;
   }
 

@@ -14,8 +14,17 @@ alter table migtest_e_basic drop constraint uq_migtest_e_basic_name;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest4;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest5;
 alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
+alter table drop_main_drop_ref_many drop constraint if exists fk_drop_main_drop_ref_many_drop_main;
+alter table drop_main_drop_ref_many drop constraint if exists fk_drop_main_drop_ref_many_drop_ref_many;
+alter table drop_ref_one drop constraint if exists fk_drop_ref_one_parent_id;
+alter table migtest_mtm_c_migtest_mtm_m drop constraint if exists fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c;
+alter table migtest_mtm_c_migtest_mtm_m drop constraint if exists fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m;
+alter table migtest_mtm_m_migtest_mtm_c drop constraint if exists fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m;
+alter table migtest_mtm_m_migtest_mtm_c drop constraint if exists fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c;
+alter table migtest_mtm_m_phone_numbers drop constraint if exists fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id;
 drop index if exists ix_migtest_e_basic_indextest3;
 drop index if exists ix_migtest_e_basic_indextest6;
+drop index if exists ix_table_textfield2;
 -- apply changes
 create table "migtest_QuOtEd" (
   id                            varchar(255) not null,
@@ -54,7 +63,7 @@ alter table migtest_e_basic alter column a_lob set default 'X';
 alter table migtest_e_basic alter column a_lob set not null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
-alter table migtest_e_basic add column description_file binary(4500);
+alter table migtest_e_basic add column description_file long binary;
 alter table migtest_e_basic add column old_boolean bit default false not null;
 alter table migtest_e_basic add column old_boolean2 bit;
 alter table migtest_e_basic add column eref_id integer;

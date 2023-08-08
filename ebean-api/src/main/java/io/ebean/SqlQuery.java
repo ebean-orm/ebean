@@ -2,8 +2,8 @@ package io.ebean;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
+
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -39,6 +39,23 @@ import java.util.function.Predicate;
  */
 @NonNullApi
 public interface SqlQuery extends Serializable, CancelableQuery {
+
+  /**
+   * Execute the query using the given transaction.
+   */
+  SqlQuery usingTransaction(Transaction transaction);
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  SqlQuery usingMaster();
 
   /**
    * Execute the query returning a list.
@@ -297,6 +314,11 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * @param <T> The type of the scalar values
    */
   interface TypeQuery<T> {
+
+    /**
+     * Execute the query using the given transaction.
+     */
+    TypeQuery<T> usingTransaction(Transaction transaction);
 
     /**
      * Return the single value.

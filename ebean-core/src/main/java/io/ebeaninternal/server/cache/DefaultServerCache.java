@@ -1,13 +1,12 @@
 package io.ebeaninternal.server.cache;
 
+import io.avaje.applog.AppLog;
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
 import io.ebean.metric.MetricFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.lang.ref.SoftReference;
@@ -15,6 +14,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.TRACE;
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * The default cache implementation.
@@ -25,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class DefaultServerCache implements ServerCache {
 
-  protected static final Logger logger = LoggerFactory.getLogger(DefaultServerCache.class);
+  protected static final System.Logger logger = AppLog.getLogger(DefaultServerCache.class);
 
   /**
    * Compare by last access time (for LRU eviction).
@@ -42,7 +44,10 @@ public class DefaultServerCache implements ServerCache {
   protected final CountMetric removeCount;
   protected final CountMetric clearCount;
   protected final CountMetric evictCount;
-
+  protected final CountMetric gcCount;
+  protected final CountMetric idleCount;
+  protected final CountMetric ttlCount;
+  protected final CountMetric lruCount;
   protected final String name;
   protected final String shortName;
   protected final int maxSize;
@@ -52,6 +57,7 @@ public class DefaultServerCache implements ServerCache {
   protected final long trimOnPut;
   protected final ReentrantLock lock = new ReentrantLock();
   protected final AtomicLong mutationCounter = new AtomicLong();
+
 
   public DefaultServerCache(DefaultServerCacheConfig config) {
     this.name = config.getName();
@@ -71,6 +77,11 @@ public class DefaultServerCache implements ServerCache {
     this.removeCount = factory.createCountMetric(prefix + shortName + ".remove");
     this.clearCount = factory.createCountMetric(prefix + shortName + ".clear");
     this.evictCount = factory.createCountMetric(prefix + shortName + ".evict");
+    this.gcCount = factory.createCountMetric(prefix + shortName + ".gc");
+    this.idleCount = factory.createCountMetric(prefix + shortName + ".idle");
+    this.ttlCount = factory.createCountMetric(prefix + shortName + ".ttl");
+    this.lruCount = factory.createCountMetric(prefix + shortName + ".lru");
+
   }
 
   public void periodicTrim(BackgroundExecutor executor) {
@@ -88,6 +99,10 @@ public class DefaultServerCache implements ServerCache {
     removeCount.visit(visitor);
     clearCount.visit(visitor);
     evictCount.visit(visitor);
+    gcCount.visit(visitor);
+    idleCount.visit(visitor);
+    ttlCount.visit(visitor);
+    lruCount.visit(visitor);
   }
 
   @Override
@@ -102,6 +117,10 @@ public class DefaultServerCache implements ServerCache {
     cacheStats.setRemoveCount(removeCount.get(reset));
     cacheStats.setClearCount(clearCount.get(reset));
     cacheStats.setEvictCount(evictCount.get(reset));
+    cacheStats.setGcCount(gcCount.get(reset));
+    cacheStats.setIdleCount(idleCount.get(reset));
+    cacheStats.setTtlCount(ttlCount.get(reset));
+    cacheStats.setLruCount(lruCount.get(reset));
     return cacheStats;
   }
 
@@ -287,13 +306,19 @@ public class DefaultServerCache implements ServerCache {
         evictCount.add(trimmedByGC);
         evictCount.add(trimmedByTTL);
         evictCount.add(trimmedByLRU);
-        if (logger.isTraceEnabled()) {
+
+        gcCount.add(trimmedByGC);
+        idleCount.add(trimmedByIdle);
+        ttlCount.add(trimmedByTTL);
+        lruCount.add(trimmedByLRU);
+
+        if (logger.isLoggable(TRACE)) {
           long exeMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
-          logger.trace("Executed trim of cache {} in [{}]millis idle[{}] timeToLive[{}] accessTime[{}] gc[{}]",
+          logger.log(TRACE, "Executed trim of cache {0} in [{1}]millis idle[{2}] timeToLive[{3}] accessTime[{4}] gc[{5}]",
             name, exeMicros, trimmedByIdle, trimmedByTTL, trimmedByLRU, trimmedByGC);
         }
       } catch (Throwable e) {
-        logger.warn("Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
+        logger.log(WARNING, "Error during trim of DefaultServerCache [" + name + "]. Cache might be bigger than desired.", e);
       }
     } finally {
       lock.unlock();

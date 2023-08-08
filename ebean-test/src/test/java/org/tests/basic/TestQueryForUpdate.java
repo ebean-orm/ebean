@@ -1,10 +1,10 @@
 package org.tests.basic;
 
 import io.ebean.*;
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class TestQueryForUpdate extends BaseTestCase {
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate() {
 
     ResetBasicData.reset();
@@ -35,13 +34,35 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else {
+    } else if (!isDb2()){
       assertThat(sqlOf(query)).contains("for update");
     }
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  public void testForUpdate_withLimit() {
+    ResetBasicData.reset();
+
+    Query<Customer> query;
+    try (final Transaction transaction = DB.beginTransaction()) {
+      query = DB.find(Customer.class)
+        .forUpdate()
+        .setMaxRows(3)
+        .order().desc("id");
+
+      query.findList();
+    }
+
+    if (isSqlServer()) {
+      assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (!isOracle() && !isDb2()) {
+      // Oracle does not support FOR UPDATE with FETCH
+      assertThat(sqlOf(query)).contains("for update");
+    }
+  }
+
+  @Test
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPCAsReference() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -75,7 +96,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPCAsReference_usingLock() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -110,10 +131,11 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({ Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
   public void testForUpdate_when_alreadyInPC() {
 
-    EBasic basic = new EBasic("test PC cache");
+    EBasic basic = new EBasic("initialValue");
+    basic.setStatus(EBasic.Status.NEW);
     DB.save(basic);
 
     try (Transaction transaction = DB.beginTransaction()) {
@@ -121,25 +143,45 @@ public class TestQueryForUpdate extends BaseTestCase {
       LoggedSql.start();
 
       EBasic basic0 = DB.find(EBasic.class, basic.getId());
-      assertThat(basic0).isNotNull();
+      assertThat(basic0.getName()).isEqualTo("initialValue");
+      assertThat(basic0.getStatus()).isEqualTo(EBasic.Status.NEW);
+
+      // modify name and status
+      updateInOtherTransaction(basic0.getId());
 
       EBasic basic1 = DB.find(EBasic.class)
-        .setId( basic.getId())
+        .setId(basic.getId())
         .forUpdate()
         .findOne();
 
       assertThat(basic1).isNotNull();
       assertThat(basic1).isSameAs(basic0);
+      assertThat(basic1.getName()).isEqualTo("nowModified");
+      assertThat(basic1.getStatus()).isEqualTo(EBasic.Status.INACTIVE);
 
       List<String> sql = LoggedSql.stop();
-      assertThat(sql).hasSize(2);
+      assertThat(sql).hasSize(3);
       if (isH2() || isPostgresCompatible()) {
         assertSql(sql.get(0)).contains("from e_basic t0 where t0.id =");
-        assertSql(sql.get(1)).contains("from e_basic t0 where t0.id =");
-        assertSql(sql.get(1)).contains("for update");
+        assertSql(sql.get(1)).contains("update e_basic set name=?, status=? where id = ?");
+        assertSql(sql.get(2)).contains("from e_basic t0 where t0.id = ? for update");
       }
 
       transaction.end();
+    }
+  }
+
+  private void updateInOtherTransaction(Integer basicId) {
+    try (Transaction otherTxn = DB.createTransaction()) {
+      int rows = DB.update(EBasic.class)
+        .set("name", "nowModified")
+        .set("status", EBasic.Status.INACTIVE)
+        .where().idEq(basicId)
+        .usingTransaction(otherTxn)
+        .update();
+
+      assertThat(rows).isEqualTo(1);
+      otherTxn.commit();
     }
   }
 

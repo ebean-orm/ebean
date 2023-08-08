@@ -16,20 +16,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ## valhalla - failing on javadoc with:
-        ## javadoc: error - The code being documented uses packages in the unnamed module, but the packages defined in https://ebean.io/platforms/ebean-platform-h2/apidocs/ are in named modules.
-        java_version: [GA,EA,loom,metropolis,panama]
+        java_version: [GA,EA]
         os: [ubuntu-latest]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Java
       uses: oracle-actions/setup-java@v1
       with:
         website: jdk.java.net
         release: ${{ matrix.java_version }}
     - name: Maven cache
-      uses: actions/cache@v2
+      uses: actions/cache@v3
       env:
         cache-name: maven-cache
       with:

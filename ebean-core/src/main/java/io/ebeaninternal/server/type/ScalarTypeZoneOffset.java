@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeBaseVarchar;
+
 import java.time.ZoneOffset;
 
 /**
@@ -12,7 +14,7 @@ final class ScalarTypeZoneOffset extends ScalarTypeBaseVarchar<ZoneOffset> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 60;
   }
 

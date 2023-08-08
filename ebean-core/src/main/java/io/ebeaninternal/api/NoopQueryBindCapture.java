@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.ebeaninternal.server.type.bindcapture.BindCapture;
+import io.ebeaninternal.server.bind.capture.BindCapture;
 
 final class NoopQueryBindCapture implements SpiQueryBindCapture {
 

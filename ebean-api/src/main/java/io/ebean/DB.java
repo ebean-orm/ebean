@@ -5,7 +5,6 @@ import io.avaje.lang.Nullable;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.plugin.Property;
-import io.ebean.text.csv.CsvReader;
 import io.ebean.text.json.JsonContext;
 
 import javax.persistence.OptimisticLockException;
@@ -785,12 +784,6 @@ public final class DB {
     return getDefault().createUpdate(beanType, ormUpdate);
   }
 
-  /**
-   * Create a CsvReader for a given beanType.
-   */
-  public static <T> CsvReader<T> createCsvReader(Class<T> beanType) {
-    return getDefault().createCsvReader(beanType);
-  }
 
   /**
    * Create a named query.

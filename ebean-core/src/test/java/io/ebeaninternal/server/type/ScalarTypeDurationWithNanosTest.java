@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -40,7 +41,7 @@ class ScalarTypeDurationWithNanosTest {
   @Test
   void testToJdbcType() throws Exception {
     Duration duration = Duration.ofSeconds(323, 1500000);
-    BigDecimal bigDecimal = DecimalUtils.toDecimal(duration);
+    BigDecimal bigDecimal = ScalarTypeUtils.toDecimal(duration);
 
     Object val1 = type.toJdbcType(duration);
     Object val2 = type.toJdbcType(bigDecimal);
@@ -52,7 +53,7 @@ class ScalarTypeDurationWithNanosTest {
   @Test
   void testToBeanType() throws Exception {
     Duration duration = Duration.ofSeconds(323, 1500000);
-    BigDecimal bigDecimal = DecimalUtils.toDecimal(duration);
+    BigDecimal bigDecimal = ScalarTypeUtils.toDecimal(duration);
 
     Duration val1 = type.toBeanType(duration);
     Duration val2 = type.toBeanType(bigDecimal);
@@ -73,16 +74,6 @@ class ScalarTypeDurationWithNanosTest {
     Duration duration = Duration.ofSeconds(323, 1500000);
     Duration val1 = type.parse("PT5M23.0015S");
     assertEquals(duration, val1);
-  }
-
-  @Test
-  void testIsDateTimeCapable() {
-    assertFalse(type.isDateTimeCapable());
-  }
-
-  @Test
-  void testConvertFromMillis() {
-    assertThrows(UnsupportedOperationException.class, () -> type.convertFromMillis(1000));
   }
 
   @Test

@@ -167,7 +167,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
 
   private void checkSelfManyToMany(DeployBeanPropertyAssocMany<?> prop) {
     if (prop.getTargetType().equals(descriptor.getBeanType())) {
-      throw new IllegalStateException("@ManyToMany mapping for " + prop.getFullBeanName() + " requires explicit @JoinTable with joinColumns & inverseJoinColumns. Refer issue #2157");
+      throw new IllegalStateException("@ManyToMany mapping for " + prop + " requires explicit @JoinTable with joinColumns & inverseJoinColumns. Refer issue #2157");
     }
   }
 
@@ -222,7 +222,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
         dbKeyColumn = mapKeyColumn.name();
       }
 
-      ScalarType<?> keyScalarType = util.getTypeManager().getScalarType(prop.getMapKeyType());
+      ScalarType<?> keyScalarType = util.typeManager().type(prop.getMapKeyType());
 
       DeployBeanProperty keyProp = new DeployBeanProperty(elementDescriptor, elementType, keyScalarType, null);
       setElementProperty(keyProp, "key", dbKeyColumn, sortOrder++);
@@ -234,10 +234,10 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       }
     }
 
-    ScalarType<?> valueScalarType = util.getTypeManager().getScalarType(elementType);
+    ScalarType<?> valueScalarType = util.typeManager().type(elementType);
     if (valueScalarType == null && elementType.isEnum()) {
       Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>)elementType;
-      valueScalarType = util.getTypeManager().createEnumScalarType(enumClass, EnumType.STRING);
+      valueScalarType = util.typeManager().enumType(enumClass, EnumType.STRING);
     }
 
     boolean scalar = true;
@@ -266,8 +266,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
       elementDescriptor.addBeanProperty(valueProp);
     }
 
-    elementDescriptor.setName(prop.getFullBeanName());
-
+    elementDescriptor.setName(prop.toString());
     factory.createUnidirectional(elementDescriptor, prop.getOwningType(), beanTable, prop.getTableJoin());
     prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType(), scalar));
   }

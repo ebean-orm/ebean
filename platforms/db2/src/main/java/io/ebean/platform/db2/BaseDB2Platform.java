@@ -2,11 +2,7 @@ package io.ebean.platform.db2;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.annotation.Platform;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -22,7 +18,7 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
     this.supportsNativeJavaTime = false;
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.likeClauseRaw = "like ?";
-    this.sqlLimiter = new Db2SqlLimiter();
+    this.sqlLimiter = new AnsiSqlRowsLimiter();
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
     this.dbIdentity.setSupportsSequence(true);
@@ -38,6 +34,8 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
 
     historySupport = new DB2HistorySupport();
     booleanDbType = Types.BOOLEAN;
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255, 4000, dbTypeMap.get(DbType.CLOB)));
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255, 8000, dbTypeMap.get(DbType.BLOB)));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint", false));
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("bigint", false));

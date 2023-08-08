@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.6.7-SNAPSHOT</version>
+    <version>13.20.2-SNAPSHOT</version>
   </parent>
 
   <name>ebean test</name>
@@ -14,10 +14,9 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.32</version>
-      <scope>provided</scope>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-applog</artifactId>
+      <version>1.0</version>
     </dependency>
 
     <dependency>
@@ -29,20 +28,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.6.7-SNAPSHOT</version>
+      <version>13.20.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.6.7-SNAPSHOT</version>
+      <version>13.20.2-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.6.7-SNAPSHOT</version>
+      <version>13.20.2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -68,10 +67,24 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.22.0</version>
+      <version>3.23.1</version>
     </dependency>
 
     <!-- Including JAXB for DB Migration generation with Java 11+ -->
+    <!-- JAVAX-DEPENDENCY-START -->
+    <dependency>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>2.3.6</version>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.activation</groupId>
+      <artifactId>jakarta.activation-api</artifactId>
+      <version>1.2.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- JAVAX-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-START ___
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
@@ -83,6 +96,7 @@
       <version>4.0.0</version>
       <scope>runtime</scope>
     </dependency>
+    ____ JAKARTA-DEPENDENCY-END -->
 
     <!-- Not strictly required but bring in H2 Driver because we use it so much -->
     <dependency>
@@ -103,8 +117,29 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-joda-time</artifactId>
+      <version>13.18.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-jackson-jsonnode</artifactId>
+      <version>13.18.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-jackson-mapper</artifactId>
+      <version>13.20.2-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>13.6.7-SNAPSHOT</version>
+      <version>13.20.2-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
@@ -147,7 +182,7 @@
     <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
-      <version>2.9.7</version>
+      <version>2.11.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -161,7 +196,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.3.3</version>
+      <version>42.5.1</version>
       <exclusions>
         <exclusion>
           <groupId>org.checkerframework</groupId>
@@ -188,7 +223,7 @@
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
-      <version>2.6.0</version>
+      <version>3.0.7</version>
       <scope>test</scope>
     </dependency>
 
@@ -219,7 +254,7 @@
     <dependency>
       <groupId>org.xerial</groupId>
       <artifactId>sqlite-jdbc</artifactId>
-      <version>3.36.0.3</version>
+      <version>3.41.2.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -260,11 +295,11 @@
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.24</version>
+        <version>2.34</version>
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.6.5</tile>
+            <tile>io.ebean.tile:enhancement:13.17.1</tile>
           </tiles>
         </configuration>
       </plugin>

@@ -3,7 +3,6 @@ package io.ebeaninternal.server.core;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
-import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.PersistExecute;
 import io.ebeaninternal.server.persist.TrimLogSql;
@@ -49,9 +48,9 @@ public final class PersistRequestUpdateSql extends PersistRequest {
   /**
    * Add this statement to JDBC batch for later execution.
    */
-  public int addBatch() {
+  public void addBatch() {
     this.addBatch = true;
-    return executeStatement(true);
+    executeStatement(true);
   }
 
   /**
@@ -66,7 +65,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    * Add this request to BatchControl to flush later.
    */
   public void addToFlushQueue(int pos) {
-    BatchControl control = transaction.getBatchControl();
+    BatchControl control = transaction.batchControl();
     if (control == null) {
       control = persistExecute.createBatchControl(transaction);
     }
@@ -148,7 +147,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   public void logSqlBatchBind() {
     if (transaction.isLogSql()) {
-      transaction.logSql(Str.add(" -- bind(", bindLog, ")"));
+      transaction.logSql(" -- bind({0})", bindLog);
     }
   }
 
@@ -161,20 +160,20 @@ public final class PersistRequestUpdateSql extends PersistRequest {
       persistExecute.collectSqlUpdate(label, startNanos);
     }
     if (transaction.isLogSql() && !batchThisRequest) {
-      transaction.logSql(Str.add(TrimLogSql.trim(updateSql.getGeneratedSql()), "; -- bind(", bindLog, ") rows(", String.valueOf(rowCount), ")"));
+      transaction.logSql("{0}; -- bind({1}) rows({2})", TrimLogSql.trim(updateSql.getGeneratedSql()), bindLog, rowCount);
     }
     if (updateSql.isAutoTableMod()) {
       // add the modification info to the TransactionEvent
       // this is used to invalidate cached objects etc
       switch (sqlType) {
         case SQL_INSERT:
-          transaction.getEvent().add(tableName, true, false, false);
+          transaction.event().add(tableName, true, false, false);
           break;
         case SQL_UPDATE:
-          transaction.getEvent().add(tableName, false, true, false);
+          transaction.event().add(tableName, false, true, false);
           break;
         case SQL_DELETE:
-          transaction.getEvent().add(tableName, false, false, true);
+          transaction.event().add(tableName, false, false, true);
           break;
         case SQL_UNKNOWN:
           transaction.markNotQueryOnly();

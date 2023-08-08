@@ -28,7 +28,7 @@ public class TestQueryIsNull extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = DB.find(Order.class).select("id, status")
-      .where().eq("status", null).query();
+      .where().eq("status", (String) null).query();
     query.findList();
 
     assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.status is null");
@@ -67,6 +67,46 @@ public class TestQueryIsNull extends BaseTestCase {
     query4.findList();
 
     assertThat(query4.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.order_date is not null and t0.status = ? and t0.ship_date is null");
+  }
+
+  @Test
+  void ifPresent() {
+    ResetBasicData.reset();
+
+    Query<Order> query = DB.find(Order.class).select("id, status")
+      .where().eqIfPresent("status", null)
+      .gtIfPresent("id", null)
+      .geIfPresent("id", null)
+      .ltIfPresent("id", null)
+      .leIfPresent("id", null)
+      .query();
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0");
+
+    Query<Order> query1 = DB.find(Order.class).select("id, status")
+      .where().eqIfPresent("status", null)
+      .gtIfPresent("id", 90)
+      .geIfPresent("id", 91)
+      .ltIfPresent("id", 92)
+      .leIfPresent("id", 93)
+      .isNull("shipDate").query();
+    query1.findList();
+
+    assertThat(query1.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.id > ? and t0.id >= ? and t0.id < ? and t0.id <= ? and t0.ship_date is null");
+
+    Query<Order> query2 = DB.find(Order.class).select("id, status")
+      .where()
+      .leIfPresent("id", 93)
+      .isNull("orderDate")
+      .ltIfPresent("id", 92)
+      .geIfPresent("id", 91)
+      .isNull("shipDate")
+      .gtIfPresent("id", 90)
+      .query();
+    query2.findList();
+
+    assertThat(query2.getGeneratedSql()).isEqualTo("select t0.id, t0.status from o_order t0 where t0.id <= ? and t0.order_date is null and t0.id < ? and t0.id >= ? and t0.ship_date is null and t0.id > ?");
   }
 
   @Test

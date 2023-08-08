@@ -5,6 +5,7 @@ import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.query.STreeProperty;
 
 import java.sql.Types;
+import java.util.Set;
 
 final class FormulaPropertyPath {
 
@@ -18,6 +19,7 @@ final class FormulaPropertyPath {
   private final String internalExpression;
   private final ElPropertyDeploy firstProp;
   private final String parsedAggregation;
+  private final Set<String> includes;
   private boolean countDistinct;
   private String cast;
   private String alias;
@@ -32,7 +34,7 @@ final class FormulaPropertyPath {
     int openBracket = formula.indexOf('(');
     int closeBracket = formula.lastIndexOf(')');
     if (openBracket == -1 || closeBracket == -1) {
-      throw new IllegalStateException("Unable to parse formula [" + formula + "]");
+      throw new IllegalStateException("Unable to parse formula " + formula);
     }
     outerFunction = formula.substring(0, openBracket).trim();
     internalExpression = trimDistinct(formula.substring(openBracket + 1, closeBracket));
@@ -47,8 +49,9 @@ final class FormulaPropertyPath {
       // fetch("machineStats", "sum(hours), sum(totalKms)")
       parsed = parsed.replace("${}", "${" + path + "}");
     }
+    this.includes = parser.includes();
     this.parsedAggregation = buildFormula(parsed);
-    this.firstProp = parser.getFirstProp();
+    this.firstProp = parser.firstProp();
   }
 
   private void parseSuffix(String suffix) {
@@ -129,7 +132,7 @@ final class FormulaPropertyPath {
   @SuppressWarnings("rawtypes")
   private DynamicPropertyAggregationFormula createManyToOne(BeanProperty property) {
     String logicalName = logicalName();
-    return new DynamicPropertyAggregationFormulaMTO((BeanPropertyAssocOne) property, logicalName, parsedAggregation, isAggregate(), target(logicalName), alias);
+    return new DynamicPropertyAggregationFormulaMTO((BeanPropertyAssocOne) property, logicalName, parsedAggregation, isAggregate(), target(logicalName), alias, includes);
   }
 
   private BeanProperty target(String logicalName) {

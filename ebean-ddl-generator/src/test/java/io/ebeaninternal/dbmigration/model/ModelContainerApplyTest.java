@@ -45,6 +45,8 @@ class ModelContainerApplyTest {
 
     ModelContainer model = new ModelContainer();
     model.apply(migration, MigrationVersion.parse("1.1"));
+
+    assertThat(model.getSchemas()).contains("foo");
   }
 
   private Migration newMigration(Object change) {

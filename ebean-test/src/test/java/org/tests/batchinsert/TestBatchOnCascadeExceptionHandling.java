@@ -90,13 +90,13 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
     Transaction txn = server.beginTransaction();
     try {
       assertThat(txn.isBatchMode()).isFalse();
-      assertThat(txn.isBatchOnCascade()).isSameAs(PersistBatch.ALL.equals(spiEbeanServer().databasePlatform().getPersistBatchOnCascade()));
+      assertThat(txn.isBatchOnCascade()).isSameAs(PersistBatch.ALL.equals(spiEbeanServer().databasePlatform().persistBatchOnCascade()));
 
       failingOperation.run();
       Assertions.fail("PersistenceException expected");
     } catch (PersistenceException e) {
       assertThat(txn.isBatchMode()).as("batch mode").isFalse(); // should not have changed
-      BatchControl bc = ((SpiTransaction) txn).getBatchControl();
+      BatchControl bc = ((SpiTransaction) txn).batchControl();
       assertThat(bc == null || bc.isEmpty()).as("batch emtpy").isTrue();
     } finally {
       txn.end();

@@ -5,6 +5,7 @@ import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -14,7 +15,6 @@ import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.querydefn.OrmUpdateProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-import io.ebeaninternal.server.type.DataBind;
 import io.ebeaninternal.server.util.BindParamsParser;
 
 import java.sql.Connection;
@@ -25,6 +25,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Compile Query Predicates.
@@ -46,25 +48,13 @@ public final class CQueryPredicates {
   private final BindParams bindParams;
   private DefaultExpressionRequest filterMany;
   /**
-   * SQL generated from the where expressions.
-   */
-  private String filterManyExprSql;
-  /**
    * Bind values from the where expressions.
    */
   private DefaultExpressionRequest where;
   /**
-   * SQL generated from the where expressions.
-   */
-  private String whereExprSql;
-  /**
    * Bind values for having expression.
    */
   private DefaultExpressionRequest having;
-  /**
-   * SQL generated from the having expression.
-   */
-  private String havingExprSql;
   private String dbHaving;
   /**
    * logicalWhere with property names converted to db columns.
@@ -86,7 +76,7 @@ public final class CQueryPredicates {
     this.binder = binder;
     this.request = request;
     this.query = request.query();
-    this.bindParams = query.getBindParams();
+    this.bindParams = query.bindParams();
     this.idValue = query.getId();
   }
 
@@ -95,15 +85,15 @@ public final class CQueryPredicates {
   }
 
   public String bind(DataBind dataBind) throws SQLException {
-    OrmUpdateProperties updateProperties = query.getUpdateProperties();
+    OrmUpdateProperties updateProperties = query.updateProperties();
     if (updateProperties != null) {
       // bind the update set clause
       updateProperties.bind(binder, dataBind);
     }
     if (query.isVersionsBetween() && binder.isAsOfStandardsBased()) {
       // sql2011 based versions between timestamp syntax
-      Timestamp start = query.getVersionStart();
-      Timestamp end = query.getVersionEnd();
+      Timestamp start = query.versionStart();
+      Timestamp end = query.versionEnd();
       dataBind.append("between ").append(start).append(" and ").append(end);
       binder.bindObject(dataBind, start);
       binder.bindObject(dataBind, end);
@@ -111,7 +101,7 @@ public final class CQueryPredicates {
     }
     CQueryPlan queryPlan = request.queryPlan();
     if (queryPlan != null) {
-      int asOfTableCount = queryPlan.getAsOfTableCount();
+      int asOfTableCount = queryPlan.asOfTableCount();
       if (asOfTableCount > 0) {
         // bind the asOf value for each table alias as part of the from/join clauses
         // there is one effective date predicate per table alias
@@ -147,7 +137,7 @@ public final class CQueryPredicates {
 
   private void buildUpdateClause(boolean buildSql, DeployParser deployParser) {
     if (buildSql) {
-      OrmUpdateProperties updateProperties = query.getUpdateProperties();
+      OrmUpdateProperties updateProperties = query.updateProperties();
       if (updateProperties != null) {
         dbUpdateClause = updateProperties.buildSetClause(deployParser);
       }
@@ -169,14 +159,14 @@ public final class CQueryPredicates {
     if (!buildSql && bindParams != null && bindParams.requiresNamedParamsPrepare()) {
       if (query.isNativeSql()) {
         // convert named params into positioned params
-        String sql = query.getNativeSql();
+        String sql = query.nativeSql();
         BindParamsParser.parse(bindParams, sql);
 
       } else if (query.isRawSql()) {
         // RawSql query hit cached query plan. Need to convert
         // named parameters into positioned parameters so that
         // the named parameters are bound
-        SpiRawSql.Sql sql = query.getRawSql().getSql();
+        SpiRawSql.Sql sql = query.rawSql().getSql();
         String s = sql.isParsed() ? sql.getPreWhere() : sql.getUnparsedSql();
         BindParamsParser.parse(bindParams, s);
       }
@@ -188,70 +178,46 @@ public final class CQueryPredicates {
     buildUpdateClause(buildSql, deployParser);
     buildBindWhereRawSql(buildSql);
 
-    SpiExpressionList<?> whereExp = query.getWhereExpressions();
+    BeanPropertyAssocMany<?> manyProperty = request.determineMany();
+    if (buildSql) {
+      String logicalOrderBy = deriveOrderByWithMany(request.manyPropertyForOrderBy());
+      if (logicalOrderBy != null) {
+        dbOrderBy = deployParser.parse(logicalOrderBy);
+      }
+      // create a copy of the includes required to support the orderBy
+      orderByIncludes = new HashSet<>(deployParser.includes());
+    }
+    SpiExpressionList<?> whereExp = query.whereExpressions();
     if (whereExp != null) {
       this.where = new DefaultExpressionRequest(request, deployParser, binder, whereExp);
       if (buildSql) {
-        whereExprSql = where.buildSql();
+        dbWhere = where.buildSql();
       }
     }
-    BeanPropertyAssocMany<?> manyProperty = request.determineMany();
     if (manyProperty != null) {
-      OrmQueryProperties chunk = query.getDetail().getChunk(manyProperty.name(), false);
+      OrmQueryProperties chunk = query.detail().getChunk(manyProperty.name(), false);
       SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
       if (filterManyExpr != null) {
         this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
         if (buildSql) {
-          filterManyExprSql = filterMany.buildSql();
+          dbFilterMany = filterMany.buildSql();
         }
       }
     }
-    // having expression
-    SpiExpressionList<?> havingExpr = query.getHavingExpressions();
+    SpiExpressionList<?> havingExpr = query.havingExpressions();
     if (havingExpr != null) {
       this.having = new DefaultExpressionRequest(request, deployParser, binder, havingExpr);
       if (buildSql) {
-        havingExprSql = having.buildSql();
+        dbHaving = having.buildSql();
       }
     }
     if (buildSql) {
-      parsePropertiesToDbColumns(deployParser);
+      predicateIncludes = deployParser.includes();
     }
   }
 
   /**
-   * Parse/Convert property names to database columns in the where and order by
-   * clauses etc.
-   */
-  private void parsePropertiesToDbColumns(DeployParser deployParser) {
-    // order by is dependent on the manyProperty (if there is one)
-    String logicalOrderBy = deriveOrderByWithMany(request.manyPropertyForOrderBy());
-    if (logicalOrderBy != null) {
-      dbOrderBy = deployParser.parse(logicalOrderBy);
-    }
-    // create a copy of the includes required to support the orderBy
-    orderByIncludes = new HashSet<>(deployParser.getIncludes());
-    dbWhere = deriveWhere(deployParser);
-    dbFilterMany = deriveFilterMany(deployParser);
-    dbHaving = deriveHaving(deployParser);
-    // all includes, including ones for manyWhere clause
-    predicateIncludes = deployParser.getIncludes();
-  }
-
-  private String deriveFilterMany(DeployParser deployParser) {
-    if (isEmpty(filterManyExprSql)) {
-      return null;
-    } else {
-      return deployParser.parse(filterManyExprSql);
-    }
-  }
-
-  private String deriveWhere(DeployParser deployParser) {
-    return parse(whereExprSql, deployParser);
-  }
-
-  /**
-   * Replace the table alias place holders.
+   * Replace the table alias place-holders.
    */
   void parseTableAlias(SqlTreeAlias alias) {
     if (dbWhere != null) {
@@ -268,20 +234,6 @@ public final class CQueryPredicates {
     if (dbOrderBy != null) {
       dbOrderBy = alias.parse(dbOrderBy);
     }
-  }
-
-  private boolean isEmpty(String s) {
-    return s == null || s.isEmpty();
-  }
-
-  private String parse(String expr, DeployParser deployParser) {
-    if (expr == null) return "";
-    if (expr.isEmpty()) return expr;
-    return deployParser.parse(expr);
-  }
-
-  private String deriveHaving(DeployParser deployParser) {
-    return parse(havingExprSql, deployParser);
   }
 
   private String parseOrderBy() {
@@ -332,14 +284,14 @@ public final class CQueryPredicates {
       // orderById is already in the order by clause
       return orderBy;
     }
-    if (idPos <= -1 || idPos >= manyPos) {
+    if (idPos == -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
-        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name();
-        msg += "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById + "]";
-        msg += " must come before the many property [" + manyProp.name() + "] in the orderBy.";
-        msg += " Ebean has automatically modified the orderBy clause to do this.";
-        CoreLog.log.warn(msg);
+        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name()
+        + "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById
+        + "] must come before the many property [" + manyProp.name() + "] in the orderBy."
+        + " Ebean has automatically modified the orderBy clause to do this.";
+        CoreLog.log.log(WARNING, msg);
       }
       // the id needs to come before the manyPropName
       orderBy = orderBy.substring(0, manyPos) + orderById + ", " + orderBy.substring(manyPos);
@@ -350,60 +302,60 @@ public final class CQueryPredicates {
   /**
    * Return the bind values for the where expression.
    */
-  public List<Object> getWhereExprBindValues() {
-    return where == null ? Collections.emptyList() : where.getBindValues();
+  public List<Object> whereExprBindValues() {
+    return where == null ? Collections.emptyList() : where.bindValues();
   }
 
   /**
    * Return the db update set clause for an UpdateQuery.
    */
-  String getDbUpdateClause() {
+  String dbUpdateClause() {
     return dbUpdateClause;
   }
 
   /**
    * Return the db column version of the combined where clause.
    */
-  String getDbHaving() {
+  String dbHaving() {
     return dbHaving;
   }
 
   /**
    * Return the db column version of the combined where clause.
    */
-  String getDbWhere() {
+  String dbWhere() {
     return dbWhere;
   }
 
   /**
    * Return a db filter for filtering many fetch joins.
    */
-  String getDbFilterMany() {
+  String dbFilterMany() {
     return dbFilterMany;
   }
 
   /**
    * Return the db column version of the order by clause.
    */
-  String getDbOrderBy() {
+  String dbOrderBy() {
     return dbOrderBy;
   }
 
   /**
    * Return the includes required for the where and order by clause.
    */
-  Set<String> getPredicateIncludes() {
+  Set<String> predicateIncludes() {
     return predicateIncludes;
   }
 
   /**
    * Return the orderBy includes.
    */
-  Set<String> getOrderByIncludes() {
+  Set<String> orderByIncludes() {
     return orderByIncludes;
   }
 
-  String getLogWhereSql() {
+  String logWhereSql() {
     if (dbWhere == null && dbFilterMany == null) {
       return "";
     }

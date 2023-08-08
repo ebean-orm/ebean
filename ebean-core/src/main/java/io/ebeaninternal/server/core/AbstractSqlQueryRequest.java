@@ -4,7 +4,6 @@ import io.ebean.CancelableQuery;
 import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.*;
-import io.ebeaninternal.server.util.Str;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.persist.TrimLogSql;
 import io.ebeaninternal.server.util.BindParamsParser;
@@ -49,7 +48,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
       transaction = server.currentServerTransaction();
       if (transaction == null || !transaction.isActive()) {
         // create a local readOnly transaction
-        transaction = server.createReadOnlyTransaction(null);
+        transaction = server.createReadOnlyTransaction(null, query.isUseMaster());
         createdTransaction = true;
       }
     }
@@ -119,7 +118,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
     int firstRow = query.getFirstRow();
     int maxRows = query.getMaxRows();
     if (firstRow > 0 || maxRows > 0) {
-      return server.databasePlatform().getBasicSqlLimiter().limit(sql, firstRow, maxRows);
+      return server.databasePlatform().basicSqlLimiter().limit(sql, firstRow, maxRows);
     }
     return sql;
   }
@@ -137,7 +136,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
     try {
       query.checkCancelled();
       prepareSql();
-      Connection conn = transaction.getInternalConnection();
+      Connection conn = transaction.internalConnection();
       pstmt = conn.prepareStatement(sql);
       if (query.getTimeout() > 0) {
         pstmt.setQueryTimeout(query.getTimeout());
@@ -151,7 +150,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
       }
       if (isLogSql()) {
         long micros = (System.nanoTime() - startNano) / 1000L;
-        transaction.logSql(Str.add(TrimLogSql.trim(sql), "; --bind(", bindLog, ") --micros(", micros + ")"));
+        transaction.logSql("{0}; --bind({1}) --micros({2})", TrimLogSql.trim(sql), bindLog, micros);
       }
     } finally {
       lock.unlock();

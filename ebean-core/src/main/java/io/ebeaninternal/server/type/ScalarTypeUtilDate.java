@@ -3,7 +3,9 @@ package io.ebeaninternal.server.type;
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
-import io.ebeaninternal.server.core.BasicTypeConverter;
+import io.ebean.core.type.ScalarTypeBaseDate;
+import io.ebean.core.type.ScalarTypeBaseDateTime;
+import io.ebean.core.type.BasicTypeConverter;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -11,14 +13,14 @@ import java.sql.Types;
 import java.time.Instant;
 import java.util.Date;
 
-import static io.ebeaninternal.server.type.IsoJsonDateTimeParser.formatIso;
+import static io.ebean.core.type.ScalarTypeUtils.formatInstant;
 
 /**
  * ScalarType for java.util.Date.
  */
 final class ScalarTypeUtilDate {
 
-  static final class TimestampType extends ScalarTypeBaseDateTime<java.util.Date> {
+  static final class TimestampType extends ScalarTypeBaseDateTime<Date> {
 
     TimestampType(JsonConfig.DateTime mode) {
       super(mode, java.util.Date.class, false, Types.TIMESTAMP);
@@ -31,7 +33,7 @@ final class ScalarTypeUtilDate {
 
     @Override
     protected String toJsonISO8601(Date value) {
-      return formatIso(value.toInstant());
+      return formatInstant(value.toInstant());
     }
 
     @Override
@@ -89,7 +91,7 @@ final class ScalarTypeUtilDate {
     }
   }
 
-  static final class DateType extends ScalarTypeBaseDate<java.util.Date> {
+  static final class DateType extends ScalarTypeBaseDate<Date> {
 
     DateType(JsonConfig.Date mode) {
       super(mode, Date.class, false, Types.DATE);

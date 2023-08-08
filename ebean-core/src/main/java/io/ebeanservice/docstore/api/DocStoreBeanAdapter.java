@@ -36,20 +36,20 @@ public interface DocStoreBeanAdapter<T> extends BeanDocType<T> {
   /**
    * Return true if this type is mapped for doc storage.
    */
-  boolean isMapped();
+  boolean mapped();
 
   /**
    * Return the unique queueId for this bean type. This is expected to be a relatively short unique
    * string (rather than a fully qualified class name).
    */
-  String getQueueId();
+  String queueId();
 
   /**
    * Determine and return how this persist type will be processed given the transaction mode.
    * <p>
    * Some transactions (like bulk updates) might specifically turn off indexing for example.
    */
-  DocStoreMode getMode(PersistRequest.Type persistType, DocStoreMode txnMode);
+  DocStoreMode mode(PersistRequest.Type persistType, DocStoreMode txnMode);
 
   /**
    * Return the index type for this bean type.

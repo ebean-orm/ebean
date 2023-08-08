@@ -45,27 +45,27 @@ final class UpdatePlan implements SpiUpdatePlan {
   }
 
   @Override
-  public long getTimeCreated() {
+  public long timeCreated() {
     return timeCreated;
   }
 
   @Override
-  public long getTimeLastUsed() {
+  public long timeLastUsed() {
     return timeLastUsed;
   }
 
   @Override
-  public String getKey() {
+  public String key() {
     return key;
   }
 
   @Override
-  public ConcurrencyMode getMode() {
+  public ConcurrencyMode mode() {
     return mode;
   }
 
   @Override
-  public String getSql() {
+  public String sql() {
     return sql;
   }
 

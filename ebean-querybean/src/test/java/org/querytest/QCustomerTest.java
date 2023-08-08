@@ -2,6 +2,7 @@ package org.querytest;
 
 import io.ebean.*;
 import io.ebean.annotation.Transactional;
+import io.ebean.test.LoggedSql;
 import io.ebean.types.Inet;
 import org.example.domain.*;
 import org.example.domain.otherpackage.PhoneNumber;
@@ -15,11 +16,13 @@ import org.junit.jupiter.api.Test;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.domain.query.QAddress.Alias.country;
 import static org.example.domain.query.QAddress.Alias.line1;
@@ -155,6 +158,39 @@ public class QCustomerTest {
     }
   }
 
+  @Test
+  void equalTo_byProperty() {
+    Query<Customer> query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .billingAddress.city.eq(QCustomer.Alias.shippingAddress.city)
+      .query();
+
+    query.findList();
+    String generatedSql = query.getGeneratedSql();
+
+    // select t0.id from be_customer t0
+    // left join o_address t2 on t2.id = t0.shipping_address_id
+    // left join o_address t1 on t1.id = t0.billing_address_id
+    // where t1.city = t2.city
+    assertThat(generatedSql).contains("where t1.city = t2.city");
+  }
+
+  @Test
+  void notEqual_byProperty() {
+    Query<Customer> query = new QCustomer()
+      .select(QCustomer.Alias.id)
+      .billingAddress.city.ne(QCustomer.Alias.shippingAddress.city)
+      .query();
+
+    query.findList();
+    String generatedSql = query.getGeneratedSql();
+
+    // select t0.id from be_customer t0
+    // left join o_address t2 on t2.id = t0.shipping_address_id
+    // left join o_address t1 on t1.id = t0.billing_address_id
+    // where t1.city <> t2.city
+    assertThat(generatedSql).contains("where t1.city <> t2.city");
+  }
 
   @Test
   public void isEmpty() {
@@ -240,8 +276,15 @@ public class QCustomerTest {
   }
 
   @Test
-  public void usingTransaction() {
+  public void usingMaster() {
+      new QCustomer()
+        .registered.isNull()
+        .usingMaster()
+        .findList();
+  }
 
+  @Test
+  public void usingTransaction() {
     try (Transaction transaction = DB.getDefault().createTransaction()) {
 
       new QCustomer()
@@ -280,10 +323,11 @@ public class QCustomerTest {
 
   @Test
   public void testAssocOne() {
-
+    DB.getDefault();
     Address address = new Address();
     address.setId(41L);
 
+    LoggedSql.start();
     new QCustomer()
       .billingAddress.eq(address)
       .findList();
@@ -299,6 +343,85 @@ public class QCustomerTest {
     new QCustomer()
       .billingAddress.notEqualTo(address)
       .findList();
+
+    new QCustomer()
+      .billingAddress.eqIfPresent(address)
+      .name.isNull()
+      .findList();
+
+    new QCustomer()
+      .billingAddress.eqIfPresent(null)
+      .name.isNull()
+      .findList();
+
+
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(6);
+    assertThat(sql.get(0)).contains("where t0.billing_address_id = ?");
+    assertThat(sql.get(1)).contains("where t0.billing_address_id = ?");
+    assertThat(sql.get(2)).contains("where t0.billing_address_id <> ?");
+    assertThat(sql.get(3)).contains("where t0.billing_address_id <> ?");
+    assertThat(sql.get(4)).contains("where t0.billing_address_id = ? and t0.name is null");
+    assertThat(sql.get(5)).contains("where t0.name is null");
+  }
+
+  @Test
+  public void testAssocOne_in() {
+    DB.getDefault();
+    Address address = new Address();
+    address.setId(41L);
+    Address address2 = new Address();
+    address2.setId(41L);
+
+    LoggedSql.start();
+    new QCustomer()
+      .billingAddress.in(address, address2)
+      .findList();
+
+    new QCustomer()
+      .billingAddress.in(List.of(address, address2))
+      .findList();
+
+    new QCustomer()
+      .billingAddress.inOrEmpty(List.of(address, address2))
+      .name.isNull()
+      .findList();
+
+    new QCustomer()
+      .billingAddress.inOrEmpty(List.of())
+      .name.isNull()
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(4);
+    assertThat(sql.get(0)).contains("where t0.billing_address_id in (?,?)");
+    assertThat(sql.get(1)).contains("where t0.billing_address_id in (?,?)");
+    assertThat(sql.get(2)).contains("where t0.billing_address_id in (?,?) and t0.name is null");
+    assertThat(sql.get(3)).contains("where t0.name is null");
+  }
+
+  @Test
+  public void testAssocOne_notIn() {
+    DB.getDefault();
+    Address address = new Address();
+    address.setId(41L);
+    Address address2 = new Address();
+    address2.setId(41L);
+
+    LoggedSql.start();
+    new QCustomer()
+      .billingAddress.notIn(address, address2)
+      .findList();
+
+    new QCustomer()
+      .billingAddress.notIn(List.of(address, address2))
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("where t0.billing_address_id not in (?,?)");
+    assertThat(sql.get(1)).contains("where t0.billing_address_id not in (?,?)");
   }
 
   @Test
@@ -330,6 +453,17 @@ public class QCustomerTest {
       .id.isIn(34L, 33L)
       .name.notIn("asd", "foo", "bar")
       .registered.in(new Date())
+      .findList();
+  }
+
+  @Test
+  public void testTwoDiffQueryTypes_expect_NoLineNumbers() {
+    new QCustomer()
+      .id.isIn(34L)
+      .findList();
+
+    new QContact()
+      .email.isNull()
       .findList();
   }
 
@@ -421,6 +555,7 @@ public class QCustomerTest {
     assertContains(new QCustomer().registered.lt(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.before(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.lessThan(new Date()).query(), " where t0.registered < ?");
+    assertContains(new QCustomer().whenCreated.lt(QCustomer.Alias.whenUpdated).query(), " where t0.when_created < t0.when_updated");
   }
 
   @Test
@@ -428,6 +563,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.le(new Date()).query(), " where t0.registered <= ?");
     assertContains(new QCustomer().registered.lessOrEqualTo(new Date()).query(), " where t0.registered <= ?");
+    assertContains(new QCustomer().whenCreated.le(QCustomer.Alias.whenUpdated).query(), " where t0.when_created <= t0.when_updated");
   }
 
   @Test
@@ -435,6 +571,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.after(new Date()).query(), " where t0.registered > ?");
     assertContains(new QCustomer().registered.gt(new Date()).query(), " where t0.registered > ?");
+    assertContains(new QCustomer().whenCreated.gt(QCustomer.Alias.whenUpdated).query(), " where t0.when_created > t0.when_updated");
     assertContains(new QCustomer().registered.greaterThan(new Date()).query(), " where t0.registered > ?");
   }
 
@@ -444,6 +581,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.ge(new Date()).query(), " where t0.registered >= ?");
     assertContains(new QCustomer().registered.greaterOrEqualTo(new Date()).query(), " where t0.registered >= ?");
+    assertContains(new QCustomer().whenCreated.ge(QCustomer.Alias.whenUpdated).query(), " where t0.when_created >= t0.when_updated");
   }
 
   private void assertContains(Query<Customer> query, String match) {
@@ -460,25 +598,7 @@ public class QCustomerTest {
       .findList();
   }
 
-  @Test
-  public void query_setInheritType() {
 
-    ACat cat = new ACat("C1");
-    cat.save();
-
-    ACat cat2 = new ACat("C2");
-    cat2.save();
-
-    ADog dog = new ADog("D1", "D878");
-    dog.save();
-
-    List<Animal> animals = new QAnimal()
-      .id.greaterOrEqualTo(1L)
-      .setInheritType(ACat.class)
-      .findList();
-
-    System.out.println(animals);
-  }
 
   @Test
   public void select_assocManyToOne() {
@@ -629,6 +749,22 @@ public class QCustomerTest {
   }
 
   @Test
+  void query_inRangeWithOtherProperties() {
+    var c = QCustomer.alias();
+
+    Query<Customer> query = new QCustomer()
+      .select(c.id)
+      .name.inRangeWith(c.contacts.firstName, c.contacts.lastName)
+      .query();
+
+    // select distinct t0.id from be_customer t0
+    // left join be_contact t1 on t1.customer_id = t0.id
+    // where t1.first_name <= t0.name and (t0.name < t1.last_name or t1.last_name is null)
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where t1.first_name <= t0.name and (t0.name < t1.last_name or t1.last_name is null)");
+  }
+
+  @Test
   public void query_exists() {
 
     boolean customerExists =
@@ -637,6 +773,32 @@ public class QCustomerTest {
         .exists();
 
     assertThat(customerExists).isFalse();
+  }
+
+  @Test
+  void checkingPropertyTypesToEQOperator() {
+
+    QCustomer c = QCustomer.alias();
+
+    new QCustomer()
+      .select(c.version, count(c.id))
+      .version.gt(0)
+      .having()
+      .add(gt(count(c.id), 1))
+      .findList();
+
+    new QCustomer()
+      .add(in(QCustomer.Alias.name, List.of("foo", "bar")))
+      .add(eq(QCustomer.Alias.currentInet, Inet.of("127.0.0.1")))
+      .findList();
+
+    new QCustomer()
+      //.add(gt(sum(QCustomer.Alias.version), 45))
+      .add(eq(QCustomer.Alias.version, 45L))
+      .add(eq(QCustomer.Alias.name, "junk"))
+      .add(eq(QCustomer.Alias.registered, new Date()))
+      .add(eq(QCustomer.Alias.whenUpdated, new Timestamp(System.currentTimeMillis())))
+      .findList();
   }
 
   @Test
@@ -804,10 +966,20 @@ public class QCustomerTest {
     cust.setName("testFetchByScalarValue");
     cust.setPhoneNumber(new PhoneNumber("+18005555555"));
     cust.save();
-    assertThat(new QCustomer()
+
+    var customer = new QCustomer()
       .name.eq("testFetchByScalarValue")
       .phoneNumber.eq(new PhoneNumber("+18005555555"))
-      .findOne()).isNotNull();
+      .findOne();
+
+    assertThat(customer).isNotNull();
+
+    var customers = new QCustomer()
+      .name.eq("testFetchByScalarValue")
+      .phoneNumber.eq(new PhoneNumber("+18005555555"))
+      .findList();
+
+    assertThat(customers).hasSize(1);
   }
 
 

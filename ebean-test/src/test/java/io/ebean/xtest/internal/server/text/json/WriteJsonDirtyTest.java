@@ -6,7 +6,7 @@ import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.text.json.WriteJson;
+import io.ebeaninternal.server.json.WriteJson;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -37,7 +37,7 @@ public class WriteJsonDirtyTest {
     customer.setAnniversary(new Date(System.currentTimeMillis()));
 
     EntityBean entityBean = (EntityBean) customer;
-    boolean[] dirtyProperties = entityBean._ebean_getIntercept().getDirtyProperties();
+    boolean[] dirtyProperties = entityBean._ebean_getIntercept().dirtyProperties();
 
     StringWriter writer = new StringWriter();
     JsonFactory jsonFactory = new JsonFactory();

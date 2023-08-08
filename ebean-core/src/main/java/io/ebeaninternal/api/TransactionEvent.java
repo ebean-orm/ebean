@@ -55,7 +55,7 @@ public final class TransactionEvent implements Serializable {
     deleteByIdMap.addList(desc, idList);
   }
 
-  public DeleteByIdMap getDeleteByIdMap() {
+  public DeleteByIdMap deleteByIdMap() {
     return deleteByIdMap;
   }
 
@@ -70,11 +70,11 @@ public final class TransactionEvent implements Serializable {
   /**
    * Return the list of PersistRequestBean's for this transaction.
    */
-  public List<PersistRequestBean<?>> getListenerNotify() {
+  public List<PersistRequestBean<?>> listenerNotify() {
     return listenerNotify;
   }
 
-  public TransactionEventTable getEventTables() {
+  public TransactionEventTable eventTables() {
     return eventTables;
   }
 
@@ -129,7 +129,7 @@ public final class TransactionEvent implements Serializable {
    * Add any relevant PersistRequestBean's to DocStoreUpdates for later processing.
    */
   public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates) {
-    List<PersistRequestBean<?>> requests = getListenerNotify();
+    List<PersistRequestBean<?>> requests = listenerNotify();
     if (requests != null) {
       for (PersistRequestBean<?> persistRequestBean : requests) {
         persistRequestBean.addDocStoreUpdates(docStoreUpdates);
@@ -139,7 +139,7 @@ public final class TransactionEvent implements Serializable {
 
   /**
    * Return the CacheChangeSet that we add cache notification messages to.
-   *
+   * <p>
    * We want to add to this change set as we process requests allowing the
    * PersistRequestBean to be garbage collected for large transactions.
    */

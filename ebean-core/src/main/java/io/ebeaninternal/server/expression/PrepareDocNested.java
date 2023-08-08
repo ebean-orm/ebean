@@ -50,7 +50,7 @@ final class PrepareDocNested {
     this.type = type;
     this.beanDescriptor = beanDescriptor;
     this.original = original;
-    this.origUnderlying = original.getUnderlyingList();
+    this.origUnderlying = original.underlyingList();
     this.origSize = origUnderlying.size();
   }
 

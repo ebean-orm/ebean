@@ -3,10 +3,6 @@ package io.ebean.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.PersistBatch;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.JsonConfig;
-import io.ebean.config.MatchingNamingConvention;
-import io.ebean.config.PlatformConfig;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.datasource.DataSourceConfig;
 import org.junit.jupiter.api.Assertions;
@@ -93,6 +89,7 @@ class DatabaseConfigTest {
     assertTrue(config.isDbOffline());
     assertTrue(config.isAutoReadOnlyDataSource());
     assertTrue(config.isAutoLoadModuleInfo());
+    assertTrue(config.isLoadModuleInfo());
     assertTrue(config.skipDataSourceCheck());
 
     assertTrue(config.isIdGeneratorAutomatic());
@@ -165,6 +162,7 @@ class DatabaseConfigTest {
     assertEquals(MutationDetection.HASH, config.getJsonMutationDetection());
     assertTrue(config.getPlatformConfig().isCaseSensitiveCollation());
     assertTrue(config.isAutoLoadModuleInfo());
+    assertTrue(config.isLoadModuleInfo());
 
     assertFalse(config.isQueryPlanEnable());
     assertEquals(Long.MAX_VALUE, config.getQueryPlanThresholdMicros());
@@ -175,6 +173,7 @@ class DatabaseConfigTest {
 
     config.setLoadModuleInfo(false);
     assertFalse(config.isAutoLoadModuleInfo());
+    assertFalse(config.isLoadModuleInfo());
     config.setAutoPersistUpdates(true);
     assertTrue(config.isAutoPersistUpdates());
     config.setSkipDataSourceCheck(true);

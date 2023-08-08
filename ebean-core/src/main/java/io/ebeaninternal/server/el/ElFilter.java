@@ -30,13 +30,11 @@ public final class ElFilter<T> implements Filter<T> {
     return elGetValue.convert(value);
   }
 
-  private ElComparator<T> getElComparator(String propertyName) {
-
+  private ElComparator<T> elComparator(String propertyName) {
     return beanDescriptor.elComparator(propertyName);
   }
 
-  private ElPropertyValue getElGetValue(String propertyName) {
-
+  private ElPropertyValue elGetValue(String propertyName) {
     return beanDescriptor.elGetValue(propertyName);
   }
 
@@ -46,7 +44,7 @@ public final class ElFilter<T> implements Filter<T> {
     return this;
   }
 
-  protected boolean isMatch(T bean) {
+  boolean isMatch(T bean) {
     for (ElMatcher<T> matcher : matches) {
       if (!matcher.isMatch(bean)) {
         return false;
@@ -55,119 +53,80 @@ public final class ElFilter<T> implements Filter<T> {
     return true;
   }
 
-
   @Override
   public Filter<T> in(String propertyName, Set<?> matchingValues) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-
-    matches.add(new ElMatchBuilder.InSet<>(matchingValues, elGetValue));
+    matches.add(new ElMatchBuilder.InSet<>(matchingValues, elGetValue(propertyName)));
     return this;
   }
 
   @Override
   public Filter<T> eq(String propertyName, Object value) {
-
     value = convertValue(propertyName, value);
-    ElComparator<T> comparator = getElComparator(propertyName);
-
-    matches.add(new ElMatchBuilder.Eq<>(value, comparator));
+    matches.add(new ElMatchBuilder.Eq<>(value, elComparator(propertyName)));
     return this;
   }
 
-
   @Override
   public Filter<T> ne(String propertyName, Object value) {
-
     value = convertValue(propertyName, value);
-    ElComparator<T> comparator = getElComparator(propertyName);
-
-    matches.add(new ElMatchBuilder.Ne<>(value, comparator));
+    matches.add(new ElMatchBuilder.Ne<>(value, elComparator(propertyName)));
     return this;
   }
 
   @Override
   public Filter<T> between(String propertyName, Object min, Object max) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
+    ElPropertyValue elGetValue = elGetValue(propertyName);
     min = elGetValue.convert(min);
     max = elGetValue.convert(max);
 
-    ElComparator<T> elComparator = getElComparator(propertyName);
-
-    matches.add(new ElMatchBuilder.Between<>(min, max, elComparator));
+    matches.add(new ElMatchBuilder.Between<>(min, max, elComparator(propertyName)));
     return this;
   }
 
 
   @Override
   public Filter<T> gt(String propertyName, Object value) {
-
     value = convertValue(propertyName, value);
-    ElComparator<T> comparator = getElComparator(propertyName);
-
-    matches.add(new ElMatchBuilder.Gt<>(value, comparator));
+    matches.add(new ElMatchBuilder.Gt<>(value, elComparator(propertyName)));
     return this;
   }
 
   @Override
   public Filter<T> ge(String propertyName, Object value) {
-
     value = convertValue(propertyName, value);
-    ElComparator<T> comparator = getElComparator(propertyName);
-
-    matches.add(new ElMatchBuilder.Ge<>(value, comparator));
+    matches.add(new ElMatchBuilder.Ge<>(value, elComparator(propertyName)));
     return this;
   }
 
   @Override
   public Filter<T> ieq(String propertyName, String value) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-
-    matches.add(new ElMatchBuilder.Ieq<>(elGetValue, value));
+    matches.add(new ElMatchBuilder.Ieq<>(elGetValue(propertyName), value));
     return this;
   }
-
 
   @Override
   public Filter<T> isNotNull(String propertyName) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-
-    matches.add(new ElMatchBuilder.IsNotNull<>(elGetValue));
+    matches.add(new ElMatchBuilder.IsNotNull<>(elGetValue(propertyName)));
     return this;
   }
-
 
   @Override
   public Filter<T> isNull(String propertyName) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-
-    matches.add(new ElMatchBuilder.IsNull<>(elGetValue));
+    matches.add(new ElMatchBuilder.IsNull<>(elGetValue(propertyName)));
     return this;
   }
-
 
   @Override
   public Filter<T> le(String propertyName, Object value) {
-
     value = convertValue(propertyName, value);
-    ElComparator<T> comparator = getElComparator(propertyName);
-
-    matches.add(new ElMatchBuilder.Le<>(value, comparator));
+    matches.add(new ElMatchBuilder.Le<>(value, elComparator(propertyName)));
     return this;
   }
 
-
   @Override
   public Filter<T> lt(String propertyName, Object value) {
-
     value = convertValue(propertyName, value);
-    ElComparator<T> comparator = getElComparator(propertyName);
-
-    matches.add(new ElMatchBuilder.Lt<>(value, comparator));
+    matches.add(new ElMatchBuilder.Lt<>(value, elComparator(propertyName)));
     return this;
   }
 
@@ -176,63 +135,45 @@ public final class ElFilter<T> implements Filter<T> {
   }
 
   public Filter<T> regex(String propertyName, String regEx, int options) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-
-    matches.add(new ElMatchBuilder.RegularExpr<>(elGetValue, regEx, options));
+    matches.add(new ElMatchBuilder.RegularExpr<>(elGetValue(propertyName), regEx, options));
     return this;
   }
 
   @Override
   public Filter<T> contains(String propertyName, String value) {
-
     String quote = ".*" + Pattern.quote(value) + ".*";
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-    matches.add(new ElMatchBuilder.RegularExpr<>(elGetValue, quote, 0));
+    matches.add(new ElMatchBuilder.RegularExpr<>(elGetValue(propertyName), quote, 0));
     return this;
   }
 
   @Override
   public Filter<T> icontains(String propertyName, String value) {
-
     String quote = ".*" + Pattern.quote(value) + ".*";
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-    matches.add(new ElMatchBuilder.RegularExpr<>(elGetValue, quote, Pattern.CASE_INSENSITIVE));
+    matches.add(new ElMatchBuilder.RegularExpr<>(elGetValue(propertyName), quote, Pattern.CASE_INSENSITIVE));
     return this;
   }
 
-
   @Override
   public Filter<T> endsWith(String propertyName, String value) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-    matches.add(new ElMatchBuilder.EndsWith<>(elGetValue, value));
+    matches.add(new ElMatchBuilder.EndsWith<>(elGetValue(propertyName), value));
     return this;
   }
 
   @Override
   public Filter<T> startsWith(String propertyName, String value) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-    matches.add(new ElMatchBuilder.StartsWith<>(elGetValue, value));
+    matches.add(new ElMatchBuilder.StartsWith<>(elGetValue(propertyName), value));
     return this;
   }
 
   @Override
   public Filter<T> iendsWith(String propertyName, String value) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-    matches.add(new ElMatchBuilder.IEndsWith<>(elGetValue, value));
+    matches.add(new ElMatchBuilder.IEndsWith<>(elGetValue(propertyName), value));
     return this;
   }
 
   @Override
   public Filter<T> istartsWith(String propertyName, String value) {
-
-    ElPropertyValue elGetValue = getElGetValue(propertyName);
-    matches.add(new ElMatchBuilder.IStartsWith<>(elGetValue, value));
+    matches.add(new ElMatchBuilder.IStartsWith<>(elGetValue(propertyName), value));
     return this;
   }
 
@@ -244,7 +185,6 @@ public final class ElFilter<T> implements Filter<T> {
 
   @Override
   public List<T> filter(List<T> list) {
-
     if (sortByClause != null) {
       // create shallow copy and sort
       list = new ArrayList<>(list);
@@ -252,7 +192,6 @@ public final class ElFilter<T> implements Filter<T> {
     }
 
     ArrayList<T> filterList = new ArrayList<>();
-
     for (T t : list) {
       if (isMatch(t)) {
         filterList.add(t);
@@ -261,7 +200,6 @@ public final class ElFilter<T> implements Filter<T> {
         }
       }
     }
-
     return filterList;
   }
 

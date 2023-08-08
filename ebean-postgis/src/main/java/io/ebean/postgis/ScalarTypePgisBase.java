@@ -62,17 +62,17 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
 
 
   @Override
-  public boolean isJdbcNative() {
+  public boolean jdbcNative() {
     return true;
   }
 
   @Override
-  public int getJdbcType() {
+  public int jdbcType() {
     return jdbcType;
   }
 
   @Override
-  public Class<T> getType() {
+  public Class<T> type() {
     return cls;
   }
 
@@ -87,11 +87,6 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
   }
 
   @Override
-  public void loadIgnore(DataReader reader) {
-    reader.incrementPos(1);
-  }
-
-  @Override
   public Object toJdbcType(Object value) {
     return null;
   }
@@ -103,21 +98,11 @@ abstract class ScalarTypePgisBase<T extends Geometry> implements ScalarType<T> {
 
   @Override
   public String formatValue(T value) {
-    return null;
+    return value.toString();
   }
 
   @Override
-  public String format(Object value) {
-    return null;
-  }
-
-  @Override
-  public T parse(String value) {
-    return null;
-  }
-
-  @Override
-  public DocPropertyType getDocType() {
+  public DocPropertyType docType() {
     return null;
   }
 

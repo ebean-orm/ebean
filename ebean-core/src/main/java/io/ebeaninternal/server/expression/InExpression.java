@@ -14,17 +14,13 @@ import java.util.*;
 
 public final class InExpression extends AbstractExpression implements IdInCommon {
 
-  private final boolean not;
-
   /**
    * Set to true when adding "1=1" predicate (due to null or empty sourceValues).
    */
   private final boolean empty;
-
+  private final boolean not;
   private final Collection<?> sourceValues;
-
   private List<Object> bindValues;
-
   private boolean multiValueSupported;
 
   InExpression(String propertyName, Collection<?> sourceValues, boolean not) {
@@ -95,7 +91,7 @@ public final class InExpression extends AbstractExpression implements IdInCommon
   public void prepareExpression(BeanQueryRequest<?> request) {
     initBindValues();
     if (bindValues.size() > 0) {
-      multiValueSupported = request.isMultiValueSupported((bindValues.get(0)).getClass());
+      multiValueSupported = request.isMultiValueSupported(bindValues.get(0).getClass());
     }
   }
 
@@ -117,29 +113,37 @@ public final class InExpression extends AbstractExpression implements IdInCommon
       }
     }
     ElPropertyValue prop = getElProp(request);
-    if (prop != null && !prop.isAssocId()) {
-      prop = null;
-    }
-
-    if (prop == null) {
-      if (bindValues.size() > 0) {
-        // if we have no property, we wrap them in a multi value wrapper.
-        // later the binder will decide, which bind strategy to use.
-        request.addBindValue(new MultiValueWrapper(bindValues));
-      }
-    } else {
-      List<Object> idList = new ArrayList<>();
+    List<Object> values = bindValues;
+    if (prop != null && prop.isAssocId()) {
+      values = new ArrayList<>();
       for (Object bindValue : bindValues) {
         // extract the id values from the bean
         Object[] ids = prop.assocIdValues((EntityBean) bindValue);
         if (ids != null) {
-          Collections.addAll(idList, ids);
+          Collections.addAll(values, ids);
         }
       }
-      if (!idList.isEmpty()) {
-        request.addBindValue(new MultiValueWrapper(idList));
+    }
+    if (values.isEmpty()) {
+      // nothing in in-query
+      return;
+    }
+    if (prop != null) {
+      if (prop.isDbEncrypted()) {
+        // bind the key as well as the value
+        request.addBindEncryptKey(prop.beanProperty().encryptKey().getStringValue());
+      } else if (prop.isLocalEncrypted()) {
+        List<Object> encValues = new ArrayList<>(values.size());
+        for (Object value : values) {
+          encValues.add(prop.localEncrypt(value));
+        }
+        // this is most likely binary garbage, so don't add it to the bind log
+        request.addBindEncryptKey(new MultiValueWrapper(encValues));
+        return;
       }
     }
+    // wrap in a multi value wrapper, later the binder will decide the bind strategy to use
+    request.addBindValue(new MultiValueWrapper(values));
   }
 
   @Override
@@ -152,19 +156,21 @@ public final class InExpression extends AbstractExpression implements IdInCommon
       request.append(not ? SQL_TRUE : SQL_FALSE);
       return;
     }
-
     ElPropertyValue prop = getElProp(request);
-    if (prop != null && !prop.isAssocId()) {
-      prop = null;
-    }
-
     if (prop != null) {
-      request.append(prop.assocIdInExpr(propName));
-      request.append(prop.assocIdInValueExpr(not, bindValues.size()));
-    } else {
-      request.append(propName);
-      request.appendInExpression(not, bindValues);
+      if (prop.isAssocId()) {
+        request.parse(prop.assocIdInExpr(propName));
+        request.append(prop.assocIdInValueExpr(not, bindValues.size()));
+        return;
+      }
+      if (prop.isDbEncrypted()) {
+        request.parse(prop.beanProperty().decryptProperty(propName));
+        request.appendInExpression(not, bindValues);
+        return;
+      }
     }
+    request.property(propName);
+    request.appendInExpression(not, bindValues);
   }
 
   /**

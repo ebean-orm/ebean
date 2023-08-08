@@ -52,14 +52,18 @@ public class PostgresPlatformProvider implements DatabasePlatformProvider {
       if (productVersion.contains("-yb-")) {
         return new YugabytePlatform();
       }
-      try (PreparedStatement statement = connection.prepareStatement("select version() as \"version\"")) {
-        try (ResultSet resultSet = statement.executeQuery()) {
+      try (Statement statement = connection.createStatement()) {
+        try (ResultSet resultSet = statement.executeQuery("select version()")) {
           if (resultSet.next()) {
-            productVersion = resultSet.getString("version").toLowerCase();
+            productVersion = resultSet.getString(1).toLowerCase();
             if (productVersion.contains("cockroach")) {
               return new CockroachPlatform();
             }
           }
+        }
+      } finally {
+        if (!connection.getAutoCommit()) {
+          connection.rollback();
         }
       }
       if (majorVersion <= 9) {

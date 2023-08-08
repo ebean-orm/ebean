@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.migration;
 
-import jakarta.xml.bind.annotation.*;
+import javax.xml.bind.annotation.*;
 
 
 /**

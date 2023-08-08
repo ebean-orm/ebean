@@ -23,6 +23,7 @@
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest5"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="indextest2" oneToOne="false" nullableColumns="indextest2"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="indextest6" oneToOne="false" nullableColumns="indextest6"/>
+        <alterTable name="migtest_e_basic" tablespace="db2;TSTABLES;" indexTablespace="db2;INDEXTS;" lobTablespace="db2;TSTABLES;"/>
         <alterColumn columnName="test_status" tableName="migtest_e_enum" checkConstraint="check ( test_status in ('N','A','I'))" checkConstraintName="ck_migtest_e_enum_test_status"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history" withHistory="true" comment="DROP COMMENT"/>
         <addTableComment name="migtest_e_history" comment="DROP COMMENT"/>
@@ -51,6 +52,14 @@
         <alterTable name="migtest_mtm_m" tablespace="$TABLESPACE_DEFAULT" indexTablespace="$TABLESPACE_DEFAULT" lobTablespace="$TABLESPACE_DEFAULT"/>
         <addUniqueConstraint constraintName="uq_m12_otoc72" tableName="migtest_oto_child" columnNames="name" oneToOne="false" nullableColumns="name" platforms="MYSQL"/>
         <addUniqueConstraint constraintName="uq_migtest_oto_master_name" tableName="migtest_oto_master" columnNames="name" oneToOne="false" nullableColumns="name" platforms="MYSQL"/>
+        <alterForeignKey name="fk_drop_main_drop_ref_many_drop_main" columnNames="DROP FOREIGN KEY" indexName="ix_drop_main_drop_ref_many_drop_main" tableName="drop_main_drop_ref_many"/>
+        <alterForeignKey name="fk_drop_main_drop_ref_many_drop_ref_many" columnNames="DROP FOREIGN KEY" indexName="ix_drop_main_drop_ref_many_drop_ref_many" tableName="drop_main_drop_ref_many"/>
+        <alterForeignKey name="fk_drop_ref_one_parent_id" columnNames="DROP FOREIGN KEY" indexName="ix_drop_ref_one_parent_id" tableName="drop_ref_one"/>
+        <alterForeignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" tableName="migtest_mtm_c_migtest_mtm_m"/>
+        <alterForeignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" tableName="migtest_mtm_c_migtest_mtm_m"/>
+        <alterForeignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" tableName="migtest_mtm_m_migtest_mtm_c"/>
+        <alterForeignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c" tableName="migtest_mtm_m_migtest_mtm_c"/>
+        <alterForeignKey name="fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_m_phone_numbers_migtest_mtm_m_id" tableName="migtest_mtm_m_phone_numbers"/>
         <createIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic" columns="indextest1"/>
         <createIndex indexName="ix_migtest_e_basic_indextest5" tableName="migtest_e_basic" columns="indextest5"/>
         <createIndex indexName="ix_migtest_quoted_status1" tableName="&quot;migtest_QuOtEd&quot;" columns="status1"/>
@@ -61,6 +70,7 @@
         <createIndex indexName="ix_migtest_oto_master_lowername" tableName="migtest_oto_master" columns="lower(name)" unique="true" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest3" tableName="migtest_e_basic"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest6" tableName="migtest_e_basic"/>
+        <dropIndex indexName="ix_table_textfield2" tableName="&quot;table&quot;"/>
     </changeSet>
     <changeSet type="pendingDrops">
         <dropColumn columnName="one_key" tableName="migtest_ckey_detail"/>
@@ -77,7 +87,17 @@
         <dropColumn columnName="new_column" tableName="migtest_e_history2" withHistory="true"/>
         <dropColumn columnName="test_boolean" tableName="migtest_e_history5" withHistory="true"/>
         <dropColumn columnName="deleted" tableName="migtest_e_softdelete"/>
+        <dropColumn columnName="textfield" tableName="&quot;table&quot;" withHistory="true"/>
+        <dropColumn columnName="textfield2" tableName="&quot;table&quot;" withHistory="true"/>
         <dropColumn columnName="master_id" tableName="migtest_oto_child"/>
+        <dropTable name="drop_main" sequenceCol="id"/>
+        <dropTable name="drop_main_drop_ref_many"/>
+        <dropTable name="drop_ref_many" sequenceCol="id"/>
+        <dropTable name="drop_ref_one" sequenceCol="id"/>
+        <dropTable name="migtest_e_test_binary" sequenceCol="id"/>
+        <dropTable name="migtest_e_test_json" sequenceCol="id"/>
+        <dropTable name="migtest_e_test_lob" sequenceCol="id"/>
+        <dropTable name="migtest_e_test_varchar" sequenceCol="id"/>
         <dropTable name="migtest_e_user" sequenceCol="id"/>
         <dropTable name="migtest_mtm_c_migtest_mtm_m"/>
         <dropTable name="migtest_mtm_m_migtest_mtm_c"/>

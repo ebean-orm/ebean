@@ -67,8 +67,8 @@ public final class ElPropertyChain implements ElPropertyValue {
       this.scalarType = null;
     }
     this.lastElPropertyValue = chain[chain.length - 1];
-    this.placeHolder = getElPlaceHolder(prefix, lastElPropertyValue, false);
-    this.placeHolderEncrypted = getElPlaceHolder(prefix, lastElPropertyValue, true);
+    this.placeHolder = placeHolder(prefix, lastElPropertyValue, false);
+    this.placeHolderEncrypted = placeHolder(prefix, lastElPropertyValue, true);
   }
 
   @Override
@@ -86,7 +86,7 @@ public final class ElPropertyChain implements ElPropertyValue {
     return false;
   }
 
-  private String getElPlaceHolder(String prefix, ElPropertyValue lastElPropertyValue, boolean encrypted) {
+  private String placeHolder(String prefix, ElPropertyValue lastElPropertyValue, boolean encrypted) {
     if (prefix == null) {
       return lastElPropertyValue.elPlaceholder(encrypted);
     }
@@ -227,20 +227,9 @@ public final class ElPropertyChain implements ElPropertyValue {
     return lastBeanProperty;
   }
 
-
-  @Override
-  public boolean isDateTimeCapable() {
-    return scalarType != null && scalarType.isDateTimeCapable();
-  }
-
   @Override
   public int jdbcType() {
-    return scalarType == null ? 0 : scalarType.getJdbcType();
-  }
-
-  @Override
-  public Object parseDateTime(long systemTimeMillis) {
-    return scalarType.convertFromMillis(systemTimeMillis);
+    return scalarType == null ? 0 : scalarType.jdbcType();
   }
 
   @Override

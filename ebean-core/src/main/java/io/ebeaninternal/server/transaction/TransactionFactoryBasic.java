@@ -13,20 +13,19 @@ import java.sql.SQLException;
  */
 class TransactionFactoryBasic extends TransactionFactory {
 
-  private final DataSource dataSource;
+  protected final DataSource dataSource;
 
   TransactionFactoryBasic(TransactionManager manager, DataSourceSupplier dataSourceSupplier) {
     super(manager);
-    this.dataSource = dataSourceSupplier.getDataSource();
+    this.dataSource = dataSourceSupplier.dataSource();
   }
 
   @Override
-  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
     Connection connection = null;
     try {
       connection = dataSource.getConnection();
-      return create(false, connection);
-
+      return new ImplicitReadOnlyTransaction(true, manager, connection);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
       throw ex;

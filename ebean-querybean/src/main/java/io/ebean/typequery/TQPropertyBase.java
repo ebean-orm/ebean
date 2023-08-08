@@ -4,8 +4,9 @@ package io.ebean.typequery;
  * Base scalar property.
  *
  * @param <R> The type of the owning root bean
+ * @param <T> The property type
  */
-public class TQPropertyBase<R> extends TQProperty<R> {
+public abstract class TQPropertyBase<R, T> extends TQProperty<R, T> {
 
   /**
    * Construct with a property name and root instance.
@@ -27,7 +28,7 @@ public class TQPropertyBase<R> extends TQProperty<R> {
   /**
    * Order by ascending on this property.
    */
-  public R asc() {
+  public final R asc() {
     expr().order().asc(_name);
     return _root;
   }
@@ -35,7 +36,7 @@ public class TQPropertyBase<R> extends TQProperty<R> {
   /**
    * Order by descending on this property.
    */
-  public R desc() {
+  public final R desc() {
     expr().order().desc(_name);
     return _root;
   }

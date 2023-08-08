@@ -56,6 +56,131 @@ drop index ix_migtest_e_basic_indextest1;
 drop index ix_migtest_e_basic_indextest5;
 drop index ix_migtest_quoted_status1;
 -- apply changes
+create table drop_main (
+  id                            number(10) not null,
+  constraint pk_drop_main primary key (id)
+);
+create sequence drop_main_seq;
+
+create table drop_main_drop_ref_many (
+  drop_main_id                  number(10) not null,
+  drop_ref_many_id              number(10) not null,
+  constraint pk_drop_main_drop_ref_many primary key (drop_main_id,drop_ref_many_id)
+);
+
+create table drop_ref_many (
+  id                            number(10) not null,
+  constraint pk_drop_ref_many primary key (id)
+);
+create sequence drop_ref_many_seq;
+
+create table drop_ref_one (
+  id                            number(10) not null,
+  parent_id                     number(10),
+  constraint pk_drop_ref_one primary key (id)
+);
+create sequence drop_ref_one_seq;
+
+create table migtest_e_test_binary (
+  id                            number(10) not null,
+  test_byte16                   raw(16),
+  test_byte256                  raw(256),
+  test_byte512                  raw(512),
+  test_byte1k                   raw(1024),
+  test_byte2k                   blob,
+  test_byte4k                   blob,
+  test_byte8k                   blob,
+  test_byte16k                  blob,
+  test_byte32k                  blob,
+  test_byte64k                  blob,
+  test_byte128k                 blob,
+  test_byte256k                 blob,
+  test_byte512k                 blob,
+  test_byte1m                   blob,
+  test_byte2m                   blob,
+  test_byte4m                   blob,
+  test_byte8m                   blob,
+  test_byte16m                  blob,
+  test_byte32m                  blob,
+  constraint pk_migtest_e_test_binary primary key (id)
+);
+create sequence migtest_e_test_binary_seq;
+
+create table migtest_e_test_json (
+  id                            number(10) not null,
+  json255                       varchar2(255),
+  json256                       varchar2(256),
+  json512                       varchar2(512),
+  json1k                        varchar2(1024),
+  json2k                        varchar2(2048),
+  json4k                        clob,
+  json8k                        clob,
+  json16k                       clob,
+  json32k                       clob,
+  json64k                       clob,
+  json128k                      clob,
+  json256k                      clob,
+  json512k                      clob,
+  json1m                        clob,
+  json2m                        clob,
+  json4m                        clob,
+  json8m                        clob,
+  json16m                       clob,
+  json32m                       clob,
+  constraint pk_migtest_e_test_json primary key (id)
+);
+create sequence migtest_e_test_json_seq;
+
+create table migtest_e_test_lob (
+  id                            number(10) not null,
+  lob255                        clob,
+  lob256                        clob,
+  lob512                        clob,
+  lob1k                         clob,
+  lob2k                         clob,
+  lob4k                         clob,
+  lob8k                         clob,
+  lob16k                        clob,
+  lob32k                        clob,
+  lob64k                        clob,
+  lob128k                       clob,
+  lob256k                       clob,
+  lob512k                       clob,
+  lob1m                         clob,
+  lob2m                         clob,
+  lob4m                         clob,
+  lob8m                         clob,
+  lob16m                        clob,
+  lob32m                        clob,
+  constraint pk_migtest_e_test_lob primary key (id)
+);
+create sequence migtest_e_test_lob_seq;
+
+create table migtest_e_test_varchar (
+  id                            number(10) not null,
+  varchar255                    varchar2(255),
+  varchar256                    varchar2(256),
+  varchar512                    varchar2(512),
+  varchar1k                     varchar2(1024),
+  varchar2k                     varchar2(2048),
+  varchar4k                     clob,
+  varchar8k                     clob,
+  varchar16k                    clob,
+  varchar32k                    clob,
+  varchar64k                    clob,
+  varchar128k                   clob,
+  varchar256k                   clob,
+  varchar512k                   clob,
+  varchar1m                     clob,
+  varchar2m                     clob,
+  varchar4m                     clob,
+  varchar8m                     clob,
+  varchar16m                    clob,
+  varchar32m                    clob,
+  constraint pk_migtest_e_test_varchar primary key (id)
+);
+create sequence migtest_e_test_varchar_seq;
+
 create table migtest_e_user (
   id                            number(10) not null,
   constraint pk_migtest_e_user primary key (id)
@@ -92,7 +217,9 @@ update migtest_e_history2 set test_string = 'unknown' where test_string is null;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 -- apply alter tables
+alter table "table" modify textfield null;
 alter table "table" add "select" varchar2(255);
+alter table "table" add textfield2 varchar2(255);
 alter table migtest_ckey_detail add one_key number(10);
 alter table migtest_ckey_detail add two_key varchar2(127);
 alter table migtest_ckey_parent add assoc_id number(10);
@@ -137,6 +264,15 @@ comment on table migtest_e_history is 'We have history now';
 comment on column "table"."index" is 'this is an other comment';
 -- NOT YET IMPLEMENTED: alter table "table" add constraint uq_table_select unique  ("select");
 -- foreign keys and indices
+create index ix_drp_mn_drp_rf_mny_drp_mn on drop_main_drop_ref_many (drop_main_id);
+alter table drop_main_drop_ref_many add constraint fk_drp_mn_drp_rf_mny_drp_mn foreign key (drop_main_id) references drop_main (id);
+
+create index ix_drp_mn_drp_rf_mny_dr_d70vl on drop_main_drop_ref_many (drop_ref_many_id);
+alter table drop_main_drop_ref_many add constraint fk_drp_mn_drp_rf_mny_dr_joeslj foreign key (drop_ref_many_id) references drop_ref_many (id);
+
+create index ix_drop_ref_one_parent_id on drop_ref_one (parent_id);
+alter table drop_ref_one add constraint fk_drop_ref_one_parent_id foreign key (parent_id) references drop_main (id);
+
 create index ix_mgtst_mtm_c_mgtst_mt_3ug4ok on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_mgtst_mtm_c_mgtst_mt_93awga foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
 
@@ -165,3 +301,4 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_table_textfield2 on "table" (textfield2);

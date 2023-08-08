@@ -60,7 +60,7 @@ create table migtest_e_basic (
   status2                       varchar(1) default 'N' not null,
   name                          varchar(127),
   description                   varchar(127),
-  description_file              binary(4500),
+  description_file              long binary,
   json_list                     long varchar,
   a_lob                         varchar(255) default 'X' not null,
   some_date                     timestamp,
@@ -156,6 +156,7 @@ create table "table" (
   "to"                          varchar(255),
   "varchar"                     varchar(255),
   "foreign"                     varchar(255),
+  textfield                     varchar(255) not null,
   constraint uq_table_to unique ("to"),
   constraint uq_table_varchar unique ("varchar"),
   constraint pk_table primary key ("index")

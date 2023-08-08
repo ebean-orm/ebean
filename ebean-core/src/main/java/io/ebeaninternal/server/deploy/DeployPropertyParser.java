@@ -37,12 +37,12 @@ public final class DeployPropertyParser extends DeployParser {
   /**
    * Return the first property found by the parser.
    */
-  public ElPropertyDeploy getFirstProp() {
+  public ElPropertyDeploy firstProp() {
     return firstProp;
   }
 
   @Override
-  public Set<String> getIncludes() {
+  public Set<String> includes() {
     return includes;
   }
 
@@ -55,7 +55,7 @@ public final class DeployPropertyParser extends DeployParser {
   }
 
   @Override
-  public String getDeployWord(String expression) {
+  public String deployWord(String expression) {
     ElPropertyDeploy elProp = beanDescriptor.elPropertyDeploy(expression);
     if (elProp == null) {
       return null;
@@ -70,7 +70,7 @@ public final class DeployPropertyParser extends DeployParser {
 
   @Override
   public String convertWord() {
-    String r = getDeployWord(word);
+    String r = deployWord(word);
     return r == null ? word : r;
   }
 

@@ -23,6 +23,6 @@ interface SqlTreeLoad {
   /**
    * Return the reader for the single attribute query.
    */
-  ScalarDataReader<?> getSingleAttributeReader();
+  ScalarDataReader<?> singleAttributeReader();
 
 }

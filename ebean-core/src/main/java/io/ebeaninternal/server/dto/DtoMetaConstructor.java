@@ -21,7 +21,7 @@ final class DtoMetaConstructor {
     this.types = constructor.getParameterTypes();
     this.scalarTypes = new ScalarType[types.length];
     for (int i = 0; i < types.length; i++) {
-      scalarTypes[i] = typeManager.getScalarType(types[i]);
+      scalarTypes[i] = typeManager.type(types[i]);
     }
     this.handle = LOOKUP.findConstructor(someClass, typeFor(types));
   }
@@ -30,11 +30,7 @@ final class DtoMetaConstructor {
     return MethodType.methodType(void.class, types);
   }
 
-  Class<?>[] getTypes() {
-    return types;
-  }
-
-  int getArgCount() {
+  int argCount() {
     return types.length;
   }
 

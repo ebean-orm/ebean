@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeBaseVarchar;
+
 import java.util.Currency;
 
 /**
@@ -12,7 +14,7 @@ final class ScalarTypeCurrency extends ScalarTypeBaseVarchar<Currency> {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 3;
   }
 

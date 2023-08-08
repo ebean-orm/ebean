@@ -1,24 +1,25 @@
 package io.localtest;
 
+import io.avaje.applog.AppLog;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Types;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 public abstract class BaseTestCase {
 
-  protected static Logger logger = LoggerFactory.getLogger(BaseTestCase.class);
+  protected static System.Logger logger = AppLog.getLogger(BaseTestCase.class);
 
   /**
    * this is the clock delta that may occur between testing machine and db server.
    * If the clock delta of DB server is in future, an "asOf" query may not find the
    * correct entry.
-   *
+   * <p>
    * Note: That some tests may use a Thread.sleep to wait, so that the local system clock
    * can catch up. So don't set that to a too high value.
    */
@@ -35,7 +36,7 @@ public abstract class BaseTestCase {
       // First try, if we get the default server. If this fails, all tests will fail.
       DB.getDefault();
     } catch (Throwable e) {
-      logger.error("Fatal error while getting ebean-server. Exiting...", e);
+      logger.log(ERROR, "Fatal error while getting ebean-server. Exiting...", e);
       System.exit(1);
     }
   }
@@ -47,7 +48,7 @@ public abstract class BaseTestCase {
   public boolean isSqlServer() {
     return Platform.SQLSERVER == platform();
   }
-  
+
   public boolean isDB2() {
     return Platform.DB2 == platform();
   }
@@ -77,7 +78,7 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformBooleanNative() {
-    return Types.BOOLEAN == spiEbeanServer().databasePlatform().getBooleanDbType();
+    return Types.BOOLEAN == spiEbeanServer().databasePlatform().booleanDbType();
   }
 
   public boolean isPlatformOrderNullsSupport() {
@@ -85,11 +86,11 @@ public abstract class BaseTestCase {
   }
 
   public boolean isPlatformSupportsDeleteTableAlias() {
-    return spiEbeanServer().databasePlatform().isSupportsDeleteTableAlias();
+    return spiEbeanServer().databasePlatform().supportsDeleteTableAlias();
   }
 
   public boolean isPersistBatchOnCascade() {
-    return spiEbeanServer().databasePlatform().getPersistBatchOnCascade() != PersistBatch.NONE;
+    return spiEbeanServer().databasePlatform().persistBatchOnCascade() != PersistBatch.NONE;
   }
 
   /**
@@ -100,7 +101,7 @@ public abstract class BaseTestCase {
   }
 
   protected Platform platform() {
-    return spiEbeanServer().databasePlatform().getPlatform().base();
+    return spiEbeanServer().databasePlatform().platform().base();
   }
 
   protected SpiEbeanServer spiEbeanServer() {

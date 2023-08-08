@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>3.9</version>
+    <version>3.10</version>
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.6.7-SNAPSHOT</version>
+  <version>13.20.2-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -38,28 +38,27 @@
   </developers>
 
   <properties>
+    <nexus.staging.stagingRepositoryId>ebeanCore</nexus.staging.stagingRepositoryId>
+    <nexus.staging.keepStagingRepositoryOnFailure>true</nexus.staging.keepStagingRepositoryOnFailure>
+    <nexus.staging.skipStagingRepositoryClose>true</nexus.staging.skipStagingRepositoryClose>
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
-    <jackson.version>2.13.2</jackson.version>
-    <h2database.version>2.1.212</h2database.version>
-    <ebean-annotation.version>8.2</ebean-annotation.version>
-    <ebean-ddl-runner.version>2.2</ebean-ddl-runner.version>
+    <jackson.version>2.15.0</jackson.version>
+    <h2database.version>2.2.220</h2database.version>
+    <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
+    <ebean-types.version>3.0</ebean-types.version>
+
+    <ebean-annotation.version>8.4</ebean-annotation.version>
+    <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
-    <ebean-migration.version>13.6.0</ebean-migration.version>
-    <ebean-test-containers.version>6.2</ebean-test-containers.version>
-    <ebean-datasource.version>8.2</ebean-datasource.version>
-    <ebean-agent.version>13.6.6</ebean-agent.version>
-    <ebean-maven-plugin.version>13.6.6</ebean-maven-plugin.version>
+    <ebean-migration.version>13.9.0</ebean-migration.version>
+    <ebean-test-containers.version>7.1</ebean-test-containers.version>
+    <ebean-datasource.version>8.6</ebean-datasource.version>
+    <ebean-agent.version>13.20.1</ebean-agent.version>
+    <ebean-maven-plugin.version>13.20.1</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
   <dependencies>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.36</version>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
@@ -83,9 +82,6 @@
     <module>ebean-core-type</module>
     <module>ebean-core</module>
     <module>ebean-ddl-generator</module>
-    <module>ebean-autotune</module>
-    <module>ebean-externalmapping-api</module>
-    <module>ebean-externalmapping-xml</module>
     <module>ebean-test</module>
     <module>querybean-generator</module>
     <module>kotlin-querybean-generator</module>
@@ -94,7 +90,8 @@
     <module>ebean-redis</module>
     <module>platforms</module>
     <module>composites</module>
-    <!--    <module>ebean-kotlin</module>-->
+    <module>ebean-jackson-mapper</module>
+    <module>ebean-spring-txn</module>
 
   </modules>
 
@@ -114,7 +111,6 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <module>ebean-kotlin</module>
         <module>tests</module>
       </modules>
     </profile>

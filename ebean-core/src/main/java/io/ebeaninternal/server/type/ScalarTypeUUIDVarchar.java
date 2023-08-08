@@ -17,7 +17,7 @@ final class ScalarTypeUUIDVarchar extends ScalarTypeUUIDBase {
   }
 
   @Override
-  public int getLength() {
+  public int length() {
     return 40;
   }
 

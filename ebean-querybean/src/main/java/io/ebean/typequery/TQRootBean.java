@@ -12,6 +12,7 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
@@ -233,8 +234,13 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Tune the query by specifying the properties to be loaded on the
-   * 'main' root level entity bean (aka partial object).
+   * Specify the properties to be loaded on the 'main' root level entity bean.
+   * <p>
+   * The resulting entities with be "partially loaded" aka partial objects.
+   * <p>
+   * Alternatively we can use a {@link #select(FetchGroup)} to specify all properties
+   * to load on all parts of the graph.
+   *
    * <pre>{@code
    *
    *   // alias for the customer properties in select()
@@ -245,12 +251,12 @@ public abstract class TQRootBean<T, R> {
    *
    *   List<Customer> customers =
    *     new QCustomer()
-   *       // tune query
+   *       // specify the parts of the graph we want to load
    *       .select(cust.id, cust.name)
    *       .contacts.fetch(contact.firstName, contact.lastName, contact.email)
    *
    *       // predicates
-   *       .id.greaterThan(1)
+   *       .id.gt(1)
    *       .findList();
    *
    * }</pre>
@@ -258,17 +264,28 @@ public abstract class TQRootBean<T, R> {
    * @param properties the list of properties to fetch
    */
   @SafeVarargs
-  public final R select(TQProperty<R>... properties) {
+  public final R select(TQProperty<R, ?>... properties) {
     ((SpiQueryFetch) query).selectProperties(properties(properties));
     return root;
   }
 
-  private Set<String> properties(TQProperty<R>[] properties) {
+  private Set<String> properties(Query.Property<?>[] properties) {
     Set<String> props = new LinkedHashSet<>();
-    for (TQProperty<R> property : properties) {
-      props.add(property.propertyName());
+    for (Query.Property<?> property : properties) {
+      props.add(property.toString());
     }
     return props;
+  }
+
+  /**
+   * Specify the properties to be loaded on the 'main' root level entity bean
+   * also allowing for functions to be used like {@link StdOperators#max(Query.Property)}.
+   *
+   * @param properties the list of properties to fetch
+   */
+  public final R select(Query.Property<?>... properties) {
+    ((SpiQueryFetch) query).selectProperties(properties(properties));
+    return root;
   }
 
   /**
@@ -500,6 +517,14 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Add an expression to the WHERE or HAVING clause.
+   */
+  public R add(Expression expression) {
+    peekExprList().add(expression);
+    return root;
+  }
+
+  /**
    * Set root table alias.
    */
   public R alias(String alias) {
@@ -694,6 +719,44 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Add EXISTS sub-query predicate.
+   */
+  public R exists(Query<?> subQuery) {
+    query.where().exists(subQuery);
+    return root;
+  }
+
+  /**
+   * Add NOT EXISTS sub-query predicate.
+   */
+  public R notExists(Query<?> subQuery) {
+    query.where().notExists(subQuery);
+    return root;
+  }
+
+  /**
+   * EXISTS using a SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R exists(String sqlSubQuery, Object... bindValues) {
+    query().where().exists(sqlSubQuery, bindValues);
+    return root;
+  }
+
+  /**
+   * Not EXISTS using a SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R notExists(String sqlSubQuery, Object... bindValues) {
+    query().where().notExists(sqlSubQuery, bindValues);
+    return root;
+  }
+
+  /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
   public R forUpdate() {
@@ -852,17 +915,6 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Deprecated migrate to setBeanCacheMode() or setUseCache().
-   * <p>
-   * When set to true all the beans from this query are loaded into the bean cache.
-   */
-  @Deprecated
-  public R setLoadBeanCache(boolean loadBeanCache) {
-    query.setLoadBeanCache(loadBeanCache);
-    return root;
-  }
-
-  /**
    * Set the property to use as keys for a map.
    * <p>
    * If no property is set then the id property is used.
@@ -890,7 +942,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Specify the PersistenceContextScope to use for this query.
    * <p>
-   * When this is not set the 'default' configured on {@link io.ebean.config.ServerConfig#setPersistenceContextScope(PersistenceContextScope)}
+   * When this is not set the 'default' configured on {@link io.ebean.config.DatabaseConfig#setPersistenceContextScope(PersistenceContextScope)}
    * is used - this value defaults to {@link io.ebean.PersistenceContextScope#TRANSACTION}.
    * <p>
    * Note that the same persistence Context is used for subsequent lazy loading and query join queries.
@@ -1169,6 +1221,14 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * In expression using multiple columns.
+   */
+  public R inTuples(InTuples inTuples) {
+    peekExprList().inTuples(inTuples);
+    return root;
+  }
+
+  /**
    * Marker that can be used to indicate that the order by clause is defined after this.
    * <p>
    * <h2>Example: order by customer name, order date</h2>
@@ -1190,23 +1250,10 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Marker that can be used to indicate that the order by clause is defined after this.
-   * <p>
-   * <h2>Example: order by customer name, order date</h2>
-   * <pre>{@code
-   *   List<Order> orders =
-   *          new QOrder()
-   *            .customer.name.ilike("rob")
-   *            .orderBy()
-   *              .customer.name.asc()
-   *              .orderDate.asc()
-   *            .findList();
-   *
-   * }</pre>
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19")
   public R order() {
-    // Yes this does not actually do anything! We include it because style wise it makes
-    // the query nicer to read and suggests that order by definitions are added after this
     return root;
   }
 
@@ -1223,15 +1270,11 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Set the full raw order by clause replacing the existing order by clause if there is one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
+   * Deprecated migrate to {@link #orderBy(String)}
    */
+  @Deprecated(since = "13.19")
   public R order(String orderByClause) {
-    query.order(orderByClause);
-    return root;
+    return orderBy(orderByClause);
   }
 
   /**
@@ -1519,6 +1562,21 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  public R usingMaster() {
+    query.usingMaster();
+    return root;
+  }
+
+  /**
    * Execute the query returning true if a row is found.
    * <p>
    * The query is executed using max rows of 1 and will only select the id property.
@@ -1767,7 +1825,7 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Execute the query returning a single value for a single property.
+   * Execute the query returning a single value or null for a single property.
    * <p>
    * <h3>Example</h3>
    * <pre>{@code
@@ -1779,8 +1837,9 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    *
-   * @return the list of values for the selected property
+   * @return a single value or null for the selected property
    */
+  @Nullable
   public <A> A findSingleAttribute() {
     return query.findSingleAttribute();
   }
@@ -2076,12 +2135,10 @@ public abstract class TQRootBean<T, R> {
    * Return the current expression list that expressions should be added to.
    */
   protected ExpressionList<T> peekExprList() {
-
     if (textMode) {
       // return the current text expression list
       return _peekText();
     }
-
     if (whereStack == null) {
       whereStack = new ArrayStack<>();
       whereStack.push(query.where());

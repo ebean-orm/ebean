@@ -107,13 +107,13 @@ public final class BindParams implements Serializable {
   /**
    * Return a Natural Key bind param if supported.
    */
-  public NaturalKeyBindParam getNaturalKeyBindParam() {
+  public NaturalKeyBindParam naturalKeyBindParam() {
     if (!positionedParameters.isEmpty()) {
       return null;
     }
     if (namedParameters.size() == 1) {
       Entry<String, Param> e = namedParameters.entrySet().iterator().next();
-      return new NaturalKeyBindParam(e.getKey(), e.getValue().getInValue());
+      return new NaturalKeyBindParam(e.getKey(), e.getValue().inValue());
     }
     return null;
   }
@@ -135,7 +135,7 @@ public final class BindParams implements Serializable {
    * Set a null parameter using position.
    */
   public void setNullParameter(int position, int jdbcType) {
-    Param p = getParam(position);
+    Param p = parameter(position);
     p.setInNullType(jdbcType);
   }
 
@@ -143,7 +143,7 @@ public final class BindParams implements Serializable {
    * Set an In Out parameter using position.
    */
   public void setParameter(int position, Object value, int outType) {
-    Param p = getParam(position);
+    Param p = parameter(position);
     p.setInValue(value);
     p.setOutType(outType);
   }
@@ -168,7 +168,7 @@ public final class BindParams implements Serializable {
   @SuppressWarnings("rawtypes")
   public void setParameter(int position, Object value) {
     //TODO: Review - assert value != null : "use setNullParameter";
-    Param p = getParam(position);
+    Param p = parameter(position);
     if (value instanceof Collection) {
       // use of postgres ANY with positioned parameter
       value = new MultiValueWrapper((Collection)value);
@@ -180,15 +180,21 @@ public final class BindParams implements Serializable {
    * Register the parameter as an Out parameter using position.
    */
   public void registerOut(int position, int outType) {
-    Param p = getParam(position);
+    Param p = parameter(position);
     p.setOutType(outType);
   }
 
-  private Param getParam(String name) {
+  /**
+   * Return the named parameter.
+   */
+  public Param parameter(String name) {
     return namedParameters.computeIfAbsent(name, k -> new Param());
   }
 
-  private Param getParam(int position) {
+  /**
+   * Return the Parameter for a given position.
+   */
+  public Param parameter(int position) {
     int more = position - positionedParameters.size();
     if (more > 0) {
       for (int i = 0; i < more; i++) {
@@ -202,7 +208,7 @@ public final class BindParams implements Serializable {
    * Set a named In Out parameter.
    */
   public void setParameter(String name, Object value, int outType) {
-    Param p = getParam(name);
+    Param p = parameter(name);
     p.setInValue(value);
     p.setOutType(outType);
   }
@@ -211,7 +217,7 @@ public final class BindParams implements Serializable {
    * Set a named In parameter that is null.
    */
   public void setNullParameter(String name, int jdbcType) {
-    Param p = getParam(name);
+    Param p = parameter(name);
     p.setInNullType(jdbcType);
   }
 
@@ -220,7 +226,7 @@ public final class BindParams implements Serializable {
    */
   public Param setParameter(String name, Object value) {
     // TODO: Review - assert value != null : "use setNullParameter";
-    Param p = getParam(name);
+    Param p = parameter(name);
     p.setInValue(value);
     return p;
   }
@@ -228,10 +234,9 @@ public final class BindParams implements Serializable {
   /**
    * Set a named In parameter that is multi-valued.
    */
-  public Param setArrayParameter(String name, Collection<?> value) {
-    Param p = getParam(name);
+  public void setArrayParameter(String name, Collection<?> value) {
+    Param p = parameter(name);
     p.setInValue(new MultiValueWrapper(value));
-    return p;
   }
 
   /**
@@ -241,7 +246,7 @@ public final class BindParams implements Serializable {
    * </p>
    */
   public Param setEncryptionKey(String name, Object value) {
-    Param p = getParam(name);
+    Param p = parameter(name);
     p.setEncryptionKey(value);
     return p;
   }
@@ -250,23 +255,8 @@ public final class BindParams implements Serializable {
    * Register the named parameter as an Out parameter.
    */
   public void registerOut(String name, int outType) {
-    Param p = getParam(name);
+    Param p = parameter(name);
     p.setOutType(outType);
-  }
-
-  /**
-   * Return the Parameter for a given position.
-   */
-  public Param getParameter(int position) {
-    // Used to read Out value by CallableSql
-    return getParam(position);
-  }
-
-  /**
-   * Return the named parameter.
-   */
-  public Param getParameter(String name) {
-    return getParam(name);
   }
 
   /**
@@ -287,7 +277,7 @@ public final class BindParams implements Serializable {
    * Return the sql with ? place holders (named parameters have been processed
    * and ordered).
    */
-  public String getPreparedSql() {
+  public String preparedSql() {
     return preparedSql;
   }
 
@@ -458,7 +448,7 @@ public final class BindParams implements Serializable {
      * Return the jdbc type of this parameter. Used for registering Out
      * parameters and setting NULL In parameters.
      */
-    public int getType() {
+    public int type() {
       return type;
     }
 
@@ -501,7 +491,7 @@ public final class BindParams implements Serializable {
      * Return the OUT value that was retrieved. This value is set after
      * CallableStatement was executed.
      */
-    public Object getOutValue() {
+    public Object outValue() {
       return outValue;
     }
 
@@ -509,7 +499,7 @@ public final class BindParams implements Serializable {
      * Return the In value. If this is null, then the type should be used to
      * specify the type of the null.
      */
-    public Object getInValue() {
+    public Object inValue() {
       return inValue;
     }
 

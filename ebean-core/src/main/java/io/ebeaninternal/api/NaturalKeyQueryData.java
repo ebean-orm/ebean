@@ -142,7 +142,9 @@ public final class NaturalKeyQueryData<T> {
    */
   private boolean matchProperties() {
     if (naturalKey.isSingleProperty()) {
-      naturalKey.matchSingleProperty((inProperty != null) ? inProperty : eqList.get(0).property);
+      if (naturalKey.matchSingleProperty((inProperty != null) ? inProperty : eqList.get(0).property)) {
+        return true;
+      }
     }
 
     // multiple properties case
@@ -187,14 +189,13 @@ public final class NaturalKeyQueryData<T> {
    * Adjust the IN clause removing the hit entry.
    */
   public List<T> removeHits(BeanCacheResult<T> cacheResult) {
-
     List<BeanCacheResult.Entry<T>> hits = cacheResult.hits();
     this.hitCount = hits.size();
 
     List<T> beans = new ArrayList<>(hitCount);
     for (BeanCacheResult.Entry<T> hit : hits) {
-      removeKey(set.getInValue(hit.getKey()));
-      beans.add(hit.getBean());
+      removeKey(set.inValue(hit.key()));
+      beans.add(hit.bean());
     }
     return beans;
   }

@@ -2,20 +2,20 @@ package io.ebean;
 
 import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.datasource.DataSourceConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.persistence.PersistenceException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.ERROR;
+
 /**
  * Holds Database instances.
  */
 final class DbContext {
 
-  private static final Logger log = LoggerFactory.getLogger("io.ebean");
+  private static final System.Logger log = EbeanVersion.log;
   static {
     EbeanVersion.getVersion();
   }
@@ -23,14 +23,9 @@ final class DbContext {
   private static final DbContext INSTANCE = new DbContext();
 
   private final ConcurrentHashMap<String, Database> concMap = new ConcurrentHashMap<>();
-
   private final HashMap<String, Database> syncMap = new HashMap<>();
-
   private final ReentrantLock lock = new ReentrantLock();
 
-  /**
-   * The 'default' Database.
-   */
   private Database defaultDatabase;
 
   private DbContext() {
@@ -43,16 +38,19 @@ final class DbContext {
         }
       }
     } catch (BeanNotEnhancedException e) {
+      String msg = "Bean is not enhanced? See https://ebean.io/docs/trouble-shooting#not-enhanced";
+      log.log(ERROR, msg, e);
       throw e;
 
     } catch (DataSourceConfigurationException e) {
       String msg = "Configuration error creating DataSource for the default Database." +
         " This typically means a missing application-test.yaml or missing ebean-test dependency." +
         " See https://ebean.io/docs/trouble-shooting#datasource";
+      log.log(ERROR, msg, e);
       throw new DataSourceConfigurationException(msg, e);
 
     } catch (Throwable e) {
-      log.error("Error trying to create the default Database", e);
+      log.log(ERROR, "Error trying to create the default Database", e);
       throw new RuntimeException(e);
     }
   }
@@ -69,9 +67,9 @@ final class DbContext {
    */
   Database getDefault() {
     if (defaultDatabase == null) {
-      String msg = "The default Database has not been defined?";
-      msg += " This is normally set via the ebean.datasource.default property.";
-      msg += " Otherwise it should be registered programmatically via registerServer()";
+      String msg = "The default Database has not been defined?"
+        + " This is normally set via the ebean.datasource.default property."
+        + " Otherwise it should be registered programmatically via registerServer()";
       throw new PersistenceException(msg);
     }
     return defaultDatabase;

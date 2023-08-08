@@ -3,12 +3,7 @@ package io.ebean.common;
 import io.ebean.bean.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 /**
  * List capable of lazy loading and modification awareness.
@@ -73,7 +68,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     if (list == null) {
       list = new ArrayList<>();
     }
-    list.addAll((Collection<? extends E>) other.getActualDetails());
+    list.addAll((Collection<? extends E>) other.actualDetails());
   }
 
   @Override
@@ -159,17 +154,17 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   /**
    * Return the actual underlying list.
    */
-  public List<E> getActualList() {
+  public List<E> actualList() {
     return list;
   }
 
   @Override
-  public Collection<E> getActualDetails() {
+  public Collection<E> actualDetails() {
     return list;
   }
 
   @Override
-  public Collection<?> getActualEntries() {
+  public Collection<?> actualEntries() {
     return list;
   }
 
@@ -538,7 +533,7 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   @Override
-  public BeanCollection<E> getShallowCopy() {
+  public BeanCollection<E> shallowCopy() {
     BeanList<E> copy = new BeanList<>(new CopyOnFirstWriteList<>(list));
     copy.setFromOriginal(this);
     return copy;

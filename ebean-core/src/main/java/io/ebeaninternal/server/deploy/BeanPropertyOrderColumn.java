@@ -5,7 +5,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
 /**
  * Bean property for synthetic sort order value / order column.
- *
+ * <p>
  * The value of which is held on the entity bean intercept.
  */
 public final class BeanPropertyOrderColumn extends BeanProperty {
@@ -16,12 +16,12 @@ public final class BeanPropertyOrderColumn extends BeanProperty {
 
   @Override
   public Object getValue(EntityBean bean) {
-    return bean._ebean_getIntercept().getSortOrder();
+    return bean._ebean_getIntercept().sortOrder();
   }
 
   @Override
   public Object getValueIntercept(EntityBean bean) {
-    return bean._ebean_getIntercept().getSortOrder();
+    return bean._ebean_getIntercept().sortOrder();
   }
 
   @Override

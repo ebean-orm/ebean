@@ -1,6 +1,11 @@
 package io.ebeaninternal.server.profile;
 
+import io.ebean.meta.BasicMetricVisitor;
+import io.ebean.meta.MetaTimedMetric;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -51,5 +56,38 @@ public class DTimedMetricTest {
     assertThat(stats.count()).isEqualTo(2);
     assertThat(stats.total()).isGreaterThan(10000);
     assertThat(stats.max()).isEqualTo(stats.total() / 2);
+  }
+
+  Function<String, String> naming = (String name) -> "prefix[" + name.replace('.', '-') + "]";
+
+  @Test
+  void visit() {
+    DTimedMetric metric = new DTimedMetric("org.timed");
+    metric.add(560);
+    metric.add(500);
+    {
+      BasicMetricVisitor visitor = new BasicMetricVisitor("v", naming);
+      metric.visit(visitor);
+      List<MetaTimedMetric> result = visitor.timedMetrics();
+
+      assertThat(result).hasSize(1);
+      assertThat(result.get(0).name()).isEqualTo("prefix[org-timed]");
+      assertThat(result.get(0).count()).isEqualTo(2);
+      assertThat(result.get(0).total()).isEqualTo(1060);
+    }
+
+    metric.add(160);
+    metric.add(100);
+    metric.add(150);
+    {
+      BasicMetricVisitor visitor = new BasicMetricVisitor("v", naming);
+      metric.visit(visitor);
+      List<MetaTimedMetric> result = visitor.timedMetrics();
+
+      assertThat(result).hasSize(1);
+      assertThat(result.get(0).name()).isEqualTo("prefix[org-timed]");
+      assertThat(result.get(0).count()).isEqualTo(3);
+      assertThat(result.get(0).total()).isEqualTo(410);
+    }
   }
 }

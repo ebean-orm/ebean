@@ -5,13 +5,7 @@ import io.ebean.util.CamelCaseHelper;
 
 import java.io.Serializable;
 import java.sql.ResultSet;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Internal service API for Raw Sql.
@@ -31,6 +25,7 @@ public interface SpiRawSql extends RawSql {
 
   SpiRawSql.ColumnMapping getColumnMapping();
 
+  String mapToColumn(String property);
 
   /**
    * Represents the sql part of the query. For parsed RawSql the sql is broken
@@ -64,7 +59,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct for unparsed SQL.
      */
-    protected Sql(String unparsedSql) {
+    Sql(String unparsedSql) {
       this.parsed = false;
       this.unparsedSql = unparsedSql;
       this.preFrom = null;
@@ -80,7 +75,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct for parsed SQL.
      */
-    protected Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
+    Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
                   String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
 
       this.unparsedSql = unparsedSql;
@@ -98,9 +93,9 @@ public interface SpiRawSql extends RawSql {
     @Override
     public String toString() {
       if (!parsed) {
-        return "unparsed[" + unparsedSql + "]";
+        return "unparsed " + unparsedSql;
       }
-      return "select[" + preFrom + "] preWhere[" + preWhere + "] preHaving[" + preHaving + "] orderBy[" + orderBy + "]";
+      return "select:" + preFrom + " preWhere:" + preWhere + " preHaving:" + preHaving + " orderBy:" + orderBy;
     }
 
     public boolean isDistinct() {
@@ -199,7 +194,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct from parsed sql where the columns have been identified.
      */
-    protected ColumnMapping(List<Column> columns) {
+    ColumnMapping(List<Column> columns) {
       this.immutable = false;
       this.parsed = true;
       this.propertyMap = null;
@@ -213,7 +208,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct for unparsed sql.
      */
-    protected ColumnMapping() {
+    ColumnMapping() {
       this.immutable = false;
       this.parsed = false;
       this.propertyMap = null;
@@ -224,7 +219,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct for ResultSet use.
      */
-    protected ColumnMapping(String... propertyNames) {
+    ColumnMapping(String... propertyNames) {
       this.immutable = false;
       this.parsed = false;
       this.propertyMap = null;
@@ -240,7 +235,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Construct an immutable ColumnMapping based on collected information.
      */
-    protected ColumnMapping(boolean parsed, LinkedHashMap<String, Column> dbColumnMap) {
+    ColumnMapping(boolean parsed, LinkedHashMap<String, Column> dbColumnMap) {
       this.immutable = true;
       this.parsed = parsed;
       this.dbColumnMap = dbColumnMap;
@@ -281,17 +276,14 @@ public interface SpiRawSql extends RawSql {
      *
      * @throws IllegalStateException when a propertyName has not been defined for a column.
      */
-    protected ColumnMapping createImmutableCopy() {
-
+    ColumnMapping createImmutableCopy() {
       for (Column c : dbColumnMap.values()) {
         c.checkMapping();
       }
-
       return new ColumnMapping(parsed, dbColumnMap);
     }
 
-    protected void columnMapping(String dbColumn, String propertyName) {
-
+    void columnMapping(String dbColumn, String propertyName) {
       if (immutable) {
         throw new IllegalStateException("Should never happen");
       }
@@ -301,8 +293,7 @@ public interface SpiRawSql extends RawSql {
       } else {
         Column column = dbColumnMap.get(dbColumn);
         if (column == null) {
-          String msg = "DB Column [" + dbColumn + "] not found in mapping. Expecting one of [" + dbColumnMap.keySet() + "]";
-          throw new IllegalArgumentException(msg);
+          throw new IllegalArgumentException("DB Column " + dbColumn + " not found in mapping. Expecting one of " + dbColumnMap.keySet());
         }
         column.setPropertyName(propertyName);
       }
@@ -331,7 +322,7 @@ public interface SpiRawSql extends RawSql {
     /**
      * Return the column mapping.
      */
-    protected Map<String, Column> mapping() {
+    Map<String, Column> mapping() {
       return dbColumnMap;
     }
 
@@ -367,13 +358,17 @@ public interface SpiRawSql extends RawSql {
      * </p>
      */
     public void tableAliasMapping(String tableAlias, String path) {
-
       String startMatch = tableAlias + ".";
       for (Map.Entry<String, Column> entry : dbColumnMap.entrySet()) {
         if (entry.getKey().startsWith(startMatch)) {
           entry.getValue().tableAliasMapping(path);
         }
       }
+    }
+
+    public String mapToColumn(String property) {
+      final var column = propertyColumnMap.get(property);
+      return column == null ? null : column.getDbColumn();
     }
 
     /**
@@ -420,8 +415,7 @@ public interface SpiRawSql extends RawSql {
 
       private void checkMapping() {
         if (propertyName == null) {
-          String msg = "No propertyName defined (Column mapping) for dbColumn [" + dbColumn + "]";
-          throw new IllegalStateException(msg);
+          throw new IllegalStateException("No propertyName defined (Column mapping) for dbColumn " + dbColumn);
         }
       }
 

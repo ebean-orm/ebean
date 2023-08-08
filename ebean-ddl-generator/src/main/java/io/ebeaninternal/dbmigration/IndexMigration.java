@@ -40,7 +40,7 @@ class IndexMigration {
 
   File init() {
     pathStack.push("");
-    String name = "idx_" + databasePlatform.getPlatform().base().name().toLowerCase() + ".migrations";
+    String name = "idx_" + databasePlatform.platform().base().name().toLowerCase() + ".migrations";
     return new File(topDir, name);
   }
 

@@ -10,10 +10,11 @@ import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
-import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Set;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Performs post commit processing using a background thread.
@@ -23,7 +24,7 @@ import java.util.Set;
  */
 final class PostCommitProcessing {
 
-  private static final Logger log = CoreLog.internal;
+  private static final System.Logger log = CoreLog.internal;
 
   private final ClusterManager clusterManager;
   private final TransactionEvent event;
@@ -45,8 +46,8 @@ final class PostCommitProcessing {
     this.txnDocStoreMode = DocStoreMode.IGNORE;
     this.txnDocStoreBatchSize = 0;
     this.event = event;
-    this.deleteByIdMap = event.getDeleteByIdMap();
-    this.listenerNotify = event.getListenerNotify();
+    this.deleteByIdMap = event.deleteByIdMap();
+    this.listenerNotify = event.listenerNotify();
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
 
@@ -57,11 +58,11 @@ final class PostCommitProcessing {
     this.clusterManager = clusterManager;
     this.manager = manager;
     this.serverName = manager.name();
-    this.txnDocStoreMode = transaction.getDocStoreMode();
+    this.txnDocStoreMode = transaction.docStoreMode();
     this.txnDocStoreBatchSize = transaction.getDocStoreBatchSize();
-    this.event = transaction.getEvent();
-    this.deleteByIdMap = event.getDeleteByIdMap();
-    this.listenerNotify = event.getListenerNotify();
+    this.event = transaction.event();
+    this.deleteByIdMap = event.deleteByIdMap();
+    this.listenerNotify = event.listenerNotify();
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
 
@@ -104,8 +105,8 @@ final class PostCommitProcessing {
   private void notifyCluster() {
     if (remoteTransactionEvent != null && !remoteTransactionEvent.isEmpty()) {
       // send the interesting events to the cluster
-      if (log.isDebugEnabled()) {
-        log.debug("Cluster Send: {}", remoteTransactionEvent);
+      if (log.isLoggable(DEBUG)) {
+        log.log(DEBUG, "Cluster Send: {0}", remoteTransactionEvent);
       }
       clusterManager.broadcast(remoteTransactionEvent);
     }
@@ -148,7 +149,7 @@ final class PostCommitProcessing {
         request.notifyLocalPersistListener();
       }
     }
-    TransactionEventTable eventTables = event.getEventTables();
+    TransactionEventTable eventTables = event.eventTables();
     if (eventTables != null && !eventTables.isEmpty()) {
       BulkEventListenerMap map = manager.bulkEventListenerMap();
       for (TableIUD tableIUD : eventTables.values()) {
@@ -182,7 +183,7 @@ final class PostCommitProcessing {
     if (deleteByIdMap != null) {
       remoteTransactionEvent.setDeleteByIdMap(deleteByIdMap);
     }
-    TransactionEventTable eventTables = event.getEventTables();
+    TransactionEventTable eventTables = event.eventTables();
     if (eventTables != null && !eventTables.isEmpty()) {
       for (TableIUD tableIUD : eventTables.values()) {
         remoteTransactionEvent.addTableIUD(tableIUD);

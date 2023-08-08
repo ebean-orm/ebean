@@ -45,10 +45,11 @@ public class ClickHousePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.UUID, new DbPlatformType("UUID", false));
     dbTypeMap.put(DbType.INET, new DbPlatformType("String", false));
     dbTypeMap.put(DbType.CIDR, new DbPlatformType("String", false));
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("String", false));
   }
 
   @Override
-  public boolean isNativeArrayType() {
+  public boolean nativeArrayType() {
     return true;
   }
 

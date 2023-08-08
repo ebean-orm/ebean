@@ -2,12 +2,12 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.Binder;
-import io.ebeaninternal.server.type.DataBind;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -67,14 +67,13 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public DbExpressionHandler getDbPlatformHandler() {
+  public DbExpressionHandler platformHandler() {
     return binder.getDbExpressionHandler();
   }
 
   @Override
   public String parseDeploy(String logicalProp) {
-
-    String s = deployParser.getDeployWord(logicalProp);
+    String s = deployParser.deployWord(logicalProp);
     return s == null ? logicalProp : s;
   }
 
@@ -102,12 +101,12 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
-  public BeanDescriptor<?> getBeanDescriptor() {
+  public BeanDescriptor<?> descriptor() {
     return beanDescriptor;
   }
 
   @Override
-  public SpiOrmQueryRequest<?> getQueryRequest() {
+  public SpiOrmQueryRequest<?> queryRequest() {
     return queryRequest;
   }
 
@@ -115,8 +114,28 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
    * Append text the underlying sql expression.
    */
   @Override
-  public SpiExpressionRequest append(String sqlExpression) {
-    sql.append(sqlExpression);
+  public SpiExpressionRequest append(String expression) {
+    sql.append(expression);
+    return this;
+  }
+
+  @Override
+  public SpiExpressionRequest property(String expression) {
+    if (deployParser == null) {
+      sql.append(expression);
+    } else {
+      sql.append(deployParser.property(expression));
+    }
+    return this;
+  }
+
+  @Override
+  public SpiExpressionRequest parse(String expression) {
+    if (deployParser == null) {
+      sql.append(expression);
+    } else {
+      sql.append(deployParser.parse(expression));
+    }
     return this;
   }
 
@@ -143,17 +162,17 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
     }
   }
 
-  public String getBindLog() {
+  public String bindLog() {
     return bindLog == null ? "" : bindLog.toString();
   }
 
   @Override
-  public String getSql() {
+  public String sql() {
     return sql.toString();
   }
 
   @Override
-  public List<Object> getBindValues() {
+  public List<Object> bindValues() {
     return bindValues;
   }
 

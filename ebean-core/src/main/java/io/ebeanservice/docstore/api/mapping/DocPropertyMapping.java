@@ -9,15 +9,12 @@ import java.util.List;
 /**
  * Property mapping in a doc store document structure.
  */
-public class DocPropertyMapping {
+public final class DocPropertyMapping {
 
   private String name;
-
   private DocPropertyType type;
-
   private DocPropertyOptions options;
-
-  private List<DocPropertyMapping> children = new ArrayList<>();
+  private final List<DocPropertyMapping> children = new ArrayList<>();
 
   /**
    * Construct ROOT.
@@ -70,7 +67,6 @@ public class DocPropertyMapping {
   }
 
   private void visitChildren(DocPropertyVisitor visitor) {
-
     for (DocPropertyMapping property : children) {
       property.visit(visitor);
     }
@@ -78,41 +74,41 @@ public class DocPropertyMapping {
 
   @Override
   public String toString() {
-    return "name:" + name + " type:" + type + " options(" + options + ")";
+    return "name:" + name + " type:" + type + " options:" + options;
   }
 
   /**
    * Return the type of the property.
    */
-  public DocPropertyType getType() {
+  public DocPropertyType type() {
     return type;
   }
 
   /**
    * Set the type of the property.
    */
-  public void setType(DocPropertyType type) {
+  public void type(DocPropertyType type) {
     this.type = type;
   }
 
   /**
    * Return the property name.
    */
-  public String getName() {
+  public String name() {
     return name;
   }
 
   /**
    * Return the property options.
    */
-  public DocPropertyOptions getOptions() {
+  public DocPropertyOptions options() {
     return options;
   }
 
   /**
    * Return the child nested properties.
    */
-  public List<DocPropertyMapping> getChildren() {
+  public List<DocPropertyMapping> children() {
     return children;
   }
 

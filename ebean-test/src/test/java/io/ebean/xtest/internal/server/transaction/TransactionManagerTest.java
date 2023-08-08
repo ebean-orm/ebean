@@ -34,7 +34,7 @@ public class TransactionManagerTest extends BaseTestCase {
     DataSource dataSource = transactionManager.dataSource();
     Connection connection = dataSource.getConnection();
     try {
-      SpiTransaction externalTxn = new ExternalJdbcTransaction("external0", true, connection, null);
+      SpiTransaction externalTxn = new ExternalJdbcTransaction(true, connection, null);
 
       // push an externally managed transaction onto scope
       ScopedTransaction scopedTransaction = transactionManager.externalBeginTransaction(externalTxn, TxScope.required());

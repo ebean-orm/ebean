@@ -34,7 +34,7 @@ final class CQueryPlanRequest {
   /**
    * Return the connection used to collect the db query plan.
    */
-  Connection getConnection() {
+  Connection connection() {
     return connection;
   }
 
@@ -48,14 +48,14 @@ final class CQueryPlanRequest {
   /**
    * Return the min epoch time in millis for minimum bind capture age.
    */
-  long getSince() {
+  long since() {
     return since;
   }
 
   /**
    * Return the captured query plans.
    */
-  List<MetaQueryPlan> getPlans() {
+  List<MetaQueryPlan> plans() {
     return plans;
   }
 

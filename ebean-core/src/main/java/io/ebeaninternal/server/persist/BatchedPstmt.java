@@ -12,6 +12,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * A batched statement that is held in BatchedPstmtHolder. It has a list of
  * BatchPostExecute which it will process after the statement is executed.
@@ -135,7 +137,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
       try {
         pstmt.close();
       } catch (SQLException e) {
-        CoreLog.log.warn("BatchedPstmt Error closing statement", e);
+        CoreLog.log.log(WARNING, "BatchedPstmt Error closing statement", e);
       } finally {
         pstmt = null;
       }
@@ -201,7 +203,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
         try {
           inputStream.close();
         } catch (IOException e) {
-          CoreLog.log.warn("BatchedPstmt Error closing inputStream ", e);
+          CoreLog.log.log(WARNING, "BatchedPstmt Error closing inputStream ", e);
         }
       }
       inputStreams = null;

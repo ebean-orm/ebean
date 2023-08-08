@@ -14,6 +14,7 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -209,8 +210,10 @@ public class DtoQuery2Test extends BaseTestCase {
       log.info("Found " + custs);
     }
 
+    Function<String, String> lowerUnderscore = (String key) -> "prefix:" + key.replace('.','_').toLowerCase();
+
     // collect without reset
-    BasicMetricVisitor basic = new BasicMetricVisitor("db", false, true, true, true);
+    BasicMetricVisitor basic = new BasicMetricVisitor("db", lowerUnderscore, false, true, true, true);
     server().metaInfo().visitMetrics(basic);
 
     List<MetaQueryMetric> stats = basic.queryMetrics();
@@ -219,7 +222,7 @@ public class DtoQuery2Test extends BaseTestCase {
     MetaQueryMetric queryMetric = stats.get(0);
     assertThat(queryMetric.label()).isEqualTo("basic");
     assertThat(queryMetric.count()).isEqualTo(3);
-    assertThat(queryMetric.name()).isEqualTo("dto.DCust_basic");
+    assertThat(queryMetric.name()).isEqualTo("prefix:dto_dcust_basic");
 
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")
@@ -233,7 +236,95 @@ public class DtoQuery2Test extends BaseTestCase {
     assertThat(stats).hasSize(2);
 
     log.info("stats " + stats);
+  }
 
+  @Test
+  void dto_mapping_columnsWithUnderscores() {
+    ResetBasicData.reset();
+
+    List<DCustCamelCols0> list = server().findDto(DCustCamelCols0.class,
+        "select id as num_with, name as name_for_me from o_customer")
+      .findList();
+
+    assertThat(list).isNotEmpty();
+    for (DCustCamelCols0 dto : list) {
+      assertThat(dto.getNumWith()).isGreaterThan(0);
+      assertThat(dto.getNameForMe()).isNotNull();
+    }
+  }
+
+  @Test
+  void dto_mapping_columnsWithNoUnderscores() {
+    ResetBasicData.reset();
+
+    List<DCustCamelCols0> list = server().findDto(DCustCamelCols0.class,
+        "select id as numwith, name as nameforme from o_customer")
+      .findList();
+
+    assertThat(list).isNotEmpty();
+    for (DCustCamelCols0 dto : list) {
+      assertThat(dto.getNumWith()).isGreaterThan(0);
+      assertThat(dto.getNameForMe()).isNotNull();
+    }
+
+    // mapping is case-insensitive
+    List<DCustCamelCols0> list2 = server().findDto(DCustCamelCols0.class,
+        "select id as numWith, name as nameForMe from o_customer")
+      .findList();
+
+    assertThat(list2).isNotEmpty();
+    for (DCustCamelCols0 dto : list2) {
+      assertThat(dto.getNumWith()).isGreaterThan(0);
+      assertThat(dto.getNameForMe()).isNotNull();
+    }
+  }
+
+  @Test
+  void dto_mapping_propertyNamesCaseInsensitive() {
+    ResetBasicData.reset();
+
+    List<DCustCamelCols2> list = server().findDto(DCustCamelCols2.class,
+        "select id as numwith, name as nameforme from o_customer")
+      .findList();
+
+    assertThat(list).isNotEmpty();
+    for (DCustCamelCols2 dto : list) {
+      assertThat(dto.getNumWITH()).isGreaterThan(0);
+      assertThat(dto.getNameFORMe()).isNotNull();
+    }
+
+    // mapping is case-insensitive
+    List<DCustCamelCols2> list2 = server().findDto(DCustCamelCols2.class,
+        "select id as numWith, name as nameForMe from o_customer")
+      .findList();
+
+    assertThat(list2).isNotEmpty();
+    for (DCustCamelCols2 dto : list2) {
+      assertThat(dto.getNumWITH()).isGreaterThan(0);
+      assertThat(dto.getNameFORMe()).isNotNull();
+    }
+  }
+
+  @Test
+  void dto_mapping_columnsUsingNestedSql() {
+    ResetBasicData.reset();
+
+    String sql
+      = "select num_with, name_for_me from ( "
+      // we don't CARE what the nested SQL is in that the jdbc metaData
+      // for the column names/labels comes from the top most select
+      + "    select id as num_with, name as name_for_me from o_customer "
+      + ") a";
+
+    List<DCustCamelCols0> list = server().findDto(DCustCamelCols0.class,
+        sql)
+      .findList();
+
+    assertThat(list).isNotEmpty();
+    for (DCustCamelCols0 dto : list) {
+      assertThat(dto.getNumWith()).isGreaterThan(0);
+      assertThat(dto.getNameForMe()).isNotNull();
+    }
   }
 
   @Test
@@ -473,6 +564,54 @@ public class DtoQuery2Test extends BaseTestCase {
 
     public void name(String name) {
       this.name = name;
+    }
+  }
+
+  public static class DCustCamelCols0 {
+
+    Integer numWith;
+    String nameForMe;
+
+    public Integer getNumWith() {
+      return numWith;
+    }
+
+    public DCustCamelCols0 setNumWith(Integer numWith) {
+      this.numWith = numWith;
+      return this;
+    }
+
+    public String getNameForMe() {
+      return nameForMe;
+    }
+
+    public DCustCamelCols0 setNameForMe(String nameForMe) {
+      this.nameForMe = nameForMe;
+      return this;
+    }
+  }
+
+  public static class DCustCamelCols2 {
+
+    Integer numWITH;
+    String nameFORMe;
+
+    public Integer getNumWITH() {
+      return numWITH;
+    }
+
+    public DCustCamelCols2 setNumWITH(Integer numWITH) {
+      this.numWITH = numWITH;
+      return this;
+    }
+
+    public String getNameFORMe() {
+      return nameFORMe;
+    }
+
+    public DCustCamelCols2 setNameFORMe(String nameFORMe) {
+      this.nameFORMe = nameFORMe;
+      return this;
     }
   }
 }

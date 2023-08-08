@@ -121,7 +121,7 @@ public class BaseTableDdl implements TableDdl {
     }
 
     private List<String> getScriptsForPlatform(List<DdlScript> scripts) {
-      Platform searchPlatform = platformDdl.getPlatform().getPlatform();
+      Platform searchPlatform = platformDdl.getPlatform().platform();
       for (DdlScript script : scripts) {
         if (matchPlatform(searchPlatform, script.getPlatforms())) {
           // just returns the first match (rather than appends them)
@@ -444,7 +444,7 @@ public class BaseTableDdl implements TableDdl {
   }
 
   private boolean platformInclude(String platforms) {
-    return matchPlatform(platformDdl.getPlatform().getPlatform(), platforms);
+    return matchPlatform(platformDdl.getPlatform().platform(), platforms);
   }
 
   /**
@@ -610,7 +610,7 @@ public class BaseTableDdl implements TableDdl {
   public void generate(DdlWrite writer, DropTable dropTable) {
     dropTable(writer.applyPostAlter(), dropTable.getName());
     if (hasValue(dropTable.getSequenceCol())
-        && platformDdl.getPlatform().getDbIdentity().isSupportsSequence()) {
+        && platformDdl.getPlatform().dbIdentity().isSupportsSequence()) {
       String sequenceName = dropTable.getSequenceName();
       if (!hasValue(sequenceName)) {
         sequenceName = namingConvention.getSequenceName(dropTable.getName(), dropTable.getSequenceCol());

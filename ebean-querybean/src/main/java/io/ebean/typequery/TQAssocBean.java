@@ -11,13 +11,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Base type for associated beans.
+ * Base type for associated beans that are not embeddable.
  *
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
  * @param <R> the specific root query bean type (e.g. QCustomer)
+ * @param <QB> the query bean type
  */
 @SuppressWarnings("rawtypes")
-public abstract class TQAssocBean<T, R> extends TQProperty<R> {
+public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
 
   private static final FetchConfig FETCH_DEFAULT = FetchConfig.ofDefault();
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
@@ -44,7 +45,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Eagerly fetch this association fetching all the properties.
    */
-  public R fetch() {
+  public final R fetch() {
     ((TQRootBean) _root).query().fetch(_name);
     return _root;
   }
@@ -52,7 +53,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Eagerly fetch this association using a "query join".
    */
-  public R fetchQuery() {
+  public final R fetchQuery() {
     ((TQRootBean) _root).query().fetchQuery(_name);
     return _root;
   }
@@ -61,7 +62,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Eagerly fetch this association using L2 bean cache.
    * Cache misses are populated via fetchQuery().
    */
-  public R fetchCache() {
+  public final R fetchCache() {
     ((TQRootBean) _root).query().fetchCache(_name);
     return _root;
   }
@@ -69,7 +70,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Use lazy loading for fetching this association.
    */
-  public R fetchLazy() {
+  public final R fetchLazy() {
     ((TQRootBean) _root).query().fetchLazy(_name);
     return _root;
   }
@@ -77,7 +78,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Eagerly fetch this association with the properties specified.
    */
-  public R fetch(String properties) {
+  public final R fetch(String properties) {
     ((TQRootBean) _root).query().fetch(_name, properties);
     return _root;
   }
@@ -85,7 +86,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Eagerly fetch this association using a "query join" with the properties specified.
    */
-  public R fetchQuery(String properties) {
+  public final R fetchQuery(String properties) {
     ((TQRootBean) _root).query().fetchQuery(_name, properties);
     return _root;
   }
@@ -94,53 +95,44 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * Eagerly fetch this association using L2 cache with the properties specified.
    * Cache misses are populated via  fetchQuery().
    */
-  public R fetchCache(String properties) {
+  public final R fetchCache(String properties) {
     ((TQRootBean) _root).query().fetchCache(_name, properties);
     return _root;
   }
 
   /**
-   * Deprecated in favor of fetch().
+   * Eagerly fetch this association loading the specified properties.
    */
-  @Deprecated
-  public R fetchAll() {
-    return fetch();
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetch(TQProperty<QB,?>... properties) {
+    return fetchWithProperties(FETCH_DEFAULT, properties);
   }
 
   /**
-   * Eagerly fetch this association fetching some of the properties.
+   * Eagerly fetch this association using a 'query join' loading the specified properties.
    */
-  @SafeVarargs
-  protected final R fetchProperties(TQProperty<?>... props) {
-    return fetchWithProperties(FETCH_DEFAULT, props);
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetchQuery(TQProperty<QB,?>... properties) {
+    return fetchWithProperties(FETCH_QUERY, properties);
   }
 
   /**
-   * Eagerly fetch query this association fetching some of the properties.
+   * Eagerly fetch this association using L2 cache.
    */
-  @SafeVarargs
-  protected final R fetchQueryProperties(TQProperty<?>... props) {
-    return fetchWithProperties(FETCH_QUERY, props);
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetchCache(TQProperty<QB,?>... properties) {
+    return fetchWithProperties(FETCH_CACHE, properties);
   }
 
   /**
-   * Eagerly fetch this association using L2 bean cache.
+   * Use lazy loading for this association loading the specified properties.
    */
-  @SafeVarargs
-  protected final R fetchCacheProperties(TQProperty<?>... props) {
-    return fetchWithProperties(FETCH_CACHE, props);
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetchLazy(TQProperty<QB,?>... properties) {
+    return fetchWithProperties(FETCH_LAZY, properties);
   }
 
-  /**
-   * Eagerly fetch query this association fetching some of the properties.
-   */
-  @SafeVarargs
-  protected final R fetchLazyProperties(TQProperty<?>... props) {
-    return fetchWithProperties(FETCH_LAZY, props);
-  }
-
-  @SafeVarargs
-  private final R fetchWithProperties(FetchConfig config, TQProperty<?>... props) {
+  private R fetchWithProperties(FetchConfig config, TQProperty<?, ?>... props) {
     spiQuery().fetchProperties(_name, properties(props), config);
     return _root;
   }
@@ -148,21 +140,21 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   /**
    * Fetch using the nested FetchGroup.
    */
-  public R fetch(FetchGroup<T> nestedGroup) {
+  public final R fetch(FetchGroup<T> nestedGroup) {
     return fetchNested(nestedGroup, FETCH_DEFAULT);
   }
 
   /**
    * Fetch query using the nested FetchGroup.
    */
-  public R fetchQuery(FetchGroup<T> nestedGroup) {
+  public final R fetchQuery(FetchGroup<T> nestedGroup) {
     return fetchNested(nestedGroup, FETCH_QUERY);
   }
 
   /**
    * Fetch cache using the nested FetchGroup.
    */
-  public R fetchCache(FetchGroup<T> nestedGroup) {
+  public final R fetchCache(FetchGroup<T> nestedGroup) {
     return fetchNested(nestedGroup, FETCH_CACHE);
   }
 
@@ -173,53 +165,22 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   }
 
   private SpiQueryFetch spiQuery() {
-    return (SpiQueryFetch)((TQRootBean) _root).query();
+    return (SpiQueryFetch) ((TQRootBean) _root).query();
   }
 
-  @SafeVarargs
-  private final Set<String> properties(TQProperty<?>... props) {
+  private Set<String> properties(TQProperty<?, ?>... props) {
     Set<String> set = new LinkedHashSet<>();
-    for (TQProperty<?> prop : props) {
+    for (TQProperty<?, ?> prop : props) {
       set.add(prop.propertyName());
     }
     return set;
   }
 
-  /**
-   * Is equal to by ID property.
-   */
-  public R eq(T other) {
-    expr().eq(_name, other);
-    return _root;
-  }
-
-  /**
-   * Is equal to by ID property.
-   */
-  public R equalTo(T other) {
-    return eq(other);
-  }
-
-  /**
-   * Is not equal to by ID property.
-   */
-  public R ne(T other) {
-    expr().ne(_name, other);
-    return _root;
-  }
-
-  /**
-   * Is not equal to by ID property.
-   */
-  public R notEqualTo(T other) {
-    return ne(other);
-  }
 
   /**
    * Apply a filter when fetching these beans.
    */
-  public R filterMany(ExpressionList<T> filter) {
-
+  public final R filterMany(ExpressionList<T> filter) {
     @SuppressWarnings("unchecked")
     ExpressionList<T> expressionList = (ExpressionList<T>) expr().filterMany(_name);
     expressionList.addAll(filter);
@@ -254,7 +215,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
    * @param params      The bind parameter values
    */
-  public R filterMany(String expressions, Object... params) {
+  public final R filterMany(String expressions, Object... params) {
     expr().filterMany(_name, expressions, params);
     return _root;
   }
@@ -268,7 +229,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * This expression only works on OneToMany and ManyToMany properties.
    * </p>
    */
-  public R isEmpty() {
+  public final R isEmpty() {
     expr().isEmpty(_name);
     return _root;
   }
@@ -282,7 +243,7 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
    * This expression only works on OneToMany and ManyToMany properties.
    * </p>
    */
-  public R isNotEmpty() {
+  public final R isNotEmpty() {
     expr().isNotEmpty(_name);
     return _root;
   }

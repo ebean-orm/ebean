@@ -11,7 +11,7 @@ public final class DtoColumn {
     this.label = label;
   }
 
-  public String getLabel() {
+  public String label() {
     return label;
   }
 

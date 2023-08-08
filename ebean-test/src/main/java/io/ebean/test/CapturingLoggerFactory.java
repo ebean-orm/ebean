@@ -1,9 +1,10 @@
 package io.ebean.test;
 
+import io.avaje.applog.AppLog;
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static java.lang.System.Logger.Level.DEBUG;
 
 /**
  * Create a logger that captures the SQL and register it for later access in tests.
@@ -15,7 +16,7 @@ public class CapturingLoggerFactory implements SpiLoggerFactory {
 
   @Override
   public SpiLogger create(String name) {
-    SpiLogger logger = new LogAdapter(LoggerFactory.getLogger(name));
+    SpiLogger logger = new LogAdapter(AppLog.getLogger(name));
     if (name.equals("io.ebean.SQL")) {
       return LoggedSql.register(logger);
     }
@@ -24,30 +25,20 @@ public class CapturingLoggerFactory implements SpiLoggerFactory {
 
   private static final class LogAdapter implements SpiLogger {
 
-    private final Logger logger;
+    private final System.Logger logger;
 
-    LogAdapter(Logger logger) {
+    LogAdapter(System.Logger logger) {
       this.logger = logger;
     }
 
     @Override
     public boolean isDebug() {
-      return logger.isDebugEnabled();
+      return logger.isLoggable(DEBUG);
     }
 
     @Override
-    public boolean isTrace() {
-      return logger.isTraceEnabled();
-    }
-
-    @Override
-    public void debug(String msg) {
-      logger.debug(msg);
-    }
-
-    @Override
-    public void trace(String msg) {
-      logger.trace(msg);
+    public void debug(String msg, Object... args) {
+      logger.log(DEBUG, msg, args);
     }
   }
 }

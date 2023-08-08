@@ -1,9 +1,16 @@
 package io.ebean.meta;
 
+import java.util.function.Function;
+
 /**
  * Defines visitor to read and report the transaction and query metrics.
  */
 public interface MetricVisitor {
+
+  /**
+   * Return the naming convention that should be applied to the reported metric names.
+   */
+  Function<String, String> namingConvention();
 
   /**
    * Return true if the metrics should be reset.

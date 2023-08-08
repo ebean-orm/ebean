@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.core.type.ScalarTypeBaseVarchar;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;

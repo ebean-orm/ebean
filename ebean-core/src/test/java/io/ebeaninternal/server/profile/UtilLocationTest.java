@@ -5,17 +5,23 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UtilLocationTest {
+class UtilLocationTest {
 
   @Test
-  public void label() {
+  void label() {
     Assertions.assertThat(UtilLocation.label("foo")).isEqualTo("foo");
     assertThat(UtilLocation.label("ProfileLocationTest$Other.<init>")).isEqualTo("ProfileLocationTest$Other.init");
   }
 
   @Test
-  public void loc() {
+  void loc() {
     assertThat(UtilLocation.loc("org.foo.MyFoo.doIt(MyFoo.java:12)")).isEqualTo("org.foo.MyFoo.doIt");
     assertThat(UtilLocation.label("org.foo.MyFoo.doIt")).isEqualTo("MyFoo.doIt");
+  }
+
+  @Test
+  void locWithLineNumber() {
+    assertThat(UtilLocation.loc("org.foo.MyFoo.doIt(MyFoo.java:12)", true)).isEqualTo("org.foo.MyFoo.doIt:12");
+    assertThat(UtilLocation.label("org.foo.MyFoo.doIt:12")).isEqualTo("MyFoo.doIt:12");
   }
 }

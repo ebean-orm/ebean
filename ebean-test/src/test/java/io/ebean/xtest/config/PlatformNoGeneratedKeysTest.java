@@ -92,7 +92,7 @@ public class PlatformNoGeneratedKeysTest {
     config.setName("h2_noGeneratedKeys");
 
     OtherH2Platform platform = new OtherH2Platform();
-    DbIdentity dbIdentity = platform.getDbIdentity();
+    DbIdentity dbIdentity = platform.dbIdentity();
     dbIdentity.setIdType(IdType.IDENTITY);
     dbIdentity.setSupportsIdentity(true);
     dbIdentity.setSupportsGetGeneratedKeys(false);
@@ -111,8 +111,8 @@ public class PlatformNoGeneratedKeysTest {
     config.setRegister(false);
     config.setDdlGenerate(true);
     config.setDdlRun(true);
-    config.getClasses().add(EBasicVer.class);
-    config.getClasses().add(BasicDraftableBean.class);
+    config.addClass(EBasicVer.class);
+    config.addClass(BasicDraftableBean.class);
     config.loadFromProperties(); // trigger auto config for H2 1.x
 
     return DatabaseFactory.create(config);

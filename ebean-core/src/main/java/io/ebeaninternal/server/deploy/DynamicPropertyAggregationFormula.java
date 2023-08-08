@@ -26,7 +26,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
 
   @Override
   public String toString() {
-    return "DynamicPropertyFormula[" + parsedFormula + "]";
+    return "DynamicPropertyFormula " + parsedFormula;
   }
 
   @Override
@@ -47,7 +47,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   public void load(SqlBeanLoad sqlBeanLoad) {
     Object value;
     try {
-      value = scalarType.read(sqlBeanLoad.ctx().getDataReader());
+      value = scalarType.read(sqlBeanLoad.ctx().dataReader());
     } catch (Exception e) {
       sqlBeanLoad.ctx().handleLoadError(fullName, e);
       return;

@@ -45,15 +45,14 @@ public final class ScopeTrans {
    * Flag set when nested commit has occurred.
    */
   private boolean nestedCommit;
+  private boolean nestedUseSavepoint;
 
   public ScopeTrans(boolean rollbackOnChecked, boolean created, SpiTransaction transaction, TxScope txScope) {
-
     this.rollbackOnChecked = rollbackOnChecked;
     this.created = created;
     this.transaction = transaction;
     this.noRollbackFor = txScope.getNoRollbackFor();
     this.rollbackFor = txScope.getRollbackFor();
-
     if (transaction != null) {
       if (!created && txScope.isBatchSet() || txScope.isBatchOnCascadeSet() || txScope.isBatchSizeSet()) {
         restoreBatch = transaction.isBatchMode();
@@ -87,13 +86,21 @@ public final class ScopeTrans {
 
   @Override
   public String toString() {
-    return "ScopeTrans[" + transaction + "]";
+    return "ScopeTrans " + transaction;
+  }
+
+  void setNestedUseSavepoint() {
+    nestedUseSavepoint = true;
+  }
+
+  boolean isNestedUseSavepoint() {
+    return nestedUseSavepoint;
   }
 
   /**
    * Return the current/active transaction.
    */
-  protected SpiTransaction getTransaction() {
+  SpiTransaction getTransaction() {
     return transaction;
   }
 
@@ -101,7 +108,6 @@ public final class ScopeTrans {
    * Complete the transaction from enhanced transactional. Try to commit.
    */
   void complete(Object returnOrThrowable, int opCode) {
-
     if (opCode == OPCODE_ATHROW) {
       // exited with a Throwable
       caughtThrowable((Throwable) returnOrThrowable);
@@ -124,7 +130,7 @@ public final class ScopeTrans {
     }
   }
 
-  protected void commitTransaction() {
+  void commitTransaction() {
     if (created) {
       transaction.commit();
     } else {
@@ -168,14 +174,13 @@ public final class ScopeTrans {
    * Returns the exception and this should be thrown by the calling code.
    */
   public <T extends Throwable> T caughtThrowable(T e) {
-
     if (isRollbackThrowable(e)) {
       rollback(e);
     }
     return e;
   }
 
-  protected void rollback(Throwable e) {
+  void rollback(Throwable e) {
     if (transaction != null && transaction.isActive()) {
       // transaction is null for NOT_SUPPORTED and sometimes SUPPORTS
       // and Inactive (already rolled back) if nested REQUIRED
@@ -188,21 +193,17 @@ public final class ScopeTrans {
    * Return true if this throwable should cause a rollback to occur.
    */
   private boolean isRollbackThrowable(Throwable e) {
-
     if (e instanceof Error) {
       return true;
     }
-
     if (noRollbackFor != null) {
       for (Class<? extends Throwable> aNoRollbackFor : noRollbackFor) {
         if (aNoRollbackFor.equals(e.getClass())) {
-
           // explicit no rollback for this one
           return false;
         }
       }
     }
-
     if (rollbackFor != null) {
       for (Class<? extends Throwable> aRollbackFor : rollbackFor) {
         if (aRollbackFor.equals(e.getClass())) {
@@ -211,7 +212,6 @@ public final class ScopeTrans {
         }
       }
     }
-
     // checked exceptions...
     // EJB defaults this to false which is not intuitive IMO
     // Ebean makes this configurable (default to true)

@@ -61,7 +61,7 @@ public final class BindParamsParser {
    */
   private String parseSql() {
     if (params.isSameBindHash()) {
-      String preparedSql = params.getPreparedSql();
+      String preparedSql = params.preparedSql();
       if (preparedSql != null && !preparedSql.isEmpty()) {
         // the sql has already been parsed and positionedParameters are set in order
         return preparedSql;
@@ -117,7 +117,7 @@ public final class BindParamsParser {
         Param param = extractNamedParam(paramName);
 
         orderedList.appendSql(sql.substring(startPos, nameParamStart));
-        Object inValue = param.getInValue();
+        Object inValue = param.inValue();
         if (inValue instanceof Collection<?>) {
           addCollectionParams(orderedList, param, (Collection<?>) inValue);
         } else {
@@ -139,10 +139,10 @@ public final class BindParamsParser {
     if (paramName.startsWith(ENCRYPTKEY_PREFIX)) {
       param = addEncryptKeyParam(paramName);
     } else {
-      param = params.getParameter(paramName);
+      param = params.parameter(paramName);
     }
     if (param == null) {
-      throw new PersistenceException("Bind value is not set or null for [" + paramName + "] in [" + sql + "]");
+      throw new PersistenceException("Bind value is not set or null for " + paramName + " in " + sql);
     }
     return param;
   }
@@ -172,8 +172,7 @@ public final class BindParamsParser {
 
   private void addCollectionParams(OrderedList orderedList, Param param, Collection<?> inValue) {
     // Chop up Collection parameter into a number of individual parameters
-    Collection<?> collection = inValue;
-    for (int c = 0; c < collection.size(); c++) {
+    for (int c = 0; c < inValue.size(); c++) {
       if (c > 0) {
         orderedList.appendSql(",");
       }

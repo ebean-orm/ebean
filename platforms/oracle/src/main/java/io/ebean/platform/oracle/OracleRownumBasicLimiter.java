@@ -5,7 +5,7 @@ import io.ebean.config.dbplatform.BasicSqlLimiter;
 /**
  * Row limiter for Oracle 9,10,11 using rownum.
  */
-public class OracleRownumBasicLimiter implements BasicSqlLimiter {
+final class OracleRownumBasicLimiter implements BasicSqlLimiter {
 
   @Override
   public String limit(String dbSql, int firstRow, int maxRows) {

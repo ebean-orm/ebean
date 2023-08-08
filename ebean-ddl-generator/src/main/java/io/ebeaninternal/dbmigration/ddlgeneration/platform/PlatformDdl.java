@@ -97,9 +97,9 @@ public class PlatformDdl {
 
   public PlatformDdl(DatabasePlatform platform) {
     this.platform = platform;
-    this.dbIdentity = platform.getDbIdentity();
-    this.dbDefaultValue = platform.getDbDefaultValue();
-    this.typeConverter = new PlatformTypeConverter(platform.getDbTypeMap());
+    this.dbIdentity = platform.dbIdentity();
+    this.dbDefaultValue = platform.dbDefaultValue();
+    this.typeConverter = new PlatformTypeConverter(platform.dbTypeMap());
   }
 
   /**
@@ -279,7 +279,13 @@ public class PlatformDdl {
     if (type == null) {
       return null;
     }
-    type = extract(type);
+    String[] tmp = type.split(";", -1); // do not discard trailing empty strings
+    int index = extract(tmp);
+    if (index < tmp.length - 1) {
+      // this is a platform specific definition. So do not apply further conversions
+      return tmp[index];
+    }
+    type = tmp[index];
     if (type.contains("[]")) {
       return convertArrayType(type);
     }
@@ -294,18 +300,22 @@ public class PlatformDdl {
       return null;
     }
     String[] tmp = type.split(";", -1); // do not discard trailing empty strings
-    if (tmp.length % 2 == 0) {
-      throw new IllegalArgumentException("You need an odd number of arguments in '" + type + "'. See Issue #2559 for details");
+    return tmp[extract(tmp)]; // else
+  }
+
+  protected int extract(String[] types) {
+    if (types.length % 2 == 0) {
+      throw new IllegalArgumentException("You need an odd number of arguments in '" + String.join(";", types) + "'. See Issue #2559 for details");
     }
-    for (int i = 0; i < tmp.length - 2; i += 2) {
-      String[] platforms = tmp[i].split(",");
+    for (int i = 0; i < types.length - 2; i += 2) {
+      String[] platforms = types[i].split(",");
       for (String plat : platforms) {
         if (platform.isPlatform(Platform.valueOf(plat.toUpperCase(Locale.ENGLISH)))) {
-          return tmp[i + 1];
+          return i + 1;
         }
       }
     }
-    return tmp[tmp.length - 1]; // else
+    return types.length - 1; // else
   }
 
   /**
@@ -719,11 +729,11 @@ public class PlatformDdl {
    * As 36^6 > 31^2, the resulting string is never longer as 6 chars.
    */
   protected String maxConstraintName(String name) {
-    if (name.length() > platform.getMaxConstraintNameLength()) {
+    if (name.length() > platform.maxConstraintNameLength()) {
       int hash = name.hashCode() & 0x7FFFFFFF;
       name = VowelRemover.trim(name, 4);
-      if (name.length() > platform.getMaxConstraintNameLength()) {
-        return name.substring(0, platform.getMaxConstraintNameLength() - 7) + "_" + Integer.toString(hash, 36);
+      if (name.length() > platform.maxConstraintNameLength()) {
+        return name.substring(0, platform.maxConstraintNameLength() - 7) + "_" + Integer.toString(hash, 36);
       }
     }
     return name;

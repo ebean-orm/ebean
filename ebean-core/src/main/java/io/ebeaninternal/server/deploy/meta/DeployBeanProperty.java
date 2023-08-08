@@ -175,7 +175,7 @@ public class DeployBeanProperty {
     this.propertyType = propertyType;
     this.genericType = null;
     this.scalarType = wrapScalarType(propertyType, scalarType, typeConverter);
-    this.dbType = (scalarType == null) ? 0 : scalarType.getJdbcType();
+    this.dbType = (scalarType == null) ? 0 : scalarType.jdbcType();
   }
 
   public DeployBeanProperty(DeployBeanDescriptor<?> desc, Class<?> propertyType, Type genericType) {
@@ -222,10 +222,6 @@ public class DeployBeanProperty {
       || AnnotationUtil.has(field, WhoCreated.class));
   }
 
-  public String getFullBeanName() {
-    return desc.getFullName() + "." + name;
-  }
-
   public DeployBeanDescriptor<?> getDesc() {
     return desc;
   }
@@ -240,7 +236,7 @@ public class DeployBeanProperty {
    */
   public int getDbLength() {
     if (dbLength == 0 && scalarType != null) {
-      return scalarType.getLength();
+      return scalarType.length();
     }
 
     return dbLength;
@@ -1042,20 +1038,6 @@ public class DeployBeanProperty {
     this.elementProperty = true;
   }
 
-  /**
-   * Returns the jackson annotated field, if jackson is present.
-   */
-  public Object /*AnnotatedField*/ getJacksonField() {
-    com.fasterxml.jackson.databind.introspect.AnnotatedClass jac =
-      (com.fasterxml.jackson.databind.introspect.AnnotatedClass) getDesc().getJacksonAnnotatedClass();
-    for (com.fasterxml.jackson.databind.introspect.AnnotatedField candidate : jac.fields()) {
-      if (candidate.getName().equals(getName())) {
-        return candidate;
-      }
-    }
-    return null;
-  }
-
   public void initMetaAnnotations(Set<Class<?>> metaAnnotationsFilter) {
     metaAnnotations = AnnotationUtil.metaFindAllFor(field, metaAnnotationsFilter);
   }
@@ -1137,7 +1119,7 @@ public class DeployBeanProperty {
 
   private boolean matchPlatform(Platform[] platforms, Platform match) {
     for (Platform platform : platforms) {
-      if (platform == match) {
+      if (platform == match || platform == match.base()) {
         return true;
       }
     }
@@ -1145,7 +1127,7 @@ public class DeployBeanProperty {
   }
 
   boolean isJsonMapper() {
-    return scalarType != null && scalarType.isJsonMapper();
+    return scalarType != null && scalarType.jsonMapper();
   }
 
   boolean isJsonType() {

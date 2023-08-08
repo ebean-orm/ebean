@@ -130,6 +130,11 @@ public interface DtoQuery<T> extends CancelableQuery {
   DtoQuery<T> setParameter(String name, Object value);
 
   /**
+   * Bind the named parameter to SQL NULL.
+   */
+  DtoQuery<T> setNullParameter(String name, int jdbcType);
+
+  /**
    * Bind the named multi-value array parameter which we would use with Postgres ANY.
    * <p>
    * For Postgres this binds an ARRAY rather than expands into multiple bind values.
@@ -140,6 +145,11 @@ public interface DtoQuery<T> extends CancelableQuery {
    * Bind the parameter by its index position (1 based like JDBC).
    */
   DtoQuery<T> setParameter(int position, Object value);
+
+  /**
+   * Set a positioned parameter to SQL NULL.
+   */
+  DtoQuery<T> setNullParameter(int position, int jdbcType);
 
   /**
    * Set the index of the first row of the results to return.
@@ -195,4 +205,16 @@ public interface DtoQuery<T> extends CancelableQuery {
    * Use the explicit transaction to execute the query.
    */
   DtoQuery<T> usingTransaction(Transaction transaction);
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  DtoQuery<T> usingMaster();
 }

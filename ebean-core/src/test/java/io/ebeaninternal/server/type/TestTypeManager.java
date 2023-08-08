@@ -31,7 +31,7 @@ class TestTypeManager extends BaseTest {
   void testEnumWithSubclasses() throws SQLException {
     DefaultTypeManager typeManager = createTypeManager();
 
-    ScalarType<?> type = typeManager.createEnumScalarType(MyEnum.class, null);
+    ScalarType<?> type = typeManager.enumType(MyEnum.class, null);
 
     DataReader reader = mock(DataReader.class);
     when(reader.getString()).thenReturn("A");
@@ -44,20 +44,20 @@ class TestTypeManager extends BaseTest {
     val = type.read(reader);
     assertThat(val).isEqualTo(MyEnum.Cval);
 
-    ScalarType<?> typeGeneral = typeManager.getScalarType(MyEnum.class);
+    ScalarType<?> typeGeneral = typeManager.type(MyEnum.class);
     assertThat(typeGeneral).isNotNull();
-    ScalarType<?> typeB = typeManager.getScalarType(MyEnum.Bval.getClass());
+    ScalarType<?> typeB = typeManager.type(MyEnum.Bval.getClass());
     assertThat(typeB).isNotNull();
-    ScalarType<?> typeA = typeManager.getScalarType(MyEnum.Aval.getClass());
+    ScalarType<?> typeA = typeManager.type(MyEnum.Aval.getClass());
     assertThat(typeA).isNotNull();
-    ScalarType<?> typeC = typeManager.getScalarType(MyEnum.Cval.getClass());
+    ScalarType<?> typeC = typeManager.type(MyEnum.Cval.getClass());
     assertThat(typeC).isNotNull();
 
     try {
-      typeManager.createEnumScalarType(MyEnum.class, EnumType.STRING);
+      typeManager.enumType(MyEnum.class, EnumType.STRING);
       fail("never get here");
     } catch (IllegalStateException e) {
-      assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
+      assertThat(e.getMessage()).contains("It is mapped using 2 of (ORDINAL, STRING or an Ebean mapping) when only one is supported.");
     }
   }
 
@@ -65,7 +65,7 @@ class TestTypeManager extends BaseTest {
   void testEnumWithChar() throws SQLException {
     DefaultTypeManager typeManager = createTypeManager();
 
-    ScalarType<?> dayOfWeekType = typeManager.createEnumScalarType(MyDayOfWeek.class, null);
+    ScalarType<?> dayOfWeekType = typeManager.enumType(MyDayOfWeek.class, null);
     DataReader reader = mock(DataReader.class);
     when(reader.getString()).thenReturn("MONDAY   ");
     Object val = dayOfWeekType.read(reader);
@@ -88,10 +88,10 @@ class TestTypeManager extends BaseTest {
     assertThat(val).isEqualTo(MyDayOfWeek.FRIDAY);
 
     try {
-      typeManager.createEnumScalarType(MyDayOfWeek.class, EnumType.ORDINAL);
+      typeManager.enumType(MyDayOfWeek.class, EnumType.ORDINAL);
       fail("never get here");
     } catch (IllegalStateException e) {
-      assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
+      assertThat(e.getMessage()).contains("It is mapped using 2 of (ORDINAL, STRING or an Ebean mapping) when only one is supported.");
     }
   }
 
@@ -99,24 +99,24 @@ class TestTypeManager extends BaseTest {
   void test() {
     DefaultTypeManager typeManager = createTypeManager();
 
-    ScalarType<?> scalarType = typeManager.getScalarType(Money.class);
-    assertEquals(Types.DECIMAL, scalarType.getJdbcType());
-    assertFalse(scalarType.isJdbcNative());
-    assertEquals(Money.class, scalarType.getType());
+    ScalarType<?> scalarType = typeManager.type(Money.class);
+    assertEquals(Types.DECIMAL, scalarType.jdbcType());
+    assertFalse(scalarType.jdbcNative());
+    assertEquals(Money.class, scalarType.type());
   }
 
   @Test
   void testWithConfig() {
     DefaultTypeManager typeManager1 = createTypeManager();
-    ScalarType<?> type1 = typeManager1.createEnumScalarType(MySex.class, null);
+    ScalarType<?> type1 = typeManager1.enumType(MySex.class, null);
     assertThat(type1).isInstanceOf(ScalarTypeEnumStandard.OrdinalEnum.class);
     //
     DefaultTypeManager typeManager2 = createTypeManagerDefaultEnumTypeString();
-    ScalarType<?> type2 = typeManager2.createEnumScalarType(MySex.class, null);
+    ScalarType<?> type2 = typeManager2.enumType(MySex.class, null);
     assertThat(type2).isInstanceOf(ScalarTypeEnumStandard.StringEnum.class);
     //
     DefaultTypeManager typeManager3 = createTypeManagerDefaultEnumTypeString();
-    ScalarType<?> type3 = typeManager3.createEnumScalarType(MySex.class, EnumType.ORDINAL);
+    ScalarType<?> type3 = typeManager3.enumType(MySex.class, EnumType.ORDINAL);
     assertThat(type3).isInstanceOf(ScalarTypeEnumStandard.OrdinalEnum.class);
   }
 
@@ -144,7 +144,7 @@ class TestTypeManager extends BaseTest {
   @Test
   void testCalendar() {
     DefaultTypeManager typeManager = createTypeManager();
-    ScalarType<?> typeB = typeManager.getScalarType(GregorianCalendar.class);
+    ScalarType<?> typeB = typeManager.type(GregorianCalendar.class);
     assertThat(typeB).isInstanceOf(ScalarTypeCalendar.class);
   }
 
