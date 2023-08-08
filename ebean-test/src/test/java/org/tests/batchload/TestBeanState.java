@@ -1,10 +1,10 @@
 package org.tests.batchload;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -53,10 +53,10 @@ class TestBeanState extends BaseTestCase {
     assertThat(beanState.changedProps()).containsOnly("name");
 
     EntityBeanIntercept ebi = ((EntityBean) customer)._ebean_getIntercept();
-    boolean[] dirtyProperties = ebi.getDirtyProperties();
+    boolean[] dirtyProperties = ebi.dirtyProperties();
     for (int i = 0; i < dirtyProperties.length; i++) {
       if (dirtyProperties[i]) {
-        String dirtyPropertyName = ebi.getProperty(i);
+        String dirtyPropertyName = ebi.property(i);
         assertEquals("name", dirtyPropertyName);
       }
     }

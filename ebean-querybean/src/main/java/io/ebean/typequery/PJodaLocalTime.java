@@ -8,7 +8,7 @@ import org.joda.time.LocalTime;
  *
  * @param <R> the root query bean type
  */
-public final class PJodaLocalTime<R> extends PBaseNumber<R,LocalTime> {
+public final class PJodaLocalTime<R> extends PBaseTime<R, LocalTime> {
 
   /**
    * Construct with a property name and root instance.

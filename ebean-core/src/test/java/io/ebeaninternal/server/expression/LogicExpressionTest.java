@@ -29,7 +29,7 @@ public class LogicExpressionTest extends BaseExpressionTest {
     LogicExpression and = and(eq("a", 10), eq("b", 10));
     and.addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("(a = ? and b = ?)");
+    assertThat(expReq.sql()).isEqualTo("(a = ? and b = ?)");
   }
 
   @Test

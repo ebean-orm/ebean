@@ -19,7 +19,7 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   /**
    * Get the query plan for the cache.
    */
-  DtoQueryPlan getQueryPlan(Object planKey);
+  DtoQueryPlan queryPlan(Object planKey);
 
   /**
    * Build the query plan.
@@ -39,7 +39,7 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   /**
    * Return the label with fallback to profile location label.
    */
-  String getPlanLabel();
+  String planLabel();
 
   /**
    * Obtain the location if necessary.
@@ -49,21 +49,21 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   /**
    * Return the profile location.
    */
-  ProfileLocation getProfileLocation();
+  ProfileLocation profileLocation();
 
   /**
    * Return the associated DTO bean type.
    */
-  Class<T> getType();
+  Class<T> type();
 
   /**
    * Return an underlying ORM query (if this query is built from an ORM query).
    */
-  SpiQuery<?> getOrmQuery();
+  SpiQuery<?> ormQuery();
 
   /**
    * Return the explicit transaction used to execute the query.
    */
-  Transaction getTransaction();
+  Transaction transaction();
 
 }

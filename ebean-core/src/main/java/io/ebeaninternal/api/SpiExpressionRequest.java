@@ -14,7 +14,7 @@ public interface SpiExpressionRequest {
   /**
    * Return the DB specific handler for JSON and ARRAY expressions.
    */
-  DbExpressionHandler getDbPlatformHandler();
+  DbExpressionHandler platformHandler();
 
   /**
    * Parse the logical property name to the deployment name.
@@ -24,17 +24,30 @@ public interface SpiExpressionRequest {
   /**
    * Return the bean descriptor for the root type.
    */
-  BeanDescriptor<?> getBeanDescriptor();
+  BeanDescriptor<?> descriptor();
 
   /**
    * Return the associated QueryRequest.
    */
-  SpiOrmQueryRequest<?> getQueryRequest();
+  SpiOrmQueryRequest<?> queryRequest();
 
   /**
-   * Append to the expression sql.
+   * Append to the expression sql without any parsing.
    */
-  SpiExpressionRequest append(String sql);
+  SpiExpressionRequest append(String expression);
+
+  /**
+   * Append to the expression sql with logical property parsing to db columns with logical path prefix.
+   * <p>
+   * This is a fast path case when expression is a bean property path and falls back to using parse()
+   * when that isn't the case.
+   */
+  SpiExpressionRequest property(String expression);
+
+  /**
+   * Append to the expression sql with logical property parsing to db columns with logical path prefix.
+   */
+  SpiExpressionRequest parse(String expression);
 
   /**
    * Add an encryption key to bind to this request.
@@ -49,12 +62,12 @@ public interface SpiExpressionRequest {
   /**
    * Return the accumulated expression sql for all expressions in this request.
    */
-  String getSql();
+  String sql();
 
   /**
    * Return the ordered list of bind values for all expressions in this request.
    */
-  List<Object> getBindValues();
+  List<Object> bindValues();
 
   /**
    * Increments the parameter index and returns that value.

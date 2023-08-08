@@ -21,11 +21,11 @@ public final class DtoBeanDescriptor<T> {
     this.namedQueries = namedQueries;
   }
 
-  public Class<T> getType() {
+  public Class<T> type() {
     return dtoType;
   }
 
-  public DtoQueryPlan getQueryPlan(Object planKey) {
+  public DtoQueryPlan queryPlan(Object planKey) {
     return plans.get(planKey);
   }
 
@@ -46,7 +46,7 @@ public final class DtoBeanDescriptor<T> {
   /**
    * Return the named RawSql query.
    */
-  public String getNamedRawSql(String name) {
+  public String namedRawSql(String name) {
     return namedQueries.get(name);
   }
 

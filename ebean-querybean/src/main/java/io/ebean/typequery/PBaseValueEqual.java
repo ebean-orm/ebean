@@ -11,7 +11,7 @@ import java.util.Collection;
  * @param <R> the root query bean type
  * @param <T> the number type
  */
-public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
+public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R, T> {
 
   /**
    * Construct with a property name and root instance.
@@ -89,8 +89,8 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
    * @param other the other property to compare
    * @return the root query bean instance
    */
-  public final R eq(TQProperty<?> other) {
-    expr().raw(_name + " = " + other.propertyName());
+  public final R eq(Query.Property<T> other) {
+    expr().raw(_name + " = " + other.toString());
     return _root;
   }
 
@@ -152,8 +152,8 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
    * @param other the other property to compare
    * @return the root query bean instance
    */
-  public final R ne(TQProperty<?> other) {
-    expr().raw(_name + " <> " + other.propertyName());
+  public final R ne(Query.Property<T> other) {
+    expr().raw(_name + " <> " + other.toString());
     return _root;
   }
 
@@ -298,6 +298,50 @@ public abstract class PBaseValueEqual<R, T> extends TQPropertyBase<R> {
    */
   public final R notIn(Query<?> subQuery) {
     expr().notIn(_name, subQuery);
+    return _root;
+  }
+
+  /**
+   * IN a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R inSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().inSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Not IN a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R notInSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().notInSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Equal To a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R eqSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().eqSubQuery(_name, sqlSubQuery, bindValues);
+    return _root;
+  }
+
+  /**
+   * Not Equal To a raw SQL SubQuery.
+   *
+   * @param sqlSubQuery The SQL SubQuery
+   * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
+   */
+  public final R neSubQuery(String sqlSubQuery, Object... bindValues) {
+    expr().neSubQuery(_name, sqlSubQuery, bindValues);
     return _root;
   }
 

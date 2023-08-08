@@ -23,7 +23,7 @@ public final class NaturalKeySet {
     return map.keySet();
   }
 
-  Object getInValue(Object naturalKey) {
-    return map.get(naturalKey).getInValue();
+  Object inValue(Object naturalKey) {
+    return map.get(naturalKey).inValue();
   }
 }

@@ -2,11 +2,11 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.ExpressionPath;
+import io.ebeaninternal.api.BindValuesKey;
+import io.ebeaninternal.api.NaturalKeyQueryData;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.NaturalKeyQueryData;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -97,20 +97,19 @@ public final class SimpleExpression extends AbstractValueExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {
-        request.append(prop.assocIdExpression(propName, type.bind()));
+        request.parse(prop.assocIdExpression(propName, type.bind()));
         return;
       }
       if (prop.isDbEncrypted()) {
         String dsql = prop.beanProperty().decryptProperty(propName);
-        request.append(dsql).append(type.bind());
+        request.parse(dsql).append(type.bind());
         return;
       }
     }
-    request.append(propName).append(type.bind());
+    request.property(propName).append(type.bind());
   }
 
   /**

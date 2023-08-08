@@ -24,5 +24,4 @@ public final class PByteArray<R> extends PBaseValueEqual<R, byte[]> {
     super(name, root, prefix);
   }
 
-
 }

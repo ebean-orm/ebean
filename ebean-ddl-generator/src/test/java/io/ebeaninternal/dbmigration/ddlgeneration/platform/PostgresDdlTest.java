@@ -14,6 +14,41 @@ class PostgresDdlTest {
   final PostgresDdl postgresDdl = new PostgresDdl(new PostgresPlatform());
 
   @Test
+  void useCast_notWhenSimpleVarcharLengthChange() {
+    assertThat(PostgresDdl.useCast("varchar(10)", "varchar(150)")).isFalse();
+  }
+
+  @Test
+  void useCast() {
+    assertThat(PostgresDdl.useCast("varchar", "varchar(150)")).isTrue();
+    assertThat(PostgresDdl.useCast("varchar(1)", "varchar")).isTrue();
+    assertThat(PostgresDdl.useCast("varchar(1)[]", "varchar(2)[]")).isTrue();
+  }
+
+  @Test
+  void useCastTrue() {
+    assertThat(PostgresDdl.useCast("text(10)", "text(150)")).isTrue();
+    assertThat(PostgresDdl.useCast("number(5)", "number(10)")).isTrue();
+    assertThat(PostgresDdl.useCast("number(5,3)", "number(10,2)")).isTrue();
+  }
+
+  @Test
+  void isPlainVarchar() {
+    assertThat(PostgresDdl.isPlainVarchar("varchar(1)")).isTrue();
+    assertThat(PostgresDdl.isPlainVarchar("varchar(10)")).isTrue();
+    assertThat(PostgresDdl.isPlainVarchar("varchar(150)")).isTrue();
+  }
+
+  @Test
+  void isPlainVarchar_false() {
+    assertThat(PostgresDdl.isPlainVarchar("varcha(10)")).isFalse();
+    assertThat(PostgresDdl.isPlainVarchar("text(10)")).isFalse();
+    assertThat(PostgresDdl.isPlainVarchar("number(10)")).isFalse();
+    assertThat(PostgresDdl.isPlainVarchar("varchar(10)[]")).isFalse();
+    assertThat(PostgresDdl.isPlainVarchar("varchar")).isFalse();
+  }
+
+  @Test
   void setLockTimeout() {
     final String sql = postgresDdl.setLockTimeout(5);
     assertThat(sql).isEqualTo("set lock_timeout = 5000");

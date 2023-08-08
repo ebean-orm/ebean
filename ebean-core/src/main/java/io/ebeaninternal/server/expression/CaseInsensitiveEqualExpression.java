@@ -52,9 +52,9 @@ final class CaseInsensitiveEqualExpression extends AbstractValueExpression {
       pname = prop.beanProperty().decryptProperty(propName);
     }
     if (not) {
-      request.append("lower(").append(pname).append(") != ?");
+      request.append("lower(").property(pname).append(") != ?");
     } else {
-      request.append("lower(").append(pname).append(") = ?");
+      request.append("lower(").property(pname).append(") = ?");
     }
   }
 

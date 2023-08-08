@@ -45,7 +45,7 @@ final class ArrayIsEmptyExpression extends AbstractExpression {
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.getDbPlatformHandler().arrayIsEmpty(request, propName, empty);
+    request.platformHandler().arrayIsEmpty(request, propName, empty);
   }
 
   @Override

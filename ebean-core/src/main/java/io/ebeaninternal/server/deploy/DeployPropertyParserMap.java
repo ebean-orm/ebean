@@ -19,18 +19,18 @@ public class DeployPropertyParserMap extends DeployParser {
    * Returns null for raw sql queries.
    */
   @Override
-  public Set<String> getIncludes() {
+  public Set<String> includes() {
     return Collections.emptySet();
   }
 
   @Override
   public String convertWord() {
-    String r = getDeployWord(word);
+    String r = deployWord(word);
     return r == null ? word : r;
   }
 
   @Override
-  public String getDeployWord(String expression) {
+  public String deployWord(String expression) {
     return map.get(expression);
   }
 

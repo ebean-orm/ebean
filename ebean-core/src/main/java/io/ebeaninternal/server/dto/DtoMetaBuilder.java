@@ -6,8 +6,7 @@ import io.ebeaninternal.server.type.TypeManager;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.System.Logger.Level.DEBUG;
 
@@ -21,7 +20,7 @@ final class DtoMetaBuilder {
   private final TypeManager typeManager;
   private final Class<?> dtoType;
   private final List<DtoMetaProperty> properties = new ArrayList<>();
-  private final List<DtoMetaConstructor> constructorList = new ArrayList<>();
+  private final Map<Integer, DtoMetaConstructor> constructorMap = new HashMap<>();
 
   DtoMetaBuilder(Class<?> dtoType, TypeManager typeManager) {
     this.dtoType = dtoType;
@@ -31,7 +30,7 @@ final class DtoMetaBuilder {
   DtoMeta build() {
     readConstructors();
     readProperties();
-    return new DtoMeta(dtoType, constructorList, properties);
+    return new DtoMeta(dtoType, constructorMap.values(), properties);
   }
 
   private void readProperties() {
@@ -74,13 +73,22 @@ final class DtoMetaBuilder {
   }
 
   private void readConstructors() {
+    final Set<Integer> removal = new HashSet<>();
     for (Constructor<?> constructor : dtoType.getConstructors()) {
       try {
-        constructorList.add(new DtoMetaConstructor(typeManager, constructor, dtoType));
+        final var meta = new DtoMetaConstructor(typeManager, constructor, dtoType);
+        final var conflicting = constructorMap.put(meta.argCount(), meta);
+        if (conflicting != null) {
+          removal.add(meta.argCount());
+        }
       } catch (Exception e) {
         // we don't want that constructor
         CoreLog.log.log(DEBUG, "exclude on " + dtoType + " constructor " + constructor, e);
       }
+    }
+    // remove the constructors that conflicted by argument count
+    for (Integer key : removal) {
+      constructorMap.remove(key);
     }
   }
 

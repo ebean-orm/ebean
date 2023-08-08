@@ -18,27 +18,27 @@ public final class DtoMappingRequest {
   private final DtoColumn[] columnMeta;
 
   public DtoMappingRequest(SpiDtoQuery query, String sql, DtoColumn[] columnMeta) {
-    this.type = query.getType();
-    this.label = query.getPlanLabel();
-    this.profileLocation = query.getProfileLocation();
+    this.type = query.type();
+    this.label = query.planLabel();
+    this.profileLocation = query.profileLocation();
     this.sql = sql;
     this.relaxedMode = query.isRelaxedMode();
     this.columnMeta = columnMeta;
   }
 
-  public DtoColumn[] getColumnMeta() {
+  public DtoColumn[] columnMeta() {
     return columnMeta;
   }
 
-  public boolean isRelaxedMode() {
+  public boolean relaxedMode() {
     return relaxedMode;
   }
 
-  public String getLabel() {
+  public String label() {
     return label;
   }
 
-  public String getSql() {
+  public String sql() {
     return sql;
   }
 
@@ -70,10 +70,10 @@ public final class DtoMappingRequest {
   }
 
   private DtoReadSet mapColumn(int pos, DtoMeta meta) {
-    String label = columnMeta[pos].getLabel();
+    String label = columnMeta[pos].label();
     DtoReadSet property = meta.findProperty(label);
     if (property == null || property.isReadOnly()) {
-      if (isRelaxedMode()) {
+      if (relaxedMode()) {
         property = DtoReadSetColumnSkip.INSTANCE;
       } else {
         throw new IllegalStateException(unableToMapColumnMessage(columnMeta[pos], meta));

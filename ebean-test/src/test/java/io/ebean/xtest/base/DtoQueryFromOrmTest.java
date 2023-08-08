@@ -118,6 +118,44 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 //  }
 
   @Test
+  public void asDto_usingMaster() {
+    ResetBasicData.reset();
+    LoggedSql.start();
+
+    DtoQuery<ContactDto> query = DB.find(Contact.class)
+      .select("id, email")
+      .where().isNotNull("email")
+      .asDto(ContactDto.class)
+      .usingMaster();
+
+    List<ContactDto> dtos = query.findList();
+
+    assertThat(dtos).isNotEmpty();
+    for (ContactDto dto : dtos) {
+      assertThat(dto.getEmail()).isNotNull();
+    }
+  }
+
+  @Test
+  public void asDto_usingMaster2() {
+    ResetBasicData.reset();
+    LoggedSql.start();
+
+    DtoQuery<ContactDto> query = DB.find(Contact.class)
+      .select("id, email")
+      .usingMaster()
+      .where().isNotNull("email")
+      .asDto(ContactDto.class);
+
+    List<ContactDto> dtos = query.findList();
+
+    assertThat(dtos).isNotEmpty();
+    for (ContactDto dto : dtos) {
+      assertThat(dto.getEmail()).isNotNull();
+    }
+  }
+
+  @Test
   public void asDto_withExplicitId() {
 
     ResetBasicData.reset();

@@ -341,7 +341,7 @@ public class TestTransparentPersist extends BaseTestCase {
 
   private List<Object> getDirtyBeansFromPersistenceContext(Transaction transaction) {
     final SpiBeanTypeManager mgr = Mockito.mock(SpiBeanTypeManager.class);
-    return ((SpiTransaction)transaction).getPersistenceContext().dirtyBeans(mgr);
+    return ((SpiTransaction)transaction).persistenceContext().dirtyBeans(mgr);
   }
 
 }

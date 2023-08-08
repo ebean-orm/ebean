@@ -7,7 +7,7 @@ import io.ebean.config.dbplatform.SqlLimiter;
 /**
  * Add ROWNUM column etc around SQL query to limit results.
  */
-class OracleRownumSqlLimiter implements SqlLimiter {
+final class OracleRownumSqlLimiter implements SqlLimiter {
 
   @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {

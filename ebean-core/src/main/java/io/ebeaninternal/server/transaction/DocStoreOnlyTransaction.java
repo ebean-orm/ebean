@@ -10,8 +10,8 @@ public final class DocStoreOnlyTransaction extends JdbcTransaction {
   /**
    * Create a new DocStore  only Transaction.
    */
-  public DocStoreOnlyTransaction(String id, boolean explicit, TransactionManager manager) {
-    super(id, explicit, null, manager);
+  public DocStoreOnlyTransaction(boolean explicit, TransactionManager manager) {
+    super(explicit, null, manager);
   }
 
   @Override
@@ -30,7 +30,7 @@ public final class DocStoreOnlyTransaction extends JdbcTransaction {
   }
 
   @Override
-  public Connection getInternalConnection() {
+  public Connection internalConnection() {
     throw new RuntimeException("not supported on DocStoreTransaction");
   }
 
