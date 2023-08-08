@@ -5,12 +5,7 @@ import io.ebean.Query;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -59,7 +54,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.dbDefaultValue.setNow("SYSUTCDATETIME()");
     dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("bit"));
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
-    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("numeric", 19));
+    dbTypeMap.put(DbType.BIGINT, new DbPlatformType("bigint", false));
     dbTypeMap.put(DbType.REAL, new DbPlatformType("float(16)"));
     dbTypeMap.put(DbType.DOUBLE, new DbPlatformType("float(32)"));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint"));
@@ -70,13 +65,21 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.LOCALDATETIME, new DbPlatformType("datetime2"));
     // UTF8 aware types - overwritten in SqlServer16 platform
     dbTypeMap.put(DbType.CHAR, new DbPlatformType("nchar", 1));
-    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("nvarchar", 255));
-    dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.CLOB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.JSON, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.JSONB, new DbPlatformType("nvarchar", Integer.MAX_VALUE));
-    dbTypeMap.put(DbType.BLOB, new DbPlatformType("image"));
-    dbTypeMap.put(DbType.LONGVARBINARY, new DbPlatformType("image"));
+
+    DbPlatformType longVarchar = new DbPlatformType("nvarchar(max)", false);
+    DbPlatformType varchar = new DbPlatformType("nvarchar", 255, 4000, longVarchar);
+    DbPlatformType json = new DbPlatformType("nvarchar(max)", 0, varchar);
+    dbTypeMap.put(DbType.VARCHAR, varchar);
+    dbTypeMap.put(DbType.LONGVARCHAR, longVarchar);
+    dbTypeMap.put(DbType.CLOB, longVarchar);
+    dbTypeMap.put(DbType.JSON, json);
+    dbTypeMap.put(DbType.JSONB, json);
+
+    DbPlatformType blob = new DbPlatformType("varbinary(max)", false);
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255, 8000, blob));
+
+    dbTypeMap.put(DbType.BLOB, blob);
+    dbTypeMap.put(DbType.LONGVARBINARY, blob);
   }
 
   @Override

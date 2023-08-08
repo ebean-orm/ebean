@@ -24,7 +24,7 @@ class TransactionFactoryTenant extends TransactionFactory {
   }
 
   @Override
-  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
     return create(false, tenantId);
   }
 
@@ -41,7 +41,7 @@ class TransactionFactoryTenant extends TransactionFactory {
         // tenantId not set (by lazy loading) so get current tenantId
         tenantId = tenantProvider.currentId();
       }
-      connection = dataSourceSupplier.getConnection(tenantId);
+      connection = dataSourceSupplier.connection(tenantId);
       SpiTransaction transaction = manager.createTransaction(explicit, connection);
       transaction.setTenantId(tenantId);
       return transaction;

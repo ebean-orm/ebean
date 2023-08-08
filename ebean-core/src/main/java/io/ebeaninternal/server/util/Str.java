@@ -43,4 +43,24 @@ public final class Str {
     return sb.append(s0).append(s1).toString();
   }
 
+  public static String add(String s0, String[] s1) {
+    if (s1 == null || s1.length == 0) {
+      return s0;
+    }
+    int len = s0.length();
+    for (String s : s1) {
+      if (s != null) {
+        len += s.length();
+      }
+    }
+    StringBuilder sb = new StringBuilder(len);
+    sb.append(s0);
+    for (String s : s1) {
+      if (s != null) {
+        sb.append(s);
+      }
+    }
+    return sb.toString();
+  }
+
 }

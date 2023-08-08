@@ -5,19 +5,15 @@ package io.ebean.typequery;
  * JSON document type.
  * <p>
  * Type that is JSON content mapped to database types such as Postgres JSON/JSONB and otherwise Varchar,Clob and Blob.
- * </p>
  * <p>
  * The expressions on this type are valid of Postgres and Oracle.
- * </p>
- *
  * <p>
  * The path can reference a nested property in the JSON document using dot notation -
  * for example "documentMeta.score" where "score" is an embedded attribute of "documentMeta"
- * </p>
  *
  * @param <R> the root query bean type
  */
-public final class PJson<R> extends TQPropertyBase<R> {
+public final class PJson<R> extends TQPropertyBase<R, String> {
 
   /**
    * Construct with a property name and root instance.
@@ -92,7 +88,7 @@ public final class PJson<R> extends TQPropertyBase<R> {
    *
    * }</pre>
    *
-   * @param path the dot notation path in the JSON document
+   * @param path  the dot notation path in the JSON document
    * @param value the equal to bind value
    */
   public R jsonEqualTo(String path, Object value) {
@@ -103,7 +99,7 @@ public final class PJson<R> extends TQPropertyBase<R> {
   /**
    * Not Equal to - for the given path in a JSON document.
    *
-   * @param path the nested path in the JSON document in dot notation
+   * @param path  the nested path in the JSON document in dot notation
    * @param value the value used to test equality against the document path's value
    */
   public R jsonNotEqualTo(String path, Object value) {
@@ -114,7 +110,7 @@ public final class PJson<R> extends TQPropertyBase<R> {
   /**
    * Greater than - for the given path in a JSON document.
    *
-   * @param path the nested path in the JSON document in dot notation
+   * @param path  the nested path in the JSON document in dot notation
    * @param value the value used to test against the document path's value
    */
   public R jsonGreaterThan(String path, Object value) {
@@ -125,7 +121,7 @@ public final class PJson<R> extends TQPropertyBase<R> {
   /**
    * Greater than or equal to - for the given path in a JSON document.
    *
-   * @param path the nested path in the JSON document in dot notation
+   * @param path  the nested path in the JSON document in dot notation
    * @param value the value used to test against the document path's value
    */
   public R jsonGreaterOrEqual(String path, Object value) {
@@ -136,7 +132,7 @@ public final class PJson<R> extends TQPropertyBase<R> {
   /**
    * Less than - for the given path in a JSON document.
    *
-   * @param path the nested path in the JSON document in dot notation
+   * @param path  the nested path in the JSON document in dot notation
    * @param value the value used to test against the document path's value
    */
   public R jsonLessThan(String path, Object value) {
@@ -147,7 +143,7 @@ public final class PJson<R> extends TQPropertyBase<R> {
   /**
    * Less than or equal to - for the given path in a JSON document.
    *
-   * @param path the nested path in the JSON document in dot notation
+   * @param path  the nested path in the JSON document in dot notation
    * @param value the value used to test against the document path's value
    */
   public R jsonLessOrEqualTo(String path, Object value) {

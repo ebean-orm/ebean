@@ -33,8 +33,8 @@ public final class CQueryPlanManager implements QueryPlanManager {
     this.tenantProvider = tenantProvider;
     this.defaultThreshold = defaultThreshold;
     this.planLogger = planLogger;
-    this.timeCollection = extraMetrics.getPlanCollect();
-    this.timeBindCapture = extraMetrics.getBindCapture();
+    this.timeCollection = extraMetrics.planCollect();
+    this.timeBindCapture = extraMetrics.bindCapture();
   }
 
   @Override

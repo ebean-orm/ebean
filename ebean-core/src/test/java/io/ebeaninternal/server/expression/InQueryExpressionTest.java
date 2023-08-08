@@ -13,14 +13,14 @@ import static org.mockito.Mockito.verify;
 public class InQueryExpressionTest extends BaseExpressionTest {
 
   private SubQueryExpression exp(String propertyName, boolean not, String sql, Object... bindValues) {
-    var op = not ? SubQueryExpression.SQOp.NOTIN : SubQueryExpression.SQOp.IN;
+    var op = not ? SubQueryOp.NOTIN : SubQueryOp.IN;
     return new SubQueryExpression(op, propertyName, sql, Arrays.asList(bindValues));
   }
 
   @Test
   void copy_subQuery_expectNewInstance() {
     SpiQuery<?> subQuery = mock(SpiQuery.class);
-    var orig = new SubQueryExpression(SubQueryExpression.SQOp.IN, "name", subQuery);
+    var orig = new SubQueryExpression(SubQueryOp.IN, "name", subQuery);
     SpiExpression copy = orig.copy();
     assertThat(copy).isNotSameAs(orig);
     verify(subQuery).copy();

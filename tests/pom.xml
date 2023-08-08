@@ -2,15 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.avaje</groupId>
-    <artifactId>java8-oss</artifactId>
-    <version>3.3</version>
-    <relativePath/>
+    <artifactId>ebean-parent</artifactId>
+    <groupId>io.ebean</groupId>
+    <version>13.20.2-SNAPSHOT</version>
   </parent>
 
-  <groupId>io.ebean</groupId>
   <artifactId>tests</artifactId>
-  <version>1.0</version>
   <packaging>pom</packaging>
 
   <name>tests</name>

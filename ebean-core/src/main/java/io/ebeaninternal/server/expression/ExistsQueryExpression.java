@@ -93,11 +93,9 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
   @Override
   public void addSql(SpiExpressionRequest request) {
     if (not) {
-      request.append(" not");
+      request.append("not ");
     }
-    request.append(" exists (");
-    request.append(sql);
-    request.append(")");
+    request.append("exists (").parse(sql).append(")");
   }
 
   @Override

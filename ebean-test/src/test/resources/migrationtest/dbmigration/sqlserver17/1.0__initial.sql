@@ -23,69 +23,44 @@ create table migtest_ckey_parent (
 );
 
 create table migtest_fk_cascade (
-  id                            numeric(19) not null,
-  one_id                        numeric(19),
+  id                            bigint not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_cascade primary key (id)
 );
 create sequence migtest_fk_cascade_seq as bigint start with 1;
 
 create table migtest_fk_cascade_one (
-  id                            numeric(19) not null,
+  id                            bigint not null,
   constraint pk_migtest_fk_cascade_one primary key (id)
 );
 create sequence migtest_fk_cascade_one_seq as bigint start with 1;
 
 create table migtest_fk_none (
-  id                            numeric(19) not null,
-  one_id                        numeric(19),
+  id                            bigint not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_none primary key (id)
 );
 create sequence migtest_fk_none_seq as bigint start with 1;
 
 create table migtest_fk_none_via_join (
-  id                            numeric(19) not null,
-  one_id                        numeric(19),
+  id                            bigint not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_none_via_join primary key (id)
 );
 create sequence migtest_fk_none_via_join_seq as bigint start with 1;
 
 create table migtest_fk_one (
-  id                            numeric(19) not null,
+  id                            bigint not null,
   constraint pk_migtest_fk_one primary key (id)
 );
 create sequence migtest_fk_one_seq as bigint start with 1;
 
 create table migtest_fk_set_null (
-  id                            numeric(19) not null,
-  one_id                        numeric(19),
+  id                            bigint not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_set_null primary key (id)
 );
 create sequence migtest_fk_set_null_seq as bigint start with 1;
-
-create table drop_main (
-  id                            integer not null,
-  constraint pk_drop_main primary key (id)
-);
-create sequence drop_main_seq as bigint start with 1;
-
-create table drop_main_drop_ref_many (
-  drop_main_id                  integer not null,
-  drop_ref_many_id              integer not null,
-  constraint pk_drop_main_drop_ref_many primary key (drop_main_id,drop_ref_many_id)
-);
-
-create table drop_ref_many (
-  id                            integer not null,
-  constraint pk_drop_ref_many primary key (id)
-);
-create sequence drop_ref_many_seq as bigint start with 1;
-
-create table drop_ref_one (
-  id                            integer not null,
-  parent_id                     integer,
-  constraint pk_drop_ref_one primary key (id)
-);
-create sequence drop_ref_one_seq as bigint start with 1;
 
 create table migtest_e_basic (
   id                            integer not null,
@@ -93,7 +68,7 @@ create table migtest_e_basic (
   status2                       nvarchar(1) default 'N' not null,
   name                          nvarchar(127),
   description                   nvarchar(127),
-  description_file              image,
+  description_file              varbinary(max),
   json_list                     nvarchar(max),
   a_lob                         nvarchar(255) default 'X' not null,
   some_date                     datetime2,
@@ -207,7 +182,7 @@ create table migtest_mtm_c (
 create sequence migtest_mtm_c_seq as bigint start with 1;
 
 create table migtest_mtm_m (
-  id                            numeric(19) not null,
+  id                            bigint not null,
   name                          nvarchar(255),
   constraint pk_migtest_mtm_m primary key (id)
 );
@@ -221,7 +196,7 @@ create table migtest_oto_child (
 create sequence migtest_oto_child_seq as bigint start with 1;
 
 create table migtest_oto_master (
-  id                            numeric(19) not null,
+  id                            bigint not null,
   name                          nvarchar(255),
   constraint pk_migtest_oto_master primary key (id)
 );
@@ -270,15 +245,6 @@ alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id forei
 
 create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
-
-create index ix_drop_main_drop_ref_many_drop_main on drop_main_drop_ref_many (drop_main_id);
-alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_main foreign key (drop_main_id) references drop_main (id);
-
-create index ix_drop_main_drop_ref_many_drop_ref_many on drop_main_drop_ref_many (drop_ref_many_id);
-alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_ref_many foreign key (drop_ref_many_id) references drop_ref_many (id);
-
-create index ix_drop_ref_one_parent_id on drop_ref_one (parent_id);
-alter table drop_ref_one add constraint fk_drop_ref_one_parent_id foreign key (parent_id) references drop_main (id);
 
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);

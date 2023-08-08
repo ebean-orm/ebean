@@ -1,9 +1,10 @@
 package org.tests.family;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
+import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -13,6 +14,11 @@ import org.tests.model.family.ChildPerson;
 import org.tests.model.family.GrandParentPerson;
 import org.tests.model.family.ParentPerson;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -97,6 +103,10 @@ public class TestInheritance extends BaseTestCase {
 
 
     server().save(grandparent1);
+
+    testMyDynamicFormulaWithIncludes();
+    testMyDynamicFormulaWithIncludesAndFetchJoin();
+
     // Test setup complete, so retrieve bean from db
     //grandparent1 = server().find(GrandParentPerson.class).setId(grandparent1.getIdentifier()).where()
     // .in("effectiveBean.id",2,null) // geht nicht!
@@ -220,6 +230,49 @@ public class TestInheritance extends BaseTestCase {
     DB.find(ChildPerson.class).delete();
     DB.find(GrandParentPerson.class).delete();
     DB.find(EBasic.class).delete();
+  }
+
+  private void testMyDynamicFormulaWithIncludes() {
+    LoggedSql.start();
+    List<ChildPerson> children = DB.find(ChildPerson.class)
+      .select("name, coalesce(someBean, parent.someBean) as effectiveBean") // include parent
+      .findList();
+
+    Map<String,EBasic> childToBasic = new HashMap<>();
+    for (ChildPerson child : children) {
+      childToBasic.put(child.getName(), child.getEffectiveBean());
+    }
+
+    assertThat(childToBasic.get("Fred").getName()).isEqualTo("An other Bean");
+    assertThat(childToBasic.get("Julia").getName()).isEqualTo("A Bean");
+    assertThat(childToBasic.get("Roland")).isNull();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select t0.identifier, t0.name, coalesce(t0.some_bean_id, t1.some_bean_id) effectiveBean from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(sql.get(1)).contains("select t0.id, t0.status, t0.name, t0.description, t0.some_date from e_basic t0 where t0.id");
+  }
+
+  private void testMyDynamicFormulaWithIncludesAndFetchJoin() {
+    LoggedSql.start();
+    List<ChildPerson> children = DB.find(ChildPerson.class)
+      .select("name, coalesce(someBean, parent.someBean) as effectiveBean") // include parent
+      .fetch("parent", "name, familyName")
+      .findList();
+
+    Map<String,EBasic> childToBasic = new HashMap<>();
+    for (ChildPerson child : children) {
+      childToBasic.put(child.getName(), child.getEffectiveBean());
+    }
+
+    assertThat(childToBasic.get("Fred").getName()).isEqualTo("An other Bean");
+    assertThat(childToBasic.get("Julia").getName()).isEqualTo("A Bean");
+    assertThat(childToBasic.get("Roland")).isNull();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select t0.identifier, t0.name, coalesce(t0.some_bean_id, t1.some_bean_id) effectiveBean, t1.identifier, t1.name, t1.family_name from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(sql.get(1)).contains("select t0.id, t0.status, t0.name, t0.description, t0.some_date from e_basic t0 where t0.id");
   }
 
   @Test

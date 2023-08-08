@@ -16,7 +16,7 @@ final class NaturalKeyEntrySimple implements NaturalKeyEntry {
   }
 
   @Override
-  public Object getInValue() {
+  public Object inValue() {
     return val;
   }
 }

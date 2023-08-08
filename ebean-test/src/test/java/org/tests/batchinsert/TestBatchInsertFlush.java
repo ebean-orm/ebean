@@ -70,7 +70,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       // detail
       assertThat(sql.get(3)).contains("insert into t_detail_with_other_namexxxyy");
 
-      assertThat(((SpiTransaction)transaction).getLabel()).isEqualTo("TestBatchInsertFlush.no_cascade");
+      assertThat(((SpiTransaction)transaction).label()).isEqualTo("TestBatchInsertFlush.no_cascade");
 
     } finally {
       transaction.end();

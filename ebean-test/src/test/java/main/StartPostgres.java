@@ -5,7 +5,7 @@ import io.ebean.test.containers.PostgresContainer;
 public class StartPostgres {
 
   public static void main(String[] args) {
-    PostgresContainer.builder("14")
+    PostgresContainer.builder("15")
       .dbName("unit")
       //.port(6432)
       //.user("unit")

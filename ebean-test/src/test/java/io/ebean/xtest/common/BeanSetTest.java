@@ -38,18 +38,18 @@ public class BeanSetTest {
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.add(object1);
 
-    assertThat(set.getModifyAdditions()).containsOnly(object1);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object1);
+    assertThat(set.modifyRemovals()).isEmpty();
 
     set.add(object1);
-    assertThat(set.getModifyAdditions()).containsOnly(object1);
+    assertThat(set.modifyAdditions()).containsOnly(object1);
 
     set.add(object2);
-    assertThat(set.getModifyAdditions()).containsOnly(object1, object2);
+    assertThat(set.modifyAdditions()).containsOnly(object1, object2);
 
     set.remove(object1);
-    assertThat(set.getModifyAdditions()).containsOnly(object2);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object2);
+    assertThat(set.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -61,8 +61,8 @@ public class BeanSetTest {
     // act
     set.addAll(all());
 
-    assertThat(set.getModifyAdditions()).containsOnly(object1, object2, object3);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object1, object2, object3);
+    assertThat(set.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -77,8 +77,8 @@ public class BeanSetTest {
     assertThat(set.contains(object2)).isTrue();
     set.add(object2);
 
-    assertThat(set.getModifyAdditions()).containsOnly(object1);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object1);
+    assertThat(set.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -90,8 +90,8 @@ public class BeanSetTest {
     // act
     set.addAll(all());
 
-    assertThat(set.getModifyAdditions()).containsOnly(object1);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object1);
+    assertThat(set.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -100,14 +100,14 @@ public class BeanSetTest {
     BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.addAll(all());
-    assertThat(set.getModifyAdditions()).containsOnly(object1, object2, object3);
+    assertThat(set.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
     set.remove(object2);
     set.remove(object3);
 
-    assertThat(set.getModifyAdditions()).containsOnly(object1);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object1);
+    assertThat(set.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -116,13 +116,13 @@ public class BeanSetTest {
     BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.addAll(all());
-    assertThat(set.getModifyAdditions()).containsOnly(object1, object2, object3);
+    assertThat(set.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
     set.removeAll(some());
 
-    assertThat(set.getModifyAdditions()).containsOnly(object1);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object1);
+    assertThat(set.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -136,8 +136,8 @@ public class BeanSetTest {
     set.remove(object3);
 
     // assert
-    assertThat(set.getModifyAdditions()).isEmpty();
-    assertThat(set.getModifyRemovals()).containsOnly(object2, object3);
+    assertThat(set.modifyAdditions()).isEmpty();
+    assertThat(set.modifyRemovals()).containsOnly(object2, object3);
   }
 
   @Test
@@ -150,8 +150,8 @@ public class BeanSetTest {
     set.removeAll(some());
 
     // assert
-    assertThat(set.getModifyAdditions()).isEmpty();
-    assertThat(set.getModifyRemovals()).containsOnly(object2, object3);
+    assertThat(set.modifyAdditions()).isEmpty();
+    assertThat(set.modifyRemovals()).containsOnly(object2, object3);
   }
 
   @Test
@@ -164,8 +164,8 @@ public class BeanSetTest {
     set.clear();
 
     //assert
-    assertThat(set.getModifyRemovals()).containsOnly(object1, object2, object3);
-    assertThat(set.getModifyAdditions()).isEmpty();
+    assertThat(set.modifyRemovals()).containsOnly(object1, object2, object3);
+    assertThat(set.modifyAdditions()).isEmpty();
   }
 
   @Test
@@ -181,8 +181,8 @@ public class BeanSetTest {
     set.clear();
 
     //assert
-    assertThat(set.getModifyRemovals()).containsOnly(object1);
-    assertThat(set.getModifyAdditions()).isEmpty();
+    assertThat(set.modifyRemovals()).containsOnly(object1);
+    assertThat(set.modifyAdditions()).isEmpty();
   }
 
   @Test
@@ -191,13 +191,13 @@ public class BeanSetTest {
     BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
     set.addAll(all());
-    assertThat(set.getModifyAdditions()).containsOnly(object1, object2, object3);
+    assertThat(set.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
     set.retainAll(some());
 
-    assertThat(set.getModifyAdditions()).containsOnly(object2, object3);
-    assertThat(set.getModifyRemovals()).isEmpty();
+    assertThat(set.modifyAdditions()).containsOnly(object2, object3);
+    assertThat(set.modifyRemovals()).isEmpty();
   }
 
   @Test
@@ -212,8 +212,8 @@ public class BeanSetTest {
     // act
     set.retainAll(some());
 
-    assertThat(set.getModifyAdditions()).containsOnly(object3);
-    assertThat(set.getModifyRemovals()).containsOnly(object1);
+    assertThat(set.modifyAdditions()).containsOnly(object3);
+    assertThat(set.modifyRemovals()).containsOnly(object1);
   }
 
   @Test
@@ -225,7 +225,7 @@ public class BeanSetTest {
     // act
     set.retainAll(some());
 
-    assertThat(set.getModifyRemovals()).containsOnly(object1);
+    assertThat(set.modifyRemovals()).containsOnly(object1);
   }
 
 }

@@ -126,7 +126,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     boolean batch = isBatchThisRequest();
     try {
       int rows;
-      BatchControl control = transaction.getBatchControl();
+      BatchControl control = transaction.batchControl();
       if (control != null) {
         rows = control.executeStatementOrBatch(this, batch, addBatch);
 

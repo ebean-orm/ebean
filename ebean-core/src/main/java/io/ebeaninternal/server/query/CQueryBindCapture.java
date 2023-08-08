@@ -1,15 +1,13 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.config.CurrentTenantProvider;
-import io.ebeaninternal.api.CoreLog;
-import io.ebeaninternal.api.SpiDbQueryPlan;
-import io.ebeaninternal.api.SpiQueryBindCapture;
-import io.ebeaninternal.api.SpiQueryPlan;
-import io.ebeaninternal.api.SpiTransactionManager;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.bind.capture.BindCapture;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.System.Logger.Level.ERROR;
@@ -64,9 +62,14 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
 
   @Override
   public void queryPlanInit(long thresholdMicros) {
-    // effective enable bind capture for this plan
-    this.thresholdMicros = thresholdMicros;
-    this.captureCount = 0;
+    lock.lock();
+    try {
+      // effective enable bind capture for this plan
+      this.thresholdMicros = thresholdMicros;
+      this.captureCount = 0;
+    } finally {
+      lock.unlock();
+    }
   }
 
   /**
@@ -88,22 +91,22 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
       lock.unlock();
     }
 
+
+    final Instant whenCaptured = Instant.ofEpochMilli(this.lastBindCapture);
+    final long startNanos = System.nanoTime();
+    SpiDbQueryPlan queryPlan;
     try (Connection connection = transactionManager.queryPlanConnection(tenant)) {
-      SpiDbQueryPlan queryPlan = manager.collectPlan(connection, this.queryPlan, last);
-      if (queryPlan != null) {
-        request.add(queryPlan.with(queryTimeMicros, captureCount, tenant));
-        // effectively turn off bind capture for this plan
-        lock.lock();
-        try {
-          thresholdMicros = Long.MAX_VALUE;
-        } finally {
-          lock.unlock();
-        }
-        return true;
-      }
+      queryPlan = manager.collectPlan(connection, this.queryPlan, last);
     } catch (SQLException e) {
       CoreLog.log.log(ERROR, "Error during query plan collection", e);
       return false;
+    }
+    if (queryPlan != null) {
+      final long captureMicros = TimeUnit.MICROSECONDS.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS);
+      request.add(queryPlan.with(queryTimeMicros, captureCount, captureMicros, whenCaptured, tenant));
+      // effectively turn off bind capture for this plan
+      thresholdMicros = Long.MAX_VALUE;
+      return true;
     }
     return false;
   }

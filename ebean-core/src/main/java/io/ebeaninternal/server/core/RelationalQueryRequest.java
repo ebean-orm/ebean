@@ -30,7 +30,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   @Override
   protected void setResultSet(ResultSet resultSet, Object planKey) throws SQLException {
     this.resultSet = resultSet;
-    this.propertyNames = getPropertyNames();
+    this.propertyNames = propertyNames();
     // calculate the initialCapacity of the Map to reduce rehashing
     float initCap = (propertyNames.length) / 0.7f;
     this.estimateCapacity = (int) initCap + 1;
@@ -95,7 +95,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   /**
    * Build the list of property names.
    */
-  private String[] getPropertyNames() throws SQLException {
+  private String[] propertyNames() throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
     int columnsPlusOne = metaData.getColumnCount() + 1;
     ArrayList<String> propNames = new ArrayList<>(columnsPlusOne - 1);
@@ -123,11 +123,11 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   public void logSummary() {
     if (transaction.isLogSummary()) {
       long micros = (System.nanoTime() - startNano) / 1000L;
-      transaction.logSummary("SqlQuery  rows[" + rows + "] micros[" + micros + "] bind[" + bindLog + "]");
+      transaction.logSummary("SqlQuery  rows[{0}] micros[{1}] bind[{2}]", rows, micros, bindLog);
     }
   }
 
-  public ResultSet getResultSet() {
+  public ResultSet resultSet() {
     return resultSet;
   }
 

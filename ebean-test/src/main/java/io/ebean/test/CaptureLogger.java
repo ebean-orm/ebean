@@ -2,6 +2,7 @@ package io.ebean.test;
 
 import io.ebeaninternal.api.SpiLogger;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,24 +25,15 @@ final class CaptureLogger implements SpiLogger {
   }
 
   @Override
-  public boolean isTrace() {
-    return true;
-  }
-
-  @Override
-  public void debug(String msg) {
+  public void debug(String msg, Object... args) {
     if (active) {
-      messages.add(msg);
+      if (args != null && args.length > 0) {
+        messages.add(MessageFormat.format(msg, args));
+      } else {
+        messages.add(msg);
+      }
     }
-    wrapped.debug(msg);
-  }
-
-  @Override
-  public void trace(String msg) {
-    if (active) {
-      messages.add(msg);
-    }
-    wrapped.trace(msg);
+    wrapped.debug(msg, args);
   }
 
   List<String> start() {

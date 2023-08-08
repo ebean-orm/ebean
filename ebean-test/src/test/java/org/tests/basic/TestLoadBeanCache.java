@@ -1,5 +1,6 @@
 package org.tests.basic;
 
+import io.ebean.CacheMode;
 import io.ebean.Query;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
@@ -20,7 +21,7 @@ class TestLoadBeanCache extends BaseTestCase {
 
   @Test
   void loadBeanCache_false() {
-    Query<Country> query = DB.find(Country.class).setLoadBeanCache(false);
+    Query<Country> query = DB.find(Country.class).setBeanCacheMode(CacheMode.OFF);
 
     SpiQuery<?> spiQuery = (SpiQuery<?>) query;
     assertThat(spiQuery.isBeanCachePut()).isFalse();
@@ -32,7 +33,7 @@ class TestLoadBeanCache extends BaseTestCase {
     ResetBasicData.reset();
 
     Map<String, Country> map = DB.find(Country.class)
-      .setLoadBeanCache(true)
+      .setBeanCacheMode(CacheMode.PUT)
       .setUseQueryCache(true)
       .setReadOnly(true)
       .order("name")

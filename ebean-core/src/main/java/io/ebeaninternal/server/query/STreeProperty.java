@@ -6,6 +6,7 @@ import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * A property in the SQL Tree.
@@ -28,7 +29,7 @@ public interface STreeProperty extends ScalarDataReader<Object> {
    * Return true if the property is the Id.
    */
   boolean isId();
-  
+
   /**
    * Returns true, if this is a lob property from db-perspective.
    */
@@ -96,4 +97,7 @@ public interface STreeProperty extends ScalarDataReader<Object> {
    */
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere);
 
+  default void extraIncludes(Set<String> predicateIncludes) {
+    // do nothing
+  }
 }

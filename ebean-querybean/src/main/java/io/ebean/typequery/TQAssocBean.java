@@ -11,13 +11,14 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Base type for associated beans.
+ * Base type for associated beans that are not embeddable.
  *
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
  * @param <R> the specific root query bean type (e.g. QCustomer)
+ * @param <QB> the query bean type
  */
 @SuppressWarnings("rawtypes")
-public abstract class TQAssocBean<T, R> extends TQProperty<R> {
+public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
 
   private static final FetchConfig FETCH_DEFAULT = FetchConfig.ofDefault();
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
@@ -100,47 +101,38 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   }
 
   /**
-   * Deprecated in favor of fetch().
+   * Eagerly fetch this association loading the specified properties.
    */
-  @Deprecated
-  public final R fetchAll() {
-    return fetch();
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetch(TQProperty<QB,?>... properties) {
+    return fetchWithProperties(FETCH_DEFAULT, properties);
   }
 
   /**
-   * Eagerly fetch this association fetching some of the properties.
+   * Eagerly fetch this association using a 'query join' loading the specified properties.
    */
-  @SafeVarargs
-  protected final R fetchProperties(TQProperty<?>... props) {
-    return fetchWithProperties(FETCH_DEFAULT, props);
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetchQuery(TQProperty<QB,?>... properties) {
+    return fetchWithProperties(FETCH_QUERY, properties);
   }
 
   /**
-   * Eagerly fetch query this association fetching some of the properties.
+   * Eagerly fetch this association using L2 cache.
    */
-  @SafeVarargs
-  protected final R fetchQueryProperties(TQProperty<?>... props) {
-    return fetchWithProperties(FETCH_QUERY, props);
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetchCache(TQProperty<QB,?>... properties) {
+    return fetchWithProperties(FETCH_CACHE, properties);
   }
 
   /**
-   * Eagerly fetch this association using L2 bean cache.
+   * Use lazy loading for this association loading the specified properties.
    */
-  @SafeVarargs
-  protected final R fetchCacheProperties(TQProperty<?>... props) {
-    return fetchWithProperties(FETCH_CACHE, props);
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetchLazy(TQProperty<QB,?>... properties) {
+    return fetchWithProperties(FETCH_LAZY, properties);
   }
 
-  /**
-   * Eagerly fetch query this association fetching some of the properties.
-   */
-  @SafeVarargs
-  protected final R fetchLazyProperties(TQProperty<?>... props) {
-    return fetchWithProperties(FETCH_LAZY, props);
-  }
-
-  @SafeVarargs
-  private R fetchWithProperties(FetchConfig config, TQProperty<?>... props) {
+  private R fetchWithProperties(FetchConfig config, TQProperty<?, ?>... props) {
     spiQuery().fetchProperties(_name, properties(props), config);
     return _root;
   }
@@ -173,47 +165,17 @@ public abstract class TQAssocBean<T, R> extends TQProperty<R> {
   }
 
   private SpiQueryFetch spiQuery() {
-    return (SpiQueryFetch)((TQRootBean) _root).query();
+    return (SpiQueryFetch) ((TQRootBean) _root).query();
   }
 
-  @SafeVarargs
-  private Set<String> properties(TQProperty<?>... props) {
+  private Set<String> properties(TQProperty<?, ?>... props) {
     Set<String> set = new LinkedHashSet<>();
-    for (TQProperty<?> prop : props) {
+    for (TQProperty<?, ?> prop : props) {
       set.add(prop.propertyName());
     }
     return set;
   }
 
-  /**
-   * Is equal to by ID property.
-   */
-  public final R eq(T other) {
-    expr().eq(_name, other);
-    return _root;
-  }
-
-  /**
-   * Is equal to by ID property.
-   */
-  public final R equalTo(T other) {
-    return eq(other);
-  }
-
-  /**
-   * Is not equal to by ID property.
-   */
-  public final R ne(T other) {
-    expr().ne(_name, other);
-    return _root;
-  }
-
-  /**
-   * Is not equal to by ID property.
-   */
-  public final R notEqualTo(T other) {
-    return ne(other);
-  }
 
   /**
    * Apply a filter when fetching these beans.

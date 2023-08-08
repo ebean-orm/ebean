@@ -44,7 +44,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     BeanProperty beanProp = targetDescriptor.beanProperty(mapKey);
     if (bc instanceof BeanMap<?, ?>) {
       BeanMap<Object, Object> bm = (BeanMap<Object, Object>) bc;
-      Map<Object, Object> actualMap = bm.getActualMap();
+      Map<Object, Object> actualMap = bm.actualMap();
       if (actualMap == null) {
         actualMap = new LinkedHashMap<>();
         bm.setActualMap(actualMap);
@@ -132,7 +132,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     } else if (current instanceof BeanMap<?, ?>) {
       // normally this case, replace just the underlying list
       BeanMap<?, ?> currentBeanMap = (BeanMap<?, ?>) current;
-      currentBeanMap.setActualMap(newBeanMap.getActualMap());
+      currentBeanMap.setActualMap(newBeanMap.actualMap());
       currentBeanMap.setModifyListening(many.modifyListenMode());
 
     } else {
@@ -155,7 +155,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
           return;
         }
       }
-      map = bc.getActualMap();
+      map = bc.actualMap();
     } else {
       map = (Map<?, ?>) collection;
     }
