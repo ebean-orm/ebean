@@ -977,43 +977,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   /**
-   * <<<<<<< HEAD
-   * =======
-   * Try to get the object out of the persistence context.
-   */
-  @Nullable
-  @SuppressWarnings("unchecked")
-  private <T> T findIdCheckPersistenceContextAndCache(@Nullable Transaction transaction, SpiQuery<T> query, Object id) {
-    SpiTransaction t = (SpiTransaction) transaction;
-    if (t == null) {
-      t = currentServerTransaction();
-    }
-    BeanDescriptor<T> desc = query.descriptor();
-    id = desc.convertId(id);
-    PersistenceContext pc = null;
-    if (t != null && useTransactionPersistenceContext(query)) {
-      // first look in the transaction scoped persistence context
-      pc = t.persistenceContext();
-      if (pc != null) {
-        WithOption o = desc.contextGetWithOption(pc, id);
-        if (o != null) {
-          if (o.isDeleted()) {
-            // Bean was previously deleted in the same transaction / persistence context
-            return null;
-          }
-          return (T) o.getBean();
-        }
-      }
-    }
-    if (!query.isBeanCacheGet() || (t != null && t.isSkipCache())) {
-      return null;
-    }
-    // Hit the L2 bean cache
-    return desc.cacheBeanGet(id, query.isReadOnly(), pc);
-  }
-
-  /**
-   * >>>>>>> master-rob
    * Return true if transactions PersistenceContext should be used.
    */
   private <T> boolean useTransactionPersistenceContext(SpiQuery<T> query) {
