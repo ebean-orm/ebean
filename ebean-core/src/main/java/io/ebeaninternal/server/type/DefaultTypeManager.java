@@ -120,10 +120,12 @@ public final class DefaultTypeManager implements TypeManager {
         if (mapper.markerAnnotation() != null) {
           return mapper;
         } else {
-          log.log(System.Logger.Level.WARNING, "Not using {0}, because markerAnnotation is null", mapper.getClass().getName());
+          log.log(System.Logger.Level.WARNING, "Not using {0}, because no marker annotation was provided. " +
+            "Please check, if there is a supported json library (e.g. jackson) on your classpath", mapper.getClass().getName());
         }
       } catch (NoClassDefFoundError e) {
-        log.log(System.Logger.Level.WARNING, "Not using {0}, because markerAnnotation is inacessible ({1})", mapper.getClass().getName(), e.getMessage());
+        log.log(System.Logger.Level.WARNING, "Can not use {0}. An error occured: {1}. " +
+          "Please check, if there is a supported json library (e.g. jackson) on your classpath", mapper.getClass().getName(), e.getMessage());
       }
     }
     return null;
