@@ -48,7 +48,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
       transaction = server.currentServerTransaction();
       if (transaction == null || !transaction.isActive()) {
         // create a local readOnly transaction
-        transaction = server.createReadOnlyTransaction(null);
+        transaction = server.createReadOnlyTransaction(null, query.isUseMaster());
         createdTransaction = true;
       }
     }
@@ -136,7 +136,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
     try {
       query.checkCancelled();
       prepareSql();
-      Connection conn = transaction.getInternalConnection();
+      Connection conn = transaction.internalConnection();
       pstmt = conn.prepareStatement(sql);
       if (query.getTimeout() > 0) {
         pstmt.setQueryTimeout(query.getTimeout());

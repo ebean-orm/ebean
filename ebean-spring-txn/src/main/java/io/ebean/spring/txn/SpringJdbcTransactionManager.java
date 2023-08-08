@@ -145,12 +145,12 @@ public final class SpringJdbcTransactionManager implements ExternalTransactionMa
     public void afterCompletion(int status) {
       switch (status) {
         case STATUS_COMMITTED:
-          log.log(DEBUG, "Spring Txn [{0}] committed", transaction.getId());
+          log.log(DEBUG, "Spring Txn [{0}] committed", transaction.id());
           transaction.postCommit();
           break;
 
         case STATUS_ROLLED_BACK:
-          log.log(DEBUG, "Spring Txn [{0}] rollback", transaction.getId());
+          log.log(DEBUG, "Spring Txn [{0}] rollback", transaction.id());
           transaction.postRollback(null);
           break;
 

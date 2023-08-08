@@ -12,9 +12,5 @@ CALL usp_ebean_drop_column('migtest_e_history2_history', 'obsolete_string1');
 CALL usp_ebean_drop_column('migtest_e_history2_history', 'obsolete_string2');
 -- apply post alter
 alter table migtest_e_history2 add system versioning history table migtest_e_history2_history not validated;
-drop table drop_main cascade;
-drop table drop_main_drop_ref_many cascade;
-drop table drop_ref_many cascade;
-drop table drop_ref_one cascade;
 drop table "migtest_QuOtEd" cascade;
 drop table migtest_e_ref cascade;

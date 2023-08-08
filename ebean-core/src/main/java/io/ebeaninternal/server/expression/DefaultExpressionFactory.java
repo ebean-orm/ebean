@@ -471,6 +471,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
     return new InPairsExpression(pairs, false);
   }
 
+  @Override
+  public Expression inTuples(InTuples pairs) {
+    return new InTuplesExpression(pairs, false);
+  }
+
   /**
    * In - property has a value in the array of values.
    */

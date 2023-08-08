@@ -87,8 +87,8 @@ final class DefaultCallableSql implements Serializable, SpiCallableSql {
 
   @Override
   public Object getObject(int position) {
-    Param p = bindParameters.getParameter(position);
-    return p.getOutValue();
+    Param p = bindParameters.parameter(position);
+    return p.outValue();
   }
 
   @Override
@@ -108,12 +108,12 @@ final class DefaultCallableSql implements Serializable, SpiCallableSql {
    * transaction after the transaction is committed.
    */
   @Override
-  public TransactionEventTable getTransactionEventTable() {
+  public TransactionEventTable transactionEventTable() {
     return transactionEvent;
   }
 
   @Override
-  public BindParams getBindParams() {
+  public BindParams bindParams() {
     return bindParameters;
   }
 

@@ -31,23 +31,6 @@ public interface ProfileLocation {
   }
 
   /**
-   * Deprecated in favor of {@link #create(String)}.
-   */
-  @Deprecated
-  static ProfileLocation create(int lineNumber, String label) {
-    return create(label);
-  }
-
-  /**
-   * Deprecated for removal - not used.
-   * Create and return a new ProfileLocation with a given location.
-   */
-  @Deprecated
-  static ProfileLocation createAt(String location) {
-    return XServiceProvider.profileLocationFactory().createAt(location);
-  }
-
-  /**
    * Obtain the description returning true if this is the initial call.
    */
   boolean obtain();

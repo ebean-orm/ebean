@@ -86,9 +86,9 @@ public final class PersistRequestCallableSql extends PersistRequest {
     }
 
     // register table modifications with the transaction event
-    TransactionEventTable tableEvents = callableSql.getTransactionEventTable();
+    TransactionEventTable tableEvents = callableSql.transactionEventTable();
     if (tableEvents != null && !tableEvents.isEmpty()) {
-      transaction.getEvent().add(tableEvents);
+      transaction.event().add(tableEvents);
     } else {
       transaction.markNotQueryOnly();
     }

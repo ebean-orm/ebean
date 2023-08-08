@@ -38,12 +38,15 @@ final class DbContext {
         }
       }
     } catch (BeanNotEnhancedException e) {
+      String msg = "Bean is not enhanced? See https://ebean.io/docs/trouble-shooting#not-enhanced";
+      log.log(ERROR, msg, e);
       throw e;
 
     } catch (DataSourceConfigurationException e) {
       String msg = "Configuration error creating DataSource for the default Database." +
         " This typically means a missing application-test.yaml or missing ebean-test dependency." +
         " See https://ebean.io/docs/trouble-shooting#datasource";
+      log.log(ERROR, msg, e);
       throw new DataSourceConfigurationException(msg, e);
 
     } catch (Throwable e) {

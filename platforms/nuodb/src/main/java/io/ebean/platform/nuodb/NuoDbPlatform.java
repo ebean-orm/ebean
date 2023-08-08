@@ -4,12 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
 import io.ebean.Query.LockWait;
 import io.ebean.annotation.Platform;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
 
@@ -41,6 +36,9 @@ public class NuoDbPlatform extends DatabasePlatform {
         .build();
 
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
+    // no max length found in documentation. Assuming 4000
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255, 4000, new DbPlatformType("clob", false)));
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255, 4000, new DbPlatformType("blob", false)));
   }
 
   @Override

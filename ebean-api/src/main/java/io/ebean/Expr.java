@@ -41,14 +41,14 @@ public final class Expr {
    * Equal To - property equal to the given value.
    */
   public static Expression eq(String propertyName, Object value) {
-    return DB.expressionFactory().eq(propertyName, value);
+    return factory().eq(propertyName, value);
   }
 
   /**
    * Not Equal To - property not equal to the given value.
    */
   public static Expression ne(String propertyName, Object value) {
-    return DB.expressionFactory().ne(propertyName, value);
+    return factory().ne(propertyName, value);
   }
 
   /**
@@ -56,7 +56,7 @@ public final class Expr {
    * using a lower() function to make it case insensitive).
    */
   public static Expression ieq(String propertyName, String value) {
-    return DB.expressionFactory().ieq(propertyName, value);
+    return factory().ieq(propertyName, value);
   }
 
   /**
@@ -66,28 +66,28 @@ public final class Expr {
    * </p>
    */
   public static Expression inRange(String propertyName, Object value1, Object value2) {
-    return DB.expressionFactory().inRange(propertyName, value1, value2);
+    return factory().inRange(propertyName, value1, value2);
   }
 
   /**
    * Between - property between the two given values.
    */
   public static Expression between(String propertyName, Object value1, Object value2) {
-    return DB.expressionFactory().between(propertyName, value1, value2);
+    return factory().between(propertyName, value1, value2);
   }
 
   /**
    * Between - value between two given properties.
    */
   public static Expression between(String lowProperty, String highProperty, Object value) {
-    return DB.expressionFactory().betweenProperties(lowProperty, highProperty, value);
+    return factory().betweenProperties(lowProperty, highProperty, value);
   }
 
   /**
    * Greater Than - property greater than the given value.
    */
   public static Expression gt(String propertyName, Object value) {
-    return DB.expressionFactory().gt(propertyName, value);
+    return factory().gt(propertyName, value);
   }
 
   /**
@@ -95,42 +95,42 @@ public final class Expr {
    * value.
    */
   public static Expression ge(String propertyName, Object value) {
-    return DB.expressionFactory().ge(propertyName, value);
+    return factory().ge(propertyName, value);
   }
 
   /**
    * Less Than - property less than the given value.
    */
   public static Expression lt(String propertyName, Object value) {
-    return DB.expressionFactory().lt(propertyName, value);
+    return factory().lt(propertyName, value);
   }
 
   /**
    * Less Than or Equal to - property less than or equal to the given value.
    */
   public static Expression le(String propertyName, Object value) {
-    return DB.expressionFactory().le(propertyName, value);
+    return factory().le(propertyName, value);
   }
 
   /**
    * Is Null - property is null.
    */
   public static Expression isNull(String propertyName) {
-    return DB.expressionFactory().isNull(propertyName);
+    return factory().isNull(propertyName);
   }
 
   /**
    * Is Not Null - property is not null.
    */
   public static Expression isNotNull(String propertyName) {
-    return DB.expressionFactory().isNotNull(propertyName);
+    return factory().isNotNull(propertyName);
   }
 
   /**
    * Case insensitive {@link #exampleLike(Object)}
    */
   public static ExampleExpression iexampleLike(Object example) {
-    return DB.expressionFactory().iexampleLike(example);
+    return factory().iexampleLike(example);
   }
 
   /**
@@ -138,14 +138,14 @@ public final class Expr {
    * LikeType.RAW (you need to add you own wildcards % and _).
    */
   public static ExampleExpression exampleLike(Object example) {
-    return DB.expressionFactory().exampleLike(example);
+    return factory().exampleLike(example);
   }
 
   /**
    * Create the query by Example expression specifying more options.
    */
   public static ExampleExpression exampleLike(Object example, boolean caseInsensitive, LikeType likeType) {
-    return DB.expressionFactory().exampleLike(example, caseInsensitive, likeType);
+    return factory().exampleLike(example, caseInsensitive, likeType);
   }
 
   /**
@@ -153,7 +153,7 @@ public final class Expr {
    * characters % (percentage) and _ (underscore).
    */
   public static Expression like(String propertyName, String value) {
-    return DB.expressionFactory().like(propertyName, value);
+    return factory().like(propertyName, value);
   }
 
   /**
@@ -162,14 +162,14 @@ public final class Expr {
    * a lower() function to make the expression case insensitive.
    */
   public static Expression ilike(String propertyName, String value) {
-    return DB.expressionFactory().ilike(propertyName, value);
+    return factory().ilike(propertyName, value);
   }
 
   /**
    * Starts With - property like value%.
    */
   public static Expression startsWith(String propertyName, String value) {
-    return DB.expressionFactory().startsWith(propertyName, value);
+    return factory().startsWith(propertyName, value);
   }
 
   /**
@@ -177,14 +177,14 @@ public final class Expr {
    * lower() function to make the expression case insensitive.
    */
   public static Expression istartsWith(String propertyName, String value) {
-    return DB.expressionFactory().istartsWith(propertyName, value);
+    return factory().istartsWith(propertyName, value);
   }
 
   /**
    * Ends With - property like %value.
    */
   public static Expression endsWith(String propertyName, String value) {
-    return DB.expressionFactory().endsWith(propertyName, value);
+    return factory().endsWith(propertyName, value);
   }
 
   /**
@@ -192,14 +192,14 @@ public final class Expr {
    * function to make the expression case insensitive.
    */
   public static Expression iendsWith(String propertyName, String value) {
-    return DB.expressionFactory().iendsWith(propertyName, value);
+    return factory().iendsWith(propertyName, value);
   }
 
   /**
    * Contains - property like %value%.
    */
   public static Expression contains(String propertyName, String value) {
-    return DB.expressionFactory().contains(propertyName, value);
+    return factory().contains(propertyName, value);
   }
 
   /**
@@ -207,42 +207,42 @@ public final class Expr {
    * function to make the expression case insensitive.
    */
   public static Expression icontains(String propertyName, String value) {
-    return DB.expressionFactory().icontains(propertyName, value);
+    return factory().icontains(propertyName, value);
   }
 
   /**
    * For collection properties that are empty (have not existing elements).
    */
   public static Expression isEmpty(String propertyName) {
-    return DB.expressionFactory().isEmpty(propertyName);
+    return factory().isEmpty(propertyName);
   }
 
   /**
    * For collection properties that are not empty (have existing elements).
    */
   public static Expression isNotEmpty(String propertyName) {
-    return DB.expressionFactory().isNotEmpty(propertyName);
+    return factory().isNotEmpty(propertyName);
   }
 
   /**
    * In - property has a value in the array of values.
    */
   public static Expression in(String propertyName, Object[] values) {
-    return DB.expressionFactory().in(propertyName, values);
+    return factory().in(propertyName, values);
   }
 
   /**
    * In - using a subQuery.
    */
   public static Expression in(String propertyName, Query<?> subQuery) {
-    return DB.expressionFactory().in(propertyName, subQuery);
+    return factory().in(propertyName, subQuery);
   }
 
   /**
    * In - property has a value in the collection of values.
    */
   public static Expression in(String propertyName, Collection<?> values) {
-    return DB.expressionFactory().in(propertyName, values);
+    return factory().in(propertyName, values);
   }
 
   /**
@@ -279,14 +279,14 @@ public final class Expr {
    * }</pre>
    */
   public static Expression inOrEmpty(String propertyName, Collection<?> values) {
-    return DB.expressionFactory().inOrEmpty(propertyName, values);
+    return factory().inOrEmpty(propertyName, values);
   }
 
   /**
    * Id Equal to - ID property is equal to the value.
    */
   public static Expression idEq(Object value) {
-    return DB.expressionFactory().idEq(value);
+    return factory().idEq(value);
   }
 
   /**
@@ -299,7 +299,7 @@ public final class Expr {
    * @param propertyMap a map keyed by property names.
    */
   public static Expression allEq(Map<String, Object> propertyMap) {
-    return DB.expressionFactory().allEq(propertyMap);
+    return factory().allEq(propertyMap);
   }
 
   /**
@@ -310,7 +310,7 @@ public final class Expr {
    * </p>
    */
   public static Expression raw(String raw, Object value) {
-    return DB.expressionFactory().raw(raw, value);
+    return factory().raw(raw, value);
   }
 
   /**
@@ -321,48 +321,48 @@ public final class Expr {
    * </p>
    */
   public static Expression raw(String raw, Object[] values) {
-    return DB.expressionFactory().raw(raw, values);
+    return factory().raw(raw, values);
   }
 
   /**
    * Add raw expression with no parameters.
    */
   public static Expression raw(String raw) {
-    return DB.expressionFactory().raw(raw);
+    return factory().raw(raw);
   }
 
   /**
    * And - join two expressions with a logical and.
    */
   public static Expression and(Expression expOne, Expression expTwo) {
-    return DB.expressionFactory().and(expOne, expTwo);
+    return factory().and(expOne, expTwo);
   }
 
   /**
    * Or - join two expressions with a logical or.
    */
   public static Expression or(Expression expOne, Expression expTwo) {
-    return DB.expressionFactory().or(expOne, expTwo);
+    return factory().or(expOne, expTwo);
   }
 
   /**
    * Negate the expression (prefix it with NOT).
    */
   public static Expression not(Expression exp) {
-    return DB.expressionFactory().not(exp);
+    return factory().not(exp);
   }
 
   /**
    * Return a list of expressions that will be joined by AND's.
    */
   public static <T> Junction<T> conjunction(Query<T> query) {
-    return DB.expressionFactory().conjunction(query);
+    return factory().conjunction(query);
   }
 
   /**
    * Return a list of expressions that will be joined by OR's.
    */
   public static <T> Junction<T> disjunction(Query<T> query) {
-    return DB.expressionFactory().disjunction(query);
+    return factory().disjunction(query);
   }
 }

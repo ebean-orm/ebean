@@ -45,6 +45,6 @@ public abstract class LoadRequest {
    * So one of - findIterate(), findEach(), findEachWhile() or findVisit().
    */
   public boolean isParentFindIterate() {
-    return parentRequest != null && parentRequest.query().getType() == SpiQuery.Type.ITERATE;
+    return parentRequest != null && parentRequest.query().type() == SpiQuery.Type.ITERATE;
   }
 }

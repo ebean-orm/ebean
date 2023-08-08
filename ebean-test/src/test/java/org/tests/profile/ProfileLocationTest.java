@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ProfileLocationTest {
 
-  private static final ProfileLocation loc = ProfileLocation.create(12, "foo");
+  private static final ProfileLocation loc = ProfileLocation.create("foo");
   private static final ProfileLocation locB = ProfileLocation.create();
   private static final ProfileLocation loc2 = ProfileLocation.create();
   private static final ProfileLocation locWithLine = ProfileLocation.createWithLine();

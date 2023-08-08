@@ -179,7 +179,7 @@ final class SaveManyBeans extends SaveManyBase {
           if (hasOrderColumn && !clearedParent) {
             // Clear the parent bean from the PersistenceContext (L1 cache), because the order of referenced beans might have changed
             final BeanDescriptor<?> beanDescriptor = many.descriptor();
-            beanDescriptor.contextClear(transaction.getPersistenceContext(), beanDescriptor.getId(parentBean));
+            beanDescriptor.contextClear(transaction.persistenceContext(), beanDescriptor.getId(parentBean));
             clearedParent = true;
           }
         }
@@ -294,7 +294,7 @@ final class SaveManyBeans extends SaveManyBase {
         // build a intersection row for 'delete'
         IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
         SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
-        persister.executeOrQueue(sqlDelete, transaction, queue);
+        persister.executeOrQueue(sqlDelete, transaction, queue, BatchControl.DELETE_QUEUE);
       }
     }
     if (additions != null && !additions.isEmpty()) {
@@ -314,7 +314,7 @@ final class SaveManyBeans extends SaveManyBase {
             // build a intersection row for 'insert'
             IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);
             SpiSqlUpdate sqlInsert = intRow.createInsert(server);
-            persister.executeOrQueue(sqlInsert, transaction, queue);
+            persister.executeOrQueue(sqlInsert, transaction, queue, BatchControl.INSERT_QUEUE);
           }
         }
       }

@@ -50,6 +50,16 @@ class Config {
     this.properties = config.getProperties();
   }
 
+  /**
+   * Return the property given the key and default value.
+   */
+  String property(String key, String defaultValue) {
+    if (properties == null) {
+      return null;
+    }
+    return properties.getProperty(key, defaultValue);
+  }
+
   void setSchemaFromDbName(String newDbName) {
     this.schema = databaseName;
     this.databaseName = newDbName;

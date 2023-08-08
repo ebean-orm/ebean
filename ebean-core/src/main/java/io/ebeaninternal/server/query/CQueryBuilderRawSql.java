@@ -32,7 +32,7 @@ final class CQueryBuilderRawSql {
     }
     if (!rsql.isParsed()) {
       String sql = rsql.getUnparsedSql();
-      BindParams bindParams = request.query().getBindParams();
+      BindParams bindParams = request.query().bindParams();
       if (bindParams != null && bindParams.requiresNamedParamsPrepare()) {
         // convert named parameters into positioned parameters
         sql = BindParamsParser.parse(bindParams, sql);
@@ -57,7 +57,7 @@ final class CQueryBuilderRawSql {
 
   private String buildMainQuery(String orderBy, OrmQueryRequest<?> request, CQueryPredicates predicates, SpiRawSql.Sql sql) {
     StringBuilder sb = new StringBuilder();
-    OrmQueryProperties ormQueryProperties = request.query().getDetail().getChunk(null, false);
+    OrmQueryProperties ormQueryProperties = request.query().detail().getChunk(null, false);
     if (ormQueryProperties.hasSelectClause()) {
       boolean first = true;
       for (String selectProperty : ormQueryProperties.getIncluded()) {
@@ -73,7 +73,7 @@ final class CQueryBuilderRawSql {
     sb.append(" ");
 
     String s = sql.getPreWhere();
-    BindParams bindParams = request.query().getBindParams();
+    BindParams bindParams = request.query().bindParams();
     if (bindParams != null && bindParams.requiresNamedParamsPrepare()) {
       // convert named parameters into positioned parameters
       // Named Parameters only allowed prior to dynamic where

@@ -27,7 +27,7 @@ public class DefaultServer_createOrmQueryRequestTest {
   }
 
   OrmQueryDetail detail(Query<Order> query) {
-    return queryRequest(query).query().getDetail();
+    return queryRequest(query).query().detail();
   }
 
   @Test
@@ -124,7 +124,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetch("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer", "details");
   }
@@ -138,7 +138,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .where().eq("customer.name", "rob").query();
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("details");
   }
@@ -152,7 +152,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetchQuery("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer");
   }
@@ -166,7 +166,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetchQuery("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer");
   }
@@ -180,7 +180,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetch("details", FetchConfig.ofLazy());
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer");
   }
@@ -194,7 +194,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetchLazy("details");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer");
   }
@@ -209,7 +209,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetch("details.product");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer");
   }
@@ -224,7 +224,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetch("customer", "name");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("details", "details.product", "customer");
   }
@@ -239,7 +239,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetch("customer", "name");
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer");
   }
@@ -254,7 +254,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetch("customer.contacts"); // second many path
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("details", "details.product", "customer");
   }
@@ -270,7 +270,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetch("customer.contacts"); // many path
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer");
   }
@@ -286,7 +286,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .fetch("customer.contacts"); // many path
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer");
   }
@@ -303,7 +303,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .query();
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("details", "details.product", "customer");
   }
@@ -320,7 +320,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .query();
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer", "customer.contacts");
   }
@@ -337,7 +337,7 @@ public class DefaultServer_createOrmQueryRequestTest {
       .query();
 
     OrmQueryRequest<Order> queryRequest = queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().getDetail();
+    OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer", "customer.contacts");
   }

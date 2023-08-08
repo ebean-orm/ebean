@@ -51,7 +51,7 @@ public class TestAutofetchTuneWithJoin extends BaseTestCase {
     }
 
     SpiQuery<?> sq = (SpiQuery<?>) q;
-    ObjectGraphNode parentNode = sq.getParentNode();
+    ObjectGraphNode parentNode = sq.parentNode();
     ObjectGraphOrigin origin = parentNode.origin();
     assertThat(origin).isNotNull();
     // MetaAutoFetchStatistic metaAutoFetchStatistic =

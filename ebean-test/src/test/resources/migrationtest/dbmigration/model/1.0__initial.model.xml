@@ -37,22 +37,6 @@
             <column name="id" type="bigint" primaryKey="true"/>
             <column name="one_id" type="bigint" references="migtest_fk_one.id" foreignKeyName="fk_migtest_fk_set_null_one_id" foreignKeyIndex="ix_migtest_fk_set_null_one_id" foreignKeyOnDelete="SET_NULL" foreignKeyOnUpdate="RESTRICT"/>
         </createTable>
-        <createTable name="drop_main" pkName="pk_drop_main">
-            <column name="id" type="integer" primaryKey="true"/>
-        </createTable>
-        <createTable name="drop_main_drop_ref_many" pkName="pk_drop_main_drop_ref_many">
-            <column name="drop_main_id" type="integer" notnull="true" primaryKey="true"/>
-            <column name="drop_ref_many_id" type="integer" notnull="true" primaryKey="true"/>
-            <foreignKey name="fk_drop_main_drop_ref_many_drop_main" columnNames="drop_main_id" refColumnNames="id" refTableName="drop_main" indexName="ix_drop_main_drop_ref_many_drop_main"/>
-            <foreignKey name="fk_drop_main_drop_ref_many_drop_ref_many" columnNames="drop_ref_many_id" refColumnNames="id" refTableName="drop_ref_many" indexName="ix_drop_main_drop_ref_many_drop_ref_many"/>
-        </createTable>
-        <createTable name="drop_ref_many" pkName="pk_drop_ref_many">
-            <column name="id" type="integer" primaryKey="true"/>
-        </createTable>
-        <createTable name="drop_ref_one" pkName="pk_drop_ref_one">
-            <column name="id" type="integer" primaryKey="true"/>
-            <column name="parent_id" type="integer" references="drop_main.id" foreignKeyName="fk_drop_ref_one_parent_id" foreignKeyIndex="ix_drop_ref_one_parent_id"/>
-        </createTable>
         <createTable name="migtest_e_basic" pkName="pk_migtest_e_basic" tablespace="db2;TSTABLES;" indexTablespace="db2;INDEXTS;" lobTablespace="db2;TSTABLES;">
             <column name="id" type="integer" primaryKey="true"/>
             <column name="status" type="varchar(1)" checkConstraint="check ( status in ('N','A','I'))" checkConstraintName="ck_migtest_e_basic_status"/>

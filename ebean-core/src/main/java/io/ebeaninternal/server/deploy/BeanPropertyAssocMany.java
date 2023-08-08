@@ -421,11 +421,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (hasJoinTable()) {
       sb.append(query.isAsDraft() ? intersectionDraftTable : intersectionPublishTable);
     } else {
-      sb.append(targetDescriptor.baseTable(query.getTemporalMode()));
+      sb.append(targetDescriptor.baseTable(query.temporalMode()));
     }
     if (needsX2Table && hasJoinTable()) {
       sb.append(" x join ");
-      sb.append(targetDescriptor.baseTable(query.getTemporalMode()));
+      sb.append(targetDescriptor.baseTable(query.temporalMode()));
       sb.append(" x2 on ");
       inverseJoin.addJoin("x2", "x", sb);
     } else {

@@ -527,11 +527,6 @@ public class DatabaseConfig {
   private ProfilingConfig profilingConfig = new ProfilingConfig();
 
   /**
-   * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
-   */
-  private boolean defaultOrderById;
-
-  /**
    * The mappingLocations for searching xml mapping.
    */
   private List<String> mappingLocations = new ArrayList<>();
@@ -593,22 +588,6 @@ public class DatabaseConfig {
    */
   public void setSlowQueryListener(SlowQueryListener slowQueryListener) {
     this.slowQueryListener = slowQueryListener;
-  }
-
-
-  /**
-   * Deprecated - look to have explicit order by. Sets the default orderById setting for queries.
-   */
-  @Deprecated
-  public void setDefaultOrderById(boolean defaultOrderById) {
-    this.defaultOrderById = defaultOrderById;
-  }
-
-  /**
-   * Returns the default orderById setting for queries.
-   */
-  public boolean isDefaultOrderById() {
-    return defaultOrderById;
   }
 
   /**
@@ -2327,8 +2306,6 @@ public class DatabaseConfig {
    * <p>
    * If no classes are specified then the classes are found automatically via
    * searching the class path.
-   * <p>
-   * Alternatively the classes can be added via {@link #setClasses(List)}.
    *
    * @param cls the entity type (or other type) that should be registered by this database.
    */
@@ -2942,7 +2919,6 @@ public class DatabaseConfig {
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
-    defaultOrderById = p.getBoolean("defaultOrderById", defaultOrderById);
 
     uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
     uuidStateFile = p.get("uuidStateFile", uuidStateFile);

@@ -12,7 +12,7 @@ class ClickHouseSetup implements PlatformSetup {
     config.setUsername("default");
     config.setPassword("");
     config.setUrl("jdbc:clickhouse://${host}:${port}/${databaseName}");
-    config.setDriver("ru.yandex.clickhouse.ClickHouseDriver");
+    config.setDriver("com.clickhouse.jdbc.ClickHouseDriver");
     config.datasourceDefaults();
 
     return dockerProperties(config);

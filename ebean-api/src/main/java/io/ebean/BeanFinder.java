@@ -33,11 +33,6 @@ import java.util.Optional;
 @NonNullApi
 public abstract class BeanFinder<I,T> {
 
-  /**
-   * Migrate to using database rather than server.
-   */
-  @Deprecated
-  protected final Database server;
   protected final Database database;
   protected final Class<T> type;
 
@@ -50,7 +45,6 @@ public abstract class BeanFinder<I,T> {
   protected BeanFinder(Class<T> type, Database database) {
     this.type = type;
     this.database = database;
-    this.server = database;
   }
 
   /**

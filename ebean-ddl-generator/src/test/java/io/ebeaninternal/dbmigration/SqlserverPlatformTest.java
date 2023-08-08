@@ -19,7 +19,7 @@ public class SqlserverPlatformTest {
     PlatformDdl ddl = PlatformDdlBuilder.create(platform);
 
     assertThat(ddl.convert("clob")).isEqualTo("nvarchar(max)");
-    assertThat(ddl.convert("blob")).isEqualTo("image");
+    assertThat(ddl.convert("blob")).isEqualTo("varbinary(max)");
     assertThat(ddl.convert("json")).isEqualTo("nvarchar(max)");
     assertThat(ddl.convert("jsonb")).isEqualTo("nvarchar(max)");
 
@@ -32,6 +32,10 @@ public class SqlserverPlatformTest {
     assertThat(ddl.convert("bit")).isEqualTo("bit");
     assertThat(ddl.convert("tinyint")).isEqualTo("smallint");
     assertThat(ddl.convert("binary(16)")).isEqualTo("binary(16)");
+
+    assertThat(ddl.convert("varchar")).isEqualTo("nvarchar(255)");
+    assertThat(ddl.convert("varchar(4000)")).isEqualTo("nvarchar(4000)");
+    assertThat(ddl.convert("varchar(4001)")).isEqualTo("nvarchar(max)");
   }
 
   @Test

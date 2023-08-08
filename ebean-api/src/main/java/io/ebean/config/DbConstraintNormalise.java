@@ -27,7 +27,6 @@ public class DbConstraintNormalise {
    * quoted identifier characters (",',[,] etc).
    */
   public String normaliseTable(String tableName) {
-
     tableName = trimQuotes(tableName);
     int lastPeriod = tableName.lastIndexOf('.');
     if (lastPeriod > -1) {
@@ -59,7 +58,6 @@ public class DbConstraintNormalise {
    * Trim off the platform quoted identifier quotes like [ ' and ".
    */
   public String trimQuotes(String identifier) {
-
     if (identifier == null) {
       return "";
     }
