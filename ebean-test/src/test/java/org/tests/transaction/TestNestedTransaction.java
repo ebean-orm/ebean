@@ -1,14 +1,9 @@
 package org.tests.transaction;
 
-<<<<<<< HEAD
 import io.ebean.TxScope;
 import io.ebean.xtest.BaseTestCase;
-=======
->>>>>>> 8ec23b7aa (FIX: nested NOT_SUPPORTED transaction with an inner REQUIRES transaction)
 import io.ebean.DB;
 import io.ebean.Transaction;
-import io.ebean.TxScope;
-import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;

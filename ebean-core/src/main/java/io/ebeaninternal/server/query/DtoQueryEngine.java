@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.QueryIterator;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DtoQueryRequest;
 import io.ebeaninternal.server.persist.Binder;
 import jakarta.persistence.PersistenceException;
@@ -29,11 +28,12 @@ public final class DtoQueryEngine {
       if (defaultFetchSizeFindList > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindList);
       }
-      request.executeSql(binder, SpiQuery.Type.LIST);
+      request.executeSql(binder);
       List<T> rows = new ArrayList<>();
       while (request.next()) {
         rows.add(request.readNextBean());
       }
+      request.putToQueryCache(rows);
       return rows;
 
     } catch (SQLException e) {
@@ -48,7 +48,7 @@ public final class DtoQueryEngine {
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       return new DtoQueryIterator<>(request);
     } catch (SQLException e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
@@ -56,19 +56,19 @@ public final class DtoQueryEngine {
   }
 
   public <T> void findEach(DtoQueryRequest<T> request, Consumer<T> consumer) {
-    try {
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
-      while (request.next()) {
-        consumer.accept(request.readNextBean());
+      try {
+        request.executeSql(binder);
+        while (request.next()) {
+          consumer.accept(request.readNextBean());
+        }
+      } catch (SQLException e) {
+        throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
+      } finally {
+        request.close();
       }
-    } catch (SQLException e) {
-      throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-    } finally {
-      request.close();
-    }
   }
 
   public <T> void findEach(DtoQueryRequest<T> request, int batchSize, Consumer<List<T>> consumer) {
@@ -77,7 +77,7 @@ public final class DtoQueryEngine {
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       while (request.next()) {
         buffer.add(request.readNextBean());
         if (buffer.size() >= batchSize) {
@@ -101,7 +101,7 @@ public final class DtoQueryEngine {
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       while (request.next()) {
         if (!consumer.test(request.readNextBean())) {
           break;

@@ -8,7 +8,6 @@ import io.ebean.core.type.ScalarType;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetricMap;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.RelationalQueryEngine;
 import io.ebeaninternal.server.core.RelationalQueryRequest;
 import io.ebeaninternal.server.core.RowReader;
@@ -67,7 +66,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       request.mapEach(consumer);
       request.logSummary();
 
@@ -85,7 +84,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       while (request.next()) {
         if (!consumer.test(reader.read())) {
           break;
@@ -104,7 +103,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   @Override
   public <T> T findOne(RelationalQueryRequest request, RowMapper<T> mapper) {
     try {
-      request.executeSql(binder, SpiQuery.Type.BEAN);
+      request.executeSql(binder);
       T value = request.mapOne(mapper);
       request.logSummary();
       return value;
@@ -123,7 +122,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
       if (defaultFetchSizeFindList > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindList);
       }
-      request.executeSql(binder, SpiQuery.Type.LIST);
+      request.executeSql(binder);
       List<T> rows = new ArrayList<>();
       while (request.next()) {
         rows.add(reader.read());
@@ -146,7 +145,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
       if (defaultFetchSizeFindList > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindList);
       }
-      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+      request.executeSql(binder);
       final DataReader dataReader = binder.createDataReader(request.resultSet());
       T value = null;
       if (dataReader.next()) {
@@ -171,7 +170,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
       if (defaultFetchSizeFindList > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindList);
       }
-      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+      request.executeSql(binder);
       final DataReader dataReader = binder.createDataReader(request.resultSet());
       List<T> rows = new ArrayList<>();
       while (dataReader.next()) {
@@ -196,7 +195,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
-      request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
+      request.executeSql(binder);
       final DataReader dataReader = binder.createDataReader(request.resultSet());
       while (dataReader.next()) {
         consumer.accept(scalarType.read(dataReader));

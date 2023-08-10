@@ -878,6 +878,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   void setManualId();
 
   /**
+   * Set the DTO type, that should be part of the queryHash.
+   */
+  void setDtoType(Class<?> dtoType);
+
+  /**
    * Set default select clauses where none have been explicitly defined.
    */
   void setDefaultSelectClause();
