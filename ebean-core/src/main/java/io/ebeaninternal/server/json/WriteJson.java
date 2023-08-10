@@ -513,6 +513,9 @@ public final class WriteJson implements SpiJsonWriter {
         return true;
       if (currentIncludeProps != null) {
         // explicitly controlled by pathProperties
+        if (prop.isId() && currentIncludeProps.contains("${identifier}")) {
+          return true;
+        }
         return currentIncludeProps.contains(prop.name());
       } else if (includeLoadedImplicit){
         // include only loaded properties
