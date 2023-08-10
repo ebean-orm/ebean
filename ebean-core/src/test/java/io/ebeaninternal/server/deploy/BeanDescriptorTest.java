@@ -135,7 +135,7 @@ public class BeanDescriptorTest extends BaseTest {
     from.setName("rob");
 
     Customer to = new Customer();
-    customerDesc.merge((EntityBean) from, (EntityBean) to);
+    customerDesc.mergeBeans((EntityBean) from, (EntityBean) to, null);
 
     assertThat(to.getId()).isEqualTo(42);
     assertThat(to.getName()).isEqualTo("rob");

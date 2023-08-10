@@ -1,21 +1,12 @@
 package io.ebeaninternal.server.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.PrettyPrinter;
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import io.ebean.FetchPath;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.JsonConfig;
 import io.ebean.plugin.BeanType;
-import io.ebean.text.json.EJson;
-import io.ebean.text.json.JsonIOException;
-import io.ebean.text.json.JsonReadOptions;
-import io.ebean.text.json.JsonWriteBeanVisitor;
-import io.ebean.text.json.JsonWriteOptions;
+import io.ebean.text.json.*;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiJsonContext;
 import io.ebeaninternal.api.json.SpiJsonReader;
@@ -26,19 +17,10 @@ import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.ManyType;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Default implementation of JsonContext.
@@ -124,7 +106,7 @@ public final class DJsonContext implements SpiJsonContext {
   public <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = getDescriptor(cls);
     try {
-      return desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), false), null, null);
+      return desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options)), null);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -136,8 +118,8 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @Override
-  public <T> void toBean(T target, String json, JsonReadOptions options) throws JsonIOException {
-    toBean(target, new StringReader(json), options);
+  public <T> void toBean(T target, String json, JsonReadOptions readOptions) throws JsonIOException {
+    toBean(target, new StringReader(json), readOptions);
   }
 
   @Override
@@ -146,8 +128,8 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @Override
-  public <T> void toBean(T target, Reader jsonReader, JsonReadOptions options) throws JsonIOException {
-    toBean(target, createParser(jsonReader), options);
+  public <T> void toBean(T target, Reader jsonReader, JsonReadOptions readOptions) throws JsonIOException {
+    toBean(target, createParser(jsonReader), readOptions);
   }
 
   @Override
@@ -157,10 +139,12 @@ public final class DJsonContext implements SpiJsonContext {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> void toBean(T target, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  @Deprecated
+  public <T> void toBean(T target, JsonParser parser, JsonReadOptions readOptions) throws JsonIOException {
     BeanDescriptor<T> desc = (BeanDescriptor<T>) getDescriptor(target.getClass());
     try {
-      desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), target != null), null, target);
+      T bean =  desc.jsonRead(new ReadJson(desc, parser, readOptions, determineObjectMapper(readOptions)), null);
+      desc.mergeBeans((EntityBean) bean, (EntityBean) target, null);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -169,13 +153,13 @@ public final class DJsonContext implements SpiJsonContext {
   @Override
   public <T> DJsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = getDescriptor(cls);
-    return new DJsonBeanReader<>(desc, new ReadJson(desc, parser, options, determineObjectMapper(options), false));
+    return new DJsonBeanReader<>(desc, new ReadJson(desc, parser, options, determineObjectMapper(options)));
   }
 
   @Override
   public <T> DJsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = (BeanDescriptor<T>) beanType;
-    SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options), false);
+    SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options));
     return new DJsonBeanReader<>(desc, readJson);
   }
 
@@ -207,7 +191,7 @@ public final class DJsonContext implements SpiJsonContext {
   @Override
   public <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = getDescriptor(cls);
-    SpiJsonReader readJson = new ReadJson(desc, src, options, determineObjectMapper(options), false);
+    SpiJsonReader readJson = new ReadJson(desc, src, options, determineObjectMapper(options));
     try {
 
       JsonToken currentToken = src.getCurrentToken();
@@ -221,7 +205,7 @@ public final class DJsonContext implements SpiJsonContext {
       List<T> list = new ArrayList<>();
       do {
         // CHECKME: Should we update the list
-        T bean = desc.jsonRead(readJson, null, null);
+        T bean = desc.jsonRead(readJson, null);
         if (bean == null) {
           break;
         } else {
@@ -386,7 +370,7 @@ public final class DJsonContext implements SpiJsonContext {
   public SpiJsonReader createJsonRead(BeanType<?> beanType, String json) {
     BeanDescriptor<?> desc = (BeanDescriptor<?>) beanType;
     JsonParser parser = createParser(new StringReader(json));
-    return new ReadJson(desc, parser, null, defaultObjectMapper, false);
+    return new ReadJson(desc, parser, null, defaultObjectMapper);
   }
 
   @Override

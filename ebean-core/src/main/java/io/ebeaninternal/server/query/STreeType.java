@@ -87,7 +87,7 @@ public interface STreeType {
   /**
    * Put the entity bean into the persistence context.
    */
-  Object contextPutIfAbsent(PersistenceContext persistenceContext, Object id, EntityBean localBean);
+  EntityBean contextPutIfAbsent(PersistenceContext persistenceContext, Object id, EntityBean localBean);
 
   /**
    * Set draft status on the entity bean.

@@ -184,7 +184,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
 
     private void readIdBean() {
       // check the PersistenceContext to see if the bean already exists
-      contextBean = (EntityBean) localDesc.contextPutIfAbsent(persistenceContext, id, localBean);
+      contextBean = localDesc.contextPutIfAbsent(persistenceContext, id, localBean);
       if (contextBean == null) {
         // bean just added to the persistenceContext
         contextBean = localBean;
