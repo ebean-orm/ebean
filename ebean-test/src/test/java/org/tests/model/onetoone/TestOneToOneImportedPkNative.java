@@ -34,7 +34,7 @@ public class TestOneToOneImportedPkNative extends BaseTestCase {
 
     String sql = sqlOf(query);
     assertThat(sql).contains("select t0.id, t0.name from oto_bmaster t0 where t0.id ");
-    assertThat(sql).doesNotContain("left join oto_bchild");
+    assertThat(sql).doesNotContain("join oto_bchild");
 
     assertThat(one).isNotNull();
 
