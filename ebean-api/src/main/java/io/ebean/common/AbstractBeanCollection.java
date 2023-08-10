@@ -59,17 +59,17 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   }
 
   @Override
-  public EntityBean getOwnerBean() {
+  public EntityBean owner() {
     return ownerBean;
   }
 
   @Override
-  public String getPropertyName() {
+  public String propertyName() {
     return propertyName;
   }
 
   @Override
-  public ExpressionList<?> getFilterMany() {
+  public ExpressionList<?> filterMany() {
     return filterMany;
   }
 
@@ -129,7 +129,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   }
 
   @Override
-  public ModifyListenMode getModifyListening() {
+  public ModifyListenMode modifyListening() {
     return modifyListenMode;
   }
 
@@ -182,7 +182,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   }
 
   @Override
-  public Set<E> getModifyAdditions() {
+  public Set<E> modifyAdditions() {
     if (modifyHolder == null) {
       return null;
     } else {
@@ -191,7 +191,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   }
 
   @Override
-  public Set<E> getModifyRemovals() {
+  public Set<E> modifyRemovals() {
     if (modifyHolder == null) {
       return null;
     } else {
@@ -213,7 +213,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   }
 
   /**
-   * Copies all relevant properties for a clone. See {@link #getShallowCopy()}
+   * Copies all relevant properties for a clone. See {@link #shallowCopy()}
    */
   protected void setFromOriginal(AbstractBeanCollection<E> other) {
     this.disableLazyLoad = other.disableLazyLoad;

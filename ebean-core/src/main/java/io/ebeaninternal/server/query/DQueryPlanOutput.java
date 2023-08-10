@@ -4,6 +4,8 @@ import io.ebean.ProfileLocation;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebeaninternal.api.SpiDbQueryPlan;
 
+import java.time.Instant;
+
 /**
  * Captured query plan details.
  */
@@ -19,6 +21,8 @@ final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   private final String hash;
   private long queryTimeMicros;
   private long captureCount;
+  private long captureMicros;
+  private Instant whenCaptured;
 
   DQueryPlanOutput(Class<?> beanType, String label, String hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
     this.beanType = beanType;
@@ -98,6 +102,16 @@ final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   }
 
   @Override
+  public long captureMicros() {
+    return captureMicros;
+  }
+
+  @Override
+  public Instant whenCaptured() {
+    return whenCaptured;
+  }
+
+  @Override
   public String toString() {
     return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + hash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
   }
@@ -106,9 +120,11 @@ final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
    * Additionally set the query execution time and the number of bind captures.
    */
   @Override
-  public DQueryPlanOutput with(long queryTimeMicros, long captureCount) {
+  public DQueryPlanOutput with(long queryTimeMicros, long captureCount, long captureMicros, Instant whenCaptured) {
     this.queryTimeMicros = queryTimeMicros;
     this.captureCount = captureCount;
+    this.captureMicros = captureMicros;
+    this.whenCaptured = whenCaptured;
     return this;
   }
 }

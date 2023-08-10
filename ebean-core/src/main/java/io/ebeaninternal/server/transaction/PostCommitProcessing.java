@@ -46,8 +46,8 @@ final class PostCommitProcessing {
     this.txnDocStoreMode = DocStoreMode.IGNORE;
     this.txnDocStoreBatchSize = 0;
     this.event = event;
-    this.deleteByIdMap = event.getDeleteByIdMap();
-    this.listenerNotify = event.getListenerNotify();
+    this.deleteByIdMap = event.deleteByIdMap();
+    this.listenerNotify = event.listenerNotify();
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
 
@@ -58,11 +58,11 @@ final class PostCommitProcessing {
     this.clusterManager = clusterManager;
     this.manager = manager;
     this.serverName = manager.name();
-    this.txnDocStoreMode = transaction.getDocStoreMode();
+    this.txnDocStoreMode = transaction.docStoreMode();
     this.txnDocStoreBatchSize = transaction.getDocStoreBatchSize();
-    this.event = transaction.getEvent();
-    this.deleteByIdMap = event.getDeleteByIdMap();
-    this.listenerNotify = event.getListenerNotify();
+    this.event = transaction.event();
+    this.deleteByIdMap = event.deleteByIdMap();
+    this.listenerNotify = event.listenerNotify();
     this.remoteTransactionEvent = createRemoteTransactionEvent();
   }
 
@@ -149,7 +149,7 @@ final class PostCommitProcessing {
         request.notifyLocalPersistListener();
       }
     }
-    TransactionEventTable eventTables = event.getEventTables();
+    TransactionEventTable eventTables = event.eventTables();
     if (eventTables != null && !eventTables.isEmpty()) {
       BulkEventListenerMap map = manager.bulkEventListenerMap();
       for (TableIUD tableIUD : eventTables.values()) {
@@ -183,7 +183,7 @@ final class PostCommitProcessing {
     if (deleteByIdMap != null) {
       remoteTransactionEvent.setDeleteByIdMap(deleteByIdMap);
     }
-    TransactionEventTable eventTables = event.getEventTables();
+    TransactionEventTable eventTables = event.eventTables();
     if (eventTables != null && !eventTables.isEmpty()) {
       for (TableIUD tableIUD : eventTables.values()) {
         remoteTransactionEvent.addTableIUD(tableIUD);

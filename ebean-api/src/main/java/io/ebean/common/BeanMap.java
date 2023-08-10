@@ -5,11 +5,7 @@ import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.ToStringBuilder;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Map capable of lazy loading and modification aware.
@@ -71,7 +67,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public void loadFrom(BeanCollection<?> other) {
     BeanMap<K, E> otherMap = (BeanMap<K, E>) other;
     internalPutNull();
-    map.putAll(otherMap.getActualMap());
+    map.putAll(otherMap.actualMap());
   }
 
   public void internalPutNull() {
@@ -175,7 +171,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   /**
    * Return the actual underlying map.
    */
-  public Map<K, E> getActualMap() {
+  public Map<K, E> actualMap() {
     return map;
   }
 
@@ -183,7 +179,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    * Returns the collection of beans (map values).
    */
   @Override
-  public Collection<E> getActualDetails() {
+  public Collection<E> actualDetails() {
     return map.values();
   }
 
@@ -191,7 +187,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
    * Returns the map entrySet.
    */
   @Override
-  public Collection<?> getActualEntries() {
+  public Collection<?> actualEntries() {
     return map.entrySet();
   }
 
@@ -346,7 +342,7 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   @Override
-  public BeanCollection<E> getShallowCopy() {
+  public BeanCollection<E> shallowCopy() {
     BeanMap<K, E> copy = new BeanMap<>(new LinkedHashMap<>(map));
     copy.setFromOriginal(this);
     return copy;

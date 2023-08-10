@@ -5,7 +5,7 @@ import io.ebean.test.containers.SqlServerContainer;
 public class StartSqlServer {
 
   public static void main(String[] args) {
-    SqlServerContainer.builder("2019-GA-ubuntu-16.04")
+    SqlServerContainer.builder("2022-RTM-CU2-ubuntu-20.04")
       .dbName("test_ebean")
       .user("test_ebean")
       .build()

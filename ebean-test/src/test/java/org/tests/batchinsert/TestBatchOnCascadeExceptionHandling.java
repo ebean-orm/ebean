@@ -96,7 +96,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
       Assertions.fail("PersistenceException expected");
     } catch (PersistenceException e) {
       assertThat(txn.isBatchMode()).as("batch mode").isFalse(); // should not have changed
-      BatchControl bc = ((SpiTransaction) txn).getBatchControl();
+      BatchControl bc = ((SpiTransaction) txn).batchControl();
       assertThat(bc == null || bc.isEmpty()).as("batch emtpy").isTrue();
     } finally {
       txn.end();

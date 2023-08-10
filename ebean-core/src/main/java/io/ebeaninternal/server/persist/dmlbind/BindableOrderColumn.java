@@ -18,7 +18,7 @@ public final class BindableOrderColumn extends BindableProperty {
 
   @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
-    int sortOrder = request.intercept().getSortOrder();
+    int sortOrder = request.intercept().sortOrder();
     if (sortOrder > 0) {
       list.add(this);
     }
@@ -29,7 +29,7 @@ public final class BindableOrderColumn extends BindableProperty {
    */
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-    int sortOrder = bean._ebean_getIntercept().getSortOrder();
+    int sortOrder = bean._ebean_getIntercept().sortOrder();
     request.bind(sortOrder, prop);
   }
 

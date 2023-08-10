@@ -130,7 +130,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
       saveState();
       log.log(DEBUG, "Saved state: clockSeq {0}, timestamp {1}, uuid {2}, stateFile: {3})", clockSeq.get(), new Date(ts), uuid, stateFile);
     } catch (IOException e) {
-      log.log(ERROR, "There was a problem while detecting the nodeId. Falling back to random mode. Try using to specify 'ebean.uuidNodeId' property", e);
+      log.log(ERROR, "There was a problem while detecting the nodeId. Falling back to random mode. Try using to specify ''ebean.uuidNodeId'' property", e);
       useRandomMode();
     }
   }
@@ -147,7 +147,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
     try {
       nodeId = getHardwareId();
     } catch (IOException e) {
-      log.log(ERROR, "Error while reading MAC address. Fall back to 'generate' mode", e);
+      log.log(ERROR, "Error while reading MAC address. Fall back to ''generate'' mode", e);
       tryGenerateMode();
     }
 
@@ -156,7 +156,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
       log.log(INFO, "Using MAC {0} to generate Type 1 UUIDs", getNodeIdentifier());
       return;
     }
-    log.log(WARNING, "No suitable network interface found. Fall back to 'generate' mode");
+    log.log(WARNING, "No suitable network interface found. Fall back to ''generate'' mode");
     tryGenerateMode();
   }
 
@@ -212,7 +212,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
 
     String propNodeId = prop.getProperty("nodeId");
     if (propNodeId == null || propNodeId.isEmpty()) {
-      log.log(WARNING, "State file '{0}' is incomplete", stateFile);
+      log.log(WARNING, "State file ''{0}'' is incomplete", stateFile);
       return false; // we cannot restore
     }
     try {
@@ -220,7 +220,7 @@ public class UuidV1IdGenerator extends UuidV1RndIdGenerator {
         nodeId = parseAlternativeNodeId(propNodeId);
       } else if (!getNodeIdentifier().equals(propNodeId)) {
         log.log(WARNING,
-          "The nodeId in the state file '{0}' has changed from {1} to {2}. "
+          "The nodeId in the state file ''{0}'' has changed from {1} to {2}. "
             + "This can happen when MAC address changes or when two containers share the same state file",
           stateFile, propNodeId, getNodeIdentifier());
         return false;

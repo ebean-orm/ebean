@@ -20,9 +20,9 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.core.EncryptAlias;
 import io.ebeaninternal.server.core.InternString;
-import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenCreated;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedWhenModified;
@@ -700,7 +700,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return the bean cache value for this property using original values.
    */
   public Object getCacheDataValueOrig(EntityBeanIntercept ebi) {
-    return cacheDataConvert(ebi.getOrigValue(propertyIndex));
+    return cacheDataConvert(ebi.origValue(propertyIndex));
   }
 
   private Object cacheDataConvert(Object value) {
@@ -756,7 +756,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public Object value(Object bean) {
-    return getValue((EntityBean) bean);
+    return getValueIntercept((EntityBean) bean);
   }
 
   /**
@@ -1408,15 +1408,20 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public void jsonRead(SpiJsonReader ctx, EntityBean bean) throws IOException {
+    Object objValue = jsonRead(ctx);
+    if (jsonDeserialize) {
+      if (ctx.update()) {
+        setValueIntercept(bean, objValue);
+      } else {
+        setValue(bean, objValue);
+      }
+    }
+  }
+
+  public Object jsonRead(SpiJsonReader ctx) throws IOException {
     JsonToken event = ctx.nextToken();
     if (JsonToken.VALUE_NULL == event) {
-      if (jsonDeserialize) {
-        if (ctx.intercept()) {
-          setValueIntercept(bean, null);
-        } else {
-          setValue(bean, null);
-        }
-      }
+      return null;
     } else {
       // expect to read non-null json value
       Object objValue;
@@ -1433,13 +1438,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
           CoreLog.log.log(ERROR, msg, e);
         }
       }
-      if (jsonDeserialize) {
-        if (ctx.intercept()) {
-          setValueIntercept(bean, objValue);
-        } else {
-          setValue(bean, objValue);
-        }
-      }
+      return objValue;
     }
   }
 

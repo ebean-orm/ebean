@@ -15,7 +15,7 @@ public class BetweenExpressionTest extends BaseExpressionTest {
     BetweenExpression exp = new BetweenExpression("startDate", 1, 2);
     exp.addSql(expReq);
 
-    assertThat(expReq.getSql()).isEqualTo("startDate between ? and ?");
+    assertThat(expReq.sql()).isEqualTo("startDate between ? and ?");
   }
 
   @Test

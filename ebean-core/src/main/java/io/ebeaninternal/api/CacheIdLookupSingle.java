@@ -26,7 +26,7 @@ public final class CacheIdLookupSingle<T> implements CacheIdLookup<T> {
     final List<BeanCacheResult.Entry<T>> hits = cacheResult.hits();
     if (hits.size() == 1) {
       found = true;
-      return Collections.singletonList(hits.get(0).getBean());
+      return Collections.singletonList(hits.get(0).bean());
     }
     return Collections.emptyList();
   }

@@ -8,7 +8,6 @@ import java.util.Objects;
  * <p>
  * It represents a location relative to the root of an object graph and specific
  * to a query and call stack hash.
- * </p>
  */
 public final class ObjectGraphNode implements Serializable {
 
@@ -17,7 +16,7 @@ public final class ObjectGraphNode implements Serializable {
   /**
    * Identifies the origin.
    */
-  private final ObjectGraphOrigin originQueryPoint;
+  private final ObjectGraphOrigin origin;
 
   /**
    * The path relative to the root.
@@ -28,26 +27,26 @@ public final class ObjectGraphNode implements Serializable {
    * Create at a sub level.
    */
   public ObjectGraphNode(ObjectGraphNode parent, String path) {
-    this.originQueryPoint = parent.getOriginQueryPoint();
-    this.path = parent.getChildPath(path);
+    this.origin = parent.origin();
+    this.path = parent.childPath(path);
   }
 
   /**
    * Create an the root level.
    */
-  public ObjectGraphNode(ObjectGraphOrigin originQueryPoint, String path) {
-    this.originQueryPoint = originQueryPoint;
+  public ObjectGraphNode(ObjectGraphOrigin origin, String path) {
+    this.origin = origin;
     this.path = path;
   }
 
   /**
    * Return the origin query point.
    */
-  public ObjectGraphOrigin getOriginQueryPoint() {
-    return originQueryPoint;
+  public ObjectGraphOrigin origin() {
+    return origin;
   }
 
-  private String getChildPath(String childPath) {
+  private String childPath(String childPath) {
     if (path == null) {
       return childPath;
     } else if (childPath == null) {
@@ -60,18 +59,18 @@ public final class ObjectGraphNode implements Serializable {
   /**
    * Return the path relative to the root.
    */
-  public String getPath() {
+  public String path() {
     return path;
   }
 
   @Override
   public String toString() {
-    return "origin:" + originQueryPoint + " path[" + path + "]";
+    return "origin:" + origin + " path[" + path + "]";
   }
 
   @Override
   public int hashCode() {
-    int hc = 92821 * originQueryPoint.hashCode();
+    int hc = 92821 * origin.hashCode();
     hc = 92821 * hc + (path == null ? 0 : path.hashCode());
     return hc;
   }
@@ -87,6 +86,6 @@ public final class ObjectGraphNode implements Serializable {
 
     ObjectGraphNode e = (ObjectGraphNode) obj;
     return (Objects.equals(e.path, path))
-      && e.originQueryPoint.equals(originQueryPoint);
+      && e.origin.equals(origin);
   }
 }

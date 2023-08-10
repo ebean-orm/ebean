@@ -20,7 +20,7 @@ public interface SpiExpressionList<T> extends ExpressionList<T>, SpiExpression {
   /**
    * Return the underlying list of expressions.
    */
-  List<SpiExpression> getUnderlyingList();
+  List<SpiExpression> underlyingList();
 
   /**
    * Return a copy of the ExpressionList with the path trimmed for filterMany() expressions.

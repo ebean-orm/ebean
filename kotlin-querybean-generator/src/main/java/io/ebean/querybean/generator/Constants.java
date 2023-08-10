@@ -7,6 +7,7 @@ interface Constants {
   String GENERATED = "io.ebean.typequery.Generated";
 
   String MAPPED_SUPERCLASS = "javax.persistence.MappedSuperclass";
+  String DISCRIMINATOR_VALUE = "javax.persistence.DiscriminatorValue";
   String INHERITANCE = "javax.persistence.Inheritance";
   String ENTITY = "javax.persistence.Entity";
   String EMBEDDABLE = "javax.persistence.Embeddable";
@@ -19,6 +20,7 @@ interface Constants {
   String DBNAME = "io.ebean.annotation.DbName";
 
   String TQROOTBEAN = "io.ebean.typequery.TQRootBean";
+  String TQASSOC = "io.ebean.typequery.TQAssoc";
   String TQASSOCBEAN = "io.ebean.typequery.TQAssocBean";
   String TQPROPERTY = "io.ebean.typequery.TQProperty";
   String TYPEQUERYBEAN = "io.ebean.typequery.TypeQueryBean";
@@ -31,4 +33,7 @@ interface Constants {
   String MODULEINFO = "io.ebean.config.ModuleInfo";
   String METAINF_MANIFEST = "META-INF/ebean-generated-info.mf";
   String METAINF_SERVICES_MODULELOADER = "META-INF/services/io.ebean.config.EntityClassRegister";
+
+  String AVAJE_LANG_NULLABLE = "io.avaje.lang.Nullable";
+  String JAVA_COLLECTION = "java.util.Collection";
 }

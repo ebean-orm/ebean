@@ -89,7 +89,7 @@ public final class InsertHandler extends DmlHandler {
    */
   @Override
   PreparedStatement getPstmt(SpiTransaction t, String sql, boolean useGeneratedKeys) throws SQLException {
-    Connection conn = t.getInternalConnection();
+    Connection conn = t.internalConnection();
     if (useGeneratedKeys) {
       return conn.prepareStatement(sql, meta.getIdentityDbColumns());
 
@@ -148,7 +148,7 @@ public final class InsertHandler extends DmlHandler {
     PreparedStatement stmt = null;
     ResultSet rset = null;
     try {
-      stmt = transaction.connection().prepareStatement(persistRequest.getSelectLastInsertedId());
+      stmt = transaction.connection().prepareStatement(persistRequest.selectLastInsertedId());
       rset = stmt.executeQuery();
       setGeneratedKey(rset);
     } finally {

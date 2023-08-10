@@ -1,7 +1,5 @@
 package io.ebean.bean;
 
-import io.ebean.common.BeanMap;
-
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -112,7 +110,7 @@ public final class ToStringBuilder {
     } else {
       String content = String.valueOf(value);
       if (content.length() > TRIM_LENGTH) {
-        content = content.substring(0, TRIM_LENGTH) + " <trimmed>";
+        content = content.substring(0, TRIM_LENGTH) + " (trimmed)";
       }
       sb.append(content);
       if (sb.length() >= MAX_TOTAL_CONTENT) {

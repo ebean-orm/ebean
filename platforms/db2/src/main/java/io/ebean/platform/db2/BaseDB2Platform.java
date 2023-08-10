@@ -34,6 +34,8 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
 
     historySupport = new DB2HistorySupport();
     booleanDbType = Types.BOOLEAN;
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255, 4000, dbTypeMap.get(DbType.CLOB)));
+    dbTypeMap.put(DbType.VARBINARY, new DbPlatformType("varbinary", 255, 8000, dbTypeMap.get(DbType.BLOB)));
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("smallint", false));
     dbTypeMap.put(DbType.INTEGER, new DbPlatformType("integer", false));
     dbTypeMap.put(DbType.BIGINT, new DbPlatformType("bigint", false));

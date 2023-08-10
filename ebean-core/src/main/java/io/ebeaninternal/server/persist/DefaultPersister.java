@@ -72,7 +72,7 @@ public final class DefaultPersister implements Persister {
   @Override
   public int executeOrmUpdate(Update<?> update, Transaction t) {
     SpiUpdate<?> ormUpdate = (SpiUpdate<?>) update;
-    BeanManager<?> mgr = beanManager(ormUpdate.getBeanType());
+    BeanManager<?> mgr = beanManager(ormUpdate.beanType());
     return executeOrQueue(new PersistRequestOrmUpdate(server, mgr, ormUpdate, (SpiTransaction) t, persistExecute));
   }
 
@@ -97,7 +97,7 @@ public final class DefaultPersister implements Persister {
 
   @Override
   public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
-    BatchControl batchControl = transaction.getBatchControl();
+    BatchControl batchControl = transaction.batchControl();
     try {
       return batchControl.execute(sqlUpdate.getGeneratedSql(), sqlUpdate.isGetGeneratedKeys());
     } catch (SQLException e) {
@@ -106,9 +106,9 @@ public final class DefaultPersister implements Persister {
   }
 
   @Override
-  public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue) {
+  public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue, int queuePosition) {
     if (queue) {
-      addToFlushQueue(update, t, 2);
+      addToFlushQueue(update, t, queuePosition);
     } else {
       executeSqlUpdate(update, t);
     }
@@ -672,7 +672,7 @@ public final class DefaultPersister implements Persister {
         if (idList != null) {
           q.where().idIn(idList);
           if (t.isLogSummary()) {
-            t.logSummary("-- DeleteById of " + descriptor.name() + " ids[" + idList + "] requires fetch of foreign key values");
+            t.logSummary("-- DeleteById of {0} ids[{1}] requires fetch of foreign key values", descriptor.name(), idList);
           }
           List<?> beanList = server.findList(q, t);
           deleteCascade(beanList, t, deleteMode, false);
@@ -681,7 +681,7 @@ public final class DefaultPersister implements Persister {
         } else {
           q.where().idEq(id);
           if (t.isLogSummary()) {
-            t.logSummary("-- DeleteById of " + descriptor.name() + " id[" + id + "] requires fetch of foreign key values");
+            t.logSummary("-- DeleteById of {0} id[{1}] requires fetch of foreign key values", descriptor.name(), id);
           }
           EntityBean bean = (EntityBean) server.findOne(q, t);
           if (bean == null) {
@@ -741,7 +741,7 @@ public final class DefaultPersister implements Persister {
       for (BeanPropertyAssocMany<?> many : manys) {
         SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
         if (t.isLogSummary()) {
-          t.logSummary("-- Deleting intersection table entries: " + many.fullName());
+          t.logSummary("-- Deleting intersection table entries: {0}", many.fullName());
         }
         executeSqlUpdate(sqlDelete, t);
       }
@@ -751,9 +751,9 @@ public final class DefaultPersister implements Persister {
     SqlUpdate deleteById = descriptor.deleteById(id, idList, deleteMode);
     if (t.isLogSummary()) {
       if (idList != null) {
-        t.logSummary("-- Deleting " + descriptor.name() + " Ids: " + idList);
+        t.logSummary("-- Deleting {0} Ids: {1}", descriptor.name(), idList);
       } else {
-        t.logSummary("-- Deleting " + descriptor.name() + " Id: " + id);
+        t.logSummary("-- Deleting {0} Id: {1}", descriptor.name(), id);
       }
     }
 
@@ -761,14 +761,14 @@ public final class DefaultPersister implements Persister {
     notifyDeleteById(descriptor, id, idList, transaction);
     deleteById.setAutoTableMod(false);
     if (idList != null) {
-      t.getEvent().addDeleteByIdList(descriptor, idList);
+      t.event().addDeleteByIdList(descriptor, idList);
     } else {
-      t.getEvent().addDeleteById(descriptor, id);
+      t.event().addDeleteById(descriptor, id);
     }
     int rows = executeSqlUpdate(deleteById, t);
 
     // Delete from the persistence context so that it can't be fetched again later
-    PersistenceContext persistenceContext = t.getPersistenceContext();
+    PersistenceContext persistenceContext = t.persistenceContext();
     if (idList != null) {
       for (Object idValue : idList) {
         descriptor.contextDeleted(persistenceContext, idValue);
@@ -861,7 +861,7 @@ public final class DefaultPersister implements Persister {
     SpiTransaction t = request.transaction();
     EntityBean orphanForRemoval = request.importedOrphanForRemoval();
     if (orphanForRemoval != null) {
-      delete(orphanForRemoval, request.transaction(), true);
+      delete(orphanForRemoval, request.transaction(), false);
     }
 
     // exported ones with cascade save
@@ -907,7 +907,7 @@ public final class DefaultPersister implements Persister {
   void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean publish, boolean queue) {
     SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many, publish);
     if (queue) {
-      addToFlushQueue(sqlDelete, t, 1);
+      addToFlushQueue(sqlDelete, t, BatchControl.DELETE_QUEUE);
     } else {
       executeSqlUpdate(sqlDelete, t);
     }
@@ -972,7 +972,7 @@ public final class DefaultPersister implements Persister {
           if (deleteMode.isHard() || many.isTargetSoftDelete()) {
             Object details = many.getValue(parentBean);
             if (details instanceof BeanCollection<?>) {
-              Set<?> modifyRemovals = ((BeanCollection<?>) details).getModifyRemovals();
+              Set<?> modifyRemovals = ((BeanCollection<?>) details).modifyRemovals();
               if (modifyRemovals != null && !modifyRemovals.isEmpty()) {
                 // delete the orphans that have been removed from the collection
                 for (Object detail : modifyRemovals) {
@@ -1077,9 +1077,9 @@ public final class DefaultPersister implements Persister {
   }
 
   private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
-    Object origValue = request.getOrigValue(prop);
+    Object origValue = request.origValue(prop);
     if (origValue instanceof EntityBean) {
-      delete((EntityBean) origValue, request.transaction(), true);
+      delete((EntityBean) origValue, request.transaction(), false);
     }
   }
 

@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.CallOrigin;
@@ -14,8 +15,10 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
-import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -132,8 +135,9 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * Create a ServerTransaction for query purposes.
    *
    * @param tenantId For multi-tenant lazy loading provide the tenantId to use.
+   * @param useMaster Set to true when the query should use the master data source.
    */
-  SpiTransaction createReadOnlyTransaction(Object tenantId);
+  SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster);
 
   /**
    * An event from another server in the cluster used to notify local
@@ -317,4 +321,137 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * Create a query bind capture for the given query plan.
    */
   SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan queryPlan);
+
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> boolean exists(Query<T> ormQuery, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> int findCount(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <A, T> List<A> findIds(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> QueryIterator<T> findIterate(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> Stream<T> findStream(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> void findEach(Query<T> query, Consumer<T> consumer, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> void findEach(Query<T> query, int batch, Consumer<List<T>> consumer, Transaction t);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> void findEachWhile(Query<T> query, Predicate<T> consumer, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> List<Version<T>> findVersions(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> List<T> findList(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> FutureRowCount<T> findFutureCount(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> FutureIds<T> findFutureIds(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> FutureList<T> findFutureList(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> PagedList<T> findPagedList(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> Set<T> findSet(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <K, T> Map<K, T> findMap(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <A, T> List<A> findSingleAttributeList(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <A, T> Set<A> findSingleAttributeSet(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  @Nullable
+  <T> T findOne(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> Optional<T> findOneOrEmpty(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> int delete(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  <T> int update(Query<T> query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  List<SqlRow> findList(SqlQuery query, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  void findEach(SqlQuery query, Consumer<SqlRow> consumer, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
+   */
+  void findEachWhile(SqlQuery query, Predicate<SqlRow> consumer, Transaction transaction);
+
+  /**
+   * Deprecated migrate to using {@link SqlQuery#usingTransaction(Transaction)}.
+   */
+  @Nullable
+  SqlRow findOne(SqlQuery query, Transaction transaction);
 }

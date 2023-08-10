@@ -4,7 +4,6 @@ package io.ebean.xtest.event;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
-import io.ebean.ValuePair;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanDeleteIdRequest;
 import io.ebean.event.BeanPersistAdapter;
@@ -14,7 +13,9 @@ import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -148,9 +149,9 @@ public class BeanPersistControllerTest {
 
     config.setRegister(false);
     config.setDefaultServer(false);
-    config.getClasses().add(EBasicVer.class);
-    config.getClasses().add(UTMaster.class);
-    config.getClasses().add(UTDetail.class);
+    config.addClass(EBasicVer.class);
+    config.addClass(UTMaster.class);
+    config.addClass(UTDetail.class);
 
     config.add(persistAdapter);
     return DatabaseFactory.create(config);

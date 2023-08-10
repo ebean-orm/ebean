@@ -21,59 +21,37 @@ create table migtest_ckey_parent (
 );
 
 create table migtest_fk_cascade (
-  id                            numeric(19) identity(1,1) not null,
-  one_id                        numeric(19),
+  id                            bigint identity(1,1) not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_cascade primary key (id)
 );
 
 create table migtest_fk_cascade_one (
-  id                            numeric(19) identity(1,1) not null,
+  id                            bigint identity(1,1) not null,
   constraint pk_migtest_fk_cascade_one primary key (id)
 );
 
 create table migtest_fk_none (
-  id                            numeric(19) identity(1,1) not null,
-  one_id                        numeric(19),
+  id                            bigint identity(1,1) not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_none primary key (id)
 );
 
 create table migtest_fk_none_via_join (
-  id                            numeric(19) identity(1,1) not null,
-  one_id                        numeric(19),
+  id                            bigint identity(1,1) not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_none_via_join primary key (id)
 );
 
 create table migtest_fk_one (
-  id                            numeric(19) identity(1,1) not null,
+  id                            bigint identity(1,1) not null,
   constraint pk_migtest_fk_one primary key (id)
 );
 
 create table migtest_fk_set_null (
-  id                            numeric(19) identity(1,1) not null,
-  one_id                        numeric(19),
+  id                            bigint identity(1,1) not null,
+  one_id                        bigint,
   constraint pk_migtest_fk_set_null primary key (id)
-);
-
-create table drop_main (
-  id                            integer identity(1,1) not null,
-  constraint pk_drop_main primary key (id)
-);
-
-create table drop_main_drop_ref_many (
-  drop_main_id                  integer not null,
-  drop_ref_many_id              integer not null,
-  constraint pk_drop_main_drop_ref_many primary key (drop_main_id,drop_ref_many_id)
-);
-
-create table drop_ref_many (
-  id                            integer identity(1,1) not null,
-  constraint pk_drop_ref_many primary key (id)
-);
-
-create table drop_ref_one (
-  id                            integer identity(1,1) not null,
-  parent_id                     integer,
-  constraint pk_drop_ref_one primary key (id)
 );
 
 create table migtest_e_basic (
@@ -185,7 +163,7 @@ create table migtest_mtm_c (
 );
 
 create table migtest_mtm_m (
-  id                            numeric(19) identity(1,1) not null,
+  id                            bigint identity(1,1) not null,
   name                          varchar(255),
   constraint pk_migtest_mtm_m primary key (id)
 );
@@ -197,7 +175,7 @@ create table migtest_oto_child (
 );
 
 create table migtest_oto_master (
-  id                            numeric(19) identity(1,1) not null,
+  id                            bigint identity(1,1) not null,
   name                          varchar(255),
   constraint pk_migtest_oto_master primary key (id)
 );
@@ -245,15 +223,6 @@ alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id forei
 
 create index ix_migtest_fk_set_null_one_id on migtest_fk_set_null (one_id);
 alter table migtest_fk_set_null add constraint fk_migtest_fk_set_null_one_id foreign key (one_id) references migtest_fk_one (id) on delete set null;
-
-create index ix_drop_main_drop_ref_many_drop_main on drop_main_drop_ref_many (drop_main_id);
-alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_main foreign key (drop_main_id) references drop_main (id);
-
-create index ix_drop_main_drop_ref_many_drop_ref_many on drop_main_drop_ref_many (drop_ref_many_id);
-alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_ref_many foreign key (drop_ref_many_id) references drop_ref_many (id);
-
-create index ix_drop_ref_one_parent_id on drop_ref_one (parent_id);
-alter table drop_ref_one add constraint fk_drop_ref_one_parent_id foreign key (parent_id) references drop_main (id);
 
 create index ix_migtest_e_basic_eref_id on migtest_e_basic (eref_id);
 alter table migtest_e_basic add constraint fk_migtest_e_basic_eref_id foreign key (eref_id) references migtest_e_ref (id);

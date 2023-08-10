@@ -46,6 +46,18 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   SqlQuery usingTransaction(Transaction transaction);
 
   /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  SqlQuery usingMaster();
+
+  /**
    * Execute the query returning a list.
    */
   List<SqlRow> findList();

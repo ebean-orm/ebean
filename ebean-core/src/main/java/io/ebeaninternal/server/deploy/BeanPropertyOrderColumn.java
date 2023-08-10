@@ -16,12 +16,12 @@ public final class BeanPropertyOrderColumn extends BeanProperty {
 
   @Override
   public Object getValue(EntityBean bean) {
-    return bean._ebean_getIntercept().getSortOrder();
+    return bean._ebean_getIntercept().sortOrder();
   }
 
   @Override
   public Object getValueIntercept(EntityBean bean) {
-    return bean._ebean_getIntercept().getSortOrder();
+    return bean._ebean_getIntercept().sortOrder();
   }
 
   @Override

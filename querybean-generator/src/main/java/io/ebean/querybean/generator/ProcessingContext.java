@@ -181,7 +181,7 @@ class ProcessingContext implements Constants {
   }
 
   private boolean isMappedSuperOrInheritance(Element mappedSuper) {
-    return hasAnnotations(mappedSuper, MAPPED_SUPERCLASS, INHERITANCE);
+    return hasAnnotations(mappedSuper, MAPPED_SUPERCLASS, INHERITANCE, DISCRIMINATOR_VALUE);
   }
 
   private boolean isEntityOrEmbedded(Element mappedSuper) {
@@ -540,5 +540,9 @@ class ProcessingContext implements Constants {
       logError(null, "Error reading services file: " + e.getMessage());
     }
     return null;
+  }
+
+  Element asElement(TypeMirror mirror) {
+    return typeUtils.asElement(mirror);
   }
 }

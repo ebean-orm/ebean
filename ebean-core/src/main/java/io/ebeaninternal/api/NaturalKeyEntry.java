@@ -13,5 +13,5 @@ public interface NaturalKeyEntry {
   /**
    * Return the inValue (used to remove from IN clause of original query).
    */
-  Object getInValue();
+  Object inValue();
 }

@@ -253,6 +253,19 @@ class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
+  void queryUsingMaster() {
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer where name is not null";
+    List<CustDto> custDtos = DB.sqlQuery(sql)
+      .usingMaster()
+      .mapTo(CUST_MAPPER)
+      .findList();
+
+    assertThat(custDtos).isNotEmpty();
+  }
+
+  @Test
   void queryUsingTransaction() throws SQLException {
     ResetBasicData.reset();
     boolean h2 = isH2();

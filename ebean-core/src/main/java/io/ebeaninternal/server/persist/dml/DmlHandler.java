@@ -8,7 +8,6 @@ import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
 import io.ebeaninternal.server.bind.DataBind;
-import io.ebeaninternal.server.util.Str;
 
 import javax.persistence.OptimisticLockException;
 import java.sql.Connection;
@@ -67,7 +66,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Bind to the statement returning the DataBind.
    */
   DataBind bind(PreparedStatement stmt) {
-    return new DataBind(persistRequest.dataTimeZone(), stmt, transaction.getInternalConnection());
+    return new DataBind(persistRequest.dataTimeZone(), stmt, transaction.internalConnection());
   }
 
   /**
@@ -102,7 +101,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     } catch (OptimisticLockException e) {
       // add the SQL and bind values to error message
       final String m = e.getMessage() + " sql[" + sql + "] bind[" + bindLog + "]";
-      persistRequest.transaction().logSummary("OptimisticLockException:" + m);
+      persistRequest.transaction().logSummary("OptimisticLockException:{0}", m);
       throw new OptimisticLockException(m, null, e.getEntity());
     }
   }
@@ -146,15 +145,15 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       switch (batchedStatus) {
         case BATCHED_FIRST: {
           transaction.logSql(sql);
-          transaction.logSql(Str.add(" -- bind(", bindLog.toString(), ")"));
+          transaction.logSql(" -- bind({0})", bindLog);
           return;
         }
         case BATCHED: {
-          transaction.logSql(Str.add(" -- bind(", bindLog.toString(), ")"));
+          transaction.logSql(" -- bind({0})", bindLog);
           return;
         }
         default: {
-          transaction.logSql(Str.add(sql, "; -- bind(", bindLog.toString(), ")"));
+          transaction.logSql("{0}; -- bind({1})", sql, bindLog);
         }
       }
     }
@@ -235,7 +234,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
   PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
-    Connection conn = t.getInternalConnection();
+    Connection conn = t.internalConnection();
     if (genKeys) {
       // the Id generated is always the first column
       // Required to stop Oracle10 giving us Oracle rowId??
@@ -250,7 +249,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
    * Return a prepared statement taking into account batch requirements.
    */
   PreparedStatement getPstmtBatch(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
-    BatchedPstmtHolder batch = t.getBatchControl().pstmtHolder();
+    BatchedPstmtHolder batch = t.batchControl().pstmtHolder();
     batchedPstmt = batch.batchedPstmt(sql);
     if (batchedPstmt != null) {
       batchedStatus = batchedPstmt.isEmpty() ? BATCHED_FIRST : BATCHED;

@@ -123,10 +123,10 @@ public class DatabaseConfig {
   private boolean loadModuleInfo = true;
 
   /**
-   * List of interesting classes such as entities, embedded, ScalarTypes,
-   * Listeners, Finders, Controllers etc.
+   * Interesting classes such as entities, embedded, ScalarTypes,
+   * Listeners, Finders, Controllers, AttributeConverters etc.
    */
-  private List<Class<?>> classes = new ArrayList<>();
+  private Set<Class<?>> classes = new HashSet<>();
 
   /**
    * The packages that are searched for interesting classes. Only used when
@@ -527,11 +527,6 @@ public class DatabaseConfig {
   private ProfilingConfig profilingConfig = new ProfilingConfig();
 
   /**
-   * Controls the default order by id setting of queries. See {@link Query#orderById(boolean)}
-   */
-  private boolean defaultOrderById;
-
-  /**
    * The mappingLocations for searching xml mapping.
    */
   private List<String> mappingLocations = new ArrayList<>();
@@ -593,22 +588,6 @@ public class DatabaseConfig {
    */
   public void setSlowQueryListener(SlowQueryListener slowQueryListener) {
     this.slowQueryListener = slowQueryListener;
-  }
-
-
-  /**
-   * Deprecated - look to have explicit order by. Sets the default orderById setting for queries.
-   */
-  @Deprecated
-  public void setDefaultOrderById(boolean defaultOrderById) {
-    this.defaultOrderById = defaultOrderById;
-  }
-
-  /**
-   * Returns the default orderById setting for queries.
-   */
-  public boolean isDefaultOrderById() {
-    return defaultOrderById;
   }
 
   /**
@@ -2320,19 +2299,15 @@ public class DatabaseConfig {
   }
 
   /**
-   * Programmatically add classes (typically entities) that this server should
-   * use.
+   * Programmatically add classes (typically entities) that this server should use.
    * <p>
    * The class can be an Entity, Embedded type, ScalarType, BeanPersistListener,
    * BeanFinder or BeanPersistController.
    * <p>
    * If no classes are specified then the classes are found automatically via
    * searching the class path.
-   * <p>
-   * Alternatively the classes can be added via {@link #setClasses(List)}.
    *
-   * @param cls the entity type (or other type) that should be registered by this
-   *            database.
+   * @param cls the entity type (or other type) that should be registered by this database.
    */
   public void addClass(Class<?> cls) {
     classes.add(cls);
@@ -2341,7 +2316,7 @@ public class DatabaseConfig {
   /**
    * Register all the classes (typically entity classes).
    */
-  public void addAll(List<Class<?>> classList) {
+  public void addAll(Collection<Class<?>> classList) {
     if (classList != null && !classList.isEmpty()) {
       classes.addAll(classList);
     }
@@ -2383,15 +2358,26 @@ public class DatabaseConfig {
    * <p>
    * Alternatively the classes can contain added via {@link #addClass(Class)}.
    */
-  public void setClasses(List<Class<?>> classes) {
-    this.classes = classes;
+  public void setClasses(Collection<Class<?>> classes) {
+    this.classes = new HashSet<>(classes);
   }
 
   /**
-   * Return the classes registered for this database. Typically this includes
+   * Return the classes registered for this database. Typically, this includes
    * entities and perhaps listeners.
    */
-  public List<Class<?>> getClasses() {
+  public Set<Class<?>> classes() {
+    return classes;
+  }
+
+  /**
+   * Deprecated - migrate to classes().
+   * <p>
+   * Sorry if returning Set rather than List breaks code but it feels safer to
+   * do that than a subtle change to return a shallow copy which you will not detect.
+   */
+  @Deprecated
+  public Set<Class<?>> getClasses() {
     return classes;
   }
 
@@ -2760,8 +2746,6 @@ public class DatabaseConfig {
     this.classLoadConfig = classLoadConfig;
   }
 
-
-
   /**
    * Load settings from application.properties, application.yaml and other sources.
    * <p>
@@ -2906,7 +2890,7 @@ public class DatabaseConfig {
     serverCachePlugin = p.createInstance(ServerCachePlugin.class, "serverCachePlugin", serverCachePlugin);
 
     String packagesProp = p.get("search.packages", p.get("packages", null));
-    packages = getSearchList(packagesProp, packages);
+    packages = searchList(packagesProp, packages);
 
     skipCacheAfterWrite = p.getBoolean("skipCacheAfterWrite", skipCacheAfterWrite);
     updateAllPropertiesInBatch = p.getBoolean("updateAllPropertiesInBatch", updateAllPropertiesInBatch);
@@ -2935,7 +2919,6 @@ public class DatabaseConfig {
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
-    defaultOrderById = p.getBoolean("defaultOrderById", defaultOrderById);
 
     uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
     uuidStateFile = p.get("uuidStateFile", uuidStateFile);
@@ -2982,10 +2965,10 @@ public class DatabaseConfig {
     tenantCatalogProvider = p.createInstance(TenantCatalogProvider.class, "tenant.catalogProvider", tenantCatalogProvider);
     tenantSchemaProvider = p.createInstance(TenantSchemaProvider.class, "tenant.schemaProvider", tenantSchemaProvider);
     tenantPartitionColumn = p.get("tenant.partitionColumn", tenantPartitionColumn);
-    classes = getClasses(p);
+    classes = readClasses(p);
 
     String mappingsProp = p.get("mappingLocations", null);
-    mappingLocations = getSearchList(mappingsProp, mappingLocations);
+    mappingLocations = searchList(mappingsProp, mappingLocations);
   }
 
   private NamingConvention createNamingConvention(PropertiesWrapper properties, NamingConvention namingConvention) {
@@ -2999,13 +2982,13 @@ public class DatabaseConfig {
    * @param properties the properties
    * @return the classes
    */
-  private List<Class<?>> getClasses(PropertiesWrapper properties) {
+  private Set<Class<?>> readClasses(PropertiesWrapper properties) {
     String classNames = properties.get("classes", null);
     if (classNames == null) {
       return classes;
     }
 
-    List<Class<?>> classList = new ArrayList<>();
+    Set<Class<?>> classList = new HashSet<>();
     String[] split = StringHelper.splitNames(classNames);
     for (String cn : split) {
       if (!"class".equalsIgnoreCase(cn)) {
@@ -3020,7 +3003,7 @@ public class DatabaseConfig {
     return classList;
   }
 
-  private List<String> getSearchList(String searchNames, List<String> defaultValue) {
+  private List<String> searchList(String searchNames, List<String> defaultValue) {
     if (searchNames != null) {
       String[] entries = StringHelper.splitNames(searchNames);
       List<String> hitList = new ArrayList<>(entries.length);
@@ -3399,8 +3382,16 @@ public class DatabaseConfig {
    * When false we either register entity classes via application code or use classpath
    * scanning to find and register entity classes.
    */
+  public boolean isLoadModuleInfo() {
+    return loadModuleInfo;
+  }
+
+  /**
+   * Deprecated - migrate to isLoadModuleInfo().
+   */
+  @Deprecated
   public boolean isAutoLoadModuleInfo() {
-    return loadModuleInfo && classes.isEmpty();
+    return loadModuleInfo;
   }
 
   /**

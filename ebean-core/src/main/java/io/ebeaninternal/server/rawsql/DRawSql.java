@@ -60,4 +60,8 @@ public final class DRawSql implements SpiRawSql {
     return columnMapping;
   }
 
+  @Override
+  public String mapToColumn(String property) {
+    return columnMapping.mapToColumn(property);
+  }
 }

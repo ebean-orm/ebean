@@ -32,7 +32,12 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   private static final String illegalStateMessage = "Transaction is Inactive";
   private static final String notExpectedMessage = "Not expected on read only transaction";
 
+  /**
+   * Set false when using autoCommit (as a performance optimisation for the read-only case).
+   */
+  private final boolean useCommit;
   private final TransactionManager manager;
+  private final SpiTxnLogger logger;
   private final boolean logSql;
   private final boolean logSummary;
 
@@ -59,26 +64,32 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   /**
    * Create without a tenantId.
    */
-  ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection) {
+  ImplicitReadOnlyTransaction(boolean useCommit, TransactionManager manager, Connection connection) {
     this.manager = manager;
-    this.logSql = manager.isLogSql();
-    this.logSummary = manager.isLogSummary();
+    this.logger = manager.loggerReadOnly();
+    this.logSql = logger.isLogSql();
+    this.logSummary = logger.isLogSummary();
     this.active = true;
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
     this.startNanos = System.nanoTime();
+    try {
+      this.useCommit = useCommit && !connection.getAutoCommit();
+    } catch (SQLException e) {
+      throw new PersistenceException(e);
+    }
   }
 
   /**
    * Create with a tenantId.
    */
   ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection, Object tenantId) {
-    this(manager, connection);
+    this(true, manager, connection);
     this.tenantId = tenantId;
   }
 
   @Override
-  public long getStartNanoTime() {
+  public long startNanoTime() {
     // not used on read only transaction
     return startNanos;
   }
@@ -99,7 +110,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public String getLabel() {
+  public String label() {
     return null;
   }
 
@@ -129,7 +140,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public ProfileLocation profileLocation() {
     return profileLocation;
   }
 
@@ -145,11 +156,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public void setSkipCache(boolean skipCache) {
-  }
-
-  @Override
-  public String getLogPrefix() {
-    return null;
   }
 
   @Override
@@ -178,7 +184,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public DocStoreMode getDocStoreMode() {
+  public DocStoreMode docStoreMode() {
     return null;
   }
 
@@ -365,7 +371,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public BatchControl getBatchControl() {
+  public BatchControl batchControl() {
     return null;
   }
 
@@ -390,7 +396,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * Return the persistence context associated with this transaction.
    */
   @Override
-  public SpiPersistenceContext getPersistenceContext() {
+  public SpiPersistenceContext persistenceContext() {
     return persistenceContext;
   }
 
@@ -410,7 +416,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public TransactionEvent getEvent() {
+  public TransactionEvent event() {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -433,20 +439,25 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public void logSql(String msg) {
-    manager.log().sql().debug(msg);
+  public void logSql(String msg, Object... args) {
+    logger.sql(msg, args);
   }
 
   @Override
-  public void logSummary(String msg) {
-    manager.log().sum().debug(msg);
+  public void logSummary(String msg, Object... args) {
+    logger.sum(msg, args);
+  }
+
+  @Override
+  public void logTxn(String msg, Object... args) {
+    // never called
   }
 
   /**
    * Return the transaction id.
    */
   @Override
-  public String getId() {
+  public String id() {
     return null;
   }
 
@@ -456,7 +467,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public Object getTenantId() {
+  public Object tenantId() {
     return tenantId;
   }
 
@@ -464,7 +475,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * Return the underlying connection for internal use.
    */
   @Override
-  public Connection getInternalConnection() {
+  public Connection internalConnection() {
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
@@ -476,7 +487,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public Connection connection() {
-    return getInternalConnection();
+    return internalConnection();
   }
 
   private void deactivate() {
@@ -503,16 +514,22 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     // do nothing, expect AutoCommit
   }
 
-  /**
-   * Commit the transaction.
-   */
   @Override
   public void commit() {
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    // expect AutoCommit so just deactivate / put back into pool
-    deactivate();
+    try {
+      if (useCommit) {
+        try {
+          connection.commit();
+        } catch (SQLException e) {
+          throw new PersistenceException(e);
+        }
+      }
+    } finally {
+      deactivate();
+    }
   }
 
   /**
@@ -554,8 +571,17 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    // expect AutoCommit so it really has already committed
-    deactivate();
+    try {
+      if (useCommit) {
+        try {
+          connection.rollback();
+        } catch (SQLException e) {
+          throw new PersistenceException(e);
+        }
+      }
+    } finally {
+      deactivate();
+    }
   }
 
   /**
@@ -563,7 +589,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void end() throws PersistenceException {
-    if (isActive()) {
+    if (active) {
       rollback();
     }
   }
@@ -606,7 +632,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public DocStoreTransaction getDocStoreTransaction() {
+  public DocStoreTransaction docStoreTransaction() {
     throw new IllegalStateException(notExpectedMessage);
   }
 

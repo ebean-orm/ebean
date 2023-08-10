@@ -31,14 +31,14 @@ public final class ExtraMetrics {
   /**
    * Timed metric for bind capture used with query plan collection.
    */
-  public TimedMetric getBindCapture() {
+  public TimedMetric bindCapture() {
     return bindCapture;
   }
 
   /**
    * Timed metric for query plan collection.
    */
-  public TimedMetric getPlanCollect() {
+  public TimedMetric planCollect() {
     return planCollect;
   }
 
