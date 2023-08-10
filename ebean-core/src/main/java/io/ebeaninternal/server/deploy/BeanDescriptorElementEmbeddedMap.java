@@ -58,13 +58,13 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
       }
       if (stringKey) {
         parser.nextToken();
-        Object val = readJsonElement(readJson, null, null); // CHECKME: Update existing map entry here?
+        Object val = readJsonElement(readJson, null);
         add.addKeyValue(fieldName, val);
       } else {
         parser.nextFieldName();
         Object key = scalarTypeKey.jsonRead(parser);
         parser.nextFieldName();
-        Object val = readJsonElement(readJson, null, null); // CHECKME: Update existing map entry here?
+        Object val = readJsonElement(readJson, null);
         add.addKeyValue(key, val);
       }
     } while (true);

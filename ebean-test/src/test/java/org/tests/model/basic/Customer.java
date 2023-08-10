@@ -90,7 +90,7 @@ public class Customer extends BasicDomain {
   List<Order> orders;
 
   @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-  List<Contact> contacts;
+  List<Contact> contacts = new ArrayList<>();
 
   @Override
   public String toString() {

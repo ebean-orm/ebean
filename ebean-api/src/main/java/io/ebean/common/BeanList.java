@@ -164,7 +164,10 @@ public class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, B
   }
 
   @Override
-  public Collection<?> actualEntries() {
+  public Collection<?> actualEntries(boolean load) {
+    if (load) {
+      init();
+    }
     return list;
   }
 

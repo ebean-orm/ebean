@@ -61,13 +61,13 @@ class BeanDescriptorElementEmbedded<T> extends BeanDescriptorElement<T> {
   }
 
   @Override
-  public T jsonRead(SpiJsonReader jsonRead, String path, T target) throws IOException {
-    return readJsonElement(jsonRead, path, target);
+  public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
+    return readJsonElement(jsonRead, path);
   }
 
   @SuppressWarnings("unchecked")
-  T readJsonElement(SpiJsonReader jsonRead, String path, T target) throws IOException {
-    return (T)targetDescriptor.jsonRead(jsonRead, path, target);
+  T readJsonElement(SpiJsonReader jsonRead, String path) throws IOException {
+    return (T)targetDescriptor.jsonRead(jsonRead, path);
   }
 
   void writeJsonElement(SpiJsonWriter ctx, Object element) {

@@ -162,8 +162,11 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
    * <p>
    * For maps this returns the entrySet as we need the keys of the map.
    */
-  Collection<?> actualEntries();
+  Collection<?> actualEntries(boolean load);
 
+  default Collection<?> actualEntries() {
+    return actualEntries(false);
+  }
   /**
    * Returns entries, that were lazily added at the end of the list. Might be null.
    */
@@ -247,4 +250,9 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
    * Return a shallow copy of this collection that is modifiable.
    */
   BeanCollection<E> shallowCopy();
+
+  /**
+   * Clears the underlying collection.
+   */
+  void clear();
 }

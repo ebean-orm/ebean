@@ -65,7 +65,7 @@ final class BeanDescriptorJsonHelp<T> {
   }
 
   @SuppressWarnings("unchecked")
-  T jsonRead(SpiJsonReader jsonRead, String path, boolean withInheritance, T target) throws IOException {
+  T jsonRead(SpiJsonReader jsonRead, String path, boolean withInheritance) throws IOException {
     JsonParser parser = jsonRead.parser();
     //noinspection StatementWithEmptyBody
     if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
@@ -82,7 +82,7 @@ final class BeanDescriptorJsonHelp<T> {
     }
 
     if (desc.inheritInfo == null || !withInheritance) {
-      return jsonReadObject(jsonRead, path, target);
+      return jsonReadObject(jsonRead, path);
     }
 
     ObjectNode node = jsonRead.mapper().readTree(parser);
@@ -97,25 +97,18 @@ final class BeanDescriptorJsonHelp<T> {
     JsonNode discNode = node.get(discColumn);
     if (discNode == null || discNode.isNull()) {
       if (!desc.isAbstractType()) {
-        return desc.jsonReadObject(newReader, path, target);
+        return desc.jsonReadObject(newReader, path);
       }
       String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
       throw new JsonParseException(newParser, msg, parser.getCurrentLocation());
     }
 
     BeanDescriptor<T> inheritDesc = (BeanDescriptor<T>) inheritInfo.readType(discNode.asText()).desc();
-    return inheritDesc.jsonReadObject(newReader, path, target);
+    return inheritDesc.jsonReadObject(newReader, path);
   }
 
-  private T jsonReadObject(SpiJsonReader readJson, String path, T target) throws IOException {
-    EntityBean bean;
-    if (target == null) {
-      bean = desc.createEntityBeanForJson();
-    } else if (desc.beanType.isInstance(target)) {
-      bean = (EntityBean) target;
-    } else {
-      throw new ClassCastException(target.getClass().getName() + " provided, but " + desc.beanType.getClass().getName() + " expected");
-    }
+  private T jsonReadObject(SpiJsonReader readJson, String path) throws IOException {
+    EntityBean bean = desc.createEntityBeanForJson();
     return jsonReadProperties(readJson, bean, path);
   }
 
@@ -133,12 +126,7 @@ final class BeanDescriptorJsonHelp<T> {
         String key = parser.getCurrentName();
         BeanProperty p = desc.beanProperty(key);
         if (p != null) {
-          if (p.isVersion() && readJson.update() ) {
-            // skip version prop during update
-            p.jsonRead(readJson);
-          } else {
-            p.jsonRead(readJson, bean);
-          }
+          p.jsonRead(readJson, bean);
         } else {
           // read an unmapped property
           if (unmappedProperties == null) {
