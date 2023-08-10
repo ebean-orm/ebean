@@ -10,9 +10,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Cat;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLazyForeignKeys extends BaseTestCase {
@@ -32,6 +34,10 @@ public class TestLazyForeignKeys extends BaseTestCase {
 
     rel1.setEntity1(e1);
     rel1.setEntity2(e2);
+
+    Cat cat = new Cat();
+    cat.setId(4711L);
+    rel1.setCat2(cat);
     DB.save(rel1);
   }
 
@@ -57,13 +63,25 @@ public class TestLazyForeignKeys extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(3);
-    assertSql(sql.get(0)).contains("select t0.id, t0.attr1, t0.id1, t0.id2, t1.species, t0.cat_id from main_entity_relation t0 left join animal t1 on t1.id = t0.cat_id");
+    assertSql(sql.get(0)).contains("select t0.id, t0.attr1, t0.id1, t0.id2, t1.species, t0.cat_id, t2.species, t0.cat2_id "
+        + "from main_entity_relation t0 left join animal t1 on t1.id = t0.cat_id left join animal t2 on t2.id = t0.cat2_id");
     if (isSqlServer() || isOracle()) {
       assertSql(sql.get(1)).contains("select t0.id, t0.attr1, t0.attr2, CASE WHEN t0.id is null THEN 1 ELSE 0 END from main_entity t0");
     } else {
       assertSql(sql.get(1)).contains("select t0.id, t0.attr1, t0.attr2, t0.id is null from main_entity t0");
       assertSql(sql.get(2)).contains("select t0.id, t0.attr1, t0.attr2, t0.id is null from main_entity t0");
     }
+
+    assertThat(rel1.getCat2().getId()).isEqualTo(4711L);
+    assertThatThrownBy(() -> rel1.getCat2().getName()).isInstanceOf(EntityNotFoundException.class);
+
+    Cat cat = new Cat();
+    cat.setId(4711L);
+    cat.setName("miau");
+    DB.save(cat);
+
+    DB.refresh(rel1);
+    assertThat(rel1.getCat2().getName()).isEqualTo("miau");
   }
 
   @Test

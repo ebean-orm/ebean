@@ -364,6 +364,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
+  public boolean isPrimaryKeyExport() {
+    return primaryKeyExport;
+  }
+
+  @Override
   public void diff(String prefix, Map<String, ValuePair> map, EntityBean newBean, EntityBean oldBean) {
     Object newEmb = (newBean == null) ? null : getValue(newBean);
     Object oldEmb = (oldBean == null) ? null : getValue(oldBean);
@@ -600,13 +605,20 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return findMatch(embeddedProp, prop, prop.dbColumn(), tableJoin);
   }
 
+  /**
+   * If column is a primaryKeyExport colum, we can directly use our own ID and do not need to add a join if the relation is not optional
+   */
+  boolean requiresJoin() {
+    return !primaryKeyExport || isNullable();
+  }
+
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!isTransient) {
-      if (primaryKeyExport) {
-        descriptor.idProperty().appendSelect(ctx, subQuery);
-      } else {
+      if (requiresJoin()) {
         localHelp.appendSelect(ctx, subQuery);
+      } else {
+        descriptor.idProperty().appendSelect(ctx, subQuery);
       }
     }
   }
@@ -624,7 +636,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
-    if (!isTransient && !primaryKeyExport) {
+    if (!isTransient && requiresJoin()) {
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
         String alias = ctx.tableAliasManyWhere(manyWhere);

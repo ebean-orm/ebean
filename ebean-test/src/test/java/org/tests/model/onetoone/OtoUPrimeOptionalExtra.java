@@ -1,22 +1,24 @@
 package org.tests.model.onetoone;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity
-public class OtoUPrimeExtra {
+public class OtoUPrimeOptionalExtra {
 
   @Id
   UUID eid;
 
   String extra;
 
+  @OneToOne(optional = false)
+  @PrimaryKeyJoinColumn
+  private OtoUPrime prime;
+
   @Version
   Long version;
 
-  public OtoUPrimeExtra(String extra) {
+  public OtoUPrimeOptionalExtra(String extra) {
     this.extra = extra;
   }
 
@@ -49,4 +51,11 @@ public class OtoUPrimeExtra {
     this.version = version;
   }
 
+  public OtoUPrime getPrime() {
+    return prime;
+  }
+
+  public void setPrime(OtoUPrime prime) {
+    this.prime = prime;
+  }
 }

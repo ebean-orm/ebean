@@ -1026,7 +1026,10 @@ public final class DefaultPersister implements Persister {
       for (BeanPropertyAssocOne<?> prop : expOnes) {
         // for soft delete check cascade type also supports soft delete
         if (deleteMode.isHard() || prop.isTargetSoftDelete()) {
-          if (request.isLoadedProperty(prop)) {
+          if (prop.isPrimaryKeyExport()) {
+            // we can delete by id, neither if property loaded or not
+            delete(prop.targetDescriptor(), prop.descriptor().id(parentBean), t, deleteMode);
+          } else if (request.isLoadedProperty(prop)) {
             Object detailBean = prop.getValue(parentBean);
             if (detailBean != null) {
               deleteRecurse((EntityBean) detailBean, t, deleteMode);

@@ -852,19 +852,25 @@ class TestQuerySingleAttribute extends BaseTestCase {
     e3.setAttr1("a1");
     DB.save(e3);
 
+    // we need a cat that does not exist in database
+    Cat cat = DB.reference(Cat.class, 4711);
+
     MainEntityRelation rel = new MainEntityRelation();
     rel.setEntity1(e1);
     rel.setEntity2(e1);
+    rel.setCat2(cat);
     DB.save(rel);
 
     rel = new MainEntityRelation();
     rel.setEntity1(e2);
     rel.setEntity2(e2);
+    rel.setCat2(cat);
     DB.save(rel);
 
     rel = new MainEntityRelation();
     rel.setEntity1(e3);
     rel.setEntity2(e3);
+    rel.setCat2(cat);
     DB.save(rel);
   }
 

@@ -45,7 +45,7 @@ public class TestOneToOnePrimaryKeyJoinBidi extends BaseTestCase {
     OtoUBPrime oneWith = queryWithFetch.findOne();
 
     assertThat(oneWith).isNotNull();
-    assertThat(sqlOf(queryWithFetch, 10)).contains("select t0.pid, t0.name, t0.version, t1.eid, t1.extra, t1.version, t1.eid from oto_ubprime t0 left join oto_ubprime_extra t1 on t1.eid = t0.pid where t0.pid = ?")
+    assertThat(sqlOf(queryWithFetch, 10)).contains("select t0.pid, t0.name, t0.version, t1.eid, t1.extra, t1.version, t1.eid from oto_ubprime t0 join oto_ubprime_extra t1 on t1.eid = t0.pid where t0.pid = ?")
       .as("we join to oto_prime_extra");
 
     assertThat(oneWith.getExtra().getExtra()).isEqualTo("v" + desc);

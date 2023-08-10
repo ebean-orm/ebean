@@ -10,7 +10,7 @@ public class OtoBMaster {
 
   String name;
 
-  @OneToOne(cascade = CascadeType.ALL, mappedBy = "master", fetch = FetchType.LAZY)
+  @OneToOne(cascade = CascadeType.ALL, mappedBy = "master", fetch = FetchType.LAZY, optional = false)
   OtoBChild child;
 
   public Long getId() {

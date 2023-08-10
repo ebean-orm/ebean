@@ -14,7 +14,7 @@ public class OtoUBPrimeExtra {
   /**
    * Child side of bi-directional PrimaryJoinColumn.
    */
-  @OneToOne
+  @OneToOne(optional = false)
   @PrimaryKeyJoinColumn
   OtoUBPrime prime;
 
