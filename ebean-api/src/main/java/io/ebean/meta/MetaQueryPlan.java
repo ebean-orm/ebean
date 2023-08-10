@@ -45,6 +45,11 @@ public interface MetaQueryPlan {
   String plan();
 
   /**
+   * The tenant ID of the plan.
+   */
+  Object tenantId();
+
+  /**
    * Return the query execution time associated with the bind values capture.
    */
   long queryTimeMicros();
