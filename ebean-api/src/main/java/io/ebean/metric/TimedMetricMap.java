@@ -5,7 +5,7 @@ import io.ebean.meta.MetricVisitor;
 /**
  * A map of timed metrics keyed by a string.
  */
-public interface TimedMetricMap {
+public interface TimedMetricMap extends Metric {
 
   /**
    * Add a time event given the start nanos.
@@ -17,8 +17,4 @@ public interface TimedMetricMap {
    */
   void add(String key, long exeMicros);
 
-  /**
-   * Visit the metric.
-   */
-  void visit(MetricVisitor visitor);
 }
