@@ -5,15 +5,11 @@ import io.ebean.meta.MetricVisitor;
 /**
  * Internal Query plan metric holder.
  */
-public interface QueryPlanMetric {
+public interface QueryPlanMetric extends Metric {
 
   /**
    * Return the underlying timed metric.
    */
   TimedMetric metric();
 
-  /**
-   * Visit the underlying metric.
-   */
-  void visit(MetricVisitor visitor);
 }

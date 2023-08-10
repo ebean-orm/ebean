@@ -16,6 +16,8 @@ import io.ebean.event.ShutdownManager;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.*;
+import io.ebean.metric.Metric;
+import io.ebean.metric.MetricRegistry;
 import io.ebean.migration.auto.AutoMigrationRunner;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Plugin;
@@ -2304,6 +2306,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       persister.visitMetrics(visitor);
     }
     extraMetrics.visitMetrics(visitor);
+    for (Metric metric : MetricRegistry.registered()) {
+      metric.visit(visitor);
+    }
     visitor.visitEnd();
   }
 

@@ -62,25 +62,4 @@ final class DCountMetric implements CountMetric {
     return tmp;
   }
 
-  private static class DCountMetricStats implements CountMetricStats {
-
-    private final String name;
-    private final long count;
-
-    private DCountMetricStats(String name, long count) {
-      this.name = name;
-      this.count = count;
-    }
-
-    @Override
-    public String name() {
-      return name;
-    }
-
-    @Override
-    public long count() {
-      return count;
-    }
-  }
-
 }
