@@ -9,9 +9,9 @@ class EbeanVersionTest {
 
   @Test
   void checkMinAgentVersion_ok() {
-    assertFalse(EbeanVersion.checkMinAgentVersion("12.12.0"));
-    assertFalse(EbeanVersion.checkMinAgentVersion("12.12.99"));
-    assertFalse(EbeanVersion.checkMinAgentVersion("13.1.0"));
+    assertFalse(EbeanVersion.checkMinAgentVersion("13.10.0"));
+    assertFalse(EbeanVersion.checkMinAgentVersion("13.10.99"));
+    assertFalse(EbeanVersion.checkMinAgentVersion("14.1.0"));
   }
 
   @Test

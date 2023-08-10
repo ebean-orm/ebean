@@ -12,7 +12,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -22,9 +27,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * This provides the mechanisms to support deferred fetching of reference beans
  * and oldValues generation for concurrency checking.
  */
-public final class InterceptReadWrite implements EntityBeanIntercept {
-
-  private static final long serialVersionUID = -3664031775464862649L;
+public final class InterceptReadWrite extends InterceptBase implements EntityBeanIntercept {
+  private static final long serialVersionUID = 1834735632647183821L;
 
   private static final int STATE_NEW = 0;
   private static final int STATE_REFERENCE = 1;
@@ -55,11 +59,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   private String ebeanServerName;
   private boolean deletedFromCollection;
-
-  /**
-   * The actual entity bean that 'owns' this intercept.
-   */
-  private final EntityBean owner;
   private EntityBean embeddedOwner;
   private int embeddedOwnerIndex;
   /**
@@ -101,15 +100,15 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    * Create with a given entity.
    */
   public InterceptReadWrite(Object ownerBean) {
-    this.owner = (EntityBean) ownerBean;
-    this.flags = new byte[owner._ebean_getPropertyNames().length];
+    super((EntityBean) ownerBean);
+    this.flags = new byte[super.propertyLength()];
   }
 
   /**
    * EXPERIMENTAL - Constructor only for use by serialization frameworks.
    */
   public InterceptReadWrite() {
-    this.owner = null;
+    super(null);
     this.flags = null;
   }
 
@@ -227,7 +226,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
     if (mutableInfo != null) {
       for (int i = 0; i < mutableInfo.length; i++) {
-        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
+        if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(value(i))) {
           dirty = true;
           break;
         }
@@ -412,25 +411,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public int findProperty(String propertyName) {
-    final String[] names = owner._ebean_getPropertyNames();
-    for (int i = 0; i < names.length; i++) {
-      if (names[i].equals(propertyName)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  @Override
-  public String property(int propertyIndex) {
-    if (propertyIndex == -1) {
-      return null;
-    }
-    return owner._ebean_getPropertyName(propertyIndex);
-  }
-
-  @Override
   public int propertyLength() {
     return flags.length;
   }
@@ -571,7 +551,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
         props.add((prefix == null ? property(i) : prefix + property(i)));
       } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
         // an embedded property has been changed - recurse
-        final EntityBean embeddedBean = (EntityBean) owner._ebean_getField(i);
+        final EntityBean embeddedBean = (EntityBean) value(i);
         embeddedBean._ebean_getIntercept().addDirtyPropertyNames(props, property(i) + ".");
       }
     }
@@ -579,9 +559,10 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   @Override
   public boolean hasDirtyProperty(Set<String> propertyNames) {
-    final String[] names = owner._ebean_getPropertyNames();
+    String[] names = owner._ebean_getPropertyNames();
     final int len = propertyLength();
-    for (int i = 0; i < len; i++) {
+    int i;
+    for (i = 0; i < len; i++) {
       if (isChangedProp(i)) {
         if (propertyNames.contains(names[i])) {
           return true;
@@ -592,6 +573,22 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
         }
       }
     }
+    for (ExtensionAccessor acc : owner._ebean_getExtensionAccessors()) {
+      names = acc.getProperties();
+      for (int j = 0; j < names.length; j++) {
+        if (isChangedProp(i)) {
+          if (propertyNames.contains(names[j])) {
+            return true;
+          }
+        } else if ((flags[i] & FLAG_EMBEDDED_DIRTY) != 0) {
+          if (propertyNames.contains(names[j])) {
+            return true;
+          }
+        }
+        i++;
+      }
+    }
+
     return false;
   }
 
@@ -609,7 +606,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       if (isChangedProp(i)) {
         // the property has been changed on this bean
         final String propName = (prefix == null ? property(i) : prefix + property(i));
-        final Object newVal = owner._ebean_getField(i);
+        final Object newVal = value(i);
         final Object oldVal = origValue(i);
         if (notEqual(oldVal, newVal)) {
           dirtyValues.put(propName, new ValuePair(newVal, oldVal));
@@ -628,7 +625,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     for (int i = 0; i < len; i++) {
       if (isChangedProp(i)) {
         // the property has been changed on this bean
-        final Object newVal = owner._ebean_getField(i);
+        final Object newVal = value(i);
         final Object oldVal = origValue(i);
         if (notEqual(oldVal, newVal)) {
           visitor.visit(i, newVal, oldVal);
@@ -1036,7 +1033,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   public boolean isChangedProp(int i) {
     if ((flags[i] & FLAG_CHANGED_PROP) != 0) {
       return true;
-    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(owner._ebean_getField(i))) {
+    } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(value(i))) {
       return false;
     } else {
       // mark for change
