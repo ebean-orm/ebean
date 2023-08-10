@@ -54,12 +54,12 @@ public final class EnhanceBeanPropertyAccess implements BeanPropertyAccess {
 
     @Override
     public Object get(EntityBean bean) {
-      return bean._ebean_getField(fieldIndex);
+      return bean._ebean_intercept().value(fieldIndex);
     }
 
     @Override
     public Object getIntercept(EntityBean bean) {
-      return bean._ebean_getFieldIntercept(fieldIndex);
+      return bean._ebean_intercept().valueIntercept(fieldIndex);
     }
   }
 
@@ -73,12 +73,12 @@ public final class EnhanceBeanPropertyAccess implements BeanPropertyAccess {
 
     @Override
     public void set(EntityBean bean, Object value) {
-      bean._ebean_setField(fieldIndex, value);
+      bean._ebean_intercept().setValue(fieldIndex, value);
     }
 
     @Override
     public void setIntercept(EntityBean bean, Object value) {
-      bean._ebean_setFieldIntercept(fieldIndex, value);
+      bean._ebean_intercept().setValueIntercept(fieldIndex, value);
     }
 
   }

@@ -16,7 +16,7 @@ final class BeanPropertyElementSetter implements BeanPropertySetter {
 
   @Override
   public void set(EntityBean bean, Object value) {
-    bean._ebean_setField(pos, value);
+    bean._ebean_getIntercept().setValue(pos, value);
   }
 
   @Override

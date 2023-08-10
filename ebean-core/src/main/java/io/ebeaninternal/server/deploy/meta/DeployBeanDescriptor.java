@@ -5,6 +5,8 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.Identity;
+import io.ebean.bean.ExtensionAccessor;
+import io.ebean.bean.ExtensionAccessors;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
@@ -146,10 +148,22 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   private String[] readPropertyNames() {
     try {
       Field field = beanType.getField("_ebean_props");
-      return (String[]) field.get(null);
+      String[] props = (String[]) field.get(null);
+
+      for (ExtensionAccessor extension : ExtensionAccessors.read(beanType)) {
+        props = concat(props, extension.getProperties());
+      }
+      return props;
     } catch (Exception e) {
       throw new IllegalStateException("Error getting _ebean_props field on type " + beanType, e);
     }
+  }
+
+  private String[] concat(String[] arr1, String[] arr2) {
+    String[] ret = new String[arr1.length + arr2.length];
+    System.arraycopy(arr1, 0, ret, 0, arr1.length);
+    System.arraycopy(arr2, 0, ret, arr1.length, arr2.length);
+    return ret;
   }
 
   public void setPropertyNames(String[] properties) {

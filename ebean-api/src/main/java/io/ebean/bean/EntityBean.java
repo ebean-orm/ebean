@@ -42,6 +42,13 @@ public interface EntityBean extends Serializable, ToStringAware {
   }
 
   /**
+   * Creates a new instance and uses the provided intercept. (For EntityExtension)
+   */
+  default Object _ebean_newExtendedInstance(int offset, EntityBean base) {
+    throw new NotEnhancedException();
+  }
+
+  /**
    * Generated method that sets the loaded state on all the embedded beans on
    * this entity bean by using EntityBeanIntercept.setEmbeddedLoaded(Object o);
    */
@@ -119,5 +126,20 @@ public interface EntityBean extends Serializable, ToStringAware {
   @Override
   default void toString(ToStringBuilder builder) {
     throw new NotEnhancedException();
+  }
+
+  /**
+   * Returns the ExtensionAccessors, this is always <code>NONE</code> for non extendable beans.
+   */
+  default ExtensionAccessors _ebean_getExtensionAccessors() {
+    return ExtensionAccessors.NONE;
+  }
+
+  /**
+   * Returns the extension bean for an accessor. This will throw NotEnhancedException for non extendable beans.
+   * (It is not intended to call this method here)
+   */
+  default EntityBean _ebean_getExtension(ExtensionAccessor accessor) {
+    throw new NotEnhancedException(); // not an extendableBean
   }
 }
