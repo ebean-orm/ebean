@@ -34,8 +34,15 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
+    - name: maven-settings
+      uses: s4u/maven-settings-action@v2
+      with:
+        servers: '[{"id": "github-release", "username": "dummy", "password": "${GITHUB_TOKEN}"}]'
+        githubServer: false
     - name: Maven version
       run: mvn --version
     - name: H2Database
-      run: mvn -T 8 clean package
+      run: mvn -T 8 clean package -Pgithub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
