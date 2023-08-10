@@ -54,6 +54,39 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
    *  Tests using multi tenancy per schema
    */
   @Test
+  public void create_new_server_with_multi_tenancy_db_with_master() {
+
+    String tenant = "customer";
+    CurrentTenantProvider tenantProvider = Mockito.mock(CurrentTenantProvider.class);
+    Mockito.doReturn(tenant).when(tenantProvider).currentId();
+
+    TenantDataSourceProvider dataSourceProvider = Mockito.mock(TenantDataSourceProvider.class);
+
+    DatabaseConfig config = new DatabaseConfig();
+
+    config.setName("h2");
+    config.loadFromProperties();
+    config.setRegister(false);
+    config.setDefaultServer(false);
+    config.setDdlGenerate(false);
+    config.setDdlRun(false);
+
+    config.setTenantMode(TenantMode.DB_WITH_MASTER);
+    config.setCurrentTenantProvider(tenantProvider);
+    config.setTenantDataSourceProvider(dataSourceProvider);
+
+    Mockito.doReturn(config.getDataSource()).when(dataSourceProvider).dataSource(tenant);
+
+    config.setDatabasePlatform(new PostgresPlatform());
+
+    final Database database = DatabaseFactory.create(config);
+    database.shutdown();
+  }
+
+  /**
+   *  Tests using multi tenancy per schema
+   */
+  @Test
   public void create_new_server_with_multi_tenancy_schema() {
 
     String tenant = "customer";
