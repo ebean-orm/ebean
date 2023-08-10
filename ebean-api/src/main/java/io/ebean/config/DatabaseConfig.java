@@ -398,6 +398,8 @@ public class DatabaseConfig {
    */
   private Clock clock = Clock.systemUTC();
 
+  private TempFileProvider tempFileProvider = new WeakRefTempFileProvider();
+
   private List<IdGenerator> idGenerators = new ArrayList<>();
   private List<BeanFindController> findControllers = new ArrayList<>();
   private List<BeanPersistController> persistControllers = new ArrayList<>();
@@ -569,6 +571,14 @@ public class DatabaseConfig {
    */
   public void setClock(final Clock clock) {
     this.clock = clock;
+  }
+
+  public TempFileProvider getTempFileProvider() {
+    return tempFileProvider;
+  }
+
+  public void setTempFileProvider(final TempFileProvider tempFileProvider) {
+    this.tempFileProvider = tempFileProvider;
   }
 
   /**

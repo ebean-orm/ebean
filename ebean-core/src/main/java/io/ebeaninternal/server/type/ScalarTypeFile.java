@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
+import io.ebean.config.TempFileProvider;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -20,26 +21,22 @@ import static java.lang.System.Logger.Level.ERROR;
  */
 final class ScalarTypeFile extends ScalarTypeBase<File> {
 
-  private final String prefix;
-  private final String suffix;
-  private final File directory;
+  private final TempFileProvider tempFileProvider;
   private final int bufferSize;
 
   /**
-   * Construct with reasonable defaults of Blob and 8096 buffer size.
+   * Construct with reasonable defaults of Blob and 8192 buffer size.
    */
-  ScalarTypeFile() {
-    this(Types.LONGVARBINARY, "db-", null, null, 8096);
+  ScalarTypeFile(TempFileProvider tempFileProvider) {
+    this(Types.LONGVARBINARY, tempFileProvider, 8192);
   }
 
   /**
    * Create the ScalarTypeFile.
    */
-  ScalarTypeFile(int jdbcType, String prefix, String suffix, File directory, int bufferSize) {
+  ScalarTypeFile(int jdbcType, TempFileProvider tempFileProvider, int bufferSize) {
     super(File.class, false, jdbcType);
-    this.prefix = prefix;
-    this.suffix = suffix;
-    this.directory = directory;
+    this.tempFileProvider = tempFileProvider;
     this.bufferSize = bufferSize;
   }
 
@@ -66,7 +63,7 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
     }
     try {
       // stream from db into our temp file
-      File tempFile = File.createTempFile(prefix, suffix, directory);
+      File tempFile = tempFileProvider.createTempFile();
       OutputStream os = getOutputStream(tempFile);
       pump(is, os);
       return tempFile;
@@ -109,7 +106,7 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
 
   @Override
   public File jsonRead(JsonParser parser) throws IOException {
-    File tempFile = File.createTempFile(prefix, suffix, directory);
+    File tempFile = tempFileProvider.createTempFile();
     try (OutputStream os = getOutputStream(tempFile)) {
       parser.readBinaryValue(os);
       os.flush();
