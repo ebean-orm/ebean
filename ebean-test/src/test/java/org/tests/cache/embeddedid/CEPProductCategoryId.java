@@ -7,23 +7,23 @@ import java.util.Objects;
 public class CEPProductCategoryId {
 
   // primitive id values as part of an EmbeddedId (NPE #1722)
-  private long customerId;
-  private long addressId;
+  private long categoryId;
+  private long productId;
 
-  public long getCustomerId() {
-    return customerId;
+  public long getCategoryId() {
+    return categoryId;
   }
 
-  public void setCustomerId(long customerId) {
-    this.customerId = customerId;
+  public void setCategoryId(long categoryId) {
+    this.categoryId = categoryId;
   }
 
-  public long getAddressId() {
-    return addressId;
+  public long getProductId() {
+    return productId;
   }
 
-  public void setAddressId(long addressId) {
-    this.addressId = addressId;
+  public void setProductId(long productId) {
+    this.productId = productId;
   }
 
   @Override
@@ -31,12 +31,12 @@ public class CEPProductCategoryId {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     CEPProductCategoryId that = (CEPProductCategoryId) o;
-    return customerId == that.customerId &&
-      addressId == that.addressId;
+    return categoryId == that.categoryId &&
+      productId == that.productId;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(customerId, addressId);
+    return Objects.hash(categoryId, productId);
   }
 }
