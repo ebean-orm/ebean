@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.dto;
 
+import io.ebean.annotation.DbJson;
+import io.ebean.annotation.DbJsonB;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.type.TypeManager;
 
@@ -21,10 +23,16 @@ final class DtoMetaBuilder {
   private final Class<?> dtoType;
   private final List<DtoMetaProperty> properties = new ArrayList<>();
   private final Map<Integer, DtoMetaConstructor> constructorMap = new HashMap<>();
+  private final Set<Class<?>> annotationFilter = new HashSet<>();
 
   DtoMetaBuilder(Class<?> dtoType, TypeManager typeManager) {
     this.dtoType = dtoType;
     this.typeManager = typeManager;
+    annotationFilter.add(DbJson.class);
+    annotationFilter.add(DbJsonB.class);
+    if (typeManager.jsonMarkerAnnotation() != null) {
+      annotationFilter.add(typeManager.jsonMarkerAnnotation());
+    }
   }
 
   DtoMeta build() {
@@ -38,7 +46,7 @@ final class DtoMetaBuilder {
       if (includeMethod(method)) {
         try {
           final String name = propertyName(method.getName());
-          properties.add(new DtoMetaProperty(typeManager, dtoType, method, name));
+          properties.add(new DtoMetaProperty(typeManager, dtoType, method, name, annotationFilter));
         } catch (Exception e) {
           CoreLog.log.log(DEBUG, "exclude on " + dtoType + " method " + method, e);
         }
