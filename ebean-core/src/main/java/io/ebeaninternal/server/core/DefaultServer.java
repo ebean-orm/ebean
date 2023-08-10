@@ -818,6 +818,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> T mergeBeans(T bean, T existing, BeanMergeOptions options) {
+    BeanDescriptor<?> desc = desc(bean.getClass());
+    return (T) desc.mergeBeans(checkEntityBean(bean), (EntityBean) existing, options);
+  }
+
+  @Override
   public void lock(Object bean) {
     BeanDescriptor<?> desc = desc(bean.getClass());
     Object id = desc.id(bean);

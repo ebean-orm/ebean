@@ -36,9 +36,9 @@ public final class DJsonBeanReader<T> implements JsonBeanReader<T> {
   }
 
   @Override
-  public T read(T target) {
+  public T read() {
     try {
-      return desc.jsonRead(readJson, null, target);
+      return desc.jsonRead(readJson, null);
     } catch (IOException e) {
       throw new PersistenceIOException(e);
     }

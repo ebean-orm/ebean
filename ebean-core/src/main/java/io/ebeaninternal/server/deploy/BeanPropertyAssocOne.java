@@ -30,10 +30,9 @@ import io.ebeaninternal.server.query.SqlJoinType;
 import jakarta.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 
 /**
  * Property mapped to a joined bean.
@@ -809,20 +808,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void jsonRead(SpiJsonReader readJson, EntityBean bean) throws IOException {
     if (jsonDeserialize && targetDescriptor != null) {
-      // CHECKME: may we skip reading the object from the json stream?
-      T target = readJson.update() ? (T) getValue(bean) : null;
-      T assocBean = targetDescriptor.jsonRead(readJson, name, target);
-      if (readJson.update()) {
-        setValueIntercept(bean, assocBean);
-      } else {
-        setValue(bean, assocBean);
-      }
+      T assocBean = targetDescriptor.jsonRead(readJson, name);
+      setValue(bean, assocBean);
     }
-  }
-
-  @Override
-  public Object jsonRead(SpiJsonReader readJson) throws IOException {
-    return targetDescriptor.jsonRead(readJson, name, null);
   }
 
   public boolean isReference(Object detailBean) {
@@ -845,6 +833,26 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         beanProperty.setValue(child, parent);
       }
     }
+  }
+
+  @Override
+  public void merge(EntityBean bean, EntityBean existing, BeanMergeHelp mergeHelp) {
+    mergeHelp.pushPath(name);
+
+    EntityBean beanValue = valueAsEntityBean(bean);
+    EntityBean existingValue = valueAsEntityBean(existing);
+
+    if (beanValue != null && existingValue != null) {
+      Object beanId = targetDescriptor.id(beanValue);
+      Object existingId = targetDescriptor.id(existingValue);
+      if (!isNullOrZero(beanId) && !isNullOrZero(existingId) && !Objects.equals(beanId, existingId)) {
+        existingValue = null;
+      }
+    }
+
+    setValueIntercept(existing, mergeHelp.mergeBeans(targetDescriptor, beanValue, existingValue));
+
+    mergeHelp.popPath();
   }
 
   public boolean hasCircularImportedId(BeanDescriptor<?> sourceDesc) {

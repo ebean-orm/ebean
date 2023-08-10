@@ -695,22 +695,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     iudMetrics.addNoBatch(type, startNanos);
   }
 
-  public void merge(EntityBean bean, EntityBean existing) {
-    EntityBeanIntercept fromEbi = bean._ebean_getIntercept();
-    EntityBeanIntercept toEbi = existing._ebean_getIntercept();
-    int propertyLength = toEbi.propertyLength();
-    String[] names = properties();
-    for (int i = 0; i < propertyLength; i++) {
-      if (fromEbi.isLoadedProperty(i)) {
-        BeanProperty property = beanProperty(names[i]);
-        if (!toEbi.isLoadedProperty(i)) {
-          Object val = property.getValue(bean);
-          property.setValue(existing, val);
-        } else if (property.isMany()) {
-          property.merge(bean, existing);
-        }
-      }
+  /**
+   * Copies all modified fields from <code>bean</code> to <code>existing</code>.
+   * It returns normally the existing bean (or a new instance, if it was null)
+   */
+  public EntityBean mergeBeans(EntityBean bean, EntityBean existing, BeanMergeOptions options) {
+    if (existing == null) {
+      existing = createEntityBean();
     }
+    return new BeanMergeHelp(existing, options).mergeBeans(this, bean, existing);
   }
 
   /**
@@ -1755,7 +1748,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * We actually need to do a query because we don't know the type without the discriminator value.
    */
-  private T findReferenceBean(Object id, PersistenceContext pc) {
+  public T findReferenceBean(Object id, PersistenceContext pc) {
     DefaultOrmQuery<T> query = new DefaultOrmQuery<>(this, ebeanServer, ebeanServer.expressionFactory());
     query.setPersistenceContext(pc);
     return query.setId(id).findOne();
@@ -2025,8 +2018,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Put the bean into the persistence context if it is absent.
    */
   @Override
-  public Object contextPutIfAbsent(PersistenceContext pc, Object id, EntityBean localBean) {
-    return pc.putIfAbsent(rootBeanType, id, localBean);
+  public EntityBean contextPutIfAbsent(PersistenceContext pc, Object id, EntityBean localBean) {
+    return (EntityBean) pc.putIfAbsent(rootBeanType, id, localBean);
   }
 
   /**
@@ -3379,12 +3372,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     jsonHelp.jsonWriteProperties(writeJson, bean);
   }
 
-  public T jsonRead(SpiJsonReader jsonRead, String path, T target) throws IOException {
-    return jsonHelp.jsonRead(jsonRead, path, true, target);
+  public T jsonRead(SpiJsonReader jsonRead, String path) throws IOException {
+    return jsonHelp.jsonRead(jsonRead, path, true);
   }
 
-  T jsonReadObject(SpiJsonReader jsonRead, String path, T target) throws IOException {
-    return jsonHelp.jsonRead(jsonRead, path, false, target);
+
+  T jsonReadObject(SpiJsonReader jsonRead, String path) throws IOException {
+    return jsonHelp.jsonRead(jsonRead, path, false);
   }
 
   public List<BeanProperty[]> uniqueProps() {

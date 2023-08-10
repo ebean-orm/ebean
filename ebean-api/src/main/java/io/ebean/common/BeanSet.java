@@ -165,7 +165,10 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   @Override
-  public Collection<?> actualEntries() {
+  public Collection<?> actualEntries(boolean load) {
+    if (load) {
+      init();
+    }
     return set;
   }
 

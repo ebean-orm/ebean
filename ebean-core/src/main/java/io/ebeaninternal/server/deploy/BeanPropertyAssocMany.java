@@ -2,8 +2,6 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
@@ -29,7 +27,6 @@ import java.io.StringWriter;
 import java.util.*;
 
 import static java.lang.System.Logger.Level.ERROR;
-import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * Property mapped to a List Set or Map.
@@ -210,21 +207,46 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Copy collection value if existing is empty.
    */
   @Override
-  public void merge(EntityBean bean, EntityBean existing) {
+  public void merge(EntityBean bean, EntityBean existing, BeanMergeHelp mergeHelp) {
+    mergeHelp.pushPath(name);
+    Object fromCollection = beanCollection(bean);
     Object existingCollection = getValue(existing);
-    if (existingCollection instanceof BeanCollection<?>) {
-      BeanCollection<?> toBC = (BeanCollection<?>) existingCollection;
-      if (!toBC.isPopulated()) {
-        Object fromCollection = getValue(bean);
-        if (fromCollection instanceof BeanCollection<?>) {
-          BeanCollection<?> fromBC = (BeanCollection<?>) fromCollection;
-          if (fromBC.isPopulated()) {
-            toBC.loadFrom(fromBC);
+    if (fromCollection instanceof BeanCollection) {
+      BeanCollection fromBC = (BeanCollection) fromCollection;
+
+      if (fromBC.isPopulated()) {
+        BeanCollection toBC;
+        if (existingCollection instanceof BeanCollection) {
+          toBC = (BeanCollection) existingCollection;
+          if (mergeHelp.addExistingToPersistenceContext()) {
+            for (Object detailBean : toBC.actualEntries(true)) {
+              mergeHelp.contextPutExisting(targetDescriptor, (EntityBean) detailBean);
+            }
+          }
+          if (mergeHelp.clearCollections()) {
+            toBC.clear();
+          }
+        } else {
+          toBC = createEmpty(existing);
+          setValueIntercept(existing, toBC);
+        }
+
+        for (Object detailBean : fromBC.actualDetails()) {
+          if (detailBean instanceof EntityBean) {
+            EntityBean toBean = mergeHelp.mergeBeans(targetDescriptor, (EntityBean) detailBean, null);
+            if (childMasterProperty != null) {
+              childMasterProperty.setValue(toBean, existing);
+            }
+            toBC.addBean(toBean);
           }
         }
       }
+    } else {
+      setValueIntercept(existing, fromCollection);
     }
+    mergeHelp.popPath();
   }
+
 
   /**
    * Add the bean to the appropriate collection on the parent bean.
@@ -1053,7 +1075,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (JsonToken.VALUE_NULL == event) {
       return null;
     }
-    return jsonReadCollection(ctx, null, null);
+    return jsonReadCollection(ctx, null);
   }
 
   /**
@@ -1066,16 +1088,15 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Read the collection (JSON Array) containing entity beans.
    */
-  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean, Object targets) throws IOException {
+  public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
     if (elementDescriptor != null && elementDescriptor.isJsonReadCollection()) {
       return elementDescriptor.jsonReadCollection(readJson, parentBean);
     }
     BeanCollection<?> collection = createEmpty(parentBean);
     BeanCollectionAdd add = beanCollectionAdd(collection);
-    Map<Object, T> existingBeans = extractBeans(targets);
     do {
 
-      EntityBean detailBean = getDetailBean(readJson, existingBeans);
+      EntityBean detailBean = (EntityBean) targetDescriptor.jsonRead(readJson, name);
       if (detailBean == null) {
         // read the entire array
         break;
@@ -1088,63 +1109,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       }
     } while (true);
     return collection;
-  }
-
-  /**
-   * Find bean in the target collection and reuse it for JSON update.
-   */
-  private EntityBean getDetailBean(SpiJsonReader readJson, Map<Object, T> targets) throws IOException {
-    BeanProperty idProperty = targetDescriptor.idProperty();
-    if (targets == null || idProperty == null) {
-      return (EntityBean) targetDescriptor.jsonRead(readJson, name, null);
-    } else {
-      JsonToken token = readJson.parser().nextToken();
-      if (JsonToken.VALUE_NULL == token || JsonToken.END_ARRAY == token) {
-        return null;
-      }
-      // extract the id. We have to buffer the JSON;
-      ObjectNode node = readJson.mapper().readTree(readJson.parser());
-      SpiJsonReader jsonReader = readJson.forJson(node.traverse());
-      JsonNode idNode = node.get(idProperty.name());
-      Object id = idNode == null ? null : idProperty.jsonRead(readJson.forJson(idNode.traverse()));
-      return (EntityBean) targetDescriptor.jsonRead(jsonReader, name, targets.get(id));
-    }
-  }
-
-  /**
-   * Extract beans, that are currently in the target collection. (targets can be a List/Set/Map)
-   */
-  private Map<Object, T> extractBeans(Object targets) {
-    Collection<T> beans;
-
-    if (targets == null) {
-      return null;
-    } else if (targets instanceof Map) {
-      if (((Map<?, T>) targets).isEmpty()) {
-        return null;
-      }
-      beans = ((Map<?, T>) targets).values();
-    } else if (targets instanceof Collection) {
-      if (((Collection<?>) targets).isEmpty()) {
-        return null;
-      }
-      beans = (Collection<T>) targets;
-    } else {
-      CoreLog.log.log(WARNING, "Found non collection value " + targets.getClass().getSimpleName());
-      return null;
-    }
-
-    BeanProperty idProp = targetDescriptor.idProperty();
-    Map<Object, T> ret = new HashMap<>();
-    for (T bean : beans) {
-      if (bean instanceof EntityBean) {
-        Object id = idProp.getValue((EntityBean) bean);
-        if (id != null) {
-          ret.put(id, bean);
-        }
-      }
-    }
-    return ret.isEmpty() ? null : ret;
   }
 
   /**
