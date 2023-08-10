@@ -6,7 +6,7 @@ import jakarta.persistence.Version;
 import java.util.UUID;
 
 @Entity
-public class OtoUPrimeExtra {
+public class OtoUPrimeExtraWithConstraint {
 
   @Id
   UUID eid;
@@ -16,7 +16,7 @@ public class OtoUPrimeExtra {
   @Version
   Long version;
 
-  public OtoUPrimeExtra(String extra) {
+  public OtoUPrimeExtraWithConstraint(String extra) {
     this.extra = extra;
   }
 

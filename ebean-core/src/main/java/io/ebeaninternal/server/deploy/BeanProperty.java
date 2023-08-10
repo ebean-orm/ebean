@@ -905,6 +905,13 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return importedPrimaryKey;
   }
 
+  /**
+   * If true, this property references O2O with its primary key.
+   */
+  public boolean isPrimaryKeyExport() {
+    return false;
+  }
+
   @Override
   public boolean isAssocMany() {
     // Returns false - override in BeanPropertyAssocMany.
