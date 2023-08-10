@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.TreeNode;
 import org.tests.model.family.ChildPerson;
 import org.tests.model.family.ParentPerson;
 
@@ -403,6 +404,57 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
         + "left join grand_parent_person j1 on j1.identifier = t1.parent_identifier "
         + "left join e_basic t2 on t2.id = coalesce(t1.some_bean_id, j1.some_bean_id) "
         + "where t2.name = ?");
+  }
+
+  public void test_softRef() {
+
+    LoggedSql.start();
+
+    DB.find(TreeNode.class)
+      .where().isNotNull("ref.id")
+      .findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql.get(0)).contains("select t0.id, t0.soft_ref, t0.parent_id, t0_ref.id "
+      + "from tree_node t0 "
+      + "left join e_basic t0_ref on t0_ref.id = t0.soft_ref "
+      + "left join e_basic t1 on t1.id = t0_ref.id where t1.id is not null");
+  }
+
+  @Test
+  public void test_softRefChildren() {
+
+    LoggedSql.start();
+
+    DB.find(TreeNode.class).select("id")
+      .where().isNotNull("children.ref.id")
+      .findList();
+
+    List<String> loggedSql = LoggedSql.stop();
+    if (isPostgresCompatible()) {
+      // TBD
+    } else {
+      assertThat(loggedSql.get(0)).contains("select distinct t0.id "
+        + "from tree_node t0 "
+        + "join tree_node u1 on u1.parent_id = t0.id "
+        + "join e_basic u1_ref on u1_ref.id = u1.soft_ref "
+        + "join e_basic u2 on u2.id = u1_ref.id where u2.id is not null");
+    }
+    LoggedSql.start();
+    DB.find(TreeNode.class).select("id")
+      .where().isNull("children.ref.id")
+      .findList();
+
+    loggedSql = LoggedSql.stop();
+    if (isPostgresCompatible()) {
+      // TBD
+    } else {
+      assertThat(loggedSql.get(0)).contains("select distinct t0.id "
+        + "from tree_node t0 "
+        + "left join tree_node u1 on u1.parent_id = t0.id "
+        + "left join e_basic u1_ref on u1_ref.id = u1.soft_ref "
+        + "left join e_basic u2 on u2.id = u1_ref.id where u2.id is null");
+    }
   }
 
 }
