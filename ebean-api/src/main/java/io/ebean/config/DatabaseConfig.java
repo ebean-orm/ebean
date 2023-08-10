@@ -503,6 +503,11 @@ public class DatabaseConfig {
   private boolean queryPlanEnable;
 
   /**
+   * Additional platform specific options for query-plan generation.
+   */
+  private String queryPlanOptions;
+
+  /**
    * The default threshold in micros for collecting query plans.
    */
   private long queryPlanThresholdMicros = Long.MAX_VALUE;
@@ -2878,6 +2883,7 @@ public class DatabaseConfig {
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     queryPlanEnable = p.getBoolean("queryPlan.enable", queryPlanEnable);
+    queryPlanOptions = p.get("queryPlan.options", queryPlanOptions);
     queryPlanThresholdMicros = p.getLong("queryPlan.thresholdMicros", queryPlanThresholdMicros);
     queryPlanCapture = p.getBoolean("queryPlan.capture", queryPlanCapture);
     queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
@@ -3275,6 +3281,20 @@ public class DatabaseConfig {
    */
   public void setQueryPlanEnable(boolean queryPlanEnable) {
     this.queryPlanEnable = queryPlanEnable;
+  }
+
+  /**
+   * Returns platform specific query plan options.
+   */
+  public String getQueryPlanOptions() {
+    return queryPlanOptions;
+  }
+
+  /**
+   * Set platform specific query plan options.
+   */
+  public void setQueryPlanOptions(String queryPlanOptions) {
+    this.queryPlanOptions = queryPlanOptions;
   }
 
   /**
