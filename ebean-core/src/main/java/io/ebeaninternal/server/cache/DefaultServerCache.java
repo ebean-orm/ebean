@@ -6,6 +6,7 @@ import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
+import io.ebean.metric.Metric;
 import io.ebean.metric.MetricFactory;
 
 import java.io.Serializable;
@@ -48,6 +49,7 @@ public class DefaultServerCache implements ServerCache {
   protected final CountMetric idleCount;
   protected final CountMetric ttlCount;
   protected final CountMetric lruCount;
+  protected final Metric sizeCount;
   protected final String name;
   protected final String shortName;
   protected final int maxSize;
@@ -81,6 +83,7 @@ public class DefaultServerCache implements ServerCache {
     this.idleCount = factory.createCountMetric(prefix + shortName + ".idle");
     this.ttlCount = factory.createCountMetric(prefix + shortName + ".ttl");
     this.lruCount = factory.createCountMetric(prefix + shortName + ".lru");
+    this.sizeCount = factory.createMetric(prefix + shortName + ".size", map::size);
 
   }
 
@@ -103,6 +106,7 @@ public class DefaultServerCache implements ServerCache {
     idleCount.visit(visitor);
     ttlCount.visit(visitor);
     lruCount.visit(visitor);
+    sizeCount.visit(visitor);
   }
 
   @Override
