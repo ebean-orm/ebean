@@ -2,11 +2,11 @@ package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbReadContext;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebeaninternal.server.bind.DataBind;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -25,6 +25,11 @@ final class IdBinderEmpty implements IdBinder {
 
   @Override
   public void initialise() {
+  }
+
+  @Override
+  public String idSelect() {
+    return "";
   }
 
   @Override

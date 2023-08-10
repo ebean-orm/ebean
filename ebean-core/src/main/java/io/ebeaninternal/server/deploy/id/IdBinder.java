@@ -26,6 +26,8 @@ public interface IdBinder {
    */
   void initialise();
 
+  String idSelect();
+
   /**
    * Return true if this is a compound key and must use expanded and or form.
    */

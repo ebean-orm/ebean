@@ -46,6 +46,11 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
+  public String idSelect() {
+    return embIdProperty.name();
+  }
+
+  @Override
   public boolean isIdInExpandedForm() {
     return idInExpandedForm;
   }
