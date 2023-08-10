@@ -2182,12 +2182,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Set<Property> checkUniqueness(Object bean) {
-    return checkUniqueness(bean, null);
-  }
-
-  @Override
-  public Set<Property> checkUniqueness(Object bean, @Nullable Transaction transaction) {
+  public Set<Property> checkUniqueness(Object bean, @Nullable Transaction transaction, boolean useQueryCache, boolean skipClean) {
     EntityBean entityBean = checkEntityBean(bean);
     BeanDescriptor<?> beanDesc = descriptor(entityBean.getClass());
     BeanProperty idProperty = beanDesc.idProperty();
@@ -2199,13 +2194,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (entityBean._ebean_getIntercept().isNew() && id != null) {
       // Primary Key is changeable only on new models - so skip check if we are not new
       Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
+      query.setUseQueryCache(useQueryCache);
       query.setId(id);
-      if (findCount(query, transaction) > 0) {
+      if (exists(query, transaction)) {
         return Collections.singleton(idProperty);
       }
     }
     for (BeanProperty[] props : beanDesc.uniqueProps()) {
-      Set<Property> ret = checkUniqueness(entityBean, beanDesc, props, transaction);
+      Set<Property> ret = checkUniqueness(entityBean, beanDesc, props, transaction, useQueryCache, skipClean);
       if (ret != null) {
         return ret;
       }
@@ -2214,12 +2210,33 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   /**
+   * Checks, if any property is dirty.
+   */
+  private boolean isAnyPropertyDirty(EntityBean entityBean, BeanProperty[] props) {
+    if (entityBean._ebean_getIntercept().isNew()) {
+      return true;
+    }
+    for (BeanProperty prop : props) {
+      if (entityBean._ebean_getIntercept().isDirtyProperty(prop.propertyIndex())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
   @Nullable
-  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, @Nullable Transaction transaction) {
+  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, @Nullable Transaction transaction,
+                                        boolean useQueryCache, boolean skipClean) {
+    if (skipClean && !isAnyPropertyDirty(entityBean, props)) {
+      return null;
+    }
+
     BeanProperty idProperty = beanDesc.idProperty();
     Query<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
+    query.setUseQueryCache(useQueryCache);
     ExpressionList<?> exprList = query.where();
     if (!entityBean._ebean_getIntercept().isNew()) {
       // if model is not new, exclude ourself.
@@ -2232,7 +2249,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
       exprList.eq(prop.name(), value);
     }
-    if (findCount(query, transaction) > 0) {
+    if (exists(query, transaction)) {
       Set<Property> ret = new LinkedHashSet<>();
       Collections.addAll(ret, props);
       return ret;
