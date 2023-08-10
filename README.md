@@ -1,25 +1,26 @@
 
-[![Build](https://github.com/ebean-orm/ebean/actions/workflows/build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/build.yml)
+[![Build](https://github.com/FOCONIS/ebean/actions/workflows/build.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/build.yml)
 [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ebean-orm/ebean/blob/master/LICENSE)
-[![Multi-JDK Build](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/FOCONIS/ebean/blob/master/LICENSE)
+[![Multi-JDK Build](https://github.com/FOCONIS/ebean/actions/workflows/multi-jdk-build.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/multi-jdk-build.yml)
 
 ##### Build with database platforms
-[![H2Database](https://github.com/ebean-orm/ebean/actions/workflows/h2database.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/h2database.yml)
-[![Postgres](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/postgres.yml)
-[![MySql](https://github.com/ebean-orm/ebean/actions/workflows/mysql.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mysql.yml)
-[![MariaDB](https://github.com/ebean-orm/ebean/actions/workflows/mariadb.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/mariadb.yml)
-[![Oracle](https://github.com/ebean-orm/ebean/actions/workflows/oracle.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/oracle.yml)
-[![SqlServer](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/sqlserver.yml)
-[![DB2 LUW](https://github.com/ebean-orm/ebean/actions/workflows/db2luw.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/db2luw.yml)
-[![Yugabyte](https://github.com/ebean-orm/ebean/actions/workflows/yugabyte.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/yugabyte.yml)
+[![H2Database](https://github.com/FOCONIS/ebean/actions/workflows/h2database.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/h2database.yml)
+[![Postgres](https://github.com/FOCONIS/ebean/actions/workflows/postgres.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/postgres.yml)
+[![MySql](https://github.com/FOCONIS/ebean/actions/workflows/mysql.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/mysql.yml)
+[![MariaDB](https://github.com/FOCONIS/ebean/actions/workflows/mariadb.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/mariadb.yml)
+[![Oracle](https://github.com/FOCONIS/ebean/actions/workflows/oracle.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/oracle.yml)
+[![SqlServer](https://github.com/FOCONIS/ebean/actions/workflows/sqlserver.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/sqlserver.yml)
+[![DB2 LUW](https://github.com/FOCONIS/ebean/actions/workflows/db2luw.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/db2luw.yml)
+[![Yugabyte](https://github.com/FOCONIS/ebean/actions/workflows/yugabyte.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/yugabyte.yml)
+
 
 ##### Build with Java Early Access versions
-[![ebean EA](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/jdk-ea.yml)
-[![datasource EA](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-datasource/actions/workflows/jdk-ea.yml)
-[![migration EA](https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-migration/actions/workflows/jdk-ea.yml)
-[![test-docker EA](https://github.com/ebean-orm/ebean-test-docker/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-test-docker/actions/workflows/jdk-ea.yml)
-[![ebean-agent EA](https://github.com/ebean-orm/ebean-agent/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/ebean-orm/ebean-agent/actions/workflows/jdk-ea.yml)
+[![ebean EA](https://github.com/FOCONIS/ebean/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/FOCONIS/ebean/actions/workflows/jdk-ea.yml)
+[![datasource EA](https://github.com/FOCONIS/ebean-datasource/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/FOCONIS/ebean-datasource/actions/workflows/jdk-ea.yml)
+[![migration EA](https://github.com/FOCONIS/ebean-migration/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/FOCONIS/ebean-migration/actions/workflows/jdk-ea.yml)
+[![test-docker EA](https://github.com/FOCONIS/ebean-test-docker/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/FOCONIS/ebean-test-docker/actions/workflows/jdk-ea.yml)
+[![ebean-agent EA](https://github.com/FOCONIS/ebean-agent/actions/workflows/jdk-ea.yml/badge.svg)](https://github.com/FOCONIS/ebean-agent/actions/workflows/jdk-ea.yml)
 
 ----------------------
 
