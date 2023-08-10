@@ -654,6 +654,14 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * BeanTables have all been created.
    */
   private void readEntityDeploymentInitial() {
+    for (Class<?> extensionClass : bootupClasses.getEntityExtensionList()) {
+      try {
+        // TODO: load class in an early stage
+        extensionClass.getField("_ebean_props").get(null);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
     for (Class<?> entityClass : bootupClasses.getEntities()) {
       DeployBeanInfo<?> info = createDeployBeanInfo(entityClass);
       deployInfoMap.put(entityClass, info);
@@ -1178,11 +1186,12 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     // set bean controller, finder and listener
     setBeanControllerFinderListener(desc);
     deplyInherit.process(desc);
-    desc.checkInheritanceMapping();
 
     createProperties.createProperties(desc);
     DeployBeanInfo<T> info = new DeployBeanInfo<>(deployUtil, desc);
     readAnnotations.readInitial(info);
+
+    desc.checkInheritanceMapping();
     return info;
   }
 

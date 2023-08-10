@@ -302,7 +302,7 @@
   <build>
     <plugins>
 
-      <plugin>
+<!--      <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
         <version>2.40</version>
@@ -312,8 +312,32 @@
             <tile>io.ebean.tile:enhancement:14.7.1</tile>
           </tiles>
         </configuration>
-      </plugin>
+      </plugin>-->
+      <plugin>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-maven-plugin</artifactId>
+        <version>${ebean-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>process-test-classes</phase>
+            <configuration>
+              <transformArgs>debug=0</transformArgs>
+            </configuration>
+            <goals>
+              <goal>testEnhance</goal>
+            </goals>
+          </execution>
 
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>ebean-agent</artifactId>
+            <version>${ebean-agent.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
     </plugins>
   </build>
 

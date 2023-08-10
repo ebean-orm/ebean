@@ -53,7 +53,7 @@
     <ebean-migration.version>14.2.0</ebean-migration.version>
     <ebean-test-containers.version>7.4</ebean-test-containers.version>
     <ebean-datasource.version>9.0</ebean-datasource.version>
-    <ebean-agent.version>14.7.1</ebean-agent.version>
+    <ebean-agent.version>14.5.2-FOC1</ebean-agent.version>
     <ebean-maven-plugin.version>14.7.1</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
@@ -103,6 +103,66 @@
   </modules>
 
   <profiles>
+    <profile>
+      <id>foconis</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>foconis-release</id>
+          <name>FOCONIS Release Repository</name>
+          <url>https://mvnrepo.foconis.de/repository/release/</url>
+        </repository>
+        <snapshotRepository>
+          <id>foconis-snapshot</id>
+          <name>FOCONIS Snapshot Repository</name>
+          <url>https://mvnrepo.foconis.de/repository/snapshot/</url>
+        </snapshotRepository>
+      </distributionManagement>
+      <repositories>
+        <repository>
+          <id>foconis-release</id>
+          <url>https://mvnrepo.foconis.de/repository/release/</url>
+        </repository>
+        <repository>
+          <id>foconis-snapshot</id>
+          <url>https://mvnrepo.foconis.de/repository/snapshot/</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>foconis-release</id>
+          <url>https://mvnrepo.foconis.de/repository/release/</url>
+        </pluginRepository>
+        <pluginRepository>
+          <id>foconis-snapshot</id>
+          <url>https://mvnrepo.foconis.de/repository/snapshot/</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+    <profile>
+      <id>github</id>
+      <distributionManagement>
+        <repository>
+          <id>github-release</id>
+          <name>FOCONIS Github Release Repository</name>
+          <url>https://maven.pkg.github.com/foconis/ebean</url>
+        </repository>
+      </distributionManagement>
+      <repositories>
+        <repository>
+          <id>github-release</id>
+          <url>https://maven.pkg.github.com/foconis/ebean-agent</url>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>github-release</id>
+          <url>https://maven.pkg.github.com/foconis/ebean-agent</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
     <profile>
       <id>central</id>
     </profile>
