@@ -19,6 +19,7 @@ import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetricNamingMatch;
+import io.ebean.plugin.CustomDeployParser;
 import io.ebean.util.StringHelper;
 import jakarta.persistence.EnumType;
 
@@ -417,6 +418,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
   private final List<BulkTableEventListener> bulkTableEventListeners = new ArrayList<>();
   private final List<ServerConfigStartup> configStartupListeners = new ArrayList<>();
+  private final List<CustomDeployParser> customDeployParsers = new ArrayList<>();
 
   /**
    * By default inserts are included in the change log.
@@ -2034,6 +2036,23 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     return configStartupListeners;
   }
 
+  @Override
+  public DatabaseConfig addCustomDeployParser(CustomDeployParser customDeployParser) {
+    customDeployParsers.add(customDeployParser);
+    return this;
+  }
+
+  @Override
+  public List<CustomDeployParser> getCustomDeployParsers() {
+    return customDeployParsers;
+  }
+
+  /**
+   * Register all the BeanPersistListener instances.
+   * <p>
+   * Note alternatively you can use {@link #add(BeanPersistListener)} to add
+   * BeanPersistListener instances one at a time.
+   */
   @Override
   public DatabaseConfig setPersistListeners(List<BeanPersistListener> persistListeners) {
     this.persistListeners = persistListeners;
