@@ -45,7 +45,7 @@ abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
   @Override
   public final Collection underlying(Object value) {
     if (value instanceof BeanCollection) {
-      return ((BeanCollection)value).getActualDetails();
+      return ((BeanCollection)value).actualDetails();
     } else {
       return (Collection)value;
     }

@@ -130,9 +130,9 @@ class MultiTenantPartitionTest extends BaseTestCase {
     config.setCurrentTenantProvider(new CurrentTenant());
     config.setTenantMode(TenantMode.PARTITION);
 
-    config.getClasses().add(MtTenant.class);
-    config.getClasses().add(MtContent.class);
-    config.getClasses().add(MtNone.class);
+    config.addClass(MtTenant.class);
+    config.addClass(MtContent.class);
+    config.addClass(MtNone.class);
 
     return DatabaseFactory.create(config);
   }

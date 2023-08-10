@@ -22,6 +22,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import static java.lang.System.Logger.Level.DEBUG;
@@ -79,9 +80,9 @@ public class BootupClasses implements Predicate<Class<?>> {
   public BootupClasses() {
   }
 
-  public BootupClasses(List<Class<?>> list) {
-    if (list != null) {
-      for (Class<?> cls : list) {
+  public BootupClasses(Set<Class<?>> classes) {
+    if (classes != null) {
+      for (Class<?> cls : classes) {
         test(cls);
       }
     }
@@ -342,8 +343,9 @@ public class BootupClasses implements Predicate<Class<?>> {
    */
   @SuppressWarnings("unchecked")
   private boolean isInterestingInterface(Class<?> cls) {
-    if (Modifier.isAbstract(cls.getModifiers())) {
-      // do not include abstract classes as we can
+    if (Modifier.isAbstract(cls.getModifiers())
+      || !(Modifier.isPublic(cls.getModifiers()) || Modifier.isProtected(cls.getModifiers()))) {
+      // do not include abstract and non pupbic/protected classes as we can
       // not instantiate them
       return false;
     }

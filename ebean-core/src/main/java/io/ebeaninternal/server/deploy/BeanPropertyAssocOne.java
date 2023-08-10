@@ -197,7 +197,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         if (assocBean != null) {
           Object parentId = targetDescriptor.id(assocBean);
           if (parentId != null) {
-            changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), parentId);
+            final String parentKey = targetDescriptor.cacheKey(parentId);
+            changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), parentKey);
           }
         }
       }
@@ -407,7 +408,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public Object getCacheDataValueOrig(EntityBeanIntercept ebi) {
-    return cacheDataConvert(ebi.getOrigValue(propertyIndex));
+    return cacheDataConvert(ebi.origValue(propertyIndex));
   }
 
   @Override
@@ -655,7 +656,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void setValue(EntityBean bean, Object value) {
     super.setValue(bean, value);
-    if (embedded && value instanceof EntityBean) {
+    if (!id && embedded && value instanceof EntityBean) {
       setEmbeddedOwner(bean, value);
     }
   }
@@ -663,7 +664,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void setValueIntercept(EntityBean bean, Object value) {
     super.setValueIntercept(bean, value);
-    if (embedded && value instanceof EntityBean) {
+    if (!id && embedded && value instanceof EntityBean) {
       setEmbeddedOwner(bean, value);
     }
   }
@@ -675,8 +676,10 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     Object emb = getValue(owner);
     if (emb != null) {
       EntityBean embeddedBean = (EntityBean) emb;
-      embeddedBean._ebean_getIntercept().setEmbeddedOwner(owner, propertyIndex);
       targetDescriptor.setAllLoaded(embeddedBean);
+      if (!id) {
+        embeddedBean._ebean_getIntercept().setEmbeddedOwner(owner, propertyIndex);
+      }
     }
   }
 
@@ -784,14 +787,20 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void jsonRead(SpiJsonReader readJson, EntityBean bean) throws IOException {
     if (jsonDeserialize && targetDescriptor != null) {
-      T target = (T) value(bean);
+      // CHECKME: may we skip reading the object from the json stream?
+      T target = readJson.update() ? (T) getValue(bean) : null;
       T assocBean = targetDescriptor.jsonRead(readJson, name, target);
-      if (readJson.intercept()) {
+      if (readJson.update()) {
         setValueIntercept(bean, assocBean);
       } else {
         setValue(bean, assocBean);
       }
     }
+  }
+
+  @Override
+  public Object jsonRead(SpiJsonReader readJson) throws IOException {
+    return targetDescriptor.jsonRead(readJson, name, null);
   }
 
   public boolean isReference(Object detailBean) {

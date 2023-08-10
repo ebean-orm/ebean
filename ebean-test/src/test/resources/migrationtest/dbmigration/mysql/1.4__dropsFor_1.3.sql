@@ -77,6 +77,14 @@ create trigger table_history_del before delete on `table` for each row begin
     insert into table_history (sys_period_start,sys_period_end,`index`, `from`, `to`, `varchar`, `select`, `foreign`) values (OLD.sys_period_start, now(6),OLD.`index`, OLD.`from`, OLD.`to`, OLD.`varchar`, OLD.`select`, OLD.`foreign`);
 end$$
 unlock tables;
+drop table if exists drop_main;
+drop table if exists drop_main_drop_ref_many;
+drop table if exists drop_ref_many;
+drop table if exists drop_ref_one;
+drop table if exists migtest_e_test_binary;
+drop table if exists migtest_e_test_json;
+drop table if exists migtest_e_test_lob;
+drop table if exists migtest_e_test_varchar;
 drop table if exists migtest_e_user;
 drop table if exists migtest_mtm_c_migtest_mtm_m;
 drop table if exists migtest_mtm_m_migtest_mtm_c;

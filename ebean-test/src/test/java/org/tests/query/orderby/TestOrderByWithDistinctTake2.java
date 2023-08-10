@@ -60,9 +60,9 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     String generatedSql = sqlOf(query);
 
     if (platformDistinctOn()) {
-      assertThat(generatedSql).contains("select distinct on (t0.name, t0.id) t0.id, t0.name, t0.id");
+      assertThat(generatedSql).contains("select distinct on (t0.name, t0.id) t0.id, t0.name");
     } else {
-      assertThat(generatedSql).contains("select distinct t0.id, t0.name, t0.id");
+      assertThat(generatedSql).contains("select distinct t0.id, t0.name");
     }
     assertThat(generatedSql).contains("order by t0.name, t0.id desc");
     assertThat(generatedSql).contains("from o_customer t0 join contact u1 on u1.customer_id = t0.id");

@@ -1,10 +1,10 @@
 package org.tests.query.other;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -34,7 +34,7 @@ public class TestQueryDistinct extends BaseTestCase {
 
       EntityBeanIntercept ebi = ((EntityBean) customer)._ebean_getIntercept();
       assertTrue(ebi.isDisableLazyLoad());
-      assertNull(ebi.getPersistenceContext());
+      assertNull(ebi.persistenceContext());
 
       // lazy loading disabled
       assertNull(customer.getId());

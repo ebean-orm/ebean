@@ -55,6 +55,6 @@ final class MergeNodeAssocOne extends MergeNode {
   }
 
   private EntityBean getEntityBean(Object bean) {
-    return (EntityBean) one.value(bean);
+    return (EntityBean) one.getValue((EntityBean)bean);
   }
 }

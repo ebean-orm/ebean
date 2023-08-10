@@ -1,4 +1,0 @@
-ebean:
-  test:
-    platform: h2
-

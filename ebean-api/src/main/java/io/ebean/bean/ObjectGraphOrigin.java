@@ -28,38 +28,38 @@ public final class ObjectGraphOrigin implements Serializable {
     this.callOrigin = callOrigin;
     this.beanType = beanType;
     this.queryHash = queryHash;
-    this.key = callOrigin.getOriginKey(queryHash);
+    this.key = callOrigin.key(queryHash);
   }
 
   /**
    * The key includes the queryPlan hash and the callStack hash. This becomes
    * the unique identifier for a query point.
    */
-  public String getKey() {
+  public String key() {
     return key;
   }
 
   /**
    * The type of bean the query is fetching.
    */
-  public String getBeanType() {
+  public String beanType() {
     return beanType;
   }
 
   /**
    * The call stack involved.
    */
-  public CallOrigin getCallOrigin() {
+  public CallOrigin callOrigin() {
     return callOrigin;
   }
 
-  public String getTopElement() {
-    return callOrigin.getTopElement();
+  public String top() {
+    return callOrigin.top();
   }
 
   @Override
   public String toString() {
-    return "key[" + key + "] type[" + beanType + "] " + callOrigin.getTopElement();
+    return "key[" + key + "] type[" + beanType + "] " + callOrigin.top();
   }
 
   @Override

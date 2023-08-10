@@ -57,7 +57,7 @@ class TestTypeManager extends BaseTest {
       typeManager.enumType(MyEnum.class, EnumType.STRING);
       fail("never get here");
     } catch (IllegalStateException e) {
-      assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
+      assertThat(e.getMessage()).contains("It is mapped using 2 of (ORDINAL, STRING or an Ebean mapping) when only one is supported.");
     }
   }
 
@@ -91,7 +91,7 @@ class TestTypeManager extends BaseTest {
       typeManager.enumType(MyDayOfWeek.class, EnumType.ORDINAL);
       fail("never get here");
     } catch (IllegalStateException e) {
-      assertThat(e.getMessage()).contains("It is mapped using 2 different modes when only one is supported");
+      assertThat(e.getMessage()).contains("It is mapped using 2 of (ORDINAL, STRING or an Ebean mapping) when only one is supported.");
     }
   }
 

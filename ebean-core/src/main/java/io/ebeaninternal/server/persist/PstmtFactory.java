@@ -21,7 +21,7 @@ final class PstmtFactory {
    * Get a callable statement without any batching.
    */
   CallableStatement cstmt(SpiTransaction t, String sql) throws SQLException {
-    Connection conn = t.getInternalConnection();
+    Connection conn = t.internalConnection();
     return conn.prepareCall(sql);
   }
 
@@ -29,7 +29,7 @@ final class PstmtFactory {
    * Get a prepared statement without any batching.
    */
   PreparedStatement pstmt(SpiTransaction t, String sql, boolean getGeneratedKeys) throws SQLException {
-    Connection conn = t.getInternalConnection();
+    Connection conn = t.internalConnection();
     if (getGeneratedKeys) {
       return conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
     } else {
@@ -41,7 +41,7 @@ final class PstmtFactory {
    * Return a prepared statement taking into account batch requirements.
    */
   PreparedStatement pstmtBatch(SpiTransaction t, String sql, BatchPostExecute batchExe) throws SQLException {
-    BatchedPstmtHolder batch = t.getBatchControl().pstmtHolder();
+    BatchedPstmtHolder batch = t.batchControl().pstmtHolder();
     BatchedPstmt existingStmt = batch.batchedPstmt(sql);
     if (existingStmt != null) {
       if (existingStmt.isEmpty() && t.isLogSql()) {
@@ -52,7 +52,7 @@ final class PstmtFactory {
     if (t.isLogSql()) {
       t.logSql(TrimLogSql.trim(sql));
     }
-    Connection conn = t.getInternalConnection();
+    Connection conn = t.internalConnection();
     PreparedStatement stmt = conn.prepareStatement(sql);
     BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, t);
     batch.addStmt(bs, batchExe);
@@ -63,7 +63,7 @@ final class PstmtFactory {
    * Return a callable statement taking into account batch requirements.
    */
   CallableStatement cstmtBatch(SpiTransaction t, boolean logSql, String sql, BatchPostExecute batchExe) throws SQLException {
-    BatchedPstmtHolder batch = t.getBatchControl().pstmtHolder();
+    BatchedPstmtHolder batch = t.batchControl().pstmtHolder();
     CallableStatement stmt = (CallableStatement) batch.stmt(sql, batchExe);
     if (stmt != null) {
       return stmt;
@@ -71,7 +71,7 @@ final class PstmtFactory {
     if (logSql) {
       t.logSql(sql);
     }
-    Connection conn = t.getInternalConnection();
+    Connection conn = t.internalConnection();
     stmt = conn.prepareCall(sql);
     BatchedPstmt bs = new BatchedPstmt(stmt, false, sql, t);
     batch.addStmt(bs, batchExe);

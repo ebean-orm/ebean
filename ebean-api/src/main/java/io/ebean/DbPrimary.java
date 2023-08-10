@@ -76,9 +76,9 @@ final class DbPrimary {
     defaultServerName = System.getProperty("db", defaultServerName);
     defaultServerName = System.getProperty("ebean_db", defaultServerName);
     if (isEmpty(defaultServerName)) {
-      defaultServerName = Config.get("datasource.default", null);
+      defaultServerName = Config.getOptional("datasource.default").orElse(null);
       if (isEmpty(defaultServerName)) {
-        defaultServerName = Config.get("ebean.default.datasource", null);
+        defaultServerName = Config.getOptional("ebean.default.datasource").orElse(null);
       }
     }
     if (defaultServerName == null) {

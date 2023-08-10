@@ -3,7 +3,7 @@ package io.ebean.test.config.provider;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.EncryptKeyManager;
 
-class FixedEncryptKeyManager implements EncryptKeyManager {
+final class FixedEncryptKeyManager implements EncryptKeyManager {
 
   private final FixedEncryptKey key;
 

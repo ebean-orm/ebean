@@ -24,7 +24,7 @@ public class BeanDescriptor_registerTest {
     config.setDdlExtra(false);
     config.setRegister(false);
     config.setDefaultServer(false);
-    config.getClasses().add(EBasic.class);
+    config.addClass(EBasic.class);
 
     SpiEbeanServer ebeanServer = (SpiEbeanServer)DatabaseFactory.create(config);
     try {

@@ -64,4 +64,11 @@ public class DbOrderByTrimTest {
     assertEquals("foo", DbOrderByTrim.trim("foo desc nulls last"));
   }
 
+  @Test
+  void trim_nulls_withAggFunction() {
+    assertEquals("min(customer)", DbOrderByTrim.trim("min(customer) asc nulls last"));
+    assertEquals("foo,min(customer)", DbOrderByTrim.trim("foo,min(customer) asc nulls last"));
+    assertEquals("bar,min(customer)", DbOrderByTrim.trim("bar desc,min(customer) asc nulls last"));
+  }
+
 }

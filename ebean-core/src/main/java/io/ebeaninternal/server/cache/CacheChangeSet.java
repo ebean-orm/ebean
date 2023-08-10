@@ -91,15 +91,15 @@ public final class CacheChangeSet {
   /**
    * Add many property remove.
    */
-  public <T> void addManyRemove(BeanDescriptor<T> desc, String manyProperty, Object parentId) {
-    many(desc, manyProperty).addRemove(parentId);
+  public <T> void addManyRemove(BeanDescriptor<T> desc, String manyProperty, String parentKey) {
+    many(desc, manyProperty).addRemove(parentKey);
   }
 
   /**
    * Add many property put.
    */
-  public <T> void addManyPut(BeanDescriptor<T> desc, String manyProperty, Object parentId, CachedManyIds entry) {
-    many(desc, manyProperty).addPut(parentId, entry);
+  public <T> void addManyPut(BeanDescriptor<T> desc, String manyProperty, String parentKey, CachedManyIds entry) {
+    many(desc, manyProperty).addPut(parentKey, entry);
   }
 
   /**
@@ -164,8 +164,8 @@ public final class CacheChangeSet {
   private static final class ManyChange implements CacheChange {
 
     final ManyKey key;
-    final Set<Object> removes = new HashSet<>();
-    final Map<Object, CachedManyIds> puts = new LinkedHashMap<>();
+    final Set<String> removes = new HashSet<>();
+    final Map<String, CachedManyIds> puts = new LinkedHashMap<>();
     boolean clear;
 
     ManyChange(ManyKey key) {
@@ -183,17 +183,17 @@ public final class CacheChangeSet {
     /**
      * Remove entry for the given parentId.
      */
-    void addRemove(Object parentId) {
+    void addRemove(String parentKey) {
       if (!clear) {
-        removes.add(parentId);
+        removes.add(parentKey);
       }
     }
 
     /**
      * Put entry for the given parentId.
      */
-    void addPut(Object parentId, CachedManyIds entry) {
-      puts.put(parentId, entry);
+    void addPut(String parentKey, CachedManyIds entry) {
+      puts.put(parentKey, entry);
     }
 
     @Override
@@ -201,11 +201,11 @@ public final class CacheChangeSet {
       if (clear) {
         key.cacheClear();
       } else {
-        for (Map.Entry<Object, CachedManyIds> entry : puts.entrySet()) {
+        for (Map.Entry<String, CachedManyIds> entry : puts.entrySet()) {
           key.cachePut(entry.getKey(), entry.getValue());
         }
-        for (Object parentId : removes) {
-          key.cacheRemove(parentId);
+        for (String parentKey : removes) {
+          key.cacheRemove(parentKey);
         }
       }
     }
@@ -241,12 +241,12 @@ public final class CacheChangeSet {
       desc.cacheManyPropClear(manyProperty);
     }
 
-    void cachePut(Object parentId, CachedManyIds entry) {
-      desc.cacheManyPropPut(manyProperty, parentId, entry);
+    void cachePut(String parentKey, CachedManyIds entry) {
+      desc.cacheManyPropPut(manyProperty, parentKey, entry);
     }
 
-    void cacheRemove(Object parentId) {
-      desc.cacheManyPropRemove(manyProperty, parentId);
+    void cacheRemove(String parentKey) {
+      desc.cacheManyPropRemove(manyProperty, parentKey);
     }
   }
 }

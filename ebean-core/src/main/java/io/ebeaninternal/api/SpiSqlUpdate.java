@@ -7,12 +7,12 @@ public interface SpiSqlUpdate extends SqlUpdate {
   /**
    * Return the sql taking into account bind parameter expansion.
    */
-  String getBaseSql();
+  String baseSql();
 
   /**
    * Return the Bind parameters.
    */
-  BindParams getBindParams();
+  BindParams bindParams();
 
   /**
    * Set the final sql being executed with named parameters replaced etc.

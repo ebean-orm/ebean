@@ -102,17 +102,17 @@ public final class ManyWhereJoins implements Serializable {
   /**
    * Return the set of many where joins.
    */
-  public Collection<PropertyJoin> getPropertyJoins() {
+  public Collection<PropertyJoin> propertyJoins() {
     return joins.values();
   }
 
   /**
    * Return the set of property names for the many where joins.
    */
-  public TreeSet<String> getPropertyNames() {
+  public TreeSet<String> propertyNames() {
     TreeSet<String> propertyNames = new TreeSet<>();
     for (PropertyJoin join : joins.values()) {
-      propertyNames.add(join.getProperty());
+      propertyNames.add(join.property());
     }
     return propertyNames;
   }
@@ -138,7 +138,7 @@ public final class ManyWhereJoins implements Serializable {
   /**
    * Return the formula properties to build the select clause for a findCount query.
    */
-  public List<String> getFormulaJoinProperties(String prefix) {
+  public List<String> formulaJoinProperties(String prefix) {
     return formulaJoinProperties.get(prefix);
   }
 

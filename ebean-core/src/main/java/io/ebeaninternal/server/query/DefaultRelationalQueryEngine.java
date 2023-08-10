@@ -130,7 +130,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
     ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
     try {
       request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
-      final DataReader dataReader = binder.createDataReader(request.getResultSet());
+      final DataReader dataReader = binder.createDataReader(request.resultSet());
       T value = null;
       if (dataReader.next()) {
         value = scalarType.read(dataReader);
@@ -152,7 +152,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
     ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
     try {
       request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
-      final DataReader dataReader = binder.createDataReader(request.getResultSet());
+      final DataReader dataReader = binder.createDataReader(request.resultSet());
       List<T> rows = new ArrayList<>();
       while (dataReader.next()) {
         rows.add(scalarType.read(dataReader));
@@ -174,7 +174,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
     ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
     try {
       request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
-      final DataReader dataReader = binder.createDataReader(request.getResultSet());
+      final DataReader dataReader = binder.createDataReader(request.resultSet());
       while (dataReader.next()) {
         consumer.accept(scalarType.read(dataReader));
       }

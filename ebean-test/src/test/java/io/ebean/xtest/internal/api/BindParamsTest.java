@@ -17,7 +17,7 @@ public class BindParamsTest {
 
     List<String> ids = Arrays.asList("1", "2", "3");
     bindParams.setParameter("ids", ids);
-    BindParams.Param param = bindParams.getParameter("ids");
+    BindParams.Param param = bindParams.parameter("ids");
     assertEquals(3, param.queryBindCount());
     assertFalse(bindParams.isSameBindHash());
     bindParams.updateHash();

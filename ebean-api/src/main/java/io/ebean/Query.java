@@ -4,6 +4,7 @@ import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 
 import javax.persistence.NonUniqueResultException;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
@@ -684,6 +685,18 @@ public interface Query<T> extends CancelableQuery {
    * Execute the query using the given database.
    */
   Query<T> usingDatabase(Database database);
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  Query<T> usingMaster();
 
   /**
    * Execute the query returning the list of Id's.
@@ -1372,13 +1385,9 @@ public interface Query<T> extends CancelableQuery {
   Query<T> orderBy(String orderByClause);
 
   /**
-   * Set the order by clause replacing the existing order by clause if there is
-   * one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19")
   default Query<T> order(String orderByClause) {
     return orderBy(orderByClause);
   }
@@ -1395,14 +1404,9 @@ public interface Query<T> extends CancelableQuery {
   OrderBy<T> orderBy();
 
   /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * <p>
-   * This is the same as <code>orderBy()</code>
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19")
   default OrderBy<T> order() {
     return orderBy();
   }
@@ -1413,8 +1417,9 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setOrderBy(OrderBy<T> orderBy);
 
   /**
-   * Set an OrderBy object to replace any existing OrderBy clause.
+   * Deprecated migrate to setOrderBy().
    */
+  @Deprecated(since = "13.19")
   default Query<T> setOrder(OrderBy<T> orderBy) {
     return setOrderBy(orderBy);
   }
@@ -1578,14 +1583,6 @@ public interface Query<T> extends CancelableQuery {
    * When set to true when you want the returned beans to be read only.
    */
   Query<T> setReadOnly(boolean readOnly);
-
-  /**
-   * Deprecated - migrate to use setBeanCacheMode(CacheMode.PUT) or other CacheMode.
-   * <p>
-   * When set to true all the beans from this query are loaded into the bean cache.
-   */
-  @Deprecated
-  Query<T> setLoadBeanCache(boolean loadBeanCache);
 
   /**
    * Set a timeout on this query.
@@ -1768,4 +1765,31 @@ public interface Query<T> extends CancelableQuery {
    */
   Query<T> orderById(boolean orderById);
 
+  /**
+   * Type safe query bean properties and expressions (marker interface).
+   * <p>
+   * Implemented by query bean properties and expressions based on those properties.
+   * <p>
+   * The base type determines which {@link StdOperators} can be used on the property.
+   *
+   * @param <T> The property type.
+   */
+  interface Property<T> {
+
+    /**
+     * Return a property given the expression.
+     */
+    static <T> Property<T> of(String expression) {
+      return new SimpleProperty<>(expression);
+    }
+
+    /**
+     * Return the property in string expression form.
+     * <p>
+     * This is a path to a database column (like "name" or "billingAddress.city") or a function
+     * wrapping a path (like <em>lower(name)</em>, <em>concat(name, '-', billingAddress.city)</em>
+     */
+    @Override
+    String toString();
+  }
 }

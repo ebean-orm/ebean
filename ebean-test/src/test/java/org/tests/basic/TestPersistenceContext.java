@@ -1,8 +1,11 @@
 package org.tests.basic;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.DatabaseFactory;
+import io.ebean.QueryIterator;
 import io.ebean.Transaction;
+import io.ebean.config.DatabaseConfig;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiPersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Disabled;
@@ -12,15 +15,17 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.WeakHashMap;
+import javax.persistence.Embeddable;
+import javax.persistence.EmbeddedId;
+import javax.persistence.Entity;
+import javax.validation.constraints.Size;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestPersistenceContext extends BaseTestCase {
+public class TestPersistenceContext extends BaseTestCase {
 
   @Test
   void testReload() {
@@ -160,7 +165,7 @@ class TestPersistenceContext extends BaseTestCase {
         lastBean[0] = customer;
       });
 
-      SpiPersistenceContext pc = ((SpiTransaction) txn).getPersistenceContext();
+      SpiPersistenceContext pc = ((SpiTransaction) txn).persistenceContext();
       // the first 100 customers using strong references
       assertThat(pc.toString()).contains("Customer=size:5000 (4900 weak)");
       assertThat(pc.toString()).contains("Order=size:100 (100 weak)");
@@ -191,29 +196,135 @@ class TestPersistenceContext extends BaseTestCase {
     }
   }
 
-  @Disabled // run manually
-  @Test
-  void testPcScopes_with_findEachFindList() {
-    for (int i = 0; i < 5000; i++) {
-      Customer c = new Customer();
-      c.setName("Customer #" + i);
-      DB.save(c);
-      Order o = new Order();
-      o.setCustomer(c);
-      DB.save(o);
+  @Embeddable
+  public static class TmId {
+    private final UUID id1;
+    private final UUID id2;
+
+    public TmId(UUID id1, UUID id2) {
+      this.id1 = id1;
+      this.id2 = id2;
     }
 
-    for (int i = 0; i < 1000; i++) {
-      try (Transaction txn = DB.beginTransaction()) {
-        List<Customer> customers = new ArrayList<>();
-        DB.find(Customer.class).select("id").findEach(customers::add);
-        SpiPersistenceContext pc = ((SpiTransaction) txn).getPersistenceContext();
-        assertThat(pc.toString()).contains("Customer=size:5000 (5000 weak)");
-        customers.clear();
-        customers = DB.find(Customer.class).select("id").findList();
+    public UUID getId1() {
+      return id1;
+    }
 
-        assertThat(pc.toString()).contains("Customer=size:5000"); // We expect ALWAYS 5000 entries in the PC
+    public UUID getId2() {
+      return id2;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      TmId tmId = (TmId) o;
+      return Objects.equals(id1, tmId.id1) && Objects.equals(id2, tmId.id2);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(id1, id2);
+    }
+  }
+
+  @Entity
+  // @Cache(enableQueryCache = true, enableBeanCache = false)
+  public static class TestModel2 {
+
+    @EmbeddedId
+    private TmId id;
+    @Size(max = 255)
+    private String someData;
+
+    public String getSomeData() {
+      return someData;
+    }
+
+    public void setSomeData(String someData) {
+      this.someData = someData;
+    }
+
+    public TmId getId() {
+      return id;
+    }
+
+    public void setId(TmId id) {
+      this.id = id;
+    }
+  }
+
+  @Test
+  @Disabled
+  void initDb() {
+    DatabaseConfig config = new DatabaseConfig();
+    config.setName("h2-batch");
+    config.loadFromProperties();
+    config.setDdlExtra(false);
+    config.getDataSourceConfig().setUsername("sa");
+    config.getDataSourceConfig().setPassword("sa");
+    config.getDataSourceConfig().setUrl("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
+    config.addClass(TestModel2.class);
+    config.addClass(TmId.class);
+    DatabaseFactory.create(config);
+
+    String base = "x".repeat(240);
+    // 10 mio TestModel - each needs about 1/4 kbytes -> 2,5 GB in total
+    List<TestModel2> batch = new ArrayList<>();
+    for (int i = 0; i < 1_000_000; i++) {
+      TestModel2 m = new TestModel2();
+      TmId id = new TmId(UUID.randomUUID(), UUID.randomUUID());
+      m.setId(id);
+      m.setSomeData(base + i); // ensure we have not duplicates
+      batch.add(m);
+      if (i % 1000 == 0) {
+        DB.saveAll(batch);
+        batch.clear();
+      }
+      if (i % 100000 == 0) {
+        System.out.println(i);
       }
     }
+    DB.saveAll(batch);
+  }
+
+  @Test
+  @Disabled
+  void testFindEachFindList() {
+    DatabaseConfig config = new DatabaseConfig();
+    config.setName("h2-batch");
+    config.loadFromProperties();
+    config.setDdlRun(false);
+    config.getDataSourceConfig().setUsername("sa");
+    config.getDataSourceConfig().setPassword("sa");
+    config.getDataSourceConfig().setUrl("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
+    config.addClass(TestModel2.class);
+    config.addClass(TmId.class);
+    DatabaseFactory.create(config);
+
+    AtomicInteger i = new AtomicInteger();
+    System.out.println("Doing findEach");
+    DB.find(TestModel2.class).select("*").findEach(c -> {
+      i.incrementAndGet();
+    });
+    System.out.println("Read " + i + " entries");
+
+    i.set(0);
+    System.out.println("Doing findStream");
+    DB.find(TestModel2.class).select("*").findStream().forEach(c -> i.incrementAndGet());
+    System.out.println("Read " + i + " entries");
+
+    i.set(0);
+    System.out.println("Doing findIterate");
+    QueryIterator<TestModel2> iter = DB.find(TestModel2.class).select("*").findIterate();
+    while (iter.hasNext()) {
+      iter.next();
+      i.incrementAndGet();
+    }
+    System.out.println("Read " + i + " entries");
+
+    System.out.println("Doing FindList, will hold all entries in memory. Expect OOM with -Xmx100m.");
+    List<TestModel2> lst = DB.find(TestModel2.class).select("*").findList();
+    System.out.println("Read " + lst.size() + " entries");
   }
 }

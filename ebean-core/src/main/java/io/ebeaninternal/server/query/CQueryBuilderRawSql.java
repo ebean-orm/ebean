@@ -8,6 +8,7 @@ import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.querydefn.OrmQueryLimitRequest;
+import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.util.BindParamsParser;
 
@@ -31,7 +32,7 @@ final class CQueryBuilderRawSql {
     }
     if (!rsql.isParsed()) {
       String sql = rsql.getUnparsedSql();
-      BindParams bindParams = request.query().getBindParams();
+      BindParams bindParams = request.query().bindParams();
       if (bindParams != null && bindParams.requiresNamedParamsPrepare()) {
         // convert named parameters into positioned parameters
         sql = BindParamsParser.parse(bindParams, sql);
@@ -56,11 +57,23 @@ final class CQueryBuilderRawSql {
 
   private String buildMainQuery(String orderBy, OrmQueryRequest<?> request, CQueryPredicates predicates, SpiRawSql.Sql sql) {
     StringBuilder sb = new StringBuilder();
-    sb.append(sql.getPreFrom());
+    OrmQueryProperties ormQueryProperties = request.query().detail().getChunk(null, false);
+    if (ormQueryProperties.hasSelectClause()) {
+      boolean first = true;
+      for (String selectProperty : ormQueryProperties.getIncluded()) {
+        if (!first) {
+          sb.append(", ");
+        }
+        sb.append(selectProperty);
+        first = false;
+      }
+    } else {
+      sb.append(sql.getPreFrom());
+    }
     sb.append(" ");
 
     String s = sql.getPreWhere();
-    BindParams bindParams = request.query().getBindParams();
+    BindParams bindParams = request.query().bindParams();
     if (bindParams != null && bindParams.requiresNamedParamsPrepare()) {
       // convert named parameters into positioned parameters
       // Named Parameters only allowed prior to dynamic where

@@ -154,6 +154,11 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   <K> Map<K,T> beanCacheHitsAsMap();
 
   /**
+   * Return the bean cache hits for findMap (when all hits / no misses).
+   */
+  Set<T> beanCacheHitsAsSet();
+
+  /**
    * Reset Bean cache mode AUTO - require explicit setting for bean cache use with findList().
    */
   void resetBeanCacheAutoMode(boolean findOne);

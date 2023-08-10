@@ -7,7 +7,7 @@ import io.ebean.types.Cidr;
  *
  * @param <R> the root query bean type
  */
-public final class PCidr<R> extends PBaseValueEqual<R, Cidr> {
+public final class PCidr<R> extends PBaseString<R, Cidr> {
 
   /**
    * Construct with a property name and root instance.

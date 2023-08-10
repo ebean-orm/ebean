@@ -36,27 +36,27 @@ public interface SpiUpdatePlan {
   /**
    * Return the time this plan was created.
    */
-  long getTimeCreated();
+  long timeCreated();
 
   /**
    * Return the time this plan was last used.
    */
-  long getTimeLastUsed();
+  long timeLastUsed();
 
   /**
    * Return the hash key for this plan.
    */
-  String getKey();
+  String key();
 
   /**
    * Return the concurrency mode for this plan.
    */
-  ConcurrencyMode getMode();
+  ConcurrencyMode mode();
 
   /**
    * Return the update SQL statement.
    */
-  String getSql();
+  String sql();
 
   /**
    * Return the set of bindable update properties.

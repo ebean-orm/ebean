@@ -48,7 +48,7 @@ final class SaveManyElementCollection extends SaveManyBase {
       final SpiSqlUpdate sqlInsert = proto.copy();
       sqlInsert.setParameter(parentId);
       many.bindElementValue(sqlInsert, value);
-      persister.addToFlushQueue(sqlInsert, transaction, 2);
+      persister.addToFlushQueue(sqlInsert, transaction, BatchControl.INSERT_QUEUE);
     }
     resetModifyState();
     postElementCollectionUpdate();

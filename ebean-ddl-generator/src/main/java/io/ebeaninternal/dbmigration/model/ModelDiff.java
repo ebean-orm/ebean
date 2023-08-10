@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebeaninternal.dbmigration.migration.*;
 
 import java.util.ArrayList;
@@ -125,6 +126,21 @@ public class ModelDiff {
     // search for tables that are no longer used
     for (MTable existingTable : baseModel.getTables().values()) {
       if (!newTables.containsKey(existingTable.getName())) {
+        // Compounded foreign keys used in many-to-many mapping tables
+        existingTable.getCompoundKeys().forEach(it -> addAlterForeignKey(it.dropForeignKey(existingTable.getName())));
+        // Foreign keys through direct mapping (oneToMany)
+        existingTable.allColumns().stream()
+          .filter(it -> it.getForeignKeyIndex() != null)
+          .map(it -> {
+            AlterForeignKey fk = new AlterForeignKey();
+            fk.setName(it.getForeignKeyName());
+            fk.setIndexName(it.getForeignKeyIndex());
+            fk.setColumnNames(DdlHelp.DROP_FOREIGN_KEY);
+            fk.setTableName(existingTable.getName());
+            return fk;
+          })
+          .forEach(applyChanges::add);
+
         addDropTable(existingTable);
       }
     }

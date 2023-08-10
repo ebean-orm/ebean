@@ -17,12 +17,11 @@ final class OracleDbExpression extends BaseDbExpression {
   @Override
   public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
     if (operator == Op.EXISTS) {
-      request.append("json_exists(").append(propName).append(", '$.").append(path).append("')");
+      request.append("json_exists(").property(propName).append(", '$.").append(path).append("')");
     } else if (operator == Op.NOT_EXISTS) {
-      request.append("not json_exists(").append(propName).append(", '$.").append(path).append("')");
+      request.append("not json_exists(").property(propName).append(", '$.").append(path).append("')");
     } else {
-      request.append("json_value(").append(propName).append(", '$.").append(path).append("')");
-      request.append(operator.bind());
+      request.append("json_value(").property(propName).append(", '$.").append(path).append("')").append(operator.bind());
     }
   }
 

@@ -5,7 +5,7 @@ import io.ebean.config.dbplatform.DbStandardHistorySupport;
 /**
  * Oracle Total recall based history support.
  */
-public class OracleDbHistorySupport extends DbStandardHistorySupport {
+final class OracleDbHistorySupport extends DbStandardHistorySupport {
 
   /**
    * Return the ' as of timestamp ?' clause appended after the table name.

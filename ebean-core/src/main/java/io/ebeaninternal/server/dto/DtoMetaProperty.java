@@ -44,7 +44,7 @@ final class DtoMetaProperty implements DtoReadSet {
     return method.getParameterTypes()[0];
   }
 
-  String getName() {
+  String name() {
     return name;
   }
 

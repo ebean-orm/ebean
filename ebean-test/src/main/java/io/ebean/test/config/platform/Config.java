@@ -50,6 +50,16 @@ class Config {
     this.properties = config.getProperties();
   }
 
+  /**
+   * Return the property given the key and default value.
+   */
+  String property(String key, String defaultValue) {
+    if (properties == null) {
+      return null;
+    }
+    return properties.getProperty(key, defaultValue);
+  }
+
   void setSchemaFromDbName(String newDbName) {
     this.schema = databaseName;
     this.databaseName = newDbName;
@@ -399,6 +409,11 @@ class Config {
   }
 
   private void setDockerOptionalParameters() {
+    String mirror = properties.getProperty("ebean.test.containers.mirror");
+    if (mirror != null) {
+      // use a image mirror (when not running locally, i.e. CI)
+      dockerProperties.setProperty("ebean.test.containers.mirror", mirror);
+    }
     // check for shutdown mode on all containers
     String mode = properties.getProperty("ebean.test.shutdownMode");
     if (mode != null) {

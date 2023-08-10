@@ -15,17 +15,8 @@ public interface SpiLogger {
   boolean isDebug();
 
   /**
-   * Is trace logging enabled.
-   */
-  boolean isTrace();
-
-  /**
    * Log a debug level message.
    */
-  void debug(String msg);
+  void debug(String msg, Object... args);
 
-  /**
-   * Log a trace level message.
-   */
-  void trace(String msg);
 }
