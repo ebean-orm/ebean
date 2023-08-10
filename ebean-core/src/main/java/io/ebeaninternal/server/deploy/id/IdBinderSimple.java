@@ -46,6 +46,11 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
+  public String idSelect() {
+    return idProperty.name();
+  }
+
+  @Override
   public boolean isIdInExpandedForm() {
     return false;
   }

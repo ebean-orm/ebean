@@ -212,7 +212,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final EntityBean prototypeEntityBean;
 
   private final IdBinder idBinder;
-  private final String idSelect;
   private String idBinderInLHSSql;
   private String idBinderIdSql;
   private String deleteByIdSql;
@@ -355,23 +354,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
         propertiesIndex[i] = propMap.get(ebi.property(i));
       }
     }
-    idSelect = initIdSelect();
   }
 
-  String initIdSelect() {
-    if (idProperty != null && !idProperty.name().equals("_idClass")) {
-      return idProperty.name();
-    } else if (entityType == EntityType.EMBEDDED) {
-      return null;
-    } else {
-      StringJoiner sj = new StringJoiner(",");
-      for (BeanProperty prop : propertiesNonMany) {
-        if (prop.isImportedPrimaryKey()) {
-          sj.add(prop.name());
-        }
-      }
-      return sj.toString().intern();
-    }
+  public String idSelect() {
+    if (idBinder == null) throw new UnsupportedOperationException();
+    return idBinder.idSelect();
   }
 
   public boolean isJacksonCorePresent() {
@@ -2450,9 +2437,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   BeanProperty _findBeanProperty(String propName) {
     BeanProperty prop = propMap.get(propName);
-    if (prop == null && inheritInfo != null) {
-      // search in sub types...
-      return inheritInfo.findSubTypeProperty(propName);
+    if (prop == null) {
+      if ("_idClass".equals(propName)) {
+        return idProperty;
+      } else if (inheritInfo != null) {
+        // search in sub types...
+        return inheritInfo.findSubTypeProperty(propName);
+      }
     }
     return prop;
   }
@@ -3055,10 +3046,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   @Override
   public BeanProperty idProperty() {
     return idProperty;
-  }
-
-  public String idSelect() {
-    return idSelect;
   }
 
   /**
