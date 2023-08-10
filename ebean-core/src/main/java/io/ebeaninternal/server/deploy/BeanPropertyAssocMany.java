@@ -38,9 +38,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Join for manyToMany intersection table.
    */
   private final TableJoin intersectionJoin;
+
+  private final boolean tableManaged;
   private final String intersectionPublishTable;
   private final String intersectionDraftTable;
   private final boolean orphanRemoval;
+  private final IntersectionFactoryHelp intersectionFactory;
   private IntersectionTable intersectionTable;
   /**
    * For ManyToMany this is the Inverse join used to build reference queries.
@@ -99,10 +102,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     this.mapKey = deploy.getMapKey();
     this.fetchOrderBy = deploy.getFetchOrderBy();
     this.intersectionJoin = deploy.createIntersectionTableJoin();
+    this.intersectionFactory = deploy.getIntersectionFactory();
     if (intersectionJoin != null) {
+      this.tableManaged = deploy.isTableManaged();
       this.intersectionPublishTable = intersectionJoin.getTable();
       this.intersectionDraftTable = deploy.getIntersectionDraftTable();
     } else {
+      this.tableManaged = false;
       this.intersectionPublishTable = null;
       this.intersectionDraftTable = null;
     }
@@ -939,11 +945,11 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     // Note ManyToMany always included as we always 'save'
     // the relationship via insert/delete of intersection table
     // REMOVALS means including PrivateOwned relationships
-    return cascadeInfo.isSave() || hasJoinTable() || ModifyListenMode.REMOVALS == modifyListenMode;
+    return cascadeInfo.isSave() || (hasJoinTable() && !tableManaged) || ModifyListenMode.REMOVALS == modifyListenMode;
   }
 
   public boolean isIncludeCascadeDelete() {
-    return cascadeInfo.isDelete() || hasJoinTable() || ModifyListenMode.REMOVALS == modifyListenMode;
+    return cascadeInfo.isDelete() || (hasJoinTable() && !tableManaged) || ModifyListenMode.REMOVALS == modifyListenMode;
   }
 
   boolean isCascadeDeleteEscalate() {
@@ -1072,14 +1078,26 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
+   * Returns true, if this M2M beanproperty has a jointable, where the jointable is managed by an other entity.
+   */
+  public boolean isTableManaged() {
+    return tableManaged;
+  }
+
+  /**
    * Returns true, if we must create a m2m join table.
    */
   public boolean createJoinTable() {
     if (hasJoinTable() && mappedBy() == null) {
       // only create on other 'owning' side
-      return !descriptor.isTableManaged(intersectionJoin.getTable());
+      return !tableManaged;
     } else {
       return false;
     }
   }
+
+  public IntersectionFactoryHelp getIntersectionFactory() {
+    return intersectionFactory;
+  }
+
 }

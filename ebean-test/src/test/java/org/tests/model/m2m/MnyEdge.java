@@ -7,8 +7,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-@Index(unique = true, columnNames = { "from_id", "to_id" })
-@Index(unique = true, columnNames = { "to_id", "from_id" })
+@Index(unique = true, columnNames = {"from_id", "to_id"})
+@Index(unique = true, columnNames = {"to_id", "from_id"})
 public class MnyEdge {
 
   @Id
@@ -19,6 +19,22 @@ public class MnyEdge {
 
   @ManyToOne
   private MnyNode to;
+
+
+  public MnyEdge() {
+// default
+  }
+
+  public MnyEdge(Object from, Object to) {
+    this.from = (MnyNode) from;
+    this.to = (MnyNode) to;
+    this.id = this.from.id * 10000 + this.to.id;
+    this.flags = this.from.id + this.to.id;
+  }
+
+  public static MnyEdge createReverseRelation(Object to, MnyNode from) {
+    return new MnyEdge(from, to);
+  }
 
   private int flags;
 
