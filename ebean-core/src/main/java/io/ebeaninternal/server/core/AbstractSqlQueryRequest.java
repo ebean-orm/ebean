@@ -126,7 +126,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   /**
    * Prepare and execute the SQL using the Binder.
    */
-  public void executeSql(Binder binder, SpiQuery.Type type) throws SQLException {
+  public void executeSql(Binder binder) throws SQLException {
     startNano = System.nanoTime();
     executeAsSql(binder);
   }

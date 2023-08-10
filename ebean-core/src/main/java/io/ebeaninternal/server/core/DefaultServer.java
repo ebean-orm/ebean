@@ -899,6 +899,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> DtoQuery<T> findDto(Class<T> dtoType, SpiQuery<?> ormQuery) {
     DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
+    ormQuery.setDtoType(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, ormQuery);
   }
 
@@ -937,6 +938,18 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     Objects.requireNonNull(id);
     Query<T> query = createQuery(beanType).setId(id);
     return findId(query, transaction);
+  }
+
+  <T> DtoQueryRequest<T> createDtoQueryRequest(Type type, SpiDtoQuery<T> query) {
+    SpiQuery<?> ormQuery = query.ormQuery();
+    if (ormQuery != null) {
+      ormQuery.setType(type);
+      ormQuery.setManualId();
+      SpiOrmQueryRequest<?> ormRequest = createQueryRequest(type, ormQuery, query.transaction());
+      return new DtoQueryRequest<>(this, dtoQueryEngine, query, ormRequest);
+    } else {
+      return new DtoQueryRequest<>(this, dtoQueryEngine, query, null);
+    }
   }
 
   <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, Query<T> query, @Nullable Transaction transaction) {
@@ -1519,7 +1532,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> void findDtoEach(SpiDtoQuery<T> query, Consumer<T> consumer) {
-    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    DtoQueryRequest<T> request = createDtoQueryRequest(Type.ITERATE, query);
     try {
       request.initTransIfRequired();
       request.findEach(consumer);
@@ -1530,7 +1543,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> void findDtoEach(SpiDtoQuery<T> query, int batch, Consumer<List<T>> consumer) {
-    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    DtoQueryRequest<T> request = createDtoQueryRequest(Type.ITERATE, query);
     try {
       request.initTransIfRequired();
       request.findEach(batch, consumer);
@@ -1541,7 +1554,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> void findDtoEachWhile(SpiDtoQuery<T> query, Predicate<T> consumer) {
-    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    DtoQueryRequest<T> request = createDtoQueryRequest(Type.ITERATE, query);
     try {
       request.initTransIfRequired();
       request.findEachWhile(consumer);
@@ -1552,7 +1565,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> QueryIterator<T> findDtoIterate(SpiDtoQuery<T> query) {
-    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    DtoQueryRequest<T> request = createDtoQueryRequest(Type.ITERATE, query);
     try {
       request.initTransIfRequired();
       return request.findIterate();
@@ -1569,7 +1582,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> List<T> findDtoList(SpiDtoQuery<T> query) {
-    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
+    DtoQueryRequest<T> request = createDtoQueryRequest(Type.LIST, query);
+    List<T> ret = request.getFromQueryCache();
+    if (ret != null) {
+      return ret;
+    }
     try {
       request.initTransIfRequired();
       return request.findList();
@@ -1581,13 +1598,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Nullable
   @Override
   public <T> T findDtoOne(SpiDtoQuery<T> query) {
-    DtoQueryRequest<T> request = new DtoQueryRequest<>(this, dtoQueryEngine, query);
-    try {
-      request.initTransIfRequired();
-      return extractUnique(request.findList());
-    } finally {
-      request.endTransIfRequired();
-    }
+    return extractUnique(findDtoList(query));
   }
 
   /**
