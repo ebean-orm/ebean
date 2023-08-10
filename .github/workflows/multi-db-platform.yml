@@ -31,18 +31,35 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
+    - name: maven-settings
+      uses: s4u/maven-settings-action@v2
+      with:
+        servers: '[{"id": "github-release", "username": "dummy", "password": "${GITHUB_TOKEN}"}]'
+        githubServer: false
     - name: h2database
-      run: mvn clean test
+      run: mvn clean test -Pgithub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: postgres
-      run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties
+      run: mvn clean test -Dprops.file=testconfig/ebean-postgres.properties -Pgithub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: mysql
-      run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties
+      run: mvn clean test -Dprops.file=testconfig/ebean-mysql.properties -Pgithub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: mariadb
-      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties
+      run: mvn clean test -Dprops.file=testconfig/ebean-mariadb.properties -Pgithub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: yugabyte
-      run: mvn clean test -Dprops.file=testconfig/ebean-yugabyte.properties
+      run: mvn clean test -Dprops.file=testconfig/ebean-yugabyte.properties -Pgithub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: sqlserver
-      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
+      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver17.properties -Pgithub
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #    - name: sqlserver19
 #      run: mvn clean test -Dprops.file=testconfig/ebean-sqlserver19.properties
 #    - name: db2
