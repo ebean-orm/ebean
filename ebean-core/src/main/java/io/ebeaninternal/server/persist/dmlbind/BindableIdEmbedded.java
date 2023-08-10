@@ -64,7 +64,6 @@ final class BindableIdEmbedded implements BindableId {
 
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
     EntityBean idValue = (EntityBean) embId.getValue(bean);
     for (BeanProperty prop : props) {
       Object value = prop.getValue(idValue);
@@ -75,14 +74,20 @@ final class BindableIdEmbedded implements BindableId {
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
-    for (BeanProperty prop : props) {
-      request.appendColumn(prop.dbColumn());
+    if (matches != null) {
+      // prefer the match dbColumns over the embedded property ones
+      for (MatchedImportedProperty match : matches) {
+        request.appendColumn(match.dbColumn());
+      }
+    } else {
+      for (BeanProperty prop : props) {
+        request.appendColumn(prop.dbColumn());
+      }
     }
   }
 
   @Override
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
-
     if (matches == null) {
       String m = "No matches for " + embId.fullName() + " the concatenated key columns where not found?"
         + " I expect that the concatenated key was null, and this bean does"

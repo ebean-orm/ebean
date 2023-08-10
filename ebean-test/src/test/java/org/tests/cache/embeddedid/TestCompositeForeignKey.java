@@ -47,4 +47,10 @@ class TestCompositeForeignKey extends BaseTestCase {
       assertThat(sql.get(3)).contains("delete from concept where (network_id,id)  in");
     }
   }
+
+  @Test
+  void insert() {
+    var c2 = new Concept2("A", "B", "foo");
+    DB.save(c2);
+  }
 }
