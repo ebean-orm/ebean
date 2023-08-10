@@ -22,11 +22,12 @@ public final class DtoQueryEngine {
 
   public <T> List<T> findList(DtoQueryRequest<T> request) {
     try {
-      request.executeSql(binder, SpiQuery.Type.LIST);
+      request.executeSql(binder);
       List<T> rows = new ArrayList<>();
       while (request.next()) {
         rows.add(request.readNextBean());
       }
+      request.putToQueryCache(rows);
       return rows;
 
     } catch (SQLException e) {
@@ -38,7 +39,7 @@ public final class DtoQueryEngine {
 
   public <T> QueryIterator<T> findIterate(DtoQueryRequest<T> request) {
     try {
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       return new DtoQueryIterator<>(request);
     } catch (SQLException e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
@@ -47,7 +48,7 @@ public final class DtoQueryEngine {
 
   public <T> void findEach(DtoQueryRequest<T> request, Consumer<T> consumer) {
      try {
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       while (request.next()) {
         consumer.accept(request.readNextBean());
       }
@@ -61,7 +62,7 @@ public final class DtoQueryEngine {
   public <T> void findEach(DtoQueryRequest<T> request, int batchSize, Consumer<List<T>> consumer) {
     try {
       List<T> buffer = new ArrayList<>();
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       while (request.next()) {
         buffer.add(request.readNextBean());
         if (buffer.size() >= batchSize) {
@@ -82,7 +83,7 @@ public final class DtoQueryEngine {
 
   public <T> void findEachWhile(DtoQueryRequest<T> request, Predicate<T> consumer) {
     try {
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      request.executeSql(binder);
       while (request.next()) {
         if (!consumer.test(request.readNextBean())) {
           break;

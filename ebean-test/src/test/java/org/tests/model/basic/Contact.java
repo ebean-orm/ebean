@@ -12,7 +12,7 @@ import java.util.List;
 @Index(columnNames = {"last_name", "first_name"})
 @ChangeLog
 @Entity
-@Cache(naturalKey = "email")
+@Cache(naturalKey = "email", enableQueryCache = true)
 public class Contact {
 
   @Id @GeneratedValue

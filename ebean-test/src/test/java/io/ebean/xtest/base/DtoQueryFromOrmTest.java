@@ -1,15 +1,15 @@
 package io.ebean.xtest.base;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
-import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -383,6 +383,37 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     assertThat(contactDtos).isNotEmpty();
   }
 
+  @Test
+  public void toDto_withQueryCache() {
+
+    ResetBasicData.reset();
+    LoggedSql.start();
+    List<ContactTotals> contactDtos1 = DB.find(Contact.class)
+      .setUseQueryCache(true)
+      .select("lastName, count(*) as totalCount").where()
+      .isNotNull("lastName").asDto(ContactTotals.class).findList();
+    assertThat(LoggedSql.stop()).hasSize(1);
+
+
+    LoggedSql.start();
+    List<ContactTotals> contactDtos2 = DB.find(Contact.class)
+      .setUseQueryCache(true)
+      .select("lastName, count(*) as totalCount").where()
+      .isNotNull("lastName").asDto(ContactTotals.class).findList();
+    assertThat(LoggedSql.stop()).isEmpty();
+    assertThat(contactDtos1).isNotEmpty().isSameAs(contactDtos2);
+    assertThat(contactDtos1.get(0)).isInstanceOf(ContactTotals.class);
+
+    List<ContactTotalsInt> contactDtos3 = DB.find(Contact.class)
+      .setUseQueryCache(true)
+      .select("lastName, count(*) as totalCount").where()
+      .isNotNull("lastName").asDto(ContactTotalsInt.class).findList();
+
+    assertThat(contactDtos3).isNotEmpty();
+    assertThat(contactDtos3.get(0)).isInstanceOf(ContactTotalsInt.class);
+
+  }
+
   public static class ContactTotals {
 
     String lastName;
@@ -406,6 +437,28 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     public void setTotalCount(Long totalCount) {
+      this.totalCount = totalCount;
+    }
+  }
+
+  public static class ContactTotalsInt {
+
+    String lastName;
+    int totalCount;
+
+    public String getLastName() {
+      return lastName;
+    }
+
+    public void setLastName(String lastName) {
+      this.lastName = lastName;
+    }
+
+    public int getTotalCount() {
+      return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
       this.totalCount = totalCount;
     }
   }
