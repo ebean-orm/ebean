@@ -76,6 +76,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final BeanFinderManager beanFinderManager;
   private final PersistListenerManager persistListenerManager;
   private final BeanQueryAdapterManager beanQueryAdapterManager;
+  private final CustomDeployParserManager customDeployParserManager;
   private final NamingConvention namingConvention;
   private final DeployCreateProperties createProperties;
   private final BeanManagerFactory beanManagerFactory;
@@ -156,6 +157,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.persistListenerManager = new PersistListenerManager(bootupClasses);
     this.beanQueryAdapterManager = new BeanQueryAdapterManager(bootupClasses);
     this.beanFinderManager = new BeanFinderManager(bootupClasses);
+    this.customDeployParserManager = new CustomDeployParserManager(bootupClasses);
     this.transientProperties = new TransientProperties();
     this.changeLogPrepare = config.changeLogPrepare(bootupClasses.getChangeLogPrepare());
     this.changeLogListener = config.changeLogListener(bootupClasses.getChangeLogListener());
@@ -307,6 +309,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
+      deployInfoMap.values().forEach(customDeployParserManager::parse);
       // creates the BeanDescriptors
       readEntityRelationships();
       List<BeanDescriptor<?>> list = new ArrayList<>(descMap.values());

@@ -15,6 +15,7 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.plugin.CustomDeployParser;
 import jakarta.persistence.EnumType;
 
 import javax.sql.DataSource;
@@ -1834,6 +1835,11 @@ public interface DatabaseBuilder {
   DatabaseBuilder addServerConfigStartup(ServerConfigStartup configStartupListener);
 
   /**
+   * Add a CustomDeployParser.
+   */
+  DatabaseConfig addCustomDeployParser(CustomDeployParser customDeployParser);
+
+  /**
    * Register all the BeanPersistListener instances.
    * <p>
    * Note alternatively you can use {@link #add(BeanPersistListener)} to add
@@ -2990,6 +2996,11 @@ public interface DatabaseBuilder {
      * Return the list of ServerConfigStartup instances.
      */
     List<ServerConfigStartup> getServerConfigStartupListeners();
+
+    /**
+     * Returns the registered CustomDeployParsers.
+     */
+    List<CustomDeployParser> getCustomDeployParsers();
 
     /**
      * Return the default PersistenceContextScope to be used if one is not explicitly set on a query.

@@ -181,6 +181,7 @@ public final class DefaultContainer implements SpiContainer {
     bootup.addFindControllers(config.getFindControllers());
     bootup.addPersistListeners(config.getPersistListeners());
     bootup.addQueryAdapters(config.getQueryAdapters());
+    bootup.addCustomDeployParser(config.getCustomDeployParsers());
     bootup.addChangeLogInstances(config);
     return bootup;
   }
