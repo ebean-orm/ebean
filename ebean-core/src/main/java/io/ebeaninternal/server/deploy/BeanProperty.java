@@ -652,6 +652,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public void setValue(EntityBean bean, Object value) {
     try {
+      if (!beanHasProperty(bean)) {
+        throw new IllegalArgumentException("Property does not exist");
+      }
       setter.set(bean, value);
     } catch (Exception ex) {
       throw new RuntimeException(setterErrorMsg(bean, value, "set "), ex);
@@ -663,6 +666,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public void setValueIntercept(EntityBean bean, Object value) {
     try {
+      if (!beanHasProperty(bean)) {
+        throw new IllegalArgumentException("Property does not exist");
+      }
       setter.setIntercept(bean, value);
     } catch (Exception ex) {
       throw new RuntimeException(setterErrorMsg(bean, value, "setIntercept "), ex);
@@ -759,12 +765,17 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return getValueIntercept((EntityBean) bean);
   }
 
+  private boolean beanHasProperty(EntityBean bean) {
+    return descriptor.inheritInfo() == null // fast exit for non inherited beans
+      || owningType.isInstance(bean);
+  }
+
   /**
    * Return the value of the property method.
    */
   public Object getValue(EntityBean bean) {
     try {
-      return getter.get(bean);
+      return beanHasProperty(bean) ? getter.get(bean) : null;
     } catch (Exception ex) {
       String beanType = bean == null ? "null" : bean.getClass().getName();
       String msg = "get " + name + " on [" + descriptor + "] type[" + beanType + "] threw error.";
@@ -774,7 +785,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   public Object getValueIntercept(EntityBean bean) {
     try {
-      return getter.getIntercept(bean);
+      return beanHasProperty(bean) ? getter.getIntercept(bean) : null;
     } catch (Exception ex) {
       String beanType = bean == null ? "null" : bean.getClass().getName();
       String msg = "getIntercept " + name + " on [" + descriptor + "] type[" + beanType + "] threw error.";
