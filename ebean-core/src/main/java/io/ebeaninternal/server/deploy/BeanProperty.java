@@ -767,6 +767,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   private boolean beanHasProperty(EntityBean bean) {
     return descriptor.inheritInfo() == null // fast exit for non inherited beans
+      || owningType == null
       || owningType.isInstance(bean);
   }
 
