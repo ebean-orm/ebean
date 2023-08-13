@@ -36,15 +36,15 @@ class TestCompositeForeignKey extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(4);
-    assertThat(sql.get(0)).contains("select t0.network_id, t0.id from concept t0");
+    assertThat(sql.get(0)).contains("select t0.id, t0.network_id from concept t0");
     if (isSqlServer() || isDb2() || isNuoDb()) {
       assertThat(sql.get(1)).contains("delete from connection where ");
       assertThat(sql.get(2)).contains("delete from connection where ");
       assertThat(sql.get(3)).contains("delete from concept where ");
     } else {
-      assertThat(sql.get(1)).contains("delete from connection where (network_id,from_conc) in");
-      assertThat(sql.get(2)).contains("delete from connection where (network_id,to_conc) in");
-      assertThat(sql.get(3)).contains("delete from concept where (network_id,id)  in");
+      assertThat(sql.get(1)).contains("delete from connection where (from_conc,network_id) in");
+      assertThat(sql.get(2)).contains("delete from connection where (to_conc,network_id) in");
+      assertThat(sql.get(3)).contains("delete from concept where (id,network_id)  in");
     }
   }
 }
