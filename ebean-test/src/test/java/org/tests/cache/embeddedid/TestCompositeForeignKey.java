@@ -14,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestCompositeForeignKey extends BaseTestCase {
 
-  @IgnorePlatform({Platform.SQLSERVER, Platform.DB2}) // FIXME for DB2 and SQLServer
   @Test
   void createConnectionWithCompositeForeignKey() {
     String networkId = "test-network";
