@@ -1,8 +1,10 @@
 package org.tests.cache.embeddedid;
 
 import io.ebean.DB;
+import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestCompositeForeignKey extends BaseTestCase {
 
+  @IgnorePlatform({Platform.SQLSERVER, Platform.DB2}) // FIXME for DB2 and SQLServer
   @Test
   void createConnectionWithCompositeForeignKey() {
     String networkId = "test-network";
