@@ -56,7 +56,7 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   private String idInExpanded() {
-    StringBuilder sb = new StringBuilder(30);
+    final StringBuilder sb = new StringBuilder(30);
     sb.append("(");
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
@@ -69,7 +69,7 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   private String idInCompressed() {
-    StringBuilder sb = new StringBuilder(20).append("(");
+    final StringBuilder sb = new StringBuilder(props.length * 2 + 2).append("(");
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
         sb.append(",");
@@ -83,27 +83,6 @@ public final class IdBinderEmbedded implements IdBinder {
   @Override
   public BeanProperty getBeanProperty() {
     return embIdProperty;
-  }
-
-  @Override
-  public String getOrderBy(String pathPrefix, boolean ascending) {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < props.length; i++) {
-      if (i > 0) {
-        sb.append(", ");
-      }
-      if (pathPrefix != null) {
-        sb.append(pathPrefix).append(".");
-      }
-      if (!idClass) {
-        sb.append(embIdProperty.name()).append(".");
-      }
-      sb.append(props[i].name());
-      if (!ascending) {
-        sb.append(" desc");
-      }
-    }
-    return sb.toString();
   }
 
   public BeanDescriptor<?> getIdBeanDescriptor() {
@@ -142,15 +121,26 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public String getDefaultOrderBy() {
-    StringBuilder sb = new StringBuilder();
+    return getOrderBy(null, true);
+  }
+
+  @Override
+  public String getOrderBy(String pathPrefix, boolean ascending) {
+    final StringBuilder sb = new StringBuilder(100);
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
         sb.append(", ");
+      }
+      if (pathPrefix != null) {
+        sb.append(pathPrefix).append(".");
       }
       if (!idClass) {
         sb.append(embIdProperty.name()).append(".");
       }
       sb.append(props[i].name());
+      if (!ascending) {
+        sb.append(" desc");
+      }
     }
     return sb.toString();
   }
@@ -167,7 +157,7 @@ public final class IdBinderEmbedded implements IdBinder {
     if (!idInExpandedForm) {
       return getIdInValueExpr(false, size);
     }
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder(80);
     sb.append("(");
     for (int j = 0; j < size; j++) {
       if (j > 0) {
@@ -191,7 +181,7 @@ public final class IdBinderEmbedded implements IdBinder {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder(80);
     if (not) {
       sb.append(" not");
     }
@@ -215,19 +205,15 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public Object[] getIdValues(EntityBean bean) {
-    Object val = embIdProperty.getValue(bean);
-    Object[] bindValues = new Object[props.length];
-    for (int i = 0; i < props.length; i++) {
-      bindValues[i] = props[i].getValue((EntityBean) val);
-    }
-    return bindValues;
+    return getBindValues(embIdProperty.getValue(bean));
   }
 
   @Override
   public Object[] getBindValues(Object value) {
-    Object[] bindValues = new Object[props.length];
+    final EntityBean bean = (EntityBean) value;
+    final Object[] bindValues = new Object[props.length];
     for (int i = 0; i < props.length; i++) {
-      bindValues[i] = props[i].getValue((EntityBean) value);
+      bindValues[i] = props[i].getValue(bean);
     }
     return bindValues;
   }
@@ -237,8 +223,8 @@ public final class IdBinderEmbedded implements IdBinder {
    */
   @Override
   public Object getIdForJson(EntityBean bean) {
-    EntityBean ebValue = (EntityBean) embIdProperty.getValue(bean);
-    Map<String, Object> map = new LinkedHashMap<>();
+    final EntityBean ebValue = (EntityBean) embIdProperty.getValue(bean);
+    final Map<String, Object> map = new LinkedHashMap<>();
     for (BeanProperty prop : props) {
       map.put(prop.name(), prop.getValue(ebValue));
     }
@@ -251,8 +237,8 @@ public final class IdBinderEmbedded implements IdBinder {
   @Override
   @SuppressWarnings("unchecked")
   public Object convertIdFromJson(Object value) {
-    Map<String, Object> map = (Map<String, Object>) value;
-    EntityBean idValue = idDesc.createEntityBean();
+    final Map<String, Object> map = (Map<String, Object>) value;
+    final EntityBean idValue = idDesc.createEntityBean();
     for (BeanProperty prop : props) {
       prop.setValue(idValue, map.get(prop.name()));
     }
@@ -261,17 +247,17 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public void bindId(DefaultSqlUpdate sqlUpdate, Object value) {
+    final EntityBean bean = (EntityBean) value;
     for (BeanProperty prop : props) {
-      Object embFieldValue = prop.getValue((EntityBean) value);
-      sqlUpdate.setParameter(embFieldValue);
+      sqlUpdate.setParameter(prop.getValue(bean));
     }
   }
 
   @Override
   public void bindId(DataBind dataBind, Object value) throws SQLException {
+    final EntityBean bean = (EntityBean) value;
     for (BeanProperty prop : props) {
-      Object embFieldValue = prop.getValue((EntityBean) value);
-      prop.bind(dataBind, embFieldValue);
+      prop.bind(dataBind, prop.getValue(bean));
     }
   }
 
@@ -285,18 +271,19 @@ public final class IdBinderEmbedded implements IdBinder {
   @Override
   public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
     for (Object value : values) {
+      final EntityBean bean = (EntityBean) value;
       for (BeanProperty prop : props) {
-        request.addBindValue(prop.getValue((EntityBean) value));
+        request.addBindValue(prop.getValue(bean));
       }
     }
   }
 
   @Override
   public Object readData(DataInput dataInput) throws IOException {
-    EntityBean embId = idDesc.createEntityBean();
+    final EntityBean embId = idDesc.createEntityBean();
     boolean notNull = true;
     for (BeanProperty prop : props) {
-      Object value = prop.readData(dataInput);
+      final Object value = prop.readData(dataInput);
       prop.setValue(embId, value);
       if (value == null) {
         notNull = false;
@@ -307,9 +294,9 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public void writeData(DataOutput dataOutput, Object idValue) throws IOException {
+    final EntityBean bean = (EntityBean) idValue;
     for (BeanProperty prop : props) {
-      Object embFieldValue = prop.getValue((EntityBean) idValue);
-      prop.writeData(dataOutput, embFieldValue);
+      prop.writeData(dataOutput, prop.getValue(bean));
     }
   }
 
@@ -322,10 +309,10 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public Object read(DbReadContext ctx) throws SQLException {
-    EntityBean embId = idDesc.createEntityBean();
+    final EntityBean embId = idDesc.createEntityBean();
     boolean nullValue = true;
     for (BeanProperty prop : props) {
-      Object value = prop.read(ctx);
+      final Object value = prop.read(ctx);
       if (value != null) {
         prop.setValue(embId, value);
         nullValue = false;
@@ -354,7 +341,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public String getAssocIdInExpr(String prefix) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder(80);
     sb.append("(");
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
@@ -371,7 +358,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public String getAssocOneIdExpr(String prefix, String operator) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder(100);
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
         sb.append(" and ");
@@ -389,7 +376,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public String getBindIdSql(String baseTableAlias) {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder(80);
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
         sb.append(" and ");
@@ -407,7 +394,7 @@ public final class IdBinderEmbedded implements IdBinder {
     if (idInExpandedForm) {
       return "";
     }
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder(80);
     sb.append("(");
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
@@ -447,8 +434,8 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public String cacheKey(Object value) {
-    EntityBean bean = (EntityBean)value;
-    StringBuilder sb = new StringBuilder();
+    final EntityBean bean = (EntityBean)value;
+    final StringBuilder sb = new StringBuilder(80);
     for (BeanProperty prop : props) {
       Object val = prop.getValue(bean);
       if (val != null) {
