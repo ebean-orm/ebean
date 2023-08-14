@@ -197,7 +197,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public String tableAliasManyWhere(String prefix) {
-    return alias.tableAliasManyWhere(prefix);
+    return prefix == null ? tableAliasStack.peek() : alias.tableAliasManyWhere(prefix);
   }
 
   @Override
@@ -225,9 +225,8 @@ final class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
-  public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String manyWhere) {
+  public void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String tableAlias) {
     // replace ${ta} placeholder with the real table alias...
-    String tableAlias = manyWhere == null ? tableAliasStack.peek() : tableAliasManyWhere(manyWhere);
     String converted = sqlFormulaJoin.replace(tableAliasPlaceHolder, tableAlias);
     if (formulaJoins == null) {
       formulaJoins = new HashSet<>();
@@ -240,9 +239,15 @@ final class DefaultDbSqlContext implements DbSqlContext {
     formulaJoins.add(converted);
     sb.append(" ");
     if (joinType == SqlJoinType.OUTER) {
-      if ("join".equalsIgnoreCase(sqlFormulaJoin.substring(0, 4))) {
+      if ("join".equalsIgnoreCase(converted.substring(0, 4))) {
         // prepend left as we are in the 'many' part
         sb.append("left ");
+      }
+    }
+    if (joinType == SqlJoinType.INNER) {
+      if ("left join".equalsIgnoreCase(converted.substring(0, 9))) {
+        // remove left as we do not need it
+        converted = converted.substring(5);
       }
     }
     sb.append(converted);
