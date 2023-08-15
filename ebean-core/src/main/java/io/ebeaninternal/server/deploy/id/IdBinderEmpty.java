@@ -52,11 +52,6 @@ final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public String getIdProperty() {
-    return null;
-  }
-
-  @Override
   public BeanProperty findBeanProperty(String dbColumnName) {
     return null;
   }

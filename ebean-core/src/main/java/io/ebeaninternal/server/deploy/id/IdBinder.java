@@ -44,15 +44,6 @@ public interface IdBinder {
   Object readData(DataInput dataInput) throws IOException;
 
   /**
-   * Return the name(s) of the Id property(s). Comma delimited if there is more
-   * than one.
-   * <p>
-   * This can be used to include in a query.
-   * </p>
-   */
-  String getIdProperty();
-
-  /**
    * Return the Id BeanProperty.
    */
   STreeProperty getBeanProperty();

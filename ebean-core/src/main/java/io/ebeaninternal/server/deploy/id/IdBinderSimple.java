@@ -79,11 +79,6 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public String getIdProperty() {
-    return idProperty.name();
-  }
-
-  @Override
   public BeanProperty findBeanProperty(String dbColumnName) {
     if (dbColumnName.equalsIgnoreCase(idProperty.dbColumn())) {
       return idProperty;

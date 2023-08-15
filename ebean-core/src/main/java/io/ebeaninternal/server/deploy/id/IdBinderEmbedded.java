@@ -90,11 +90,6 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
-  public String getIdProperty() {
-    return embIdProperty.name();
-  }
-
-  @Override
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
     if (!idClass) {
       prefix = SplitName.add(prefix, embIdProperty.name());
