@@ -45,7 +45,7 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
   public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
     if (readId) {
       ctx.pushTableAlias(prefix);
-      appendSelectId(ctx, idBinder.getBeanProperty());
+      appendSelectId(ctx, idBinder.beanProperty());
       ctx.popTableAlias();
       super.appendDistinctOn(ctx, subQuery);
     }

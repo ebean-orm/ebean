@@ -218,7 +218,7 @@ class BeanPropertyAssocManySqlHelp<T> {
    */
   private String rawParentIdMultiBinder(String tableAlias, int size) {
     final String property = '(' + tableAlias + exportedProperties[0].getForeignDbColumn() + ')';
-    final String inValueExpr = descriptor.idBinder().getIdInValueExpr(false, size);
+    final String inValueExpr = descriptor.idBinder().idInValueExpr(false, size);
     return property + inValueExpr;
   }
 
