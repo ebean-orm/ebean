@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -670,6 +671,16 @@ public interface Query<T> extends CancelableQuery {
    * </p>
    */
   Query<T> apply(FetchPath fetchPath);
+
+  /**
+   * Apply changes to the query conditional on the supplied predicate.
+   * <p>
+   * Typically, the changes are extra predicates etc.
+   *
+   * @param predicate The predicate which when true the changes are applied
+   * @param apply The changes to apply to the query
+   */
+  Query<T> alsoIf(BooleanSupplier predicate, Consumer<Query<T>> apply);
 
   /**
    * Execute the query using the given transaction.
