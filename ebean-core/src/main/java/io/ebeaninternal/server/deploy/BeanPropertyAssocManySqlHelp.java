@@ -190,7 +190,10 @@ class BeanPropertyAssocManySqlHelp<T> {
   }
 
   private String rawParentIdStandard(String tableAlias, int size) {
-    StringBuilder sb = new StringBuilder();
+    if (descriptor.isSimpleId()) {
+      return rawParentIdMultiBinder(tableAlias, size);
+    }
+    final var sb = new StringBuilder(100 + size * exportedPropertyBindProto.length());
     sb.append('(');
     for (int i = 0; i < exportedProperties.length; i++) {
       String fkColumn = exportedProperties[i].getForeignDbColumn();
@@ -208,6 +211,15 @@ class BeanPropertyAssocManySqlHelp<T> {
     }
     sb.append(')');
     return sb.toString();
+  }
+
+  /**
+   * Potentially a MultiValue binder like Postgres ANY Array binding.
+   */
+  private String rawParentIdMultiBinder(String tableAlias, int size) {
+    final String property = '(' + tableAlias + exportedProperties[0].getForeignDbColumn() + ')';
+    final String inValueExpr = descriptor.idBinder().getIdInValueExpr(false, size);
+    return property + inValueExpr;
   }
 
   private String rawParentIdExpanded(String tableAlias, int size) {
