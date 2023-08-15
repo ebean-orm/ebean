@@ -518,7 +518,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     IdBinder idBinder = d.idBinder();
     if (idBinder instanceof IdBinderEmbedded) {
       IdBinderEmbedded embId = (IdBinderEmbedded) idBinder;
-      BeanDescriptor<?> idBeanDescriptor = embId.getIdBeanDescriptor();
+      BeanDescriptor<?> idBeanDescriptor = embId.descriptor();
       Class<?> idType = idBeanDescriptor.type();
       try {
         idType.getDeclaredMethod("hashCode");
