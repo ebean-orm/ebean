@@ -16,6 +16,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -483,6 +484,21 @@ public abstract class TQRootBean<T, R> {
    */
   public R apply(PathProperties pathProperties) {
     query.apply(pathProperties);
+    return root;
+  }
+
+  /**
+   * Apply changes to the query conditional on the supplied predicate.
+   * <p>
+   * Typically, the changes are extra predicates etc.
+   *
+   * @param predicate The predicate which when true the changes are applied
+   * @param apply The changes to apply to the query
+   */
+  public R alsoIf(BooleanSupplier predicate, Consumer<R> apply) {
+    if (predicate.getAsBoolean()) {
+      apply.accept(root);
+    }
     return root;
   }
 

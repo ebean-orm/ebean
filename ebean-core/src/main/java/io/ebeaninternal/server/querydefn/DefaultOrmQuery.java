@@ -26,6 +26,7 @@ import javax.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -279,6 +280,14 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> apply(FetchPath fetchPath) {
     fetchPath.apply(this);
+    return this;
+  }
+
+  @Override
+  public Query<T> alsoIf(BooleanSupplier predicate, Consumer<Query<T>> consumer) {
+    if (predicate.getAsBoolean()) {
+      consumer.accept(this);
+    }
     return this;
   }
 
