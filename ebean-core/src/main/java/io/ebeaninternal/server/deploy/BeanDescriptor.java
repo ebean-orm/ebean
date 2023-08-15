@@ -2438,7 +2438,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   BeanProperty _findBeanProperty(String propName) {
     BeanProperty prop = propMap.get(propName);
     if (prop == null) {
-      if ("_idClass".equals(propName)) {
+      if ("_$IdClass$".equals(propName)) {
         return idProperty;
       } else if (inheritInfo != null) {
         // search in sub types...
