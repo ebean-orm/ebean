@@ -35,7 +35,7 @@ public final class IdBinderEmbedded implements IdBinder {
   public IdBinderEmbedded(boolean idInExpandedForm, BeanPropertyAssocOne<?> embIdProperty) {
     this.idInExpandedForm = idInExpandedForm;
     this.embIdProperty = embIdProperty;
-    this.idClass = "_idClass".equals(embIdProperty.name());
+    this.idClass = "_$IdClass$".equals(embIdProperty.name());
   }
 
   @Override

@@ -654,7 +654,7 @@ public class DeployBeanDescriptor<T> {
   public void postAnnotations() {
     if (idClass != null) {
       idClassProperty = new DeployBeanPropertyAssocOne<>(this, idClass);
-      idClassProperty.setName("_idClass");
+      idClassProperty.setName("_$IdClass$");
       idClassProperty.setEmbedded();
       idClassProperty.setNullable(false);
     }
