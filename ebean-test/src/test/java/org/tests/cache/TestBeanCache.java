@@ -16,6 +16,7 @@ import org.tests.model.basic.OCachedBean;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,7 +68,7 @@ public class TestBeanCache extends BaseTestCase {
 
     // Test findIds
     LoggedSql.start();
-    query.copy()
+    Map<Object, OCachedBean> map1 = query.copy()
       .where().idIn(ids.subList(0, 1))
       .findMap(); // cache key is: 3/d[{/c1000}]/w[List[IdIn[?1],]]
     if (isPostgresCompatible()) {
@@ -77,7 +78,7 @@ public class TestBeanCache extends BaseTestCase {
     }
 
     LoggedSql.start();
-    query.copy()
+    Map<Object, OCachedBean> map2 = query.copy()
       .where().idIn(ids.subList(0, 4))
       .findMap(); // cache key is: 3/d[{/c1000}]/w[List[IdIn[?5],]]
     if (isPostgresCompatible()) {
@@ -87,7 +88,7 @@ public class TestBeanCache extends BaseTestCase {
     }
 
     LoggedSql.start();
-    query.copy()
+    Map<Object, OCachedBean> map3 = query.copy()
       .where().idIn(ids.subList(2, 6))
       .findMap(); // same cache key as above and same SQL above
     if (isPostgresCompatible()) {
@@ -95,6 +96,112 @@ public class TestBeanCache extends BaseTestCase {
     } else {
       assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
     }
+
+    ServerCache bc = DB.getDefault().pluginApi().cacheManager().beanCache(OCachedBean.class);
+    bc.statistics(true);
+
+    ServerCache qc = DB.getDefault().pluginApi().cacheManager().queryCache(OCachedBean.class);
+    qc.statistics(true);
+
+    LoggedSql.start();
+    assertThat(query.copy()
+      .where().idIn(ids.subList(0, 1))
+      .findMap()).isEqualTo(map1).isNotSameAs(map1);
+
+
+    assertThat(query.copy()
+      .where().idIn(ids.subList(0, 4))
+      .findMap()).isEqualTo(map2).isNotSameAs(map2);
+
+    assertThat(query.copy()
+      .where().idIn(ids.subList(2, 6))
+      .findMap()).isEqualTo(map3).isNotSameAs(map3);
+
+    assertThat(LoggedSql.stop()).isEmpty(); // we should have no DB-hits
+
+    // we should have all beans in the bean cache, but no hits in the query cache
+    assertThat(bc.statistics(true).getHitCount()).isEqualTo(map1.size() + map2.size() + map3.size());
+    assertThat(qc.statistics(true).getHitCount()).isEqualTo(0);
+
+    // check with a different set, that should be in the cache
+    query.copy().where().idIn(ids.subList(2, 5)).findMap();
+    assertThat(bc.statistics(true).getHitCount()).isEqualTo(3);
+    assertThat(qc.statistics(true).getHitCount()).isEqualTo(0);
+
+  }
+
+
+  @Test
+  public void idsInFindMapWithBeanAndQueryCache() {
+
+    List<OCachedBean> beans = createBeans(Arrays.asList("m0", "m1", "m2", "m3", "m4", "m5", "m6"));
+    List<Long> ids = beans.stream().map(OCachedBean::getId).collect(Collectors.toList());
+    beanCache.clear();
+    beanCache.statistics(true);
+    Query<OCachedBean> query = DB.find(OCachedBean.class)
+      .setUseCache(true)
+      .setUseQueryCache(true)
+      .setReadOnly(true);
+
+    // Test findIds
+    LoggedSql.start();
+    Map<Object, OCachedBean> map1 = query.copy()
+      .where().idIn(ids.subList(0, 1))
+      .findMap(); // cache key is: 3/d[{/c1000}]/w[List[IdIn[?1],]]
+    if (isPostgresCompatible()) {
+      assertThat(LoggedSql.stop().get(0)).contains("t0.id = any(?)");
+    } else {
+      assertThat(LoggedSql.stop().get(0)).contains("in (?)");
+    }
+
+    LoggedSql.start();
+    Map<Object, OCachedBean> map2 = query.copy()
+      .where().idIn(ids.subList(0, 4))
+      .findMap(); // cache key is: 3/d[{/c1000}]/w[List[IdIn[?5],]]
+    if (isPostgresCompatible()) {
+      assertThat(LoggedSql.stop().get(0)).contains("t0.id = any(?)");
+    } else {
+      assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
+    }
+
+    LoggedSql.start();
+    Map<Object, OCachedBean> map3 = query.copy()
+      .where().idIn(ids.subList(2, 6))
+      .findMap(); // same cache key as above and same SQL above
+    if (isPostgresCompatible()) {
+      assertThat(LoggedSql.stop().get(0)).contains("t0.id = any(?)");
+    } else {
+      assertThat(LoggedSql.stop().get(0)).contains("in (?,?,?,?,?)");
+    }
+
+    ServerCache bc = DB.getDefault().pluginApi().cacheManager().beanCache(OCachedBean.class);
+    bc.statistics(true);
+
+    ServerCache qc = DB.getDefault().pluginApi().cacheManager().queryCache(OCachedBean.class);
+    qc.statistics(true);
+
+    LoggedSql.start();
+    assertThat(query.copy()
+      .where().idIn(ids.subList(0, 1))
+      .findMap()).isEqualTo(map1).isSameAs(map1);
+
+    assertThat(query.copy()
+      .where().idIn(ids.subList(0, 4))
+      .findMap()).isEqualTo(map2).isSameAs(map2);
+
+    assertThat(query.copy()
+      .where().idIn(ids.subList(2, 6))
+      .findMap()).isEqualTo(map3).isSameAs(map3);
+
+    assertThat(LoggedSql.stop()).isEmpty(); // we should have no DB-hits
+
+    assertThat(bc.statistics(true).getHitCount()).isEqualTo(0);
+    assertThat(qc.statistics(true).getHitCount()).isEqualTo(3);
+
+    // check with a different set, that should be in the cache
+    query.copy().where().idIn(ids.subList(2, 5)).findMap();
+    assertThat(bc.statistics(true).getHitCount()).isEqualTo(3);
+    assertThat(qc.statistics(true).getHitCount()).isEqualTo(0);
   }
 
   @Test
