@@ -110,6 +110,11 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
     return queryRequest;
   }
 
+  @Override
+  public StringBuilder buffer() {
+    return sql;
+  }
+
   /**
    * Append text the underlying sql expression.
    */
