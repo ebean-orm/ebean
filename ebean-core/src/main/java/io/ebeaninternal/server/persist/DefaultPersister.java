@@ -44,13 +44,21 @@ public final class DefaultPersister implements Persister {
   private final PersistExecute persistExecute;
   private final SpiEbeanServer server;
   private final BeanDescriptorManager beanDescriptorManager;
-  private final int maxInBinding;
+  private final int maxDeleteBatch;
 
   public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr) {
     this.server = server;
     this.beanDescriptorManager = descMgr;
     this.persistExecute = new DefaultPersistExecute(binder, server.config().getPersistBatchSize());
-    this.maxInBinding = server.databasePlatform().maxInBinding();
+    this.maxDeleteBatch = initMaxDeleteBatch(server.databasePlatform().maxInBinding());
+  }
+
+  /**
+   * When delete batching is required limit the size.
+   * e.g. SqlServer has a 2100 parameter limit, so delete max 2000 for it.
+   */
+  private int initMaxDeleteBatch(int maxInBinding) {
+    return maxInBinding == 0 ? 1000 : maxInBinding;
   }
 
   @Override
@@ -647,14 +655,12 @@ public final class DefaultPersister implements Persister {
    * Delete by Id or a List of Id's.
    */
   private int delete(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
-    if (idList == null) {
-      return deleteBatch(descriptor, id, null, transaction, deleteMode);
+    if (idList == null || idList.size() <= maxDeleteBatch) {
+      return deleteBatch(descriptor, id, idList, transaction, deleteMode);
     }
     int rows = 0;
-    final int maxPartitionSize = maxInBinding == 0 ? 1000 : maxInBinding;
-    final List<List<Object>> idLists = Lists.partition(maxPartitionSize, idList);
-    for (List<Object> ids : idLists) {
-      rows += deleteBatch(descriptor, id, ids, transaction, deleteMode);
+    for (List<Object> batchOfIds : Lists.partition(maxDeleteBatch, idList)) {
+      rows += deleteBatch(descriptor, id, batchOfIds, transaction, deleteMode);
     }
     return rows;
   }
