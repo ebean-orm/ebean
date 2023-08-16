@@ -647,16 +647,15 @@ public final class DefaultPersister implements Persister {
    * Delete by Id or a List of Id's.
    */
   private int delete(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
-    int rows = 0;
-    if (maxInBinding > 0) {
-      // SqlServer has a 2100 parameter limit, so delete max 2000 ids at once
-      // this gives space up to 100 more query parameters.
-      while (idList != null && idList.size() > maxInBinding) {
-        rows += deleteBatch(descriptor, id, idList.subList(0, maxInBinding), transaction, deleteMode);
-        idList = idList.subList(maxInBinding, idList.size());
-      }
+    if (idList == null) {
+      return deleteBatch(descriptor, id, null, transaction, deleteMode);
     }
-    rows += deleteBatch(descriptor, id, idList, transaction, deleteMode);
+    int rows = 0;
+    final int maxPartitionSize = maxInBinding == 0 ? 1000 : maxInBinding;
+    final List<List<Object>> idLists = Lists.partition(maxPartitionSize, idList);
+    for (List<Object> ids : idLists) {
+      rows += deleteBatch(descriptor, id, ids, transaction, deleteMode);
+    }
     return rows;
   }
 
