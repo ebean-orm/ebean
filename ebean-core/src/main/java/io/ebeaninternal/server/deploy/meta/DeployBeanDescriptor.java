@@ -95,6 +95,8 @@ public class DeployBeanDescriptor<T> {
    * The EntityBean type used to create new EntityBeans.
    */
   private final Class<T> beanType;
+  private Class<?> originalType;
+  private boolean customized;
   private final List<BeanPersistController> persistControllers = new ArrayList<>();
   private final List<BeanPersistListener> persistListeners = new ArrayList<>();
   private final List<BeanQueryAdapter> queryAdapters = new ArrayList<>();
@@ -288,11 +290,9 @@ public class DeployBeanDescriptor<T> {
   }
 
   public DeployBeanTable createDeployBeanTable() {
-
-    DeployBeanTable beanTable = new DeployBeanTable(getBeanType());
+    DeployBeanTable beanTable = new DeployBeanTable(beanType);
     beanTable.setBaseTable(baseTable);
     beanTable.setIdProperty(idProperty());
-
     return beanTable;
   }
 
@@ -366,6 +366,20 @@ public class DeployBeanDescriptor<T> {
 
   public void setProperties(String[] props) {
     this.properties = props;
+  }
+
+  public boolean isCustomized() {
+    return customized;
+  }
+
+  public void markAsCustomized() {
+    this.customized = true;
+    this.entityType = EntityType.VIEW;
+    this.dependentTables = new String[]{baseTable};
+  }
+
+  public Class<?> getOriginalType() {
+    return originalType;
   }
 
   /**
@@ -952,15 +966,18 @@ public class DeployBeanDescriptor<T> {
    * Check valid mapping annotations on the class hierarchy.
    */
   private void checkInheritance(Class<?> beanType) {
-
     Class<?> parent = beanType.getSuperclass();
     if (parent == null || Object.class.equals(parent)) {
       // all good
       return;
     }
     if (parent.isAnnotationPresent(Entity.class)) {
-      String msg = "Checking " + getBeanType() + " and found " + parent + " that has @Entity annotation rather than MappedSuperclass?";
-      throw new IllegalStateException(msg);
+      // String msg = "Checking " + getBeanType() + " and found " + parent + " that has @Entity annotation rather than MappedSuperclass?";
+      // throw new IllegalStateException(msg);
+      // allow an entity to extend an entity ... as "customization"
+      originalType = parent;
+      manager.addCustomizedEntity(beanType, parent);
+      return;
     }
     if (parent.isAnnotationPresent(MappedSuperclass.class)) {
       // continue checking

@@ -120,6 +120,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<>();
   private Set<Class<?>> embeddedIdTypes = new HashSet<>();
   private List<DeployBeanInfo<?>> embeddedBeans = new ArrayList<>();
+  private final List<CustomPair> customizedEntities = new ArrayList<>();
 
   /**
    * Create for a given database dbConfig.
@@ -512,6 +513,11 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
         checkForValidEmbeddedId(d);
       }
     }
+    //for (CustomPair pair : customizedEntities) {
+      //BeanManager<?> newDesc = beanManagerMap.get(pair.overrideType.getName());
+      //BeanManager<?> oldDesc = beanManagerMap.get(pair.originalType.getName());
+      // System.out.println("replaced " + oldDesc + " with " + newDesc);
+    //}
   }
 
   private void checkForValidEmbeddedId(BeanDescriptor<?> d) {
@@ -619,7 +625,16 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
   private void registerDescriptor(DeployBeanInfo<?> info) {
     BeanDescriptor<?> desc = new BeanDescriptor<>(this, info.getDescriptor());
+    if (info.isCustomized()) {
+      // register for persisting via BeanManager which will use this descriptor
+      descMap.put("customized:" + desc.type().getName(), desc);
+      return;
+    }
     descMap.put(desc.type().getName(), desc);
+    Class<?> originalType = info.getOriginalType();
+    if (originalType != null) {
+      descMap.put(originalType.getName(), desc);
+    }
     if (desc.isDocStoreMapped()) {
       descQueueMap.put(desc.docStoreQueueId(), desc);
     }
@@ -658,6 +673,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
         embeddedBeans.add(info);
       }
     }
+    for (CustomPair pair : customizedEntities) {
+      DeployBeanInfo<?> info = deployInfoMap.get(pair.originalType);
+      info.markAsCustomized();
+    }
   }
 
   private void registerEmbeddedBean(DeployBeanInfo<?> info) {
@@ -672,8 +691,14 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    */
   private void readEntityBeanTable() {
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      BeanTable beanTable = createBeanTable(info);
-      beanTableMap.put(beanTable.getBeanType(), beanTable);
+      if (!info.isCustomized()) {
+        BeanTable beanTable = createBeanTable(info);
+        beanTableMap.put(beanTable.getBeanType(), beanTable);
+        Class<?> originalType = info.getOriginalType();
+        if (originalType != null) {
+          beanTableMap.put(originalType, beanTable);
+        }
+      }
     }
     // register non-id embedded beans (after bean tables are created)
     for (DeployBeanInfo<?> info : embeddedBeans) {
@@ -1503,6 +1528,13 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   /**
+   * Register that entity overrideType extends/customizes the originalType entity.
+   */
+  public void addCustomizedEntity(Class<?> overrideType, Class<?> originalType) {
+    customizedEntities.add(new CustomPair(overrideType, originalType));
+  }
+
+  /**
    * Comparator to sort the BeanDescriptors by name.
    */
   private static final class BeanDescComparator implements Comparator<BeanDescriptor<?>>, Serializable {
@@ -1512,6 +1544,17 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     @Override
     public int compare(BeanDescriptor<?> o1, BeanDescriptor<?> o2) {
       return o1.name().compareTo(o2.name());
+    }
+  }
+
+  private static final class CustomPair {
+
+    final Class<?> overrideType;
+    final Class<?> originalType;
+
+    CustomPair(Class<?> overrideType, Class<?> originalType) {
+      this.overrideType = overrideType;
+      this.originalType = originalType;
     }
   }
 }

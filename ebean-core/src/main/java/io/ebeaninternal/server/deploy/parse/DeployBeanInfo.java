@@ -77,4 +77,16 @@ public final class DeployBeanInfo<T> {
   public boolean isEmbedded() {
     return descriptor.isEmbedded();
   }
+
+  public Class<?> getOriginalType() {
+    return descriptor.getOriginalType();
+  }
+
+  public void markAsCustomized() {
+    descriptor.markAsCustomized();
+  }
+
+  public boolean isCustomized() {
+    return descriptor.isCustomized();
+  }
 }
