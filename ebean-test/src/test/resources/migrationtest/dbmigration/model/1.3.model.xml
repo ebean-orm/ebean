@@ -55,6 +55,7 @@
         <alterForeignKey name="fk_drop_main_drop_ref_many_drop_main" columnNames="DROP FOREIGN KEY" indexName="ix_drop_main_drop_ref_many_drop_main" tableName="drop_main_drop_ref_many"/>
         <alterForeignKey name="fk_drop_main_drop_ref_many_drop_ref_many" columnNames="DROP FOREIGN KEY" indexName="ix_drop_main_drop_ref_many_drop_ref_many" tableName="drop_main_drop_ref_many"/>
         <alterForeignKey name="fk_drop_ref_one_parent_id" columnNames="DROP FOREIGN KEY" indexName="ix_drop_ref_one_parent_id" tableName="drop_ref_one"/>
+        <alterForeignKey name="fk_drop_ref_one_to_one_parent_id" columnNames="DROP FOREIGN KEY" tableName="drop_ref_one_to_one"/>
         <alterForeignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c" tableName="migtest_mtm_c_migtest_mtm_m"/>
         <alterForeignKey name="fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m" tableName="migtest_mtm_c_migtest_mtm_m"/>
         <alterForeignKey name="fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" columnNames="DROP FOREIGN KEY" indexName="ix_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m" tableName="migtest_mtm_m_migtest_mtm_c"/>
