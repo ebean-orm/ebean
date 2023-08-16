@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -452,5 +453,31 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertThat(spiTuples.entries()).hasSize(3);
     assertThat(list).hasSize(3);
     assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in ((?,?),(?,?),(?,?)) order by t0.sku desc;");
+  }
+
+  @IgnorePlatform({Platform.SQLSERVER, Platform.DB2})
+  @Test
+  void inTuples_literalMode() {
+    InTuples tuples = InTuples.of("sku", "code");
+    // add more entries than threshold triggers literal mode
+    tuples.add("hi", 123);
+    tuples.add("bye", 121);
+    for (int i = 0; i < 5_000; i++) {
+      tuples.add(UUID.randomUUID(), i);
+    }
+
+    LoggedSql.start();
+
+    DB.find(OCachedNatKeyBean3.class)
+      .where()
+      .eq("store", "def")
+      .inTuples(tuples)
+      .setUseCache(false)
+      .orderBy("sku desc")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+
+    assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in (('hi',123),('bye',121),('");
   }
 }

@@ -44,6 +44,11 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
+  public StringBuilder buffer() {
+    return sql;
+  }
+
+  @Override
   public SpiExpressionRequest append(String expression) {
     sql.append(expression);
     return this;
