@@ -38,6 +38,13 @@ create table drop_ref_one (
 );
 create sequence drop_ref_one_seq as bigint start with 1;
 
+create table drop_ref_one_to_one (
+  id                            integer not null,
+  parent_id                     integer,
+  constraint pk_drop_ref_one_to_one primary key (id)
+);
+create sequence drop_ref_one_to_one_seq as bigint start with 1;
+
 create table migtest_e_test_binary (
   id                            integer not null,
   test_byte16                   varbinary(16),
@@ -227,6 +234,7 @@ alter table migtest_e_history6 alter column test_number2 integer;
 alter table migtest_e_softdelete add deleted bit default 0 not null;
 alter table migtest_oto_child add master_id bigint;
 -- apply post alter
+create unique nonclustered index uq_drop_ref_one_to_one_parent_id on drop_ref_one_to_one(parent_id) where parent_id is not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
 update migtest_e_basic set new_boolean_field = old_boolean;
@@ -251,6 +259,8 @@ alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_dr
 
 create index ix_drop_ref_one_parent_id on drop_ref_one (parent_id);
 alter table drop_ref_one add constraint fk_drop_ref_one_parent_id foreign key (parent_id) references drop_main (id);
+
+alter table drop_ref_one_to_one add constraint fk_drop_ref_one_to_one_parent_id foreign key (parent_id) references drop_main (id);
 
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);

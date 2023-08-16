@@ -94,6 +94,7 @@
         <dropTable name="drop_main_drop_ref_many"/>
         <dropTable name="drop_ref_many" sequenceCol="id"/>
         <dropTable name="drop_ref_one" sequenceCol="id"/>
+        <dropTable name="drop_ref_one_to_one" sequenceCol="id"/>
         <dropTable name="migtest_e_test_binary" sequenceCol="id"/>
         <dropTable name="migtest_e_test_json" sequenceCol="id"/>
         <dropTable name="migtest_e_test_lob" sequenceCol="id"/>

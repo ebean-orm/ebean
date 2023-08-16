@@ -29,6 +29,10 @@
             <column name="id" type="integer" primaryKey="true"/>
             <column name="parent_id" type="integer" references="drop_main.id" foreignKeyName="fk_drop_ref_one_parent_id" foreignKeyIndex="ix_drop_ref_one_parent_id"/>
         </createTable>
+        <createTable name="drop_ref_one_to_one" pkName="pk_drop_ref_one_to_one">
+            <column name="id" type="integer" primaryKey="true"/>
+            <column name="parent_id" type="integer" uniqueOneToOne="uq_drop_ref_one_to_one_parent_id" references="drop_main.id" foreignKeyName="fk_drop_ref_one_to_one_parent_id"/>
+        </createTable>
         <alterColumn columnName="status" tableName="migtest_e_basic" currentType="varchar(1)" defaultValue="'A'" notnull="true" currentNotnull="false" checkConstraint="check ( status in ('N','A','I','?'))" checkConstraintName="ck_migtest_e_basic_status"/>
         <alterColumn columnName="status2" tableName="migtest_e_basic" type="varchar(127)" currentType="varchar(1)" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true" dropCheckConstraint="ck_migtest_e_basic_status2"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" unique="uq_migtest_e_basic_description">
