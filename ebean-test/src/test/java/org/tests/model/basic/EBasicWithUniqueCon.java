@@ -1,10 +1,13 @@
 package org.tests.model.basic;
 
+import io.ebean.annotation.Cache;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 
 @Entity
+@Cache(enableQueryCache = true)
 @Table(name = "e_basicverucon")
 @UniqueConstraint(columnNames = {"other", "other_one"})
 public class EBasicWithUniqueCon {
