@@ -659,7 +659,7 @@ public final class DefaultPersister implements Persister {
       return deleteBatch(descriptor, id, idList, transaction, deleteMode);
     }
     int rows = 0;
-    for (List<Object> batchOfIds : Lists.partition(maxDeleteBatch, idList)) {
+    for (List<Object> batchOfIds : Lists.partition(idList, maxDeleteBatch)) {
       rows += deleteBatch(descriptor, id, batchOfIds, transaction, deleteMode);
     }
     return rows;
