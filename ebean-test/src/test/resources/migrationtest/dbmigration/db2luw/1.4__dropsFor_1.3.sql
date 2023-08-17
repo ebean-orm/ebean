@@ -73,6 +73,14 @@ if exists (select seqschema from syscat.sequences where seqschema = current_sche
   execute stmt;
 end if;
 end$$;
+drop table drop_ref_one_to_one;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'DROP_REF_ONE_TO_ONE_SEQ') then
+  prepare stmt from 'drop sequence drop_ref_one_to_one_seq';
+  execute stmt;
+end if;
+end$$;
 drop table migtest_e_test_binary;
 delimiter $$
 begin

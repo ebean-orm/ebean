@@ -21,6 +21,7 @@ drop table if exists drop_main;
 drop table if exists drop_main_drop_ref_many;
 drop table if exists drop_ref_many;
 drop table if exists drop_ref_one;
+drop table if exists drop_ref_one_to_one;
 drop table if exists migtest_e_test_binary;
 drop table if exists migtest_e_test_json;
 drop table if exists migtest_e_test_lob;
