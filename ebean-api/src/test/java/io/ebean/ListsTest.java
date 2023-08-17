@@ -10,28 +10,28 @@ class ListsTest {
 
   @Test
   void partition_empty() {
-    List<List<Integer>> partitions = Lists.partition(5, List.of());
+    List<List<Integer>> partitions = Lists.partition(List.of(), 5);
     assertThat(partitions).hasSize(1);
     assertThat(partitions.get(0)).hasSize(0);
   }
 
   @Test
   void partition_lt() {
-    List<List<Integer>> partitions = Lists.partition(5, List.of(1, 2, 3, 4));
+    List<List<Integer>> partitions = Lists.partition(List.of(1, 2, 3, 4), 5);
     assertThat(partitions).hasSize(1);
     assertThat(partitions.get(0)).hasSize(4);
   }
 
   @Test
   void partition_eq() {
-    List<List<Integer>> partitions = Lists.partition(5, List.of(1, 2, 3, 4, 5));
+    List<List<Integer>> partitions = Lists.partition(List.of(1, 2, 3, 4, 5), 5);
     assertThat(partitions).hasSize(1);
     assertThat(partitions.get(0)).hasSize(5);
   }
 
   @Test
   void partition_gt() {
-    List<List<Integer>> partitions = Lists.partition(5, List.of(1, 2, 3, 4, 5, 6));
+    List<List<Integer>> partitions = Lists.partition(List.of(1, 2, 3, 4, 5, 6), 5);
     assertThat(partitions).hasSize(2);
     assertThat(partitions.get(0)).hasSize(5);
     assertThat(partitions.get(1)).hasSize(1);
@@ -41,7 +41,7 @@ class ListsTest {
 
   @Test
   void partition_gt1_letters() {
-    var partitions = Lists.partition(3, List.of("a", "b", "c", "d"));
+    var partitions = Lists.partition(List.of("a", "b", "c", "d"), 3);
     assertThat(partitions).hasSize(2);
     assertThat(partitions.get(0)).hasSize(3);
     assertThat(partitions.get(1)).hasSize(1);
@@ -51,7 +51,7 @@ class ListsTest {
 
   @Test
   void partition_gt1a_letters() {
-    var partitions = Lists.partition(3, List.of("a", "b", "c", "d", "e"));
+    var partitions = Lists.partition(List.of("a", "b", "c", "d", "e"), 3);
     assertThat(partitions).hasSize(2);
     assertThat(partitions.get(0)).hasSize(3);
     assertThat(partitions.get(1)).hasSize(2);
@@ -61,7 +61,7 @@ class ListsTest {
 
   @Test
   void partition_eq2_letters() {
-    var partitions = Lists.partition(3, List.of("a", "b", "c", "d", "e", "f"));
+    var partitions = Lists.partition(List.of("a", "b", "c", "d", "e", "f"), 3);
     assertThat(partitions).hasSize(2);
     assertThat(partitions.get(0)).hasSize(3);
     assertThat(partitions.get(1)).hasSize(3);
@@ -71,7 +71,7 @@ class ListsTest {
 
   @Test
   void partition_gt2_letters() {
-    var partitions = Lists.partition(3, List.of("a", "b", "c", "d", "e", "f", "g"));
+    var partitions = Lists.partition(List.of("a", "b", "c", "d", "e", "f", "g"), 3);
     assertThat(partitions).hasSize(3);
     assertThat(partitions.get(0)).hasSize(3);
     assertThat(partitions.get(1)).hasSize(3);

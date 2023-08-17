@@ -6,17 +6,23 @@ import java.util.List;
 /**
  * Helper methods for Lists.
  */
-public interface Lists {
+public final class Lists {
+
+  private Lists() {
+  }
 
   /**
    * Partition the source List into sub-lists with a maximum size.
+   * <p>
+   * The sub-lists will all be the max size except for the last sub-list
+   * which can potentially be smaller.
    *
-   * @param max    The max size of each partition
    * @param source The source list
+   * @param max    The max size of each partition
    * @param <T>    The list element type
-   * @return List of partitions
+   * @return List of sub-list partitions
    */
-  static <T> List<List<T>> partition(int max, List<T> source) {
+  public static <T> List<List<T>> partition(List<T> source, int max) {
     final int totalCount = source.size();
     if (totalCount <= max) {
       return List.of(source);
