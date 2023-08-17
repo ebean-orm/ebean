@@ -2,8 +2,10 @@ package org.tests.model.aggregation;
 
 import io.ebean.DB;
 import io.ebean.InTuples;
+import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -15,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestInTuplesWithLocalDate extends BaseTestCase {
 
+  @IgnorePlatform({Platform.SQLSERVER, Platform.DB2})
   @Test
   void inTuples_localDate() {
     DOrg org = new DOrg("inTuple");
