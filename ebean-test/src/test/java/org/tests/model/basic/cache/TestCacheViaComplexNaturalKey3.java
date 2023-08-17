@@ -459,11 +459,11 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
   @Test
   void inTuples_literalMode() {
     InTuples tuples = InTuples.of("sku", "code");
-    // add more entries than threshold triggers literal mode
     tuples.add("hi", 123);
     tuples.add("bye", 121);
+    // add more entries than threshold triggers literal mode
     for (int i = 0; i < 5_000; i++) {
-      tuples.add(UUID.randomUUID(), i);
+      tuples.add("x", i);
     }
 
     LoggedSql.start();
@@ -478,6 +478,11 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
 
-    assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in (('hi',123),('bye',121),('");
+    if (isPostgresCompatible()) {
+      // didn't exceed postgres threshold
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in ((?,?),(?,?),(");
+    } else {
+      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in (('hi',123),('bye',121),('");
+    }
   }
 }

@@ -33,6 +33,11 @@ final class OrmQueryPlanKey implements CQueryPlanKey {
   }
 
   @Override
+  public boolean useCache() {
+    return !description.startsWith("$NoCache");
+  }
+
+  @Override
   public String partialKey() {
     return description;
   }
