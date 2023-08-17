@@ -1503,7 +1503,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   public void queryPlan(CQueryPlanKey key, CQueryPlan plan) {
-    queryPlanCache.put(key, plan);
+    if (key.useCache()) {
+      queryPlanCache.put(key, plan);
+    }
   }
 
   /**

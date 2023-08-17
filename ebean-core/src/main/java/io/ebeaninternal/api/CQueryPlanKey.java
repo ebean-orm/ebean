@@ -6,6 +6,11 @@ package io.ebeaninternal.api;
 public interface CQueryPlanKey {
 
   /**
+   * Return true if the query plan should be cached.
+   */
+  boolean useCache();
+
+  /**
    * Used by read audit such that we can log read audit entries without the full sql
    * (which would make the read audit logs verbose).
    */

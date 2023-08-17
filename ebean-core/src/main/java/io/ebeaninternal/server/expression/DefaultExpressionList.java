@@ -612,9 +612,9 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     }
     for (SpiExpression expr : list) {
       expr.queryPlanHash(builder);
-      builder.append(",");
+      builder.append(',');
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

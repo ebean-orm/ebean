@@ -1047,13 +1047,13 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
       sb.append("/tm").append(temporalMode.ordinal());
       if (versionsStart != null) {
-        sb.append("v");
+        sb.append('v');
       }
     }
     if (forUpdate != null) {
       sb.append("/fu").append(forUpdate.ordinal());
       if (lockType != null) {
-        sb.append("t").append(lockType.ordinal());
+        sb.append('t').append(lockType.ordinal());
       }
     }
     if (id != null) {
@@ -1092,27 +1092,27 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (detail != null) {
       sb.append("/d[");
       detail.queryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     if (bindParams != null) {
       sb.append("/b[");
       bindParams.buildQueryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     if (whereExpressions != null) {
       sb.append("/w[");
       whereExpressions.queryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     if (havingExpressions != null) {
       sb.append("/h[");
       havingExpressions.queryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     if (updateProperties != null) {
       sb.append("/u[");
       updateProperties.buildQueryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     return sb.toString();
   }

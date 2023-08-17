@@ -66,7 +66,7 @@ final class InTuplesExpression extends AbstractExpression {
     if (maxInBinding == 0) {
       return 5000 / propertyCount;
     }
-    return Math.min((maxInBinding / propertyCount) - 200, 5000);
+    return (maxInBinding / propertyCount) - 200;
   }
 
   @Override
@@ -159,19 +159,19 @@ final class InTuplesExpression extends AbstractExpression {
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
+    if (literalMode) {
+      builder.delete(0, builder.length());
+      builder.append("$NoCache/").append(UUID.randomUUID()).append('/');
+      return;
+    }
     if (not) {
       builder.append("Not");
     }
     builder.append("InTuple[");
-    if (literalMode) {
-      builder.append(UUID.randomUUID());
-    } else {
-      for (String property : properties) {
-        builder.append(property).append("-");
-      }
-      builder.append(entries.size());
+    for (String property : properties) {
+      builder.append(property).append("-");
     }
-    builder.append("]");
+    builder.append(entries.size()).append(']');
   }
 
   @Override

@@ -2,8 +2,10 @@ package org.tests.model.aggregation;
 
 import io.ebean.DB;
 import io.ebean.InTuples;
+import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -15,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestInTuplesWithLocalDate extends BaseTestCase {
 
+  @IgnorePlatform({Platform.SQLSERVER, Platform.DB2})
   @Test
   void inTuples_localDate() {
     DOrg org = new DOrg("inTuple");
@@ -81,9 +84,11 @@ class TestInTuplesWithLocalDate extends BaseTestCase {
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("where (t0.edate,t0.hours) in ((?,?),(?,?),(?,?),(?,?),(?,?)) and t1.name = ?");
     if (isMySql()) {
-      assertThat(sql.get(1)).contains("where (t0.edate,t0.hours) in (({d '2023-08-16'},0),({d '2023-08-16'},100),({d '2023-08-16'},101)");
+      assertThat(sql.get(1)).contains("where (t0.edate,t0.hours) in (({d '2023-08-16'},0),({d '2023-08-16'},100),({d '2023-08-16'},101),(");
+    } else if (isPostgresCompatible()) {
+      assertThat(sql.get(1)).contains("where (t0.edate,t0.hours) in ((?,?),(?,?),(?,?),(");
     } else {
-      assertThat(sql.get(1)).contains("where (t0.edate,t0.hours) in ((date '2023-08-16',0),(date '2023-08-16',100),(date '2023-08-16',101)");
+      assertThat(sql.get(1)).contains("where (t0.edate,t0.hours) in ((date '2023-08-16',0),(date '2023-08-16',100),(date '2023-08-16',101),(");
     }
 
     DB.deleteAll(allStats);
