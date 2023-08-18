@@ -4,10 +4,11 @@ import io.ebean.*;
 import io.ebean.annotation.Transactional;
 import io.ebean.test.LoggedSql;
 import io.ebean.types.Inet;
-import org.example.domain.*;
+import org.example.domain.Address;
+import org.example.domain.Country;
+import org.example.domain.Customer;
 import org.example.domain.otherpackage.PhoneNumber;
 import org.example.domain.otherpackage.ValidEmail;
-import org.example.domain.query.QAnimal;
 import org.example.domain.query.QContact;
 import org.example.domain.query.QCustomer;
 import org.junit.jupiter.api.Disabled;
@@ -26,7 +27,9 @@ import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.domain.query.QAddress.Alias.country;
 import static org.example.domain.query.QAddress.Alias.line1;
+import static org.example.domain.query.QContact.Alias.firstName;
 import static org.example.domain.query.QContact.Alias.lastName;
+import static org.example.domain.query.QCustomer.Alias.*;
 import static org.example.domain.query.QCustomer.Alias.billingAddress;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -161,8 +164,8 @@ public class QCustomerTest {
   @Test
   void equalTo_byProperty() {
     Query<Customer> query = new QCustomer()
-      .select(QCustomer.Alias.id)
-      .billingAddress.city.eq(QCustomer.Alias.shippingAddress.city)
+      .select(id)
+      .billingAddress.city.eq(shippingAddress.city)
       .query();
 
     query.findList();
@@ -178,8 +181,8 @@ public class QCustomerTest {
   @Test
   void notEqual_byProperty() {
     Query<Customer> query = new QCustomer()
-      .select(QCustomer.Alias.id)
-      .billingAddress.city.ne(QCustomer.Alias.shippingAddress.city)
+      .select(id)
+      .billingAddress.city.ne(shippingAddress.city)
       .query();
 
     query.findList();
@@ -246,6 +249,37 @@ public class QCustomerTest {
       .findList();
   }
 
+  static final FetchGroup<Customer> FGCustomerContacts = QCustomer.forFetchGroup()
+    .select(name)
+    .contacts.fetch(firstName, lastName)
+    .buildFetchGroup();
+
+  @Test
+  void filterMany() {
+
+    var q = new QCustomer()
+      .select(FGCustomerContacts)
+      .contacts.filterMany(contacts -> contacts
+        .firstName.startsWith("r")
+        .email.isNotNull())
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).isEqualTo("select t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where t1.first_name like ? escape'|'  and t1.email is not null order by t0.id");
+  }
+
+  @Test
+  void filterManySingle() {
+
+    var q = new QCustomer()
+      .select(FGCustomerContacts)
+      .contacts.filterMany(c -> c.firstName.startsWith("r"))
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).isEqualTo("select t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where t1.first_name like ? escape'|'  order by t0.id");
+  }
+
   @Test
   public void testIdIn() {
 
@@ -277,10 +311,10 @@ public class QCustomerTest {
 
   @Test
   public void usingMaster() {
-      new QCustomer()
-        .registered.isNull()
-        .usingMaster()
-        .findList();
+    new QCustomer()
+      .registered.isNull()
+      .usingMaster()
+      .findList();
   }
 
   @Test
@@ -555,7 +589,7 @@ public class QCustomerTest {
     assertContains(new QCustomer().registered.lt(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.before(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.lessThan(new Date()).query(), " where t0.registered < ?");
-    assertContains(new QCustomer().whenCreated.lt(QCustomer.Alias.whenUpdated).query(), " where t0.when_created < t0.when_updated");
+    assertContains(new QCustomer().whenCreated.lt(whenUpdated).query(), " where t0.when_created < t0.when_updated");
   }
 
   @Test
@@ -563,7 +597,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.le(new Date()).query(), " where t0.registered <= ?");
     assertContains(new QCustomer().registered.lessOrEqualTo(new Date()).query(), " where t0.registered <= ?");
-    assertContains(new QCustomer().whenCreated.le(QCustomer.Alias.whenUpdated).query(), " where t0.when_created <= t0.when_updated");
+    assertContains(new QCustomer().whenCreated.le(whenUpdated).query(), " where t0.when_created <= t0.when_updated");
   }
 
   @Test
@@ -571,7 +605,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.after(new Date()).query(), " where t0.registered > ?");
     assertContains(new QCustomer().registered.gt(new Date()).query(), " where t0.registered > ?");
-    assertContains(new QCustomer().whenCreated.gt(QCustomer.Alias.whenUpdated).query(), " where t0.when_created > t0.when_updated");
+    assertContains(new QCustomer().whenCreated.gt(whenUpdated).query(), " where t0.when_created > t0.when_updated");
     assertContains(new QCustomer().registered.greaterThan(new Date()).query(), " where t0.registered > ?");
   }
 
@@ -581,7 +615,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.ge(new Date()).query(), " where t0.registered >= ?");
     assertContains(new QCustomer().registered.greaterOrEqualTo(new Date()).query(), " where t0.registered >= ?");
-    assertContains(new QCustomer().whenCreated.ge(QCustomer.Alias.whenUpdated).query(), " where t0.when_created >= t0.when_updated");
+    assertContains(new QCustomer().whenCreated.ge(whenUpdated).query(), " where t0.when_created >= t0.when_updated");
   }
 
   private void assertContains(Query<Customer> query, String match) {
@@ -597,8 +631,6 @@ public class QCustomerTest {
       .setAllowLoadErrors()
       .findList();
   }
-
-
 
   @Test
   public void select_assocManyToOne() {
@@ -788,16 +820,16 @@ public class QCustomerTest {
       .findList();
 
     new QCustomer()
-      .add(in(QCustomer.Alias.name, List.of("foo", "bar")))
-      .add(eq(QCustomer.Alias.currentInet, Inet.of("127.0.0.1")))
+      .add(in(name, List.of("foo", "bar")))
+      .add(eq(currentInet, Inet.of("127.0.0.1")))
       .findList();
 
     new QCustomer()
       //.add(gt(sum(QCustomer.Alias.version), 45))
-      .add(eq(QCustomer.Alias.version, 45L))
-      .add(eq(QCustomer.Alias.name, "junk"))
-      .add(eq(QCustomer.Alias.registered, new Date()))
-      .add(eq(QCustomer.Alias.whenUpdated, new Timestamp(System.currentTimeMillis())))
+      .add(eq(version, 45L))
+      .add(eq(name, "junk"))
+      .add(eq(registered, new Date()))
+      .add(eq(whenUpdated, new Timestamp(System.currentTimeMillis())))
       .findList();
   }
 

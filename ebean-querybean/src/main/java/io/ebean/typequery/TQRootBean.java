@@ -136,6 +136,13 @@ public abstract class TQRootBean<T, R> {
     this.query = null;
   }
 
+  /** Construct for FilterMany */
+  protected TQRootBean(ExpressionList<T> filter) {
+    this.query = null;
+    this.whereStack = new ArrayStack<>();
+    whereStack.push(filter);
+  }
+
   /**
    * Return the fetch group.
    */
