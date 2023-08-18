@@ -84,7 +84,6 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
   public void appendLike(boolean rawLikeExpression) {
     sql.append(" ");
     sql.append(queryRequest.dbLikeClause(rawLikeExpression));
-    sql.append(" ");
   }
 
   @Override
