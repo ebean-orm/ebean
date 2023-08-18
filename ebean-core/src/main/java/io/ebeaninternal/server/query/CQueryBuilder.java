@@ -148,7 +148,7 @@ final class CQueryBuilder {
     StringBuilder sb = new StringBuilder(200);
     sb.append("update ").append(request.descriptor().baseTable());
     if (rootTableAlias != null) {
-      sb.append(" ").append(rootTableAlias);
+      sb.append(' ').append(rootTableAlias);
     }
     sb.append(" set ").append(predicates.dbUpdateClause());
     String updateClause = sb.toString();

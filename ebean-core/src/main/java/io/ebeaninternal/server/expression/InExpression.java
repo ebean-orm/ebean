@@ -193,7 +193,7 @@ public final class InExpression extends AbstractExpression implements IdInCommon
         builder.append(bindValues.size());
       }
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

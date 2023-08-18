@@ -265,7 +265,7 @@ public final class OrmQueryProperties implements Serializable {
   public void asStringDebug(String prefix, StringBuilder sb) {
     sb.append(prefix);
     if (path != null) {
-      sb.append(path).append(" ");
+      sb.append(path).append(' ');
     }
     if (allProperties) {
       sb.append("(*)");

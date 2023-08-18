@@ -105,9 +105,9 @@ public final class TableJoin {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(30);
-    sb.append(type).append(" ").append(table).append(" ");
+    sb.append(type).append(' ').append(table).append(' ');
     for (TableJoinColumn column : columns) {
-      sb.append(column).append(" ");
+      sb.append(column).append(' ');
     }
     return sb.toString();
   }

@@ -66,13 +66,10 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
    */
   @Override
   public SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
-    ctx.append(baseTable);
-    ctx.append(" ").append(baseTableAlias);
-    ctx.appendFromForUpdate();
+    ctx.append(baseTable).append(" ").append(baseTableAlias).appendFromForUpdate();
     if (includeJoin != null) {
-      String a1 = baseTableAlias;
-      String a2 = "int_"; // unique alias for intersection join
-      includeJoin.addJoin(joinType, a1, a2, ctx);
+      // unique alias for intersection join
+      includeJoin.addJoin(joinType, baseTableAlias, "int_", ctx);
     }
     return joinType;
   }

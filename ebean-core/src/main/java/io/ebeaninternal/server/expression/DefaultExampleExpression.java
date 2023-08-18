@@ -209,7 +209,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
     if (list.isEmpty()) {
       request.append(SQL_TRUE);
     } else {
-      request.append("(");
+      request.append('(');
       for (int i = 0; i < list.size(); i++) {
         SpiExpression item = list.get(i);
         if (i > 0) {
@@ -217,7 +217,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
         }
         item.addSql(request);
       }
-      request.append(")");
+      request.append(')');
     }
   }
 
@@ -229,9 +229,9 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
     builder.append("Example[");
     for (SpiExpression expr : list) {
       expr.queryPlanHash(builder);
-      builder.append(",");
+      builder.append(',');
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

@@ -98,10 +98,10 @@ final class InTuplesExpression extends AbstractExpression {
       request.append(not ? SQL_TRUE : SQL_FALSE);
       return;
     }
-    request.append("(");
+    request.append('(');
     for (int i = 0; i < properties.length; i++) {
       if (i > 0) {
-        request.append(",");
+        request.append(',');
       }
       request.property(properties[i]);
     }
@@ -111,7 +111,7 @@ final class InTuplesExpression extends AbstractExpression {
     } else {
       addSqlBinding(request);
     }
-    request.append(")");
+    request.append(')');
   }
 
   private void addSqlLiterals(SpiExpressionRequest request) {
@@ -136,7 +136,7 @@ final class InTuplesExpression extends AbstractExpression {
     final String eb = entryBinding();
     for (int i = 0; i < entries.size(); i++) {
       if (i > 0) {
-        request.append(",");
+        request.append(',');
       }
       request.append(eb);
     }
