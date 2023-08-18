@@ -44,7 +44,7 @@ final class ArrayContainsExpression extends AbstractExpression {
   public void queryPlanHash(StringBuilder builder) {
     builder.append("ArrayContains[").append(propName)
       .append(" b:").append(contains)
-      .append(" ?:").append(values.length).append("]");
+      .append(" ?:").append(values.length).append(']');
   }
 
   @Override

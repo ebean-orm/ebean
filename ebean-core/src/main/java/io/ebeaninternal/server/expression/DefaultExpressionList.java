@@ -610,7 +610,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       builder.append("textRoot:true ");
     }
     if (allDocNestedPath != null) {
-      builder.append("path:").append(allDocNestedPath).append(" ");
+      builder.append("path:").append(allDocNestedPath).append(' ');
     }
     for (SpiExpression expr : list) {
       expr.queryPlanHash(builder);

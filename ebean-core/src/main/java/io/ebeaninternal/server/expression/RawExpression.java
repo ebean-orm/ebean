@@ -65,7 +65,7 @@ final class RawExpression extends NonPrepareExpression {
     if (values != null) {
       builder.append(" ?").append(values.length);
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

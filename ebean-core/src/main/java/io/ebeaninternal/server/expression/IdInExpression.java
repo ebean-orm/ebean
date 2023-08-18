@@ -109,7 +109,7 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
       // query plan specific to the number of parameters in the IN clause
       builder.append(idCollection.size());
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

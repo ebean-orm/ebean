@@ -86,7 +86,7 @@ final class BetweenPropertyExpression extends NonPrepareExpression {
 
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("BetweenProperties[").append("low:").append(lowProperty).append(" high:").append(highProperty).append("]");
+    builder.append("BetweenProperties[").append("low:").append(lowProperty).append(" high:").append(highProperty).append(']');
   }
 
   @Override

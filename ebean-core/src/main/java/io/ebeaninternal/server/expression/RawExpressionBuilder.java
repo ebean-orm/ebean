@@ -54,9 +54,9 @@ final class RawExpressionBuilder {
     StringBuilder sqlExpand = new StringBuilder(values.size() * 2);
     for (int i = 0; i < values.size(); i++) {
       if (i > 0) {
-        sqlExpand.append(",");
+        sqlExpand.append(',');
       }
-      sqlExpand.append("?");
+      sqlExpand.append('?');
     }
     return sqlExpand.toString();
   }
