@@ -134,18 +134,22 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
-  public void test_with_findOne() {
-
+  public void test_with_findOne_rawSeparateQuery() {
     ResetBasicData.reset();
 
+    LoggedSql.start();
     Customer customer = DB.find(Customer.class)
       .setMaxRows(1)
       .order().asc("id")
       .fetch("orders")
-      .filterMany("orders").raw("1 = 0")
+      .filterMany("orders").raw("orderDate is not null")
       .findOne();
 
     assertThat(customer).isNotNull();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("from o_customer t0 order by");
+    assertThat(sql.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where");
   }
 
   @Test
