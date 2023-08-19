@@ -153,6 +153,24 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
+  public void test_with_findOne_rawSameQuery() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+    var result = DB.find(Customer.class)
+      .order().asc("id")
+      .fetch("orders")
+      .filterMany("orders").raw("orderDate is not null")
+      .findList();
+
+    assertThat(result).isNotEmpty();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("from o_customer t0 left join o_order t1");
+    assertThat(sql.get(0)).contains("where t1.order_date is not null");
+  }
+
+  @Test
   public void test_with_findOneOrEmpty() {
 
     ResetBasicData.reset();
