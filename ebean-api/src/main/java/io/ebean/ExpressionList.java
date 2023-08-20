@@ -508,6 +508,8 @@ public interface ExpressionList<T> {
   ExpressionList<T> filterMany(String manyProperty);
 
   /**
+   * Deprecated for removal - migrate to filterManyRaw()
+   * <p>
    * Add filter expressions to the many property.
    *
    * <pre>{@code
@@ -524,7 +526,28 @@ public interface ExpressionList<T> {
    * @param expressions  Filter expressions with and, or and ? or ?1 type bind parameters
    * @param params       Bind parameters used in the expressions
    */
+  @Deprecated(forRemoval = true)
   ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params);
+
+  /**
+   * Add filter expressions for the many path. The expressions can include SQL functions if
+   * desired and the property names are translated to column names.
+   * <p>
+   * The expressions can contain placeholders for bind values using <code>?</code> or <code>?1</code> style.
+   *
+   * <pre>{@code
+   *
+   *     new QCustomer()
+   *       .name.startsWith("Postgres")
+   *       .contacts.filterMany("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
+   *       .findList();
+   *
+   * }</pre>
+   *
+   * @param rawExpressions The raw expressions which can include ? and ?1 style bind parameter placeholders
+   * @param params The parameter values to bind
+   */
+  ExpressionList<T> filterManyRaw(String manyProperty, String rawExpressions, Object... params);
 
   /**
    * Specify specific properties to fetch on the main/root bean (aka partial

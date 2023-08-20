@@ -318,6 +318,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> filterManyRaw(String manyProperty, String rawExpression, Object... params) {
+    throw new IllegalStateException("filterMany not allowed on Junction expression list");
+  }
+
+  @Override
   public Query<T> usingTransaction(Transaction transaction) {
     return exprList.usingTransaction(transaction);
   }

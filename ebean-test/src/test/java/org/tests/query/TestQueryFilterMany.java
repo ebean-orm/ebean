@@ -124,13 +124,58 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sqlList = LoggedSql.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
-    assertThat(sqlList.get(1)).contains("status = ?");
+    assertThat(sqlList.get(1)).contains("t0.status = ?");
 
     if (isH2() || isPostgresCompatible()) {
       assertThat(sqlList.get(0)).doesNotContain("offset");
       assertThat(sqlList.get(0)).contains(" limit 5");
       assertThat(sqlList.get(1)).contains(" order by t0.order_date desc, t0.id limit 100 offset 3");
     }
+  }
+
+  @Test
+  public void filterManyRaw_firstMaxRows_expressionFluidStyle() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+
+    final Query<Customer> query = DB.find(Customer.class)
+      .where().ieq("name", "Rob")
+      // use expression + fluid style adding maxRows/firstRow to filterMany
+      .filterManyRaw("orders", "status = ?", Order.Status.NEW)
+      .setMaxRows(100).setFirstRow(3).order("orderDate desc, id")
+      .order().asc("id").setMaxRows(5);
+
+    final List<Customer> customers = query.findList();
+    assertThat(customers).isNotEmpty();
+    List<String> sqlList = LoggedSql.stop();
+    assertEquals(2, sqlList.size());
+    assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
+    assertThat(sqlList.get(1)).contains("t0.status = ?");
+
+    if (isH2() || isPostgresCompatible()) {
+      assertThat(sqlList.get(0)).doesNotContain("offset");
+      assertThat(sqlList.get(0)).contains(" limit 5");
+      assertThat(sqlList.get(1)).contains(" order by t0.order_date desc, t0.id limit 100 offset 3");
+    }
+  }
+
+  @Test
+  public void filterManyRaw_singleQuery() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+
+    final Query<Customer> query = DB.find(Customer.class)
+      .where().ieq("name", "Rob")
+      .filterManyRaw("orders", "status = ?", Order.Status.NEW)
+      .order().asc("id");
+
+    final List<Customer> customers = query.findList();
+    assertThat(customers).isNotEmpty();
+    List<String> sqlList = LoggedSql.stop();
+    assertEquals(1, sqlList.size());
+    assertThat(sqlList.get(0)).contains(" where lower(t0.name) = ? and t1.status = ? order by t0.id");
   }
 
   @Test

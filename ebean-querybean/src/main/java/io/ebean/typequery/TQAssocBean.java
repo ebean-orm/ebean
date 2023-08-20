@@ -188,6 +188,8 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
   }
 
   /**
+   * Deprecated for removal - migrate to filterManyRaw()
+   * <p>
    * Apply a filter when fetching these beans.
    * <p>
    * The expressions can use any valid Ebean expression and contain
@@ -215,8 +217,32 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
    * @param params      The bind parameter values
    */
+  @Deprecated(forRemoval = true)
   public final R filterMany(String expressions, Object... params) {
     expr().filterMany(_name, expressions, params);
+    return _root;
+  }
+
+  /**
+   * Add filter expressions for the many path. The expressions can include SQL functions if
+   * desired and the property names are translated to column names.
+   * <p>
+   * The expressions can contain placeholders for bind values using <code>?</code> or <code>?1</code> style.
+   *
+   * <pre>{@code
+   *
+   *     new QCustomer()
+   *       .name.startsWith("Shrek")
+   *       .contacts.filterMany("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
+   *       .findList();
+   *
+   * }</pre>
+   *
+   * @param rawExpressions The raw expressions which can include ? and ?1 style bind parameter placeholders
+   * @param params The parameter values to bind
+   */
+  public final R filterManyRaw(String rawExpressions, Object... params) {
+    expr().filterManyRaw(_name, rawExpressions, params);
     return _root;
   }
 

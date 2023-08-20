@@ -445,6 +445,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> filterManyRaw(String manyProperty, String rawExpression, Object... params) {
+    return query.filterMany(manyProperty).raw(rawExpression, params);
+  }
+
+  @Override
   public Query<T> withLock(Query.LockType lockType) {
     return query.withLock(lockType);
   }
