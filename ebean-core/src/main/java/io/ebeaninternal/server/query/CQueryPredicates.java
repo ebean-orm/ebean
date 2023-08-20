@@ -10,7 +10,6 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DeployParser;
-import io.ebeaninternal.server.deploy.DeployPropertyParser;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.persist.Binder;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
