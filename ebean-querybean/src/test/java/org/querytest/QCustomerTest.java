@@ -281,6 +281,41 @@ public class QCustomerTest {
   }
 
   @Test
+  void filterManySeparateQuery() {
+    Customer cust = new Customer();
+    cust.setName("filterManySeparateQuery");
+    cust.setStatus(Customer.Status.GOOD);
+    cust.save();
+
+    var q = new QCustomer()
+      .select(FGCustomerContacts)
+      .contacts.filterManyRaw("firstName like ?", "R%")
+      .contacts.filterMany(c -> c.firstName.startsWith("R")) // same as filterManyRaw() expression
+      .setMaxRows(10) // force the ToMany path to be in a separate secondary query
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).isEqualTo("select t0.id, t0.name from be_customer t0 limit 10");
+  }
+
+  @Test
+  void filterManySingleQuery() {
+    Customer cust = new Customer();
+    cust.setName("filterManySingleQuery");
+    cust.setStatus(Customer.Status.GOOD);
+    cust.save();
+
+    var q = new QCustomer()
+      .select(FGCustomerContacts)
+      .contacts.filterManyRaw("firstName like ?", "R%")
+      .contacts.filterMany(c -> c.firstName.startsWith("R")) // same as filterManyRaw() expression
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where t1.first_name like ? and t1.first_name like ");
+  }
+
+  @Test
   public void testIdIn() {
 
     List<Integer> ids = new ArrayList<>();
