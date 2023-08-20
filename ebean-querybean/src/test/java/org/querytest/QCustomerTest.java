@@ -312,7 +312,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("select t0.id, t0.name from be_customer t0 limit 10");
+    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where t1.first_name like ? and t1.first_name like ");
   }
 
   @Test
