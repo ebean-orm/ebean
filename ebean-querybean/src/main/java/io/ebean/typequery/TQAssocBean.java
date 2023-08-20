@@ -233,7 +233,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    *
    *     new QCustomer()
    *       .name.startsWith("Shrek")
-   *       .contacts.filterMany("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
+   *       .contacts.filterManyRaw("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
    *       .findList();
    *
    * }</pre>

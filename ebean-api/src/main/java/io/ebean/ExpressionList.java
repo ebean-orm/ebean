@@ -539,7 +539,7 @@ public interface ExpressionList<T> {
    *
    *     new QCustomer()
    *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
+   *       .contacts.filterManyRaw("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
    *       .findList();
    *
    * }</pre>
