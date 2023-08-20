@@ -74,4 +74,22 @@ public class RawExpressionTest extends BaseExpressionTest {
     query.queryBindKey(bindValuesKey);
     return bindValuesKey;
   }
+
+  @Test
+  void filterManyPaths_one() {
+    String result = RawExpression.filterManyPaths("contacts", "${}first is not null");
+    assertThat(result).isEqualTo("${contacts}first is not null");
+  }
+
+  @Test
+  void filterManyPaths_nested() {
+    String result = RawExpression.filterManyPaths("contacts", "${address}city");
+    assertThat(result).isEqualTo("${contacts.address}city");
+  }
+
+  @Test
+  void filterManyPaths_2() {
+    String result = RawExpression.filterManyPaths("contacts", "${}first ${}last");
+    assertThat(result).isEqualTo("${contacts}first ${contacts}last");
+  }
 }

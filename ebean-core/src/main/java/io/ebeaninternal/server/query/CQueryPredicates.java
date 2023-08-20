@@ -199,10 +199,9 @@ public final class CQueryPredicates {
       OrmQueryProperties chunk = query.detail().getChunk(manyProperty.name(), false);
       SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
       if (filterManyExpr != null) {
-        DeployPropertyParser parser = manyProperty.targetDescriptor().parser();
-        this.filterMany = new DefaultExpressionRequest(request, parser, binder, filterManyExpr);
+        this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
         if (buildSql) {
-          dbFilterMany = filterManyPaths(manyProperty.name(), filterMany.buildSql());
+          dbFilterMany = filterMany.buildSql();
         }
       }
     }
@@ -216,22 +215,6 @@ public final class CQueryPredicates {
     if (buildSql) {
       predicateIncludes = deployParser.includes();
     }
-  }
-
-  static String filterManyPaths(String prefix, String raw) {
-    final StringBuilder sb = new StringBuilder(raw.length() + 50);
-    int lastPos = 0;
-    int nextPos = raw.indexOf("${");
-    while (nextPos > -1) {
-      sb.append(raw.substring(lastPos, nextPos)).append("${").append(prefix);
-      if (raw.charAt(nextPos + 2) != '}') {
-        sb.append('.');
-      }
-      lastPos = nextPos + 2;
-      nextPos = raw.indexOf("${", nextPos + 2);
-    }
-    sb.append(raw.substring(lastPos));
-    return sb.toString();
   }
 
   /**
