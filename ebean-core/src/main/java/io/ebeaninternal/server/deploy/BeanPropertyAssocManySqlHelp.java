@@ -4,9 +4,9 @@ import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiSqlUpdate;
+import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.visitor.BaseTablePropertyVisitor;
 import io.ebeaninternal.server.deploy.visitor.VisitProperties;
-import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.util.Str;
 
 import java.util.List;
@@ -123,7 +123,7 @@ class BeanPropertyAssocManySqlHelp<T> {
     many.bindParentIdsIn(rawWhere, parentIds, query);
   }
 
-  List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds, boolean hard) {
+  List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard, List<Object> excludeDetailIds) {
     final SpiEbeanServer server = descriptor.ebeanServer();
     final SpiQuery<?> query = many.newQuery(server);
     many.bindParentIdEq(rawParentIdEQ(""), parentId, query);
@@ -136,15 +136,12 @@ class BeanPropertyAssocManySqlHelp<T> {
     return server.findIds(query, t);
   }
 
-  List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, List<Object> excludeDetailIds, boolean hard) {
+  List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, boolean hard) {
     final SpiEbeanServer server = descriptor.ebeanServer();
     final SpiQuery<?> query = many.newQuery(server);
     many.bindParentIdsIn(rawParentIdIN("", parentIds.size()), parentIds, query);
     if (hard) {
       query.setIncludeSoftDeletes();
-    }
-    if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
-      query.where().not(query.getExpressionFactory().idIn(excludeDetailIds));
     }
     return server.findIds(query, t);
   }

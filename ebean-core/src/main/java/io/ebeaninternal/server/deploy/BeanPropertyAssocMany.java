@@ -296,23 +296,38 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     // do not add to the selectChain at the top level of the Many bean
   }
 
-  public SpiSqlUpdate deleteByParentId(Object parentId, List<Object> parentIdist) {
-    if (parentId != null) {
-      return sqlHelp.deleteByParentId(parentId);
-    } else {
-      return sqlHelp.deleteByParentIdList(parentIdist);
-    }
+  @Override
+  public SpiSqlUpdate deleteByParentId(Object parentId) {
+    return sqlHelp.deleteByParentId(parentId);
+  }
+
+  @Override
+  public SpiSqlUpdate deleteByParentIdList(List<Object> parentIdist) {
+    return sqlHelp.deleteByParentIdList(parentIdist);
+  }
+
+
+  /**
+   * Find the Id's of detail beans given a parent Id
+   */
+  @Override
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard) {
+    return sqlHelp.findIdsByParentId(parentId, t, hard, null);
   }
 
   /**
-   * Find the Id's of detail beans given a parent Id or list of parent Id's.
+   * Find the Id's of detail beans given a parent Id and optionally exclude detail IDs
    */
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds, boolean hard) {
-    if (parentId != null) {
-      return sqlHelp.findIdsByParentId(parentId, t, excludeDetailIds, hard);
-    } else {
-      return sqlHelp.findIdsByParentIdList(parentIdList, t, excludeDetailIds, hard);
-    }
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard, List<Object> excludeDetailIds) {
+    return sqlHelp.findIdsByParentId(parentId, t, hard, excludeDetailIds);
+  }
+
+  /**
+   * Find the Id's of detail beans given a list of parent Id's.
+   */
+  @Override
+  public List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, boolean hard) {
+    return sqlHelp.findIdsByParentIdList(parentIdList, t, hard);
   }
 
   /**

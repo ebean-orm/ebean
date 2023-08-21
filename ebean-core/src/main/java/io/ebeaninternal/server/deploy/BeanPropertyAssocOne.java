@@ -237,36 +237,24 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return encrypted ? elPlaceHolderEncrypted : elPlaceHolder;
   }
 
-  public SqlUpdate deleteByParentId(Object parentId, List<Object> parentIdist) {
-    if (parentId != null) {
-      return deleteByParentId(parentId);
-    } else {
-      return deleteByParentIdList(parentIdist);
-    }
-  }
 
-  private SqlUpdate deleteByParentIdList(List<Object> parentIds) {
+  @Override
+  public SqlUpdate deleteByParentIdList(List<Object> parentIds) {
     String sql = deleteByParentIdInSql + targetIdBinder.idInValueExpr(false, parentIds.size());
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sql);
     bindParentIds(delete, parentIds);
     return delete;
   }
 
-  private SqlUpdate deleteByParentId(Object parentId) {
+  @Override
+  public SqlUpdate deleteByParentId(Object parentId) {
     DefaultSqlUpdate delete = new DefaultSqlUpdate(deleteByParentIdSql);
     bindParentId(delete, parentId);
     return delete;
   }
 
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIds, Transaction t) {
-    if (parentId != null) {
-      return findIdsByParentId(parentId, t);
-    } else {
-      return findIdsByParentIdList(parentIds, t);
-    }
-  }
 
-  private List<Object> findIdsByParentId(Object parentId, Transaction t) {
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard) {
     String rawWhere = deriveWhereParentIdSql(false);
     SpiEbeanServer server = server();
     Query<?> q = server.find(type());
@@ -274,7 +262,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return server.findIds(q, t);
   }
 
-  private List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t) {
+  public List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, boolean hard) {
     String rawWhere = deriveWhereParentIdSql(true);
     String inClause = idBinder().idInValueExpr(false, parentIds.size());
     String expr = rawWhere + inClause;
