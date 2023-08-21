@@ -48,12 +48,12 @@ public class H2HistoryTrigger implements Trigger {
 
     // build the insert into history table SQL
     StringBuilder insertSql = new StringBuilder(150);
-    insertSql.append("insert into ").append(schemaName).append(".").append(tableName).append(HISTORY_SUFFIX).append(" (");
+    insertSql.append("insert into ").append(schemaName).append('.').append(tableName).append(HISTORY_SUFFIX).append(" (");
 
     int count = 0;
     while (rs.next()) {
       if (++count > 1) {
-        insertSql.append(",");
+        insertSql.append(',');
       }
       String columnName = rs.getString("COLUMN_NAME");
       if (columnName.equalsIgnoreCase(SYS_PERIOD_START)) {
@@ -66,9 +66,9 @@ public class H2HistoryTrigger implements Trigger {
     insertSql.append(") values (");
     for (int i = 0; i < count; i++) {
       if (i > 0) {
-        insertSql.append(",");
+        insertSql.append(',');
       }
-      insertSql.append("?");
+      insertSql.append('?');
     }
     insertSql.append(");");
 

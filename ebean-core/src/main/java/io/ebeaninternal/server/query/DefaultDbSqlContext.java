@@ -151,13 +151,13 @@ final class DefaultDbSqlContext implements DbSqlContext {
       if (pair.getForeignSqlFormula() != null) {
         sb.append(pair.getForeignSqlFormula().replace(tableAliasPlaceHolder, a2));
       } else {
-        sb.append(a2).append(".").append(pair.getForeignDbColumn());
+        sb.append(a2).append('.').append(pair.getForeignDbColumn());
       }
       sb.append(" = ");
       if (pair.getLocalSqlFormula() != null) {
         sb.append(pair.getLocalSqlFormula().replace(tableAliasPlaceHolder, a1));
       } else {
-        sb.append(a1).append(".").append(pair.getLocalDbColumn());
+        sb.append(a1).append('.').append(pair.getLocalDbColumn());
       }
     }
     if (addAsOfOnClause) {

@@ -230,7 +230,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
       if (dependentTables != null && !dependentTables.isEmpty()) {
         StringBuilder msg = new StringBuilder(50);
         for (String table : dependentTables) {
-          msg.append(table).append(",");
+          msg.append(table).append(',');
         }
         String formattedMsg = msg.toString();
         if (tableModLogger.isLoggable(DEBUG)) {

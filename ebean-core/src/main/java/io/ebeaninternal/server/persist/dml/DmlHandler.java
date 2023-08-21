@@ -166,7 +166,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   public void bind(Object value, int sqlType) throws SQLException {
     if (logLevelSql) {
       if (bindLog.length() > 0) {
-        bindLog.append(",");
+        bindLog.append(',');
       }
       if (value == null) {
         bindLog.append("null");
@@ -186,7 +186,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   public void bindNoLog(Object value, int sqlType, String logPlaceHolder) throws SQLException {
     if (logLevelSql) {
       if (bindLog.length() > 0) {
-        bindLog.append(",");
+        bindLog.append(',');
       }
       bindLog.append(logPlaceHolder);
     }
@@ -212,7 +212,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   private void bindInternal(boolean log, Object value, BeanProperty prop) throws SQLException {
     if (log) {
       if (bindLog.length() > 0) {
-        bindLog.append(",");
+        bindLog.append(',');
       }
       if (prop.isLob()) {
         bindLog.append("[LOB]");

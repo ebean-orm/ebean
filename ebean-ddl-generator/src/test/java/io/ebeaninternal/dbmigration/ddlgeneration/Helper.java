@@ -97,7 +97,7 @@ public class Helper {
       StringBuilder builder = new StringBuilder(400);
       String line;
       while ((line = lineNumberReader.readLine()) != null) {
-        builder.append(line).append("\n");
+        builder.append(line).append('\n');
       }
       return builder.toString();
 

@@ -86,7 +86,7 @@ class BeanPropertyAssocManySqlHelp<T> {
 
     @Override
     public void visitScalar(BeanProperty p, boolean allowNonNull) {
-      sb.append(",").append(p.dbColumn());
+      sb.append(',').append(p.dbColumn());
       colCount++;
     }
 
@@ -166,7 +166,7 @@ class BeanPropertyAssocManySqlHelp<T> {
   private void appendBind(StringBuilder sb, int count, boolean skipComma) {
     for (int i = 0; i < count; i++) {
       if (!skipComma || i > 0) {
-        sb.append(",");
+        sb.append(',');
       }
       sb.append('?');
     }
@@ -261,7 +261,7 @@ class BeanPropertyAssocManySqlHelp<T> {
       return "?";
     }
     final var sb = new StringBuilder(exportedProperties.length * 2 + 2);
-    sb.append("(");
+    sb.append('(');
     for (int i = 0; i < exportedProperties.length; i++) {
       if (i > 0) {
         sb.append(',');

@@ -128,7 +128,7 @@ public class SqlServerDdl extends PlatformDdl {
     if (cache > 1) {
       sb.append(" cache ").append(increment);
     }
-    sb.append(";");
+    sb.append(';');
     return sb.toString();
   }
 

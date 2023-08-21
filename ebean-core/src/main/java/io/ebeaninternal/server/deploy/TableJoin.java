@@ -160,9 +160,9 @@ public final class TableJoin {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(a1).append(".").append(pair.getLocalDbColumn());
+      sb.append(a1).append('.').append(pair.getLocalDbColumn());
       sb.append(" = ");
-      sb.append(a2).append(".").append(pair.getForeignDbColumn());
+      sb.append(a2).append('.').append(pair.getForeignDbColumn());
     }
   }
 

@@ -270,7 +270,7 @@ public final class OrmQueryProperties implements Serializable {
     if (allProperties) {
       sb.append("(*)");
     } else if (included != null) {
-      sb.append("(").append(String.join(",", included)).append(")");
+      sb.append('(').append(String.join(",", included)).append(')');
     }
   }
 
@@ -411,7 +411,7 @@ public final class OrmQueryProperties implements Serializable {
    * Calculate the query plan hash.
    */
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("{");
+    builder.append('{');
     if (path != null) {
       builder.append(path);
     }
@@ -428,7 +428,7 @@ public final class OrmQueryProperties implements Serializable {
     if (fetchConfig != null) {
       builder.append("/c").append(fetchConfig.hashCode());
     }
-    builder.append("}");
+    builder.append('}');
   }
 
 }
