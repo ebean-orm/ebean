@@ -444,7 +444,7 @@ public final class CQueryEngine {
     }
     msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
     msg.append("] rows[").append(q.loadedRowDetail());
-    msg.append("] bind[").append(q.bindLog()).append("]");
+    msg.append("] bind[").append(q.bindLog()).append(']');
     q.transaction().logSummary(msg.toString());
   }
 
@@ -489,7 +489,7 @@ public final class CQueryEngine {
     msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
     msg.append("] rows[").append(q.loadedRowDetail());
     msg.append("] predicates[").append(q.logWhereSql());
-    msg.append("] bind[").append(q.bindLog()).append("]");
+    msg.append("] bind[").append(q.bindLog()).append(']');
     q.transaction().logSummary(msg.toString());
   }
 }

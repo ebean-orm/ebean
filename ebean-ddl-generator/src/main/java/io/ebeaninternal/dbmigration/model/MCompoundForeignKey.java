@@ -121,7 +121,7 @@ public class MCompoundForeignKey {
     StringBuilder sb = new StringBuilder(40);
     for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
-        sb.append(",");
+        sb.append(',');
       }
       sb.append(columns.get(i));
     }

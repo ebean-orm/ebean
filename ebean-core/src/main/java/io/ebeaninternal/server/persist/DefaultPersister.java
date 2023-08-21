@@ -807,7 +807,7 @@ public final class DefaultPersister implements Persister {
     Query<?> q = server.createQuery(desc.type());
     StringBuilder sb = new StringBuilder(30);
     for (BeanPropertyAssocOne<?> aPropImportDelete : propImportDelete) {
-      sb.append(aPropImportDelete.name()).append(",");
+      sb.append(aPropImportDelete.name()).append(',');
     }
     q.setAutoTune(false);
     q.select(sb.toString());

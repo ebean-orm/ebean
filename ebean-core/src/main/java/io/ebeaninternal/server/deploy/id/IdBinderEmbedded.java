@@ -57,26 +57,26 @@ public final class IdBinderEmbedded implements IdBinder {
 
   private String idInExpanded() {
     final StringBuilder sb = new StringBuilder(30);
-    sb.append("(");
+    sb.append('(');
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(idDesc.baseTableAlias()).append(".").append(props[i].dbColumn()).append("=?");
+      sb.append(idDesc.baseTableAlias()).append('.').append(props[i].dbColumn()).append("=?");
     }
-    sb.append(")");
+    sb.append(')');
     return sb.toString();
   }
 
   private String idInCompressed() {
-    final StringBuilder sb = new StringBuilder(props.length * 2 + 2).append("(");
+    final StringBuilder sb = new StringBuilder(props.length * 2 + 2).append('(');
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
-        sb.append(",");
+        sb.append(',');
       }
-      sb.append("?");
+      sb.append('?');
     }
-    sb.append(")");
+    sb.append(')');
     return sb.toString();
   }
 
@@ -127,10 +127,10 @@ public final class IdBinderEmbedded implements IdBinder {
         sb.append(", ");
       }
       if (pathPrefix != null) {
-        sb.append(pathPrefix).append(".");
+        sb.append(pathPrefix).append('.');
       }
       if (!idClass) {
-        sb.append(embIdProperty.name()).append(".");
+        sb.append(embIdProperty.name()).append('.');
       }
       sb.append(props[i].name());
       if (!ascending) {
@@ -153,19 +153,19 @@ public final class IdBinderEmbedded implements IdBinder {
       return idInValueExpr(false, size);
     }
     final StringBuilder sb = new StringBuilder(80);
-    sb.append("(");
+    sb.append('(');
     for (int j = 0; j < size; j++) {
       if (j > 0) {
         sb.append(" or ");
       }
-      sb.append("(");
+      sb.append('(');
       for (int i = 0; i < props.length; i++) {
         if (i > 0) {
           sb.append(" and ");
         }
         sb.append(props[i].dbColumn()).append("=?");
       }
-      sb.append(")");
+      sb.append(')');
     }
     sb.append(") ");
     return sb.toString();
@@ -337,17 +337,17 @@ public final class IdBinderEmbedded implements IdBinder {
   @Override
   public String assocInExpr(String prefix) {
     final StringBuilder sb = new StringBuilder(80);
-    sb.append("(");
+    sb.append('(');
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
         sb.append(", ");
       }
       if (prefix != null) {
-        sb.append(prefix).append(".");
+        sb.append(prefix).append('.');
       }
       sb.append(props[i].name());
     }
-    sb.append(")");
+    sb.append(')');
     return sb.toString();
   }
 
@@ -359,10 +359,10 @@ public final class IdBinderEmbedded implements IdBinder {
         sb.append(" and ");
       }
       if (prefix != null) {
-        sb.append(prefix).append(".");
+        sb.append(prefix).append('.');
       }
       if (!idClass) {
-        sb.append(embIdProperty.name()).append(".");
+        sb.append(embIdProperty.name()).append('.');
       }
       sb.append(props[i].name()).append(operator);
     }
@@ -377,7 +377,7 @@ public final class IdBinderEmbedded implements IdBinder {
         sb.append(" and ");
       }
       if (baseTableAlias != null) {
-        sb.append(baseTableAlias).append(".");
+        sb.append(baseTableAlias).append('.');
       }
       sb.append(props[i].dbColumn()).append("=?");
     }
@@ -390,17 +390,17 @@ public final class IdBinderEmbedded implements IdBinder {
       return "";
     }
     final StringBuilder sb = new StringBuilder(80);
-    sb.append("(");
+    sb.append('(');
     for (int i = 0; i < props.length; i++) {
       if (i > 0) {
-        sb.append(",");
+        sb.append(',');
       }
       if (baseTableAlias != null) {
-        sb.append(baseTableAlias).append(".");
+        sb.append(baseTableAlias).append('.');
       }
       sb.append(props[i].dbColumn());
     }
-    sb.append(")");
+    sb.append(')');
     return sb.toString();
   }
 
@@ -436,7 +436,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (val != null) {
         sb.append(prop.format(val));
       }
-      sb.append("|");
+      sb.append('|');
     }
     return sb.toString();
   }

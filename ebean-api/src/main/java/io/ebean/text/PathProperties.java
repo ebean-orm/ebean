@@ -205,7 +205,7 @@ public class PathProperties implements FetchPath {
         sb.append(it.next());
         hasNext = it.hasNext();
         if (hasNext) {
-          sb.append(",");
+          sb.append(',');
         }
       }
       return sb.toString();

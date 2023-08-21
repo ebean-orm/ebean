@@ -169,7 +169,7 @@ final class InTuplesExpression extends AbstractExpression {
     }
     builder.append("InTuple[");
     for (String property : properties) {
-      builder.append(property).append("-");
+      builder.append(property).append('-');
     }
     builder.append(entries.size()).append(']');
   }

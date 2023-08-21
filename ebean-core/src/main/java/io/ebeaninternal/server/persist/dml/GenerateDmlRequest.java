@@ -29,11 +29,11 @@ public final class GenerateDmlRequest {
     //sb.append(expr);
     if (insertMode > 0) {
       if (insertMode++ > 1) {
-        insertBindBuffer.append(",");
+        insertBindBuffer.append(',');
       }
       insertBindBuffer.append(bind);
     } else {
-      sb.append("=");
+      sb.append('=');
       sb.append(bind);
     }
     if (prefix2 != null) {

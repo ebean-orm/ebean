@@ -79,7 +79,7 @@ final class CQueryBuilder {
         sb.append(", ");
       }
       sb.append(name);
-      sb.append(".");
+      sb.append('.');
       sb.append(token.trim());
     }
     return sb.toString();
@@ -580,7 +580,7 @@ final class CQueryBuilder {
           sb.append(select.selectSql());
         }
         if (request.isInlineCountDistinct()) {
-          sb.append(")");
+          sb.append(')');
         }
         if (distinct && dbOrderBy != null) {
           // add the orderBy columns to the select clause (due to distinct)

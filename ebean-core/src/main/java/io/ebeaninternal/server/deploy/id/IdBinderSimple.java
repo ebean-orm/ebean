@@ -59,7 +59,7 @@ public final class IdBinderSimple implements IdBinder {
   public String orderBy(String pathPrefix, boolean ascending) {
     StringBuilder sb = new StringBuilder();
     if (pathPrefix != null) {
-      sb.append(pathPrefix).append(".");
+      sb.append(pathPrefix).append('.');
     }
     sb.append(idProperty.name());
     if (!ascending) {
@@ -224,7 +224,7 @@ public final class IdBinderSimple implements IdBinder {
     StringBuilder sb = new StringBuilder();
     if (prefix != null) {
       sb.append(prefix);
-      sb.append(".");
+      sb.append('.');
     }
     sb.append(idProperty.name());
     return sb.toString();
