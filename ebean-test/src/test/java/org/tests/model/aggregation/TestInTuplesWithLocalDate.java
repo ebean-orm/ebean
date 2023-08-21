@@ -54,7 +54,6 @@ class TestInTuplesWithLocalDate extends BaseTestCase {
       .add(today.plusDays(1), 12)
       .add(today.plusDays(2), 15);
 
-
     LoggedSql.start();
 
     List<DMachineStats> result = DB.find(DMachineStats.class)
@@ -65,31 +64,9 @@ class TestInTuplesWithLocalDate extends BaseTestCase {
 
     assertThat(result).hasSize(5);
 
-    var in2 = InTuples.of("date", "hours")
-      .add(today, 0);
-
-    for (int i = 0; i < 3_000; i++) {
-      in2.add(today, 100 + i);
-    }
-
-    List<DMachineStats> result2 = DB.find(DMachineStats.class)
-      .where()
-      .inTuples(in2)
-      //.raw("(t0.edate,t0.hours) in ((date '2023-08-16',0),(date '2023-08-16',100))")
-      .eq("machine.name", "inTuple")
-      .findList();
-
     List<String> sql = LoggedSql.stop();
-
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("where (t0.edate,t0.hours) in ((?,?),(?,?),(?,?),(?,?),(?,?)) and t1.name = ?");
-    if (isMySql()) {
-      assertThat(sql.get(1)).contains("where (t0.edate,t0.hours) in (({d '2023-08-16'},0),({d '2023-08-16'},100),({d '2023-08-16'},101),(");
-    } else if (isPostgresCompatible()) {
-      assertThat(sql.get(1)).contains("where (t0.edate,t0.hours) in ((?,?),(?,?),(?,?),(");
-    } else {
-      assertThat(sql.get(1)).contains("where (t0.edate,t0.hours) in ((date '2023-08-16',0),(date '2023-08-16',100),(date '2023-08-16',101),(");
-    }
 
     DB.deleteAll(allStats);
     DB.delete(machine);

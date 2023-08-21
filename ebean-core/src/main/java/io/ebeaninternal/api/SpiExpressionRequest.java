@@ -32,11 +32,6 @@ public interface SpiExpressionRequest {
   SpiOrmQueryRequest<?> queryRequest();
 
   /**
-   * Return the underling buffer.
-   */
-  StringBuilder buffer();
-
-  /**
    * Append to the expression sql without any parsing.
    */
   SpiExpressionRequest append(String expression);

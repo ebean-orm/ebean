@@ -454,35 +454,4 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     assertThat(list).hasSize(3);
     assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in ((?,?),(?,?),(?,?)) order by t0.sku desc;");
   }
-
-  @IgnorePlatform({Platform.SQLSERVER, Platform.DB2})
-  @Test
-  void inTuples_literalMode() {
-    InTuples tuples = InTuples.of("sku", "code");
-    tuples.add("hi", 123);
-    tuples.add("bye", 121);
-    // add more entries than threshold triggers literal mode
-    for (int i = 0; i < 5_000; i++) {
-      tuples.add("x", i);
-    }
-
-    LoggedSql.start();
-
-    DB.find(OCachedNatKeyBean3.class)
-      .where()
-      .eq("store", "def")
-      .inTuples(tuples)
-      .setUseCache(false)
-      .orderBy("sku desc")
-      .findList();
-
-    List<String> sql = LoggedSql.stop();
-
-    if (isPostgresCompatible()) {
-      // didn't exceed postgres threshold
-      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in ((?,?),(?,?),(");
-    } else {
-      assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in (('hi',123),('bye',121),('");
-    }
-  }
 }
