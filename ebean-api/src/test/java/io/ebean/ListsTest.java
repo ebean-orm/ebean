@@ -11,8 +11,7 @@ class ListsTest {
   @Test
   void partition_empty() {
     List<List<Integer>> partitions = Lists.partition(List.of(), 5);
-    assertThat(partitions).hasSize(1);
-    assertThat(partitions.get(0)).hasSize(0);
+    assertThat(partitions).isEmpty();
   }
 
   @Test
