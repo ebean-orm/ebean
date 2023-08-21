@@ -318,7 +318,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   /**
    * Find the Id's of detail beans given a parent Id and optionally exclude detail IDs
    */
-  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard, List<Object> excludeDetailIds) {
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard, Set<Object> excludeDetailIds) {
     return sqlHelp.findIdsByParentId(parentId, t, hard, excludeDetailIds);
   }
 
@@ -755,7 +755,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     throw new PersistenceException(from + ": Could not find mapKey property " + mapKey + " on " + to);
   }
 
-  public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, List<Object> excludeDetailIds) {
+  public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, Set<Object> excludeDetailIds) {
     IntersectionRow row = new IntersectionRow(tableJoin.getTable(), targetDescriptor);
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       row.setExcludeIds(excludeDetailIds, targetDescriptor());

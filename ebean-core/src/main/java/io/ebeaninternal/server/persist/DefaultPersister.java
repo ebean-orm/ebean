@@ -1082,12 +1082,13 @@ public final class DefaultPersister implements Persister {
    * </p>
    */
   void deleteManyDetails(SpiTransaction t, BeanDescriptor<?> desc, EntityBean parentBean,
-                         BeanPropertyAssocMany<?> many, List<Object> excludeDetailIds, DeleteMode deleteMode) {
+                         BeanPropertyAssocMany<?> many, Set<Object> excludeDetailIds, DeleteMode deleteMode) {
     if (many.cascadeInfo().isDelete()) {
       // cascade delete the beans in the collection
       BeanDescriptor<?> targetDesc = many.targetDescriptor();
       if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
-        if (targetDesc.isDeleteByStatement()) {
+        if (targetDesc.isDeleteByStatement()
+          && (excludeDetailIds == null || excludeDetailIds.size() <= 1000)) { // TODO wait for #3176
           // Just delete all the children with one statement
           IntersectionRow intRow = many.buildManyDeleteChildren(parentBean, excludeDetailIds);
           SqlUpdate sqlDelete = intRow.createDelete(server, deleteMode);

@@ -11,13 +11,14 @@ import io.ebeaninternal.server.persist.DeleteMode;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public final class IntersectionRow {
 
   private final String tableName;
   private final BeanDescriptor<?> targetDescriptor;
   private final LinkedHashMap<String, Object> values = new LinkedHashMap<>();
-  private List<Object> excludeIds;
+  private Set<Object> excludeIds;
   private BeanDescriptor<?> excludeDescriptor;
 
   IntersectionRow(String tableName, BeanDescriptor<?> targetDescriptor) {
@@ -33,7 +34,7 @@ public final class IntersectionRow {
   /**
    * Set Id's to exclude. This is for deleting non-attached detail Id's.
    */
-  void setExcludeIds(List<Object> excludeIds, BeanDescriptor<?> excludeDescriptor) {
+  void setExcludeIds(Set<Object> excludeIds, BeanDescriptor<?> excludeDescriptor) {
     this.excludeIds = excludeIds;
     this.excludeDescriptor = excludeDescriptor;
   }
