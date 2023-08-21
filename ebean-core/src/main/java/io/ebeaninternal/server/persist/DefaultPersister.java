@@ -655,11 +655,12 @@ public final class DefaultPersister implements Persister {
    * Delete by Id or a List of Id's.
    */
   private int delete(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
-    if (idList == null || idList.size() <= maxDeleteBatch) {
+    if (idList == null) {
       return deleteBatch(descriptor, id, idList, transaction, deleteMode);
     }
     int rows = 0;
-    for (List<Object> batchOfIds : Lists.partition(idList, maxDeleteBatch)) {
+    final int batch = maxDeleteBatch / descriptor.idBinder().size();
+    for (List<Object> batchOfIds : Lists.partition(idList, batch)) {
       rows += deleteBatch(descriptor, id, batchOfIds, transaction, deleteMode);
     }
     return rows;
