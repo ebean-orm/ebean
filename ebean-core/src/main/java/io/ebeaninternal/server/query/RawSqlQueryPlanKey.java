@@ -25,11 +25,6 @@ final class RawSqlQueryPlanKey implements CQueryPlanKey {
   }
 
   @Override
-  public boolean useCache() {
-    return true;
-  }
-
-  @Override
   public CQueryPlanKey withDeleteByIds() {
     throw new IllegalStateException("Not allowed");
   }
