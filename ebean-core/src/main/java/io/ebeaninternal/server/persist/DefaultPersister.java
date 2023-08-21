@@ -55,10 +55,9 @@ public final class DefaultPersister implements Persister {
 
   /**
    * When delete batching is required limit the size.
-   * e.g. SqlServer has a 2100 parameter limit, so delete max 2000 for it.
    */
   private int initMaxDeleteBatch(int maxInBinding) {
-    return maxInBinding == 0 ? 1000 : maxInBinding;
+    return maxInBinding == 0 ? 1000 : Math.min(1000, maxInBinding);
   }
 
   @Override
