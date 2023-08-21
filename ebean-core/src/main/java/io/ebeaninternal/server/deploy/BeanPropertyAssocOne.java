@@ -254,21 +254,29 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
 
-  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard) {
+  @Override
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean includeSoftDeletes) {
     String rawWhere = deriveWhereParentIdSql(false);
     SpiEbeanServer server = server();
     Query<?> q = server.find(type());
     bindParentIdEq(rawWhere, parentId, q);
+    if (includeSoftDeletes) {
+      q.setIncludeSoftDeletes();
+    }
     return server.findIds(q, t);
   }
 
-  public List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, boolean hard) {
+  @Override
+  public List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, boolean includeSoftDeletes) {
     String rawWhere = deriveWhereParentIdSql(true);
     String inClause = idBinder().idInValueExpr(false, parentIds.size());
     String expr = rawWhere + inClause;
     SpiEbeanServer server = server();
     Query<?> q = server.find(type());
     bindParentIdsIn(expr, parentIds, q);
+    if (includeSoftDeletes) {
+      q.setIncludeSoftDeletes();
+    }
     return server.findIds(q, t);
   }
 

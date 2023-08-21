@@ -50,11 +50,13 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
     long parentId = setup(2500); // we cannot make a "not in" query for so many params
     List<String> sql = doUpdate(parentId, name -> !"c0".equals(name));
     if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
-      assertThat(sql).hasSize(4);
-      assertThat(sql.get(0)).contains("update coone_many set deleted=true where coone_id = ? and not ( id ");
-      assertThat(sql.get(1)).contains(" -- bind(");
-      assertThat(sql.get(2)).contains("insert into coone_many (coone_id, name, deleted) values (?,?,?)");
-      assertThat(sql.get(3)).contains(" -- bind(");
+      // CHECKME: H2 would not require the batch mode here and could theoretically do it in fewer statements
+      assertThat(sql).hasSize(5);
+      assertThat(sql.get(0)).contains("select t0.id from coone_many t0 where coone_id=? and t0.deleted = false and t0.deleted = false; --bind");
+      assertThat(sql.get(1)).contains("update coone_many set deleted=true where id  in (?)");
+      assertThat(sql.get(2)).contains(" -- bind(");
+      assertThat(sql.get(3)).contains("insert into coone_many (coone_id, name, deleted) values (?,?,?)");
+      assertThat(sql.get(4)).contains(" -- bind(");
     }
 
     if (isSqlServer()) {
@@ -81,15 +83,19 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
     long parentId = setup(5000); //  we will replace 2500 beans in this step
     List<String> sql = doUpdate(parentId, name -> Integer.parseInt(name.substring(1)) >= 2500);
     if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
-      assertThat(sql).hasSize(4);
-      assertThat(sql.get(0)).contains("update coone_many set deleted=true where coone_id = ? and not ( id ");
-      assertThat(sql.get(1)).contains(" -- bind(");
-      assertThat(sql.get(2)).contains("insert into coone_many (coone_id, name, deleted) values (?,?,?)");
-      assertThat(sql.get(3)).contains(" -- bind(");
+      // CHECKME: H2 would not require the batch mode here and could theoretically do it in fewer statements
+      assertThat(sql).hasSize(8);
+      assertThat(sql.get(0)).contains("select t0.id from coone_many t0 where coone_id=? and t0.deleted = false and t0.deleted = false; --bind"); // find all Ids
+      assertThat(sql.get(1)).contains("update coone_many set deleted=true where id  in (?,?,?");
+      assertThat(sql.get(2)).contains(" -- bind(Array[1000]="); // update first 1000
+      assertThat(sql.get(3)).contains(" -- bind(Array[1000]="); // update second 1000
+      assertThat(sql.get(4)).contains("update coone_many set deleted=true where id  in (?,?,?");
+      assertThat(sql.get(5)).contains(" -- bind(Array[500]="); // update last 500
+      assertThat(sql.get(6)).contains("insert into coone_many (coone_id, name, deleted) values (?,?,?)");
+      assertThat(sql.get(7)).contains(" -- bind(");
     }
 
     if (isSqlServer()) {
-      // filter mode
       assertThat(sql).hasSize(7);
       assertThat(sql.get(0)).contains("select t0.id from coone_many t0 where coone_id=? and t0.deleted = 0 and t0.deleted = 0; --bind"); // find all Ids
       assertThat(sql.get(1)).contains("update coone_many set deleted=1 where id  in (?,?,?");

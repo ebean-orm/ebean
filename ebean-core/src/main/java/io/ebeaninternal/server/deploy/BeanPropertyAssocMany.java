@@ -311,23 +311,23 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    * Find the Id's of detail beans given a parent Id
    */
   @Override
-  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard) {
-    return sqlHelp.findIdsByParentId(parentId, t, hard, null);
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean includeSoftDeletes) {
+    return sqlHelp.findIdsByParentId(parentId, t, includeSoftDeletes, null);
   }
 
   /**
    * Find the Id's of detail beans given a parent Id and optionally exclude detail IDs
    */
-  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard, Set<Object> excludeDetailIds) {
-    return sqlHelp.findIdsByParentId(parentId, t, hard, excludeDetailIds);
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean includeSoftDeletes, Set<Object> excludeDetailIds) {
+    return sqlHelp.findIdsByParentId(parentId, t, includeSoftDeletes, excludeDetailIds);
   }
 
   /**
    * Find the Id's of detail beans given a list of parent Id's.
    */
   @Override
-  public List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, boolean hard) {
-    return sqlHelp.findIdsByParentIdList(parentIdList, t, hard);
+  public List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, boolean includeSoftDeletes) {
+    return sqlHelp.findIdsByParentIdList(parentIdList, t, includeSoftDeletes);
   }
 
   /**

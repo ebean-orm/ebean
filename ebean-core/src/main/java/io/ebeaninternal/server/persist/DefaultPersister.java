@@ -697,7 +697,7 @@ public final class DefaultPersister implements Persister {
             if (deleteMode.isHard() && targetDesc.isDeleteByStatement()) {
               executeSqlUpdate(sqlDeleteChildren(expOne), transaction);
             } else {
-              List<Object> childIds = findChildIds(expOne, true); // CHECMKE: do we need something for soft/hard delete here
+              List<Object> childIds = findChildIds(expOne, deleteMode.isHard());
               if (childIds != null && !childIds.isEmpty()) {
                 deleteChildrenById(transaction, targetDesc, childIds, deleteMode);
               }
@@ -746,7 +746,7 @@ public final class DefaultPersister implements Persister {
 
     abstract SqlUpdate sqlDeleteChildren(BeanPropertyAssoc<?> prop);
 
-    abstract List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean hard);
+    abstract List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean includeSoftDeletes);
 
     abstract int deleteBeans();
   }
@@ -783,8 +783,8 @@ public final class DefaultPersister implements Persister {
     }
 
     @Override
-    List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean hard) {
-      return prop.findIdsByParentId(id, transaction, hard);
+    List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean includeSoftDeletes) {
+      return prop.findIdsByParentId(id, transaction, includeSoftDeletes);
     }
 
     int deleteBeans() {
@@ -834,8 +834,8 @@ public final class DefaultPersister implements Persister {
     }
 
     @Override
-    List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean hard) {
-      return prop.findIdsByParentIdList(idList, transaction, hard);
+    List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean includeSoftDeletes) {
+      return prop.findIdsByParentIdList(idList, transaction, includeSoftDeletes);
     }
 
     int deleteBeans() {
@@ -1088,7 +1088,7 @@ public final class DefaultPersister implements Persister {
       BeanDescriptor<?> targetDesc = many.targetDescriptor();
       if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
         if (targetDesc.isDeleteByStatement()
-          && (excludeDetailIds == null || excludeDetailIds.size() <= 1000)) { // TODO wait for #3176
+          && (excludeDetailIds == null || excludeDetailIds.size() <= maxDeleteBatch)) { // TODO wait for #3176
           // Just delete all the children with one statement
           IntersectionRow intRow = many.buildManyDeleteChildren(parentBean, excludeDetailIds);
           SqlUpdate sqlDelete = intRow.createDelete(server, deleteMode);
@@ -1099,7 +1099,16 @@ public final class DefaultPersister implements Persister {
           // ... and only using findIdsByParentId() when the many property isn't loaded
           // Delete recurse using the Id values of the children
           Object parentId = desc.getId(parentBean);
-          List<Object> idsByParentId = many.findIdsByParentId(parentId, t, deleteMode.isHard(), excludeDetailIds);
+          List<Object> idsByParentId;
+          if (excludeDetailIds == null || excludeDetailIds.size() <= maxDeleteBatch) { // TODO: Wait for #3176
+            idsByParentId = many.findIdsByParentId(parentId, t, deleteMode.isHard(), excludeDetailIds);
+          } else {
+            // if we hit the parameter limit, we must filter that on the java side.
+            // There is no easy way to batch "not in" queries.
+            // checkme: We could pass the first 1000-2000 params to the DB and filter the rest
+            idsByParentId = many.findIdsByParentId(parentId, t, deleteMode.isHard(), null);
+            idsByParentId.removeIf(id -> excludeDetailIds.contains(id));
+          }
           if (!idsByParentId.isEmpty()) {
             deleteChildrenById(t, targetDesc, idsByParentId, deleteMode);
           }

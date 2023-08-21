@@ -124,33 +124,25 @@ class BeanPropertyAssocManySqlHelp<T> {
     many.bindParentIdsIn(rawWhere, parentIds, query);
   }
 
-  List<Object> findIdsByParentId(Object parentId, Transaction t, boolean hard, Set<Object> excludeDetailIds) {
+  List<Object> findIdsByParentId(Object parentId, Transaction t, boolean includeSoftDeletes, Set<Object> excludeDetailIds) {
     final SpiEbeanServer server = descriptor.ebeanServer();
     final SpiQuery<?> query = many.newQuery(server);
     many.bindParentIdEq(rawParentIdEQ(""), parentId, query);
-    if (hard) {
+    if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
     }
 
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
-      if (excludeDetailIds.size() > 1000) { // TODO: Wait for #3176
-        // if we hit the parameter limit, we must filter that on the java side.
-        // There is no easy way to batch "not in" queries.
-        // checkme: We could pass the first 1000-2000 params to the DB and filter the rest
-        List<Object> ret = server.findIds(query, t);
-        ret.removeIf(id -> excludeDetailIds.contains(id));
-        return ret;
-      }
       query.where().not(query.getExpressionFactory().idIn(excludeDetailIds));
     }
     return server.findIds(query, t);
   }
 
-  List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, boolean hard) {
+  List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, boolean includeSoftDeletes) {
     final SpiEbeanServer server = descriptor.ebeanServer();
     final SpiQuery<?> query = many.newQuery(server);
     many.bindParentIdsIn(rawParentIdIN("", parentIds.size()), parentIds, query);
-    if (hard) {
+    if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
     }
     return server.findIds(query, t);

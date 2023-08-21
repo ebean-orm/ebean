@@ -586,12 +586,12 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   /**
    * Find child beans of the parent <code>id</code>.
    */
-  public abstract List<Object> findIdsByParentId(Object id, Transaction transaction, boolean hard);
+  public abstract List<Object> findIdsByParentId(Object id, Transaction transaction, boolean includeSoftDeletes);
 
   /**
    * Find child beans of the parent ids in <code>idList</code>.
    */
-  public abstract List<Object> findIdsByParentIdList(List<Object> idList, Transaction transaction, boolean hard);
+  public abstract List<Object> findIdsByParentIdList(List<Object> idList, Transaction transaction, boolean includeSoftDeletes);
 
 }
 
