@@ -1,6 +1,7 @@
 package io.ebean;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -24,7 +25,9 @@ public final class Lists {
    */
   public static <T> List<List<T>> partition(List<T> source, int max) {
     final int totalCount = source.size();
-    if (totalCount <= max) {
+    if (totalCount == 0) {
+      return Collections.emptyList();
+    } else if (totalCount <= max) {
       return List.of(source);
     }
     final int numOfPartitions = (totalCount + max - 1) / max;  // round up
