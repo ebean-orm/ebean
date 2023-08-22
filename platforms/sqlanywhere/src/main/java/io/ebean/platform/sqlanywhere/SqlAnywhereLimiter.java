@@ -22,11 +22,11 @@ public final class SqlAnywhereLimiter implements SqlLimiter {
     }
     int maxRows = request.getMaxRows();
     if (maxRows > 0) {
-      sb.append("top ").append(maxRows).append(" ");
+      sb.append("top ").append(maxRows).append(' ');
     }
     int firstRow = request.getFirstRow();
     if (firstRow > 0) {
-      sb.append("start at ").append(firstRow + 1).append(" ");
+      sb.append("start at ").append(firstRow + 1).append(' ');
     }
     sb.append(dbSql);
     String sql = request.getDbPlatform().completeSql(sb.toString(), request.getOrmQuery());

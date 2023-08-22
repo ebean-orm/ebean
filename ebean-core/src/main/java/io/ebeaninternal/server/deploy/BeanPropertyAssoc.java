@@ -122,7 +122,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
       targetInheritInfo = targetDescriptor.inheritInfo();
       saveRecurseSkippable = targetDescriptor.isSaveRecurseSkippable();
       if (!targetIdBinder.isComplexId()) {
-        targetIdProperty = targetIdBinder.getIdProperty();
+        targetIdProperty = targetIdBinder.idSelect();
       }
     }
   }

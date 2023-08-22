@@ -270,7 +270,7 @@ final class ConvertInetAddresses {
       int count = numberOfColons(ipString);
       StringBuilder buffer = new StringBuilder(DOUBLE_COLON);
       for (int i = 0; i + count < 7; i++) {
-        buffer.append(":");
+        buffer.append(':');
       }
 
       ipString = IPSTRING_REPLACE.matcher(ipString).replaceAll(Matcher.quoteReplacement(buffer.toString()));

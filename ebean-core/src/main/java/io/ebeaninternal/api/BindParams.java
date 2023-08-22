@@ -73,13 +73,13 @@ public final class BindParams implements Serializable {
     for (Param param : positionedParameters) {
       tempBindCount = param.queryBindCount();
       bc += tempBindCount;
-      builder.append("p").append(bc).append(" ?:").append(tempBindCount).append(",");
+      builder.append('p').append(bc).append(" ?:").append(tempBindCount).append(',');
     }
 
     for (Map.Entry<String, Param> entry : namedParameters.entrySet()) {
       tempBindCount = entry.getValue().queryBindCount();
       bc += tempBindCount;
-      builder.append("n").append(bc).append(" k:").append(entry.getKey()).append(" ?:").append(tempBindCount).append(",");
+      builder.append('n').append(bc).append(" k:").append(entry.getKey()).append(" ?:").append(tempBindCount).append(',');
     }
   }
 

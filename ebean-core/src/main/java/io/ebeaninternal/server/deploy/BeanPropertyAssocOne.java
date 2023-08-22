@@ -246,7 +246,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   private SqlUpdate deleteByParentIdList(List<Object> parentIds) {
-    String sql = deleteByParentIdInSql + targetIdBinder.getIdInValueExpr(false, parentIds.size());
+    String sql = deleteByParentIdInSql + targetIdBinder.idInValueExpr(false, parentIds.size());
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sql);
     bindParentIds(delete, parentIds);
     return delete;
@@ -276,7 +276,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   private List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t) {
     String rawWhere = deriveWhereParentIdSql(true);
-    String inClause = idBinder().getIdInValueExpr(false, parentIds.size());
+    String inClause = idBinder().idInValueExpr(false, parentIds.size());
     String expr = rawWhere + inClause;
     SpiEbeanServer server = server();
     Query<?> q = server.find(type());
@@ -487,7 +487,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public Object[] assocIdValues(EntityBean bean) {
-    return targetDescriptor.idBinder().getIdValues(bean);
+    return targetDescriptor.idBinder().values(bean);
   }
 
   /**
@@ -495,7 +495,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public String assocIdExpression(String prefix, String operator) {
-    return targetDescriptor.idBinder().getAssocOneIdExpr(prefix, operator);
+    return targetDescriptor.idBinder().assocExpr(prefix, operator);
   }
 
   /**
@@ -503,7 +503,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public String assocIdInValueExpr(boolean not, int size) {
-    return targetDescriptor.idBinder().getIdInValueExpr(not, size);
+    return targetDescriptor.idBinder().idInValueExpr(not, size);
   }
 
   /**
@@ -511,7 +511,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   @Override
   public String assocIdInExpr(String prefix) {
-    return targetDescriptor.idBinder().getAssocIdInExpr(prefix);
+    return targetDescriptor.idBinder().assocInExpr(prefix);
   }
 
   @Override
@@ -613,12 +613,24 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  /**
+   * Add table join with explicit table alias.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String a1, String a2, DbSqlContext ctx) {
+    if (sqlFormulaJoin != null) {
+      ctx.appendFormulaJoin(sqlFormulaJoin, joinType, a1);
+    }
+    return super.addJoin(joinType, a1, a2, ctx);
+  }
+
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (!isTransient && !primaryKeyExport) {
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
-        ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
+        String alias = ctx.tableAliasManyWhere(manyWhere);
+        ctx.appendFormulaJoin(sqlFormulaJoin, joinType, alias);
       }
     }
   }

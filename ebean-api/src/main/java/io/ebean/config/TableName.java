@@ -117,12 +117,12 @@ public final class TableName {
     // Add schema
     if (schema != null) {
       if (buffer.length() > 0) {
-        buffer.append(".");
+        buffer.append('.');
       }
       buffer.append(schema);
     }
     if (buffer.length() > 0) {
-      buffer.append(".");
+      buffer.append('.');
     }
     return buffer.append(name).toString();
   }

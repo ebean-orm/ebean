@@ -56,7 +56,7 @@ final class DeleteUnloadedForeignKeys {
 
     StringBuilder sb = new StringBuilder(30);
     for (BeanPropertyAssocOne<?> aPropList : propList) {
-      sb.append(aPropList.name()).append(",");
+      sb.append(aPropList.name()).append(',');
     }
 
     // run query in a separate persistence context

@@ -25,14 +25,14 @@ public final class CamelCaseHelper {
         lastUpper = i;
       } else if (Character.isDigit(c)) {
         if (i > lastUpper + 1 && !digitsCompressed) {
-          sb.append("_");
+          sb.append('_');
           lastUpper = i;
         }
         sb.append(c);
 
       } else if (Character.isUpperCase(c)) {
         if (i > lastUpper + 1) {
-          sb.append("_");
+          sb.append('_');
         }
         sb.append(Character.toLowerCase(c));
         lastUpper = i;

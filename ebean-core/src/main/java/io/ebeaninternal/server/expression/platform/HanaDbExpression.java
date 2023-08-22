@@ -21,7 +21,7 @@ final class HanaDbExpression extends BaseDbExpression {
 
   @Override
   public void arrayIsEmpty(SpiExpressionRequest request, String propName, boolean empty) {
-    request.append("cardinality(").property(propName).append(")");
+    request.append("cardinality(").property(propName).append(')');
     if (empty) {
       request.append(" = 0");
     } else {
@@ -36,7 +36,7 @@ final class HanaDbExpression extends BaseDbExpression {
     if (suffix != null && !suffix.isEmpty()) {
       sb.append("||'").append(suffix).append('\'');
     }
-    sb.append(")");
+    sb.append(')');
     return sb.toString();
   }
 
@@ -50,7 +50,7 @@ final class HanaDbExpression extends BaseDbExpression {
       if (!contains) {
         request.append(" not ");
       }
-      request.append(" member of ").property(propName).append(")");
+      request.append(" member of ").property(propName).append(')');
     }
   }
 

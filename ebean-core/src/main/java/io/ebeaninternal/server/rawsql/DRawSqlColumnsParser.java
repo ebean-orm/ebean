@@ -67,7 +67,7 @@ final class DRawSqlColumnsParser {
     StringBuilder sb = new StringBuilder();
     sb.append(split[0]);
     for (int i = 1; i < split.length - 2; i++) {
-      sb.append(" ").append(split[i]);
+      sb.append(' ').append(split[i]);
     }
     return new ColumnMapping.Column(indexPos++, sb.toString(), split[split.length - 1]);
   }

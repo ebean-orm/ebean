@@ -65,7 +65,7 @@ public final class RemoteTransactionEvent implements Runnable, BinaryWritable {
     if (deleteByIdMap != null) {
       sb.append(deleteByIdMap);
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 

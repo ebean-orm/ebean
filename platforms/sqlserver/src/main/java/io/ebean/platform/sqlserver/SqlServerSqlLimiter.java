@@ -21,7 +21,7 @@ final class SqlServerSqlLimiter implements SqlLimiter {
       if (request.isDistinct()) {
         sb.append("distinct ");
       }
-      sb.append("top ").append(maxRows).append(" ");
+      sb.append("top ").append(maxRows).append(' ');
       sb.append(dbSql);
       return new SqlLimitResponse(sb.toString());
     }
@@ -30,8 +30,8 @@ final class SqlServerSqlLimiter implements SqlLimiter {
       sb.append("distinct ");
     }
     sb.append(dbSql);
-    sb.append(" ").append("offset");
-    sb.append(" ").append(firstRow).append(" rows");
+    sb.append(' ').append("offset");
+    sb.append(' ').append(firstRow).append(" rows");
     if (maxRows > 0) {
       sb.append(" fetch next ").append(maxRows).append(" rows only");
     }

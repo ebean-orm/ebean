@@ -30,4 +30,8 @@ final class MatchedImportedEmbedded implements MatchedImportedProperty {
     localProp.setValue(embeddedId, value);
   }
 
+  @Override
+  public String dbColumn() {
+    return localProp.dbColumn();
+  }
 }

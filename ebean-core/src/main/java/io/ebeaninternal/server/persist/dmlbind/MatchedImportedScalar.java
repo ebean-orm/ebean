@@ -22,4 +22,9 @@ final class MatchedImportedScalar implements MatchedImportedProperty {
     localProp.setValue(embeddedId, value);
   }
 
+  @Override
+  public String dbColumn() {
+    return foreignProp.dbColumn();
+  }
+
 }

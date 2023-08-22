@@ -21,10 +21,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.System.Logger.Level.WARNING;
 
@@ -303,7 +300,20 @@ public final class CQueryPredicates {
    * Return the bind values for the where expression.
    */
   public List<Object> whereExprBindValues() {
-    return where == null ? Collections.emptyList() : where.bindValues();
+    if (idValue == null && where == null) {
+      return Collections.emptyList();
+    }
+    if (where == null) {
+      return List.of(idValue);
+    }
+    if (idValue == null) {
+      return where.bindValues();
+    }
+
+    List<Object> bindValues = new ArrayList<>();
+    bindValues.add(idValue);
+    bindValues.addAll(where.bindValues());
+    return Collections.unmodifiableList(bindValues);
   }
 
   /**

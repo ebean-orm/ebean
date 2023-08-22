@@ -51,6 +51,17 @@ exception
   when expected_error then null;
 end;
 $$;
+drop table drop_ref_one_to_one cascade constraints purge;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2289);
+begin
+  execute immediate 'drop sequence drop_ref_one_to_one_seq';
+exception
+  when expected_error then null;
+end;
+$$;
 drop table migtest_e_test_binary cascade constraints purge;
 delimiter $$
 declare

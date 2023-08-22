@@ -37,6 +37,11 @@ public interface SpiExpressionRequest {
   SpiExpressionRequest append(String expression);
 
   /**
+   * Append to the expression sql without any parsing.
+   */
+  SpiExpressionRequest append(char c);
+
+  /**
    * Append to the expression sql with logical property parsing to db columns with logical path prefix.
    * <p>
    * This is a fast path case when expression is a bean property path and falls back to using parse()

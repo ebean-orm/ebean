@@ -121,7 +121,7 @@ final class DumpMetrics {
   }
 
   private void appendQueryName(MetaQueryMetric metric, StringBuilder sb) {
-    sb.append("query:").append(padName(metric.name())).append(" ");
+    sb.append("query:").append(padName(metric.name())).append(' ');
   }
 
   private void appendProfileAndSql(MetaQueryMetric metric, StringBuilder sb) {
@@ -136,7 +136,7 @@ final class DumpMetrics {
 
   private void log(MetaTimedMetric metric) {
     StringBuilder sb = new StringBuilder();
-    sb.append(padNameTimed(metric.name())).append(" ");
+    sb.append(padNameTimed(metric.name())).append(' ');
     appendCounters(metric, sb);
     out(sb.toString());
   }

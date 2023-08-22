@@ -73,7 +73,7 @@ public interface DbSqlContext {
    * Append a Sql Formula join. This converts the "${ta}" keyword to the current
    * table alias.
    */
-  void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String manyWhere);
+  void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String tableAlias);
 
   /**
    * Return the current content length.

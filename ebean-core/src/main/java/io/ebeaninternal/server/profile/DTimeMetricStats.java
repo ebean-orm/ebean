@@ -28,7 +28,7 @@ final class DTimeMetricStats implements TimedMetricStats {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if (name != null) {
-      sb.append("name:").append(name).append(" ");
+      sb.append("name:").append(name).append(' ');
     }
     sb.append("count:").append(count)
       .append(" total:").append(total)

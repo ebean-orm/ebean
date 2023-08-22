@@ -24,6 +24,8 @@ drop table if exists drop_ref_many;
 drop sequence if exists drop_ref_many_seq;
 drop table if exists drop_ref_one;
 drop sequence if exists drop_ref_one_seq;
+drop table if exists drop_ref_one_to_one;
+drop sequence if exists drop_ref_one_to_one_seq;
 drop table if exists migtest_e_test_binary;
 drop sequence if exists migtest_e_test_binary_seq;
 drop table if exists migtest_e_test_json;

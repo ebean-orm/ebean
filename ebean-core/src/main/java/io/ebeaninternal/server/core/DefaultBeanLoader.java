@@ -87,7 +87,7 @@ final class DefaultBeanLoader {
       query.setLoadDescription("+lazy", null);
     }
 
-    query.select(parentDesc.idBinder().getIdProperty());
+    query.select(parentDesc.idBinder().idSelect());
     if (onlyIds) {
       query.fetch(many.name(), many.targetIdProperty());
     } else {

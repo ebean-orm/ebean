@@ -333,10 +333,10 @@ public class OrderBy<T> implements Serializable {
           sb.append(property);
         }
         if (!ascending) {
-          sb.append(" ").append("desc");
+          sb.append(' ').append("desc");
         }
         if (nulls != null) {
-          sb.append(" ").append(nulls).append(" ").append(highLow);
+          sb.append(' ').append(nulls).append(' ').append(highLow);
         }
         return sb.toString();
       }

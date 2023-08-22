@@ -303,7 +303,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     int count = 0;
     for (String value : checkConstraintValues) {
       if (count++ > 0) {
-        sb.append(",");
+        sb.append(',');
       }
       sb.append(value);
     }

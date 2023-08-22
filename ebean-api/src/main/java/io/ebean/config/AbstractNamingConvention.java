@@ -228,7 +228,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   public TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable) {
     StringBuilder buffer = new StringBuilder();
     buffer.append(unQuote(lhsTable.getName()));
-    buffer.append("_");
+    buffer.append('_');
 
     String rhsTableName = unQuote(rhsTable.getName());
     if (rhsTableName.indexOf('_') < rhsPrefixLength) {
@@ -271,10 +271,10 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   public String getTableName(String catalog, String schema, String name) {
     StringBuilder sb = new StringBuilder();
     if (!isNull(catalog)) {
-      sb.append(quoteIdentifiers(catalog)).append(".");
+      sb.append(quoteIdentifiers(catalog)).append('.');
     }
     if (!isNull(schema)) {
-      sb.append(quoteIdentifiers(schema)).append(".");
+      sb.append(quoteIdentifiers(schema)).append('.');
     }
     return sb.append(quoteIdentifiers(name)).toString();
   }

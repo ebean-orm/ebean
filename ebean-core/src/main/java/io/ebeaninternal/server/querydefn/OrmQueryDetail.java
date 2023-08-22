@@ -108,7 +108,7 @@ public final class OrmQueryDetail implements Serializable {
     if (fetchPaths != null) {
       for (OrmQueryProperties join : fetchPaths.values()) {
         if (sb.length() > 0) {
-          sb.append(" ");
+          sb.append(' ');
         }
         join.asStringDebug("fetch ", sb);
       }

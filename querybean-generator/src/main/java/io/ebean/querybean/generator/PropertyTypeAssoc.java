@@ -8,19 +8,12 @@ import java.util.Set;
 class PropertyTypeAssoc extends PropertyType {
 
   /**
-   * The package name for this associated query bean.
-   */
-  private final String assocPackage;
-
-  /**
    * Construct given the associated bean type name and package.
    *
    * @param qAssocTypeName the associated bean type name.
-   * @param assocPackage   the associated bean package.
    */
-  PropertyTypeAssoc(String qAssocTypeName, String assocPackage) {
+  PropertyTypeAssoc(String qAssocTypeName) {
     super(qAssocTypeName);
-    this.assocPackage = assocPackage;
   }
 
   /**
@@ -28,7 +21,7 @@ class PropertyTypeAssoc extends PropertyType {
    */
   @Override
   void addImports(Set<String> allImports) {
-    allImports.add(assocPackage + "." + propertyType);
+    // do nothing
   }
 
 }

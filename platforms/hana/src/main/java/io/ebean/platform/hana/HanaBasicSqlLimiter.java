@@ -9,11 +9,11 @@ final class HanaBasicSqlLimiter implements BasicSqlLimiter {
     StringBuilder sb = new StringBuilder(50 + dbSql.length());
     sb.append(dbSql);
     if (maxRows > 0) {
-      sb.append(" ").append("limit");
-      sb.append(" ").append(maxRows);
+      sb.append(' ').append("limit");
+      sb.append(' ').append(maxRows);
 
       if (firstRow > 0) {
-        sb.append(" ").append("offset").append(" ");
+        sb.append(' ').append("offset").append(' ');
         sb.append(firstRow);
       }
     }

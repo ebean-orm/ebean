@@ -103,15 +103,15 @@ final class InPairsExpression extends AbstractExpression {
     } else {
       builder.append("InPairs[");
     }
-    builder.append(property0).append("-");
-    builder.append(property1).append("-");
-    builder.append(separator).append("-");
+    builder.append(property0).append('-');
+    builder.append(property1).append('-');
+    builder.append(separator).append('-');
     builder.append(suffix).append(" ?");
     if (!multiValueSupported || entries.isEmpty()) {
       // query plan specific to the number of parameters in the IN clause
       builder.append(entries.size());
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

@@ -44,7 +44,7 @@ public final class PersistDeferredRelationship {
       return; // could not bind: TODO: should we log/throw an error?
     }
     // bind the where clause for the bean
-    Object[] idValues = beanDescriptor.idBinder().getIdValues(bean);
+    Object[] idValues = beanDescriptor.idBinder().values(bean);
     for (int j = 0; j < idValues.length; j++) {
       sqlUpdate.setParameter(pos + j, idValues[j]);
     }

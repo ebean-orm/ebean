@@ -81,7 +81,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
       // if we have no property ask first children (in a distinct select with join)
       if (children.length == 0) {
         // expected to be a findIds query
-        return desc.idBinder().getBeanProperty();
+        return desc.idBinder().beanProperty();
       }
       return children[0].singleAttributeReader();
     }

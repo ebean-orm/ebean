@@ -23,11 +23,11 @@ public class BasicSqlLimitOffset implements BasicSqlLimiter {
     sb.append(dbSql);
 
     if (maxRows > 0) {
-      sb.append(" ").append(LIMIT);
-      sb.append(" ").append(maxRows);
+      sb.append(' ').append(LIMIT);
+      sb.append(' ').append(maxRows);
     }
     if (firstRow > 0) {
-      sb.append(" ").append(OFFSET).append(" ");
+      sb.append(' ').append(OFFSET).append(' ');
       sb.append(firstRow);
     }
     return sb.toString();

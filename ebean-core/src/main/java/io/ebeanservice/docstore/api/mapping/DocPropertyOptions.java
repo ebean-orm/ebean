@@ -51,19 +51,19 @@ public final class DocPropertyOptions {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     if (code != null) {
-      sb.append("code:").append(code).append(" ");
+      sb.append("code:").append(code).append(' ');
     }
     if (sortable != null) {
-      sb.append("sortable:").append(sortable).append(" ");
+      sb.append("sortable:").append(sortable).append(' ');
     }
     if (store != null) {
-      sb.append("store:").append(store).append(" ");
+      sb.append("store:").append(store).append(' ');
     }
     if (boost != null) {
-      sb.append("boost:").append(boost).append(" ");
+      sb.append("boost:").append(boost).append(' ');
     }
     if (nullValue != null) {
-      sb.append("nullValue:").append(nullValue).append(" ");
+      sb.append("nullValue:").append(nullValue).append(' ');
     }
     return sb.toString();
   }

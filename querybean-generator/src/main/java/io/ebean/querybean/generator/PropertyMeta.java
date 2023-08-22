@@ -31,14 +31,12 @@ class PropertyMeta {
   }
 
   void writeFieldDefn(Append writer, String shortName, boolean assoc) {
-
     writer.append("  public ");
     writer.append(getTypeDefn(shortName, assoc));
     writer.append(" ").append(name).append(";");
   }
 
   void writeFieldAliasDefn(Append writer, String shortName) {
-
     writer.append("    public static ");
     writer.append(getTypeDefn(shortName, false));
     writer.append(" ").append(name).append(" = _alias.").append(name).append(";");

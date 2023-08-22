@@ -96,7 +96,7 @@ final class NotExpression implements SpiExpression {
   public void queryPlanHash(StringBuilder builder) {
     builder.append("Not[");
     exp.queryPlanHash(builder);
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

@@ -364,7 +364,7 @@ public class PlatformDdl {
     StringBuilder sb = new StringBuilder("create sequence ");
     sb.append(quote(sequenceName));
     sb.append(identity.sequenceOptions(sequenceStartWith, sequenceIncrementBy, sequenceCache));
-    sb.append(";");
+    sb.append(';');
     return sb.toString();
   }
 

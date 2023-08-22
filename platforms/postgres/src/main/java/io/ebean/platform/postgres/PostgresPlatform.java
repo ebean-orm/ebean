@@ -28,6 +28,7 @@ public class PostgresPlatform extends DatabasePlatform {
   public PostgresPlatform() {
     super();
     this.platform = Platform.POSTGRES;
+    this.maxInBinding = 32_000; // technically 32_767
     this.supportsNativeIlike = true;
     this.supportsDeleteTableAlias = true;
     this.selectCountWithAlias = true;

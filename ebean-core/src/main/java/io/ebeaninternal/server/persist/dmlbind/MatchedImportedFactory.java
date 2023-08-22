@@ -39,6 +39,12 @@ final class MatchedImportedFactory {
         return new MatchedImportedScalar(prop, beanProperty);
       }
     }
+    // match on property name
+    for (BeanProperty beanProperty : desc.propertiesBaseScalar()) {
+      if (prop.name().equals(beanProperty.name())) {
+        return new MatchedImportedScalar(prop, beanProperty);
+      }
+    }
     // there was no matching assoc one property.
     // example UserRole bean missing assoc one to User?
     return null;

@@ -38,7 +38,7 @@ final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public String getOrderBy(String pathPrefix, boolean ascending) {
+  public String orderBy(String pathPrefix, boolean ascending) {
     return pathPrefix;
   }
 
@@ -47,12 +47,7 @@ final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public BeanProperty getBeanProperty() {
-    return null;
-  }
-
-  @Override
-  public String getIdProperty() {
+  public BeanProperty beanProperty() {
     return null;
   }
 
@@ -67,58 +62,58 @@ final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public String getDefaultOrderBy() {
+  public String orderBy() {
     // this should never happen?
     return "";
   }
 
   @Override
-  public String getBindIdSql(String baseTableAlias) {
+  public String bindEqSql(String baseTableAlias) {
     return bindIdSql;
   }
 
   @Override
-  public String getAssocOneIdExpr(String prefix, String operator) {
+  public String assocExpr(String prefix, String operator) {
     return null;
   }
 
   @Override
-  public String getAssocIdInExpr(String prefix) {
+  public String assocInExpr(String prefix) {
     return null;
   }
 
   @Override
-  public String getIdInValueExprDelete(int size) {
-    return getIdInValueExpr(false, size);
+  public String idInValueExprDelete(int size) {
+    return idInValueExpr(false, size);
   }
 
   @Override
-  public String getIdInValueExpr(boolean not, int size) {
+  public String idInValueExpr(boolean not, int size) {
     return "";
   }
 
   @Override
-  public String getBindIdInSql(String baseTableAlias) {
+  public String bindInSql(String baseTableAlias) {
     return null;
   }
 
   @Override
-  public Object[] getIdValues(EntityBean bean) {
+  public Object[] values(EntityBean bean) {
     return null;
   }
 
   @Override
-  public Object[] getBindValues(Object idValue) {
+  public Object[] bindValues(Object idValue) {
     return new Object[]{idValue};
   }
 
   @Override
-  public Object getIdForJson(EntityBean bean) {
+  public Object convertForJson(EntityBean bean) {
     return null;
   }
 
   @Override
-  public Object convertIdFromJson(Object value) {
+  public Object convertFromJson(Object value) {
     return value;
   }
 
@@ -131,11 +126,11 @@ final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
+  public void addBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
   }
 
   @Override
-  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> ids) {
+  public void addBindValues(SpiExpressionRequest request, Collection<?> ids) {
   }
 
   @Override

@@ -72,10 +72,10 @@ final class NestedPathWrapperExpression implements SpiExpression {
   public void queryPlanHash(StringBuilder builder) {
     builder.append("NestedPath[");
     if (nestedPath != null) {
-      builder.append("path:").append(nestedPath).append(" ");
+      builder.append("path:").append(nestedPath).append(' ');
     }
     delegate.queryPlanHash(builder);
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

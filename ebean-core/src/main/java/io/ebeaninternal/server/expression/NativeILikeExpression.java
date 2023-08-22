@@ -49,7 +49,7 @@ final class NativeILikeExpression extends AbstractExpression {
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("NativeILike[").append(propName).append("]");
+    builder.append("NativeILike[").append(propName).append(']');
   }
 
   @Override

@@ -64,13 +64,13 @@ public class DdlIdentity {
     if (brackets) {
       sb.append(" (");
     } else {
-      sb.append(" ");
+      sb.append(' ');
     }
     optionFor(sb, startWith, identityMode.getStart());
     optionFor(sb, incrementBy, identityMode.getIncrement());
     optionFor(sb, cache, identityMode.getCache());
     if (brackets) {
-      sb.append(")");
+      sb.append(')');
     }
     return sb.toString();
   }
@@ -78,7 +78,7 @@ public class DdlIdentity {
   private void optionFor(StringBuilder sb, String prefix, int val) {
     if (val > 0 && prefix != null) {
       if (sb.length() > 2) {
-        sb.append(" ");
+        sb.append(' ');
       }
       sb.append(prefix).append(" ").append(val);
     }

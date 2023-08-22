@@ -13,6 +13,7 @@ public class SQLitePlatform extends DatabasePlatform {
   public SQLitePlatform() {
     super();
     this.platform = Platform.SQLITE;
+    this.maxInBinding = 800; // technically 999
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(false);
     this.dbIdentity.setSupportsSequence(false);

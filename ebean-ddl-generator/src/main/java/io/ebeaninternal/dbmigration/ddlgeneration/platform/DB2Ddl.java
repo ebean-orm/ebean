@@ -54,7 +54,7 @@ public class DB2Ddl extends PlatformDdl {
 
     for (int i = 0; i < columns.length; i++) {
       if (i > 0) {
-        sb.append(",");
+        sb.append(',');
       }
       sb.append(columns[i]);
     }

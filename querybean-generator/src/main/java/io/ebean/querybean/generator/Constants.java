@@ -21,9 +21,7 @@ interface Constants {
   String DBNAME = "io.ebean.annotation.DbName";
 
   String TQROOTBEAN = "io.ebean.typequery.TQRootBean";
-  String TQASSOC = "io.ebean.typequery.TQAssoc";
   String TQASSOCBEAN = "io.ebean.typequery.TQAssocBean";
-  String TQPROPERTY = "io.ebean.typequery.TQProperty";
   String TYPEQUERYBEAN = "io.ebean.typequery.TypeQueryBean";
   String DATABASE = "io.ebean.Database";
   String DB = "io.ebean.DB";
@@ -37,4 +35,7 @@ interface Constants {
 
   String AVAJE_LANG_NULLABLE = "io.avaje.lang.Nullable";
   String JAVA_COLLECTION = "java.util.Collection";
+  String EXPRESSIONLIST = "io.ebean.ExpressionList";
+  String EXPR = "io.ebean.Expr";
+  String CONSUMER = "java.util.function.Consumer";
 }

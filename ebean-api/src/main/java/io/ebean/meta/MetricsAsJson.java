@@ -118,28 +118,28 @@ final class MetricsAsJson implements ServerMetricsAsJson {
 
   private void objStart() throws IOException {
     objKeyCounter = 0;
-    writer.append("{");
+    writer.append('{');
   }
 
   private void objEnd() throws IOException {
-    writer.append("}");
+    writer.append('}');
   }
 
   private void listStart() throws IOException {
     listCounter = 0;
-    writer.append("[");
+    writer.append('[');
     writer.append(newLine);
   }
 
   private void listEnd() throws IOException {
-    writer.append("]");
+    writer.append(']');
   }
 
   private void key(String key) throws IOException {
     if (objKeyCounter++ > 0) {
       writer.append(", ");
     }
-    writer.append("\"").append(key).append("\":");
+    writer.append('"').append(key).append("\":");
   }
 
   private void val(long count) throws IOException {
@@ -147,12 +147,12 @@ final class MetricsAsJson implements ServerMetricsAsJson {
   }
 
   private void val(String val) throws IOException {
-    writer.append("\"").append(val).append("\"");
+    writer.append('"').append(val).append('"');
   }
 
   private void metricStart(MetaMetric metric) throws IOException {
     if (listCounter++ > 0) {
-      writer.append(",").append(newLine);
+      writer.append(',').append(newLine);
     }
     objStart();
     key("name");

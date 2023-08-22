@@ -458,7 +458,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public Object[] assocIdValues(EntityBean bean) {
-    return targetDescriptor.idBinder().getIdValues(bean);
+    return targetDescriptor.idBinder().values(bean);
   }
 
   /**
@@ -466,7 +466,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public String assocIdExpression(String prefix, String operator) {
-    return targetDescriptor.idBinder().getAssocOneIdExpr(prefix, operator);
+    return targetDescriptor.idBinder().assocExpr(prefix, operator);
   }
 
   /**
@@ -474,7 +474,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public String assocIdInValueExpr(boolean not, int size) {
-    return targetDescriptor.idBinder().getIdInValueExpr(not, size);
+    return targetDescriptor.idBinder().idInValueExpr(not, size);
   }
 
   /**
@@ -482,7 +482,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public String assocIdInExpr(String prefix) {
-    return targetDescriptor.idBinder().getAssocIdInExpr(prefix);
+    return targetDescriptor.idBinder().assocInExpr(prefix);
   }
 
   @Override

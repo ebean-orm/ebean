@@ -69,7 +69,7 @@ public final class BeanNaturalKey {
   public String calculateKey(Map<String, Object> map) {
     StringBuilder sb = new StringBuilder();
     for (BeanProperty prop : props) {
-      sb.append(prop.naturalKeyVal(map)).append(";");
+      sb.append(prop.naturalKeyVal(map)).append(';');
     }
     return sb.toString();
   }

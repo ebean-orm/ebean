@@ -47,9 +47,9 @@ public class ExtraDdlXmlReader {
         sb.append(value);
         if (value.lastIndexOf(';') == -1) {
           // add statement terminator as we didn't find one
-          sb.append(";");
+          sb.append(';');
         }
-        sb.append("\n");
+        sb.append('\n');
       }
     }
     return sb.toString();

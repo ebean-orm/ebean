@@ -30,7 +30,7 @@ final class ArrayIsEmptyExpression extends AbstractExpression {
     } else {
       builder.append("ArrayIsNotEmpty[");
     }
-    builder.append(propName).append("]");
+    builder.append(propName).append(']');
   }
 
   @Override

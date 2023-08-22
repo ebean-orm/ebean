@@ -44,7 +44,7 @@ final class LikeExpression extends AbstractValueExpression {
       pname = prop.beanProperty().decryptProperty(propName);
     }
     if (caseInsensitive) {
-      request.append("lower(").property(pname).append(")");
+      request.append("lower(").property(pname).append(')');
     } else {
       request.property(pname);
     }
@@ -62,9 +62,9 @@ final class LikeExpression extends AbstractValueExpression {
   @Override
   public void queryPlanHash(StringBuilder builder) {
     if (caseInsensitive){
-      builder.append("I");
+      builder.append('I');
     }
-    builder.append("Like[").append(type).append(" ").append(propName).append("]");
+    builder.append("Like[").append(type).append(' ').append(propName).append(']');
   }
 
   @Override

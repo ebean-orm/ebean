@@ -120,6 +120,8 @@ drop table if exists drop_ref_many cascade;
 drop sequence if exists drop_ref_many_seq;
 drop table if exists drop_ref_one cascade;
 drop sequence if exists drop_ref_one_seq;
+drop table if exists drop_ref_one_to_one cascade;
+drop sequence if exists drop_ref_one_to_one_seq;
 drop table if exists migtest_e_test_binary cascade;
 drop sequence if exists migtest_e_test_binary_seq;
 drop table if exists migtest_e_test_json cascade;

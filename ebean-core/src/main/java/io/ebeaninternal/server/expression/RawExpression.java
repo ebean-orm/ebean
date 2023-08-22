@@ -2,6 +2,9 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
+import io.ebeaninternal.server.deploy.DeployPropertyParser;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
 import java.io.IOException;
@@ -11,6 +14,7 @@ final class RawExpression extends NonPrepareExpression {
 
   final String sql;
   final Object[] values;
+  private String prefixPath;
 
   RawExpression(String sql, Object[] values) {
     this.sql = sql;
@@ -52,8 +56,38 @@ final class RawExpression extends NonPrepareExpression {
   }
 
   @Override
+  public void prefixProperty(String path) {
+    this.prefixPath = path;
+  }
+
+  @Override
   public void addSql(SpiExpressionRequest request) {
-    request.parse(sql);
+    if (prefixPath == null) {
+      request.parse(sql);
+    } else {
+      BeanDescriptor<?> descriptor = request.descriptor();
+      BeanProperty beanProperty = descriptor.findPropertyFromPath(prefixPath);
+      BeanPropertyAssoc bpa = (BeanPropertyAssoc)beanProperty;
+      DeployPropertyParser parser = bpa.targetDescriptor().parser();
+      request.append(filterManyPaths(prefixPath, parser.parse(sql)));
+    }
+  }
+
+
+  static String filterManyPaths(String prefix, String raw) {
+    final StringBuilder sb = new StringBuilder(raw.length() + 50);
+    int lastPos = 0;
+    int nextPos = raw.indexOf("${");
+    while (nextPos > -1) {
+      sb.append(raw.substring(lastPos, nextPos)).append("${").append(prefix);
+      if (raw.charAt(nextPos + 2) != '}') {
+        sb.append('.');
+      }
+      lastPos = nextPos + 2;
+      nextPos = raw.indexOf("${", nextPos + 2);
+    }
+    sb.append(raw.substring(lastPos));
+    return sb.toString();
   }
 
   /**
@@ -65,7 +99,7 @@ final class RawExpression extends NonPrepareExpression {
     if (values != null) {
       builder.append(" ?").append(values.length);
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

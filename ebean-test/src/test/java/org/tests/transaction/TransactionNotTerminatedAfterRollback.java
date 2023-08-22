@@ -60,10 +60,10 @@ public class TransactionNotTerminatedAfterRollback {
     @Override
     public String toString() {
       StringBuilder s = new StringBuilder();
-      s.append("{");
+      s.append('{');
       s.append("id: ").append(id).append(", ");
       s.append("name: ").append(name);
-      s.append("}");
+      s.append('}');
       return s.toString();
     }
   }

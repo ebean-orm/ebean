@@ -101,7 +101,7 @@ public final class BeanPersistIds implements BinaryWritable {
     if (ids != null) {
       sb.append(" ids:").append(ids);
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 

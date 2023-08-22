@@ -82,9 +82,8 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
    */
   @Override
   public void appendLike(boolean rawLikeExpression) {
-    sql.append(" ");
+    sql.append(' ');
     sql.append(queryRequest.dbLikeClause(rawLikeExpression));
-    sql.append(" ");
   }
 
   @Override
@@ -110,12 +109,15 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
     return queryRequest;
   }
 
-  /**
-   * Append text the underlying sql expression.
-   */
   @Override
   public SpiExpressionRequest append(String expression) {
     sql.append(expression);
+    return this;
+  }
+
+  @Override
+  public SpiExpressionRequest append(char c) {
+    sql.append(c);
     return this;
   }
 
@@ -156,7 +158,7 @@ public final class DefaultExpressionRequest implements SpiExpressionRequest {
       if (bindLog == null) {
         bindLog = new StringBuilder();
       } else {
-        bindLog.append(",");
+        bindLog.append(',');
       }
       bindLog.append(val);
     }

@@ -36,6 +36,13 @@ create table drop_ref_one (
   constraint pk_drop_ref_one primary key (id)
 );
 
+create table drop_ref_one_to_one (
+  id                            serial not null,
+  parent_id                     integer,
+  constraint uq_drop_ref_one_to_one_parent_id unique (parent_id),
+  constraint pk_drop_ref_one_to_one primary key (id)
+);
+
 create table migtest_e_test_binary (
   id                            serial not null,
   test_byte16                   bytea,
@@ -421,6 +428,8 @@ alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_dr
 
 create index ix_drop_ref_one_parent_id on drop_ref_one (parent_id);
 alter table drop_ref_one add constraint fk_drop_ref_one_parent_id foreign key (parent_id) references drop_main (id) on delete restrict on update restrict;
+
+alter table drop_ref_one_to_one add constraint fk_drop_ref_one_to_one_parent_id foreign key (parent_id) references drop_main (id) on delete restrict on update restrict;
 
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id) on delete restrict on update restrict;

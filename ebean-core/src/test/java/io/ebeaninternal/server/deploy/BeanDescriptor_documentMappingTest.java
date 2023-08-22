@@ -52,12 +52,12 @@ public class BeanDescriptor_documentMappingTest extends BaseTest {
     @Override
     public void visitBegin() {
 
-      sb.append("{");
+      sb.append('{');
     }
 
     @Override
     public void visitEnd() {
-      sb.append("}");
+      sb.append('}');
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BeanDescriptor_documentMappingTest extends BaseTest {
 
     @Override
     public void visitEndObject(DocPropertyMapping property) {
-      sb.append("}");
+      sb.append('}');
     }
 
     @Override

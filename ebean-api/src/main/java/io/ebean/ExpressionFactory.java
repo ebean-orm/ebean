@@ -37,6 +37,11 @@ import java.util.Map;
 public interface ExpressionFactory {
 
   /**
+   * Return a new ExpressionList.
+   */
+  <T> ExpressionList<T> expressionList();
+
+  /**
    * Path exists - for the given path in a JSON document.
    */
   Expression jsonExists(String propertyName, String path);

@@ -43,6 +43,8 @@ IF OBJECT_ID('drop_ref_many', 'U') IS NOT NULL drop table drop_ref_many;
 IF OBJECT_ID('drop_ref_many_seq', 'SO') IS NOT NULL drop sequence drop_ref_many_seq;
 IF OBJECT_ID('drop_ref_one', 'U') IS NOT NULL drop table drop_ref_one;
 IF OBJECT_ID('drop_ref_one_seq', 'SO') IS NOT NULL drop sequence drop_ref_one_seq;
+IF OBJECT_ID('drop_ref_one_to_one', 'U') IS NOT NULL drop table drop_ref_one_to_one;
+IF OBJECT_ID('drop_ref_one_to_one_seq', 'SO') IS NOT NULL drop sequence drop_ref_one_to_one_seq;
 IF OBJECT_ID('migtest_e_test_binary', 'U') IS NOT NULL drop table migtest_e_test_binary;
 IF OBJECT_ID('migtest_e_test_binary_seq', 'SO') IS NOT NULL drop sequence migtest_e_test_binary_seq;
 IF OBJECT_ID('migtest_e_test_json', 'U') IS NOT NULL drop table migtest_e_test_json;

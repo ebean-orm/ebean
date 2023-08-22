@@ -56,10 +56,10 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public String getOrderBy(String pathPrefix, boolean ascending) {
+  public String orderBy(String pathPrefix, boolean ascending) {
     StringBuilder sb = new StringBuilder();
     if (pathPrefix != null) {
-      sb.append(pathPrefix).append(".");
+      sb.append(pathPrefix).append('.');
     }
     sb.append(idProperty.name());
     if (!ascending) {
@@ -74,13 +74,8 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public BeanProperty getBeanProperty() {
+  public BeanProperty beanProperty() {
     return idProperty;
-  }
-
-  @Override
-  public String getIdProperty() {
-    return idProperty.name();
   }
 
   @Override
@@ -97,12 +92,12 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public String getDefaultOrderBy() {
+  public String orderBy() {
     return idProperty.name();
   }
 
   @Override
-  public String getBindIdInSql(String baseTableAlias) {
+  public String bindInSql(String baseTableAlias) {
     if (baseTableAlias == null) {
       return idProperty.dbColumn();
     } else {
@@ -111,7 +106,7 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public String getBindIdSql(String baseTableAlias) {
+  public String bindEqSql(String baseTableAlias) {
     if (baseTableAlias == null) {
       return bindIdSql;
     } else {
@@ -120,22 +115,22 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public Object[] getIdValues(EntityBean bean) {
+  public Object[] values(EntityBean bean) {
     return new Object[]{idProperty.getValue(bean)};
   }
 
   @Override
-  public Object[] getBindValues(Object idValue) {
+  public Object[] bindValues(Object idValue) {
     return new Object[]{idValue};
   }
 
   @Override
-  public String getIdInValueExprDelete(int size) {
-    return getIdInValueExpr(false, size);
+  public String idInValueExprDelete(int size) {
+    return idInValueExpr(false, size);
   }
 
   @Override
-  public String getIdInValueExpr(boolean not, int size) {
+  public String idInValueExpr(boolean not, int size) {
     if (size <= 0) {
       throw new IndexOutOfBoundsException("The size must be at least 1");
     }
@@ -143,24 +138,24 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
+  public void addBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids) {
     sqlUpdate.setParameter(new MultiValueWrapper(ids));
   }
 
   @Override
-  public void addIdInBindValues(SpiExpressionRequest request, Collection<?> values) {
+  public void addBindValues(SpiExpressionRequest request, Collection<?> values) {
     List<Object> copy = new ArrayList<>(values);
     copy.replaceAll(idValue -> convertSetId(idValue, null));
     request.addBindValue(new MultiValueWrapper(copy));
   }
 
   @Override
-  public Object getIdForJson(EntityBean bean) {
+  public Object convertForJson(EntityBean bean) {
     return idProperty.getValue(bean);
   }
 
   @Override
-  public Object convertIdFromJson(Object value) {
+  public Object convertFromJson(Object value) {
     // handle simple type conversion if required
     return convertId(value);
   }
@@ -213,11 +208,11 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public String getAssocOneIdExpr(String prefix, String operator) {
-    StringBuilder sb = new StringBuilder();
+  public String assocExpr(String prefix, String operator) {
+    StringBuilder sb = new StringBuilder(25);
     if (prefix != null) {
       sb.append(prefix);
-      sb.append(".");
+      sb.append('.');
     }
     sb.append(idProperty.name());
     sb.append(operator);
@@ -225,11 +220,11 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public String getAssocIdInExpr(String prefix) {
+  public String assocInExpr(String prefix) {
     StringBuilder sb = new StringBuilder();
     if (prefix != null) {
       sb.append(prefix);
-      sb.append(".");
+      sb.append('.');
     }
     sb.append(idProperty.name());
     return sb.toString();

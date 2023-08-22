@@ -69,7 +69,7 @@ public class TenantAwareKey {
     public String toString() {
       StringBuilder sb = new StringBuilder(key.toString());
       if (tenantId != null) {
-        sb.append(":").append(tenantId);
+        sb.append(':').append(tenantId);
       }
       return sb.toString();
     }
