@@ -16,100 +16,96 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQuerySubquery extends BaseTestCase {
 
-    private Long robId;
+  private Long robId;
 
-    @BeforeEach
-    public void setup() {
-        ResetBasicData.reset();
+  @BeforeEach
+  public void setup() {
+    ResetBasicData.reset();
 
-        Person rob = new Person();
-        rob.setName("Rob");
-        rob.setSurname("Test");
-        DB.save(rob);
-        robId = rob.getId();
+    Person rob = new Person();
+    rob.setName("Rob");
+    rob.setSurname("Test");
+    DB.save(rob);
+    robId = rob.getId();
 
-        DB.getDefault().pluginApi().cacheManager().clearAll();
-    }
+    DB.getDefault().pluginApi().cacheManager().clearAll();
+  }
 
-    @AfterEach
-    public void cleanup() {
-        DB.delete(Person.class, robId);
-    }
+  @AfterEach
+  public void cleanup() {
+    DB.delete(Person.class, robId);
+  }
 
-    @Test
-    public void testWithoutSubquery() {
+  @Test
+  public void testWithoutSubquery() {
 
-        Person contact = DB.find(Person.class)
-                .where()
-                .idEq(robId)
-                .findOne();
+    Person contact = DB.find(Person.class)
+      .where()
+      .idEq(robId)
+      .findOne();
 
-        LoggedSql.start();
-        List<Order> orders = DB.find(Order.class)
-                .alias("t0")
-                .where()
-                .eq("customer.name", contact.getName())
-                .findList();
+    LoggedSql.start();
+    List<Order> orders = DB.find(Order.class)
+      .where()
+      .eq("customer.name", contact.getName())
+      .findList();
 
-        assertThat(orders).hasSize(3);
-        assertThat(LoggedSql.stop())
-                .hasSize(1)
-                .first().asString()
-                .contains("--bind("+ contact.getName() + ")")
-                .contains("kcustomer_id where t1.name = ?");
-    }
+    assertThat(orders).hasSize(3);
+    assertThat(LoggedSql.stop())
+      .hasSize(1)
+      .first().asString()
+      .contains("--bind(" + contact.getName() + ")")
+      .contains("kcustomer_id where t1.name = ?");
+  }
 
-    @Test
-    public void testEqSubqueryWithIdEq() {
-        LoggedSql.start();
-        List<Order> orders = DB.find(Order.class)
-                .alias("t0")
-                .where()
-                .eq("customer.name", DB.find(Person.class).select("name").where().idEq(robId).query())
-                .findList();
+  @Test
+  public void testEqSubqueryWithIdEq() {
+    LoggedSql.start();
+    List<Order> orders = DB.find(Order.class)
+      .where()
+      .eq("customer.name", DB.find(Person.class).alias("sq").select("name").where().idEq(robId).query())
+      .findList();
 
-        assertThat(orders).hasSize(3);
-        assertThat(LoggedSql.stop())
-                .hasSize(1)
-                .first().asString()
-                .contains("--bind("+ robId + ")")
-                .contains("name = (select t0.NAME");
-    }
+    assertThat(orders).hasSize(3);
+    assertThat(LoggedSql.stop())
+      .hasSize(1)
+      .first().asString()
+      .contains("--bind(" + robId + ")")
+      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.ID = ?)");
+  }
 
-    @Test
-    public void testEqSubqueryWithSetId() {
-        LoggedSql.start();
+  @Test
+  public void testEqSubqueryWithSetId() {
+    LoggedSql.start();
 
-        List<Order> orders = DB.find(Order.class)
-                .alias("t0")
-                .where()
-                .eq("customer.name", DB.find(Person.class).select("name").setId(robId))
-                .findList();
+    List<Order> orders = DB.find(Order.class)
+      .where()
+      .eq("customer.name", DB.find(Person.class).alias("sq").select("name").setId(robId))
+      .findList();
 
-        assertThat(orders).hasSize(3);
-        assertThat(LoggedSql.stop())
-                .hasSize(1)
-                .first().asString()
-                .contains("--bind("+ robId + ")")
-                .contains("name = (select t0.NAME");
-    }
+    assertThat(orders).hasSize(3);
+    assertThat(LoggedSql.stop())
+      .hasSize(1)
+      .first().asString()
+      .contains("--bind(" + robId + ")")
+      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.ID = ?)");
+  }
 
-    @Test
-    public void testEqSubqueryWithEqId() {
-        LoggedSql.start();
+  @Test
+  public void testEqSubqueryWithEqId() {
+    LoggedSql.start();
 
-        List<Order> orders = DB.find(Order.class)
-                .alias("t0")
-                .where()
-                .eq("customer.name", DB.find(Person.class).select("name").where().eq("id", robId).query())
-                .findList();
+    List<Order> orders = DB.find(Order.class)
+      .where()
+      .eq("customer.name", DB.find(Person.class).alias("sq").select("name").where().eq("id", robId).query())
+      .findList();
 
-        assertThat(orders).hasSize(3);
-        assertThat(LoggedSql.stop())
-                .hasSize(1)
-                .first().asString()
-                .contains("--bind("+ robId + ")")
-                .contains("name = (select t0.NAME");
-    }
+    assertThat(orders).hasSize(3);
+    assertThat(LoggedSql.stop())
+      .hasSize(1)
+      .first().asString()
+      .contains("--bind(" + robId + ")")
+      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.ID = ?)");
+  }
 
 }
