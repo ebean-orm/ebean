@@ -4,12 +4,13 @@ import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiSqlUpdate;
+import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.visitor.BaseTablePropertyVisitor;
 import io.ebeaninternal.server.deploy.visitor.VisitProperties;
-import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.util.Str;
 
 import java.util.List;
+import java.util.Set;
 
 class BeanPropertyAssocManySqlHelp<T> {
 
@@ -123,28 +124,26 @@ class BeanPropertyAssocManySqlHelp<T> {
     many.bindParentIdsIn(rawWhere, parentIds, query);
   }
 
-  List<Object> findIdsByParentId(Object parentId, Transaction t, List<Object> excludeDetailIds, boolean hard) {
+  List<Object> findIdsByParentId(Object parentId, Transaction t, boolean includeSoftDeletes, Set<Object> excludeDetailIds) {
     final SpiEbeanServer server = descriptor.ebeanServer();
     final SpiQuery<?> query = many.newQuery(server);
     many.bindParentIdEq(rawParentIdEQ(""), parentId, query);
-    if (hard) {
+    if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
     }
+
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       query.where().not(query.getExpressionFactory().idIn(excludeDetailIds));
     }
     return server.findIds(query, t);
   }
 
-  List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, List<Object> excludeDetailIds, boolean hard) {
+  List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, boolean includeSoftDeletes) {
     final SpiEbeanServer server = descriptor.ebeanServer();
     final SpiQuery<?> query = many.newQuery(server);
     many.bindParentIdsIn(rawParentIdIN("", parentIds.size()), parentIds, query);
-    if (hard) {
+    if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
-    }
-    if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
-      query.where().not(query.getExpressionFactory().idIn(excludeDetailIds));
     }
     return server.findIds(query, t);
   }
