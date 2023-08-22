@@ -1077,35 +1077,32 @@ public final class DefaultPersister implements Persister {
    * For stateless updates this deletes details beans that are no longer in
    * the many - the excludeDetailIds holds the detail beans that are in the
    * collection (and should not be deleted).
-   * </p>
    */
   void deleteManyDetails(SpiTransaction t, BeanDescriptor<?> desc, EntityBean parentBean,
                          BeanPropertyAssocMany<?> many, Set<Object> excludeDetailIds, DeleteMode deleteMode) {
     if (many.cascadeInfo().isDelete()) {
       // cascade delete the beans in the collection
-      BeanDescriptor<?> targetDesc = many.targetDescriptor();
+      final BeanDescriptor<?> targetDesc = many.targetDescriptor();
+      final int batch = maxDeleteBatch / targetDesc.idBinder().size();
       if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
         if (targetDesc.isDeleteByStatement()
-          && (excludeDetailIds == null || excludeDetailIds.size() <= maxDeleteBatch)) { // TODO wait for #3176
+          && (excludeDetailIds == null || excludeDetailIds.size() <= batch)) {
           // Just delete all the children with one statement
           IntersectionRow intRow = many.buildManyDeleteChildren(parentBean, excludeDetailIds);
           SqlUpdate sqlDelete = intRow.createDelete(server, deleteMode);
           executeSqlUpdate(sqlDelete, t);
 
         } else {
-          // TODO: Review first checking if many property is loaded and using the loaded beans
-          // ... and only using findIdsByParentId() when the many property isn't loaded
           // Delete recurse using the Id values of the children
           Object parentId = desc.getId(parentBean);
           List<Object> idsByParentId;
-          if (excludeDetailIds == null || excludeDetailIds.size() <= maxDeleteBatch) { // TODO: Wait for #3176
+          if (excludeDetailIds == null || excludeDetailIds.size() <= batch) {
             idsByParentId = many.findIdsByParentId(parentId, t, deleteMode.isHard(), excludeDetailIds);
           } else {
-            // if we hit the parameter limit, we must filter that on the java side.
-            // There is no easy way to batch "not in" queries.
-            // checkme: We could pass the first 1000-2000 params to the DB and filter the rest
+            // if we hit the parameter limit, we must filter that on the java side
+            // as there is no easy way to batch "not in" queries.
             idsByParentId = many.findIdsByParentId(parentId, t, deleteMode.isHard(), null);
-            idsByParentId.removeIf(id -> excludeDetailIds.contains(id));
+            idsByParentId.removeIf(excludeDetailIds::contains);
           }
           if (!idsByParentId.isEmpty()) {
             deleteChildrenById(t, targetDesc, idsByParentId, deleteMode);
