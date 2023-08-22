@@ -60,6 +60,13 @@ public interface IdBinder {
   boolean isComplexId();
 
   /**
+   * Return the number of properties that make up the id.
+   */
+  default int size() {
+    return 1;
+  }
+
+  /**
    * Return the default order by that may need to be used if the query includes
    * a many property.
    */
