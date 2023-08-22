@@ -648,14 +648,38 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
+   * By default, getIntercept and setIntercept will check, if the passed bean is an instance of descriptor type.
+   * <p>
+   * If the property is not part of the type hierarchy (i.e. is this property from this descriptor)
+   * an UnsuppoertedOperation is thrown.
+   * <p>
+   * If inheritance is involved, this method returns false instead of an exception, if the property might exist in
+   * one of the child beans. This is necessary for getIntercept, as it returns <code>null</code> in this case.
+   * @return true if property can be
+   */
+  private boolean checkPropertyAccess(EntityBean bean) {
+    if (bean == null || descriptor.type().isInstance(bean)) { // null = fall through - NPE is catched later.
+      return true;
+    }
+    InheritInfo inheritInfo = descriptor.inheritInfo();
+    if (inheritInfo == null || inheritInfo.isRoot() || !inheritInfo.getRoot().getType().isInstance(bean)) {
+      throw new IllegalArgumentException(propertyIncomatibleMsg(bean));
+    } else {
+      return false;
+    }
+  }
+
+  private String propertyIncomatibleMsg(EntityBean bean) {
+    String beanType = bean == null ? "null" : bean.getClass().getName();
+    return "Property " + name + " on [" + descriptor + "] is incompatible with type[" + beanType + "]";
+  }
+
+  /**
    * Set the value of the property without interception or
    * PropertyChangeSupport.
    */
   public void setValue(EntityBean bean, Object value) {
     try {
-      if (!beanHasProperty(bean)) {
-        throw new IllegalArgumentException("Property does not exist");
-      }
       setter.set(bean, value);
     } catch (Exception ex) {
       throw new RuntimeException(setterErrorMsg(bean, value, "set "), ex);
@@ -666,10 +690,10 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Set the value of the property.
    */
   public void setValueIntercept(EntityBean bean, Object value) {
+    if (!checkPropertyAccess(bean)) {
+      throw new IllegalArgumentException(propertyIncomatibleMsg(bean));
+    }
     try {
-      if (!beanHasProperty(bean)) {
-        throw new IllegalArgumentException("Property does not exist");
-      }
       setter.setIntercept(bean, value);
     } catch (Exception ex) {
       throw new RuntimeException(setterErrorMsg(bean, value, "setIntercept "), ex);
@@ -766,18 +790,12 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return getValueIntercept((EntityBean) bean);
   }
 
-  private boolean beanHasProperty(EntityBean bean) {
-    return descriptor.inheritInfo() == null // fast exit for non inherited beans
-      || owningType == null
-      || owningType.isInstance(bean);
-  }
-
   /**
    * Return the value of the property method.
    */
   public Object getValue(EntityBean bean) {
     try {
-      return beanHasProperty(bean) ? getter.get(bean) : null;
+      return getter.get(bean);
     } catch (Exception ex) {
       String beanType = bean == null ? "null" : bean.getClass().getName();
       String msg = "get " + name + " on [" + descriptor + "] type[" + beanType + "] threw error.";
@@ -786,8 +804,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object getValueIntercept(EntityBean bean) {
+    if (!checkPropertyAccess(bean)) {
+      return null;
+    }
     try {
-      return beanHasProperty(bean) ? getter.getIntercept(bean) : null;
+      return getter.getIntercept(bean);
     } catch (Exception ex) {
       String beanType = bean == null ? "null" : bean.getClass().getName();
       String msg = "getIntercept " + name + " on [" + descriptor + "] type[" + beanType + "] threw error.";
