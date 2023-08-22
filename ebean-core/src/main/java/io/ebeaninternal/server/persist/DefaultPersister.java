@@ -58,7 +58,7 @@ public final class DefaultPersister implements Persister {
    * e.g. SqlServer has a 2100 parameter limit, so delete max 2000 for it.
    */
   private int initMaxDeleteBatch(int maxInBinding) {
-    return maxInBinding == 0 ? 1000 : maxInBinding;
+    return maxInBinding == 0 ? 1000 : Math.min(1000, maxInBinding);
   }
 
   @Override
@@ -652,11 +652,9 @@ public final class DefaultPersister implements Persister {
   }
 
   private int delete(BeanDescriptor<?> descriptor, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
-    if (idList == null || idList.size() <= maxDeleteBatch) {
-      return new DeleteBatchHelpMultiple(descriptor, idList, transaction, deleteMode).deleteBatch();
-    }
+    final int batch = maxDeleteBatch / descriptor.idBinder().size();
     int rows = 0;
-    for (List<Object> batchOfIds : Lists.partition(idList, maxDeleteBatch)) {
+    for (List<Object> batchOfIds : Lists.partition(idList, batch)) {
       rows += new DeleteBatchHelpMultiple(descriptor, batchOfIds, transaction, deleteMode).deleteBatch();
     }
     return rows;
