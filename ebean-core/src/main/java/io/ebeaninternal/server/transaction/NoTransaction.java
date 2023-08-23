@@ -68,6 +68,16 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public void setMaxTransactionSize(int maxTransactionSize) {
+
+  }
+
+  @Override
+  public void commitAndContinueIfNecessary() {
+    // do nothing
+  }
+
+  @Override
   public void commitAndContinue() {
     // do nothing
   }

@@ -53,8 +53,18 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void setMaxTransactionSize(int maxTransactionSize) {
+    transaction.setMaxTransactionSize(maxTransactionSize);
+  }
+
+  @Override
   public void commitAndContinue() {
     transaction.commitAndContinue();
+  }
+
+  @Override
+  public void commitAndContinueIfNecessary() {
+    transaction.commitAndContinueIfNecessary();
   }
 
   @Override

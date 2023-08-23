@@ -555,4 +555,13 @@ public interface Transaction extends AutoCloseable {
    * Get an object added with {@link #putUserObject(String, Object)}.
    */
   Object getUserObject(String name);
+
+  /**
+   * Sets the maximum transaction size. After this amount of inserts/updates or sql/orm calls,
+   * the transaction performs an autocommit.
+   * This prevents having huge transactions, which consumes a lot of log space.
+   * Note: saving an object graph could produce more than one insert/update statement,
+   * but this increases the transaction size only by one.
+   */
+  void setMaxTransactionSize(int maxTransactionSize);
 }

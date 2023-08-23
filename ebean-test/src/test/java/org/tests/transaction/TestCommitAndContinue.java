@@ -1,17 +1,19 @@
 package org.tests.transaction;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.Transaction;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.m2m.MnyB;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -169,6 +171,66 @@ class TestCommitAndContinue extends BaseTestCase {
 
     } finally {
       txn.end();
+    }
+  }
+
+  @Test
+  void testAutoCommit() {
+    DB.find(MnyB.class).delete();
+
+    MnyB a = new MnyB("a");
+    MnyB b = new MnyB("b");
+    MnyB c = new MnyB("c");
+
+    try (Transaction txn = DB.beginTransaction()) {
+      a.save();
+      b.save();
+      c.save();
+    }
+    assertThat(DB.find(MnyB.class).findCount()).isEqualTo(0);
+
+    // try again with new beans
+    a = new MnyB("a");
+    b = new MnyB("b");
+    c = new MnyB("c");
+    try (Transaction txn = DB.beginTransaction()) {
+      txn.setMaxTransactionSize(2);
+      a.save();
+      b.save();
+      // txn.commitAndContinue() is executed here
+      c.save();
+    }
+    assertThat(DB.find(MnyB.class).findCount()).isEqualTo(2);
+  }
+
+  /**
+   * Demonstrate the auto commit and continue feature.
+   * <p>
+   * On DB2 (and maybe also on other DBMS) you'll get the error "Sqlcode: -964, Sqlstate: 57011"
+   * (transaction log for the database is full) when doing huge imports in one transaction.
+   * <p>
+   * To avoid this, you can specify a "maxTransaction" size, so that ebean performs automatically
+   * a "commit and contine" after a certain amount of updates.
+   * <p>
+   * For simulation, reduce the LOGSECOND to 1 with
+   * <code>docker exec -i ut_db2 su - admin -c "db2 update db cfg for unit using LOGSECOND 1"</code>
+   * If there is no limit on transaction size, the test will fail after about ~112000 inserts.
+   */
+  @Test
+  @Disabled
+  void testLogSpace() {
+    //DB.find(MnyB.class).delete();
+
+    try (Transaction txn = DB.beginTransaction()) {
+      txn.setBatchMode(true);
+      txn.setMaxTransactionSize(100_000); // without this line, the test will fail
+      for (int i = 0; i < 1_000_000; i++) {
+        MnyB b = new MnyB("x" + i);
+        b.save();
+        if (i % 1000 == 0) {
+          System.out.println(i);
+        }
+      }
     }
   }
 

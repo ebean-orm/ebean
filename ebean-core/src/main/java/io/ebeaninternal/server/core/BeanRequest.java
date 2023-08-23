@@ -49,6 +49,8 @@ public abstract class BeanRequest {
   public void commitTransIfRequired() {
     if (createdTransaction) {
       server.commitTransaction();
+    } else {
+      transaction.commitAndContinueIfNecessary();
     }
   }
 

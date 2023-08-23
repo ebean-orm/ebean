@@ -503,11 +503,21 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     manager.collectMetricReadOnly((System.nanoTime() - startNanos) / 1000L);
   }
 
+  @Override
+  public void setMaxTransactionSize(int maxTransactionSize) {
+
+  }
+
   /**
-   * Perform a commit, fire callbacks and notify l2 cache etc.
-   * <p>
-   * This leaves the transaction active and expects another commit
-   * to occur later (which closes the underlying connection etc).
+   * Do nothing.
+   */
+  @Override
+  public void commitAndContinueIfNecessary() {
+    // do nothing
+  }
+
+  /**
+   * Do nothing.
    */
   @Override
   public void commitAndContinue() {

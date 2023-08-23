@@ -94,6 +94,9 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private final long startNanos;
   private boolean autoPersistUpdates;
 
+  private int transactionSize;
+  private int maxTransactionSize;
+
   JdbcTransaction(boolean explicit, Connection connection, TransactionManager manager) {
     try {
       this.active = true;
@@ -892,6 +895,22 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     // we must flush the batch queue again, because the callback can
     // modify current transaction
     internalBatchFlush();
+  }
+
+  @Override
+  public void setMaxTransactionSize(int maxTransactionSize) {
+    this.maxTransactionSize = maxTransactionSize;
+  }
+
+  @Override
+  public void commitAndContinueIfNecessary() {
+    if (maxTransactionSize > 0) {
+      transactionSize++;
+      if (transactionSize >= maxTransactionSize) {
+        commitAndContinue();
+        transactionSize = 0;
+      }
+    }
   }
 
   /**

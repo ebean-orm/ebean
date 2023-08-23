@@ -357,4 +357,9 @@ public interface SpiTransaction extends Transaction {
    */
   void postRollback(Throwable cause);
 
+  /**
+   * Performs a commit and continue, if necessary. This can be done every 1000 updates or so.
+   */
+  void commitAndContinueIfNecessary();
+
 }
