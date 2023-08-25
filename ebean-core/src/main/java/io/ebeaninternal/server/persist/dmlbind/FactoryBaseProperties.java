@@ -10,7 +10,6 @@ import java.util.List;
  * Add base properties to the BindableList for a bean type.
  * <p>
  * This excludes unique embedded and associated properties.
- * </p>
  */
 public final class FactoryBaseProperties {
 

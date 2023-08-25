@@ -16,7 +16,6 @@ import java.util.List;
  * <p>
  * This inserts the foreign key value that is retrieved from the id of the
  * parentBean.
- * </p>
  */
 public final class BindableUnidirectional implements Bindable {
 
@@ -28,11 +27,6 @@ public final class BindableUnidirectional implements Bindable {
     this.desc = desc;
     this.unidirectional = unidirectional;
     this.importedId = unidirectional.importedId();
-  }
-
-  @Override
-  public String toString() {
-    return "BindableShadowFKey " + unidirectional;
   }
 
   @Override
@@ -53,12 +47,11 @@ public final class BindableUnidirectional implements Bindable {
 
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-    PersistRequestBean<?> persistRequest = request.getPersistRequest();
+    PersistRequestBean<?> persistRequest = request.persistRequest();
     Object parentBean = persistRequest.parentBean();
     if (parentBean == null) {
       Class<?> localType = desc.type();
       Class<?> targetType = unidirectional.targetType();
-
       String msg = "Error inserting bean [" + localType + "] with unidirectional relationship. ";
       msg += "For inserts you must use cascade save on the master bean [" + targetType + "].";
       throw new PersistenceException(msg);

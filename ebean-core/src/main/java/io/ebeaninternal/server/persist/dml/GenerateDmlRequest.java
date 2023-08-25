@@ -42,11 +42,11 @@ public final class GenerateDmlRequest {
     }
   }
 
-  int getBindColumnCount() {
+  int bindColumnCount() {
     return bindColumnCount;
   }
 
-  String getInsertBindBuffer() {
+  String insertBindBuffer() {
     return insertBindBuffer.toString();
   }
 
