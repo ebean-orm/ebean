@@ -229,7 +229,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> int delete(SpiQuery<T> query, Transaction t) {
+  public <T> int delete(SpiQuery<T> query) {
     return 0;
   }
 
@@ -239,7 +239,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> int update(SpiQuery<T> query, Transaction transaction) {
+  public <T> int update(SpiQuery<T> query) {
     return 0;
   }
 
@@ -256,17 +256,17 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> List<Version<T>> findVersions(SpiQuery<T> query, Transaction transaction) {
+  public <T> List<Version<T>> findVersions(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <A, T> List<A> findIdsWithCopy(SpiQuery<T> query, Transaction t) {
+  public <A, T> List<A> findIdsWithCopy(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <T> int findCountWithCopy(SpiQuery<T> query, Transaction t) {
+  public <T> int findCountWithCopy(SpiQuery<T> query) {
     return 0;
   }
 
@@ -453,7 +453,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction) {
+  public SpiResultSet findResultSet(SpiQuery<?> ormQuery) {
     return null;
   }
 
@@ -604,7 +604,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> boolean exists(SpiQuery<T> ormQuery, Transaction transaction) {
+  public <T> boolean exists(SpiQuery<T> ormQuery) {
     return false;
   }
 
@@ -619,39 +619,39 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> int findCount(SpiQuery<T> query, Transaction transaction) {
+  public <T> int findCount(SpiQuery<T> query) {
     return 0;
   }
 
   @Override
-  public <A, T> List<A> findIds(SpiQuery<T> query, Transaction transaction) {
+  public <A, T> List<A> findIds(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <T> QueryIterator<T> findIterate(SpiQuery<T> query, Transaction transaction) {
+  public <T> QueryIterator<T> findIterate(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <T> Stream<T> findStream(SpiQuery<T> query, Transaction transaction) {
+  public <T> Stream<T> findStream(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <T> void findEach(SpiQuery<T> query, Consumer<T> consumer, Transaction transaction) {
+  public <T> void findEach(SpiQuery<T> query, Consumer<T> consumer) {
   }
 
   @Override
-  public <T> void findEach(SpiQuery<T> query, int batch, Consumer<List<T>> consumer, Transaction t) {
+  public <T> void findEach(SpiQuery<T> query, int batch, Consumer<List<T>> consumer) {
   }
 
   @Override
-  public <T> void findEachWhile(SpiQuery<T> query, Predicate<T> consumer, Transaction transaction) {
+  public <T> void findEachWhile(SpiQuery<T> query, Predicate<T> consumer) {
   }
 
   @Override
-  public <T> List<T> findList(SpiQuery<T> query, Transaction transaction) {
+  public <T> List<T> findList(SpiQuery<T> query) {
     return null;
   }
 
@@ -671,55 +671,55 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> PagedList<T> findPagedList(SpiQuery<T> query, Transaction transaction) {
+  public <T> PagedList<T> findPagedList(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <T> Set<T> findSet(SpiQuery<T> query, Transaction transaction) {
+  public <T> Set<T> findSet(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <K, T> Map<K, T> findMap(SpiQuery<T> query, Transaction transaction) {
+  public <K, T> Map<K, T> findMap(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <A, T> List<A> findSingleAttributeList(SpiQuery<T> query, Transaction transaction) {
+  public <A, T> List<A> findSingleAttributeList(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <A, T> Set<A> findSingleAttributeSet(SpiQuery<T> query, Transaction transaction) {
+  public <A, T> Set<A> findSingleAttributeSet(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <T> T findOne(SpiQuery<T> query, Transaction transaction) {
+  public <T> T findOne(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public <T> Optional<T> findOneOrEmpty(SpiQuery<T> query, Transaction transaction) {
+  public <T> Optional<T> findOneOrEmpty(SpiQuery<T> query) {
     return null;
   }
 
   @Override
-  public List<SqlRow> findList(SpiSqlQuery query, Transaction transaction) {
+  public List<SqlRow> findList(SpiSqlQuery query) {
     return null;
   }
 
   @Override
-  public void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer, Transaction transaction) {
+  public void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer) {
   }
 
   @Override
-  public void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer, Transaction transaction) {
+  public void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer) {
   }
 
   @Override
-  public SqlRow findOne(SpiSqlQuery query, Transaction transaction) {
+  public SqlRow findOne(SpiSqlQuery query) {
     return null;
   }
 

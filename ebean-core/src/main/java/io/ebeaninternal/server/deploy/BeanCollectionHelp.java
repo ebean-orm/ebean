@@ -64,11 +64,6 @@ public interface BeanCollectionHelp<T> extends CQueryCollectionAdd<T> {
   BeanCollection<T> createReference(EntityBean parentBean);
 
   /**
-   * Refresh the List Set or Map.
-   */
-  void refresh(SpiEbeanServer server, SpiQuery<?> query, Transaction t, EntityBean parentBean);
-
-  /**
    * Apply the new refreshed BeanCollection to the appropriate property of the parent bean.
    */
   void refresh(BeanCollection<?> bc, EntityBean parentBean);

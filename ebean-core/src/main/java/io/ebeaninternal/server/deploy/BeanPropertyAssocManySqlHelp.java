@@ -127,6 +127,7 @@ class BeanPropertyAssocManySqlHelp<T> {
   List<Object> findIdsByParentId(Object parentId, Transaction t, boolean includeSoftDeletes, Set<Object> excludeDetailIds) {
     final SpiEbeanServer server = descriptor.ebeanServer();
     final SpiQuery<?> query = many.newQuery(server);
+    query.usingTransaction(t);
     many.bindParentIdEq(rawParentIdEQ(""), parentId, query);
     if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
@@ -135,17 +136,18 @@ class BeanPropertyAssocManySqlHelp<T> {
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       query.where().not(query.getExpressionFactory().idIn(excludeDetailIds));
     }
-    return server.findIds(query, t);
+    return server.findIds(query);
   }
 
   List<Object> findIdsByParentIdList(List<Object> parentIds, Transaction t, boolean includeSoftDeletes) {
     final SpiEbeanServer server = descriptor.ebeanServer();
     final SpiQuery<?> query = many.newQuery(server);
+    query.usingTransaction(t);
     many.bindParentIdsIn(rawParentIdIN("", parentIds.size()), parentIds, query);
     if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
     }
-    return server.findIds(query, t);
+    return server.findIds(query);
   }
 
   SpiSqlUpdate deleteByParentId(Object parentId) {

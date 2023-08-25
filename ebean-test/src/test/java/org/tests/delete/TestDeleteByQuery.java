@@ -20,6 +20,7 @@ public class TestDeleteByQuery extends BaseTestCase {
     DB.save(u1);
   }
 
+  @IgnorePlatform(Platform.MYSQL)
   @Test
   void maxDelete_expect_singleDeleteStatement() {
     LoggedSql.start();

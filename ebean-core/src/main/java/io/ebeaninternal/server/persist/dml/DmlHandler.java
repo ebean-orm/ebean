@@ -58,7 +58,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   }
 
   @Override
-  public PersistRequestBean<?> getPersistRequest() {
+  public PersistRequestBean<?> persistRequest() {
     return persistRequest;
   }
 
@@ -233,7 +233,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
-  PreparedStatement getPstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
+  PreparedStatement pstmt(SpiTransaction t, String sql, boolean genKeys) throws SQLException {
     Connection conn = t.internalConnection();
     if (genKeys) {
       // the Id generated is always the first column
@@ -248,7 +248,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   /**
    * Return a prepared statement taking into account batch requirements.
    */
-  PreparedStatement getPstmtBatch(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
+  PreparedStatement pstmtBatch(SpiTransaction t, String sql, PersistRequestBean<?> request, boolean genKeys) throws SQLException {
     BatchedPstmtHolder batch = t.batchControl().pstmtHolder();
     batchedPstmt = batch.batchedPstmt(sql);
     if (batchedPstmt != null) {
@@ -256,7 +256,7 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
       return batchedPstmt.statement(request);
     }
     batchedStatus = BATCHED_FIRST;
-    PreparedStatement stmt = getPstmt(t, sql, genKeys);
+    PreparedStatement stmt = pstmt(t, sql, genKeys);
     batchedPstmt = new BatchedPstmt(stmt, genKeys, sql, t);
     batch.addStmt(batchedPstmt, request);
     return stmt;

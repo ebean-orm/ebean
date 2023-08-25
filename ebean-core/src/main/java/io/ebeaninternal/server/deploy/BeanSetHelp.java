@@ -73,12 +73,6 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public final void refresh(SpiEbeanServer server, SpiQuery<?> query, Transaction t, EntityBean parentBean) {
-    BeanSet<?> newBeanSet = (BeanSet<?>) server.findSet(query, t);
-    refresh(newBeanSet, parentBean);
-  }
-
-  @Override
   public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {
     BeanSet<?> newBeanSet = (BeanSet<?>) bc;
     Set<?> current = (Set<?>) many.getValue(parentBean);

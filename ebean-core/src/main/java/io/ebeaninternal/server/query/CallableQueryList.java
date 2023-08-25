@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 
@@ -14,8 +13,8 @@ public final class CallableQueryList<T> extends CallableQuery<T> implements Call
 
   private final boolean createdTransaction;
 
-  public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, Transaction t, boolean createdTransaction) {
-    super(server, query, t);
+  public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, boolean createdTransaction) {
+    super(server, query);
     this.createdTransaction = createdTransaction;
   }
 
@@ -25,7 +24,7 @@ public final class CallableQueryList<T> extends CallableQuery<T> implements Call
   @Override
   public List<T> call() {
     try {
-      return server.findList(query, transaction);
+      return server.findList(query);
     } finally {
       if (createdTransaction) {
         transaction.end();

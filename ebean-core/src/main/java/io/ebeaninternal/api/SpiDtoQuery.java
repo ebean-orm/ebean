@@ -61,9 +61,4 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
    */
   SpiQuery<?> ormQuery();
 
-  /**
-   * Return the explicit transaction used to execute the query.
-   */
-  Transaction transaction();
-
 }

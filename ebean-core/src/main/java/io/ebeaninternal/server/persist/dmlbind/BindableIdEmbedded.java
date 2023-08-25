@@ -49,11 +49,6 @@ final class BindableIdEmbedded implements BindableId {
     return null;
   }
 
-  @Override
-  public String toString() {
-    return embId + " props:" + Arrays.toString(props);
-  }
-
   /**
    * Does nothing for BindableId.
    */
@@ -94,18 +89,13 @@ final class BindableIdEmbedded implements BindableId {
         + " not have ManyToOne assoc beans matching the primary key columns?";
       throw new PersistenceException(m);
     }
-
     EntityBean bean = persist.entityBean();
-
     // create the new id
     EntityBean newId = (EntityBean) embId.createEmbeddedId();
-
     // populate it from the assoc one id values...
     for (MatchedImportedProperty match : matches) {
       match.populate(bean, newId);
     }
-
-    // support PropertyChangeSupport
     embId.setValueIntercept(bean, newId);
     return true;
   }

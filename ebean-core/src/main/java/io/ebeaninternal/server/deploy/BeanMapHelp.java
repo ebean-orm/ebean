@@ -114,12 +114,6 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public final void refresh(SpiEbeanServer server, SpiQuery<?> query, Transaction t, EntityBean parentBean) {
-    BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) server.findMap(query, t);
-    refresh(newBeanMap, parentBean);
-  }
-
-  @Override
   public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {
     BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) bc;
     Map<?, ?> current = (Map<?, ?>) many.getValue(parentBean);
