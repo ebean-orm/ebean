@@ -44,7 +44,7 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
     lock.lock();
     try {
       if (futureRowCount == null) {
-        futureRowCount = server.findFutureCount(query, null);
+        futureRowCount = server.findFutureCount(query);
       }
       return futureRowCount;
     } finally {

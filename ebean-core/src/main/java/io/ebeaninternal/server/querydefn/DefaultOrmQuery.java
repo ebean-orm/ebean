@@ -87,11 +87,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private boolean distinct;
 
   /**
-   * Set to true if this is a future fetch using background threads.
-   */
-  private boolean futureFetch;
-
-  /**
    * Only used for read auditing with findFutureList() query.
    */
   private ReadEvent futureFetchAudit;
@@ -1389,6 +1384,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public SpiTransaction transaction() {
+    return transaction;
+  }
+
+  @Override
   public final Query<T> usingTransaction(Transaction transaction) {
     this.transaction = (SpiTransaction) transaction;
     return this;
@@ -1544,17 +1544,17 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final FutureIds<T> findFutureIds() {
-    return server.findFutureIds(this, transaction);
+    return server.findFutureIds(this);
   }
 
   @Override
   public final FutureList<T> findFutureList() {
-    return server.findFutureList(this, transaction);
+    return server.findFutureList(this);
   }
 
   @Override
   public final FutureRowCount<T> findFutureCount() {
-    return server.findFutureCount(this, transaction);
+    return server.findFutureCount(this);
   }
 
   @Override
@@ -1915,16 +1915,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final boolean isDisableReadAudit() {
     return disableReadAudit;
-  }
-
-  @Override
-  public final boolean isFutureFetch() {
-    return futureFetch;
-  }
-
-  @Override
-  public final void setFutureFetch(boolean backgroundFetch) {
-    this.futureFetch = backgroundFetch;
   }
 
   @Override

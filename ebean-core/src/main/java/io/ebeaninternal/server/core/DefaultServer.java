@@ -1270,29 +1270,42 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query, Transaction transaction) {
+  public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query) {
     SpiQuery<T> copy = query.copy();
-    copy.setFutureFetch(true);
-    Transaction newTxn = createTransaction();
-    QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy, newTxn));
+    boolean createdTransaction = false;
+    SpiTransaction transaction = query.transaction();
+    if (transaction == null) {
+      transaction = currentServerTransaction();
+      if (transaction == null) {
+        transaction = (SpiTransaction) createTransaction();
+        createdTransaction = true;
+      }
+    }
+    var queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy, transaction, createdTransaction));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 
   @Override
-  public <T> FutureIds<T> findFutureIds(SpiQuery<T> query, Transaction transaction) {
+  public <T> FutureIds<T> findFutureIds(SpiQuery<T> query) {
     SpiQuery<T> copy = query.copy();
-    copy.setFutureFetch(true);
-    Transaction newTxn = createTransaction();
-    QueryFutureIds<T> queryFuture = new QueryFutureIds<>(new CallableQueryIds<>(this, copy, newTxn));
+    boolean createdTransaction = false;
+    SpiTransaction transaction = query.transaction();
+    if (transaction == null) {
+      transaction = currentServerTransaction();
+      if (transaction == null) {
+        transaction = (SpiTransaction) createTransaction();
+        createdTransaction = true;
+      }
+    }
+    QueryFutureIds<T> queryFuture = new QueryFutureIds<>(new CallableQueryIds<>(this, copy, transaction, createdTransaction));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 
   @Override
-  public <T> FutureList<T> findFutureList(SpiQuery<T> query, Transaction transaction) {
+  public <T> FutureList<T> findFutureList(SpiQuery<T> query) {
     SpiQuery<T> spiQuery = query.copy();
-    spiQuery.setFutureFetch(true);
     // FutureList query always run in it's own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
     if (!spiQuery.isDisableReadAudit()) {
@@ -1300,8 +1313,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       desc.readAuditFutureList(spiQuery);
     }
     // Create a new transaction solely to execute the findList() at some future time
-    Transaction newTxn = createTransaction();
-    QueryFutureList<T> queryFuture = new QueryFutureList<>(new CallableQueryList<>(this, spiQuery, newTxn));
+    boolean createdTransaction = false;
+    SpiTransaction transaction = query.transaction();
+    if (transaction == null) {
+      transaction = currentServerTransaction();
+      if (transaction == null) {
+        transaction = (SpiTransaction) createTransaction();
+        createdTransaction = true;
+      }
+    }
+    QueryFutureList<T> queryFuture = new QueryFutureList<>(new CallableQueryList<>(this, spiQuery, transaction, createdTransaction));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
