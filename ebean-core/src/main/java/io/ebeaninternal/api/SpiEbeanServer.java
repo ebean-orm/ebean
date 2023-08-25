@@ -162,12 +162,12 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * the query has finished (if executing in a background thread).
    * </p>
    */
-  <A, T> List<A> findIdsWithCopy(SpiQuery<T> query, Transaction transaction);
+  <A, T> List<A> findIdsWithCopy(SpiQuery<T> query);
 
   /**
    * Execute the findCount query but without copying the query.
    */
-  <T> int findCountWithCopy(SpiQuery<T> query, Transaction transaction);
+  <T> int findCountWithCopy(SpiQuery<T> query);
 
   /**
    * Load a batch of Associated One Beans.
@@ -295,7 +295,7 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
   /**
    * Execute the underlying ORM query returning as a JDBC ResultSet to map to DTO beans.
    */
-  SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction);
+  SpiResultSet findResultSet(SpiQuery<?> ormQuery);
 
   /**
    * Visit all the metrics (typically reporting them).
@@ -327,56 +327,25 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    */
   SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan queryPlan);
 
+  <T> boolean exists(SpiQuery<T> ormQuery);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> boolean exists(SpiQuery<T> ormQuery, Transaction transaction);
+  <T> int findCount(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> int findCount(SpiQuery<T> query, Transaction transaction);
+  <A, T> List<A> findIds(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <A, T> List<A> findIds(SpiQuery<T> query, Transaction transaction);
+  <T> QueryIterator<T> findIterate(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> QueryIterator<T> findIterate(SpiQuery<T> query, Transaction transaction);
+  <T> Stream<T> findStream(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> Stream<T> findStream(SpiQuery<T> query, Transaction transaction);
+  <T> void findEach(SpiQuery<T> query, Consumer<T> consumer);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> void findEach(SpiQuery<T> query, Consumer<T> consumer, Transaction transaction);
+  <T> void findEach(SpiQuery<T> query, int batch, Consumer<List<T>> consumer);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> void findEach(SpiQuery<T> query, int batch, Consumer<List<T>> consumer, Transaction t);
+  <T> void findEachWhile(SpiQuery<T> query, Predicate<T> consumer);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> void findEachWhile(SpiQuery<T> query, Predicate<T> consumer, Transaction transaction);
+  <T> List<Version<T>> findVersions(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> List<Version<T>> findVersions(SpiQuery<T> query, Transaction transaction);
-
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> List<T> findList(SpiQuery<T> query, Transaction transaction);
+  <T> List<T> findList(SpiQuery<T> query);
 
   <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query);
 
@@ -384,51 +353,24 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
 
   <T> FutureList<T> findFutureList(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> PagedList<T> findPagedList(SpiQuery<T> query, Transaction transaction);
+  <T> PagedList<T> findPagedList(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> Set<T> findSet(SpiQuery<T> query, Transaction transaction);
+  <T> Set<T> findSet(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <K, T> Map<K, T> findMap(SpiQuery<T> query, Transaction transaction);
+  <K, T> Map<K, T> findMap(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <A, T> List<A> findSingleAttributeList(SpiQuery<T> query, Transaction transaction);
+  <A, T> List<A> findSingleAttributeList(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <A, T> Set<A> findSingleAttributeSet(SpiQuery<T> query, Transaction transaction);
+  <A, T> Set<A> findSingleAttributeSet(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
   @Nullable
-  <T> T findOne(SpiQuery<T> query, Transaction transaction);
+  <T> T findOne(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> Optional<T> findOneOrEmpty(SpiQuery<T> query, Transaction transaction);
+  <T> Optional<T> findOneOrEmpty(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> int delete(SpiQuery<T> query, Transaction transaction);
+  <T> int delete(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> int update(SpiQuery<T> query, Transaction transaction);
+  <T> int update(SpiQuery<T> query);
 
   /**
    * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.

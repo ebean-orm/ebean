@@ -67,11 +67,11 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
     return beanList;
   }
 
-  @Override
-  public final void refresh(SpiEbeanServer server, SpiQuery<?> query, Transaction t, EntityBean parentBean) {
-    BeanList<?> newBeanList = (BeanList<?>) server.findList(query, t);
-    refresh(newBeanList, parentBean);
-  }
+//  @Override
+//  public final void refresh(SpiEbeanServer server, SpiQuery<?> query, EntityBean parentBean) {
+//    BeanList<?> newBeanList = (BeanList<?>) server.findList(query);
+//    refresh(newBeanList, parentBean);
+//  }
 
   @Override
   public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {

@@ -92,7 +92,8 @@ final class MergeHandler {
       MergeNode node = buildNode(path);
       node.addSelectId(query);
     }
-    return (EntityBean) server.findOne(query, transaction);
+    query.usingTransaction(transaction);
+    return (EntityBean) server.findOne(query);
   }
 
   private MergeNode buildNode(String path) {

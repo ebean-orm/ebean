@@ -259,11 +259,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     String rawWhere = deriveWhereParentIdSql(false);
     SpiEbeanServer server = server();
     SpiQuery<?> q = server.createQuery(type());
+    q.usingTransaction(t);
     bindParentIdEq(rawWhere, parentId, q);
     if (includeSoftDeletes) {
       q.setIncludeSoftDeletes();
     }
-    return server.findIds(q, t);
+    return server.findIds(q);
   }
 
   @Override
@@ -273,11 +274,12 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     String expr = rawWhere + inClause;
     SpiEbeanServer server = server();
     SpiQuery<?> q = server.createQuery(type());
+    q.usingTransaction(t);
     bindParentIdsIn(expr, parentIds, q);
     if (includeSoftDeletes) {
       q.setIncludeSoftDeletes();
     }
-    return server.findIds(q, t);
+    return server.findIds(q);
   }
 
   void addFkey() {

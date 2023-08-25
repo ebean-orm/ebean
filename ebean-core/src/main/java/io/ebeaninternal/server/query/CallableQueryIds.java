@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 
@@ -14,8 +13,8 @@ public final class CallableQueryIds<T> extends CallableQuery<T> implements Calla
 
   private final boolean createdTransaction;
 
-  public CallableQueryIds(SpiEbeanServer server, SpiQuery<T> query, Transaction t, boolean createdTransaction) {
-    super(server, query, t);
+  public CallableQueryIds(SpiEbeanServer server, SpiQuery<T> query, boolean createdTransaction) {
+    super(server, query);
     this.createdTransaction = createdTransaction;
   }
 
@@ -28,7 +27,7 @@ public final class CallableQueryIds<T> extends CallableQuery<T> implements Calla
     // this way the same query instance is available to the
     // QueryFutureIds (as so has access to the List before it is done)
     try {
-      return server.findIdsWithCopy(query, transaction);
+      return server.findIdsWithCopy(query);
     } finally {
       if (createdTransaction) {
         transaction.end();
