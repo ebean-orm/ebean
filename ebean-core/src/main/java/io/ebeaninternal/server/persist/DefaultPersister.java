@@ -152,7 +152,7 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<T> desc = server.descriptor(beanType);
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
-    List<T> liveBeans = draftHandler.fetchSourceBeans(query, false);
+    List<T> liveBeans = draftHandler.fetchSourceBeans((SpiQuery<T>) query, false);
     PUB.log(DEBUG, "draftRestore [{0}] count[{1}]", desc.name(), liveBeans.size());
     if (liveBeans.isEmpty()) {
       return Collections.emptyList();
@@ -194,7 +194,7 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<T> desc = server.descriptor(beanType);
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
-    List<T> draftBeans = draftHandler.fetchSourceBeans(query, true);
+    List<T> draftBeans = draftHandler.fetchSourceBeans((SpiQuery<T>) query, true);
     PUB.log(DEBUG, "publish [{0}] count[{1}]", desc.name(), draftBeans.size());
     if (draftBeans.isEmpty()) {
       return Collections.emptyList();
@@ -290,7 +290,7 @@ public final class DefaultPersister implements Persister {
     /**
      * Fetch the source beans based on the query.
      */
-    List<T> fetchSourceBeans(Query<T> query, boolean asDraft) {
+    List<T> fetchSourceBeans(SpiQuery<T> query, boolean asDraft) {
       desc.draftQueryOptimise(query);
       if (asDraft) {
         query.asDraft();
@@ -303,7 +303,8 @@ public final class DefaultPersister implements Persister {
      */
     void fetchDestinationBeans(List<T> sourceBeans, boolean asDraft) {
       List<Object> ids = getBeanIds(desc, sourceBeans);
-      Query<T> destQuery = server.find(desc.type()).where().idIn(ids).query();
+      SpiQuery<T> destQuery = server.createQuery(desc.type());
+      destQuery.where().idIn(ids);
       if (asDraft) {
         destQuery.asDraft();
       }
@@ -761,7 +762,7 @@ public final class DefaultPersister implements Persister {
       // We actually need to execute a query to get the foreign key values
       // as they are required for the delete cascade. Query back just the
       // Id and the appropriate foreign key values
-      Query<?> q = deleteRequiresQuery(descriptor, propImportDelete, deleteMode);
+      SpiQuery<?> q = deleteRequiresQuery(descriptor, propImportDelete, deleteMode);
       q.where().idEq(id);
       if (transaction.isLogSummary()) {
         transaction.logSummary("-- DeleteById of {0} id[{1}] requires fetch of foreign key values", descriptor.name(), id);
@@ -817,7 +818,7 @@ public final class DefaultPersister implements Persister {
       // We actually need to execute a query to get the foreign key values
       // as they are required for the delete cascade. Query back just the
       // Id and the appropriate foreign key values
-      Query<?> q = deleteRequiresQuery(descriptor, propImportDelete, deleteMode);
+      SpiQuery<?> q = deleteRequiresQuery(descriptor, propImportDelete, deleteMode);
       q.where().idIn(idList);
       if (transaction.isLogSummary()) {
         transaction.logSummary("-- DeleteById of {0} ids[{1}] requires fetch of foreign key values", descriptor.name(), idList);
@@ -877,8 +878,8 @@ public final class DefaultPersister implements Persister {
    * We need to create and execute a query to get the foreign key values as
    * the delete cascades to them (foreign keys).
    */
-  private Query<?> deleteRequiresQuery(BeanDescriptor<?> desc, BeanPropertyAssocOne<?>[] propImportDelete, DeleteMode deleteMode) {
-    Query<?> q = server.createQuery(desc.type());
+  private SpiQuery<?> deleteRequiresQuery(BeanDescriptor<?> desc, BeanPropertyAssocOne<?>[] propImportDelete, DeleteMode deleteMode) {
+    SpiQuery<?> q = server.createQuery(desc.type());
     StringBuilder sb = new StringBuilder(30);
     for (BeanPropertyAssocOne<?> aPropImportDelete : propImportDelete) {
       sb.append(aPropImportDelete.name()).append(',');
