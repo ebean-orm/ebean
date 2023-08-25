@@ -108,4 +108,41 @@ class TestFindFutureRowCount extends BaseTestCase {
       assertThat(fids2.get(0).getId()).isEqualTo(expectedIdValue);
     }
   }
+
+  @Test
+  void findFutures_when_newTransaction() throws Exception {
+    EBasic basic = new EBasic("findFutures_when_newTransaction");
+    DB.save(basic);
+
+    List<EBasic> list = DB.find(EBasic.class)
+      .where().eq("name", "findFutures_when_newTransaction")
+      .findList();
+
+    Object expectedIdValue = list.get(0).getId();
+
+    FutureList<EBasic> futureList = DB.find(EBasic.class)
+      .where().eq("name", "findFutures_when_newTransaction")
+      .findFutureList();
+
+    List<EBasic> flist = futureList.get();
+    assertThat(flist).hasSize(1);
+    assertThat(flist.get(0).getId()).isEqualTo(expectedIdValue);
+
+    FutureIds<EBasic> futureIds = DB.find(EBasic.class)
+      .where().eq("name", "findFutures_when_newTransaction")
+      .findFutureIds();
+
+    List<Object> fids = futureIds.get();
+    assertThat(fids).hasSize(1);
+    assertThat(fids.get(0)).isEqualTo(expectedIdValue);
+
+    FutureRowCount<EBasic> futureCount = DB.find(EBasic.class)
+      .where().eq("name", "findFutures_when_newTransaction")
+      .findFutureCount();
+
+    assertThat(futureCount.get()).isEqualTo(1);
+
+    DB.delete(basic);
+  }
+
 }
