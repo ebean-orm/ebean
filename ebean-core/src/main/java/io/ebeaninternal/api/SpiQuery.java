@@ -878,17 +878,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   boolean isDisableReadAudit();
 
   /**
-   * Return true if this is a query executing in the background.
-   */
-  boolean isFutureFetch();
-
-  /**
-   * Set to true to indicate the query is executing in a background thread
-   * asynchronously.
-   */
-  void setFutureFetch(boolean futureFetch);
-
-  /**
    * Set the readEvent for future queries (as prepared in foreground thread).
    */
   void setFutureFetchAudit(ReadEvent event);

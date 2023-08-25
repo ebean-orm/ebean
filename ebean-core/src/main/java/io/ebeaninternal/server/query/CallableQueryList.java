@@ -9,13 +9,14 @@ import java.util.concurrent.Callable;
 
 /**
  * Represent the findList query as a Callable.
- *
- * @param <T> the entity bean type
  */
 public final class CallableQueryList<T> extends CallableQuery<T> implements Callable<List<T>> {
 
-  public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
+  private final boolean createdTransaction;
+
+  public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, Transaction t, boolean createdTransaction) {
     super(server, query, t);
+    this.createdTransaction = createdTransaction;
   }
 
   /**
@@ -26,10 +27,10 @@ public final class CallableQueryList<T> extends CallableQuery<T> implements Call
     try {
       return server.findList(query, transaction);
     } finally {
-      // cleanup the underlying connection
-      transaction.end();
+      if (createdTransaction) {
+        transaction.end();
+      }
     }
   }
-
 
 }

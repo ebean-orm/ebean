@@ -378,20 +378,11 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    */
   <T> List<T> findList(SpiQuery<T> query, Transaction transaction);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
   <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> FutureIds<T> findFutureIds(SpiQuery<T> query, Transaction transaction);
+  <T> FutureIds<T> findFutureIds(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  <T> FutureList<T> findFutureList(SpiQuery<T> query, Transaction transaction);
+  <T> FutureList<T> findFutureList(SpiQuery<T> query);
 
   /**
    * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
