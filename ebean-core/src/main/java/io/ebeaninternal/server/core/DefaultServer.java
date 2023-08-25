@@ -1087,8 +1087,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> Set<T> findSet(SpiQuery<T> query) {
     SpiOrmQueryRequest request = buildQueryRequest(Type.SET, query);
     request.resetBeanCacheAutoMode(false);
-    SpiTransaction transaction = request.transaction();
-    if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
+    if (request.isGetAllFromBeanCache()) {
       // hit bean cache and got all results from cache
       return request.beanCacheHitsAsSet();
     }
@@ -1110,8 +1109,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <K, T> Map<K, T> findMap(SpiQuery<T> query) {
     SpiOrmQueryRequest request = buildQueryRequest(Type.MAP, query);
     request.resetBeanCacheAutoMode(false);
-    SpiTransaction transaction = request.transaction();
-    if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
+    if (request.isGetAllFromBeanCache()) {
       // hit bean cache and got all results from cache
       return request.beanCacheHitsAsMap();
     }
@@ -1422,8 +1420,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private <T> List<T> findList(SpiQuery<T> query, boolean findOne) {
     SpiOrmQueryRequest<T> request = buildQueryRequest(Type.LIST, query);
     request.resetBeanCacheAutoMode(findOne);
-    SpiTransaction transaction = request.transaction();
-    if ((transaction == null || !transaction.isSkipCache()) && request.getFromBeanCache()) {
+    if (request.isGetAllFromBeanCache()) {
       // hit bean cache and got all results from cache
       return request.beanCacheHits();
     }

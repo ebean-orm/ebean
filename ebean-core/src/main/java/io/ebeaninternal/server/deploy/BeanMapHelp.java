@@ -113,12 +113,6 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     return beanMap;
   }
 
-//  @Override
-//  public final void refresh(SpiEbeanServer server, SpiQuery<?> query, EntityBean parentBean) {
-//    BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) server.findMap(query);
-//    refresh(newBeanMap, parentBean);
-//  }
-
   @Override
   public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {
     BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) bc;
