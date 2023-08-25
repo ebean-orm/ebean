@@ -11,12 +11,15 @@ import java.util.concurrent.Callable;
  */
 public final class CallableQueryCount<T> extends CallableQuery<T> implements Callable<Integer> {
 
+  private final boolean createdTransaction;
+
   /**
    * Note that the transaction passed in is always a new transaction solely to
    * find the row count so it must be cleaned up by this CallableQueryRowCount.
    */
-  public CallableQueryCount(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
+  public CallableQueryCount(SpiEbeanServer server, SpiQuery<T> query, Transaction t, boolean createdTransaction) {
     super(server, query, t);
+    this.createdTransaction = createdTransaction;
   }
 
   /**
@@ -27,8 +30,9 @@ public final class CallableQueryCount<T> extends CallableQuery<T> implements Cal
     try {
       return server.findCountWithCopy(query, transaction);
     } finally {
-      // cleanup the underlying connection
-      transaction.end();
+      if (createdTransaction) {
+        transaction.end();
+      }
     }
   }
 

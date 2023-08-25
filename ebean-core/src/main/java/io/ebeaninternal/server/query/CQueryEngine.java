@@ -163,9 +163,6 @@ public final class CQueryEngine {
       if (request.logSummary()) {
         request.transaction().logSummary(rcQuery.summary());
       }
-      if (request.query().isFutureFetch()) {
-        request.transaction().end();
-      }
       if (request.isQueryCachePut()) {
         request.addDependentTables(rcQuery.dependentTables());
         request.putToQueryCache(count);

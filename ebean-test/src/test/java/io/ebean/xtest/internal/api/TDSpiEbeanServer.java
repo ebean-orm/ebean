@@ -656,7 +656,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query, Transaction transaction) {
+  public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query) {
     return null;
   }
 

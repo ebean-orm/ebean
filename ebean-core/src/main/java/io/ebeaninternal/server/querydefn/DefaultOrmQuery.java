@@ -1389,6 +1389,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public SpiTransaction transaction() {
+    return transaction;
+  }
+
+  @Override
   public final Query<T> usingTransaction(Transaction transaction) {
     this.transaction = (SpiTransaction) transaction;
     return this;
@@ -1554,7 +1559,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final FutureRowCount<T> findFutureCount() {
-    return server.findFutureCount(this, transaction);
+    return server.findFutureCount(this);
   }
 
   @Override

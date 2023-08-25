@@ -236,6 +236,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   String planLabel();
 
   /**
+   * Return the transaction explicitly assigned or null.
+   */
+  SpiTransaction transaction();
+
+  /**
    * Return true if this query should not use the read only data source.
    */
   boolean isUseMaster();

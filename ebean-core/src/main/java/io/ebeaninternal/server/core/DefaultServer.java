@@ -1270,11 +1270,19 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query, Transaction transaction) {
+  public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query) {
     SpiQuery<T> copy = query.copy();
     copy.setFutureFetch(true);
-    Transaction newTxn = createTransaction();
-    QueryFutureRowCount<T> queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy, newTxn));
+    boolean createdTransaction = false;
+    SpiTransaction transaction = query.transaction();
+    if (transaction == null) {
+      transaction = currentServerTransaction();
+      if (transaction == null) {
+        transaction = (SpiTransaction) createTransaction();
+        createdTransaction = true;
+      }
+    }
+    var queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy, transaction, createdTransaction));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
