@@ -372,24 +372,12 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
 
   <T> int update(SpiQuery<T> query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  List<SqlRow> findList(SpiSqlQuery query, Transaction transaction);
+  List<SqlRow> findList(SpiSqlQuery query);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer, Transaction transaction);
+  void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer);
 
-  /**
-   * Deprecated migrate to using {@link Query#usingTransaction(Transaction)}.
-   */
-  void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer, Transaction transaction);
+  void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer);
 
-  /**
-   * Deprecated migrate to using {@link SqlQuery#usingTransaction(Transaction)}.
-   */
   @Nullable
-  SqlRow findOne(SpiSqlQuery query, Transaction transaction);
+  SqlRow findOne(SpiSqlQuery query);
 }

@@ -706,20 +706,20 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public List<SqlRow> findList(SpiSqlQuery query, Transaction transaction) {
+  public List<SqlRow> findList(SpiSqlQuery query) {
     return null;
   }
 
   @Override
-  public void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer, Transaction transaction) {
+  public void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer) {
   }
 
   @Override
-  public void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer, Transaction transaction) {
+  public void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer) {
   }
 
   @Override
-  public SqlRow findOne(SpiSqlQuery query, Transaction transaction) {
+  public SqlRow findOne(SpiSqlQuery query) {
     return null;
   }
 

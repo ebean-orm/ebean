@@ -1442,16 +1442,16 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Nullable
   @Override
-  public SqlRow findOne(SpiSqlQuery query, Transaction transaction) {
+  public SqlRow findOne(SpiSqlQuery query) {
     // no findId() method for SqlQuery...
     // a query that is expected to return either 0 or 1 rows
-    List<SqlRow> list = findList(query, transaction);
+    List<SqlRow> list = findList(query);
     return extractUnique(list);
   }
 
   @Override
-  public void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer, Transaction transaction) {
-    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
+  public void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer) {
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query);
     try {
       request.initTransIfRequired();
       request.findEach(consumer);
@@ -1461,8 +1461,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer, Transaction transaction) {
-    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
+  public void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer) {
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query);
     try {
       request.initTransIfRequired();
       request.findEachWhile(consumer);
@@ -1472,8 +1472,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public List<SqlRow> findList(SpiSqlQuery query, Transaction transaction) {
-    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, transaction);
+  public List<SqlRow> findList(SpiSqlQuery query) {
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query);
     try {
       request.initTransIfRequired();
       return request.findList();
@@ -1483,7 +1483,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private <P> P executeSqlQuery(Function<RelationalQueryRequest, P> fun, SpiSqlQuery query) {
-    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query, query.transaction());
+    RelationalQueryRequest request = new RelationalQueryRequest(this, relationalQueryEngine, query);
     try {
       request.initTransIfRequired();
       return fun.apply(request);
