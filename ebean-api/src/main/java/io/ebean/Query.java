@@ -1398,7 +1398,7 @@ public interface Query<T> extends CancelableQuery {
   /**
    * Deprecated migrate to orderBy().
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   default Query<T> order(String orderByClause) {
     return orderBy(orderByClause);
   }
@@ -1417,7 +1417,7 @@ public interface Query<T> extends CancelableQuery {
   /**
    * Deprecated migrate to orderBy().
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   default OrderBy<T> order() {
     return orderBy();
   }
@@ -1430,7 +1430,7 @@ public interface Query<T> extends CancelableQuery {
   /**
    * Deprecated migrate to setOrderBy().
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   default Query<T> setOrder(OrderBy<T> orderBy) {
     return setOrderBy(orderBy);
   }
