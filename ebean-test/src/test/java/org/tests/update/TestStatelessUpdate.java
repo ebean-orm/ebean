@@ -349,9 +349,9 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
     assertThat(sql).hasSize(5);
     assertThat(sql.get(0)).contains("update o_customer set updtime=? where id=?");
-    assertThat(sql.get(1)).contains("insert into contact");
+    assertThat(sql.get(3)).contains("insert into contact");
     assertThat(sql.get(2)).contains(" -- bind(");
-    assertThat(sql.get(3)).contains("update contact set last_name=?, customer_id=? where id=?");
+    assertThat(sql.get(1)).contains("update contact set last_name=?, customer_id=? where id=?");
     assertThat(sql.get(4)).contains(" -- bind(");
 
     // assert
@@ -404,9 +404,9 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
     assertThat(sql).hasSize(5);
     assertThat(sql.get(0)).contains("update o_customer set updtime=? where id=?");
-    assertThat(sql.get(1)).contains("insert into contact");
+    assertThat(sql.get(1)).contains("update contact set last_name=?, customer_id=? where id=?");
     assertThat(sql.get(2)).contains(" -- bind(");
-    assertThat(sql.get(3)).contains("update contact set last_name=?, customer_id=? where id=?");
+    assertThat(sql.get(3)).contains("insert into contact");
     assertThat(sql.get(4)).contains(" -- bind(");
 
     // assert

@@ -92,15 +92,15 @@ final class BatchedBeanHolder {
       deletes = new ArrayList<>();
       control.executeNow(bufferedDeletes);
     }
-    if (inserts != null && !inserts.isEmpty()) {
-      ArrayList<PersistRequest> bufferedInserts = inserts;
-      inserts = new ArrayList<>();
-      control.executeNow(bufferedInserts);
-    }
     if (updates != null && !updates.isEmpty()) {
       ArrayList<PersistRequest> bufferedUpdates = updates;
       updates = new ArrayList<>();
       control.executeNow(bufferedUpdates);
+    }
+    if (inserts != null && !inserts.isEmpty()) {
+      ArrayList<PersistRequest> bufferedInserts = inserts;
+      inserts = new ArrayList<>();
+      control.executeNow(bufferedInserts);
     }
     empty = true;
   }

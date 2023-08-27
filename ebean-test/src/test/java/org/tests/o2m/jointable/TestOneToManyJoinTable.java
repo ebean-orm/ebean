@@ -98,10 +98,10 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     if (isPersistBatchOnCascade()) {
       assertThat(sql).hasSize(13);
       assertSql(sql.get(0)).contains("insert into trainer ");
-      assertSql(sql.get(1)).contains("insert into monkey ");
-      assertSqlBind(sql, 2, 4);
-      assertThat(sql.get(5)).contains("update monkey set food_preference=?, version=? where mid=? and version=?");
-      assertThat(sql.get(6)).contains("-- bind(");
+      assertThat(sql.get(1)).contains("update monkey set food_preference=?, version=? where mid=? and version=?");
+      assertThat(sql.get(2)).contains("-- bind(");
+      assertSql(sql.get(3)).contains("insert into monkey ");
+      assertSqlBind(sql, 4, 6);
       assertThat(sql.get(7)).contains("insert into trainer_monkey ");
       assertSqlBind(sql, 8, 12);
 

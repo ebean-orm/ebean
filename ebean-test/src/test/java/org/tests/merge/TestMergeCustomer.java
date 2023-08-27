@@ -123,9 +123,9 @@ public class TestMergeCustomer extends BaseTestCase {
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(6);
     assertSql(sql.get(0)).contains("select t0.id, t2.id, t1.id from mcustomer t0 left join maddress t2 on t2.id = t0.shipping_address_id left join maddress t1 on t1.id = t0.billing_address_id where t0.id = ?");
-    assertSql(sql.get(1)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
+    assertSql(sql.get(3)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
     assertSqlBind(sql.get(2));
-    assertThat(sql.get(3)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
+    assertThat(sql.get(1)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
     assertSqlBind(sql.get(4));
     assertThat(sql.get(5)).contains("update mcustomer set name=?, version=?, shipping_address_id=?, billing_address_id=? where id=? and version=?");
   }
@@ -159,9 +159,9 @@ public class TestMergeCustomer extends BaseTestCase {
 
     // Additional check to see if the address with the unknown UUID is 'insert' or 'update'
     assertSql(sql.get(1)).contains("select t0.id from maddress t0 where t0.id = ?");
-    assertSql(sql.get(2)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
+    assertSql(sql.get(4)).contains("insert into maddress (id, street, city, version) values (?,?,?,?)");
     assertSqlBind(sql.get(3));
-    assertThat(sql.get(4)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
+    assertThat(sql.get(2)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
     assertSqlBind(sql.get(5));
     assertThat(sql.get(6)).contains("update mcustomer set name=?, version=?, shipping_address_id=?, billing_address_id=? where id=? and version=?");
   }
@@ -284,9 +284,12 @@ public class TestMergeCustomer extends BaseTestCase {
     }
 
     if (isPersistBatchOnCascade()) {
-      assertThat(sql.get(8)).contains("insert into mcontact");
+      assertThat(sql.get(8)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
       assertThat(sql.get(9)).contains("-- bind(");
-      assertThat(sql.get(11)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
+      assertThat(sql.get(12)).contains("-- bind(");
+      assertThat(sql.get(13)).contains("insert into mcontact");
+      assertThat(sql.get(14)).contains("-- bind(");
+      assertThat(sql.get(15)).contains("-- bind(");
     } else {
       assertThat(sql.get(6)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
       assertThat(sql.get(7)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
@@ -328,8 +331,10 @@ public class TestMergeCustomer extends BaseTestCase {
       assertThat(sql.get(7)).contains("delete from mcontact where id=?");
 
       assertThat(sql.get(8)).contains("update maddress set street=?, city=?, version=? where id=? and version=?");
-      assertThat(sql.get(13)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
-      assertSqlBind(sql, 14, 17);
+      assertThat(sql.get(10)).contains("update mcustomer set name=?, notes=?, version=?, shipping_address_id=?, billing_address_id=? where id=? and version=?");
+      assertThat(sql.get(11)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
+      assertSqlBind(sql, 12, 15);
+      assertThat(sql.get(16)).contains("insert into mcontact (id, email, first_name, last_name, version, customer_id) values");
       assertThat(sql.get(18)).contains("update mcontact_message set title=?, subject=?, notes=?, version=?, contact_id=? where id=? and version=?");
       assertSqlBind(sql, 19, 22);
     }
