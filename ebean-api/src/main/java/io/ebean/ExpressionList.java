@@ -56,7 +56,7 @@ public interface ExpressionList<T> {
   /**
    * Deprecated migrate to {@link #orderBy(String)}
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   default ExpressionList<T> order(String orderByClause) {
     return orderBy(orderByClause);
   }
@@ -74,7 +74,7 @@ public interface ExpressionList<T> {
   /**
    * Deprecated migrate to orderBy().
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   default OrderBy<T> order() {
     return orderBy();
   }
