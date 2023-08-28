@@ -16,13 +16,11 @@ module io.ebean.core {
   uses io.ebeaninternal.api.SpiLoggerFactory;
   uses io.ebeaninternal.api.GeoTypeProvider;
   uses io.ebeaninternal.api.SpiDdlGeneratorProvider;
-  uses io.ebeaninternal.xmapping.api.XmapService;
   uses io.ebeaninternal.server.autotune.AutoTuneServiceProvider;
   uses io.ebeaninternal.server.cluster.ClusterBroadcastFactory;
 
   requires transitive io.ebean.api;
   requires transitive io.ebean.migration.auto;
-  requires transitive io.ebean.xmapping.api;
   requires transitive io.ebean.core.type;
   requires transitive io.ebean.ddl.runner;
   requires io.avaje.classpath.scanner.api;

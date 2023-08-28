@@ -432,11 +432,6 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
-    return null;
-  }
-
-  @Override
   public <D> DtoQuery<D> findDto(Class<D> dtoType, SpiQuery<?> ormQuery) {
     return null;
   }

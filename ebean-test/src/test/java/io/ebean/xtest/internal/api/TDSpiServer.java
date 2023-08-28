@@ -153,11 +153,6 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
-    return null;
-  }
-
-  @Override
   public SqlQuery sqlQuery(String sql) {
     return null;
   }
