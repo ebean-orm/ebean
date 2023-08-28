@@ -114,10 +114,12 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
-      // use expression + fluid style adding maxRows/firstRow to filterMany
-      .filterMany("orders", "status = ?", Order.Status.NEW)
-        .setMaxRows(100).setFirstRow(3).order("orderDate desc, id")
-      .order().asc("id").setMaxRows(5);
+      .filterMany("orders")
+        .raw("status = ?", Order.Status.NEW)
+        .setMaxRows(100).setFirstRow(3)
+      .orderBy("orderDate desc, id")
+      .query()
+      .orderBy().asc("id").setMaxRows(5);
 
     final List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
@@ -363,16 +365,16 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     DB.find(Customer.class)
       .where()
-      .filterMany("contacts", "firstName isNotNull and email istartsWith ?", "rob")
+      .filterManyRaw("contacts", "firstName is not null and lower(email) like ?", "rob%")
       .findList();
 
     List<String> sql = LoggedSql.stop();
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? ) order by t0.id; --bind(rob%)");
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where t1.first_name is not null and lower(t1.email) like ? order by t0.id; --bind(rob%)");
     } else {
-      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? escape'|') order by t0.id; --bind(rob%)");
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where t1.first_name is not null and lower(t1.email) like ? order by t0.id; --bind(rob%)");
     }
   }
 }

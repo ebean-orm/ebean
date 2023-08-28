@@ -34,7 +34,6 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.el.ElFilter;
-import io.ebeaninternal.server.grammer.EqlParser;
 import io.ebeaninternal.server.query.*;
 import io.ebeaninternal.server.querydefn.*;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
@@ -845,29 +844,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> Query<T> findNative(Class<T> beanType, String nativeSql) {
     DefaultOrmQuery<T> query = new DefaultOrmQuery<>(desc(beanType), this, expressionFactory);
     query.setNativeSql(nativeSql);
-    return query;
-  }
-
-  @Override
-  public <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery) {
-    BeanDescriptor<T> desc = desc(beanType);
-    String named = desc.namedQuery(namedQuery);
-    if (named != null) {
-      return createQuery(beanType, named);
-    }
-    SpiRawSql rawSql = desc.namedRawSql(namedQuery);
-    if (rawSql != null) {
-      DefaultOrmQuery<T> query = createQuery(beanType);
-      query.setRawSql(rawSql);
-      return query;
-    }
-    throw new PersistenceException("No named query called " + namedQuery + " for bean:" + beanType.getName());
-  }
-
-  @Override
-  public <T> DefaultOrmQuery<T> createQuery(Class<T> beanType, String eql) {
-    DefaultOrmQuery<T> query = createQuery(beanType);
-    EqlParser.parse(eql, query);
     return query;
   }
 
