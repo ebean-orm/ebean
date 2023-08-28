@@ -169,11 +169,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
     SOFT_DELETED(false),
 
     /**
-     * Query runs against draft tables.
-     */
-    DRAFT(false),
-
-    /**
      * Query runs against current data (normal).
      */
     CURRENT(false),
@@ -374,11 +369,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if this is a 'As Of' query.
    */
   boolean isAsOfQuery();
-
-  /**
-   * Return true if this is a 'As Draft' query.
-   */
-  boolean isAsDraft();
 
   /**
    * Return true if this query includes soft deleted rows.

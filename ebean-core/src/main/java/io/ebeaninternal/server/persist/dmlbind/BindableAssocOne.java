@@ -24,11 +24,6 @@ class BindableAssocOne implements Bindable {
   }
 
   @Override
-  public final boolean isDraftOnly() {
-    return assocOne.isDraftOnly();
-  }
-
-  @Override
   public final void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (request.isAddToUpdate(assocOne)) {
       list.add(this);

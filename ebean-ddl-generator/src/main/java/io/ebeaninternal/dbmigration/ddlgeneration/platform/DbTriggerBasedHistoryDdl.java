@@ -140,10 +140,8 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
   protected void createHistoryTableAs(DdlBuffer apply, MTable table) {
     apply.append(platformDdl.getCreateTableCommandPrefix()).append(" ").append(historyTableName(table.getName())).append("(").newLine();
     for (MColumn column : table.allColumns()) {
-      if (!column.isDraftOnly()) {
-        writeColumnDefinition(apply, column.getName(), column.getType());
-        apply.append(",").newLine();
-      }
+      writeColumnDefinition(apply, column.getName(), column.getType());
+      apply.append(",").newLine();
     }
     // TODO: We must apply also pending dropped columns. Let's do that in a later step
     if (table.hasDroppedColumns()) {

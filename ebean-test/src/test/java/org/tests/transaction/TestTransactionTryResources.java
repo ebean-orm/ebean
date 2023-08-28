@@ -34,7 +34,6 @@ public class TestTransactionTryResources extends BaseTestCase {
 
     Document document = Document.find.asDraft(doc.getId());
     assertThat(document).isNotNull();
-    assertThat(document.isDraft()).isTrue();
 
     // cleanup
     DB.delete(document);
@@ -69,7 +68,6 @@ public class TestTransactionTryResources extends BaseTestCase {
 
       List<Document> docs = Document.find.query()
         .where().startsWith("body", "tryWithResources_catch")
-        .asDraft()
         .findList();
 
       assertThat(docs).hasSize(1);

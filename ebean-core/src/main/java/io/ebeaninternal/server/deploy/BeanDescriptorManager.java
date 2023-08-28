@@ -106,10 +106,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * Map of base tables to 'with history views' used to support 'as of' queries.
    */
   private final Map<String, String> asOfTableMap = new HashMap<>();
-  /**
-   * Map of base tables to 'draft' tables.
-   */
-  private final Map<String, String> draftTableMap = new HashMap<>();
 
   // temporary collections used during startup and then cleared
   private Map<Class<?>, DeployBeanInfo<?>> deployInfoMap = new HashMap<>();
@@ -270,13 +266,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   /**
-   * Return the map of base tables to draft tables.
-   */
-  public Map<String, String> draftTableMap() {
-    return draftTableMap;
-  }
-
-  /**
    * Deploy returning the asOfTableMap (which is required by the SQL builders).
    */
   public Map<String, String> deploy() {
@@ -417,7 +406,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     // now that all the BeanDescriptors are in their map
     // we can initialise them which sorts out circular
     // dependencies for OneToMany and ManyToOne etc
-    BeanDescriptorInitContext initContext = new BeanDescriptorInitContext(asOfTableMap, draftTableMap, asOfViewSuffix);
+    BeanDescriptorInitContext initContext = new BeanDescriptorInitContext(asOfTableMap, asOfViewSuffix);
 
     // PASS 1:
     // initialise the ID properties of all the beans
@@ -959,13 +948,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       // skip mapping check
       return;
     }
-    DeployBeanDescriptor<?> targetDesc = targetDescriptor(prop);
-    if (targetDesc.isDraftableElement()) {
-      // automatically turning on orphan removal and CascadeType.ALL
-      prop.setModifyListenMode(BeanCollection.ModifyListenMode.REMOVALS);
-      prop.getCascadeInfo().setSaveDelete(true, true);
-    }
-
     if (prop.hasOrderColumn()) {
       makeOrderColumn(prop);
     }
@@ -991,6 +973,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     String mappedBy = prop.getMappedBy();
 
     // get the mappedBy property
+    DeployBeanDescriptor<?> targetDesc = targetDescriptor(prop);
     DeployBeanPropertyAssocOne<?> mappedAssocOne = mappedManyToOne(prop, targetDesc, mappedBy);
     DeployTableJoin tableJoin = prop.getTableJoin();
     if (!tableJoin.hasJoinColumns()) {
@@ -1032,9 +1015,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     // get the bean descriptor that holds the mappedBy property
     String mappedBy = prop.getMappedBy();
     if (mappedBy == null) {
-      if (targetDescriptor(prop).isDraftable()) {
-        prop.setIntersectionDraftTable();
-      }
       return;
     }
 
@@ -1059,10 +1039,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     DeployTableJoin inverseJoin = new DeployTableJoin();
     mappedIntJoin.copyTo(inverseJoin, false, intTableName);
     prop.setInverseJoin(inverseJoin);
-
-    if (targetDesc.isDraftable()) {
-      prop.setIntersectionDraftTable();
-    }
   }
 
   private DeployBeanPropertyAssocMany<?> mappedManyToMany(DeployBeanPropertyAssocMany<?> prop, String mappedBy, DeployBeanDescriptor<?> targetDesc) {
@@ -1179,8 +1155,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     if (identityMode.isIdentity()) {
       // used when getGeneratedKeys is not supported (SQL Server 2000, SAP Hana)
       String selectLastInsertedId = dbIdentity.getSelectLastInsertedId(desc.getBaseTable());
-      String selectLastInsertedIdDraft = (!desc.isDraftable()) ? selectLastInsertedId : dbIdentity.getSelectLastInsertedId(desc.getDraftTable());
-      desc.setSelectLastInsertedId(selectLastInsertedId, selectLastInsertedIdDraft);
+      desc.setSelectLastInsertedId(selectLastInsertedId);
       return;
     }
 

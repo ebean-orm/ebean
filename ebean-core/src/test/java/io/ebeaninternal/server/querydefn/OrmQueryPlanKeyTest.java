@@ -205,8 +205,6 @@ public class OrmQueryPlanKeyTest extends BaseTest {
   public void equals_when_diffTemporalMode() {
 
     CQueryPlanKey key1 = planKey(query());
-    CQueryPlanKey key2 = planKey(query().asDraft());
-    assertDifferent(key1, key2);
 
     CQueryPlanKey key3 = planKey(query().asOf(new Timestamp(System.currentTimeMillis())));
     assertDifferent(key1, key3);

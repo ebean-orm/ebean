@@ -38,13 +38,13 @@ public final class CQueryEngine {
   private final CQueryHistorySupport historySupport;
   private final DatabasePlatform dbPlatform;
 
-  public CQueryEngine(DatabaseConfig config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
+  public CQueryEngine(DatabaseConfig config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping) {
     this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = config.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.forwardOnlyHintOnFindIterate();
     this.historySupport = new CQueryHistorySupport(dbPlatform.historySupport(), asOfTableMapping, config.getAsOfSysPeriod());
-    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
+    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport);
   }
 
   public int forwardOnlyFetchSize() {
@@ -414,9 +414,6 @@ public final class CQueryEngine {
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
     }
-    if (query.isAsDraft()) {
-      msg.append(" draft[true] ");
-    }
     if (originKey != null) {
       msg.append("origin[").append(originKey).append("] ");
     }
@@ -457,9 +454,6 @@ public final class CQueryEngine {
     msg.append("type[").append(q.beanName()).append("] ");
     if (query.isAutoTuned()) {
       msg.append("tuned[true] ");
-    }
-    if (query.isAsDraft()) {
-      msg.append(" draft[true] ");
     }
     if (originKey != null) {
       msg.append("origin[").append(originKey).append("] ");

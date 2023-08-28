@@ -101,9 +101,8 @@ public final class SqlTreeBuilder {
     this.distinctNoLobs = builder.isPlatformDistinctNoLobs();
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.historySupport(query);
-    CQueryDraftSupport draftSupport = builder.draftSupport(query);
     String colAlias = subQuery ? null : columnAliasPrefix;
-    this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate);
+    this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, fromForUpdate);
     this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, includeJoin);
   }
 

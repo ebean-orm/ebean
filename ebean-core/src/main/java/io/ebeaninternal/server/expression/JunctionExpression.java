@@ -348,11 +348,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public Query<T> asDraft() {
-    return exprList.asDraft();
-  }
-
-  @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return exprList.asDto(dtoClass);
   }

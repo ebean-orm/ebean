@@ -34,11 +34,9 @@ public class HanaHistoryDdl extends DbTableBasedHistoryDdl implements PlatformHi
     // create history table
     Collection<MColumn> cols = table.allColumns();
     for (MColumn column : cols) {
-      if (!column.isDraftOnly()) {
-        writeColumnDefinition(apply, column.getName(), column.getType(), column.getDefaultValue(), column.isNotnull(),
+      writeColumnDefinition(apply, column.getName(), column.getType(), column.getDefaultValue(), column.isNotnull(),
           column.isIdentity() ? platformDdl.identitySuffix : null);
-        apply.append(",").newLine();
-      }
+      apply.append(",").newLine();
     }
     writeColumnDefinition(apply, systemPeriodStart, "TIMESTAMP", null, false, null);
     apply.append(",").newLine();
