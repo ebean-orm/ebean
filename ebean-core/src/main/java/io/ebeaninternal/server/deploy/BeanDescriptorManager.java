@@ -2,7 +2,6 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Model;
-import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
@@ -35,10 +34,6 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.type.TypeManager;
-import io.ebeaninternal.xmapping.api.XmapEbean;
-import io.ebeaninternal.xmapping.api.XmapEntity;
-import io.ebeaninternal.xmapping.api.XmapNamedQuery;
-import io.ebeaninternal.xmapping.api.XmapRawSql;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreFactory;
 
@@ -284,11 +279,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   /**
    * Deploy returning the asOfTableMap (which is required by the SQL builders).
    */
-  public Map<String, String> deploy(List<XmapEbean> mappings) {
+  public Map<String, String> deploy() {
     try {
       createListeners();
       readEntityDeploymentInitial();
-      readXmlMapping(mappings);
       readEntityBeanTable();
       readEntityDeploymentAssociations();
       readInheritedIdGenerators();
@@ -312,56 +306,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     } catch (RuntimeException e) {
       log.log(ERROR, "Error in deployment", e);
       throw e;
-    }
-  }
-
-  private void readXmlMapping(List<XmapEbean> mappings) {
-    if (mappings != null) {
-      ClassLoader classLoader = config.getClassLoadConfig().getClassLoader();
-      for (XmapEbean mapping : mappings) {
-        List<XmapEntity> entityDeploy = mapping.getEntity();
-        for (XmapEntity deploy : entityDeploy) {
-          readEntityMapping(classLoader, deploy);
-        }
-      }
-    }
-  }
-
-  private void readEntityMapping(ClassLoader classLoader, XmapEntity entityDeploy) {
-    String entityClassName = entityDeploy.getClazz();
-    Class<?> entityClass;
-    try {
-      entityClass = Class.forName(entityClassName, false, classLoader);
-    } catch (Exception e) {
-      log.log(ERROR, "Could not load entity bean class " + entityClassName + " for ebean.xml entry");
-      return;
-    }
-
-    DeployBeanInfo<?> info = deployInfoMap.get(entityClass);
-    if (info == null) {
-      log.log(ERROR, "No entity bean for ebean.xml entry " + entityClassName);
-
-    } else {
-      for (XmapRawSql sql : entityDeploy.getRawSql()) {
-        RawSqlBuilder builder;
-        try {
-          builder = RawSqlBuilder.parse(sql.getQuery());
-        } catch (RuntimeException e) {
-          builder = RawSqlBuilder.unparsed(sql.getQuery());
-        }
-
-        for (Map.Entry<String, String> columnMapping : sql.getColumnMapping().entrySet()) {
-          builder.columnMapping(columnMapping.getKey(), columnMapping.getValue());
-        }
-        for (Map.Entry<String, String> aliasMapping : sql.getAliasMapping().entrySet()) {
-          builder.tableAliasMapping(aliasMapping.getKey(), aliasMapping.getValue());
-        }
-        info.addRawSql(sql.getName(), builder.create());
-      }
-
-      for (XmapNamedQuery namedQuery : entityDeploy.getNamedQuery()) {
-        info.addNamedQuery(namedQuery.getName(), namedQuery.getQuery());
-      }
     }
   }
 
