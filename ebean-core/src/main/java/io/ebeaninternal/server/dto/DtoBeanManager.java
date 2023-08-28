@@ -16,12 +16,10 @@ public final class DtoBeanManager {
   private static final Map<String,String> EMPTY_NAMED_QUERIES = new HashMap<>();
 
   private final TypeManager typeManager;
-  private final Map<Class<?>, DtoNamedQueries> namedQueries;
   private final Map<Class, DtoBeanDescriptor> descriptorMap = new ConcurrentHashMap<>();
 
-  public DtoBeanManager(TypeManager typeManager, Map<Class<?>, DtoNamedQueries> namedQueries) {
+  public DtoBeanManager(TypeManager typeManager) {
     this.typeManager = typeManager;
-    this.namedQueries = namedQueries;
   }
 
   /**
@@ -35,15 +33,10 @@ public final class DtoBeanManager {
   private <T> DtoBeanDescriptor createDescriptor(Class<T> dtoType) {
     try {
       DtoMeta meta = new DtoMetaBuilder(dtoType, typeManager).build();
-      return new DtoBeanDescriptor<>(dtoType, meta, namedQueries(dtoType));
+      return new DtoBeanDescriptor<>(dtoType, meta);
     } catch (Exception e) {
       throw new IllegalStateException(e);
     }
-  }
-
-  private <T> Map<String, String> namedQueries(Class<T> dtoType) {
-    DtoNamedQueries namedQueries = this.namedQueries.get(dtoType);
-    return (namedQueries == null) ? EMPTY_NAMED_QUERIES : namedQueries.map();
   }
 
   public void visitMetrics(MetricVisitor visitor) {

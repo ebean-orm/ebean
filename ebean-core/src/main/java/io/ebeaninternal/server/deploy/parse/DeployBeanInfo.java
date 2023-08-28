@@ -1,10 +1,8 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.RawSql;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
-import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 /**
  * Wraps information about a bean during deployment parsing.
@@ -40,20 +38,6 @@ public final class DeployBeanInfo<T> {
    */
   public DeployUtil getUtil() {
     return util;
-  }
-
-  /**
-   * Add named RawSql from ebean.xml.
-   */
-  public void addRawSql(String name, RawSql rawSql) {
-    descriptor.addRawSql(name, (SpiRawSql)rawSql);
-  }
-
-  /**
-   * Add the named query.
-   */
-  public void addNamedQuery(String name, String query) {
-    descriptor.addNamedQuery(name, query);
   }
 
   /**

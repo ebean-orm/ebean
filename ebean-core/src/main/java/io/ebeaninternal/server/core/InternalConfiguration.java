@@ -50,8 +50,6 @@ import io.ebeaninternal.server.json.DJsonContext;
 import io.ebeaninternal.server.transaction.*;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.TypeManager;
-import io.ebeaninternal.xmapping.api.XmapEbean;
-import io.ebeaninternal.xmapping.api.XmapService;
 import io.ebeanservice.docstore.api.DocStoreFactory;
 import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
@@ -123,10 +121,9 @@ public final class InternalConfiguration {
     this.serverCachePlugin = initServerCachePlugin();
     this.cacheManager = initCacheManager();
 
-    final InternalConfigXmlMap xmlMap = initExternalMapping();
-    this.dtoBeanManager = new DtoBeanManager(typeManager, xmlMap.readDtoMapping());
+    this.dtoBeanManager = new DtoBeanManager(typeManager);
     this.beanDescriptorManager = new BeanDescriptorManager(this);
-    Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlMap.xmlDeployment());
+    Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
     Map<String, String> draftTableMap = beanDescriptorManager.draftTableMap();
     beanDescriptorManager.scheduleBackgroundTrim();
     this.dataTimeZone = initDataTimeZone();
@@ -138,11 +135,6 @@ public final class InternalConfiguration {
     return jacksonCorePresent;
   }
 
-  private InternalConfigXmlMap initExternalMapping() {
-    final List<XmapEbean> xmEbeans = readExternalMapping();
-    return new InternalConfigXmlMap(xmEbeans, config.getClassLoadConfig().getClassLoader());
-  }
-
   private <S> S service(Class<S> cls) {
     S service = config.getServiceObject(cls);
     if (service != null) {
@@ -150,14 +142,6 @@ public final class InternalConfiguration {
     } else {
       return ServiceUtil.service(cls);
     }
-  }
-
-  private List<XmapEbean> readExternalMapping() {
-    final XmapService xmapService = service(XmapService.class);
-    if (xmapService == null) {
-      return Collections.emptyList();
-    }
-    return xmapService.read(config.getClassLoadConfig().getClassLoader(), config.getMappingLocations());
   }
 
   private SpiLogManager initLogManager() {
