@@ -9,7 +9,6 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.SqlLimitRequest;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.config.dbplatform.SqlLimiter;
-import io.ebean.event.readaudit.ReadAuditQueryPlan;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
@@ -344,11 +343,6 @@ final class CQueryBuilder {
       queryPlan = new CQueryPlanRawSql(request, res, sqlTree, predicates.logWhereSql());
     } else {
       queryPlan = new CQueryPlan(request, res, sqlTree.plan(), false, predicates.logWhereSql());
-    }
-    BeanDescriptor<T> desc = request.descriptor();
-    if (desc.isReadAuditing()) {
-      // log the query plan based bean type (i.e. ignoring query disabling for logging the sql/plan)
-      desc.readAuditLogger().queryPlan(new ReadAuditQueryPlan(desc.fullName(), queryPlan.auditQueryKey(), queryPlan.sql()));
     }
     // cache the query plan because we can reuse it and also
     // gather query performance statistics based on it.

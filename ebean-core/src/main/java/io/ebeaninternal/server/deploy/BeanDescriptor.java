@@ -14,9 +14,6 @@ import io.ebean.event.*;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.event.changelog.ChangeType;
-import io.ebean.event.readaudit.ReadAuditLogger;
-import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.meta.QueryPlanInit;
@@ -123,7 +120,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final TablespaceMeta tablespaceMeta;
   private final String storageEngine;
   private final String dbComment;
-  private final boolean readAuditing;
   private final boolean draftable;
   private final boolean draftableElement;
   private final BeanProperty unmappedJson;
@@ -260,7 +256,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.selectLastInsertedIdDraft = deploy.getSelectLastInsertedIdDraft();
     this.concurrencyMode = deploy.getConcurrencyMode();
     this.indexDefinitions = deploy.getIndexDefinitions();
-    this.readAuditing = deploy.isReadAuditing();
     this.draftable = deploy.isDraftable();
     this.draftableElement = deploy.isDraftableElement();
     this.historySupport = deploy.isHistorySupport();
@@ -717,20 +712,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     for (BeanProperty property : propertiesBaseScalar) {
       insert.setParameter(property.getValue(bean));
     }
-  }
-
-  /**
-   * Return the ReadAuditLogger for logging read audit events.
-   */
-  public ReadAuditLogger readAuditLogger() {
-    return ebeanServer.readAuditLogger();
-  }
-
-  /**
-   * Return the ReadAuditPrepare for preparing read audit events prior to logging.
-   */
-  private ReadAuditPrepare readAuditPrepare() {
-    return ebeanServer.readAuditPrepare();
   }
 
   public boolean isChangeLog() {
@@ -1355,52 +1336,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
-   * Prepare the read audit of a findFutureList() query.
-   */
-  public void readAuditFutureList(SpiQuery<T> spiQuery) {
-    if (isReadAuditing()) {
-      ReadEvent event = new ReadEvent(fullName);
-      // prepare in the foreground thread while we have the user context
-      // information (query is processed/executed later in bg thread)
-      readAuditPrepare(event);
-      spiQuery.setFutureFetchAudit(event);
-    }
-  }
-
-  /**
-   * Write a bean read to the read audit log.
-   */
-  public void readAuditBean(String queryKey, String bindLog, Object bean) {
-    ReadEvent event = new ReadEvent(fullName, queryKey, bindLog, idForJson(bean));
-    readAuditPrepare(event);
-    readAuditLogger().auditBean(event);
-  }
-
-  private void readAuditPrepare(ReadEvent event) {
-    ReadAuditPrepare prepare = readAuditPrepare();
-    if (prepare != null) {
-      prepare.prepare(event);
-    }
-  }
-
-  /**
-   * Write a many bean read to the read audit log.
-   */
-  public void readAuditMany(String queryKey, String bindLog, List<Object> ids) {
-    ReadEvent event = new ReadEvent(fullName, queryKey, bindLog, ids);
-    readAuditPrepare(event);
-    readAuditLogger().auditMany(event);
-  }
-
-  /**
-   * Write a futureList many read to the read audit log.
-   */
-  public void readAuditFutureMany(ReadEvent event) {
-    // this has already been prepared (in foreground thread)
-    readAuditLogger().auditMany(event);
-  }
-
-  /**
    * Return the base table alias. This is always the first letter of the bean name.
    */
   public String baseTableAlias() {
@@ -1777,9 +1712,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       if (d != null) {
         Object shareableBean = d.getSharableBean();
         if (shareableBean != null) {
-          if (isReadAuditing()) {
-            readAuditBean("ref", "", shareableBean);
-          }
           return (T) shareableBean;
         }
       }
@@ -2706,13 +2638,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   public String draftTable() {
     return draftTable;
-  }
-
-  /**
-   * Return true if read auditing is on this entity bean.
-   */
-  public boolean isReadAuditing() {
-    return readAuditing;
   }
 
   @Override

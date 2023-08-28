@@ -996,11 +996,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public Query<T> setDisableReadAuditing() {
-    return exprList.setDisableReadAuditing();
-  }
-
-  @Override
   public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
     return exprList.setCountDistinct(orderBy);
   }
