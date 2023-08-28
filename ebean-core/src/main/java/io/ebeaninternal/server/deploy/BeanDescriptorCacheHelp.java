@@ -594,9 +594,6 @@ final class BeanDescriptorCacheHelp<T> {
         if (beanLog.isLoggable(TRACE)) {
           beanLog.log(TRACE, "   GET {0}({1}) - hit shared bean", cacheName, id);
         }
-        if (desc.isReadAuditing()) {
-          desc.readAuditBean("l2", "", bean);
-        }
         return (T) bean;
       }
     }
@@ -648,9 +645,6 @@ final class BeanDescriptorCacheHelp<T> {
     }
 
     CachedBeanDataToBean.load(desc, bean, data, context);
-    if (desc.isReadAuditing()) {
-      desc.readAuditBean("l2", "", bean);
-    }
     return bean;
   }
 

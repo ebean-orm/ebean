@@ -425,16 +425,6 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setIncludeSoftDeletes();
 
   /**
-   * Disable read auditing for this query.
-   * <p>
-   * This is intended to be used when the query is not a user initiated query and instead
-   * part of the internal processing in an application to load a cache or document store etc.
-   * In these cases we don't want the query to be part of read auditing.
-   * </p>
-   */
-  Query<T> setDisableReadAuditing();
-
-  /**
    * Specify the properties to fetch on the root level entity bean in comma delimited format.
    * <p>
    * The Id property is automatically included in the properties to fetch unless setDistinct(true)

@@ -5,7 +5,6 @@ import io.ebean.QueryIterator;
 import io.ebean.Version;
 import io.ebean.bean.*;
 import io.ebean.core.type.DataReader;
-import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiProfileTransactionEvent;
@@ -160,27 +159,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   private long executionTimeMicros;
 
   /**
-   * Flag set when read auditing.
-   */
-  private final boolean audit;
-
-  /**
-   * Flag set when findIterate is being read audited meaning we log in batches.
-   */
-  private boolean auditFindIterate;
-
-  /**
-   * A buffer of Ids collected for findIterate auditing.
-   */
-  private List<Object> auditIds;
-
-  /**
    * Create the Sql select based on the request.
    */
   @SuppressWarnings("unchecked")
   public CQuery(OrmQueryRequest<T> request, CQueryPredicates predicates, CQueryPlan queryPlan) {
     this.request = request;
-    this.audit = request.isAuditReads();
     this.queryPlan = queryPlan;
     this.query = request.query();
     this.queryMode = query.mode();
@@ -350,13 +333,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
    */
   public void close() {
     try {
-      if (auditFindIterate && auditIds != null && !auditIds.isEmpty()) {
-        auditIterateLogMessage();
-      }
-    } catch (Throwable e) {
-      CoreLog.log.log(ERROR, "Error logging read audit logs", e);
-    }
-    try {
       if (dataReader != null) {
         dataReader.close();
         dataReader = null;
@@ -475,9 +451,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   }
 
   EntityBean next() {
-    if (audit) {
-      auditNextBean();
-    }
     hasNextCache = false;
     if (nextBean == null) {
       throw new NoSuchElementException();
@@ -680,66 +653,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   public void setCurrentPrefix(String currentPrefix, Map<String, String> currentPathMap) {
     this.currentPrefix = currentPrefix;
     this.currentPathMap = currentPathMap;
-  }
-
-  /**
-   * A find bean query with read auditing so build and log the ReadEvent.
-   */
-  void auditFind(EntityBean bean) {
-    if (bean != null) {
-      // only audit when a bean was actually found
-      desc.readAuditBean(queryPlan.auditQueryKey(), bindLog, bean);
-    }
-  }
-
-  /**
-   * a find many query with read auditing so build the ReadEvent and log it.
-   */
-  void auditFindMany() {
-    if (auditIds != null && !auditIds.isEmpty()) {
-      // get the id values of the underlying collection
-      ReadEvent futureReadEvent = query.futureFetchAudit();
-      if (futureReadEvent == null) {
-        // normal query execution
-        desc.readAuditMany(queryPlan.auditQueryKey(), bindLog, auditIds);
-      } else {
-        // this query was executed via findFutureList() and the prepare()
-        // has already been called so set the details and log
-        futureReadEvent.setQueryKey(queryPlan.auditQueryKey());
-        futureReadEvent.setBindLog(bindLog);
-        futureReadEvent.setIds(auditIds);
-        desc.readAuditFutureMany(futureReadEvent);
-      }
-    }
-  }
-
-  /**
-   * Indicate that read auditing is occurring on this findIterate query.
-   */
-  void auditFindIterate() {
-    auditFindIterate = true;
-  }
-
-  /**
-   * Send the current buffer of findIterate collected ids to the audit log.
-   */
-  private void auditIterateLogMessage() {
-    desc.readAuditMany(queryPlan.auditQueryKey(), bindLog, auditIds);
-    // create a new list on demand with the next bean/id
-    auditIds = null;
-  }
-
-  /**
-   * Add the id to the audit id buffer and flush if needed in batches of 100.
-   */
-  private void auditNextBean() {
-    if (auditIds == null) {
-      auditIds = new ArrayList<>(100);
-    }
-    auditIds.add(desc.idForJson(nextBean));
-    if (auditFindIterate && auditIds.size() >= 100) {
-      auditIterateLogMessage();
-    }
   }
 
   /**

@@ -14,8 +14,6 @@ import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
-import io.ebean.event.readaudit.ReadAuditLogger;
-import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetricNamingMatch;
 import io.ebean.util.StringHelper;
 
@@ -416,8 +414,6 @@ public class DatabaseConfig {
   private ChangeLogListener changeLogListener;
   private ChangeLogRegister changeLogRegister;
   private boolean changeLogAsync = true;
-  private ReadAuditLogger readAuditLogger;
-  private ReadAuditPrepare readAuditPrepare;
   private EncryptKeyManager encryptKeyManager;
   private EncryptDeployManager encryptDeployManager;
   private Encryptor encryptor;
@@ -1195,40 +1191,6 @@ public class DatabaseConfig {
    */
   public void setChangeLogAsync(boolean changeLogAsync) {
     this.changeLogAsync = changeLogAsync;
-  }
-
-  /**
-   * Return the ReadAuditLogger to use.
-   */
-  public ReadAuditLogger getReadAuditLogger() {
-    return readAuditLogger;
-  }
-
-  /**
-   * Set the ReadAuditLogger to use. If not set the default implementation is used
-   * which logs the read events in JSON format to a standard named SLF4J logger
-   * (which can be configured in say logback to log to a separate log file).
-   */
-  public void setReadAuditLogger(ReadAuditLogger readAuditLogger) {
-    this.readAuditLogger = readAuditLogger;
-  }
-
-  /**
-   * Return the ReadAuditPrepare to use.
-   */
-  public ReadAuditPrepare getReadAuditPrepare() {
-    return readAuditPrepare;
-  }
-
-  /**
-   * Set the ReadAuditPrepare to use.
-   * <p>
-   * It is expected that an implementation is used that read user context information
-   * (user id, user ip address etc) and sets it on the ReadEvent bean before it is sent
-   * to the ReadAuditLogger.
-   */
-  public void setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
-    this.readAuditPrepare = readAuditPrepare;
   }
 
   /**

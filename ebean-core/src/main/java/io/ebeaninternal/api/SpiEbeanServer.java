@@ -4,8 +4,6 @@ import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.CallOrigin;
-import io.ebean.event.readaudit.ReadAuditLogger;
-import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiQuery.Type;
@@ -189,17 +187,6 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * Map of known bean types.
    */
   boolean isSupportedType(java.lang.reflect.Type genericType);
-
-  /**
-   * Return the ReadAuditLogger to use for logging all read audit events.
-   */
-  ReadAuditLogger readAuditLogger();
-
-  /**
-   * Return the ReadAuditPrepare used to populate the read audit events with
-   * user context information (user id, user ip address etc).
-   */
-  ReadAuditPrepare readAuditPrepare();
 
   /**
    * Return the DataTimeZone to use when reading/writing timestamps via JDBC.
