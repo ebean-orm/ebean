@@ -120,11 +120,10 @@ public final class InternalConfiguration {
     this.dtoBeanManager = new DtoBeanManager(typeManager);
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
-    Map<String, String> draftTableMap = beanDescriptorManager.draftTableMap();
     beanDescriptorManager.scheduleBackgroundTrim();
     this.dataTimeZone = initDataTimeZone();
     this.binder = getBinder(typeManager, databasePlatform, dataTimeZone);
-    this.cQueryEngine = new CQueryEngine(config, databasePlatform, binder, asOfTableMapping, draftTableMap);
+    this.cQueryEngine = new CQueryEngine(config, databasePlatform, binder, asOfTableMapping);
   }
 
   public boolean isJacksonCorePresent() {

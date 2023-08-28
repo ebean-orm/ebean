@@ -114,21 +114,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       }
     }
 
-    addDraftTable();
     table.updateCompoundIndices();
   }
-
-  /**
-   * Create a 'draft' table that is mostly the same as the base table.
-   * It has @DraftOnly columns and adjusted primary and foreign keys.
-   */
-  private void addDraftTable() {
-    if (beanDescriptor.isDraftable() || beanDescriptor.isDraftableElement()) {
-      // create a 'Draft' table which looks very similar (change PK, FK etc)
-      ctx.createDraft(table, !beanDescriptor.isDraftableElement());
-    }
-  }
-
 
   @Override
   public void visitMany(BeanPropertyAssocMany<?> p) {
@@ -251,7 +238,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     MColumn col = table.addColumnScalar(p.dbColumn(), ctx.getColumnDefn(p, false));
     //MColumn col = new MColumn(p.dbColumn(), ctx.getColumnDefn(p, false));
     col.setComment(p.dbComment());
-    col.setDraftOnly(p.isDraftOnly());
     col.setHistoryExclude(p.isExcludedFromHistory());
     if (p.isId() || p.isImportedPrimaryKey()) {
       col.setPrimaryKey(true);

@@ -5,10 +5,7 @@ import io.ebean.annotation.Draft;
 import io.ebean.annotation.DraftOnly;
 import io.ebean.annotation.Draftable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.List;
@@ -35,12 +32,8 @@ public class Document extends BaseDomain {
   @ManyToOne
   Organisation organisation;
 
-  /**
-   * Relationship to draftable elements.
-   */
-  //@PrivateOwned
-  @OneToMany(mappedBy = "document")//, cascade = CascadeType.ALL)
-    List<DocumentMedia> media;
+  @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+  List<DocumentMedia> media;
 
   public String getTitle() {
     return title;
@@ -96,7 +89,7 @@ public class Document extends BaseDomain {
     }
 
     public Document asDraft(Long id) {
-      return query().asDraft().setId(id).findOne();
+      return query().setId(id).findOne(); //.asDraft()
     }
   }
 }

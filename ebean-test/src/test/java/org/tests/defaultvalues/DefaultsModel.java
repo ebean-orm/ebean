@@ -10,14 +10,11 @@ import javax.persistence.OneToMany;
 import java.util.List;
 
 @Entity
-@Draftable
 public class DefaultsModel {
 
   @Id
   Integer id;
 
-  @Draft
-  boolean draft;
 
   @OneToMany(cascade = CascadeType.ALL)
   List<ReferencedDefaultsModel> relatedModels;
@@ -36,13 +33,5 @@ public class DefaultsModel {
 
   public void setRelatedModels(final List<ReferencedDefaultsModel> relatedModels) {
     this.relatedModels = relatedModels;
-  }
-
-  public boolean isDraft() {
-    return draft;
-  }
-
-  public void setDraft(final boolean draft) {
-    this.draft = draft;
   }
 }

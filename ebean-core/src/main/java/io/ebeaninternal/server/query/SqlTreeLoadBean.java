@@ -259,9 +259,6 @@ class SqlTreeLoadBean implements SqlTreeLoad {
         if (readIdNormal) {
           createListProxies();
         }
-        if (temporalMode == SpiQuery.TemporalMode.DRAFT) {
-          localDesc.setDraft(localBean);
-        }
         localDesc.postLoad(localBean);
 
         EntityBeanIntercept ebi = localBean._ebean_getIntercept();

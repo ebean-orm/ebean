@@ -477,46 +477,6 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public <T> T publish(Class<T> beanType, Object id) {
-    return null;
-  }
-
-  @Override
-  public <T> List<T> publish(Query<T> query) {
-    return null;
-  }
-
-  @Override
-  public <T> T publish(Class<T> beanType, Object id, Transaction transaction) {
-    return null;
-  }
-
-  @Override
-  public <T> List<T> publish(Query<T> query, Transaction transaction) {
-    return null;
-  }
-
-  @Override
-  public <T> T draftRestore(Class<T> beanType, Object id, Transaction transaction) {
-    return null;
-  }
-
-  @Override
-  public <T> List<T> draftRestore(Query<T> query, Transaction transaction) {
-    return null;
-  }
-
-  @Override
-  public <T> T draftRestore(Class<T> beanType, Object id) {
-    return null;
-  }
-
-  @Override
-  public <T> List<T> draftRestore(Query<T> query) {
-    return null;
-  }
-
-  @Override
   public Transaction createTransaction() {
     return null;
   }

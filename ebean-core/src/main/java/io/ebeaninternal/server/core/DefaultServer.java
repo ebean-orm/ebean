@@ -1636,54 +1636,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }, transaction);
   }
 
-  @Override
-  public <T> List<T> publish(Query<T> query, @Nullable Transaction transaction) {
-    return executeInTrans((txn) -> persister.publish(query, txn), transaction);
-  }
-
-  @Nullable
-  @Override
-  public <T> T publish(Class<T> beanType, Object id) {
-    return publish(beanType, id, null);
-  }
-
-  @Override
-  public <T> List<T> publish(Query<T> query) {
-    return publish(query, null);
-  }
-
-  @Nullable
-  @Override
-  public <T> T publish(Class<T> beanType, Object id, @Nullable Transaction transaction) {
-    Query<T> query = find(beanType).setId(id);
-    List<T> liveBeans = publish(query, transaction);
-    return (liveBeans.size() == 1) ? liveBeans.get(0) : null;
-  }
-
-  @Override
-  public <T> List<T> draftRestore(Query<T> query, @Nullable Transaction transaction) {
-    return executeInTrans((txn) -> persister.draftRestore(query, txn), transaction);
-  }
-
-  @Nullable
-  @Override
-  public <T> T draftRestore(Class<T> beanType, Object id, @Nullable Transaction transaction) {
-    Query<T> query = find(beanType).setId(id);
-    List<T> beans = draftRestore(query, transaction);
-    return (beans.size() == 1) ? beans.get(0) : null;
-  }
-
-  @Nullable
-  @Override
-  public <T> T draftRestore(Class<T> beanType, Object id) {
-    return draftRestore(beanType, id, null);
-  }
-
-  @Override
-  public <T> List<T> draftRestore(Query<T> query) {
-    return draftRestore(query, null);
-  }
-
   private EntityBean checkEntityBean(Object bean) {
     return (EntityBean) Objects.requireNonNull(bean);
   }

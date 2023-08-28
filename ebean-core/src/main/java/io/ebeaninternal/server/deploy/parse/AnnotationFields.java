@@ -205,16 +205,7 @@ final class AnnotationFields extends AnnotationParser {
       prop.setTenantId();
     }
     if (has(prop, Draft.class)) {
-      prop.setDraft();
-    }
-    if (has(prop, DraftOnly.class)) {
-      prop.setDraftOnly();
-    }
-    if (has(prop, DraftDirty.class)) {
-      prop.setDraftDirty();
-    }
-    if (has(prop, DraftReset.class)) {
-      prop.setDraftReset();
+      // TODO: Not Supported
     }
     if (has(prop, SoftDelete.class)) {
       prop.setSoftDelete();

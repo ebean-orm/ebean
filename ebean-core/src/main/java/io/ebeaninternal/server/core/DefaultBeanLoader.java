@@ -178,12 +178,11 @@ final class DefaultBeanLoader {
       desc.contextPut(pc, id, bean);
       ebi.setPersistenceContext(pc);
     }
-    boolean draft = desc.isDraftInstance(bean);
     if (embeddedOwnerIndex == -1) {
       if (desc.lazyLoadMany(ebi)) {
         return;
       }
-      if (!draft && Mode.LAZYLOAD_BEAN == mode && desc.isBeanCaching()) {
+      if (Mode.LAZYLOAD_BEAN == mode && desc.isBeanCaching()) {
         // lazy loading and the bean cache is active
         if (desc.cacheBeanLoad(bean, ebi, id, pc)) {
           return;
@@ -192,9 +191,7 @@ final class DefaultBeanLoader {
     }
     SpiQuery<?> query = server.createQuery(desc.type());
     query.setLazyLoadProperty(ebi.lazyLoadProperty());
-    if (draft) {
-      query.asDraft();
-    } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN && desc.isSoftDelete()) {
+    if (mode == SpiQuery.Mode.LAZYLOAD_BEAN && desc.isSoftDelete()) {
       query.setIncludeSoftDeletes();
     }
     if (embeddedOwnerIndex > -1) {
