@@ -188,42 +188,6 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
   }
 
   /**
-   * Deprecated for removal - migrate to filterManyRaw()
-   * <p>
-   * Apply a filter when fetching these beans.
-   * <p>
-   * The expressions can use any valid Ebean expression and contain
-   * placeholders for bind values using <code>?</code> or <code>?1</code> style.
-   * </p>
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("firstName istartsWith ?", "Rob")
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("whenCreated inRange ? to ?", startDate, endDate)
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
-   * @param params      The bind parameter values
-   */
-  @Deprecated(forRemoval = true)
-  public final R filterMany(String expressions, Object... params) {
-    expr().filterMany(_name, expressions, params);
-    return _root;
-  }
-
-  /**
    * Add filter expressions for the many path. The expressions can include SQL functions if
    * desired and the property names are translated to column names.
    * <p>

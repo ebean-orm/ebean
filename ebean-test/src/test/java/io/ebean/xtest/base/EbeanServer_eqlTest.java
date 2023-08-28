@@ -22,7 +22,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = server().createQuery(Customer.class, "order by id limit 10");
+    Query<Customer> query = server().createQuery(Customer.class).orderBy("id").setMaxRows(10);
     query.setMaxRows(100);
     query.findList();
 
@@ -41,7 +41,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = DB.createQuery(Customer.class, "order by id limit 10");
+    Query<Customer> query = server().createQuery(Customer.class).orderBy("id").setMaxRows(10);
     query.findList();
 
     if (isSqlServer()) {
@@ -59,7 +59,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = DB.createQuery(Customer.class, "order by id limit 10 offset 3");
+    Query<Customer> query = server().createQuery(Customer.class).orderBy("id").setMaxRows(10).setFirstRow(3);
     query.findList();
 
     if (isSqlServer()) {
@@ -77,7 +77,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = DB.createQuery(Customer.class, "order by name");
+    Query<Customer> query = server().createQuery(Customer.class).orderBy("name");
     query.setMaxRows(10);
     query.setFirstRow(3);
     query.findList();
@@ -102,7 +102,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = DB.createQuery(Customer.class, "order by name");
+    Query<Customer> query = server().createQuery(Customer.class).orderBy("name");
     query.setMaxRows(10);
     query.setFirstRow(3);
     query.orderById(true);
@@ -169,7 +169,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = server().createQuery(Customer.class, "order by id");
+    Query<Customer> query = server().createQuery(Customer.class).orderBy("id");
 
     // use clear() and then effectively override the orderBy clause
     query.orderBy().clear().asc("name");
@@ -184,54 +184,14 @@ public class EbeanServer_eqlTest extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Customer> query = server().createQuery(Customer.class, "where name startsWith :name order by name");
-    query.setParameter("name", "Ro");
+    Query<Customer> query = server().createQuery(Customer.class)
+      .where().startsWith("name", "Ro")
+      .orderBy("name")
+      .query();
+
     query.findList();
 
     assertSql(query).contains("where t0.name like ");
-  }
-
-  @Test
-  public void unboundNamedParams_expect_PersistenceException() {
-    Query<Customer> query = server().createQuery(Customer.class, "where name = :name");
-    assertThrows(PersistenceException.class, () ->query.findOne());
-  }
-
-  @Test
-  public void namedQuery() {
-    ResetBasicData.reset();
-
-    Query<Customer> name = server().createNamedQuery(Customer.class, "name");
-    name.findList();
-
-    assertThat(sqlOf(name, 1)).contains("select t0.id, t0.name from o_customer t0 order by t0.name");
-  }
-
-  @Test
-  public void namedQuery_withStatus() {
-
-    ResetBasicData.reset();
-
-    Query<Customer> name = server().createNamedQuery(Customer.class, "withStatus");
-    name.order().clear().asc("status");
-    name.findList();
-
-    assertThat(sqlOf(name, 2)).contains("select t0.id, t0.name, t0.status from o_customer t0 order by t0.status");
-  }
-
-  @Test
-  public void namedQuery_withContacts() {
-
-    ResetBasicData.reset();
-
-    Query<Customer> query = server()
-      .createNamedQuery(Customer.class, "withContacts")
-      .setParameter("id", 1);
-
-    query.setUseCache(false);
-    query.findOne();
-
-    assertSql(query).contains("from o_customer t0 left join contact t1 on t1.customer_id = t0.id ");
   }
 
 }

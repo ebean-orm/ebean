@@ -25,7 +25,6 @@ module io.ebean.core {
   requires transitive io.ebean.xmapping.api;
   requires transitive io.ebean.core.type;
   requires transitive io.ebean.ddl.runner;
-  requires org.antlr.antlr4.runtime;
   requires io.avaje.classpath.scanner.api;
   requires io.avaje.classpath.scanner;
   requires io.ebean.types;

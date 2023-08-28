@@ -155,10 +155,4 @@ public abstract class BeanFinder<I,T> {
     return db().findNative(type, nativeSql);
   }
 
-  /**
-   * Creates a query using the ORM query language.
-   */
-  protected Query<T> query(String ormQuery) {
-    return db().createQuery(type, ormQuery);
-  }
 }
