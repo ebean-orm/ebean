@@ -9,8 +9,6 @@ import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
-import io.ebean.event.readaudit.ReadAuditLogger;
-import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
 
@@ -68,14 +66,10 @@ public class BootupClasses implements Predicate<Class<?>> {
   private Class<? extends ChangeLogPrepare> changeLogPrepareClass;
   private Class<? extends ChangeLogListener> changeLogListenerClass;
   private Class<? extends ChangeLogRegister> changeLogRegisterClass;
-  private Class<? extends ReadAuditPrepare> readAuditPrepareClass;
-  private Class<? extends ReadAuditLogger> readAuditLoggerClass;
 
   private ChangeLogPrepare changeLogPrepare;
   private ChangeLogListener changeLogListener;
   private ChangeLogRegister changeLogRegister;
-  private ReadAuditPrepare readAuditPrepare;
-  private ReadAuditLogger readAuditLogger;
 
   public BootupClasses() {
   }
@@ -173,19 +167,11 @@ public class BootupClasses implements Predicate<Class<?>> {
   }
 
   public void addChangeLogInstances(DatabaseConfig config) {
-    readAuditPrepare = config.getReadAuditPrepare();
-    readAuditLogger = config.getReadAuditLogger();
     changeLogPrepare = config.getChangeLogPrepare();
     changeLogListener = config.getChangeLogListener();
     changeLogRegister = config.getChangeLogRegister();
     // if not already set create the implementations found
     // via classpath scanning
-    if (readAuditPrepare == null && readAuditPrepareClass != null) {
-      readAuditPrepare = create(readAuditPrepareClass, false);
-    }
-    if (readAuditLogger == null && readAuditLoggerClass != null) {
-      readAuditLogger = create(readAuditLoggerClass, false);
-    }
     if (changeLogPrepare == null && changeLogPrepareClass != null) {
       changeLogPrepare = create(changeLogPrepareClass, false);
     }
@@ -250,14 +236,6 @@ public class BootupClasses implements Predicate<Class<?>> {
 
   public ChangeLogRegister getChangeLogRegister() {
     return changeLogRegister;
-  }
-
-  public ReadAuditPrepare getReadAuditPrepare() {
-    return readAuditPrepare;
-  }
-
-  public ReadAuditLogger getReadAuditLogger() {
-    return readAuditLogger;
   }
 
   public List<IdGenerator> getIdGenerators() {
@@ -421,15 +399,6 @@ public class BootupClasses implements Predicate<Class<?>> {
 
     if (ChangeLogPrepare.class.isAssignableFrom(cls)) {
       changeLogPrepareClass = (Class<? extends ChangeLogPrepare>) cls;
-      interesting = true;
-    }
-
-    if (ReadAuditPrepare.class.isAssignableFrom(cls)) {
-      readAuditPrepareClass = (Class<? extends ReadAuditPrepare>) cls;
-      interesting = true;
-    }
-    if (ReadAuditLogger.class.isAssignableFrom(cls)) {
-      readAuditLoggerClass = (Class<? extends ReadAuditLogger>) cls;
       interesting = true;
     }
 

@@ -13,8 +13,6 @@ import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.ShutdownManager;
-import io.ebean.event.readaudit.ReadAuditLogger;
-import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.*;
 import io.ebean.migration.auto.AutoMigrationRunner;
 import io.ebean.plugin.BeanType;
@@ -92,8 +90,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DtoBeanManager dtoBeanManager;
   private final BeanDescriptorManager descriptorManager;
   private final AutoTuneService autoTuneService;
-  private final ReadAuditPrepare readAuditPrepare;
-  private final ReadAuditLogger readAuditLogger;
   private final CQueryEngine cqueryEngine;
   private final List<Plugin> serverPlugins;
   private final SpiDdlGenerator ddlGenerator;
@@ -145,8 +141,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.relationalQueryEngine = config.createRelationalQueryEngine();
     this.dtoQueryEngine = config.createDtoQueryEngine();
     this.autoTuneService = config.createAutoTuneService(this);
-    this.readAuditPrepare = config.getReadAuditPrepare();
-    this.readAuditLogger = config.getReadAuditLogger();
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
     this.dataTimeZone = config.getDataTimeZone();
@@ -280,16 +274,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public DataSource readOnlyDataSource() {
     return transactionManager.readOnlyDataSource();
-  }
-
-  @Override
-  public ReadAuditPrepare readAuditPrepare() {
-    return readAuditPrepare;
-  }
-
-  @Override
-  public ReadAuditLogger readAuditLogger() {
-    return readAuditLogger;
   }
 
   /**
@@ -1276,10 +1260,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiQuery<T> spiQuery = query.copy();
     // FutureList query always run in it's own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
-    if (!spiQuery.isDisableReadAudit()) {
-      BeanDescriptor<T> desc = descriptorManager.descriptor(spiQuery.getBeanType());
-      desc.readAuditFutureList(spiQuery);
-    }
     // Create a new transaction solely to execute the findList() at some future time
     boolean createdTransaction = false;
     SpiTransaction transaction = query.transaction();

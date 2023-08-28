@@ -7,7 +7,6 @@ import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.ObjectGraphOrigin;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.event.BeanQueryRequest;
-import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.autotune.ProfilingListener;
@@ -85,11 +84,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Set to true by a user wanting a DISTINCT query (id property must be excluded).
    */
   private boolean distinct;
-
-  /**
-   * Only used for read auditing with findFutureList() query.
-   */
-  private ReadEvent futureFetchAudit;
 
   private int timeout;
 
@@ -1897,27 +1891,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final int bufferFetchSizeHint() {
     return bufferFetchSizeHint;
-  }
-
-  @Override
-  public final Query<T> setDisableReadAuditing() {
-    this.disableReadAudit = true;
-    return this;
-  }
-
-  @Override
-  public final boolean isDisableReadAudit() {
-    return disableReadAudit;
-  }
-
-  @Override
-  public final void setFutureFetchAudit(ReadEvent event) {
-    this.futureFetchAudit = event;
-  }
-
-  @Override
-  public final ReadEvent futureFetchAudit() {
-    return futureFetchAudit;
   }
 
   @Override

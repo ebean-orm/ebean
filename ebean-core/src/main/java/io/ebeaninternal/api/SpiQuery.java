@@ -10,7 +10,6 @@ import io.ebean.Query;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
-import io.ebean.event.readaudit.ReadEvent;
 import io.ebean.plugin.BeanType;
 import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
@@ -866,21 +865,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return the hint for Statement.setFetchSize().
    */
   int bufferFetchSizeHint();
-
-  /**
-   * Return true if read auditing is disabled on this query.
-   */
-  boolean isDisableReadAudit();
-
-  /**
-   * Set the readEvent for future queries (as prepared in foreground thread).
-   */
-  void setFutureFetchAudit(ReadEvent event);
-
-  /**
-   * Read the readEvent for future queries (null otherwise).
-   */
-  ReadEvent futureFetchAudit();
 
   /**
    * Return the base table to use if user defined on the query.

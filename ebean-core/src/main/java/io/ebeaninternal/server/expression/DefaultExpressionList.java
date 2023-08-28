@@ -537,11 +537,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> setDisableReadAuditing() {
-    return query.setDisableReadAuditing();
-  }
-
-  @Override
   public Query<T> setLabel(String label) {
     return query.setLabel(label);
   }

@@ -671,16 +671,6 @@ public interface ExpressionList<T> {
   Query<T> setDisableLazyLoading(boolean disableLazyLoading);
 
   /**
-   * Disable read auditing for this query.
-   * <p>
-   * This is intended to be used when the query is not a user initiated query and instead
-   * part of the internal processing in an application to load a cache or document store etc.
-   * In these cases we don't want the query to be part of read auditing.
-   * </p>
-   */
-  Query<T> setDisableReadAuditing();
-
-  /**
    * Set a label on the query (to help identify query execution statistics).
    */
   Query<T> setLabel(String label);
