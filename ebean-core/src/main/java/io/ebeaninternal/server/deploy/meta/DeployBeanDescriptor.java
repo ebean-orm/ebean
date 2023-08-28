@@ -20,7 +20,6 @@ import io.ebeaninternal.server.deploy.parse.DeployBeanInfo;
 import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
 import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
 import io.ebeaninternal.server.idgen.UuidV4IdGenerator;
-import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.MappedSuperclass;
@@ -30,10 +29,6 @@ import java.util.*;
  * Describes Beans including their deployment information.
  */
 public class DeployBeanDescriptor<T> {
-
-  private static final Map<String, String> EMPTY_NAMED_QUERY = new HashMap<>();
-
-  private static final Map<String, SpiRawSql> EMPTY_RAW_MAP = new HashMap<>();
 
   private static class PropOrder implements Comparator<DeployBeanProperty> {
 
@@ -84,7 +79,6 @@ public class DeployBeanDescriptor<T> {
   private String draftTable;
   private String[] dependentTables;
   private boolean historySupport;
-  private boolean readAuditing;
   private boolean draftable;
   private boolean draftableElement;
   private TableName baseTableFull;
@@ -191,20 +185,6 @@ public class DeployBeanDescriptor<T> {
    */
   public boolean isHistorySupport() {
     return historySupport;
-  }
-
-  /**
-   * Set read auditing on for this entity bean.
-   */
-  public void setReadAuditing() {
-    readAuditing = true;
-  }
-
-  /**
-   * Return true if read auditing is on for this entity bean.
-   */
-  public boolean isReadAuditing() {
-    return readAuditing;
   }
 
   public void setDbComment(String dbComment) {

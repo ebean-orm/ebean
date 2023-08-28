@@ -31,7 +31,6 @@ public final class DLoadContext implements LoadContext {
   private final CacheMode useBeanCache;
   private final int defaultBatchSize;
   private final boolean disableLazyLoading;
-  private final boolean disableReadAudit;
   private final boolean includeSoftDeletes;
   final boolean useDocStore;
 
@@ -64,7 +63,6 @@ public final class DLoadContext implements LoadContext {
     this.asOf = null;
     this.readOnly = false;
     this.disableLazyLoading = false;
-    this.disableReadAudit = false;
     this.includeSoftDeletes = false;
     this.relativePath = null;
     this.planLabel = null;
@@ -91,7 +89,6 @@ public final class DLoadContext implements LoadContext {
     this.asDraft = query.isAsDraft();
     this.includeSoftDeletes = query.isIncludeSoftDeletes() && query.mode() == SpiQuery.Mode.NORMAL;
     this.readOnly = query.isReadOnly();
-    this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.useBeanCache = query.beanCacheMode();
     this.profilingListener = query.profilingListener();
@@ -330,9 +327,6 @@ public final class DLoadContext implements LoadContext {
     }
     if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
-    }
-    if (disableReadAudit) {
-      query.setDisableReadAuditing();
     }
     if (profilingListener != null) {
       query.setProfilingListener(profilingListener);

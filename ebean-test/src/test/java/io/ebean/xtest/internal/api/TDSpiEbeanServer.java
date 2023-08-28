@@ -9,8 +9,6 @@ import io.ebean.bean.CallOrigin;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.event.readaudit.ReadAuditLogger;
-import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.plugin.Property;
@@ -147,16 +145,6 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
 
   @Override
   public DocumentStore docStore() {
-    return null;
-  }
-
-  @Override
-  public ReadAuditLogger readAuditLogger() {
-    return null;
-  }
-
-  @Override
-  public ReadAuditPrepare readAuditPrepare() {
     return null;
   }
 

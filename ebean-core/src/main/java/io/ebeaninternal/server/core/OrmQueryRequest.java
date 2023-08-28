@@ -648,17 +648,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     }
 
     Object cached = beanDescriptor.queryCacheGet(cacheKey);
-    if (cached != null && isAuditReads() && readAuditQueryType()) {
-      if (cached instanceof BeanCollection) {
-        // raw sql can't use L2 cache so normal queries only in here
-        Collection<T> actualDetails = ((BeanCollection<T>) cached).actualDetails();
-        List<Object> ids = new ArrayList<>(actualDetails.size());
-        for (T bean : actualDetails) {
-          ids.add(beanDescriptor.idForJson(bean));
-        }
-        beanDescriptor.readAuditMany(queryPlanKey.partialKey(), "l2-query-cache", ids);
-      }
-    }
     if (Boolean.FALSE.equals(query.isReadOnly())) {
       // return shallow copies if readonly is explicitly set to false
       if (cached instanceof BeanCollection) {
@@ -672,24 +661,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       }
     }
     return cached;
-  }
-
-  /**
-   * Return true if the query type contains bean data (not just ids etc) and hence we want to include
-   * it in read auditing.  Return false for row count and find ids queries.
-   */
-  private boolean readAuditQueryType() {
-    Type type = query.type();
-    switch (type) {
-      case BEAN:
-      case ITERATE:
-      case LIST:
-      case SET:
-      case MAP:
-        return true;
-      default:
-        return false;
-    }
   }
 
   public void putToQueryCache(Object result) {
@@ -716,15 +687,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public int lazyLoadBatchSize() {
     int batchSize = query.lazyLoadBatchSize();
     return (batchSize > 0) ? batchSize : server.lazyLoadBatchSize();
-  }
-
-  /**
-   * Return true if read auditing is on for this query request.
-   * <p>
-   * This means that read audit is on for this bean type and that query has not explicitly disabled it.
-   */
-  public boolean isAuditReads() {
-    return beanDescriptor.isReadAuditing() && !query.isDisableReadAudit();
   }
 
   /**

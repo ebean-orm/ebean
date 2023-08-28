@@ -30,7 +30,6 @@ module io.ebean.api {
   exports io.ebean.config;
   exports io.ebean.config.dbplatform;
   exports io.ebean.event;
-  exports io.ebean.event.readaudit;
   exports io.ebean.event.changelog;
   exports io.ebean.common;
   exports io.ebean.docstore;
