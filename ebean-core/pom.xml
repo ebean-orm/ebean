@@ -55,12 +55,6 @@
       <version>13.18.0</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.antlr</groupId>
-      <artifactId>antlr4-runtime</artifactId>
-      <version>4.8-1</version>
-    </dependency>
-
     <!--
     Class retention Nonnull and Nullable annotations
     to assist with IDE auto-completion with Ebean API
