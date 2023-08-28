@@ -37,9 +37,8 @@ public class CustomerFinder extends Finder<Integer, Customer> {
   }
 
   public List<Customer> byNameStatus(String nameStartsWith, Customer.Status status) {
-    return query("where status = :status and name istartsWith :name order by name")
-      .setParameter("status", status)
-      .setParameter("name", nameStartsWith)
+    return query().where().raw("status = ? and lower(name) like ?", status, nameStartsWith.toLowerCase() + "%")
+      .orderBy().asc("name")
       .findList();
   }
 
