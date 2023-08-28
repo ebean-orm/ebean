@@ -38,9 +38,4 @@ public interface Bindable {
    * when binding a update or delete where clause with ALL concurrency mode.
    */
   void dmlBind(BindableRequest request, EntityBean bean) throws SQLException;
-
-  /**
-   * Return true if the underlying property is 'draft only'.
-   */
-  boolean isDraftOnly();
 }

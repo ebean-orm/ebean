@@ -93,8 +93,6 @@ public class CurrentModel {
       ModelBuildBeanVisitor visitor = new ModelBuildBeanVisitor(context);
       VisitAllUsing visit = new VisitAllUsing(visitor, server);
       visit.visitAllBeans();
-      // adjust the foreign keys on the 'draft' tables
-      context.adjustDraftReferences();
     }
     return model;
   }

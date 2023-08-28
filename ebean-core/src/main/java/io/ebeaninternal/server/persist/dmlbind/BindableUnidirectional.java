@@ -30,11 +30,6 @@ public final class BindableUnidirectional implements Bindable {
   }
 
   @Override
-  public boolean isDraftOnly() {
-    return false;
-  }
-
-  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     throw new PersistenceException("Never called (for insert only)");
   }

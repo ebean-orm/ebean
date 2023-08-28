@@ -48,17 +48,15 @@ final class CQueryBuilder {
   private final Binder binder;
   private final boolean selectCountWithAlias;
   private final CQueryHistorySupport historySupport;
-  private final CQueryDraftSupport draftSupport;
   private final DatabasePlatform dbPlatform;
   private final boolean selectCountWithColumnAlias;
 
   /**
    * Create the SqlGenSelect.
    */
-  CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+  CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport) {
     this.dbPlatform = dbPlatform;
     this.binder = binder;
-    this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.columnAliasPrefix = dbPlatform.columnAliasPrefix();
     this.sqlLimiter = dbPlatform.sqlLimiter();
@@ -219,13 +217,6 @@ final class CQueryBuilder {
    */
   <T> CQueryHistorySupport historySupport(SpiQuery<T> query) {
     return query.temporalMode().isHistory() ? historySupport : null;
-  }
-
-  /**
-   * Return the draft support (or null) for a 'asDraft' query.
-   */
-  <T> CQueryDraftSupport draftSupport(SpiQuery<T> query) {
-    return query.temporalMode() == SpiQuery.TemporalMode.DRAFT ? draftSupport : null;
   }
 
   /**

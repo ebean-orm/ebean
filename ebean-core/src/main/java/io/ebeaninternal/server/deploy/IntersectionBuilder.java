@@ -8,13 +8,11 @@ import java.util.List;
  */
 public final class IntersectionBuilder {
 
-  private final String publishTable;
-  private final String draftTable;
+  private final String table;
   private final List<String> columns = new ArrayList<>();
 
-  IntersectionBuilder(String publishTable, String draftTable) {
-    this.publishTable = publishTable;
-    this.draftTable = draftTable;
+  IntersectionBuilder(String table) {
+    this.table = table;
   }
 
   public void addColumn(String column) {
@@ -22,18 +20,9 @@ public final class IntersectionBuilder {
   }
 
   public IntersectionTable build() {
-    String insertSql = insertSql(publishTable);
-    String deleteSql = deleteSql(publishTable);
-    String draftInsertSql;
-    String draftDeleteSql;
-    if (publishTable.equals(draftTable)) {
-      draftInsertSql = insertSql;
-      draftDeleteSql = deleteSql;
-    } else {
-      draftInsertSql = insertSql(draftTable);
-      draftDeleteSql = deleteSql(draftTable);
-    }
-    return new IntersectionTable(insertSql, deleteSql, draftInsertSql, draftDeleteSql);
+    String insertSql = insertSql(table);
+    String deleteSql = deleteSql(table);
+    return new IntersectionTable(insertSql, deleteSql);
   }
 
   private String insertSql(String tableName) {
