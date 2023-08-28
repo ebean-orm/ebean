@@ -89,8 +89,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final ConcurrentHashMap<String, STreeProperty> dynamicProperty = new ConcurrentHashMap<>();
   private final ConcurrentHashMap<String, Map<String, String>> pathMaps = new ConcurrentHashMap<>();
 
-  private final Map<String, SpiRawSql> namedRawSql;
-  private final Map<String, String> namedQuery;
   private final boolean multiValueSupported;
   private boolean batchEscalateOnCascadeInsert;
   private boolean batchEscalateOnCascadeDelete;
@@ -245,8 +243,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
     this.iudMetrics = new BeanIudMetrics(name);
-    this.namedQuery = deploy.getNamedQuery();
-    this.namedRawSql = deploy.getNamedRawSql();
     this.inheritInfo = deploy.getInheritInfo();
     this.beanFinder = deploy.getBeanFinder();
     this.persistController = deploy.getPersistController();
@@ -1038,20 +1034,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       return inheritInfo.getRoot().desc().name();
     }
     return name;
-  }
-
-  /**
-   * Return the named ORM query.
-   */
-  public String namedQuery(String name) {
-    return namedQuery.get(name);
-  }
-
-  /**
-   * Return the named RawSql query.
-   */
-  public SpiRawSql namedRawSql(String named) {
-    return namedRawSql.get(named);
   }
 
   /**

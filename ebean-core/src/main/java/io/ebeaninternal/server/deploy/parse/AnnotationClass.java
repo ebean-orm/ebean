@@ -186,7 +186,7 @@ final class AnnotationClass extends AnnotationParser {
       }
     }
     for (NamedQuery namedQuery : annotationClassNamedQuery(cls)) {
-      descriptor.addNamedQuery(namedQuery.name(), namedQuery.query());
+      // TODO: throw new UnsupportedOperationException("NamedQuery not supported");
     }
   }
 

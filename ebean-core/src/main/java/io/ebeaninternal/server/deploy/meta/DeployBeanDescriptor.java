@@ -53,8 +53,6 @@ public class DeployBeanDescriptor<T> {
    * Map of BeanProperty Linked so as to preserve order.
    */
   private LinkedHashMap<String, DeployBeanProperty> propMap = new LinkedHashMap<>();
-  private Map<String, SpiRawSql> namedRawSql;
-  private Map<String, String> namedQuery;
   private EntityType entityType;
   private DeployBeanPropertyAssocOne<?> unidirectional;
   private DeployBeanProperty orderColumn;
@@ -1023,40 +1021,6 @@ public class DeployBeanDescriptor<T> {
     if (mostSpecific != DocStoreMode.DEFAULT) return mostSpecific;
     if (docStorePersist != DocStoreMode.DEFAULT) return docStorePersist;
     return config.getDocStoreConfig().getPersist();
-  }
-
-  /**
-   * Return the named ORM queries.
-   */
-  public Map<String, String> getNamedQuery() {
-    return (namedQuery != null) ? namedQuery : EMPTY_NAMED_QUERY;
-  }
-
-  /**
-   * Add a named query.
-   */
-  public void addNamedQuery(String name, String query) {
-    if (namedQuery == null) {
-      namedQuery = new LinkedHashMap<>();
-    }
-    namedQuery.put(name, query);
-  }
-
-  /**
-   * Return the named RawSql queries.
-   */
-  public Map<String, SpiRawSql> getNamedRawSql() {
-    return (namedRawSql != null) ? namedRawSql : EMPTY_RAW_MAP;
-  }
-
-  /**
-   * Add a named RawSql from ebean.xml file.
-   */
-  public void addRawSql(String name, SpiRawSql rawSql) {
-    if (namedRawSql == null) {
-      namedRawSql = new HashMap<>();
-    }
-    namedRawSql.put(name, rawSql);
   }
 
   /**

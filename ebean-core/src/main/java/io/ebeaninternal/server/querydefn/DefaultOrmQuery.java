@@ -858,13 +858,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final void setDefaultRawSqlIfRequired() {
-    if (beanDescriptor.isRawSqlBased() && rawSql == null) {
-      rawSql = beanDescriptor.namedRawSql(DEFAULT_QUERY_NAME);
-    }
-  }
-
-  @Override
   public final Query<T> setAutoTune(boolean autoTune) {
     this.autoTune = autoTune;
     return this;

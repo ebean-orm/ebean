@@ -443,18 +443,6 @@ public interface Database {
   <T> DtoQuery<T> findDto(Class<T> dtoType, String sql);
 
   /**
-   * Create a named Query for DTO beans.
-   * <p>
-   * DTO beans are just normal bean like classes with public constructor(s) and setters.
-   * They do not need to be registered with DB before use.
-   *
-   * @param dtoType    The type of the DTO bean the rows will be mapped into.
-   * @param namedQuery The name of the query
-   * @param <T>        The type of the DTO bean.
-   */
-  <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery);
-
-  /**
    * Look to execute a native sql query that does not return beans but instead
    * returns SqlRow or direct access to ResultSet.
    *
