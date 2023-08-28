@@ -59,17 +59,6 @@ public class ModelContainer {
   }
 
   /**
-   * Adjust the FK references on all the draft tables.
-   */
-  public void adjustDraftReferences() {
-    for (MTable table : this.tables.values()) {
-      if (table.isDraft()) {
-        table.adjustReferences(this);
-      }
-    }
-  }
-
-  /**
    * Return the map of all the tables.
    */
   public Map<String, MTable> getTables() {

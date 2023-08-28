@@ -84,16 +84,6 @@ public interface Persister {
   int executeCallable(CallableSql callable, Transaction t);
 
   /**
-   * Publish the draft beans matching the given query.
-   */
-  <T> List<T> publish(Query<T> query, Transaction transaction);
-
-  /**
-   * Restore the draft beans back to the matching live beans.
-   */
-  <T> List<T> draftRestore(Query<T> query, Transaction transaction);
-
-  /**
    * Visit the metrics.
    */
   void visitMetrics(MetricVisitor visitor);

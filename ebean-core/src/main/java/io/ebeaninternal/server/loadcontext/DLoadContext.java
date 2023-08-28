@@ -25,7 +25,6 @@ public final class DLoadContext implements LoadContext {
   private final Map<String, DLoadBeanContext> beanMap = new HashMap<>();
   private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
   private final DLoadBeanContext rootBeanContext;
-  private final boolean asDraft;
   private final Timestamp asOf;
   private final Boolean readOnly;
   private final CacheMode useBeanCache;
@@ -59,7 +58,6 @@ public final class DLoadContext implements LoadContext {
     this.origin = initOrigin();
     this.defaultBatchSize = 100;
     this.useBeanCache = CacheMode.OFF;
-    this.asDraft = false;
     this.asOf = null;
     this.readOnly = false;
     this.disableLazyLoading = false;
@@ -86,7 +84,6 @@ public final class DLoadContext implements LoadContext {
     SpiQuery<?> query = request.query();
     this.useDocStore = query.isUseDocStore();
     this.asOf = query.getAsOf();
-    this.asDraft = query.isAsDraft();
     this.includeSoftDeletes = query.isIncludeSoftDeletes() && query.mode() == SpiQuery.Mode.NORMAL;
     this.readOnly = query.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
@@ -322,9 +319,6 @@ public final class DLoadContext implements LoadContext {
     }
     query.setDisableLazyLoading(disableLazyLoading);
     query.asOf(asOf);
-    if (asDraft) {
-      query.asDraft();
-    }
     if (includeSoftDeletes) {
       query.setIncludeSoftDeletes();
     }

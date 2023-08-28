@@ -54,7 +54,7 @@ final class MergeNodeAssocManyToMany extends MergeNode {
 
     if (!deletions.isEmpty()) {
       transaction.flush();
-      SqlUpdate delete = intersectionTable.delete(server, false);
+      SqlUpdate delete = intersectionTable.delete(server);
       for (EntityBean deletion : deletions) {
         many.intersectionBind(delete, parentBean, deletion);
         delete.addBatch();
@@ -64,7 +64,7 @@ final class MergeNodeAssocManyToMany extends MergeNode {
 
     if (!additions.isEmpty()) {
       transaction.flush();
-      SqlUpdate insert = intersectionTable.insert(server, false);
+      SqlUpdate insert = intersectionTable.insert(server);
       for (EntityBean addition : additions) {
         many.intersectionBind(insert, parentBean, addition);
         insert.addBatch();

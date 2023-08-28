@@ -16,8 +16,10 @@ public class TestInsertCheckUnique extends BaseTestCase {
 
   @BeforeEach
   public void clearDb() {
-    DB.find(Document.class).asDraft().where().contains("title", "UniqueKey").delete();
-    DB.find(Document.class).asDraft().where().isNull("title").delete();
+    DB.find(Document.class)//.asDraft()
+      .where().contains("title", "UniqueKey").delete();
+    DB.find(Document.class)//.asDraft()
+      .where().isNull("title").delete();
   }
 
   @Test
@@ -34,10 +36,6 @@ public class TestInsertCheckUnique extends BaseTestCase {
       Document doc2 = new Document();
       doc2.setTitle("AUniqueKey_duplicateCheck");
       doc2.setBody("clashes with doc1");
-
-      assertThat(DB.checkUniqueness(doc2)).isEmpty();
-
-      DB.getDefault().publish(doc1.getClass(), doc1.getId());
 
       assertThat(DB.checkUniqueness(doc2).toString()).contains("title");
     }
@@ -59,12 +57,11 @@ public class TestInsertCheckUnique extends BaseTestCase {
 
       assertThat(DB.checkUniqueness(doc2)).isEmpty();
 
-      DB.getDefault().publish(doc1.getClass(), doc1.getId());
-
-      assertThat(DB.checkUniqueness(doc2)).isEmpty();
+      //DB.getDefault().publish(doc1.getClass(), doc1.getId());
+      //assertThat(DB.checkUniqueness(doc2)).isEmpty();
 
       doc2.save();
-      DB.getDefault().publish(doc2.getClass(), doc2.getId());
+      //DB.getDefault().publish(doc2.getClass(), doc2.getId());
     }
   }
 
@@ -77,7 +74,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
       doc1.setBody("one");
       doc1.save();
 
-      DB.getDefault().publish(doc1.getClass(), doc1.getId());
+      //DB.getDefault().publish(doc1.getClass(), doc1.getId());
 
       Document doc2 = new Document();
       doc2.setTitle("One flew over the cuckoo's nest");

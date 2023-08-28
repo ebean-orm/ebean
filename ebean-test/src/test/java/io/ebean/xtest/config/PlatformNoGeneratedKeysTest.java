@@ -78,7 +78,7 @@ public class PlatformNoGeneratedKeysTest {
 
     assertThat(d0.getId()).isNotNull();
 
-    server.publish(BasicDraftableBean.class, d0.getId());
+    //server.publish(BasicDraftableBean.class, d0.getId());
 
     BasicDraftableBean one = server.find(BasicDraftableBean.class, d0.getId());
 

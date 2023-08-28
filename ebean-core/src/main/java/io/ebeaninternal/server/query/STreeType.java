@@ -90,11 +90,6 @@ public interface STreeType {
   Object contextPutIfAbsent(PersistenceContext persistenceContext, Object id, EntityBean localBean);
 
   /**
-   * Set draft status on the entity bean.
-   */
-  void setDraft(EntityBean localBean);
-
-  /**
    * Invoke any post load listeners.
    */
   void postLoad(Object localBean);

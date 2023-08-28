@@ -35,12 +35,8 @@ public class Document extends BaseDomain {
   @ManyToOne
   Organisation organisation;
 
-  /**
-   * Relationship to draftable elements.
-   */
-  //@PrivateOwned
-  @OneToMany(mappedBy = "document")//, cascade = CascadeType.ALL)
-    List<DocumentMedia> media;
+  @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+  List<DocumentMedia> media;
 
   public String getTitle() {
     return title;
@@ -96,7 +92,7 @@ public class Document extends BaseDomain {
     }
 
     public Document asDraft(Long id) {
-      return query().asDraft().setId(id).findOne();
+      return query().setId(id).findOne(); //.asDraft()
     }
   }
 }

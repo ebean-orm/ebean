@@ -44,7 +44,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private final Object parentBean;
   private final boolean dirty;
-  private final boolean publish;
   private int flags;
   private boolean saveRecurse;
   private DocStoreMode docStoreMode;
@@ -153,10 +152,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       }
     }
     this.concurrencyMode = beanDescriptor.concurrencyMode(intercept);
-    this.publish = Flags.isPublish(flags);
-    if (isMarkDraftDirty(publish)) {
-      beanDescriptor.setDraftDirty(entityBean, true);
-    }
     this.dirty = intercept.isDirty();
   }
 
@@ -199,13 +194,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public boolean isCascade() {
     return Flags.isRecurse(flags);
-  }
-
-  /**
-   * Return true if the draftDirty property should be set to true for this request.
-   */
-  private boolean isMarkDraftDirty(boolean publish) {
-    return !publish && type != Type.DELETE && beanDescriptor.isDraftable();
   }
 
   /**
@@ -417,7 +405,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Set the cache notify status.
    */
   private void setNotifyCache() {
-    this.notifyCache = beanDescriptor.isCacheNotify(type, publish);
+    this.notifyCache = beanDescriptor.isCacheNotify(type);
   }
 
   /**
@@ -643,42 +631,10 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Return true if the bean type is a Draftable.
-   */
-  public boolean isDraftable() {
-    return beanDescriptor.isDraftable();
-  }
-
-  /**
-   * Return true if this request is a hard delete of a draftable bean.
-   * If this is true Ebean is expected to auto-publish and delete the associated live bean.
-   */
-  public boolean isHardDeleteDraft() {
-    if (type == Type.DELETE && beanDescriptor.isDraftable() && !beanDescriptor.isDraftableElement()) {
-      // deleting a top level draftable bean
-      if (beanDescriptor.isLiveInstance(entityBean)) {
-        throw new PersistenceException("Explicit Delete is not allowed on a 'live' bean - only draft beans");
-      }
-      return true;
-    }
-    return false;
-  }
-
-  /**
    * Return true if this was a hard/permanent delete request (and should cascade as such).
    */
   public boolean isHardDeleteCascade() {
     return (type == Type.DELETE && beanDescriptor.isSoftDelete());
-  }
-
-  /**
-   * Checks for @Draftable entity beans with @Draft property that the bean is a 'draft'.
-   * Save or Update is not allowed to execute using 'live' beans - must use publish().
-   */
-  public void checkDraft() {
-    if (beanDescriptor.isDraftable() && beanDescriptor.isLiveInstance(entityBean)) {
-      throw new PersistenceException("Save or update is not allowed on a 'live' bean - only draft beans");
-    }
   }
 
   /**
@@ -928,20 +884,19 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private void logSummaryMessage() {
-    String draft = (beanDescriptor.isDraftable() && !publish) ? " draft[true]" : "";
     String name = beanDescriptor.name();
     switch (type) {
       case INSERT:
-        transaction.logSummary("Inserted [{0}] [{1}]{2}", name, (idValue == null ? "" : idValue), draft);
+        transaction.logSummary("Inserted [{0}] [{1}]", name, (idValue == null ? "" : idValue));
         break;
       case UPDATE:
-        transaction.logSummary("Updated [{0}] [{1}]{2}", name, idValue , draft);
+        transaction.logSummary("Updated [{0}] [{1}]", name, idValue);
         break;
       case DELETE:
-        transaction.logSummary("Deleted [{0}] [{1}]{2}", name, idValue , draft);
+        transaction.logSummary("Deleted [{0}] [{1}]", name, idValue);
         break;
       case DELETE_SOFT:
-        transaction.logSummary("SoftDelete [{0}] [{1}]{2}", name, idValue , draft);
+        transaction.logSummary("SoftDelete [{0}] [{1}]", name, idValue);
         break;
       default:
         break;
@@ -979,9 +934,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private void postInsert() {
     // mark all properties as loaded after an insert to support immediate update
     beanDescriptor.setAllLoaded(entityBean);
-    if (!publish) {
-      beanDescriptor.setDraft(entityBean);
-    }
     if (transaction.isAutoPersistUpdates() && idValue != null) {
       // with getGeneratedKeys off we will not have a idValue
       beanDescriptor.contextPut(transaction.persistenceContext(), idValue, entityBean);
@@ -1130,13 +1082,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * Return true if this request is a 'publish' action.
-   */
-  public boolean isPublish() {
-    return publish;
-  }
-
-  /**
    * Return the key for an update persist request.
    */
   public String updatePlanHash() {
@@ -1152,17 +1097,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         key.append('v');
       }
     }
-    if (publish) {
-      key.append('p');
-    }
     return key.toString();
   }
 
   /**
-   * Return the table to update depending if the request is a 'publish' one or normal.
+   * Return the table to update.
    */
   public String updateTable() {
-    return publish ? beanDescriptor.baseTable() : beanDescriptor.draftTable();
+    return beanDescriptor.baseTable();
   }
 
   /**
@@ -1374,7 +1316,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the SQL used to fetch the last inserted id value.
    */
   public String selectLastInsertedId() {
-    return beanDescriptor.selectLastInsertedId(publish);
+    return beanDescriptor.selectLastInsertedId();
   }
 
   /**
