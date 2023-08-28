@@ -156,11 +156,11 @@ final class AnnotationClass extends AnnotationParser {
     }
     Draftable draftable = typeGet(cls, Draftable.class);
     if (draftable != null) {
-      descriptor.setDraftable();
+      //TODO: Not Supported
     }
     DraftableElement draftableElement = typeGet(cls, DraftableElement.class);
     if (draftableElement != null) {
-      descriptor.setDraftableElement();
+      //TODO: Not Supported
     }
     ReadAudit readAudit = typeGet(cls, ReadAudit.class);
     if (readAudit != null) {

@@ -7,28 +7,24 @@ public final class IntersectionTable {
 
   private final String insertSql;
   private final String deleteSql;
-  private final String draftInsertSql;
-  private final String draftDeleteSql;
 
-  IntersectionTable(String insertSql, String deleteSql, String draftInsertSql, String draftDeleteSql) {
+  IntersectionTable(String insertSql, String deleteSql) {
     this.insertSql = insertSql;
     this.deleteSql = deleteSql;
-    this.draftInsertSql = draftInsertSql;
-    this.draftDeleteSql = draftDeleteSql;
   }
 
   /**
    * Return a SqlUpdate for inserting into the intersection table.
    */
-  public SqlUpdate insert(Database server, boolean draft) {
-    return server.sqlUpdate(draft ? draftInsertSql : insertSql);
+  public SqlUpdate insert(Database server) {
+    return server.sqlUpdate(insertSql);
   }
 
   /**
    * Return a SqlUpdate for deleting from the intersection table.
    */
-  public SqlUpdate delete(Database server, boolean draft) {
-    return server.sqlUpdate(draft ? draftDeleteSql : deleteSql);
+  public SqlUpdate delete(Database server) {
+    return server.sqlUpdate(deleteSql);
   }
 
 }

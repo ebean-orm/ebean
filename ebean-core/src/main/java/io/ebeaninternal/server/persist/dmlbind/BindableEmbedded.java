@@ -6,7 +6,6 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,11 +20,6 @@ final class BindableEmbedded implements Bindable {
   BindableEmbedded(BeanPropertyAssocOne<?> embProp, List<Bindable> bindList) {
     this.embProp = embProp;
     this.items = bindList.toArray(new Bindable[0]);
-  }
-
-  @Override
-  public boolean isDraftOnly() {
-    return embProp.isDraftOnly();
   }
 
   @Override

@@ -21,7 +21,9 @@ public class TestInsertDuplicateKey extends BaseTestCase {
 
   @BeforeEach
   public void clearDb() {
-    server().find(Document.class).asDraft().where().contains("title", "UniqueKey").delete();
+    server().find(Document.class)
+      //.asDraft()
+      .where().contains("title", "UniqueKey").delete();
   }
 
   @Test
@@ -64,7 +66,7 @@ public class TestInsertDuplicateKey extends BaseTestCase {
 
     List<Document> found = DB.getDefault()
       .find(Document.class)
-      .asDraft()
+      //.asDraft()
       .where().startsWith("body", "insertTheBatch_duplicateKey_catchAndContinue")
       .findList();
 

@@ -35,11 +35,6 @@ final class BindableIdScalar implements BindableId {
     return uidProp.dbColumn();
   }
 
-  @Override
-  public boolean isDraftOnly() {
-    return false;
-  }
-
   /**
    * Does nothing for BindableId.
    */

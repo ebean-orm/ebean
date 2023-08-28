@@ -27,13 +27,13 @@ public class TestDefaults extends BaseTestCase {
 
     assertThat(current).isNotEmpty();
     if (isMySql() || isMariaDB() || isOracle()) {
-      assertThat(current.get(0)).contains("insert into defaults_model_draft values (default);");
+      assertThat(current.get(0)).contains("insert into defaults_model values (default);");
     } else if (isDb2()) {
-      assertThat(current.get(0)).contains("insert into defaults_model_draft (id) values (default)");
+      assertThat(current.get(0)).contains("insert into defaults_model (id) values (default)");
     } else if (isSqlServer()) {
-      assertThat(current.get(0)).contains("insert into defaults_model_draft (id) values (?)");
+      assertThat(current.get(0)).contains("insert into defaults_model (id) values (?)");
     } else {
-      assertThat(current.get(0)).contains("insert into defaults_model_draft default values;");
+      assertThat(current.get(0)).contains("insert into defaults_model default values;");
     }
   }
 

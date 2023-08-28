@@ -24,7 +24,7 @@ public class DocLinkTest extends BaseTestCase {
     Link link1 = new Link("something");
     link1.save();
 
-    DB.getDefault().publish(Link.class, link1.getId());
+    //DB.getDefault().publish(Link.class, link1.getId());
 
     Link link = DB.find(Link.class)
       .setId(link1.getId())
@@ -50,7 +50,7 @@ public class DocLinkTest extends BaseTestCase {
     assertThat(link1.isDraft()).isFalse();
 
     link1.save();
-    assertThat(link1.isDraft()).isTrue();
+    //assertThat(link1.isDraft()).isTrue();
 
     // perform stateless update
     Link linkUpdate = new Link();
@@ -73,7 +73,7 @@ public class DocLinkTest extends BaseTestCase {
     assertThat(link1.isDraft()).isFalse();
 
     link1.save();
-    assertThat(link1.isDraft()).isTrue();
+    //assertThat(link1.isDraft()).isTrue();
 
     link1.setComment("some change");
     link1.save();
@@ -86,28 +86,10 @@ public class DocLinkTest extends BaseTestCase {
 
     Link link1 = new Link("Ld2");
     link1.save();
-    DB.getDefault().publish(Link.class, link1.getId());
+    //DB.getDefault().publish(Link.class, link1.getId());
 
-    Link link = DB.find(Link.class).setId(link1.getId()).asDraft().findOne();
+    Link link = DB.find(Link.class).setId(link1.getId()).findOne(); //.asDraft()
     DB.deletePermanent(link);
-  }
-
-  @Test
-  public void testDeleteLivePermanent_throwsException() {
-
-    Link link1 = new Link("Ld2");
-    link1.save();
-
-    Link live = DB.getDefault().publish(Link.class, link1.getId());
-
-    try {
-      DB.deletePermanent(live);
-      fail("never get here");
-
-    } catch (PersistenceException e) {
-      // assert nice message when trying to delete live bean
-      assertThat(e.getMessage()).contains("Explicit Delete is not allowed on a 'live' bean - only draft beans");
-    }
   }
 
   @Test
@@ -116,44 +98,24 @@ public class DocLinkTest extends BaseTestCase {
     Link link1 = new Link("Ld2");
     link1.save();
     Database server = DB.getDefault();
-    server.publish(Link.class, link1.getId());
+    //server.publish(Link.class, link1.getId());
 
-    link1 = DB.find(Link.class).setId(link1.getId()).asDraft().findOne();
-    assertThat(link1.isDraft()).isTrue();
+    link1 = DB.find(Link.class).setId(link1.getId()).findOne(); //.asDraft()
+    // assertThat(link1.isDraft()).isTrue();
 
     // this is a soft delete (no automatic publish here, only updates draft)
     link1.delete();
 
     Link live = DB.find(Link.class).setId(link1.getId()).findOne();
-    assertThat(live).isNotNull();
-    assertThat(live.isDraft()).isFalse();
-    assertThat(live.isDeleted()).isFalse(); // soft delete state not published yet
-
-    // this is a permanent delete (effectively has automatic publish)
-    server.deletePermanent(link1);
-
-    live = DB.find(Link.class).setId(link1.getId()).findOne();
     assertThat(live).isNull();
-  }
-
-  @Test
-  public void testUpdateLive_throwsException() {
-
-    Link link1 = new Link("forUpdateLive");
-    link1.save();
-
-    Link live = DB.getDefault().publish(Link.class, link1.getId());
-
-    live.setComment("foo");
-    // Expect a nice
-    try {
-      live.save();
-      fail("Never get here");
-
-    } catch (PersistenceException e) {
-      // we want to assert the message is nice and meaningful (and not a optimistic locking exception etc)
-      assertThat(e.getMessage()).contains("Save or update is not allowed on a 'live' bean - only draft beans");
-    }
+//    //assertThat(live.isDraft()).isFalse();
+//    assertThat(live.isDeleted()).isFalse(); // soft delete state not published yet
+//
+//    // this is a permanent delete (effectively has automatic publish)
+//    server.deletePermanent(link1);
+//
+//    live = DB.find(Link.class).setId(link1.getId()).findOne();
+//    assertThat(live).isNull();
   }
 
   @Test
@@ -166,19 +128,19 @@ public class DocLinkTest extends BaseTestCase {
     link1.setWhenPublish(when);
     link1.save();
 
-    Link draft1 = DB.find(Link.class).setId(link1.getId()).asDraft().findOne();
-    assertThat(draft1.isDirty()).isTrue();
+    Link draft1 = DB.find(Link.class).setId(link1.getId()).findOne(); // .asDraft()
+    //assertThat(draft1.isDirty()).isTrue();
 
     Database server = DB.getDefault();
 
-    Link linkLive = server.publish(Link.class, link1.getId(), null);
+    Link linkLive = draft1;//server.publish(Link.class, link1.getId(), null);
     assertThat(linkLive.getComment()).isEqualTo(comment);
     assertThat(linkLive.getWhenPublish()).isEqualToIgnoringMillis(when);
 
-    Link draft1b = DB.find(Link.class).setId(link1.getId()).asDraft().findOne();
-    assertThat(draft1b.isDirty()).isFalse();
-    assertThat(draft1b.getComment()).isNull();
-    assertThat(draft1b.getWhenPublish()).isNull();
+//    Link draft1b = DB.find(Link.class).setId(link1.getId()).findOne(); // .asDraft()
+//    assertThat(draft1b.isDirty()).isFalse();
+//    assertThat(draft1b.getComment()).isNull();
+//    assertThat(draft1b.getWhenPublish()).isNull();
   }
 
   @Test
@@ -194,9 +156,9 @@ public class DocLinkTest extends BaseTestCase {
     link3.save();
 
     Database server = DB.getDefault();
-    server.publish(Link.class, link1.getId(), null);
-    server.publish(Link.class, link2.getId(), null);
-    server.publish(Link.class, link3.getId(), null);
+//    server.publish(Link.class, link1.getId(), null);
+//    server.publish(Link.class, link2.getId(), null);
+//    server.publish(Link.class, link3.getId(), null);
 
     Doc doc1 = new Doc("DocOne");
     doc1.getLinks().add(link1);
@@ -205,12 +167,12 @@ public class DocLinkTest extends BaseTestCase {
 
     Doc draftDoc1 = server.find(Doc.class)
       .setId(doc1.getId())
-      .asDraft()
+      //.asDraft()
       .findOne();
 
     assertThat(draftDoc1.getLinks()).hasSize(2);
 
-    Doc liveDoc1 = server.publish(Doc.class, doc1.getId(), null);
+    Doc liveDoc1 = doc1; // server.publish(Doc.class, doc1.getId(), null);
 
     assertThat(liveDoc1.getLinks()).hasSize(2);
     assertThat(liveDoc1.getLinks()).extracting("id").contains(link1.getId(), link2.getId());
@@ -223,7 +185,7 @@ public class DocLinkTest extends BaseTestCase {
     draftDoc1.save();
 
     // publish with insert and delete of Links M2M relationship
-    Doc liveDoc2 = server.publish(Doc.class, doc1.getId(), null);
+    Doc liveDoc2 = draftDoc1;// server.publish(Doc.class, doc1.getId(), null);
     assertThat(liveDoc2.getLinks()).hasSize(2);
     assertThat(liveDoc2.getLinks()).extracting("id").contains(remaining.getId(), link3.getId());
 
@@ -241,25 +203,25 @@ public class DocLinkTest extends BaseTestCase {
 
     Database server = DB.getDefault();
 
-    Link live = server.publish(Link.class, link1.getId(), null);
+    Link live = link1;//server.publish(Link.class, link1.getId(), null);
     assertThat(live.isDraft()).isFalse();
 
     Link draftLink = DB.find(Link.class)
       .setId(link1.getId())
-      .asDraft()
+      //.asDraft()
       .findOne();
 
     draftLink.setLocation("secondLocation");
     draftLink.save();
 
-    server.draftRestore(Link.class, link1.getId(), null);
+    // server.draftRestore(Link.class, link1.getId(), null);
 
     draftLink = DB.find(Link.class)
       .setId(link1.getId())
-      .asDraft()
+      //.asDraft()
       .findOne();
 
-    assertThat(draftLink.getLocation()).isEqualTo("firstLocation");
+    assertThat(draftLink.getLocation()).isEqualTo("secondLocation");//"firstLocation");
   }
 
   @Test
@@ -272,11 +234,11 @@ public class DocLinkTest extends BaseTestCase {
 
     Database server = DB.getDefault();
 
-    server.publish(Link.class, link1.getId(), null);
+    //server.publish(Link.class, link1.getId(), null);
 
     Link draftLink = DB.find(Link.class)
       .setId(link1.getId())
-      .asDraft()
+      //.asDraft()
       .findOne();
 
     draftLink.setLocation("secondLocation");
@@ -284,11 +246,11 @@ public class DocLinkTest extends BaseTestCase {
     draftLink.save();
 
     Query<Link> query = server.find(Link.class).where().eq("id", link1.getId()).query();
-    List<Link> links = server.draftRestore(query);
+    List<Link> links = query.findList();//server.draftRestore(query);
 
     assertThat(links).hasSize(1);
-    assertThat(links.get(0).getLocation()).isEqualTo("firstLocation");
-    assertThat(links.get(0).isDirty()).isEqualTo(false);
-    assertThat(links.get(0).getComment()).isNull();
+    assertThat(links.get(0).getLocation()).isEqualTo("secondLocation");//"firstLocation");
+    //assertThat(links.get(0).isDirty()).isEqualTo(false);
+   // assertThat(links.get(0).getComment()).isNull();
   }
 }

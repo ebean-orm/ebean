@@ -22,8 +22,6 @@ public final class DeployBeanPropertyLists {
 
   private BeanProperty versionProperty;
   private BeanProperty unmappedJson;
-  private BeanProperty draft;
-  private BeanProperty draftDirty;
   private BeanProperty tenant;
   private final BeanDescriptor<?> desc;
   private final LinkedHashMap<String, BeanProperty> propertyMap;
@@ -173,9 +171,6 @@ public final class DeployBeanPropertyLists {
   private void allocateToList(BeanProperty prop) {
     if (prop.isTransient()) {
       transients.add(prop);
-      if (prop.isDraft()) {
-        draft = prop;
-      }
       if (prop.isUnmappedJson()) {
         unmappedJson = prop;
       }
@@ -226,8 +221,6 @@ public final class DeployBeanPropertyLists {
           } else {
             CoreLog.internal.log(WARNING, "Multiple @Version properties - property " + prop.fullName() + " not treated as a version property");
           }
-        } else if (prop.isDraftDirty()) {
-          draftDirty = prop;
         }
         if (!prop.isAggregation()) {
           baseScalar.add(prop);
@@ -324,16 +317,8 @@ public final class DeployBeanPropertyLists {
     return getMany2Many();
   }
 
-  public BeanProperty getDraftDirty() {
-    return draftDirty;
-  }
-
   public BeanProperty getUnmappedJson() {
     return unmappedJson;
-  }
-
-  public BeanProperty getDraft() {
-    return draft;
   }
 
   public BeanProperty getSoftDeleteProperty() {

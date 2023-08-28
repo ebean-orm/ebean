@@ -35,16 +35,14 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private String currentPrefix;
   private List<BeanProperty> encryptedProps;
   private List<SqlTreeJoin> extraJoins;
-  private final CQueryDraftSupport draftSupport;
   private final CQueryHistorySupport historySupport;
   private final boolean historyQuery;
 
   DefaultDbSqlContext(SqlTreeAlias alias, String columnAliasPrefix, CQueryHistorySupport historySupport,
-                      CQueryDraftSupport draftSupport, String fromForUpdate) {
+                      String fromForUpdate) {
     this.alias = alias;
     this.columnAliasPrefix = columnAliasPrefix;
     this.useColumnAlias = columnAliasPrefix != null;
-    this.draftSupport = draftSupport;
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);
     this.fromForUpdate = fromForUpdate;
@@ -124,9 +122,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
     tableJoins.add(joinKey);
     sb.append(' ').append(type);
     boolean addAsOfOnClause = false;
-    if (draftSupport != null) {
-      appendTable(table, draftSupport.draftTable(table));
-    } else if (!historyQuery) {
+    if (!historyQuery) {
       sb.append(' ').append(table).append(' ');
     } else {
       // check if there is an associated history table and if so
@@ -183,11 +179,6 @@ final class DefaultDbSqlContext implements DbSqlContext {
   @Override
   public int asOfTableCount() {
     return asOfTableCount;
-  }
-
-  @Override
-  public boolean isDraftQuery() {
-    return draftSupport != null;
   }
 
   @Override

@@ -251,11 +251,6 @@ public interface Query<T> extends CancelableQuery {
   Query<T> asOf(Timestamp asOf);
 
   /**
-   * Execute the query against the draft set of tables.
-   */
-  Query<T> asDraft();
-
-  /**
    * Convert the query to a DTO bean query.
    * <p>
    * We effectively use the underlying ORM query to build the SQL and then execute

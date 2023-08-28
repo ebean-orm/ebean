@@ -17,23 +17,12 @@ final class DeleteMeta extends BaseMeta {
 
   private final String sqlVersion;
   private final String sqlNone;
-  private final String sqlDraftVersion;
-  private final String sqlDraftNone;
 
   DeleteMeta(BeanDescriptor<?> desc, BindableId id, Bindable version, Bindable tenantId) {
     super(id, version, tenantId);
-
     String tableName = desc.baseTable();
     this.sqlNone = genSql(ConcurrencyMode.NONE, tableName);
     this.sqlVersion = genSql(ConcurrencyMode.VERSION, tableName);
-    if (desc.isDraftable()) {
-      String draftTableName = desc.draftTable();
-      this.sqlDraftNone = genSql(ConcurrencyMode.NONE, draftTableName);
-      this.sqlDraftVersion = genSql(ConcurrencyMode.VERSION, draftTableName);
-    } else {
-      this.sqlDraftNone = sqlNone;
-      this.sqlDraftVersion = sqlVersion;
-    }
   }
 
   /**
@@ -59,13 +48,12 @@ final class DeleteMeta extends BaseMeta {
       throw new IllegalStateException("Can not deleteById on " + request.fullName() + " as no @Id property");
     }
 
-    boolean publish = request.isPublish();
     switch (request.concurrencyMode()) {
       case NONE:
-        return publish ? sqlNone : sqlDraftNone;
+        return sqlNone;
 
       case VERSION:
-        return publish ? sqlVersion : sqlDraftVersion;
+        return sqlVersion;
 
       default:
         throw new RuntimeException("Invalid mode " + request.concurrencyMode());

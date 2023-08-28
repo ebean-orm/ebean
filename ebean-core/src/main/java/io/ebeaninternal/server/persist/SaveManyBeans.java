@@ -23,7 +23,6 @@ import static java.lang.System.Logger.Level.WARNING;
 final class SaveManyBeans extends SaveManyBase {
 
   private final boolean cascade;
-  private final boolean publish;
   private final BeanDescriptor<?> targetDescriptor;
   private final boolean isMap;
   private final boolean saveRecurseSkippable;
@@ -38,7 +37,6 @@ final class SaveManyBeans extends SaveManyBase {
   SaveManyBeans(DefaultPersister persister, boolean insertedParent, BeanPropertyAssocMany<?> many, EntityBean parentBean, PersistRequestBean<?> request) {
     super(persister, insertedParent, many, parentBean, request);
     this.cascade = many.cascadeInfo().isSave();
-    this.publish = request.isPublish();
     this.targetDescriptor = many.targetDescriptor();
     this.isMap = many.manyType().isMap();
     this.saveRecurseSkippable = many.isSaveRecurseSkippable();
@@ -258,7 +256,7 @@ final class SaveManyBeans extends SaveManyBase {
     if (vanillaCollection || forcedUpdate) {
       // delete all intersection rows and then treat all
       // beans in the collection as additions
-      persister.deleteManyIntersection(parentBean, many, transaction, publish, queue);
+      persister.deleteManyIntersection(parentBean, many, transaction, queue);
     }
 
     Collection<?> deletions = null;
@@ -296,7 +294,7 @@ final class SaveManyBeans extends SaveManyBase {
         EntityBean otherDelete = (EntityBean) other;
         // the object from the 'other' side of the ManyToMany
         // build a intersection row for 'delete'
-        IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
+        IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete);
         SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
         persister.executeOrQueue(sqlDelete, transaction, queue, BatchControl.DELETE_QUEUE);
       }
@@ -316,7 +314,7 @@ final class SaveManyBeans extends SaveManyBase {
             throw new PersistenceException("ManyToMany bean does not have an Id value? " + otherBean);
           } else {
             // build a intersection row for 'insert'
-            IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);
+            IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean);
             SpiSqlUpdate sqlInsert = intRow.createInsert(server);
             persister.executeOrQueue(sqlInsert, transaction, queue, BatchControl.INSERT_QUEUE);
           }
