@@ -49,11 +49,6 @@
       <version>13.23.0-jakarta</version>
     </dependency>
 
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-externalmapping-api</artifactId>
-      <version>13.18.0</version>
-    </dependency>
 
     <!--
     Class retention Nonnull and Nullable annotations

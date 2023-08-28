@@ -864,16 +864,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public <T> DtoQuery<T> createNamedDtoQuery(Class<T> dtoType, String namedQuery) {
-    DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
-    String sql = descriptor.namedRawSql(namedQuery);
-    if (sql == null) {
-      throw new PersistenceException("No named query called " + namedQuery + " for bean:" + dtoType.getName());
-    }
-    return new DefaultDtoQuery<>(this, descriptor, sql);
-  }
-
-  @Override
   public <T> DtoQuery<T> findDto(Class<T> dtoType, SpiQuery<?> ormQuery) {
     DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, ormQuery);
@@ -936,7 +926,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       transaction = currentServerTransaction();
     }
     if (!query.isRawSql()) {
-      query.setDefaultRawSqlIfRequired();
       if (query.isAutoTunable() && !autoTuneService.tuneQuery(query)) {
         // use deployment FetchType.LAZY/EAGER annotations
         // to define the 'default' select clause

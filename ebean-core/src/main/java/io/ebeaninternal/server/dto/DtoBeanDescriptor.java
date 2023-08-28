@@ -13,12 +13,10 @@ public final class DtoBeanDescriptor<T> {
   private final Map<Object, DtoQueryPlan> plans = new ConcurrentHashMap<>();
   private final Class<T> dtoType;
   private final DtoMeta meta;
-  private final Map<String, String> namedQueries;
 
-  DtoBeanDescriptor(Class<T> dtoType, DtoMeta meta, Map<String, String> namedQueries) {
+  DtoBeanDescriptor(Class<T> dtoType, DtoMeta meta) {
     this.dtoType = dtoType;
     this.meta = meta;
-    this.namedQueries = namedQueries;
   }
 
   public Class<T> type() {
@@ -41,13 +39,6 @@ public final class DtoBeanDescriptor<T> {
     for (DtoQueryPlan plan : plans.values()) {
       plan.visit(visitor);
     }
-  }
-
-  /**
-   * Return the named RawSql query.
-   */
-  public String namedRawSql(String name) {
-    return namedQueries.get(name);
   }
 
 }
