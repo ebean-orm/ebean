@@ -13,8 +13,6 @@ import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
-import io.ebean.event.readaudit.ReadAuditLogger;
-import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.*;
@@ -44,8 +42,6 @@ import io.ebeaninternal.server.persist.DefaultPersister;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.persist.platform.PostgresMultiValueBind;
 import io.ebeaninternal.server.query.*;
-import io.ebeaninternal.server.readaudit.DefaultReadAuditLogger;
-import io.ebeaninternal.server.readaudit.DefaultReadAuditPrepare;
 import io.ebeaninternal.server.json.DJsonContext;
 import io.ebeaninternal.server.transaction.*;
 import io.ebeaninternal.server.type.DefaultTypeManager;
@@ -229,22 +225,6 @@ public final class InternalConfiguration {
    */
   public ChangeLogListener changeLogListener(ChangeLogListener listener) {
     return plugin((listener != null) ? listener : jacksonCorePresent ? new DefaultChangeLogListener() : null);
-  }
-
-  /**
-   * Return the ReadAuditLogger implementation to use.
-   */
-  ReadAuditLogger getReadAuditLogger() {
-    ReadAuditLogger found = bootupClasses.getReadAuditLogger();
-    return plugin(found != null ? found : jacksonCorePresent ? new DefaultReadAuditLogger() : null);
-  }
-
-  /**
-   * Return the ReadAuditPrepare implementation to use.
-   */
-  ReadAuditPrepare getReadAuditPrepare() {
-    ReadAuditPrepare found = bootupClasses.getReadAuditPrepare();
-    return plugin(found != null ? found : new DefaultReadAuditPrepare());
   }
 
   /**

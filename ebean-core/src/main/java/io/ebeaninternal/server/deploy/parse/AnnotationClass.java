@@ -164,7 +164,7 @@ final class AnnotationClass extends AnnotationParser {
     }
     ReadAudit readAudit = typeGet(cls, ReadAudit.class);
     if (readAudit != null) {
-      descriptor.setReadAuditing();
+      // TODO: Not supported
     }
     History history = typeGet(cls, History.class);
     if (history != null) {
