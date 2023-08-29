@@ -1,9 +1,7 @@
 package io.ebean;
 
-import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DocStoreConfig;
 
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
@@ -210,29 +208,6 @@ public interface Transaction extends AutoCloseable {
    * Return true if the transaction is active.
    */
   boolean isActive();
-
-  /**
-   * Set the behavior for document store updates on this transaction.
-   * <p>
-   * For example, set the mode to DocStoreEvent.IGNORE for this transaction and
-   * then any changes via this transaction are not sent to the doc store. This
-   * would be used when doing large bulk inserts into the database and we want
-   * to control how that is sent to the document store.
-   * </p>
-   */
-  void setDocStoreMode(DocStoreMode mode);
-
-  /**
-   * Set the batch size to use for sending messages to the document store.
-   * <p>
-   * You might set this if you know the changes in this transaction result in especially large or
-   * especially small payloads and want to adjust the batch size to match.
-   * </p>
-   * <p>
-   * Setting this overrides the default of {@link DocStoreConfig#getBulkBatchSize()}
-   * </p>
-   */
-  void setDocStoreBatchSize(int batchSize);
 
   /**
    * Explicitly turn off or on the cascading nature of save() and delete(). This

@@ -178,11 +178,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   @Override
-  protected void docStoreIncludeByDefault(PathProperties pathProps) {
-    // by default not including "Many" properties in document store
-  }
-
-  @Override
   public void registerColumn(BeanDescriptor<?> desc, String prefix) {
     if (targetDescriptor != null) {
       desc.registerTable(targetDescriptor.baseTable(), this);
@@ -343,13 +338,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     }
   }
 
-  public void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds, boolean useDocStore) {
-    if (useDocStore) {
-      // assumes the ManyToOne property is included
-      query.where().in(childMasterIdProperty, parentIds);
-    } else {
-      sqlHelp.addWhereParentIdIn(query, parentIds);
-    }
+  public void addWhereParentIdIn(SpiQuery<?> query, List<Object> parentIds) {
+    sqlHelp.addWhereParentIdIn(query, parentIds);
   }
 
   /**
@@ -871,10 +861,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
   public SpiSqlUpdate insertElementCollection() {
     return sqlHelp.insertElementCollection();
-  }
-
-  public boolean isTargetDocStoreMapped() {
-    return targetDescriptor.isDocStoreMapped();
   }
 
   void jsonWriteMapEntry(SpiJsonWriter ctx, Map.Entry<?, ?> entry) throws IOException {

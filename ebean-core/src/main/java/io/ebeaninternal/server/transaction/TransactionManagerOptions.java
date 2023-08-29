@@ -9,7 +9,6 @@ import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.ClockService;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
-import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 
 /**
  * Objects supplied for constructing the TransactionManager.
@@ -22,7 +21,6 @@ public final class TransactionManagerOptions {
   final ClusterManager clusterManager;
   final BackgroundExecutor backgroundExecutor;
 
-  final DocStoreUpdateProcessor docStoreUpdateProcessor;
   final BeanDescriptorManager descMgr;
   final DataSourceSupplier dataSourceSupplier;
   final SpiProfileHandler profileHandler;
@@ -34,7 +32,7 @@ public final class TransactionManagerOptions {
 
 
   public TransactionManagerOptions(SpiServer server, boolean notifyL2CacheInForeground, DatabaseConfig config, TransactionScopeManager scopeManager, ClusterManager clusterManager,
-                                   BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
+                                   BackgroundExecutor backgroundExecutor,
                                    BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler,
                                    SpiLogManager logManager, TableModState tableModState, ServerCacheNotify cacheNotify, ClockService clockService) {
     this.server = server;
@@ -43,7 +41,6 @@ public final class TransactionManagerOptions {
     this.scopeManager = scopeManager;
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
-    this.docStoreUpdateProcessor = docStoreUpdateProcessor;
     this.descMgr = descMgr;
     this.dataSourceSupplier = dataSourceSupplier;
     this.profileHandler = profileHandler;

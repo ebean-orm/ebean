@@ -6,7 +6,6 @@ import io.ebeaninternal.server.core.BindPadding;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -42,17 +41,7 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
   }
 
   @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    return null;
-  }
-
-  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeIds(idCollection);
   }
 
   @Override

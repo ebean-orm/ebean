@@ -2,7 +2,6 @@ package io.ebeaninternal.api;
 
 import io.ebean.ExpressionList;
 import io.ebean.Junction;
-import io.ebeaninternal.server.expression.DocQueryContext;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,11 +30,6 @@ public interface SpiExpressionList<T> extends ExpressionList<T>, SpiExpression {
    * Return true if this list is empty.
    */
   boolean isEmpty();
-
-  /**
-   * Write the top level where expressions taking into account possible extra idEquals expression.
-   */
-  void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException;
 
   /**
    * Apply firstRow maxRows limits on the filterMany query.

@@ -9,7 +9,6 @@ import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
-import io.ebeanservice.docstore.api.DocStoreTransaction;
 
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
@@ -102,19 +101,6 @@ public interface SpiTransaction extends Transaction {
    * If null is returned the server default is used (set on DatabaseConfig).
    */
   Boolean isUpdateAllLoadedProperties();
-
-  /**
-   * Return the batchSize specifically set for this transaction or 0.
-   * <p>
-   * Returning 0 implies to use the system wide default batch size.
-   */
-  DocStoreMode docStoreMode();
-
-  /**
-   * Return the batch size to us for ElasticSearch Bulk API calls
-   * as a result of this transaction.
-   */
-  int getDocStoreBatchSize();
 
   /**
    * Return the batchSize specifically set for this transaction or 0.
@@ -286,11 +272,6 @@ public interface SpiTransaction extends Transaction {
    * Send the change set to be prepared and then logged.
    */
   void sendChangeLog(ChangeSet changeSet);
-
-  /**
-   * Return a document store transaction.
-   */
-  DocStoreTransaction docStoreTransaction();
 
   /**
    * Set the current Tenant Id.

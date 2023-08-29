@@ -6,8 +6,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.io.IOException;
-
 final class NativeILikeExpression extends AbstractExpression {
 
   private final String val;
@@ -15,11 +13,6 @@ final class NativeILikeExpression extends AbstractExpression {
   NativeILikeExpression(String propertyName, String value) {
     super(propertyName);
     this.val = value;
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeLike(propName, val, LikeType.RAW, true);
   }
 
   @Override

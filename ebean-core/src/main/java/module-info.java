@@ -10,7 +10,6 @@ module io.ebean.core {
   uses io.ebean.core.type.ExtraTypeFactory;
   uses io.ebean.core.type.ScalarTypeSetFactory;
   uses io.ebean.core.type.ScalarJsonMapper;
-  uses io.ebeanservice.docstore.api.DocStoreFactory;
   uses io.ebean.migration.auto.AutoMigrationRunner;
   uses io.avaje.classpath.scanner.ClassPathScannerFactory;
   uses io.ebeaninternal.api.SpiLoggerFactory;
@@ -39,10 +38,6 @@ module io.ebean.core {
   requires static org.joda.time;
 
   exports io.ebeaninternal.server.cache;
-
-  exports io.ebeanservice.docstore.api;
-  exports io.ebeanservice.docstore.api.support to io.ebean.elastic, io.ebean.test;
-  exports io.ebeanservice.docstore.api.mapping to io.ebean.elastic;
 
   exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.spring.txn;
   exports io.ebeaninternal.api.json to io.ebean.test;

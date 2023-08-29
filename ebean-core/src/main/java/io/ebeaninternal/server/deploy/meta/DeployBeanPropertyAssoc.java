@@ -33,7 +33,6 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
    * From the deployment mappedBy attribute.
    */
   private String mappedBy;
-  private String docStoreDoc;
   private int fetchPreference = 1000;
   private PropertyForeignKey foreignKey;
   boolean orphanRemoval;
@@ -148,17 +147,6 @@ public abstract class DeployBeanPropertyAssoc<T> extends DeployBeanProperty {
 
   public boolean isOrphanRemoval() {
     return orphanRemoval;
-  }
-
-  /**
-   * Set DocStoreEmbedded deployment information.
-   */
-  public void setDocStoreEmbedded(String embeddedDoc) {
-    this.docStoreDoc = embeddedDoc;
-  }
-
-  public String getDocStoreDoc() {
-    return docStoreDoc;
   }
 
   public int getFetchPreference() {

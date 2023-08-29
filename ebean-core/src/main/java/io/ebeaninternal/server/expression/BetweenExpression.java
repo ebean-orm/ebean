@@ -5,8 +5,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.io.IOException;
-
 final class BetweenExpression extends AbstractExpression {
 
   private static final String _BETWEEN = " between ? and ?";
@@ -26,11 +24,6 @@ final class BetweenExpression extends AbstractExpression {
 
   private Object high() {
     return NamedParamHelp.value(valueHigh);
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeRange(propName, Op.GT_EQ, low(), Op.LT_EQ, high());
   }
 
   @Override

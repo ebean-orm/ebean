@@ -60,7 +60,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       query.setBeanCacheMode(CacheMode.ON);
     }
     setLabel(query);
-    parent.propagateQueryState(query, desc.isDocStoreMapped());
+    parent.propagateQueryState(query);
     query.setParentNode(objectGraphNode);
     query.setLazyLoadProperty(lazyLoadProperty);
     if (queryProps != null) {

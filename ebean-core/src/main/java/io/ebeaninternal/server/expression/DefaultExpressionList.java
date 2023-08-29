@@ -4,11 +4,9 @@ import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
-import io.ebean.search.*;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
@@ -27,29 +25,12 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   protected final Query<T> query;
   private final ExpressionList<T> parentExprList;
   protected final ExpressionFactory expr;
-  String allDocNestedPath;
-  /**
-   * Set to true for the "Text" root expression list.
-   */
-  private final boolean textRoot;
-
-  /**
-   * Construct for Text root expression list - this handles implicit Bool Should, Must etc.
-   */
-  public DefaultExpressionList(Query<T> query) {
-    this(query, query.getExpressionFactory(), null, new ArrayList<>(), true);
-  }
 
   public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
     this(query, query.getExpressionFactory(), parentExprList, new ArrayList<>());
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
-    this(query, expr, parentExprList, list, false);
-  }
-
-  private DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list, boolean textRoot) {
-    this.textRoot = textRoot;
     this.list = list;
     this.query = query;
     this.expr = expr;
@@ -64,23 +45,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     this(null, null, null, new ArrayList<>());
   }
 
-  /**
-   * Wrap the expression list as a Junction or top level DefaultExpressionList.
-   *
-   * @param list       The list of expressions grouped by nested path
-   * @param nestedPath The doc store nested path
-   * @param type       The junction type (or null for top level expression list).
-   * @return A single SpiExpression that has the nestedPath set
-   */
-  SpiExpression wrap(List<SpiExpression> list, String nestedPath, Junction.Type type) {
-    DefaultExpressionList<T> wrapper = new DefaultExpressionList<>(query, expr, null, list, false);
-    wrapper.setAllDocNested(nestedPath);
-    if (type != null) {
-      return new JunctionExpression<>(type, wrapper);
-    } else {
-      return wrapper;
-    }
-  }
 
   void simplifyEntries() {
     for (SpiExpression expr : list) {
@@ -109,90 +73,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public void simplify() {
     simplifyEntries();
-  }
-
-  /**
-   * Write being aware if it is the Top level "text" expressions.
-   * <p>
-   * If this is the Top level "text" expressions then it detects if explicit or implicit Bool Should, Must etc is required
-   * to wrap the expressions.
-   * <p>
-   * If implicit Bool is required SHOULD is used.
-   */
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    if (!textRoot) {
-      writeDocQuery(context, null);
-
-    } else {
-      // this is a Top level "text" expressions, so we may need to wrap in Bool SHOULD etc.
-      if (list.isEmpty()) {
-        throw new IllegalStateException("empty expression list?");
-      }
-
-      if (allDocNestedPath != null) {
-        context.startNested(allDocNestedPath);
-      }
-      int size = list.size();
-      SpiExpression first = list.get(0);
-      boolean explicitBool = first instanceof SpiJunction<?>;
-      boolean implicitBool = !explicitBool && size > 1;
-
-      if (implicitBool || explicitBool) {
-        context.startBoolGroup();
-      }
-      if (implicitBool) {
-        context.startBoolGroupList(Junction.Type.SHOULD);
-      }
-      for (SpiExpression expr : list) {
-        if (explicitBool) {
-          try {
-            ((SpiJunction<?>) expr).writeDocQueryJunction(context);
-          } catch (ClassCastException e) {
-            throw new IllegalStateException("The top level text() expressions should be all be 'Must', 'Should' or 'Must Not' or none of them should be.", e);
-          }
-        } else {
-          expr.writeDocQuery(context);
-        }
-      }
-      if (implicitBool) {
-        context.endBoolGroupList();
-      }
-      if (implicitBool || explicitBool) {
-        context.endBoolGroup();
-      }
-      if (allDocNestedPath != null) {
-        context.endNested();
-      }
-    }
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context, SpiExpression idEquals) throws IOException {
-    if (allDocNestedPath != null) {
-      context.startNested(allDocNestedPath);
-    }
-    int size = list.size();
-    if (size == 1 && idEquals == null) {
-      // only 1 expression - skip bool
-      list.get(0).writeDocQuery(context);
-    } else if (size == 0 && idEquals != null) {
-      // only idEquals - skip bool
-      idEquals.writeDocQuery(context);
-    } else {
-      // bool must wrap all the children
-      context.startBoolMust();
-      if (idEquals != null) {
-        idEquals.writeDocQuery(context);
-      }
-      for (SpiExpression expr : list) {
-        expr.writeDocQuery(context);
-      }
-      context.endBool();
-    }
-    if (allDocNestedPath != null) {
-      context.endNested();
-    }
   }
 
   @Override
@@ -480,11 +360,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public Query<T> setDocIndexName(String indexName) {
-    return query.setDocIndexName(indexName);
-  }
-
-  @Override
   public ExpressionList<T> setFirstRow(int firstRow) {
     query.setFirstRow(firstRow);
     return this;
@@ -519,11 +394,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public Query<T> setCountDistinct(CountDistinctOrder orderBy) {
     return query.setCountDistinct(orderBy);
-  }
-
-  @Override
-  public Query<T> setUseDocStore(boolean useDocsStore) {
-    return query.setUseDocStore(useDocsStore);
   }
 
   @Override
@@ -596,12 +466,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("List[");
-    if (textRoot) {
-      builder.append("textRoot:true ");
-    }
-    if (allDocNestedPath != null) {
-      builder.append("path:").append(allDocNestedPath).append(' ');
-    }
     for (SpiExpression expr : list) {
       expr.queryPlanHash(builder);
       builder.append(',');
@@ -1133,46 +997,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return add(expr.startsWith(propertyName, value));
   }
 
-  @Override
-  public ExpressionList<T> match(String propertyName, String search) {
-    return match(propertyName, search, null);
-  }
-
-  @Override
-  public ExpressionList<T> match(String propertyName, String search, Match options) {
-    setUseDocStore(true);
-    return add(expr.textMatch(propertyName, search, options));
-  }
-
-  @Override
-  public ExpressionList<T> multiMatch(String query, String... fields) {
-    return multiMatch(query, MultiMatch.fields(fields));
-  }
-
-  @Override
-  public ExpressionList<T> multiMatch(String query, MultiMatch options) {
-    setUseDocStore(true);
-    return add(expr.textMultiMatch(query, options));
-  }
-
-  @Override
-  public ExpressionList<T> textSimple(String search, TextSimple options) {
-    setUseDocStore(true);
-    return add(expr.textSimple(search, options));
-  }
-
-  @Override
-  public ExpressionList<T> textQueryString(String search, TextQueryString options) {
-    setUseDocStore(true);
-    return add(expr.textQueryString(search, options));
-  }
-
-  @Override
-  public ExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
-    setUseDocStore(true);
-    return add(expr.textCommonTerms(search, options));
-  }
-
   protected Junction<T> junction(Junction.Type type) {
     Junction<T> junction = expr.junction(type, query, this);
     add(junction);
@@ -1224,49 +1048,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return junction(Junction.Type.OR);
   }
 
-  @Override
-  public Junction<T> must() {
-    setUseDocStore(true);
-    return junction(Junction.Type.MUST);
-  }
-
-  @Override
-  public Junction<T> should() {
-    setUseDocStore(true);
-    return junction(Junction.Type.SHOULD);
-  }
-
-  @Override
-  public Junction<T> mustNot() {
-    setUseDocStore(true);
-    return junction(Junction.Type.MUST_NOT);
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    // effectively handled by JunctionExpression
-    return null;
-  }
-
-  /**
-   * Set the nested path that all contained expressions share.
-   */
-  public void setAllDocNested(String allDocNestedPath) {
-    this.allDocNestedPath = allDocNestedPath;
-  }
-
   /**
    * Replace the underlying expression list with one organised by nested path.
    */
   public void setUnderlying(List<SpiExpression> groupedByNesting) {
     this.list = groupedByNesting;
-  }
-
-  /**
-   * Prepare expressions for document store nested path handling.
-   */
-  public void prepareDocNested(BeanDescriptor<T> beanDescriptor) {
-    PrepareDocNested.prepare(this, beanDescriptor);
   }
 
   public Object idEqualTo(String idName) {

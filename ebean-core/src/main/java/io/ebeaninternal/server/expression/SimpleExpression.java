@@ -8,9 +8,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.io.IOException;
-import java.util.Arrays;
-
 public final class SimpleExpression extends AbstractValueExpression {
 
   private final Op type;
@@ -35,24 +32,6 @@ public final class SimpleExpression extends AbstractValueExpression {
       return false;
     }
     return data.matchEq(propName, bindValue);
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    if (type == Op.BETWEEN) {
-      throw new IllegalStateException("BETWEEN Not expected in SimpleExpression?");
-    }
-    ExpressionPath prop = context.getExpressionPath(propName);
-    if (prop != null && prop.isAssocId()) {
-      String idName = prop.assocIdExpression(propName, "");
-      Object[] ids = prop.assocIdValues((EntityBean) value());
-      if (ids == null || ids.length != 1) {
-        throw new IllegalArgumentException("Expecting 1 Id value for " + idName + " but got " + Arrays.toString(ids));
-      }
-      context.writeSimple(type, idName, ids[0]);
-    } else {
-      context.writeSimple(type, propName, value());
-    }
   }
 
   public String getPropName() {

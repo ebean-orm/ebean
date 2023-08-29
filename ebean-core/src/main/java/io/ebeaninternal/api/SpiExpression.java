@@ -3,9 +3,6 @@ package io.ebeaninternal.api;
 import io.ebean.Expression;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.expression.DocQueryContext;
-
-import java.io.IOException;
 
 
 /**
@@ -20,16 +17,6 @@ public interface SpiExpression extends Expression {
    * Simplify nested expressions if possible.
    */
   void simplify();
-
-  /**
-   * Write the expression as an elastic search expression.
-   */
-  void writeDocQuery(DocQueryContext context) throws IOException;
-
-  /**
-   * Return the nested path for this expression.
-   */
-  String nestedPath(BeanDescriptor<?> desc);
 
   /**
    * Process "Many" properties populating ManyWhereJoins.

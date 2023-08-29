@@ -6,7 +6,6 @@ import io.ebean.plugin.Property;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
-import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;
@@ -123,7 +122,6 @@ public class BeanDescriptorTest extends BaseTest {
 
   private BeanDescriptorMap mockOwner() {
     BeanDescriptorMap owner = mock(BeanDescriptorMap.class);
-    when(owner.createDocStoreBeanAdapter(any(), any())).thenReturn(mock(DocStoreBeanAdapter.class));
     return owner;
   }
 

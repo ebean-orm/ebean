@@ -3,10 +3,6 @@ package io.ebean.typequery;
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 import io.ebean.*;
-import io.ebean.search.MultiMatch;
-import io.ebean.search.TextCommonTerms;
-import io.ebean.search.TextQueryString;
-import io.ebean.search.TextSimple;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQueryFetch;
@@ -72,17 +68,6 @@ public abstract class TQRootBean<T, R> {
    * The underlying expression lists held as a stack. Pushed and popped based on and/or (conjunction/disjunction).
    */
   private ArrayStack<ExpressionList<T>> whereStack;
-
-  /**
-   * Stack of Text expressions ("query" section of ElasticSearch query rather than "filter" section).
-   */
-  private ArrayStack<ExpressionList<T>> textStack;
-
-  /**
-   * When true expressions should be added to the "text" stack - ElasticSearch "query" section
-   * rather than the "where" stack.
-   */
-  private boolean textMode;
 
   /**
    * The root query bean instance. Used to provide fluid query construction.
@@ -629,46 +614,6 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Set the index(es) to search for a document store which uses partitions.
-   * <p>
-   * For example, when executing a query against ElasticSearch with daily indexes we can
-   * explicitly specify the indexes to search against.
-   * </p>
-   * <pre>{@code
-   *
-   *   // explicitly specify the indexes to search
-   *   query.setDocIndexName("logstash-2016.11.5,logstash-2016.11.6")
-   *
-   *   // search today's index
-   *   query.setDocIndexName("$today")
-   *
-   *   // search the last 3 days
-   *   query.setDocIndexName("$last-3")
-   *
-   * }</pre>
-   * <p>
-   * If the indexName is specified with ${daily} e.g. "logstash-${daily}" ... then we can use
-   * $today and $last-x as the search docIndexName like the examples below.
-   * </p>
-   * <pre>{@code
-   *
-   *   // search today's index
-   *   query.setDocIndexName("$today")
-   *
-   *   // search the last 3 days
-   *   query.setDocIndexName("$last-3")
-   *
-   * }</pre>
-   *
-   * @param indexName The index or indexes to search against
-   * @return This query
-   */
-  public R setDocIndexName(String indexName) {
-    query.setDocIndexName(indexName);
-    return root;
-  }
-
-  /**
    * Restrict the query to only return subtypes of the given inherit type.
    * <pre>{@code
    *
@@ -1019,17 +964,6 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Set to true if this query should execute against the doc store.
-   * <p>
-   * When setting this you may also consider disabling lazy loading.
-   * </p>
-   */
-  public R setUseDocStore(boolean useDocStore) {
-    query.setUseDocStore(useDocStore);
-    return root;
-  }
-
-  /**
    * Set true if you want to disable lazy loading.
    * <p>
    * That is, once the object graph is returned further lazy loading is disabled.
@@ -1376,54 +1310,10 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Begin a list of expressions added by MUST.
-   * <p>
-   * This automatically makes this query a document store query.
-   * </p>
-   * <p>
-   * Use endJunction() to stop added to MUST and 'pop' to the parent expression list.
-   * </p>
-   */
-  public R must() {
-    pushExprList(peekExprList().must());
-    return root;
-  }
-
-  /**
-   * Begin a list of expressions added by MUST NOT.
-   * <p>
-   * This automatically makes this query a document store query.
-   * </p>
-   * <p>
-   * Use endJunction() to stop added to MUST NOT and 'pop' to the parent expression list.
-   * </p>
-   */
-  public R mustNot() {
-    return pushExprList(peekExprList().mustNot());
-  }
-
-  /**
-   * Begin a list of expressions added by SHOULD.
-   * <p>
-   * This automatically makes this query a document store query.
-   * </p>
-   * <p>
-   * Use endJunction() to stop added to SHOULD and 'pop' to the parent expression list.
-   * </p>
-   */
-  public R should() {
-    return pushExprList(peekExprList().should());
-  }
-
-  /**
    * End a list of expressions added by 'OR'.
    */
   public R endJunction() {
-    if (textMode) {
-      textStack.pop();
-    } else {
-      whereStack.pop();
-    }
+    whereStack.pop();
     return root;
   }
 
@@ -1452,11 +1342,7 @@ public abstract class TQRootBean<T, R> {
    * Push the expression list onto the appropriate stack.
    */
   private R pushExprList(ExpressionList<T> list) {
-    if (textMode) {
-      textStack.push(list);
-    } else {
-      whereStack.push(list);
-    }
+    whereStack.push(list);
     return root;
   }
 
@@ -1473,77 +1359,6 @@ public abstract class TQRootBean<T, R> {
    * </p>
    */
   public R where() {
-    textMode = false;
-    return root;
-  }
-
-  /**
-   * Begin added expressions to the 'Text' expression list.
-   * <p>
-   * This automatically makes the query a document store query.
-   * </p>
-   * <p>
-   * For ElasticSearch expressions added to 'text' go into the ElasticSearch 'query context'
-   * and expressions added to 'where' go into the ElasticSearch 'filter context'.
-   * </p>
-   */
-  public R text() {
-    textMode = true;
-    return root;
-  }
-
-  /**
-   * Add a Text Multi-match expression (document store only).
-   * <p>
-   * This automatically makes the query a document store query.
-   * </p>
-   */
-  public R multiMatch(String query, MultiMatch multiMatch) {
-    peekExprList().multiMatch(query, multiMatch);
-    return root;
-  }
-
-  /**
-   * Add a Text Multi-match expression (document store only).
-   * <p>
-   * This automatically makes the query a document store query.
-   * </p>
-   */
-  public R multiMatch(String query, String... properties) {
-    peekExprList().multiMatch(query, properties);
-    return root;
-  }
-
-  /**
-   * Add a Text common terms expression (document store only).
-   * <p>
-   * This automatically makes the query a document store query.
-   * </p>
-   */
-  public R textCommonTerms(String query, TextCommonTerms options) {
-    peekExprList().textCommonTerms(query, options);
-    return root;
-  }
-
-  /**
-   * Add a Text simple expression (document store only).
-   * <p>
-   * This automatically makes the query a document store query.
-   * </p>
-   */
-  public R textSimple(String query, TextSimple options) {
-    peekExprList().textSimple(query, options);
-    return root;
-  }
-
-  /**
-   * Add a Text query string expression (document store only).
-   * <p>
-   * This automatically makes the query a document store query.
-   * </p>
-   */
-  public R textQueryString(String query, TextQueryString options) {
-    peekExprList().textQueryString(query, options);
     return root;
   }
 
@@ -2137,10 +1952,6 @@ public abstract class TQRootBean<T, R> {
    * Return the current expression list that expressions should be added to.
    */
   protected ExpressionList<T> peekExprList() {
-    if (textMode) {
-      // return the current text expression list
-      return _peekText();
-    }
     if (whereStack == null) {
       whereStack = new ArrayStack<>();
       whereStack.push(query.where());
@@ -2149,13 +1960,4 @@ public abstract class TQRootBean<T, R> {
     return whereStack.peek();
   }
 
-  protected ExpressionList<T> _peekText() {
-    if (textStack == null) {
-      textStack = new ArrayStack<>();
-      // empty so push on the queries base expression list
-      textStack.push(query.text());
-    }
-    // return the current expression list
-    return textStack.peek();
-  }
 }
