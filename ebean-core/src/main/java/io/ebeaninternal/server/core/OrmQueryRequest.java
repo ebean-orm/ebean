@@ -116,7 +116,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return server.databasePlatform().escapeLikeString(value);
   }
 
-  @Override
   public void executeSecondaryQueries(boolean forEach) {
     // disable lazy loading leaves loadContext null
     if (loadContext != null) {
@@ -155,11 +154,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   public LoadContext loadContext() {
     return loadContext;
-  }
-
-  @Override
-  public boolean isUseDocStore() {
-    return query.isUseDocStore();
   }
 
   /**
@@ -257,23 +251,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     }
   }
 
-  /**
-   * Return the JsonReadOptions taking into account lazy loading and persistence context.
-   */
-  @Override
-  public JsonReadOptions createJsonReadOptions() {
-    persistenceContext = persistenceContext(query, transaction);
-    if (query.persistenceContext() == null) {
-      query.setPersistenceContext(persistenceContext);
-    }
-    JsonReadOptions jsonRead = new JsonReadOptions();
-    jsonRead.setPersistenceContext(persistenceContext);
-    if (!query.isDisableLazyLoading()) {
-      loadContext = new DLoadContext(this, secondaryQueries);
-      jsonRead.setLoadContext(loadContext);
-    }
-    return jsonRead;
-  }
 
   /**
    * Get the TransactionContext either explicitly set on the query or

@@ -53,11 +53,6 @@ final class InPairsExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) {
-    throw new RuntimeException("Not supported with document query");
-  }
-
-  @Override
   public void addBindValues(SpiExpressionRequest request) {
 
     // Note at this point entries may have been removed when used with l2 caching

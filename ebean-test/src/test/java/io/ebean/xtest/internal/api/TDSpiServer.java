@@ -504,11 +504,6 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public DocumentStore docStore() {
-    return null;
-  }
-
-  @Override
   public <T> Set<String> validateQuery(Query<T> query) {
     return null;
   }
@@ -545,11 +540,6 @@ public class TDSpiServer implements SpiServer {
 
   @Override
   public List<? extends BeanType<?>> beanTypes(String baseTableName) {
-    return null;
-  }
-
-  @Override
-  public BeanType<?> beanTypeForQueueId(String queueId) {
     return null;
   }
 

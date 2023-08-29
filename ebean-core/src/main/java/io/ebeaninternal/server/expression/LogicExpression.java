@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.Expression;
-import io.ebean.Junction;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.ManyWhereJoins;
@@ -10,8 +9,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-
-import java.io.IOException;
 
 /**
  * A logical And or, Or for joining two expressions.
@@ -73,35 +70,6 @@ abstract class LogicExpression implements SpiExpression {
     // do nothing
   }
 
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-
-    context.startBool(conjunction ? Junction.Type.AND : Junction.Type.OR);
-    expOne.writeDocQuery(context);
-    expTwo.writeDocQuery(context);
-    context.endBool();
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-
-    String pathOne = expOne.nestedPath(desc);
-    String pathTwo = expTwo.nestedPath(desc);
-
-    if (pathOne == null && pathTwo == null) {
-      return null;
-    }
-    if (pathOne != null && pathOne.equals(pathTwo)) {
-      return pathOne;
-    }
-    if (pathOne != null) {
-      expOne = new NestedPathWrapperExpression(pathOne, expOne);
-    }
-    if (pathTwo != null) {
-      expTwo = new NestedPathWrapperExpression(pathTwo, expTwo);
-    }
-    return null;
-  }
 
   @Override
   public Object getIdEqualTo(String idName) {

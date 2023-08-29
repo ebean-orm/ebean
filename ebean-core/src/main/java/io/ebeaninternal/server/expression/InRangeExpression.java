@@ -5,8 +5,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.io.IOException;
-
 final class InRangeExpression extends AbstractExpression {
 
   private final Object valueHigh;
@@ -24,11 +22,6 @@ final class InRangeExpression extends AbstractExpression {
 
   private Object high() {
     return NamedParamHelp.value(valueHigh);
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeRange(propName, Op.GT_EQ, low(), Op.LT, high());
   }
 
   @Override

@@ -1,11 +1,8 @@
 package io.ebeaninternal.server.expression;
 
-import io.ebean.util.SplitName;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
-
-import java.io.IOException;
 
 /**
  * Between expression where a value is between two properties.
@@ -36,24 +33,6 @@ final class BetweenPropertyExpression extends NonPrepareExpression {
 
   private Object val() {
     return NamedParamHelp.value(value);
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.startBoolMust();
-    context.writeSimple(Op.LT_EQ, lowProperty, val());
-    context.writeSimple(Op.GT_EQ, highProperty, val());
-    context.endBool();
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    ElPropertyDeploy elProp = desc.elPropertyDeploy(name(lowProperty));
-    if (elProp != null && elProp.containsMany()) {
-      // assumes highProperty is also nested property which seems reasonable
-      return SplitName.begin(lowProperty);
-    }
-    return null;
   }
 
   @Override

@@ -39,11 +39,6 @@ public interface SpiServer extends Database {
   List<? extends BeanType<?>> beanTypes(String baseTableName);
 
   /**
-   * Return the bean type for a given doc store queueId.
-   */
-  BeanType<?> beanTypeForQueueId(String queueId);
-
-  /**
    * Return a BeanLoader.
    */
   BeanLoader beanLoader();

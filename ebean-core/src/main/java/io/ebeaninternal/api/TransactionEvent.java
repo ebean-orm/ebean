@@ -6,7 +6,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.transaction.DeleteByIdMap;
 import io.ebeaninternal.server.transaction.TransactionManager;
-import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -123,18 +122,6 @@ public final class TransactionEvent implements Serializable {
       deleteByIdMap.notifyCache(changeSet);
     }
     return changeSet;
-  }
-
-  /**
-   * Add any relevant PersistRequestBean's to DocStoreUpdates for later processing.
-   */
-  public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates) {
-    List<PersistRequestBean<?>> requests = listenerNotify();
-    if (requests != null) {
-      for (PersistRequestBean<?> persistRequestBean : requests) {
-        persistRequestBean.addDocStoreUpdates(docStoreUpdates);
-      }
-    }
   }
 
   /**

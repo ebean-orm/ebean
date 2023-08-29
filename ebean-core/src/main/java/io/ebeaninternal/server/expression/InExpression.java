@@ -9,7 +9,6 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
-import java.io.IOException;
 import java.util.*;
 
 public final class InExpression extends AbstractExpression implements IdInCommon {
@@ -92,13 +91,6 @@ public final class InExpression extends AbstractExpression implements IdInCommon
     initBindValues();
     if (bindValues.size() > 0) {
       multiValueSupported = request.isMultiValueSupported(bindValues.get(0).getClass());
-    }
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    if (!empty) {
-      context.writeIn(propName, values().toArray(), not);
     }
   }
 

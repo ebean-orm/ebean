@@ -24,9 +24,6 @@ import io.ebeaninternal.server.query.STreePropertyAssoc;
 import io.ebeaninternal.server.query.STreeType;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
-import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
-import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
-import io.ebeanservice.docstore.api.support.DocStructure;
 
 import jakarta.persistence.PersistenceException;
 import java.util.ArrayList;
@@ -69,7 +66,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   final BeanTable beanTable;
   final String mappedBy;
-  private final String docStoreDoc;
   private final String extraWhere;
   private final int fetchPreference;
   private boolean saveRecurseSkippable;
@@ -83,7 +79,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     this.extraWhere = InternString.intern(deploy.getExtraWhere());
     this.beanTable = deploy.getBeanTable();
     this.mappedBy = InternString.intern(deploy.getMappedBy());
-    this.docStoreDoc = deploy.getDocStoreDoc();
     this.tableJoin = new TableJoin(deploy.getTableJoin());
     this.targetType = deploy.getTargetType();
     this.cascadeInfo = deploy.getCascadeInfo();
@@ -100,7 +95,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     extraWhere = source.extraWhere;
     beanTable = source.beanTable;
     mappedBy = source.mappedBy;
-    docStoreDoc = source.docStoreDoc;
     targetType = source.targetType;
     cascadeInfo = source.cascadeInfo;
     fetchPreference = source.fetchPreference;
@@ -308,59 +302,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   @Override
   public String extraWhere() {
     return extraWhere;
-  }
-
-  /**
-   * Return the elastic search doc for this embedded property.
-   */
-  private String docStoreDoc() {
-    return docStoreDoc;
-  }
-
-  /**
-   * Determine if and how the associated bean is included in the doc store document.
-   */
-  @Override
-  public void docStoreInclude(boolean includeByDefault, DocStructure docStructure) {
-    String embeddedDoc = docStoreDoc();
-    if (embeddedDoc == null) {
-      // not annotated so use include by default
-      // which is *ToOne included and *ToMany excluded
-      if (includeByDefault) {
-        docStoreIncludeByDefault(docStructure.doc());
-      }
-    } else {
-      // explicitly annotated to be included
-      if (embeddedDoc.isEmpty()) {
-        embeddedDoc = "*";
-      }
-      // add in a nested way
-      PathProperties embDoc = PathProperties.parse(embeddedDoc);
-      docStructure.addNested(name, embDoc);
-    }
-  }
-
-  /**
-   * Include the property in the document store by default.
-   */
-  void docStoreIncludeByDefault(PathProperties pathProps) {
-    pathProps.addToPath(null, name);
-  }
-
-  @Override
-  public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
-    if (mapping.includesPath(prefix, name)) {
-      String fullName = SplitName.add(prefix, name);
-
-      DocPropertyType type = isMany() ? DocPropertyType.LIST : DocPropertyType.OBJECT;
-      DocPropertyMapping nested = new DocPropertyMapping(name, type);
-      mapping.push(nested);
-      targetDescriptor.docStoreMapping(mapping, fullName);
-      mapping.pop();
-      if (!nested.children().isEmpty()) {
-        mapping.add(nested);
-      }
-    }
   }
 
   /**

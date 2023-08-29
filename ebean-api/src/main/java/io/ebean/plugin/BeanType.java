@@ -2,7 +2,6 @@ package io.ebean.plugin;
 
 import io.ebean.Query;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.docstore.DocMapping;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistListener;
@@ -144,30 +143,6 @@ public interface BeanType<T> {
    * Return the identity generation type.
    */
   IdType idType();
-
-  /**
-   * Return true if this bean type has doc store backing.
-   */
-  boolean isDocStoreMapped();
-
-  /**
-   * Return the DocumentMapping for this bean type.
-   * <p>
-   * This is the document structure and mapping options for how this bean type is mapped
-   * for the document store.
-   * </p>
-   */
-  DocMapping docMapping();
-
-  /**
-   * Return the doc store queueId for this bean type.
-   */
-  String docStoreQueueId();
-
-  /**
-   * Return the doc store support for this bean type.\
-   */
-  BeanDocType<T> docStore();
 
   /**
    * Add the discriminator value to the query if needed.

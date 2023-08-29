@@ -5,8 +5,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.io.IOException;
-
 final class CaseInsensitiveEqualExpression extends AbstractValueExpression {
 
   private final boolean not;
@@ -21,15 +19,6 @@ final class CaseInsensitiveEqualExpression extends AbstractValueExpression {
    */
   private String val() {
     return strValue().toLowerCase();
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    if (not) {
-      context.writeINotEqualTo(propName, val());
-    } else {
-      context.writeIEqualTo(propName, val());
-    }
   }
 
   @Override

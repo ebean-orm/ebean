@@ -23,11 +23,6 @@ final class SubQueryRawExpression extends AbstractExpression implements Unsuppor
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) {
-    throw new IllegalStateException("Not supported");
-  }
-
-  @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("SubQueryRaw[").append(propName).append(op.expression)
       .append(" subQuery:").append(subQuery)

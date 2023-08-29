@@ -35,11 +35,6 @@ final class ExistsSqlQueryExpression implements SpiExpression, UnsupportedDocSto
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) {
-    throw new IllegalStateException("Not supported");
-  }
-
-  @Override
   public Object getIdEqualTo(String idName) {
     // always return null for this expression
     return null;
@@ -87,11 +82,6 @@ final class ExistsSqlQueryExpression implements SpiExpression, UnsupportedDocSto
   public boolean isSameByBind(SpiExpression other) {
     final ExistsSqlQueryExpression that = (ExistsSqlQueryExpression) other;
     return Arrays.equals(bindParams, that.bindParams);
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    return null;
   }
 
   @Override

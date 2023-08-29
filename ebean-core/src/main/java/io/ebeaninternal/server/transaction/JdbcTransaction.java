@@ -2,7 +2,6 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
-import io.ebean.annotation.DocStoreMode;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
@@ -11,7 +10,6 @@ import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
-import io.ebeanservice.docstore.api.DocStoreTransaction;
 
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.RollbackException;
@@ -75,12 +73,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private TChangeLogHolder changeLogHolder;
   private List<PersistDeferredRelationship> deferredList;
   /**
-   * The mode for updating doc store indexes for this transaction.
-   * Only set when you want to override the default behavior.
-   */
-  private DocStoreMode docStoreMode;
-  private int docStoreBatchSize;
-  /**
    * Explicit control over skipCache.
    */
   private Boolean skipCache;
@@ -88,7 +80,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Default skip cache behavior from {@link DatabaseConfig#isSkipCacheAfterWrite()}.
    */
   private final boolean skipCacheAfterWrite;
-  DocStoreTransaction docStoreTxn;
   private ProfileStream profileStream;
   private ProfileLocation profileLocation;
   private final long startNanos;
@@ -296,26 +287,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     if (changeLogHolder != null) {
       changeLogHolder.postCommit();
     }
-  }
-
-  @Override
-  public final int getDocStoreBatchSize() {
-    return docStoreBatchSize;
-  }
-
-  @Override
-  public final void setDocStoreBatchSize(int docStoreBatchSize) {
-    this.docStoreBatchSize = docStoreBatchSize;
-  }
-
-  @Override
-  public final DocStoreMode docStoreMode() {
-    return docStoreMode;
-  }
-
-  @Override
-  public final void setDocStoreMode(DocStoreMode docStoreMode) {
-    this.docStoreMode = docStoreMode;
   }
 
   @Override
@@ -1095,15 +1066,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public final void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
     event().add(tableName, inserts, updates, deletes);
-  }
-
-  @Override
-  public final DocStoreTransaction docStoreTransaction() {
-    if (docStoreTxn == null) {
-      queryOnly = false;
-      docStoreTxn = manager.createDocStoreTransaction(docStoreBatchSize);
-    }
-    return docStoreTxn;
   }
 
   @Override

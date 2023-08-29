@@ -102,19 +102,6 @@ public class DeployBeanDescriptor<T> {
   private String dbComment;
   private PartitionMeta partitionMeta;
   private TablespaceMeta tablespaceMeta;
-  /**
-   * One of NONE, INDEX or EMBEDDED.
-   */
-  private boolean docStoreMapped;
-  private DocStore docStore;
-  private PathProperties docStorePathProperties;
-  private String docStoreQueueId;
-  private String docStoreIndexName;
-  private String docStoreIndexType;
-  private DocStoreMode docStorePersist;
-  private DocStoreMode docStoreInsert;
-  private DocStoreMode docStoreUpdate;
-  private DocStoreMode docStoreDelete;
   private DeployBeanProperty idProperty;
   private TableJoin primaryKeyJoin;
 
@@ -211,26 +198,6 @@ public class DeployBeanDescriptor<T> {
 
   public TablespaceMeta getTablespaceMeta() {
     return tablespaceMeta;
-  }
-
-  /**
-   * Read the top level doc store deployment information.
-   */
-  public void readDocStore(DocStore docStore) {
-
-    this.docStore = docStore;
-    docStoreMapped = true;
-    docStoreQueueId = docStore.queueId();
-    docStoreIndexName = docStore.indexName();
-    docStoreIndexType = docStore.indexType();
-    docStorePersist = docStore.persist();
-    docStoreInsert = docStore.insert();
-    docStoreUpdate = docStore.update();
-    docStoreDelete = docStore.delete();
-    String doc = docStore.doc();
-    if (!doc.isEmpty()) {
-      docStorePathProperties = PathProperties.parse(doc);
-    }
   }
 
   public boolean isScalaObject() {
@@ -913,63 +880,6 @@ public class DeployBeanDescriptor<T> {
       // continue checking
       checkInheritance(parent);
     }
-  }
-
-  public PathProperties getDocStorePathProperties() {
-    return docStorePathProperties;
-  }
-
-  /**
-   * Return true if this type is mapped for a doc store.
-   */
-  public boolean isDocStoreMapped() {
-    return docStoreMapped;
-  }
-
-  public String getDocStoreQueueId() {
-    return docStoreQueueId;
-  }
-
-  public String getDocStoreIndexName() {
-    return docStoreIndexName;
-  }
-
-  public String getDocStoreIndexType() {
-    return docStoreIndexType;
-  }
-
-  public DocStore getDocStore() {
-    return docStore;
-  }
-
-  /**
-   * Return the DocStore index behavior for bean inserts.
-   */
-  public DocStoreMode getDocStoreInsertEvent() {
-    return getDocStoreIndexEvent(docStoreInsert);
-  }
-
-  /**
-   * Return the DocStore index behavior for bean updates.
-   */
-  public DocStoreMode getDocStoreUpdateEvent() {
-    return getDocStoreIndexEvent(docStoreUpdate);
-  }
-
-  /**
-   * Return the DocStore index behavior for bean deletes.
-   */
-  public DocStoreMode getDocStoreDeleteEvent() {
-    return getDocStoreIndexEvent(docStoreDelete);
-  }
-
-  private DocStoreMode getDocStoreIndexEvent(DocStoreMode mostSpecific) {
-    if (!docStoreMapped) {
-      return DocStoreMode.IGNORE;
-    }
-    if (mostSpecific != DocStoreMode.DEFAULT) return mostSpecific;
-    if (docStorePersist != DocStoreMode.DEFAULT) return docStorePersist;
-    return config.getDocStoreConfig().getPersist();
   }
 
   /**

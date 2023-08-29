@@ -4,7 +4,6 @@ import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -58,16 +57,6 @@ final class JsonPathExpression extends AbstractExpression {
     this.operator = Op.BETWEEN;
     this.value = value;
     this.upperValue = upperValue;
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    String fullName = propName + "." + path;
-    if (operator == Op.BETWEEN) {
-      context.writeRange(fullName, Op.GT_EQ, value, Op.LT_EQ, upperValue);
-    } else {
-      context.writeSimple(operator, fullName, value);
-    }
   }
 
   @Override

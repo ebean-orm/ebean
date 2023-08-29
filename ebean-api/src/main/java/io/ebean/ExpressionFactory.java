@@ -1,7 +1,5 @@
 package io.ebean;
 
-import io.ebean.search.*;
-
 import java.util.Collection;
 import java.util.Map;
 
@@ -624,31 +622,6 @@ public interface ExpressionFactory {
    * Add raw expression with no parameters.
    */
   Expression raw(String raw);
-
-  /**
-   * Create a Text Match expression (currently doc store/Elastic only).
-   */
-  Expression textMatch(String propertyName, String search, Match options);
-
-  /**
-   * Create a Text Multi match expression (currently doc store/Elastic only).
-   */
-  Expression textMultiMatch(String query, MultiMatch options);
-
-  /**
-   * Create a text simple query expression (currently doc store/Elastic only).
-   */
-  Expression textSimple(String search, TextSimple options);
-
-  /**
-   * Create a text query string expression (currently doc store/Elastic only).
-   */
-  Expression textQueryString(String search, TextQueryString options);
-
-  /**
-   * Create a text common terms expression (currently doc store/Elastic only).
-   */
-  Expression textCommonTerms(String search, TextCommonTerms options);
 
   /**
    * And - join two expressions with a logical and.

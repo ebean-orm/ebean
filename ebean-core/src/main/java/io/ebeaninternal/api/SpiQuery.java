@@ -286,17 +286,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   SpiRawSql rawSql();
 
   /**
-   * Return true if this query should be executed against the doc store.
-   */
-  boolean isUseDocStore();
-
-  /**
-   * For doc store query return the document index name to search against.
-   * This is for partitioned indexes (like daily logstash indexes etc).
-   */
-  String getDocIndexName();
-
-  /**
    * Return the PersistenceContextScope that this query should use.
    * <p>
    * This can be null and in that case use the default scope.
@@ -497,11 +486,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return a Natural Key bind parameter if supported by this query.
    */
   NaturalKeyBindParam naturalKeyBindParam();
-
-  /**
-   * Prepare the query for docstore execution with nested paths.
-   */
-  void prepareDocNested();
 
   /**
    * Set the query to be a delete query.
@@ -707,11 +691,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Can return null if no expressions where added to the having clause.
    */
   SpiExpressionList<T> havingExpressions();
-
-  /**
-   * Return the text expressions.
-   */
-  SpiExpressionList<T> textExpression();
 
   /**
    * Returns true if either firstRow or maxRows has been set.
