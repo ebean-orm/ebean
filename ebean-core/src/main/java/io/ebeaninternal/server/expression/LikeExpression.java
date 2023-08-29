@@ -6,8 +6,6 @@ import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.io.IOException;
-
 final class LikeExpression extends AbstractValueExpression {
 
   private final boolean caseInsensitive;
@@ -17,11 +15,6 @@ final class LikeExpression extends AbstractValueExpression {
     super(propertyName, value);
     this.caseInsensitive = caseInsensitive;
     this.type = type;
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeLike(propName, strValue(), type, caseInsensitive);
   }
 
   @Override

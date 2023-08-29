@@ -133,16 +133,6 @@ public class DatabaseConfig {
   private List<String> packages = new ArrayList<>();
 
   /**
-   * Configuration for the ElasticSearch integration.
-   */
-  private DocStoreConfig docStoreConfig = new DocStoreConfig();
-
-  /**
-   * Set to true when the Database only uses Document store.
-   */
-  private boolean docStoreOnly;
-
-  /**
    * This is used to populate @WhoCreated, @WhoModified and
    * support other audit features (who executed a query etc).
    */
@@ -1562,34 +1552,6 @@ public class DatabaseConfig {
   }
 
   /**
-   * Return true if this Database is a Document store only instance (has no JDBC DB).
-   */
-  public boolean isDocStoreOnly() {
-    return docStoreOnly;
-  }
-
-  /**
-   * Set to true if this Database is Document store only instance (has no JDBC DB).
-   */
-  public void setDocStoreOnly(boolean docStoreOnly) {
-    this.docStoreOnly = docStoreOnly;
-  }
-
-  /**
-   * Return the configuration for the ElasticSearch integration.
-   */
-  public DocStoreConfig getDocStoreConfig() {
-    return docStoreConfig;
-  }
-
-  /**
-   * Set the configuration for the ElasticSearch integration.
-   */
-  public void setDocStoreConfig(DocStoreConfig docStoreConfig) {
-    this.docStoreConfig = docStoreConfig;
-  }
-
-  /**
    * Return the constraint naming convention used in DDL generation.
    */
   public DbConstraintNaming getConstraintNaming() {
@@ -2774,13 +2736,6 @@ public class DatabaseConfig {
   /**
    * This is broken out to allow overridden behaviour.
    */
-  protected void loadDocStoreSettings(PropertiesWrapper p) {
-    docStoreConfig.loadSettings(p);
-  }
-
-  /**
-   * This is broken out to allow overridden behaviour.
-   */
   protected void loadAutoTuneSettings(PropertiesWrapper p) {
     autoTuneConfig.loadSettings(p);
   }
@@ -2809,11 +2764,6 @@ public class DatabaseConfig {
     }
     loadDataSourceSettings(p);
 
-    if (docStoreConfig == null) {
-      docStoreConfig = new DocStoreConfig();
-    }
-    loadDocStoreSettings(p);
-
     defaultServer = p.getBoolean("defaultServer", defaultServer);
     autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
@@ -2828,7 +2778,6 @@ public class DatabaseConfig {
     queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
     queryPlanCaptureMaxTimeMillis = p.getLong("queryPlan.captureMaxTimeMillis", queryPlanCaptureMaxTimeMillis);
     queryPlanCaptureMaxCount = p.getInt("queryPlan.captureMaxCount", queryPlanCaptureMaxCount);
-    docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     localOnlyL2Cache = p.getBoolean("localOnlyL2Cache", localOnlyL2Cache);
     enabledL2Regions = p.get("enabledL2Regions", enabledL2Regions);

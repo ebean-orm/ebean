@@ -99,7 +99,7 @@ public final class LoadManyRequest extends LoadRequest {
       query.where().raw(extraWhere.replace("${ta}", "t0").replace("${mta}", "int_"));
     }
     query.setLazyLoadForParents(many);
-    many.addWhereParentIdIn(query, parentIdList(server), loadContext.isUseDocStore());
+    many.addWhereParentIdIn(query, parentIdList(server));
     query.setPersistenceContext(loadContext.persistenceContext());
     query.setLoadDescription(lazy ? "+lazy" : "+query", description());
     if (lazy) {

@@ -46,10 +46,6 @@ import io.ebeaninternal.server.json.DJsonContext;
 import io.ebeaninternal.server.transaction.*;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.TypeManager;
-import io.ebeanservice.docstore.api.DocStoreFactory;
-import io.ebeanservice.docstore.api.DocStoreIntegration;
-import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
-import io.ebeanservice.docstore.none.NoneDocStoreFactory;
 
 import java.util.*;
 
@@ -85,7 +81,6 @@ public final class InternalConfiguration {
   private final ExpressionFactory expressionFactory;
   private final SpiBackgroundExecutor backgroundExecutor;
   private final JsonFactory jsonFactory;
-  private final DocStoreFactory docStoreFactory;
   private final List<Plugin> plugins = new ArrayList<>();
   private final MultiValueBind multiValueBind;
   private final SpiLogManager logManager;
@@ -102,7 +97,6 @@ public final class InternalConfiguration {
     this.clockService = new ClockService(config.getClock());
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
-    this.docStoreFactory = initDocStoreFactory(service(DocStoreFactory.class));
     this.jsonFactory = config.getJsonFactory();
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
@@ -157,17 +151,6 @@ public final class InternalConfiguration {
   private ExpressionFactory initExpressionFactory(DatabaseConfig config) {
     boolean nativeIlike = config.isExpressionNativeIlike() && databasePlatform.supportsNativeIlike();
     return new DefaultExpressionFactory(config.isExpressionEqualsWithNullAsNoop(), nativeIlike);
-  }
-
-  private DocStoreFactory initDocStoreFactory(DocStoreFactory service) {
-    return service == null ? new NoneDocStoreFactory() : service;
-  }
-
-  /**
-   * Return the doc store factory.
-   */
-  public DocStoreFactory getDocStoreFactory() {
-    return docStoreFactory;
   }
 
   ClockService getClockService() {
@@ -338,28 +321,18 @@ public final class InternalConfiguration {
   }
 
   /**
-   * Create the DocStoreIntegration components for the given server.
-   */
-  DocStoreIntegration createDocStoreIntegration(SpiServer server) {
-    return plugin(docStoreFactory.create(server));
-  }
-
-  /**
    * Create the TransactionManager taking into account autoCommit mode.
    */
-  TransactionManager createTransactionManager(SpiServer server, DocStoreUpdateProcessor indexUpdateProcessor) {
+  TransactionManager createTransactionManager(SpiServer server) {
 
     TransactionScopeManager scopeManager = createTransactionScopeManager();
     boolean notifyL2CacheInForeground = cacheManager.isLocalL2Caching() || config.isNotifyL2CacheInForeground();
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
-        indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
+        beanDescriptorManager, dataSource(), profileHandler(), logManager,
         tableModState, cacheNotify, clockService);
 
-    if (config.isDocStoreOnly()) {
-      return new DocStoreTransactionManager(options);
-    }
     return new TransactionManager(options);
   }
 

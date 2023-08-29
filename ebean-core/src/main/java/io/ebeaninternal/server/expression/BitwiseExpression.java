@@ -23,11 +23,6 @@ final class BitwiseExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) {
-    throw new IllegalStateException("Not supported for document queries");
-  }
-
-  @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("Bitwise[");
     builder.append(propName).append(" op:").append(operator).append(" cp:").append(compare);

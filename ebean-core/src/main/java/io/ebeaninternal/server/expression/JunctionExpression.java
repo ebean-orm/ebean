@@ -4,7 +4,6 @@ import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
-import io.ebean.search.*;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
@@ -79,24 +78,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public SpiExpression copyForPlanKey() {
     return new JunctionExpression<>(type, exprList.copyForPlanKey());
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.startBool(type);
-    for (SpiExpression expr : exprList.internalList()) {
-      expr.writeDocQuery(context);
-    }
-    context.endBool();
-  }
-
-  @Override
-  public void writeDocQueryJunction(DocQueryContext context) throws IOException {
-    context.startBoolGroupList(type);
-    for (SpiExpression expr : exprList.internalList()) {
-      expr.writeDocQuery(context);
-    }
-    context.endBoolGroupList();
   }
 
   @Override
@@ -195,41 +176,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   public boolean isSameByBind(SpiExpression other) {
     JunctionExpression<?> that = (JunctionExpression<?>) other;
     return type == that.type && exprList.isSameByBind(that.exprList);
-  }
-
-  @Override
-  public ExpressionList<T> match(String propertyName, String search) {
-    return match(propertyName, search, null);
-  }
-
-  @Override
-  public ExpressionList<T> match(String propertyName, String search, Match options) {
-    return exprList.match(propertyName, search, options);
-  }
-
-  @Override
-  public ExpressionList<T> multiMatch(String query, String... properties) {
-    return exprList.multiMatch(query, properties);
-  }
-
-  @Override
-  public ExpressionList<T> multiMatch(String query, MultiMatch options) {
-    return exprList.multiMatch(query, options);
-  }
-
-  @Override
-  public ExpressionList<T> textSimple(String search, TextSimple options) {
-    return exprList.textSimple(search, options);
-  }
-
-  @Override
-  public ExpressionList<T> textQueryString(String search, TextQueryString options) {
-    return exprList.textQueryString(search, options);
-  }
-
-  @Override
-  public ExpressionList<T> textCommonTerms(String search, TextCommonTerms options) {
-    return exprList.textCommonTerms(search, options);
   }
 
   @Override
@@ -946,11 +892,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public Query<T> setDocIndexName(String indexName) {
-    return exprList.setDocIndexName(indexName);
-  }
-
-  @Override
   public ExpressionList<T> setFirstRow(int firstRow) {
     return exprList.setFirstRow(firstRow);
   }
@@ -978,11 +919,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public Query<T> setUseQueryCache(CacheMode useCache) {
     return exprList.setUseQueryCache(useCache);
-  }
-
-  @Override
-  public Query<T> setUseDocStore(boolean useDocsStore) {
-    return exprList.setUseDocStore(useDocsStore);
   }
 
   @Override
@@ -1036,21 +972,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public Junction<T> must() {
-    return exprList.must();
-  }
-
-  @Override
-  public Junction<T> should() {
-    return exprList.should();
-  }
-
-  @Override
-  public Junction<T> mustNot() {
-    return exprList.mustNot();
-  }
-
-  @Override
   public ExpressionList<T> endJunction() {
     return exprList.endJunction();
   }
@@ -1068,18 +989,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> endNot() {
     return endJunction();
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    PrepareDocNested.prepare(exprList, desc, type);
-    String nestedPath = exprList.allDocNestedPath;
-    if (nestedPath != null) {
-      // push the nestedPath up to parent
-      exprList.setAllDocNested(null);
-      return nestedPath;
-    }
-    return null;
   }
 
   @Override

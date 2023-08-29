@@ -78,16 +78,12 @@ public final class DefaultContainer implements SpiContainer {
       BootupClasses bootupClasses = bootupClasses(config);
 
       boolean online = true;
-      if (config.isDocStoreOnly()) {
-        config.setDatabasePlatform(new DatabasePlatform());
-      } else {
-        TenantMode tenantMode = config.getTenantMode();
-        if (TenantMode.DB != tenantMode) {
-          setDataSource(config);
-          if (!tenantMode.isDynamicDataSource()) {
-            // check the autoCommit and Transaction Isolation
-            online = checkDataSource(config);
-          }
+      TenantMode tenantMode = config.getTenantMode();
+      if (TenantMode.DB != tenantMode) {
+        setDataSource(config);
+        if (!tenantMode.isDynamicDataSource()) {
+          // check the autoCommit and Transaction Isolation
+          online = checkDataSource(config);
         }
       }
 

@@ -83,7 +83,6 @@ final class AnnotationClass extends AnnotationParser {
     // maybe doc store only so check for this before @Entity
     DocStore docStore = typeGet(cls, DocStore.class);
     if (docStore != null) {
-      descriptor.readDocStore(docStore);
       descriptor.setEntityType(EntityType.DOC);
       descriptor.setName(cls.getSimpleName());
     }

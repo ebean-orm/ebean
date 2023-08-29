@@ -17,7 +17,6 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.meta.QueryPlanInit;
-import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
 import io.ebean.plugin.Property;
@@ -44,12 +43,6 @@ import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.util.SortByClause;
 import io.ebeaninternal.util.SortByClauseParser;
-import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
-import io.ebeanservice.docstore.api.DocStoreUpdateContext;
-import io.ebeanservice.docstore.api.DocStoreUpdates;
-import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
-import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
-import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
 import javax.persistence.PersistenceException;
 import java.io.IOException;
@@ -210,12 +203,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final String name;
   private final String baseTableAlias;
   private final boolean cacheSharableBeans;
-  private final String docStoreQueueId;
   private final BeanDescriptorCacheHelp<T> cacheHelp;
   private final BeanDescriptorJsonHelp<T> jsonHelp;
-  private DocStoreBeanAdapter<T> docStoreAdapter;
-  private DocumentMapping docMapping;
-  private boolean docStoreEmbeddedInvalidation;
   private final String defaultSelectClause;
   private SpiEbeanServer ebeanServer;
 
@@ -297,8 +286,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
     this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.cacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
     this.jsonHelp = initJsonHelp();
-    this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);
-    this.docStoreQueueId = docStoreAdapter.queueId();
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy
     // then we also need to check every BeanDescriptors in the InheritInfo as
@@ -576,7 +563,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
         }
       }
     }
-    docStoreEmbeddedInvalidation = docStoreAdapter.hasEmbeddedInvalidation();
   }
 
   private void addUniqueColumns(IndexDefinition indexDef) {
@@ -612,11 +598,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     for (BeanPropertyAssocOne<?> one : propertiesOne) {
       one.initialisePostTarget();
     }
-    if (inheritInfo != null && !inheritInfo.isRoot()) {
-      docStoreAdapter = (DocStoreBeanAdapter<T>) inheritInfo.getRoot().desc().docStoreAdapter();
-    }
-    docMapping = docStoreAdapter.createDocMapping();
-    docStoreAdapter.registerPaths();
     cacheHelp.deriveNotifyFlags();
   }
 
@@ -904,77 +885,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
-   * Return true if this type maps to a root type of a doc store document (not embedded or ignored).
-   */
-  @Override
-  public boolean isDocStoreMapped() {
-    return docStoreAdapter.mapped();
-  }
-
-  /**
-   * Return true if this bean type has embedded doc store invalidation.
-   */
-  public boolean isDocStoreEmbeddedInvalidation() {
-    return docStoreEmbeddedInvalidation;
-  }
-
-  /**
-   * Return the queueId used to uniquely identify this type when queuing an index updateAdd.
-   */
-  @Override
-  public String docStoreQueueId() {
-    return docStoreQueueId;
-  }
-
-  @Override
-  public DocumentMapping docMapping() {
-    return docMapping;
-  }
-
-  /**
-   * Return the doc store helper for this bean type.
-   */
-  @Override
-  public BeanDocType<T> docStore() {
-    return docStoreAdapter;
-  }
-
-  /**
-   * Return doc store adapter for internal use for processing persist requests.
-   */
-  public DocStoreBeanAdapter<T> docStoreAdapter() {
-    return docStoreAdapter;
-  }
-
-  /**
-   * Build the Document mapping recursively with the given prefix relative to the root of the document.
-   */
-  public void docStoreMapping(final DocMappingBuilder mapping, final String prefix) {
-    if (prefix != null && idProperty != null) {
-      // id property not included in the
-      idProperty.docStoreMapping(mapping, prefix);
-    }
-    if (inheritInfo != null) {
-      String discCol = inheritInfo.getDiscriminatorColumn();
-      if (Types.VARCHAR == inheritInfo.getDiscriminatorType()) {
-        mapping.add(new DocPropertyMapping(discCol, DocPropertyType.ENUM));
-      } else {
-        mapping.add(new DocPropertyMapping(discCol, DocPropertyType.INTEGER));
-      }
-    }
-    for (BeanProperty prop : propertiesNonTransient) {
-      prop.docStoreMapping(mapping, prefix);
-    }
-    if (inheritInfo != null) {
-      inheritInfo.visitChildren(inheritInfo1 -> {
-        for (BeanProperty localProperty : inheritInfo1.localProperties()) {
-          localProperty.docStoreMapping(mapping, prefix);
-        }
-      });
-    }
-  }
-
-  /**
    * Return the root bean type if part of inheritance hierarchy.
    */
   @Override
@@ -996,33 +906,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
-   * Return the type of DocStoreMode that should occur for this type of persist request
-   * given the transactions requested mode.
-   */
-  public DocStoreMode docStoreMode(PersistRequest.Type persistType, DocStoreMode txnMode) {
-    return docStoreAdapter.mode(persistType, txnMode);
-  }
-
-  public void docStoreInsert(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext bulkUpdate) throws IOException {
-    docStoreAdapter.insert(idValue, persistRequest, bulkUpdate);
-  }
-
-  public void docStoreUpdate(Object idValue, PersistRequestBean<T> persistRequest, DocStoreUpdateContext bulkUpdate) throws IOException {
-    docStoreAdapter.update(idValue, persistRequest, bulkUpdate);
-  }
-
-  /**
-   * Check if this update invalidates an embedded part of a doc store document.
-   */
-  public void docStoreUpdateEmbedded(PersistRequestBean<T> request, DocStoreUpdates docStoreUpdates) {
-    docStoreAdapter.updateEmbedded(request, docStoreUpdates);
-  }
-
-  public void docStoreDeleteById(Object idValue, DocStoreUpdateContext txn) throws IOException {
-    docStoreAdapter.deleteById(idValue, txn);
-  }
-
-  /**
    * Prepare the query for multi-tenancy check for document store only use.
    */
   public void prepareQuery(SpiQuery<T> query) {
@@ -1031,9 +914,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       if (tenantId != null) {
         tenant.addTenant(query, tenantId);
       }
-    }
-    if (isDocStoreOnly()) {
-      query.setUseDocStore(true);
     }
   }
 

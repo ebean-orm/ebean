@@ -2,7 +2,6 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.*;
 import io.ebean.bean.EntityBean;
-import io.ebean.search.*;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiQuery;
 
@@ -38,31 +37,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   @Override
   public <T> ExpressionList<T> expressionList() {
     return new DefaultExpressionList<>(this);
-  }
-
-  @Override
-  public Expression textMatch(String propertyName, String search, Match options) {
-    return new TextMatchExpression(propertyName, search, options);
-  }
-
-  @Override
-  public Expression textMultiMatch(String query, MultiMatch options) {
-    return new TextMultiMatchExpression(query, options);
-  }
-
-  @Override
-  public Expression textSimple(String search, TextSimple options) {
-    return new TextSimpleExpression(search, options);
-  }
-
-  @Override
-  public Expression textQueryString(String search, TextQueryString options) {
-    return new TextQueryStringExpression(search, options);
-  }
-
-  @Override
-  public Expression textCommonTerms(String search, TextCommonTerms options) {
-    return new TextCommonTermsExpression(search, options);
   }
 
   @Override

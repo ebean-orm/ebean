@@ -10,13 +10,11 @@ import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
-import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.properties.BeanPropertyGetter;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarTypeWrapper;
-import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.FetchType;
@@ -145,7 +143,6 @@ public class DeployBeanProperty {
    * The jdbc data type this maps to.
    */
   private int dbType;
-  private final DeployDocPropertyOptions docMapping = new DeployDocPropertyOptions();
   private int propertyIndex;
   private BeanPropertyGetter getter;
   private BeanPropertySetter setter;
@@ -937,22 +934,6 @@ public class DeployBeanProperty {
 
   public String getDbComment() {
     return dbComment;
-  }
-
-  public void setDocProperty(DocProperty docProperty) {
-    docMapping.setDocProperty(docProperty);
-  }
-
-  public void setDocSortable(DocSortable docSortable) {
-    docMapping.setDocSortable(docSortable);
-  }
-
-  public void setDocCode(DocCode docCode) {
-    docMapping.setDocCode(docCode);
-  }
-
-  public DocPropertyOptions getDocPropertyOptions() {
-    return docMapping.create();
   }
 
   /**

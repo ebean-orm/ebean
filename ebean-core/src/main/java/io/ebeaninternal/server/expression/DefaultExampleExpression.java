@@ -15,7 +15,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -108,17 +107,6 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    if (!list.isEmpty()) {
-      context.startBoolMust();
-      for (SpiExpression expr : list) {
-        expr.writeDocQuery(context);
-      }
-      context.endBool();
-    }
-  }
-
-  @Override
   public Object getIdEqualTo(String idName) {
     // always return null for this expression
     return null;
@@ -127,11 +115,6 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
   @Override
   public SpiExpression copyForPlanKey() {
     return new DefaultExampleExpression(list);
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    return null;
   }
 
   @Override

@@ -31,7 +31,6 @@ public final class DLoadContext implements LoadContext {
   private final int defaultBatchSize;
   private final boolean disableLazyLoading;
   private final boolean includeSoftDeletes;
-  final boolean useDocStore;
 
   /**
    * The path relative to the root of the object graph.
@@ -51,7 +50,6 @@ public final class DLoadContext implements LoadContext {
    * Construct for use with JSON marshalling (doc store).
    */
   public DLoadContext(BeanDescriptor<?> rootDescriptor, PersistenceContext persistenceContext) {
-    this.useDocStore = true;
     this.rootDescriptor = rootDescriptor;
     this.ebeanServer = rootDescriptor.ebeanServer();
     this.persistenceContext = persistenceContext;
@@ -82,7 +80,6 @@ public final class DLoadContext implements LoadContext {
     this.rootDescriptor = request.descriptor();
 
     SpiQuery<?> query = request.query();
-    this.useDocStore = query.isUseDocStore();
     this.asOf = query.getAsOf();
     this.includeSoftDeletes = query.isIncludeSoftDeletes() && query.mode() == SpiQuery.Mode.NORMAL;
     this.readOnly = query.isReadOnly();
@@ -310,10 +307,7 @@ public final class DLoadContext implements LoadContext {
   /**
    * Propagate the original query settings (draft, asOf etc) to the secondary queries.
    */
-  void propagateQueryState(SpiQuery<?> query, boolean docStoreMapped) {
-    if (useDocStore && docStoreMapped) {
-      query.setUseDocStore(true);
-    }
+  void propagateQueryState(SpiQuery<?> query) {
     if (readOnly != null) {
       query.setReadOnly(readOnly);
     }
