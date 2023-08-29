@@ -51,10 +51,8 @@ class TestO2MSet {
     employees.clear();
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(3);
-    assertThat(sql.get(0)).contains("select t0.department_id, t0.id from o2_memp t0 where (t0.department_id)");
-    assertThat(sql.get(1)).contains("select t0.id, t0.code, t0.name, t0.department_id from o2_memp t0 where t0.id = ?");
-    assertThat(sql.get(2)).contains("select t0.id, t0.code, t0.name, t0.department_id from o2_memp t0 where t0.id = ?");
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.department_id, t0.id, t0.code, t0.name, t0.department_id from o2_memp t0 where (t0.department_id)");
 
     final O2MEmp employee2 = new O2MEmp("After1", "Code3");
     employees.add(employee2);
