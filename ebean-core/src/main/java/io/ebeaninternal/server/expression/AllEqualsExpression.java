@@ -22,16 +22,6 @@ final class AllEqualsExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeAllEquals(propMap);
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    return null;
-  }
-
-  @Override
   public void containsMany(BeanDescriptor<?> desc, ManyWhereJoins manyWhereJoin) {
     if (propMap != null) {
       for (String propertyName : propMap.keySet()) {

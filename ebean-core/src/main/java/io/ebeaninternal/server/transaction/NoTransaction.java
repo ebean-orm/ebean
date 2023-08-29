@@ -2,7 +2,6 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
-import io.ebean.annotation.DocStoreMode;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.api.SpiPersistenceContext;
@@ -12,7 +11,6 @@ import io.ebeaninternal.api.TransactionEvent;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
-import io.ebeanservice.docstore.api.DocStoreTransaction;
 
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
@@ -178,16 +176,6 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public DocStoreMode docStoreMode() {
-    return null;
-  }
-
-  @Override
-  public int getDocStoreBatchSize() {
-    return 0;
-  }
-
-  @Override
   public void register(TransactionCallback callback) {
   }
 
@@ -207,15 +195,6 @@ final class NoTransaction implements SpiTransaction {
   @Override
   public boolean isRollbackOnly() {
     return false;
-  }
-
-
-  @Override
-  public void setDocStoreMode(DocStoreMode mode) {
-  }
-
-  @Override
-  public void setDocStoreBatchSize(int batchSize) {
   }
 
   @Override
@@ -395,11 +374,6 @@ final class NoTransaction implements SpiTransaction {
 
   @Override
   public void sendChangeLog(ChangeSet changeSet) {
-  }
-
-  @Override
-  public DocStoreTransaction docStoreTransaction() {
-    return null;
   }
 
   @Override

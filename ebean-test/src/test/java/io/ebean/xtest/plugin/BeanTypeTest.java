@@ -2,14 +2,9 @@ package io.ebean.xtest.plugin;
 
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.FetchPath;
 import io.ebean.Query;
-import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Property;
-import io.ebean.text.PathProperties;
-import io.ebeaninternal.api.SpiQuery;
-import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.junit.jupiter.api.Test;
 import org.tests.inheritance.Stockforecast;
 import org.tests.model.basic.*;
@@ -95,94 +90,6 @@ public class BeanTypeTest {
     beanType(Order.class).setId(order, 42);
 
     assertThat(42).isEqualTo(order.getId());
-  }
-
-  @Test
-  public void isDocStoreIndex() {
-
-    assertThat(beanType(Order.class).isDocStoreMapped()).isFalse();
-    assertThat(beanType(Person.class).isDocStoreMapped()).isFalse();
-
-    assertThat(beanType(Order.class).docMapping()).isNotNull();
-    assertThat(beanType(Person.class).docMapping()).isNull();
-  }
-
-  @Test
-  public void docStore_getEmbedded() {
-
-    BeanDocType<Order> orderDocType = beanType(Order.class).docStore();
-    FetchPath customer = orderDocType.embedded("customer");
-    assertThat(customer).isNotNull();
-    assertThat(customer.getProperties(null)).contains("id", "name");
-  }
-
-  @Test
-  public void docStore_getEmbeddedManyRoot() {
-
-    BeanDocType<Order> orderDocType = beanType(Order.class).docStore();
-
-    FetchPath detailsPath = orderDocType.embedded("details");
-    assertThat(detailsPath).isNotNull();
-
-    FetchPath detailsRoot = orderDocType.embeddedManyRoot("details");
-    assertThat(detailsRoot).isNotNull();
-    assertThat(detailsRoot.getProperties(null)).containsExactly("id", "details");
-    assertThat(detailsRoot.hasPath("details")).isTrue();
-  }
-
-  @Test
-  public void getDocStoreQueueId() {
-
-    assertThat(beanType(Order.class).docStoreQueueId()).isEqualTo("order");
-    assertThat(beanType(Customer.class).docStoreQueueId()).isEqualTo("customer");
-  }
-
-  @Test
-  public void getDocStoreIndexType() {
-
-    assertThat(beanType(Order.class).docStore().indexType()).isEqualTo("order");
-    assertThat(beanType(Customer.class).docStore().indexType()).isEqualTo("customer");
-  }
-
-  @Test
-  public void getDocStoreIndexName() {
-
-    assertThat(beanType(Order.class).docStore().indexType()).isEqualTo("order");
-    assertThat(beanType(Customer.class).docStore().indexType()).isEqualTo("customer");
-  }
-
-  @Test
-  public void docStoreNested() {
-
-    FetchPath parse = PathProperties.parse("id,name");
-
-    FetchPath nestedCustomer = beanType(Order.class).docStore().embedded("customer");
-    assertThat(nestedCustomer.toString()).isEqualTo(parse.toString());
-  }
-
-  @Test
-  public void docStoreApplyPath() {
-
-    SpiQuery<Order> orderQuery = (SpiQuery<Order>) db.find(Order.class);
-    beanType(Order.class).docStore().applyPath(orderQuery);
-
-    OrmQueryDetail detail = orderQuery.detail();
-    assertThat(detail.getChunk("customer", false).getIncluded()).containsExactly("id", "name");
-  }
-
-  @Test
-  public void docStoreIndex() {
-    assertThrows(IllegalStateException.class, () -> beanType(Order.class).docStore().index(1, new Order(), null));
-  }
-
-  @Test
-  public void docStoreDeleteById() {
-    assertThrows(IllegalStateException.class, () -> beanType(Order.class).docStore().deleteById(1, null));
-  }
-
-  @Test
-  public void docStoreUpdateEmbedded() {
-    assertThrows(IllegalStateException.class, () -> beanType(Order.class).docStore().updateEmbedded(1, "customer", "someJson", null));
   }
 
   @Test

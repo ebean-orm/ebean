@@ -2,7 +2,6 @@ package io.ebean;
 
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
-import io.ebean.search.*;
 
 import jakarta.persistence.NonUniqueResultException;
 import java.sql.Connection;
@@ -554,19 +553,6 @@ public interface ExpressionList<T> {
   Query<T> setDistinct(boolean distinct);
 
   /**
-   * Set the index(es) to search for a document store which uses partitions.
-   * <p>
-   * For example, when executing a query against ElasticSearch with daily indexes we can
-   * explicitly specify the indexes to search against.
-   * </p>
-   *
-   * @param indexName The index or indexes to search against
-   * @return This query
-   * @see Query#setDocIndexName(String)
-   */
-  Query<T> setDocIndexName(String indexName);
-
-  /**
    * Set the first row to fetch.
    *
    * @see Query#setFirstRow(int)
@@ -648,14 +634,6 @@ public interface ExpressionList<T> {
   default Query<T> setUseQueryCache(boolean enabled) {
     return setUseQueryCache(enabled ? CacheMode.ON : CacheMode.OFF);
   }
-
-  /**
-   * Set to true if this query should execute against the doc store.
-   * <p>
-   * When setting this you may also consider disabling lazy loading.
-   * </p>
-   */
-  Query<T> setUseDocStore(boolean useDocsStore);
 
   /**
    * Set true if you want to disable lazy loading.
@@ -1579,47 +1557,6 @@ public interface ExpressionList<T> {
   ExpressionList<T> rawOrEmpty(String raw, Collection<?> values);
 
   /**
-   * Add a match expression.
-   *
-   * @param propertyName The property name for the match
-   * @param search       The search value
-   */
-  ExpressionList<T> match(String propertyName, String search);
-
-  /**
-   * Add a match expression with options.
-   *
-   * @param propertyName The property name for the match
-   * @param search       The search value
-   */
-  ExpressionList<T> match(String propertyName, String search, Match options);
-
-  /**
-   * Add a multi-match expression.
-   */
-  ExpressionList<T> multiMatch(String search, String... properties);
-
-  /**
-   * Add a multi-match expression using options.
-   */
-  ExpressionList<T> multiMatch(String search, MultiMatch options);
-
-  /**
-   * Add a simple query string expression.
-   */
-  ExpressionList<T> textSimple(String search, TextSimple options);
-
-  /**
-   * Add a query string expression.
-   */
-  ExpressionList<T> textQueryString(String search, TextQueryString options);
-
-  /**
-   * Add common terms expression.
-   */
-  ExpressionList<T> textCommonTerms(String search, TextCommonTerms options);
-
-  /**
    * And - join two expressions with a logical and.
    */
   ExpressionList<T> and(Expression expOne, Expression expTwo);
@@ -1760,42 +1697,6 @@ public interface ExpressionList<T> {
    * </p>
    */
   Junction<T> disjunction();
-
-  /**
-   * Start a list of expressions that will be joined by MUST.
-   * <p>
-   * This automatically makes the query a useDocStore(true) query that
-   * will execute against the document store (ElasticSearch etc).
-   * </p>
-   * <p>
-   * This is logically similar to and().
-   * </p>
-   */
-  Junction<T> must();
-
-  /**
-   * Start a list of expressions that will be joined by SHOULD.
-   * <p>
-   * This automatically makes the query a useDocStore(true) query that
-   * will execute against the document store (ElasticSearch etc).
-   * </p>
-   * <p>
-   * This is logically similar to or().
-   * </p>
-   */
-  Junction<T> should();
-
-  /**
-   * Start a list of expressions that will be joined by MUST NOT.
-   * <p>
-   * This automatically makes the query a useDocStore(true) query that
-   * will execute against the document store (ElasticSearch etc).
-   * </p>
-   * <p>
-   * This is logically similar to not().
-   * </p>
-   */
-  Junction<T> mustNot();
 
   /**
    * End a junction returning the parent expression list.

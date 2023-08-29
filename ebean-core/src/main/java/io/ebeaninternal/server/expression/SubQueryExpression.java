@@ -42,11 +42,6 @@ final class SubQueryExpression extends AbstractExpression implements Unsupported
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) {
-    throw new IllegalStateException("Not supported");
-  }
-
-  @Override
   public void prepareExpression(BeanQueryRequest<?> request) {
     CQuery<?> subQuery = compileSubQuery(request);
     this.bindParams = subQuery.predicates().whereExprBindValues();

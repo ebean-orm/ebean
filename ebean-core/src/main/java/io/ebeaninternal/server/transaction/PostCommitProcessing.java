@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.transaction;
 
-import io.ebean.annotation.DocStoreMode;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.api.TransactionEvent;
@@ -9,7 +8,6 @@ import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.PersistRequestBean;
-import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 import java.util.List;
 import java.util.Set;
@@ -33,8 +31,6 @@ final class PostCommitProcessing {
   private final List<PersistRequestBean<?>> listenerNotify;
   private final RemoteTransactionEvent remoteTransactionEvent;
   private final DeleteByIdMap deleteByIdMap;
-  private final DocStoreMode txnDocStoreMode;
-  private final int txnDocStoreBatchSize;
 
   /**
    * Create for an external modification.
@@ -43,8 +39,6 @@ final class PostCommitProcessing {
     this.clusterManager = clusterManager;
     this.manager = manager;
     this.serverName = manager.name();
-    this.txnDocStoreMode = DocStoreMode.IGNORE;
-    this.txnDocStoreBatchSize = 0;
     this.event = event;
     this.deleteByIdMap = event.deleteByIdMap();
     this.listenerNotify = event.listenerNotify();
@@ -58,8 +52,6 @@ final class PostCommitProcessing {
     this.clusterManager = clusterManager;
     this.manager = manager;
     this.serverName = manager.name();
-    this.txnDocStoreMode = transaction.docStoreMode();
-    this.txnDocStoreBatchSize = transaction.getDocStoreBatchSize();
     this.event = transaction.event();
     this.deleteByIdMap = event.deleteByIdMap();
     this.listenerNotify = event.listenerNotify();
@@ -74,32 +66,6 @@ final class PostCommitProcessing {
       // process l2 cache changes in foreground
       processCacheChanges();
     }
-  }
-
-  /**
-   * Process any document store updates.
-   */
-  private void processDocStoreUpdates() {
-    if (isDocStoreUpdate()) {
-      // collect 'bulk update' and 'queue' events
-      DocStoreUpdates docStoreUpdates = new DocStoreUpdates();
-      event.addDocStoreUpdates(docStoreUpdates);
-      if (deleteByIdMap != null) {
-        deleteByIdMap.addDocStoreUpdates(docStoreUpdates, txnDocStoreMode);
-      }
-
-      if (!docStoreUpdates.isEmpty()) {
-        // send to docstore / ElasticSearch and/or queue
-        manager.processDocStoreUpdates(docStoreUpdates, txnDocStoreBatchSize);
-      }
-    }
-  }
-
-  /**
-   * Return true if updates to the document store occur for this transaction.
-   */
-  private boolean isDocStoreUpdate() {
-    return manager.isDocStoreActive() && (txnDocStoreMode == null || txnDocStoreMode != DocStoreMode.IGNORE);
   }
 
   private void notifyCluster() {
@@ -122,7 +88,6 @@ final class PostCommitProcessing {
       }
       localPersistListenersNotify();
       notifyCluster();
-      processDocStoreUpdates();
     };
   }
 

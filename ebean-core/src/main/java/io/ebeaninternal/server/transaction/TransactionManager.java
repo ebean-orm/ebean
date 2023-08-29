@@ -25,9 +25,6 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.profile.TimedProfileLocation;
 import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
-import io.ebeanservice.docstore.api.DocStoreTransaction;
-import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
-import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -75,12 +72,9 @@ public class TransactionManager implements SpiTransactionManager {
   private final BackgroundExecutor backgroundExecutor;
   private final ClusterManager clusterManager;
   private final String serverName;
-  private final boolean docStoreActive;
-
   /**
    * The elastic search index update processor.
    */
-  final DocStoreUpdateProcessor docStoreUpdateProcessor;
   private final boolean autoPersistUpdates;
   private final boolean persistBatch;
   private final boolean persistBatchOnCascade;
@@ -130,8 +124,6 @@ public class TransactionManager implements SpiTransactionManager {
     this.cacheNotify = options.cacheNotify;
     this.backgroundExecutor = options.backgroundExecutor;
     this.dataSourceSupplier = options.dataSourceSupplier;
-    this.docStoreActive = options.config.getDocStoreConfig().isActive();
-    this.docStoreUpdateProcessor = options.docStoreUpdateProcessor;
     this.profileHandler = options.profileHandler;
     this.bulkEventListenerMap = new BulkEventListenerMap(options.config.getBulkTableEventListeners());
     this.prefix = "";
@@ -208,14 +200,6 @@ public class TransactionManager implements SpiTransactionManager {
    */
   final boolean isSupportsSavepointId() {
     return supportsSavepointId;
-  }
-
-  final boolean isDocStoreActive() {
-    return docStoreActive;
-  }
-
-  final DocStoreTransaction createDocStoreTransaction(int docStoreBatchSize) {
-    return docStoreUpdateProcessor.createTransaction(docStoreBatchSize);
   }
 
   final boolean isSkipCacheAfterWrite() {
@@ -377,13 +361,6 @@ public class TransactionManager implements SpiTransactionManager {
       }
     }
     changeSet.apply();
-  }
-
-  /**
-   * Process the docstore / ElasticSearch updates.
-   */
-  final void processDocStoreUpdates(DocStoreUpdates docStoreUpdates, int bulkBatchSize) {
-    docStoreUpdateProcessor.process(docStoreUpdates, bulkBatchSize);
   }
 
   /**

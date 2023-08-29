@@ -52,7 +52,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
 
       query0.setLazyLoadForParents(beanProperty);
 
-      beanProperty.addWhereParentIdIn(query0, parentIds, false);
+      beanProperty.addWhereParentIdIn(query0, parentIds);
 
       query0.findList();
       assertThat(query0.getGeneratedSql()).contains(" from o_order_detail t0 where (t0.order_id) ");

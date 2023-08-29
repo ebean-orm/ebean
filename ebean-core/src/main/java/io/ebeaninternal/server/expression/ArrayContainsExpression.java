@@ -24,23 +24,6 @@ final class ArrayContainsExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    if (values.length == 1) {
-      context.writeEqualTo(propName, values[0]);
-    } else {
-      if (contains) {
-        context.startBoolMust();
-      } else {
-        context.startBoolMustNot();
-      }
-      for (Object value : values) {
-        context.writeEqualTo(propName, value);
-      }
-      context.endBool();
-    }
-  }
-
-  @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("ArrayContains[").append(propName)
       .append(" b:").append(contains)

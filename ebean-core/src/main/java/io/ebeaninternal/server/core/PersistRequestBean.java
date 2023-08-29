@@ -16,9 +16,6 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.persist.*;
 import io.ebeaninternal.server.transaction.BeanPersistIdMap;
-import io.ebeanservice.docstore.api.DocStoreUpdate;
-import io.ebeanservice.docstore.api.DocStoreUpdateContext;
-import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.OptimisticLockException;
@@ -30,7 +27,7 @@ import java.util.*;
 /**
  * PersistRequest for insert update or delete of a bean.
  */
-public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T>, DocStoreUpdate, PreGetterCallback, SpiProfileTransactionEvent {
+public final class PersistRequestBean<T> extends PersistRequest implements BeanPersistRequest<T>, PreGetterCallback, SpiProfileTransactionEvent {
 
   private final BeanManager<T> beanManager;
   private final BeanDescriptor<T> beanDescriptor;
@@ -46,7 +43,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private final boolean dirty;
   private int flags;
   private boolean saveRecurse;
-  private DocStoreMode docStoreMode;
   private final ConcurrencyMode concurrencyMode;
   /**
    * The unique id used for logging summary.
@@ -136,7 +132,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     this.parentBean = parentBean;
     this.controller = beanDescriptor.persistController();
     this.type = type;
-    this.docStoreMode = calcDocStoreMode(transaction, type);
     this.flags = flags;
     if (Flags.isRecurse(flags)) {
       this.persistCascade = t.isPersistCascade();
@@ -180,17 +175,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     profileBase(type.profileEventId, offset, beanDescriptor.name(), flushCount);
   }
 
-  /**
-   * Return the document store event that should be used for this request.
-   * <p>
-   * Used to check if the Transaction has set the mode to IGNORE when doing large batch inserts that we
-   * don't want to send to the doc store.
-   */
-  private DocStoreMode calcDocStoreMode(SpiTransaction txn, Type type) {
-    DocStoreMode txnMode = (txn == null) ? null : txn.docStoreMode();
-    return beanDescriptor.docStoreMode(type, txnMode);
-  }
-
   @Override
   public boolean isCascade() {
     return Flags.isRecurse(flags);
@@ -210,9 +194,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Init the transaction and also check for batch on cascade escalation.
    */
   public void initTransIfRequiredWithBatchCascade() {
-    if (createImplicitTransIfRequired()) {
-      docStoreMode = calcDocStoreMode(transaction, type);
-    }
+    createImplicitTransIfRequired();
     checkBatchEscalationOnCascade();
   }
 
@@ -412,15 +394,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return true if this change should notify persist listener or doc store (and keep the request).
    */
   private boolean isNotifyListeners() {
-    return isNotifyPersistListener() || isDocStoreNotify();
+    return isNotifyPersistListener();
   }
 
-  /**
-   * Return true if this request should update the document store.
-   */
-  private boolean isDocStoreNotify() {
-    return docStoreMode != DocStoreMode.IGNORE;
-  }
 
   private boolean isNotifyPersistListener() {
     return beanPersistListener != null;
@@ -445,46 +421,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         default:
           throw new IllegalStateException("Invalid type " + type);
       }
-    }
-  }
-
-  /**
-   * Process the persist request updating the document store.
-   */
-  @Override
-  public void docStoreUpdate(DocStoreUpdateContext txn) throws IOException {
-    switch (type) {
-      case INSERT:
-        beanDescriptor.docStoreInsert(idValue, this, txn);
-        break;
-      case UPDATE:
-      case DELETE_SOFT:
-        beanDescriptor.docStoreUpdate(idValue, this, txn);
-        break;
-      case DELETE:
-        beanDescriptor.docStoreDeleteById(idValue, txn);
-        break;
-      default:
-        throw new IllegalStateException("Invalid type " + type);
-    }
-  }
-
-  /**
-   * Add this event to the queue entries in IndexUpdates.
-   */
-  @Override
-  public void addToQueue(DocStoreUpdates docStoreUpdates) {
-    switch (type) {
-      case INSERT:
-      case UPDATE:
-      case DELETE_SOFT:
-        docStoreUpdates.queueIndex(beanDescriptor.docStoreQueueId(), idValue);
-        break;
-      case DELETE:
-        docStoreUpdates.queueDelete(beanDescriptor.docStoreQueueId(), idValue);
-        break;
-      default:
-        throw new IllegalStateException("Invalid type " + type);
     }
   }
 
@@ -821,7 +757,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     setNotifyCache();
     boolean isChangeLog = beanDescriptor.isChangeLog();
-    if (type == Type.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
+    if (type == Type.UPDATE && (isChangeLog || notifyCache)) {
       // get the dirty properties for update notification to the doc store
       dirtyProperties = intercept.dirtyProperties();
     }
@@ -1031,32 +967,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   /**
-   * For requests that update document store add this event to either the list
-   * of queue events or list of update events.
-   */
-  public void addDocStoreUpdates(DocStoreUpdates docStoreUpdates) {
-    if (type == Type.UPDATE) {
-      beanDescriptor.docStoreUpdateEmbedded(this, docStoreUpdates);
-    }
-    switch (docStoreMode) {
-      case UPDATE: {
-        docStoreUpdates.addPersist(this);
-        return;
-      }
-      case QUEUE: {
-        if (type == Type.DELETE) {
-          docStoreUpdates.queueDelete(beanDescriptor.docStoreQueueId(), idValue);
-        } else {
-          docStoreUpdates.queueIndex(beanDescriptor.docStoreQueueId(), idValue);
-        }
-      }
-      break;
-      default:
-        break;
-    }
-  }
-
-  /**
    * Determine if all loaded properties should be used for an update.
    * <p>
    * Takes into account transaction setting and JDBC batch.
@@ -1171,30 +1081,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     // delete handled by the BeanController so return 0
     return 0;
-  }
-
-  /**
-   * Persist to the document store now (via buffer, not post commit).
-   */
-  public void docStorePersist() {
-    idValue = beanDescriptor.getId(entityBean);
-    if (type == Type.UPDATE) {
-      dirtyProperties = intercept.dirtyProperties();
-    }
-    // processing now so set IGNORE (unlike DB + DocStore processing with post-commit)
-    docStoreMode = DocStoreMode.IGNORE;
-    try {
-      docStoreUpdate(transaction.docStoreTransaction().obtain());
-      postExecute();
-      if (type == Type.UPDATE
-        && beanDescriptor.isDocStoreEmbeddedInvalidation()
-        && transaction.isPersistCascade()) {
-        // queue embedded/nested updates for later processing
-        beanDescriptor.docStoreUpdateEmbedded(this, transaction.docStoreTransaction().queue());
-      }
-    } catch (IOException e) {
-      throw new PersistenceException("Error persisting doc store bean", e);
-    }
   }
 
   /**

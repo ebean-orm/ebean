@@ -40,7 +40,6 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.util.ParamTypeHelper;
 import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
-import io.ebeanservice.docstore.api.DocStoreIntegration;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.NonUniqueResultException;
@@ -99,7 +98,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DefaultBeanLoader beanLoader;
   private final EncryptKeyManager encryptKeyManager;
   private final SpiJsonContext jsonContext;
-  private final DocumentStore documentStore;
   private final MetaInfoManager metaInfoManager;
   private final CurrentTenantProvider currentTenantProvider;
   private final SpiLogManager logManager;
@@ -146,9 +144,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.dataTimeZone = config.getDataTimeZone();
     this.clockService = config.getClockService();
 
-    DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
-    this.transactionManager = config.createTransactionManager(this, docStoreComponents.updateProcessor());
-    this.documentStore = docStoreComponents.documentStore();
+    this.transactionManager = config.createTransactionManager(this);
     this.queryPlanManager = config.initQueryPlanManager(transactionManager);
     this.metaInfoManager = new DefaultMetaInfoManager(this, this.config.getMetricNaming());
     this.serverPlugins = config.getPlugins();
@@ -182,9 +178,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
    * Execute all the plugins with an online flag indicating the DB is up or not.
    */
   public void executePlugins(boolean online) {
-    if (!config.isDocStoreOnly()) {
-      ddlGenerator.execute(online);
-    }
+    ddlGenerator.execute(online);
     for (Plugin plugin : serverPlugins) {
       plugin.online(online);
     }
@@ -992,9 +986,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     SpiOrmQueryRequest<T> request = buildQueryRequest(query);
     request.prepareQuery();
-    if (request.isUseDocStore()) {
-      return docStore().find(request);
-    }
     try {
       request.initTransIfRequired();
       return (T) request.findId();
@@ -1282,9 +1273,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (maxRows == 0) {
       throw new PersistenceException("maxRows must be specified for findPagedList() query");
     }
-    if (query.isUseDocStore()) {
-      return docStore().findPagedList(createQueryRequest(Type.LIST, query));
-    }
     return new LimitOffsetPagedList<>(this, query);
   }
 
@@ -1312,10 +1300,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> void findEach(SpiQuery<T> query, Consumer<T> consumer) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query);
-    if (request.isUseDocStore()) {
-      docStore().findEach(request, consumer);
-      return;
-    }
     request.initTransIfRequired();
     request.findEach(consumer);
     // no try finally - findEach guarantee's cleanup of the transaction if required
@@ -1324,10 +1308,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> void findEach(SpiQuery<T> query, int batch, Consumer<List<T>> consumer) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query);
-//    if (request.isUseDocStore()) {
-//      docStore().findEach(request, consumer);
-//      return;
-//    }
     request.initTransIfRequired();
     request.findEach(batch, consumer);
     // no try finally - findEach guarantee's cleanup of the transaction if required
@@ -1336,10 +1316,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> void findEachWhile(SpiQuery<T> query, Predicate<T> consumer) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.ITERATE, query);
-    if (request.isUseDocStore()) {
-      docStore().findEachWhile(request, consumer);
-      return;
-    }
     request.initTransIfRequired();
     request.findEachWhile(consumer);
     // no try finally - findEachWhile guarantee's cleanup of the transaction if required
@@ -1373,9 +1349,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     Object result = request.getFromQueryCache();
     if (result != null) {
       return (List<T>) result;
-    }
-    if (request.isUseDocStore()) {
-      return docStore().findList(request);
     }
     try {
       request.initTransIfRequired();
@@ -1944,16 +1917,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return descriptorManager.beanTypes(tableName);
   }
 
-  @Override
-  public BeanType<?> beanTypeForQueueId(String queueId) {
-    return descriptorByQueueId(queueId);
-  }
-
-  @Override
-  public BeanDescriptor<?> descriptorByQueueId(String queueId) {
-    return descriptorManager.descriptorByQueueId(queueId);
-  }
-
   /**
    * Return the SPI bean types for the given bean class.
    */
@@ -2058,11 +2021,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public CallOrigin createCallOrigin() {
     return callStackFactory.createCallOrigin();
-  }
-
-  @Override
-  public DocumentStore docStore() {
-    return documentStore;
   }
 
   @Override

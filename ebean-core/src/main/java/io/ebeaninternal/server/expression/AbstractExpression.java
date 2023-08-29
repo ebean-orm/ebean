@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.expression;
 
 import io.ebean.event.BeanQueryRequest;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
@@ -43,21 +42,6 @@ abstract class AbstractExpression implements SpiExpression {
   @Override
   public SpiExpression copyForPlanKey() {
     return this;
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    return propertyNestedPath(propName, desc);
-  }
-
-  protected String propertyNestedPath(String propertyName, BeanDescriptor<?> desc) {
-    if (propertyName != null) {
-      ElPropertyDeploy elProp = desc.elPropertyDeploy(propertyName);
-      if (elProp != null && elProp.containsMany()) {
-        return SplitName.begin(propName);
-      }
-    }
-    return null;
   }
 
   @Override

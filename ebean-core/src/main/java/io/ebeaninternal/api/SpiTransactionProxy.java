@@ -2,14 +2,12 @@ package io.ebeaninternal.api;
 
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
-import io.ebean.annotation.DocStoreMode;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
-import io.ebeanservice.docstore.api.DocStoreTransaction;
 
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
@@ -111,32 +109,6 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   public Object tenantId() {
     return transaction.tenantId();
   }
-
-  @Override
-  public DocStoreTransaction docStoreTransaction() {
-    return transaction.docStoreTransaction();
-  }
-
-  @Override
-  public DocStoreMode docStoreMode() {
-    return transaction.docStoreMode();
-  }
-
-  @Override
-  public void setDocStoreMode(DocStoreMode mode) {
-    transaction.setDocStoreMode(mode);
-  }
-
-  @Override
-  public int getDocStoreBatchSize() {
-    return transaction.getDocStoreBatchSize();
-  }
-
-  @Override
-  public void setDocStoreBatchSize(int batchSize) {
-    transaction.setDocStoreBatchSize(batchSize);
-  }
-
 
   @Override
   public boolean isLogSql() {

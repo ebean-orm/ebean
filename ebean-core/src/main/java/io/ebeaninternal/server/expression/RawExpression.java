@@ -7,7 +7,6 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.DeployPropertyParser;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
-import java.io.IOException;
 import java.util.Collection;
 
 final class RawExpression extends NonPrepareExpression {
@@ -19,16 +18,6 @@ final class RawExpression extends NonPrepareExpression {
   RawExpression(String sql, Object[] values) {
     this.sql = sql;
     this.values = values;
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeRaw(sql, values);
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    return null;
   }
 
   @Override

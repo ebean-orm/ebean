@@ -100,11 +100,6 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
   BeanDescriptor<?> descriptorById(String className);
 
   /**
-   * Return BeanDescriptor using it's unique doc store queueId.
-   */
-  BeanDescriptor<?> descriptorByQueueId(String queueId);
-
-  /**
    * Return BeanDescriptors mapped to this table.
    */
   List<BeanDescriptor<?>> descriptors(String tableName);

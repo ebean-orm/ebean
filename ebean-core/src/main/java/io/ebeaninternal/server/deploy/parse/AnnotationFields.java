@@ -78,17 +78,8 @@ final class AnnotationFields extends AnnotationParser {
       prop.setEmbedded();
       info.setEmbeddedId(prop);
     }
-    DocEmbedded docEmbedded = get(prop, DocEmbedded.class);
-    if (docEmbedded != null) {
-      prop.setDocStoreEmbedded(docEmbedded.doc());
-      if (descriptor.isDocStoreOnly()) {
-        if (has(prop, ManyToOne.class)) {
-          prop.setEmbedded();
-          prop.setDbInsertable(true);
-          prop.setDbUpdateable(true);
-        }
-      }
-    }
+    // TODO: Not Supported - DocEmbedded docEmbedded = get(prop, DocEmbedded.class);
+
     if (prop instanceof DeployBeanPropertyAssocOne<?>) {
       if (prop.isId() && !prop.isEmbedded()) {
         prop.setEmbedded();
@@ -241,18 +232,10 @@ final class AnnotationFields extends AnnotationParser {
   }
 
   private void initFormula(DeployBeanProperty prop) {
-    DocCode docCode = get(prop, DocCode.class);
-    if (docCode != null) {
-      prop.setDocCode(docCode);
-    }
-    DocSortable docSortable = get(prop, DocSortable.class);
-    if (docSortable != null) {
-      prop.setDocSortable(docSortable);
-    }
-    DocProperty docProperty = get(prop, DocProperty.class);
-    if (docProperty != null) {
-      prop.setDocProperty(docProperty);
-    }
+    // TODO: Not Supported - DocCode docCode = get(prop, DocCode.class);
+    //DocSortable docSortable = get(prop, DocSortable.class);
+    //DocProperty docProperty = get(prop, DocProperty.class);
+
     Formula formula = prop.getMetaAnnotationFormula(platform);
     if (formula != null) {
       prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));

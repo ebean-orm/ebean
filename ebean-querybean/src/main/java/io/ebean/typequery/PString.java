@@ -134,16 +134,4 @@ public final class PString<R> extends PBaseComparable<R, String> {
     return _root;
   }
 
-  /**
-   * Add a full text "Match" expression.
-   * <p>
-   * This means the query will automatically execute against the document store (ElasticSearch).
-   * </p>
-   *
-   * @param value the match expression
-   */
-  public R match(String value) {
-    expr().match(_name, value);
-    return _root;
-  }
 }

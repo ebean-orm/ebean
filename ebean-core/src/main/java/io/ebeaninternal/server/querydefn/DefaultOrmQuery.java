@@ -103,7 +103,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Bind parameters when using the query language.
    */
   private BindParams bindParams;
-  private DefaultExpressionList<T> textExpressions;
   private DefaultExpressionList<T> whereExpressions;
   private DefaultExpressionList<T> havingExpressions;
   private boolean asOfBaseTable;
@@ -147,8 +146,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private PersistenceContext persistenceContext;
   private ManyWhereJoins manyWhereJoins;
   private SpiRawSql rawSql;
-  private boolean useDocStore;
-  private String docIndexName;
   private OrmUpdateProperties updateProperties;
   private String nativeSql;
   private boolean orderById;
@@ -256,17 +253,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final Query<T> setUseDocStore(boolean useDocStore) {
-    this.useDocStore = useDocStore;
-    return this;
-  }
-
-  @Override
-  public final boolean isUseDocStore() {
-    return useDocStore;
-  }
-
-  @Override
   public final Query<T> apply(FetchPath fetchPath) {
     fetchPath.apply(this);
     return this;
@@ -340,18 +326,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final Query<T> setIncludeSoftDeletes() {
     this.temporalMode = TemporalMode.SOFT_DELETED;
     return this;
-  }
-
-  @Override
-  public final Query<T> setDocIndexName(String indexName) {
-    this.docIndexName = indexName;
-    this.useDocStore = true;
-    return this;
-  }
-
-  @Override
-  public final String getDocIndexName() {
-    return docIndexName;
   }
 
   @Override
@@ -477,9 +451,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final SpiQuerySecondary convertJoins() {
-    if (!useDocStore) {
-      createExtraJoinsToSupportManyWhereClause();
-    }
+    createExtraJoinsToSupportManyWhereClause();
     markQueryJoins();
     return new OrmQuerySecondary(removeQueryJoins(), removeLazyJoins());
   }
@@ -546,16 +518,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (filterMany != null) {
       OrmQueryProperties chunk = detail.getChunk(prop, true);
       chunk.setFilterMany((SpiExpressionList<?>) filterMany);
-    }
-  }
-
-  @Override
-  public final void prepareDocNested() {
-    if (textExpressions != null) {
-      textExpressions.prepareDocNested(beanDescriptor);
-    }
-    if (whereExpressions != null) {
-      whereExpressions.prepareDocNested(beanDescriptor);
     }
   }
 
@@ -1007,9 +969,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     StringBuilder sb = new StringBuilder(300);
     if (type != null) {
       sb.append(type.ordinal());
-    }
-    if (useDocStore) {
-      sb.append("/ds");
     }
     if (beanDescriptor.discValue() != null) {
       sb.append("/dv").append(beanDescriptor.discValue());
@@ -1586,7 +1545,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final boolean checkPagingOrderBy() {
-    return orderById && !useDocStore;
+    return orderById;
   }
 
   @Override
@@ -1784,15 +1743,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final ExpressionList<T> text() {
-    if (textExpressions == null) {
-      useDocStore = true;
-      textExpressions = new DefaultExpressionList<>(this);
-    }
-    return textExpressions;
-  }
-
-  @Override
   public final ExpressionList<T> where() {
     if (whereExpressions == null) {
       whereExpressions = new DefaultExpressionList<>(this, null);
@@ -1829,11 +1779,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final SpiExpressionList<T> whereExpressions() {
     return whereExpressions;
-  }
-
-  @Override
-  public final SpiExpressionList<T> textExpression() {
-    return textExpressions;
   }
 
   @Override

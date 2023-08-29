@@ -8,9 +8,6 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.io.IOException;
-
-
 /**
  * Null / Not Null expression.
  * <p>
@@ -43,11 +40,6 @@ final class NullExpression extends AbstractExpression {
       }
       propertyContainsMany(propName, desc, manyWhereJoin);
     }
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeExists(notNull, propName);
   }
 
   @Override
