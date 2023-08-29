@@ -13,7 +13,7 @@ public class O2MDepart {
 
   private final String name;
 
-  @OneToMany(cascade = CascadeType.PERSIST)
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   private final Set<O2MEmp> employees = new LinkedHashSet<>();
 
   public O2MDepart(String name) {
