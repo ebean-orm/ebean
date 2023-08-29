@@ -8,8 +8,6 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import java.io.IOException;
-
 final class IsEmptyExpression extends AbstractExpression {
 
   private final boolean empty;
@@ -20,32 +18,6 @@ final class IsEmptyExpression extends AbstractExpression {
     super(propertyName);
     this.empty = empty;
     this.propertyPath = SplitName.split(propertyName)[0];
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    if (empty) {
-      // capture the nestedPath as we want to put wrap
-      // a NOT around the outer of the nested path  exists
-      this.nestedPath = propertyNestedPath(propName, desc);
-      return null;
-    } else {
-      return super.nestedPath(desc);
-    }
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    if (nestedPath == null) {
-      context.writeExists(!empty, propName);
-    } else {
-      // wrap bool must not around the outside of nested path exists expression
-      context.startBoolMustNot();
-      context.startNested(nestedPath);
-      context.writeExists(empty, propName);
-      context.endNested();
-      context.endBool();
-    }
   }
 
   public String getPropName() {

@@ -32,10 +32,8 @@ module io.ebean.api {
   exports io.ebean.event;
   exports io.ebean.event.changelog;
   exports io.ebean.common;
-  exports io.ebean.docstore;
   exports io.ebean.plugin;
   exports io.ebean.metric;
-  exports io.ebean.search;
   exports io.ebean.service;
   exports io.ebean.text;
   exports io.ebean.text.json;

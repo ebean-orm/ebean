@@ -5,7 +5,6 @@ import io.ebean.Version;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeanservice.docstore.api.DocQueryRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * Defines the ORM query request api.
  */
-public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequest<T> {
+public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T> {
 
   /**
    * Return the query.
@@ -177,11 +176,6 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
    * Mark the underlying transaction as not being query only.
    */
   void markNotQueryOnly();
-
-  /**
-   * Return true if this query is expected to use the doc store.
-   */
-  boolean isUseDocStore();
 
   /**
    * Return true if delete by statement is allowed for this type given cascade rules etc.

@@ -34,8 +34,6 @@ import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
 import io.ebeaninternal.server.type.TypeManager;
-import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
-import io.ebeanservice.docstore.api.DocStoreFactory;
 
 import javax.persistence.MappedSuperclass;
 import javax.persistence.PersistenceException;
@@ -77,7 +75,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final ChangeLogListener changeLogListener;
   private final ChangeLogRegister changeLogRegister;
   private final ChangeLogPrepare changeLogPrepare;
-  private final DocStoreFactory docStoreFactory;
   private final MultiValueBind multiValueBind;
   private final TypeManager typeManager;
   private final BootupClasses bootupClasses;
@@ -85,7 +82,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final List<BeanDescriptor<?>> elementDescriptors = new ArrayList<>();
   private final Map<Class<?>, BeanTable> beanTableMap = new HashMap<>();
   private final Map<String, BeanDescriptor<?>> descMap = new HashMap<>();
-  private final Map<String, BeanDescriptor<?>> descQueueMap = new HashMap<>();
   private final Map<String, BeanManager<?>> beanManagerMap = new HashMap<>();
   private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<>();
   private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<>();
@@ -119,7 +115,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.config = config.getConfig();
     this.serverName = InternString.intern(this.config.getName());
     this.cacheManager = config.getCacheManager();
-    this.docStoreFactory = config.getDocStoreFactory();
     this.backgroundExecutor = config.getBackgroundExecutor();
     this.dataSource = this.config.getDataSource();
     this.encryptKeyManager = this.config.getEncryptKeyManager();
@@ -209,15 +204,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   @Override
   public DatabaseConfig config() {
     return config;
-  }
-
-  @Override
-  public <T> DocStoreBeanAdapter<T> createDocStoreBeanAdapter(BeanDescriptor<T> descriptor, DeployBeanDescriptor<T> deploy) {
-    return docStoreFactory.createAdapter(descriptor, deploy);
-  }
-
-  public BeanDescriptor<?> descriptorByQueueId(String queueId) {
-    return descQueueMap.get(queueId);
   }
 
   @Override
@@ -553,9 +539,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private void registerDescriptor(DeployBeanInfo<?> info) {
     BeanDescriptor<?> desc = new BeanDescriptor<>(this, info.getDescriptor());
     descMap.put(desc.type().getName(), desc);
-    if (desc.isDocStoreMapped()) {
-      descQueueMap.put(desc.docStoreQueueId(), desc);
-    }
     for (BeanPropertyAssocMany<?> many : desc.propertiesMany()) {
       if (many.isElementCollection()) {
         elementDescriptors.add(many.elementDescriptor());

@@ -9,7 +9,6 @@ import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
-import io.ebeanservice.docstore.api.DocStoreTransaction;
 
 import javax.persistence.PersistenceException;
 import java.sql.Connection;
@@ -170,26 +169,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public void register(TransactionCallback callback) {
-    throw new IllegalStateException(notExpectedMessage);
-  }
-
-  @Override
-  public int getDocStoreBatchSize() {
-    return 0;
-  }
-
-  @Override
-  public void setDocStoreBatchSize(int docStoreBatchSize) {
-    throw new IllegalStateException(notExpectedMessage);
-  }
-
-  @Override
-  public DocStoreMode docStoreMode() {
-    return null;
-  }
-
-  @Override
-  public void setDocStoreMode(DocStoreMode docStoreMode) {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -628,11 +607,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
-    throw new IllegalStateException(notExpectedMessage);
-  }
-
-  @Override
-  public DocStoreTransaction docStoreTransaction() {
     throw new IllegalStateException(notExpectedMessage);
   }
 

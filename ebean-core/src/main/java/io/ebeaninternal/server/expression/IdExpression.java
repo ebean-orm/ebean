@@ -3,8 +3,6 @@ package io.ebeaninternal.server.expression;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.io.IOException;
-
 /**
  * Slightly redundant as Query.setId() ultimately also does the same job.
  */
@@ -19,16 +17,6 @@ final class IdExpression extends NonPrepareExpression implements SpiExpression {
   @Override
   public void prefixProperty(String path) {
     throw new IllegalStateException("Not allowed?");
-  }
-
-  @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.writeId(value);
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    return null;
   }
 
   /**

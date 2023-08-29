@@ -317,43 +317,6 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setPersistenceContextScope(PersistenceContextScope scope);
 
   /**
-   * Set the index(es) to search for a document store which uses partitions.
-   * <p>
-   * For example, when executing a query against ElasticSearch with daily indexes we can
-   * explicitly specify the indexes to search against.
-   * </p>
-   * <pre>{@code
-   *
-   *   // explicitly specify the indexes to search
-   *   query.setDocIndexName("logstash-2016.11.5,logstash-2016.11.6")
-   *
-   *   // search today's index
-   *   query.setDocIndexName("$today")
-   *
-   *   // search the last 3 days
-   *   query.setDocIndexName("$last-3")
-   *
-   * }</pre>
-   * <p>
-   * If the indexName is specified with ${daily} e.g. "logstash-${daily}" ... then we can use
-   * $today and $last-x as the search docIndexName like the examples below.
-   * </p>
-   * <pre>{@code
-   *
-   *   // search today's index
-   *   query.setDocIndexName("$today")
-   *
-   *   // search the last 3 days
-   *   query.setDocIndexName("$last-3")
-   *
-   * }</pre>
-   *
-   * @param indexName The index or indexes to search against
-   * @return This query
-   */
-  Query<T> setDocIndexName(String indexName);
-
-  /**
    * Return the ExpressionFactory used by this query.
    */
   ExpressionFactory getExpressionFactory();
@@ -1289,27 +1252,6 @@ public interface Query<T> extends CancelableQuery {
   ExpressionList<T> where();
 
   /**
-   * Add Full text search expressions for Document store queries.
-   * <p>
-   * This is currently ElasticSearch only and provides the full text
-   * expressions such as Match and Multi-Match.
-   * </p>
-   * <p>
-   * This automatically makes this query a "Doc Store" query and will execute
-   * against the document store (ElasticSearch).
-   * </p>
-   * <p>
-   * Expressions added here are added to the "query" section of an ElasticSearch
-   * query rather than the "filter" section.
-   * </p>
-   * <p>
-   * Expressions added to the where() are added to the "filter" section of an
-   * ElasticSearch query.
-   * </p>
-   */
-  ExpressionList<T> text();
-
-  /**
    * This applies a filter on the 'many' property list rather than the root
    * level objects.
    * <p>
@@ -1566,14 +1508,6 @@ public interface Query<T> extends CancelableQuery {
    * </p>
    */
   Query<T> setLabel(String label);
-
-  /**
-   * Set to true if this query should execute against the doc store.
-   * <p>
-   * When setting this you may also consider disabling lazy loading.
-   * </p>
-   */
-  Query<T> setUseDocStore(boolean useDocStore);
 
   /**
    * When set to true when you want the returned beans to be read only.

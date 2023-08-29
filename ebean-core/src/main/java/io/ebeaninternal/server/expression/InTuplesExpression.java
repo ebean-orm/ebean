@@ -32,11 +32,6 @@ final class InTuplesExpression extends AbstractExpression {
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) {
-    throw new RuntimeException("Not supported with document query");
-  }
-
-  @Override
   public void addBindValues(SpiExpressionRequest request) {
     for (Object[] entry : entries) {
       for (Object value : entry) {

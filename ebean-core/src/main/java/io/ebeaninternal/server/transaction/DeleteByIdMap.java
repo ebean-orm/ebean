@@ -1,11 +1,8 @@
 package io.ebeaninternal.server.transaction;
 
-import io.ebean.annotation.DocStoreMode;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeanservice.docstore.api.DocStoreUpdates;
-import io.ebeanservice.docstore.api.support.DocStoreDeleteEvent;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -67,28 +64,4 @@ public final class DeleteByIdMap {
     return beanMap.computeIfAbsent(beanType, k -> new BeanPersistIds(desc));
   }
 
-  /**
-   * Add the deletes to the DocStoreUpdates.
-   */
-  void addDocStoreUpdates(DocStoreUpdates docStoreUpdates, DocStoreMode txnIndexMode) {
-    for (BeanPersistIds deleteIds : beanMap.values()) {
-      BeanDescriptor<?> desc = deleteIds.getBeanDescriptor();
-      DocStoreMode mode = desc.docStoreMode(PersistRequest.Type.DELETE, txnIndexMode);
-      if (DocStoreMode.IGNORE != mode) {
-        // Add to queue or bulk update entries
-        boolean queue = (DocStoreMode.QUEUE == mode);
-        String queueId = desc.docStoreQueueId();
-        List<Object> idValues = deleteIds.getIds();
-        if (idValues != null) {
-          for (Object idValue : idValues) {
-            if (queue) {
-              docStoreUpdates.queueDelete(queueId, idValue);
-            } else {
-              docStoreUpdates.addDelete(new DocStoreDeleteEvent(desc, idValue));
-            }
-          }
-        }
-      }
-    }
-  }
 }

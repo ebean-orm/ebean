@@ -43,5 +43,4 @@ public interface LoadManyBuffer {
 
   void configureQuery(SpiQuery<?> query);
 
-  boolean isUseDocStore();
 }

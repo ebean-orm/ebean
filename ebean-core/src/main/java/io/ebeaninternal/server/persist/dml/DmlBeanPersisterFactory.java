@@ -24,7 +24,7 @@ public final class DmlBeanPersisterFactory implements BeanPersisterFactory {
   @Override
   public BeanPersister create(BeanDescriptor<?> desc) {
     if (desc.isDocStoreOnly()) {
-      return new DocStoreBeanPersister(GeneratedProperties.of(desc));
+      return null;
     }
     UpdateMeta updMeta = metaFactory.createUpdate(desc);
     DeleteMeta delMeta = metaFactory.createDelete(desc);

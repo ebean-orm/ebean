@@ -227,9 +227,6 @@ final class AnnotationAssocOnes extends AnnotationAssoc {
   }
 
   private void readEmbedded(DeployBeanPropertyAssocOne<?> prop, Embedded embedded) {
-    if (descriptor.isDocStoreOnly() && prop.getDocStoreDoc() == null) {
-      prop.setDocStoreEmbedded("");
-    }
     prop.setEmbedded();
     prop.setDbInsertable(true);
     prop.setDbUpdateable(true);

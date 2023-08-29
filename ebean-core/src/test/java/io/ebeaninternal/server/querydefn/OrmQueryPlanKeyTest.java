@@ -164,14 +164,6 @@ public class OrmQueryPlanKeyTest extends BaseTest {
   }
 
   @Test
-  public void equals_when_useDocStore() {
-    CQueryPlanKey key1 = planKey(query().setUseDocStore(true));
-    CQueryPlanKey key2 = planKey(query());
-
-    assertDifferent(key1, key2);
-  }
-
-  @Test
   public void equals_when_diffMapKey() {
 
     CQueryPlanKey key1 = planKey(query().setMapKey("name"));

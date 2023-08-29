@@ -1322,11 +1322,6 @@ public interface Database {
   ScriptRunner script();
 
   /**
-   * Return the Document store.
-   */
-  DocumentStore docStore();
-
-  /**
    * Returns the set of properties/paths that are unknown (do not map to known properties or paths).
    * <p>
    * Validate the query checking the where and orderBy expression paths to confirm if

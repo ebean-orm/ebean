@@ -144,18 +144,8 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public DocumentStore docStore() {
-    return null;
-  }
-
-  @Override
   public void clearQueryStatistics() {
 
-  }
-
-  @Override
-  public BeanDescriptor<?> descriptorByQueueId(String queueId) {
-    return null;
   }
 
   @Override

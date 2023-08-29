@@ -23,14 +23,12 @@ import java.util.concurrent.locks.ReentrantLock;
 final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext {
 
   private final BeanPropertyAssocMany<?> property;
-  private final boolean docStoreMapped;
   private List<LoadBuffer> bufferList;
   private LoadBuffer currentBuffer;
 
   DLoadManyContext(DLoadContext parent, BeanPropertyAssocMany<?> property, String path, OrmQueryProperties queryProps) {
     super(parent, property.descriptor(), path, queryProps);
     this.property = property;
-    this.docStoreMapped = property.isTargetDocStoreMapped();
     // bufferList only required when using query joins (queryFetch)
     this.bufferList = (!queryFetch) ? null : new ArrayList<>();
     this.currentBuffer = createBuffer(batchSize);
@@ -56,7 +54,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
 
   private void configureQuery(SpiQuery<?> query) {
     setLabel(query);
-    parent.propagateQueryState(query, docStoreMapped);
+    parent.propagateQueryState(query);
     query.setParentNode(objectGraphNode);
     if (queryProps != null) {
       queryProps.configureBeanQuery(query);
@@ -127,11 +125,6 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
       // case it changes as part of a findIterate etc
       this.persistenceContext = context.persistenceContext();
       this.batchSize = batchSize;
-    }
-
-    @Override
-    public boolean isUseDocStore() {
-      return context.parent.useDocStore && context.docStoreMapped;
     }
 
     @Override

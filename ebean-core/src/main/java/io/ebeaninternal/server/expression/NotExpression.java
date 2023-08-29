@@ -10,8 +10,6 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import java.io.IOException;
-
 final class NotExpression implements SpiExpression {
 
   private static final String NOT_START = "not (";
@@ -40,13 +38,6 @@ final class NotExpression implements SpiExpression {
   }
 
   @Override
-  public void writeDocQuery(DocQueryContext context) throws IOException {
-    context.startBoolMustNot();
-    exp.writeDocQuery(context);
-    context.endBool();
-  }
-
-  @Override
   public Object getIdEqualTo(String idName) {
     // always return null for this expression
     return null;
@@ -55,11 +46,6 @@ final class NotExpression implements SpiExpression {
   @Override
   public SpiExpression copyForPlanKey() {
     return new NotExpression(exp.copyForPlanKey());
-  }
-
-  @Override
-  public String nestedPath(BeanDescriptor<?> desc) {
-    return exp.nestedPath(desc);
   }
 
   @Override

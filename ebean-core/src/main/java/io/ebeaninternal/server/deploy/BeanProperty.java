@@ -36,10 +36,6 @@ import io.ebeaninternal.server.query.SqlBeanLoad;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.type.*;
 import io.ebeaninternal.util.ValueUtil;
-import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
-import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
-import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
-import io.ebeanservice.docstore.api.support.DocStructure;
 
 import javax.persistence.PersistenceException;
 import java.io.DataInput;
@@ -143,7 +139,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @SuppressWarnings("rawtypes")
   final ScalarType scalarType;
 
-  private final DocPropertyOptions docOptions;
   /**
    * The length or precision for DB column.
    */
@@ -235,7 +230,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.lob = isLobType(dbType);
     this.propertyType = deploy.getPropertyType();
     this.field = deploy.getField();
-    this.docOptions = deploy.getDocPropertyOptions();
     this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), false, null);
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);
     this.elPrefix = deploy.getElPrefix();
@@ -326,7 +320,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.lob = isLobType(dbType);
     this.propertyType = source.type();
     this.field = source.field();
-    this.docOptions = source.docOptions;
     this.unmappedJson = source.unmappedJson;
     this.elPrefix = override.replace(source.elPrefix, source.dbColumn);
     this.elPlaceHolder = override.replace(source.elPlaceHolder, source.dbColumn);
@@ -1283,15 +1276,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return name;
   }
 
-  /**
-   * Append this property to the document store based on includeByDefault setting.
-   */
-  public void docStoreInclude(boolean includeByDefault, DocStructure docStructure) {
-    if (includeByDefault) {
-      docStructure.addProperty(name);
-    }
-  }
-
   public boolean isJsonSerialize() {
     return jsonSerialize;
   }
@@ -1399,24 +1383,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       String propName = (prefix == null) ? name : prefix + "." + name;
       map.put(propName, new ValuePair(newVal, oldVal));
     }
-  }
-
-  /**
-   * Add to the document mapping if this property is included for this index.
-   */
-  public void docStoreMapping(DocMappingBuilder mapping, String prefix) {
-    if (mapping.includesProperty(prefix, name)) {
-      DocPropertyType type = scalarType.docType();
-      DocPropertyOptions options = docOptions.copy();
-      if (isKeywordType(type, options)) {
-        type = DocPropertyType.KEYWORD;
-      }
-      mapping.add(new DocPropertyMapping(name, type, options));
-    }
-  }
-
-  private boolean isKeywordType(DocPropertyType type, DocPropertyOptions docOptions) {
-    return type == DocPropertyType.TEXT && (docOptions.isCode() || id || discriminator);
   }
 
   public void merge(EntityBean bean, EntityBean existing) {
