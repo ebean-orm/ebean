@@ -8,8 +8,6 @@ import io.ebean.event.BeanPersistListener;
 import io.ebean.event.BeanQueryAdapter;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * Information and methods on BeanDescriptors made available to plugins.
@@ -144,49 +142,4 @@ public interface BeanType<T> {
    */
   IdType idType();
 
-  /**
-   * Add the discriminator value to the query if needed.
-   */
-  void addInheritanceWhere(Query<?> query);
-
-  /**
-   * Return the root bean type for an inheritance hierarchy.
-   */
-  BeanType<?> root();
-
-  /**
-   * Return true if this bean type has an inheritance hierarchy.
-   */
-  boolean hasInheritance();
-
-  /**
-   * Return true if this object is the root level object in its entity
-   * inheritance.
-   */
-  boolean isInheritanceRoot();
-
-  /**
-   * Returns all direct children of this beantype
-   */
-  List<BeanType<?>> inheritanceChildren();
-
-  /**
-   * Returns the parent in inheritance hierarchy
-   */
-  BeanType<?> inheritanceParent();
-
-  /**
-   * Visit all children recursively
-   */
-  void visitAllInheritanceChildren(Consumer<BeanType<?>> visitor);
-
-  /**
-   * Return the discriminator column.
-   */
-  String discColumn();
-
-  /**
-   * Create a bean given the discriminator value.
-   */
-  T createBeanUsingDisc(Object discValue);
 }

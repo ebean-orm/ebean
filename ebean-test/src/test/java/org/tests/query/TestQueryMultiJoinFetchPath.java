@@ -23,17 +23,17 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
     HCustomer c3 = new HCustomer("c3", "c3");
     DB.save(c3);
 
-    HAccount a1 = new BankAccount();
+    HAccount a1 = new HAccount();
     a1.setAccountNumber("a1");
     a1.setOwner(c1);
     DB.save(a1);
 
-    CustomerAccess ca = new CustomerAccess();
+    HAccess ca = new HAccess();
     ca.setAccessor(c3);
     ca.setPrincipal(c1);
     DB.save(ca);
 
-    AccountAccess aa = new AccountAccess();
+    HAccess aa = new HAccess();
     aa.setAccessor(c2);
     aa.setAccount(a1);
     DB.save(aa);
@@ -59,9 +59,9 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
 
     assertThat(accesses).hasSize(2);
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).isEqualTo("select t0.dtype, t0.id, t0.accessor_id, t0.principal_id, t2.dtype, t0.access_account_number, t1.cid, t1.name, t2.dtype, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number and t2.dtype = 'B' left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id in (?,?,?,?,?)");
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.accessor_id, t0.principal_id, t0.access_account_number, t1.cid, t1.name, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id in (?,?,?,?,?)");
     } else {
-      assertThat(query.getGeneratedSql()).contains("select t0.dtype, t0.id, t0.accessor_id, t0.principal_id, t2.dtype, t0.access_account_number, t1.cid, t1.name, t2.dtype, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number and t2.dtype = 'B' left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id ");
+      assertThat(query.getGeneratedSql()).contains("select t0.id, t0.accessor_id, t0.principal_id, t0.access_account_number, t1.cid, t1.name, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id ");
     }
   }
 

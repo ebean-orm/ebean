@@ -5,8 +5,7 @@ import org.tests.o2m.jointable.JtMonkey;
 import jakarta.persistence.*;
 import java.util.List;
 
-@Inheritance
-@Entity
+@MappedSuperclass
 public abstract class ClassSuper {
   @Id
   long sid;

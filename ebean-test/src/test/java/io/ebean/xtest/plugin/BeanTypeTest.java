@@ -2,11 +2,9 @@ package io.ebean.xtest.plugin;
 
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.Query;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.Property;
 import org.junit.jupiter.api.Test;
-import org.tests.inheritance.Stockforecast;
 import org.tests.model.basic.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -90,49 +88,6 @@ public class BeanTypeTest {
     beanType(Order.class).setId(order, 42);
 
     assertThat(42).isEqualTo(order.getId());
-  }
-
-  @Test
-  public void hasInheritance_when_not() {
-    assertFalse(beanType(Order.class).hasInheritance());
-  }
-
-  @Test
-  public void hasInheritance_when_root() {
-    assertTrue(beanType(Vehicle.class).hasInheritance());
-  }
-
-  @Test
-  public void hasInheritance_when_leaf() {
-    assertTrue(beanType(Car.class).hasInheritance());
-  }
-
-  @Test
-  public void getDiscColumn_when_default() {
-    assertEquals(beanType(Car.class).discColumn(), "dtype");
-  }
-
-  @Test
-  public void getDiscColumn_when_set() {
-    assertEquals(beanType(Stockforecast.class).discColumn(), "type");
-  }
-
-  @Test
-  public void createBeanUsingDisc_when_set() {
-    Vehicle vehicle = beanType(Vehicle.class).createBeanUsingDisc("C");
-    assertTrue(vehicle instanceof Car);
-  }
-
-  @Test
-  public void addInheritanceWhere_when_leaf() {
-    Query<Vehicle> query = db.find(Vehicle.class);
-    beanType(Car.class).addInheritanceWhere(query);
-  }
-
-  @Test
-  public void addInheritanceWhere_when_root() {
-    Query<Vehicle> query = db.find(Vehicle.class);
-    beanType(Vehicle.class).addInheritanceWhere(query);
   }
 
 }

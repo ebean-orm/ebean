@@ -13,13 +13,13 @@ public class ListAttributeValue extends BasicDomain {
   private String name;
 
   @ManyToMany
-  private Set<ListAttribute> listAttributes;
+  private Set<Attribute> listAttributes;
 
-  public Set<ListAttribute> getListAttributes() {
+  public Set<Attribute> getListAttributes() {
     return listAttributes;
   }
 
-  public void setListAttribute(Set<ListAttribute> listAttributes) {
+  public void setListAttribute(Set<Attribute> listAttributes) {
     this.listAttributes = listAttributes;
   }
 

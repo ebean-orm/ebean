@@ -15,7 +15,6 @@ public final class CachedBeanData implements Externalizable {
 
   private long whenCreated;
   private long version;
-  private String discValue;
   private Map<String, Object> data;
   /**
    * The sharable bean is effectively transient (near cache only).
@@ -25,10 +24,9 @@ public final class CachedBeanData implements Externalizable {
   /**
    * Construct from a loaded bean.
    */
-  public CachedBeanData(Object sharableBean, String discValue, Map<String, Object> data, long version) {
+  public CachedBeanData(Object sharableBean, Map<String, Object> data, long version) {
     this.whenCreated = System.currentTimeMillis();
     this.sharableBean = sharableBean;
-    this.discValue = discValue;
     this.data = data;
     this.version = version;
   }
@@ -43,11 +41,6 @@ public final class CachedBeanData implements Externalizable {
   public void writeExternal(ObjectOutput out) throws IOException {
     out.writeLong(version);
     out.writeLong(whenCreated);
-    boolean hasDisc = discValue != null;
-    out.writeBoolean(hasDisc);
-    if (hasDisc) {
-      out.writeUTF(discValue);
-    }
     out.writeInt(data.size());
     for (Map.Entry<String, Object> entry : data.entrySet()) {
       out.writeUTF(entry.getKey());
@@ -59,9 +52,6 @@ public final class CachedBeanData implements Externalizable {
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
     version = in.readLong();
     whenCreated = in.readLong();
-    if (in.readBoolean()) {
-      discValue = in.readUTF();
-    }
     data = new LinkedHashMap<>();
     int count = in.readInt();
     for (int i = 0; i < count; i++) {
@@ -85,7 +75,7 @@ public final class CachedBeanData implements Externalizable {
     Map<String, Object> copy = new HashMap<>();
     copy.putAll(data);
     copy.putAll(changes);
-    return new CachedBeanData(null, discValue, copy, version);
+    return new CachedBeanData(null, copy, version);
   }
 
   /**
@@ -100,13 +90,6 @@ public final class CachedBeanData implements Externalizable {
    */
   public long getVersion() {
     return version;
-  }
-
-  /**
-   * Return the raw discriminator value.
-   */
-  public String getDiscValue() {
-    return discValue;
   }
 
   /**

@@ -25,8 +25,10 @@ public class InnerReport {
 
 
   @Entity
-  @DiscriminatorValue("F")
-  public static class Forecast extends Stockforecast {
+  public static class Forecast {
+
+    @Id
+    long id;
 
     @ManyToOne
     InnerReport innerReport;

@@ -3,8 +3,7 @@ package org.tests.model.join;
 import jakarta.persistence.*;
 
 @Entity
-@Inheritance
-public abstract class HAccount {
+public final class HAccount {
 
   @Id
   String accountNumber;

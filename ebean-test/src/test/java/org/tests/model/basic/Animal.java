@@ -3,9 +3,8 @@ package org.tests.model.basic;
 import jakarta.persistence.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "species")
-public abstract class Animal {
+// DiscriminatorColumn(name = "species")
+public final class Animal {
 
   @Id
   Long id;
@@ -18,6 +17,10 @@ public abstract class Animal {
 
   @ManyToOne
   AnimalShelter shelter;
+
+  public Animal(String species) {
+    this.species = species;
+  }
 
   public Long getId() {
     return id;

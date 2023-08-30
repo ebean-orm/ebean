@@ -4,7 +4,6 @@ import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.DbReadContext;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
 import java.util.Map;
@@ -63,11 +62,6 @@ public interface STreeType {
    * Return the associated many properties.
    */
   STreePropertyAssocMany[] propsMany();
-
-  /**
-   * Return the inheritance information for this type.
-   */
-  InheritInfo inheritInfo();
 
   /**
    * Return the IdBinder for this type.

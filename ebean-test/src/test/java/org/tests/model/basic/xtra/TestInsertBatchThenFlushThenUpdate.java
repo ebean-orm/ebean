@@ -23,7 +23,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
     try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
 
-      EdParent parent = new EdParent();
+      EdExtendedParent parent = new EdExtendedParent();
       parent.setName("MyComputer");
 
       EdChild child = new EdChild();
@@ -49,7 +49,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       // nothing flushed yet
       assertThat(LoggedSql.start()).isEmpty();
 
-      DB.commitTransaction();
+      txn.commit();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSql.start();

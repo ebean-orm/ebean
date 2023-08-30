@@ -353,7 +353,7 @@ class TestQuerySingleAttribute extends BaseTestCase {
       .select("more");
 
     query.findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0 where t0.type = 'A'");
+    assertThat(sqlOf(query)).contains("select distinct t0.more from rawinherit_parent t0");
   }
 
   @Test
@@ -424,7 +424,7 @@ class TestQuerySingleAttribute extends BaseTestCase {
       .select("more");
 
     query.findSingleAttributeList();
-    assertThat(sqlOf(query)).contains("select t0.more from rawinherit_parent t0 where t0.type = 'A'");
+    assertThat(sqlOf(query)).contains("select t0.more from rawinherit_parent t0");
   }
 
   @Test

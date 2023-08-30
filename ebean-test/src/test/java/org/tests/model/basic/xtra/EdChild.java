@@ -14,7 +14,7 @@ public class EdChild {
 
   @ManyToOne
   @JoinColumn(name = "parent_id", nullable = false)
-  EdParent parent;
+  EdExtendedParent parent;
 
   public int getId() {
     return id;
@@ -36,7 +36,7 @@ public class EdChild {
     return parent;
   }
 
-  public void setParent(EdParent parent) {
+  public void setParent(EdExtendedParent parent) {
     this.parent = parent;
   }
 }

@@ -51,8 +51,4 @@ public interface LoadContext {
    */
   void register(String path, BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
 
-  /**
-   * Use soft-references for streaming queries, so unreachable entries can be garbage collected.
-   */
-  void useReferences(boolean useReferences);
 }

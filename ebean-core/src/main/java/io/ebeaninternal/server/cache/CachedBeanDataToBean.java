@@ -14,9 +14,6 @@ public final class CachedBeanDataToBean {
     // any future lazy loading skips L2 bean cache
     ebi.setLoadedFromCache(true);
     BeanProperty idProperty = desc.idProperty();
-    if (desc.inheritInfo() != null) {
-        desc = desc.inheritInfo().readType(bean.getClass()).desc();
-    }
     if (idProperty != null) {
       // load the id property
       loadProperty(bean, cacheBeanData, ebi, idProperty, context);

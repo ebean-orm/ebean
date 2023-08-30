@@ -35,7 +35,7 @@ public class TestInheritAbstract {
     cb.setFoo(f);
     server.save(cb);
 
-    List<AbstractBar> list2 = server.find(AbstractBar.class)
+    List<ConcreteBar> list2 = server.find(ConcreteBar.class)
       .fetch("foo", "importantText")
       .findList();
 
