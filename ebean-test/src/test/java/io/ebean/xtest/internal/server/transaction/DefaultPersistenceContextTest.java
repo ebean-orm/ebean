@@ -4,7 +4,6 @@ import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.deploy.PersistenceContextUtil;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Car;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Vehicle;
@@ -14,12 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DefaultPersistenceContextTest {
 
   private final Customer customer42;
-  private final Car car1;
+  private final Vehicle car1;
 
   DefaultPersistenceContextTest() {
     customer42 = new Customer();
     customer42.setId(42);
-    car1 = new Car();
+    car1 = new Vehicle();
     car1.setId(1);
   }
 
@@ -35,15 +34,6 @@ class DefaultPersistenceContextTest {
 
   Class<?> root(Class<?> cls) {
     return PersistenceContextUtil.root(cls);
-  }
-
-  @Test
-  void put_get_withInheritance() {
-    PersistenceContext pc = pc();
-    pc.put(root(Vehicle.class), 1, car1);
-
-    Object found = pc.get(root(Car.class), 1);
-    assertThat(found).isSameAs(car1);
   }
 
   @Test

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
@@ -25,7 +24,7 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
     try (Transaction txn = DB.beginTransaction())  {
       txn.setBatchMode(true);
 
-      EdParent parent = new EdParent();
+      EdExtendedParent parent = new EdExtendedParent();
       parent.setName("MyComputer");
 
       EdChild child = new EdChild();
@@ -58,13 +57,14 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
       // insert statements for EdParent
       List<String> loggedSql1 = LoggedSql.start();
 
-      DB.commitTransaction();
+      txn.commit();
 
       assertEquals(0, loggedSql1.size());
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSql.start();
-      assertThat(loggedSql2).hasSize(10);
+      assertEquals(6, loggedSql2.size());
+
     }
   }
 

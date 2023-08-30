@@ -228,7 +228,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       persistenceContext.beginIterate();
     }
     loadContext = new DLoadContext(this, secondaryQueries);
-    loadContext.useReferences(Type.ITERATE == query.type());
   }
 
   /**

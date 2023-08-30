@@ -5,7 +5,6 @@ import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
 import io.ebeaninternal.server.properties.BeanPropertySetter;
-import io.ebeaninternal.server.type.ScalarTypeString;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -27,7 +26,6 @@ public final class DeployBeanPropertyLists {
   private final LinkedHashMap<String, BeanProperty> propertyMap;
   private BeanProperty id;
 
-  private final List<BeanProperty> local = new ArrayList<>();
   private final List<BeanProperty> mutable = new ArrayList<>();
   private final List<BeanPropertyAssocMany<?>> manys = new ArrayList<>();
   private final List<BeanProperty> nonManys = new ArrayList<>();
@@ -57,35 +55,9 @@ public final class DeployBeanPropertyLists {
 
     DeployBeanPropertyAssocOne<?> deployUnidirectional = deploy.getUnidirectional();
     this.unidirectional = deployUnidirectional == null ? null : new BeanPropertyAssocOne<>(owner, desc, deployUnidirectional);
-
     this.propertyMap = new LinkedHashMap<>();
 
-    // see if there is a discriminator property we should add
-    String discriminatorColumn = null;
-    BeanProperty discProperty = null;
-
-    InheritInfo inheritInfo = deploy.getInheritInfo();
-    if (inheritInfo != null) {
-      // Create a BeanProperty for the discriminator column to support
-      // using RawSql queries with inheritance
-      discriminatorColumn = inheritInfo.getDiscriminatorColumn();
-      DeployBeanProperty discDeployProp = new DeployBeanProperty(deploy, String.class, ScalarTypeString.INSTANCE, null);
-      discDeployProp.setDiscriminator();
-      discDeployProp.setName(discriminatorColumn);
-      discDeployProp.setDbColumn(discriminatorColumn);
-      discDeployProp.setSetter(NOOP_SETTER);
-
-      // only register it in the propertyMap. This might not be used if
-      // an explicit property is mapped to the discriminator on the bean
-      discProperty = new BeanProperty(desc, discDeployProp);
-    }
-
     for (DeployBeanProperty prop : deploy.propertiesAll()) {
-      if (discriminatorColumn != null && discriminatorColumn.equals(prop.getDbColumn())) {
-        // we have an explicit property mapped to the discriminator column
-        prop.setDiscriminator();
-        discProperty = null;
-      }
       BeanProperty beanProp = createBeanProperty(owner, prop);
       propertyMap.put(beanProp.name(), beanProp);
     }
@@ -100,12 +72,6 @@ public final class DeployBeanPropertyLists {
       orderColumn.setDeployOrder(order);
       allocateToList(orderColumn);
       propertyMap.put(orderColumn.name(), orderColumn);
-    }
-
-    if (discProperty != null) {
-      // put the discriminator property into the property map only
-      // (after the real properties have been organised into their lists)
-      propertyMap.put(discProperty.name(), discProperty);
     }
   }
 
@@ -188,10 +154,6 @@ public final class DeployBeanPropertyLists {
       mutable.add(prop);
     }
 
-    if (desc.inheritInfo() != null && prop.isLocal()) {
-      local.add(prop);
-    }
-
     if (prop instanceof BeanPropertyAssocMany<?>) {
       manys.add((BeanPropertyAssocMany<?>) prop);
 
@@ -255,10 +217,6 @@ public final class DeployBeanPropertyLists {
 
   public BeanProperty getVersionProperty() {
     return versionProperty;
-  }
-
-  public BeanProperty[] getLocal() {
-    return local.toArray(new BeanProperty[0]);
   }
 
   public BeanProperty[] getMutable() {

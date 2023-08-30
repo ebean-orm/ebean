@@ -3,7 +3,6 @@ package io.ebeaninternal.server.query;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.deploy.DbSqlContext;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
@@ -39,7 +38,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
   final boolean readIdNormal;
   final boolean disableLazyLoad;
   final boolean readOnly;
-  final InheritInfo inheritInfo;
   final String prefix;
   final Map<String, String> pathMap;
   final STreePropertyAssocMany lazyLoadParent;
@@ -80,7 +78,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.lazyLoadParentIdBinder = (lazyLoadParent == null) ? null : lazyLoadParent.idBinder();
     this.prefix = prefix;
     this.desc = desc;
-    this.inheritInfo = desc.inheritInfo();
     this.idBinder = desc.idBinder();
     this.temporalMode = common.temporalMode();
     this.temporalVersions = temporalMode == SpiQuery.TemporalMode.VERSIONS;
@@ -134,10 +131,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
   @Override
   public final void buildRawSqlSelectChain(List<String> selectChain) {
     if (readId) {
-      if (inheritInfo != null) {
-        // discriminator column always proceeds id column
-        selectChain.add(path(prefix, inheritInfo.getDiscriminatorColumn()));
-      }
       idBinder.buildRawSqlSelectChain(prefix, selectChain);
     }
     for (STreeProperty property : properties) {
@@ -198,9 +191,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
       lazyLoadParent.addSelectExported(ctx, prefix);
     }
     if (readId) {
-      if (!subQuery && inheritInfo != null) {
-        ctx.appendColumn(inheritInfo.getDiscriminatorColumn());
-      }
       appendSelectId(ctx, idBinder.beanProperty());
     }
     appendSelect(ctx, subQuery, properties);
@@ -241,17 +231,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   @Override
   public final void appendWhere(DbSqlContext ctx) {
-    // Only apply inheritance to root node as any join will already have the inheritance join include - see TableJoin
-    if (inheritInfo != null && nodeBeanProp == null) {
-      if (!inheritInfo.isRoot()) {
-        // restrict to this type and sub types of this type.
-        if (ctx.length() > 0) {
-          ctx.append(" and");
-        }
-        ctx.append(" ").append(ctx.tableAlias(prefix)).append(".");
-        ctx.append(inheritInfo.getWhere());
-      }
-    }
     appendExtraWhere(ctx);
     for (SqlTreeNode child : children) {
       child.appendWhere(ctx);
@@ -321,9 +300,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
    */
   SqlJoinType appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
     SqlJoinType sqlJoinType = appendFromAsJoin(ctx, joinType);
-    if (inheritInfo != null) {
-       appendJoinDiscriminator(ctx);
-    }
     if (desc.isSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
       ctx.append(" and ").append(desc.softDeletePredicate(ctx.tableAlias(prefix)));
     }
@@ -350,12 +326,6 @@ class SqlTreeNodeBean implements SqlTreeNode {
       }
     }
     return nodeBeanProp.addJoin(joinType, prefix, ctx);
-  }
-
-  void appendJoinDiscriminator(DbSqlContext ctx) {
-    if (inheritInfo.getWhere() == null) return;
-    String alias = ctx.tableAlias(prefix);
-    ctx.append(" and ").append(alias).append(".").append(inheritInfo.getWhere());
   }
 
   /**

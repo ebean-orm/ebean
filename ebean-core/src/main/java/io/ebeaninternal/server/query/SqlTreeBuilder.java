@@ -7,7 +7,6 @@ import io.ebeaninternal.api.PropertyJoin;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Type;
 import io.ebeaninternal.server.core.OrmQueryRequest;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
@@ -520,13 +519,6 @@ public final class SqlTreeBuilder {
       } else {
         selectProps.add(propertyAssocOne);
       }
-    }
-
-    InheritInfo inheritInfo = desc.inheritInfo();
-    if (inheritInfo != null) {
-      // add sub type properties
-      inheritInfo.addChildrenProperties(selectProps);
-
     }
     return selectProps;
   }

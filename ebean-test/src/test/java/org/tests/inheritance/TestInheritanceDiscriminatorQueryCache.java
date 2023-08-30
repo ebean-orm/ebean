@@ -4,8 +4,8 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import org.junit.jupiter.api.Test;
-import org.tests.inheritance.model.GroupConfiguration;
-import org.tests.inheritance.model.ProductConfiguration;
+import org.tests.inheritance.model.Configuration;
+import org.tests.inheritance.model.Configuration;
 
 import java.util.List;
 
@@ -15,29 +15,29 @@ public class TestInheritanceDiscriminatorQueryCache extends BaseTestCase {
   public void testDiscriminatorQueryCache() {
     Database server = DB.getDefault();
 
-    ProductConfiguration pc1 = new ProductConfiguration();
+    Configuration pc1 = new Configuration();
     pc1.setName("PC1");
     server.save(pc1);
 
-    ProductConfiguration pc2 = new ProductConfiguration();
+    Configuration pc2 = new Configuration();
     pc1.setName("PC2");
     server.save(pc2);
 
-    GroupConfiguration gc1 = new GroupConfiguration();
+    Configuration gc1 = new Configuration();
     gc1.setName("GC1");
     server.save(gc1);
 
-    GroupConfiguration gc2 = new GroupConfiguration();
+    Configuration gc2 = new Configuration();
     gc1.setName("GC2");
     server.save(gc2);
 
-    List<ProductConfiguration> list1 = server.createQuery(ProductConfiguration.class).setUseQueryCache(true).findList();
-    List<GroupConfiguration> list2 = server.createQuery(GroupConfiguration.class).setUseQueryCache(true).findList();
+    List<Configuration> list1 = server.createQuery(Configuration.class).setUseQueryCache(true).findList();
+    List<Configuration> list2 = server.createQuery(Configuration.class).setUseQueryCache(true).findList();
 
-    for(ProductConfiguration pc : list1) {
+    for(Configuration pc : list1) {
       System.out.print(pc.getProductName());
     }
-    for(GroupConfiguration gc : list2) {
+    for(Configuration gc : list2) {
       System.out.print(gc.getGroupName());
     }
   }

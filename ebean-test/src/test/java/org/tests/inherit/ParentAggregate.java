@@ -10,6 +10,6 @@ import jakarta.persistence.OneToOne;
 public class ParentAggregate {
 
   @OneToOne
-  public Parent parent;
+  public ChildA parent;
 
 }

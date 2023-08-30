@@ -31,7 +31,7 @@ public class CachedBeanDataSerializeTest {
     map.put("whenCreated", "" + System.currentTimeMillis());
 
     long version = System.currentTimeMillis();
-    CachedBeanData write = new CachedBeanData(null, "C", map, version);
+    CachedBeanData write = new CachedBeanData(null, map, version);
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -50,7 +50,6 @@ public class CachedBeanDataSerializeTest {
 
     assertEquals(read.getVersion(), write.getVersion());
     assertEquals(read.getWhenCreated(), write.getWhenCreated());
-    assertEquals(read.getDiscValue(), write.getDiscValue());
     assertEquals(read.getData(), write.getData());
   }
 

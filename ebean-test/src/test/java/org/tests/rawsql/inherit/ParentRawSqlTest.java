@@ -18,7 +18,7 @@ public class ParentRawSqlTest extends BaseTestCase {
   @BeforeEach
   public void clearDb() {
     DB.deleteAll(DB.find(Data.class).findList());
-    DB.deleteAll(DB.find(Parent.class).findList());
+    DB.deleteAll(DB.find(ChildA.class).findList());
     //@rob: this does not work as it does not clear the ManyToMany relations.
 //    DB.find(Data.class).delete();
 //    DB.find(Parent.class).delete();
@@ -36,7 +36,7 @@ public class ParentRawSqlTest extends BaseTestCase {
     a.setData(exampleData);
     DB.save(a);
 
-    ChildB b = new ChildB(1, "PB");
+    ChildA b = new ChildA("B", 1, "PB");
     b.setData(exampleData);
     DB.save(b);
 
@@ -48,7 +48,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .parse("select type, id, val from rawinherit_parent where val > 1")
       .create();
 
-    List<Parent> partial = DB.find(Parent.class)
+    List<ChildA> partial = DB.find(ChildA.class)
       .setRawSql(rawSql)
       .findList();
 
@@ -68,7 +68,7 @@ public class ParentRawSqlTest extends BaseTestCase {
     a.setData(exampleData);
     DB.save(a);
 
-    ChildB b = new ChildB(1, "PB");
+    ChildA b = new ChildA("B", 1, "PB");
     b.setData(exampleData);
     DB.save(b);
 
@@ -108,8 +108,8 @@ public class ParentRawSqlTest extends BaseTestCase {
     List<EUncle> uncles = DB.find(EUncle.class).setRawSql(rawSql).findList();
 
     assertNotNull(uncles.get(0));
-    Parent parent = uncles.get(0).getParent();
-    assertTrue(parent instanceof ChildB);
+    ChildA parent = uncles.get(0).getParent();
+    assertTrue(parent instanceof ChildA);
   }
 
   private void joinToInheritanceHierarchy_with_queryJoin() {
@@ -127,8 +127,8 @@ public class ParentRawSqlTest extends BaseTestCase {
       .findList();
 
     assertNotNull(uncles.get(0));
-    Parent parent = uncles.get(0).getParent();
-    assertTrue(parent instanceof ChildB);
+    ChildA parent = uncles.get(0).getParent();
+    assertTrue(parent instanceof ChildA);
   }
 
   private void joinToInheritanceHierarchy_withIgnore() {
@@ -146,8 +146,8 @@ public class ParentRawSqlTest extends BaseTestCase {
       .findList();
 
     assertNotNull(uncles.get(0));
-    Parent parent = uncles.get(0).getParent();
-    assertTrue(parent instanceof ChildB);
+    ChildA parent = uncles.get(0).getParent();
+    assertTrue(parent instanceof ChildA);
   }
 
   private void joinToInheritanceHierarchy_withAliasMapping() {
@@ -161,8 +161,8 @@ public class ParentRawSqlTest extends BaseTestCase {
       .findList();
 
     assertNotNull(uncles.get(0));
-    Parent parent = uncles.get(0).getParent();
-    assertTrue(parent instanceof ChildB);
+    ChildA parent = uncles.get(0).getParent();
+    assertTrue(parent instanceof ChildA);
   }
 
   /**
@@ -180,7 +180,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .fetchQuery("parent")
       .findList();
 
-    List<Parent> partial = new ArrayList<>();
+    List<ChildA> partial = new ArrayList<>();
     for (ParentAggregate aggregate : aggregates) {
       partial.add(aggregate.parent);
     }
@@ -204,7 +204,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .fetchQuery("parent")
       .findList();
 
-    List<Parent> partial = new ArrayList<>();
+    List<ChildA> partial = new ArrayList<>();
     for (ParentAggregate aggregate : aggregates) {
       partial.add(aggregate.parent);
     }
@@ -230,7 +230,7 @@ public class ParentRawSqlTest extends BaseTestCase {
       .fetchQuery("parent")
       .findList();
 
-    List<Parent> partial = new ArrayList<>();
+    List<ChildA> partial = new ArrayList<>();
     for (ParentAggregate aggregate : aggregates) {
       partial.add(aggregate.parent);
     }
