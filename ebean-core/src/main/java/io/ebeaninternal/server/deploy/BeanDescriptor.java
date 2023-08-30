@@ -134,7 +134,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final BeanQueryAdapter queryAdapter;
   private final BeanFindController beanFinder;
   private final ChangeLogFilter changeLogFilter;
-  final InheritInfo inheritInfo;
   private final boolean abstractType;
   private final BeanProperty idProperty;
   private final int idPropertyIndex;
@@ -146,10 +145,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Properties that are initialised in the constructor need to be 'unloaded' to support partial object queries.
    */
   private final int[] unloadProperties;
-  /**
-   * Properties local to this type (not from a super type).
-   */
-  private final BeanProperty[] propertiesLocal;
   /**
    * Scalar mutable properties (need to dirty check on update).
    */
@@ -220,7 +215,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.rootBeanType = PersistenceContextUtil.root(beanType);
     this.prototypeEntityBean = createPrototypeEntityBean(beanType);
     this.iudMetrics = new BeanIudMetrics(name);
-    this.inheritInfo = deploy.getInheritInfo();
     this.beanFinder = deploy.getBeanFinder();
     this.persistController = deploy.getPersistController();
     this.persistListener = deploy.getPersistListener();
@@ -263,7 +257,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.propertiesNonTransient = listHelper.getNonTransients();
     this.propertiesBaseScalar = listHelper.getBaseScalar();
     this.propertiesEmbedded = listHelper.getEmbedded();
-    this.propertiesLocal = listHelper.getLocal();
     this.propertiesMutable = listHelper.getMutable();
     this.unidirectional = listHelper.getUnidirectional();
     this.orderColumn = listHelper.getOrderColumn();
@@ -449,10 +442,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       // add mapping (used to swap out baseTable for asOf queries)
       initContext.addHistory(baseTable, baseTableAsOf);
     }
-    if (inheritInfo != null) {
-      inheritInfo.setDescriptor(this);
-    }
-
     // initialise just the Id property only
     if (idProperty != null) {
       idProperty.initialise(initContext);
@@ -623,18 +612,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   public boolean isBatchEscalateOnCascade(PersistRequest.Type type) {
     return type == PersistRequest.Type.INSERT ? batchEscalateOnCascadeInsert : batchEscalateOnCascadeDelete;
-  }
-
-  void initInheritInfo() {
-    if (inheritInfo != null) {
-      // need to check every BeanDescriptor in the inheritance hierarchy
-      if (saveRecurseSkippable) {
-        saveRecurseSkippable = inheritInfo.isSaveRecurseSkippable();
-      }
-      if (deleteRecurseSkippable) {
-        deleteRecurseSkippable = inheritInfo.isDeleteRecurseSkippable();
-      }
-    }
   }
 
   public void metricPersistBatch(PersistRequest.Type type, long startNanos, int size) {
@@ -873,36 +850,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   public String defaultSelectClause() {
     return defaultSelectClause;
-  }
-
-  /**
-   * Return true if this object is the root level object in its entity
-   * inheritance.
-   */
-  @Override
-  public boolean isInheritanceRoot() {
-    return inheritInfo == null || inheritInfo.isRoot();
-  }
-
-  /**
-   * Return the root bean type if part of inheritance hierarchy.
-   */
-  @Override
-  public BeanType<?> root() {
-    if (inheritInfo != null && !inheritInfo.isRoot()) {
-      return inheritInfo.getRoot().desc();
-    }
-    return this;
-  }
-
-  /**
-   * Return the full name taking into account inheritance.
-   */
-  public String rootName() {
-    if (inheritInfo != null && !inheritInfo.isRoot()) {
-      return inheritInfo.getRoot().desc().name();
-    }
-    return name;
   }
 
   /**
@@ -1553,9 +1500,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       }
     }
     try {
-      if (inheritInfo != null && !inheritInfo.isConcrete()) {
-        return findReferenceBean(id, pc);
-      }
       EntityBean eb = createEntityBean();
       id = convertSetId(id, eb);
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
@@ -1590,9 +1534,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Create a non read only reference bean without checking cacheSharableBeans.
    */
   public T createReference(Object id, PersistenceContext pc) {
-    if (inheritInfo != null && !inheritInfo.isConcrete()) {
-      return findReferenceBean(id, pc);
-    }
     return createRef(id, pc);
   }
 
@@ -1691,17 +1632,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * visible.
    */
   public BeanPropertyAssocOne<?> unidirectional() {
-    BeanDescriptor<?> other = this;
-    while (true) {
-      if (other.unidirectional != null) {
-        return other.unidirectional;
-      }
-      if (other.inheritInfo != null && !other.inheritInfo.isRoot()) {
-        other = other.inheritInfo.getParent().desc();
-        continue;
-      }
-      return null;
-    }
+    return unidirectional;
   }
 
   /**
@@ -1958,9 +1889,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     if (lazyLoadProperty == -1) {
       return false;
     }
-    if (inheritInfo != null) {
-      return descOf(ebi.owner().getClass()).lazyLoadMany(ebi, lazyLoadProperty, parent);
-    }
     return lazyLoadMany(ebi, lazyLoadProperty, parent);
   }
 
@@ -1986,13 +1914,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       return true;
     }
     return false;
-  }
-
-  /**
-   * Return the correct BeanDescriptor based on the bean class type.
-   */
-  BeanDescriptor<?> descOf(Class<?> type) {
-    return inheritInfo.readType(type).desc();
   }
 
   /**
@@ -2187,13 +2108,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   BeanProperty _findBeanProperty(String propName) {
     BeanProperty prop = propMap.get(propName);
-    if (prop == null) {
-      if ("_$IdClass$".equals(propName)) {
-        return idProperty;
-      } else if (inheritInfo != null) {
-        // search in sub types...
-        return inheritInfo.findSubTypeProperty(propName);
-      }
+    if (prop == null && "_$IdClass$".equals(propName)) {
+      return idProperty;
     }
     return prop;
   }
@@ -2225,45 +2141,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   public boolean isAutoTunable() {
     return autoTunable;
-  }
-
-  /**
-   * Returns the Inheritance mapping information. This will be null if this type
-   * of bean is not involved in any ORM inheritance mapping.
-   */
-  @Override
-  public InheritInfo inheritInfo() {
-    return inheritInfo;
-  }
-
-  @Override
-  public boolean hasInheritance() {
-    return inheritInfo != null;
-  }
-
-  @Override
-  public String discColumn() {
-    return inheritInfo.getDiscriminatorColumn();
-  }
-
-  /**
-   * Return the discriminator value for this bean type (or null when there is no inheritance).
-   */
-  public String discValue() {
-    return inheritInfo == null ? null : inheritInfo.getDiscriminatorStringValue();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public T createBeanUsingDisc(Object discValue) {
-    return (T) inheritInfo.getType(discValue.toString()).desc().createBean();
-  }
-
-  @Override
-  public void addInheritanceWhere(Query<?> query) {
-    if (inheritInfo != null && !inheritInfo.isRoot()) {
-      query.where().eq(inheritInfo.getDiscriminatorColumn(), inheritInfo.getDiscriminatorValue());
-    }
   }
 
   /**
@@ -2994,13 +2871,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
-   * Return the properties local to this type for inheritance.
-   */
-  public BeanProperty[] propertiesLocal() {
-    return propertiesLocal;
-  }
-
-  /**
    * Return the properties set as generated values on insert.
    */
   public BeanProperty[] propertiesGenInsert() {
@@ -3062,27 +2932,4 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return propertiesUnique;
   }
 
-  @Override
-  public List<BeanType<?>> inheritanceChildren() {
-    if (hasInheritance()) {
-      return inheritInfo().getChildren()
-        .stream()
-        .map(InheritInfo::desc)
-        .collect(Collectors.toList());
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  @Override
-  public BeanType<?> inheritanceParent() {
-    return inheritInfo() == null ? null : inheritInfo().getParent().desc();
-  }
-
-  @Override
-  public void visitAllInheritanceChildren(Consumer<BeanType<?>> visitor) {
-    if (hasInheritance()) {
-      inheritInfo().visitChildren(info -> visitor.accept(info.desc()));
-    }
-  }
 }

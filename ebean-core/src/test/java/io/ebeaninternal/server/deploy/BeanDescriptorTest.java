@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.Property;
 import io.ebeaninternal.server.core.CacheOptions;
@@ -8,7 +7,10 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployIdentityMode;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.*;
+import org.tests.model.basic.Contact;
+import org.tests.model.basic.Country;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.Order;
 import org.tests.model.bridge.BSite;
 import org.tests.model.bridge.BUser;
 
@@ -16,7 +18,6 @@ import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,31 +55,6 @@ public class BeanDescriptorTest extends BaseTest {
 
     Customer bean = customerDesc.createReference(Boolean.FALSE, true, 42, null);
     Assertions.assertThat(server().beanState(bean).isDisableLazyLoad()).isTrue();
-  }
-
-  @Test
-  public void createReference_with_inheritance() {
-    initTables();
-
-    Cat cat = new Cat();
-    cat.setName("Puss");
-    DB.save(cat);
-
-    Dog dog = new Dog();
-    dog.setRegistrationNumber("DOGGIE");
-    DB.save(dog);
-
-    AnimalShelter shelter = new AnimalShelter();
-    shelter.setName("My Animal Shelter");
-    shelter.getAnimals().add(cat);
-    shelter.getAnimals().add(dog);
-
-    DB.save(shelter);
-
-    BeanDescriptor<Animal> animalDesc = spiEbeanServer().descriptor(Animal.class);
-
-    Animal bean = animalDesc.createReference(Boolean.FALSE, false, dog.getId(), null);
-    assertThat(bean.getId()).isEqualTo(dog.getId());
   }
 
   @Test

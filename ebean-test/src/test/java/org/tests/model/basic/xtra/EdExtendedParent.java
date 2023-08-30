@@ -1,11 +1,11 @@
 package org.tests.model.basic.xtra;
 
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 
 @Entity
-@DiscriminatorValue("EXTENDED")
+@Table(name = "td_parent")
 public class EdExtendedParent extends EdParent {
 
   private String extendedName;

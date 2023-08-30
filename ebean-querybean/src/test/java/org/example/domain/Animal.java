@@ -2,13 +2,9 @@ package org.example.domain;
 
 import io.ebean.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 
-@Entity
-@Inheritance
+@MappedSuperclass
 public abstract class Animal extends Model {
 
   @Id

@@ -10,8 +10,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +33,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
   }
 
   private LoadBuffer createBuffer(int size) {
-    LoadBuffer buffer = parent.useReferences ? new LoadBufferWeakRef(this, size) : new LoadBufferHardRef(this, size);
+    LoadBuffer buffer = new LoadBuffer(this, size);
     if (bufferList != null) {
       bufferList.add(buffer);
     }
@@ -112,12 +110,14 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
    * A buffer for batch loading bean collections on a given path.
    * Supports batch lazy loading and secondary query loading.
    */
-  static abstract class LoadBuffer implements BeanCollectionLoader, LoadManyBuffer {
+  static final class LoadBuffer implements BeanCollectionLoader, LoadManyBuffer {
 
     private final ReentrantLock lock = new ReentrantLock();
     private final PersistenceContext persistenceContext;
     private final DLoadManyContext context;
-    final int batchSize;
+    private final int batchSize;
+    private final BeanCollection<?>[] list;
+    private int size;
 
     LoadBuffer(DLoadManyContext context, int batchSize) {
       this.context = context;
@@ -125,6 +125,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
       // case it changes as part of a findIterate etc
       this.persistenceContext = context.persistenceContext();
       this.batchSize = batchSize;
+      this.list = new BeanCollection<?>[batchSize];
     }
 
     @Override
@@ -138,13 +139,6 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
     public boolean isFull() {
       return batchSize() == size();
     }
-
-    /**
-     * Return true if the buffer is full.
-     */
-    public abstract void add(BeanCollection<?> bc);
-
-    abstract void clear();
 
     @Override
     public BeanPropertyAssocMany<?> beanProperty() {
@@ -181,54 +175,10 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
       return context.fullPath;
     }
 
-    @Override
-    public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
-      lock.lock();
-      try {
-        boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
-        if (useCache) {
-          EntityBean ownerBean = bc.owner();
-          BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
-          Object parentId = parentDesc.getId(ownerBean);
-          final String parentKey = parentDesc.cacheKey(parentId);
-          if (parentDesc.cacheManyPropLoad(context.property, bc, parentKey, context.parent.isReadOnly())) {
-            // we loaded the bean collection from cache so remove it from the buffer
-            if (removeFromBuffer(bc)) {
-              bc.setLoader(context.parent.server());
-            }
-            // find it using instance equality - avoiding equals() and potential deadlock issue
-            return;
-          }
-        }
-
-        context.parent.server().loadMany(new LoadManyRequest(this, onlyIds, useCache, bc));
-        // clear the buffer as all entries have been loaded
-        clear();
-      } finally {
-        lock.unlock();
-      }
-    }
-  }
-
-  static class LoadBufferHardRef extends LoadBuffer {
-    private final BeanCollection<?>[] list;
-
-    private int size;
-
-    LoadBufferHardRef(DLoadManyContext context, int batchSize) {
-      super(context, batchSize);
-      this.list = new BeanCollection<?>[batchSize];
-    }
-
-    /**
-     * Return true if the buffer is full.
-     */
-    @Override
     public void add(BeanCollection<?> bc) {
       list[size++] = bc;
     }
 
-    @Override
     void clear() {
       Arrays.fill(list, null);
       size = 0;
@@ -255,71 +205,33 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
       }
       return false;
     }
-  }
-
-  /**
-   * This load buffer uses weak references, so unreachable beanCollections will drop out from the buffer.
-   */
-  static class LoadBufferWeakRef extends LoadBuffer {
-    private final Reference<BeanCollection<?>>[] list;
-
-    private int size;
-
-    LoadBufferWeakRef(DLoadManyContext context, int batchSize) {
-      super(context, batchSize);
-      this.list = new Reference[batchSize];
-    }
-
-    /**
-     * Return true if the buffer is full.
-     */
-    @Override
-    public void add(BeanCollection<?> bc) {
-      list[size++] = new WeakReference<>(bc);
-    }
 
     @Override
-    void clear() {
-      Arrays.fill(list, null);
-      size = 0;
-    }
-
-    @Override
-    public int size() {
-      return size;
-    }
-
-    @Override
-    public BeanCollection<?> get(int i) {
-      Reference<BeanCollection<?>> ref = list[i];
-      if (ref == null) {
-        return null;
-      }
-      BeanCollection<?> bc = ref.get();
-      if (bc == null) {
-        // remove dead references
-        list[i] = null;
-      }
-      return bc;
-    }
-
-    @Override
-    public boolean removeFromBuffer(BeanCollection<?> collection) {
-      for (int i = 0; i < size; i++) {
-        if (list[i] != null) {
-          BeanCollection<?> bc = list[i].get();
-          if (bc == null) {
-            // remove dead references
-            list[i] = null;
-          }
-          // find it using instance equality - avoiding equals() and potential deadlock issue
-          if (bc == collection) {
-            list[i] = null;
-            return true;
+    public void loadMany(BeanCollection<?> bc, boolean onlyIds) {
+      lock.lock();
+      try {
+        boolean useCache = !onlyIds && context.hitCache && context.property.isUseCache();
+        if (useCache) {
+          EntityBean ownerBean = bc.owner();
+          BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
+          Object parentId = parentDesc.getId(ownerBean);
+          final String parentKey = parentDesc.cacheKey(parentId);
+          if (parentDesc.cacheManyPropLoad(context.property, bc, parentKey, context.parent.isReadOnly())) {
+            // we loaded the bean collection from cache so remove it from the buffer
+            if (removeFromBuffer(bc)) {
+              bc.setLoader(context.parent.server());
+            }
+            // find it using instance equality - avoiding equals() and potential deadlock issue
+            return;
           }
         }
+
+        context.parent.server().loadMany(new LoadManyRequest(this, onlyIds, useCache, bc));
+        // clear the buffer as all entries have been loaded
+        clear();
+      } finally {
+        lock.unlock();
       }
-      return false;
     }
   }
 }

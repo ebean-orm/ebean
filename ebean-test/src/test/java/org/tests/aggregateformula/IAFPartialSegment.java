@@ -1,13 +1,11 @@
 package org.tests.aggregateformula;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 @Entity
-@Inheritance
-@DiscriminatorValue("target")
+@Table(name = "iaf_segment")
+// Inheritance
+// DiscriminatorValue("target")
 public class IAFPartialSegment extends IAFBaseSegment {
 
   private final long segmentIdZat;

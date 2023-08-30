@@ -449,44 +449,7 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   void beanPutAll(Collection<EntityBean> beans) {
-    if (desc.inheritInfo != null) {
-      Class<?> aClass = theClassOf(beans);
-      // check if all beans have the same class
-      for (EntityBean bean : beans) {
-        if (!bean.getClass().equals(aClass)) {
-          aClass = null;
-          break;
-        }
-      }
-      if (aClass == null) {
-        // there are different bean types in the collection, so we add one by one to the cache
-        for (EntityBean bean : beans) {
-          desc.descOf(bean.getClass()).cacheBeanPutDirect(bean);
-        }
-      } else {
-        desc.descOf(aClass).cacheBeanPutAllDirect(beans);
-      }
-    } else {
-      beanCachePutAllDirect(beans);
-    }
-  }
-
-  private Class<?> theClassOf(Collection<EntityBean> beans) {
-    if (beans instanceof List) {
-      return ((List<?>) beans).get(0).getClass();
-    }
-    return beans.iterator().next().getClass();
-  }
-
-  /**
-   * Put a bean into the bean cache.
-   */
-  void beanCachePut(EntityBean bean) {
-    if (desc.inheritInfo != null) {
-      desc.descOf(bean.getClass()).cacheBeanPutDirect(bean);
-    } else {
-      beanCachePutDirect(bean);
-    }
+    beanCachePutAllDirect(beans);
   }
 
   void beanCachePutAllDirect(Collection<EntityBean> beans) {
@@ -518,6 +481,13 @@ final class BeanDescriptorCacheHelp<T> {
       }
       naturalKeyCache.putAll(natKeys);
     }
+  }
+
+  /**
+   * Put a bean into the bean cache.
+   */
+  void beanCachePut(EntityBean bean) {
+    beanCachePutDirect(bean);
   }
 
   /**
@@ -604,19 +574,7 @@ final class BeanDescriptorCacheHelp<T> {
    * Load the entity bean taking into account inheritance.
    */
   private EntityBean loadBean(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
-    String discValue = data.getDiscValue();
-    if (discValue == null) {
-      return loadBeanDirect(id, readOnly, data, context);
-    } else {
-      return rootDescriptor(discValue).cacheBeanLoadDirect(id, readOnly, data, context);
-    }
-  }
-
-  /**
-   * Return the root BeanDescriptor for inheritance.
-   */
-  private BeanDescriptor<?> rootDescriptor(String discValue) {
-    return desc.inheritInfo.readType(discValue).desc();
+    return loadBeanDirect(id, readOnly, data, context);
   }
 
   /**
@@ -652,12 +610,7 @@ final class BeanDescriptorCacheHelp<T> {
    * Load the embedded bean checking for inheritance.
    */
   EntityBean embeddedBeanLoad(CachedBeanData data, PersistenceContext context) {
-    String discValue = data.getDiscValue();
-    if (discValue == null) {
-      return embeddedBeanLoadDirect(data, context);
-    } else {
-      return rootDescriptor(discValue).cacheEmbeddedBeanLoadDirect(data, context);
-    }
+    return embeddedBeanLoadDirect(data, context);
   }
 
   /**

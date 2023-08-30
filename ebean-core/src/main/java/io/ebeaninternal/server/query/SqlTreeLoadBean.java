@@ -9,7 +9,6 @@ import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiQuery.Mode;
 import io.ebeaninternal.server.deploy.DbReadContext;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.id.IdBinder;
 
 import java.sql.SQLException;
@@ -32,7 +31,6 @@ class SqlTreeLoadBean implements SqlTreeLoad {
   private final boolean readIdNormal;
   private final boolean disableLazyLoad;
   private final boolean readOnlyNoIntercept;
-  private final InheritInfo inheritInfo;
   final String prefix;
   private final Map<String, String> pathMap;
   final STreePropertyAssocMany lazyLoadParent;
@@ -46,7 +44,6 @@ class SqlTreeLoadBean implements SqlTreeLoad {
     this.lazyLoadParentIdBinder = node.lazyLoadParentIdBinder;
     this.prefix = node.prefix;
     this.desc = node.desc;
-    this.inheritInfo = desc.inheritInfo();
     this.idBinder = desc.idBinder();
     this.temporalMode = node.temporalMode;
     this.temporalVersions = node.temporalVersions;
@@ -92,39 +89,6 @@ class SqlTreeLoadBean implements SqlTreeLoad {
       }
     }
     return properties[0];
-  }
-
-  /**
-   * Load that takes into account inheritance.
-   */
-  private final class LoadInherit extends Load {
-
-    private LoadInherit(DbReadContext ctx, EntityBean parentBean) {
-      super(ctx, parentBean);
-    }
-
-    @Override
-    void initBeanType() throws SQLException {
-      InheritInfo localInfo = readId ? inheritInfo.readType(ctx) : desc.inheritInfo();
-      if (localInfo == null) {
-        // the bean must be null
-        localIdBinder = idBinder;
-        localDesc = desc;
-      } else {
-        localBean = localInfo.createEntityBean();
-        localType = localInfo.getType();
-        localIdBinder = localInfo.getIdBinder();
-        localDesc = localInfo.desc();
-      }
-    }
-
-    @Override
-    void loadProperties() {
-      // take account of inheritance
-      for (STreeProperty property : properties) {
-        localDesc.inheritanceLoad(sqlBeanLoad, property, ctx);
-      }
-    }
   }
 
   /**
@@ -383,7 +347,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
    * Create the loader with or without inheritance.
    */
   final Load createLoad(DbReadContext ctx, EntityBean parentBean) {
-    return (inheritInfo != null) ? new LoadInherit(ctx, parentBean) : new Load(ctx, parentBean);
+    return new Load(ctx, parentBean);
   }
 
   @Override

@@ -12,7 +12,7 @@ public class EUncle {
   private String name;
 
   @ManyToOne(optional = false)
-  private Parent parent;
+  private ChildA parent;
 
   @Version
   private Long version;
@@ -33,11 +33,11 @@ public class EUncle {
     this.name = name;
   }
 
-  public Parent getParent() {
+  public ChildA getParent() {
     return parent;
   }
 
-  public void setParent(Parent parent) {
+  public void setParent(ChildA parent) {
     this.parent = parent;
   }
 

@@ -1609,28 +1609,6 @@ public interface Query<T> extends CancelableQuery {
   Class<T> getBeanType();
 
   /**
-   * Restrict the query to only return subtypes of the given inherit type.
-   *
-   * <pre>{@code
-   *
-   *   List<Animal> animals =
-   *     new QAnimal()
-   *       .name.startsWith("Fluffy")
-   *       .setInheritType(Cat.class)
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * @param type An inheritance subtype of the
-   */
-  Query<T> setInheritType(Class<? extends T> type);
-
-  /**
-   * Returns the inherit type. This is normally the same as getBeanType() returns as long as no other type is set.
-   */
-  Class<? extends T> getInheritType();
-
-  /**
    * Return the type of query being executed.
    */
   QueryType getQueryType();

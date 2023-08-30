@@ -4,9 +4,7 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.inherit.ChildA;
-import org.tests.inherit.ChildB;
 import org.tests.inherit.Data;
-import org.tests.inherit.Parent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +25,7 @@ class ParentQueryTest extends BaseTestCase {
     a.setData(exampleData);
     DB.save(a);
 
-    ChildB b = new ChildB(1001, "PQT-PB");
+    ChildA b = new ChildA("B", 1001, "PQT-PB");
     b.setData(exampleData);
     DB.save(b);
 
@@ -35,7 +33,7 @@ class ParentQueryTest extends BaseTestCase {
     c.setData(exampleData);
     DB.save(c);
 
-    List<Parent> partial = DB.find(Parent.class).where().ge("val", 1001).findList();
+    List<ChildA> partial = DB.find(ChildA.class).where().ge("val", 1001).findList();
     assertNotNull(partial.get(0).getData());
     assertThat(partial.get(0).getMore()).startsWith("PQT-");
     assertThat(partial.get(0).getData()).hasSize(3);

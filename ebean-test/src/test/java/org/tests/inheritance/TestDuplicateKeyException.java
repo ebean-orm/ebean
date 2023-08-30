@@ -4,8 +4,8 @@ package org.tests.inheritance;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Attribute;
 import org.tests.model.basic.AttributeHolder;
-import org.tests.model.basic.ListAttribute;
 import org.tests.model.basic.ListAttributeValue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +26,7 @@ public class TestDuplicateKeyException extends BaseTestCase {
 
     DB.save(value1);
 
-    final ListAttribute listAttribute = new ListAttribute();
+    final Attribute listAttribute = new Attribute();
     listAttribute.add(value1);
     DB.save(listAttribute);
 

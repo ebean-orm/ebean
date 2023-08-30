@@ -41,7 +41,7 @@ public final class CachedBeanDataFromBean {
 
     long version = desc.getVersion(bean);
     EntityBean sharableBean = createSharableBean(desc, bean, ebi);
-    return new CachedBeanData(sharableBean, desc.discValue(), data, version);
+    return new CachedBeanData(sharableBean, data, version);
   }
 
   private static EntityBean createSharableBean(BeanDescriptor<?> desc, EntityBean bean, EntityBeanIntercept beanEbi) {
