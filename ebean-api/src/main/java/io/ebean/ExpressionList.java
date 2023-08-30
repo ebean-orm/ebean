@@ -413,42 +413,6 @@ public interface ExpressionList<T> {
   Optional<T> findOneOrEmpty();
 
   /**
-   * Execute find row count query in a background thread.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   *
-   * @return a Future object for the row count query
-   */
-  FutureRowCount<T> findFutureCount();
-
-  /**
-   * Execute find Id's query in a background thread.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   *
-   * @return a Future object for the list of Id's
-   */
-  FutureIds<T> findFutureIds();
-
-  /**
-   * Execute find list query in a background thread.
-   * <p>
-   * This returns a Future object which can be used to cancel, check the
-   * execution status (isDone etc) and get the value (with or without a
-   * timeout).
-   * </p>
-   *
-   * @return a Future object for the list result of the query
-   */
-  FutureList<T> findFutureList();
-
-  /**
    * Return a PagedList for this query using firstRow and maxRows.
    * <p>
    * The benefit of using this over findList() is that it provides functionality to get the
