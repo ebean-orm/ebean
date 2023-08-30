@@ -329,21 +329,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public FutureIds<T> findFutureIds() {
-    return exprList.findFutureIds();
-  }
-
-  @Override
-  public FutureList<T> findFutureList() {
-    return exprList.findFutureList();
-  }
-
-  @Override
-  public FutureRowCount<T> findFutureCount() {
-    return exprList.findFutureCount();
-  }
-
-  @Override
   public <A> List<A> findIds() {
     return exprList.findIds();
   }

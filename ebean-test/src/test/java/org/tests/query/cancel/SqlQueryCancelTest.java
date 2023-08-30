@@ -99,10 +99,7 @@ class SqlQueryCancelTest extends BaseTestCase {
   @Test
   public void cancelOrmQueryAtBegin() throws SQLException {
     doCancelOrmAtBegin(Query::findCount);
-    doCancelOrmAtBegin(Query::findFutureCount);
     // We cannot test 'findCount' due H2 restrictions
-    doCancelOrmAtBegin(Query::findFutureIds);
-    doCancelOrmAtBegin(Query::findFutureList);
     doCancelOrmAtBegin(Query::findIds);
     doCancelOrmAtBegin(Query::findIterate);
     doCancelOrmAtBegin(Query::findList);
@@ -126,8 +123,6 @@ class SqlQueryCancelTest extends BaseTestCase {
     // doCancelOrmDuringRun(Query::findCount);
     // testDuringRunFuture(Query::findFutureCount);
     // We cannot test 'findCount' due H2 restrictions
-    doCancelOrmFutureDuringRun(Query::findFutureIds);
-    doCancelOrmFutureDuringRun(Query::findFutureList);
     doCancelOrmDuringRun(Query::findIds);
     doCancelOrmDuringRun(Query::findIterate);
     doCancelOrmDuringRun(Query::findList);

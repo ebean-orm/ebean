@@ -331,10 +331,6 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
 
   <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query);
 
-  <T> FutureIds<T> findFutureIds(SpiQuery<T> query);
-
-  <T> FutureList<T> findFutureList(SpiQuery<T> query);
-
   <T> PagedList<T> findPagedList(SpiQuery<T> query);
 
   <T> Set<T> findSet(SpiQuery<T> query);
