@@ -11,7 +11,7 @@ import java.util.List;
 
 @DocStore
 @Inheritance
-@DiscriminatorColumn(name = "type")
+@DiscriminatorColumn
 @JsonSerialize(using = ReportJsonSerializer.class)
 @JsonDeserialize(using = ReportJsonDeserializer.class)
 public class Report {
