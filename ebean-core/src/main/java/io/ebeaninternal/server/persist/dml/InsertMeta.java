@@ -5,9 +5,7 @@ import io.ebean.bean.EntityBean;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.persist.dmlbind.Bindable;
-import io.ebeaninternal.server.persist.dmlbind.BindableDiscriminator;
 import io.ebeaninternal.server.persist.dmlbind.BindableId;
 import io.ebeaninternal.server.persist.dmlbind.BindableList;
 
@@ -22,7 +20,6 @@ final class InsertMeta {
   private final String sqlNullId;
   private final String sqlWithId;
   private final BindableId id;
-  private final Bindable discriminator;
   private final BindableList all;
   private final boolean supportsGetGeneratedKeys;
   private final boolean concatenatedKey;
@@ -36,7 +33,6 @@ final class InsertMeta {
 
   InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
     this.platform = dbPlatform.platform();
-    this.discriminator = discriminator(desc);
     this.id = id;
     this.all = all;
     this.shadowFKey = shadowFKey;
@@ -67,11 +63,6 @@ final class InsertMeta {
       }
       this.sqlNullId = genSql(true, tableName);
     }
-  }
-
-  private static Bindable discriminator(BeanDescriptor<?> desc) {
-    InheritInfo inheritInfo = desc.inheritInfo();
-    return inheritInfo != null ? new BindableDiscriminator(inheritInfo) : null;
   }
 
   /**
@@ -118,9 +109,6 @@ final class InsertMeta {
     if (shadowFKey != null) {
       shadowFKey.dmlBind(request, bean);
     }
-    if (discriminator != null) {
-      discriminator.dmlBind(request, bean);
-    }
     all.dmlBind(request, bean);
   }
 
@@ -149,9 +137,6 @@ final class InsertMeta {
     if (shadowFKey != null) {
       shadowFKey.dmlAppend(request);
     }
-    if (discriminator != null) {
-      discriminator.dmlAppend(request);
-    }
     all.dmlAppend(request);
 
     request.append(") values (");
@@ -178,7 +163,6 @@ final class InsertMeta {
    */
   private boolean noColumnsForInsert() {
     return shadowFKey == null
-      && discriminator == null
       && all.isEmpty();
   }
 

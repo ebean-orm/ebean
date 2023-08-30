@@ -29,7 +29,6 @@ import io.ebeaninternal.server.core.timezone.*;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.parse.DeployCreateProperties;
-import io.ebeaninternal.server.deploy.parse.DeployInherit;
 import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.dto.DtoBeanManager;
 import io.ebeaninternal.server.expression.DefaultExpressionFactory;
@@ -64,7 +63,6 @@ public final class InternalConfiguration {
   private final DatabaseConfig config;
   private final BootupClasses bootupClasses;
   private final DatabasePlatform databasePlatform;
-  private final DeployInherit deployInherit;
   private final TypeManager typeManager;
   private final DtoBeanManager dtoBeanManager;
   private final ClockService clockService;
@@ -105,7 +103,6 @@ public final class InternalConfiguration {
     this.expressionFactory = initExpressionFactory(config);
     this.typeManager = new DefaultTypeManager(config, bootupClasses);
     this.multiValueBind = createMultiValueBind(databasePlatform.platform());
-    this.deployInherit = new DeployInherit(bootupClasses);
     this.deployCreateProperties = new DeployCreateProperties(typeManager);
     this.deployUtil = new DeployUtil(typeManager, config);
     this.serverCachePlugin = initServerCachePlugin();
@@ -293,10 +290,6 @@ public final class InternalConfiguration {
 
   BeanDescriptorManager getBeanDescriptorManager() {
     return beanDescriptorManager;
-  }
-
-  public DeployInherit getDeployInherit() {
-    return deployInherit;
   }
 
   public DeployCreateProperties getDeployCreateProperties() {

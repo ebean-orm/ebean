@@ -4,15 +4,14 @@ package org.tests.model.basic.xtra;
 import javax.persistence.*;
 import java.util.List;
 
-@Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "parent_type")
-@DiscriminatorValue("BASIC")
-@Table(name = "td_parent")
-public class EdParent {
+@MappedSuperclass
+public abstract class EdParent {
+
   @Id
   @Column(name = "parent_id")
   private int id;
+
+  String parentType = "EXTENDED";
 
   @Column(name = "parent_name")
   private String name;

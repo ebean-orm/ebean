@@ -14,9 +14,9 @@ public class CarAccessory extends BasicDomain {
   private CarFuse fuse;
 
   @ManyToOne
-  private Car car;
+  private Vehicle car;
 
-  public CarAccessory(Car car, CarFuse fuse) {
+  public CarAccessory(Vehicle car, CarFuse fuse) {
     this.car = car;
     this.fuse = fuse;
   }
@@ -29,11 +29,11 @@ public class CarAccessory extends BasicDomain {
     this.name = name;
   }
 
-  public Car getCar() {
+  public Vehicle getCar() {
     return car;
   }
 
-  public void setCar(Car car) {
+  public void setCar(Vehicle car) {
     this.car = car;
   }
 

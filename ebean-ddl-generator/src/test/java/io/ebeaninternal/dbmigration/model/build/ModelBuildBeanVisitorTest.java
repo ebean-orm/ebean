@@ -43,10 +43,6 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     new VisitAllUsing(addTable, defaultServer).visitAllBeans();
 
     assert_compound_pk(model);
-
-    assert_discriminatorColumn_explicit(model);
-    assert_discriminatorColumn_implied(model);
-    assert_discriminatorColumn_length(model);
   }
 
   @Test
@@ -104,27 +100,4 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     assertThat(item.primaryKeyColumns()).hasSize(2);
   }
 
-  private void assert_discriminatorColumn_explicit(ModelContainer model) {
-
-    MTable configuration = model.getTable("configuration");
-    MColumn discTypeColumn = configuration.getColumn("type");
-    assertThat(discTypeColumn.getType()).isEqualTo("varchar(21)");
-    assertThat(discTypeColumn.isNotnull()).isTrue();
-  }
-
-  private void assert_discriminatorColumn_implied(ModelContainer model) {
-
-    MTable configuration = model.getTable("bar");
-    MColumn discTypeColumn = configuration.getColumn("bar_type");
-    assertThat(discTypeColumn.getType()).isEqualTo("varchar(31)");
-    assertThat(discTypeColumn.isNotnull()).isTrue();
-  }
-
-  private void assert_discriminatorColumn_length(ModelContainer model) {
-
-    MTable configuration = model.getTable("vehicle");
-    MColumn discTypeColumn = configuration.getColumn("dtype");
-    assertThat(discTypeColumn.getType()).isEqualTo("varchar(3)");
-    assertThat(discTypeColumn.isNotnull()).isTrue();
-  }
 }

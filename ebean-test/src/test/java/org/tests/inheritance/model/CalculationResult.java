@@ -12,10 +12,10 @@ public class CalculationResult {
   private double charge;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
-  private ProductConfiguration productConfiguration;
+  private Configuration productConfiguration;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
-  private GroupConfiguration groupConfiguration;
+  private Configuration groupConfiguration;
 
   public double getCharge() {
     return charge;
@@ -25,19 +25,19 @@ public class CalculationResult {
     this.charge = charge;
   }
 
-  public ProductConfiguration getProductConfiguration() {
+  public Configuration getProductConfiguration() {
     return productConfiguration;
   }
 
-  public void setProductConfiguration(ProductConfiguration productConfiguration) {
+  public void setProductConfiguration(Configuration productConfiguration) {
     this.productConfiguration = productConfiguration;
   }
 
-  public GroupConfiguration getGroupConfiguration() {
+  public Configuration getGroupConfiguration() {
     return groupConfiguration;
   }
 
-  public void setGroupConfiguration(GroupConfiguration groupConfiguration) {
+  public void setGroupConfiguration(Configuration groupConfiguration) {
     this.groupConfiguration = groupConfiguration;
   }
 

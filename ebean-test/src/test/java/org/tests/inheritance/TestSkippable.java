@@ -5,8 +5,8 @@ import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.Attribute;
 import org.tests.model.basic.AttributeHolder;
-import org.tests.model.basic.ListAttribute;
 import org.tests.model.basic.ListAttributeValue;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -31,12 +31,12 @@ public class TestSkippable extends BaseTestCase {
     DB.save(value1);
     DB.save(value2);
 
-    final ListAttribute listAttribute = new ListAttribute();
+    final Attribute listAttribute = new Attribute();
     listAttribute.add(value1);
     DB.save(listAttribute);
     logger.info(" -- seeded data");
 
-    final ListAttribute listAttributeDB = DB.find(ListAttribute.class, listAttribute.getId());
+    final Attribute listAttributeDB = DB.find(Attribute.class, listAttribute.getId());
     assertNotNull(listAttributeDB);
 
     final ListAttributeValue value1_DB = listAttributeDB.getValues().iterator().next();
@@ -61,7 +61,7 @@ public class TestSkippable extends BaseTestCase {
     logger.info(" -- M2M detected delete of value1 and add of value2 ?");
 
 
-    final ListAttribute listAttributeDB_2 = DB.find(ListAttribute.class, listAttributeDB.getId());
+    final Attribute listAttributeDB_2 = DB.find(Attribute.class, listAttributeDB.getId());
     assertNotNull(listAttributeDB_2);
     final ListAttributeValue value2_DB_2 = listAttributeDB_2.getValues().iterator().next();
 

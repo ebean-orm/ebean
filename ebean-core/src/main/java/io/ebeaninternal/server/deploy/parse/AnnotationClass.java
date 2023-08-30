@@ -6,7 +6,6 @@ import io.ebean.config.TableName;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.IndexDefinition;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.TablespaceMeta;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -69,10 +68,6 @@ final class AnnotationClass extends AnnotationParser {
   private void setTableName() {
     if (descriptor.isBaseTableType()) {
       Class<?> beanType = descriptor.getBeanType();
-      InheritInfo inheritInfo = descriptor.getInheritInfo();
-      if (inheritInfo != null) {
-        beanType = inheritInfo.getRoot().getType();
-      }
       // default the TableName using NamingConvention.
       TableName tableName = namingConvention.getTableName(beanType);
       descriptor.setBaseTable(tableName, asOfViewSuffix, versionsBetweenSuffix);

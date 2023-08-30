@@ -59,7 +59,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
 
   private final ReadAnnotations readAnnotations;
   private final TransientProperties transientProperties;
-  private final DeployInherit deplyInherit;
   private final BeanPropertyAccess beanPropertyAccess = new EnhanceBeanPropertyAccess();
   private final DeployUtil deployUtil;
   private final PersistControllerManager persistControllerManager;
@@ -129,7 +128,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.createProperties = config.getDeployCreateProperties();
     this.namingConvention = this.config.getNamingConvention();
     this.dbIdentity = config.getDatabasePlatform().dbIdentity();
-    this.deplyInherit = config.getDeployInherit();
     this.deployUtil = config.getDeployUtil();
     this.typeManager = deployUtil.typeManager();
     this.beanManagerFactory = new BeanManagerFactory(config.getDatabasePlatform());
@@ -260,7 +258,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       readEntityDeploymentInitial();
       readEntityBeanTable();
       readEntityDeploymentAssociations();
-      readInheritedIdGenerators();
       // creates the BeanDescriptors
       readEntityRelationships();
       List<BeanDescriptor<?>> list = new ArrayList<>(descMap.values());
@@ -402,12 +399,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       d.initialiseId(initContext);
     }
 
-    // PASS 2:
-    // now initialise all the inherit info
-    for (BeanDescriptor<?> d : descMap.values()) {
-      d.initInheritInfo();
-    }
-
+    // PASS 2: Was to initialise all the inherit info
     // PASS 3:
     // now initialise all the associated properties
     for (BeanDescriptor<?> d : descMap.values()) {
@@ -608,20 +600,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     }
   }
 
-  private void readInheritedIdGenerators() {
-    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      DeployBeanDescriptor<?> descriptor = info.getDescriptor();
-      InheritInfo inheritInfo = descriptor.getInheritInfo();
-      if (inheritInfo != null && !inheritInfo.isRoot()) {
-        DeployBeanInfo<?> rootBeanInfo = deployInfoMap.get(inheritInfo.getRoot().getType());
-        PlatformIdGenerator rootIdGen = rootBeanInfo.getDescriptor().getIdGenerator();
-        if (rootIdGen != null) {
-          descriptor.setIdGenerator(rootIdGen);
-        }
-      }
-    }
-  }
-
   /**
    * Create the BeanTable from the deployment information gathered so far.
    */
@@ -645,33 +623,8 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       secondaryPropsJoins(info);
     }
     for (DeployBeanInfo<?> info : deployInfoMap.values()) {
-      setInheritanceInfo(info);
-    }
-    for (DeployBeanInfo<?> info : deployInfoMap.values()) {
       if (!info.isEmbedded()) {
         registerDescriptor(info);
-      }
-    }
-  }
-
-  /**
-   * Sets the inheritance info.
-   */
-  private void setInheritanceInfo(DeployBeanInfo<?> info) {
-    for (DeployBeanPropertyAssocOne<?> oneProp : info.getDescriptor().propertiesAssocOne()) {
-      if (!oneProp.isTransient()) {
-        DeployBeanInfo<?> assoc = deployInfoMap.get(oneProp.getTargetType());
-        if (assoc != null) {
-          oneProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
-        }
-      }
-    }
-    for (DeployBeanPropertyAssocMany<?> manyProp : info.getDescriptor().propertiesAssocMany()) {
-      if (!manyProp.isTransient()) {
-        DeployBeanInfo<?> assoc = deployInfoMap.get(manyProp.getTargetType());
-        if (assoc != null) {
-          manyProp.getTableJoin().setInheritInfo(assoc.getDescriptor().getInheritInfo());
-        }
       }
     }
   }
@@ -809,13 +762,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     orderProperty.setDbUpdateable(orderColumn.isUpdatable());
     orderProperty.setDbRead(true);
     orderProperty.setOwningType(targetDesc.getBeanType());
-    final InheritInfo targetInheritInfo = targetDesc.getInheritInfo();
-    if (targetInheritInfo != null) {
-      for (InheritInfo child : targetInheritInfo.getChildren()) {
-        final DeployBeanDescriptor<?> childDescriptor = deployInfoMap.get(child.getType()).getDescriptor();
-        childDescriptor.setOrderColumn(orderProperty);
-      }
-    }
     targetDesc.setOrderColumn(orderProperty);
   }
 
@@ -1063,9 +1009,6 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     beanLifecycleAdapterFactory.addLifecycleMethods(desc);
     // set bean controller, finder and listener
     setBeanControllerFinderListener(desc);
-    deplyInherit.process(desc);
-    desc.checkInheritanceMapping();
-
     createProperties.createProperties(desc);
     DeployBeanInfo<T> info = new DeployBeanInfo<>(deployUtil, desc);
     readAnnotations.readInitial(info);

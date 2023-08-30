@@ -15,10 +15,10 @@ public class Configurations {
   private String name;
 
   @OneToMany
-  private List<GroupConfiguration> groupConfigurations;
+  private List<Configuration> groupConfigurations;
 
   @OneToMany
-  private List<ProductConfiguration> productConfigurations;
+  private List<Configuration> productConfigurations;
 
   public Integer getId() {
     return id;
@@ -36,28 +36,28 @@ public class Configurations {
     this.name = name;
   }
 
-  public List<GroupConfiguration> getGroupConfigurations() {
+  public List<Configuration> getGroupConfigurations() {
     return groupConfigurations;
   }
 
-  public void setGroupConfigurations(List<GroupConfiguration> groupConfigurations) {
+  public void setGroupConfigurations(List<Configuration> groupConfigurations) {
     this.groupConfigurations = groupConfigurations;
   }
 
-  public void addGroupConfiguration(GroupConfiguration groupConfiguration) {
+  public void addGroupConfiguration(Configuration groupConfiguration) {
     groupConfiguration.setConfigurations(this);
     groupConfigurations.add(groupConfiguration);
   }
 
-  public List<ProductConfiguration> getProductConfigurations() {
+  public List<Configuration> getProductConfigurations() {
     return productConfigurations;
   }
 
-  public void setProductConfigurations(List<ProductConfiguration> productConfigurations) {
+  public void setProductConfigurations(List<Configuration> productConfigurations) {
     this.productConfigurations = productConfigurations;
   }
 
-  public void addProductConfiguration(ProductConfiguration productConfiguration) {
+  public void addProductConfiguration(Configuration productConfiguration) {
     productConfiguration.setConfigurations(this);
     productConfigurations.add(productConfiguration);
   }

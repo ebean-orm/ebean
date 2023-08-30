@@ -2,13 +2,12 @@ package org.tests.aggregateformula;
 
 import javax.persistence.*;
 
-@Entity
-@Inheritance
-@Table(name = "iaf_segment")
-@DiscriminatorColumn(name = "ptype")
-public class IAFBaseSegment {
+@MappedSuperclass
+// DiscriminatorColumn(name = "ptype")
+public abstract class IAFBaseSegment {
 
   @Id
   private Long id;
 
+  String ptype;
 }

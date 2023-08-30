@@ -18,8 +18,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   private final MTable table;
 
-  private final BeanDescriptor<?> beanDescriptor;
-
   private final IndexSet indexSet = new IndexSet();
 
   private MColumn lastColumn;
@@ -32,7 +30,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
   public ModelBuildPropertyVisitor(ModelBuildContext ctx, MTable table, BeanDescriptor<?> beanDescriptor) {
     this.ctx = ctx;
     this.table = table;
-    this.beanDescriptor = beanDescriptor;
     addIndexes(beanDescriptor.indexDefinitions());
   }
 
@@ -270,10 +267,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     }
     Set<String> checkConstraintValues = p.dbCheckConstraintValues();
     if (checkConstraintValues != null) {
-      if (beanDescriptor.hasInheritance()) {
-        InheritInfo inheritInfo = beanDescriptor.inheritInfo();
-        inheritInfo.appendCheckConstraintValues(p.name(), checkConstraintValues);
-      }
       col.setCheckConstraint(buildCheckConstraint(p.dbColumn(), checkConstraintValues));
       col.setCheckConstraintName(checkConstraintName(col.getName()));
     }

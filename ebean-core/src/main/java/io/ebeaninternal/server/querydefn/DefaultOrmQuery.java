@@ -970,9 +970,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (type != null) {
       sb.append(type.ordinal());
     }
-    if (beanDescriptor.discValue() != null) {
-      sb.append("/dv").append(beanDescriptor.discValue());
-    }
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
       sb.append("/tm").append(temporalMode.ordinal());
       if (versionsStart != null) {
@@ -1628,26 +1625,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Class<T> getBeanType() {
     return beanType;
-  }
-
-  @Override
-  public final Class<? extends T> getInheritType() {
-    return beanDescriptor.type();
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public final Query<T> setInheritType(Class<? extends T> type) {
-    if (type == beanType) {
-      return this;
-    }
-    InheritInfo inheritInfo = rootBeanDescriptor.inheritInfo();
-    inheritInfo = inheritInfo == null ? null : inheritInfo.readType(type);
-    if (inheritInfo == null) {
-      throw new IllegalArgumentException("Given type " + type + " is not a subtype of " + beanType);
-    }
-    beanDescriptor = (BeanDescriptor<T>) rootBeanDescriptor.descriptor(type);
-    return this;
   }
 
   @Override

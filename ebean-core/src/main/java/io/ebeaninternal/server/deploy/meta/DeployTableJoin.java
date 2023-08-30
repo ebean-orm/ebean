@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebeaninternal.server.deploy.BeanTable;
-import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.query.SqlJoinType;
 
@@ -29,7 +28,6 @@ public final class DeployTableJoin {
    * The list of join column pairs. Used to generate the on clause.
    */
   private ArrayList<DeployTableJoinColumn> columns = new ArrayList<>(4);
-  private InheritInfo inheritInfo;
   private String extraWhere;
 
   /**
@@ -169,14 +167,6 @@ public final class DeployTableJoin {
     destJoin.setColumns(columns(), reverse);
 
     return destJoin;
-  }
-
-  public InheritInfo getInheritInfo() {
-    return inheritInfo;
-  }
-
-  public void setInheritInfo(InheritInfo inheritInfo) {
-    this.inheritInfo = inheritInfo;
   }
 
   /**

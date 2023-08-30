@@ -4,14 +4,13 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.ChangeLog;
 
 import javax.persistence.*;
+import java.util.List;
 
 @ChangeLog
 @Entity
 @Cache(enableQueryCache = true)
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING, columnDefinition = "varchar(21)")
 public class Configuration extends AbstractBaseClass {
-  
+
   @Id
   @Column(name = "id")
   private Integer id;
@@ -20,6 +19,15 @@ public class Configuration extends AbstractBaseClass {
   @ManyToOne
   private Configurations configurations;
 
+  private String groupName;
+
+  @OneToMany(mappedBy = "groupConfiguration")
+  private List<CalculationResult> groupResults;
+
+  private String productName;
+
+  @OneToMany(mappedBy = "productConfiguration")
+  private List<CalculationResult> productResults;
 
   public Configuration() {
     super();
@@ -39,5 +47,13 @@ public class Configuration extends AbstractBaseClass {
 
   public void setConfigurations(Configurations configurations) {
     this.configurations = configurations;
+  }
+
+  public String getProductName() {
+    return productName;
+  }
+
+  public String getGroupName() {
+    return groupName;
   }
 }

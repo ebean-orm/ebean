@@ -25,7 +25,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
 
       LoggedSql.start();
 
-      EdParent parent = new EdParent();
+      EdExtendedParent parent = new EdExtendedParent();
       parent.setName("MyComputer");
 
       EdChild child = new EdChild();
@@ -44,7 +44,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
       parent.setName("MyDesk");
       DB.save(parent);
 
-      DB.commitTransaction();
+      txn.commit();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql = LoggedSql.stop();
@@ -66,7 +66,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
 
       LoggedSql.start();
 
-      EdParent parent = new EdParent();
+      EdExtendedParent parent = new EdExtendedParent();
       parent.setName("MyComputer");
 
       EdChild child = new EdChild();
@@ -87,7 +87,7 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
       DB.save(parent);
 
       // flush
-      DB.commitTransaction();
+      txn.commit();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql = LoggedSql.stop();

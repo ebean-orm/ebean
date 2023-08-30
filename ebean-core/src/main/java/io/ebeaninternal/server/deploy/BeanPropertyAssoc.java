@@ -4,9 +4,6 @@ import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.bean.EntityBean;
-import io.ebean.core.type.DocPropertyType;
-import io.ebean.text.PathProperties;
-import io.ebean.util.SplitName;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -42,7 +39,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    */
   BeanDescriptor<T> targetDescriptor;
   IdBinder targetIdBinder;
-  InheritInfo targetInheritInfo;
   String targetIdProperty;
   /**
    * Derived list of exported property and matching foreignKey
@@ -115,7 +111,6 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     targetDescriptor = descriptor.descriptor(targetType);
     if (!isTransient) {
       targetIdBinder = targetDescriptor.idBinder();
-      targetInheritInfo = targetDescriptor.inheritInfo();
       saveRecurseSkippable = targetDescriptor.isSaveRecurseSkippable();
       if (!targetIdBinder.isComplexId()) {
         targetIdProperty = targetIdBinder.idSelect();

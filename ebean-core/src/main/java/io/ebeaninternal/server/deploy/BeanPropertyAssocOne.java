@@ -17,7 +17,6 @@ import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cache.CachedBeanData;
-import io.ebeaninternal.server.cache.CachedBeanId;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.id.ImportedId;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
@@ -125,6 +124,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         // no imported or exported information
       } else if (!oneToOneExported) {
         importedId = createImportedId(this, targetDescriptor, tableJoin);
+        if (importedId == null) {
+          throw new IllegalStateException("Missing  @Id property on " + targetDescriptor);
+        }
         if (importedId.isScalar()) {
           // limit JoinColumn mapping to the @Id / primary key
           TableJoinColumn[] columns = tableJoin.columns();
@@ -319,15 +321,6 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   public void buildRawSqlSelectChain(String prefix, List<String> selectChain) {
     prefix = SplitName.add(prefix, name);
     if (!embedded) {
-      InheritInfo inheritInfo = targetDescriptor.inheritInfo();
-      if (inheritInfo != null) {
-        // expect the discriminator column to be included in order
-        // to determine the inheritance type so we add it to the
-        // selectChain (so that it takes a position in the resultSet)
-        String discriminatorColumn = inheritInfo.getDiscriminatorColumn();
-        String discProperty = prefix + "." + discriminatorColumn;
-        selectChain.add(discProperty);
-      }
       if (targetIdBinder == null) {
         throw new IllegalStateException("No Id binding property for " + fullName()
           + ". Probably a missing @OneToOne mapping annotation on this relationship?");
@@ -420,17 +413,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
     if (embedded) {
       return targetDescriptor.cacheEmbeddedBeanExtract((EntityBean) ap);
-    } else if (targetInheritInfo != null) {
-      return createCacheBeanId(ap);
     } else {
       return targetDescriptor.idProperty().getCacheDataValue((EntityBean) ap);
     }
-  }
-
-  private Object createCacheBeanId(Object bean) {
-    final BeanDescriptor<?> desc = targetDescriptor.descOf(bean.getClass());
-    final Object id = desc.idProperty().getCacheDataValue((EntityBean) bean);
-    return new CachedBeanId(desc.discValue(), id);
   }
 
   @Override
@@ -446,18 +431,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       if (embedded) {
         setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData, context));
       } else {
-        if (cacheData instanceof CachedBeanId) {
-          setValue(bean, refInheritBean((CachedBeanId) cacheData, context));
-        } else {
-          setValue(bean, refBean(targetDescriptor, cacheData, context));
-        }
+        setValue(bean, refBean(targetDescriptor, cacheData, context));
       }
     }
-  }
-
-  private Object refInheritBean(CachedBeanId cacheId, PersistenceContext context) {
-    final InheritInfo rowInheritInfo = targetInheritInfo.readType(cacheId.getDiscValue());
-    return refBean(rowInheritInfo.desc(), cacheId.getId(), context);
   }
 
   private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context) {
@@ -718,11 +694,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     } else if (oneToOneExported) {
       return new AssocOneHelpRefExported(this);
     } else {
-      if (targetInheritInfo != null) {
-        return new AssocOneHelpRefInherit(this);
-      } else {
-        return new AssocOneHelpRefSimple(this, embeddedPrefix);
-      }
+      return new AssocOneHelpRefSimple(this, embeddedPrefix);
     }
   }
 

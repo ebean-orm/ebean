@@ -6,13 +6,15 @@ import javax.persistence.*;
 
 @Entity
 @MappedSuperclass
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "type")
+// Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+// DiscriminatorColumn(name = "type")
 @Index(columnNames = "type")
 public class OrderReferencedParent {
 
   @Id
   Long id;
+
+  String type;
 
   String name;
 

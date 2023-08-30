@@ -14,14 +14,16 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "o_cached_inherit")
-@Inheritance
 @Cache
-public abstract class OCachedInhRoot {
+public final class OCachedInhRoot {
 
   @Id
   Long id;
 
   String name;
+
+  String childAData;
+  String childBData;
 
   public Long getId() {
     return id;
@@ -40,5 +42,11 @@ public abstract class OCachedInhRoot {
   }
 
 
+  public void setChildAData(String childData) {
+    this.childAData = childData;
+  }
 
+  public String getChildAData() {
+    return childAData;
+  }
 }

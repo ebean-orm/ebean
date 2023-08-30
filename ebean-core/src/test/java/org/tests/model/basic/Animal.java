@@ -3,9 +3,7 @@ package org.tests.model.basic;
 import javax.persistence.*;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "species")
-public abstract class Animal {
+public final class Animal {
 
   @Id
   Long id;

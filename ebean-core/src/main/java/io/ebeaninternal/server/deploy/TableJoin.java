@@ -21,8 +21,6 @@ public final class TableJoin {
    */
   private final SqlJoinType type;
 
-  private final InheritInfo inheritInfo;
-
   /**
    * Columns as an array.
    */
@@ -49,7 +47,6 @@ public final class TableJoin {
     this.extraWhere = deploy.getExtraWhere();
     this.table = InternString.intern(deploy.getTable());
     this.type = deploy.getType();
-    this.inheritInfo = deploy.getInheritInfo();
     DeployTableJoinColumn[] deployCols = deploy.columns();
     this.columns = new TableJoinColumn[deployCols.length];
     for (int i = 0; i < deployCols.length; i++) {
@@ -63,7 +60,6 @@ public final class TableJoin {
     this.extraWhere = source.extraWhere;
     this.table = source.table;
     this.type = source.type;
-    this.inheritInfo = source.inheritInfo;
     this.columns = new TableJoinColumn[1];
     this.columns[0] = source.columns[0].withOverrideColumn(overrideColumn);
     this.queryHash = calcQueryHash();

@@ -24,7 +24,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
       delete = DB.sqlUpdate(sql);
       delete.execute();
 
-      EdParent parent = new EdParent();
+      EdExtendedParent parent = new EdExtendedParent();
       parent.setName("MyComputer");
 
       EdChild child = new EdChild();
@@ -58,7 +58,7 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
     init();
 
     try (Transaction txn = DB.beginTransaction()) {
-      EdParent parent = DB.find(EdParent.class).where().eq("name", "MyComputer").findOne();
+      EdParent parent = DB.find(EdExtendedParent.class).where().eq("name", "MyComputer").findOne();
       // // Works only if the following statement is included
       // int x = parent.getChildren().size();
       DB.delete(parent);

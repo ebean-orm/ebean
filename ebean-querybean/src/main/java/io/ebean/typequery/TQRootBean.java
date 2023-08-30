@@ -614,23 +614,6 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Restrict the query to only return subtypes of the given inherit type.
-   * <pre>{@code
-   *
-   *   List<Animal> animals =
-   *     new QAnimal()
-   *       .name.startsWith("Fluffy")
-   *       .setInheritType(Cat.class)
-   *       .findList();
-   *
-   * }</pre>
-   */
-  public R setInheritType(Class<? extends T> type) {
-    query.setInheritType(type);
-    return root;
-  }
-
-  /**
    * Set the base table to use for this query.
    * <p>
    * Typically this is used when a table has partitioning and we wish to specify a specific

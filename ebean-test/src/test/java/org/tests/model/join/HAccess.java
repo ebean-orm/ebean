@@ -5,9 +5,8 @@ import io.ebean.annotation.DbForeignKey;
 import javax.persistence.*;
 import java.util.UUID;
 
-@Inheritance
 @Entity
-public abstract class HAccess {
+public final class HAccess {
 
   @Id
   UUID id;

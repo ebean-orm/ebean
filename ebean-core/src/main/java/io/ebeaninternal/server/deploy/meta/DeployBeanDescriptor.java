@@ -1,8 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
 import io.ebean.annotation.Cache;
-import io.ebean.annotation.DocStore;
-import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.Identity;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TableName;
@@ -10,7 +8,6 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogFilter;
-import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
@@ -21,8 +18,6 @@ import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
 import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
 import io.ebeaninternal.server.idgen.UuidV4IdGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
 import java.util.*;
 
 /**
@@ -96,7 +91,6 @@ public class DeployBeanDescriptor<T> {
   /**
    * Inheritance information. Server side only.
    */
-  private InheritInfo inheritInfo;
   private String name;
   private ChangeLogFilter changeLogFilter;
   private String dbComment;
@@ -305,21 +299,6 @@ public class DeployBeanDescriptor<T> {
 
   public ChangeLogFilter getChangeLogFilter() {
     return changeLogFilter;
-  }
-
-  /**
-   * Returns the Inheritance mapping information. This will be null if this type
-   * of bean is not involved in any ORM inheritance mapping.
-   */
-  public InheritInfo getInheritInfo() {
-    return inheritInfo;
-  }
-
-  /**
-   * Set the ORM inheritance mapping information.
-   */
-  public void setInheritInfo(InheritInfo inheritInfo) {
-    this.inheritInfo = inheritInfo;
   }
 
   /**
@@ -851,35 +830,6 @@ public class DeployBeanDescriptor<T> {
     }
 
     return list;
-  }
-
-  /**
-   * Check the mapping for class inheritance
-   */
-  public void checkInheritanceMapping() {
-    if (inheritInfo == null) {
-      checkInheritance(getBeanType());
-    }
-  }
-
-  /**
-   * Check valid mapping annotations on the class hierarchy.
-   */
-  private void checkInheritance(Class<?> beanType) {
-
-    Class<?> parent = beanType.getSuperclass();
-    if (parent == null || Object.class.equals(parent)) {
-      // all good
-      return;
-    }
-    if (parent.isAnnotationPresent(Entity.class)) {
-      String msg = "Checking " + getBeanType() + " and found " + parent + " that has @Entity annotation rather than MappedSuperclass?";
-      throw new IllegalStateException(msg);
-    }
-    if (parent.isAnnotationPresent(MappedSuperclass.class)) {
-      // continue checking
-      checkInheritance(parent);
-    }
   }
 
   /**

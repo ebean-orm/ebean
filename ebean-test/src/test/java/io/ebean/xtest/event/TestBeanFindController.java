@@ -79,9 +79,7 @@ class TestBeanFindController implements BeanFindController {
   private Class<?> beanTypeFor(String tableName, BeanQueryRequest<?> request) {
     List<? extends BeanType<?>> types = request.database().pluginApi().beanTypes(tableName);
     for (BeanType<?> type : types) {
-      if (type.isInheritanceRoot()) {
-        return type.type();
-      }
+      return type.type();
     }
     return null;
   }
