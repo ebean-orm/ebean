@@ -97,8 +97,12 @@ public final class LoadManyRequest extends LoadRequest {
     // potentially changes the joins, selected properties, cache mode
     loadContext.configureQuery(query);
     if (onlyIds) {
-      // lazy loading invoked via clear() and removeAll()
-      query.select(many.targetIdProperty());
+      String mapKey = many.mapKey();
+      if (mapKey != null) {
+        query.select(mapKey);
+      } else {
+        query.select(many.targetIdProperty());
+      }
     }
     return query;
   }
