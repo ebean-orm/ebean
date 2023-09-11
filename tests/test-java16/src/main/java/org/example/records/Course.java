@@ -2,9 +2,9 @@ package org.example.records;
 
 import io.ebean.annotation.Length;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import java.util.HashMap;
 import java.util.Map;
 

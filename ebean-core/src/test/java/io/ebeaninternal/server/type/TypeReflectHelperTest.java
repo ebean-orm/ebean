@@ -10,7 +10,7 @@ import org.tests.model.ivo.converter.MoneyTypeConverter;
 import org.tests.model.ivo.converter.OidTypeConverter;
 import org.tests.model.ivo.converter.SysTimeConverter;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

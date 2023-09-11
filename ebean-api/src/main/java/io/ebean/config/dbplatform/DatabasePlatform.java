@@ -9,7 +9,7 @@ import io.ebean.config.CustomDbTypeMapping;
 import io.ebean.config.PlatformConfig;
 import io.ebean.util.JdbcClose;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.*;
 

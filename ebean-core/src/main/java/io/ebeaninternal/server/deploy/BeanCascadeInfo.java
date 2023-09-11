@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-import javax.persistence.CascadeType;
+import jakarta.persistence.CascadeType;
 
 /**
  * Persist info for determining if save or delete should be performed.

@@ -3,8 +3,8 @@ package org.tests.json.transientproperties;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.ebean.annotation.Sql;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Sql
 @Entity

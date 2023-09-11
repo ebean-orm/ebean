@@ -7,7 +7,7 @@ import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import org.tests.model.basic.EBasicVer;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;

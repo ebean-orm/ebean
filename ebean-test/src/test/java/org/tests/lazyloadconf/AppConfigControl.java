@@ -1,6 +1,6 @@
 package org.tests.lazyloadconf;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "app_config_control")

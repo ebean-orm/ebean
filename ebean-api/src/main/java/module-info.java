@@ -12,7 +12,7 @@ module io.ebean.api {
   requires transitive java.sql;
   requires transitive io.avaje.config;
   requires transitive io.avaje.lang;
-  requires transitive persistence.api;
+  requires transitive jakarta.persistence.api;
   requires transitive io.ebean.annotation;
   requires transitive io.ebean.datasource.api;
   requires transitive io.avaje.applog;
@@ -21,7 +21,7 @@ module io.ebean.api {
   requires static io.ebean.types;
   requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;
-  requires static javax.servlet.api;
+  requires static jakarta.servlet;
 
   exports io.ebean;
   exports io.ebean.bean;
