@@ -1,7 +1,7 @@
 package io.ebean.config;
 
 /**
- * Matches the functionality of javax.persistence.AttributeConverter
+ * Matches the functionality of jakarta.persistence.AttributeConverter
  * <p>
  * In general AttributeConverter should be used in preference to this
  * ScalarTypeConverter as it is JPA standard and offers the same functionality.

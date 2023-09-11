@@ -5,9 +5,9 @@ import io.ebean.annotation.Max;
 import io.ebean.annotation.Sum;
 import io.ebean.annotation.View;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

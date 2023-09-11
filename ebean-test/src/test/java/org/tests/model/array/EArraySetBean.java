@@ -4,9 +4,9 @@ package org.tests.model.array;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DbArray;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;

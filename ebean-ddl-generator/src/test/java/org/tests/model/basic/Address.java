@@ -3,11 +3,11 @@ package org.tests.model.basic;
 import io.ebean.annotation.InvalidateQueryCache;
 import org.tests.model.metaannotation.SizeMedium;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 

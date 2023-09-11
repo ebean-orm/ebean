@@ -2,7 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import io.ebean.CancelableQuery;
 import io.ebeaninternal.api.SpiCancelableQuery;

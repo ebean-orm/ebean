@@ -1,6 +1,6 @@
 package io.ebean;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * Thrown when a foreign key constraint is enforced.

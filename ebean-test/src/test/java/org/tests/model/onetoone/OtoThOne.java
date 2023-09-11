@@ -2,8 +2,8 @@ package org.tests.model.onetoone;
 
 import org.tests.model.BaseModel;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class OtoThOne extends BaseModel {

@@ -3,9 +3,9 @@ package org.tests.model.docstore;
 import io.ebean.annotation.DocStore;
 import org.tests.model.basic.Customer;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import java.util.List;
 
 /**

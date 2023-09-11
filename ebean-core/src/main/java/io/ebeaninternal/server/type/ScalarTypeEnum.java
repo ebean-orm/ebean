@@ -2,7 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.ScalarType;
 
-import javax.persistence.EnumType;
+import jakarta.persistence.EnumType;
 import java.util.Set;
 
 /**

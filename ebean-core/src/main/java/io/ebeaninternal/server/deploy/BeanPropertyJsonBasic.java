@@ -5,7 +5,7 @@ import io.ebean.core.type.DataReader;
 import io.ebean.text.TextException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Map;

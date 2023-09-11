@@ -1,6 +1,6 @@
 package org.tests.ddl;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class DfkNoneViaJoin {

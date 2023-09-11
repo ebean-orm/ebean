@@ -3,7 +3,7 @@ package org.tests.lazyforeignkeys;
 import io.ebean.annotation.DbForeignKey;
 import org.tests.model.basic.Cat;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 
