@@ -22,6 +22,7 @@ interface Constants {
 
   String TQROOTBEAN = "io.ebean.typequery.TQRootBean";
   String TQASSOCBEAN = "io.ebean.typequery.TQAssocBean";
+  String TQASSOC = "io.ebean.typequery.TQAssoc";
   String TYPEQUERYBEAN = "io.ebean.typequery.TypeQueryBean";
   String DATABASE = "io.ebean.Database";
   String DB = "io.ebean.DB";
