@@ -1025,7 +1025,7 @@ public final class DefaultPersister implements Persister {
         if (deleteMode.isHard() || prop.isTargetSoftDelete()) {
           if (prop.isPrimaryKeyExport()) {
             // we can delete by id, neither if property loaded or not
-            delete(prop.targetDescriptor(), prop.descriptor().id(parentBean), null, t, deleteMode);
+            delete(prop.targetDescriptor(), prop.descriptor().id(parentBean), t, deleteMode);
           } else if (request.isLoadedProperty(prop)) {
             Object detailBean = prop.getValue(parentBean);
             if (detailBean != null) {
