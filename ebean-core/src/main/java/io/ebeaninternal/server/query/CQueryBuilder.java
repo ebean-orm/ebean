@@ -25,7 +25,7 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping.Column;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

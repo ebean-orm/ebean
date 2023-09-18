@@ -4,7 +4,7 @@ import io.ebean.bean.NotEnhancedException;
 import io.ebean.bean.extend.EntityExtension;
 import org.tests.model.virtualprop.VirtualBaseA;
 
-import javax.persistence.OneToMany;
+import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package org.tests.model.basic.xtra;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

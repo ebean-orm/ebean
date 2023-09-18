@@ -2,7 +2,7 @@ package org.tests.model.onetoone;
 
 import io.ebean.annotation.Formula;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity

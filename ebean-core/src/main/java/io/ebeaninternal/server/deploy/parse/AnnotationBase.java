@@ -9,11 +9,11 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
+import jakarta.persistence.NamedQueries;
+import jakarta.persistence.NamedQuery;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Set;

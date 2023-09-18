@@ -2,8 +2,8 @@ package org.tests.model.virtualprop;
 
 import io.ebean.bean.extend.ExtendableBean;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public class AbstractVirtualBase implements ExtendableBean {

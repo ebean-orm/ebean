@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import io.ebean.CancelableQuery;
 

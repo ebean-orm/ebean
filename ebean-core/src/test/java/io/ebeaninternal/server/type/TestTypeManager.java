@@ -13,7 +13,7 @@ import org.tests.model.basic.enums.MySex;
 import org.tests.model.ivo.Money;
 import org.tests.model.ivo.converter.MoneyTypeConverter;
 
-import javax.persistence.EnumType;
+import jakarta.persistence.EnumType;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.GregorianCalendar;

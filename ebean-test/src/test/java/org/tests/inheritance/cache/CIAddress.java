@@ -1,7 +1,7 @@
 package org.tests.inheritance.cache;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class CIAddress extends CIBaseModel {

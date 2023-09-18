@@ -20,8 +20,8 @@ import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployProperty;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.EnumType;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.EnumType;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

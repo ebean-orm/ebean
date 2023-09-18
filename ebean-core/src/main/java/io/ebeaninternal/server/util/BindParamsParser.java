@@ -6,7 +6,7 @@ import io.ebeaninternal.api.BindParams.OrderedList;
 import io.ebeaninternal.api.BindParams.Param;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.Collection;
 
 /**

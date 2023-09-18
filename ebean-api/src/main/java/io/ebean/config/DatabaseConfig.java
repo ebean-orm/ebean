@@ -20,7 +20,7 @@ import io.ebean.meta.MetricNamingMatch;
 import io.ebean.plugin.CustomDeployParser;
 import io.ebean.util.StringHelper;
 
-import javax.persistence.EnumType;
+import jakarta.persistence.EnumType;
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.time.ZonedDateTime;

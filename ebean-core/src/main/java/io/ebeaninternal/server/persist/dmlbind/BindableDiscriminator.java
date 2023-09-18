@@ -5,7 +5,7 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.List;
 

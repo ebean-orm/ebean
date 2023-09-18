@@ -3,7 +3,7 @@ package io.ebeaninternal.server.persist.dml;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequestBean;
 
-import javax.persistence.OptimisticLockException;
+import jakarta.persistence.OptimisticLockException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 

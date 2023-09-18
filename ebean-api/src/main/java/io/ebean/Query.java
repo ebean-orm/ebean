@@ -3,7 +3,7 @@ package io.ebean;
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 
-import javax.persistence.NonUniqueResultException;
+import jakarta.persistence.NonUniqueResultException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;

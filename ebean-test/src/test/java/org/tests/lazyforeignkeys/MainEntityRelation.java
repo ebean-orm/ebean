@@ -4,7 +4,7 @@ import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.NotNull;
 import org.tests.model.basic.Cat;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 

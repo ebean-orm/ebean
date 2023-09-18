@@ -2,9 +2,9 @@ package org.tests.model.draftable;
 
 import io.ebean.annotation.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import java.sql.Timestamp;
 import java.util.List;
 

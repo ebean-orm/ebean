@@ -14,7 +14,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.deploy.meta.DeployTableJoinColumn;
 import io.ebeaninternal.server.query.SqlJoinType;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import static java.lang.System.Logger.Level.INFO;
 

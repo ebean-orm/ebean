@@ -4,8 +4,8 @@ import io.ebean.bean.NotEnhancedException;
 import io.ebean.bean.extend.EntityExtension;
 import org.tests.model.virtualprop.VirtualBase;
 
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import java.util.List;
 
 /**

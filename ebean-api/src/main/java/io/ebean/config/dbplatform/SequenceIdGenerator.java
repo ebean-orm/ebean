@@ -5,7 +5,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

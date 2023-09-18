@@ -3,7 +3,7 @@ package org.tests.model.onetoone;
 import io.ebean.annotation.Identity;
 import io.ebean.annotation.IdentityGenerated;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Identity(generated = IdentityGenerated.BY_DEFAULT)
 @Entity

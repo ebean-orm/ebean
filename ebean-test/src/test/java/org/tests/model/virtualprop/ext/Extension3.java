@@ -5,7 +5,7 @@ import io.ebean.bean.NotEnhancedException;
 import io.ebean.bean.extend.EntityExtension;
 import org.tests.model.virtualprop.VirtualBase;
 
-import javax.persistence.OneToOne;
+import jakarta.persistence.OneToOne;
 
 /**
  * This class will add the fields 'virtualExtendOne' and 'firstName' to 'VirtualBase' by EntityExtension

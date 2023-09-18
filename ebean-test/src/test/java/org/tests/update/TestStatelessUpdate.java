@@ -11,7 +11,7 @@ import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
 import org.tests.model.basic.ResetBasicData;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,7 +100,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
   /**
    * I am expecting that Ebean detects there aren't any changes and don't execute any query.
-   * Currently a {@link javax.persistence.PersistenceException} with message 'Invalid value "null" for parameter "SQL"' is thrown.
+   * Currently a {@link jakarta.persistence.PersistenceException} with message 'Invalid value "null" for parameter "SQL"' is thrown.
    */
   @Test
   public void testWithoutChangesAndIgnoreNullValues() {

@@ -7,8 +7,8 @@ import io.ebean.cache.ServerCacheManager;
 import io.ebean.plugin.Property;
 import io.ebean.text.json.JsonContext;
 
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceException;
 import java.util.*;
 import java.util.concurrent.Callable;
 

@@ -5,7 +5,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.annotation.Where;
 import io.ebean.annotation.ext.IntersectionFactory;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Identity(start = 1000)

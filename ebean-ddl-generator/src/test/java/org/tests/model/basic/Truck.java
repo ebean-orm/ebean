@@ -2,11 +2,11 @@ package org.tests.model.basic;
 
 import io.ebean.annotation.DbEnumValue;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 @Inheritance

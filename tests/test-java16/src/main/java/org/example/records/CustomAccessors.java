@@ -1,6 +1,6 @@
 package org.example.records;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public record CustomAccessors(String line1, String line2, String city) {

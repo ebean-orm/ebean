@@ -8,7 +8,7 @@ import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.*;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.*;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;

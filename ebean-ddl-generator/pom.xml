@@ -39,15 +39,15 @@
       <scope>provided</scope>
     </dependency>
 
-    <!-- JAVAX-DEPENDENCY-START -->
+    <!-- JAVAX-DEPENDENCY-START ___
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
       <version>2.3.6</version>
       <scope>provided</scope>
     </dependency>
-    <!-- JAVAX-DEPENDENCY-END -->
-    <!-- JAKARTA-DEPENDENCY-START ___
+    ____ JAVAX-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-START -->
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
@@ -59,7 +59,7 @@
       <version>4.0.0</version>
       <scope>runtime</scope>
     </dependency>
-    ____ JAKARTA-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-END -->
 
     <!-- test dependencies -->
     <dependency>
