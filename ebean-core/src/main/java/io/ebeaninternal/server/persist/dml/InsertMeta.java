@@ -39,7 +39,7 @@ final class InsertMeta {
 
   InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
     this.platform = dbPlatform.platform();
-    this.discriminator = getDiscriminator(desc);
+    this.discriminator = discriminator(desc);
     this.id = id;
     this.all = all;
     this.allExcludeDraftOnly = all.excludeDraftOnly();
@@ -77,7 +77,7 @@ final class InsertMeta {
     }
   }
 
-  private static Bindable getDiscriminator(BeanDescriptor<?> desc) {
+  private static Bindable discriminator(BeanDescriptor<?> desc) {
     InheritInfo inheritInfo = desc.inheritInfo();
     return inheritInfo != null ? new BindableDiscriminator(inheritInfo) : null;
   }
@@ -89,7 +89,7 @@ final class InsertMeta {
     return concatenatedKey;
   }
 
-  String[] getIdentityDbColumns() {
+  String[] identityDbColumns() {
     return identityDbColumns;
   }
 
@@ -170,7 +170,7 @@ final class InsertMeta {
       allExcludeDraftOnly.dmlAppend(request);
     }
     request.append(") values (");
-    request.append(request.getInsertBindBuffer());
+    request.append(request.insertBindBuffer());
     request.append(")");
     return request.toString();
   }

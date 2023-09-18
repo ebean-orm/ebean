@@ -8,4 +8,9 @@ interface MatchedImportedProperty {
    * Populate the embeddedId bean from the source entity.
    */
   void populate(EntityBean sourceBean, EntityBean embeddedId);
+
+  /**
+   * Return the DB column to use.
+   */
+  String dbColumn();
 }

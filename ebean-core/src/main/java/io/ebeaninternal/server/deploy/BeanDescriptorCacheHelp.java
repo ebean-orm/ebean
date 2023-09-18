@@ -549,7 +549,7 @@ abstract class BeanDescriptorCacheHelp<T> {
       if (val == null) {
         return null;
       }
-      sb.append(val).append(";");
+      sb.append(val).append(';');
     }
     return sb.toString();
   }

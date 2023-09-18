@@ -66,7 +66,7 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
       return;
     }
     // Bind the ID values including EmbeddedId and multiple ID
-    request.descriptor().idBinder().addIdInBindValues(request, idCollection);
+    request.descriptor().idBinder().addBindValues(request, idCollection);
   }
 
   /**
@@ -77,8 +77,8 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
       request.append(SQL_FALSE); // append false for this stage
     } else {
       final BeanDescriptor<?> descriptor = request.descriptor();
-      request.property(descriptor.idBinder().getBindIdInSql(null));
-      request.append(descriptor.idBinder().getIdInValueExpr(false, idCollection.size()));
+      request.property(descriptor.idBinder().bindInSql(null));
+      request.append(descriptor.idBinder().idInValueExpr(false, idCollection.size()));
     }
   }
 
@@ -91,9 +91,9 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
       final IdBinder idBinder = descriptor.idBinder();
       if (idBinder.isComplexId()) {
         request.parse(descriptor.idBinderInLHSSql());
-        request.append(idBinder.getIdInValueExpr(false, idCollection.size()));
+        request.append(idBinder.idInValueExpr(false, idCollection.size()));
       } else {
-        request.property(idBinder.getBeanProperty().name());
+        request.property(idBinder.beanProperty().name());
         request.appendInExpression(false, idCollection);
       }
     }
@@ -109,7 +109,7 @@ public final class IdInExpression extends NonPrepareExpression implements IdInCo
       // query plan specific to the number of parameters in the IN clause
       builder.append(idCollection.size());
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

@@ -25,11 +25,6 @@ public final class BindableDiscriminator implements Bindable {
   }
 
   @Override
-  public String toString() {
-    return columnName + " = " + discValue;
-  }
-
-  @Override
   public boolean isDraftOnly() {
     return false;
   }
@@ -46,7 +41,6 @@ public final class BindableDiscriminator implements Bindable {
 
   @Override
   public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
-
     bindRequest.bind(discValue, sqlType);
   }
 

@@ -44,7 +44,7 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
     lock.lock();
     try {
       if (futureRowCount == null) {
-        futureRowCount = server.findFutureCount(query, null);
+        futureRowCount = server.findFutureCount(query);
       }
       return futureRowCount;
     } finally {
@@ -57,7 +57,7 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
     lock.lock();
     try {
       if (list == null) {
-        list = server.findList(query, null);
+        list = server.findList(query);
       }
       return list;
     } finally {
@@ -99,7 +99,7 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
       if (foregroundTotalRowCount > -1) return foregroundTotalRowCount;
 
       // just using foreground thread
-      foregroundTotalRowCount = server.findCount(query, null);
+      foregroundTotalRowCount = server.findCount(query);
       return foregroundTotalRowCount;
     } finally {
       lock.unlock();

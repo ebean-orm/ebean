@@ -663,7 +663,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
   public void postAnnotations() {
     if (idClass != null) {
       idClassProperty = new DeployBeanPropertyAssocOne<>(this, idClass);
-      idClassProperty.setName("_idClass");
+      idClassProperty.setName("_$IdClass$");
       idClassProperty.setEmbedded();
       idClassProperty.setNullable(false);
     }
@@ -820,7 +820,7 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     for (DeployBeanProperty prop : propMap.values()) {
       if (!prop.isTransient() && !(prop instanceof DeployBeanPropertyAssocMany<?>)) {
         if (prop.isFetchEager()) {
-          sb.append(prop.getName()).append(",");
+          sb.append(prop.getName()).append(',');
         } else {
           hasLazyFetch = true;
         }

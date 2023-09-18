@@ -57,7 +57,7 @@ final class BetweenExpression extends AbstractExpression {
 
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("Between[").append(propName).append("]");
+    builder.append("Between[").append(propName).append(']');
   }
 
   @Override

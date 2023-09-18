@@ -456,5 +456,4 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
         + "left join e_basic u2 on u2.id = u1_ref.id where u2.id is null");
     }
   }
-
 }

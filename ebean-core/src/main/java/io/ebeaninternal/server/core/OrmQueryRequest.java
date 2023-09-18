@@ -63,6 +63,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
+  public boolean isGetAllFromBeanCache() {
+    return (transaction == null || !transaction.isSkipCache()) && getFromBeanCache();
+  }
+
+  @Override
   public boolean isDeleteByStatement() {
     if (!transaction.isPersistCascade() || beanDescriptor.isDeleteByStatement()) {
       // plain delete by query

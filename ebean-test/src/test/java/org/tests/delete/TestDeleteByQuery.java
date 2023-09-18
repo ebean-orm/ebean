@@ -20,6 +20,53 @@ public class TestDeleteByQuery extends BaseTestCase {
     DB.save(u1);
   }
 
+  @IgnorePlatform({Platform.MYSQL, Platform.MARIADB})
+  @Test
+  void maxDelete_expect_singleDeleteStatement() {
+    LoggedSql.start();
+    DB.find(BBookmarkUser.class)
+      .where().eq("name", "a")
+      .setMaxRows(10)
+      .delete();
+
+    DB.find(BBookmarkUser.class)
+      .where().eq("name", "b")
+      .setMaxRows(20)
+      .delete();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql).hasSize(2);
+    if (isH2()) {
+      assertThat(loggedSql.get(0)).contains("delete from bbookmark_user where id in (select t0.id from bbookmark_user t0 where t0.name = ? limit 10)");
+      assertThat(loggedSql.get(1)).contains("delete from bbookmark_user where id in (select t0.id from bbookmark_user t0 where t0.name = ? limit 20)");
+    }
+  }
+
+  @Test
+  void maxDelete_when_beanCaching_expect_selectThenDelete() {
+    var a0 = new Article("deleteMe1", "auth1");
+    var a1 = new Article("deleteMe2", "auth1");
+    DB.saveAll(a0, a1);
+
+    LoggedSql.start();
+    DB.find(Article.class)
+      .where().eq("name", "deleteMe1")
+      .setMaxRows(10)
+      .delete();
+
+    DB.find(Article.class)
+      .where().eq("name", "deleteMe2")
+      .setMaxRows(20)
+      .delete();
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql).hasSize(6);
+    if (isH2()) {
+      assertThat(loggedSql.get(0)).contains("select t0.id from article t0 where t0.name = ? limit 10");
+      assertThat(loggedSql.get(3)).contains("select t0.id from article t0 where t0.name = ? limit 20");
+    }
+  }
+
   @Test
   @IgnorePlatform({Platform.MYSQL, Platform.MARIADB})
   public void deleteWithLimit() {

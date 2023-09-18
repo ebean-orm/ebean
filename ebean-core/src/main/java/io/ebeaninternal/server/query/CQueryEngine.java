@@ -162,9 +162,6 @@ public final class CQueryEngine {
       if (request.logSummary()) {
         request.transaction().logSummary(rcQuery.summary());
       }
-      if (request.query().isFutureFetch()) {
-        request.transaction().end();
-      }
       if (request.isQueryCachePut()) {
         request.putToQueryCache(count);
       }
@@ -439,7 +436,7 @@ public final class CQueryEngine {
     }
     msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
     msg.append("] rows[").append(q.loadedRowDetail());
-    msg.append("] bind[").append(q.bindLog()).append("]");
+    msg.append("] bind[").append(q.bindLog()).append(']');
     q.transaction().logSummary(msg.toString());
   }
 
@@ -484,7 +481,7 @@ public final class CQueryEngine {
     msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
     msg.append("] rows[").append(q.loadedRowDetail());
     msg.append("] predicates[").append(q.logWhereSql());
-    msg.append("] bind[").append(q.bindLog()).append("]");
+    msg.append("] bind[").append(q.bindLog()).append(']');
     q.transaction().logSummary(msg.toString());
   }
 }

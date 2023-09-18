@@ -122,12 +122,12 @@ final class DefaultDbSqlContext implements DbSqlContext {
     }
 
     tableJoins.add(joinKey);
-    sb.append(" ").append(type);
+    sb.append(' ').append(type);
     boolean addAsOfOnClause = false;
     if (draftSupport != null) {
       appendTable(table, draftSupport.draftTable(table));
     } else if (!historyQuery) {
-      sb.append(" ").append(table).append(" ");
+      sb.append(' ').append(table).append(' ');
     } else {
       // check if there is an associated history table and if so
       // use the unionAll view - we expect an additional predicate to match
@@ -151,13 +151,13 @@ final class DefaultDbSqlContext implements DbSqlContext {
       if (pair.getForeignSqlFormula() != null) {
         sb.append(pair.getForeignSqlFormula().replace(tableAliasPlaceHolder, a2));
       } else {
-        sb.append(a2).append(".").append(pair.getForeignDbColumn());
+        sb.append(a2).append('.').append(pair.getForeignDbColumn());
       }
       sb.append(" = ");
       if (pair.getLocalSqlFormula() != null) {
         sb.append(pair.getLocalSqlFormula().replace(tableAliasPlaceHolder, a1));
       } else {
-        sb.append(a1).append(".").append(pair.getLocalDbColumn());
+        sb.append(a1).append('.').append(pair.getLocalDbColumn());
       }
     }
     if (addAsOfOnClause) {
@@ -174,9 +174,9 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private void appendTable(String table, String draftTable) {
     if (draftTable != null) {
       // there is an associated history table and view so use that
-      sb.append(" ").append(draftTable).append(" ");
+      sb.append(' ').append(draftTable).append(' ');
     } else {
-      sb.append(" ").append(table).append(" ");
+      sb.append(' ').append(table).append(' ');
     }
   }
 
@@ -237,7 +237,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
     }
     // we only want to add this join once
     formulaJoins.add(converted);
-    sb.append(" ");
+    sb.append(' ');
     if (joinType == SqlJoinType.OUTER) {
       if ("join".equalsIgnoreCase(converted.substring(0, 4))) {
         // prepend left as we are in the 'many' part
@@ -259,7 +259,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
     sb.append(COMMA);
     sb.append(converted);
     if (columnAlias != null) {
-      sb.append(" ").append(columnAlias);
+      sb.append(' ').append(columnAlias);
     } else {
       appendColumnAlias();
     }
@@ -286,7 +286,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
 
   private void appendColumnAlias() {
     if (useColumnAlias) {
-      sb.append(" ");
+      sb.append(' ');
       sb.append(columnAliasPrefix);
       sb.append(columnIndex);
     }

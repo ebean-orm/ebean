@@ -105,9 +105,9 @@ public final class TableJoin {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(30);
-    sb.append(type).append(" ").append(table).append(" ");
+    sb.append(type).append(' ').append(table).append(' ');
     for (TableJoinColumn column : columns) {
-      sb.append(column).append(" ");
+      sb.append(column).append(' ');
     }
     return sb.toString();
   }
@@ -160,9 +160,9 @@ public final class TableJoin {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append(a1).append(".").append(pair.getLocalDbColumn());
+      sb.append(a1).append('.').append(pair.getLocalDbColumn());
       sb.append(" = ");
-      sb.append(a2).append(".").append(pair.getForeignDbColumn());
+      sb.append(a2).append('.').append(pair.getForeignDbColumn());
     }
   }
 

@@ -70,7 +70,7 @@ final class CQueryBuilderRawSql {
     } else {
       sb.append(sql.getPreFrom());
     }
-    sb.append(" ");
+    sb.append(' ');
 
     String s = sql.getPreWhere();
     BindParams bindParams = request.query().bindParams();
@@ -80,7 +80,7 @@ final class CQueryBuilderRawSql {
       // clause (so not allowed in having etc - use unparsed)
       s = BindParamsParser.parse(bindParams, s);
     }
-    sb.append(s).append(" ");
+    sb.append(s).append(' ');
 
     String dynamicWhere = null;
     if (request.query().getId() != null) {
@@ -109,12 +109,12 @@ final class CQueryBuilderRawSql {
       } else {
         sb.append(" where ");
       }
-      sb.append(dynamicWhere).append(" ");
+      sb.append(dynamicWhere).append(' ');
     }
 
     String preHaving = sql.getPreHaving();
     if (hasValue(preHaving)) {
-      sb.append(preHaving).append(" ");
+      sb.append(preHaving).append(' ');
     }
 
     String dbHaving = predicates.dbHaving();
@@ -124,10 +124,10 @@ final class CQueryBuilderRawSql {
       } else {
         sb.append(" having ");
       }
-      sb.append(dbHaving).append(" ");
+      sb.append(dbHaving).append(' ');
     }
     if (hasValue(orderBy)) {
-      sb.append(" ").append(sql.getOrderByPrefix()).append(" ").append(orderBy);
+      sb.append(' ').append(sql.getOrderByPrefix()).append(' ').append(orderBy);
     }
     return sb.toString().trim();
   }

@@ -58,7 +58,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
       .append("] rows[").append(rowCount)
       .append("] type[").append(desc.fullName())
       .append("] predicates[").append(predicates.logWhereSql())
-      .append("] bind[").append(bindLog).append("]");
+      .append("] bind[").append(bindLog).append(']');
 
     return sb.toString();
   }

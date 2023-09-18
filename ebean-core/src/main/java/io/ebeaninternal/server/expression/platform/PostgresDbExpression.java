@@ -18,13 +18,13 @@ final class PostgresDbExpression extends BaseDbExpression {
     String[] paths = path.split("\\.");
     if (paths.length == 1) {
       // (t0.content ->> 'title') = 'Some value'
-      request.append("(").property(propName).append(" ->> '").append(path).append("')");
+      request.append('(').property(propName).append(" ->> '").append(path).append("')");
     } else {
       // (t0.content #>> '{path,inner}') = 'Some value'
-      request.append("(").property(propName).append(" #>> '{");
+      request.append('(').property(propName).append(" #>> '{");
       for (int i = 0; i < paths.length; i++) {
         if (i > 0) {
-          request.append(",");
+          request.append(',');
         }
         request.append(paths[i]);
       }
@@ -42,9 +42,9 @@ final class PostgresDbExpression extends BaseDbExpression {
     for (int i = 1; i < values.length; i++) {
       request.append(",?");
     }
-    request.append("]").append(PostgresCast.cast(values[0], true));
+    request.append(']').append(PostgresCast.cast(values[0], true));
     if (!contains) {
-      request.append(")");
+      request.append(')');
     }
   }
 

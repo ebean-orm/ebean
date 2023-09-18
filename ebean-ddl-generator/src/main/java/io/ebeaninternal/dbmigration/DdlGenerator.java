@@ -307,7 +307,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     try (LineNumberReader lineReader = new LineNumberReader(reader)) {
       String s;
       while ((s = lineReader.readLine()) != null) {
-        buf.append(s).append("\n");
+        buf.append(s).append('\n');
       }
       return buf.toString();
     }

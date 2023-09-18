@@ -79,7 +79,7 @@ final class CQueryBuilder {
         sb.append(", ");
       }
       sb.append(name);
-      sb.append(".");
+      sb.append('.');
       sb.append(token.trim());
     }
     return sb.toString();
@@ -148,7 +148,7 @@ final class CQueryBuilder {
     StringBuilder sb = new StringBuilder(200);
     sb.append("update ").append(request.descriptor().baseTable());
     if (rootTableAlias != null) {
-      sb.append(" ").append(rootTableAlias);
+      sb.append(' ').append(rootTableAlias);
     }
     sb.append(" set ").append(predicates.dbUpdateClause());
     String updateClause = sb.toString();
@@ -580,7 +580,7 @@ final class CQueryBuilder {
           sb.append(select.selectSql());
         }
         if (request.isInlineCountDistinct()) {
-          sb.append(")");
+          sb.append(')');
         }
         if (distinct && dbOrderBy != null) {
           // add the orderBy columns to the select clause (due to distinct)

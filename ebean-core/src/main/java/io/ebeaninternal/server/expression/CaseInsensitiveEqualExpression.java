@@ -61,9 +61,9 @@ final class CaseInsensitiveEqualExpression extends AbstractValueExpression {
   @Override
   public void queryPlanHash(StringBuilder builder) {
     if (not) {
-      builder.append("Ine[").append(propName).append("]");
+      builder.append("Ine[").append(propName).append(']');
     } else {
-      builder.append("Ieq[").append(propName).append("]");
+      builder.append("Ieq[").append(propName).append(']');
     }
   }
 

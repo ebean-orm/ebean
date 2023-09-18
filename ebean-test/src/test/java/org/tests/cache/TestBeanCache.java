@@ -229,7 +229,7 @@ public class TestBeanCache extends BaseTestCase {
 
     ServerCacheStatistics statistics = beanCache.statistics(true);
     assertThat(statistics.getHitCount()).isEqualTo(0);
-    assertThat(statistics.getMissCount()).isEqualTo(2);
+    assertThat(statistics.getMissCount()).isEqualTo(0);
     assertThat(statistics.getPutCount()).isEqualTo(2);
   }
 

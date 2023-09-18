@@ -23,7 +23,7 @@ final class ObtainedTransactionImplicit extends ObtainedTransaction {
 
   @Override
   public void commitIfCreated() {
-    server.commitTransaction();
+    transaction.commit();
   }
 
   @Override

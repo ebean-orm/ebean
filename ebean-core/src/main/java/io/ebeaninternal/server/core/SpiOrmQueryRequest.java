@@ -203,4 +203,8 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
    */
   boolean isDeleteByStatement();
 
+  /**
+   * Return true if hitting bean cache and returning all beans from cache.
+   */
+  boolean isGetAllFromBeanCache();
 }

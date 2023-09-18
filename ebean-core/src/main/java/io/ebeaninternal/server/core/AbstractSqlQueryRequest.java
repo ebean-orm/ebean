@@ -33,10 +33,10 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   /**
    * Create the BeanFindRequest.
    */
-  AbstractSqlQueryRequest(SpiEbeanServer server, SpiSqlBinding query, Transaction t) {
+  AbstractSqlQueryRequest(SpiEbeanServer server, SpiSqlBinding query) {
     this.server = server;
     this.query = query;
-    this.transaction = (SpiTransaction) t;
+    this.transaction = query.transaction();
     this.query.setCancelableQuery(this);
   }
 

@@ -1,10 +1,10 @@
 package org.tests.compositekeys;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.CountDistinctOrder;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.annotation.Identity;
+import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -82,8 +82,8 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
     ids.add(1L);
     ids.add(2L);
 
-    beanProperty.findIdsByParentId(null, ids, null, null, true);
-    beanProperty.findIdsByParentId(1L, null, null, null, true);
+    beanProperty.findIdsByParentIdList(ids, null, true);
+    beanProperty.findIdsByParentId(1L, null, true);
   }
 
   /**
@@ -107,18 +107,18 @@ public class TestOnCascadeDeleteChildrenWithCompositeKeys extends BaseTestCase {
 
     if (isH2() || isMariaDB() || isPostgresCompatible()) {
       assertThat(query1.getGeneratedSql()).contains("select distinct r1.attribute_, count(*) from "
-          + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
-          + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
-          + "group by r1.attribute_ order by count(*) desc, r1.attribute_ limit 20");
+        + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
+        + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
+        + "group by r1.attribute_ order by count(*) desc, r1.attribute_ limit 20");
     } else if (isDb2()) {
       assertThat(query1.getGeneratedSql()).contains("select distinct r1.attribute_, count(*) from "
-          + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
-          + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
-          + "group by r1.attribute_ order by count(*) desc, r1.attribute_ fetch next 20 rows only");
+        + "(select distinct t0.user_id, t0.role_id, t1.name as attribute_ "
+        + "from em_user_role t0 join em_user t1 on t1.id = t0.user_id) r1 "
+        + "group by r1.attribute_ order by count(*) desc, r1.attribute_ fetch next 20 rows only");
     } else if (isSqlServer()) {
       assertThat(query1.getGeneratedSql()).contains("select distinct top 20 r1.attribute_, count(*) "
-          + "from (select distinct t0.user_id, t0.role_id, t1.name as attribute_ from em_user_role t0 "
-          + "join em_user t1 on t1.id = t0.user_id) r1 group by r1.attribute_ order by count(*) desc, r1.attribute_");
+        + "from (select distinct t0.user_id, t0.role_id, t1.name as attribute_ from em_user_role t0 "
+        + "join em_user t1 on t1.id = t0.user_id) r1 group by r1.attribute_ order by count(*) desc, r1.attribute_");
     } else {
       // no Oracle test yet
     }

@@ -141,7 +141,7 @@ public class MCompoundUniqueConstraint {
     StringBuilder sb = new StringBuilder(50);
     for (int i = 0; i < arr.length; i++) {
       if (i > 0) {
-        sb.append(",");
+        sb.append(',');
       }
       sb.append(arr[i]);
     }

@@ -141,11 +141,11 @@ abstract class LogicExpression implements SpiExpression {
   @Override
   public void addSql(SpiExpressionRequest request) {
 
-    request.append("(");
+    request.append('(');
     expOne.addSql(request);
     request.append(conjunction ? AND : OR);
     expTwo.addSql(request);
-    request.append(")");
+    request.append(')');
   }
 
   @Override
@@ -159,11 +159,11 @@ abstract class LogicExpression implements SpiExpression {
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("Logic").append(conjunction ? AND : OR).append("[");
+    builder.append("Logic").append(conjunction ? AND : OR).append('[');
     expOne.queryPlanHash(builder);
-    builder.append(",");
+    builder.append(',');
     expTwo.queryPlanHash(builder);
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

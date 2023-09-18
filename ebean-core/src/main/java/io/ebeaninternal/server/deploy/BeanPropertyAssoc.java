@@ -1,6 +1,8 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.Query;
+import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.text.PathProperties;
@@ -122,7 +124,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
       targetInheritInfo = targetDescriptor.inheritInfo();
       saveRecurseSkippable = targetDescriptor.isSaveRecurseSkippable();
       if (!targetIdBinder.isComplexId()) {
-        targetIdProperty = targetIdBinder.getIdProperty();
+        targetIdProperty = targetIdBinder.idSelect();
       }
     }
   }
@@ -570,4 +572,26 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
       + " or a @JoinColumn needs an explicit referencedColumnName specified?";
     throw new PersistenceException(msg);
   }
+
+  /**
+   * Create SqlUpdate statement to delete all child beans of the parent <code>id</code>.
+   */
+  public abstract SqlUpdate deleteByParentId(Object id);
+
+  /**
+   * Create SqlUpdate statement to delete all child beans of the parent ids in <code>idList</code>.
+   */
+  public abstract SqlUpdate deleteByParentIdList(List<Object> idList);
+
+  /**
+   * Find child beans of the parent <code>id</code>.
+   */
+  public abstract List<Object> findIdsByParentId(Object id, Transaction transaction, boolean includeSoftDeletes);
+
+  /**
+   * Find child beans of the parent ids in <code>idList</code>.
+   */
+  public abstract List<Object> findIdsByParentIdList(List<Object> idList, Transaction transaction, boolean includeSoftDeletes);
+
 }
+

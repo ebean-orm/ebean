@@ -36,11 +36,6 @@ final class BindableIdScalar implements BindableId {
   }
 
   @Override
-  public String toString() {
-    return uidProp.toString();
-  }
-
-  @Override
   public boolean isDraftOnly() {
     return false;
   }

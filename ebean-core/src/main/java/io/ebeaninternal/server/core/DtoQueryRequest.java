@@ -32,8 +32,9 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   private DataReader dataReader;
   private SpiOrmQueryRequest<?> ormRequest;
 
-  DtoQueryRequest(SpiEbeanServer server, DtoQueryEngine engine, SpiDtoQuery<T> query, SpiOrmQueryRequest<?> ormRequest) {
-    super(server, query, query.transaction());
+
+  DtoQueryRequest(SpiEbeanServer server, DtoQueryEngine engine, SpiDtoQuery<T> query) {
+    super(server, query);
     this.queryEngine = engine;
     this.query = query;
     this.ormRequest = ormRequest;
@@ -48,9 +49,14 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     startNano = System.nanoTime();
     if (ormRequest != null) {
       // execute the underlying ORM query returning the ResultSet
-      query.setCancelableQuery(query.ormQuery());
-      ormRequest.transaction(transaction);
-      SpiResultSet result = ormRequest.findResultSet();
+//<<<<<<< HEAD
+//      query.setCancelableQuery(query.ormQuery());
+//      ormRequest.transaction(transaction);
+//      SpiResultSet result = ormRequest.findResultSet();
+//=======
+      ormQuery.usingTransaction(transaction);
+      SpiResultSet result = server.findResultSet(ormQuery);
+//>>>>>>> master-rob
       this.pstmt = result.statement();
       this.sql = ormRequest.query().getGeneratedSql();
       setResultSet(result.resultSet(), ormRequest.query().queryPlanKey());

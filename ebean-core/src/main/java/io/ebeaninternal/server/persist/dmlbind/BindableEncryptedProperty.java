@@ -24,11 +24,6 @@ final class BindableEncryptedProperty implements Bindable {
   }
 
   @Override
-  public String toString() {
-    return prop.toString();
-  }
-
-  @Override
   public boolean isDraftOnly() {
     return prop.isDraftOnly();
   }
@@ -42,18 +37,12 @@ final class BindableEncryptedProperty implements Bindable {
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
-
     // columnName = AES_ENCRYPT(?,?)
     request.appendColumn(prop.dbColumn(), prop.dbBind());
   }
 
-
-  /**
-   * Bind a value in a Insert SET clause.
-   */
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
     Object value = null;
     if (bean != null) {
       value = prop.getValue(bean);
@@ -61,13 +50,11 @@ final class BindableEncryptedProperty implements Bindable {
 
     // get Encrypt key
     String encryptKeyValue = prop.encryptKey().getStringValue();
-
     if (!bindEncryptDataFirst) {
       // H2 encrypt function ... different parameter order
       request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.name() + "=****");
     }
     request.bindNoLog(value, prop);
-
     if (bindEncryptDataFirst) {
       // MySql, Postgres, Oracle
       request.bindNoLog(encryptKeyValue, Types.VARCHAR, prop.name() + "=****");

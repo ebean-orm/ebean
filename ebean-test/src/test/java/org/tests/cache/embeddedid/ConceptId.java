@@ -4,8 +4,8 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class ConceptId {
-  private final String networkId;
   private final String id;
+  private final String networkId;
 
   public ConceptId(String networkId, String id) {
     this.networkId = networkId;

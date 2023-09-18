@@ -3,9 +3,9 @@ package io.ebeaninternal.server.persist;
 import io.ebean.CacheMode;
 import io.ebean.MergeOptions;
 import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -82,7 +82,7 @@ final class MergeHandler {
    * We use the Id values to determine what are inserts, updates and deletes as part of the merge.
    */
   private EntityBean fetchOutline(Set<String> paths) {
-    Query<?> query = server.find(desc.type());
+    SpiQuery<?> query = server.createQuery(desc.type());
     query.setBeanCacheMode(CacheMode.OFF);
     query.setPersistenceContextScope(PersistenceContextScope.QUERY);
     query.setId(desc.getId(bean));
@@ -92,7 +92,8 @@ final class MergeHandler {
       MergeNode node = buildNode(path);
       node.addSelectId(query);
     }
-    return (EntityBean) server.findOne(query, transaction);
+    query.usingTransaction(transaction);
+    return (EntityBean) server.findOne(query);
   }
 
   private MergeNode buildNode(String path) {

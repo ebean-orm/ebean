@@ -33,9 +33,9 @@ final class DeleteHandler extends DmlHandler {
     SpiTransaction t = persistRequest.transaction();
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
-      pstmt = getPstmtBatch(t, sql, persistRequest, false);
+      pstmt = pstmtBatch(t, sql, persistRequest, false);
     } else {
-      pstmt = getPstmt(t, sql, false);
+      pstmt = pstmt(t, sql, false);
     }
     dataBind = bind(pstmt);
     meta.bind(persistRequest, this);

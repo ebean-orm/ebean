@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 
@@ -9,13 +8,14 @@ import java.util.concurrent.Callable;
 
 /**
  * Represent the findList query as a Callable.
- *
- * @param <T> the entity bean type
  */
 public final class CallableQueryList<T> extends CallableQuery<T> implements Callable<List<T>> {
 
-  public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
-    super(server, query, t);
+  private final boolean createdTransaction;
+
+  public CallableQueryList(SpiEbeanServer server, SpiQuery<T> query, boolean createdTransaction) {
+    super(server, query);
+    this.createdTransaction = createdTransaction;
   }
 
   /**
@@ -24,12 +24,12 @@ public final class CallableQueryList<T> extends CallableQuery<T> implements Call
   @Override
   public List<T> call() {
     try {
-      return server.findList(query, transaction);
+      return server.findList(query);
     } finally {
-      // cleanup the underlying connection
-      transaction.end();
+      if (createdTransaction) {
+        transaction.end();
+      }
     }
   }
-
 
 }

@@ -44,18 +44,9 @@ public interface IdBinder {
   Object readData(DataInput dataInput) throws IOException;
 
   /**
-   * Return the name(s) of the Id property(s). Comma delimited if there is more
-   * than one.
-   * <p>
-   * This can be used to include in a query.
-   * </p>
-   */
-  String getIdProperty();
-
-  /**
    * Return the Id BeanProperty.
    */
-  STreeProperty getBeanProperty();
+  STreeProperty beanProperty();
 
   /**
    * Find a BeanProperty that is mapped to the database column.
@@ -69,12 +60,24 @@ public interface IdBinder {
   boolean isComplexId();
 
   /**
+   * Return the number of properties that make up the id.
+   */
+  default int size() {
+    return 1;
+  }
+
+  /**
    * Return the default order by that may need to be used if the query includes
    * a many property.
    */
-  String getDefaultOrderBy();
+  String orderBy();
 
-  String getOrderBy(String pathPrefix, boolean ascending);
+  String orderBy(String pathPrefix, boolean ascending);
+
+  /**
+   * Return the id values for a given bean.
+   */
+  Object[] values(EntityBean bean);
 
   /**
    * Return the values as an array of scalar bindable values.
@@ -86,8 +89,7 @@ public interface IdBinder {
    * Added primarily for Query.addWhere().add(Expr.idEq()) support.
    * </p>
    */
-  Object[] getBindValues(Object idValue);
-
+  Object[] bindValues(Object idValue);
 
   /**
    * For EmbeddedId convert the idValue into a simple map.
@@ -96,7 +98,7 @@ public interface IdBinder {
    * This is used to provide a simple JSON serializable version of the id value.
    * </p>
    */
-  Object getIdForJson(EntityBean idValue);
+  Object convertForJson(EntityBean idValue);
 
   /**
    * For EmbeddedId the value is assumed to be a Map and this is
@@ -108,12 +110,7 @@ public interface IdBinder {
    * This is used to provide a simple JSON serializable version of the id value.
    * </p>
    */
-  Object convertIdFromJson(Object value);
-
-  /**
-   * Return the id values for a given bean.
-   */
-  Object[] getIdValues(EntityBean bean);
+  Object convertFromJson(Object value);
 
   /**
    * Build a string of the logical expressions.
@@ -121,12 +118,12 @@ public interface IdBinder {
    * Typically used to build a id = ? string.
    * </p>
    */
-  String getAssocOneIdExpr(String prefix, String operator);
+  String assocExpr(String prefix, String operator);
 
   /**
    * Return the logical id in expression taking into account embedded id's.
    */
-  String getAssocIdInExpr(String prefix);
+  String assocInExpr(String prefix);
 
   /**
    * Binds an id value to a prepared statement.
@@ -141,27 +138,27 @@ public interface IdBinder {
   /**
    * Binds multiple id value to an update.
    */
-  void addIdInBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids);
+  void addBindValues(DefaultSqlUpdate sqlUpdate, Collection<?> ids);
 
   /**
    * Binds multiple id value to a request.
    */
-  void addIdInBindValues(SpiExpressionRequest request, Collection<?> ids);
+  void addBindValues(SpiExpressionRequest request, Collection<?> ids);
 
   /**
    * Return the sql for binding the id using an IN clause.
    */
-  String getBindIdInSql(String baseTableAlias);
+  String bindInSql(String baseTableAlias);
 
   /**
    * Return the binding expression (like "?" or "(?,?)")for the Id.
    */
-  String getIdInValueExpr(boolean not, int size);
+  String idInValueExpr(boolean not, int size);
 
   /**
    * Same as getIdInValueExpr but for delete by id.
    */
-  String getIdInValueExprDelete(int size);
+  String idInValueExprDelete(int size);
 
   void buildRawSqlSelectChain(String prefix, List<String> selectChain);
 
@@ -190,7 +187,7 @@ public interface IdBinder {
    * Return the sql for binding the id to. This includes table alias and columns
    * that make up the id.
    */
-  String getBindIdSql(String baseTableAlias);
+  String bindEqSql(String baseTableAlias);
 
   /**
    * Cast or convert the Id value if necessary and optionally set it.

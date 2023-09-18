@@ -72,9 +72,9 @@ public final class InsertHandler extends DmlHandler {
     sql = meta.getSql(withId, persistRequest.isPublish());
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
-      pstmt = getPstmtBatch(t, sql, persistRequest, useGeneratedKeys);
+      pstmt = pstmtBatch(t, sql, persistRequest, useGeneratedKeys);
     } else {
-      pstmt = getPstmt(t, sql, useGeneratedKeys);
+      pstmt = pstmt(t, sql, useGeneratedKeys);
     }
     dataBind = bind(pstmt);
     meta.bind(this, bean, withId, persistRequest.isPublish());
@@ -88,11 +88,10 @@ public final class InsertHandler extends DmlHandler {
    * Check with useGeneratedKeys to get appropriate PreparedStatement.
    */
   @Override
-  PreparedStatement getPstmt(SpiTransaction t, String sql, boolean useGeneratedKeys) throws SQLException {
+  PreparedStatement pstmt(SpiTransaction t, String sql, boolean useGeneratedKeys) throws SQLException {
     Connection conn = t.internalConnection();
     if (useGeneratedKeys) {
-      return conn.prepareStatement(sql, meta.getIdentityDbColumns());
-
+      return conn.prepareStatement(sql, meta.identityDbColumns());
     } else {
       return conn.prepareStatement(sql);
     }

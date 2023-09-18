@@ -2410,7 +2410,7 @@ public class DatabaseConfig {
    * Sorry if returning Set rather than List breaks code but it feels safer to
    * do that than a subtle change to return a shallow copy which you will not detect.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public Set<Class<?>> getClasses() {
     return classes;
   }
@@ -3458,7 +3458,7 @@ public class DatabaseConfig {
   /**
    * Deprecated - migrate to isLoadModuleInfo().
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public boolean isAutoLoadModuleInfo() {
     return loadModuleInfo;
   }
