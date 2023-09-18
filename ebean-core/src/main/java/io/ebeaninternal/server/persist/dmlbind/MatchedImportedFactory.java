@@ -41,7 +41,7 @@ final class MatchedImportedFactory {
     }
     // match on property name
     for (BeanProperty beanProperty : desc.propertiesBaseScalar()) {
-      if (prop.name().equals(beanProperty.name())) {
+      if (!beanProperty.isFormula() && prop.name().equals(beanProperty.name())) {
         return new MatchedImportedScalar(prop, beanProperty);
       }
     }
