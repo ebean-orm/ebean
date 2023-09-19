@@ -9,14 +9,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-
 public class DataWithFormula {
-
-  private static final long serialVersionUID = 1L;
 
   @EmbeddedId
   private DataWithFormulaKey id;
-
 
   @Formula(select = "${ta}.meta_key")
   private String metaKey;

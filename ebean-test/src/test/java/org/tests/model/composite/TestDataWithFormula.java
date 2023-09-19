@@ -11,20 +11,16 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class TestDataWithFormula extends BaseTestCase {
+class TestDataWithFormula extends BaseTestCase {
 
   @Test
-  public void test1() {
-
+  void test1() {
 
     DataWithFormulaMain main = new DataWithFormulaMain();
     main.setId(UUID.randomUUID());
     main.setTitle("Main");
 
-    DataWithFormulaKey key = new DataWithFormulaKey();
-    key.setMainId(main.getId());
-    key.setMetaKey("meta");
-    key.setValueIndex(42);
+    DataWithFormulaKey key = new DataWithFormulaKey(main.getId(), "meta", 42);
     DataWithFormula data = new DataWithFormula();
     data.setId(key);
     data.setStringValue("SomeValue");

@@ -10,6 +10,7 @@ import java.util.UUID;
 
 @Entity
 public class DataWithFormulaMain {
+
   @Id
   private UUID id;
 

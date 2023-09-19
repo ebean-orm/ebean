@@ -9,39 +9,31 @@ import java.util.UUID;
 @Embeddable
 public class DataWithFormulaKey {
 
-  private static final long serialVersionUID = 1L;
+  @NotNull
+  private final UUID mainId;
 
   @NotNull
-  private UUID mainId;
+  private final String metaKey;
 
   @NotNull
-  private String metaKey = "";
+  private final Integer valueIndex;
 
-  @NotNull
-  private Integer valueIndex = 0;
+  public DataWithFormulaKey(UUID mainId, String metaKey, Integer valueIndex) {
+    this.mainId = mainId;
+    this.metaKey = metaKey;
+    this.valueIndex = valueIndex;
+  }
 
   public UUID getMainId() {
     return mainId;
-  }
-
-  public void setMainId(UUID mainId) {
-    this.mainId = mainId;
   }
 
   public String getMetaKey() {
     return metaKey;
   }
 
-  public void setMetaKey(String metaKey) {
-    this.metaKey = metaKey;
-  }
-
   public Integer getValueIndex() {
     return valueIndex;
-  }
-
-  public void setValueIndex(Integer valueIndex) {
-    this.valueIndex = valueIndex;
   }
 
   @Override
