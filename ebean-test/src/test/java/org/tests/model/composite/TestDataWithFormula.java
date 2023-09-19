@@ -35,5 +35,13 @@ class TestDataWithFormula extends BaseTestCase {
     assertThat(sqls.get(1)).contains("insert into data_with_formula (main_id, meta_key, value_index, string_value) values (?,?,?,?)"); // main
     assertThat(sqls.get(2)).contains("-- bind");
 
+
+    DataWithFormula found = DB.find(DataWithFormula.class)
+      .where().idEq(key)
+      .findOne();
+
+    assertThat(found.getStringValue()).isEqualTo("SomeValue");
+    assertThat(found.getId().getMainId()).isEqualTo(key.getMainId());
+    assertThat(found.getMetaKey()).isEqualTo(key.getMetaKey());
   }
 }
