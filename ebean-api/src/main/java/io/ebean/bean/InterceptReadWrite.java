@@ -1,25 +1,23 @@
 package io.ebean.bean;
 
+import io.avaje.applog.AppLog;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.ValuePair;
-
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static java.lang.System.Logger.Level.WARNING;
 
 /**
  * This is the object added to every entity bean using byte code enhancement.
@@ -29,6 +27,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class InterceptReadWrite extends InterceptBase implements EntityBeanIntercept {
   private static final long serialVersionUID = 1834735632647183821L;
+
+  public static final System.Logger log = AppLog.getLogger("io.ebean.bean");
 
   private static final int STATE_NEW = 0;
   private static final int STATE_REFERENCE = 1;
@@ -50,6 +50,11 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
    * Flags indicating if the mutable hash is set.
    */
   private static final byte FLAG_MUTABLE_HASH_SET = 16;
+
+  /**
+   * Flag indicates that warning was logged.
+   */
+  private static final byte FLAG_MUTABLE_WARN_LOGGED = 32;
 
   private final ReentrantLock lock = new ReentrantLock();
   private transient NodeUsageCollector nodeUsageCollector;
@@ -226,8 +231,17 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
     }
     if (mutableInfo != null) {
       for (int i = 0; i < mutableInfo.length; i++) {
+        if ((flags[i] & FLAG_MUTABLE_WARN_LOGGED) == FLAG_MUTABLE_WARN_LOGGED) {
+           break; // do not check again and do NOT mark as dirty
+        }
         if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(value(i))) {
-          dirty = true;
+          if (readOnly) {
+            log.log(WARNING, "Mutable object in {0}.{1} ({2}) changed. Not setting bean dirty, because it is readonly",
+              owner.getClass().getName(), property(i), owner);
+            flags[i] |= FLAG_MUTABLE_WARN_LOGGED;
+          } else {
+            dirty = true;
+          }
           break;
         }
       }
@@ -237,12 +251,16 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
 
   @Override
   public void setEmbeddedDirty(int embeddedProperty) {
+    checkReadonly();
     this.dirty = true;
     setEmbeddedPropertyDirty(embeddedProperty);
   }
 
   @Override
   public void setDirty(boolean dirty) {
+    if (dirty) {
+      checkReadonly();
+    }
     this.dirty = dirty;
   }
 
@@ -842,18 +860,14 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else {
-      if (readOnly) {
-        throw new IllegalStateException("This bean is readOnly");
-      }
+      checkReadonly();
       setChangeLoaded(propertyIndex);
     }
   }
 
   @Override
   public void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
-    if (readOnly) {
-      throw new IllegalStateException("This bean is readOnly");
-    }
+    checkReadonly();
     setChangedProperty(propertyIndex);
     if (setDirtyState) {
       setOriginalValue(propertyIndex, origValue);
@@ -864,6 +878,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
   @Override
   public void setDirtyStatus() {
     if (!dirty) {
+      checkReadonly();
       dirty = true;
       if (embeddedOwner != null) {
         // Cascade dirty state from Embedded bean to parent bean
@@ -872,6 +887,12 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
       if (nodeUsageCollector != null) {
         nodeUsageCollector.setModified();
       }
+    }
+  }
+
+  private void checkReadonly() {
+    if (readOnly) {
+      throw new IllegalStateException("This bean is readOnly");
     }
   }
 
@@ -1036,6 +1057,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
     } else if (mutableInfo == null || mutableInfo[i] == null || mutableInfo[i].isEqualToObject(value(i))) {
       return false;
     } else {
+      checkReadonly();
       // mark for change
       flags[i] |= FLAG_CHANGED_PROP;
       dirty = true; // this makes the bean automatically dirty!
