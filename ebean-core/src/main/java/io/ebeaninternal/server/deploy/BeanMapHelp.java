@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanMap;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
@@ -111,12 +111,6 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
       beanMap.setModifyListening(many.modifyListenMode());
     }
     return beanMap;
-  }
-
-  @Override
-  public final void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
-    BeanMap<?, ?> newBeanMap = (BeanMap<?, ?>) server.findMap(query, t);
-    refresh(newBeanMap, parentBean);
   }
 
   @Override

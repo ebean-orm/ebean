@@ -152,7 +152,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
     List<SpiExpression> list = exprList.internalList();
     if (!list.isEmpty()) {
       request.append(type.prefix());
-      request.append("(");
+      request.append('(');
       for (int i = 0; i < list.size(); i++) {
         SpiExpression item = list.get(i);
         if (i > 0) {
@@ -160,7 +160,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
         }
         item.addSql(request);
       }
-      request.append(")");
+      request.append(')');
     }
   }
 
@@ -176,12 +176,12 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append(type).append("[");
+    builder.append(type).append('[');
     for (SpiExpression expr : exprList.internalList()) {
       expr.queryPlanHash(builder);
-      builder.append(",");
+      builder.append(',');
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override
@@ -314,6 +314,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
 
   @Override
   public ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params) {
+    throw new IllegalStateException("filterMany not allowed on Junction expression list");
+  }
+
+  @Override
+  public ExpressionList<T> filterManyRaw(String manyProperty, String rawExpression, Object... params) {
     throw new IllegalStateException("filterMany not allowed on Junction expression list");
   }
 
@@ -711,6 +716,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> inTuples(InTuples pairs) {
+    return exprList.inTuples(pairs);
+  }
+
+  @Override
   public ExpressionList<T> in(String propertyName, Collection<?> values) {
     return exprList.in(propertyName, values);
   }
@@ -896,16 +906,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public OrderBy<T> order() {
-    return exprList.order();
-  }
-
-  @Override
-  public ExpressionList<T> order(String orderByClause) {
-    return exprList.order(orderByClause);
-  }
-
-  @Override
   public OrderBy<T> orderBy() {
     return exprList.orderBy();
   }
@@ -978,11 +978,6 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> setMaxRows(int maxRows) {
     return exprList.setMaxRows(maxRows);
-  }
-
-  @Override
-  public Query<T> setOrderBy(String orderBy) {
-    return exprList.setOrderBy(orderBy);
   }
 
   @Override

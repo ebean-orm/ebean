@@ -12,7 +12,7 @@ import io.ebean.annotation.MutationDetection;
 import io.ebean.core.type.*;
 import io.ebean.text.TextException;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;

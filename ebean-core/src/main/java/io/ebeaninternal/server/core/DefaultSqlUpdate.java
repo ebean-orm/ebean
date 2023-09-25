@@ -246,7 +246,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   }
 
   @Override
-  public String getBaseSql() {
+  public String baseSql() {
     return baseSql;
   }
 
@@ -281,9 +281,9 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
     int offset = 0;
     for (Object val : values) {
       if (offset > 0) {
-        sqlExpand.append(",");
+        sqlExpand.append(',');
       }
-      sqlExpand.append("?");
+      sqlExpand.append('?');
       bindParams.setParameter(position + offset++, val);
     }
     bindExpansion += (offset - 1);
@@ -342,7 +342,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
    * Return the bind parameters.
    */
   @Override
-  public BindParams getBindParams() {
+  public BindParams bindParams() {
     return bindParams;
   }
 

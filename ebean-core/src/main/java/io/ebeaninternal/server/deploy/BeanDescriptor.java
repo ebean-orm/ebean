@@ -55,7 +55,7 @@ import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocumentMapping;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Modifier;
@@ -212,7 +212,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private final EntityBean prototypeEntityBean;
 
   private final IdBinder idBinder;
-  private final String idSelect;
   private String idBinderInLHSSql;
   private String idBinderIdSql;
   private String deleteByIdSql;
@@ -355,23 +354,11 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
         propertiesIndex[i] = propMap.get(ebi.property(i));
       }
     }
-    idSelect = initIdSelect();
   }
 
-  String initIdSelect() {
-    if (idProperty != null && !idProperty.name().equals("_idClass")) {
-      return idProperty.name();
-    } else if (entityType == EntityType.EMBEDDED) {
-      return null;
-    } else {
-      StringJoiner sj = new StringJoiner(",");
-      for (BeanProperty prop : propertiesNonMany) {
-        if (prop.isImportedPrimaryKey()) {
-          sj.add(prop.name());
-        }
-      }
-      return sj.toString().intern();
-    }
+  public String idSelect() {
+    if (idBinder == null) throw new UnsupportedOperationException();
+    return idBinder.idSelect();
   }
 
   public boolean isJacksonCorePresent() {
@@ -543,10 +530,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       unidirectional.initialise(initContext);
     }
     idBinder.initialise();
-    idBinderInLHSSql = idBinder.getBindIdInSql(baseTableAlias);
-    idBinderIdSql = idBinder.getBindIdSql(baseTableAlias);
-    String idBinderInLHSSqlNoAlias = idBinder.getBindIdInSql(null);
-    String idEqualsSql = idBinder.getBindIdSql(null);
+    idBinderInLHSSql = idBinder.bindInSql(baseTableAlias);
+    idBinderIdSql = idBinder.bindEqSql(baseTableAlias);
+    String idBinderInLHSSqlNoAlias = idBinder.bindInSql(null);
+    String idEqualsSql = idBinder.bindEqSql(null);
     deleteByIdSql = "delete from " + baseTable + " where " + idEqualsSql;
     whereIdInSql = " where " + idBinderInLHSSqlNoAlias + " ";
     deleteByIdInSql = "delete from " + baseTable + whereIdInSql;
@@ -868,10 +855,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private SqlUpdate deleteByIdList(List<Object> idList, DeleteMode mode) {
     String baseSql = mode.isHard() ? deleteByIdInSql : softDeleteByIdInSql;
     StringBuilder sb = new StringBuilder(baseSql);
-    String inClause = idBinder.getIdInValueExprDelete(idList.size());
+    String inClause = idBinder.idInValueExprDelete(idList.size());
     sb.append(inClause);
     DefaultSqlUpdate delete = new DefaultSqlUpdate(sb.toString());
-    idBinder.addIdInBindValues(delete, idList);
+    idBinder.addBindValues(delete, idList);
     return delete;
   }
 
@@ -882,7 +869,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   private SqlUpdate deleteById(Object id, DeleteMode mode) {
     String baseSql = mode.isHard() ? deleteByIdSql : softDeleteByIdSql;
     DefaultSqlUpdate sqlDelete = new DefaultSqlUpdate(baseSql);
-    Object[] bindValues = idBinder.getBindValues(id);
+    Object[] bindValues = idBinder.bindValues(id);
     for (Object bindValue : bindValues) {
       sqlDelete.setParameter(bindValue);
     }
@@ -1537,7 +1524,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return a Sql update statement to set the importedId value (deferred execution).
    */
   public String updateImportedIdSql(ImportedId prop) {
-    return "update " + baseTable + " set " + prop.importedIdClause() + " where " + idBinder.getBindIdSql(null);
+    return "update " + baseTable + " set " + prop.importedIdClause() + " where " + idBinder.bindEqSql(null);
   }
 
   /**
@@ -1618,7 +1605,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return the many property included in the query or null if one is not.
    */
   public BeanPropertyAssocMany<?> manyProperty(SpiQuery<?> query) {
-    OrmQueryDetail detail = query.getDetail();
+    OrmQueryDetail detail = query.detail();
     for (BeanPropertyAssocMany<?> many : propertiesMany) {
       if (detail.includesPath(many.name())) {
         return many;
@@ -1631,7 +1618,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Return a raw expression for 'where parent id in ...' clause.
    */
   String parentIdInExpr(int parentIdSize, String rawWhere) {
-    String inClause = idBinder.getIdInValueExpr(false, parentIdSize);
+    String inClause = idBinder.idInValueExpr(false, parentIdSize);
     return idBinder.isIdInExpandedForm() ? inClause : rawWhere + inClause;
   }
 
@@ -1684,7 +1671,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     if (alias == null) {
       return idBinderIdSql;
     } else {
-      return idBinder.getBindIdSql(alias);
+      return idBinder.bindEqSql(alias);
     }
   }
 
@@ -1710,7 +1697,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * This 'flattens' any EmbeddedId or multiple Id property cases.
    */
   public Object[] bindIdValues(Object idValue) {
-    return idBinder.getBindValues(idValue);
+    return idBinder.bindValues(idValue);
   }
 
   @Override
@@ -2118,7 +2105,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * The usage is to provide simple id types for JSON processing (for embeddedId's).
    */
   public Object idForJson(Object bean) {
-    return idBinder.getIdForJson((EntityBean) bean);
+    return idBinder.convertForJson((EntityBean) bean);
   }
 
   /**
@@ -2127,7 +2114,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * The usage is to provide simple id types for JSON processing (for embeddedId's).
    */
   Object convertIdFromJson(Object idValue) {
-    return idBinder.convertIdFromJson(idValue);
+    return idBinder.convertFromJson(idValue);
   }
 
   /**
@@ -2135,7 +2122,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * included in the query.
    */
   public String defaultOrderBy() {
-    return idBinder.getDefaultOrderBy();
+    return idBinder.orderBy();
   }
 
   /**
@@ -2355,7 +2342,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       ElPropertyDeploy fk = elDeployCache.get(propName);
       if (fk instanceof BeanFkeyProperty) {
         // propertyDeploy chain for foreign key column
-        return ((BeanFkeyProperty) fk).create(chain.getExpression(), chain.isContainsMany());
+        return ((BeanFkeyProperty) fk).create(chain.expression(), chain.isContainsMany());
       }
     }
     int basePos = propName.indexOf('.');
@@ -2375,7 +2362,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       return property;
     }
     if (property == null) {
-      throw new PersistenceException("No property found for [" + propName + "] in expression " + chain.getExpression());
+      throw new PersistenceException("No property found for [" + propName + "] in expression " + chain.expression());
     }
     if (property.containsMany()) {
       chain.setContainsMany();
@@ -2450,9 +2437,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
 
   BeanProperty _findBeanProperty(String propName) {
     BeanProperty prop = propMap.get(propName);
-    if (prop == null && inheritInfo != null) {
-      // search in sub types...
-      return inheritInfo.findSubTypeProperty(propName);
+    if (prop == null) {
+      if ("_$IdClass$".equals(propName)) {
+        return idProperty;
+      } else if (inheritInfo != null) {
+        // search in sub types...
+        return inheritInfo.findSubTypeProperty(propName);
+      }
     }
     return prop;
   }
@@ -3055,10 +3046,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   @Override
   public BeanProperty idProperty() {
     return idProperty;
-  }
-
-  public String idSelect() {
-    return idSelect;
   }
 
   /**

@@ -2,8 +2,8 @@ package org.tests.idkeys.db;
 
 import io.ebean.annotation.Identity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
 

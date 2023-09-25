@@ -22,8 +22,8 @@ import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
 import io.ebeaninternal.server.idgen.UuidV4IdGenerator;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 
-import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Entity;
+import jakarta.persistence.MappedSuperclass;
 import java.util.*;
 
 /**
@@ -654,7 +654,7 @@ public class DeployBeanDescriptor<T> {
   public void postAnnotations() {
     if (idClass != null) {
       idClassProperty = new DeployBeanPropertyAssocOne<>(this, idClass);
-      idClassProperty.setName("_idClass");
+      idClassProperty.setName("_$IdClass$");
       idClassProperty.setEmbedded();
       idClassProperty.setNullable(false);
     }
@@ -809,7 +809,7 @@ public class DeployBeanDescriptor<T> {
     for (DeployBeanProperty prop : propMap.values()) {
       if (!prop.isTransient() && !(prop instanceof DeployBeanPropertyAssocMany<?>)) {
         if (prop.isFetchEager()) {
-          sb.append(prop.getName()).append(",");
+          sb.append(prop.getName()).append(',');
         } else {
           hasLazyFetch = true;
         }

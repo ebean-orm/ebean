@@ -1,9 +1,9 @@
 package org.tests.model.compositekeys;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Version;
 import java.util.UUID;
 
 @Entity

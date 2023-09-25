@@ -6,7 +6,7 @@ import io.ebean.Transaction;
 import io.ebean.TransactionCallbackAdapter;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

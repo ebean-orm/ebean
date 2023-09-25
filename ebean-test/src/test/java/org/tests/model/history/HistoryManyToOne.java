@@ -2,11 +2,11 @@ package org.tests.model.history;
 
 import io.ebean.annotation.History;
 import io.ebean.annotation.SoftDelete;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import org.tests.model.draftable.BaseDomain;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
 import java.util.List;
 
 @History

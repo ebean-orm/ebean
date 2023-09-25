@@ -22,7 +22,7 @@ public class VisitProperties {
 
   protected void visitProperties(BeanDescriptor<?> desc, BeanPropertyVisitor propertyVisitor) {
     BeanProperty idProp = desc.idProperty();
-    if (idProp != null) {
+    if (idProp != null && !idProp.name().equals("_$IdClass$")) {
       visit(propertyVisitor, idProp);
     }
     BeanPropertyAssocOne<?> unidirectional = desc.unidirectional();

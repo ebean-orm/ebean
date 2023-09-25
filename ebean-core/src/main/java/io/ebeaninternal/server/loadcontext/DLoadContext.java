@@ -89,16 +89,16 @@ public final class DLoadContext implements LoadContext {
     this.useDocStore = query.isUseDocStore();
     this.asOf = query.getAsOf();
     this.asDraft = query.isAsDraft();
-    this.includeSoftDeletes = query.isIncludeSoftDeletes() && query.getMode() == SpiQuery.Mode.NORMAL;
+    this.includeSoftDeletes = query.isIncludeSoftDeletes() && query.mode() == SpiQuery.Mode.NORMAL;
     this.readOnly = query.isReadOnly();
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
-    this.useBeanCache = query.getUseBeanCache();
-    this.profilingListener = query.getProfilingListener();
-    this.planLabel = query.getPlanLabel();
-    this.profileLocation = query.getProfileLocation();
+    this.useBeanCache = query.beanCacheMode();
+    this.profilingListener = query.profilingListener();
+    this.planLabel = query.planLabel();
+    this.profileLocation = query.profileLocation();
 
-    ObjectGraphNode parentNode = query.getParentNode();
+    ObjectGraphNode parentNode = query.parentNode();
     if (parentNode != null) {
       this.origin = parentNode.origin();
       this.relativePath = parentNode.path();
@@ -129,13 +129,13 @@ public final class DLoadContext implements LoadContext {
    * Register the +query and +lazy secondary queries with their appropriate LoadBeanContext or LoadManyContext.
    */
   private void registerSecondaryQueries(SpiQuerySecondary secondaryQueries) {
-    this.secQuery = secondaryQueries.getQueryJoins();
+    this.secQuery = secondaryQueries.queryJoins();
     if (secQuery != null) {
       for (OrmQueryProperties pathProperties : secQuery) {
         registerSecondaryQuery(pathProperties);
       }
     }
-    List<OrmQueryProperties> lazyJoins = secondaryQueries.getLazyJoins();
+    List<OrmQueryProperties> lazyJoins = secondaryQueries.lazyJoins();
     if (lazyJoins != null) {
       for (OrmQueryProperties lazyJoin : lazyJoins) {
         registerSecondaryQuery(lazyJoin);

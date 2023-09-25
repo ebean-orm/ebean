@@ -206,11 +206,10 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
    */
   @Override
   public void addSql(SpiExpressionRequest request) {
-
     if (list.isEmpty()) {
       request.append(SQL_TRUE);
     } else {
-      request.append("(");
+      request.append('(');
       for (int i = 0; i < list.size(); i++) {
         SpiExpression item = list.get(i);
         if (i > 0) {
@@ -218,7 +217,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
         }
         item.addSql(request);
       }
-      request.append(")");
+      request.append(')');
     }
   }
 
@@ -230,9 +229,9 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
     builder.append("Example[");
     for (SpiExpression expr : list) {
       expr.queryPlanHash(builder);
-      builder.append(",");
+      builder.append(',');
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override
@@ -270,7 +269,6 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
    * Add expressions to the list for all the non-null properties (and do this recursively).
    */
   private void addExpressions(ArrayList<SpiExpression> list, BeanDescriptor<?> beanDescriptor, EntityBean bean, String prefix) {
-
     for (BeanProperty beanProperty : beanDescriptor.propertiesAll()) {
 
       if (!beanProperty.isTransient()) {

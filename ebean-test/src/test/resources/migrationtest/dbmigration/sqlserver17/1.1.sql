@@ -9,13 +9,142 @@ IF OBJECT_ID('uq_migtest_e_basic_indextest2', 'UQ') IS NOT NULL alter table migt
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'uq_migtest_e_basic_indextest6') drop index uq_migtest_e_basic_indextest6 ON migtest_e_basic;
 IF OBJECT_ID('uq_migtest_e_basic_indextest6', 'UQ') IS NOT NULL alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
 IF OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status;
-IF OBJECT_ID('fk_drop_main_drop_ref_many_drop_main', 'F') IS NOT NULL alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_main;
-IF OBJECT_ID('fk_drop_main_drop_ref_many_drop_ref_many', 'F') IS NOT NULL alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_ref_many;
-IF OBJECT_ID('fk_drop_ref_one_parent_id', 'F') IS NOT NULL alter table drop_ref_one drop constraint fk_drop_ref_one_parent_id;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest1') drop index ix_migtest_e_basic_indextest1 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest5') drop index ix_migtest_e_basic_indextest5 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('"migtest_QuOtEd"','U') AND name = 'ix_migtest_quoted_status1') drop index ix_migtest_quoted_status1 ON "migtest_QuOtEd";
 -- apply changes
+create table drop_main (
+  id                            integer not null,
+  constraint pk_drop_main primary key (id)
+);
+create sequence drop_main_seq as bigint start with 1;
+
+create table drop_main_drop_ref_many (
+  drop_main_id                  integer not null,
+  drop_ref_many_id              integer not null,
+  constraint pk_drop_main_drop_ref_many primary key (drop_main_id,drop_ref_many_id)
+);
+
+create table drop_ref_many (
+  id                            integer not null,
+  constraint pk_drop_ref_many primary key (id)
+);
+create sequence drop_ref_many_seq as bigint start with 1;
+
+create table drop_ref_one (
+  id                            integer not null,
+  parent_id                     integer,
+  constraint pk_drop_ref_one primary key (id)
+);
+create sequence drop_ref_one_seq as bigint start with 1;
+
+create table drop_ref_one_to_one (
+  id                            integer not null,
+  parent_id                     integer,
+  constraint pk_drop_ref_one_to_one primary key (id)
+);
+create sequence drop_ref_one_to_one_seq as bigint start with 1;
+
+create table migtest_e_test_binary (
+  id                            integer not null,
+  test_byte16                   varbinary(16),
+  test_byte256                  varbinary(256),
+  test_byte512                  varbinary(512),
+  test_byte1k                   varbinary(1024),
+  test_byte2k                   varbinary(2048),
+  test_byte4k                   varbinary(4096),
+  test_byte8k                   varbinary(max),
+  test_byte16k                  varbinary(max),
+  test_byte32k                  varbinary(max),
+  test_byte64k                  varbinary(max),
+  test_byte128k                 varbinary(max),
+  test_byte256k                 varbinary(max),
+  test_byte512k                 varbinary(max),
+  test_byte1m                   varbinary(max),
+  test_byte2m                   varbinary(max),
+  test_byte4m                   varbinary(max),
+  test_byte8m                   varbinary(max),
+  test_byte16m                  varbinary(max),
+  test_byte32m                  varbinary(max),
+  constraint pk_migtest_e_test_binary primary key (id)
+);
+create sequence migtest_e_test_binary_seq as bigint start with 1;
+
+create table migtest_e_test_json (
+  id                            integer not null,
+  json255                       nvarchar(255),
+  json256                       nvarchar(256),
+  json512                       nvarchar(512),
+  json1k                        nvarchar(1024),
+  json2k                        nvarchar(2048),
+  json4k                        nvarchar(max),
+  json8k                        nvarchar(max),
+  json16k                       nvarchar(max),
+  json32k                       nvarchar(max),
+  json64k                       nvarchar(max),
+  json128k                      nvarchar(max),
+  json256k                      nvarchar(max),
+  json512k                      nvarchar(max),
+  json1m                        nvarchar(max),
+  json2m                        nvarchar(max),
+  json4m                        nvarchar(max),
+  json8m                        nvarchar(max),
+  json16m                       nvarchar(max),
+  json32m                       nvarchar(max),
+  constraint pk_migtest_e_test_json primary key (id)
+);
+create sequence migtest_e_test_json_seq as bigint start with 1;
+
+create table migtest_e_test_lob (
+  id                            integer not null,
+  lob255                        nvarchar(max),
+  lob256                        nvarchar(max),
+  lob512                        nvarchar(max),
+  lob1k                         nvarchar(max),
+  lob2k                         nvarchar(max),
+  lob4k                         nvarchar(max),
+  lob8k                         nvarchar(max),
+  lob16k                        nvarchar(max),
+  lob32k                        nvarchar(max),
+  lob64k                        nvarchar(max),
+  lob128k                       nvarchar(max),
+  lob256k                       nvarchar(max),
+  lob512k                       nvarchar(max),
+  lob1m                         nvarchar(max),
+  lob2m                         nvarchar(max),
+  lob4m                         nvarchar(max),
+  lob8m                         nvarchar(max),
+  lob16m                        nvarchar(max),
+  lob32m                        nvarchar(max),
+  constraint pk_migtest_e_test_lob primary key (id)
+);
+create sequence migtest_e_test_lob_seq as bigint start with 1;
+
+create table migtest_e_test_varchar (
+  id                            integer not null,
+  varchar255                    nvarchar(255),
+  varchar256                    nvarchar(256),
+  varchar512                    nvarchar(512),
+  varchar1k                     nvarchar(1024),
+  varchar2k                     nvarchar(2048),
+  varchar4k                     nvarchar(max),
+  varchar8k                     nvarchar(max),
+  varchar16k                    nvarchar(max),
+  varchar32k                    nvarchar(max),
+  varchar64k                    nvarchar(max),
+  varchar128k                   nvarchar(max),
+  varchar256k                   nvarchar(max),
+  varchar512k                   nvarchar(max),
+  varchar1m                     nvarchar(max),
+  varchar2m                     nvarchar(max),
+  varchar4m                     nvarchar(max),
+  varchar8m                     nvarchar(max),
+  varchar16m                    nvarchar(max),
+  varchar32m                    nvarchar(max),
+  constraint pk_migtest_e_test_varchar primary key (id)
+);
+create sequence migtest_e_test_varchar_seq as bigint start with 1;
+
 create table migtest_e_user (
   id                            integer not null,
   constraint pk_migtest_e_user primary key (id)
@@ -105,6 +234,7 @@ alter table migtest_e_history6 alter column test_number2 integer;
 alter table migtest_e_softdelete add deleted bit default 0 not null;
 alter table migtest_oto_child add master_id bigint;
 -- apply post alter
+create unique nonclustered index uq_drop_ref_one_to_one_parent_id on drop_ref_one_to_one(parent_id) where parent_id is not null;
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 create unique nonclustered index uq_migtest_e_basic_description on migtest_e_basic(description) where description is not null;
 update migtest_e_basic set new_boolean_field = old_boolean;
@@ -121,6 +251,17 @@ period for system_time (sys_periodFrom, sys_periodTo);
 alter table migtest_e_history set (system_versioning = on (history_table=dbo.migtest_e_history_history));
 create unique nonclustered index uq_table_select on "table"("select") where "select" is not null;
 -- foreign keys and indices
+create index ix_drop_main_drop_ref_many_drop_main on drop_main_drop_ref_many (drop_main_id);
+alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_main foreign key (drop_main_id) references drop_main (id);
+
+create index ix_drop_main_drop_ref_many_drop_ref_many on drop_main_drop_ref_many (drop_ref_many_id);
+alter table drop_main_drop_ref_many add constraint fk_drop_main_drop_ref_many_drop_ref_many foreign key (drop_ref_many_id) references drop_ref_many (id);
+
+create index ix_drop_ref_one_parent_id on drop_ref_one (parent_id);
+alter table drop_ref_one add constraint fk_drop_ref_one_parent_id foreign key (parent_id) references drop_main (id);
+
+alter table drop_ref_one_to_one add constraint fk_drop_ref_one_to_one_parent_id foreign key (parent_id) references drop_main (id);
+
 create index ix_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c on migtest_mtm_c_migtest_mtm_m (migtest_mtm_c_id);
 alter table migtest_mtm_c_migtest_mtm_m add constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c foreign key (migtest_mtm_c_id) references migtest_mtm_c (id);
 

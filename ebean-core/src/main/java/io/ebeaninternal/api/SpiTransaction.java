@@ -11,7 +11,7 @@ import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -25,8 +25,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return the user defined label for the transaction.
    */
-  String getLabel();
-
+  String label();
 
   /**
    * Return true if generated SQL and Bind values should be logged to the
@@ -91,12 +90,12 @@ public interface SpiTransaction extends Transaction {
    * Returns a String used to identify the transaction. This id is used for
    * Transaction logging.
    */
-  String getId();
+  String id();
 
   /**
    * Return the start timestamp for the transaction (JVM side).
    */
-  long getStartNanoTime();
+  long startNanoTime();
 
   /**
    * Return true if this transaction has updateAllLoadedProperties set.
@@ -109,7 +108,7 @@ public interface SpiTransaction extends Transaction {
    * <p>
    * Returning 0 implies to use the system wide default batch size.
    */
-  DocStoreMode getDocStoreMode();
+  DocStoreMode docStoreMode();
 
   /**
    * Return the batch size to us for ElasticSearch Bulk API calls
@@ -184,7 +183,7 @@ public interface SpiTransaction extends Transaction {
    * indexes. On commit the Table modifications this generates is broadcast
    * around the cluster (if you have a cluster).
    */
-  TransactionEvent getEvent();
+  TransactionEvent event();
 
   /**
    * Whether persistCascade is on for save and delete.
@@ -200,7 +199,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return the BatchControl used to batch up persist requests.
    */
-  BatchControl getBatchControl();
+  BatchControl batchControl();
 
   /**
    * Set the BatchControl used to batch up persist requests. There should only be one
@@ -215,7 +214,7 @@ public interface SpiTransaction extends Transaction {
    * later. This is along the lines of 'extended persistence context'
    * behaviour.
    */
-  SpiPersistenceContext getPersistenceContext();
+  SpiPersistenceContext persistenceContext();
 
   /**
    * Set the persistence context to this transaction.
@@ -236,7 +235,7 @@ public interface SpiTransaction extends Transaction {
    * that method we can no longer trust the query only status of a
    * Transaction.
    */
-  Connection getInternalConnection();
+  Connection internalConnection();
 
   /**
    * Return true if the manyToMany intersection should be persisted for this particular relationship direction.
@@ -291,7 +290,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return a document store transaction.
    */
-  DocStoreTransaction getDocStoreTransaction();
+  DocStoreTransaction docStoreTransaction();
 
   /**
    * Set the current Tenant Id.
@@ -301,7 +300,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return the current Tenant Id.
    */
-  Object getTenantId();
+  Object tenantId();
 
   /**
    * Return the offset time from the start of the transaction.
@@ -331,7 +330,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return the profile location for this transaction.
    */
-  ProfileLocation getProfileLocation();
+  ProfileLocation profileLocation();
 
   /**
    * Return true when nested transactions should create Savepoints.

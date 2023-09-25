@@ -2,8 +2,8 @@ package org.multitenant.partition;
 
 import io.ebean.annotation.TenantId;
 
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class MtTenantAware extends MtBaseDomain {

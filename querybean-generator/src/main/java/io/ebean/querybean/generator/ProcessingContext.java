@@ -157,7 +157,7 @@ class ProcessingContext implements Constants {
     return (
       modifiers.contains(Modifier.STATIC) ||
       modifiers.contains(Modifier.TRANSIENT) ||
-      hasAnnotations(field, "javax.persistence.Transient")
+      hasAnnotations(field, "jakarta.persistence.Transient")
     );
   }
 
@@ -361,20 +361,8 @@ class ProcessingContext implements Constants {
    */
   private PropertyType createPropertyTypeAssoc(String fullName) {
     String[] split = Split.split(fullName);
-    String propertyName = "QAssoc" + split[1];
-    String packageName = packageAppend(split[0]);
-    return new PropertyTypeAssoc(propertyName, packageName);
-  }
-
-  /**
-   * Prepend the package to the suffix taking null into account.
-   */
-  private String packageAppend(String origPackage) {
-    if (origPackage == null) {
-      return "query.assoc";
-    } else {
-      return origPackage + "." + "query.assoc";
-    }
+    String propertyName = "Q" + split[1] + ".Assoc";
+    return new PropertyTypeAssoc(propertyName);
   }
 
   /**

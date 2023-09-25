@@ -28,7 +28,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     StringBuilder buffer0 = new StringBuilder();
     DB.getDefault().metaInfo()
-      .collectMetricsAsJson()
+      .collectMetrics().asJson()
       .withHeader(false)
       .write(buffer0);
 
@@ -42,7 +42,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     StringBuilder buffer1 = new StringBuilder();
     DB.getDefault().metaInfo()
-      .collectMetricsAsJson()
+      .collectMetrics().asJson()
       .withHeader(false)
       .write(buffer1);
 
@@ -230,7 +230,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     String metricsJson = server().metaInfo()
-      .collectMetricsAsJson()
+      .collectMetrics().asJson()
       .withHash(true)
       .withExtraAttributes(true)
       .withNewLine(true)
@@ -241,7 +241,7 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"org.tests.model.basic.finder.CustomerFinder.byNameStatus\"");
     if (isH2() || isPostgresCompatible()) {
-      assertThat(metricsJson).contains("\"hash\":\"de3affa5b4bff07e19c1c012590dcde6\"");
+      assertThat(metricsJson).contains("\"hash\":\"25c7fe502c5a20ebe5b13db21e70e6a9\"");
       assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
     }
   }
@@ -254,7 +254,7 @@ public class TestCustomerFinder extends BaseTestCase {
     runQueries();
 
     String metricsJson = server().metaInfo()
-      .collectMetricsAsJson()
+      .collectMetrics().asJson()
       .withHash(false)
       .withExtraAttributes(false)
       .withNewLine(false)
@@ -277,7 +277,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     StringBuilder buffer = new StringBuilder();
     server().metaInfo()
-      .collectMetricsAsJson()
+      .collectMetrics().asJson()
       .withHeader(false)
       .write(buffer);
 
@@ -295,7 +295,7 @@ public class TestCustomerFinder extends BaseTestCase {
 
     StringBuilder buffer = new StringBuilder();
     server().metaInfo()
-      .collectMetricsAsJson()
+      .collectMetrics().asJson()
       .withHeader(true)
       .write(buffer);
 

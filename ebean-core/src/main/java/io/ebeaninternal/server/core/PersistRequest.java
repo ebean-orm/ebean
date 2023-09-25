@@ -8,7 +8,7 @@ import io.ebeaninternal.server.persist.BatchPostExecute;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.persist.PersistExecute;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 
 /**
@@ -126,7 +126,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
     boolean batch = isBatchThisRequest();
     try {
       int rows;
-      BatchControl control = transaction.getBatchControl();
+      BatchControl control = transaction.batchControl();
       if (control != null) {
         rows = control.executeStatementOrBatch(this, batch, addBatch);
 

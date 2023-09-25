@@ -231,7 +231,7 @@ public final class OrmQueryProperties implements Serializable {
     if (filterMany != null) {
       filterMany.applyRowLimits(query);
       SpiExpressionList<?> trimPath = filterMany.trimPath(path.length() + 1);
-      for (SpiExpression spiExpression : trimPath.getUnderlyingList()) {
+      for (SpiExpression spiExpression : trimPath.underlyingList()) {
         query.where().add(spiExpression);
       }
     }
@@ -265,12 +265,12 @@ public final class OrmQueryProperties implements Serializable {
   public void asStringDebug(String prefix, StringBuilder sb) {
     sb.append(prefix);
     if (path != null) {
-      sb.append(path).append(" ");
+      sb.append(path).append(' ');
     }
     if (allProperties) {
       sb.append("(*)");
     } else if (included != null) {
-      sb.append("(").append(String.join(",", included)).append(")");
+      sb.append('(').append(String.join(",", included)).append(')');
     }
   }
 
@@ -411,7 +411,7 @@ public final class OrmQueryProperties implements Serializable {
    * Calculate the query plan hash.
    */
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("{");
+    builder.append('{');
     if (path != null) {
       builder.append(path);
     }
@@ -428,7 +428,7 @@ public final class OrmQueryProperties implements Serializable {
     if (fetchConfig != null) {
       builder.append("/c").append(fetchConfig.hashCode());
     }
-    builder.append("}");
+    builder.append('}');
   }
 
 }

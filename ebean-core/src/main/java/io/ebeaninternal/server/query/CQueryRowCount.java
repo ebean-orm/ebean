@@ -8,7 +8,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -58,7 +58,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
       .append("] rows[").append(rowCount)
       .append("] type[").append(desc.fullName())
       .append("] predicates[").append(predicates.logWhereSql())
-      .append("] bind[").append(bindLog).append("]");
+      .append("] bind[").append(bindLog).append(']');
 
     return sb.toString();
   }
@@ -89,13 +89,13 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
     try {
       SpiTransaction t = transaction();
       profileOffset = t.profileOffset();
-      Connection conn = t.getInternalConnection();
+      Connection conn = t.internalConnection();
       lock.lock();
       try {
         query.checkCancelled();
         pstmt = conn.prepareStatement(sql);
-        if (query.getTimeout() > 0) {
-          pstmt.setQueryTimeout(query.getTimeout());
+        if (query.timeout() > 0) {
+          pstmt.setQueryTimeout(query.timeout());
         }
         bindLog = predicates.bind(pstmt, conn);
       } finally {
@@ -137,7 +137,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId());
   }
 
   Set<String> dependentTables() {

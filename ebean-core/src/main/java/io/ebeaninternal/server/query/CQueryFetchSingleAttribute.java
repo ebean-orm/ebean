@@ -66,7 +66,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
       .append("] rows[").append(rowCount)
       .append("] type[").append(desc.name())
       .append("] predicates[").append(predicates.logWhereSql())
-      .append("] bind[").append(bindLog).append("]");
+      .append("] bind[").append(bindLog).append(']');
     return sb.toString();
   }
 
@@ -125,13 +125,13 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
       query.checkCancelled();
       SpiTransaction t = transaction();
       profileOffset = t.profileOffset();
-      Connection conn = t.getInternalConnection();
+      Connection conn = t.internalConnection();
       pstmt = conn.prepareStatement(sql);
-      if (query.getBufferFetchSizeHint() > 0) {
-        pstmt.setFetchSize(query.getBufferFetchSizeHint());
+      if (query.bufferFetchSizeHint() > 0) {
+        pstmt.setFetchSize(query.bufferFetchSizeHint());
       }
-      if (query.getTimeout() > 0) {
-        pstmt.setQueryTimeout(query.getTimeout());
+      if (query.timeout() > 0) {
+        pstmt.setQueryTimeout(query.timeout());
       }
       bindLog = predicates.bind(pstmt, conn);
     } finally {
@@ -165,7 +165,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.getProfileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId());
   }
 
   Set<String> dependentTables() {

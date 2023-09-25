@@ -57,6 +57,10 @@ public class DbMigrationTest extends BaseTestCase {
       "migtest_ckey_detail",
       "migtest_ckey_parent",
       "migtest_e_basic",
+      "migtest_e_test_binary",
+      "migtest_e_test_varchar",
+      "migtest_e_test_lob",
+      "migtest_e_test_json",
       "migtest_e_enum",
       "migtest_e_history",
       "migtest_e_history2",
@@ -83,9 +87,15 @@ public class DbMigrationTest extends BaseTestCase {
       "`migtest_QuOtEd`",
       "migtest_QuOtEd",
       "\"migtest_QuOtEd\"",
+      "drop_main_drop_ref_many",
+      "drop_ref_one_to_one",
+      "drop_ref_many",
+      "drop_ref_one",
+      "drop_main",
       "table",
       "\"table\"",
       "`table`");
+
     ((DataSourcePool)server().dataSource()).offline();
     ((DataSourcePool)server().dataSource()).online();
 

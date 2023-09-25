@@ -5,7 +5,7 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -25,11 +25,6 @@ public final class BindableDiscriminator implements Bindable {
   }
 
   @Override
-  public String toString() {
-    return columnName + " = " + discValue;
-  }
-
-  @Override
   public boolean isDraftOnly() {
     return false;
   }
@@ -46,7 +41,6 @@ public final class BindableDiscriminator implements Bindable {
 
   @Override
   public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
-
     bindRequest.bind(discValue, sqlType);
   }
 

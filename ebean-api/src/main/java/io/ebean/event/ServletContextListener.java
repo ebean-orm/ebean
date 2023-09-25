@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import javax.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextEvent;
 
 /**
  * Listens for webserver server starting and stopping events.
@@ -15,7 +15,7 @@ import javax.servlet.ServletContextEvent;
  * hook that Ebean registers.
  * </p>
  */
-public class ServletContextListener implements javax.servlet.ServletContextListener {
+public class ServletContextListener implements jakarta.servlet.ServletContextListener {
 
   /**
    * The servlet container is stopping.

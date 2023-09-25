@@ -77,7 +77,7 @@ public final class OrmUpdateProperties {
       } else {
         binder.bindObject(dataBind, value);
       }
-      dataBind.append(value).append(",");
+      dataBind.append(value).append(',');
     }
   }
 
@@ -111,7 +111,7 @@ public final class OrmUpdateProperties {
     public void bind(Binder binder, DataBind dataBind) throws SQLException {
       for (Object val : bindValues) {
         binder.bindObject(dataBind, val);
-        dataBind.append(val).append(",");
+        dataBind.append(val).append(',');
       }
     }
   }

@@ -3,7 +3,7 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -21,9 +21,10 @@ abstract class TransactionFactory {
   /**
    * Return a new query only transaction.
    *
-   * @param tenantId The tenantId for lazy loading queries.
+   * @param tenantId  The tenantId for lazy loading queries.
+   * @param useMaster Explicitly use the master data source rather than read only data source
    */
-  abstract SpiTransaction createReadOnlyTransaction(Object tenantId);
+  abstract SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster);
 
   /**
    * Return a new transaction.
@@ -35,7 +36,7 @@ abstract class TransactionFactory {
    */
   final SpiTransaction setIsolationLevel(SpiTransaction t, boolean explicit, int isolationLevel) {
     if (isolationLevel > -1) {
-      Connection connection = t.getInternalConnection();
+      Connection connection = t.internalConnection();
       try {
         connection.setTransactionIsolation(isolationLevel);
       } catch (SQLException e) {

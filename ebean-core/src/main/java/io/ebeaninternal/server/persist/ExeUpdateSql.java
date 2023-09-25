@@ -8,7 +8,7 @@ import io.ebeaninternal.server.core.PersistRequestUpdateSql;
 import io.ebeaninternal.server.core.PersistRequestUpdateSql.SqlType;
 import io.ebeaninternal.server.util.BindParamsParser;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -77,10 +77,10 @@ final class ExeUpdateSql {
     SpiSqlUpdate updateSql = request.updateSql();
     SpiTransaction t = request.transaction();
 
-    BindParams bindParams = updateSql.getBindParams();
+    BindParams bindParams = updateSql.bindParams();
 
     // process named parameters if required
-    String sql = updateSql.getBaseSql();
+    String sql = updateSql.baseSql();
     sql = BindParamsParser.parse(bindParams, sql);
     parseUpdate(sql, request);
 
@@ -95,7 +95,7 @@ final class ExeUpdateSql {
     }
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, pstmt, t.getInternalConnection());
+      bindLog = binder.bind(bindParams, pstmt, t.internalConnection());
     }
     request.setBindLog(bindLog);
     updateSql.setGeneratedSql(sql);

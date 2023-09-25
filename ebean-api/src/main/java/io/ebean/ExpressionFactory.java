@@ -37,6 +37,11 @@ import java.util.Map;
 public interface ExpressionFactory {
 
   /**
+   * Return a new ExpressionList.
+   */
+  <T> ExpressionList<T> expressionList();
+
+  /**
    * Path exists - for the given path in a JSON document.
    */
   Expression jsonExists(String propertyName, String path);
@@ -368,6 +373,11 @@ public interface ExpressionFactory {
    * In expression using pairs of value objects.
    */
   Expression inPairs(Pairs pairs);
+
+  /**
+   * In expression using multiple columns.
+   */
+  Expression inTuples(InTuples pairs);
 
   /**
    * In - property has a value in the array of values.

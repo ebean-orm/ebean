@@ -2,7 +2,7 @@ package io.ebeaninternal.server.type;
 
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

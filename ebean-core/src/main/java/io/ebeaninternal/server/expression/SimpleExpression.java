@@ -117,7 +117,7 @@ public final class SimpleExpression extends AbstractValueExpression {
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append(type.name()).append("[").append(propName).append("]");
+    builder.append(type.name()).append('[').append(propName).append(']');
   }
 
   @Override

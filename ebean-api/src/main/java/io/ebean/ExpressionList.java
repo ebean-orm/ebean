@@ -4,7 +4,7 @@ import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 import io.ebean.search.*;
 
-import javax.persistence.NonUniqueResultException;
+import jakarta.persistence.NonUniqueResultException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
@@ -54,14 +54,12 @@ public interface ExpressionList<T> {
   Query<T> orderById(boolean orderById);
 
   /**
-   * Set the order by clause replacing the existing order by clause if there is
-   * one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
+   * Deprecated migrate to {@link #orderBy(String)}
    */
-  ExpressionList<T> order(String orderByClause);
+  @Deprecated(since = "13.19", forRemoval = true)
+  default ExpressionList<T> order(String orderByClause) {
+    return orderBy(orderByClause);
+  }
 
   /**
    * Set the order by clause replacing the existing order by clause if there is
@@ -74,15 +72,12 @@ public interface ExpressionList<T> {
   ExpressionList<T> orderBy(String orderBy);
 
   /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * <p>
-   * This is the same as <code>orderBy()</code>
+   * Deprecated migrate to orderBy().
    */
-  OrderBy<T> order();
+  @Deprecated(forRemoval = true)
+  default OrderBy<T> order() {
+    return orderBy();
+  }
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -94,12 +89,6 @@ public interface ExpressionList<T> {
    * This is the same as <code>order()</code>
    */
   OrderBy<T> orderBy();
-
-  /**
-   * Deprecated migrate to {@link #orderBy(String)}
-   */
-  @Deprecated
-  Query<T> setOrderBy(String orderBy);
 
   /**
    * Apply the path properties to the query replacing the select and fetch clauses.
@@ -519,6 +508,8 @@ public interface ExpressionList<T> {
   ExpressionList<T> filterMany(String manyProperty);
 
   /**
+   * Deprecated for removal - migrate to filterManyRaw()
+   * <p>
    * Add filter expressions to the many property.
    *
    * <pre>{@code
@@ -535,7 +526,28 @@ public interface ExpressionList<T> {
    * @param expressions  Filter expressions with and, or and ? or ?1 type bind parameters
    * @param params       Bind parameters used in the expressions
    */
+  @Deprecated(forRemoval = true)
   ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params);
+
+  /**
+   * Add filter expressions for the many path. The expressions can include SQL functions if
+   * desired and the property names are translated to column names.
+   * <p>
+   * The expressions can contain placeholders for bind values using <code>?</code> or <code>?1</code> style.
+   *
+   * <pre>{@code
+   *
+   *     new QCustomer()
+   *       .name.startsWith("Postgres")
+   *       .contacts.filterManyRaw("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
+   *       .findList();
+   *
+   * }</pre>
+   *
+   * @param rawExpressions The raw expressions which can include ? and ?1 style bind parameter placeholders
+   * @param params The parameter values to bind
+   */
+  ExpressionList<T> filterManyRaw(String manyProperty, String rawExpressions, Object... params);
 
   /**
    * Specify specific properties to fetch on the main/root bean (aka partial
@@ -1141,6 +1153,11 @@ public interface ExpressionList<T> {
    * In expression using pairs of value objects.
    */
   ExpressionList<T> inPairs(Pairs pairs);
+
+  /**
+   * In expression using multiple columns.
+   */
+  ExpressionList<T> inTuples(InTuples pairs);
 
   /**
    * EXISTS a raw SQL SubQuery.

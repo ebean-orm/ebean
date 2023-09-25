@@ -5,10 +5,7 @@ import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.SpiDtoQuery;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
@@ -39,7 +36,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   private String label;
   private ProfileLocation profileLocation;
   private final BindParams bindParams = new BindParams();
-  private Transaction transaction;
+  private SpiTransaction transaction;
 
   /**
    * Create given an underlying ORM query.
@@ -48,8 +45,9 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     this.server = server;
     this.descriptor = descriptor;
     this.ormQuery = ormQuery;
-    this.label = ormQuery.getLabel();
-    this.profileLocation = ormQuery.getProfileLocation();
+    this.useMaster = ormQuery.isUseMaster();
+    this.label = ormQuery.label();
+    this.profileLocation = ormQuery.profileLocation();
   }
 
   /**
@@ -68,7 +66,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public DtoQueryPlan getQueryPlan(Object planKey) {
+  public DtoQueryPlan queryPlan(Object planKey) {
     return descriptor.queryPlan(planKey);
   }
 
@@ -84,8 +82,19 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Override
   public DtoQuery<T> usingTransaction(Transaction transaction) {
-    this.transaction = transaction;
+    this.transaction = (SpiTransaction) transaction;
     return this;
+  }
+
+  @Override
+  public DtoQuery<T> usingMaster() {
+    this.useMaster = true;
+    return this;
+  }
+
+  @Override
+  public boolean isUseMaster() {
+    return useMaster;
   }
 
   @Override
@@ -205,17 +214,17 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public Class<T> getType() {
+  public Class<T> type() {
     return descriptor.type();
   }
 
   @Override
-  public SpiQuery<?> getOrmQuery() {
+  public SpiQuery<?> ormQuery() {
     return ormQuery;
   }
 
   @Override
-  public Transaction getTransaction() {
+  public SpiTransaction transaction() {
     return transaction;
   }
 
@@ -243,7 +252,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Nullable
   @Override
-  public String getPlanLabel() {
+  public String planLabel() {
     if (label != null) {
       return label;
     }
@@ -267,7 +276,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public ProfileLocation profileLocation() {
     return profileLocation;
   }
 

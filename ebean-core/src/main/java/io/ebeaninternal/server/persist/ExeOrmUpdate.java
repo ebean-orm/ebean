@@ -8,7 +8,7 @@ import io.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.util.BindParamsParser;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -39,8 +39,8 @@ final class ExeOrmUpdate {
         return -1;
       } else {
         SpiUpdate<?> ormUpdate = request.ormUpdate();
-        if (ormUpdate.getTimeout() > 0) {
-          pstmt.setQueryTimeout(ormUpdate.getTimeout());
+        if (ormUpdate.timeout() > 0) {
+          pstmt.setQueryTimeout(ormUpdate.timeout());
         }
         int rowCount = pstmt.executeUpdate();
         request.checkRowCount(rowCount);
@@ -71,11 +71,11 @@ final class ExeOrmUpdate {
     SpiUpdate<?> ormUpdate = request.ormUpdate();
     SpiTransaction t = request.transaction();
 
-    String sql = ormUpdate.getUpdateStatement();
+    String sql = ormUpdate.updateStatement();
     // convert bean and property names to table and
     // column names if required
     sql = translate(request, sql);
-    BindParams bindParams = ormUpdate.getBindParams();
+    BindParams bindParams = ormUpdate.bindParams();
     // process named parameters if required
     sql = BindParamsParser.parse(bindParams, sql);
     ormUpdate.setGeneratedSql(sql);
@@ -91,7 +91,7 @@ final class ExeOrmUpdate {
     }
     String bindLog = null;
     if (!bindParams.isEmpty()) {
-      bindLog = binder.bind(bindParams, pstmt, t.getInternalConnection());
+      bindLog = binder.bind(bindParams, pstmt, t.internalConnection());
     }
     request.setBindLog(bindLog);
     return pstmt;

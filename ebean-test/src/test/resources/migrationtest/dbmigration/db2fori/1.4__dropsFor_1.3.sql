@@ -48,6 +48,71 @@ drop table migtest_e_history_history;
 alter table migtest_e_history2 add versioning use history table migtest_e_history2_history;
 alter table migtest_e_history5 add versioning use history table migtest_e_history5_history;
 alter table "table" add versioning use history table table_history;
+drop table drop_main;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'DROP_MAIN_SEQ') then
+  prepare stmt from 'drop sequence drop_main_seq';
+  execute stmt;
+end if;
+end$$;
+drop table drop_main_drop_ref_many;
+drop table drop_ref_many;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'DROP_REF_MANY_SEQ') then
+  prepare stmt from 'drop sequence drop_ref_many_seq';
+  execute stmt;
+end if;
+end$$;
+drop table drop_ref_one;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'DROP_REF_ONE_SEQ') then
+  prepare stmt from 'drop sequence drop_ref_one_seq';
+  execute stmt;
+end if;
+end$$;
+drop table drop_ref_one_to_one;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'DROP_REF_ONE_TO_ONE_SEQ') then
+  prepare stmt from 'drop sequence drop_ref_one_to_one_seq';
+  execute stmt;
+end if;
+end$$;
+drop table migtest_e_test_binary;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'MIGTEST_E_TEST_BINARY_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_test_binary_seq';
+  execute stmt;
+end if;
+end$$;
+drop table migtest_e_test_json;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'MIGTEST_E_TEST_JSON_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_test_json_seq';
+  execute stmt;
+end if;
+end$$;
+drop table migtest_e_test_lob;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'MIGTEST_E_TEST_LOB_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_test_lob_seq';
+  execute stmt;
+end if;
+end$$;
+drop table migtest_e_test_varchar;
+delimiter $$
+begin
+if exists (select seqschema from syscat.sequences where seqschema = current_schema and ucase(seqname) = 'MIGTEST_E_TEST_VARCHAR_SEQ') then
+  prepare stmt from 'drop sequence migtest_e_test_varchar_seq';
+  execute stmt;
+end if;
+end$$;
 drop table migtest_e_user;
 delimiter $$
 begin

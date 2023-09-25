@@ -15,9 +15,9 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
-import javax.persistence.Embeddable;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
 import javax.validation.constraints.Size;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -165,7 +165,7 @@ public class TestPersistenceContext extends BaseTestCase {
         lastBean[0] = customer;
       });
 
-      SpiPersistenceContext pc = ((SpiTransaction) txn).getPersistenceContext();
+      SpiPersistenceContext pc = ((SpiTransaction) txn).persistenceContext();
       // the first 100 customers using strong references
       assertThat(pc.toString()).contains("Customer=size:5000 (4900 weak)");
       assertThat(pc.toString()).contains("Order=size:100 (100 weak)");

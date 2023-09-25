@@ -90,7 +90,7 @@ public final class LoadManyRequest extends LoadRequest {
     SpiQuery<?> query = many.newQuery(server);
     String orderBy = many.lazyFetchOrderBy();
     if (orderBy != null) {
-      query.order(orderBy);
+      query.orderBy(orderBy);
     }
     String extraWhere = many.extraWhere();
     if (extraWhere != null) {
@@ -111,7 +111,12 @@ public final class LoadManyRequest extends LoadRequest {
     loadContext.configureQuery(query);
     if (onlyIds) {
       // lazy loading invoked via clear() and removeAll()
-      query.select(many.targetIdProperty());
+      String mapKey = many.mapKey();
+      if (mapKey != null) {
+        query.select(mapKey);
+      } else {
+        query.select(many.targetIdProperty());
+      }
     }
     return query;
   }

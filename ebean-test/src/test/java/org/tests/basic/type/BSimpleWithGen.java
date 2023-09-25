@@ -1,8 +1,8 @@
 package org.tests.basic.type;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import java.util.List;
 import java.util.Map;
 

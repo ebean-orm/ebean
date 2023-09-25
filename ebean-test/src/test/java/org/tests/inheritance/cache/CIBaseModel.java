@@ -3,8 +3,8 @@ package org.tests.inheritance.cache;
 import io.ebean.Model;
 import io.ebean.annotation.Cache;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 @Cache(enableQueryCache=true)
 @MappedSuperclass

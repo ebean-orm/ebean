@@ -552,7 +552,7 @@ final class BeanDescriptorCacheHelp<T> {
       if (val == null) {
         return null;
       }
-      sb.append(val).append(";");
+      sb.append(val).append(';');
     }
     return sb.toString();
   }
@@ -755,7 +755,7 @@ final class BeanDescriptorCacheHelp<T> {
 
   void cacheUpdateQuery(boolean update, SpiTransaction transaction) {
     if (invalidateQueryCache || cacheNotifyOnAll || (!update && cacheNotifyOnDelete)) {
-      transaction.getEvent().add(desc.baseTable(), false, update, !update);
+      transaction.event().add(desc.baseTable(), false, update, !update);
     }
   }
 

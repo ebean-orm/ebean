@@ -16,6 +16,9 @@ import io.ebeaninternal.server.query.CQuery;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -62,6 +65,11 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * graph costing.
    */
   CallOrigin createCallOrigin();
+
+  /**
+   * Override in order to return SpiQuery
+   */
+  <T> SpiQuery<T> createQuery(Class<T> beanType);
 
   /**
    * Return the PersistenceContextScope to use defined at query or server level.
@@ -132,8 +140,9 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * Create a ServerTransaction for query purposes.
    *
    * @param tenantId For multi-tenant lazy loading provide the tenantId to use.
+   * @param useMaster Set to true when the query should use the master data source.
    */
-  SpiTransaction createReadOnlyTransaction(Object tenantId);
+  SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster);
 
   /**
    * An event from another server in the cluster used to notify local
@@ -144,7 +153,7 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
   /**
    * Compile a query.
    */
-  <T> CQuery<T> compileQuery(Type type, Query<T> query, Transaction transaction);
+  <T> CQuery<T> compileQuery(Type type, SpiQuery<T> query, Transaction transaction);
 
   /**
    * Execute the findId's query but without copying the query.
@@ -153,12 +162,12 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * the query has finished (if executing in a background thread).
    * </p>
    */
-  <A, T> List<A> findIdsWithCopy(Query<T> query, Transaction transaction);
+  <A, T> List<A> findIdsWithCopy(SpiQuery<T> query);
 
   /**
    * Execute the findCount query but without copying the query.
    */
-  <T> int findCountWithCopy(Query<T> query, Transaction transaction);
+  <T> int findCountWithCopy(SpiQuery<T> query);
 
   /**
    * Load a batch of Associated One Beans.
@@ -286,7 +295,7 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
   /**
    * Execute the underlying ORM query returning as a JDBC ResultSet to map to DTO beans.
    */
-  SpiResultSet findResultSet(SpiQuery<?> ormQuery, SpiTransaction transaction);
+  SpiResultSet findResultSet(SpiQuery<?> ormQuery);
 
   /**
    * Visit all the metrics (typically reporting them).
@@ -317,4 +326,58 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * Create a query bind capture for the given query plan.
    */
   SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan queryPlan);
+
+  <T> boolean exists(SpiQuery<T> ormQuery);
+
+  <T> int findCount(SpiQuery<T> query);
+
+  <A, T> List<A> findIds(SpiQuery<T> query);
+
+  <T> QueryIterator<T> findIterate(SpiQuery<T> query);
+
+  <T> Stream<T> findStream(SpiQuery<T> query);
+
+  <T> void findEach(SpiQuery<T> query, Consumer<T> consumer);
+
+  <T> void findEach(SpiQuery<T> query, int batch, Consumer<List<T>> consumer);
+
+  <T> void findEachWhile(SpiQuery<T> query, Predicate<T> consumer);
+
+  <T> List<Version<T>> findVersions(SpiQuery<T> query);
+
+  <T> List<T> findList(SpiQuery<T> query);
+
+  <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query);
+
+  <T> FutureIds<T> findFutureIds(SpiQuery<T> query);
+
+  <T> FutureList<T> findFutureList(SpiQuery<T> query);
+
+  <T> PagedList<T> findPagedList(SpiQuery<T> query);
+
+  <T> Set<T> findSet(SpiQuery<T> query);
+
+  <K, T> Map<K, T> findMap(SpiQuery<T> query);
+
+  <A, T> List<A> findSingleAttributeList(SpiQuery<T> query);
+
+  <A, T> Set<A> findSingleAttributeSet(SpiQuery<T> query);
+
+  @Nullable
+  <T> T findOne(SpiQuery<T> query);
+
+  <T> Optional<T> findOneOrEmpty(SpiQuery<T> query);
+
+  <T> int delete(SpiQuery<T> query);
+
+  <T> int update(SpiQuery<T> query);
+
+  List<SqlRow> findList(SpiSqlQuery query);
+
+  void findEach(SpiSqlQuery query, Consumer<SqlRow> consumer);
+
+  void findEachWhile(SpiSqlQuery query, Predicate<SqlRow> consumer);
+
+  @Nullable
+  SqlRow findOne(SpiSqlQuery query);
 }

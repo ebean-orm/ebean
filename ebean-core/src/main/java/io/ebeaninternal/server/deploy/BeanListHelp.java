@@ -1,12 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Query;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
 import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
@@ -65,12 +65,6 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
     BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
     beanList.setModifyListening(many.modifyListenMode());
     return beanList;
-  }
-
-  @Override
-  public final void refresh(SpiEbeanServer server, Query<?> query, Transaction t, EntityBean parentBean) {
-    BeanList<?> newBeanList = (BeanList<?>) server.findList(query, t);
-    refresh(newBeanList, parentBean);
   }
 
   @Override

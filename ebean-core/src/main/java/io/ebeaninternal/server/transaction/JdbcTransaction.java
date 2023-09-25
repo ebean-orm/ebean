@@ -13,8 +13,8 @@ import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
-import javax.persistence.PersistenceException;
-import javax.persistence.RollbackException;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.RollbackException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -136,12 +136,12 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final String getLabel() {
+  public final String label() {
     return label;
   }
 
   @Override
-  public final long getStartNanoTime() {
+  public final long startNanoTime() {
     return startNanos;
   }
 
@@ -173,7 +173,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final ProfileLocation getProfileLocation() {
+  public final ProfileLocation profileLocation() {
     return profileLocation;
   }
 
@@ -188,7 +188,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       }
     }
   }
-
 
 
   @Override
@@ -251,7 +250,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     callbackList.add(callback);
   }
 
-  private void withEachCallback(Consumer<TransactionCallback> consumer) {
+  private void withEachCallbackFailSilent(Consumer<TransactionCallback> consumer) {
     if (callbackList != null) {
       // using old style loop to cater for case when new callbacks are added recursively (as otherwise iterator fails fast)
       for (int i = 0; i < callbackList.size(); i++) {
@@ -259,17 +258,27 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
           consumer.accept(callbackList.get(i));
         } catch (Exception e) {
           log.log(ERROR, "Error executing transaction callback", e);
+          throw wrapIfNeeded(e);
         }
       }
     }
   }
 
+  private void withEachCallback(Consumer<TransactionCallback> consumer) {
+    if (callbackList != null) {
+      // using old style loop to cater for case when new callbacks are added recursively (as otherwise iterator fails fast)
+      for (int i = 0; i < callbackList.size(); i++) {
+        consumer.accept(callbackList.get(i));
+      }
+    }
+  }
+
   private void firePreRollback() {
-    withEachCallback(TransactionCallback::preRollback);
+    withEachCallbackFailSilent(TransactionCallback::preRollback);
   }
 
   private void firePostRollback() {
-    withEachCallback(TransactionCallback::postRollback);
+    withEachCallbackFailSilent(TransactionCallback::postRollback);
     if (changeLogHolder != null) {
       changeLogHolder.postRollback();
     }
@@ -300,7 +309,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final DocStoreMode getDocStoreMode() {
+  public final DocStoreMode docStoreMode() {
     return docStoreMode;
   }
 
@@ -609,7 +618,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final BatchControl getBatchControl() {
+  public final BatchControl batchControl() {
     return batchControl;
   }
 
@@ -667,7 +676,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Return the persistence context associated with this transaction.
    */
   @Override
-  public final SpiPersistenceContext getPersistenceContext() {
+  public final SpiPersistenceContext persistenceContext() {
     return persistenceContext;
   }
 
@@ -687,7 +696,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Return the underlying TransactionEvent.
    */
   @Override
-  public final TransactionEvent getEvent() {
+  public final TransactionEvent event() {
     queryOnly = false;
     if (event == null) {
       event = new TransactionEvent();
@@ -732,7 +741,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Return the transaction id.
    */
   @Override
-  public final String getId() {
+  public final String id() {
     return id;
   }
 
@@ -742,7 +751,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final Object getTenantId() {
+  public final Object tenantId() {
     return tenantId;
   }
 
@@ -750,7 +759,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * Return the underlying connection for internal use.
    */
   @Override
-  public Connection getInternalConnection() {
+  public Connection internalConnection() {
     return connection;
   }
 
@@ -760,7 +769,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public Connection connection() {
     queryOnly = false;
-    return getInternalConnection();
+    return internalConnection();
   }
 
   void deactivate() {
@@ -1085,11 +1094,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
 
   @Override
   public final void addModification(String tableName, boolean inserts, boolean updates, boolean deletes) {
-    getEvent().add(tableName, inserts, updates, deletes);
+    event().add(tableName, inserts, updates, deletes);
   }
 
   @Override
-  public final DocStoreTransaction getDocStoreTransaction() {
+  public final DocStoreTransaction docStoreTransaction() {
     if (docStoreTxn == null) {
       queryOnly = false;
       docStoreTxn = manager.createDocStoreTransaction(docStoreBatchSize);

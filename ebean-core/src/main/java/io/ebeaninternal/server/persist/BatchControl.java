@@ -81,7 +81,10 @@ public final class BatchControl {
    */
   private int bufferMax;
 
-  private final Queue[] queues = new Queue[3];
+  private final Queue[] queues = new Queue[2];
+
+  static final int DELETE_QUEUE = 0;
+  static final int INSERT_QUEUE = 1;
 
   /**
    * Create for a given transaction, PersistExecute, default size and getGeneratedKeys.
@@ -221,14 +224,21 @@ public final class BatchControl {
    * Execute all the requests contained in the list.
    */
   void executeNow(ArrayList<PersistRequest> list) throws BatchedSqlException {
-    for (int i = 0; i < list.size(); i++) {
-      if (i % batchSize == 0) {
-        // hit the batch size so flush
-        flushPstmtHolder();
+    boolean old = transaction.isFlushOnQuery();
+    transaction.setFlushOnQuery(false);
+    // disable flush on query due transsaction callbacks
+    try {
+      for (int i = 0; i < list.size(); i++) {
+        if (i % batchSize == 0) {
+          // hit the batch size so flush
+          flushPstmtHolder();
+        }
+        list.get(i).executeNow();
       }
-      list.get(i).executeNow();
+      flushPstmtHolder();
+    } finally {
+      transaction.setFlushOnQuery(old);
     }
-    flushPstmtHolder();
   }
 
   public void flushOnCommit() throws BatchedSqlException {
@@ -265,10 +275,9 @@ public final class BatchControl {
   }
 
   private void flushBuffer(boolean reset) throws BatchedSqlException {
-    flushQueue(queues[0]);
     flushInternal(reset);
-    flushQueue(queues[1]);
-    flushQueue(queues[2]);
+    flushQueue(queues[DELETE_QUEUE]);
+    flushQueue(queues[INSERT_QUEUE]);
   }
 
   private void flushQueue(Queue queue) throws BatchedSqlException {

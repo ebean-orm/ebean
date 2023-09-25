@@ -4,7 +4,7 @@ import io.ebean.annotation.DbComment;
 import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Table(name = "`table`")
@@ -45,4 +45,13 @@ public class ETable {
 
   @OneToMany(mappedBy = "foreign")
   List<ETable> foreigns;
+
+  // @NotNull
+  // @DbDefault("")
+  // private String textfield;
+  // FIXME: MariaDb produces an invalid quoted statement. We would need to fix quotes here.
+  // but using reserved names for tables is a bad idea IMHO
+  // actual:   update "table" set textfield = '' where textfield is null;
+  // expected: update `table` set textfield = '' where textfield is null;
+
 }

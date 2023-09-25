@@ -61,7 +61,7 @@ public class MultiValueBind {
     }
     sb.append(" in (?");
     sb.append(",?".repeat(Math.max(0, size - 1)));
-    sb.append(")");
+    sb.append(')');
     return sb.toString();
   }
 }

@@ -18,9 +18,9 @@ public final class DtoMappingRequest {
   private final DtoColumn[] columnMeta;
 
   public DtoMappingRequest(SpiDtoQuery query, String sql, DtoColumn[] columnMeta) {
-    this.type = query.getType();
-    this.label = query.getPlanLabel();
-    this.profileLocation = query.getProfileLocation();
+    this.type = query.type();
+    this.label = query.planLabel();
+    this.profileLocation = query.profileLocation();
     this.sql = sql;
     this.relaxedMode = query.isRelaxedMode();
     this.columnMeta = columnMeta;

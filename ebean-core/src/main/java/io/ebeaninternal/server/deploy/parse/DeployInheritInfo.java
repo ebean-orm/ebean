@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy.parse;
 import io.ebeaninternal.server.deploy.InheritInfo;
 
 import java.lang.reflect.Modifier;
-import javax.persistence.DiscriminatorType;
+import jakarta.persistence.DiscriminatorType;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -235,17 +235,17 @@ public final class DeployInheritInfo implements Comparable<DeployInheritInfo> {
       appendSqlLiteralValue(i, discList.get(i), sb);
     }
     if (size > 1) {
-      sb.append(")");
+      sb.append(')');
     }
     return sb.toString();
   }
 
   private void appendSqlLiteralValue(int count, Object value, StringBuilder sb) {
     if (count > 0) {
-      sb.append(",");
+      sb.append(',');
     }
     if (value instanceof String) {
-      sb.append("'").append(value).append("'");
+      sb.append('\'').append(value).append('\'');
     } else {
       sb.append(value);
     }

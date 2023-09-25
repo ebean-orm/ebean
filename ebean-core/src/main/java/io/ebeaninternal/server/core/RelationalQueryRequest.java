@@ -2,7 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.*;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiSqlBinding;
+import io.ebeaninternal.api.SpiSqlQuery;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -22,15 +22,15 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   private int estimateCapacity;
   private int rows;
 
-  RelationalQueryRequest(SpiEbeanServer server, RelationalQueryEngine engine, SqlQuery q, Transaction t) {
-    super(server, (SpiSqlBinding) q, t);
+  RelationalQueryRequest(SpiEbeanServer server, RelationalQueryEngine engine, SpiSqlQuery q) {
+    super(server, q);
     this.queryEngine = engine;
   }
 
   @Override
   protected void setResultSet(ResultSet resultSet, Object planKey) throws SQLException {
     this.resultSet = resultSet;
-    this.propertyNames = getPropertyNames();
+    this.propertyNames = propertyNames();
     // calculate the initialCapacity of the Map to reduce rehashing
     float initCap = (propertyNames.length) / 0.7f;
     this.estimateCapacity = (int) initCap + 1;
@@ -95,7 +95,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   /**
    * Build the list of property names.
    */
-  private String[] getPropertyNames() throws SQLException {
+  private String[] propertyNames() throws SQLException {
     ResultSetMetaData metaData = resultSet.getMetaData();
     int columnsPlusOne = metaData.getColumnCount() + 1;
     ArrayList<String> propNames = new ArrayList<>(columnsPlusOne - 1);
@@ -127,7 +127,7 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
     }
   }
 
-  public ResultSet getResultSet() {
+  public ResultSet resultSet() {
     return resultSet;
   }
 

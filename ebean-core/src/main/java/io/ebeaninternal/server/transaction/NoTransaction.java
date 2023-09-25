@@ -14,7 +14,7 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -41,7 +41,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public String getLabel() {
+  public String label() {
     return null;
   }
 
@@ -56,7 +56,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public long getStartNanoTime() {
+  public long startNanoTime() {
     // not used
     return System.nanoTime();
   }
@@ -168,7 +168,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public String getId() {
+  public String id() {
     return null;
   }
 
@@ -178,7 +178,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public DocStoreMode getDocStoreMode() {
+  public DocStoreMode docStoreMode() {
     return null;
   }
 
@@ -317,7 +317,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public TransactionEvent getEvent() {
+  public TransactionEvent event() {
     return null;
   }
 
@@ -332,7 +332,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public BatchControl getBatchControl() {
+  public BatchControl batchControl() {
     return null;
   }
 
@@ -341,7 +341,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public SpiPersistenceContext getPersistenceContext() {
+  public SpiPersistenceContext persistenceContext() {
     return null;
   }
 
@@ -350,7 +350,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public Connection getInternalConnection() {
+  public Connection internalConnection() {
     return null;
   }
 
@@ -398,7 +398,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public DocStoreTransaction getDocStoreTransaction() {
+  public DocStoreTransaction docStoreTransaction() {
     return null;
   }
 
@@ -407,7 +407,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public Object getTenantId() {
+  public Object tenantId() {
     return null;
   }
 
@@ -434,7 +434,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public ProfileLocation getProfileLocation() {
+  public ProfileLocation profileLocation() {
     return null;
   }
 }

@@ -3,9 +3,9 @@ package org.domain;
 import io.ebean.Model;
 import io.ebean.annotation.Cache;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 
 @Cache
 @Entity

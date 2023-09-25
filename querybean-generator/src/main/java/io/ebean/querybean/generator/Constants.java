@@ -7,12 +7,12 @@ interface Constants {
   String AT_TYPEQUERYBEAN = "@TypeQueryBean(\"v1\")";
   String GENERATED = "io.ebean.typequery.Generated";
 
-  String MAPPED_SUPERCLASS = "javax.persistence.MappedSuperclass";
-  String DISCRIMINATOR_VALUE = "javax.persistence.DiscriminatorValue";
-  String INHERITANCE = "javax.persistence.Inheritance";
-  String ENTITY = "javax.persistence.Entity";
-  String EMBEDDABLE = "javax.persistence.Embeddable";
-  String CONVERTER = "javax.persistence.Converter";
+  String MAPPED_SUPERCLASS = "jakarta.persistence.MappedSuperclass";
+  String DISCRIMINATOR_VALUE = "jakarta.persistence.DiscriminatorValue";
+  String INHERITANCE = "jakarta.persistence.Inheritance";
+  String ENTITY = "jakarta.persistence.Entity";
+  String EMBEDDABLE = "jakarta.persistence.Embeddable";
+  String CONVERTER = "jakarta.persistence.Converter";
   String EBEAN_COMPONENT = "io.ebean.annotation.EbeanComponent";
 
   String DBARRAY = "io.ebean.annotation.DbArray";
@@ -21,9 +21,8 @@ interface Constants {
   String DBNAME = "io.ebean.annotation.DbName";
 
   String TQROOTBEAN = "io.ebean.typequery.TQRootBean";
-  String TQASSOC = "io.ebean.typequery.TQAssoc";
   String TQASSOCBEAN = "io.ebean.typequery.TQAssocBean";
-  String TQPROPERTY = "io.ebean.typequery.TQProperty";
+  String TQASSOC = "io.ebean.typequery.TQAssoc";
   String TYPEQUERYBEAN = "io.ebean.typequery.TypeQueryBean";
   String DATABASE = "io.ebean.Database";
   String DB = "io.ebean.DB";
@@ -37,4 +36,7 @@ interface Constants {
 
   String AVAJE_LANG_NULLABLE = "io.avaje.lang.Nullable";
   String JAVA_COLLECTION = "java.util.Collection";
+  String EXPRESSIONLIST = "io.ebean.ExpressionList";
+  String EXPR = "io.ebean.Expr";
+  String CONSUMER = "java.util.function.Consumer";
 }

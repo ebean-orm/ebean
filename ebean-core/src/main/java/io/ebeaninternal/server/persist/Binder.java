@@ -13,7 +13,7 @@ import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.*;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Collection;
@@ -105,13 +105,13 @@ public final class Binder {
       for (BindParams.Param param : list) {
 
         if (param.isOutParam() && cstmt != null) {
-          cstmt.registerOutParameter(dataBind.nextPos(), param.getType());
+          cstmt.registerOutParameter(dataBind.nextPos(), param.type());
           if (param.isInParam()) {
             dataBind.decrementPos();
           }
         }
         if (param.isInParam()) {
-          value = param.getInValue();
+          value = param.inValue();
           if (bindLog != null) {
             if (bindLog.length() > 0) {
               bindLog.append(", ");
@@ -128,7 +128,7 @@ public final class Binder {
             }
           } else if (value == null) {
             // this doesn't work for query predicates
-            bindObject(dataBind, null, param.getType());
+            bindObject(dataBind, null, param.type());
           } else {
             bindObject(dataBind, value);
           }

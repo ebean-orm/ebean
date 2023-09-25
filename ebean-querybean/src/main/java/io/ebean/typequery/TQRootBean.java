@@ -12,9 +12,11 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -132,6 +134,13 @@ public abstract class TQRootBean<T, R> {
    */
   public TQRootBean(boolean aliasDummy) {
     this.query = null;
+  }
+
+  /** Construct for FilterMany */
+  protected TQRootBean(ExpressionList<T> filter) {
+    this.query = null;
+    this.whereStack = new ArrayStack<>();
+    whereStack.push(filter);
   }
 
   /**
@@ -482,6 +491,21 @@ public abstract class TQRootBean<T, R> {
    */
   public R apply(PathProperties pathProperties) {
     query.apply(pathProperties);
+    return root;
+  }
+
+  /**
+   * Apply changes to the query conditional on the supplied predicate.
+   * <p>
+   * Typically, the changes are extra predicates etc.
+   *
+   * @param predicate The predicate which when true the changes are applied
+   * @param apply The changes to apply to the query
+   */
+  public R alsoIf(BooleanSupplier predicate, Consumer<R> apply) {
+    if (predicate.getAsBoolean()) {
+      apply.accept(root);
+    }
     return root;
   }
 
@@ -914,17 +938,6 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Deprecated migrate to setBeanCacheMode() or setUseCache().
-   * <p>
-   * When set to true all the beans from this query are loaded into the bean cache.
-   */
-  @Deprecated
-  public R setLoadBeanCache(boolean loadBeanCache) {
-    query.setLoadBeanCache(loadBeanCache);
-    return root;
-  }
-
-  /**
    * Set the property to use as keys for a map.
    * <p>
    * If no property is set then the id property is used.
@@ -1231,6 +1244,14 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * In expression using multiple columns.
+   */
+  public R inTuples(InTuples inTuples) {
+    peekExprList().inTuples(inTuples);
+    return root;
+  }
+
+  /**
    * Marker that can be used to indicate that the order by clause is defined after this.
    * <p>
    * <h2>Example: order by customer name, order date</h2>
@@ -1252,23 +1273,10 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Marker that can be used to indicate that the order by clause is defined after this.
-   * <p>
-   * <h2>Example: order by customer name, order date</h2>
-   * <pre>{@code
-   *   List<Order> orders =
-   *          new QOrder()
-   *            .customer.name.ilike("rob")
-   *            .orderBy()
-   *              .customer.name.asc()
-   *              .orderDate.asc()
-   *            .findList();
-   *
-   * }</pre>
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19")
   public R order() {
-    // Yes this does not actually do anything! We include it because style wise it makes
-    // the query nicer to read and suggests that order by definitions are added after this
     return root;
   }
 
@@ -1285,15 +1293,11 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Set the full raw order by clause replacing the existing order by clause if there is one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
+   * Deprecated migrate to {@link #orderBy(String)}
    */
+  @Deprecated(since = "13.19")
   public R order(String orderByClause) {
-    query.order(orderByClause);
-    return root;
+    return orderBy(orderByClause);
   }
 
   /**
@@ -1577,6 +1581,21 @@ public abstract class TQRootBean<T, R> {
    */
   public R usingConnection(Connection connection) {
     query.usingConnection(connection);
+    return root;
+  }
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  public R usingMaster() {
+    query.usingMaster();
     return root;
   }
 

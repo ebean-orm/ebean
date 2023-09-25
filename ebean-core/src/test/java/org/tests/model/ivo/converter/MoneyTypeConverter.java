@@ -2,7 +2,7 @@ package org.tests.model.ivo.converter;
 
 import org.tests.model.ivo.Money;
 
-import javax.persistence.AttributeConverter;
+import jakarta.persistence.AttributeConverter;
 import java.math.BigDecimal;
 
 /**

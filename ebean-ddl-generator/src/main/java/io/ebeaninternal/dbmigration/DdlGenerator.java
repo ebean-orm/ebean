@@ -13,7 +13,7 @@ import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
 import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -309,7 +309,7 @@ public class DdlGenerator implements SpiDdlGenerator {
     try (LineNumberReader lineReader = new LineNumberReader(reader)) {
       String s;
       while ((s = lineReader.readLine()) != null) {
-        buf.append(s).append("\n");
+        buf.append(s).append('\n');
       }
       return buf.toString();
     }

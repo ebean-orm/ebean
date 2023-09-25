@@ -23,7 +23,6 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
 
   @Override
   public int compare(T o1, T o2) {
-
     Object val1 = elGetValue.pathGet(o1);
     Object val2 = elGetValue.pathGet(o2);
     return compareValues(val1, val2);
@@ -31,14 +30,12 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
 
   @Override
   public int compareValue(Object value, T o2) {
-
     Object val2 = elGetValue.pathGet(o2);
     return compareValues(value, val2);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   public int compareValues(Object val1, Object val2) {
-
     if (val1 == null) {
       return val2 == null ? 0 : nullOrder;
     }
@@ -54,6 +51,5 @@ public final class ElComparatorProperty<T> implements Comparator<T>, ElComparato
     Comparable c = (Comparable) val1;
     return asc * c.compareTo(val2);
   }
-
 
 }

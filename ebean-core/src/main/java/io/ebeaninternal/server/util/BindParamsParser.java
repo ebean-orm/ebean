@@ -6,7 +6,7 @@ import io.ebeaninternal.api.BindParams.OrderedList;
 import io.ebeaninternal.api.BindParams.Param;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.Collection;
 
 /**
@@ -61,7 +61,7 @@ public final class BindParamsParser {
    */
   private String parseSql() {
     if (params.isSameBindHash()) {
-      String preparedSql = params.getPreparedSql();
+      String preparedSql = params.preparedSql();
       if (preparedSql != null && !preparedSql.isEmpty()) {
         // the sql has already been parsed and positionedParameters are set in order
         return preparedSql;
@@ -117,7 +117,7 @@ public final class BindParamsParser {
         Param param = extractNamedParam(paramName);
 
         orderedList.appendSql(sql.substring(startPos, nameParamStart));
-        Object inValue = param.getInValue();
+        Object inValue = param.inValue();
         if (inValue instanceof Collection<?>) {
           addCollectionParams(orderedList, param, (Collection<?>) inValue);
         } else {
@@ -139,7 +139,7 @@ public final class BindParamsParser {
     if (paramName.startsWith(ENCRYPTKEY_PREFIX)) {
       param = addEncryptKeyParam(paramName);
     } else {
-      param = params.getParameter(paramName);
+      param = params.parameter(paramName);
     }
     if (param == null) {
       throw new PersistenceException("Bind value is not set or null for " + paramName + " in " + sql);

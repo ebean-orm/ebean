@@ -8,8 +8,11 @@ import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.*;
 
-import javax.persistence.PersistenceException;
-import java.util.*;
+import jakarta.persistence.PersistenceException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 import static java.lang.System.Logger.Level.WARNING;
@@ -179,7 +182,7 @@ final class SaveManyBeans extends SaveManyBase {
           if (hasOrderColumn && !clearedParent) {
             // Clear the parent bean from the PersistenceContext (L1 cache), because the order of referenced beans might have changed
             final BeanDescriptor<?> beanDescriptor = many.descriptor();
-            beanDescriptor.contextClear(transaction.getPersistenceContext(), beanDescriptor.getId(parentBean));
+            beanDescriptor.contextClear(transaction.persistenceContext(), beanDescriptor.getId(parentBean));
             clearedParent = true;
           }
         }
@@ -205,9 +208,10 @@ final class SaveManyBeans extends SaveManyBase {
 
   /**
    * Return the Id values of beans we know are being updated (any others are orphans)
+   * If there are no IDs, null is returned.
    */
-  private List<Object> detailIds() {
-    final var detailIds = new ArrayList<>();
+  private Set<Object> detailIds() {
+    final var detailIds = new HashSet<>();
     for (Object detailBean : collection) {
       if (isMap) {
         detailBean = ((Map.Entry<?, ?>) detailBean).getValue();
@@ -222,7 +226,7 @@ final class SaveManyBeans extends SaveManyBase {
         }
       }
     }
-    return detailIds;
+    return detailIds.isEmpty() ? null : detailIds;
   }
 
   /**
@@ -294,7 +298,7 @@ final class SaveManyBeans extends SaveManyBase {
         // build a intersection row for 'delete'
         IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
         SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
-        persister.executeOrQueue(sqlDelete, transaction, queue);
+        persister.executeOrQueue(sqlDelete, transaction, queue, BatchControl.DELETE_QUEUE);
       }
     }
     if (additions != null && !additions.isEmpty()) {
@@ -314,7 +318,7 @@ final class SaveManyBeans extends SaveManyBase {
             // build a intersection row for 'insert'
             IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);
             SpiSqlUpdate sqlInsert = intRow.createInsert(server);
-            persister.executeOrQueue(sqlInsert, transaction, queue);
+            persister.executeOrQueue(sqlInsert, transaction, queue, BatchControl.INSERT_QUEUE);
           }
         }
       }

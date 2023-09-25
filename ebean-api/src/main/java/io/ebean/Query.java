@@ -3,13 +3,15 @@ package io.ebean;
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 
-import javax.persistence.NonUniqueResultException;
+import jakarta.persistence.NonUniqueResultException;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -671,6 +673,16 @@ public interface Query<T> extends CancelableQuery {
   Query<T> apply(FetchPath fetchPath);
 
   /**
+   * Apply changes to the query conditional on the supplied predicate.
+   * <p>
+   * Typically, the changes are extra predicates etc.
+   *
+   * @param predicate The predicate which when true the changes are applied
+   * @param apply The changes to apply to the query
+   */
+  Query<T> alsoIf(BooleanSupplier predicate, Consumer<Query<T>> apply);
+
+  /**
    * Execute the query using the given transaction.
    */
   Query<T> usingTransaction(Transaction transaction);
@@ -684,6 +696,18 @@ public interface Query<T> extends CancelableQuery {
    * Execute the query using the given database.
    */
   Query<T> usingDatabase(Database database);
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  Query<T> usingMaster();
 
   /**
    * Execute the query returning the list of Id's.
@@ -1372,13 +1396,9 @@ public interface Query<T> extends CancelableQuery {
   Query<T> orderBy(String orderByClause);
 
   /**
-   * Set the order by clause replacing the existing order by clause if there is
-   * one.
-   * <p>
-   * This follows SQL syntax using commas between each property with the
-   * optional asc and desc keywords representing ascending and descending order
-   * respectively.
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19", forRemoval = true)
   default Query<T> order(String orderByClause) {
     return orderBy(orderByClause);
   }
@@ -1395,14 +1415,9 @@ public interface Query<T> extends CancelableQuery {
   OrderBy<T> orderBy();
 
   /**
-   * Return the OrderBy so that you can append an ascending or descending
-   * property to the order by clause.
-   * <p>
-   * This will never return a null. If no order by clause exists then an 'empty'
-   * OrderBy object is returned.
-   * <p>
-   * This is the same as <code>orderBy()</code>
+   * Deprecated migrate to orderBy().
    */
+  @Deprecated(since = "13.19", forRemoval = true)
   default OrderBy<T> order() {
     return orderBy();
   }
@@ -1413,8 +1428,9 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setOrderBy(OrderBy<T> orderBy);
 
   /**
-   * Set an OrderBy object to replace any existing OrderBy clause.
+   * Deprecated migrate to setOrderBy().
    */
+  @Deprecated(since = "13.19", forRemoval = true)
   default Query<T> setOrder(OrderBy<T> orderBy) {
     return setOrderBy(orderBy);
   }
@@ -1578,14 +1594,6 @@ public interface Query<T> extends CancelableQuery {
    * When set to true when you want the returned beans to be read only.
    */
   Query<T> setReadOnly(boolean readOnly);
-
-  /**
-   * Deprecated - migrate to use setBeanCacheMode(CacheMode.PUT) or other CacheMode.
-   * <p>
-   * When set to true all the beans from this query are loaded into the bean cache.
-   */
-  @Deprecated
-  Query<T> setLoadBeanCache(boolean loadBeanCache);
 
   /**
    * Set a timeout on this query.

@@ -1,5 +1,6 @@
 package org.tests.basic;
 
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -7,18 +8,31 @@ import org.tests.model.basic.Article;
 import org.tests.model.basic.Section;
 import org.tests.model.basic.SubSection;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestDeleteCascadingOneToMany extends BaseTestCase {
+class TestDeleteCascadingOneToMany extends BaseTestCase {
 
   @Test
-  public void testDeleteCascadingOneToMany() {
+  void testDeleteCascadingOneToMany() {
     Section s0 = new Section("some content");
     Article a0 = new Article("art1", "auth1");
     a0.addSection(s0);
 
     DB.save(a0);
+
+    LoggedSql.start();
+
     DB.delete(a0);
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(5);
+    assertThat(sql.get(0)).contains("select t0.id from section t0 where article_id=?");
+    assertThat(sql.get(1)).contains("select t0.id from sub_section t0 where (section_id)"); // in | any
+    assertThat(sql.get(2)).contains("delete from section where id"); // in | any
+    assertThat(sql.get(3)).contains(" -- bind");
+    assertThat(sql.get(4)).contains("delete from article where id=? and version=?");
   }
 
   @Test

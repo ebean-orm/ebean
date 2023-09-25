@@ -80,7 +80,7 @@ final class JsonPathExpression extends AbstractExpression {
     if (upperValue != null) {
       builder.append(" ?2");
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

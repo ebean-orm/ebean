@@ -50,6 +50,12 @@ public class TDSpiExpressionRequest implements SpiExpressionRequest {
   }
 
   @Override
+  public SpiExpressionRequest append(char c) {
+    sql.append(c);
+    return this;
+  }
+
+  @Override
   public SpiExpressionRequest property(String expression) {
     sql.append(expression);
     return this;

@@ -44,13 +44,21 @@ public final class DefaultPersister implements Persister {
   private final PersistExecute persistExecute;
   private final SpiEbeanServer server;
   private final BeanDescriptorManager beanDescriptorManager;
-  private final int maxInBinding;
+  private final int maxDeleteBatch;
 
   public DefaultPersister(SpiEbeanServer server, Binder binder, BeanDescriptorManager descMgr) {
     this.server = server;
     this.beanDescriptorManager = descMgr;
     this.persistExecute = new DefaultPersistExecute(binder, server.config().getPersistBatchSize());
-    this.maxInBinding = server.databasePlatform().maxInBinding();
+    this.maxDeleteBatch = initMaxDeleteBatch(server.databasePlatform().maxInBinding());
+  }
+
+  /**
+   * When delete batching is required limit the size.
+   * e.g. SqlServer has a 2100 parameter limit, so delete max 2000 for it.
+   */
+  private int initMaxDeleteBatch(int maxInBinding) {
+    return maxInBinding == 0 ? 1000 : Math.min(1000, maxInBinding);
   }
 
   @Override
@@ -72,7 +80,7 @@ public final class DefaultPersister implements Persister {
   @Override
   public int executeOrmUpdate(Update<?> update, Transaction t) {
     SpiUpdate<?> ormUpdate = (SpiUpdate<?>) update;
-    BeanManager<?> mgr = beanManager(ormUpdate.getBeanType());
+    BeanManager<?> mgr = beanManager(ormUpdate.beanType());
     return executeOrQueue(new PersistRequestOrmUpdate(server, mgr, ormUpdate, (SpiTransaction) t, persistExecute));
   }
 
@@ -97,7 +105,7 @@ public final class DefaultPersister implements Persister {
 
   @Override
   public int[] executeBatch(SpiSqlUpdate sqlUpdate, SpiTransaction transaction) {
-    BatchControl batchControl = transaction.getBatchControl();
+    BatchControl batchControl = transaction.batchControl();
     try {
       return batchControl.execute(sqlUpdate.getGeneratedSql(), sqlUpdate.isGetGeneratedKeys());
     } catch (SQLException e) {
@@ -106,9 +114,9 @@ public final class DefaultPersister implements Persister {
   }
 
   @Override
-  public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue) {
+  public void executeOrQueue(SpiSqlUpdate update, SpiTransaction t, boolean queue, int queuePosition) {
     if (queue) {
-      addToFlushQueue(update, t, 2);
+      addToFlushQueue(update, t, queuePosition);
     } else {
       executeSqlUpdate(update, t);
     }
@@ -144,7 +152,8 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<T> desc = server.descriptor(beanType);
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
-    List<T> liveBeans = draftHandler.fetchSourceBeans(query, false);
+    query.usingTransaction(transaction);
+    List<T> liveBeans = draftHandler.fetchSourceBeans((SpiQuery<T>) query, false);
     PUB.log(DEBUG, "draftRestore [{0}] count[{1}]", desc.name(), liveBeans.size());
     if (liveBeans.isEmpty()) {
       return Collections.emptyList();
@@ -186,7 +195,8 @@ public final class DefaultPersister implements Persister {
     BeanDescriptor<T> desc = server.descriptor(beanType);
     DraftHandler<T> draftHandler = new DraftHandler<>(desc, transaction);
 
-    List<T> draftBeans = draftHandler.fetchSourceBeans(query, true);
+    query.usingTransaction(transaction);
+    List<T> draftBeans = draftHandler.fetchSourceBeans((SpiQuery<T>) query, true);
     PUB.log(DEBUG, "publish [{0}] count[{1}]", desc.name(), draftBeans.size());
     if (draftBeans.isEmpty()) {
       return Collections.emptyList();
@@ -282,12 +292,12 @@ public final class DefaultPersister implements Persister {
     /**
      * Fetch the source beans based on the query.
      */
-    List<T> fetchSourceBeans(Query<T> query, boolean asDraft) {
+    List<T> fetchSourceBeans(SpiQuery<T> query, boolean asDraft) {
       desc.draftQueryOptimise(query);
       if (asDraft) {
         query.asDraft();
       }
-      return server.findList(query, transaction);
+      return server.findList(query);
     }
 
     /**
@@ -295,12 +305,14 @@ public final class DefaultPersister implements Persister {
      */
     void fetchDestinationBeans(List<T> sourceBeans, boolean asDraft) {
       List<Object> ids = getBeanIds(desc, sourceBeans);
-      Query<T> destQuery = server.find(desc.type()).where().idIn(ids).query();
+      SpiQuery<T> destQuery = server.createQuery(desc.type());
+      destQuery.usingTransaction(transaction);
+      destQuery.where().idIn(ids);
       if (asDraft) {
         destQuery.asDraft();
       }
       desc.draftQueryOptimise(destQuery);
-      this.destBeans = server.findMap(destQuery, transaction);
+      this.destBeans = server.findMap(destQuery);
     }
 
     /**
@@ -597,7 +609,7 @@ public final class DefaultPersister implements Persister {
       // convert to appropriate type if required
       idList.add(descriptor.convertId(id));
     }
-    return delete(descriptor, null, idList, transaction, deleteMode);
+    return delete(descriptor, idList, transaction, deleteMode);
   }
 
   /**
@@ -634,149 +646,221 @@ public final class DefaultPersister implements Persister {
 
     id = descriptor.convertId(id);
     DeleteMode deleteMode = (permanent || !descriptor.isSoftDelete()) ? DeleteMode.HARD : DeleteMode.SOFT;
-    return delete(descriptor, id, null, transaction, deleteMode);
+    return delete(descriptor, id, transaction, deleteMode);
   }
 
   @Override
   public int deleteByIds(BeanDescriptor<?> descriptor, List<Object> idList, Transaction transaction, boolean permanent) {
     DeleteMode deleteMode = (permanent || !descriptor.isSoftDelete()) ? DeleteMode.HARD : DeleteMode.SOFT;
-    return delete(descriptor, null, idList, transaction, deleteMode);
+    return delete(descriptor, idList, transaction, deleteMode);
+  }
+
+  private int delete(BeanDescriptor<?> descriptor, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
+    final int batch = maxDeleteBatch / descriptor.idBinder().size();
+    int rows = 0;
+    for (List<Object> batchOfIds : Lists.partition(idList, batch)) {
+      rows += new DeleteBatchHelpMultiple(descriptor, batchOfIds, transaction, deleteMode).deleteBatch();
+    }
+    return rows;
   }
 
   /**
    * Delete by Id or a List of Id's.
    */
-  private int delete(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
-    int rows = 0;
-    if (maxInBinding > 0) {
-      // SqlServer has a 2100 parameter limit, so delete max 2000 ids at once
-      // this gives space up to 100 more query parameters.
-      while (idList != null && idList.size() > maxInBinding) {
-        rows += deleteBatch(descriptor, id, idList.subList(0, maxInBinding), transaction, deleteMode);
-        idList = idList.subList(maxInBinding, idList.size());
-      }
-    }
-    rows += deleteBatch(descriptor, id, idList, transaction, deleteMode);
-    return rows;
+  private int delete(BeanDescriptor<?> descriptor, Object id, Transaction transaction, DeleteMode deleteMode) {
+    return new DeleteBatchHelpSingle(descriptor, id, transaction, deleteMode).deleteBatch();
   }
 
-  private int deleteBatch(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
-    SpiTransaction t = (SpiTransaction) transaction;
-    if (t.isPersistCascade()) {
-      BeanPropertyAssocOne<?>[] propImportDelete = descriptor.propertiesOneImportedDelete();
-      if (propImportDelete.length > 0) {
-        // We actually need to execute a query to get the foreign key values
-        // as they are required for the delete cascade. Query back just the
-        // Id and the appropriate foreign key values
-        Query<?> q = deleteRequiresQuery(descriptor, propImportDelete, deleteMode);
-        if (idList != null) {
-          q.where().idIn(idList);
-          if (t.isLogSummary()) {
-            t.logSummary("-- DeleteById of {0} ids[{1}] requires fetch of foreign key values", descriptor.name(), idList);
-          }
-          List<?> beanList = server.findList(q, t);
-          deleteCascade(beanList, t, deleteMode, false);
-          return beanList.size();
+  private abstract class DeleteBatchHelp {
+    final BeanDescriptor<?> descriptor;
+    final SpiTransaction transaction;
+    final DeleteMode deleteMode;
 
-        } else {
-          q.where().idEq(id);
-          if (t.isLogSummary()) {
-            t.logSummary("-- DeleteById of {0} id[{1}] requires fetch of foreign key values", descriptor.name(), id);
-          }
-          EntityBean bean = (EntityBean) server.findOne(q, t);
-          if (bean == null) {
-            return 0;
-          } else {
-            return deleteRecurse(bean, t, deleteMode);
-          }
-        }
-      }
+    public DeleteBatchHelp(BeanDescriptor<?> descriptor, Transaction transaction, DeleteMode deleteMode) {
+      this.descriptor = descriptor;
+      this.transaction = (SpiTransaction) transaction;
+      this.deleteMode = deleteMode;
     }
 
-    if (t.isPersistCascade()) {
-      // OneToOne exported side with delete cascade
-      BeanPropertyAssocOne<?>[] expOnes = descriptor.propertiesOneExportedDelete();
-      for (BeanPropertyAssocOne<?> expOne : expOnes) {
-        BeanDescriptor<?> targetDesc = expOne.targetDescriptor();
-        // only cascade soft deletes when supported by target
-        if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
-          if (deleteMode.isHard() && targetDesc.isDeleteByStatement()) {
-            SqlUpdate sqlDelete = expOne.deleteByParentId(id, idList);
-            executeSqlUpdate(sqlDelete, t);
-          } else {
-            List<Object> childIds = expOne.findIdsByParentId(id, idList, t);
-            if (childIds != null && !childIds.isEmpty()) {
-              deleteChildrenById(t, targetDesc, childIds, deleteMode);
-            }
-          }
-        }
-      }
+    int deleteBatch() {
 
-      // OneToMany's with delete cascade
-      BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyDelete();
-      for (BeanPropertyAssocMany<?> many : manys) {
-        if (!many.isManyToMany()) {
-          BeanDescriptor<?> targetDesc = many.targetDescriptor();
+      if (transaction.isPersistCascade()) {
+        BeanPropertyAssocOne<?>[] propImportDelete = descriptor.propertiesOneImportedDelete();
+        if (propImportDelete.length > 0) {
+          return deleteImported(propImportDelete);
+        }
+
+        // OneToOne exported side with delete cascade
+        BeanPropertyAssocOne<?>[] expOnes = descriptor.propertiesOneExportedDelete();
+        for (BeanPropertyAssocOne<?> expOne : expOnes) {
+          BeanDescriptor<?> targetDesc = expOne.targetDescriptor();
           // only cascade soft deletes when supported by target
           if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
             if (deleteMode.isHard() && targetDesc.isDeleteByStatement()) {
-              // we can just delete children with a single statement
-              SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
-              executeSqlUpdate(sqlDelete, t);
+              executeSqlUpdate(sqlDeleteChildren(expOne), transaction);
             } else {
-              // we need to fetch the Id's to delete (recurse or notify L2 cache)
-              List<Object> childIds = many.findIdsByParentId(id, idList, t, null, deleteMode.isHard());
-              if (!childIds.isEmpty()) {
-                delete(targetDesc, null, childIds, t, deleteMode);
+              List<Object> childIds = findChildIds(expOne, deleteMode.isHard());
+              if (childIds != null && !childIds.isEmpty()) {
+                deleteChildrenById(transaction, targetDesc, childIds, deleteMode);
+              }
+            }
+          }
+        }
+
+        // OneToMany's with delete cascade
+        BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyDelete();
+        for (BeanPropertyAssocMany<?> many : manys) {
+          if (!many.isManyToMany()) {
+            BeanDescriptor<?> targetDesc = many.targetDescriptor();
+            // only cascade soft deletes when supported by target
+            if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
+              if (deleteMode.isHard() && targetDesc.isDeleteByStatement()) {
+                // we can just delete children with a single statement
+                executeSqlUpdate(sqlDeleteChildren(many), transaction);
+              } else {
+                // we need to fetch the Id's to delete (recurse or notify L2 cache)
+                List<Object> childIds = findChildIds(many, deleteMode.isHard());
+                if (!childIds.isEmpty()) {
+                  delete(targetDesc, childIds, transaction, deleteMode);
+                }
               }
             }
           }
         }
       }
-    }
 
-    if (deleteMode.isHard()) {
-      // ManyToMany's ... delete from intersection table
-      BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyToMany();
-      for (BeanPropertyAssocMany<?> many : manys) {
-        SqlUpdate sqlDelete = many.deleteByParentId(id, idList);
-        if (t.isLogSummary()) {
-          t.logSummary("-- Deleting intersection table entries: {0}", many.fullName());
+      if (deleteMode.isHard()) {
+        // ManyToMany's ... delete from intersection table
+        BeanPropertyAssocMany<?>[] manys = descriptor.propertiesManyToMany();
+        for (BeanPropertyAssocMany<?> many : manys) {
+          if (transaction.isLogSummary()) {
+            transaction.logSummary("-- Deleting intersection table entries: {0}", many.fullName());
+          }
+          executeSqlUpdate(sqlDeleteChildren(many), transaction);
         }
-        executeSqlUpdate(sqlDelete, t);
       }
+
+      // delete the bean(s)
+      return deleteBeans();
     }
 
-    // delete the bean(s)
-    SqlUpdate deleteById = descriptor.deleteById(id, idList, deleteMode);
-    if (t.isLogSummary()) {
-      if (idList != null) {
-        t.logSummary("-- Deleting {0} Ids: {1}", descriptor.name(), idList);
+    abstract int deleteImported(BeanPropertyAssocOne<?>[] propImportDelete);
+
+    abstract SqlUpdate sqlDeleteChildren(BeanPropertyAssoc<?> prop);
+
+    abstract List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean includeSoftDeletes);
+
+    abstract int deleteBeans();
+  }
+
+  private class DeleteBatchHelpSingle extends DeleteBatchHelp {
+    private final Object id;
+
+    public DeleteBatchHelpSingle(BeanDescriptor<?> descriptor, Object id, Transaction transaction, DeleteMode deleteMode) {
+      super(descriptor, transaction, deleteMode);
+      this.id = id;
+    }
+
+    int deleteImported(BeanPropertyAssocOne<?>[] propImportDelete) {
+      // We actually need to execute a query to get the foreign key values
+      // as they are required for the delete cascade. Query back just the
+      // Id and the appropriate foreign key values
+      SpiQuery<?> q = deleteRequiresQuery(descriptor, propImportDelete, deleteMode);
+      q.usingTransaction(transaction);
+      q.where().idEq(id);
+      if (transaction.isLogSummary()) {
+        transaction.logSummary("-- DeleteById of {0} id[{1}] requires fetch of foreign key values", descriptor.name(), id);
+      }
+      EntityBean bean = (EntityBean) server.findOne(q);
+      if (bean == null) {
+        return 0;
       } else {
-        t.logSummary("-- Deleting {0} Id: {1}", descriptor.name(), id);
+        return deleteRecurse(bean, transaction, deleteMode);
       }
     }
 
-    // use Id's to update L2 cache rather than Bulk table event
-    notifyDeleteById(descriptor, id, idList, transaction);
-    deleteById.setAutoTableMod(false);
-    if (idList != null) {
-      t.getEvent().addDeleteByIdList(descriptor, idList);
-    } else {
-      t.getEvent().addDeleteById(descriptor, id);
+    @Override
+    SqlUpdate sqlDeleteChildren(BeanPropertyAssoc<?> prop) {
+      return prop.deleteByParentId(id);
     }
-    int rows = executeSqlUpdate(deleteById, t);
 
-    // Delete from the persistence context so that it can't be fetched again later
-    PersistenceContext persistenceContext = t.getPersistenceContext();
-    if (idList != null) {
+    @Override
+    List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean includeSoftDeletes) {
+      return prop.findIdsByParentId(id, transaction, includeSoftDeletes);
+    }
+
+    int deleteBeans() {
+      SqlUpdate deleteById = descriptor.deleteById(id, null, deleteMode);
+      if (transaction.isLogSummary()) {
+        transaction.logSummary("-- Deleting {0} Id: {1}", descriptor.name(), id);
+      }
+
+      // use Id's to update L2 cache rather than Bulk table event
+      notifyDeleteById(descriptor, id, null, transaction);
+      deleteById.setAutoTableMod(false);
+      transaction.event().addDeleteById(descriptor, id);
+
+      int rows = executeSqlUpdate(deleteById, transaction);
+
+      // Delete from the persistence context so that it can't be fetched again later
+      PersistenceContext persistenceContext = transaction.persistenceContext();
+      descriptor.contextDeleted(persistenceContext, id);
+      return rows;
+    }
+  }
+
+  private class DeleteBatchHelpMultiple extends DeleteBatchHelp {
+    private final List<Object> idList;
+
+    public DeleteBatchHelpMultiple(BeanDescriptor<?> descriptor, List<Object> idList, Transaction transaction, DeleteMode deleteMode) {
+      super(descriptor, transaction, deleteMode);
+      this.idList = idList;
+    }
+
+    int deleteImported(BeanPropertyAssocOne<?>[] propImportDelete) {
+      // We actually need to execute a query to get the foreign key values
+      // as they are required for the delete cascade. Query back just the
+      // Id and the appropriate foreign key values
+      SpiQuery<?> q = deleteRequiresQuery(descriptor, propImportDelete, deleteMode);
+      q.usingTransaction(transaction);
+      q.where().idIn(idList);
+      if (transaction.isLogSummary()) {
+        transaction.logSummary("-- DeleteById of {0} ids[{1}] requires fetch of foreign key values", descriptor.name(), idList);
+      }
+      List<?> beanList = server.findList(q);
+      deleteCascade(beanList, transaction, deleteMode, false);
+      return beanList.size();
+    }
+
+    SqlUpdate sqlDeleteChildren(BeanPropertyAssoc<?> prop) {
+      return prop.deleteByParentIdList(idList);
+    }
+
+    @Override
+    List<Object> findChildIds(BeanPropertyAssoc<?> prop, boolean includeSoftDeletes) {
+      return prop.findIdsByParentIdList(idList, transaction, includeSoftDeletes);
+    }
+
+    int deleteBeans() {
+      SqlUpdate deleteById = descriptor.deleteById(null, idList, deleteMode);
+      if (transaction.isLogSummary()) {
+        transaction.logSummary("-- Deleting {0} Ids: {1}", descriptor.name(), idList);
+      }
+
+      // use Id's to update L2 cache rather than Bulk table event
+      notifyDeleteById(descriptor, null, idList, transaction);
+      deleteById.setAutoTableMod(false);
+      transaction.event().addDeleteByIdList(descriptor, idList);
+
+      int rows = executeSqlUpdate(deleteById, transaction);
+
+      // Delete from the persistence context so that it can't be fetched again later
+      PersistenceContext persistenceContext = transaction.persistenceContext();
       for (Object idValue : idList) {
         descriptor.contextDeleted(persistenceContext, idValue);
       }
-    } else {
-      descriptor.contextDeleted(persistenceContext, id);
+      return rows;
     }
-    return rows;
   }
 
   private void notifyDeleteById(BeanDescriptor<?> descriptor, Object id, List<Object> idList, Transaction transaction) {
@@ -798,11 +882,11 @@ public final class DefaultPersister implements Persister {
    * We need to create and execute a query to get the foreign key values as
    * the delete cascades to them (foreign keys).
    */
-  private Query<?> deleteRequiresQuery(BeanDescriptor<?> desc, BeanPropertyAssocOne<?>[] propImportDelete, DeleteMode deleteMode) {
-    Query<?> q = server.createQuery(desc.type());
+  private SpiQuery<?> deleteRequiresQuery(BeanDescriptor<?> desc, BeanPropertyAssocOne<?>[] propImportDelete, DeleteMode deleteMode) {
+    SpiQuery<?> q = server.createQuery(desc.type());
     StringBuilder sb = new StringBuilder(30);
     for (BeanPropertyAssocOne<?> aPropImportDelete : propImportDelete) {
-      sb.append(aPropImportDelete.name()).append(",");
+      sb.append(aPropImportDelete.name()).append(',');
     }
     q.setAutoTune(false);
     q.select(sb.toString());
@@ -907,7 +991,7 @@ public final class DefaultPersister implements Persister {
   void deleteManyIntersection(EntityBean bean, BeanPropertyAssocMany<?> many, SpiTransaction t, boolean publish, boolean queue) {
     SpiSqlUpdate sqlDelete = deleteAllIntersection(bean, many, publish);
     if (queue) {
-      addToFlushQueue(sqlDelete, t, 1);
+      addToFlushQueue(sqlDelete, t, BatchControl.DELETE_QUEUE);
     } else {
       executeSqlUpdate(sqlDelete, t);
     }
@@ -998,26 +1082,33 @@ public final class DefaultPersister implements Persister {
    * For stateless updates this deletes details beans that are no longer in
    * the many - the excludeDetailIds holds the detail beans that are in the
    * collection (and should not be deleted).
-   * </p>
    */
   void deleteManyDetails(SpiTransaction t, BeanDescriptor<?> desc, EntityBean parentBean,
-                         BeanPropertyAssocMany<?> many, List<Object> excludeDetailIds, DeleteMode deleteMode) {
+                         BeanPropertyAssocMany<?> many, Set<Object> excludeDetailIds, DeleteMode deleteMode) {
     if (many.cascadeInfo().isDelete()) {
       // cascade delete the beans in the collection
-      BeanDescriptor<?> targetDesc = many.targetDescriptor();
+      final BeanDescriptor<?> targetDesc = many.targetDescriptor();
+      final int batch = maxDeleteBatch / targetDesc.idBinder().size();
       if (deleteMode.isHard() || targetDesc.isSoftDelete()) {
-        if (targetDesc.isDeleteByStatement()) {
+        if (targetDesc.isDeleteByStatement()
+          && (excludeDetailIds == null || excludeDetailIds.size() <= batch)) {
           // Just delete all the children with one statement
           IntersectionRow intRow = many.buildManyDeleteChildren(parentBean, excludeDetailIds);
           SqlUpdate sqlDelete = intRow.createDelete(server, deleteMode);
           executeSqlUpdate(sqlDelete, t);
 
         } else {
-          // TODO: Review first checking if many property is loaded and using the loaded beans
-          // ... and only using findIdsByParentId() when the many property isn't loaded
           // Delete recurse using the Id values of the children
           Object parentId = desc.getId(parentBean);
-          List<Object> idsByParentId = many.findIdsByParentId(parentId, null, t, excludeDetailIds, deleteMode.isHard());
+          List<Object> idsByParentId;
+          if (excludeDetailIds == null || excludeDetailIds.size() <= batch) {
+            idsByParentId = many.findIdsByParentId(parentId, t, deleteMode.isHard(), excludeDetailIds);
+          } else {
+            // if we hit the parameter limit, we must filter that on the java side
+            // as there is no easy way to batch "not in" queries.
+            idsByParentId = many.findIdsByParentId(parentId, t, deleteMode.isHard(), null);
+            idsByParentId.removeIf(excludeDetailIds::contains);
+          }
           if (!idsByParentId.isEmpty()) {
             deleteChildrenById(t, targetDesc, idsByParentId, deleteMode);
           }
@@ -1041,7 +1132,7 @@ public final class DefaultPersister implements Persister {
       deleteCascade(refList, t, deleteMode, true);
     } else {
       // perform delete by statement if possible
-      delete(targetDesc, null, childIds, t, deleteMode);
+      delete(targetDesc, childIds, t, deleteMode);
     }
   }
 
@@ -1077,7 +1168,7 @@ public final class DefaultPersister implements Persister {
   }
 
   private void deleteOrphan(PersistRequestBean<?> request, BeanPropertyAssocOne<?> prop) {
-    Object origValue = request.getOrigValue(prop);
+    Object origValue = request.origValue(prop);
     if (origValue instanceof EntityBean) {
       delete((EntityBean) origValue, request.transaction(), false);
     }

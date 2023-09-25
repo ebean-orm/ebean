@@ -83,6 +83,23 @@ create or replace trigger table_history_del for "table" before delete for each r
 end_trigger;
 $$
 
+drop table if exists drop_main;
+drop sequence if exists drop_main_seq;
+drop table if exists drop_main_drop_ref_many;
+drop table if exists drop_ref_many;
+drop sequence if exists drop_ref_many_seq;
+drop table if exists drop_ref_one;
+drop sequence if exists drop_ref_one_seq;
+drop table if exists drop_ref_one_to_one;
+drop sequence if exists drop_ref_one_to_one_seq;
+drop table if exists migtest_e_test_binary;
+drop sequence if exists migtest_e_test_binary_seq;
+drop table if exists migtest_e_test_json;
+drop sequence if exists migtest_e_test_json_seq;
+drop table if exists migtest_e_test_lob;
+drop sequence if exists migtest_e_test_lob_seq;
+drop table if exists migtest_e_test_varchar;
+drop sequence if exists migtest_e_test_varchar_seq;
 drop table if exists migtest_e_user;
 drop sequence if exists migtest_e_user_seq;
 drop table if exists migtest_mtm_c_migtest_mtm_m;

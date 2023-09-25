@@ -14,7 +14,7 @@ import org.tests.model.basic.EBasicWithUniqueCon;
 import org.tests.model.basic.EOptOneB;
 import org.tests.model.basic.EOptOneC;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.sql.Savepoint;
 
@@ -96,7 +96,7 @@ public class TestBatchOnCascadeExceptionHandling extends BaseTestCase {
       Assertions.fail("PersistenceException expected");
     } catch (PersistenceException e) {
       assertThat(txn.isBatchMode()).as("batch mode").isFalse(); // should not have changed
-      BatchControl bc = ((SpiTransaction) txn).getBatchControl();
+      BatchControl bc = ((SpiTransaction) txn).batchControl();
       assertThat(bc == null || bc.isEmpty()).as("batch emtpy").isTrue();
     } finally {
       txn.end();

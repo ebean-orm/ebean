@@ -51,7 +51,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
   }
 
   @Override
-  public Class<?> getBeanType() {
+  public Class<?> beanType() {
     return beanType;
   }
 
@@ -59,7 +59,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
    * Return the timeout in seconds.
    */
   @Override
-  public int getTimeout() {
+  public int timeout() {
     return timeout;
   }
 
@@ -127,12 +127,12 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
   }
 
   @Override
-  public String getLabel() {
+  public String label() {
     return label;
   }
 
   @Override
-  public String getUpdateStatement() {
+  public String updateStatement() {
     return updateStatement;
   }
 
@@ -188,7 +188,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
    * Return the bind parameters.
    */
   @Override
-  public BindParams getBindParams() {
+  public BindParams bindParams() {
     return bindParams;
   }
 
@@ -203,12 +203,12 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
   }
 
   @Override
-  public String getBaseTable() {
+  public String baseTable() {
     return baseTable;
   }
 
   @Override
-  public OrmUpdateType getOrmUpdateType() {
+  public OrmUpdateType ormUpdateType() {
     return type;
   }
 

@@ -2,13 +2,16 @@ package org.tests.model.basic;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 
 @Cache(readOnly = true)
 @Entity
-@Table(name = "feature_desc")
+@Table(name = "feature_desc", indexes = {
+  @Index(columnList = "name, description desc"),
+  @Index(columnList = "name desc")})
 public class FeatureDescription {
 
   @Id

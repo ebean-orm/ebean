@@ -75,7 +75,7 @@ public final class DefaultProfileStream implements ProfileStream {
     buffer.append(micros).append(',');
     buffer.append(beanName).append(',');
     buffer.append(beanCount).append(',');
-    buffer.append(queryId).append(";");
+    buffer.append(queryId).append(';');
   }
 
   /**

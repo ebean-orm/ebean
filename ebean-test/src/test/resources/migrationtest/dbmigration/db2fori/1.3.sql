@@ -135,6 +135,34 @@ end if;
 end$$;
 delimiter $$
 begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_MAIN_DROP_REF_MANY_DROP_MAIN' and ucase(tabname) = 'DROP_MAIN_DROP_REF_MANY') then
+  prepare stmt from 'alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_main';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_MAIN_DROP_REF_MANY_DROP_REF_MANY' and ucase(tabname) = 'DROP_MAIN_DROP_REF_MANY') then
+  prepare stmt from 'alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_ref_many';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_REF_ONE_PARENT_ID' and ucase(tabname) = 'DROP_REF_ONE') then
+  prepare stmt from 'alter table drop_ref_one drop constraint fk_drop_ref_one_parent_id';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_REF_ONE_TO_ONE_PARENT_ID' and ucase(tabname) = 'DROP_REF_ONE_TO_ONE') then
+  prepare stmt from 'alter table drop_ref_one_to_one drop constraint fk_drop_ref_one_to_one_parent_id';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
 if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_MTM_C_MIGTEST_MTM_M_MIGTEST_MTM_C' and ucase(tabname) = 'MIGTEST_MTM_C_MIGTEST_MTM_M') then
   prepare stmt from 'alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c';
   execute stmt;
@@ -211,6 +239,7 @@ update migtest_e_basic set status2 = 'N' where status2 is null;
 update migtest_e_basic set a_lob = 'X' where a_lob is null;
 
 update migtest_e_basic set user_id = 23 where user_id is null;
+CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_E_BASIC','TSTABLES','INDEXTS','TSTABLES','','','','','','MOVE');
 alter table migtest_e_history2 drop versioning;
 alter table migtest_e_history3 drop versioning;
 alter table migtest_e_history4 drop versioning;

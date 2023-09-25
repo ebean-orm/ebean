@@ -1,6 +1,6 @@
 package org.tests.model.zero;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

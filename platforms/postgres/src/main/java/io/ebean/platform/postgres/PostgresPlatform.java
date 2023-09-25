@@ -2,22 +2,11 @@ package io.ebean.platform.postgres;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.Query;
-import io.ebean.annotation.PartitionMode;
 import io.ebean.annotation.Platform;
 import io.ebean.config.PlatformConfig;
-import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.config.dbplatform.DbType;
-import io.ebean.config.dbplatform.IdType;
-import io.ebean.config.dbplatform.PlatformIdGenerator;
-import io.ebean.config.dbplatform.SqlErrorCodes;
-import io.ebean.util.SplitName;
+import io.ebean.config.dbplatform.*;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Types;
 
 /**
@@ -39,6 +28,7 @@ public class PostgresPlatform extends DatabasePlatform {
   public PostgresPlatform() {
     super();
     this.platform = Platform.POSTGRES;
+    this.maxInBinding = 32_000; // technically 32_767
     this.supportsNativeIlike = true;
     this.supportsDeleteTableAlias = true;
     this.selectCountWithAlias = true;
@@ -70,6 +60,7 @@ public class PostgresPlatform extends DatabasePlatform {
 
     DbPlatformType dbTypeText = new DbPlatformType("text", false);
     DbPlatformType dbBytea = new DbPlatformType("bytea", false);
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255, 10_485_760, dbTypeText));
     dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
     dbTypeMap.put(DbType.INET, new DbPlatformType("inet", false));
     dbTypeMap.put(DbType.CIDR, new DbPlatformType("cidr", false));
@@ -139,11 +130,16 @@ public class PostgresPlatform extends DatabasePlatform {
 
   private String lock(Query.LockType lockType) {
     switch (lockType) {
-      case UPDATE: return FOR_UPDATE;
-      case NO_KEY_UPDATE: return FOR_NO_KEY_UPDATE;
-      case SHARE: return FOR_SHARE;
-      case KEY_SHARE: return FOR_KEY_SHARE;
-      case DEFAULT: return forUpdateNoKey ? FOR_NO_KEY_UPDATE : FOR_UPDATE;
+      case UPDATE:
+        return FOR_UPDATE;
+      case NO_KEY_UPDATE:
+        return FOR_NO_KEY_UPDATE;
+      case SHARE:
+        return FOR_SHARE;
+      case KEY_SHARE:
+        return FOR_KEY_SHARE;
+      case DEFAULT:
+        return forUpdateNoKey ? FOR_NO_KEY_UPDATE : FOR_UPDATE;
     }
     return FOR_UPDATE;
   }
