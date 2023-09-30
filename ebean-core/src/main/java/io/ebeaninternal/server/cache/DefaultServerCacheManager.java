@@ -154,4 +154,8 @@ public final class DefaultServerCacheManager implements SpiCacheManager {
     return cacheHolder.getCache(beanType, ServerCacheType.BEAN);
   }
 
+  @Override
+  public boolean isTenantPartitionedCache() {
+    return cacheHolder.isTenantPartitionedCache();
+  }
 }
