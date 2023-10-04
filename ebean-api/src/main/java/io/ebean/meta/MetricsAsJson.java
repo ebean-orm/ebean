@@ -187,9 +187,20 @@ final class MetricsAsJson implements ServerMetricsAsJson {
     }
     if (isIncludeDetail(metric)) {
       append("loc", metric.location());
-      append("sql", metric.sql());
+      append("sql", escape(metric.sql()));
     }
     metricEnd();
+  }
+
+  static String escape(String sql) {
+    return sql == null ? null : sql
+      .replace("\\", "\\\\")
+      .replace("\"", "\\\"")
+      .replace("\b", "\\b")
+      .replace("\f", "\\f")
+      .replace("\n", "\\n")
+      .replace("\r", "\\r")
+      .replace("\t", "\\t");
   }
 
   private boolean isIncludeDetail(MetaTimedMetric metric) {
