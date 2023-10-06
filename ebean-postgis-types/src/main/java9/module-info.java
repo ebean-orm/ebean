@@ -4,7 +4,7 @@ import io.ebeaninternal.api.GeoTypeProvider;
 /**
  * Provides GeoTypeProvider and ExtraTypeFactory.
  */
-module io.ebean.postgis {
+module io.ebean.postgis.types {
 
   provides ExtraTypeFactory with io.ebean.postgis.PostgisExtraTypeFactory;
   provides GeoTypeProvider with io.ebean.postgis.PostgisGeoTypeBindProvider;
