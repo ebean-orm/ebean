@@ -57,15 +57,22 @@
     </dependency>
 
     <dependency>
-      <groupId>net.postgis</groupId>
-      <artifactId>postgis-jdbc</artifactId>
-      <version>${postgis.jdbc.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>${postgres.jdbc.version}</version>
+      <exclusions>
+        <!-- exclude unnecessary checker framework -->
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>net.postgis</groupId>
+      <artifactId>postgis-jdbc</artifactId>
+      <version>${postgis.jdbc.version}</version>
     </dependency>
 
   </dependencies>
