@@ -181,12 +181,6 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
-        <artifactId>ebean-postgis</artifactId>
-        <version>13.22.0</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.ebean</groupId>
         <artifactId>ebean-redis</artifactId>
         <version>13.22.0</version>
       </dependency>
@@ -250,6 +244,18 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-postgres</artifactId>
+        <version>13.22.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-postgis</artifactId>
+        <version>13.22.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-postgis-types</artifactId>
         <version>13.22.0</version>
       </dependency>
 
