@@ -362,7 +362,8 @@ class ProcessingContext implements Constants {
   private PropertyType createPropertyTypeAssoc(String fullName) {
     String[] split = Split.split(fullName);
     String propertyName = "Q" + split[1] + ".Assoc";
-    return new PropertyTypeAssoc(propertyName);
+    String importName = split[0] + ".query.Q" + split[1];
+    return new PropertyTypeAssoc(propertyName, importName);
   }
 
   /**

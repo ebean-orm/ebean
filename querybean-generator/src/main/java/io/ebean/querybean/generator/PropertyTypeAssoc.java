@@ -7,13 +7,17 @@ import java.util.Set;
  */
 class PropertyTypeAssoc extends PropertyType {
 
+  private final String importName;
+
   /**
    * Construct given the associated bean type name and package.
    *
    * @param qAssocTypeName the associated bean type name.
+   * @param importName the import for the Assoc bean.
    */
-  PropertyTypeAssoc(String qAssocTypeName) {
+  PropertyTypeAssoc(String qAssocTypeName, String importName) {
     super(qAssocTypeName);
+    this.importName = importName;
   }
 
   /**
@@ -21,7 +25,7 @@ class PropertyTypeAssoc extends PropertyType {
    */
   @Override
   void addImports(Set<String> allImports) {
-    // do nothing
+    allImports.add(importName);
   }
 
 }
