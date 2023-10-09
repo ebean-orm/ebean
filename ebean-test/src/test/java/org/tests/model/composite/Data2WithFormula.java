@@ -1,40 +1,37 @@
 package org.tests.model.composite;
 
 
-import io.ebean.annotation.Formula;
 import io.ebean.annotation.Index;
-import jakarta.persistence.EmbeddedId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
+import java.util.UUID;
+
+@IdClass(DataWithFormulaKey.class)
 @Entity
-public class DataWithFormula {
+public class Data2WithFormula {
 
-  @EmbeddedId
-  private DataWithFormulaKey id;
+  @Id
+  private UUID mainId;
 
-  // @Column(insertable = false, updatable = false)
-  @Formula(select = "${ta}.meta_key")
+  @Id
   private String metaKey;
 
-  // @Column(insertable = false, updatable = false)
-  @Formula(select = "${ta}.value_index")
+  @Id
   private Integer valueIndex;
 
   @ManyToOne
   @JoinColumn(name = "main_id", insertable = false, nullable = false)
-  private DataWithFormulaMain main;
+  private Data2WithFormulaMain main;
 
   @Index
   private String stringValue;
 
-  public DataWithFormulaKey getId() {
-    return id;
+  public UUID mainId() {
+    return mainId;
   }
 
-  public void setId(DataWithFormulaKey id) {
-    this.id = id;
+  public void setMainId(UUID mainId) {
+    this.mainId = mainId;
   }
 
   public String getMetaKey() {

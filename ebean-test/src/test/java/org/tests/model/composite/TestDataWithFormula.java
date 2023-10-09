@@ -11,20 +11,16 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class TestDataWithFormula extends BaseTestCase {
+class TestDataWithFormula extends BaseTestCase {
 
   @Test
-  public void test1() {
-
+  void test1() {
 
     DataWithFormulaMain main = new DataWithFormulaMain();
     main.setId(UUID.randomUUID());
     main.setTitle("Main");
 
-    DataWithFormulaKey key = new DataWithFormulaKey();
-    key.setMainId(main.getId());
-    key.setMetaKey("meta");
-    key.setValueIndex(42);
+    DataWithFormulaKey key = new DataWithFormulaKey(main.getId(), "meta", 42);
     DataWithFormula data = new DataWithFormula();
     data.setId(key);
     data.setStringValue("SomeValue");
@@ -39,5 +35,13 @@ public class TestDataWithFormula extends BaseTestCase {
     assertThat(sqls.get(1)).contains("insert into data_with_formula (main_id, meta_key, value_index, string_value) values (?,?,?,?)"); // main
     assertThat(sqls.get(2)).contains("-- bind");
 
+
+    DataWithFormula found = DB.find(DataWithFormula.class)
+      .where().idEq(key)
+      .findOne();
+
+    assertThat(found.getStringValue()).isEqualTo("SomeValue");
+    assertThat(found.getId().getMainId()).isEqualTo(key.getMainId());
+    assertThat(found.getMetaKey()).isEqualTo(key.getMetaKey());
   }
 }

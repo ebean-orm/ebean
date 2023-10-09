@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class DataWithFormulaMain {
+public class Data2WithFormulaMain {
 
   @Id
   private UUID id;
@@ -17,7 +17,7 @@ public class DataWithFormulaMain {
   private String title;
 
   @OneToMany(cascade = CascadeType.ALL, mappedBy = "main")
-  private List<DataWithFormula> metaData;
+  private List<Data2WithFormula> metaData;
 
   public UUID getId() {
     return id;
@@ -35,11 +35,11 @@ public class DataWithFormulaMain {
     this.title = title;
   }
 
-  public List<DataWithFormula> getMetaData() {
+  public List<Data2WithFormula> getMetaData() {
     return metaData;
   }
 
-  public void setMetaData(List<DataWithFormula> metaData) {
+  public void setMetaData(List<Data2WithFormula> metaData) {
     this.metaData = metaData;
   }
 }
