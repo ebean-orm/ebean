@@ -68,11 +68,11 @@ class TestO2MMap {
     DB.save(dept);
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(7);
     assertThat(sql.get(0)).contains("delete from map_emp where id=?");
     assertThat(sql.get(1)).contains(" -- bind");
     assertThat(sql.get(2)).contains(" -- bind");
-    assertThat(sql.get(3)).contains("insert into map_emp (code, name, department_id) values (?,?,?)");
-    assertThat(sql.get(4)).contains(" -- bind");
+    assertThat(sql.get(4)).contains("insert into map_emp (code, name, department_id) values (?,?,?)");
+    assertThat(sql.get(5)).contains(" -- bind");
   }
 }

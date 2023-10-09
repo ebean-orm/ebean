@@ -30,16 +30,16 @@ public class TestPersistCascade extends BaseTestCase {
       assertSql(sql.get(0)).contains("insert into pcf_country");
       assertSql(sql.get(1)).contains("insert into pcf_person");
       assertSqlBind(sql, 2, 7);
-      assertThat(sql.get(8)).contains("insert into pcf_calendar");
-      assertSqlBind(sql, 9, 20);
-      assertThat(sql.get(21)).contains("insert into pcf_city");
-      assertSqlBind(sql, 22, 24);
-      assertThat(sql.get(25)).contains("insert into pcf_event");
-      assertSqlBind(sql, 26, 45);
-      assertThat(sql.get(46)).contains("insert into pcf_event");
-      assertSqlBind(sql, 47, 66);
-      assertThat(sql.get(67)).contains("insert into pcf_event");
-      assertSqlBind(sql, 68, 87);
+      assertThat(sql.get(9)).contains("insert into pcf_calendar");
+      assertSqlBind(sql, 10, 21);
+      assertThat(sql.get(23)).contains("insert into pcf_city");
+      assertSqlBind(sql, 24, 26);
+      assertThat(sql.get(28)).contains("insert into pcf_event");
+      assertSqlBind(sql, 29, 48);
+      assertThat(sql.get(50)).contains("insert into pcf_event");
+      assertSqlBind(sql, 51, 70);
+      assertThat(sql.get(72)).contains("insert into pcf_event");
+      assertSqlBind(sql, 73, 87);
     }
 
     country.deletePermanent();

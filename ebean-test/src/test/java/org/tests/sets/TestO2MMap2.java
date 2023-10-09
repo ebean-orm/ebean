@@ -67,7 +67,7 @@ class TestO2MMap2 {
     DB.save(dept);
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("insert into map_emp2 (code, name, department_id) values (?,?,?)");
     assertThat(sql.get(1)).contains(" -- bind");
   }
