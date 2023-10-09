@@ -41,8 +41,8 @@ public class TestElementCollectionCascadeMultiple extends BaseTestCase {
     assertThat(sql.get(8)).contains("-- bind");
     assertThat(sql.get(9)).contains("insert into ec_top_ecs_person");
     assertThat(sql.get(10)).contains("-- bind");
-    assertThat(sql.get(11)).contains("-- executeBatch() rows:2 sql:insert into ecs_person_phone");
-    assertThat(sql.get(12)).contains("-- executeBatch() rows:1 sql:insert into ec_top_ecs_person");
+    assertThat(sql.get(11)).contains("-- executeBatch() size:2 sql:insert into ecs_person_phone");
+    assertThat(sql.get(12)).contains("-- executeBatch() size:1 sql:insert into ec_top_ecs_person");
   }
 
   @Transactional(batchSize = 20)
