@@ -28,7 +28,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // assert
     List<String> loggedSql = LoggedSql.stop();
-    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql).hasSize(5);
     assertThat(loggedSql.get(0)).contains("insert into e_basicver (");
     assertThat(loggedSql.get(0)).contains("name, description, other, last_update) values (");
 
@@ -50,7 +50,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
     DB.deleteAll(someBeans);
 
     loggedSql = LoggedSql.stop();
-    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql).hasSize(5);
     assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=?");
   }
 
@@ -125,7 +125,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
 
     // assert
     List<String> loggedSql = LoggedSql.stop();
-    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql).hasSize(5);
     assertThat(loggedSql.get(0)).contains("insert into e_basicver (");
     assertThat(loggedSql.get(0)).contains("name, description, other, last_update) values (");
 
@@ -151,7 +151,7 @@ public class EbeanServer_saveAllTest extends BaseTestCase {
       txn.commit();
     }
     loggedSql = LoggedSql.stop();
-    assertThat(loggedSql).hasSize(4);
+    assertThat(loggedSql).hasSize(5);
     assertThat(loggedSql.get(0)).contains("delete from e_basicver where id=?");
   }
 
