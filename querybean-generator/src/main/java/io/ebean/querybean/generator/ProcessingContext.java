@@ -80,7 +80,7 @@ class ProcessingContext implements Constants {
   /**
    * For partial compile the previous list of prefixed entity classes.
    */
-  private List<String> loadedPrefixEntities = new ArrayList<>();
+  private final List<String> loadedPrefixEntities = new ArrayList<>();
 
   /**
    * The package for the generated EntityClassRegister.
@@ -360,7 +360,15 @@ class ProcessingContext implements Constants {
    * Create the QAssoc PropertyType.
    */
   private PropertyType createPropertyTypeAssoc(String fullName) {
-    String[] split = Split.split(fullName);
+    TypeElement typeElement = elementUtils.getTypeElement(fullName);
+    String type;
+    if (typeElement.getNestingKind().isNested()) {
+      type = typeElement.getEnclosingElement().toString() + "$" + typeElement.getSimpleName();
+    } else {
+      type = typeElement.getQualifiedName().toString();
+    }
+
+    String[] split = Split.split(type);
     String propertyName = "Q" + split[1] + ".Assoc";
     String importName = split[0] + ".query.Q" + split[1];
     return new PropertyTypeAssoc(propertyName, importName);
