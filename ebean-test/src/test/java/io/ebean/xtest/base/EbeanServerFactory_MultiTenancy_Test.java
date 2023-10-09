@@ -62,21 +62,20 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     TenantSchemaProvider schemaProvider = Mockito.mock(TenantSchemaProvider.class);
     Mockito.doReturn("tenant_schema").when(schemaProvider).schema(tenant);
 
-    DatabaseConfig config = new DatabaseConfig();
-    config.setName("h2");
-    config.loadFromProperties();
-    config.setName("multi-tenancy");
-    config.setRegister(false);
-    config.setDefaultServer(false);
+    var builder = Database.builder()
+      .name("h2")
+      .loadFromProperties()
+      .name("multi-tenancy")
+      .register(false)
+      .defaultDatabase(false)
+      .withAllOptions()
+      .tenantMode(TenantMode.SCHEMA)
+      .currentTenantProvider(tenantProvider)
+      .tenantSchemaProvider(schemaProvider)
+      .ddlRun(false)
+      .databasePlatform(new MySqlPlatform());
 
-    config.setTenantMode(TenantMode.SCHEMA);
-    config.setCurrentTenantProvider(tenantProvider);
-    config.setTenantSchemaProvider(schemaProvider);
-
-    config.setDdlRun(false);
-    config.setDatabasePlatform(new MySqlPlatform());
-
-    final Database database = DatabaseFactory.create(config);
+    final Database database = builder.build();
     database.shutdown();
   }
 

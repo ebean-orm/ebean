@@ -87,6 +87,13 @@ import java.util.concurrent.Callable;
 public interface Database {
 
   /**
+   * Return a Builder for a Database.
+   */
+  static DatabaseBuilder builder() {
+    return new DDatabaseBuilder();
+  }
+
+  /**
    * Shutdown the Database instance.
    */
   void shutdown();
