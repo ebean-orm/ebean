@@ -440,11 +440,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params) {
-    return query.filterMany(manyProperty).where(expressions, params);
-  }
-
-  @Override
   public ExpressionList<T> filterManyRaw(String manyProperty, String rawExpression, Object... params) {
     return query.filterMany(manyProperty).raw(rawExpression, params);
   }
@@ -716,12 +711,6 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> jsonBetween(String propertyName, String path, Object lowerValue, Object upperValue) {
     return add(expr.jsonBetween(propertyName, path, lowerValue, upperValue));
-  }
-
-  @Override
-  public ExpressionList<T> where(String expressions, Object... params) {
-    expr.where(this, expressions, params);
-    return this;
   }
 
   @Override

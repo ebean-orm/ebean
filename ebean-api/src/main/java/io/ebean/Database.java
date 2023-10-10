@@ -226,58 +226,11 @@ public interface Database {
   <T> UpdateQuery<T> update(Class<T> beanType);
 
   /**
-   * Create a named query.
-   * <p>
-   * For RawSql the named query is expected to be in ebean.xml.
-   *
-   * @param beanType   The type of entity bean
-   * @param namedQuery The name of the query
-   * @param <T>        The type of entity bean
-   * @return The query
-   */
-  <T> Query<T> createNamedQuery(Class<T> beanType, String namedQuery);
-
-  /**
    * Create a query for an entity bean and synonym for {@link #find(Class)}.
    *
    * @see #find(Class)
    */
   <T> Query<T> createQuery(Class<T> beanType);
-
-  /**
-   * Parse the Ebean query language statement returning the query which can then
-   * be modified (add expressions, change order by clause, change maxRows, change
-   * fetch and select paths etc).
-   * <p>
-   * <h3>Example</h3>
-   * <pre>{@code
-   *
-   *   // Find order additionally fetching the customer, details and details.product name.
-   *
-   *   String ormQuery = "fetch customer fetch details fetch details.product (name) where id = :orderId ";
-   *
-   *   Query<Order> query = DB.createQuery(Order.class, ormQuery);
-   *   query.setParameter("orderId", 2);
-   *
-   *   Order order = query.findOne();
-   *
-   *   // This is the same as:
-   *
-   *   Order order = DB.find(Order.class)
-   *     .fetch("customer")
-   *     .fetch("details")
-   *     .fetch("detail.product", "name")
-   *     .setId(2)
-   *     .findOne();
-   *
-   * }</pre>
-   *
-   * @param beanType The type of bean to fetch
-   * @param ormQuery The Ebean ORM query
-   * @param <T>      The type of the entity bean
-   * @return The query with expressions defined as per the parsed query statement
-   */
-  <T> Query<T> createQuery(Class<T> beanType, String ormQuery);
 
   /**
    * Create a query for a type of entity bean.

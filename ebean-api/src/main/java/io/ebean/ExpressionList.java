@@ -508,28 +508,6 @@ public interface ExpressionList<T> {
   ExpressionList<T> filterMany(String manyProperty);
 
   /**
-   * Deprecated for removal - migrate to filterManyRaw()
-   * <p>
-   * Add filter expressions to the many property.
-   *
-   * <pre>{@code
-   *
-   *   DB.find(Customer.class)
-   *   .where()
-   *   .eq("name", "Rob")
-   *   .filterMany("orders", "status = ?", Status.NEW)
-   *   .findList();
-   *
-   * }</pre>
-   *
-   * @param manyProperty The many property
-   * @param expressions  Filter expressions with and, or and ? or ?1 type bind parameters
-   * @param params       Bind parameters used in the expressions
-   */
-  @Deprecated(forRemoval = true)
-  ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params);
-
-  /**
    * Add filter expressions for the many path. The expressions can include SQL functions if
    * desired and the property names are translated to column names.
    * <p>
@@ -720,14 +698,6 @@ public interface ExpressionList<T> {
    * Add another expression to the where clause.
    */
   ExpressionList<T> where();
-
-  /**
-   * Add the expressions to this expression list.
-   *
-   * @param expressions The expressions that are parsed and added to this expression list
-   * @param params      Bind parameters to match ? or ?1 bind positions.
-   */
-  ExpressionList<T> where(String expressions, Object... params);
 
   /**
    * Path exists - for the given path in a JSON document.
