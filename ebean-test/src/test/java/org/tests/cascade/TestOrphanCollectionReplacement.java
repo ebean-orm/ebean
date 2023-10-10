@@ -97,25 +97,25 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
       assertThat(sql.get(9)).contains(" -- bind(");
     }
     if (isPostgresCompatible()) {
-      assertThat(sql).hasSize(7);
+      assertThat(sql).hasSize(9);
       assertThat(sql.get(0)).contains("select t0.id from coone_many t0 where coone_id=? and t0.deleted = false and t0.deleted = false; --bind"); // find all Ids
       assertThat(sql.get(1)).contains("update coone_many set deleted=true where id  = any(?");
       assertThat(sql.get(2)).contains(" -- bind(Array[1000]="); // update first 1000
       assertThat(sql.get(3)).contains(" -- bind(Array[1000]="); // update first 1000
       assertThat(sql.get(4)).contains(" -- bind(Array[500]="); // update last 500
-      assertThat(sql.get(5)).contains("insert into coone_many (coone_id, name, deleted) values (?,?,?)");
-      assertThat(sql.get(6)).contains(" -- bind(");
+      assertThat(sql.get(6)).contains("insert into coone_many (coone_id, name, deleted) values (?,?,?)");
+      assertThat(sql.get(7)).contains(" -- bind(");
     }
 
     if (isSqlServer()) {
-      assertThat(sql).hasSize(7);
+      assertThat(sql).hasSize(9);
       assertThat(sql.get(0)).contains("select t0.id from coone_many t0 where coone_id=? and t0.deleted = 0 and t0.deleted = 0; --bind"); // find all Ids
       assertThat(sql.get(1)).contains("update coone_many set deleted=1 where id  in (?,?,?");
       assertThat(sql.get(2)).contains(" -- bind(Array[2000]="); // update first 2000
       assertThat(sql.get(3)).contains("update coone_many set deleted=1 where id  in (?,?,?");
       assertThat(sql.get(4)).contains(" -- bind(Array[500]="); // update next 500
-      assertThat(sql.get(5)).contains("insert into coone_many (id, coone_id, name, deleted) values (?,?,?,?)");
-      assertThat(sql.get(6)).contains(" -- bind(");
+      assertThat(sql.get(6)).contains("insert into coone_many (id, coone_id, name, deleted) values (?,?,?,?)");
+      assertThat(sql.get(7)).contains(" -- bind(");
     }
 
     COOne fetchedUser2 = DB.find(COOne.class, parentId);
