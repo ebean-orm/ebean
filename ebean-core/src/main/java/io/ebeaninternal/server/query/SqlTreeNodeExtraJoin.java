@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import static io.ebeaninternal.api.SpiQuery.TemporalMode.SOFT_DELETED;
+
 /**
  * The purpose is to add an extra join to the query.
  * <p>
@@ -145,7 +147,7 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
         assocBeanProperty.appendFrom(ctx, joinType, null);
       }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
-      if (ctx.joinAdded() && assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
+      if (temporalMode != SOFT_DELETED && ctx.joinAdded() && assocBeanProperty.isTargetSoftDelete()) {
         ctx.append(" and ").append(assocBeanProperty.softDeletePredicate(ctx.tableAlias(prefix)));
       }
     }
