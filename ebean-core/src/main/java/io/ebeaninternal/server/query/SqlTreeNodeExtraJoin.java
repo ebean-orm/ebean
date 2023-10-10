@@ -145,7 +145,7 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
         assocBeanProperty.appendFrom(ctx, joinType, null);
       }
       joinType = assocBeanProperty.addJoin(joinType, prefix, ctx);
-      if (!oneToOneExported && assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
+      if (ctx.joinAdded() && assocBeanProperty.isTargetSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
         ctx.append(" and ").append(assocBeanProperty.softDeletePredicate(ctx.tableAlias(prefix)));
       }
     }
