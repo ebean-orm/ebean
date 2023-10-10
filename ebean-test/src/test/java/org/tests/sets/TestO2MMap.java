@@ -2,6 +2,7 @@ package org.tests.sets;
 
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestO2MMap {
+class TestO2MMap extends BaseTestCase {
 
   @Test
   void lazyLoadO2M_when_setWithHashCode_expect_selectProperties() {
@@ -72,7 +73,11 @@ class TestO2MMap {
     assertThat(sql.get(0)).contains("delete from map_emp where id=?");
     assertThat(sql.get(1)).contains(" -- bind");
     assertThat(sql.get(2)).contains(" -- bind");
-    assertThat(sql.get(4)).contains("insert into map_emp (code, name, department_id) values (?,?,?)");
+    if (isSqlServer()) {
+      assertThat(sql.get(4)).contains("insert into map_emp (id, code, name, department_id) values (?,?,?,?)");
+    } else {
+      assertThat(sql.get(4)).contains("insert into map_emp (code, name, department_id) values (?,?,?)");
+    }
     assertThat(sql.get(5)).contains(" -- bind");
   }
 }

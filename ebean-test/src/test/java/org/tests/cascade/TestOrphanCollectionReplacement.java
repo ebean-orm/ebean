@@ -63,12 +63,12 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
 
     if (isSqlServer()) {
       // filter mode
-      assertThat(sql).hasSize(5);
+      assertThat(sql).hasSize(7);
       assertThat(sql.get(0)).contains("select t0.id from coone_many t0 where coone_id=? and t0.deleted = 0 and t0.deleted = 0; --bind");
       assertThat(sql.get(1)).contains("update coone_many set deleted=1 where id  in (?)");
       assertThat(sql.get(2)).contains(" -- bind(");
-      assertThat(sql.get(3)).contains("insert into coone_many (id, coone_id, name, deleted) values (?,?,?,?)");
-      assertThat(sql.get(4)).contains(" -- bind(");
+      assertThat(sql.get(4)).contains("insert into coone_many (id, coone_id, name, deleted) values (?,?,?,?)");
+      assertThat(sql.get(5)).contains(" -- bind(");
     }
     COOne fetchedUser2 = DB.find(COOne.class, parentId);
     requireNonNull(fetchedUser2);
@@ -108,7 +108,7 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
     }
 
     if (isSqlServer()) {
-      assertThat(sql).hasSize(9);
+      assertThat(sql).hasSize(11);
       assertThat(sql.get(0)).contains("select t0.id from coone_many t0 where coone_id=? and t0.deleted = 0 and t0.deleted = 0; --bind"); // find all Ids
       assertThat(sql.get(1)).contains("update coone_many set deleted=1 where id  in (?,?,?");
       assertThat(sql.get(2)).contains(" -- bind(Array[2000]="); // update first 2000
@@ -128,11 +128,9 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
       .contains("cTest"); // added
   }
 
-
   private static List<String> doUpdate(long parentId, Predicate<String> filter) {
     COOne fetchedParent = DB.find(COOne.class, parentId);
     assert fetchedParent != null;
-
 
     List<COOneMany> filtered = fetchedParent.getChildren().stream().filter(r -> filter.test(r.getName())).collect(Collectors.toList());
 
