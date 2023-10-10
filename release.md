@@ -25,13 +25,34 @@ Then check, if all -SNAPSHOT versions are foc-version
 ## Release command
 
 
-We @foconis use this command to release.
+Note: Since Jakarta, Ebean is no longer released with the release-plugin by rob.
+
+
+Solution1: Steps must be done manually:
+```bash
+# Set Version to next version with
+mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=13.x.x-FOCx
+# commit everything
+git add '*.xml'
+git commit -m "bump version to release"
+git tag 13.x.x-FOCx
+
+#build and deploy it
+mvn clean source:jar deploy -DskipTests -Pfoconis -T 8
+
+mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=13.x.x-FOCx+1-SNAPSHOT
+git add '*.xml'
+git commit -m "bump version to snapshot"
+````
+
+
+Solution 2: Ensure that you are on a snapshot version and use
 
 ```bash
 mvn release:prepare release:perform -Darguments="-Dgpg.skip -DskipTests" -Pfoconis
 ```
 
-### Build releases for github and/or jakarta
+### Build releases for github
 
 First, checkout latest release commit with
 ```bash
@@ -42,20 +63,6 @@ Build github release:
 
 ```bash
 mvn clean source:jar deploy -DskipTests -Pgithub -T 8
-```
-
-Switch to Jakarta:
-
-```bash
-export EBEAN_VERSION=$(grep "<version>13" pom.xml | awk -F '[<>]' '{print $3}')
-# first, set to snapshot, because of kotlin
-mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=${EBEAN_VERSION}-SNAPSHOT -Pjdk16plus -Pjdk15less
-mvn versions:set  -DgenerateBackupPoms=false -DnewVersion=${EBEAN_VERSION}-jakarta -Pjdk16plus -Pjdk15less
-./javax-to-jakarta.sh
-mvn clean source:jar deploy -DskipTests -Pfoconis -T 8
-mvn clean source:jar deploy -DskipTests -Pgithub -T 8
-# do not commit, switch back to master
-git switch -f master
 ```
 
 ## Fix POMs after release
