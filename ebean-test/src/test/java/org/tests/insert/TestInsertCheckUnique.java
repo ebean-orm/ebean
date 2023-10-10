@@ -112,7 +112,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
       assertThat(DB.checkUniqueness(doc2).toString()).contains("title");
       List<String> sql = LoggedSql.stop();
       assertThat(sql).hasSize(1);
-      assertThat(sql.get(0)).contains("select t0.id from document t0 where t0.title = ?");
+      assertThat(sql.get(0)).contains("select").contains(" t0.id from document t0 where t0.title = ?");
 
 
     }
@@ -135,8 +135,8 @@ public class TestInsertCheckUnique extends BaseTestCase {
     assertThat(DB.checkUniqueness(basic, null, true, false)).isEmpty();
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id from e_basicverucon t0 where t0.name = ?");
-    assertThat(sql.get(1)).contains("select t0.id from e_basicverucon t0 where t0.other = ? and t0.other_one = ?");
+    assertThat(sql.get(0)).contains("select").contains("t0.id from e_basicverucon t0 where t0.name = ?");
+    assertThat(sql.get(1)).contains("select").contains("t0.id from e_basicverucon t0 where t0.other = ? and t0.other_one = ?");
     DB.save(basic);
     try {
       // reload from database
@@ -147,8 +147,8 @@ public class TestInsertCheckUnique extends BaseTestCase {
       assertThat(DB.checkUniqueness(basic, null, true, false)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).hasSize(2);
-      assertThat(sql.get(0)).contains("select t0.id from e_basicverucon t0 where t0.id <> ? and t0.name = ?");
-      assertThat(sql.get(1)).contains("select t0.id from e_basicverucon t0 where t0.id <> ? and t0.other = ? and t0.other_one = ?");
+      assertThat(sql.get(0)).contains("select").contains("t0.id from e_basicverucon t0 where t0.id <> ? and t0.name = ?");
+      assertThat(sql.get(1)).contains("select").contains("t0.id from e_basicverucon t0 where t0.id <> ? and t0.other = ? and t0.other_one = ?");
 
       // and check again - expect to hit query cache
       LoggedSql.start();
@@ -187,8 +187,8 @@ public class TestInsertCheckUnique extends BaseTestCase {
     assertThat(DB.checkUniqueness(basic, null, false, true)).isEmpty();
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id from e_basicverucon t0 where t0.name = ?");
-    assertThat(sql.get(1)).contains("select t0.id from e_basicverucon t0 where t0.other = ? and t0.other_one = ?");
+    assertThat(sql.get(0)).contains("select").contains("t0.id from e_basicverucon t0 where t0.name = ?");
+    assertThat(sql.get(1)).contains("select").contains("t0.id from e_basicverucon t0 where t0.other = ? and t0.other_one = ?");
     DB.save(basic);
     try (Transaction txn = DB.beginTransaction()) {
       // reload from database

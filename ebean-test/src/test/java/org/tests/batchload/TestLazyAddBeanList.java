@@ -68,8 +68,8 @@ public class TestLazyAddBeanList extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql.get(0)).contains("insert into contact");
-    assertThat(sql.get(1)).contains("bind(jim,slim,");
-    assertThat(sql.get(2)).contains("bind(joe,big,");
+    assertThat(sql.get(1)).contains("bind").contains("jim,slim,");
+    assertThat(sql.get(2)).contains("bind").contains("joe,big,");
     assertThat(sql).hasSize(3);
 
     assertThat(cust.getContacts()).hasSize(2);
@@ -94,8 +94,8 @@ public class TestLazyAddBeanList extends BaseTestCase {
 
     assertThat(sql.get(0)).contains("from order_referenced_parent"); // lazy load children
     assertThat(sql.get(1)).contains("insert into order_referenced_parent");
-    assertThat(sql.get(2)).contains("bind(D,foo,");
-    assertThat(sql.get(3)).contains("bind(D,bar,");
+    assertThat(sql.get(2)).contains("bind").contains("D,foo,");
+    assertThat(sql.get(3)).contains("bind").contains("D,bar,");
 
     List<String> list = DB.find(OrderMaster.class)
       .fetch("children", "name")

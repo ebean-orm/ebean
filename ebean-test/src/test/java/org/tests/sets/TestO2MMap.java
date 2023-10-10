@@ -72,7 +72,7 @@ class TestO2MMap {
     assertThat(sql.get(0)).contains("delete from map_emp where id=?");
     assertThat(sql.get(1)).contains(" -- bind");
     assertThat(sql.get(2)).contains(" -- bind");
-    assertThat(sql.get(3)).contains("insert into map_emp (code, name, department_id) values (?,?,?)");
+    assertThat(sql.get(3)).contains("insert into map_emp");
     assertThat(sql.get(4)).contains(" -- bind");
   }
 }

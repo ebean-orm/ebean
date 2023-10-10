@@ -1,10 +1,10 @@
 package org.tests.query;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
@@ -370,7 +370,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? ) order by t0.id; --bind(rob%)");
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ?) order by t0.id; --bind(rob%)");
     } else {
       assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? escape'|') order by t0.id; --bind(rob%)");
     }
