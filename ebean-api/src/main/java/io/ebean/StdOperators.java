@@ -9,7 +9,6 @@ import java.util.Collection;
  * <p>
  * This is currently deemed to be experimental and subject to change.
  */
-@Deprecated(since = "experimental")
 public final class StdOperators {
 
   // ---- Functions ---- //
