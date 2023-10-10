@@ -71,18 +71,20 @@ public class TestM2MWithWhere extends BaseTestCase {
     LoggedSql.start();
     DB.save(node);
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
     assertThat(sql.get(0)).contains("update mny_node set name=? where id=?; -- bind(fooBarBaz");
     assertThat(sql.get(1)).contains("delete from mny_edge where from_id = ? and to_id = ? and mny_edge.flags != 12345 and 'mny_node' = 'mny_node'");
     assertThat(sql.get(2)).contains("-- bind");
+    assertThat(sql.get(3)).contains("executeBatch() size:1 sql:delete from mny_edge where from_id = ? and to_id = ? and mny_edge.flags != 12345 and 'mny_node' = 'mny_node'");
 
     node.getAllRelations().add(removed);
     LoggedSql.start();
     DB.save(node);
     sql = LoggedSql.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("insert into mny_edge (id, flags, from_id, to_id) values (?,?,?,?)");
     assertThat(sql.get(1)).contains("-- bind");
+    assertThat(sql.get(2)).contains("-- executeBatch() size:1 sql:insert into mny_edge (id, flags, from_id, to_id) values (?,?,?,?)");
 
   }
 

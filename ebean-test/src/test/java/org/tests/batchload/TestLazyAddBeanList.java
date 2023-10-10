@@ -70,7 +70,8 @@ public class TestLazyAddBeanList extends BaseTestCase {
     assertThat(sql.get(0)).contains("insert into contact");
     assertThat(sql.get(1)).contains("bind").contains("jim,slim,");
     assertThat(sql.get(2)).contains("bind").contains("joe,big,");
-    assertThat(sql).hasSize(3);
+    assertThat(sql.get(3)).contains("executeBatch() size:2").contains("sql:insert into contact");
+    assertThat(sql).hasSize(4);
 
     assertThat(cust.getContacts()).hasSize(2);
 
@@ -117,7 +118,7 @@ public class TestLazyAddBeanList extends BaseTestCase {
 
     LoggedSql.start();
     DB.save(cust);
-    assertThat(LoggedSql.stop()).hasSize(3); // insert + 2x bind
+    assertThat(LoggedSql.stop()).hasSize(4); // insert + 2x bind + executeBatch()
 
     cust = DB.find(Customer.class, cust.getId());
 
@@ -165,7 +166,7 @@ public class TestLazyAddBeanList extends BaseTestCase {
 
     LoggedSql.start();
     DB.saveAll(custs);
-    assertThat(LoggedSql.stop()).hasSize(21);
+    assertThat(LoggedSql.stop()).hasSize(22);
 
     LoggedSql.start();
     custs = DB.find(Customer.class).where().startsWith("name", "batch").findList();

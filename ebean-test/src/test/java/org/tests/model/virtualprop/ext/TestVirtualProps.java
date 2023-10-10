@@ -121,15 +121,16 @@ public class TestVirtualProps {
     LoggedSql.start();
     db.save(base1);
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertThat(sql.get(0)).contains("insert into kreuztabelle (virtual_base_id, virtual_extend_many_to_many_id) values (?, ?)");
     assertThat(sql.get(1)).contains("-- bind");
+    assertThat(sql.get(2)).contains("-- executeBatch() size:1 sql:insert into kreuztabelle (virtual_base_id, virtual_extend_many_to_many_id) values (?, ?)");
 
     many2.getBases().add(base1);
     LoggedSql.start();
     db.save(many2);
     sql = LoggedSql.stop();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
 
 
     LoggedSql.start();
