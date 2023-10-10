@@ -29,17 +29,20 @@ public class TestElementCollectionCascadeMultiple extends BaseTestCase {
     save(top);
 
     final List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(9);
+    assertThat(sql).hasSize(13);
 
     assertSql(sql.get(0)).contains("insert into ecs_person");
     assertSql(sql.get(1)).contains("-- bind");
-    assertSql(sql.get(2)).contains("insert into ec_top");
-    assertThat(sql.get(3)).contains("-- bind");
-    assertThat(sql.get(4)).contains("insert into ecs_person_phone");
-    assertThat(sql.get(5)).contains("-- bind");
-    assertThat(sql.get(6)).contains("-- bind");
-    assertThat(sql.get(7)).contains("insert into ec_top_ecs_person");
+    assertThat(sql.get(2)).contains("-- executeBatch");
+    assertSql(sql.get(3)).contains("insert into ec_top");
+    assertThat(sql.get(4)).contains("-- bind");
+    assertThat(sql.get(6)).contains("insert into ecs_person_phone");
+    assertThat(sql.get(7)).contains("-- bind");
     assertThat(sql.get(8)).contains("-- bind");
+    assertThat(sql.get(9)).contains("insert into ec_top_ecs_person");
+    assertThat(sql.get(10)).contains("-- bind");
+    assertThat(sql.get(11)).contains("-- executeBatch() size:2 sql:insert into ecs_person_phone");
+    assertThat(sql.get(12)).contains("-- executeBatch() size:1 sql:insert into ec_top_ecs_person");
   }
 
   @Transactional(batchSize = 20)

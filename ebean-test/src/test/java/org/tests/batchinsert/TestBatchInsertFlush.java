@@ -100,7 +100,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       assertSql(sql.get(0)).contains("insert into t_atable_thatisrelatively");
       assertSql(sql.get(1)).contains("-- bind(");
       // detail
-      assertThat(sql.get(3)).contains("insert into t_detail_with_other_namexxxyy");
+      assertThat(sql.get(4)).contains("insert into t_detail_with_other_namexxxyy");
 
       assertThat(((SpiTransaction) transaction).label()).isEqualTo("TestBatchInsertFlush.no_cascade");
 
@@ -205,7 +205,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     assertThat(LoggedSql.collect()).isEmpty();
     Integer id = b1.getId();
     assertNotNull(id);
-    assertThat(LoggedSql.collect()).hasSize(3);
+    assertThat(LoggedSql.collect()).hasSize(4);
 
     EBasicVer b3 = new EBasicVer("b3");
     server.save(b3);
@@ -231,7 +231,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       assertThat(LoggedSql.collect()).isEmpty();
       Integer id = b1.getId();
       assertNotNull(id);
-      assertThat(LoggedSql.collect()).hasSize(3);
+      assertThat(LoggedSql.collect()).hasSize(4);
 
       EBasicVer b3 = new EBasicVer("b3");
       server.save(b3, txn);
@@ -298,7 +298,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       server.save(b3, txn);
 
       txn.commit();
-      assertThat(LoggedSql.collect()).hasSize(5);
+      assertThat(LoggedSql.collect()).hasSize(7);
 
     } finally {
       txn.end();

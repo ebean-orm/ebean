@@ -55,12 +55,15 @@ public class TestMultiCascadeBatch extends BaseTestCase {
 
     assertThat(list).hasSize(3);
 
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(7);
     assertSql(sql.get(0)).contains("insert into site (id, name");
     assertSql(sql.get(1)).contains("insert into site (id, name");
     assertSqlBind(sql.get(2));
-    assertThat(sql.get(3)).contains("insert into site (id, name");
-    assertSqlBind(sql.get(4));
+    assertThat(sql.get(3)).contains(" -- executeBatch");
+    assertThat(sql.get(4)).contains("insert into site (id, name");
+    assertSqlBind(sql.get(5));
+    assertThat(sql.get(6)).contains(" -- executeBatch");
+
   }
 
   @Test
