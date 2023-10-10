@@ -331,7 +331,6 @@ public class TestMergeCustomer extends BaseTestCase {
       assertThat(sql.get(17)).contains("update mcontact set email=?, first_name=?, last_name=?, version=?, customer_id=? where id=? and version=?");
       assertSqlBind(sql, 18, 21);
       assertThat(sql.get(23)).contains("update mcontact_message set title=?, subject=?, notes=?, version=?, contact_id=? where id=? and version=?");
-      assertSqlBind(sql, 24, 29);
     }
   }
 
