@@ -111,11 +111,15 @@ class TestOrphanCollectionReplacement extends BaseTestCase {
       assertThat(sql).hasSize(11);
       assertThat(sql.get(0)).contains("select t0.id from coone_many t0 where coone_id=? and t0.deleted = 0 and t0.deleted = 0; --bind"); // find all Ids
       assertThat(sql.get(1)).contains("update coone_many set deleted=1 where id  in (?,?,?");
-      assertThat(sql.get(2)).contains(" -- bind(Array[2000]="); // update first 2000
-      assertThat(sql.get(3)).contains("update coone_many set deleted=1 where id  in (?,?,?");
-      assertThat(sql.get(4)).contains(" -- bind(Array[500]="); // update next 500
-      assertThat(sql.get(6)).contains("insert into coone_many (id, coone_id, name, deleted) values (?,?,?,?)");
-      assertThat(sql.get(7)).contains(" -- bind(");
+      assertThat(sql.get(2)).contains(" -- bind(Array[1000]="); // update first 2000
+      assertThat(sql.get(3)).contains(" -- bind(Array[1000]="); // update first 2000
+      assertThat(sql.get(4)).contains("update coone_many set deleted=1 where id  in (?,?,?");
+      assertThat(sql.get(5)).contains(" -- bind(Array[500]="); // update next 500
+      assertThat(sql.get(6)).contains(" -- executeBatch() size:2");
+      assertThat(sql.get(7)).contains(" -- executeBatch() size:1");
+      assertThat(sql.get(8)).contains("insert into coone_many (id, coone_id, name, deleted) values (?,?,?,?)");
+      assertThat(sql.get(9)).contains(" -- bind(");
+      assertThat(sql.get(10)).contains(" -- executeBatch()"); // update next 500
     }
 
     COOne fetchedUser2 = DB.find(COOne.class, parentId);
