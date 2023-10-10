@@ -2,6 +2,7 @@ package org.tests.sets;
 
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class TestO2MMap2 {
+class TestO2MMap2 extends BaseTestCase {
 
   @Test
   void lazyLoadO2M_when_setWithHashCode_expect_selectProperties() {
@@ -67,8 +68,12 @@ class TestO2MMap2 {
     DB.save(dept);
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("insert into map_emp2");
+    assertThat(sql).hasSize(3);
+    if (isSqlServer()) {
+      assertThat(sql.get(0)).contains("insert into map_emp2 (id, code, name, department_id) values (?,?,?,?)");
+    } else {
+      assertThat(sql.get(0)).contains("insert into map_emp2 (code, name, department_id) values (?,?,?)");
+    }
     assertThat(sql.get(1)).contains(" -- bind");
   }
 }

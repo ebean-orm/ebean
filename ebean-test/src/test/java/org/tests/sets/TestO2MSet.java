@@ -60,11 +60,12 @@ class TestO2MSet {
     DB.save(dept);
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(7);
     assertThat(sql.get(0)).contains("delete from o2_memp where id=?");
     assertThat(sql.get(1)).contains(" -- bind");
     assertThat(sql.get(2)).contains(" -- bind");
-    assertThat(sql.get(3)).contains("insert into o2_memp (id, code, name, department_id) values (?,?,?,?)");
-    assertThat(sql.get(4)).contains(" -- bind");
+    assertThat(sql.get(3)).contains("-- executeBatch");
+    assertThat(sql.get(4)).contains("insert into o2_memp (id, code, name, department_id) values (?,?,?,?)");
+    assertThat(sql.get(5)).contains(" -- bind");
   }
 }

@@ -256,7 +256,7 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-postgis-types</artifactId>
-        <version>13.22.0</version>
+        <version>13.23.0-jakarta</version>
       </dependency>
 
       <dependency>

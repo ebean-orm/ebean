@@ -40,25 +40,30 @@ class TestDeleteCascadeById extends BaseTestCase {
 
     DB.delete(o);
     List<String> sql = LoggedSql.collect();
-    assertThat(sql).hasSize(6);
+    assertThat(sql).hasSize(8);
     assertThat(sql.get(0)).contains("select t0.id from o_order_detail t0 where order_id=?");
     assertThat(sql.get(1)).contains("delete from o_order_detail where id");
     assertThat(sql.get(2)).contains("-- bind(Array[3]");
     assertThat(sql.get(3)).contains("delete from or_order_ship where order_id = ?");
     assertThat(sql.get(4)).contains("-- bind(");
-    assertThat(sql.get(5)).contains("delete from o_order where id=? and updtime=?");
+    assertThat(sql.get(5)).contains("-- executeBatch");
+    assertThat(sql.get(6)).contains("-- executeBatch");
+    assertThat(sql.get(7)).contains("delete from o_order where id=? and updtime=?");
 
     DB.delete(cust);
     sql = LoggedSql.stop();
-    assertThat(sql).hasSize(9);
+    assertThat(sql).hasSize(12);
     assertThat(sql.get(0)).contains("select t0.id from contact t0 where customer_id=");
     assertThat(sql.get(1)).contains("delete from contact_note where (contact_id)");
     assertThat(sql.get(2)).contains(" -- bind(Array[3]=");
     assertThat(sql.get(3)).contains("delete from contact where id");
     assertThat(sql.get(4)).contains(" -- bind(Array[3]");
-    assertThat(sql.get(5)).contains("delete from o_customer where id=? and version=?");
-    assertThat(sql.get(6)).contains("delete from o_address where id=? and updtime=?");
-    assertThat(sql.get(7)).contains(" -- bind(");
-    assertThat(sql.get(8)).contains(" -- bind(");
+    assertThat(sql.get(5)).contains(" -- executeBatch");
+    assertThat(sql.get(6)).contains(" -- executeBatch");
+    assertThat(sql.get(7)).contains("delete from o_customer where id=? and version=?");
+    assertThat(sql.get(8)).contains("delete from o_address where id=? and updtime=?");
+    assertThat(sql.get(9)).contains(" -- bind(");
+    assertThat(sql.get(10)).contains(" -- bind(");
+    assertThat(sql.get(11)).contains(" -- executeBatch");
   }
 }

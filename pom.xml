@@ -54,7 +54,7 @@
     <ebean-test-containers.version>7.1</ebean-test-containers.version>
     <ebean-datasource.version>8.7</ebean-datasource.version>
     <ebean-agent.version>13.20.1-FOC1</ebean-agent.version>
-    <ebean-maven-plugin.version>13.22.0</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>13.23.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 

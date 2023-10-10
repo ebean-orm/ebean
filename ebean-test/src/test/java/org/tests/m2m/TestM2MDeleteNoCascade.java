@@ -75,12 +75,14 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
     DB.update(user);
 
     final List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(7);
     assertSql(sql.get(0)).contains("update mnoc_user set user_name=?, version=? where user_id=? and version=?");
     assertSql(sql.get(1)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
     assertSqlBind(sql.get(2));
     assertThat(sql.get(3)).contains("insert into mnoc_user_mnoc_role (mnoc_user_user_id, mnoc_role_role_id) values (?, ?)");
     assertSqlBind(sql.get(4));
+    assertThat(sql.get(5)).contains("-- executeBatch");
+    assertThat(sql.get(6)).contains("-- executeBatch");
   }
 
   @Test
@@ -107,10 +109,10 @@ public class TestM2MDeleteNoCascade extends BaseTestCase {
     }
 
     final List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(8);
+    assertThat(sql).hasSize(12);
     assertSql(sql.get(0)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
-    assertThat(sql.get(4)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
-    assertSql(sql.get(2)).contains("delete from mnoc_user where user_id=? and version=?");
-    assertThat(sql.get(6)).contains("delete from mnoc_user where user_id=? and version=?");
+    assertThat(sql.get(6)).contains("delete from mnoc_user_mnoc_role where mnoc_user_user_id = ?");
+    assertSql(sql.get(3)).contains("delete from mnoc_user where user_id=? and version=?");
+    assertThat(sql.get(9)).contains("delete from mnoc_user where user_id=? and version=?");
   }
 }
