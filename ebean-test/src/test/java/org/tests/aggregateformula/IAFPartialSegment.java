@@ -1,6 +1,6 @@
 package org.tests.aggregateformula;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "iaf_segment")

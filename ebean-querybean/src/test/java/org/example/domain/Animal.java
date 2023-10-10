@@ -2,7 +2,7 @@ package org.example.domain;
 
 import io.ebean.Model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @MappedSuperclass
 public abstract class Animal extends Model {
