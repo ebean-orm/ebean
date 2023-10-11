@@ -57,6 +57,12 @@
     </dependency>
 
     <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-postgis-types</artifactId>
+      <version>13.23.0-jakarta</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>${postgres.jdbc.version}</version>
