@@ -162,21 +162,18 @@
         <groupId>io.ebean</groupId>
         <artifactId>querybean-generator</artifactId>
         <version>13.23.0-jakarta</version>
-        <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>kotlin-querybean-generator</artifactId>
         <version>13.23.0-jakarta</version>
-        <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-test</artifactId>
         <version>13.23.0-jakarta</version>
-        <scope>test</scope>
       </dependency>
 
       <dependency>
