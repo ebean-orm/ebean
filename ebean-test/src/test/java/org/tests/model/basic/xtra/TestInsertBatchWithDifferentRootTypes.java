@@ -64,7 +64,7 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSql.start();
-      assertThat(loggedSql2).hasSize(10);
+      assertThat(loggedSql2).hasSize(8);
     }
   }
 

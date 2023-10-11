@@ -32,7 +32,7 @@ public class TestInheritanceOrderColumn extends BaseTestCase {
     LoggedSql.start();
     DB.save(master);
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(7);
+    assertThat(sql).hasSize(5);
     // Some platforms insert ids and others don't need to...
     assertSql(trimId(sql, 1))
       .contains("insert into ordered_parent (order_master_inheritance_id, common_name, ordered_aname, ordered_bname, sort_order) values");
