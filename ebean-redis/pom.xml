@@ -42,13 +42,6 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>querybean-generator</artifactId>
-      <version>13.23.0-jakarta</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
       <version>13.23.0-jakarta</version>
       <scope>test</scope>
@@ -72,7 +65,19 @@
 
   <build>
     <plugins>
-
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>io.ebean</groupId>
+              <artifactId>querybean-generator</artifactId>
+              <version>13.23.0-jakarta</version>
+            </path>
+          </annotationProcessorPaths>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>

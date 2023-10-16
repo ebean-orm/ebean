@@ -69,13 +69,6 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>querybean-generator</artifactId>
-      <version>13.23.0-jakarta</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
       <version>13.23.0-jakarta</version>
       <scope>test</scope>
@@ -103,7 +96,13 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <compilerArgument>-proc:full</compilerArgument>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>io.ebean</groupId>
+              <artifactId>querybean-generator</artifactId>
+              <version>13.23.0-jakarta</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
       <!-- Enhancement -->
