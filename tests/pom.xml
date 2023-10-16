@@ -28,9 +28,9 @@
       </modules>
     </profile>
     <profile>
-      <id>jdk15less</id>
+      <id>jdk11</id>
       <activation>
-        <jdk>[11]</jdk>
+        <jdk>11</jdk>
       </activation>
       <modules>
         <module>test-kotlin</module>
