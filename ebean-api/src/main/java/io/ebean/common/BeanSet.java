@@ -119,7 +119,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     try {
       if (set == null) {
         if (!disableLazyLoad && modifyListening) {
-          lazyLoadCollection(true);
+          lazyLoadCollection(false);
         } else {
           set = new LinkedHashSet<>();
         }
@@ -136,7 +136,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
         if (disableLazyLoad) {
           set = new LinkedHashSet<>();
         } else {
-          lazyLoadCollection(true);
+          lazyLoadCollection(false);
         }
       }
     } finally {

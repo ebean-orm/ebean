@@ -84,6 +84,9 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
    */
   private void flushStatementBatch() throws SQLException {
     final int[] rows = pstmt.executeBatch();
+    if (transaction.isLogSql()) {
+      transaction.logSql(" -- executeBatch() size:{0} sql:{1}", rows.length, sql);
+    }
     if (rows.length != list.size()) {
       throw new IllegalStateException("Invalid state on executeBatch, rows:" + rows.length + " != " + list.size());
     }
@@ -153,6 +156,9 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
   private void executeAndCheckRowCounts() throws SQLException {
     try {
       results = pstmt.executeBatch();
+      if (transaction.isLogSql()) {
+        transaction.logSql(" -- executeBatch() size:{0} sql:{1}", results.length, sql);
+      }
       if (results.length != list.size()) {
         throw new SQLException("Invalid state on executeBatch, rows:" + results.length + " != " + list.size());
       }

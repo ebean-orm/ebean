@@ -4,7 +4,7 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.View;
 import org.tests.model.basic.Order;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Cache(enableQueryCache = true)
 @Entity

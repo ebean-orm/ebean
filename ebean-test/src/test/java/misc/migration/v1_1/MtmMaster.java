@@ -2,7 +2,7 @@ package misc.migration.v1_1;
 
 import io.ebean.annotation.Tablespace;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

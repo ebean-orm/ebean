@@ -16,8 +16,8 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.text.json.JsonContext;
 
 import javax.annotation.Nullable;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.List;

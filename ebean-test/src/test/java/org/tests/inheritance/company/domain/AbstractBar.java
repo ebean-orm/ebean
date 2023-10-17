@@ -1,6 +1,6 @@
 package org.tests.inheritance.company.domain;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * @author Per-Ingemar Andersson, It-huset i Norden AB

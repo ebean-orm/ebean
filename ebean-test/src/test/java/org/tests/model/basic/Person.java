@@ -1,6 +1,6 @@
 package org.tests.model.basic;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -11,9 +11,9 @@ public class Person implements Serializable {
   private static final long serialVersionUID = 495045977245770183L;
 
   @Id
-  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
+  @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
   @SequenceGenerator(name = "PERSONS_SEQ", initialValue = 1000, allocationSize = 40)
-  @Column(name = "ID", unique = true, nullable = false)
+  @Column(name = "id", unique = true, nullable = false)
   private Long id;
 
   @Column(name = "SURNAME", nullable = false, unique = false, columnDefinition = "varchar(64)")

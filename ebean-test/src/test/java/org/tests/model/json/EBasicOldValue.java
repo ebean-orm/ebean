@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.DbJson;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.util.*;
 
 import static io.ebean.annotation.MutationDetection.SOURCE;

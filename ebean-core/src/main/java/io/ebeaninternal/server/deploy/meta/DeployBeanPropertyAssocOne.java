@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy.meta;
 
 import io.ebeaninternal.server.query.SqlJoinType;
 
-import javax.persistence.CascadeType;
+import jakarta.persistence.CascadeType;
 
 /**
  * Property mapped to a joined bean.

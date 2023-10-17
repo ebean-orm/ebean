@@ -1,8 +1,11 @@
 package io.ebean.event;
 
-import javax.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextEvent;
 
 /**
+ * Deprecated for removal - no intention to replace. Create your own copy of this
+ * ServletContextListener if needed for your application.
+ * <p>
  * Listens for webserver server starting and stopping events.
  * <p>
  * This should be used when the deployment is into a servlet container where the webapp
@@ -15,7 +18,8 @@ import javax.servlet.ServletContextEvent;
  * hook that Ebean registers.
  * </p>
  */
-public class ServletContextListener implements javax.servlet.ServletContextListener {
+@Deprecated(forRemoval = true)
+public class ServletContextListener implements jakarta.servlet.ServletContextListener {
 
   /**
    * The servlet container is stopping.

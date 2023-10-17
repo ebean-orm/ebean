@@ -2,7 +2,7 @@ package io.ebeaninternal.server.transaction;
 
 import io.ebeaninternal.api.SpiTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * Manages the transaction scoping using a Ebean thread local.

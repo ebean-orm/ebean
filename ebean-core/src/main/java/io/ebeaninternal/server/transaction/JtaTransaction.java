@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.transaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.Status;
+import jakarta.transaction.UserTransaction;
 import java.sql.SQLException;
 
 /**

@@ -2,8 +2,8 @@ package org.tests.model.basic;
 
 import io.ebean.annotation.Formula;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("CAT")

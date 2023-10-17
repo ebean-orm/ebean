@@ -2,10 +2,10 @@ package org.tests.o2m.dm;
 
 import io.ebean.annotation.SoftDelete;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 

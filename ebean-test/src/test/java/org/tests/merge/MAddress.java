@@ -1,6 +1,6 @@
 package org.tests.merge;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class MAddress extends MBase {

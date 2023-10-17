@@ -2,7 +2,7 @@ package org.tests.sp.model.car;
 
 import org.tests.sp.model.IdEntity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

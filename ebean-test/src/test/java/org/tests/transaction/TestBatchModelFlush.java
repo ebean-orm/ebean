@@ -72,7 +72,7 @@ public class TestBatchModelFlush extends BaseTestCase {
 
     // DEBUG io.ebean.SUM - txn[1001] BatchControl flush [MnyB:100 i:2, Role:101 i:2, MnyTopic:102 i:2]
 
-    assertThat(sql).hasSize(9);
+    assertThat(sql).hasSize(12);
 
     // first saved to batch - (depth 100)
     assertSql(sql.get(0)).contains("insert into mny_b");
@@ -81,14 +81,14 @@ public class TestBatchModelFlush extends BaseTestCase {
       assertSql(sql.get(2)).contains(" -- bind(BatchMultipleTop_1");
     }
     // second saved to batch - (depth 101)
-    assertThat(sql.get(3)).contains("insert into mt_role");
-    assertThat(sql.get(4)).contains(" -- bind(");
+    assertThat(sql.get(4)).contains("insert into mt_role");
     assertThat(sql.get(5)).contains(" -- bind(");
+    assertThat(sql.get(6)).contains(" -- bind(");
     // third saved to batch - (depth 102)
-    assertThat(sql.get(6)).contains("insert into mny_topic");
+    assertThat(sql.get(8)).contains("insert into mny_topic");
     if (idType() == IdType.IDENTITY) {
-      assertThat(sql.get(7)).contains(" -- bind(MnyTopic_0");
-      assertThat(sql.get(8)).contains(" -- bind(MnyTopic_1");
+      assertThat(sql.get(9)).contains(" -- bind(MnyTopic_0");
+      assertThat(sql.get(10)).contains(" -- bind(MnyTopic_1");
     }
 
     DB.delete(t0);

@@ -24,11 +24,6 @@ class BindableAssocOne implements Bindable {
   }
 
   @Override
-  public final String toString() {
-    return "BindableAssocOne " + assocOne;
-  }
-
-  @Override
   public final boolean isDraftOnly() {
     return assocOne.isDraftOnly();
   }
@@ -61,7 +56,7 @@ class BindableAssocOne implements Bindable {
       // which will require an additional update
       // register for post insert of assocBean
       // update of bean set importedId
-      request.getPersistRequest().deferredRelationship(assocBean, importedId, bean);
+      request.persistRequest().deferredRelationship(assocBean, importedId, bean);
     }
   }
 

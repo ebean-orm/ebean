@@ -2,9 +2,9 @@ package org.tests.json.transientproperties;
 
 import io.ebean.annotation.Sql;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 
 @Sql
 @Entity

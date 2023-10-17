@@ -4,7 +4,7 @@ import io.ebean.FutureList;
 import io.ebean.Query;
 import io.ebean.Transaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;

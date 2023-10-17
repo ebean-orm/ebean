@@ -3,9 +3,9 @@ package org.tests.model.basic.cache;
 import io.ebean.annotation.Cache;
 import org.tests.model.basic.BasicDomain;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
 
 @Cache(enableQueryCache = true)
 @Entity

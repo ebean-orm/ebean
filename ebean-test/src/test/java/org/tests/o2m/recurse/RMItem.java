@@ -1,6 +1,6 @@
 package org.tests.o2m.recurse;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

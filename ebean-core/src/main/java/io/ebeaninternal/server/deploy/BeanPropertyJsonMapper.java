@@ -12,7 +12,7 @@ import io.ebean.text.TextException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.util.Checksum;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.Objects;
 

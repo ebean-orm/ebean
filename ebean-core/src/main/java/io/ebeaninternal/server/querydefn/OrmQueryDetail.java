@@ -8,7 +8,7 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.Serializable;
 import java.util.*;
 

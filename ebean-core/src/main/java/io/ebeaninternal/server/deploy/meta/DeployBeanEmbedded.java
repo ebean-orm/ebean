@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
-import javax.persistence.Column;
+import jakarta.persistence.Column;
 import java.util.HashMap;
 import java.util.Map;
 

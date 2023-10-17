@@ -7,7 +7,7 @@ import io.ebean.util.IOUtils;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.util.UrlHelper;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;

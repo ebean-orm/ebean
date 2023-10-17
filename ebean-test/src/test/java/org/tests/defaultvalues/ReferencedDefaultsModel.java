@@ -3,8 +3,8 @@ package org.tests.defaultvalues;
 import io.ebean.annotation.Draft;
 import io.ebean.annotation.Draftable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity
 @Draftable

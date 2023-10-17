@@ -1,6 +1,6 @@
 package io.ebean.config.dbplatform;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 
 /**

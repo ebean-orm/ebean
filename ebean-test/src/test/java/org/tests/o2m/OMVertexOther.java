@@ -1,7 +1,7 @@
 package org.tests.o2m;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.util.UUID;
 
 @Entity

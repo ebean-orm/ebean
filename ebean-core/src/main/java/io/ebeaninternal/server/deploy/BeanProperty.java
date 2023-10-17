@@ -41,7 +41,7 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 import io.ebeanservice.docstore.api.support.DocStructure;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;

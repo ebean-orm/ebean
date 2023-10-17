@@ -2,7 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.*;
 import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiSqlBinding;
+import io.ebeaninternal.api.SpiSqlQuery;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -22,8 +22,8 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   private int estimateCapacity;
   private int rows;
 
-  RelationalQueryRequest(SpiEbeanServer server, RelationalQueryEngine engine, SqlQuery q, Transaction t) {
-    super(server, (SpiSqlBinding) q, t);
+  RelationalQueryRequest(SpiEbeanServer server, RelationalQueryEngine engine, SpiSqlQuery q) {
+    super(server, q);
     this.queryEngine = engine;
   }
 

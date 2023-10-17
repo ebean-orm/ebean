@@ -2,7 +2,7 @@ package org.tests.o2m.jointable.inheritance;
 
 import org.tests.o2m.jointable.JtMonkey;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Inheritance

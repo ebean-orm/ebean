@@ -4,7 +4,7 @@ import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 import io.ebean.search.*;
 
-import javax.persistence.NonUniqueResultException;
+import jakarta.persistence.NonUniqueResultException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
@@ -56,7 +56,7 @@ public interface ExpressionList<T> {
   /**
    * Deprecated migrate to {@link #orderBy(String)}
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   default ExpressionList<T> order(String orderByClause) {
     return orderBy(orderByClause);
   }
@@ -74,7 +74,7 @@ public interface ExpressionList<T> {
   /**
    * Deprecated migrate to orderBy().
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   default OrderBy<T> order() {
     return orderBy();
   }

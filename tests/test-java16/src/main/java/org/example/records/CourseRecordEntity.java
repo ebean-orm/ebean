@@ -2,9 +2,9 @@ package org.example.records;
 
 import io.ebean.annotation.Identity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Identity(start = 1000)
 @Entity

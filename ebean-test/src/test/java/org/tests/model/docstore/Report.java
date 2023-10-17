@@ -2,8 +2,8 @@ package org.tests.model.docstore;
 
 import io.ebean.annotation.DocStore;
 
-import javax.persistence.Inheritance;
-import javax.persistence.OneToMany;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.OneToMany;
 import java.util.List;
 
 @DocStore

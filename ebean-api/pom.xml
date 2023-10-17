@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.21.1-SNAPSHOT</version>
+    <version>13.23.0-jakarta</version>
   </parent>
 
   <name>ebean api</name>
@@ -39,12 +39,12 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>3.4</version>
+      <version>3.8</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>persistence-api</artifactId>
+      <artifactId>jakarta-persistence-api</artifactId>
       <version>${ebean-persistence-api.version}</version>
     </dependency>
 
@@ -90,22 +90,22 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- JAVAX-DEPENDENCY-START -->
+    <!-- JAVAX-DEPENDENCY-START ___
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>3.1.0</version>
       <optional>true</optional>
     </dependency>
-    <!-- JAVAX-DEPENDENCY-END -->
-    <!-- JAKARTA-DEPENDENCY-START ___
+    ____ JAVAX-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-START -->
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
       <version>6.0.0</version>
       <optional>true</optional>
     </dependency>
-    ____ JAKARTA-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-END -->
 
     <dependency>
       <groupId>io.avaje</groupId>

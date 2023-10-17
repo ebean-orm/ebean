@@ -1,6 +1,6 @@
 package org.tests.model.aggregation;
 
-import javax.persistence.Column;
+import jakarta.persistence.Column;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

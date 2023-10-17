@@ -1,6 +1,6 @@
 package io.ebean;
 
-import javax.persistence.OptimisticLockException;
+import jakarta.persistence.OptimisticLockException;
 
 /**
  * Thrown at SERIALIZABLE isolation level for non-recoverable concurrent conflict.

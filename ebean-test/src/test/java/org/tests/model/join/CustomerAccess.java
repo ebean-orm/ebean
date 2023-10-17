@@ -1,7 +1,7 @@
 package org.tests.model.join;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
 @DiscriminatorValue("C")
 @Entity

@@ -2,10 +2,10 @@ package org.tests.model.json;
 
 import io.ebean.annotation.DbJson;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Version;
 import java.util.Map;
 
 @Entity

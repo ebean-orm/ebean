@@ -1,6 +1,6 @@
 package org.example.domain
 
-import javax.persistence.*
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "t_inner")

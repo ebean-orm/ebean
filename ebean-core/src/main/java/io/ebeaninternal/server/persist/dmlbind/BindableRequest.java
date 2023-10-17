@@ -19,11 +19,9 @@ public interface BindableRequest {
    * Bind the value to a PreparedStatement.
    * <p>
    * Takes into account logicalType to dbType conversion if required.
-   * </p>
    * <p>
    * Returns the value that was bound (and was potentially converted from
    * logicalType to dbType.
-   * </p>
    */
   void bind(Object value, BeanProperty prop) throws SQLException;
 
@@ -45,7 +43,7 @@ public interface BindableRequest {
   /**
    * Return the original PersistRequest.
    */
-  PersistRequestBean<?> getPersistRequest();
+  PersistRequestBean<?> persistRequest();
 
   /**
    * Return the system current time in millis. This is expected to the same time used

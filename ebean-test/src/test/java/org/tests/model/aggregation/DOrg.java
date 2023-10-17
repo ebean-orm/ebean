@@ -2,9 +2,9 @@ package org.tests.model.aggregation;
 
 import io.ebean.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 
 @Entity
 public class DOrg extends Model {

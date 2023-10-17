@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.BeanCollection;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.Collection;
 import java.util.Map;
 

@@ -236,6 +236,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   String planLabel();
 
   /**
+   * Return the transaction explicitly assigned or null.
+   */
+  SpiTransaction transaction();
+
+  /**
    * Return true if this query should not use the read only data source.
    */
   boolean isUseMaster();
@@ -871,17 +876,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if read auditing is disabled on this query.
    */
   boolean isDisableReadAudit();
-
-  /**
-   * Return true if this is a query executing in the background.
-   */
-  boolean isFutureFetch();
-
-  /**
-   * Set to true to indicate the query is executing in a background thread
-   * asynchronously.
-   */
-  void setFutureFetch(boolean futureFetch);
 
   /**
    * Set the readEvent for future queries (as prepared in foreground thread).

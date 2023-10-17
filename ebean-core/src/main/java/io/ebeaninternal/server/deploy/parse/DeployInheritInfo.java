@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy.parse;
 import io.ebeaninternal.server.deploy.InheritInfo;
 
 import java.lang.reflect.Modifier;
-import javax.persistence.DiscriminatorType;
+import jakarta.persistence.DiscriminatorType;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;

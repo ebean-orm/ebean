@@ -1,6 +1,6 @@
 package org.tests.model.basic.xtra;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "td_child")

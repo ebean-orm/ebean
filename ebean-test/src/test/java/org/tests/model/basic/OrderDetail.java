@@ -3,7 +3,7 @@ package org.tests.model.basic;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocEmbedded;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Timestamp;

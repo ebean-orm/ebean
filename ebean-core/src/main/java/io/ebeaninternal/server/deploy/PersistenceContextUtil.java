@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 /**
  * Utility to find the root bean type.

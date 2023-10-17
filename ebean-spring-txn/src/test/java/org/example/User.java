@@ -2,7 +2,7 @@ package org.example;
 
 import io.ebean.Model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Set;
 
 @Table(name="o_user")

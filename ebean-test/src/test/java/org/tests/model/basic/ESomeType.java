@@ -1,7 +1,7 @@
 package org.tests.model.basic;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import java.util.Currency;
 import java.util.Locale;
 import java.util.TimeZone;

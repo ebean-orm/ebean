@@ -1,6 +1,6 @@
 package org.tests.inheritance.cascadedelete;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Entity

@@ -1,6 +1,6 @@
 package org.tests.model.basic;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -11,7 +11,7 @@ public class Phone implements Serializable {
   private static final long serialVersionUID = -326610269092956952L;
 
   @Id
-  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
+  @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
   @Column(name = "id", unique = true, nullable = false)
   private Long id;
 

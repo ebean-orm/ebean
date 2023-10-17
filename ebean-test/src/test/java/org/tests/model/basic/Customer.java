@@ -3,7 +3,7 @@ package org.tests.model.basic;
 import io.ebean.annotation.*;
 import org.tests.model.basic.finder.CustomerFinder;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.sql.Date;

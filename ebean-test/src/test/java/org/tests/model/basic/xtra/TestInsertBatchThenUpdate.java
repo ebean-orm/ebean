@@ -48,10 +48,10 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
 
       // insert statements for EdExtendedParent
       List<String> loggedSql = LoggedSql.stop();
-      assertThat(loggedSql).hasSize(6);
+      assertThat(loggedSql).hasSize(9);
       assertThat(loggedSql.get(0)).contains("insert into td_parent");
-      assertThat(loggedSql.get(2)).contains("insert into td_child ");
-      assertThat(loggedSql.get(4)).contains("update td_parent set parent_name=? where parent_id=?");
+      assertThat(loggedSql.get(3)).contains("insert into td_child ");
+      assertThat(loggedSql.get(6)).contains("update td_parent set parent_name=? where parent_id=?");
     }
   }
 
@@ -91,9 +91,9 @@ public class TestInsertBatchThenUpdate extends BaseTestCase {
 
       // insert statements for EdExtendedParent
       List<String> loggedSql = LoggedSql.stop();
-      assertThat(loggedSql).hasSize(4);
+      assertThat(loggedSql).hasSize(6);
       assertThat(loggedSql.get(0)).contains("insert into td_parent");
-      assertThat(loggedSql.get(2)).contains("insert into td_child ");
+      assertThat(loggedSql.get(3)).contains("insert into td_child ");
     }
   }
 

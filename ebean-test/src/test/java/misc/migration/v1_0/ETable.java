@@ -5,7 +5,7 @@ import io.ebean.annotation.History;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Table(name = "`table`")

@@ -4,7 +4,7 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.concurrent.Callable;
 
 import static org.assertj.core.api.Assertions.assertThat;

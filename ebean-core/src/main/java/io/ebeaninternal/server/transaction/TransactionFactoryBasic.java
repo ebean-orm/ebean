@@ -3,7 +3,7 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;

@@ -1,6 +1,6 @@
 package org.tests.model.softdelete;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class ESoftDelUp extends BaseSoftDelete {

@@ -2,7 +2,7 @@ package org.example.records;
 
 import io.avaje.lang.NonNullApi;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import java.util.Objects;
 
 @NonNullApi

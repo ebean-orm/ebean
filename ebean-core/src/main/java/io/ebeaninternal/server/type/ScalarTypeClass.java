@@ -2,7 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.ScalarTypeBaseVarchar;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * ScalarType for Class that persists it to VARCHAR column.

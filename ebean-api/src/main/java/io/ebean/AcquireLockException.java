@@ -1,6 +1,6 @@
 package io.ebean;
 
-import javax.persistence.PessimisticLockException;
+import jakarta.persistence.PessimisticLockException;
 
 /**
  * Thrown when failing to acquire a pessimistic lock.

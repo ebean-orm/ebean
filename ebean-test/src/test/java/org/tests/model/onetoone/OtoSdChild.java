@@ -3,10 +3,10 @@ package org.tests.model.onetoone;
 import io.ebean.Finder;
 import io.ebean.annotation.SoftDelete;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Version;
 
 @Entity
 public class OtoSdChild {

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.draftable.Doc;
 import org.tests.model.draftable.Link;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Timestamp;
 import java.util.List;
 

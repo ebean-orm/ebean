@@ -18,9 +18,6 @@ final class BindablePropertyJsonInsert extends BindableProperty {
     this.propertyIndex = prop.propertyIndex();
   }
 
-  /**
-   * Normal binding of a property value from the bean.
-   */
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
     if (bean == null) {

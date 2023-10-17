@@ -2,9 +2,9 @@ package org.example.records;
 
 import io.ebean.Model;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.Version;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Version;
 
 @Entity
 public class UserRole extends Model {

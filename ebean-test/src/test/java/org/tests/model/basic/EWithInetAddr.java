@@ -3,10 +3,10 @@ package org.tests.model.basic;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 import java.net.InetAddress;
 
 @Entity

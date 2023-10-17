@@ -11,7 +11,7 @@ import io.ebeaninternal.server.deploy.PartitionMeta;
 import io.ebeaninternal.server.deploy.TablespaceMeta;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 import static io.ebean.util.AnnotationUtil.typeGet;
 import static java.lang.System.Logger.Level.ERROR;
@@ -129,7 +129,7 @@ final class AnnotationClass extends AnnotationParser {
       for (UniqueConstraint c : uniqueConstraints) {
         descriptor.addIndex(new IndexDefinition(c.name(), convertColumnNames(c.columnNames())));
       }
-      for (javax.persistence.Index index : table.indexes()) {
+      for (jakarta.persistence.Index index : table.indexes()) {
         final String[] cols = index.columnList().split(",");
         descriptor.addIndex(new IndexDefinition(index.name(), convertColumnNames(cols), index.unique()));
       }

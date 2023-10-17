@@ -2,8 +2,8 @@ package org.tests.model.basic.mapsuper;
 
 import io.ebean.annotation.WhenCreated;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import java.sql.Timestamp;
 
 @MappedSuperclass

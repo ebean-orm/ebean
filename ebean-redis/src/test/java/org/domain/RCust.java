@@ -5,7 +5,7 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.CacheBeanTuning;
 import io.ebean.annotation.Index;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import java.time.LocalDate;
 
 @Cache(naturalKey = "name")

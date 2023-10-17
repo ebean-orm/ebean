@@ -2,8 +2,8 @@ package org.tests.inherit;
 
 import io.ebean.annotation.Sql;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
 
 @Entity
 @Sql

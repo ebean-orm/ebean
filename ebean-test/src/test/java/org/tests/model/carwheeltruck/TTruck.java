@@ -1,6 +1,6 @@
 package org.tests.model.carwheeltruck;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

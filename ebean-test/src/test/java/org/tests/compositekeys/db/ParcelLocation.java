@@ -1,6 +1,6 @@
 package org.tests.compositekeys.db;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class ParcelLocation {

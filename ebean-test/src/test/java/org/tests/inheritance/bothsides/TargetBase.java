@@ -1,7 +1,7 @@
 package org.tests.inheritance.bothsides;
 
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
 
 @Entity
 @Inheritance

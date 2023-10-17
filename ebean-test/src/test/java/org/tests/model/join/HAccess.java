@@ -2,7 +2,7 @@ package org.tests.model.join;
 
 import io.ebean.annotation.DbForeignKey;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.UUID;
 
 @Inheritance

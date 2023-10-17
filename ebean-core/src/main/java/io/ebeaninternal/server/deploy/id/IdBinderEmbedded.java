@@ -115,6 +115,11 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
+  public int size() {
+    return props.length;
+  }
+
+  @Override
   public String orderBy() {
     return orderBy(null, true);
   }

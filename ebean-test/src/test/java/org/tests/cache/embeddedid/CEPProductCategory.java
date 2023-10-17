@@ -1,9 +1,9 @@
 package org.tests.cache.embeddedid;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.ManyToOne;
 
 @IdClass(CEPProductCategoryId.class)
 @Entity

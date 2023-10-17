@@ -1,8 +1,8 @@
 package org.tests.model.basic;
 
-import javax.persistence.Entity;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import javax.validation.constraints.Size;
 
 @Entity

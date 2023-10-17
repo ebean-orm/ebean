@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.persist;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;

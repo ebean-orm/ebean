@@ -2,9 +2,9 @@ package org.example.domain;
 
 import java.time.Instant;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 
 import io.ebean.Model;
 import io.ebean.annotation.WhenCreated;

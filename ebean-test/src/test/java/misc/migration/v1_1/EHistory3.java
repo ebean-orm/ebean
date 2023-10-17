@@ -4,9 +4,9 @@ package misc.migration.v1_1;
 import io.ebean.annotation.History;
 import io.ebean.annotation.HistoryExclude;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 
 @Entity

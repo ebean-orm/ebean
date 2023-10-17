@@ -3,7 +3,7 @@ package org.tests.model.converstation;
 import io.ebean.annotation.FetchPreference;
 import org.tests.model.BaseModel;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

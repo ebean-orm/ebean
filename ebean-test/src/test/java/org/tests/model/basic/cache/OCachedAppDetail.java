@@ -2,9 +2,9 @@ package org.tests.model.basic.cache;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.UniqueConstraint;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.UniqueConstraint;
 
 @Cache(naturalKey = {"app", "detail"})
 @Entity

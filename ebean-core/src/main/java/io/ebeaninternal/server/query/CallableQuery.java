@@ -13,9 +13,9 @@ abstract class CallableQuery<T> {
   final SpiEbeanServer server;
   final Transaction transaction;
 
-  CallableQuery(SpiEbeanServer server, SpiQuery<T> query, Transaction t) {
+  CallableQuery(SpiEbeanServer server, SpiQuery<T> query) {
     this.server = server;
     this.query = query;
-    this.transaction = t;
+    this.transaction = query.transaction();
   }
 }

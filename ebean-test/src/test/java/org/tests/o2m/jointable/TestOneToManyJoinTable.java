@@ -38,7 +38,7 @@ public class TestOneToManyJoinTable extends BaseTestCase {
 
     List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(3);
+      assertThat(sql).hasSize(4);
       assertSql(sql.get(0)).contains("insert into troop_monkey (troop_pid, monkey_mid) values (?, ?)");
       assertSqlBind(sql, 1, 2);
 
@@ -96,14 +96,14 @@ public class TestOneToManyJoinTable extends BaseTestCase {
     List<String> sql = LoggedSql.collect();
 
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(13);
+      assertThat(sql).hasSize(16);
       assertSql(sql.get(0)).contains("insert into trainer ");
       assertSql(sql.get(1)).contains("insert into monkey ");
       assertSqlBind(sql, 2, 4);
-      assertThat(sql.get(5)).contains("update monkey set food_preference=?, version=? where mid=? and version=?");
-      assertThat(sql.get(6)).contains("-- bind(");
-      assertThat(sql.get(7)).contains("insert into trainer_monkey ");
-      assertSqlBind(sql, 8, 12);
+      assertThat(sql.get(6)).contains("update monkey set food_preference=?, version=? where mid=? and version=?");
+      assertThat(sql.get(7)).contains("-- bind(");
+      assertThat(sql.get(9)).contains("insert into trainer_monkey ");
+      assertSqlBind(sql, 10, 14);
 
     } else {
       assertThat(sql).hasSize(10);

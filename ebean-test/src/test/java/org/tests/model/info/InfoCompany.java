@@ -4,7 +4,7 @@ import io.ebean.Finder;
 import io.ebean.Model;
 import io.ebean.annotation.JsonIgnore;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

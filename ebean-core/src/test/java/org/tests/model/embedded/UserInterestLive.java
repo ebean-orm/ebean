@@ -3,8 +3,8 @@ package org.tests.model.embedded;
 import io.ebean.Model;
 import io.ebean.annotation.WhenCreated;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
 import java.util.Date;
 
 @Entity

@@ -42,9 +42,9 @@ import io.ebeaninternal.xmapping.api.XmapRawSql;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreFactory;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PersistenceException;
-import javax.persistence.Transient;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Transient;
 import javax.sql.DataSource;
 import java.io.Serializable;
 import java.lang.reflect.Field;

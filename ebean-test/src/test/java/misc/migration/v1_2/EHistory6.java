@@ -5,9 +5,9 @@ import io.ebean.annotation.DbDefault;
 import io.ebean.annotation.History;
 import io.ebean.annotation.NotNull;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 
 @Entity

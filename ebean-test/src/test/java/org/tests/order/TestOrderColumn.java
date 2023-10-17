@@ -100,7 +100,7 @@ class TestOrderColumn extends TransactionalTestCase {
     LoggedSql.start();
     DB.save(result);
     final List<String> sql = LoggedSql.collect();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
 
     assertThat(sql.get(0)).contains("update order_toy set title=?, sort_order=? where id=?");
     assertThat(sql.get(1)).contains("bind(tt10");
@@ -138,10 +138,10 @@ class TestOrderColumn extends TransactionalTestCase {
     DB.save(result);
     final List<String> sql = LoggedSql.stop();
 
-    assertThat(sql).hasSize(4);
+    assertThat(sql).hasSize(6);
     assertSql(sql.get(0)).contains("delete from order_toy where id=?");
-    assertSql(sql.get(2)).contains("update order_toy set sort_order=? where id=?");
-    assertSql(sql.get(3)).contains("bind(2,");
+    assertSql(sql.get(3)).contains("update order_toy set sort_order=? where id=?");
+    assertSql(sql.get(4)).contains("bind(2,");
   }
 
 }

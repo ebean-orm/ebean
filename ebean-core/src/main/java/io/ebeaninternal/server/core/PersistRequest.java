@@ -8,7 +8,7 @@ import io.ebeaninternal.server.persist.BatchPostExecute;
 import io.ebeaninternal.server.persist.BatchedSqlException;
 import io.ebeaninternal.server.persist.PersistExecute;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 
 /**

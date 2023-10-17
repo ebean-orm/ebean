@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.PlainBean;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;

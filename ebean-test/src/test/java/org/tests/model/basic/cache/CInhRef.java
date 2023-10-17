@@ -3,8 +3,8 @@ package org.tests.model.basic.cache;
 import io.ebean.annotation.Cache;
 import org.tests.model.basic.BasicDomain;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 @Cache(enableQueryCache = true)

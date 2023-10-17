@@ -3,7 +3,7 @@ package io.ebeaninternal.server.type;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.EnumType;
+import jakarta.persistence.EnumType;
 import java.lang.reflect.Type;
 
 /**

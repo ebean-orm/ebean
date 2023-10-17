@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTMaster;
 
-import javax.persistence.OptimisticLockException;
+import jakarta.persistence.OptimisticLockException;
 import java.sql.Timestamp;
 
 import static org.assertj.core.api.Assertions.assertThat;

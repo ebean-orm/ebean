@@ -11,8 +11,8 @@ import io.ebean.plugin.Property;
 import io.ebean.plugin.SpiServer;
 import io.ebean.text.json.JsonContext;
 
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.Collection;
 import java.util.List;
@@ -650,13 +650,19 @@ public interface Database {
   void flush();
 
   /**
+   * Deprecated for removal migrate using try-with-resources and commit on the transaction itself.
+   * <p>
    * Commit the current transaction.
    */
+  @Deprecated(forRemoval = true)
   void commitTransaction();
 
   /**
+   * Deprecated for removal migrate to using try-with-resources and rollback on the transaction itself.
+   * <p>
    * Rollback the current transaction.
    */
+  @Deprecated(forRemoval = true)
   void rollbackTransaction();
 
   /**

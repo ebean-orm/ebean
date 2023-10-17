@@ -22,7 +22,7 @@ import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
@@ -85,11 +85,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Set to true by a user wanting a DISTINCT query (id property must be excluded).
    */
   private boolean distinct;
-
-  /**
-   * Set to true if this is a future fetch using background threads.
-   */
-  private boolean futureFetch;
 
   /**
    * Only used for read auditing with findFutureList() query.
@@ -1389,6 +1384,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public SpiTransaction transaction() {
+    return transaction;
+  }
+
+  @Override
   public final Query<T> usingTransaction(Transaction transaction) {
     this.transaction = (SpiTransaction) transaction;
     return this;
@@ -1419,22 +1419,22 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final int delete() {
-    return server.delete(this, transaction);
+    return server.delete(this);
   }
 
   @Override
   public final int delete(Transaction transaction) {
-    return server.delete(this, transaction);
+    return server.delete(this);
   }
 
   @Override
   public final int update() {
-    return server.update(this, transaction);
+    return server.update(this);
   }
 
   @Override
   public final int update(Transaction transaction) {
-    return server.update(this, transaction);
+    return server.update(this);
   }
 
   @Override
@@ -1442,12 +1442,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
     // the copy rather than this query instance)
-    return server.findIds(this, transaction);
+    return server.findIds(this);
   }
 
   @Override
   public final boolean exists() {
-    return server.exists(this, transaction);
+    return server.exists(this);
   }
 
   @Override
@@ -1455,38 +1455,38 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
     // the copy rather than this query instance)
-    return server.findCount(this, transaction);
+    return server.findCount(this);
   }
 
   @Override
   public final void findEachWhile(Predicate<T> consumer) {
-    server.findEachWhile(this, consumer, transaction);
+    server.findEachWhile(this, consumer);
   }
 
   @Override
   public final void findEach(Consumer<T> consumer) {
-    server.findEach(this, consumer, transaction);
+    server.findEach(this, consumer);
   }
 
   @Override
   public final void findEach(int batch, Consumer<List<T>> consumer) {
-    server.findEach(this, batch, consumer, transaction);
+    server.findEach(this, batch, consumer);
   }
 
   @Override
   public final QueryIterator<T> findIterate() {
-    return server.findIterate(this, transaction);
+    return server.findIterate(this);
   }
 
   @Override
   public final Stream<T> findStream() {
-    return server.findStream(this, transaction);
+    return server.findStream(this);
   }
 
   @Override
   public final List<Version<T>> findVersions() {
     this.temporalMode = TemporalMode.VERSIONS;
-    return server.findVersions(this, transaction);
+    return server.findVersions(this);
   }
 
   @Override
@@ -1497,33 +1497,33 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     this.temporalMode = TemporalMode.VERSIONS;
     this.versionsStart = start;
     this.versionsEnd = end;
-    return server.findVersions(this, transaction);
+    return server.findVersions(this);
   }
 
   @Override
   public final List<T> findList() {
-    return server.findList(this, transaction);
+    return server.findList(this);
   }
 
   @Override
   public final Set<T> findSet() {
-    return server.findSet(this, transaction);
+    return server.findSet(this);
   }
 
   @Override
   public final <K> Map<K, T> findMap() {
-    return server.findMap(this, transaction);
+    return server.findMap(this);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public final <A> List<A> findSingleAttributeList() {
-    return server.findSingleAttributeList(this, transaction);
+    return server.findSingleAttributeList(this);
   }
 
   @Override
   public final <A> Set<A> findSingleAttributeSet() {
-    return server.findSingleAttributeSet(this, transaction);
+    return server.findSingleAttributeSet(this);
   }
 
   @Override
@@ -1534,32 +1534,32 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final T findOne() {
-    return server.findOne(this, transaction);
+    return server.findOne(this);
   }
 
   @Override
   public final Optional<T> findOneOrEmpty() {
-    return server.findOneOrEmpty(this, transaction);
+    return server.findOneOrEmpty(this);
   }
 
   @Override
   public final FutureIds<T> findFutureIds() {
-    return server.findFutureIds(this, transaction);
+    return server.findFutureIds(this);
   }
 
   @Override
   public final FutureList<T> findFutureList() {
-    return server.findFutureList(this, transaction);
+    return server.findFutureList(this);
   }
 
   @Override
   public final FutureRowCount<T> findFutureCount() {
-    return server.findFutureCount(this, transaction);
+    return server.findFutureCount(this);
   }
 
   @Override
   public final PagedList<T> findPagedList() {
-    return server.findPagedList(this, transaction);
+    return server.findPagedList(this);
   }
 
   @Override
@@ -1915,16 +1915,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final boolean isDisableReadAudit() {
     return disableReadAudit;
-  }
-
-  @Override
-  public final boolean isFutureFetch() {
-    return futureFetch;
-  }
-
-  @Override
-  public final void setFutureFetch(boolean backgroundFetch) {
-    this.futureFetch = backgroundFetch;
   }
 
   @Override

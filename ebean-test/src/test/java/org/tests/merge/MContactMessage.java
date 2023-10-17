@@ -2,8 +2,8 @@ package org.tests.merge;
 
 import io.ebean.annotation.NotNull;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 public class MContactMessage extends MBase {

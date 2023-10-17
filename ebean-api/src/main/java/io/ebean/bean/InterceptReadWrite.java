@@ -4,8 +4,8 @@ import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.ValuePair;
 
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -5,10 +5,7 @@ import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.SpiDtoQuery;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
@@ -39,7 +36,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   private String label;
   private ProfileLocation profileLocation;
   private final BindParams bindParams = new BindParams();
-  private Transaction transaction;
+  private SpiTransaction transaction;
 
   /**
    * Create given an underlying ORM query.
@@ -85,7 +82,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Override
   public DtoQuery<T> usingTransaction(Transaction transaction) {
-    this.transaction = transaction;
+    this.transaction = (SpiTransaction) transaction;
     return this;
   }
 
@@ -227,7 +224,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public Transaction transaction() {
+  public SpiTransaction transaction() {
     return transaction;
   }
 

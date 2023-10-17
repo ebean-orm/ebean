@@ -1,6 +1,6 @@
 package org.tests.model.basic.first;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "f_first")

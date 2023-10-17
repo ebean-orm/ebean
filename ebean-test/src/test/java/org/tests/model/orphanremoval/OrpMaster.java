@@ -2,7 +2,7 @@ package org.tests.model.orphanremoval;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
 

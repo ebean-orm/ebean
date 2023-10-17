@@ -8,7 +8,7 @@ import io.ebeaninternal.server.core.PersistRequestOrmUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.util.BindParamsParser;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 

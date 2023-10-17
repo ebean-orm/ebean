@@ -3,7 +3,7 @@ package io.ebean;
 import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.datasource.DataSourceConfigurationException;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;

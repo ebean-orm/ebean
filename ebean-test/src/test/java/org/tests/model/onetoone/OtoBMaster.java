@@ -1,6 +1,6 @@
 package org.tests.model.onetoone;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class OtoBMaster {

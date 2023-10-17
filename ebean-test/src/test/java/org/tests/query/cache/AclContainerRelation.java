@@ -1,6 +1,6 @@
 package org.tests.query.cache;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity

@@ -1,6 +1,6 @@
 package org.tests.rawsql.transport;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import java.sql.Date;
 
 @Entity

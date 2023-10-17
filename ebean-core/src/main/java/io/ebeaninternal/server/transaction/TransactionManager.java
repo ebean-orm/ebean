@@ -29,7 +29,7 @@ import io.ebeanservice.docstore.api.DocStoreTransaction;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;

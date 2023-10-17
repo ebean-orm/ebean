@@ -1,8 +1,8 @@
 package org.example.domain;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
 
 @Inheritance
 @DiscriminatorValue("WC")

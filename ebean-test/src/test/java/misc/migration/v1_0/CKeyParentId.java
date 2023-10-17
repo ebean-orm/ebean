@@ -1,6 +1,6 @@
 package misc.migration.v1_0;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import javax.validation.constraints.Size;
 
 @Embeddable

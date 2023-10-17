@@ -41,11 +41,12 @@ public class TestMergeM2M extends BaseTestCase {
 
     List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(6);
+      assertThat(sql).hasSize(7);
       assertSql(sql.get(0)).contains("select");
       assertSql(sql.get(1)).contains("insert into mmachine");
       assertSql(sql.get(2)).contains("insert into mmachine_mgroup");
       assertSqlBind(sql, 3, 5);
+      assertSql(sql.get(6)).contains(" -- executeBatch");
     } else {
       assertThat(sql).hasSize(5);
       assertSql(sql.get(0)).contains("select");
@@ -66,13 +67,13 @@ public class TestMergeM2M extends BaseTestCase {
     DB.merge(m1, options);
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(9);
+    assertThat(sql).hasSize(11);
     assertSql(sql.get(0)).contains("select");
     assertSql(sql.get(1)).contains("delete from mmachine_mgroup");
     assertSqlBind(sql, 2, 4);
 
-    assertThat(sql.get(5)).contains("insert into mmachine_mgroup");
-    assertSqlBind(sql, 6, 7);
-    assertThat(sql.get(8)).contains("update mmachine");
+    assertThat(sql.get(6)).contains("insert into mmachine_mgroup");
+    assertSqlBind(sql, 7, 8);
+    assertThat(sql.get(10)).contains("update mmachine");
   }
 }

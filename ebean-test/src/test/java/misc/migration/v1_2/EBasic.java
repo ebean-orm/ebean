@@ -3,7 +3,7 @@ package misc.migration.v1_2;
 import io.ebean.annotation.Index;
 import io.ebean.annotation.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.Size;
 import java.io.File;
 import java.sql.Timestamp;

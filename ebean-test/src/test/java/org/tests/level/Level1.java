@@ -1,6 +1,6 @@
 package org.tests.level;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Set;
 
 @Entity

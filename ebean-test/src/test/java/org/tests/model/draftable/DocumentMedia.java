@@ -2,8 +2,8 @@ package org.tests.model.draftable;
 
 import io.ebean.annotation.DraftableElement;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 
 /**
  * 'Owned' by @Draftable root.

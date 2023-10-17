@@ -71,7 +71,7 @@ public class TestQuerySubquery extends BaseTestCase {
       .hasSize(1)
       .first().asString()
       .contains("--bind(" + robId + ")")
-      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.ID = ?)");
+      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.id = ?)");
   }
 
   @Test
@@ -88,7 +88,7 @@ public class TestQuerySubquery extends BaseTestCase {
       .hasSize(1)
       .first().asString()
       .contains("--bind(" + robId + ")")
-      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.ID = ?)");
+      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.id = ?)");
   }
 
   @Test
@@ -105,7 +105,7 @@ public class TestQuerySubquery extends BaseTestCase {
       .hasSize(1)
       .first().asString()
       .contains("--bind(" + robId + ")")
-      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.ID = ?)");
+      .contains("t1.name = (select sq.NAME from PERSONS sq where sq.id = ?)");
   }
 
 }

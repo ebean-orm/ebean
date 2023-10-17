@@ -62,7 +62,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
     }
 
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
     assertSql(sql.get(0)).contains("update audit_log set description = description where id = ?");
     assertSqlBind(sql, 1, 2);
   }

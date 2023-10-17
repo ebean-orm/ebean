@@ -3,7 +3,7 @@ package io.ebeaninternal.api;
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import io.ebeaninternal.server.util.ArrayStack;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * Manage scoped (typically thread local) transactions.

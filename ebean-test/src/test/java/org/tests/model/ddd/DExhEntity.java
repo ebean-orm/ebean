@@ -4,9 +4,9 @@ import io.ebean.annotation.Identity;
 import org.tests.model.ivo.Oid;
 import org.tests.model.ivo.converter.AnEnumType;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import java.sql.Timestamp;
 
 import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;

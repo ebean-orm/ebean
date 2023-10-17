@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.CascadeType;
+import jakarta.persistence.CascadeType;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;

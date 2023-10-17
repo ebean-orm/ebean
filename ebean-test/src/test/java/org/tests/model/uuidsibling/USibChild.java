@@ -4,7 +4,7 @@ import io.ebean.Finder;
 import io.ebean.Model;
 import io.ebean.annotation.SoftDelete;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.UUID;
 

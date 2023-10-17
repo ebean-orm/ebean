@@ -5,7 +5,7 @@ import io.ebean.annotation.PersistBatch;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DocStoreConfig;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 
 /**

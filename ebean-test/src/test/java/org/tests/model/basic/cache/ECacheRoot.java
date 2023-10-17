@@ -2,9 +2,9 @@ package org.tests.model.basic.cache;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import javax.validation.constraints.Size;
 import java.util.UUID;
 

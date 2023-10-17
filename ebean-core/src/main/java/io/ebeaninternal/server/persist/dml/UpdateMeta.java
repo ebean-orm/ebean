@@ -44,11 +44,11 @@ final class UpdateMeta extends BaseMeta {
   /**
    * get or generate the sql based on the concurrency mode.
    */
-  SpiUpdatePlan getUpdatePlan(PersistRequestBean<?> request) {
-    return getDynamicUpdatePlan(request);
+  SpiUpdatePlan updatePlan(PersistRequestBean<?> request) {
+    return dynamicUpdatePlan(request);
   }
 
-  private SpiUpdatePlan getDynamicUpdatePlan(PersistRequestBean<?> persistRequest) {
+  private SpiUpdatePlan dynamicUpdatePlan(PersistRequestBean<?> persistRequest) {
     String key = persistRequest.updatePlanHash();
     // check if we can use a cached UpdatePlan
     BeanDescriptor<?> beanDescriptor = persistRequest.descriptor();
@@ -80,7 +80,7 @@ final class UpdateMeta extends BaseMeta {
     request.setUpdateSetMode();
     bindableList.dmlAppend(request);
 
-    if (request.getBindColumnCount() == 0) {
+    if (request.bindColumnCount() == 0) {
       // update properties must have been updatable=false
       // with the result that nothing is in the set clause
       return null;

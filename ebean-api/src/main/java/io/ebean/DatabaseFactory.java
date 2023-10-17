@@ -5,7 +5,7 @@ import io.ebean.config.DatabaseConfig;
 import io.ebean.service.SpiContainer;
 import io.ebean.service.SpiContainerFactory;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.ServiceLoader;

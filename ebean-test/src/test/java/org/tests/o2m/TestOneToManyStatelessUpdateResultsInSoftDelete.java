@@ -141,7 +141,7 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     DB.save(goodsAfterInsert);
     var sql = LoggedSql.collect();
     if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
-      assertThat(sql).hasSize(2);
+      assertThat(sql).hasSize(3);
       assertThat(sql.get(0)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
     }
 
@@ -166,14 +166,14 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     sql = LoggedSql.collect();
     assertThat(sql).isNotEmpty();
     if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
-      assertThat(sql).hasSize(7);
+      assertThat(sql).hasSize(10);
       assertThat(sql.get(0)).contains("update workflow_entity set when_modified=? where id=?");
       assertThat(sql.get(1)).contains(" -- bind(");
-      assertThat(sql.get(2)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
-      assertThat(sql.get(3)).contains(" -- bind(");
-      assertThat(sql.get(4)).contains("insert into workflow_operation_entity (name, version, when_created, when_modified");
-      assertThat(sql.get(5)).contains(" -- bind(");
-      assertThat(sql.get(6)).contains("update goods_entity set when_modified=?, workflow_entity_id=? where id=?");
+      assertThat(sql.get(3)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
+      assertThat(sql.get(4)).contains(" -- bind(");
+      assertThat(sql.get(6)).contains("insert into workflow_operation_entity (name, version, when_created, when_modified");
+      assertThat(sql.get(7)).contains(" -- bind(");
+      assertThat(sql.get(9)).contains("update goods_entity set when_modified=?, workflow_entity_id=? where id=?");
     }
 
     var ops = workflow.getOperations();
@@ -218,12 +218,12 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
 
     var sql = LoggedSql.collect();
     if (isH2() || isPostgresCompatible()) { // using deleted=true vs deleted=1
-      assertThat(sql).hasSize(5);
+      assertThat(sql).hasSize(7);
       assertThat(sql.get(0)).contains("update workflow_entity set when_modified=? where id=?");
       assertThat(sql.get(1)).contains(" -- bind(");
-      assertThat(sql.get(2)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
-      assertThat(sql.get(3)).contains(" -- bind(");
-      assertThat(sql.get(4)).contains("update goods_entity set when_modified=?, workflow_entity_id=? where id=?");
+      assertThat(sql.get(3)).contains("update workflow_operation_entity set deleted=true where workflow_id = ?");
+      assertThat(sql.get(4)).contains(" -- bind(");
+      assertThat(sql.get(6)).contains("update goods_entity set when_modified=?, workflow_entity_id=? where id=?");
     }
 
     try (var writer = new StringWriter()) {
@@ -296,12 +296,12 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     assertThat(sql).isNotEmpty();
     assertThat(sql.get(0)).contains("delete from attachment where goods_entity_id = ?");
     assertThat(sql.get(1)).contains(" -- bind(");
-    assertThat(sql.get(2)).contains("insert into attachment (id, goods_entity_id, name, ");
-    assertThat(sql.get(3)).contains(" -- bind(");
+    assertThat(sql.get(3)).contains("insert into attachment (id, goods_entity_id, name, ");
     assertThat(sql.get(4)).contains(" -- bind(");
+    assertThat(sql.get(5)).contains(" -- bind(");
     if (isH2() || isPostgresCompatible() || isMySql()) { // i.e. using identity, not using sequence
-      assertThat(sql.get(5)).contains("insert into attachment (goods_entity_id, name,");
-      assertThat(sql.get(6)).contains(" -- bind(");
+      assertThat(sql.get(6)).contains("insert into attachment (goods_entity_id, name,");
+      assertThat(sql.get(7)).contains(" -- bind(");
     }
 
     persistedGoods = DB.find(GoodsEntity.class, goods.getId());
@@ -328,13 +328,13 @@ class TestOneToManyStatelessUpdateResultsInSoftDelete extends BaseTestCase {
     assertThat(sql.get(1)).contains(" -- bind(");
     assertThat(sql.get(2)).contains(" -- bind(");
     assertThat(sql.get(3)).contains(" -- bind(");
-    assertThat(sql.get(4)).contains("insert into attachment (id, goods_entity_id, name,");
-    assertThat(sql.get(5)).contains(" -- bind(");
+    assertThat(sql.get(5)).contains("insert into attachment (id, goods_entity_id, name,");
     assertThat(sql.get(6)).contains(" -- bind(");
+    assertThat(sql.get(7)).contains(" -- bind(");
     if (isH2() || isPostgresCompatible()) { // using identity, not using sequence
-      assertThat(sql).hasSize(9);
-      assertThat(sql.get(7)).contains("insert into attachment (goods_entity_id, name, ");
-      assertThat(sql.get(8)).contains(" -- bind(");
+      assertThat(sql).hasSize(12);
+      assertThat(sql.get(8)).contains("insert into attachment (goods_entity_id, name, ");
+      assertThat(sql.get(9)).contains(" -- bind(");
     }
 
     var persistedGoods2 = DB.find(GoodsEntity.class, goods.getId());

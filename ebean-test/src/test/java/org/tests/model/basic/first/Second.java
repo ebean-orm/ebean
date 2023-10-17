@@ -1,6 +1,6 @@
 package org.tests.model.basic.first;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @AttributeOverride(name = "name", column = @Column(name = "mod_name"))
 @Entity

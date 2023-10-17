@@ -10,7 +10,6 @@ import io.ebeaninternal.server.persist.dml.DmlMode;
  * <p>
  * Lob properties can be excluded and it creates BindablePropertyInsertGenerated
  * and BindablePropertyUpdateGenerated as required.
- * </p>
  */
 final class FactoryProperty {
 

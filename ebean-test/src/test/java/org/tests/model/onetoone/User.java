@@ -3,9 +3,9 @@ package org.tests.model.onetoone;
 import io.ebean.Finder;
 import org.tests.model.BaseModel;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "oto_user")

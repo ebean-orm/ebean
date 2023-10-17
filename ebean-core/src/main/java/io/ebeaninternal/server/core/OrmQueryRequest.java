@@ -18,7 +18,7 @@ import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
@@ -58,6 +58,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public PersistenceException translate(String bindLog, String sql, SQLException e) {
     return queryEngine.translate(this, bindLog, sql, e);
+  }
+
+  @Override
+  public boolean isGetAllFromBeanCache() {
+    return (transaction == null || !transaction.isSkipCache()) && getFromBeanCache();
   }
 
   @Override

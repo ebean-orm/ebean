@@ -3,8 +3,8 @@ package org.tests.cache.personinfo;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.SoftDelete;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import javax.validation.constraints.Size;
 
 @Entity

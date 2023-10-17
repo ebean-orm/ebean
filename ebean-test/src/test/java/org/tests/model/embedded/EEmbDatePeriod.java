@@ -2,7 +2,7 @@ package org.tests.model.embedded;
 
 import io.ebean.annotation.NotNull;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import java.util.Date;
 
 @Embeddable

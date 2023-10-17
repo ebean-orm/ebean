@@ -2,9 +2,9 @@ package misc.migration.v1_1;
 
 import io.ebean.annotation.DbJson;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.util.List;
 
 @Entity

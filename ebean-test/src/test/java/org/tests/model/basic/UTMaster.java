@@ -3,7 +3,7 @@ package org.tests.model.basic;
 import io.ebean.Model;
 import io.ebean.annotation.DbJsonB;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;

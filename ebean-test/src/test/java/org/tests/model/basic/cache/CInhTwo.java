@@ -2,9 +2,9 @@ package org.tests.model.basic.cache;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
 
 @Cache
 @Entity

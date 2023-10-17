@@ -35,7 +35,7 @@ module io.ebean.core {
   requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;
   requires static jakarta.validation;
-  requires static java.transaction;
+  requires static jakarta.transaction;
   requires static java.naming;
   requires static java.validation;
   requires static org.postgresql.jdbc;

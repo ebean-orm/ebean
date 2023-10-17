@@ -13,7 +13,7 @@ import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.*;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Collection;

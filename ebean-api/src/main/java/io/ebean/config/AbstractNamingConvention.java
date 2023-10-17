@@ -3,9 +3,9 @@ package io.ebean.config;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.AnnotationUtil;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Inheritance;
-import javax.persistence.Table;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.Table;
 
 import static io.ebean.util.StringHelper.isNull;
 

@@ -41,7 +41,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       txn.flush();
 
       List<String> loggedSql1 = LoggedSql.start();
-      assertThat(loggedSql1).hasSize(4);
+      assertThat(loggedSql1).hasSize(6);
 
       parent.setName("MyDesk");
       DB.save(parent);
@@ -53,7 +53,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSql.start();
-      assertThat(loggedSql2).hasSize(2);
+      assertThat(loggedSql2).hasSize(3);
       assertThat(loggedSql2.get(0)).contains(" update td_parent ");
     }
   }

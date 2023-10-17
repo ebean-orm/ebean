@@ -5,7 +5,7 @@ import io.ebean.annotation.PreSoftDelete;
 import io.ebean.annotation.SoftDelete;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "e_basic_with_ex")

@@ -2,7 +2,7 @@ package org.tests.inheritance;
 
 import io.ebean.annotation.Index;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.NotNull;
 
 /**

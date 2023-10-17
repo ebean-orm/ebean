@@ -1,9 +1,9 @@
 package org.example.order
 
 import java.math.BigDecimal
-import javax.persistence.Entity
-import javax.persistence.Id
-import javax.persistence.ManyToOne
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
 
 @Entity
 class OrderItem(

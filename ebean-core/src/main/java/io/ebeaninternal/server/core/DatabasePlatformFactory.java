@@ -6,7 +6,7 @@ import io.ebean.config.dbplatform.DatabasePlatformProvider;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.DbOffline;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

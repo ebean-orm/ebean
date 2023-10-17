@@ -2,7 +2,7 @@ package org.tests.model.aggregation;
 
 import io.ebean.Model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

@@ -2,7 +2,7 @@ package io.ebeaninternal.server.persist;
 
 import io.ebeaninternal.server.core.PersistRequestBean;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * Defines bean insert update and delete implementation.

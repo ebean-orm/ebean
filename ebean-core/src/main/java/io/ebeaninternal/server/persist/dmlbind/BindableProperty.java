@@ -20,11 +20,6 @@ class BindableProperty implements Bindable {
   }
 
   @Override
-  public final String toString() {
-    return prop.toString();
-  }
-
-  @Override
   public final boolean isDraftOnly() {
     return prop.isDraftOnly();
   }

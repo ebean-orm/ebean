@@ -1,6 +1,6 @@
 package org.tests.inheritance.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class CalculationResult {

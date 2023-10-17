@@ -1,6 +1,6 @@
 package org.tests.model.basic;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 /**
  * A user may have multiple bookmarks
