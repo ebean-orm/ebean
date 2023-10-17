@@ -475,6 +475,11 @@ class ProcessingContext implements Constants {
     return createMetaInfWriter(METAINF_MANIFEST);
   }
 
+  FileObject createNativeImageWriter(String name) throws IOException {
+    String nm = "META-INF/native-image/" + name + "/reflect-config.json";
+    return createMetaInfWriter(nm);
+  }
+
   FileObject createMetaInfWriter(String target) throws IOException {
     return filer.createResource(StandardLocation.CLASS_OUTPUT, "", target);
   }
