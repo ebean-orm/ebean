@@ -3,8 +3,8 @@ package org.tests.model.history;
 import io.ebean.annotation.History;
 import org.tests.model.draftable.BaseDomain;
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToMany;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToMany;
 import java.util.List;
 
 @History

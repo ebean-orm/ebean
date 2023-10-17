@@ -2,7 +2,7 @@ package org.tests.model.carwheeltruck;
 
 import io.ebean.annotation.SoftDelete;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
 

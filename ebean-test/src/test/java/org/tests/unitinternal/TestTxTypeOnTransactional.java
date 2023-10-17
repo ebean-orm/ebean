@@ -10,7 +10,7 @@ import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.xtra.DummyDao;
 import org.tests.model.basic.xtra.OptimisticLockExceptionThrowingDao;
 
-import javax.persistence.OptimisticLockException;
+import jakarta.persistence.OptimisticLockException;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;

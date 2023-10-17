@@ -18,10 +18,10 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarTypeWrapper;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;

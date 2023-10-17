@@ -3,9 +3,9 @@ package org.tests.model.basic;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 import java.io.Serializable;
 import java.sql.Timestamp;
 

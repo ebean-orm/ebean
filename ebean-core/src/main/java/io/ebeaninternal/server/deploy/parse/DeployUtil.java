@@ -18,9 +18,9 @@ import io.ebeaninternal.server.type.ScalarTypeWrapper;
 import io.ebeaninternal.server.type.SimpleAesEncryptor;
 import io.ebeaninternal.server.type.TypeManager;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.PersistenceException;
 import java.sql.Types;
 
 /**

@@ -4,7 +4,7 @@ import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 import io.ebean.search.*;
 
-import javax.persistence.NonUniqueResultException;
+import jakarta.persistence.NonUniqueResultException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;

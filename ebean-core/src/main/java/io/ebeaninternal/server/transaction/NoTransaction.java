@@ -14,7 +14,7 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
 

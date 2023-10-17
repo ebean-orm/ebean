@@ -5,7 +5,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.21.1-SNAPSHOT</version>
+    <version>13.23.0-jakarta</version>
   </parent>
 
   <artifactId>test-java16</artifactId>
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>13.21.1-SNAPSHOT</version>
+      <version>13.23.0-jakarta</version>
     </dependency>
 
     <dependency>
@@ -30,7 +30,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.21.1-SNAPSHOT</version>
+      <version>13.23.0-jakarta</version>
       <scope>test</scope>
     </dependency>
 
@@ -52,7 +52,7 @@
             <path>
               <groupId>io.ebean</groupId>
               <artifactId>querybean-generator</artifactId>
-              <version>13.16.0</version>
+              <version>13.23.0-jakarta</version>
             </path>
           </annotationProcessorPaths>
         </configuration>

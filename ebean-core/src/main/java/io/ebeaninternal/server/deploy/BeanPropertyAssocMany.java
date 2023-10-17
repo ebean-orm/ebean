@@ -23,7 +23,7 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;

@@ -1,6 +1,6 @@
 package org.tests.model.embedded;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class EPerson3 {

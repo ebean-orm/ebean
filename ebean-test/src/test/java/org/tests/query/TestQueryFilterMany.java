@@ -370,7 +370,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? ) order by t0.id; --bind(rob%)");
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ?) order by t0.id; --bind(rob%)");
     } else {
       assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? escape'|') order by t0.id; --bind(rob%)");
     }

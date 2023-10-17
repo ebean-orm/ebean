@@ -3,10 +3,10 @@ package org.tests.model.docstore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.ebean.annotation.DocStore;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.OneToMany;
 
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.Inheritance;
-import javax.persistence.OneToMany;
 import java.util.List;
 
 @DocStore

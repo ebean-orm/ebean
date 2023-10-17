@@ -43,8 +43,8 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
 
     sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(7);
-      assertSqlBind(sql, 4, 6);
+      assertThat(sql).hasSize(9);
+      assertSqlBind(sql, 5, 7);
     } else {
       assertThat(sql).hasSize(5);
     }
@@ -69,7 +69,7 @@ public class TestElementCollectionBasicCache extends BaseTestCase {
 
     sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(7); // cache hit
+      assertThat(sql).hasSize(9); // cache hit
     } else {
       assertThat(sql).hasSize(5); // cache hit
     }

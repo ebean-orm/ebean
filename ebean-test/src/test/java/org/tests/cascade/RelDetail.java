@@ -1,6 +1,6 @@
 package org.tests.cascade;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

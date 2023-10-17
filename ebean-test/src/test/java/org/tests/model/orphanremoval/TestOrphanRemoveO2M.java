@@ -30,7 +30,7 @@ public class TestOrphanRemoveO2M extends BaseTestCase {
     assertThat(DB.find(OrpDetail.class, "d1")).isNull();
     assertThat(DB.find(OrpDetail.class, "d2")).isNull();
 
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
     assertSql(sql.get(0)).contains("delete from orp_detail where id=?");
     assertSqlBind(sql, 1, 2);
   }

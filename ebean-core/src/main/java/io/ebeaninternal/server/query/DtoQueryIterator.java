@@ -3,7 +3,7 @@ package io.ebeaninternal.server.query;
 import io.ebean.QueryIterator;
 import io.ebeaninternal.server.core.DtoQueryRequest;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 
 final class DtoQueryIterator<T> implements QueryIterator<T> {

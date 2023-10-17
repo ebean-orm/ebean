@@ -5,7 +5,7 @@ import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

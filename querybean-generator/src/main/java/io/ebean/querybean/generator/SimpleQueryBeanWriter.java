@@ -77,16 +77,21 @@ class SimpleQueryBeanWriter {
   private void gatherPropertyDetails() {
     importTypes.add(Constants.GENERATED);
     importTypes.add(beanFullName);
-    importTypes.add(Constants.TQASSOCBEAN);
-    importTypes.add(Constants.TQROOTBEAN);
     importTypes.add(Constants.TYPEQUERYBEAN);
-    importTypes.add(Constants.DATABASE);
-    importTypes.add(Constants.FETCHGROUP);
-    importTypes.add(Constants.QUERY);
-    importTypes.add(Constants.TRANSACTION);
-    importTypes.add(Constants.CONSUMER);
-    importTypes.add(Constants.EXPR);
-    importTypes.add(Constants.EXPRESSIONLIST);
+    if (embeddable) {
+      importTypes.add(Constants.TQASSOC);
+    } else {
+      importTypes.add(Constants.TQASSOCBEAN);
+      importTypes.add(Constants.TQROOTBEAN);
+      importTypes.add(Constants.DATABASE);
+      importTypes.add(Constants.FETCHGROUP);
+      importTypes.add(Constants.QUERY);
+      importTypes.add(Constants.TRANSACTION);
+      importTypes.add(Constants.CONSUMER);
+      importTypes.add(Constants.EXPR);
+      importTypes.add(Constants.EXPRESSIONLIST);
+    }
+
     if (implementsInterface != null) {
       implementsInterfaceFullName = implementsInterface.getQualifiedName().toString();
       boolean nested = implementsInterface.getNestingKind().isNested();
@@ -122,24 +127,20 @@ class SimpleQueryBeanWriter {
    */
   void writeRootBean() throws IOException {
     gatherPropertyDetails();
-    if (isEmbeddable()) {
-      processingContext.addEntity(beanFullName, dbName);
-    } else if (isEntity()) {
-      processingContext.addEntity(beanFullName, dbName);
-      writer = new Append(createFileWriter());
-
-      writePackage();
-      writeImports();
-      writeClass();
+    processingContext.addEntity(beanFullName, dbName);
+    writer = new Append(createFileWriter());
+    writePackage();
+    writeImports();
+    writeClass();
+    if (isEntity()) {
       writeAlias();
       writeFields();
       writeConstructors();
       writeStaticAliasClass();
-      writeAssocClass();
-      writeClassEnd();
-
-      writer.close();
     }
+    writeAssocClass();
+    writeClassEnd();
+    writer.close();
   }
 
   /**
@@ -237,8 +238,12 @@ class SimpleQueryBeanWriter {
     writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
     writer.append(" */").eol();
     writer.append(Constants.AT_GENERATED).eol();
-    writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-    writer.append("public final class Q%s extends TQRootBean<%1$s,Q%1$s> {", shortName).eol();
+    if (embeddable) {
+      writer.append("public final class Q%s {", shortName).eol();
+    } else {
+      writer.append(Constants.AT_TYPEQUERYBEAN).eol();
+      writer.append("public final class Q%s extends TQRootBean<%1$s,Q%1$s> {", shortName).eol();
+    }
     writer.eol();
   }
 
@@ -276,9 +281,9 @@ class SimpleQueryBeanWriter {
     writer.append("  ").append(Constants.AT_GENERATED).eol();
     writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
     if (embeddable) {
-      writer.append("  public static final class Assoc<R> extends TQAssoc<%s,R> {", shortName, shortInnerName).eol();
+      writer.append("  public static final class Assoc<R> extends TQAssoc<%s,R> {", shortInnerName).eol();
     } else {
-      writer.append("  public static final class Assoc<R> extends TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName, origShortName).eol();
+      writer.append("  public static final class Assoc<R> extends TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName).eol();
     }
     for (PropertyMeta property : properties) {
       writer.append("  ");
@@ -287,12 +292,15 @@ class SimpleQueryBeanWriter {
     }
     writer.eol();
     writeAssocBeanConstructor();
-    writeAssocFilterMany();
-    writeAssocBeanFetch();
+    if (!embeddable) {
+      writeAssocFilterMany();
+      writeAssocBeanFetch();
+    }
     writer.append("  }").eol();
   }
 
   private void writeAssocFilterMany() {
+    writer.eol();
     writer.append("    public final R filterMany(Consumer<Q%s> apply) {", shortName).eol();
     writer.append("      final ExpressionList list = Expr.factory().expressionList();", shortName).eol();
     writer.append("      final var qb = new Q%s(list);", shortName).eol();

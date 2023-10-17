@@ -38,6 +38,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private final CQueryDraftSupport draftSupport;
   private final CQueryHistorySupport historySupport;
   private final boolean historyQuery;
+  private boolean joinSuppressed;
 
   DefaultDbSqlContext(SqlTreeAlias alias, String columnAliasPrefix, CQueryHistorySupport historySupport,
                       CQueryDraftSupport draftSupport, String fromForUpdate) {
@@ -48,6 +49,11 @@ final class DefaultDbSqlContext implements DbSqlContext {
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);
     this.fromForUpdate = fromForUpdate;
+  }
+
+  @Override
+  public boolean joinAdded() {
+    return !joinSuppressed;
   }
 
   @Override
@@ -118,9 +124,10 @@ final class DefaultDbSqlContext implements DbSqlContext {
     }
     String joinKey = table + "-" + a1 + "-" + a2;
     if (tableJoins.contains(joinKey)) {
+      joinSuppressed = true;
       return;
     }
-
+    joinSuppressed = false;
     tableJoins.add(joinKey);
     sb.append(' ').append(type);
     boolean addAsOfOnClause = false;

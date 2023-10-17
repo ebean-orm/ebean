@@ -8,7 +8,7 @@ import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareList;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Types;
