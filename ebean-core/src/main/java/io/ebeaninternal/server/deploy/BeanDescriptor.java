@@ -237,7 +237,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.owner = owner;
     this.multiValueSupported = owner.isMultiValueSupported();
     this.entityType = deploy.getEntityType();
-    this.properties = deploy.getProperties();
+    this.properties = deploy.propertyNames();
     this.name = InternString.intern(deploy.getName());
     this.baseTableAlias = "t0";
     this.fullName = InternString.intern(deploy.getFullName());

@@ -7,6 +7,7 @@ import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
 
 import java.util.Collections;
 
@@ -47,7 +48,7 @@ public class AnnotationClassTest {
   private AnnotationClass createAnnotationClass(DatabaseConfig config) {
     DeployUtil deployUtil = new DeployUtil(new DefaultTypeManager(config, new BootupClasses()), config);
 
-    DeployBeanInfo deployBeanInfo = new DeployBeanInfo(deployUtil, new DeployBeanDescriptor<>(null, null, null));
+    DeployBeanInfo deployBeanInfo = new DeployBeanInfo(deployUtil, new DeployBeanDescriptor<>(null, Customer.class, null));
     ReadAnnotationConfig readAnnotationConfig = new ReadAnnotationConfig(new GeneratedPropertyFactory(true, new DatabaseConfig(), Collections.emptyList()), "","", new DatabaseConfig());
     return new AnnotationClass(deployBeanInfo, readAnnotationConfig);
   }

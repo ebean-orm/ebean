@@ -443,11 +443,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
         // build map of tables to view entities dependent on those tables
         // for the purpose of invalidating appropriate query caches
         String[] dependentTables = desc.dependentTables();
-        if (dependentTables != null && dependentTables.length > 0) {
+        if (dependentTables != null) {
           for (String depTable : dependentTables) {
             depTable = depTable.toLowerCase();
-            List<BeanDescriptor<?>> list = tableToViewDescMap.computeIfAbsent(depTable, k -> new ArrayList<>(1));
-            list.add(desc);
+            tableToViewDescMap.computeIfAbsent(depTable, k -> new ArrayList<>(1)).add(desc);
           }
         }
       }
@@ -578,7 +577,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     }
   }
 
-  private <T> String errNothingRegistered() {
+  private String errNothingRegistered() {
     return "There are no registered entities. If using query beans, that generates EbeanEntityRegister.java into " +
       "generated sources and is service loaded. If using module-info.java, then probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause.";
   }
@@ -1186,7 +1185,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       setConcurrencyMode(desc);
     }
     // generate the byte code
-    createByteCode(desc);
+    setAccessors(desc);
   }
 
   /**
@@ -1255,13 +1254,13 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, stepSize, seqName);
   }
 
-  private void createByteCode(DeployBeanDescriptor<?> deploy) {
+  private void setAccessors(DeployBeanDescriptor<?> deploy) {
     // check to see if the bean supports EntityBean interface
     // generate a subclass if required
-    setEntityBeanClass(deploy);
+    confirmEnhanced(deploy);
     // use Code generation or Standard reflection to support
     // getter and setter methods
-    setBeanReflect(deploy);
+    setPropertyAccessors(deploy);
   }
 
   /**
@@ -1288,15 +1287,14 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * and getting of properties. It is generally faster to use code generation
    * rather than reflection to do this.
    */
-  private void setBeanReflect(DeployBeanDescriptor<?> desc) {
+  private void setPropertyAccessors(DeployBeanDescriptor<?> desc) {
     // Set the BeanReflectGetter and BeanReflectSetter that typically
     // use generated code. NB: Due to Bug 166 so now doing this for
     // abstract classes as well.
-    BeanPropertiesReader reflectProps = new BeanPropertiesReader(desc.getBeanType());
-    desc.setProperties(reflectProps.getProperties());
+    BeanPropertiesReader reflectProps = new BeanPropertiesReader(desc.propertyNames());
     for (DeployBeanProperty prop : desc.propertiesAll()) {
       String propName = prop.getName();
-      Integer pos = reflectProps.getPropertyIndex(propName);
+      Integer pos = reflectProps.propertyIndex(propName);
       if (pos == null) {
         if (isPersistentField(prop)) {
           throw new IllegalStateException(
@@ -1368,7 +1366,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   /**
    * Test the bean type to see if it implements EntityBean interface already.
    */
-  private void setEntityBeanClass(DeployBeanDescriptor<?> desc) {
+  private void confirmEnhanced(DeployBeanDescriptor<?> desc) {
     Class<?> beanClass = desc.getBeanType();
     if (!hasEntityBeanInterface(beanClass)) {
       String msg = "Bean " + beanClass + " is not enhanced? Check packages specified in ebean.mf. If you are running in IDEA or " +

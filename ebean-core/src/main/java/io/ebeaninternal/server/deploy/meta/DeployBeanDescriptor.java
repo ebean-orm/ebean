@@ -24,6 +24,8 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.MappedSuperclass;
+
+import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -44,8 +46,6 @@ public class DeployBeanDescriptor<T> {
   }
 
   private static final PropOrder PROP_ORDER = new PropOrder();
-
-  private static final String I_SCALAOBJECT = "scala.ScalaObject";
 
   private final DatabaseConfig config;
   private final BeanDescriptorManager manager;
@@ -139,10 +139,30 @@ public class DeployBeanDescriptor<T> {
     this.beanType = beanType;
   }
 
+  private String[] readPropertyNames() {
+    try {
+      Field field = beanType.getField("_ebean_props");
+      return (String[]) field.get(null);
+    } catch (Exception e) {
+      throw new IllegalStateException("Error getting _ebean_props field on type " + beanType, e);
+    }
+  }
+
+  public void setPropertyNames(String[] properties) {
+    this.properties = properties;
+  }
+
+  public String[] propertyNames() {
+    if (properties == null) {
+      properties = readPropertyNames();
+    }
+    return properties;
+  }
+
   /**
    * Set the IdClass to use.
    */
-  public void setIdClass(Class idClass) {
+  public void setIdClass(Class<?> idClass) {
     this.idClass = idClass;
   }
 
@@ -260,7 +280,6 @@ public class DeployBeanDescriptor<T> {
    * Read the top level doc store deployment information.
    */
   public void readDocStore(DocStore docStore) {
-
     this.docStore = docStore;
     docStoreMapped = true;
     docStoreQueueId = docStore.queueId();
@@ -276,23 +295,10 @@ public class DeployBeanDescriptor<T> {
     }
   }
 
-  public boolean isScalaObject() {
-    Class<?>[] interfaces = beanType.getInterfaces();
-    for (Class<?> anInterface : interfaces) {
-      String iname = anInterface.getName();
-      if (I_SCALAOBJECT.equals(iname)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   public DeployBeanTable createDeployBeanTable() {
-
     DeployBeanTable beanTable = new DeployBeanTable(getBeanType());
     beanTable.setBaseTable(baseTable);
     beanTable.setIdProperty(idProperty());
-
     return beanTable;
   }
 
@@ -358,14 +364,6 @@ public class DeployBeanDescriptor<T> {
 
   public void setIdentityType(IdType type) {
     this.identityMode.setIdType(type);
-  }
-
-  public String[] getProperties() {
-    return properties;
-  }
-
-  public void setProperties(String[] props) {
-    this.properties = props;
   }
 
   /**
