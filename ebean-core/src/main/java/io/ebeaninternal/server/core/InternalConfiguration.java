@@ -590,14 +590,16 @@ public final class InternalConfiguration {
    */
   QueryPlanLogger queryPlanLogger(Platform platform) {
     switch (platform.base()) {
-      case POSTGRES:
-        return new QueryPlanLoggerPostgres();
       case SQLSERVER:
         return new QueryPlanLoggerSqlServer();
       case ORACLE:
         return new QueryPlanLoggerOracle();
+      case POSTGRES:
+        return new QueryPlanLoggerExplain("explain (analyze, buffers) ");
+      case YUGABYTE:
+        return new QueryPlanLoggerExplain("explain (analyze, buffers, dist) ");
       default:
-        return new QueryPlanLoggerExplain();
+        return new QueryPlanLoggerExplain("explain ");
     }
   }
 
