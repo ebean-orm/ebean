@@ -17,9 +17,16 @@ import static java.lang.System.Logger.Level.WARNING;
  */
 public final class QueryPlanLoggerExplain extends QueryPlanLogger {
 
+  private final String prefix;
+
+  public QueryPlanLoggerExplain(String prefix) {
+    this.prefix = prefix;
+  }
+
+  @SuppressWarnings("all")
   @Override
   public SpiDbQueryPlan collectPlan(Connection conn, SpiQueryPlan plan, BindCapture bind) {
-    try (PreparedStatement explainStmt = conn.prepareStatement("EXPLAIN " + plan.sql())) {
+    try (PreparedStatement explainStmt = conn.prepareStatement(prefix + plan.sql())) {
       bind.prepare(explainStmt, conn);
       try (ResultSet rset = explainStmt.executeQuery()) {
         return readQueryPlan(plan, bind, rset);
