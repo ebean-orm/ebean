@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.23.1-jakarta</version>
+    <version>13.23.2-jakarta</version>
     <relativePath>../..</relativePath>
   </parent>
 
@@ -15,67 +15,67 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-clickhouse</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-db2</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-hana</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-hsqldb</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-mysql</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-mariadb</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-nuodb</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-oracle</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlanywhere</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlite</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>13.23.1-jakarta</version>
+      <version>13.23.2-jakarta</version>
     </dependency>
 
   </dependencies>
