@@ -52,8 +52,13 @@ abstract class DLoadBaseContext {
   void setLabel(SpiQuery<?> query) {
     String label = parent.planLabel();
     if (label != null) {
-      query.setProfilePath(label, fullPath + "__" + query.loadMode(), parent.profileLocation());
+      query.setProfilePath(label, pathMode(query), parent.profileLocation());
     }
+  }
+
+  private String pathMode(SpiQuery<?> query) {
+    final var loadMode = query.loadMode();
+    return fullPath == null ? '_' + loadMode : fullPath + "__" + loadMode;
   }
 
   PersistenceContext persistenceContext() {
