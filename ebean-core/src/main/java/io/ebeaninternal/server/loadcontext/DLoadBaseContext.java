@@ -52,7 +52,7 @@ abstract class DLoadBaseContext {
   void setLabel(SpiQuery<?> query) {
     String label = parent.planLabel();
     if (label != null) {
-      query.setProfilePath(label, fullPath + "(" + query.loadMode() + ")", parent.profileLocation());
+      query.setProfilePath(label, fullPath + "__" + query.loadMode(), parent.profileLocation());
     }
   }
 
