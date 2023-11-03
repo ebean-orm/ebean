@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.h2.H2Platform;
 import io.ebean.platform.hana.HanaPlatform;
@@ -48,7 +49,7 @@ public class PlatformDdl_dropUniqueConstraintTest {
     sql = mysqlDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("alter table mytab drop index uq_name", sql);
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     hanaDdl.configure(config);
     sql = hanaDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("delimiter $$\n" +

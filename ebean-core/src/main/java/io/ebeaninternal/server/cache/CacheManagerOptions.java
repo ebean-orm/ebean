@@ -4,7 +4,7 @@ import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.server.cluster.ClusterManager;
 
 /**
@@ -13,7 +13,7 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 public final class CacheManagerOptions {
 
   private final ClusterManager clusterManager;
-  private final DatabaseConfig databaseConfig;
+  private final DatabaseBuilder databaseBuilder;
   private final boolean localL2Caching;
   private CurrentTenantProvider currentTenantProvider;
   private QueryCacheEntryValidate queryCacheEntryValidate;
@@ -24,15 +24,15 @@ public final class CacheManagerOptions {
   CacheManagerOptions() {
     this.localL2Caching = true;
     this.clusterManager = null;
-    this.databaseConfig = null;
+    this.databaseBuilder = null;
     this.cacheFactory = new DefaultServerCacheFactory();
     this.beanDefault = new ServerCacheOptions();
     this.queryDefault = new ServerCacheOptions();
   }
 
-  public CacheManagerOptions(ClusterManager clusterManager, DatabaseConfig config, boolean localL2Caching) {
+  public CacheManagerOptions(ClusterManager clusterManager, DatabaseBuilder config, boolean localL2Caching) {
     this.clusterManager = clusterManager;
-    this.databaseConfig = config;
+    this.databaseBuilder = config;
     this.localL2Caching = localL2Caching;
     this.currentTenantProvider = config.getCurrentTenantProvider();
   }
@@ -55,7 +55,7 @@ public final class CacheManagerOptions {
   }
 
   public String getServerName() {
-    return (databaseConfig == null) ? "db" : databaseConfig.getName();
+    return (databaseBuilder == null) ? "db" : databaseBuilder.getName();
   }
 
   public boolean isLocalL2Caching() {

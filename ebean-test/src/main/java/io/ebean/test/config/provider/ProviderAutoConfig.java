@@ -1,10 +1,8 @@
 package io.ebean.test.config.provider;
 
 import io.avaje.applog.AppLog;
-import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.CurrentUserProvider;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.EncryptKeyManager;
+import io.ebean.DatabaseBuilder;
+import io.ebean.config.*;
 
 import java.util.Properties;
 
@@ -18,10 +16,10 @@ public class ProviderAutoConfig {
 
   private static final System.Logger log = AppLog.getLogger("io.ebean.test");
 
-  private final DatabaseConfig config;
+  private final DatabaseBuilder config;
   private final Properties properties;
 
-  public ProviderAutoConfig(DatabaseConfig config) {
+  public ProviderAutoConfig(DatabaseBuilder config) {
     this.config = config;
     this.properties = config.getProperties();
   }

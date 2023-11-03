@@ -1,6 +1,6 @@
 package io.ebean.core.type;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 
 import java.util.List;
 
@@ -12,5 +12,5 @@ public interface ExtraTypeFactory {
   /**
    * Provide extra types to Ebean.
    */
-  List<? extends ScalarType<?>> createTypes(DatabaseConfig config, Object objectMapper);
+  List<? extends ScalarType<?>> createTypes(DatabaseBuilder config, Object objectMapper);
 }

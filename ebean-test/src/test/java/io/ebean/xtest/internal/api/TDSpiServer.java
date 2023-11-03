@@ -7,7 +7,7 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.meta.MetaInfoManager;
 import io.ebean.plugin.BeanType;
@@ -579,7 +579,7 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public DatabaseConfig config() {
+  public DatabaseBuilder config() {
     return null;
   }
 

@@ -61,7 +61,7 @@ import java.util.function.Function;
  * @author rbygrave
  * @see DatabaseFactory
  */
-public class DatabaseConfig {
+public class DatabaseConfig implements DatabaseBuilder {
 
   /**
    * The Database name.
@@ -548,1043 +548,639 @@ public class DatabaseConfig {
   public DatabaseConfig() {
   }
 
-  /**
-   * Get the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
-   */
+  @Override
   public Clock getClock() {
     return clock;
   }
 
-  /**
-   * Set the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
-   */
+  @Override
   public void setClock(final Clock clock) {
     this.clock = clock;
   }
 
-  /**
-   * Return the slow query time in millis.
-   */
+  @Override
   public long getSlowQueryMillis() {
     return slowQueryMillis;
   }
 
-  /**
-   * Set the slow query time in millis.
-   */
+  @Override
   public void setSlowQueryMillis(long slowQueryMillis) {
     this.slowQueryMillis = slowQueryMillis;
   }
 
-  /**
-   * Return the slow query event listener.
-   */
+  @Override
   public SlowQueryListener getSlowQueryListener() {
     return slowQueryListener;
   }
 
-  /**
-   * Set the slow query event listener.
-   */
+  @Override
   public void setSlowQueryListener(SlowQueryListener slowQueryListener) {
     this.slowQueryListener = slowQueryListener;
   }
 
-  /**
-   * Put a service object into configuration such that it can be used by ebean or a plugin.
-   * <p>
-   * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
-   */
+  @Override
   public void putServiceObject(String key, Object configObject) {
     serviceObject.put(key, configObject);
   }
 
-  /**
-   * Put a service object into configuration such that it can be used by ebean or a plugin.
-   * <p>
-   * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
-   * You can also override some SPI objects that should be used for that Database. Currently, the following
-   * objects are possible.
-   * <ul>
-   *   <li>DataSourceAlertFactory (e.g. add different alert factories for different ebean instances)</li>
-   *   <li>DocStoreFactory</li>
-   *   <li>SlowQueryListener (e.g. add custom query listener for a certain ebean instance)</li>
-   *   <li>ServerCacheNotifyPlugin</li>
-   * </ul>
-   */
+  @Override
   public <T> void putServiceObject(Class<T> iface, T configObject) {
     serviceObject.put(serviceObjectKey(iface), configObject);
   }
 
-  /**
-   * Return the service object given the key.
-   */
+  @Override
   public Object getServiceObject(String key) {
     return serviceObject.get(key);
   }
 
-  /**
-   * Put a service object into configuration such that it can be used by ebean or a plugin.
-   *
-   * <pre>{@code
-   *
-   *   JedisPool jedisPool = ..
-   *
-   *   config.putServiceObject(jedisPool);
-   *
-   * }</pre>
-   */
+  @Override
   public void putServiceObject(Object configObject) {
     String key = serviceObjectKey(configObject);
     serviceObject.put(key, configObject);
   }
 
-  private String serviceObjectKey(Object configObject) {
-    return serviceObjectKey(configObject.getClass());
-  }
-
-  private String serviceObjectKey(Class<?> cls) {
-    String simpleName = cls.getSimpleName();
-    return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
-  }
-
-  /**
-   * Used by ebean or plugins to obtain service objects.
-   *
-   * <pre>{@code
-   *
-   *   JedisPool jedisPool = config.getServiceObject(JedisPool.class);
-   *
-   * }</pre>
-   *
-   * @param cls The type of the service object to obtain
-   * @return The service object given the class type
-   */
+  @Override
   @SuppressWarnings("unchecked")
   public <P> P getServiceObject(Class<P> cls) {
     return (P) serviceObject.get(serviceObjectKey(cls));
   }
 
-  /**
-   * Return the Jackson JsonFactory to use.
-   * <p>
-   * If not set a default implementation will be used.
-   */
+  @Override
   public JsonFactory getJsonFactory() {
     return jsonFactory;
   }
 
-  /**
-   * Set the Jackson JsonFactory to use.
-   * <p>
-   * If not set a default implementation will be used.
-   */
+  @Override
   public void setJsonFactory(JsonFactory jsonFactory) {
     this.jsonFactory = jsonFactory;
   }
 
-  /**
-   * Return the JSON format used for DateTime types.
-   */
+  @Override
   public JsonConfig.DateTime getJsonDateTime() {
     return jsonDateTime;
   }
 
-  /**
-   * Set the JSON format to use for DateTime types.
-   */
+  @Override
   public void setJsonDateTime(JsonConfig.DateTime jsonDateTime) {
     this.jsonDateTime = jsonDateTime;
   }
 
-  /**
-   * Return the JSON format used for Date types.
-   */
+  @Override
   public JsonConfig.Date getJsonDate() {
     return jsonDate;
   }
 
-  /**
-   * Set the JSON format to use for Date types.
-   */
+  @Override
   public void setJsonDate(JsonConfig.Date jsonDate) {
     this.jsonDate = jsonDate;
   }
 
-  /**
-   * Return the JSON include mode used when writing JSON.
-   */
+  @Override
   public JsonConfig.Include getJsonInclude() {
     return jsonInclude;
   }
 
-  /**
-   * Set the JSON include mode used when writing JSON.
-   * <p>
-   * Set to NON_NULL or NON_EMPTY to suppress nulls or null and empty collections respectively.
-   */
+  @Override
   public void setJsonInclude(JsonConfig.Include jsonInclude) {
     this.jsonInclude = jsonInclude;
   }
 
-  /**
-   * Return the default MutableDetection to use with {@code @DbJson} using Jackson.
-   *
-   * @see DbJson#mutationDetection()
-   */
+  @Override
   public MutationDetection getJsonMutationDetection() {
     return jsonMutationDetection;
   }
 
-  /**
-   * Set the default MutableDetection to use with {@code @DbJson} using Jackson.
-   *
-   * @see DbJson#mutationDetection()
-   */
+  @Override
   public void setJsonMutationDetection(MutationDetection jsonMutationDetection) {
     this.jsonMutationDetection = jsonMutationDetection;
   }
 
-  /**
-   * Return the name of the Database.
-   */
+  @Override
   public String getName() {
     return name;
   }
 
-  /**
-   * Set the name of the Database.
-   */
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
-  /**
-   * Return the container / clustering configuration.
-   * <p/>
-   * The container holds all the Database instances and provides clustering communication
-   * services to all the Database instances.
-   */
+  @Override
   public ContainerConfig getContainerConfig() {
     return containerConfig;
   }
 
-  /**
-   * Set the container / clustering configuration.
-   * <p/>
-   * The container holds all the Database instances and provides clustering communication
-   * services to all the Database instances.
-   */
+  @Override
   public void setContainerConfig(ContainerConfig containerConfig) {
     this.containerConfig = containerConfig;
   }
 
-  /**
-   * Return true if this server should be registered with the Ebean singleton
-   * when it is created.
-   * <p>
-   * By default this is set to true.
-   */
+  @Override
   public boolean isRegister() {
     return register;
   }
 
-  /**
-   * Set to false if you do not want this server to be registered with the Ebean
-   * singleton when it is created.
-   * <p>
-   * By default this is set to true.
-   */
+  @Override
   public void setRegister(boolean register) {
     this.register = register;
   }
 
-  /**
-   * Return true if this server should be registered as the "default" server
-   * with the Ebean singleton.
-   * <p>
-   * This is only used when {@link #setRegister(boolean)} is also true.
-   */
+  @Override
   public boolean isDefaultServer() {
     return defaultServer;
   }
 
-  /**
-   * Set false if you do not want this Database to be registered as the "default" database
-   * with the DB singleton.
-   * <p>
-   * This is only used when {@link #setRegister(boolean)} is also true.
-   */
+  @Override
   public void setDefaultServer(boolean defaultServer) {
     this.defaultServer = defaultServer;
   }
 
-  /**
-   * Return the CurrentUserProvider. This is used to populate @WhoCreated, @WhoModified and
-   * support other audit features (who executed a query etc).
-   */
+  @Override
   public CurrentUserProvider getCurrentUserProvider() {
     return currentUserProvider;
   }
 
-  /**
-   * Set the CurrentUserProvider. This is used to populate @WhoCreated, @WhoModified and
-   * support other audit features (who executed a query etc).
-   */
+  @Override
   public void setCurrentUserProvider(CurrentUserProvider currentUserProvider) {
     this.currentUserProvider = currentUserProvider;
   }
 
-  /**
-   * Return the tenancy mode used.
-   */
+  @Override
   public TenantMode getTenantMode() {
     return tenantMode;
   }
 
-  /**
-   * Set the tenancy mode to use.
-   */
+  @Override
   public void setTenantMode(TenantMode tenantMode) {
     this.tenantMode = tenantMode;
   }
 
-  /**
-   * Return the column name used for TenantMode.PARTITION.
-   */
+  @Override
   public String getTenantPartitionColumn() {
     return tenantPartitionColumn;
   }
 
-  /**
-   * Set the column name used for TenantMode.PARTITION.
-   */
+  @Override
   public void setTenantPartitionColumn(String tenantPartitionColumn) {
     this.tenantPartitionColumn = tenantPartitionColumn;
   }
 
-  /**
-   * Return the current tenant provider.
-   */
+  @Override
   public CurrentTenantProvider getCurrentTenantProvider() {
     return currentTenantProvider;
   }
 
-  /**
-   * Set the current tenant provider.
-   */
+  @Override
   public void setCurrentTenantProvider(CurrentTenantProvider currentTenantProvider) {
     this.currentTenantProvider = currentTenantProvider;
   }
 
-  /**
-   * Return the tenancy datasource provider.
-   */
+  @Override
   public TenantDataSourceProvider getTenantDataSourceProvider() {
     return tenantDataSourceProvider;
   }
 
-  /**
-   * Set the tenancy datasource provider.
-   */
+  @Override
   public void setTenantDataSourceProvider(TenantDataSourceProvider tenantDataSourceProvider) {
     this.tenantDataSourceProvider = tenantDataSourceProvider;
   }
 
-  /**
-   * Return the tenancy schema provider.
-   */
+  @Override
   public TenantSchemaProvider getTenantSchemaProvider() {
     return tenantSchemaProvider;
   }
 
-  /**
-   * Set the tenancy schema provider.
-   */
+  @Override
   public void setTenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider) {
     this.tenantSchemaProvider = tenantSchemaProvider;
   }
 
-  /**
-   * Return the tenancy catalog provider.
-   */
+  @Override
   public TenantCatalogProvider getTenantCatalogProvider() {
     return tenantCatalogProvider;
   }
 
-  /**
-   * Set the tenancy catalog provider.
-   */
+  @Override
   public void setTenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider) {
     this.tenantCatalogProvider = tenantCatalogProvider;
   }
 
-  /**
-   * Return true if dirty beans are automatically persisted.
-   */
+  @Override
   public boolean isAutoPersistUpdates() {
     return autoPersistUpdates;
   }
 
-  /**
-   * Set to true if dirty beans are automatically persisted.
-   */
+  @Override
   public void setAutoPersistUpdates(boolean autoPersistUpdates) {
     this.autoPersistUpdates = autoPersistUpdates;
   }
 
-  /**
-   * Return the PersistBatch mode to use by default at the transaction level.
-   * <p>
-   * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
-   * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
-   * or the batch size is meet.
-   */
+  @Override
   public PersistBatch getPersistBatch() {
     return persistBatch;
   }
 
-  /**
-   * Set the JDBC batch mode to use at the transaction level.
-   * <p>
-   * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
-   * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
-   * or the batch size is meet.
-   */
+  @Override
   public void setPersistBatch(PersistBatch persistBatch) {
     this.persistBatch = persistBatch;
   }
 
-  /**
-   * Return the JDBC batch mode to use per save(), delete(), insert() or update() request.
-   * <p>
-   * This makes sense when a save() or delete() cascades and executes multiple child statements. The best case
-   * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
-   * <p>
-   * This only takes effect when the persistBatch mode at the transaction level does not take effect.
-   */
+  @Override
   public PersistBatch getPersistBatchOnCascade() {
     return persistBatchOnCascade;
   }
 
-  /**
-   * Set the JDBC batch mode to use per save(), delete(), insert() or update() request.
-   * <p>
-   * This makes sense when a save() or delete() etc cascades and executes multiple child statements. The best caase
-   * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
-   * <p>
-   * This only takes effect when the persistBatch mode at the transaction level does not take effect.
-   */
+  @Override
   public void setPersistBatchOnCascade(PersistBatch persistBatchOnCascade) {
     this.persistBatchOnCascade = persistBatchOnCascade;
   }
 
-  /**
-   * Deprecated, please migrate to using setPersistBatch().
-   * <p>
-   * Set to true if you what to use JDBC batching for persisting and deleting beans.
-   * <p>
-   * With this Ebean will batch up persist requests and use the JDBC batch api.
-   * This is a performance optimisation designed to reduce the network chatter.
-   * <p>
-   * When true this is equivalent to {@code setPersistBatch(PersistBatch.ALL)} or
-   * when false to {@code setPersistBatch(PersistBatch.NONE)}
-   */
+  @Override
   public void setPersistBatching(boolean persistBatching) {
     this.persistBatch = (persistBatching) ? PersistBatch.ALL : PersistBatch.NONE;
   }
 
-  /**
-   * Return the batch size used for JDBC batching. This defaults to 20.
-   */
+  @Override
   public int getPersistBatchSize() {
     return persistBatchSize;
   }
 
-  /**
-   * Set the batch size used for JDBC batching. If unset this defaults to 20.
-   * <p>
-   * You can also set the batch size on the transaction.
-   *
-   * @see Transaction#setBatchSize(int)
-   */
+  @Override
   public void setPersistBatchSize(int persistBatchSize) {
     this.persistBatchSize = persistBatchSize;
   }
 
-  /**
-   * Gets the query batch size. This defaults to 100.
-   *
-   * @return the query batch size
-   */
+  @Override
   public int getQueryBatchSize() {
     return queryBatchSize;
   }
 
-  /**
-   * Sets the query batch size. This defaults to 100.
-   *
-   * @param queryBatchSize the new query batch size
-   */
+  @Override
   public void setQueryBatchSize(int queryBatchSize) {
     this.queryBatchSize = queryBatchSize;
   }
 
+  @Override
   public EnumType getDefaultEnumType() {
     return defaultEnumType;
   }
 
+  @Override
   public void setDefaultEnumType(EnumType defaultEnumType) {
     this.defaultEnumType = defaultEnumType;
   }
 
-  /**
-   * Return true if lazy loading is disabled on queries by default.
-   */
+  @Override
   public boolean isDisableLazyLoading() {
     return disableLazyLoading;
   }
 
-  /**
-   * Set to true to disable lazy loading by default.
-   * <p>
-   * It can be turned on per query via {@link Query#setDisableLazyLoading(boolean)}.
-   */
+  @Override
   public void setDisableLazyLoading(boolean disableLazyLoading) {
     this.disableLazyLoading = disableLazyLoading;
   }
 
-  /**
-   * Return the default batch size for lazy loading of beans and collections.
-   */
+  @Override
   public int getLazyLoadBatchSize() {
     return lazyLoadBatchSize;
   }
 
-  /**
-   * Set the default batch size for lazy loading.
-   * <p>
-   * This is the number of beans or collections loaded when lazy loading is
-   * invoked by default.
-   * <p>
-   * The default value is for this is 10 (load 10 beans or collections).
-   * <p>
-   * You can explicitly control the lazy loading batch size for a given join on
-   * a query using +lazy(batchSize) or JoinConfig.
-   */
+  @Override
   public void setLazyLoadBatchSize(int lazyLoadBatchSize) {
     this.lazyLoadBatchSize = lazyLoadBatchSize;
   }
 
-  /**
-   * Set the number of sequences to fetch/preallocate when using DB sequences.
-   * <p>
-   * This is a performance optimisation to reduce the number times Ebean
-   * requests a sequence to be used as an Id for a bean (aka reduce network
-   * chatter).
-   */
+  @Override
   public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
-  /**
-   * Return the default JDBC fetchSize hint for findList queries.
-   */
+  @Override
   public int getJdbcFetchSizeFindList() {
     return jdbcFetchSizeFindList;
   }
 
-  /**
-   * Set the default JDBC fetchSize hint for findList queries.
-   */
+  @Override
   public void setJdbcFetchSizeFindList(int jdbcFetchSizeFindList) {
     this.jdbcFetchSizeFindList = jdbcFetchSizeFindList;
   }
 
-  /**
-   * Return the default JDBC fetchSize hint for findEach/findEachWhile queries.
-   */
+  @Override
   public int getJdbcFetchSizeFindEach() {
     return jdbcFetchSizeFindEach;
   }
 
-  /**
-   * Set the default JDBC fetchSize hint for findEach/findEachWhile queries.
-   */
+  @Override
   public void setJdbcFetchSizeFindEach(int jdbcFetchSizeFindEach) {
     this.jdbcFetchSizeFindEach = jdbcFetchSizeFindEach;
   }
 
-  /**
-   * Return the ChangeLogPrepare.
-   * <p>
-   * This is used to set user context information to the ChangeSet in the
-   * foreground thread prior to the logging occurring in a background thread.
-   */
+  @Override
   public ChangeLogPrepare getChangeLogPrepare() {
     return changeLogPrepare;
   }
 
-  /**
-   * Set the ChangeLogPrepare.
-   * <p>
-   * This is used to set user context information to the ChangeSet in the
-   * foreground thread prior to the logging occurring in a background thread.
-   */
+  @Override
   public void setChangeLogPrepare(ChangeLogPrepare changeLogPrepare) {
     this.changeLogPrepare = changeLogPrepare;
   }
 
-  /**
-   * Return the ChangeLogListener which actually performs the logging of change sets
-   * in the background.
-   */
+  @Override
   public ChangeLogListener getChangeLogListener() {
     return changeLogListener;
   }
 
-  /**
-   * Set the ChangeLogListener which actually performs the logging of change sets
-   * in the background.
-   */
+  @Override
   public void setChangeLogListener(ChangeLogListener changeLogListener) {
     this.changeLogListener = changeLogListener;
   }
 
-  /**
-   * Return the ChangeLogRegister which controls which ChangeLogFilter is used for each
-   * bean type and in this way provide fine grained control over which persist requests
-   * are included in the change log.
-   */
+  @Override
   public ChangeLogRegister getChangeLogRegister() {
     return changeLogRegister;
   }
 
-  /**
-   * Set the ChangeLogRegister which controls which ChangeLogFilter is used for each
-   * bean type and in this way provide fine grained control over which persist requests
-   * are included in the change log.
-   */
+  @Override
   public void setChangeLogRegister(ChangeLogRegister changeLogRegister) {
     this.changeLogRegister = changeLogRegister;
   }
 
-  /**
-   * Return true if inserts should be included in the change log by default.
-   */
+  @Override
   public boolean isChangeLogIncludeInserts() {
     return changeLogIncludeInserts;
   }
 
-  /**
-   * Set if inserts should be included in the change log by default.
-   */
+  @Override
   public void setChangeLogIncludeInserts(boolean changeLogIncludeInserts) {
     this.changeLogIncludeInserts = changeLogIncludeInserts;
   }
 
-  /**
-   * Return true (default) if the changelog should be written async.
-   */
+  @Override
   public boolean isChangeLogAsync() {
     return changeLogAsync;
   }
 
-  /**
-   * Sets if the changelog should be written async (default = true).
-   */
+  @Override
   public void setChangeLogAsync(boolean changeLogAsync) {
     this.changeLogAsync = changeLogAsync;
   }
 
-  /**
-   * Return the ReadAuditLogger to use.
-   */
+  @Override
   public ReadAuditLogger getReadAuditLogger() {
     return readAuditLogger;
   }
 
-  /**
-   * Set the ReadAuditLogger to use. If not set the default implementation is used
-   * which logs the read events in JSON format to a standard named SLF4J logger
-   * (which can be configured in say logback to log to a separate log file).
-   */
+  @Override
   public void setReadAuditLogger(ReadAuditLogger readAuditLogger) {
     this.readAuditLogger = readAuditLogger;
   }
 
-  /**
-   * Return the ReadAuditPrepare to use.
-   */
+  @Override
   public ReadAuditPrepare getReadAuditPrepare() {
     return readAuditPrepare;
   }
 
-  /**
-   * Set the ReadAuditPrepare to use.
-   * <p>
-   * It is expected that an implementation is used that read user context information
-   * (user id, user ip address etc) and sets it on the ReadEvent bean before it is sent
-   * to the ReadAuditLogger.
-   */
+  @Override
   public void setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
     this.readAuditPrepare = readAuditPrepare;
   }
 
-  /**
-   * Return the configuration for profiling.
-   */
+  @Override
   public ProfilingConfig getProfilingConfig() {
     return profilingConfig;
   }
 
-  /**
-   * Set the configuration for profiling.
-   */
+  @Override
   public void setProfilingConfig(ProfilingConfig profilingConfig) {
     this.profilingConfig = profilingConfig;
   }
 
-  /**
-   * Return the DB schema to use.
-   */
+  @Override
   public String getDbSchema() {
     return dbSchema;
   }
 
-  /**
-   * Set the DB schema to use. This specifies to use this schema for:
-   * <ul>
-   * <li>Running Database migrations - Create and use the DB schema</li>
-   * <li>Testing DDL - Create-all.sql DDL execution creates and uses schema</li>
-   * <li>Testing Docker - Set default schema on connection URL</li>
-   * </ul>
-   */
+  @Override
   public void setDbSchema(String dbSchema) {
     this.dbSchema = dbSchema;
   }
 
-  /**
-   * Return the Geometry SRID.
-   */
+  @Override
   public int getGeometrySRID() {
     return platformConfig.getGeometrySRID();
   }
 
-  /**
-   * Set the Geometry SRID.
-   */
+  @Override
   public void setGeometrySRID(int geometrySRID) {
     platformConfig.setGeometrySRID(geometrySRID);
   }
 
-  /**
-   * Return the time zone to use when reading/writing Timestamps via JDBC.
-   * <p>
-   * When set a Calendar object is used in JDBC calls when reading/writing Timestamp objects.
-   */
+  @Override
   public String getDataTimeZone() {
     return System.getProperty("ebean.dataTimeZone", dataTimeZone);
   }
 
-  /**
-   * Set the time zone to use when reading/writing Timestamps via JDBC.
-   */
+  @Override
   public void setDataTimeZone(String dataTimeZone) {
     this.dataTimeZone = dataTimeZone;
   }
 
-  /**
-   * Return the suffix appended to the base table to derive the view that contains the union
-   * of the base table and the history table in order to support asOf queries.
-   */
+  @Override
   public String getAsOfViewSuffix() {
     return asOfViewSuffix;
   }
 
-  /**
-   * Set the suffix appended to the base table to derive the view that contains the union
-   * of the base table and the history table in order to support asOf queries.
-   */
+  @Override
   public void setAsOfViewSuffix(String asOfViewSuffix) {
     this.asOfViewSuffix = asOfViewSuffix;
   }
 
-  /**
-   * Return the database column used to support history and 'As of' queries. This column is a timestamp range
-   * or equivalent.
-   */
+  @Override
   public String getAsOfSysPeriod() {
     return asOfSysPeriod;
   }
 
-  /**
-   * Set the database column used to support history and 'As of' queries. This column is a timestamp range
-   * or equivalent.
-   */
+  @Override
   public void setAsOfSysPeriod(String asOfSysPeriod) {
     this.asOfSysPeriod = asOfSysPeriod;
   }
 
-  /**
-   * Return the history table suffix (defaults to _history).
-   */
+  @Override
   public String getHistoryTableSuffix() {
     return historyTableSuffix;
   }
 
-  /**
-   * Set the history table suffix.
-   */
+  @Override
   public void setHistoryTableSuffix(String historyTableSuffix) {
     this.historyTableSuffix = historyTableSuffix;
   }
 
-  /**
-   * Return true if we are running in a JTA Transaction manager.
-   */
+  @Override
   public boolean isUseJtaTransactionManager() {
     return useJtaTransactionManager;
   }
 
-  /**
-   * Set to true if we are running in a JTA Transaction manager.
-   */
+  @Override
   public void setUseJtaTransactionManager(boolean useJtaTransactionManager) {
     this.useJtaTransactionManager = useJtaTransactionManager;
   }
 
-  /**
-   * Return the external transaction manager.
-   */
+  @Override
   public ExternalTransactionManager getExternalTransactionManager() {
     return externalTransactionManager;
   }
 
-  /**
-   * Set the external transaction manager.
-   */
+  @Override
   public void setExternalTransactionManager(ExternalTransactionManager externalTransactionManager) {
     this.externalTransactionManager = externalTransactionManager;
   }
 
-  /**
-   * Return the ServerCachePlugin.
-   */
+  @Override
   public ServerCachePlugin getServerCachePlugin() {
     return serverCachePlugin;
   }
 
-  /**
-   * Set the ServerCachePlugin to use.
-   */
+  @Override
   public void setServerCachePlugin(ServerCachePlugin serverCachePlugin) {
     this.serverCachePlugin = serverCachePlugin;
   }
 
-  /**
-   * Return true if LOB's should default to fetch eager.
-   * By default this is set to false and LOB's must be explicitly fetched.
-   */
+  @Override
   public boolean isEagerFetchLobs() {
     return eagerFetchLobs;
   }
 
-  /**
-   * Set to true if you want LOB's to be fetch eager by default.
-   * By default this is set to false and LOB's must be explicitly fetched.
-   */
+  @Override
   public void setEagerFetchLobs(boolean eagerFetchLobs) {
     this.eagerFetchLobs = eagerFetchLobs;
   }
 
-  /**
-   * Return the max call stack to use for origin location.
-   */
+  @Override
   public int getMaxCallStack() {
     return maxCallStack;
   }
 
-  /**
-   * Set the max call stack to use for origin location.
-   */
+  @Override
   public void setMaxCallStack(int maxCallStack) {
     this.maxCallStack = maxCallStack;
   }
 
-  /**
-   * Return true if transactions should rollback on checked exceptions.
-   */
+  @Override
   public boolean isTransactionRollbackOnChecked() {
     return transactionRollbackOnChecked;
   }
 
-  /**
-   * Set to true if transactions should by default rollback on checked exceptions.
-   */
+  @Override
   public void setTransactionRollbackOnChecked(boolean transactionRollbackOnChecked) {
     this.transactionRollbackOnChecked = transactionRollbackOnChecked;
   }
 
-  /**
-   * Return the Background executor schedule pool size. Defaults to 1.
-   */
+  @Override
   public int getBackgroundExecutorSchedulePoolSize() {
     return backgroundExecutorSchedulePoolSize;
   }
 
-  /**
-   * Set the Background executor schedule pool size.
-   */
+  @Override
   public void setBackgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize) {
     this.backgroundExecutorSchedulePoolSize = backgroundExecutorSchedulePoolSize;
   }
 
-  /**
-   * Return the Background executor shutdown seconds. This is the time allowed for the pool to shutdown nicely
-   * before it is forced shutdown.
-   */
+  @Override
   public int getBackgroundExecutorShutdownSecs() {
     return backgroundExecutorShutdownSecs;
   }
 
-  /**
-   * Set the Background executor shutdown seconds. This is the time allowed for the pool to shutdown nicely
-   * before it is forced shutdown.
-   */
+  @Override
   public void setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs) {
     this.backgroundExecutorShutdownSecs = backgroundExecutorShutdownSecs;
   }
 
-  /**
-   * Return the background executor wrapper.
-   */
+  @Override
   public BackgroundExecutorWrapper getBackgroundExecutorWrapper() {
     return backgroundExecutorWrapper;
   }
 
-  /**
-   * Sets the background executor wrapper. The wrapper is used when a task is sent to background and should copy the thread-locals.
-   */
+  @Override
   public void setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper) {
     this.backgroundExecutorWrapper = backgroundExecutorWrapper;
   }
 
-  /**
-   * Return the L2 cache default max size.
-   */
+  @Override
   public int getCacheMaxSize() {
     return cacheMaxSize;
   }
 
-  /**
-   * Set the L2 cache default max size.
-   */
+  @Override
   public void setCacheMaxSize(int cacheMaxSize) {
     this.cacheMaxSize = cacheMaxSize;
   }
 
-  /**
-   * Return the L2 cache default max idle time in seconds.
-   */
+  @Override
   public int getCacheMaxIdleTime() {
     return cacheMaxIdleTime;
   }
 
-  /**
-   * Set the L2 cache default max idle time in seconds.
-   */
+  @Override
   public void setCacheMaxIdleTime(int cacheMaxIdleTime) {
     this.cacheMaxIdleTime = cacheMaxIdleTime;
   }
 
-  /**
-   * Return the L2 cache default max time to live in seconds.
-   */
+  @Override
   public int getCacheMaxTimeToLive() {
     return cacheMaxTimeToLive;
   }
 
-  /**
-   * Set the L2 cache default max time to live in seconds.
-   */
+  @Override
   public void setCacheMaxTimeToLive(int cacheMaxTimeToLive) {
     this.cacheMaxTimeToLive = cacheMaxTimeToLive;
   }
 
-  /**
-   * Return the L2 query cache default max size.
-   */
+  @Override
   public int getQueryCacheMaxSize() {
     return queryCacheMaxSize;
   }
 
-  /**
-   * Set the L2 query cache default max size.
-   */
+  @Override
   public void setQueryCacheMaxSize(int queryCacheMaxSize) {
     this.queryCacheMaxSize = queryCacheMaxSize;
   }
 
-  /**
-   * Return the L2 query cache default max idle time in seconds.
-   */
+  @Override
   public int getQueryCacheMaxIdleTime() {
     return queryCacheMaxIdleTime;
   }
 
-  /**
-   * Set the L2 query cache default max idle time in seconds.
-   */
+  @Override
   public void setQueryCacheMaxIdleTime(int queryCacheMaxIdleTime) {
     this.queryCacheMaxIdleTime = queryCacheMaxIdleTime;
   }
 
-  /**
-   * Return the L2 query cache default max time to live in seconds.
-   */
+  @Override
   public int getQueryCacheMaxTimeToLive() {
     return queryCacheMaxTimeToLive;
   }
 
-  /**
-   * Set the L2 query cache default max time to live in seconds.
-   */
+  @Override
   public void setQueryCacheMaxTimeToLive(int queryCacheMaxTimeToLive) {
     this.queryCacheMaxTimeToLive = queryCacheMaxTimeToLive;
   }
 
-  /**
-   * Return the NamingConvention.
-   * <p>
-   * If none has been set the default UnderscoreNamingConvention is used.
-   */
+  @Override
   public NamingConvention getNamingConvention() {
     return namingConvention;
   }
 
-  /**
-   * Set the NamingConvention.
-   * <p>
-   * If none is set the default UnderscoreNamingConvention is used.
-   */
+  @Override
   public void setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
   }
 
-  /**
-   * Return true if all DB column and table names should use quoted identifiers.
-   */
+  @Override
   public boolean isAllQuotedIdentifiers() {
     return platformConfig.isAllQuotedIdentifiers();
   }
 
-  /**
-   * Set to true if all DB column and table names should use quoted identifiers.
-   * <p>
-   * For Postgres pgjdbc version 42.3.0 should be used with datasource property
-   * <em>quoteReturningIdentifiers</em> set to <em>false</em> (refer #2303).
-   */
+  @Override
   public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
     platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
     if (allQuotedIdentifiers) {
@@ -1599,423 +1195,242 @@ public class DatabaseConfig {
     }
   }
 
-  /**
-   * Return true if this Database is a Document store only instance (has no JDBC DB).
-   */
+  @Override
   public boolean isDocStoreOnly() {
     return docStoreOnly;
   }
 
-  /**
-   * Set to true if this Database is Document store only instance (has no JDBC DB).
-   */
+  @Override
   public void setDocStoreOnly(boolean docStoreOnly) {
     this.docStoreOnly = docStoreOnly;
   }
 
-  /**
-   * Return the configuration for the ElasticSearch integration.
-   */
+  @Override
   public DocStoreConfig getDocStoreConfig() {
     return docStoreConfig;
   }
 
-  /**
-   * Set the configuration for the ElasticSearch integration.
-   */
+  @Override
   public void setDocStoreConfig(DocStoreConfig docStoreConfig) {
     this.docStoreConfig = docStoreConfig;
   }
 
-  /**
-   * Return the constraint naming convention used in DDL generation.
-   */
+  @Override
   public DbConstraintNaming getConstraintNaming() {
     return platformConfig.getConstraintNaming();
   }
 
-  /**
-   * Set the constraint naming convention used in DDL generation.
-   */
+  @Override
   public void setConstraintNaming(DbConstraintNaming constraintNaming) {
     platformConfig.setConstraintNaming(constraintNaming);
   }
 
-  /**
-   * Return the configuration for AutoTune.
-   */
+  @Override
   public AutoTuneConfig getAutoTuneConfig() {
     return autoTuneConfig;
   }
 
-  /**
-   * Set the configuration for AutoTune.
-   */
+  @Override
   public void setAutoTuneConfig(AutoTuneConfig autoTuneConfig) {
     this.autoTuneConfig = autoTuneConfig;
   }
 
-  /**
-   * Return true if the startup DataSource check should be skipped.
-   */
+  @Override
   public boolean skipDataSourceCheck() {
     return skipDataSourceCheck;
   }
 
-  /**
-   * Set to true to skip the startup DataSource check.
-   */
+  @Override
   public void setSkipDataSourceCheck(boolean skipDataSourceCheck) {
     this.skipDataSourceCheck = skipDataSourceCheck;
   }
 
-  /**
-   * Return the DataSource.
-   */
+  @Override
   public DataSource getDataSource() {
     return dataSource;
   }
 
-  /**
-   * Set a DataSource.
-   */
+  @Override
   public void setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
   }
 
-  /**
-   * Return the read only DataSource.
-   */
+  @Override
   public DataSource getReadOnlyDataSource() {
     return readOnlyDataSource;
   }
 
-  /**
-   * Set the read only DataSource.
-   * <p>
-   * Note that the DataSource is expected to use AutoCommit true mode avoiding the need
-   * for explicit commit (or rollback).
-   * <p>
-   * This read only DataSource will be used for implicit query only transactions. It is not
-   * used if the transaction is created explicitly or if the query is an update or delete query.
-   */
+  @Override
   public void setReadOnlyDataSource(DataSource readOnlyDataSource) {
     this.readOnlyDataSource = readOnlyDataSource;
   }
 
-  /**
-   * Return the configuration to build a DataSource using Ebean's own DataSource
-   * implementation.
-   */
+  @Override
   public DataSourceBuilder getDataSourceConfig() {
     return dataSourceConfig;
   }
 
-  /**
-   * Set the configuration required to build a DataSource using Ebean's own
-   * DataSource implementation.
-   */
+  @Override
   public void setDataSourceConfig(DataSourceBuilder dataSourceConfig) {
     this.dataSourceConfig = dataSourceConfig;
   }
 
-  /**
-   * Return true if Ebean should create a DataSource for use with implicit read only transactions.
-   */
+  @Override
   public boolean isAutoReadOnlyDataSource() {
     return autoReadOnlyDataSource;
   }
 
-  /**
-   * Set to true if Ebean should create a DataSource for use with implicit read only transactions.
-   */
+  @Override
   public void setAutoReadOnlyDataSource(boolean autoReadOnlyDataSource) {
     this.autoReadOnlyDataSource = autoReadOnlyDataSource;
   }
 
-  /**
-   * Return the configuration for the read only DataSource.
-   * <p>
-   * This is only used if autoReadOnlyDataSource is true.
-   * <p>
-   * The driver, url, username and password default to the configuration for the main DataSource if they are not
-   * set on this configuration. This means there is actually no need to set any configuration here and we only
-   * set configuration for url, username and password etc if it is different from the main DataSource.
-   */
+  @Override
   public DataSourceBuilder getReadOnlyDataSourceConfig() {
     return readOnlyDataSourceConfig;
   }
 
-  /**
-   * Set the configuration for the read only DataSource.
-   */
+  @Override
   public void setReadOnlyDataSourceConfig(DataSourceBuilder readOnlyDataSourceConfig) {
     this.readOnlyDataSourceConfig = readOnlyDataSourceConfig;
   }
 
-  /**
-   * Return a value used to represent TRUE in the database.
-   * <p>
-   * This is used for databases that do not support boolean natively.
-   * <p>
-   * The value returned is either a Integer or a String (e.g. "1", or "T").
-   */
+  @Override
   public String getDatabaseBooleanTrue() {
     return platformConfig.getDatabaseBooleanTrue();
   }
 
-  /**
-   * Set the value to represent TRUE in the database.
-   * <p>
-   * This is used for databases that do not support boolean natively.
-   * <p>
-   * The value set is either a Integer or a String (e.g. "1", or "T").
-   */
+  @Override
   public void setDatabaseBooleanTrue(String databaseTrue) {
     platformConfig.setDatabaseBooleanTrue(databaseTrue);
   }
 
-  /**
-   * Return a value used to represent FALSE in the database.
-   * <p>
-   * This is used for databases that do not support boolean natively.
-   * <p>
-   * The value returned is either a Integer or a String (e.g. "0", or "F").
-   */
+  @Override
   public String getDatabaseBooleanFalse() {
     return platformConfig.getDatabaseBooleanFalse();
   }
 
-  /**
-   * Set the value to represent FALSE in the database.
-   * <p>
-   * This is used for databases that do not support boolean natively.
-   * <p>
-   * The value set is either a Integer or a String (e.g. "0", or "F").
-   */
+  @Override
   public void setDatabaseBooleanFalse(String databaseFalse) {
     this.platformConfig.setDatabaseBooleanFalse(databaseFalse);
   }
 
-  /**
-   * Return the number of DB sequence values that should be preallocated.
-   */
+  @Override
   public int getDatabaseSequenceBatchSize() {
     return platformConfig.getDatabaseSequenceBatchSize();
   }
 
-  /**
-   * Set the number of DB sequence values that should be preallocated and cached
-   * by Ebean.
-   * <p>
-   * This is only used for DB's that use sequences and is a performance
-   * optimisation. This reduces the number of times Ebean needs to get a
-   * sequence value from the Database reducing network chatter.
-   * <p>
-   * By default this value is 10 so when we need another Id (and don't have one
-   * in our cache) Ebean will fetch 10 id's from the database. Note that when
-   * the cache drops to have full (which is 5 by default) Ebean will fetch
-   * another batch of Id's in a background thread.
-   */
+  @Override
   public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
     this.platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
   }
 
-  /**
-   * Return the database platform name (can be null).
-   * <p>
-   * If null then the platform is determined automatically via the JDBC driver
-   * information.
-   */
+  @Override
   public String getDatabasePlatformName() {
     return databasePlatformName;
   }
 
-  /**
-   * Explicitly set the database platform name
-   * <p>
-   * If none is set then the platform is determined automatically via the JDBC
-   * driver information.
-   * <p>
-   * This can be used when the Database Platform can not be automatically
-   * detected from the JDBC driver (possibly 3rd party JDBC driver). It is also
-   * useful when you want to do offline DDL generation for a database platform
-   * that you don't have access to.
-   * <p>
-   * Values are oracle, h2, postgres, mysql, sqlserver16, sqlserver17.
-   */
+  @Override
   public void setDatabasePlatformName(String databasePlatformName) {
     this.databasePlatformName = databasePlatformName;
   }
 
-  /**
-   * Return the database platform to use for this database.
-   */
+  @Override
   public DatabasePlatform getDatabasePlatform() {
     return databasePlatform;
   }
 
-  /**
-   * Explicitly set the database platform to use.
-   * <p>
-   * If none is set then the platform is determined via the databasePlatformName
-   * or automatically via the JDBC driver information.
-   */
+  @Override
   public void setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
   }
 
-  /**
-   * Return the preferred DB platform IdType.
-   */
+  @Override
   public IdType getIdType() {
     return platformConfig.getIdType();
   }
 
-  /**
-   * Set the preferred DB platform IdType.
-   */
+  @Override
   public void setIdType(IdType idType) {
     this.platformConfig.setIdType(idType);
   }
 
-  /**
-   * Return the EncryptKeyManager.
-   */
+  @Override
   public EncryptKeyManager getEncryptKeyManager() {
     return encryptKeyManager;
   }
 
-  /**
-   * Set the EncryptKeyManager.
-   * <p>
-   * This is required when you want to use encrypted properties.
-   * <p>
-   * You can also set this in ebean.proprerties:
-   * <p>
-   * <pre>{@code
-   * # set via ebean.properties
-   * ebean.encryptKeyManager=org.avaje.tests.basic.encrypt.BasicEncyptKeyManager
-   * }</pre>
-   */
+  @Override
   public void setEncryptKeyManager(EncryptKeyManager encryptKeyManager) {
     this.encryptKeyManager = encryptKeyManager;
   }
 
-  /**
-   * Return the EncryptDeployManager.
-   * <p>
-   * This is optionally used to programmatically define which columns are
-   * encrypted instead of using the {@link Encrypted} Annotation.
-   */
+  @Override
   public EncryptDeployManager getEncryptDeployManager() {
     return encryptDeployManager;
   }
 
-  /**
-   * Set the EncryptDeployManager.
-   * <p>
-   * This is optionally used to programmatically define which columns are
-   * encrypted instead of using the {@link Encrypted} Annotation.
-   */
+  @Override
   public void setEncryptDeployManager(EncryptDeployManager encryptDeployManager) {
     this.encryptDeployManager = encryptDeployManager;
   }
 
-  /**
-   * Return the Encryptor used to encrypt data on the java client side (as
-   * opposed to DB encryption functions).
-   */
+  @Override
   public Encryptor getEncryptor() {
     return encryptor;
   }
 
-  /**
-   * Set the Encryptor used to encrypt data on the java client side (as opposed
-   * to DB encryption functions).
-   * <p>
-   * Ebean has a default implementation that it will use if you do not set your
-   * own Encryptor implementation.
-   */
+  @Override
   public void setEncryptor(Encryptor encryptor) {
     this.encryptor = encryptor;
   }
 
-  /**
-   * Return true if the Database instance should be created in offline mode.
-   */
+  @Override
   public boolean isDbOffline() {
     return dbOffline;
   }
 
-  /**
-   * Set to true if the Database instance should be created in offline mode.
-   * <p>
-   * Typically used to create an Database instance for DDL Migration generation
-   * without requiring a real DataSource / Database to connect to.
-   */
+  @Override
   public void setDbOffline(boolean dbOffline) {
     this.dbOffline = dbOffline;
   }
 
-  /**
-   * Return the DbEncrypt used to encrypt and decrypt properties.
-   * <p>
-   * Note that if this is not set then the DbPlatform may already have a
-   * DbEncrypt set and that will be used.
-   */
+  @Override
   public DbEncrypt getDbEncrypt() {
     return dbEncrypt;
   }
 
-  /**
-   * Set the DbEncrypt used to encrypt and decrypt properties.
-   * <p>
-   * Note that if this is not set then the DbPlatform may already have a
-   * DbEncrypt set (H2, MySql, Postgres and Oracle platforms have a DbEncrypt)
-   */
+  @Override
   public void setDbEncrypt(DbEncrypt dbEncrypt) {
     this.dbEncrypt = dbEncrypt;
   }
 
-  /**
-   * Return the configuration for DB types (such as UUID and custom mappings).
-   */
+  @Override
   public PlatformConfig getPlatformConfig() {
     return platformConfig;
   }
 
-  /**
-   * Set the configuration for DB platform (such as UUID and custom mappings).
-   */
+  @Override
   public void setPlatformConfig(PlatformConfig platformConfig) {
     this.platformConfig = platformConfig;
   }
 
-  /**
-   * Set the DB type used to store UUID.
-   */
+  @Override
   public void setDbUuid(PlatformConfig.DbUuid dbUuid) {
     this.platformConfig.setDbUuid(dbUuid);
   }
 
-  /**
-   * Returns the UUID version mode.
-   */
+  @Override
   public UuidVersion getUuidVersion() {
     return uuidVersion;
   }
 
-  /**
-   * Sets the UUID version mode.
-   */
+  @Override
   public void setUuidVersion(UuidVersion uuidVersion) {
     this.uuidVersion = uuidVersion;
   }
 
-  /**
-   * Return the UUID state file.
-   */
+  @Override
   public String getUuidStateFile() {
     if (uuidStateFile == null || uuidStateFile.isEmpty()) {
       // by default, add servername...
@@ -2029,194 +1444,119 @@ public class DatabaseConfig {
     return uuidStateFile;
   }
 
-  /**
-   * Set the UUID state file.
-   */
+  @Override
   public void setUuidStateFile(String uuidStateFile) {
     this.uuidStateFile = uuidStateFile;
   }
 
-  /**
-   * Returns the V1-UUID-NodeId
-   */
+  @Override
   public String getUuidNodeId() {
     return uuidNodeId;
   }
 
-  /**
-   * Sets the V1-UUID-NodeId.
-   */
+  @Override
   public void setUuidNodeId(String uuidNodeId) {
     this.uuidNodeId = uuidNodeId;
   }
 
-  /**
-   * Return true if LocalTime should be persisted with nanos precision.
-   */
+  @Override
   public boolean isLocalTimeWithNanos() {
     return localTimeWithNanos;
   }
 
-  /**
-   * Set to true if LocalTime should be persisted with nanos precision.
-   * <p>
-   * Otherwise it is persisted using java.sql.Time which is seconds precision.
-   */
+  @Override
   public void setLocalTimeWithNanos(boolean localTimeWithNanos) {
     this.localTimeWithNanos = localTimeWithNanos;
   }
 
-  /**
-   * Return true if Duration should be persisted with nanos precision (SQL DECIMAL).
-   * <p>
-   * Otherwise it is persisted with second precision (SQL INTEGER).
-   */
+  @Override
   public boolean isDurationWithNanos() {
     return durationWithNanos;
   }
 
-  /**
-   * Set to true if Duration should be persisted with nanos precision (SQL DECIMAL).
-   * <p>
-   * Otherwise it is persisted with second precision (SQL INTEGER).
-   */
+  @Override
   public void setDurationWithNanos(boolean durationWithNanos) {
     this.durationWithNanos = durationWithNanos;
   }
 
-  /**
-   * Set to true to run DB migrations on server start.
-   * <p>
-   * This is the same as config.getMigrationConfig().setRunMigration(). We have added this method here
-   * as it is often the only thing we need to configure for migrations.
-   */
+  @Override
   public void setRunMigration(boolean runMigration) {
     this.runMigration = runMigration;
   }
 
-  /**
-   * Return true if the DB migration should run on server start.
-   */
+  @Override
   public boolean isRunMigration() {
     final String run = System.getProperty("ebean.migration.run");
     return (run != null) ? Boolean.parseBoolean(run) : runMigration;
   }
 
-  /**
-   * Set to true to generate the "create all" DDL on startup.
-   * <p>
-   * Typically we want this on when we are running tests locally (and often using H2)
-   * and we want to create the full DB schema from scratch to run tests.
-   */
+  @Override
   public void setDdlGenerate(boolean ddlGenerate) {
     this.ddlGenerate = ddlGenerate;
   }
 
-  /**
-   * Set to true to run the generated "create all DDL" on startup.
-   * <p>
-   * Typically we want this on when we are running tests locally (and often using H2)
-   * and we want to create the full DB schema from scratch to run tests.
-   */
+  @Override
   public void setDdlRun(boolean ddlRun) {
     this.ddlRun = ddlRun;
   }
 
-  /**
-   * Set to false if you not want to run the extra-ddl.xml scripts. (default = true)
-   * <p>
-   * Typically we want this on when we are running tests.
-   */
+  @Override
   public void setDdlExtra(boolean ddlExtra) {
     this.ddlExtra = ddlExtra;
   }
 
 
-  /**
-   * Return true if the "drop all ddl" should be skipped.
-   * <p>
-   * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
-   * are not required so skipping the drop table statements etc makes it faster with less noise in the logs.
-   */
+  @Override
   public boolean isDdlCreateOnly() {
     return ddlCreateOnly;
   }
 
-  /**
-   * Set to true if the "drop all ddl" should be skipped.
-   * <p>
-   * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
-   * are not required so skipping the drop table statements etc makes it faster with less noise in the logs.
-   */
+  @Override
   public void setDdlCreateOnly(boolean ddlCreateOnly) {
     this.ddlCreateOnly = ddlCreateOnly;
   }
 
-  /**
-   * Return SQL script to execute after the "create all" DDL has been run.
-   * <p>
-   * Typically this is a sql script that inserts test seed data when running tests.
-   * Place a sql script in src/test/resources that inserts test seed data.
-   */
+  @Override
   public String getDdlSeedSql() {
     return ddlSeedSql;
   }
 
-  /**
-   * Set a SQL script to execute after the "create all" DDL has been run.
-   * <p>
-   * Typically this is a sql script that inserts test seed data when running tests.
-   * Place a sql script in src/test/resources that inserts test seed data.
-   */
+  @Override
   public void setDdlSeedSql(String ddlSeedSql) {
     this.ddlSeedSql = ddlSeedSql;
   }
 
-  /**
-   * Return a SQL script to execute before the "create all" DDL has been run.
-   */
+  @Override
   public String getDdlInitSql() {
     return ddlInitSql;
   }
 
-  /**
-   * Set a SQL script to execute before the "create all" DDL has been run.
-   */
+  @Override
   public void setDdlInitSql(String ddlInitSql) {
     this.ddlInitSql = ddlInitSql;
   }
 
-  /**
-   * Return true if the DDL should be generated.
-   */
+  @Override
   public boolean isDdlGenerate() {
     return ddlGenerate;
   }
 
-  /**
-   * Return true if the DDL should be run.
-   */
+  @Override
   public boolean isDdlRun() {
     return ddlRun;
   }
 
-  /**
-   * Return true, if extra-ddl.xml should be executed.
-   */
+  @Override
   public boolean isDdlExtra() {
     return ddlExtra;
   }
 
-  /**
-   * Set the header to use with DDL generation.
-   */
+  @Override
   public void setDdlHeader(String ddlHeader) {
     this.ddlHeader = ddlHeader;
   }
 
-  /**
-   * Return the header to use with DDL generation.
-   */
+  @Override
   public String getDdlHeader() {
     if (ddlHeader != null && !ddlHeader.isEmpty()) {
       String header = ddlHeader.replace("${version}", EbeanVersion.getVersion());
@@ -2226,540 +1566,291 @@ public class DatabaseConfig {
     return ddlHeader;
   }
 
-  /**
-   * Return true if strict mode is used which includes a check that non-null columns have a default value.
-   */
+  @Override
   public boolean isDdlStrictMode() {
     return ddlStrictMode;
   }
 
-  /**
-   * Set to false to turn off strict mode allowing non-null columns to not have a default value.
-   */
+  @Override
   public void setDdlStrictMode(boolean ddlStrictMode) {
     this.ddlStrictMode = ddlStrictMode;
   }
 
-  /**
-   * Return a comma and equals delimited placeholders that are substituted in DDL scripts.
-   */
+  @Override
   public String getDdlPlaceholders() {
     return ddlPlaceholders;
   }
 
-  /**
-   * Set a comma and equals delimited placeholders that are substituted in DDL scripts.
-   */
+  @Override
   public void setDdlPlaceholders(String ddlPlaceholders) {
     this.ddlPlaceholders = ddlPlaceholders;
   }
 
-  /**
-   * Return a map of placeholder values that are substituted in DDL scripts.
-   */
+  @Override
   public Map<String, String> getDdlPlaceholderMap() {
     return ddlPlaceholderMap;
   }
 
-  /**
-   * Set a map of placeholder values that are substituted in DDL scripts.
-   */
+  @Override
   public void setDdlPlaceholderMap(Map<String, String> ddlPlaceholderMap) {
     this.ddlPlaceholderMap = ddlPlaceholderMap;
   }
 
-  /**
-   * Return true if the class path search should be disabled.
-   */
+  @Override
   public boolean isDisableClasspathSearch() {
     return disableClasspathSearch;
   }
 
-  /**
-   * Set to true to disable the class path search even for the case where no entity bean classes
-   * have been registered. This can be used to start an Database instance just to use the
-   * SQL functions such as SqlQuery, SqlUpdate etc.
-   */
+  @Override
   public void setDisableClasspathSearch(boolean disableClasspathSearch) {
     this.disableClasspathSearch = disableClasspathSearch;
   }
 
-  /**
-   * Return the mode to use for Joda LocalTime support 'normal' or 'utc'.
-   */
+  @Override
   public String getJodaLocalTimeMode() {
     return jodaLocalTimeMode;
   }
 
-  /**
-   * Set the mode to use for Joda LocalTime support 'normal' or 'utc'.
-   */
+  @Override
   public void setJodaLocalTimeMode(String jodaLocalTimeMode) {
     this.jodaLocalTimeMode = jodaLocalTimeMode;
   }
 
-  /**
-   * Programmatically add classes (typically entities) that this server should use.
-   * <p>
-   * The class can be an Entity, Embedded type, ScalarType, BeanPersistListener,
-   * BeanFinder or BeanPersistController.
-   * <p>
-   * If no classes are specified then the classes are found automatically via
-   * searching the class path.
-   *
-   * @param cls the entity type (or other type) that should be registered by this database.
-   */
+  @Override
   public void addClass(Class<?> cls) {
     classes.add(cls);
   }
 
-  /**
-   * Register all the classes (typically entity classes).
-   */
+  @Override
   public void addAll(Collection<Class<?>> classList) {
     if (classList != null && !classList.isEmpty()) {
       classes.addAll(classList);
     }
   }
 
-  /**
-   * Add a package to search for entities via class path search.
-   * <p>
-   * This is only used if classes have not been explicitly specified.
-   */
+  @Override
   public void addPackage(String packageName) {
     packages.add(packageName);
   }
 
-  /**
-   * Return packages to search for entities via class path search.
-   * <p>
-   * This is only used if classes have not been explicitly specified.
-   */
+  @Override
   public List<String> getPackages() {
     return packages;
   }
 
-  /**
-   * Set packages to search for entities via class path search.
-   * <p>
-   * This is only used if classes have not been explicitly specified.
-   */
+  @Override
   public void setPackages(List<String> packages) {
     this.packages = packages;
   }
 
-  /**
-   * Set the list of classes (entities, listeners, scalarTypes etc) that should
-   * be used for this database.
-   * <p>
-   * If no classes are specified then the classes are found automatically via
-   * searching the class path.
-   * <p>
-   * Alternatively the classes can contain added via {@link #addClass(Class)}.
-   */
+  @Override
   public void setClasses(Collection<Class<?>> classes) {
     this.classes = new HashSet<>(classes);
   }
 
-  /**
-   * Return the classes registered for this database. Typically, this includes
-   * entities and perhaps listeners.
-   */
+  @Override
   public Set<Class<?>> classes() {
     return classes;
   }
 
   /**
    * @deprecated - migrate to {@link #classes()}.
-   * <p>
-   * Sorry if returning Set rather than List breaks code but it feels safer to
-   * do that than a subtle change to return a shallow copy which you will not detect.
    */
+  @Override
+  @SuppressWarnings("removal")
   @Deprecated(forRemoval = true)
   public Set<Class<?>> getClasses() {
     return classes;
   }
 
-  /**
-   * Return true if L2 bean cache should be skipped once writes have occurred on a transaction.
-   * <p>
-   * This defaults to true and means that for "find by id" and "find by natural key"
-   * queries that normally hit L2 bean cache automatically will not do so after a write/persist
-   * on the transaction.
-   * <p>
-   * <pre>{@code
-   *
-   *   // assume Customer has L2 bean caching enabled ...
-   *
-   *   try (Transaction transaction = DB.beginTransaction()) {
-   *
-   *     // this uses L2 bean cache as the transaction
-   *     // ... is considered "query only" at this point
-   *     Customer.find.byId(42);
-   *
-   *     // transaction no longer "query only" once
-   *     // ... a bean has been saved etc
-   *     DB.save(someBean);
-   *
-   *     // will NOT use L2 bean cache as the transaction
-   *     // ... is no longer considered "query only"
-   *     Customer.find.byId(55);
-   *
-   *
-   *
-   *     // explicit control - please use L2 bean cache
-   *
-   *     transaction.setSkipCache(false);
-   *     Customer.find.byId(77); // hit the l2 bean cache
-   *
-   *
-   *     // explicit control - please don't use L2 bean cache
-   *
-   *     transaction.setSkipCache(true);
-   *     Customer.find.byId(99); // skips l2 bean cache
-   *
-   *   }
-   *
-   * }</pre>
-   *
-   * @see Transaction#setSkipCache(boolean)
-   */
+  @Override
   public boolean isSkipCacheAfterWrite() {
     return skipCacheAfterWrite;
   }
 
-  /**
-   * Set to false when we still want to hit the cache after a write has occurred on a transaction.
-   */
+  @Override
   public void setSkipCacheAfterWrite(boolean skipCacheAfterWrite) {
     this.skipCacheAfterWrite = skipCacheAfterWrite;
   }
 
-  /**
-   * Returns true if updates in JDBC batch default to include all properties by default.
-   */
+  @Override
   public boolean isUpdateAllPropertiesInBatch() {
     return updateAllPropertiesInBatch;
   }
 
-  /**
-   * Set to false if by default updates in JDBC batch should not include all properties.
-   * <p>
-   * This mode can be explicitly set per transaction.
-   *
-   * @see Transaction#setUpdateAllLoadedProperties(boolean)
-   */
+  @Override
   public void setUpdateAllPropertiesInBatch(boolean updateAllPropertiesInBatch) {
     this.updateAllPropertiesInBatch = updateAllPropertiesInBatch;
   }
 
-  /**
-   * Returns the resource directory.
-   */
+  @Override
   public String getResourceDirectory() {
     return resourceDirectory;
   }
 
-  /**
-   * Sets the resource directory.
-   */
+  @Override
   public void setResourceDirectory(String resourceDirectory) {
     this.resourceDirectory = resourceDirectory;
   }
 
-  /**
-   * Add a custom type mapping.
-   * <p>
-   * <pre>{@code
-   *
-   *   // set the default mapping for BigDecimal.class/decimal
-   *   config.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
-   *
-   *   // set the default mapping for String.class/varchar but only for Postgres
-   *   config.addCustomMapping(DbType.VARCHAR, "text", Platform.POSTGRES);
-   *
-   * }</pre>
-   *
-   * @param type             The DB type this mapping should apply to
-   * @param columnDefinition The column definition that should be used
-   * @param platform         Optionally specify the platform this mapping should apply to.
-   */
+  @Override
   public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
     platformConfig.addCustomMapping(type, columnDefinition, platform);
   }
 
-  /**
-   * Add a custom type mapping that applies to all platforms.
-   * <p>
-   * <pre>{@code
-   *
-   *   // set the default mapping for BigDecimal/decimal
-   *   config.addCustomMapping(DbType.DECIMAL, "decimal(18,6)");
-   *
-   *   // set the default mapping for String/varchar
-   *   config.addCustomMapping(DbType.VARCHAR, "text");
-   *
-   * }</pre>
-   *
-   * @param type             The DB type this mapping should apply to
-   * @param columnDefinition The column definition that should be used
-   */
+  @Override
   public void addCustomMapping(DbType type, String columnDefinition) {
     platformConfig.addCustomMapping(type, columnDefinition);
   }
 
-  /**
-   * Register a BeanQueryAdapter instance.
-   * <p>
-   * Note alternatively you can use {@link #setQueryAdapters(List)} to set all
-   * the BeanQueryAdapter instances.
-   */
+  @Override
   public void add(BeanQueryAdapter beanQueryAdapter) {
     queryAdapters.add(beanQueryAdapter);
   }
 
-  /**
-   * Return the BeanQueryAdapter instances.
-   */
+  @Override
   public List<BeanQueryAdapter> getQueryAdapters() {
     return queryAdapters;
   }
 
-  /**
-   * Register all the BeanQueryAdapter instances.
-   * <p>
-   * Note alternatively you can use {@link #add(BeanQueryAdapter)} to add
-   * BeanQueryAdapter instances one at a time.
-   */
+  @Override
   public void setQueryAdapters(List<BeanQueryAdapter> queryAdapters) {
     this.queryAdapters = queryAdapters;
   }
 
-  /**
-   * Return the custom IdGenerator instances.
-   */
+  @Override
   public List<IdGenerator> getIdGenerators() {
     return idGenerators;
   }
 
-  /**
-   * Set the custom IdGenerator instances.
-   */
+  @Override
   public void setIdGenerators(List<IdGenerator> idGenerators) {
     this.idGenerators = idGenerators;
   }
 
-  /**
-   * Register a customer IdGenerator instance.
-   */
+  @Override
   public void add(IdGenerator idGenerator) {
     idGenerators.add(idGenerator);
   }
 
-  /**
-   * Register a BeanPersistController instance.
-   * <p>
-   * Note alternatively you can use {@link #setPersistControllers(List)} to set
-   * all the BeanPersistController instances.
-   */
+  @Override
   public void add(BeanPersistController beanPersistController) {
     persistControllers.add(beanPersistController);
   }
 
-  /**
-   * Register a BeanPostLoad instance.
-   * <p>
-   * Note alternatively you can use {@link #setPostLoaders(List)} to set
-   * all the BeanPostLoad instances.
-   */
+  @Override
   public void add(BeanPostLoad postLoad) {
     postLoaders.add(postLoad);
   }
 
-  /**
-   * Register a BeanPostConstructListener instance.
-   * <p>
-   * Note alternatively you can use {@link #setPostConstructListeners(List)} to set
-   * all the BeanPostConstructListener instances.
-   */
+  @Override
   public void add(BeanPostConstructListener listener) {
     postConstructListeners.add(listener);
   }
 
-  /**
-   * Return the list of BeanFindController instances.
-   */
+  @Override
   public List<BeanFindController> getFindControllers() {
     return findControllers;
   }
 
-  /**
-   * Set the list of BeanFindController instances.
-   */
+  @Override
   public void setFindControllers(List<BeanFindController> findControllers) {
     this.findControllers = findControllers;
   }
 
-  /**
-   * Return the list of BeanPostLoader instances.
-   */
+  @Override
   public List<BeanPostLoad> getPostLoaders() {
     return postLoaders;
   }
 
-  /**
-   * Set the list of BeanPostLoader instances.
-   */
+  @Override
   public void setPostLoaders(List<BeanPostLoad> postLoaders) {
     this.postLoaders = postLoaders;
   }
 
-  /**
-   * Return the list of BeanPostLoader instances.
-   */
+  @Override
   public List<BeanPostConstructListener> getPostConstructListeners() {
     return postConstructListeners;
   }
 
-  /**
-   * Set the list of BeanPostLoader instances.
-   */
+  @Override
   public void setPostConstructListeners(List<BeanPostConstructListener> listeners) {
     this.postConstructListeners = listeners;
   }
 
-  /**
-   * Return the BeanPersistController instances.
-   */
+  @Override
   public List<BeanPersistController> getPersistControllers() {
     return persistControllers;
   }
 
-  /**
-   * Register all the BeanPersistController instances.
-   * <p>
-   * Note alternatively you can use {@link #add(BeanPersistController)} to add
-   * BeanPersistController instances one at a time.
-   */
+  @Override
   public void setPersistControllers(List<BeanPersistController> persistControllers) {
     this.persistControllers = persistControllers;
   }
 
-  /**
-   * Register a BeanPersistListener instance.
-   * <p>
-   * Note alternatively you can use {@link #setPersistListeners(List)} to set
-   * all the BeanPersistListener instances.
-   */
+  @Override
   public void add(BeanPersistListener beanPersistListener) {
     persistListeners.add(beanPersistListener);
   }
 
-  /**
-   * Return the BeanPersistListener instances.
-   */
+  @Override
   public List<BeanPersistListener> getPersistListeners() {
     return persistListeners;
   }
 
-  /**
-   * Add a BulkTableEventListener
-   */
+  @Override
   public void add(BulkTableEventListener bulkTableEventListener) {
     bulkTableEventListeners.add(bulkTableEventListener);
   }
 
-  /**
-   * Return the list of BulkTableEventListener instances.
-   */
+  @Override
   public List<BulkTableEventListener> getBulkTableEventListeners() {
     return bulkTableEventListeners;
   }
 
-  /**
-   * Add a ServerConfigStartup.
-   */
+  @Override
   public void addServerConfigStartup(ServerConfigStartup configStartupListener) {
     configStartupListeners.add(configStartupListener);
   }
 
-  /**
-   * Return the list of ServerConfigStartup instances.
-   */
+  @Override
   public List<ServerConfigStartup> getServerConfigStartupListeners() {
     return configStartupListeners;
   }
 
-  /**
-   * Register all the BeanPersistListener instances.
-   * <p>
-   * Note alternatively you can use {@link #add(BeanPersistListener)} to add
-   * BeanPersistListener instances one at a time.
-   */
+  @Override
   public void setPersistListeners(List<BeanPersistListener> persistListeners) {
     this.persistListeners = persistListeners;
   }
 
-  /**
-   * Return the default PersistenceContextScope to be used if one is not explicitly set on a query.
-   * <p/>
-   * The PersistenceContextScope can specified on each query via {@link io.ebean
-   * .Query#setPersistenceContextScope(io.ebean.PersistenceContextScope)}. If it
-   * is not set on the query this default scope is used.
-   *
-   * @see Query#setPersistenceContextScope(PersistenceContextScope)
-   */
+  @Override
   public PersistenceContextScope getPersistenceContextScope() {
     // if somehow null return TRANSACTION scope
     return persistenceContextScope == null ? PersistenceContextScope.TRANSACTION : persistenceContextScope;
   }
 
-  /**
-   * Set the PersistenceContext scope to be used if one is not explicitly set on a query.
-   * <p/>
-   * This defaults to {@link PersistenceContextScope#TRANSACTION}.
-   * <p/>
-   * The PersistenceContextScope can specified on each query via {@link io.ebean
-   * .Query#setPersistenceContextScope(io.ebean.PersistenceContextScope)}. If it
-   * is not set on the query this scope is used.
-   *
-   * @see Query#setPersistenceContextScope(PersistenceContextScope)
-   */
+  @Override
   public void setPersistenceContextScope(PersistenceContextScope persistenceContextScope) {
     this.persistenceContextScope = persistenceContextScope;
   }
 
-  /**
-   * Return the ClassLoadConfig which is used to detect Joda, Java8 types etc and also
-   * create new instances of plugins given a className.
-   */
+  @Override
   public ClassLoadConfig getClassLoadConfig() {
     return classLoadConfig;
   }
 
-  /**
-   * Set the ClassLoadConfig which is used to detect Joda, Java8 types etc and also
-   * create new instances of plugins given a className.
-   */
+  @Override
   public void setClassLoadConfig(ClassLoadConfig classLoadConfig) {
     this.classLoadConfig = classLoadConfig;
   }
 
-  /**
-   * Load settings from application.properties, application.yaml and other sources.
-   * <p>
-   * Uses <code>avaje-config</code> to load configuration properties.  Goto https://avaje.io/config
-   * for detail on how and where properties are loaded from.
-   */
+  @Override
   public void loadFromProperties() {
     this.properties = Config.asProperties();
     configureFromProperties();
   }
 
-  /**
-   * Load the settings from the given properties
-   */
+  @Override
   public void loadFromProperties(Properties properties) {
     // keep the properties used for configuration so that these are available for plugins
     this.properties = Config.asConfiguration().eval(properties);
@@ -2790,9 +1881,7 @@ public class DatabaseConfig {
     return list;
   }
 
-  /**
-   * Return the properties that we used for configuration and were set via a call to loadFromProperties().
-   */
+  @Override
   public Properties getProperties() {
     return properties;
   }
@@ -3014,10 +2103,7 @@ public class DatabaseConfig {
     }
   }
 
-  /**
-   * Return the PersistBatch mode to use for 'batchOnCascade' taking into account if the database
-   * platform supports getGeneratedKeys in batch mode.
-   */
+  @Override
   public PersistBatch appliedPersistBatchOnCascade() {
     if (persistBatchOnCascade == PersistBatch.INHERIT) {
       // use the platform default (ALL except SQL Server which has NONE)
@@ -3026,164 +2112,97 @@ public class DatabaseConfig {
     return persistBatchOnCascade;
   }
 
-  /**
-   * Return the Jackson ObjectMapper.
-   * <p>
-   * Note that this is not strongly typed as Jackson ObjectMapper is an optional dependency.
-   */
+  @Override
   public Object getObjectMapper() {
     return objectMapper;
   }
 
-  /**
-   * Set the Jackson ObjectMapper.
-   * <p>
-   * Note that this is not strongly typed as Jackson ObjectMapper is an optional dependency.
-   */
+  @Override
   public void setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;
   }
 
-  /**
-   * Return true if eq("someProperty", null) should to generate "1=1" rather than "is null" sql expression.
-   */
+  @Override
   public boolean isExpressionEqualsWithNullAsNoop() {
     return expressionEqualsWithNullAsNoop;
   }
 
-  /**
-   * Set to true if you want eq("someProperty", null) to generate "1=1" rather than "is null" sql expression.
-   * <p>
-   * Setting this to true has the effect that eq(propertyName, value), ieq(propertyName, value) and
-   * ne(propertyName, value) have no effect when the value is null. The expression factory adds a NoopExpression
-   * which will add "1=1" into the SQL rather than "is null".
-   */
+  @Override
   public void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
     this.expressionEqualsWithNullAsNoop = expressionEqualsWithNullAsNoop;
   }
 
-  /**
-   * Return true if native ILIKE expression should be used if supported by the database platform (e.g. Postgres).
-   */
+  @Override
   public boolean isExpressionNativeIlike() {
     return expressionNativeIlike;
   }
 
-  /**
-   * Set to true to use native ILIKE expression if supported by the database platform (e.g. Postgres).
-   */
+  @Override
   public void setExpressionNativeIlike(boolean expressionNativeIlike) {
     this.expressionNativeIlike = expressionNativeIlike;
   }
 
-  /**
-   * Return the enabled L2 cache regions.
-   */
+  @Override
   public String getEnabledL2Regions() {
     return enabledL2Regions;
   }
 
-  /**
-   * Set the enabled L2 cache regions (comma delimited).
-   */
+  @Override
   public void setEnabledL2Regions(String enabledL2Regions) {
     this.enabledL2Regions = enabledL2Regions;
   }
 
-  /**
-   * Return true if L2 cache is disabled.
-   */
+  @Override
   public boolean isDisableL2Cache() {
     return disableL2Cache;
   }
 
-  /**
-   * Set to true to disable L2 caching. Typically useful in performance testing.
-   */
+  @Override
   public void setDisableL2Cache(boolean disableL2Cache) {
     this.disableL2Cache = disableL2Cache;
   }
 
-  /**
-   * Return true to use local only L2 cache. Effectively ignore l2 cache plugin like ebean-redis etc.
-   */
+  @Override
   public boolean isLocalOnlyL2Cache() {
     return localOnlyL2Cache;
   }
 
-  /**
-   * Force the use of local only L2 cache. Effectively ignore l2 cache plugin like ebean-redis etc.
-   */
+  @Override
   public void setLocalOnlyL2Cache(boolean localOnlyL2Cache) {
     this.localOnlyL2Cache = localOnlyL2Cache;
   }
 
-  /**
-   * Returns if we use javax.validation.constraints.NotNull
-   */
+  @Override
   public boolean isUseValidationNotNull() {
     return useValidationNotNull;
   }
 
-  /**
-   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code> or
-   * <code>&x64;jakarta.validation.contstraints.NotNull</code>
-   * with respect to generating a <code>NOT NULL</code> column.
-   * <p>
-   * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
-   * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
-   * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
-   */
+  @Override
   public void setUseValidationNotNull(boolean useValidationNotNull) {
     this.useValidationNotNull = useValidationNotNull;
   }
 
-  /**
-   * Return true if L2 cache notification should run in the foreground.
-   */
+  @Override
   public boolean isNotifyL2CacheInForeground() {
     return notifyL2CacheInForeground;
   }
 
-  /**
-   * Set this to true to run L2 cache notification in the foreground.
-   * <p>
-   * In general we don't want to do that as when we use a distributed cache (like Ignite, Hazelcast etc)
-   * we are making network calls and we prefer to do this in background and not impact the response time
-   * of the executing transaction.
-   */
+  @Override
   public void setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground) {
     this.notifyL2CacheInForeground = notifyL2CacheInForeground;
   }
 
-  /**
-   * Return the time to live for ebean's internal query plan.
-   */
+  @Override
   public int getQueryPlanTTLSeconds() {
     return queryPlanTTLSeconds;
   }
 
-  /**
-   * Set the time to live for ebean's internal query plan.
-   * <p>
-   * This is the plan that knows how to execute the query, read the result
-   * and collects execution metrics. By default this is set to 5 mins.
-   */
+  @Override
   public void setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
     this.queryPlanTTLSeconds = queryPlanTTLSeconds;
   }
 
-  /**
-   * Create a new PlatformConfig based of the one held but with overridden properties by reading
-   * properties with the given path and prefix.
-   * <p>
-   * Typically used in Db Migration generation for many platform targets that might have different
-   * configuration for IdType, UUID, quoted identifiers etc.
-   *
-   * @param propertiesPath The properties path used for loading and setting properties
-   * @param platformPrefix The prefix used for loading and setting properties
-   * @return A copy of the PlatformConfig with overridden properties
-   */
+  @Override
   public PlatformConfig newPlatformConfig(String propertiesPath, String platformPrefix) {
     if (properties == null) {
       properties = new Properties();
@@ -3194,9 +2213,7 @@ public class DatabaseConfig {
     return config;
   }
 
-  /**
-   * Add a mapping location to search for xml mapping via class path search.
-   */
+  @Override
   public void addMappingLocation(String mappingLocation) {
     if (mappingLocations == null) {
       mappingLocations = new ArrayList<>();
@@ -3204,184 +2221,117 @@ public class DatabaseConfig {
     mappingLocations.add(mappingLocation);
   }
 
-  /**
-   * Return mapping locations to search for xml mapping via class path search.
-   */
+  @Override
   public List<String> getMappingLocations() {
     return mappingLocations;
   }
 
-  /**
-   * Set mapping locations to search for xml mapping via class path search.
-   * <p>
-   * This is only used if classes have not been explicitly specified.
-   */
+  @Override
   public void setMappingLocations(List<String> mappingLocations) {
     this.mappingLocations = mappingLocations;
   }
 
-  /**
-   * When false we need explicit <code>@GeneratedValue</code> mapping to assign
-   * Identity or Sequence generated values. When true Id properties are automatically
-   * assigned Identity or Sequence without the GeneratedValue mapping.
-   */
+  @Override
   public boolean isIdGeneratorAutomatic() {
     return idGeneratorAutomatic;
   }
 
-  /**
-   * Set to false such that Id properties require explicit <code>@GeneratedValue</code>
-   * mapping before they are assigned Identity or Sequence generation based on platform.
-   */
+  @Override
   public void setIdGeneratorAutomatic(boolean idGeneratorAutomatic) {
     this.idGeneratorAutomatic = idGeneratorAutomatic;
   }
 
-  /**
-   * Return true if query plan capture is enabled.
-   */
+  @Override
   public boolean isQueryPlanEnable() {
     return queryPlanEnable;
   }
 
-  /**
-   * Set to true to enable query plan capture.
-   */
+  @Override
   public void setQueryPlanEnable(boolean queryPlanEnable) {
     this.queryPlanEnable = queryPlanEnable;
   }
 
-  /**
-   * Return the query plan collection threshold in microseconds.
-   */
+  @Override
   public long getQueryPlanThresholdMicros() {
     return queryPlanThresholdMicros;
   }
 
-  /**
-   * Set the query plan collection threshold in microseconds.
-   * <p>
-   * Queries executing slower than this will have bind values captured such that later
-   * the query plan can be captured and reported.
-   */
+  @Override
   public void setQueryPlanThresholdMicros(long queryPlanThresholdMicros) {
     this.queryPlanThresholdMicros = queryPlanThresholdMicros;
   }
 
-  /**
-   * Return true if periodic capture of query plans is enabled.
-   */
+  @Override
   public boolean isQueryPlanCapture() {
     return queryPlanCapture;
   }
 
-  /**
-   * Set to true to turn on periodic capture of query plans.
-   */
+  @Override
   public void setQueryPlanCapture(boolean queryPlanCapture) {
     this.queryPlanCapture = queryPlanCapture;
   }
 
-  /**
-   * Return the frequency to capture query plans.
-   */
+  @Override
   public long getQueryPlanCapturePeriodSecs() {
     return queryPlanCapturePeriodSecs;
   }
 
-  /**
-   * Set the frequency in seconds to capture query plans.
-   */
+  @Override
   public void setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs) {
     this.queryPlanCapturePeriodSecs = queryPlanCapturePeriodSecs;
   }
 
-  /**
-   * Return the time after which a capture query plans request will
-   * stop capturing more query plans.
-   * <p>
-   * Effectively this controls the amount of load/time we want to
-   * allow for query plan capture.
-   */
+  @Override
   public long getQueryPlanCaptureMaxTimeMillis() {
     return queryPlanCaptureMaxTimeMillis;
   }
 
-  /**
-   * Set the time after which a capture query plans request will
-   * stop capturing more query plans.
-   * <p>
-   * Effectively this controls the amount of load/time we want to
-   * allow for query plan capture.
-   */
+  @Override
   public void setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis) {
     this.queryPlanCaptureMaxTimeMillis = queryPlanCaptureMaxTimeMillis;
   }
 
-  /**
-   * Return the max number of query plans captured per request.
-   */
+  @Override
   public int getQueryPlanCaptureMaxCount() {
     return queryPlanCaptureMaxCount;
   }
 
-  /**
-   * Set the max number of query plans captured per request.
-   */
+  @Override
   public void setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount) {
     this.queryPlanCaptureMaxCount = queryPlanCaptureMaxCount;
   }
 
-  /**
-   * Return the listener used to process captured query plans.
-   */
+  @Override
   public QueryPlanListener getQueryPlanListener() {
     return queryPlanListener;
   }
 
-  /**
-   * Set the listener used to process captured query plans.
-   */
+  @Override
   public void setQueryPlanListener(QueryPlanListener queryPlanListener) {
     this.queryPlanListener = queryPlanListener;
   }
 
-  /**
-   * Return true if metrics should be dumped when the server is shutdown.
-   */
+  @Override
   public boolean isDumpMetricsOnShutdown() {
     return dumpMetricsOnShutdown;
   }
 
-  /**
-   * Set to true if metrics should be dumped when the server is shutdown.
-   */
+  @Override
   public void setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown) {
     this.dumpMetricsOnShutdown = dumpMetricsOnShutdown;
   }
 
-  /**
-   * Return the options for dumping metrics.
-   */
+  @Override
   public String getDumpMetricsOptions() {
     return dumpMetricsOptions;
   }
 
-  /**
-   * Include 'sql' or 'hash' in options such that they are included in the output.
-   *
-   * @param dumpMetricsOptions Example "sql,hash", "sql"
-   */
+  @Override
   public void setDumpMetricsOptions(String dumpMetricsOptions) {
     this.dumpMetricsOptions = dumpMetricsOptions;
   }
 
-  /**
-   * Return true if entity classes should be loaded and registered via EntityClassRegister.
-   * <p>
-   * When false we either register entity classes via application code or use classpath
-   * scanning to find and register entity classes.
-   */
+  @Override
   public boolean isLoadModuleInfo() {
     return loadModuleInfo;
   }
@@ -3389,32 +2339,24 @@ public class DatabaseConfig {
   /**
    * @deprecated - migrate to {@link #isLoadModuleInfo()}.
    */
+  @Override
+  @SuppressWarnings("removal")
   @Deprecated(forRemoval = true)
   public boolean isAutoLoadModuleInfo() {
     return loadModuleInfo;
   }
 
-  /**
-   * Set false to turn off automatic registration of entity beans.
-   * <p>
-   * When using query beans that also generates a module info class that
-   * can register the entity bean classes (to avoid classpath scanning).
-   * This is on by default and setting this to false turns it off.
-   */
+  @Override
   public void setLoadModuleInfo(boolean loadModuleInfo) {
     this.loadModuleInfo = loadModuleInfo;
   }
 
-  /**
-   * Return the naming convention to apply to metrics names.
-   */
+  @Override
   public Function<String, String> getMetricNaming() {
     return metricNaming;
   }
 
-  /**
-   * Set the naming convention to apply to metrics names.
-   */
+  @Override
   public void setMetricNaming(Function<String, String> metricNaming) {
     this.metricNaming = metricNaming;
   }

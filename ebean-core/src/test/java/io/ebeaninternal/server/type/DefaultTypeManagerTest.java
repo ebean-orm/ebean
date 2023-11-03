@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebean.core.type.ScalarType;
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DefaultTypeManagerTest {
 
   private DefaultTypeManager create() {
-    DatabaseConfig serverConfig = new DatabaseConfig();
+    DatabaseBuilder serverConfig = new DatabaseConfig();
     serverConfig.setDatabasePlatform(new PostgresPlatform());
     BootupClasses bootupClasses = new BootupClasses();
     return new DefaultTypeManager(serverConfig, bootupClasses);

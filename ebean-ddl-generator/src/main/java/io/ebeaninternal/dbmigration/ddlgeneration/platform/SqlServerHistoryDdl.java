@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DbConstraintNaming;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
@@ -22,7 +22,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   protected String historySuffix;
 
   @Override
-  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
     this.systemPeriodStart = config.getAsOfSysPeriod() + "From";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "To";
     this.platformDdl = platformDdl;

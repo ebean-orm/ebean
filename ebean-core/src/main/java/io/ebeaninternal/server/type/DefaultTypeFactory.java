@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.ScalarType;
 import io.ebean.core.type.BasicTypeConverter;
@@ -16,9 +16,9 @@ import java.util.Date;
  */
 final class DefaultTypeFactory {
 
-  private final DatabaseConfig config;
+  private final DatabaseBuilder config;
 
-  public DefaultTypeFactory(DatabaseConfig config) {
+  public DefaultTypeFactory(DatabaseBuilder config) {
     this.config = config;
   }
 

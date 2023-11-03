@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean</artifactId>
+      <artifactId>ebean-h2</artifactId>
       <version>13.23.2-jakarta</version>
     </dependency>
 

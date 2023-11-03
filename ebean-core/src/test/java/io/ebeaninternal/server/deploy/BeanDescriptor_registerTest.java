@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.DatabaseFactory;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.AbstractBeanPersistListener;
 import io.ebean.event.BeanPersistAdapter;
@@ -17,7 +18,7 @@ public class BeanDescriptor_registerTest {
   @Test
   public void testRegisterDeregister() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
 
     config.setName("h2other");
     config.loadFromProperties();

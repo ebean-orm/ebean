@@ -3,6 +3,7 @@ package org.tests.basic;
 import io.ebean.DB;
 import io.ebean.DatabaseFactory;
 import io.ebean.QueryIterator;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Disabled;
@@ -97,7 +98,7 @@ public class TestPersistenceContextMany extends BaseTestCase {
   @Test
   @Disabled
   void initDb() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2-batch");
     config.loadFromProperties();
     config.setDdlExtra(false);
@@ -141,7 +142,7 @@ public class TestPersistenceContextMany extends BaseTestCase {
   @Test
   @Disabled
   void testFindEachFindList() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2-batch");
     config.loadFromProperties();
     config.setDdlRun(false);

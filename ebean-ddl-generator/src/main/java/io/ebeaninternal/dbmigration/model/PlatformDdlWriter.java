@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.model;
 
 import io.avaje.applog.AppLog;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.IOUtils;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
@@ -26,13 +26,13 @@ public class PlatformDdlWriter {
 
   private static final System.Logger logger = AppLog.getLogger(PlatformDdlWriter.class);
 
-  private final DatabaseConfig databaseConfig;
+  private final DatabaseBuilder databaseBuilder;
   private final PlatformDdl platformDdl;
   private final int lockTimeoutSeconds;
 
-  public PlatformDdlWriter(DatabasePlatform platform, DatabaseConfig dbConfig, int lockTimeoutSeconds) {
+  public PlatformDdlWriter(DatabasePlatform platform, DatabaseBuilder dbConfig, int lockTimeoutSeconds) {
     this.platformDdl = PlatformDdlBuilder.create(platform);
-    this.databaseConfig = dbConfig;
+    this.databaseBuilder = dbConfig;
     this.lockTimeoutSeconds = lockTimeoutSeconds;
   }
 
@@ -87,7 +87,7 @@ public class PlatformDdlWriter {
    * Write the 'Apply' DDL buffers to the writer.
    */
   protected void writeApplyDdl(Writer writer, DdlWrite ddl) throws IOException {
-    String header = databaseConfig.getDdlHeader();
+    String header = databaseBuilder.getDdlHeader();
     if (header != null && !header.isEmpty()) {
       writer.append(header).append('\n');
     }
@@ -98,7 +98,7 @@ public class PlatformDdlWriter {
    * Return the platform specific DdlHandler (to generate DDL).
    */
   protected DdlHandler handler() {
-    return platformDdl.createDdlHandler(databaseConfig);
+    return platformDdl.createDdlHandler(databaseBuilder);
   }
 
   /**

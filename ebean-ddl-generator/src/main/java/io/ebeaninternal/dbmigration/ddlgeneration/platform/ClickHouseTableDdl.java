@@ -1,12 +1,12 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.migration.CreateTable;
 
 public class ClickHouseTableDdl extends BaseTableDdl {
 
-  public ClickHouseTableDdl(DatabaseConfig config, PlatformDdl platformDdl) {
+  public ClickHouseTableDdl(DatabaseBuilder config, PlatformDdl platformDdl) {
     super(config, platformDdl);
   }
 

@@ -4,7 +4,7 @@ import io.ebean.*;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.*;
 import io.ebean.cache.QueryCacheEntry;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
@@ -423,7 +423,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Return the DatabaseConfig.
    */
-  public DatabaseConfig config() {
+  public DatabaseBuilder config() {
     return owner.config();
   }
 

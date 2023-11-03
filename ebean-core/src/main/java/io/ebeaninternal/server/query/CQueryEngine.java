@@ -7,7 +7,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.JdbcClose;
 import io.ebean.util.StringHelper;
@@ -38,7 +38,7 @@ public final class CQueryEngine {
   private final CQueryHistorySupport historySupport;
   private final DatabasePlatform dbPlatform;
 
-  public CQueryEngine(DatabaseConfig config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
+  public CQueryEngine(DatabaseBuilder config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
     this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = config.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();

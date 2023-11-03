@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatformProvider;
 import io.ebeaninternal.api.CoreLog;
@@ -37,7 +37,7 @@ public class DatabasePlatformFactory {
   /**
    * Create the appropriate database specific platform.
    */
-  public DatabasePlatform create(DatabaseConfig config) {
+  public DatabasePlatform create(DatabaseBuilder config) {
     try {
       String offlinePlatform = DbOffline.getPlatform();
       if (offlinePlatform != null) {

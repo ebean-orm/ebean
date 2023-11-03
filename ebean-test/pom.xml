@@ -135,14 +135,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-joda-time</artifactId>
-      <version>13.18.0</version>
+      <version>13.24.0-RC1</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-jsonnode</artifactId>
-      <version>13.18.0</version>
+      <version>13.24.0-RC1</version>
       <scope>test</scope>
     </dependency>
 

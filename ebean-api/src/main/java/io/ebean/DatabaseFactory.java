@@ -1,7 +1,6 @@
 package io.ebean;
 
 import io.ebean.config.ContainerConfig;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.service.SpiContainer;
 import io.ebean.service.SpiContainerFactory;
 
@@ -76,7 +75,7 @@ public final class DatabaseFactory {
    *
    * }</pre>
    */
-  public static Database create(DatabaseConfig config) {
+  public static Database create(DatabaseBuilder config) {
     lock.lock();
     try {
       if (config.getName() == null) {
@@ -102,7 +101,7 @@ public final class DatabaseFactory {
   /**
    * Create using the DatabaseConfig additionally specifying a classLoader to use as the context class loader.
    */
-  public static Database createWithContextClassLoader(DatabaseConfig config, ClassLoader classLoader) {
+  public static Database createWithContextClassLoader(DatabaseBuilder config, ClassLoader classLoader) {
     lock.lock();
     try {
       ClassLoader currentContextLoader = Thread.currentThread().getContextClassLoader();
@@ -132,7 +131,7 @@ public final class DatabaseFactory {
     }
   }
 
-  private static Database createInternal(DatabaseConfig config) {
+  private static Database createInternal(DatabaseBuilder config) {
     return container(config.getContainerConfig()).createServer(config);
   }
 

@@ -1,5 +1,6 @@
 package io.ebean.platform.sqlserver;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.*;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ class SqlServerPlatformTest {
   @Test
   public void convertQuotedIdentifiers_when_allQuotedIdentifier_sqlServer() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setAllQuotedIdentifiers(true);
     config.setNamingConvention(new MatchingNamingConvention());
 
@@ -25,7 +26,7 @@ class SqlServerPlatformTest {
 
   @Test
   public void convertQuotedIdentifiers() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
 
     SqlServer17Platform dbPlatform = new SqlServer17Platform();
     dbPlatform.configure(config.getPlatformConfig());

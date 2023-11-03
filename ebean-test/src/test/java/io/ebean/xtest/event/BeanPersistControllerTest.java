@@ -4,6 +4,7 @@ package io.ebean.xtest.event;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanDeleteIdRequest;
 import io.ebean.event.BeanPersistAdapter;
@@ -140,7 +141,7 @@ public class BeanPersistControllerTest {
   }
 
   private Database getDatabase(PersistAdapter persistAdapter) {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2ebasicver");
     config.loadFromProperties();
     config.setDdlGenerate(true);

@@ -7,7 +7,7 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.CallOrigin;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
@@ -126,7 +126,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public DatabaseConfig config() {
+  public DatabaseBuilder config() {
     return null;
   }
 

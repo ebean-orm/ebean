@@ -1,6 +1,7 @@
 package io.ebean.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ebean.DatabaseBuilder;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.IdType;
@@ -17,7 +18,7 @@ class DatabaseConfigTest {
 
   @Test
   void testLoadFromEbeanProperties() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.loadFromProperties();
 
     assertEquals(PersistBatch.NONE, config.getPersistBatch());
@@ -32,7 +33,7 @@ class DatabaseConfigTest {
     Properties props = new Properties();
     props.setProperty("ddl.initSql", "${user.home}" + fileSeparator + "initSql");
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.loadFromProperties(props);
 
     String ddlInitSql = config.getDdlInitSql();
@@ -41,7 +42,7 @@ class DatabaseConfigTest {
 
   @Test
   void testLoadWithProperties() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setPersistBatch(PersistBatch.NONE);
     config.setPersistBatchOnCascade(PersistBatch.NONE);
     config.setAutoReadOnlyDataSource(false);
@@ -149,7 +150,7 @@ class DatabaseConfigTest {
 
   @Test
   void test_defaults() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     assertTrue(config.isIdGeneratorAutomatic());
     assertTrue(config.isDefaultServer());
     assertFalse(config.isAutoPersistUpdates());
@@ -184,7 +185,7 @@ class DatabaseConfigTest {
   void test_putServiceObject() {
     ObjectMapper objectMapper = new ObjectMapper();
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.putServiceObject(objectMapper);
 
     ObjectMapper mapper0 = config.getServiceObject(ObjectMapper.class);

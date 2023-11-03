@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -10,7 +10,7 @@ import io.ebeaninternal.dbmigration.model.MTable;
 
 /**
  * DB2 History support.
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  */
 public class Db2HistoryDdl extends DbTableBasedHistoryDdl implements PlatformHistoryDdl {
@@ -20,7 +20,7 @@ public class Db2HistoryDdl extends DbTableBasedHistoryDdl implements PlatformHis
   private String transactionId;
 
   @Override
-  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
     super.configure(config, platformDdl);
     this.systemPeriodStart = config.getAsOfSysPeriod() + "_start";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";

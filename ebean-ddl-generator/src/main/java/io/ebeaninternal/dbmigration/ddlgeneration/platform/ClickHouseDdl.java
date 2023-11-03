@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
@@ -18,7 +18,7 @@ public class ClickHouseDdl extends PlatformDdl {
   }
 
   @Override
-  public DdlHandler createDdlHandler(DatabaseConfig config) {
+  public DdlHandler createDdlHandler(DatabaseBuilder config) {
     return new ClickHouseDdlHandler(config, this);
   }
 

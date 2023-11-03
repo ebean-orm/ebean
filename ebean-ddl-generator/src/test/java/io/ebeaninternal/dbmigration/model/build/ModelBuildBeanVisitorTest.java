@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 
+import io.ebean.DatabaseBuilder;
 import io.localtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DatabaseFactory;
@@ -54,7 +55,7 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
 
     ModelContainer model = new ModelContainer();
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");

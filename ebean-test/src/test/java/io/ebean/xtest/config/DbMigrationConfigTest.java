@@ -1,5 +1,6 @@
 package io.ebean.xtest.config;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.migration.MigrationConfig;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,7 @@ public class DbMigrationConfigTest {
   @Test
   public void testLoad() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2other");
     config.loadFromProperties();
     config.setDefaultServer(false);

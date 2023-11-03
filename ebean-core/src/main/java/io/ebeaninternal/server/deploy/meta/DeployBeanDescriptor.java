@@ -4,7 +4,7 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.Identity;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
@@ -47,7 +47,7 @@ public class DeployBeanDescriptor<T> {
 
   private static final PropOrder PROP_ORDER = new PropOrder();
 
-  private final DatabaseConfig config;
+  private final DatabaseBuilder config;
   private final BeanDescriptorManager manager;
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -133,7 +133,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Construct the BeanDescriptor.
    */
-  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, DatabaseConfig config) {
+  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, DatabaseBuilder config) {
     this.manager = manager;
     this.config = config;
     this.beanType = beanType;

@@ -1,6 +1,6 @@
 package io.ebean.postgis;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.core.type.ExtraTypeFactory;
 import io.ebean.core.type.ScalarType;
 import io.ebean.postgis.latte.ScalarTypeGeoLatteLineString;
@@ -16,7 +16,7 @@ import java.util.List;
 public class PostgisExtraTypeFactory implements ExtraTypeFactory {
 
   @Override
-  public List<ScalarType<?>> createTypes(DatabaseConfig config, Object objectMapper) {
+  public List<ScalarType<?>> createTypes(DatabaseBuilder config, Object objectMapper) {
 
     List<ScalarType<?>> list = new ArrayList<>();
     list.add(new ScalarTypePgisPoint());

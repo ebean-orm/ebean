@@ -1,13 +1,8 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.annotation.*;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.EncryptDeploy;
-import io.ebean.config.EncryptDeployManager;
-import io.ebean.config.EncryptKeyManager;
-import io.ebean.config.Encryptor;
-import io.ebean.config.NamingConvention;
-import io.ebean.config.TableName;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.ScalarType;
@@ -49,7 +44,7 @@ public final class DeployUtil {
   private final Encryptor bytesEncryptor;
   private final boolean useValidationNotNull;
 
-  public DeployUtil(TypeManager typeMgr, DatabaseConfig config) {
+  public DeployUtil(TypeManager typeMgr, DatabaseBuilder config) {
     this.typeManager = typeMgr;
     this.namingConvention = config.getNamingConvention();
     this.dbPlatform = config.getDatabasePlatform();

@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
@@ -13,7 +13,7 @@ import io.ebeaninternal.dbmigration.model.MTable;
 public class NoHistorySupportDdl implements PlatformHistoryDdl {
 
   @Override
-  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
     // does nothing
   }
 

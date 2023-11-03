@@ -1,7 +1,7 @@
 package io.ebean.test.config.platform;
 
 import io.avaje.applog.AppLog;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.test.containers.DockerHost;
 
@@ -37,11 +37,11 @@ class Config {
   private String schema;
   private String username;
   private String password;
-  private final DatabaseConfig config;
+  private final DatabaseBuilder config;
   private boolean containerDropCreate;
   private final Properties dockerProperties = new Properties();
 
-  Config(String db, String platform, String databaseName, DatabaseConfig config) {
+  Config(String db, String platform, String databaseName, DatabaseBuilder config) {
     this.db = db;
     this.platform = platform;
     this.dockerPlatform = platform;

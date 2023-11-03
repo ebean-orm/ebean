@@ -4,6 +4,7 @@ import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.bean.BeanCollection;
 import io.ebean.common.BeanList;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryRequest;
@@ -26,7 +27,7 @@ public class BeanFindControllerTest extends BaseTestCase {
   @Test
   public void test() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
 
     config.setName("h2otherfind");
     config.loadFromProperties();
@@ -169,7 +170,7 @@ public class BeanFindControllerTest extends BaseTestCase {
   }
 
   private Database prepareSoftRefs() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
 
     config.setName("h2otherfind");
     config.loadFromProperties();

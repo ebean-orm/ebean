@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.h2.H2Platform;
 import io.ebean.core.type.DataReader;
@@ -121,7 +122,7 @@ class TestTypeManager extends BaseTest {
   }
 
   private DefaultTypeManager createTypeManager() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setDatabasePlatform(new H2Platform());
 
     BootupClasses bootupClasses = new BootupClasses();
@@ -131,7 +132,7 @@ class TestTypeManager extends BaseTest {
   }
 
   private DefaultTypeManager createTypeManagerDefaultEnumTypeString() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setDatabasePlatform(new H2Platform());
     config.setDefaultEnumType(EnumType.STRING);
 

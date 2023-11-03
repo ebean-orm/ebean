@@ -1,6 +1,7 @@
 package io.ebean.test.config.platform;
 
 import io.ebean.annotation.Platform;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceBuilder;
 import io.ebeaninternal.api.DbOffline;
@@ -37,10 +38,10 @@ class ConfigTest {
 
   @Test
   void extensions_whenNoSetValues() {
-    DatabaseConfig databaseConfig = new DatabaseConfig();
-    databaseConfig.loadFromProperties(new Properties());
+    DatabaseBuilder databaseBuilder = new DatabaseConfig();
+    databaseBuilder.loadFromProperties(new Properties());
 
-    Config config = new Config("db", "postgis", "db", databaseConfig);
+    Config config = new Config("db", "postgis", "db", databaseBuilder);
 
     config.setUsernameDefault();
     config.setPasswordDefault();
@@ -55,13 +56,13 @@ class ConfigTest {
 
   @Test
   void extensions_whenSetValues() {
-    DatabaseConfig databaseConfig = new DatabaseConfig();
+    DatabaseBuilder databaseBuilder = new DatabaseConfig();
     Properties properties = new Properties();
     properties.setProperty("ebean.test.extensions", "x,y");
     properties.setProperty("ebean.test.extraDb.extensions", "z");
-    databaseConfig.loadFromProperties(properties);
+    databaseBuilder.loadFromProperties(properties);
 
-    Config config = new Config("db", "postgis", "db", databaseConfig);
+    Config config = new Config("db", "postgis", "db", databaseBuilder);
 
     config.setExtensions("a,b");
     config.setExtraExtensions("c,d");
@@ -77,7 +78,7 @@ class ConfigTest {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb", "other");
 
-    DatabaseConfig serverConfig = new DatabaseConfig();
+    DatabaseBuilder serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(p);
 
     Config config = new Config("other", "postgres", "other", serverConfig);
@@ -99,7 +100,7 @@ class ConfigTest {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb.dbName", "other");
 
-    DatabaseConfig serverConfig = new DatabaseConfig();
+    DatabaseBuilder serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(p);
 
     Config config = new Config("other", "postgres", "other", serverConfig);
@@ -125,7 +126,7 @@ class ConfigTest {
     p.setProperty("ebean.test.extraDb.password", "other_pwd");
     p.setProperty("ebean.test.extraDb.url", "other_url");
 
-    DatabaseConfig serverConfig = new DatabaseConfig();
+    DatabaseBuilder serverConfig = new DatabaseConfig();
     serverConfig.setName("scOther");
     serverConfig.loadFromProperties(p);
 
@@ -150,7 +151,7 @@ class ConfigTest {
     sourceProperties.setProperty("ebean.test.dbName", "main");
     sourceProperties.setProperty("ebean.test.extraDb.dbName", "central");
 
-    DatabaseConfig serverConfig = new DatabaseConfig();
+    DatabaseBuilder serverConfig = new DatabaseConfig();
     serverConfig.setName("main");
     serverConfig.loadFromProperties(sourceProperties);
 
@@ -163,7 +164,7 @@ class ConfigTest {
     assertThat(mainProps.getProperty("datasource.main.username")).isEqualTo("main");
 
 
-    DatabaseConfig centralConfig = new DatabaseConfig();
+    DatabaseBuilder centralConfig = new DatabaseConfig();
     centralConfig.setName("central");
     centralConfig.loadFromProperties(sourceProperties);
 
@@ -219,7 +220,7 @@ class ConfigTest {
   }
 
   private Config createConfig(Properties p) {
-    DatabaseConfig serverConfig = new DatabaseConfig();
+    DatabaseBuilder serverConfig = new DatabaseConfig();
     serverConfig.setName("scOther");
     serverConfig.loadFromProperties(p);
     return new Config("db_name", "postgres", "db_name", serverConfig);

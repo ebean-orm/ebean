@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.clickhouse.ClickHousePlatform;
 import io.ebean.platform.h2.H2Platform;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BaseTableDdlTest {
 
-  private final DatabaseConfig serverConfig = new DatabaseConfig();
+  private final DatabaseBuilder serverConfig = new DatabaseConfig();
   private final PlatformDdl h2ddl = PlatformDdlBuilder.create(new H2Platform());
 
   @Test

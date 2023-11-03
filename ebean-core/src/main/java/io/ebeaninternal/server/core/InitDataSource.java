@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.annotation.Platform;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.datasource.*;
 
 import jakarta.persistence.PersistenceException;
@@ -12,16 +12,16 @@ import javax.sql.DataSource;
  */
 final class InitDataSource {
 
-  private final DatabaseConfig config;
+  private final DatabaseBuilder config;
 
   /**
    * Create and set the main DataSource and read-only DataSource.
    */
-  static void init(DatabaseConfig config) {
+  static void init(DatabaseBuilder config) {
     new InitDataSource(config).initialise();
   }
 
-  InitDataSource(DatabaseConfig config) {
+  InitDataSource(DatabaseBuilder config) {
     this.config = config;
   }
 
