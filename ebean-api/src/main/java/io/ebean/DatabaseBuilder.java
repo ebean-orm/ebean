@@ -79,15 +79,6 @@ public interface DatabaseBuilder {
    */
   void putServiceObject(Object configObject);
 
-  default String serviceObjectKey(Object configObject) {
-    return serviceObjectKey(configObject.getClass());
-  }
-
-  default String serviceObjectKey(Class<?> cls) {
-    String simpleName = cls.getSimpleName();
-    return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
-  }
-
   /**
    * Set the Jackson JsonFactory to use.
    * <p>

@@ -386,7 +386,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * Note: It is possible that multiple servers are sharing the same state file as
    * long as they are in the <b>same</b> JVM/ClassLoader scope. In this case it is
    * recommended to use the same uuidNodeId configuration.
-   *
+   * <p>
    * If you have multiple servers in different JVMs, do <b>not</b> share the state
    * files!
    */
@@ -608,6 +608,15 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @SuppressWarnings("unchecked")
   public <P> P getServiceObject(Class<P> cls) {
     return (P) serviceObject.get(serviceObjectKey(cls));
+  }
+
+  private String serviceObjectKey(Object configObject) {
+    return serviceObjectKey(configObject.getClass());
+  }
+
+  private String serviceObjectKey(Class<?> cls) {
+    String simpleName = cls.getSimpleName();
+    return Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
   }
 
   @Override
