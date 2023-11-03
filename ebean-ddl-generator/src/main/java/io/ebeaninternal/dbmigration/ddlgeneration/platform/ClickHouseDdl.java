@@ -18,7 +18,7 @@ public class ClickHouseDdl extends PlatformDdl {
   }
 
   @Override
-  public DdlHandler createDdlHandler(DatabaseBuilder config) {
+  public DdlHandler createDdlHandler(DatabaseBuilder.Settings config) {
     return new ClickHouseDdlHandler(config, this);
   }
 

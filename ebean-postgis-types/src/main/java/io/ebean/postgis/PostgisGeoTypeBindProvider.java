@@ -7,7 +7,7 @@ import io.ebeaninternal.server.type.GeoTypeBinder;
 public class PostgisGeoTypeBindProvider implements GeoTypeProvider {
 
   @Override
-  public GeoTypeBinder createBinder(DatabaseBuilder config) {
+  public GeoTypeBinder createBinder(DatabaseBuilder.Settings config) {
     boolean withGeolatte = config.getClassLoadConfig().isPresent("org.geolatte.geom.Geometry");
     return new PostgisGeoTypeBinder(withGeolatte);
   }

@@ -36,7 +36,7 @@ public class PlatformDdl_AlterColumnTest {
   private final SoftAssertions softly = new SoftAssertions();
 
   {
-    DatabaseBuilder serverConfig = DB.getDefault().pluginApi().config();
+    DatabaseBuilder.Settings serverConfig = DB.getDefault().pluginApi().config();
     sqlServerDdl.configure(serverConfig);
   }
 

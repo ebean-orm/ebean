@@ -73,7 +73,7 @@ public class DefaultDbMigration implements DbMigration {
   protected DatabasePlatform databasePlatform;
   private boolean vanillaPlatform;
   protected List<Pair> platforms = new ArrayList<>();
-  protected DatabaseBuilder databaseBuilder;
+  protected DatabaseBuilder.Settings databaseBuilder;
   protected DbConstraintNaming constraintNaming;
   protected Boolean strictMode;
   protected Boolean includeGeneratedFileComment;
@@ -114,7 +114,8 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   @Override
-  public void setServerConfig(DatabaseBuilder config) {
+  public void setServerConfig(DatabaseBuilder builder) {
+    var config = builder.settings();
     if (this.databaseBuilder == null) {
       this.databaseBuilder = config;
     }

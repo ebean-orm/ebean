@@ -12,5 +12,5 @@ public interface ExtraTypeFactory {
   /**
    * Provide extra types to Ebean.
    */
-  List<? extends ScalarType<?>> createTypes(DatabaseBuilder config, Object objectMapper);
+  List<? extends ScalarType<?>> createTypes(DatabaseBuilder.Settings config, Object objectMapper);
 }

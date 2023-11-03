@@ -6,7 +6,7 @@ import io.ebeaninternal.dbmigration.migration.CreateTable;
 
 public class ClickHouseTableDdl extends BaseTableDdl {
 
-  public ClickHouseTableDdl(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public ClickHouseTableDdl(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     super(config, platformDdl);
   }
 

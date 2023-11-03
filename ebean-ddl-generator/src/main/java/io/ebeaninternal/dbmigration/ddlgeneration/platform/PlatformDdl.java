@@ -105,7 +105,7 @@ public class PlatformDdl {
   /**
    * Set configuration options.
    */
-  public void configure(DatabaseBuilder config) {
+  public void configure(DatabaseBuilder.Settings config) {
     historyDdl.configure(config, this);
     naming = config.getConstraintNaming();
   }
@@ -113,7 +113,7 @@ public class PlatformDdl {
   /**
    * Create a DdlHandler for the specific database platform.
    */
-  public DdlHandler createDdlHandler(DatabaseBuilder config) {
+  public DdlHandler createDdlHandler(DatabaseBuilder.Settings config) {
     return new BaseDdlHandler(config, this);
   }
 

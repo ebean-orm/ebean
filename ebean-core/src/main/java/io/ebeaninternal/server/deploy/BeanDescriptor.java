@@ -423,7 +423,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Return the DatabaseConfig.
    */
-  public DatabaseBuilder config() {
+  public DatabaseBuilder.Settings config() {
     return owner.config();
   }
 

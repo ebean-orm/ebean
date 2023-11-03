@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DefaultTypeManagerTest {
 
   private DefaultTypeManager create() {
-    DatabaseBuilder serverConfig = new DatabaseConfig();
+    var serverConfig = new DatabaseConfig();
     serverConfig.setDatabasePlatform(new PostgresPlatform());
     BootupClasses bootupClasses = new BootupClasses();
     return new DefaultTypeManager(serverConfig, bootupClasses);

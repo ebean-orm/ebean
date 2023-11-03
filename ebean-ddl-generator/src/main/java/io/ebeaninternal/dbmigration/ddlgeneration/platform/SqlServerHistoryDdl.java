@@ -22,7 +22,7 @@ public class SqlServerHistoryDdl implements PlatformHistoryDdl {
   protected String historySuffix;
 
   @Override
-  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     this.systemPeriodStart = config.getAsOfSysPeriod() + "From";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "To";
     this.platformDdl = platformDdl;

@@ -27,7 +27,7 @@ public class PlatformDdl_CreateIndexTest {
   private final PlatformDdl db2LuwDdl = PlatformDdlBuilder.create(new DB2LuwPlatform());
 
   {
-    DatabaseBuilder config = DB.getDefault().pluginApi().config();
+    DatabaseBuilder.Settings config = DB.getDefault().pluginApi().config();
     h2Ddl.configure(config);
     pgDdl.configure(config);
     mysqlDdl.configure(config);
@@ -38,7 +38,6 @@ public class PlatformDdl_CreateIndexTest {
   }
 
   WriteCreateIndex writeCreateIndex() {
-
     return writeCreateIndex(true, true);
   }
 

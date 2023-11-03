@@ -47,7 +47,7 @@ public class DeployBeanDescriptor<T> {
 
   private static final PropOrder PROP_ORDER = new PropOrder();
 
-  private final DatabaseBuilder config;
+  private final DatabaseBuilder.Settings config;
   private final BeanDescriptorManager manager;
   /**
    * Map of BeanProperty Linked so as to preserve order.
@@ -133,7 +133,7 @@ public class DeployBeanDescriptor<T> {
   /**
    * Construct the BeanDescriptor.
    */
-  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, DatabaseBuilder config) {
+  public DeployBeanDescriptor(BeanDescriptorManager manager, Class<T> beanType, DatabaseBuilder.Settings config) {
     this.manager = manager;
     this.config = config;
     this.beanType = beanType;

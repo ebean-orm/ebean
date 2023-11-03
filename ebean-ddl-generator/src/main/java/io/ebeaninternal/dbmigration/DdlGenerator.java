@@ -51,7 +51,7 @@ public class DdlGenerator implements SpiDdlGenerator {
 
   public DdlGenerator(SpiEbeanServer server) {
     this.server = server;
-    final DatabaseBuilder config = server.config();
+    final var config = server.config();
     this.jaxbPresent = Detect.isJAXBPresent(config);
     this.generateDdl = config.isDdlGenerate();
     this.extraDdl = config.isDdlExtra();
@@ -318,7 +318,7 @@ public class DdlGenerator implements SpiDdlGenerator {
   /**
    * Create the ScriptTransform for placeholder key/value replacement.
    */
-  private ScriptTransform createScriptTransform(DatabaseBuilder config) {
+  private ScriptTransform createScriptTransform(DatabaseBuilder.Settings config) {
     return ScriptTransform.build(config.getDdlPlaceholders(), config.getDdlPlaceholderMap());
   }
 

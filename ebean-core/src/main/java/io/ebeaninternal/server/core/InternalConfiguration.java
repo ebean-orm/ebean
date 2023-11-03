@@ -69,7 +69,7 @@ public final class InternalConfiguration {
 
   private final TableModState tableModState;
   private final boolean online;
-  private final DatabaseBuilder config;
+  private final DatabaseBuilder.Settings config;
   private final BootupClasses bootupClasses;
   private final DatabasePlatform databasePlatform;
   private final DeployInherit deployInherit;
@@ -98,12 +98,12 @@ public final class InternalConfiguration {
   private boolean localL2Caching;
 
   InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
-                        DatabaseBuilder config, BootupClasses bootupClasses) {
+                        DatabaseBuilder.Settings config, BootupClasses bootupClasses) {
 
     this.online = online;
     this.config = config;
     this.jacksonCorePresent = config.getClassLoadConfig().isJacksonCorePresent();
-    this.clockService = new ClockService(config.getClock());
+    this.clockService = new ClockService(config.settings().getClock());
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(service(DocStoreFactory.class));
@@ -173,7 +173,7 @@ public final class InternalConfiguration {
   /**
    * Create and return the ExpressionFactory based on configuration and database platform.
    */
-  private ExpressionFactory initExpressionFactory(DatabaseBuilder config) {
+  private ExpressionFactory initExpressionFactory(DatabaseBuilder.Settings config) {
     boolean nativeIlike = config.isExpressionNativeIlike() && databasePlatform.supportsNativeIlike();
     return new DefaultExpressionFactory(config.isExpressionEqualsWithNullAsNoop(), nativeIlike);
   }
@@ -331,7 +331,7 @@ public final class InternalConfiguration {
     return config.getDatabasePlatform();
   }
 
-  public DatabaseBuilder getConfig() {
+  public DatabaseBuilder.Settings getConfig() {
     return config;
   }
 

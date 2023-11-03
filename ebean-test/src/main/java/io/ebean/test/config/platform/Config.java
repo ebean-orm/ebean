@@ -37,11 +37,11 @@ class Config {
   private String schema;
   private String username;
   private String password;
-  private final DatabaseBuilder config;
+  private final DatabaseBuilder.Settings config;
   private boolean containerDropCreate;
   private final Properties dockerProperties = new Properties();
 
-  Config(String db, String platform, String databaseName, DatabaseBuilder config) {
+  Config(String db, String platform, String databaseName, DatabaseBuilder.Settings config) {
     this.db = db;
     this.platform = platform;
     this.dockerPlatform = platform;

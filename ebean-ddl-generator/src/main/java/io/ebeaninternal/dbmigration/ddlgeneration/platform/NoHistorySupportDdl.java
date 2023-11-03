@@ -13,7 +13,7 @@ import io.ebeaninternal.dbmigration.model.MTable;
 public class NoHistorySupportDdl implements PlatformHistoryDdl {
 
   @Override
-  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     // does nothing
   }
 

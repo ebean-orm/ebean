@@ -58,7 +58,8 @@ public final class DefaultContainer implements SpiContainer {
     return createServer(config);
   }
 
-  private SpiBackgroundExecutor createBackgroundExecutor(DatabaseBuilder config) {
+  private SpiBackgroundExecutor createBackgroundExecutor(DatabaseBuilder builder) {
+    var config = builder.settings();
     String namePrefix = "ebean-" + config.getName();
     int schedulePoolSize = config.getBackgroundExecutorSchedulePoolSize();
     int shutdownSecs = config.getBackgroundExecutorShutdownSecs();
@@ -70,9 +71,10 @@ public final class DefaultContainer implements SpiContainer {
    * Create the implementation from the configuration.
    */
   @Override
-  public SpiEbeanServer createServer(DatabaseBuilder config) {
+  public SpiEbeanServer createServer(DatabaseBuilder builder) {
     lock.lock();
     try {
+      var config = builder.settings();
       long start = System.currentTimeMillis();
       applyConfigServices(config);
       setNamingConvention(config);
@@ -116,7 +118,7 @@ public final class DefaultContainer implements SpiContainer {
     }
   }
 
-  private void applyConfigServices(DatabaseBuilder config) {
+  private void applyConfigServices(DatabaseBuilder.Settings config) {
     if (config.isDefaultServer()) {
       for (DatabaseConfigProvider configProvider : ServiceLoader.load(DatabaseConfigProvider.class)) {
         configProvider.apply(config);
@@ -159,7 +161,7 @@ public final class DefaultContainer implements SpiContainer {
    * Get the entities, scalarTypes, Listeners etc combining the class registered
    * ones with the already created instances.
    */
-  private BootupClasses bootupClasses(DatabaseBuilder config) {
+  private BootupClasses bootupClasses(DatabaseBuilder.Settings config) {
     BootupClasses bootup = bootupClasses1(config);
     bootup.addServerConfigStartup(config.getServerConfigStartupListeners());
     bootup.runServerConfigStartup(config);
@@ -177,7 +179,7 @@ public final class DefaultContainer implements SpiContainer {
   /**
    * Get the class based entities, scalarTypes, Listeners etc.
    */
-  private BootupClasses bootupClasses1(DatabaseBuilder config) {
+  private BootupClasses bootupClasses1(DatabaseBuilder.Settings config) {
     Set<Class<?>> classes = config.classes();
     if (config.isDisableClasspathSearch() || (classes != null && !classes.isEmpty())) {
       // use classes we explicitly added via configuration
@@ -189,7 +191,7 @@ public final class DefaultContainer implements SpiContainer {
   /**
    * Set the naming convention to underscore if it has not already been set.
    */
-  private void setNamingConvention(DatabaseBuilder config) {
+  private void setNamingConvention(DatabaseBuilder.Settings config) {
     if (config.getNamingConvention() == null) {
       config.setNamingConvention(new UnderscoreNamingConvention());
     }
@@ -198,7 +200,7 @@ public final class DefaultContainer implements SpiContainer {
   /**
    * Set the DatabasePlatform if it has not already been set.
    */
-  private void setDatabasePlatform(DatabaseBuilder config) {
+  private void setDatabasePlatform(DatabaseBuilder.Settings config) {
     DatabasePlatform platform = config.getDatabasePlatform();
     if (platform == null) {
       if (config.getTenantMode().isDynamicDataSource()) {
@@ -214,7 +216,7 @@ public final class DefaultContainer implements SpiContainer {
   /**
    * Set the DataSource if it has not already been set.
    */
-  private void setDataSource(DatabaseBuilder config) {
+  private void setDataSource(DatabaseBuilder.Settings config) {
     if (isOfflineMode(config)) {
       log.log(DEBUG, "... DbOffline using platform [{0}]", DbOffline.getPlatform());
     } else {
@@ -222,7 +224,7 @@ public final class DefaultContainer implements SpiContainer {
     }
   }
 
-  private boolean isOfflineMode(DatabaseBuilder config) {
+  private boolean isOfflineMode(DatabaseBuilder.Settings config) {
     return config.isDbOffline() || DbOffline.isSet();
   }
 
@@ -236,7 +238,7 @@ public final class DefaultContainer implements SpiContainer {
    * checking may not work as expected.
    * </p>
    */
-  private boolean checkDataSource(DatabaseBuilder config) {
+  private boolean checkDataSource(DatabaseBuilder.Settings config) {
     if (isOfflineMode(config)) {
       return false;
     }

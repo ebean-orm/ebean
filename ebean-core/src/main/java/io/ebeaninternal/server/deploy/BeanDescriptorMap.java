@@ -25,7 +25,7 @@ public interface BeanDescriptorMap {
   /**
    * Return the DatabaseConfig.
    */
-  DatabaseBuilder config();
+  DatabaseBuilder.Settings config();
 
   /**
    * Return the Cache Manager.

@@ -172,7 +172,7 @@ public class BootupClasses implements Predicate<Class<?>> {
     add(startupInstances, serverConfigStartupInstances, serverConfigStartupCandidates);
   }
 
-  public void addChangeLogInstances(DatabaseBuilder config) {
+  public void addChangeLogInstances(DatabaseBuilder.Settings config) {
     readAuditPrepare = config.getReadAuditPrepare();
     readAuditLogger = config.getReadAuditLogger();
     changeLogPrepare = config.getChangeLogPrepare();

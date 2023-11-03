@@ -55,7 +55,7 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
 
     ModelContainer model = new ModelContainer();
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");

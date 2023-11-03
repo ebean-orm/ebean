@@ -74,7 +74,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
   private final ReentrantLock lock = new ReentrantLock();
   private ServerCacheNotify listener;
 
-  RedisCacheFactory(DatabaseBuilder config, BackgroundExecutor executor) {
+  RedisCacheFactory(DatabaseBuilder.Settings config, BackgroundExecutor executor) {
     this.executor = executor;
     this.nearCacheNotify = new DNearCacheNotify();
     MetricFactory factory = MetricFactory.get();
@@ -95,7 +95,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
   /**
    * Return the JedisPool to use (only 1 at this stage).
    */
-  private JedisPool getJedisPool(DatabaseBuilder config) {
+  private JedisPool getJedisPool(DatabaseBuilder.Settings config) {
     JedisPool jedisPool = config.getServiceObject(JedisPool.class);
     if (jedisPool != null) {
       return jedisPool;

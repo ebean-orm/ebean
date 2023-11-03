@@ -22,7 +22,7 @@ public class BaseDdlHandlerTest extends BaseTestCase {
 
   private static boolean useV1Syntax = Boolean.getBoolean("ebean.h2.useV1Syntax");
 
-  private final DatabaseBuilder serverConfig = new DatabaseConfig();
+  private final DatabaseConfig serverConfig = new DatabaseConfig();
 
   private DdlHandler handler(DatabasePlatform platform) {
     return PlatformDdlBuilder.create(platform).createDdlHandler(serverConfig);

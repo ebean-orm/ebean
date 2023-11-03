@@ -28,7 +28,7 @@ public abstract class DbTriggerBasedHistoryDdl extends DbTableBasedHistoryDdl im
   }
 
   @Override
-  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     super.configure(config, platformDdl);
     this.sysPeriod = config.getAsOfSysPeriod();
     this.viewSuffix = config.getAsOfViewSuffix();

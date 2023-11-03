@@ -46,7 +46,7 @@ public class AnnotationClassTest {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private AnnotationClass createAnnotationClass(DatabaseBuilder config) {
+  private AnnotationClass createAnnotationClass(DatabaseBuilder.Settings config) {
     DeployUtil deployUtil = new DeployUtil(new DefaultTypeManager(config, new BootupClasses()), config);
 
     DeployBeanInfo deployBeanInfo = new DeployBeanInfo(deployUtil, new DeployBeanDescriptor<>(null, Customer.class, null));
@@ -54,9 +54,9 @@ public class AnnotationClassTest {
     return new AnnotationClass(deployBeanInfo, readAnnotationConfig);
   }
 
-  private DatabaseBuilder sqlServerPlatform(boolean allQuotedIdentifiers) {
+  private DatabaseBuilder.Settings sqlServerPlatform(boolean allQuotedIdentifiers) {
     SqlServer17Platform sqlServer17Platform = new SqlServer17Platform();
-    DatabaseBuilder config = new DatabaseConfig();
+    var config = new DatabaseConfig().settings();
     config.setDatabasePlatform(sqlServer17Platform);
     config.setAllQuotedIdentifiers(allQuotedIdentifiers);
 

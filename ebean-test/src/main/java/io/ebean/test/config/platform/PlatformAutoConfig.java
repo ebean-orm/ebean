@@ -38,14 +38,14 @@ public class PlatformAutoConfig {
     KNOWN_PLATFORMS.put("yugabyte", new YugabyteSetup());
   }
 
-  private final DatabaseBuilder config;
+  private final DatabaseBuilder.Settings config;
   private final Properties properties;
   private String db;
   private String platform;
   private PlatformSetup platformSetup;
   private String databaseName;
 
-  public PlatformAutoConfig(String db, DatabaseBuilder config) {
+  public PlatformAutoConfig(String db, DatabaseBuilder.Settings config) {
     this.db = db;
     this.config = config;
     this.properties = config.getProperties();

@@ -23,7 +23,7 @@ class TestJsonSourceDefault {
   @ForPlatform(Platform.H2)
   @Disabled
   void testDirtyValues_diffSource() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.getDataSourceConfig()
       .setUsername("sa")
       .setPassword("")

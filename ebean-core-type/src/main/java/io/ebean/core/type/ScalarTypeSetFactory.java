@@ -12,6 +12,6 @@ public interface ScalarTypeSetFactory {
    * Create the ScalarTypeSet given the config and optional objectMapper.
    */
   @Nullable
-  ScalarTypeSet<?> createTypeSet(DatabaseBuilder config, @Nullable Object objectMapper);
+  ScalarTypeSet<?> createTypeSet(DatabaseBuilder.Settings config, @Nullable Object objectMapper);
 
 }

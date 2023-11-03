@@ -11,5 +11,5 @@ public interface GeoTypeProvider {
   /**
    * Create a binder for binding geometry types.
    */
-  GeoTypeBinder createBinder(DatabaseBuilder config);
+  GeoTypeBinder createBinder(DatabaseBuilder.Settings config);
 }

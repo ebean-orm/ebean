@@ -20,7 +20,7 @@ public class Db2HistoryDdl extends DbTableBasedHistoryDdl implements PlatformHis
   private String transactionId;
 
   @Override
-  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     super.configure(config, platformDdl);
     this.systemPeriodStart = config.getAsOfSysPeriod() + "_start";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";

@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class BaseTableDdlTest {
 
-  private final DatabaseBuilder serverConfig = new DatabaseConfig();
+  private final DatabaseConfig serverConfig = new DatabaseConfig();
   private final PlatformDdl h2ddl = PlatformDdlBuilder.create(new H2Platform());
 
   @Test

@@ -75,9 +75,10 @@ public final class DatabaseFactory {
    *
    * }</pre>
    */
-  public static Database create(DatabaseBuilder config) {
+  public static Database create(DatabaseBuilder builder) {
     lock.lock();
     try {
+      var config = builder.settings();
       if (config.getName() == null) {
         throw new PersistenceException("The name is null (it is required)");
       }
@@ -131,7 +132,7 @@ public final class DatabaseFactory {
     }
   }
 
-  private static Database createInternal(DatabaseBuilder config) {
+  private static Database createInternal(DatabaseBuilder.Settings config) {
     return container(config.getContainerConfig()).createServer(config);
   }
 

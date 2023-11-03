@@ -31,7 +31,7 @@ final class ReadAnnotationConfig {
   private final ReadValidationAnnotations jakartaValidation;
   private final Set<Class<?>> metaAnnotations = new HashSet<>();
 
-  ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseBuilder config) {
+  ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseBuilder.Settings config) {
     this.generatedPropFactory = generatedPropFactory;
     this.asOfViewSuffix = asOfViewSuffix;
     this.versionsBetweenSuffix = versionsBetweenSuffix;

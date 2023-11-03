@@ -27,7 +27,7 @@ public class BeanFindControllerTest extends BaseTestCase {
   @Test
   public void test() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    var config = new DatabaseConfig();
 
     config.setName("h2otherfind");
     config.loadFromProperties();
@@ -170,7 +170,7 @@ public class BeanFindControllerTest extends BaseTestCase {
   }
 
   private Database prepareSoftRefs() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     config.setName("h2otherfind");
     config.loadFromProperties();

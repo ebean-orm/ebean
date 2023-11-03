@@ -258,7 +258,7 @@ public class TestPersistenceContext extends BaseTestCase {
   @Test
   @Disabled
   void initDb() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2-batch");
     config.loadFromProperties();
     config.setDdlExtra(false);
@@ -292,7 +292,7 @@ public class TestPersistenceContext extends BaseTestCase {
   @Test
   @Disabled
   void testFindEachFindList() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2-batch");
     config.loadFromProperties();
     config.setDdlRun(false);

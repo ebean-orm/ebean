@@ -122,7 +122,7 @@ class TestTypeManager extends BaseTest {
   }
 
   private DefaultTypeManager createTypeManager() {
-    DatabaseBuilder config = new DatabaseConfig();
+    var config = new DatabaseConfig();
     config.setDatabasePlatform(new H2Platform());
 
     BootupClasses bootupClasses = new BootupClasses();
@@ -132,7 +132,7 @@ class TestTypeManager extends BaseTest {
   }
 
   private DefaultTypeManager createTypeManagerDefaultEnumTypeString() {
-    DatabaseBuilder config = new DatabaseConfig();
+    var config = new DatabaseConfig();
     config.setDatabasePlatform(new H2Platform());
     config.setDefaultEnumType(EnumType.STRING);
 

@@ -89,7 +89,7 @@ public class DbMigrationGenerateTest {
     migration.addPlatform(Platform.YUGABYTE);
 
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("migrationtest");
     config.loadFromProperties();
     config.setRegister(false);

@@ -16,9 +16,9 @@ import java.util.Date;
  */
 final class DefaultTypeFactory {
 
-  private final DatabaseBuilder config;
+  private final DatabaseBuilder.Settings config;
 
-  public DefaultTypeFactory(DatabaseBuilder config) {
+  public DefaultTypeFactory(DatabaseBuilder.Settings config) {
     this.config = config;
   }
 

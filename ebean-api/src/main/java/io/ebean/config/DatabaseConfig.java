@@ -61,7 +61,7 @@ import java.util.function.Function;
  * @author rbygrave
  * @see DatabaseFactory
  */
-public class DatabaseConfig implements DatabaseBuilder {
+public class DatabaseConfig implements DatabaseBuilder.Settings {
 
   /**
    * The Database name.
@@ -546,6 +546,11 @@ public class DatabaseConfig implements DatabaseBuilder {
    * Construct a Database Configuration for programmatically creating an Database.
    */
   public DatabaseConfig() {
+  }
+
+  @Override
+  public Settings settings() {
+    return this;
   }
 
   @Override

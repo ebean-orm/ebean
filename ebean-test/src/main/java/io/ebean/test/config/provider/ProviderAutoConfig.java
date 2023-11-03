@@ -16,10 +16,10 @@ public class ProviderAutoConfig {
 
   private static final System.Logger log = AppLog.getLogger("io.ebean.test");
 
-  private final DatabaseBuilder config;
+  private final DatabaseBuilder.Settings config;
   private final Properties properties;
 
-  public ProviderAutoConfig(DatabaseBuilder config) {
+  public ProviderAutoConfig(DatabaseBuilder.Settings config) {
     this.config = config;
     this.properties = config.getProperties();
   }

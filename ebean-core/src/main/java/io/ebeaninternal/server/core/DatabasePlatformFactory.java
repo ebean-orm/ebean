@@ -37,7 +37,7 @@ public class DatabasePlatformFactory {
   /**
    * Create the appropriate database specific platform.
    */
-  public DatabasePlatform create(DatabaseBuilder config) {
+  public DatabasePlatform create(DatabaseBuilder.Settings config) {
     try {
       String offlinePlatform = DbOffline.getPlatform();
       if (offlinePlatform != null) {

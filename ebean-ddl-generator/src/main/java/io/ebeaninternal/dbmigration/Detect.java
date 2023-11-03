@@ -10,7 +10,7 @@ public class Detect {
   /**
    * Return true if JAXB is present.
    */
-  public static boolean isJAXBPresent(DatabaseBuilder config) {
+  public static boolean isJAXBPresent(DatabaseBuilder.Settings config) {
     return config.getClassLoadConfig().isPresent("jakarta.xml.bind.JAXBException");
   }
 }

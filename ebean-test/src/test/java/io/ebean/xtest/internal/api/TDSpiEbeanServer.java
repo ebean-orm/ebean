@@ -126,7 +126,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public DatabaseBuilder config() {
+  public DatabaseBuilder.Settings config() {
     return null;
   }
 

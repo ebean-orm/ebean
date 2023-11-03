@@ -16,7 +16,7 @@ public interface SpiServer extends Database {
   /**
    * Return the DatabaseConfig.
    */
-  DatabaseBuilder config();
+  DatabaseBuilder.Settings config();
 
   /**
    * Return the DatabasePlatform for this database.

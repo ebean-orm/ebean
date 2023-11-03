@@ -44,7 +44,7 @@ public final class DeployUtil {
   private final Encryptor bytesEncryptor;
   private final boolean useValidationNotNull;
 
-  public DeployUtil(TypeManager typeMgr, DatabaseBuilder config) {
+  public DeployUtil(TypeManager typeMgr, DatabaseBuilder.Settings config) {
     this.typeManager = typeMgr;
     this.namingConvention = config.getNamingConvention();
     this.dbPlatform = config.getDatabasePlatform();

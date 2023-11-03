@@ -12,16 +12,16 @@ import javax.sql.DataSource;
  */
 final class InitDataSource {
 
-  private final DatabaseBuilder config;
+  private final DatabaseBuilder.Settings config;
 
   /**
    * Create and set the main DataSource and read-only DataSource.
    */
-  static void init(DatabaseBuilder config) {
+  static void init(DatabaseBuilder.Settings config) {
     new InitDataSource(config).initialise();
   }
 
-  InitDataSource(DatabaseBuilder config) {
+  InitDataSource(DatabaseBuilder.Settings config) {
     this.config = config;
   }
 

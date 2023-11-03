@@ -16,7 +16,7 @@ public class ClassPathScanners {
   /**
    * Return the list of ClassPathScanner services using DatabaseConfig service loader.
    */
-  public static List<ClassPathScanner> find(DatabaseBuilder config) {
+  public static List<ClassPathScanner> find(DatabaseBuilder.Settings config) {
     List<ClassPathScanner> scanners = new ArrayList<>();
     for (ClassPathScannerFactory factory : ServiceLoader.load(ClassPathScannerFactory.class)) {
       scanners.add(factory.createScanner(config.getClassLoadConfig().getClassLoader()));

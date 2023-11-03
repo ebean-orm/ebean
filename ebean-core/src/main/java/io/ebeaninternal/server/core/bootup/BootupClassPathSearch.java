@@ -24,11 +24,11 @@ public class BootupClassPathSearch {
    * Search the classPath for the classes we are interested in returning
    * them as BootupClasses.
    */
-  public static BootupClasses search(DatabaseBuilder config) {
+  public static BootupClasses search(DatabaseBuilder.Settings config) {
     return new BootupClassPathSearch(config).getBootupClasses();
   }
 
-  private BootupClassPathSearch(DatabaseBuilder config) {
+  private BootupClassPathSearch(DatabaseBuilder.Settings config) {
     // find packages defined in ebean.mf resources
     Set<String> mfPackages = ManifestReader.create(config.getClassLoadConfig().getClassLoader())
       .read("META-INF/ebean.mf")

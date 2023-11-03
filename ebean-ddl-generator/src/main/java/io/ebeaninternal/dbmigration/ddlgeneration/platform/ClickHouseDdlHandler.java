@@ -5,7 +5,7 @@ import io.ebeaninternal.dbmigration.ddlgeneration.BaseDdlHandler;
 
 public class ClickHouseDdlHandler extends BaseDdlHandler {
 
-  public ClickHouseDdlHandler(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public ClickHouseDdlHandler(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     super(config, platformDdl, new ClickHouseTableDdl(config, platformDdl));
   }
 }

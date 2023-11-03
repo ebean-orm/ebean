@@ -12,7 +12,7 @@ class SqlServerPlatformTest {
   @Test
   public void convertQuotedIdentifiers_when_allQuotedIdentifier_sqlServer() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setAllQuotedIdentifiers(true);
     config.setNamingConvention(new MatchingNamingConvention());
 
@@ -26,7 +26,7 @@ class SqlServerPlatformTest {
 
   @Test
   public void convertQuotedIdentifiers() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
 
     SqlServer17Platform dbPlatform = new SqlServer17Platform();
     dbPlatform.configure(config.getPlatformConfig());

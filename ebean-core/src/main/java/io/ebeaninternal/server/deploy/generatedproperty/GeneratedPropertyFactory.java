@@ -27,7 +27,7 @@ public final class GeneratedPropertyFactory {
   private final ClassLoadConfig classLoadConfig;
   private final Map<String, PlatformIdGenerator> idGeneratorMap = new HashMap<>();
 
-  public GeneratedPropertyFactory(boolean offlineMode, DatabaseBuilder config, List<IdGenerator> idGenerators) {
+  public GeneratedPropertyFactory(boolean offlineMode, DatabaseBuilder.Settings config, List<IdGenerator> idGenerators) {
     this.classLoadConfig = config.getClassLoadConfig();
     this.insertFactory = new InsertTimestampFactory(classLoadConfig);
     this.updateFactory = new UpdateTimestampFactory(classLoadConfig);

@@ -18,7 +18,7 @@ public final class TransactionManagerOptions {
 
   final SpiServer server;
   final boolean notifyL2CacheInForeground;
-  final DatabaseBuilder config;
+  final DatabaseBuilder.Settings config;
   final ClusterManager clusterManager;
   final BackgroundExecutor backgroundExecutor;
 
@@ -33,8 +33,8 @@ public final class TransactionManagerOptions {
   final ClockService clockService;
 
 
-  public TransactionManagerOptions(SpiServer server, boolean notifyL2CacheInForeground, DatabaseBuilder config, TransactionScopeManager scopeManager, ClusterManager clusterManager,
-                                   BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
+  public TransactionManagerOptions(SpiServer server, boolean notifyL2CacheInForeground, DatabaseBuilder.Settings config, TransactionScopeManager scopeManager,
+                                   ClusterManager clusterManager, BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
                                    BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler,
                                    SpiLogManager logManager, TableModState tableModState, ServerCacheNotify cacheNotify, ClockService clockService) {
     this.server = server;

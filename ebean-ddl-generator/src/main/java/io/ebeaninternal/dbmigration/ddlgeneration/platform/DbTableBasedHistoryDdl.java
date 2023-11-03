@@ -16,7 +16,7 @@ public abstract class DbTableBasedHistoryDdl implements PlatformHistoryDdl.Table
   protected PlatformDdl platformDdl;
 
   @Override
-  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     this.platformDdl = platformDdl;
     this.historySuffix = config.getHistoryTableSuffix();
     this.constraintNaming = config.getConstraintNaming();

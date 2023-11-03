@@ -49,7 +49,7 @@ public class PlatformDdl_dropUniqueConstraintTest {
     sql = mysqlDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("alter table mytab drop index uq_name", sql);
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     hanaDdl.configure(config);
     sql = hanaDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("delimiter $$\n" +

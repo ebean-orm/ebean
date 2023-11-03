@@ -24,7 +24,7 @@ public class DJsonScalarTest {
   private final DJsonScalar jsonScalar;
 
   public DJsonScalarTest() {
-    DatabaseBuilder serverConfig = new DatabaseConfig();
+    var serverConfig = new DatabaseConfig();
     serverConfig.setDatabasePlatform(new H2Platform());
     DefaultTypeManager typeManager = new DefaultTypeManager(serverConfig, new BootupClasses());
     jsonScalar = new DJsonScalar(typeManager);

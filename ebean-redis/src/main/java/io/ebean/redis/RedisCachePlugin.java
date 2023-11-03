@@ -12,6 +12,6 @@ public class RedisCachePlugin implements ServerCachePlugin {
    */
   @Override
   public ServerCacheFactory create(DatabaseBuilder config, BackgroundExecutor executor) {
-    return new RedisCacheFactory(config, executor);
+    return new RedisCacheFactory(config.settings(), executor);
   }
 }

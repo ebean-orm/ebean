@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class InitDataSourceTest {
 
-  private DatabaseBuilder newConfig(String readOnlyUrl) {
+  private DatabaseBuilder.Settings newConfig(String readOnlyUrl) {
     DatabaseBuilder config = new DatabaseConfig();
     DataSourceConfig roConfig = new DataSourceConfig();
     roConfig.setUrl(readOnlyUrl);
     config.setReadOnlyDataSourceConfig(roConfig);
-    return config;
+    return config.settings();
   }
 
   @Test
@@ -35,7 +35,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_null_whenSetNullExplicitly() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setReadOnlyDataSourceConfig(null);
 
     assertNull(new InitDataSource(config).readOnlyConfig());
@@ -57,7 +57,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_autoReadOnlyDataSource() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setAutoReadOnlyDataSource(true);
 
     assertNotNull(new InitDataSource(config).readOnlyConfig());
@@ -65,7 +65,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_autoReadOnlyDataSource_expect_setToNull() {
-    DatabaseBuilder config = newConfig("none");
+    var config = newConfig("none");
     config.setAutoReadOnlyDataSource(true);
 
     final DataSourceBuilder readOnlyConfig = new InitDataSource(config).readOnlyConfig();
@@ -75,7 +75,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_urlSet() {
-    DatabaseBuilder config = newConfig("foo");
+    var config = newConfig("foo");
 
     final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
@@ -84,7 +84,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain() {
-    DatabaseBuilder config = newConfig(null);
+    var config = newConfig(null);
     // alternate location to set read-only url for developer convenience
     config.getDataSourceConfig().readOnlyUrl("bar");
 
@@ -95,7 +95,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain_withNone() {
-    DatabaseBuilder config = newConfig("None");
+    var config = newConfig("None");
     // alternate location to set read-only url for developer convenience
     config.getDataSourceConfig().readOnlyUrl("bar");
 
@@ -106,7 +106,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_bothReadOnlyUrlsSet() {
-    DatabaseBuilder config = newConfig("one");
+    var config = newConfig("one");
     config.getDataSourceConfig().readOnlyUrl("two");
 
     final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
@@ -116,7 +116,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain_withNoneNone() {
-    DatabaseBuilder config = newConfig("none");
+    var config = newConfig("none");
     // alternate location to set read-only url for developer convenience
     config.getDataSourceConfig().readOnlyUrl("none");
 
@@ -126,8 +126,8 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_urlSet_2() {
-    DatabaseBuilder config = new DatabaseConfig();
-    config.getReadOnlyDataSourceConfig().url("foo");
+    DatabaseConfig config = new DatabaseConfig();
+    config.settings().getReadOnlyDataSourceConfig().url("foo");
 
     final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
@@ -136,7 +136,7 @@ public class InitDataSourceTest {
 
   @Test
   void isPostgresAllQuotedIdentifiers_true_when_postgres() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setAllQuotedIdentifiers(true);
     config.setDatabasePlatform(new PostgresPlatform());
 
@@ -145,7 +145,7 @@ public class InitDataSourceTest {
 
   @Test
   void isPostgresAllQuotedIdentifiers_true_when_postgres9() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setAllQuotedIdentifiers(true);
     config.setDatabasePlatform(new Postgres9Platform());
 
@@ -154,7 +154,7 @@ public class InitDataSourceTest {
 
   @Test
   void isPostgresAllQuotedIdentifiers_false() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setAllQuotedIdentifiers(false);
     config.setDatabasePlatform(new PostgresPlatform());
 
@@ -163,7 +163,7 @@ public class InitDataSourceTest {
 
   @Test
   void isPostgresAllQuotedIdentifiers_false_when_notPostgres() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setAllQuotedIdentifiers(true);
     config.setDatabasePlatform(new H2Platform());
 
@@ -172,7 +172,7 @@ public class InitDataSourceTest {
 
   @Test
   public void online() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.getDataSourceConfig().username("sa");
     config.getDataSourceConfig().password("");
     config.getDataSourceConfig().url("jdbc:h2:mem:dsTestOnline");
@@ -204,7 +204,7 @@ public class InitDataSourceTest {
 
   @Test
   public void offline() throws SQLException {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     DataSourceBuilder dsConfig = config.getDataSourceConfig();
     dsConfig.username("sa");
     dsConfig.password("");

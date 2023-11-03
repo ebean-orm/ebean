@@ -155,7 +155,7 @@ public class BaseTableDdl implements TableDdl {
   /**
    * Construct with a naming convention and platform specific DDL.
    */
-  public BaseTableDdl(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public BaseTableDdl(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     this.namingConvention = config.getNamingConvention();
     this.naming = config.getConstraintNaming();
     this.historyTableSuffix = config.getHistoryTableSuffix();

@@ -38,7 +38,7 @@ class ConfigTest {
 
   @Test
   void extensions_whenNoSetValues() {
-    DatabaseBuilder databaseBuilder = new DatabaseConfig();
+    DatabaseConfig databaseBuilder = new DatabaseConfig();
     databaseBuilder.loadFromProperties(new Properties());
 
     Config config = new Config("db", "postgis", "db", databaseBuilder);
@@ -56,7 +56,7 @@ class ConfigTest {
 
   @Test
   void extensions_whenSetValues() {
-    DatabaseBuilder databaseBuilder = new DatabaseConfig();
+    DatabaseConfig databaseBuilder = new DatabaseConfig();
     Properties properties = new Properties();
     properties.setProperty("ebean.test.extensions", "x,y");
     properties.setProperty("ebean.test.extraDb.extensions", "z");
@@ -78,7 +78,7 @@ class ConfigTest {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb", "other");
 
-    DatabaseBuilder serverConfig = new DatabaseConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(p);
 
     Config config = new Config("other", "postgres", "other", serverConfig);
@@ -100,7 +100,7 @@ class ConfigTest {
     Properties p = new Properties();
     p.setProperty("ebean.test.extraDb.dbName", "other");
 
-    DatabaseBuilder serverConfig = new DatabaseConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties(p);
 
     Config config = new Config("other", "postgres", "other", serverConfig);
@@ -126,7 +126,7 @@ class ConfigTest {
     p.setProperty("ebean.test.extraDb.password", "other_pwd");
     p.setProperty("ebean.test.extraDb.url", "other_url");
 
-    DatabaseBuilder serverConfig = new DatabaseConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.setName("scOther");
     serverConfig.loadFromProperties(p);
 
@@ -151,7 +151,7 @@ class ConfigTest {
     sourceProperties.setProperty("ebean.test.dbName", "main");
     sourceProperties.setProperty("ebean.test.extraDb.dbName", "central");
 
-    DatabaseBuilder serverConfig = new DatabaseConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.setName("main");
     serverConfig.loadFromProperties(sourceProperties);
 
@@ -220,7 +220,7 @@ class ConfigTest {
   }
 
   private Config createConfig(Properties p) {
-    DatabaseBuilder serverConfig = new DatabaseConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.setName("scOther");
     serverConfig.loadFromProperties(p);
     return new Config("db_name", "postgres", "db_name", serverConfig);

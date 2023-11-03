@@ -16,7 +16,7 @@ public class DbMigrationConfigTest {
   @Test
   public void testLoad() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2other");
     config.loadFromProperties();
     config.setDefaultServer(false);

@@ -16,7 +16,7 @@ import java.util.List;
 public class PostgisExtraTypeFactory implements ExtraTypeFactory {
 
   @Override
-  public List<ScalarType<?>> createTypes(DatabaseBuilder config, Object objectMapper) {
+  public List<ScalarType<?>> createTypes(DatabaseBuilder.Settings config, Object objectMapper) {
 
     List<ScalarType<?>> list = new ArrayList<>();
     list.add(new ScalarTypePgisPoint());

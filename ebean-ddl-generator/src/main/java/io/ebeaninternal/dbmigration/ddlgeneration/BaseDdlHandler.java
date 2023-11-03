@@ -14,7 +14,7 @@ public class BaseDdlHandler implements DdlHandler {
 
   protected final TableDdl tableDdl;
 
-  public BaseDdlHandler(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public BaseDdlHandler(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     this(config, platformDdl, new BaseTableDdl(config, platformDdl));
   }
 

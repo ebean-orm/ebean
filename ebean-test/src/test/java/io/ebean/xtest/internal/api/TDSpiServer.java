@@ -579,7 +579,7 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public DatabaseBuilder config() {
+  public DatabaseBuilder.Settings config() {
     return null;
   }
 

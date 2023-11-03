@@ -14,7 +14,7 @@ public interface PlatformHistoryDdl {
   /**
    * Configure typically reading the necessary parameters from DatabaseConfig and Platform.
    */
-  void configure(DatabaseBuilder config, PlatformDdl platformDdl);
+  void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl);
 
   /**
    * Creates a new table and add history support to the table using platform specific mechanism.

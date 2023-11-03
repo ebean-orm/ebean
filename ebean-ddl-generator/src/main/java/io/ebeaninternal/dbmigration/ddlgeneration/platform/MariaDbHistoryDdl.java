@@ -16,7 +16,7 @@ public class MariaDbHistoryDdl implements PlatformHistoryDdl {
   private PlatformDdl platformDdl;
 
   @Override
-  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     this.platformDdl = platformDdl;
   }
 

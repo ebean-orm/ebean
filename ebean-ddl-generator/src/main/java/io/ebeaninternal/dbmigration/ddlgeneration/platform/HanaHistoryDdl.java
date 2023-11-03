@@ -17,7 +17,7 @@ public class HanaHistoryDdl extends DbTableBasedHistoryDdl implements PlatformHi
   private String systemPeriodEnd;
 
   @Override
-  public void configure(DatabaseBuilder config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     super.configure(config, platformDdl);
     this.systemPeriodStart = config.getAsOfSysPeriod() + "_start";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";

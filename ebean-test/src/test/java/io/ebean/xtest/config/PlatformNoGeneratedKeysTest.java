@@ -89,7 +89,7 @@ public class PlatformNoGeneratedKeysTest {
 
   private static Database testH2Server() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseConfig config = new DatabaseConfig();
     config.setName("h2_noGeneratedKeys");
 
     OtherH2Platform platform = new OtherH2Platform();

@@ -31,7 +31,8 @@ public class AutoConfigureForTesting implements AutoConfigure {
   private final String environmentDb = System.getProperty("db");
 
   @Override
-  public void preConfigure(DatabaseBuilder config) {
+  public void preConfigure(DatabaseBuilder builder) {
+    var config = builder.settings();
     Properties properties = config.getProperties();
     if (properties != null) {
       // trigger determination of docker.host system property if not already done
@@ -55,7 +56,8 @@ public class AutoConfigureForTesting implements AutoConfigure {
   }
 
   @Override
-  public void postConfigure(DatabaseBuilder config) {
+  public void postConfigure(DatabaseBuilder builder) {
+    var config = builder.settings();
     if (!config.isDefaultServer()) {
       return;
     }
@@ -87,7 +89,7 @@ public class AutoConfigureForTesting implements AutoConfigure {
   /**
    * Check if this is not the primary server and return true if that is the case.
    */
-  private boolean isExtraServer(DatabaseBuilder config, Properties properties) {
+  private boolean isExtraServer(DatabaseBuilder.Settings config, Properties properties) {
     String extraDb = properties.getProperty("ebean.test.extraDb.dbName", properties.getProperty("ebean.test.extraDb"));
     if (extraDb != null && extraDb.equals(config.getName())) {
       config.setDefaultServer(false);
@@ -99,7 +101,7 @@ public class AutoConfigureForTesting implements AutoConfigure {
   /**
    * Setup the DataSource on the extra database if necessary.
    */
-  private void setupExtraDataSourceIfNecessary(DatabaseBuilder config) {
+  private void setupExtraDataSourceIfNecessary(DatabaseBuilder.Settings config) {
     DataSourceBuilder dataSourceConfig = config.getDataSourceConfig();
     if (dataSourceConfig == null || dataSourceConfig.settings().getUsername() == null) {
       new PlatformAutoConfig(environmentDb, config)
@@ -110,14 +112,14 @@ public class AutoConfigureForTesting implements AutoConfigure {
   /**
    * Setup support for Who, Multi-Tenant and DB encryption if they are not already set.
    */
-  private void setupProviders(DatabaseBuilder config) {
+  private void setupProviders(DatabaseBuilder.Settings config) {
     new ProviderAutoConfig(config).run();
   }
 
   /**
    * Setup the platform for testing including docker as needed and adjusting datasource config as needed.
    */
-  private void setupPlatform(String db, DatabaseBuilder config) {
+  private void setupPlatform(String db, DatabaseBuilder.Settings config) {
     new PlatformAutoConfig(db, config).run();
   }
 }

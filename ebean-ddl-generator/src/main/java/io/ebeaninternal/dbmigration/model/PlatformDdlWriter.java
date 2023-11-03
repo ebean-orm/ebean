@@ -26,13 +26,13 @@ public class PlatformDdlWriter {
 
   private static final System.Logger logger = AppLog.getLogger(PlatformDdlWriter.class);
 
-  private final DatabaseBuilder databaseBuilder;
+  private final DatabaseBuilder.Settings config;
   private final PlatformDdl platformDdl;
   private final int lockTimeoutSeconds;
 
-  public PlatformDdlWriter(DatabasePlatform platform, DatabaseBuilder dbConfig, int lockTimeoutSeconds) {
+  public PlatformDdlWriter(DatabasePlatform platform, DatabaseBuilder.Settings config, int lockTimeoutSeconds) {
     this.platformDdl = PlatformDdlBuilder.create(platform);
-    this.databaseBuilder = dbConfig;
+    this.config = config;
     this.lockTimeoutSeconds = lockTimeoutSeconds;
   }
 
@@ -87,7 +87,7 @@ public class PlatformDdlWriter {
    * Write the 'Apply' DDL buffers to the writer.
    */
   protected void writeApplyDdl(Writer writer, DdlWrite ddl) throws IOException {
-    String header = databaseBuilder.getDdlHeader();
+    String header = config.getDdlHeader();
     if (header != null && !header.isEmpty()) {
       writer.append(header).append('\n');
     }
@@ -98,7 +98,7 @@ public class PlatformDdlWriter {
    * Return the platform specific DdlHandler (to generate DDL).
    */
   protected DdlHandler handler() {
-    return platformDdl.createDdlHandler(databaseBuilder);
+    return platformDdl.createDdlHandler(config);
   }
 
   /**
