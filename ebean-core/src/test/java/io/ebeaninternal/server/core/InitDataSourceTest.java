@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceAlert;
+import io.ebean.datasource.DataSourceBuilder;
 import io.ebean.datasource.DataSourceConfig;
 import io.ebean.datasource.DataSourcePool;
 import io.ebean.platform.h2.H2Platform;
@@ -66,69 +67,70 @@ public class InitDataSourceTest {
     DatabaseConfig config = newConfig("none");
     config.setAutoReadOnlyDataSource(true);
 
-    final DataSourceConfig readOnlyConfig = new InitDataSource(config).readOnlyConfig();
-    assertNull(readOnlyConfig.getUrl());
+    final DataSourceBuilder readOnlyConfig = new InitDataSource(config).readOnlyConfig();
+    assertThat(readOnlyConfig).isNotNull();
+    assertNull(readOnlyConfig.settings().getUrl());
   }
 
   @Test
   public void readOnlyConfig_when_urlSet() {
     DatabaseConfig config = newConfig("foo");
 
-    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
-    assertEquals("foo", roConfig.getUrl());
+    assertEquals("foo", roConfig.settings().getUrl());
   }
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain() {
     DatabaseConfig config = newConfig(null);
     // alternate location to set read-only url for developer convenience
-    config.getDataSourceConfig().setReadOnlyUrl("bar");
+    config.getDataSourceConfig().readOnlyUrl("bar");
 
-    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
-    assertEquals("bar", roConfig.getUrl());
+    assertEquals("bar", roConfig.settings().getUrl());
   }
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain_withNone() {
     DatabaseConfig config = newConfig("None");
     // alternate location to set read-only url for developer convenience
-    config.getDataSourceConfig().setReadOnlyUrl("bar");
+    config.getDataSourceConfig().readOnlyUrl("bar");
 
-    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
-    assertEquals("bar", roConfig.getUrl());
+    assertEquals("bar", roConfig.settings().getUrl());
   }
 
   @Test
   public void readOnlyConfig_when_bothReadOnlyUrlsSet() {
     DatabaseConfig config = newConfig("one");
-    config.getDataSourceConfig().setReadOnlyUrl("two");
+    config.getDataSourceConfig().readOnlyUrl("two");
 
-    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
-    assertEquals("one", roConfig.getUrl());
+    assertEquals("one", roConfig.settings().getUrl());
   }
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain_withNoneNone() {
     DatabaseConfig config = newConfig("none");
     // alternate location to set read-only url for developer convenience
-    config.getDataSourceConfig().setReadOnlyUrl("none");
+    config.getDataSourceConfig().readOnlyUrl("none");
 
-    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNull(roConfig);
   }
 
   @Test
   public void readOnlyConfig_when_urlSet_2() {
     DatabaseConfig config = new DatabaseConfig();
-    config.getReadOnlyDataSourceConfig().setUrl("foo");
+    config.getReadOnlyDataSourceConfig().url("foo");
 
-    final DataSourceConfig roConfig = new InitDataSource(config).readOnlyConfig();
+    final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
-    assertEquals("foo", roConfig.getUrl());
+    assertEquals("foo", roConfig.settings().getUrl());
   }
 
   @Test
@@ -170,10 +172,10 @@ public class InitDataSourceTest {
   @Test
   public void online() {
     DatabaseConfig config = new DatabaseConfig();
-    config.getDataSourceConfig().setUsername("sa");
-    config.getDataSourceConfig().setPassword("");
-    config.getDataSourceConfig().setUrl("jdbc:h2:mem:dsTestOnline");
-    config.getDataSourceConfig().setDriver("org.h2.Driver");
+    config.getDataSourceConfig().username("sa");
+    config.getDataSourceConfig().password("");
+    config.getDataSourceConfig().url("jdbc:h2:mem:dsTestOnline");
+    config.getDataSourceConfig().driver("org.h2.Driver");
     InitDataSource.init(config);
     DataSourcePool pool = (DataSourcePool) config.getDataSource();
     assertThat(pool.isDataSourceUp()).isTrue();
@@ -202,14 +204,15 @@ public class InitDataSourceTest {
   @Test
   public void offline() throws SQLException {
     DatabaseConfig config = new DatabaseConfig();
-    config.getDataSourceConfig().setUsername("sa");
-    config.getDataSourceConfig().setPassword("");
-    config.getDataSourceConfig().setUrl("jdbc:h2:mem:dsTestOffline");
-    config.getDataSourceConfig().setDriver("org.h2.Driver");
-    config.getDataSourceConfig().setOffline(true);
-    config.getDataSourceConfig().setFailOnStart(false);
+    DataSourceBuilder dsConfig = config.getDataSourceConfig();
+    dsConfig.username("sa");
+    dsConfig.password("");
+    dsConfig.url("jdbc:h2:mem:dsTestOffline");
+    dsConfig.driver("org.h2.Driver");
+    dsConfig.offline(true);
+    dsConfig.failOnStart(false);
     MyAlert alert = new MyAlert();
-    config.getDataSourceConfig().setAlert(alert);
+    dsConfig.alert(alert);
     config.setDatabasePlatformName("h2");
     InitDataSource.init(config);
     DataSourcePool pool = (DataSourcePool) config.getDataSource();

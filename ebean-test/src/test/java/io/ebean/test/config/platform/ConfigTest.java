@@ -2,7 +2,7 @@ package io.ebean.test.config.platform;
 
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceBuilder;
 import io.ebeaninternal.api.DbOffline;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -85,8 +85,8 @@ class ConfigTest {
     PostgresSetup postgresSetup = new PostgresSetup();
     postgresSetup.setupExtraDbDataSource(config);
 
-    DataSourceConfig ds = serverConfig.getDataSourceConfig();
-    assertThat(ds.getUsername()).isEqualTo("other");
+    DataSourceBuilder ds = serverConfig.getDataSourceConfig();
+    assertThat(ds.settings().getUsername()).isEqualTo("other");
 
     p = serverConfig.getProperties();
     assertThat(p.getProperty("datasource.other.username")).isEqualTo("other");
@@ -107,8 +107,8 @@ class ConfigTest {
     PostgresSetup postgresSetup = new PostgresSetup();
     postgresSetup.setupExtraDbDataSource(config);
 
-    DataSourceConfig ds = serverConfig.getDataSourceConfig();
-    assertThat(ds.getUsername()).isEqualTo("other");
+    DataSourceBuilder ds = serverConfig.getDataSourceConfig();
+    assertThat(ds.settings().getUsername()).isEqualTo("other");
 
     p = serverConfig.getProperties();
     assertThat(p.getProperty("datasource.other.username")).isEqualTo("other");
@@ -135,8 +135,8 @@ class ConfigTest {
     postgresSetup.setupExtraDbDataSource(config);
 
 
-    DataSourceConfig ds = serverConfig.getDataSourceConfig();
-    assertThat(ds.getUsername()).isEqualTo("other_user");
+    DataSourceBuilder ds = serverConfig.getDataSourceConfig();
+    assertThat(ds.settings().getUsername()).isEqualTo("other_user");
 
     p = serverConfig.getProperties();
     assertThat(p.getProperty("datasource.other_db_name.username")).isEqualTo("other_user");

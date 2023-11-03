@@ -62,7 +62,7 @@ public class PlatformAutoConfig {
 
       Config config = new Config(db, platform, databaseName, this.config);
       platformSetup.setupExtraDbDataSource(config);
-      log.log(DEBUG, "configured dataSource for extraDb name:{0} url:{1}", db, this.config.getDataSourceConfig().getUrl());
+      log.log(DEBUG, "configured dataSource for extraDb name:{0} url:{1}", db, this.config.getDataSourceConfig().settings().getUrl());
     }
   }
 

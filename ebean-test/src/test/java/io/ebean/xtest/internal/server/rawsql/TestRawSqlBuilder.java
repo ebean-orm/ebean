@@ -1,10 +1,10 @@
 package io.ebean.xtest.internal.server.rawsql;
 
 import io.ebean.*;
+import io.ebean.datasource.DataSourceBuilder;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
-import io.ebean.datasource.DataSourceConfig;
 import io.ebeaninternal.server.core.DefaultServer;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
@@ -280,7 +280,8 @@ public class TestRawSqlBuilder extends BaseTestCase {
     final String sql = "select description from ebasic_clob where id = ?";
 
     List<SqlRow> rows = new ArrayList<>();
-    final DataSourceConfig config = ((DefaultServer) DB.getDefault()).config().getDataSourceConfig();
+    final DataSourceBuilder builder = ((DefaultServer) DB.getDefault()).config().getDataSourceConfig();
+    DataSourceBuilder.Settings config = builder.settings();
 
     try (Connection connection = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
          PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -305,8 +306,8 @@ public class TestRawSqlBuilder extends BaseTestCase {
     DB.save(pfc);
 
     List<SqlRow> rows = new ArrayList<>();
-    final DataSourceConfig config = ((DefaultServer) DB.getDefault()).config().getDataSourceConfig();
-
+    final DataSourceBuilder builder = ((DefaultServer) DB.getDefault()).config().getDataSourceConfig();
+    DataSourceBuilder.Settings config = builder.settings();
     final String sql = "select content from persistent_file_content where id = ?";
     try (Connection connection = DriverManager.getConnection(config.getUrl(), config.getUsername(), config.getPassword());
          PreparedStatement stmt = connection.prepareStatement(sql)) {

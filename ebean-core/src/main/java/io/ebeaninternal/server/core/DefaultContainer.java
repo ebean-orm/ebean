@@ -240,7 +240,7 @@ public final class DefaultContainer implements SpiContainer {
       return false;
     }
     if (config.getDataSource() == null) {
-      if (config.getDataSourceConfig().isOffline()) {
+      if (config.getDataSourceConfig().settings().isOffline()) {
         // this is ok - offline DDL generation etc
         return false;
       }

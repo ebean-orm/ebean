@@ -2,10 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.annotation.Platform;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.datasource.DataSourceAlertFactory;
-import io.ebean.datasource.DataSourceConfig;
-import io.ebean.datasource.DataSourceFactory;
-import io.ebean.datasource.DataSourcePoolListener;
+import io.ebean.datasource.*;
 
 import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
@@ -48,27 +45,28 @@ final class InitDataSource {
    * Initialise the "read only" DataSource from configuration.
    */
   private DataSource initReadOnlyDataSource() {
-    DataSourceConfig roConfig = readOnlyConfig();
+    var roConfig = readOnlyConfig();
     return roConfig == null ? null : createFromConfig(roConfig, true);
   }
 
-  DataSourceConfig readOnlyConfig() {
-    DataSourceConfig roConfig = config.getReadOnlyDataSourceConfig();
+  DataSourceBuilder readOnlyConfig() {
+    var roConfig = config.getReadOnlyDataSourceConfig();
     if (roConfig == null) {
       // it has explicitly been set to null, not expected but ok
       return null;
     }
-    if (urlSet(roConfig.getUrl())) {
+    var roSettings = roConfig.settings();
+    if (urlSet(roSettings.getUrl())) {
       return roConfig;
     }
     // convenient alternate place to set the read-only url
-    final String readOnlyUrl = config.getDataSourceConfig().getReadOnlyUrl();
+    final String readOnlyUrl = config.getDataSourceConfig().settings().getReadOnlyUrl();
     if (urlSet(readOnlyUrl)) {
-      roConfig.setUrl(readOnlyUrl);
+      roConfig.url(readOnlyUrl);
       return roConfig;
     }
     if (config.isAutoReadOnlyDataSource()) {
-      roConfig.setUrl(null); // blank out in case it is "none"
+      roConfig.url(null); // blank out in case it is "none"
       return roConfig;
     } else {
       return null;
@@ -79,25 +77,27 @@ final class InitDataSource {
     return url != null && !"none".equalsIgnoreCase(url) && !url.trim().isEmpty();
   }
 
-  private DataSource createFromConfig(DataSourceConfig dsConfig, boolean readOnly) {
+  private DataSource createFromConfig(DataSourceBuilder dsConfig, boolean readOnly) {
     if (dsConfig == null) {
-      throw new PersistenceException("No DataSourceConfig defined for " + config.getName());
+      throw new PersistenceException("No  DataSourceBuilder defined for " + config.getName());
     }
-    if (dsConfig.isOffline()) {
+    var dsSettings = dsConfig.settings();
+    if (dsSettings.isOffline()) {
       if (config.getDatabasePlatformName() == null) {
         throw new PersistenceException("You MUST specify a DatabasePlatformName on DatabaseConfig when offline");
       }
     }
 
-    attachAlert(dsConfig);
-    attachListener(dsConfig);
+    attachAlert(dsSettings);
+    attachListener(dsSettings);
 
     if (readOnly) {
       // setup to use AutoCommit such that we skip explicit commit
-      dsConfig.setAutoCommit(true);
-      dsConfig.setReadOnly(true);
-      dsConfig.setDefaults(config.getDataSourceConfig());
-      dsConfig.setIsolationLevel(config.getDataSourceConfig().getIsolationLevel());
+      var mainSettings = config.getDataSourceConfig().settings();
+      dsConfig.autoCommit(true);
+      dsConfig.readOnly(true);
+      dsConfig.setDefaults(mainSettings);
+      dsConfig.isolationLevel(mainSettings.getIsolationLevel());
     } else if (isPostgresAllQuotedIdentifiers()) {
       dsConfig.addProperty("quoteReturningIdentifiers", false);
     }
@@ -108,32 +108,32 @@ final class InitDataSource {
     return config.isAllQuotedIdentifiers() && Platform.POSTGRES == config.getDatabasePlatform().platform().base();
   }
 
-  private DataSource create(DataSourceConfig dsConfig, boolean readOnly) {
+  private DataSource create(DataSourceBuilder dsConfig, boolean readOnly) {
     String poolName = config.getName() + (readOnly ? "-ro" : "");
-    return DataSourceFactory.create(poolName, dsConfig);
+    return dsConfig.name(poolName).build();
   }
 
   /**
    * Attach DataSourceAlert via service loader if present.
    */
-  private void attachAlert(DataSourceConfig dsConfig) {
+  private void attachAlert(DataSourceBuilder.Settings dsConfig) {
     DataSourceAlertFactory alertFactory = config.getServiceObject(DataSourceAlertFactory.class);
     if (alertFactory == null) {
       alertFactory = ServiceUtil.service(DataSourceAlertFactory.class);
     }
     if (alertFactory != null) {
-      dsConfig.setAlert(alertFactory.createAlert());
+      dsConfig.alert(alertFactory.createAlert());
     }
   }
 
   /**
    * Create and attach a DataSourcePoolListener if it has been specified via properties and there is not one already attached.
    */
-  private void attachListener(DataSourceConfig dsConfig) {
+  private void attachListener(DataSourceBuilder.Settings dsConfig) {
     if (dsConfig.getListener() == null) {
       String poolListener = dsConfig.getPoolListener();
       if (poolListener != null) {
-        dsConfig.setListener((DataSourcePoolListener) config.getClassLoadConfig().newInstance(poolListener));
+        dsConfig.listener((DataSourcePoolListener) config.getClassLoadConfig().newInstance(poolListener));
       }
     }
   }

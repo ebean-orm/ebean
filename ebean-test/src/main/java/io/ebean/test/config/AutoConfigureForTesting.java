@@ -3,7 +3,7 @@ package io.ebean.test.config;
 import io.avaje.applog.AppLog;
 import io.ebean.config.AutoConfigure;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceBuilder;
 import io.ebean.test.config.platform.PlatformAutoConfig;
 import io.ebean.test.config.provider.ProviderAutoConfig;
 import io.ebean.test.containers.DockerHost;
@@ -69,11 +69,11 @@ public class AutoConfigureForTesting implements AutoConfigure {
     }
   }
 
-  private void makeV1Compatible(DataSourceConfig ds) {
+  private void makeV1Compatible(DataSourceBuilder ds) {
     if (ds == null) {
       return;
     }
-    String url = ds.getUrl();
+    String url = ds.settings().getUrl();
     if (url == null || !url.startsWith("jdbc:h2:")) {
       return;
     }
@@ -81,7 +81,7 @@ public class AutoConfigureForTesting implements AutoConfigure {
     url = url.replace(";MODE=LEGACY", "");
     url = url.replace(";NON_KEYWORDS=KEY,VALUE", "");
     url = url.replace(";NON_KEYWORDS=KEY", "");
-    ds.setUrl(url);
+    ds.url(url);
   }
 
   /**
@@ -100,8 +100,8 @@ public class AutoConfigureForTesting implements AutoConfigure {
    * Setup the DataSource on the extra database if necessary.
    */
   private void setupExtraDataSourceIfNecessary(DatabaseConfig config) {
-    DataSourceConfig dataSourceConfig = config.getDataSourceConfig();
-    if (dataSourceConfig == null || dataSourceConfig.getUsername() == null) {
+    DataSourceBuilder dataSourceConfig = config.getDataSourceConfig();
+    if (dataSourceConfig == null || dataSourceConfig.settings().getUsername() == null) {
       new PlatformAutoConfig(environmentDb, config)
         .configExtraDataSource();
     }

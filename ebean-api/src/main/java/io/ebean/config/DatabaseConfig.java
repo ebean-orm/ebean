@@ -9,7 +9,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbType;
 import io.ebean.config.dbplatform.IdType;
-import io.ebean.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceBuilder;
 import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
@@ -314,7 +314,7 @@ public class DatabaseConfig {
   /**
    * The data source config.
    */
-  private DataSourceConfig dataSourceConfig = new DataSourceConfig();
+  private DataSourceBuilder dataSourceConfig = DataSourceBuilder.create();
 
   /**
    * When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
@@ -327,7 +327,7 @@ public class DatabaseConfig {
   /**
    * Optional configuration for a read only data source.
    */
-  private DataSourceConfig readOnlyDataSourceConfig = new DataSourceConfig();
+  private DataSourceBuilder readOnlyDataSourceConfig = DataSourceBuilder.create();
 
   /**
    * Optional - the database schema that should be used to own the tables etc.
@@ -1707,7 +1707,7 @@ public class DatabaseConfig {
    * Return the configuration to build a DataSource using Ebean's own DataSource
    * implementation.
    */
-  public DataSourceConfig getDataSourceConfig() {
+  public DataSourceBuilder getDataSourceConfig() {
     return dataSourceConfig;
   }
 
@@ -1715,7 +1715,7 @@ public class DatabaseConfig {
    * Set the configuration required to build a DataSource using Ebean's own
    * DataSource implementation.
    */
-  public void setDataSourceConfig(DataSourceConfig dataSourceConfig) {
+  public void setDataSourceConfig(DataSourceBuilder dataSourceConfig) {
     this.dataSourceConfig = dataSourceConfig;
   }
 
@@ -1742,14 +1742,14 @@ public class DatabaseConfig {
    * set on this configuration. This means there is actually no need to set any configuration here and we only
    * set configuration for url, username and password etc if it is different from the main DataSource.
    */
-  public DataSourceConfig getReadOnlyDataSourceConfig() {
+  public DataSourceBuilder getReadOnlyDataSourceConfig() {
     return readOnlyDataSourceConfig;
   }
 
   /**
    * Set the configuration for the read only DataSource.
    */
-  public void setReadOnlyDataSourceConfig(DataSourceConfig readOnlyDataSourceConfig) {
+  public void setReadOnlyDataSourceConfig(DataSourceBuilder readOnlyDataSourceConfig) {
     this.readOnlyDataSourceConfig = readOnlyDataSourceConfig;
   }
 
@@ -2843,7 +2843,7 @@ public class DatabaseConfig {
     loadAutoTuneSettings(p);
 
     if (dataSourceConfig == null) {
-      dataSourceConfig = new DataSourceConfig();
+      dataSourceConfig = DataSourceBuilder.create();
     }
     loadDataSourceSettings(p);
 
