@@ -2371,7 +2371,7 @@ public class DatabaseConfig {
   }
 
   /**
-   * Deprecated - migrate to classes().
+   * @deprecated - migrate to {@link #classes()}.
    * <p>
    * Sorry if returning Set rather than List breaks code but it feels safer to
    * do that than a subtle change to return a shallow copy which you will not detect.
@@ -3387,7 +3387,7 @@ public class DatabaseConfig {
   }
 
   /**
-   * Deprecated - migrate to isLoadModuleInfo().
+   * @deprecated - migrate to {@link #isLoadModuleInfo()}.
    */
   @Deprecated(forRemoval = true)
   public boolean isAutoLoadModuleInfo() {
