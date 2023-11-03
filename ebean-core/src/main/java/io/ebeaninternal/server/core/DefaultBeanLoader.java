@@ -82,9 +82,9 @@ final class DefaultBeanLoader {
       // populate a new collection
       BeanCollection<?> emptyCollection = many.createEmpty(parentBean);
       many.setValue(parentBean, emptyCollection);
-      query.setLoadDescription("+refresh", null);
+      query.setLoadDescription("refresh", null);
     } else {
-      query.setLoadDescription("+lazy", null);
+      query.setLoadDescription("lazy", null);
     }
 
     query.select(parentDesc.idBinder().idSelect());
