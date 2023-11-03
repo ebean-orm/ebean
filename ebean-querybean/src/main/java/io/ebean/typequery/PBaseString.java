@@ -25,7 +25,7 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
   }
 
   /**
-   * Deprecated migrate to eq().
+   * @deprecated migrate to {@link #eq(Object)}.
    * <p>
    * Is equal to. The same as <code>eq</code> but uses the strong type as argument rather than String.
    *
@@ -39,7 +39,7 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
   }
 
   /**
-   * Deprecated migrate to ne().
+   * @deprecated migrate to {@link #ne(Object)}.
    * <p>
    * Is not equal to. The same as <code>ne</code> but uses the strong type as argument rather than String.
    *
