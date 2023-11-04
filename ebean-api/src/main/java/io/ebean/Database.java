@@ -87,6 +87,23 @@ import java.util.concurrent.Callable;
 public interface Database {
 
   /**
+   * Return a new database builder.
+    * <pre>{@code
+ *
+ *   // build the 'default' database using configuration
+ *   // from application.properties / application.yaml
+ *
+ *   Database db = Database.builder()
+ *     .loadFromProperties()
+ *     .build();
+ *
+ * }</pre>
+   */
+  static DatabaseBuilder builder() {
+    return new DatabaseConfig();
+  }
+
+  /**
    * Shutdown the Database instance.
    */
   void shutdown();

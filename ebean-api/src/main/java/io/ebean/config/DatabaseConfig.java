@@ -3,7 +3,9 @@ package io.ebean.config;
 import com.fasterxml.jackson.core.JsonFactory;
 import io.avaje.config.Config;
 import io.ebean.*;
-import io.ebean.annotation.*;
+import io.ebean.annotation.MutationDetection;
+import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbEncrypt;
@@ -18,8 +20,8 @@ import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.meta.MetricNamingMatch;
 import io.ebean.util.StringHelper;
-
 import jakarta.persistence.EnumType;
+
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.time.ZonedDateTime;
@@ -549,6 +551,11 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
+  public Database build() {
+    return DatabaseFactory.create(this);
+  }
+
+  @Override
   public Settings settings() {
     return this;
   }
@@ -559,8 +566,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setClock(final Clock clock) {
+  public DatabaseConfig setClock(final Clock clock) {
     this.clock = clock;
+    return this;
   }
 
   @Override
@@ -569,8 +577,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setSlowQueryMillis(long slowQueryMillis) {
+  public DatabaseConfig setSlowQueryMillis(long slowQueryMillis) {
     this.slowQueryMillis = slowQueryMillis;
+    return this;
   }
 
   @Override
@@ -579,18 +588,21 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setSlowQueryListener(SlowQueryListener slowQueryListener) {
+  public DatabaseConfig setSlowQueryListener(SlowQueryListener slowQueryListener) {
     this.slowQueryListener = slowQueryListener;
+    return this;
   }
 
   @Override
-  public void putServiceObject(String key, Object configObject) {
+  public DatabaseConfig putServiceObject(String key, Object configObject) {
     serviceObject.put(key, configObject);
+    return this;
   }
 
   @Override
-  public <T> void putServiceObject(Class<T> iface, T configObject) {
+  public <T> DatabaseConfig putServiceObject(Class<T> iface, T configObject) {
     serviceObject.put(serviceObjectKey(iface), configObject);
+    return this;
   }
 
   @Override
@@ -599,9 +611,10 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void putServiceObject(Object configObject) {
+  public DatabaseConfig putServiceObject(Object configObject) {
     String key = serviceObjectKey(configObject);
     serviceObject.put(key, configObject);
+    return this;
   }
 
   @Override
@@ -625,8 +638,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setJsonFactory(JsonFactory jsonFactory) {
+  public DatabaseConfig setJsonFactory(JsonFactory jsonFactory) {
     this.jsonFactory = jsonFactory;
+    return this;
   }
 
   @Override
@@ -635,8 +649,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setJsonDateTime(JsonConfig.DateTime jsonDateTime) {
+  public DatabaseConfig setJsonDateTime(JsonConfig.DateTime jsonDateTime) {
     this.jsonDateTime = jsonDateTime;
+    return this;
   }
 
   @Override
@@ -645,8 +660,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setJsonDate(JsonConfig.Date jsonDate) {
+  public DatabaseConfig setJsonDate(JsonConfig.Date jsonDate) {
     this.jsonDate = jsonDate;
+    return this;
   }
 
   @Override
@@ -655,8 +671,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setJsonInclude(JsonConfig.Include jsonInclude) {
+  public DatabaseConfig setJsonInclude(JsonConfig.Include jsonInclude) {
     this.jsonInclude = jsonInclude;
+    return this;
   }
 
   @Override
@@ -665,8 +682,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setJsonMutationDetection(MutationDetection jsonMutationDetection) {
+  public DatabaseConfig setJsonMutationDetection(MutationDetection jsonMutationDetection) {
     this.jsonMutationDetection = jsonMutationDetection;
+    return this;
   }
 
   @Override
@@ -675,8 +693,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setName(String name) {
+  public DatabaseConfig setName(String name) {
     this.name = name;
+    return this;
   }
 
   @Override
@@ -685,8 +704,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setContainerConfig(ContainerConfig containerConfig) {
+  public DatabaseConfig setContainerConfig(ContainerConfig containerConfig) {
     this.containerConfig = containerConfig;
+    return this;
   }
 
   @Override
@@ -695,8 +715,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setRegister(boolean register) {
+  public DatabaseConfig setRegister(boolean register) {
     this.register = register;
+    return this;
   }
 
   @Override
@@ -705,8 +726,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDefaultServer(boolean defaultServer) {
+  public DatabaseConfig setDefaultServer(boolean defaultServer) {
     this.defaultServer = defaultServer;
+    return this;
   }
 
   @Override
@@ -715,8 +737,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setCurrentUserProvider(CurrentUserProvider currentUserProvider) {
+  public DatabaseConfig setCurrentUserProvider(CurrentUserProvider currentUserProvider) {
     this.currentUserProvider = currentUserProvider;
+    return this;
   }
 
   @Override
@@ -725,8 +748,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setTenantMode(TenantMode tenantMode) {
+  public DatabaseConfig setTenantMode(TenantMode tenantMode) {
     this.tenantMode = tenantMode;
+    return this;
   }
 
   @Override
@@ -735,8 +759,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setTenantPartitionColumn(String tenantPartitionColumn) {
+  public DatabaseConfig setTenantPartitionColumn(String tenantPartitionColumn) {
     this.tenantPartitionColumn = tenantPartitionColumn;
+    return this;
   }
 
   @Override
@@ -745,8 +770,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setCurrentTenantProvider(CurrentTenantProvider currentTenantProvider) {
+  public DatabaseConfig setCurrentTenantProvider(CurrentTenantProvider currentTenantProvider) {
     this.currentTenantProvider = currentTenantProvider;
+    return this;
   }
 
   @Override
@@ -755,8 +781,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setTenantDataSourceProvider(TenantDataSourceProvider tenantDataSourceProvider) {
+  public DatabaseConfig setTenantDataSourceProvider(TenantDataSourceProvider tenantDataSourceProvider) {
     this.tenantDataSourceProvider = tenantDataSourceProvider;
+    return this;
   }
 
   @Override
@@ -765,8 +792,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setTenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider) {
+  public DatabaseConfig setTenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider) {
     this.tenantSchemaProvider = tenantSchemaProvider;
+    return this;
   }
 
   @Override
@@ -775,8 +803,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setTenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider) {
+  public DatabaseConfig setTenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider) {
     this.tenantCatalogProvider = tenantCatalogProvider;
+    return this;
   }
 
   @Override
@@ -785,8 +814,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setAutoPersistUpdates(boolean autoPersistUpdates) {
+  public DatabaseConfig setAutoPersistUpdates(boolean autoPersistUpdates) {
     this.autoPersistUpdates = autoPersistUpdates;
+    return this;
   }
 
   @Override
@@ -795,8 +825,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPersistBatch(PersistBatch persistBatch) {
+  public DatabaseConfig setPersistBatch(PersistBatch persistBatch) {
     this.persistBatch = persistBatch;
+    return this;
   }
 
   @Override
@@ -805,13 +836,15 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPersistBatchOnCascade(PersistBatch persistBatchOnCascade) {
+  public DatabaseConfig setPersistBatchOnCascade(PersistBatch persistBatchOnCascade) {
     this.persistBatchOnCascade = persistBatchOnCascade;
+    return this;
   }
 
   @Override
-  public void setPersistBatching(boolean persistBatching) {
+  public DatabaseConfig setPersistBatching(boolean persistBatching) {
     this.persistBatch = (persistBatching) ? PersistBatch.ALL : PersistBatch.NONE;
+    return this;
   }
 
   @Override
@@ -820,8 +853,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPersistBatchSize(int persistBatchSize) {
+  public DatabaseConfig setPersistBatchSize(int persistBatchSize) {
     this.persistBatchSize = persistBatchSize;
+    return this;
   }
 
   @Override
@@ -830,8 +864,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryBatchSize(int queryBatchSize) {
+  public DatabaseConfig setQueryBatchSize(int queryBatchSize) {
     this.queryBatchSize = queryBatchSize;
+    return this;
   }
 
   @Override
@@ -840,8 +875,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDefaultEnumType(EnumType defaultEnumType) {
+  public DatabaseConfig setDefaultEnumType(EnumType defaultEnumType) {
     this.defaultEnumType = defaultEnumType;
+    return this;
   }
 
   @Override
@@ -850,8 +886,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDisableLazyLoading(boolean disableLazyLoading) {
+  public DatabaseConfig setDisableLazyLoading(boolean disableLazyLoading) {
     this.disableLazyLoading = disableLazyLoading;
+    return this;
   }
 
   @Override
@@ -860,13 +897,15 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setLazyLoadBatchSize(int lazyLoadBatchSize) {
+  public DatabaseConfig setLazyLoadBatchSize(int lazyLoadBatchSize) {
     this.lazyLoadBatchSize = lazyLoadBatchSize;
+    return this;
   }
 
   @Override
-  public void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
+  public DatabaseConfig setDatabaseSequenceBatchSize(int databaseSequenceBatchSize) {
     platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
+    return this;
   }
 
   @Override
@@ -875,8 +914,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setJdbcFetchSizeFindList(int jdbcFetchSizeFindList) {
+  public DatabaseConfig setJdbcFetchSizeFindList(int jdbcFetchSizeFindList) {
     this.jdbcFetchSizeFindList = jdbcFetchSizeFindList;
+    return this;
   }
 
   @Override
@@ -885,8 +925,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setJdbcFetchSizeFindEach(int jdbcFetchSizeFindEach) {
+  public DatabaseConfig setJdbcFetchSizeFindEach(int jdbcFetchSizeFindEach) {
     this.jdbcFetchSizeFindEach = jdbcFetchSizeFindEach;
+    return this;
   }
 
   @Override
@@ -895,8 +936,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setChangeLogPrepare(ChangeLogPrepare changeLogPrepare) {
+  public DatabaseConfig setChangeLogPrepare(ChangeLogPrepare changeLogPrepare) {
     this.changeLogPrepare = changeLogPrepare;
+    return this;
   }
 
   @Override
@@ -905,8 +947,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setChangeLogListener(ChangeLogListener changeLogListener) {
+  public DatabaseConfig setChangeLogListener(ChangeLogListener changeLogListener) {
     this.changeLogListener = changeLogListener;
+    return this;
   }
 
   @Override
@@ -915,8 +958,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setChangeLogRegister(ChangeLogRegister changeLogRegister) {
+  public DatabaseConfig setChangeLogRegister(ChangeLogRegister changeLogRegister) {
     this.changeLogRegister = changeLogRegister;
+    return this;
   }
 
   @Override
@@ -925,8 +969,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setChangeLogIncludeInserts(boolean changeLogIncludeInserts) {
+  public DatabaseConfig setChangeLogIncludeInserts(boolean changeLogIncludeInserts) {
     this.changeLogIncludeInserts = changeLogIncludeInserts;
+    return this;
   }
 
   @Override
@@ -935,8 +980,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setChangeLogAsync(boolean changeLogAsync) {
+  public DatabaseConfig setChangeLogAsync(boolean changeLogAsync) {
     this.changeLogAsync = changeLogAsync;
+    return this;
   }
 
   @Override
@@ -945,8 +991,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setReadAuditLogger(ReadAuditLogger readAuditLogger) {
+  public DatabaseConfig setReadAuditLogger(ReadAuditLogger readAuditLogger) {
     this.readAuditLogger = readAuditLogger;
+    return this;
   }
 
   @Override
@@ -955,8 +1002,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
+  public DatabaseConfig setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
     this.readAuditPrepare = readAuditPrepare;
+    return this;
   }
 
   @Override
@@ -965,8 +1013,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setProfilingConfig(ProfilingConfig profilingConfig) {
+  public DatabaseConfig setProfilingConfig(ProfilingConfig profilingConfig) {
     this.profilingConfig = profilingConfig;
+    return this;
   }
 
   @Override
@@ -975,8 +1024,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDbSchema(String dbSchema) {
+  public DatabaseConfig setDbSchema(String dbSchema) {
     this.dbSchema = dbSchema;
+    return this;
   }
 
   @Override
@@ -985,8 +1035,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setGeometrySRID(int geometrySRID) {
+  public DatabaseConfig setGeometrySRID(int geometrySRID) {
     platformConfig.setGeometrySRID(geometrySRID);
+    return this;
   }
 
   @Override
@@ -995,8 +1046,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDataTimeZone(String dataTimeZone) {
+  public DatabaseConfig setDataTimeZone(String dataTimeZone) {
     this.dataTimeZone = dataTimeZone;
+    return this;
   }
 
   @Override
@@ -1005,8 +1057,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setAsOfViewSuffix(String asOfViewSuffix) {
+  public DatabaseConfig setAsOfViewSuffix(String asOfViewSuffix) {
     this.asOfViewSuffix = asOfViewSuffix;
+    return this;
   }
 
   @Override
@@ -1015,8 +1068,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setAsOfSysPeriod(String asOfSysPeriod) {
+  public DatabaseConfig setAsOfSysPeriod(String asOfSysPeriod) {
     this.asOfSysPeriod = asOfSysPeriod;
+    return this;
   }
 
   @Override
@@ -1025,8 +1079,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setHistoryTableSuffix(String historyTableSuffix) {
+  public DatabaseConfig setHistoryTableSuffix(String historyTableSuffix) {
     this.historyTableSuffix = historyTableSuffix;
+    return this;
   }
 
   @Override
@@ -1035,8 +1090,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setUseJtaTransactionManager(boolean useJtaTransactionManager) {
+  public DatabaseConfig setUseJtaTransactionManager(boolean useJtaTransactionManager) {
     this.useJtaTransactionManager = useJtaTransactionManager;
+    return this;
   }
 
   @Override
@@ -1045,8 +1101,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setExternalTransactionManager(ExternalTransactionManager externalTransactionManager) {
+  public DatabaseConfig setExternalTransactionManager(ExternalTransactionManager externalTransactionManager) {
     this.externalTransactionManager = externalTransactionManager;
+    return this;
   }
 
   @Override
@@ -1055,8 +1112,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setServerCachePlugin(ServerCachePlugin serverCachePlugin) {
+  public DatabaseConfig setServerCachePlugin(ServerCachePlugin serverCachePlugin) {
     this.serverCachePlugin = serverCachePlugin;
+    return this;
   }
 
   @Override
@@ -1065,8 +1123,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setEagerFetchLobs(boolean eagerFetchLobs) {
+  public DatabaseConfig setEagerFetchLobs(boolean eagerFetchLobs) {
     this.eagerFetchLobs = eagerFetchLobs;
+    return this;
   }
 
   @Override
@@ -1075,8 +1134,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setMaxCallStack(int maxCallStack) {
+  public DatabaseConfig setMaxCallStack(int maxCallStack) {
     this.maxCallStack = maxCallStack;
+    return this;
   }
 
   @Override
@@ -1085,8 +1145,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setTransactionRollbackOnChecked(boolean transactionRollbackOnChecked) {
+  public DatabaseConfig setTransactionRollbackOnChecked(boolean transactionRollbackOnChecked) {
     this.transactionRollbackOnChecked = transactionRollbackOnChecked;
+    return this;
   }
 
   @Override
@@ -1095,8 +1156,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setBackgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize) {
+  public DatabaseConfig setBackgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize) {
     this.backgroundExecutorSchedulePoolSize = backgroundExecutorSchedulePoolSize;
+    return this;
   }
 
   @Override
@@ -1105,8 +1167,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs) {
+  public DatabaseConfig setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs) {
     this.backgroundExecutorShutdownSecs = backgroundExecutorShutdownSecs;
+    return this;
   }
 
   @Override
@@ -1115,8 +1178,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper) {
+  public DatabaseConfig setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper) {
     this.backgroundExecutorWrapper = backgroundExecutorWrapper;
+    return this;
   }
 
   @Override
@@ -1125,8 +1189,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setCacheMaxSize(int cacheMaxSize) {
+  public DatabaseConfig setCacheMaxSize(int cacheMaxSize) {
     this.cacheMaxSize = cacheMaxSize;
+    return this;
   }
 
   @Override
@@ -1135,8 +1200,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setCacheMaxIdleTime(int cacheMaxIdleTime) {
+  public DatabaseConfig setCacheMaxIdleTime(int cacheMaxIdleTime) {
     this.cacheMaxIdleTime = cacheMaxIdleTime;
+    return this;
   }
 
   @Override
@@ -1145,8 +1211,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setCacheMaxTimeToLive(int cacheMaxTimeToLive) {
+  public DatabaseConfig setCacheMaxTimeToLive(int cacheMaxTimeToLive) {
     this.cacheMaxTimeToLive = cacheMaxTimeToLive;
+    return this;
   }
 
   @Override
@@ -1155,8 +1222,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryCacheMaxSize(int queryCacheMaxSize) {
+  public DatabaseConfig setQueryCacheMaxSize(int queryCacheMaxSize) {
     this.queryCacheMaxSize = queryCacheMaxSize;
+    return this;
   }
 
   @Override
@@ -1165,8 +1233,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryCacheMaxIdleTime(int queryCacheMaxIdleTime) {
+  public DatabaseConfig setQueryCacheMaxIdleTime(int queryCacheMaxIdleTime) {
     this.queryCacheMaxIdleTime = queryCacheMaxIdleTime;
+    return this;
   }
 
   @Override
@@ -1175,8 +1244,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryCacheMaxTimeToLive(int queryCacheMaxTimeToLive) {
+  public DatabaseConfig setQueryCacheMaxTimeToLive(int queryCacheMaxTimeToLive) {
     this.queryCacheMaxTimeToLive = queryCacheMaxTimeToLive;
+    return this;
   }
 
   @Override
@@ -1185,8 +1255,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setNamingConvention(NamingConvention namingConvention) {
+  public DatabaseConfig setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
+    return this;
   }
 
   @Override
@@ -1195,11 +1266,12 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
+  public DatabaseConfig setAllQuotedIdentifiers(boolean allQuotedIdentifiers) {
     platformConfig.setAllQuotedIdentifiers(allQuotedIdentifiers);
     if (allQuotedIdentifiers) {
       adjustNamingConventionForAllQuoted();
     }
+    return this;
   }
 
   private void adjustNamingConventionForAllQuoted() {
@@ -1215,8 +1287,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDocStoreOnly(boolean docStoreOnly) {
+  public DatabaseConfig setDocStoreOnly(boolean docStoreOnly) {
     this.docStoreOnly = docStoreOnly;
+    return this;
   }
 
   @Override
@@ -1225,8 +1298,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDocStoreConfig(DocStoreConfig docStoreConfig) {
+  public DatabaseConfig setDocStoreConfig(DocStoreConfig docStoreConfig) {
     this.docStoreConfig = docStoreConfig;
+    return this;
   }
 
   @Override
@@ -1235,8 +1309,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setConstraintNaming(DbConstraintNaming constraintNaming) {
+  public DatabaseConfig setConstraintNaming(DbConstraintNaming constraintNaming) {
     platformConfig.setConstraintNaming(constraintNaming);
+    return this;
   }
 
   @Override
@@ -1245,8 +1320,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setAutoTuneConfig(AutoTuneConfig autoTuneConfig) {
+  public DatabaseConfig setAutoTuneConfig(AutoTuneConfig autoTuneConfig) {
     this.autoTuneConfig = autoTuneConfig;
+    return this;
   }
 
   @Override
@@ -1255,8 +1331,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setSkipDataSourceCheck(boolean skipDataSourceCheck) {
+  public DatabaseConfig setSkipDataSourceCheck(boolean skipDataSourceCheck) {
     this.skipDataSourceCheck = skipDataSourceCheck;
+    return this;
   }
 
   @Override
@@ -1265,8 +1342,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDataSource(DataSource dataSource) {
+  public DatabaseConfig setDataSource(DataSource dataSource) {
     this.dataSource = dataSource;
+    return this;
   }
 
   @Override
@@ -1275,8 +1353,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setReadOnlyDataSource(DataSource readOnlyDataSource) {
+  public DatabaseConfig setReadOnlyDataSource(DataSource readOnlyDataSource) {
     this.readOnlyDataSource = readOnlyDataSource;
+    return this;
   }
 
   @Override
@@ -1285,8 +1364,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDataSourceConfig(DataSourceBuilder dataSourceConfig) {
+  public DatabaseConfig setDataSourceConfig(DataSourceBuilder dataSourceConfig) {
     this.dataSourceConfig = dataSourceConfig;
+    return this;
   }
 
   @Override
@@ -1295,8 +1375,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setAutoReadOnlyDataSource(boolean autoReadOnlyDataSource) {
+  public DatabaseConfig setAutoReadOnlyDataSource(boolean autoReadOnlyDataSource) {
     this.autoReadOnlyDataSource = autoReadOnlyDataSource;
+    return this;
   }
 
   @Override
@@ -1305,8 +1386,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setReadOnlyDataSourceConfig(DataSourceBuilder readOnlyDataSourceConfig) {
+  public DatabaseConfig setReadOnlyDataSourceConfig(DataSourceBuilder readOnlyDataSourceConfig) {
     this.readOnlyDataSourceConfig = readOnlyDataSourceConfig;
+    return this;
   }
 
   @Override
@@ -1315,8 +1397,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDatabaseBooleanTrue(String databaseTrue) {
+  public DatabaseConfig setDatabaseBooleanTrue(String databaseTrue) {
     platformConfig.setDatabaseBooleanTrue(databaseTrue);
+    return this;
   }
 
   @Override
@@ -1325,8 +1408,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDatabaseBooleanFalse(String databaseFalse) {
+  public DatabaseConfig setDatabaseBooleanFalse(String databaseFalse) {
     this.platformConfig.setDatabaseBooleanFalse(databaseFalse);
+    return this;
   }
 
   @Override
@@ -1335,8 +1419,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
+  public DatabaseConfig setDatabaseSequenceBatch(int databaseSequenceBatchSize) {
     this.platformConfig.setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
+    return this;
   }
 
   @Override
@@ -1345,8 +1430,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDatabasePlatformName(String databasePlatformName) {
+  public DatabaseConfig setDatabasePlatformName(String databasePlatformName) {
     this.databasePlatformName = databasePlatformName;
+    return this;
   }
 
   @Override
@@ -1355,8 +1441,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDatabasePlatform(DatabasePlatform databasePlatform) {
+  public DatabaseConfig setDatabasePlatform(DatabasePlatform databasePlatform) {
     this.databasePlatform = databasePlatform;
+    return this;
   }
 
   @Override
@@ -1365,8 +1452,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setIdType(IdType idType) {
+  public DatabaseConfig setIdType(IdType idType) {
     this.platformConfig.setIdType(idType);
+    return this;
   }
 
   @Override
@@ -1375,8 +1463,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setEncryptKeyManager(EncryptKeyManager encryptKeyManager) {
+  public DatabaseConfig setEncryptKeyManager(EncryptKeyManager encryptKeyManager) {
     this.encryptKeyManager = encryptKeyManager;
+    return this;
   }
 
   @Override
@@ -1385,8 +1474,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setEncryptDeployManager(EncryptDeployManager encryptDeployManager) {
+  public DatabaseConfig setEncryptDeployManager(EncryptDeployManager encryptDeployManager) {
     this.encryptDeployManager = encryptDeployManager;
+    return this;
   }
 
   @Override
@@ -1395,8 +1485,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setEncryptor(Encryptor encryptor) {
+  public DatabaseConfig setEncryptor(Encryptor encryptor) {
     this.encryptor = encryptor;
+    return this;
   }
 
   @Override
@@ -1405,8 +1496,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDbOffline(boolean dbOffline) {
+  public DatabaseConfig setDbOffline(boolean dbOffline) {
     this.dbOffline = dbOffline;
+    return this;
   }
 
   @Override
@@ -1415,8 +1507,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDbEncrypt(DbEncrypt dbEncrypt) {
+  public DatabaseConfig setDbEncrypt(DbEncrypt dbEncrypt) {
     this.dbEncrypt = dbEncrypt;
+    return this;
   }
 
   @Override
@@ -1425,13 +1518,15 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPlatformConfig(PlatformConfig platformConfig) {
+  public DatabaseConfig setPlatformConfig(PlatformConfig platformConfig) {
     this.platformConfig = platformConfig;
+    return this;
   }
 
   @Override
-  public void setDbUuid(PlatformConfig.DbUuid dbUuid) {
+  public DatabaseConfig setDbUuid(PlatformConfig.DbUuid dbUuid) {
     this.platformConfig.setDbUuid(dbUuid);
+    return this;
   }
 
   @Override
@@ -1440,8 +1535,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setUuidVersion(UuidVersion uuidVersion) {
+  public DatabaseConfig setUuidVersion(UuidVersion uuidVersion) {
     this.uuidVersion = uuidVersion;
+    return this;
   }
 
   @Override
@@ -1459,8 +1555,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setUuidStateFile(String uuidStateFile) {
+  public DatabaseConfig setUuidStateFile(String uuidStateFile) {
     this.uuidStateFile = uuidStateFile;
+    return this;
   }
 
   @Override
@@ -1469,8 +1566,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setUuidNodeId(String uuidNodeId) {
+  public DatabaseConfig setUuidNodeId(String uuidNodeId) {
     this.uuidNodeId = uuidNodeId;
+    return this;
   }
 
   @Override
@@ -1479,8 +1577,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setLocalTimeWithNanos(boolean localTimeWithNanos) {
+  public DatabaseConfig setLocalTimeWithNanos(boolean localTimeWithNanos) {
     this.localTimeWithNanos = localTimeWithNanos;
+    return this;
   }
 
   @Override
@@ -1489,13 +1588,15 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDurationWithNanos(boolean durationWithNanos) {
+  public DatabaseConfig setDurationWithNanos(boolean durationWithNanos) {
     this.durationWithNanos = durationWithNanos;
+    return this;
   }
 
   @Override
-  public void setRunMigration(boolean runMigration) {
+  public DatabaseConfig setRunMigration(boolean runMigration) {
     this.runMigration = runMigration;
+    return this;
   }
 
   @Override
@@ -1505,18 +1606,21 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDdlGenerate(boolean ddlGenerate) {
+  public DatabaseConfig setDdlGenerate(boolean ddlGenerate) {
     this.ddlGenerate = ddlGenerate;
+    return this;
   }
 
   @Override
-  public void setDdlRun(boolean ddlRun) {
+  public DatabaseConfig setDdlRun(boolean ddlRun) {
     this.ddlRun = ddlRun;
+    return this;
   }
 
   @Override
-  public void setDdlExtra(boolean ddlExtra) {
+  public DatabaseConfig setDdlExtra(boolean ddlExtra) {
     this.ddlExtra = ddlExtra;
+    return this;
   }
 
 
@@ -1526,8 +1630,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDdlCreateOnly(boolean ddlCreateOnly) {
+  public DatabaseConfig setDdlCreateOnly(boolean ddlCreateOnly) {
     this.ddlCreateOnly = ddlCreateOnly;
+    return this;
   }
 
   @Override
@@ -1536,8 +1641,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDdlSeedSql(String ddlSeedSql) {
+  public DatabaseConfig setDdlSeedSql(String ddlSeedSql) {
     this.ddlSeedSql = ddlSeedSql;
+    return this;
   }
 
   @Override
@@ -1546,8 +1652,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDdlInitSql(String ddlInitSql) {
+  public DatabaseConfig setDdlInitSql(String ddlInitSql) {
     this.ddlInitSql = ddlInitSql;
+    return this;
   }
 
   @Override
@@ -1566,8 +1673,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDdlHeader(String ddlHeader) {
+  public DatabaseConfig setDdlHeader(String ddlHeader) {
     this.ddlHeader = ddlHeader;
+    return this;
   }
 
   @Override
@@ -1586,8 +1694,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDdlStrictMode(boolean ddlStrictMode) {
+  public DatabaseConfig setDdlStrictMode(boolean ddlStrictMode) {
     this.ddlStrictMode = ddlStrictMode;
+    return this;
   }
 
   @Override
@@ -1596,8 +1705,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDdlPlaceholders(String ddlPlaceholders) {
+  public DatabaseConfig setDdlPlaceholders(String ddlPlaceholders) {
     this.ddlPlaceholders = ddlPlaceholders;
+    return this;
   }
 
   @Override
@@ -1606,8 +1716,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDdlPlaceholderMap(Map<String, String> ddlPlaceholderMap) {
+  public DatabaseConfig setDdlPlaceholderMap(Map<String, String> ddlPlaceholderMap) {
     this.ddlPlaceholderMap = ddlPlaceholderMap;
+    return this;
   }
 
   @Override
@@ -1616,8 +1727,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDisableClasspathSearch(boolean disableClasspathSearch) {
+  public DatabaseConfig setDisableClasspathSearch(boolean disableClasspathSearch) {
     this.disableClasspathSearch = disableClasspathSearch;
+    return this;
   }
 
   @Override
@@ -1626,25 +1738,29 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setJodaLocalTimeMode(String jodaLocalTimeMode) {
+  public DatabaseConfig setJodaLocalTimeMode(String jodaLocalTimeMode) {
     this.jodaLocalTimeMode = jodaLocalTimeMode;
+    return this;
   }
 
   @Override
-  public void addClass(Class<?> cls) {
+  public DatabaseConfig addClass(Class<?> cls) {
     classes.add(cls);
+    return this;
   }
 
   @Override
-  public void addAll(Collection<Class<?>> classList) {
+  public DatabaseConfig addAll(Collection<Class<?>> classList) {
     if (classList != null && !classList.isEmpty()) {
       classes.addAll(classList);
     }
+    return this;
   }
 
   @Override
-  public void addPackage(String packageName) {
+  public DatabaseConfig addPackage(String packageName) {
     packages.add(packageName);
+    return this;
   }
 
   @Override
@@ -1653,13 +1769,25 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPackages(List<String> packages) {
+  public DatabaseConfig setPackages(List<String> packages) {
     this.packages = packages;
+    return this;
+  }
+
+  /**
+   * Set the list of classes (entities, listeners, scalarTypes etc) that should
+   * be used for this database.
+   * <p>
+   * Leaving void for spring xml wiring for now.
+   */
+  public void setClasses(Collection<Class<?>> classes) {
+    this.classes = new HashSet<>(classes);
   }
 
   @Override
-  public void setClasses(Collection<Class<?>> classes) {
+  public DatabaseConfig classes(Collection<Class<?>> classes) {
     this.classes = new HashSet<>(classes);
+    return this;
   }
 
   @Override
@@ -1683,8 +1811,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setSkipCacheAfterWrite(boolean skipCacheAfterWrite) {
+  public DatabaseConfig setSkipCacheAfterWrite(boolean skipCacheAfterWrite) {
     this.skipCacheAfterWrite = skipCacheAfterWrite;
+    return this;
   }
 
   @Override
@@ -1693,8 +1822,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setUpdateAllPropertiesInBatch(boolean updateAllPropertiesInBatch) {
+  public DatabaseConfig setUpdateAllPropertiesInBatch(boolean updateAllPropertiesInBatch) {
     this.updateAllPropertiesInBatch = updateAllPropertiesInBatch;
+    return this;
   }
 
   @Override
@@ -1703,23 +1833,27 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setResourceDirectory(String resourceDirectory) {
+  public DatabaseConfig setResourceDirectory(String resourceDirectory) {
     this.resourceDirectory = resourceDirectory;
+    return this;
   }
 
   @Override
-  public void addCustomMapping(DbType type, String columnDefinition, Platform platform) {
+  public DatabaseConfig addCustomMapping(DbType type, String columnDefinition, Platform platform) {
     platformConfig.addCustomMapping(type, columnDefinition, platform);
+    return this;
   }
 
   @Override
-  public void addCustomMapping(DbType type, String columnDefinition) {
+  public DatabaseConfig addCustomMapping(DbType type, String columnDefinition) {
     platformConfig.addCustomMapping(type, columnDefinition);
+    return this;
   }
 
   @Override
-  public void add(BeanQueryAdapter beanQueryAdapter) {
+  public DatabaseConfig add(BeanQueryAdapter beanQueryAdapter) {
     queryAdapters.add(beanQueryAdapter);
+    return this;
   }
 
   @Override
@@ -1728,8 +1862,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryAdapters(List<BeanQueryAdapter> queryAdapters) {
+  public DatabaseConfig setQueryAdapters(List<BeanQueryAdapter> queryAdapters) {
     this.queryAdapters = queryAdapters;
+    return this;
   }
 
   @Override
@@ -1738,28 +1873,33 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setIdGenerators(List<IdGenerator> idGenerators) {
+  public DatabaseConfig setIdGenerators(List<IdGenerator> idGenerators) {
     this.idGenerators = idGenerators;
+    return this;
   }
 
   @Override
-  public void add(IdGenerator idGenerator) {
+  public DatabaseConfig add(IdGenerator idGenerator) {
     idGenerators.add(idGenerator);
+    return this;
   }
 
   @Override
-  public void add(BeanPersistController beanPersistController) {
+  public DatabaseConfig add(BeanPersistController beanPersistController) {
     persistControllers.add(beanPersistController);
+    return this;
   }
 
   @Override
-  public void add(BeanPostLoad postLoad) {
+  public DatabaseConfig add(BeanPostLoad postLoad) {
     postLoaders.add(postLoad);
+    return this;
   }
 
   @Override
-  public void add(BeanPostConstructListener listener) {
+  public DatabaseConfig add(BeanPostConstructListener listener) {
     postConstructListeners.add(listener);
+    return this;
   }
 
   @Override
@@ -1768,8 +1908,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setFindControllers(List<BeanFindController> findControllers) {
+  public DatabaseConfig setFindControllers(List<BeanFindController> findControllers) {
     this.findControllers = findControllers;
+    return this;
   }
 
   @Override
@@ -1778,8 +1919,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPostLoaders(List<BeanPostLoad> postLoaders) {
+  public DatabaseConfig setPostLoaders(List<BeanPostLoad> postLoaders) {
     this.postLoaders = postLoaders;
+    return this;
   }
 
   @Override
@@ -1788,8 +1930,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPostConstructListeners(List<BeanPostConstructListener> listeners) {
+  public DatabaseConfig setPostConstructListeners(List<BeanPostConstructListener> listeners) {
     this.postConstructListeners = listeners;
+    return this;
   }
 
   @Override
@@ -1798,13 +1941,15 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPersistControllers(List<BeanPersistController> persistControllers) {
+  public DatabaseConfig setPersistControllers(List<BeanPersistController> persistControllers) {
     this.persistControllers = persistControllers;
+    return this;
   }
 
   @Override
-  public void add(BeanPersistListener beanPersistListener) {
+  public DatabaseConfig add(BeanPersistListener beanPersistListener) {
     persistListeners.add(beanPersistListener);
+    return this;
   }
 
   @Override
@@ -1813,8 +1958,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void add(BulkTableEventListener bulkTableEventListener) {
+  public DatabaseConfig add(BulkTableEventListener bulkTableEventListener) {
     bulkTableEventListeners.add(bulkTableEventListener);
+    return this;
   }
 
   @Override
@@ -1823,8 +1969,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void addServerConfigStartup(ServerConfigStartup configStartupListener) {
+  public DatabaseConfig addServerConfigStartup(ServerConfigStartup configStartupListener) {
     configStartupListeners.add(configStartupListener);
+    return this;
   }
 
   @Override
@@ -1833,8 +1980,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPersistListeners(List<BeanPersistListener> persistListeners) {
+  public DatabaseConfig setPersistListeners(List<BeanPersistListener> persistListeners) {
     this.persistListeners = persistListeners;
+    return this;
   }
 
   @Override
@@ -1844,8 +1992,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setPersistenceContextScope(PersistenceContextScope persistenceContextScope) {
+  public DatabaseConfig setPersistenceContextScope(PersistenceContextScope persistenceContextScope) {
     this.persistenceContextScope = persistenceContextScope;
+    return this;
   }
 
   @Override
@@ -1854,21 +2003,24 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setClassLoadConfig(ClassLoadConfig classLoadConfig) {
+  public DatabaseConfig setClassLoadConfig(ClassLoadConfig classLoadConfig) {
     this.classLoadConfig = classLoadConfig;
+    return this;
   }
 
   @Override
-  public void loadFromProperties() {
+  public DatabaseConfig loadFromProperties() {
     this.properties = Config.asProperties();
     configureFromProperties();
+    return this;
   }
 
   @Override
-  public void loadFromProperties(Properties properties) {
+  public DatabaseConfig loadFromProperties(Properties properties) {
     // keep the properties used for configuration so that these are available for plugins
     this.properties = Config.asConfiguration().eval(properties);
     configureFromProperties();
+    return this;
   }
 
   /**
@@ -2132,8 +2284,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setObjectMapper(Object objectMapper) {
+  public DatabaseConfig setObjectMapper(Object objectMapper) {
     this.objectMapper = objectMapper;
+    return this;
   }
 
   @Override
@@ -2142,8 +2295,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
+  public DatabaseConfig setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
     this.expressionEqualsWithNullAsNoop = expressionEqualsWithNullAsNoop;
+    return this;
   }
 
   @Override
@@ -2152,8 +2306,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setExpressionNativeIlike(boolean expressionNativeIlike) {
+  public DatabaseConfig setExpressionNativeIlike(boolean expressionNativeIlike) {
     this.expressionNativeIlike = expressionNativeIlike;
+    return this;
   }
 
   @Override
@@ -2162,8 +2317,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setEnabledL2Regions(String enabledL2Regions) {
+  public DatabaseConfig setEnabledL2Regions(String enabledL2Regions) {
     this.enabledL2Regions = enabledL2Regions;
+    return this;
   }
 
   @Override
@@ -2172,8 +2328,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDisableL2Cache(boolean disableL2Cache) {
+  public DatabaseConfig setDisableL2Cache(boolean disableL2Cache) {
     this.disableL2Cache = disableL2Cache;
+    return this;
   }
 
   @Override
@@ -2182,8 +2339,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setLocalOnlyL2Cache(boolean localOnlyL2Cache) {
+  public DatabaseConfig setLocalOnlyL2Cache(boolean localOnlyL2Cache) {
     this.localOnlyL2Cache = localOnlyL2Cache;
+    return this;
   }
 
   @Override
@@ -2192,8 +2350,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setUseValidationNotNull(boolean useValidationNotNull) {
+  public DatabaseConfig setUseValidationNotNull(boolean useValidationNotNull) {
     this.useValidationNotNull = useValidationNotNull;
+    return this;
   }
 
   @Override
@@ -2202,8 +2361,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground) {
+  public DatabaseConfig setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground) {
     this.notifyL2CacheInForeground = notifyL2CacheInForeground;
+    return this;
   }
 
   @Override
@@ -2212,8 +2372,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
+  public DatabaseConfig setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
     this.queryPlanTTLSeconds = queryPlanTTLSeconds;
+    return this;
   }
 
   @Override
@@ -2228,11 +2389,12 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void addMappingLocation(String mappingLocation) {
+  public DatabaseConfig addMappingLocation(String mappingLocation) {
     if (mappingLocations == null) {
       mappingLocations = new ArrayList<>();
     }
     mappingLocations.add(mappingLocation);
+    return this;
   }
 
   @Override
@@ -2241,8 +2403,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setMappingLocations(List<String> mappingLocations) {
+  public DatabaseConfig setMappingLocations(List<String> mappingLocations) {
     this.mappingLocations = mappingLocations;
+    return this;
   }
 
   @Override
@@ -2251,8 +2414,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setIdGeneratorAutomatic(boolean idGeneratorAutomatic) {
+  public DatabaseConfig setIdGeneratorAutomatic(boolean idGeneratorAutomatic) {
     this.idGeneratorAutomatic = idGeneratorAutomatic;
+    return this;
   }
 
   @Override
@@ -2261,8 +2425,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryPlanEnable(boolean queryPlanEnable) {
+  public DatabaseConfig setQueryPlanEnable(boolean queryPlanEnable) {
     this.queryPlanEnable = queryPlanEnable;
+    return this;
   }
 
   @Override
@@ -2271,8 +2436,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryPlanThresholdMicros(long queryPlanThresholdMicros) {
+  public DatabaseConfig setQueryPlanThresholdMicros(long queryPlanThresholdMicros) {
     this.queryPlanThresholdMicros = queryPlanThresholdMicros;
+    return this;
   }
 
   @Override
@@ -2281,8 +2447,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryPlanCapture(boolean queryPlanCapture) {
+  public DatabaseConfig setQueryPlanCapture(boolean queryPlanCapture) {
     this.queryPlanCapture = queryPlanCapture;
+    return this;
   }
 
   @Override
@@ -2291,8 +2458,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs) {
+  public DatabaseConfig setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs) {
     this.queryPlanCapturePeriodSecs = queryPlanCapturePeriodSecs;
+    return this;
   }
 
   @Override
@@ -2301,8 +2469,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis) {
+  public DatabaseConfig setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis) {
     this.queryPlanCaptureMaxTimeMillis = queryPlanCaptureMaxTimeMillis;
+    return this;
   }
 
   @Override
@@ -2311,8 +2480,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount) {
+  public DatabaseConfig setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount) {
     this.queryPlanCaptureMaxCount = queryPlanCaptureMaxCount;
+    return this;
   }
 
   @Override
@@ -2321,8 +2491,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setQueryPlanListener(QueryPlanListener queryPlanListener) {
+  public DatabaseConfig setQueryPlanListener(QueryPlanListener queryPlanListener) {
     this.queryPlanListener = queryPlanListener;
+    return this;
   }
 
   @Override
@@ -2331,8 +2502,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown) {
+  public DatabaseConfig setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown) {
     this.dumpMetricsOnShutdown = dumpMetricsOnShutdown;
+    return this;
   }
 
   @Override
@@ -2341,8 +2513,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setDumpMetricsOptions(String dumpMetricsOptions) {
+  public DatabaseConfig setDumpMetricsOptions(String dumpMetricsOptions) {
     this.dumpMetricsOptions = dumpMetricsOptions;
+    return this;
   }
 
   @Override
@@ -2361,8 +2534,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setLoadModuleInfo(boolean loadModuleInfo) {
+  public DatabaseConfig setLoadModuleInfo(boolean loadModuleInfo) {
     this.loadModuleInfo = loadModuleInfo;
+    return this;
   }
 
   @Override
@@ -2371,8 +2545,9 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public void setMetricNaming(Function<String, String> metricNaming) {
+  public DatabaseConfig setMetricNaming(Function<String, String> metricNaming) {
     this.metricNaming = metricNaming;
+    return this;
   }
 
   public enum UuidVersion {

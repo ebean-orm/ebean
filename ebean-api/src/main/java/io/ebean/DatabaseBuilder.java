@@ -1,9 +1,6 @@
 package io.ebean;
 
 import com.fasterxml.jackson.core.JsonFactory;
-import io.ebean.PersistenceContextScope;
-import io.ebean.Query;
-import io.ebean.Transaction;
 import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.*;
@@ -25,31 +22,172 @@ import java.time.Clock;
 import java.util.*;
 import java.util.function.Function;
 
+/**
+ * Build a Database instance.
+ *
+ * <pre>{@code
+ *
+ *   // build the 'default' database using configuration
+ *   // from application.properties / application.yaml
+ *
+ *   Database db = Database.builder()
+ *     .loadFromProperties()
+ *     .build();
+ *
+ * }</pre>
+ *
+ * Create a non-default database and not register it with {@link DB}. When
+ * not registered the database can not by obtained via {@link DB#byName(String)}.
+ *
+ * <pre>{@code
+ *
+ *   Database database = Database.builder()
+ *     .setName("other"
+ *     .loadFromProperties()
+ *     .setRegister(false)
+ *     .setDefaultServer(false)
+ *     .addClass(EBasic.class)
+ *     .build();
+ *
+ * }</pre>
+ */
 public interface DatabaseBuilder {
 
+  /**
+   * Build and return the Database instance.
+   */
+  Database build();
+
+  /**
+   * Return the settings to read the configuration that has been set. This
+   * provides the getters/accessors to read the configuration properties.
+   */
   Settings settings();
+
+  /**
+   * Set the name of the Database.
+   */
+  DatabaseBuilder setName(String name);
+
+  /**
+   * Set to false if you do not want this server to be registered with the Ebean
+   * singleton when it is created.
+   * <p>
+   * By default, this is set to true.
+   */
+  DatabaseBuilder setRegister(boolean register);
+
+  /**
+   * Set false if you do not want this Database to be registered as the "default" database
+   * with the DB singleton.
+   * <p>
+   * This is only used when {@link #setRegister(boolean)} is also true.
+   */
+  DatabaseBuilder setDefaultServer(boolean defaultServer);
+
+  /**
+   * Set the DB schema to use. This specifies to use this schema for:
+   * <ul>
+   * <li>Running Database migrations - Create and use the DB schema</li>
+   * <li>Testing DDL - Create-all.sql DDL execution creates and uses schema</li>
+   * <li>Testing Docker - Set default schema on connection URL</li>
+   * </ul>
+   */
+  DatabaseBuilder setDbSchema(String dbSchema);
+
+  /**
+   * Set the Geometry SRID.
+   */
+  DatabaseBuilder setGeometrySRID(int geometrySRID);
+
+  /**
+   * Set the time zone to use when reading/writing Timestamps via JDBC.
+   */
+  DatabaseBuilder setDataTimeZone(String dataTimeZone);
+
+  /**
+   * Set the JDBC batch mode to use at the transaction level.
+   * <p>
+   * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
+   * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
+   * or the batch size is meet.
+   */
+  DatabaseBuilder setPersistBatch(PersistBatch persistBatch);
+
+  /**
+   * Set the JDBC batch mode to use per save(), delete(), insert() or update() request.
+   * <p>
+   * This makes sense when a save() or delete() etc cascades and executes multiple child statements. The best caase
+   * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
+   * <p>
+   * This only takes effect when the persistBatch mode at the transaction level does not take effect.
+   */
+  DatabaseBuilder setPersistBatchOnCascade(PersistBatch persistBatchOnCascade);
+
+  /**
+   * Deprecated, please migrate to using setPersistBatch().
+   * <p>
+   * Set to true if you what to use JDBC batching for persisting and deleting beans.
+   * <p>
+   * With this Ebean will batch up persist requests and use the JDBC batch api.
+   * This is a performance optimisation designed to reduce the network chatter.
+   * <p>
+   * When true this is equivalent to {@code setPersistBatch(PersistBatch.ALL)} or
+   * when false to {@code setPersistBatch(PersistBatch.NONE)}
+   */
+  DatabaseBuilder setPersistBatching(boolean persistBatching);
+
+  /**
+   * Set the batch size used for JDBC batching. If unset this defaults to 20.
+   * <p>
+   * You can also set the batch size on the transaction.
+   *
+   * @see Transaction#setBatchSize(int)
+   */
+  DatabaseBuilder setPersistBatchSize(int persistBatchSize);
+
+
+  /**
+   * Set to true to disable lazy loading by default.
+   * <p>
+   * It can be turned on per query via {@link Query#setDisableLazyLoading(boolean)}.
+   */
+  DatabaseBuilder setDisableLazyLoading(boolean disableLazyLoading);
+
+  /**
+   * Set the default batch size for lazy loading.
+   * <p>
+   * This is the number of beans or collections loaded when lazy loading is
+   * invoked by default.
+   * <p>
+   * The default value is for this is 10 (load 10 beans or collections).
+   * <p>
+   * You can explicitly control the lazy loading batch size for a given join on
+   * a query using +lazy(batchSize) or JoinConfig.
+   */
+  DatabaseBuilder setLazyLoadBatchSize(int lazyLoadBatchSize);
 
   /**
    * Set the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
    */
-  void setClock(Clock clock);
+  DatabaseBuilder setClock(Clock clock);
 
   /**
    * Set the slow query time in millis.
    */
-  void setSlowQueryMillis(long slowQueryMillis);
+  DatabaseBuilder setSlowQueryMillis(long slowQueryMillis);
 
   /**
    * Set the slow query event listener.
    */
-  void setSlowQueryListener(SlowQueryListener slowQueryListener);
+  DatabaseBuilder setSlowQueryListener(SlowQueryListener slowQueryListener);
 
   /**
    * Put a service object into configuration such that it can be used by ebean or a plugin.
    * <p>
    * For example, put IgniteConfiguration in to be passed to the Ignite plugin.
    */
-  void putServiceObject(String key, Object configObject);
+  DatabaseBuilder putServiceObject(String key, Object configObject);
 
   /**
    * Put a service object into configuration such that it can be used by ebean or a plugin.
@@ -64,7 +202,7 @@ public interface DatabaseBuilder {
    *   <li>ServerCacheNotifyPlugin</li>
    * </ul>
    */
-  <T> void putServiceObject(Class<T> iface, T configObject);
+  <T> DatabaseBuilder putServiceObject(Class<T> iface, T configObject);
 
   /**
    * Put a service object into configuration such that it can be used by ebean or a plugin.
@@ -77,44 +215,38 @@ public interface DatabaseBuilder {
    *
    * }</pre>
    */
-  void putServiceObject(Object configObject);
+  DatabaseBuilder putServiceObject(Object configObject);
 
   /**
    * Set the Jackson JsonFactory to use.
    * <p>
    * If not set a default implementation will be used.
    */
-  void setJsonFactory(JsonFactory jsonFactory);
+  DatabaseBuilder setJsonFactory(JsonFactory jsonFactory);
 
   /**
    * Set the JSON format to use for DateTime types.
    */
-  void setJsonDateTime(JsonConfig.DateTime jsonDateTime);
+  DatabaseBuilder setJsonDateTime(JsonConfig.DateTime jsonDateTime);
 
   /**
    * Set the JSON format to use for Date types.
    */
-  void setJsonDate(JsonConfig.Date jsonDate);
+  DatabaseBuilder setJsonDate(JsonConfig.Date jsonDate);
 
   /**
    * Set the JSON include mode used when writing JSON.
    * <p>
    * Set to NON_NULL or NON_EMPTY to suppress nulls or null and empty collections respectively.
    */
-  void setJsonInclude(JsonConfig.Include jsonInclude);
+  DatabaseBuilder setJsonInclude(JsonConfig.Include jsonInclude);
 
   /**
    * Set the default MutableDetection to use with {@code @DbJson} using Jackson.
    *
    * @see DbJson#mutationDetection()
    */
-  void setJsonMutationDetection(MutationDetection jsonMutationDetection);
-
-  /**
-   * Set the name of the Database.
-   */
-  void setName(String name);
-
+  DatabaseBuilder setJsonMutationDetection(MutationDetection jsonMutationDetection);
 
   /**
    * Set the container / clustering configuration.
@@ -122,144 +254,57 @@ public interface DatabaseBuilder {
    * The container holds all the Database instances and provides clustering communication
    * services to all the Database instances.
    */
-  void setContainerConfig(ContainerConfig containerConfig);
-
-  /**
-   * Set to false if you do not want this server to be registered with the Ebean
-   * singleton when it is created.
-   * <p>
-   * By default this is set to true.
-   */
-  void setRegister(boolean register);
-
-  /**
-   * Set false if you do not want this Database to be registered as the "default" database
-   * with the DB singleton.
-   * <p>
-   * This is only used when {@link #setRegister(boolean)} is also true.
-   */
-  void setDefaultServer(boolean defaultServer);
+  DatabaseBuilder setContainerConfig(ContainerConfig containerConfig);
 
   /**
    * Set the CurrentUserProvider. This is used to populate @WhoCreated, @WhoModified and
    * support other audit features (who executed a query etc).
    */
-  void setCurrentUserProvider(CurrentUserProvider currentUserProvider);
+  DatabaseBuilder setCurrentUserProvider(CurrentUserProvider currentUserProvider);
 
   /**
    * Set the tenancy mode to use.
    */
-  void setTenantMode(TenantMode tenantMode);
+  DatabaseBuilder setTenantMode(TenantMode tenantMode);
 
   /**
    * Set the column name used for TenantMode.PARTITION.
    */
-  void setTenantPartitionColumn(String tenantPartitionColumn);
+  DatabaseBuilder setTenantPartitionColumn(String tenantPartitionColumn);
 
   /**
    * Set the current tenant provider.
    */
-  void setCurrentTenantProvider(CurrentTenantProvider currentTenantProvider);
+  DatabaseBuilder setCurrentTenantProvider(CurrentTenantProvider currentTenantProvider);
 
   /**
    * Set the tenancy datasource provider.
    */
-  void setTenantDataSourceProvider(TenantDataSourceProvider tenantDataSourceProvider);
+  DatabaseBuilder setTenantDataSourceProvider(TenantDataSourceProvider tenantDataSourceProvider);
 
   /**
    * Set the tenancy schema provider.
    */
-  void setTenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider);
-
-  /**
-   * Return the tenancy catalog provider.
-   */
-  TenantCatalogProvider getTenantCatalogProvider();
+  DatabaseBuilder setTenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider);
 
   /**
    * Set the tenancy catalog provider.
    */
-  void setTenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider);
-
-  /**
-   * Return true if dirty beans are automatically persisted.
-   */
-  boolean isAutoPersistUpdates();
+  DatabaseBuilder setTenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider);
 
   /**
    * Set to true if dirty beans are automatically persisted.
    */
-  void setAutoPersistUpdates(boolean autoPersistUpdates);
-
-  /**
-   * Set the JDBC batch mode to use at the transaction level.
-   * <p>
-   * When INSERT or ALL is used then save(), delete() etc do not execute immediately but instead go into
-   * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
-   * or the batch size is meet.
-   */
-  void setPersistBatch(PersistBatch persistBatch);
-
-  /**
-   * Set the JDBC batch mode to use per save(), delete(), insert() or update() request.
-   * <p>
-   * This makes sense when a save() or delete() etc cascades and executes multiple child statements. The best caase
-   * for this is when saving a master/parent bean this cascade inserts many detail/child beans.
-   * <p>
-   * This only takes effect when the persistBatch mode at the transaction level does not take effect.
-   */
-  void setPersistBatchOnCascade(PersistBatch persistBatchOnCascade);
-
-  /**
-   * Deprecated, please migrate to using setPersistBatch().
-   * <p>
-   * Set to true if you what to use JDBC batching for persisting and deleting beans.
-   * <p>
-   * With this Ebean will batch up persist requests and use the JDBC batch api.
-   * This is a performance optimisation designed to reduce the network chatter.
-   * <p>
-   * When true this is equivalent to {@code setPersistBatch(PersistBatch.ALL)} or
-   * when false to {@code setPersistBatch(PersistBatch.NONE)}
-   */
-  void setPersistBatching(boolean persistBatching);
-
-  /**
-   * Set the batch size used for JDBC batching. If unset this defaults to 20.
-   * <p>
-   * You can also set the batch size on the transaction.
-   *
-   * @see Transaction#setBatchSize(int)
-   */
-  void setPersistBatchSize(int persistBatchSize);
+  DatabaseBuilder setAutoPersistUpdates(boolean autoPersistUpdates);
 
   /**
    * Sets the query batch size. This defaults to 100.
    *
    * @param queryBatchSize the new query batch size
    */
-  void setQueryBatchSize(int queryBatchSize);
+  DatabaseBuilder setQueryBatchSize(int queryBatchSize);
 
-  void setDefaultEnumType(EnumType defaultEnumType);
-
-  /**
-   * Set to true to disable lazy loading by default.
-   * <p>
-   * It can be turned on per query via {@link Query#setDisableLazyLoading(boolean)}.
-   */
-  void setDisableLazyLoading(boolean disableLazyLoading);
-
-  /**
-   * Set the default batch size for lazy loading.
-   * <p>
-   * This is the number of beans or collections loaded when lazy loading is
-   * invoked by default.
-   * <p>
-   * The default value is for this is 10 (load 10 beans or collections).
-   * <p>
-   * You can explicitly control the lazy loading batch size for a given join on
-   * a query using +lazy(batchSize) or JoinConfig.
-   */
-  void setLazyLoadBatchSize(int lazyLoadBatchSize);
+  DatabaseBuilder setDefaultEnumType(EnumType defaultEnumType);
 
   /**
    * Set the number of sequences to fetch/preallocate when using DB sequences.
@@ -268,17 +313,17 @@ public interface DatabaseBuilder {
    * requests a sequence to be used as an Id for a bean (aka reduce network
    * chatter).
    */
-  void setDatabaseSequenceBatchSize(int databaseSequenceBatchSize);
+  DatabaseBuilder setDatabaseSequenceBatchSize(int databaseSequenceBatchSize);
 
   /**
    * Set the default JDBC fetchSize hint for findList queries.
    */
-  void setJdbcFetchSizeFindList(int jdbcFetchSizeFindList);
+  DatabaseBuilder setJdbcFetchSizeFindList(int jdbcFetchSizeFindList);
 
   /**
    * Set the default JDBC fetchSize hint for findEach/findEachWhile queries.
    */
-  void setJdbcFetchSizeFindEach(int jdbcFetchSizeFindEach);
+  DatabaseBuilder setJdbcFetchSizeFindEach(int jdbcFetchSizeFindEach);
 
   /**
    * Set the ChangeLogPrepare.
@@ -286,37 +331,37 @@ public interface DatabaseBuilder {
    * This is used to set user context information to the ChangeSet in the
    * foreground thread prior to the logging occurring in a background thread.
    */
-  void setChangeLogPrepare(ChangeLogPrepare changeLogPrepare);
+  DatabaseBuilder setChangeLogPrepare(ChangeLogPrepare changeLogPrepare);
 
   /**
    * Set the ChangeLogListener which actually performs the logging of change sets
    * in the background.
    */
-  void setChangeLogListener(ChangeLogListener changeLogListener);
+  DatabaseBuilder setChangeLogListener(ChangeLogListener changeLogListener);
 
   /**
    * Set the ChangeLogRegister which controls which ChangeLogFilter is used for each
    * bean type and in this way provide fine grained control over which persist requests
    * are included in the change log.
    */
-  void setChangeLogRegister(ChangeLogRegister changeLogRegister);
+  DatabaseBuilder setChangeLogRegister(ChangeLogRegister changeLogRegister);
 
   /**
    * Set if inserts should be included in the change log by default.
    */
-  void setChangeLogIncludeInserts(boolean changeLogIncludeInserts);
+  DatabaseBuilder setChangeLogIncludeInserts(boolean changeLogIncludeInserts);
 
   /**
    * Sets if the changelog should be written async (default = true).
    */
-  void setChangeLogAsync(boolean changeLogAsync);
+  DatabaseBuilder setChangeLogAsync(boolean changeLogAsync);
 
   /**
    * Set the ReadAuditLogger to use. If not set the default implementation is used
    * which logs the read events in JSON format to a standard named SLF4J logger
    * (which can be configured in say logback to log to a separate log file).
    */
-  void setReadAuditLogger(ReadAuditLogger readAuditLogger);
+  DatabaseBuilder setReadAuditLogger(ReadAuditLogger readAuditLogger);
 
   /**
    * Set the ReadAuditPrepare to use.
@@ -325,133 +370,113 @@ public interface DatabaseBuilder {
    * (user id, user ip address etc) and sets it on the ReadEvent bean before it is sent
    * to the ReadAuditLogger.
    */
-  void setReadAuditPrepare(ReadAuditPrepare readAuditPrepare);
+  DatabaseBuilder setReadAuditPrepare(ReadAuditPrepare readAuditPrepare);
 
   /**
    * Set the configuration for profiling.
    */
-  void setProfilingConfig(ProfilingConfig profilingConfig);
-
-  /**
-   * Set the DB schema to use. This specifies to use this schema for:
-   * <ul>
-   * <li>Running Database migrations - Create and use the DB schema</li>
-   * <li>Testing DDL - Create-all.sql DDL execution creates and uses schema</li>
-   * <li>Testing Docker - Set default schema on connection URL</li>
-   * </ul>
-   */
-  void setDbSchema(String dbSchema);
-
-  /**
-   * Set the Geometry SRID.
-   */
-  void setGeometrySRID(int geometrySRID);
-
-  /**
-   * Set the time zone to use when reading/writing Timestamps via JDBC.
-   */
-  void setDataTimeZone(String dataTimeZone);
+  DatabaseBuilder setProfilingConfig(ProfilingConfig profilingConfig);
 
   /**
    * Set the suffix appended to the base table to derive the view that contains the union
    * of the base table and the history table in order to support asOf queries.
    */
-  void setAsOfViewSuffix(String asOfViewSuffix);
+  DatabaseBuilder setAsOfViewSuffix(String asOfViewSuffix);
 
   /**
    * Set the database column used to support history and 'As of' queries. This column is a timestamp range
    * or equivalent.
    */
-  void setAsOfSysPeriod(String asOfSysPeriod);
+  DatabaseBuilder setAsOfSysPeriod(String asOfSysPeriod);
 
   /**
    * Set the history table suffix.
    */
-  void setHistoryTableSuffix(String historyTableSuffix);
+  DatabaseBuilder setHistoryTableSuffix(String historyTableSuffix);
 
   /**
    * Set to true if we are running in a JTA Transaction manager.
    */
-  void setUseJtaTransactionManager(boolean useJtaTransactionManager);
+  DatabaseBuilder setUseJtaTransactionManager(boolean useJtaTransactionManager);
 
   /**
    * Set the external transaction manager.
    */
-  void setExternalTransactionManager(ExternalTransactionManager externalTransactionManager);
+  DatabaseBuilder setExternalTransactionManager(ExternalTransactionManager externalTransactionManager);
 
   /**
    * Set the ServerCachePlugin to use.
    */
-  void setServerCachePlugin(ServerCachePlugin serverCachePlugin);
+  DatabaseBuilder setServerCachePlugin(ServerCachePlugin serverCachePlugin);
 
   /**
    * Set to true if you want LOB's to be fetch eager by default.
    * By default this is set to false and LOB's must be explicitly fetched.
    */
-  void setEagerFetchLobs(boolean eagerFetchLobs);
+  DatabaseBuilder setEagerFetchLobs(boolean eagerFetchLobs);
 
   /**
    * Set the max call stack to use for origin location.
    */
-  void setMaxCallStack(int maxCallStack);
+  DatabaseBuilder setMaxCallStack(int maxCallStack);
 
   /**
    * Set to true if transactions should by default rollback on checked exceptions.
    */
-  void setTransactionRollbackOnChecked(boolean transactionRollbackOnChecked);
+  DatabaseBuilder setTransactionRollbackOnChecked(boolean transactionRollbackOnChecked);
 
   /**
    * Set the Background executor schedule pool size.
    */
-  void setBackgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize);
+  DatabaseBuilder setBackgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize);
 
   /**
    * Set the Background executor shutdown seconds. This is the time allowed for the pool to shutdown nicely
    * before it is forced shutdown.
    */
-  void setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs);
+  DatabaseBuilder setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs);
 
   /**
    * Sets the background executor wrapper. The wrapper is used when a task is sent to background and should copy the thread-locals.
    */
-  void setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper);
+  DatabaseBuilder setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper);
 
   /**
    * Set the L2 cache default max size.
    */
-  void setCacheMaxSize(int cacheMaxSize);
+  DatabaseBuilder setCacheMaxSize(int cacheMaxSize);
 
   /**
    * Set the L2 cache default max idle time in seconds.
    */
-  void setCacheMaxIdleTime(int cacheMaxIdleTime);
+  DatabaseBuilder setCacheMaxIdleTime(int cacheMaxIdleTime);
 
   /**
    * Set the L2 cache default max time to live in seconds.
    */
-  void setCacheMaxTimeToLive(int cacheMaxTimeToLive);
+  DatabaseBuilder setCacheMaxTimeToLive(int cacheMaxTimeToLive);
 
   /**
    * Set the L2 query cache default max size.
    */
-  void setQueryCacheMaxSize(int queryCacheMaxSize);
+  DatabaseBuilder setQueryCacheMaxSize(int queryCacheMaxSize);
 
   /**
    * Set the L2 query cache default max idle time in seconds.
    */
-  void setQueryCacheMaxIdleTime(int queryCacheMaxIdleTime);
+  DatabaseBuilder setQueryCacheMaxIdleTime(int queryCacheMaxIdleTime);
 
   /**
    * Set the L2 query cache default max time to live in seconds.
    */
-  void setQueryCacheMaxTimeToLive(int queryCacheMaxTimeToLive);
+  DatabaseBuilder setQueryCacheMaxTimeToLive(int queryCacheMaxTimeToLive);
 
   /**
    * Set the NamingConvention.
    * <p>
    * If none is set the default UnderscoreNamingConvention is used.
    */
-  void setNamingConvention(NamingConvention namingConvention);
+  DatabaseBuilder setNamingConvention(NamingConvention namingConvention);
 
   /**
    * Set to true if all DB column and table names should use quoted identifiers.
@@ -459,37 +484,37 @@ public interface DatabaseBuilder {
    * For Postgres pgjdbc version 42.3.0 should be used with datasource property
    * <em>quoteReturningIdentifiers</em> set to <em>false</em> (refer #2303).
    */
-  void setAllQuotedIdentifiers(boolean allQuotedIdentifiers);
+  DatabaseBuilder setAllQuotedIdentifiers(boolean allQuotedIdentifiers);
 
   /**
    * Set to true if this Database is Document store only instance (has no JDBC DB).
    */
-  void setDocStoreOnly(boolean docStoreOnly);
+  DatabaseBuilder setDocStoreOnly(boolean docStoreOnly);
 
   /**
    * Set the configuration for the ElasticSearch integration.
    */
-  void setDocStoreConfig(DocStoreConfig docStoreConfig);
+  DatabaseBuilder setDocStoreConfig(DocStoreConfig docStoreConfig);
 
   /**
    * Set the constraint naming convention used in DDL generation.
    */
-  void setConstraintNaming(DbConstraintNaming constraintNaming);
+  DatabaseBuilder setConstraintNaming(DbConstraintNaming constraintNaming);
 
   /**
    * Set the configuration for AutoTune.
    */
-  void setAutoTuneConfig(AutoTuneConfig autoTuneConfig);
+  DatabaseBuilder setAutoTuneConfig(AutoTuneConfig autoTuneConfig);
 
   /**
    * Set to true to skip the startup DataSource check.
    */
-  void setSkipDataSourceCheck(boolean skipDataSourceCheck);
+  DatabaseBuilder setSkipDataSourceCheck(boolean skipDataSourceCheck);
 
   /**
    * Set a DataSource.
    */
-  void setDataSource(DataSource dataSource);
+  DatabaseBuilder setDataSource(DataSource dataSource);
 
   /**
    * Set the read only DataSource.
@@ -500,23 +525,23 @@ public interface DatabaseBuilder {
    * This read only DataSource will be used for implicit query only transactions. It is not
    * used if the transaction is created explicitly or if the query is an update or delete query.
    */
-  void setReadOnlyDataSource(DataSource readOnlyDataSource);
+  DatabaseBuilder setReadOnlyDataSource(DataSource readOnlyDataSource);
 
   /**
    * Set the configuration required to build a DataSource using Ebean's own
    * DataSource implementation.
    */
-  void setDataSourceConfig(DataSourceBuilder dataSourceConfig);
+  DatabaseBuilder setDataSourceConfig(DataSourceBuilder dataSourceConfig);
 
   /**
    * Set to true if Ebean should create a DataSource for use with implicit read only transactions.
    */
-  void setAutoReadOnlyDataSource(boolean autoReadOnlyDataSource);
+  DatabaseBuilder setAutoReadOnlyDataSource(boolean autoReadOnlyDataSource);
 
   /**
    * Set the configuration for the read only DataSource.
    */
-  void setReadOnlyDataSourceConfig(DataSourceBuilder readOnlyDataSourceConfig);
+  DatabaseBuilder setReadOnlyDataSourceConfig(DataSourceBuilder readOnlyDataSourceConfig);
 
   /**
    * Set the value to represent TRUE in the database.
@@ -525,7 +550,7 @@ public interface DatabaseBuilder {
    * <p>
    * The value set is either a Integer or a String (e.g. "1", or "T").
    */
-  void setDatabaseBooleanTrue(String databaseTrue);
+  DatabaseBuilder setDatabaseBooleanTrue(String databaseTrue);
 
   /**
    * Set the value to represent FALSE in the database.
@@ -534,7 +559,7 @@ public interface DatabaseBuilder {
    * <p>
    * The value set is either a Integer or a String (e.g. "0", or "F").
    */
-  void setDatabaseBooleanFalse(String databaseFalse);
+  DatabaseBuilder setDatabaseBooleanFalse(String databaseFalse);
 
   /**
    * Set the number of DB sequence values that should be preallocated and cached
@@ -549,7 +574,7 @@ public interface DatabaseBuilder {
    * the cache drops to have full (which is 5 by default) Ebean will fetch
    * another batch of Id's in a background thread.
    */
-  void setDatabaseSequenceBatch(int databaseSequenceBatchSize);
+  DatabaseBuilder setDatabaseSequenceBatch(int databaseSequenceBatchSize);
 
   /**
    * Explicitly set the database platform name
@@ -564,7 +589,7 @@ public interface DatabaseBuilder {
    * <p>
    * Values are oracle, h2, postgres, mysql, sqlserver16, sqlserver17.
    */
-  void setDatabasePlatformName(String databasePlatformName);
+  DatabaseBuilder setDatabasePlatformName(String databasePlatformName);
 
   /**
    * Explicitly set the database platform to use.
@@ -572,12 +597,12 @@ public interface DatabaseBuilder {
    * If none is set then the platform is determined via the databasePlatformName
    * or automatically via the JDBC driver information.
    */
-  void setDatabasePlatform(DatabasePlatform databasePlatform);
+  DatabaseBuilder setDatabasePlatform(DatabasePlatform databasePlatform);
 
   /**
    * Set the preferred DB platform IdType.
    */
-  void setIdType(IdType idType);
+  DatabaseBuilder setIdType(IdType idType);
 
   /**
    * Set the EncryptKeyManager.
@@ -591,7 +616,7 @@ public interface DatabaseBuilder {
    * ebean.encryptKeyManager=org.avaje.tests.basic.encrypt.BasicEncyptKeyManager
    * }</pre>
    */
-  void setEncryptKeyManager(EncryptKeyManager encryptKeyManager);
+  DatabaseBuilder setEncryptKeyManager(EncryptKeyManager encryptKeyManager);
 
   /**
    * Set the EncryptDeployManager.
@@ -599,7 +624,7 @@ public interface DatabaseBuilder {
    * This is optionally used to programmatically define which columns are
    * encrypted instead of using the {@link Encrypted} Annotation.
    */
-  void setEncryptDeployManager(EncryptDeployManager encryptDeployManager);
+  DatabaseBuilder setEncryptDeployManager(EncryptDeployManager encryptDeployManager);
 
   /**
    * Set the Encryptor used to encrypt data on the java client side (as opposed
@@ -608,7 +633,7 @@ public interface DatabaseBuilder {
    * Ebean has a default implementation that it will use if you do not set your
    * own Encryptor implementation.
    */
-  void setEncryptor(Encryptor encryptor);
+  DatabaseBuilder setEncryptor(Encryptor encryptor);
 
   /**
    * Set to true if the Database instance should be created in offline mode.
@@ -616,7 +641,7 @@ public interface DatabaseBuilder {
    * Typically used to create an Database instance for DDL Migration generation
    * without requiring a real DataSource / Database to connect to.
    */
-  void setDbOffline(boolean dbOffline);
+  DatabaseBuilder setDbOffline(boolean dbOffline);
 
   /**
    * Set the DbEncrypt used to encrypt and decrypt properties.
@@ -624,47 +649,46 @@ public interface DatabaseBuilder {
    * Note that if this is not set then the DbPlatform may already have a
    * DbEncrypt set (H2, MySql, Postgres and Oracle platforms have a DbEncrypt)
    */
-  void setDbEncrypt(DbEncrypt dbEncrypt);
+  DatabaseBuilder setDbEncrypt(DbEncrypt dbEncrypt);
 
   /**
    * Set the configuration for DB platform (such as UUID and custom mappings).
    */
-  void setPlatformConfig(PlatformConfig platformConfig);
-
+  DatabaseBuilder setPlatformConfig(PlatformConfig platformConfig);
 
   /**
    * Set the DB type used to store UUID.
    */
-  void setDbUuid(PlatformConfig.DbUuid dbUuid);
+  DatabaseBuilder setDbUuid(PlatformConfig.DbUuid dbUuid);
 
   /**
    * Sets the UUID version mode.
    */
-  void setUuidVersion(DatabaseConfig.UuidVersion uuidVersion);
+  DatabaseBuilder setUuidVersion(DatabaseConfig.UuidVersion uuidVersion);
 
   /**
    * Set the UUID state file.
    */
-  void setUuidStateFile(String uuidStateFile);
+  DatabaseBuilder setUuidStateFile(String uuidStateFile);
 
   /**
    * Sets the V1-UUID-NodeId.
    */
-  void setUuidNodeId(String uuidNodeId);
+  DatabaseBuilder setUuidNodeId(String uuidNodeId);
 
   /**
    * Set to true if LocalTime should be persisted with nanos precision.
    * <p>
    * Otherwise it is persisted using java.sql.Time which is seconds precision.
    */
-  void setLocalTimeWithNanos(boolean localTimeWithNanos);
+  DatabaseBuilder setLocalTimeWithNanos(boolean localTimeWithNanos);
 
   /**
    * Set to true if Duration should be persisted with nanos precision (SQL DECIMAL).
    * <p>
    * Otherwise it is persisted with second precision (SQL INTEGER).
    */
-  void setDurationWithNanos(boolean durationWithNanos);
+  DatabaseBuilder setDurationWithNanos(boolean durationWithNanos);
 
   /**
    * Set to true to run DB migrations on server start.
@@ -672,7 +696,7 @@ public interface DatabaseBuilder {
    * This is the same as config.getMigrationConfig().setRunMigration(). We have added this method here
    * as it is often the only thing we need to configure for migrations.
    */
-  void setRunMigration(boolean runMigration);
+  DatabaseBuilder setRunMigration(boolean runMigration);
 
   /**
    * Set to true to generate the "create all" DDL on startup.
@@ -680,7 +704,7 @@ public interface DatabaseBuilder {
    * Typically we want this on when we are running tests locally (and often using H2)
    * and we want to create the full DB schema from scratch to run tests.
    */
-  void setDdlGenerate(boolean ddlGenerate);
+  DatabaseBuilder setDdlGenerate(boolean ddlGenerate);
 
   /**
    * Set to true to run the generated "create all DDL" on startup.
@@ -688,14 +712,14 @@ public interface DatabaseBuilder {
    * Typically we want this on when we are running tests locally (and often using H2)
    * and we want to create the full DB schema from scratch to run tests.
    */
-  void setDdlRun(boolean ddlRun);
+  DatabaseBuilder setDdlRun(boolean ddlRun);
 
   /**
    * Set to false if you not want to run the extra-ddl.xml scripts. (default = true)
    * <p>
    * Typically we want this on when we are running tests.
    */
-  void setDdlExtra(boolean ddlExtra);
+  DatabaseBuilder setDdlExtra(boolean ddlExtra);
 
   /**
    * Set to true if the "drop all ddl" should be skipped.
@@ -703,7 +727,7 @@ public interface DatabaseBuilder {
    * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
    * are not required so skipping the drop table statements etc makes it faster with less noise in the logs.
    */
-  void setDdlCreateOnly(boolean ddlCreateOnly);
+  DatabaseBuilder setDdlCreateOnly(boolean ddlCreateOnly);
 
   /**
    * Set a SQL script to execute after the "create all" DDL has been run.
@@ -711,49 +735,44 @@ public interface DatabaseBuilder {
    * Typically this is a sql script that inserts test seed data when running tests.
    * Place a sql script in src/test/resources that inserts test seed data.
    */
-  void setDdlSeedSql(String ddlSeedSql);
+  DatabaseBuilder setDdlSeedSql(String ddlSeedSql);
 
   /**
    * Set a SQL script to execute before the "create all" DDL has been run.
    */
-  void setDdlInitSql(String ddlInitSql);
+  DatabaseBuilder setDdlInitSql(String ddlInitSql);
 
   /**
    * Set the header to use with DDL generation.
    */
-  void setDdlHeader(String ddlHeader);
-
-  /**
-   * Return true if strict mode is used which includes a check that non-null columns have a default value.
-   */
-  boolean isDdlStrictMode();
+  DatabaseBuilder setDdlHeader(String ddlHeader);
 
   /**
    * Set to false to turn off strict mode allowing non-null columns to not have a default value.
    */
-  void setDdlStrictMode(boolean ddlStrictMode);
+  DatabaseBuilder setDdlStrictMode(boolean ddlStrictMode);
 
   /**
    * Set a comma and equals delimited placeholders that are substituted in DDL scripts.
    */
-  void setDdlPlaceholders(String ddlPlaceholders);
+  DatabaseBuilder setDdlPlaceholders(String ddlPlaceholders);
 
   /**
    * Set a map of placeholder values that are substituted in DDL scripts.
    */
-  void setDdlPlaceholderMap(Map<String, String> ddlPlaceholderMap);
+  DatabaseBuilder setDdlPlaceholderMap(Map<String, String> ddlPlaceholderMap);
 
   /**
    * Set to true to disable the class path search even for the case where no entity bean classes
    * have been registered. This can be used to start an Database instance just to use the
    * SQL functions such as SqlQuery, SqlUpdate etc.
    */
-  void setDisableClasspathSearch(boolean disableClasspathSearch);
+  DatabaseBuilder setDisableClasspathSearch(boolean disableClasspathSearch);
 
   /**
    * Set the mode to use for Joda LocalTime support 'normal' or 'utc'.
    */
-  void setJodaLocalTimeMode(String jodaLocalTimeMode);
+  DatabaseBuilder setJodaLocalTimeMode(String jodaLocalTimeMode);
 
   /**
    * Programmatically add classes (typically entities) that this server should use.
@@ -766,26 +785,26 @@ public interface DatabaseBuilder {
    *
    * @param cls the entity type (or other type) that should be registered by this database.
    */
-  void addClass(Class<?> cls);
+  DatabaseBuilder addClass(Class<?> cls);
 
   /**
    * Register all the classes (typically entity classes).
    */
-  void addAll(Collection<Class<?>> classList);
+  DatabaseBuilder addAll(Collection<Class<?>> classList);
 
   /**
    * Add a package to search for entities via class path search.
    * <p>
    * This is only used if classes have not been explicitly specified.
    */
-  void addPackage(String packageName);
+  DatabaseBuilder addPackage(String packageName);
 
   /**
    * Set packages to search for entities via class path search.
    * <p>
    * This is only used if classes have not been explicitly specified.
    */
-  void setPackages(List<String> packages);
+  DatabaseBuilder setPackages(List<String> packages);
 
   /**
    * Set the list of classes (entities, listeners, scalarTypes etc) that should
@@ -796,12 +815,12 @@ public interface DatabaseBuilder {
    * <p>
    * Alternatively the classes can contain added via {@link #addClass(Class)}.
    */
-  void setClasses(Collection<Class<?>> classes);
+  DatabaseBuilder classes(Collection<Class<?>> classes);
 
   /**
    * Set to false when we still want to hit the cache after a write has occurred on a transaction.
    */
-  void setSkipCacheAfterWrite(boolean skipCacheAfterWrite);
+  DatabaseBuilder setSkipCacheAfterWrite(boolean skipCacheAfterWrite);
 
   /**
    * Set to false if by default updates in JDBC batch should not include all properties.
@@ -810,13 +829,12 @@ public interface DatabaseBuilder {
    *
    * @see Transaction#setUpdateAllLoadedProperties(boolean)
    */
-  void setUpdateAllPropertiesInBatch(boolean updateAllPropertiesInBatch);
+  DatabaseBuilder setUpdateAllPropertiesInBatch(boolean updateAllPropertiesInBatch);
 
   /**
    * Sets the resource directory.
    */
-  void setResourceDirectory(String resourceDirectory);
-
+  DatabaseBuilder setResourceDirectory(String resourceDirectory);
 
   /**
    * Add a custom type mapping.
@@ -835,7 +853,7 @@ public interface DatabaseBuilder {
    * @param columnDefinition The column definition that should be used
    * @param platform         Optionally specify the platform this mapping should apply to.
    */
-  void addCustomMapping(DbType type, String columnDefinition, Platform platform);
+  DatabaseBuilder addCustomMapping(DbType type, String columnDefinition, Platform platform);
 
   /**
    * Add a custom type mapping that applies to all platforms.
@@ -853,7 +871,7 @@ public interface DatabaseBuilder {
    * @param type             The DB type this mapping should apply to
    * @param columnDefinition The column definition that should be used
    */
-  void addCustomMapping(DbType type, String columnDefinition);
+  DatabaseBuilder addCustomMapping(DbType type, String columnDefinition);
 
   /**
    * Register a BeanQueryAdapter instance.
@@ -861,7 +879,7 @@ public interface DatabaseBuilder {
    * Note alternatively you can use {@link #setQueryAdapters(List)} to set all
    * the BeanQueryAdapter instances.
    */
-  void add(BeanQueryAdapter beanQueryAdapter);
+  DatabaseBuilder add(BeanQueryAdapter beanQueryAdapter);
 
   /**
    * Register all the BeanQueryAdapter instances.
@@ -869,17 +887,17 @@ public interface DatabaseBuilder {
    * Note alternatively you can use {@link #add(BeanQueryAdapter)} to add
    * BeanQueryAdapter instances one at a time.
    */
-  void setQueryAdapters(List<BeanQueryAdapter> queryAdapters);
+  DatabaseBuilder setQueryAdapters(List<BeanQueryAdapter> queryAdapters);
 
   /**
    * Set the custom IdGenerator instances.
    */
-  void setIdGenerators(List<IdGenerator> idGenerators);
+  DatabaseBuilder setIdGenerators(List<IdGenerator> idGenerators);
 
   /**
    * Register a customer IdGenerator instance.
    */
-  void add(IdGenerator idGenerator);
+  DatabaseBuilder add(IdGenerator idGenerator);
 
   /**
    * Register a BeanPersistController instance.
@@ -887,7 +905,7 @@ public interface DatabaseBuilder {
    * Note alternatively you can use {@link #setPersistControllers(List)} to set
    * all the BeanPersistController instances.
    */
-  void add(BeanPersistController beanPersistController);
+  DatabaseBuilder add(BeanPersistController beanPersistController);
 
   /**
    * Register a BeanPostLoad instance.
@@ -895,7 +913,7 @@ public interface DatabaseBuilder {
    * Note alternatively you can use {@link #setPostLoaders(List)} to set
    * all the BeanPostLoad instances.
    */
-  void add(BeanPostLoad postLoad);
+  DatabaseBuilder add(BeanPostLoad postLoad);
 
   /**
    * Register a BeanPostConstructListener instance.
@@ -903,22 +921,22 @@ public interface DatabaseBuilder {
    * Note alternatively you can use {@link #setPostConstructListeners(List)} to set
    * all the BeanPostConstructListener instances.
    */
-  void add(BeanPostConstructListener listener);
+  DatabaseBuilder add(BeanPostConstructListener listener);
 
   /**
    * Set the list of BeanFindController instances.
    */
-  void setFindControllers(List<BeanFindController> findControllers);
+  DatabaseBuilder setFindControllers(List<BeanFindController> findControllers);
 
   /**
    * Set the list of BeanPostLoader instances.
    */
-  void setPostLoaders(List<BeanPostLoad> postLoaders);
+  DatabaseBuilder setPostLoaders(List<BeanPostLoad> postLoaders);
 
   /**
    * Set the list of BeanPostLoader instances.
    */
-  void setPostConstructListeners(List<BeanPostConstructListener> listeners);
+  DatabaseBuilder setPostConstructListeners(List<BeanPostConstructListener> listeners);
 
   /**
    * Register all the BeanPersistController instances.
@@ -926,7 +944,7 @@ public interface DatabaseBuilder {
    * Note alternatively you can use {@link #add(BeanPersistController)} to add
    * BeanPersistController instances one at a time.
    */
-  void setPersistControllers(List<BeanPersistController> persistControllers);
+  DatabaseBuilder setPersistControllers(List<BeanPersistController> persistControllers);
 
   /**
    * Register a BeanPersistListener instance.
@@ -934,17 +952,17 @@ public interface DatabaseBuilder {
    * Note alternatively you can use {@link #setPersistListeners(List)} to set
    * all the BeanPersistListener instances.
    */
-  void add(BeanPersistListener beanPersistListener);
+  DatabaseBuilder add(BeanPersistListener beanPersistListener);
 
   /**
    * Add a BulkTableEventListener
    */
-  void add(BulkTableEventListener bulkTableEventListener);
+  DatabaseBuilder add(BulkTableEventListener bulkTableEventListener);
 
   /**
    * Add a ServerConfigStartup.
    */
-  void addServerConfigStartup(ServerConfigStartup configStartupListener);
+  DatabaseBuilder addServerConfigStartup(ServerConfigStartup configStartupListener);
 
   /**
    * Register all the BeanPersistListener instances.
@@ -952,7 +970,7 @@ public interface DatabaseBuilder {
    * Note alternatively you can use {@link #add(BeanPersistListener)} to add
    * BeanPersistListener instances one at a time.
    */
-  void setPersistListeners(List<BeanPersistListener> persistListeners);
+  DatabaseBuilder setPersistListeners(List<BeanPersistListener> persistListeners);
 
   /**
    * Set the PersistenceContext scope to be used if one is not explicitly set on a query.
@@ -965,13 +983,13 @@ public interface DatabaseBuilder {
    *
    * @see Query#setPersistenceContextScope(PersistenceContextScope)
    */
-  void setPersistenceContextScope(PersistenceContextScope persistenceContextScope);
+  DatabaseBuilder setPersistenceContextScope(PersistenceContextScope persistenceContextScope);
 
   /**
    * Set the ClassLoadConfig which is used to detect Joda, Java8 types etc and also
    * create new instances of plugins given a className.
    */
-  void setClassLoadConfig(ClassLoadConfig classLoadConfig);
+  DatabaseBuilder setClassLoadConfig(ClassLoadConfig classLoadConfig);
 
   /**
    * Load settings from application.properties, application.yaml and other sources.
@@ -979,25 +997,19 @@ public interface DatabaseBuilder {
    * Uses <code>avaje-config</code> to load configuration properties.  Goto https://avaje.io/config
    * for detail on how and where properties are loaded from.
    */
-  void loadFromProperties();
+  DatabaseBuilder loadFromProperties();
 
   /**
    * Load the settings from the given properties
    */
-  void loadFromProperties(Properties properties);
-
-  /**
-   * Return the PersistBatch mode to use for 'batchOnCascade' taking into account if the database
-   * platform supports getGeneratedKeys in batch mode.
-   */
-  PersistBatch appliedPersistBatchOnCascade();
+  DatabaseBuilder loadFromProperties(Properties properties);
 
   /**
    * Set the Jackson ObjectMapper.
    * <p>
    * Note that this is not strongly typed as Jackson ObjectMapper is an optional dependency.
    */
-  void setObjectMapper(Object objectMapper);
+  DatabaseBuilder setObjectMapper(Object objectMapper);
 
   /**
    * Set to true if you want eq("someProperty", null) to generate "1=1" rather than "is null" sql expression.
@@ -1006,27 +1018,27 @@ public interface DatabaseBuilder {
    * ne(propertyName, value) have no effect when the value is null. The expression factory adds a NoopExpression
    * which will add "1=1" into the SQL rather than "is null".
    */
-  void setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop);
+  DatabaseBuilder setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop);
 
   /**
    * Set to true to use native ILIKE expression if supported by the database platform (e.g. Postgres).
    */
-  void setExpressionNativeIlike(boolean expressionNativeIlike);
+  DatabaseBuilder setExpressionNativeIlike(boolean expressionNativeIlike);
 
   /**
    * Set the enabled L2 cache regions (comma delimited).
    */
-  void setEnabledL2Regions(String enabledL2Regions);
+  DatabaseBuilder setEnabledL2Regions(String enabledL2Regions);
 
   /**
    * Set to true to disable L2 caching. Typically useful in performance testing.
    */
-  void setDisableL2Cache(boolean disableL2Cache);
+  DatabaseBuilder setDisableL2Cache(boolean disableL2Cache);
 
   /**
    * Force the use of local only L2 cache. Effectively ignore l2 cache plugin like ebean-redis etc.
    */
-  void setLocalOnlyL2Cache(boolean localOnlyL2Cache);
+  DatabaseBuilder setLocalOnlyL2Cache(boolean localOnlyL2Cache);
 
   /**
    * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code> or
@@ -1037,7 +1049,7 @@ public interface DatabaseBuilder {
    * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
    * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
    */
-  void setUseValidationNotNull(boolean useValidationNotNull);
+  DatabaseBuilder setUseValidationNotNull(boolean useValidationNotNull);
 
   /**
    * Set this to true to run L2 cache notification in the foreground.
@@ -1046,7 +1058,7 @@ public interface DatabaseBuilder {
    * we are making network calls and we prefer to do this in background and not impact the response time
    * of the executing transaction.
    */
-  void setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground);
+  DatabaseBuilder setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground);
 
   /**
    * Set the time to live for ebean's internal query plan.
@@ -1054,7 +1066,7 @@ public interface DatabaseBuilder {
    * This is the plan that knows how to execute the query, read the result
    * and collects execution metrics. By default this is set to 5 mins.
    */
-  void setQueryPlanTTLSeconds(int queryPlanTTLSeconds);
+  DatabaseBuilder setQueryPlanTTLSeconds(int queryPlanTTLSeconds);
 
   /**
    * Create a new PlatformConfig based of the one held but with overridden properties by reading
@@ -1072,25 +1084,25 @@ public interface DatabaseBuilder {
   /**
    * Add a mapping location to search for xml mapping via class path search.
    */
-  void addMappingLocation(String mappingLocation);
+  DatabaseBuilder addMappingLocation(String mappingLocation);
 
   /**
    * Set mapping locations to search for xml mapping via class path search.
    * <p>
    * This is only used if classes have not been explicitly specified.
    */
-  void setMappingLocations(List<String> mappingLocations);
+  DatabaseBuilder setMappingLocations(List<String> mappingLocations);
 
   /**
    * Set to false such that Id properties require explicit <code>@GeneratedValue</code>
    * mapping before they are assigned Identity or Sequence generation based on platform.
    */
-  void setIdGeneratorAutomatic(boolean idGeneratorAutomatic);
+  DatabaseBuilder setIdGeneratorAutomatic(boolean idGeneratorAutomatic);
 
   /**
    * Set to true to enable query plan capture.
    */
-  void setQueryPlanEnable(boolean queryPlanEnable);
+  DatabaseBuilder setQueryPlanEnable(boolean queryPlanEnable);
 
   /**
    * Set the query plan collection threshold in microseconds.
@@ -1098,17 +1110,17 @@ public interface DatabaseBuilder {
    * Queries executing slower than this will have bind values captured such that later
    * the query plan can be captured and reported.
    */
-  void setQueryPlanThresholdMicros(long queryPlanThresholdMicros);
+  DatabaseBuilder setQueryPlanThresholdMicros(long queryPlanThresholdMicros);
 
   /**
    * Set to true to turn on periodic capture of query plans.
    */
-  void setQueryPlanCapture(boolean queryPlanCapture);
+  DatabaseBuilder setQueryPlanCapture(boolean queryPlanCapture);
 
   /**
    * Set the frequency in seconds to capture query plans.
    */
-  void setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs);
+  DatabaseBuilder setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs);
 
   /**
    * Set the time after which a capture query plans request will
@@ -1117,49 +1129,43 @@ public interface DatabaseBuilder {
    * Effectively this controls the amount of load/time we want to
    * allow for query plan capture.
    */
-  void setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis);
+  DatabaseBuilder setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis);
 
   /**
    * Set the max number of query plans captured per request.
    */
-  void setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount);
+  DatabaseBuilder setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount);
 
   /**
    * Set the listener used to process captured query plans.
    */
-  void setQueryPlanListener(QueryPlanListener queryPlanListener);
+  DatabaseBuilder setQueryPlanListener(QueryPlanListener queryPlanListener);
 
   /**
    * Set to true if metrics should be dumped when the server is shutdown.
    */
-  void setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown);
+  DatabaseBuilder setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown);
 
   /**
    * Include 'sql' or 'hash' in options such that they are included in the output.
    *
    * @param dumpMetricsOptions Example "sql,hash", "sql"
    */
-  void setDumpMetricsOptions(String dumpMetricsOptions);
-
-  /**
-   * @deprecated - migrate to {@link Settings#isLoadModuleInfo()}.
-   */
-  @Deprecated(forRemoval = true)
-  boolean isAutoLoadModuleInfo();
+  DatabaseBuilder setDumpMetricsOptions(String dumpMetricsOptions);
 
   /**
    * Set false to turn off automatic registration of entity beans.
    * <p>
    * When using query beans that also generates a module info class that
-   * can register the entity bean classes (to avoid classpath scanning).
+   * can register the entity bean classes (to aDatabaseBuilder classpath scanning).
    * This is on by default and setting this to false turns it off.
    */
-  void setLoadModuleInfo(boolean loadModuleInfo);
+  DatabaseBuilder setLoadModuleInfo(boolean loadModuleInfo);
 
   /**
    * Set the naming convention to apply to metrics names.
    */
-  void setMetricNaming(Function<String, String> metricNaming);
+  DatabaseBuilder setMetricNaming(Function<String, String> metricNaming);
 
 
   /**
@@ -1167,6 +1173,12 @@ public interface DatabaseBuilder {
    * that has been set.
    */
   interface Settings extends DatabaseBuilder {
+
+    /**
+     * @deprecated - migrate to {@link Settings#isLoadModuleInfo()}.
+     */
+    @Deprecated(forRemoval = true)
+    boolean isAutoLoadModuleInfo();
 
     /**
      * Return the Jackson JsonFactory to use.
@@ -1388,6 +1400,11 @@ public interface DatabaseBuilder {
     ReadAuditPrepare getReadAuditPrepare();
 
     /**
+     * Return the tenancy catalog provider.
+     */
+    TenantCatalogProvider getTenantCatalogProvider();
+
+    /**
      * Return the configuration for profiling.
      */
     ProfilingConfig getProfilingConfig();
@@ -1472,6 +1489,11 @@ public interface DatabaseBuilder {
      * Return the background executor wrapper.
      */
     BackgroundExecutorWrapper getBackgroundExecutorWrapper();
+
+    /**
+     * Return true if dirty beans are automatically persisted.
+     */
+    boolean isAutoPersistUpdates();
 
     /**
      * Return the L2 cache default max size.
@@ -1650,6 +1672,11 @@ public interface DatabaseBuilder {
      */
     PlatformConfig getPlatformConfig();
 
+    /**
+     * Return the PersistBatch mode to use for 'batchOnCascade' taking into account if the database
+     * platform supports getGeneratedKeys in batch mode.
+     */
+    PersistBatch appliedPersistBatchOnCascade();
 
     /**
      * Returns the UUID version mode.
@@ -1718,6 +1745,11 @@ public interface DatabaseBuilder {
      * Return true, if extra-ddl.xml should be executed.
      */
     boolean isDdlExtra();
+
+    /**
+     * Return true if strict mode is used which includes a check that non-null columns have a default value.
+     */
+    boolean isDdlStrictMode();
 
     /**
      * Return the header to use with DDL generation.
