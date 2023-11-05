@@ -48,7 +48,7 @@ public class DatabasePlatformFactory {
         // choose based on dbName
         return byDatabaseName(config.getDatabasePlatformName());
       }
-      if (config.getDataSourceConfig().settings().isOffline()) {
+      if (config.getDataSourceConfig().isOffline()) {
         throw new PersistenceException("DatabasePlatformName must be specified with offline mode");
       }
       // guess using meta data from driver

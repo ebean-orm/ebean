@@ -49,18 +49,17 @@ final class InitDataSource {
     return roConfig == null ? null : createFromConfig(roConfig, true);
   }
 
-  DataSourceBuilder readOnlyConfig() {
+  DataSourceBuilder.Settings readOnlyConfig() {
     var roConfig = config.getReadOnlyDataSourceConfig();
     if (roConfig == null) {
       // it has explicitly been set to null, not expected but ok
       return null;
     }
-    var roSettings = roConfig.settings();
-    if (urlSet(roSettings.getUrl())) {
+    if (urlSet(roConfig.getUrl())) {
       return roConfig;
     }
     // convenient alternate place to set the read-only url
-    final String readOnlyUrl = config.getDataSourceConfig().settings().getReadOnlyUrl();
+    final String readOnlyUrl = config.getDataSourceConfig().getReadOnlyUrl();
     if (urlSet(readOnlyUrl)) {
       roConfig.url(readOnlyUrl);
       return roConfig;
@@ -77,23 +76,22 @@ final class InitDataSource {
     return url != null && !"none".equalsIgnoreCase(url) && !url.trim().isEmpty();
   }
 
-  private DataSource createFromConfig(DataSourceBuilder dsConfig, boolean readOnly) {
+  private DataSource createFromConfig(DataSourceBuilder.Settings dsConfig, boolean readOnly) {
     if (dsConfig == null) {
       throw new PersistenceException("No  DataSourceBuilder defined for " + config.getName());
     }
-    var dsSettings = dsConfig.settings();
-    if (dsSettings.isOffline()) {
+    if (dsConfig.isOffline()) {
       if (config.getDatabasePlatformName() == null) {
         throw new PersistenceException("You MUST specify a DatabasePlatformName on DatabaseConfig when offline");
       }
     }
 
-    attachAlert(dsSettings);
-    attachListener(dsSettings);
+    attachAlert(dsConfig);
+    attachListener(dsConfig);
 
     if (readOnly) {
       // setup to use AutoCommit such that we skip explicit commit
-      var mainSettings = config.getDataSourceConfig().settings();
+      var mainSettings = config.getDataSourceConfig();
       dsConfig.autoCommit(true);
       dsConfig.readOnly(true);
       dsConfig.setDefaults(mainSettings);
