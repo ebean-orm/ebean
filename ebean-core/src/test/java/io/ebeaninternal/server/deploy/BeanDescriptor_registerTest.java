@@ -17,11 +17,11 @@ public class BeanDescriptor_registerTest {
   public void testRegisterDeregister() {
 
     Database db = Database.builder()
-      .setName("h2other")
+      .name("h2other")
       .loadFromProperties()
-      .setDdlExtra(false)
-      .setRegister(false)
-      .setDefaultServer(false)
+      .ddlExtra(false)
+      .register(false)
+      .defaultDatabase(false)
       .addClass(EBasic.class)
       .build();
 
