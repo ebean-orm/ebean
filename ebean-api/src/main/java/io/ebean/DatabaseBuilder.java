@@ -35,7 +35,7 @@ import java.util.function.Function;
  *     .build();
  *
  * }</pre>
- *
+ * <p>
  * Create a non-default database and not register it with {@link DB}. When
  * not registered the database can not by obtained via {@link DB#byName(String)}.
  *
@@ -67,6 +67,14 @@ public interface DatabaseBuilder {
   /**
    * Set the name of the Database.
    */
+  default DatabaseBuilder name(String name) {
+    return setName(name);
+  }
+
+  /**
+   * @deprecated migrate to {@link #name(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setName(String name);
 
   /**
@@ -75,6 +83,14 @@ public interface DatabaseBuilder {
    * <p>
    * By default, this is set to true.
    */
+  default DatabaseBuilder register(boolean register) {
+    return setRegister(register);
+  }
+
+  /**
+   * @deprecated migrate to {@link #register(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setRegister(boolean register);
 
   /**
@@ -83,6 +99,14 @@ public interface DatabaseBuilder {
    * <p>
    * This is only used when {@link #setRegister(boolean)} is also true.
    */
+  default DatabaseBuilder defaultDatabase(boolean defaultServer) {
+    return setDefaultServer(defaultServer);
+  }
+
+  /**
+   * @deprecated migrate to {@link #defaultDatabase(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDefaultServer(boolean defaultServer);
 
   /**
@@ -93,16 +117,40 @@ public interface DatabaseBuilder {
    * <li>Testing Docker - Set default schema on connection URL</li>
    * </ul>
    */
+  default DatabaseBuilder dbSchema(String dbSchema) {
+    return setDbSchema(dbSchema);
+  }
+
+  /**
+   * @deprecated migrate to {@link #setDbSchema(String)}
+   */
+  @Deprecated
   DatabaseBuilder setDbSchema(String dbSchema);
 
   /**
    * Set the Geometry SRID.
    */
+  default DatabaseBuilder geometrySRID(int geometrySRID) {
+    return setGeometrySRID(geometrySRID);
+  }
+
+  /**
+   * @deprecated migrate to {@link #geometrySRID(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setGeometrySRID(int geometrySRID);
 
   /**
    * Set the time zone to use when reading/writing Timestamps via JDBC.
    */
+  default DatabaseBuilder dataTimeZone(String dataTimeZone) {
+    return setDataTimeZone(dataTimeZone);
+  }
+
+  /**
+   * @deprecated migrate to {@link #dataTimeZone(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDataTimeZone(String dataTimeZone);
 
   /**
@@ -112,6 +160,14 @@ public interface DatabaseBuilder {
    * a JDBC batch execute buffer that is flushed. The buffer is flushed if a query is executed, transaction ends
    * or the batch size is meet.
    */
+  default DatabaseBuilder persistBatch(PersistBatch persistBatch) {
+    return setPersistBatch(persistBatch);
+  }
+
+  /**
+   * @deprecated migrate to {@link #persistBatch(PersistBatch)}.
+   */
+  @Deprecated
   DatabaseBuilder setPersistBatch(PersistBatch persistBatch);
 
   /**
@@ -122,6 +178,14 @@ public interface DatabaseBuilder {
    * <p>
    * This only takes effect when the persistBatch mode at the transaction level does not take effect.
    */
+  default DatabaseBuilder persistBatchOnCascade(PersistBatch persistBatchOnCascade) {
+    return setPersistBatchOnCascade(persistBatchOnCascade);
+  }
+
+  /**
+   * @deprecated migrate to {@link #persistBatchOnCascade(PersistBatch)}.
+   */
+  @Deprecated
   DatabaseBuilder setPersistBatchOnCascade(PersistBatch persistBatchOnCascade);
 
   /**
@@ -135,6 +199,14 @@ public interface DatabaseBuilder {
    * When true this is equivalent to {@code setPersistBatch(PersistBatch.ALL)} or
    * when false to {@code setPersistBatch(PersistBatch.NONE)}
    */
+  default DatabaseBuilder persistBatching(boolean persistBatching) {
+    return setPersistBatching(persistBatching);
+  }
+
+  /**
+   * @deprecated migrate to {@link #persistBatching(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setPersistBatching(boolean persistBatching);
 
   /**
@@ -144,14 +216,29 @@ public interface DatabaseBuilder {
    *
    * @see Transaction#setBatchSize(int)
    */
-  DatabaseBuilder setPersistBatchSize(int persistBatchSize);
+  default DatabaseBuilder persistBatchSize(int persistBatchSize) {
+    return setPersistBatchSize(persistBatchSize);
+  }
 
+  /**
+   * @deprecated migrate to {@link #persistBatchSize(int)}.
+   */
+  @Deprecated
+  DatabaseBuilder setPersistBatchSize(int persistBatchSize);
 
   /**
    * Set to true to disable lazy loading by default.
    * <p>
    * It can be turned on per query via {@link Query#setDisableLazyLoading(boolean)}.
    */
+  default DatabaseBuilder disableLazyLoading(boolean disableLazyLoading) {
+    return setDisableLazyLoading(disableLazyLoading);
+  }
+
+  /**
+   * @deprecated migrate to {@link #disableLazyLoading(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDisableLazyLoading(boolean disableLazyLoading);
 
   /**
@@ -165,21 +252,52 @@ public interface DatabaseBuilder {
    * You can explicitly control the lazy loading batch size for a given join on
    * a query using +lazy(batchSize) or JoinConfig.
    */
+  default DatabaseBuilder lazyLoadBatchSize(int lazyLoadBatchSize) {
+    return setLazyLoadBatchSize(lazyLoadBatchSize);
+  }
+
+  /**
+   * @deprecated migrate to {@link #lazyLoadBatchSize(int)}.
+   */
   DatabaseBuilder setLazyLoadBatchSize(int lazyLoadBatchSize);
 
   /**
    * Set the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
    */
+  default DatabaseBuilder clock(Clock clock) {
+    return setClock(clock);
+  }
+
+  /**
+   * @deprecated migrate to {@link #clock(Clock)}.
+   */
+  @Deprecated
   DatabaseBuilder setClock(Clock clock);
 
   /**
    * Set the slow query time in millis.
    */
+  default DatabaseBuilder slowQueryMillis(long slowQueryMillis) {
+    return setSlowQueryMillis(slowQueryMillis);
+  }
+
+  /**
+   * @deprecated migrate to {@link #slowQueryMillis(long)}.
+   */
+  @Deprecated
   DatabaseBuilder setSlowQueryMillis(long slowQueryMillis);
 
   /**
    * Set the slow query event listener.
    */
+  default DatabaseBuilder slowQueryListener(SlowQueryListener slowQueryListener) {
+    return setSlowQueryListener(slowQueryListener);
+  }
+
+  /**
+   * @deprecated migrate to {@link #slowQueryListener(SlowQueryListener)}.
+   */
+  @Deprecated
   DatabaseBuilder setSlowQueryListener(SlowQueryListener slowQueryListener);
 
   /**
@@ -222,16 +340,38 @@ public interface DatabaseBuilder {
    * <p>
    * If not set a default implementation will be used.
    */
+  default DatabaseBuilder jsonFactory(JsonFactory jsonFactory) {
+    return setJsonFactory(jsonFactory);
+  }
+
+  /**
+   * @deprecated migrate to {@link #jsonFactory(JsonFactory)}.
+   */
   DatabaseBuilder setJsonFactory(JsonFactory jsonFactory);
 
   /**
    * Set the JSON format to use for DateTime types.
+   */
+  default DatabaseBuilder jsonDateTime(JsonConfig.DateTime jsonDateTime) {
+    return setJsonDateTime(jsonDateTime);
+  }
+
+  /**
+   * @deprecated migrate to {@link #jsonDateTime(JsonConfig.DateTime)}.
    */
   DatabaseBuilder setJsonDateTime(JsonConfig.DateTime jsonDateTime);
 
   /**
    * Set the JSON format to use for Date types.
    */
+  default DatabaseBuilder jsonDate(JsonConfig.Date jsonDate) {
+    return setJsonDate(jsonDate);
+  }
+
+  /**
+   * @deprecated migrate to {@link #jsonDateTime(JsonConfig.DateTime)}.
+   */
+  @Deprecated
   DatabaseBuilder setJsonDate(JsonConfig.Date jsonDate);
 
   /**
@@ -239,6 +379,14 @@ public interface DatabaseBuilder {
    * <p>
    * Set to NON_NULL or NON_EMPTY to suppress nulls or null and empty collections respectively.
    */
+  default DatabaseBuilder jsonInclude(JsonConfig.Include jsonInclude) {
+    return setJsonInclude(jsonInclude);
+  }
+
+  /**
+   * @deprecated migrate to {@link #jsonInclude(JsonConfig.Include)}.
+   */
+  @Deprecated
   DatabaseBuilder setJsonInclude(JsonConfig.Include jsonInclude);
 
   /**
@@ -246,6 +394,14 @@ public interface DatabaseBuilder {
    *
    * @see DbJson#mutationDetection()
    */
+  default DatabaseBuilder jsonMutationDetection(MutationDetection jsonMutationDetection) {
+    return setJsonMutationDetection(jsonMutationDetection);
+  }
+
+  /**
+   * @deprecated migrate to {@link #jsonMutationDetection(MutationDetection)}.
+   */
+  @Deprecated
   DatabaseBuilder setJsonMutationDetection(MutationDetection jsonMutationDetection);
 
   /**
@@ -254,47 +410,119 @@ public interface DatabaseBuilder {
    * The container holds all the Database instances and provides clustering communication
    * services to all the Database instances.
    */
+  default DatabaseBuilder containerConfig(ContainerConfig containerConfig) {
+    return setContainerConfig(containerConfig);
+  }
+
+  /**
+   * @deprecated migrate to {@link #containerConfig(ContainerConfig)}.
+   */
+  @Deprecated
   DatabaseBuilder setContainerConfig(ContainerConfig containerConfig);
 
   /**
    * Set the CurrentUserProvider. This is used to populate @WhoCreated, @WhoModified and
    * support other audit features (who executed a query etc).
    */
+  default DatabaseBuilder currentUserProvider(CurrentUserProvider currentUserProvider) {
+    return setCurrentUserProvider(currentUserProvider);
+  }
+
+  /**
+   * @deprecated migrate to {@link #currentUserProvider(CurrentUserProvider)}.
+   */
+  @Deprecated
   DatabaseBuilder setCurrentUserProvider(CurrentUserProvider currentUserProvider);
 
   /**
    * Set the tenancy mode to use.
    */
+  default DatabaseBuilder tenantMode(TenantMode tenantMode) {
+    return setTenantMode(tenantMode);
+  }
+
+  /**
+   * @deprecated migrate to {@link #tenantMode(TenantMode)}.
+   */
+  @Deprecated
   DatabaseBuilder setTenantMode(TenantMode tenantMode);
 
   /**
    * Set the column name used for TenantMode.PARTITION.
    */
+  default DatabaseBuilder tenantPartitionColumn(String tenantPartitionColumn) {
+    return setTenantPartitionColumn(tenantPartitionColumn);
+  }
+
+  /**
+   * @deprecated migrate to {@link #tenantPartitionColumn(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setTenantPartitionColumn(String tenantPartitionColumn);
 
   /**
    * Set the current tenant provider.
    */
+  default DatabaseBuilder currentTenantProvider(CurrentTenantProvider currentTenantProvider) {
+    return setCurrentTenantProvider(currentTenantProvider);
+  }
+
+  /**
+   * @deprecated migrate to {@link #currentTenantProvider(CurrentTenantProvider)}.
+   */
+  @Deprecated
   DatabaseBuilder setCurrentTenantProvider(CurrentTenantProvider currentTenantProvider);
 
   /**
    * Set the tenancy datasource provider.
    */
+  default DatabaseBuilder tenantDataSourceProvider(TenantDataSourceProvider tenantDataSourceProvider) {
+    return setTenantDataSourceProvider(tenantDataSourceProvider);
+  }
+
+  /**
+   * @deprecated migrate to {@link #tenantDataSourceProvider(TenantDataSourceProvider)}.
+   */
+  @Deprecated
   DatabaseBuilder setTenantDataSourceProvider(TenantDataSourceProvider tenantDataSourceProvider);
 
   /**
    * Set the tenancy schema provider.
    */
+  default DatabaseBuilder tenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider) {
+    return setTenantSchemaProvider(tenantSchemaProvider);
+  }
+
+  /**
+   * @deprecated migrate to {@link #tenantSchemaProvider(TenantSchemaProvider)}.
+   */
+  @Deprecated
   DatabaseBuilder setTenantSchemaProvider(TenantSchemaProvider tenantSchemaProvider);
 
   /**
    * Set the tenancy catalog provider.
    */
+  default DatabaseBuilder tenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider) {
+    return setTenantCatalogProvider(tenantCatalogProvider);
+  }
+
+  /**
+   * @deprecated migrate to {@link #tenantCatalogProvider(TenantCatalogProvider)}.
+   */
+  @Deprecated
   DatabaseBuilder setTenantCatalogProvider(TenantCatalogProvider tenantCatalogProvider);
 
   /**
    * Set to true if dirty beans are automatically persisted.
    */
+  default DatabaseBuilder autoPersistUpdates(boolean autoPersistUpdates) {
+    return setAutoPersistUpdates(autoPersistUpdates);
+  }
+
+  /**
+   * @deprecated migrate to {@link #autoPersistUpdates(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setAutoPersistUpdates(boolean autoPersistUpdates);
 
   /**
@@ -302,8 +530,27 @@ public interface DatabaseBuilder {
    *
    * @param queryBatchSize the new query batch size
    */
+  default DatabaseBuilder queryBatchSize(int queryBatchSize) {
+    return setQueryBatchSize(queryBatchSize);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryBatchSize(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryBatchSize(int queryBatchSize);
 
+  /**
+   * Set the default mapping for enum type.
+   */
+  default DatabaseBuilder defaultEnumType(EnumType defaultEnumType) {
+    return setDefaultEnumType(defaultEnumType);
+  }
+
+  /**
+   * @deprecated migrate to {@link #defaultEnumType(EnumType)}.
+   */
+  @Deprecated
   DatabaseBuilder setDefaultEnumType(EnumType defaultEnumType);
 
   /**
@@ -313,16 +560,40 @@ public interface DatabaseBuilder {
    * requests a sequence to be used as an Id for a bean (aka reduce network
    * chatter).
    */
+  default DatabaseBuilder databaseSequenceBatchSize(int databaseSequenceBatchSize) {
+    return setDatabaseSequenceBatchSize(databaseSequenceBatchSize);
+  }
+
+  /**
+   * @deprecated migrate to {@link #databaseSequenceBatchSize(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setDatabaseSequenceBatchSize(int databaseSequenceBatchSize);
 
   /**
    * Set the default JDBC fetchSize hint for findList queries.
    */
+  default DatabaseBuilder jdbcFetchSizeFindList(int jdbcFetchSizeFindList) {
+    return setJdbcFetchSizeFindList(jdbcFetchSizeFindList);
+  }
+
+  /**
+   * @deprecated migrate to {@link #jdbcFetchSizeFindList(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setJdbcFetchSizeFindList(int jdbcFetchSizeFindList);
 
   /**
    * Set the default JDBC fetchSize hint for findEach/findEachWhile queries.
    */
+  default DatabaseBuilder jdbcFetchSizeFindEach(int jdbcFetchSizeFindEach) {
+    return setJdbcFetchSizeFindEach(jdbcFetchSizeFindEach);
+  }
+
+  /**
+   * @deprecated migrate to {@link #jdbcFetchSizeFindEach(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setJdbcFetchSizeFindEach(int jdbcFetchSizeFindEach);
 
   /**
@@ -331,12 +602,28 @@ public interface DatabaseBuilder {
    * This is used to set user context information to the ChangeSet in the
    * foreground thread prior to the logging occurring in a background thread.
    */
+  default DatabaseBuilder changeLogPrepare(ChangeLogPrepare changeLogPrepare) {
+    return setChangeLogPrepare(changeLogPrepare);
+  }
+
+  /**
+   * @deprecated migrate to {@link #changeLogPrepare(ChangeLogPrepare)}.
+   */
+  @Deprecated
   DatabaseBuilder setChangeLogPrepare(ChangeLogPrepare changeLogPrepare);
 
   /**
    * Set the ChangeLogListener which actually performs the logging of change sets
    * in the background.
    */
+  default DatabaseBuilder changeLogListener(ChangeLogListener changeLogListener) {
+    return setChangeLogListener(changeLogListener);
+  }
+
+  /**
+   * @deprecated migrate to {@link #changeLogListener(ChangeLogListener)}.
+   */
+  @Deprecated
   DatabaseBuilder setChangeLogListener(ChangeLogListener changeLogListener);
 
   /**
@@ -344,16 +631,40 @@ public interface DatabaseBuilder {
    * bean type and in this way provide fine grained control over which persist requests
    * are included in the change log.
    */
+  default DatabaseBuilder changeLogRegister(ChangeLogRegister changeLogRegister) {
+    return setChangeLogRegister(changeLogRegister);
+  }
+
+  /**
+   * @deprecated migrate to {@link #changeLogRegister(ChangeLogRegister)}.
+   */
+  @Deprecated
   DatabaseBuilder setChangeLogRegister(ChangeLogRegister changeLogRegister);
 
   /**
    * Set if inserts should be included in the change log by default.
    */
+  default DatabaseBuilder changeLogIncludeInserts(boolean changeLogIncludeInserts) {
+    return setChangeLogIncludeInserts(changeLogIncludeInserts);
+  }
+
+  /**
+   * @deprecated migrate to {@link #changeLogIncludeInserts(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setChangeLogIncludeInserts(boolean changeLogIncludeInserts);
 
   /**
    * Sets if the changelog should be written async (default = true).
    */
+  default DatabaseBuilder changeLogAsync(boolean changeLogAsync) {
+    return setChangeLogAsync(changeLogAsync);
+  }
+
+  /**
+   * @deprecated migrate to {@link #changeLogAsync(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setChangeLogAsync(boolean changeLogAsync);
 
   /**
@@ -361,6 +672,14 @@ public interface DatabaseBuilder {
    * which logs the read events in JSON format to a standard named SLF4J logger
    * (which can be configured in say logback to log to a separate log file).
    */
+  default DatabaseBuilder readAuditLogger(ReadAuditLogger readAuditLogger) {
+    return setReadAuditLogger(readAuditLogger);
+  }
+
+  /**
+   * @deprecated migrate to {@link #readAuditLogger(ReadAuditLogger)}.
+   */
+  @Deprecated
   DatabaseBuilder setReadAuditLogger(ReadAuditLogger readAuditLogger);
 
   /**
@@ -370,105 +689,265 @@ public interface DatabaseBuilder {
    * (user id, user ip address etc) and sets it on the ReadEvent bean before it is sent
    * to the ReadAuditLogger.
    */
+  default DatabaseBuilder readAuditPrepare(ReadAuditPrepare readAuditPrepare) {
+    return setReadAuditPrepare(readAuditPrepare);
+  }
+
+  /**
+   * @deprecated migrate to {@link #readAuditPrepare(ReadAuditPrepare)}.
+   */
+  @Deprecated
   DatabaseBuilder setReadAuditPrepare(ReadAuditPrepare readAuditPrepare);
 
   /**
    * Set the configuration for profiling.
    */
+  default DatabaseBuilder profilingConfig(ProfilingConfig profilingConfig) {
+    return setProfilingConfig(profilingConfig);
+  }
+
+  /**
+   * @deprecated migrate to {@link #profilingConfig(ProfilingConfig)}.
+   */
+  @Deprecated
   DatabaseBuilder setProfilingConfig(ProfilingConfig profilingConfig);
 
   /**
    * Set the suffix appended to the base table to derive the view that contains the union
    * of the base table and the history table in order to support asOf queries.
    */
+  default DatabaseBuilder asOfViewSuffix(String asOfViewSuffix) {
+    return setAsOfViewSuffix(asOfViewSuffix);
+  }
+
+  /**
+   * @deprecated migrate to {@link #asOfViewSuffix(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setAsOfViewSuffix(String asOfViewSuffix);
 
   /**
    * Set the database column used to support history and 'As of' queries. This column is a timestamp range
    * or equivalent.
    */
+  default DatabaseBuilder asOfSysPeriod(String asOfSysPeriod) {
+    return setAsOfSysPeriod(asOfSysPeriod);
+  }
+
+  /**
+   * @deprecated migrate to {@link #asOfSysPeriod(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setAsOfSysPeriod(String asOfSysPeriod);
 
   /**
    * Set the history table suffix.
    */
+  default DatabaseBuilder historyTableSuffix(String historyTableSuffix) {
+    return setHistoryTableSuffix(historyTableSuffix);
+  }
+
+  /**
+   * @deprecated migrate to {@link #historyTableSuffix(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setHistoryTableSuffix(String historyTableSuffix);
 
   /**
    * Set to true if we are running in a JTA Transaction manager.
    */
+  default DatabaseBuilder useJtaTransactionManager(boolean useJtaTransactionManager) {
+    return setUseJtaTransactionManager(useJtaTransactionManager);
+  }
+
+  /**
+   * @deprecated migrate to {@link #useJtaTransactionManager(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setUseJtaTransactionManager(boolean useJtaTransactionManager);
 
   /**
    * Set the external transaction manager.
    */
+  default DatabaseBuilder externalTransactionManager(ExternalTransactionManager externalTransactionManager) {
+    return setExternalTransactionManager(externalTransactionManager);
+  }
+
+  /**
+   * @deprecated migrate to {@link #externalTransactionManager(ExternalTransactionManager)}.
+   */
+  @Deprecated
   DatabaseBuilder setExternalTransactionManager(ExternalTransactionManager externalTransactionManager);
 
   /**
    * Set the ServerCachePlugin to use.
    */
+  default DatabaseBuilder serverCachePlugin(ServerCachePlugin serverCachePlugin) {
+    return setServerCachePlugin(serverCachePlugin);
+  }
+
+  /**
+   * @deprecated migrate to {@link #serverCachePlugin(ServerCachePlugin)}.
+   */
+  @Deprecated
   DatabaseBuilder setServerCachePlugin(ServerCachePlugin serverCachePlugin);
 
   /**
    * Set to true if you want LOB's to be fetch eager by default.
    * By default this is set to false and LOB's must be explicitly fetched.
    */
+  default DatabaseBuilder eagerFetchLobs(boolean eagerFetchLobs) {
+    return setEagerFetchLobs(eagerFetchLobs);
+  }
+
+  /**
+   * @deprecated migrate to {@link #eagerFetchLobs(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setEagerFetchLobs(boolean eagerFetchLobs);
 
   /**
    * Set the max call stack to use for origin location.
    */
+  default DatabaseBuilder maxCallStack(int maxCallStack) {
+    return setMaxCallStack(maxCallStack);
+  }
+
+  /**
+   * @deprecated migrate to {@link #maxCallStack(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setMaxCallStack(int maxCallStack);
 
   /**
    * Set to true if transactions should by default rollback on checked exceptions.
    */
+  default DatabaseBuilder transactionRollbackOnChecked(boolean transactionRollbackOnChecked) {
+    return setTransactionRollbackOnChecked(transactionRollbackOnChecked);
+  }
+
+  /**
+   * @deprecated migrate to {@link #transactionRollbackOnChecked(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setTransactionRollbackOnChecked(boolean transactionRollbackOnChecked);
 
   /**
    * Set the Background executor schedule pool size.
    */
+  default DatabaseBuilder backgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize) {
+    return setBackgroundExecutorSchedulePoolSize(backgroundExecutorSchedulePoolSize);
+  }
+
+  /**
+   * @deprecated migrate to {@link #backgroundExecutorSchedulePoolSize(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setBackgroundExecutorSchedulePoolSize(int backgroundExecutorSchedulePoolSize);
 
   /**
    * Set the Background executor shutdown seconds. This is the time allowed for the pool to shutdown nicely
    * before it is forced shutdown.
    */
+  default DatabaseBuilder backgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs) {
+    return setBackgroundExecutorShutdownSecs(backgroundExecutorShutdownSecs);
+  }
+
+  /**
+   * @deprecated migrate to {@link #backgroundExecutorShutdownSecs(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setBackgroundExecutorShutdownSecs(int backgroundExecutorShutdownSecs);
 
   /**
    * Sets the background executor wrapper. The wrapper is used when a task is sent to background and should copy the thread-locals.
    */
+  default DatabaseBuilder backgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper) {
+    return setBackgroundExecutorWrapper(backgroundExecutorWrapper);
+  }
+
+  /**
+   * @deprecated migrate to {@link #backgroundExecutorWrapper(BackgroundExecutorWrapper)}.
+   */
+  @Deprecated
   DatabaseBuilder setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper);
 
   /**
    * Set the L2 cache default max size.
    */
+  default DatabaseBuilder cacheMaxSize(int cacheMaxSize) {
+    return setCacheMaxSize(cacheMaxSize);
+  }
+
+  /**
+   * @deprecated migrate to {@link #cacheMaxSize(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setCacheMaxSize(int cacheMaxSize);
 
   /**
    * Set the L2 cache default max idle time in seconds.
    */
+  default DatabaseBuilder cacheMaxIdleTime(int cacheMaxIdleTime) {
+    return setCacheMaxIdleTime(cacheMaxIdleTime);
+  }
+
+  /**
+   * @deprecated migrate to {@link #cacheMaxIdleTime(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setCacheMaxIdleTime(int cacheMaxIdleTime);
 
   /**
    * Set the L2 cache default max time to live in seconds.
    */
+  default DatabaseBuilder cacheMaxTimeToLive(int cacheMaxTimeToLive) {
+    return setCacheMaxTimeToLive(cacheMaxTimeToLive);
+  }
+
+  /**
+   * @deprecated migrate to {@link #cacheMaxTimeToLive(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setCacheMaxTimeToLive(int cacheMaxTimeToLive);
 
   /**
    * Set the L2 query cache default max size.
    */
+  default DatabaseBuilder queryCacheMaxSize(int queryCacheMaxSize) {
+    return setQueryCacheMaxSize(queryCacheMaxSize);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryCacheMaxSize(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryCacheMaxSize(int queryCacheMaxSize);
 
   /**
    * Set the L2 query cache default max idle time in seconds.
    */
+  default DatabaseBuilder queryCacheMaxIdleTime(int queryCacheMaxIdleTime) {
+    return setQueryCacheMaxIdleTime(queryCacheMaxIdleTime);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryCacheMaxIdleTime(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryCacheMaxIdleTime(int queryCacheMaxIdleTime);
 
   /**
    * Set the L2 query cache default max time to live in seconds.
    */
+  default DatabaseBuilder queryCacheMaxTimeToLive(int queryCacheMaxTimeToLive) {
+    return setQueryCacheMaxTimeToLive(queryCacheMaxTimeToLive);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryCacheMaxTimeToLive(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryCacheMaxTimeToLive(int queryCacheMaxTimeToLive);
 
   /**
@@ -476,6 +955,14 @@ public interface DatabaseBuilder {
    * <p>
    * If none is set the default UnderscoreNamingConvention is used.
    */
+  default DatabaseBuilder namingConvention(NamingConvention namingConvention) {
+    return setNamingConvention(namingConvention);
+  }
+
+  /**
+   * @deprecated migrate to {@link #namingConvention(NamingConvention)}.
+   */
+  @Deprecated
   DatabaseBuilder setNamingConvention(NamingConvention namingConvention);
 
   /**
@@ -484,6 +971,14 @@ public interface DatabaseBuilder {
    * For Postgres pgjdbc version 42.3.0 should be used with datasource property
    * <em>quoteReturningIdentifiers</em> set to <em>false</em> (refer #2303).
    */
+  default DatabaseBuilder allQuotedIdentifiers(boolean allQuotedIdentifiers) {
+    return setAllQuotedIdentifiers(allQuotedIdentifiers);
+  }
+
+  /**
+   * @deprecated migrate to {@link #allQuotedIdentifiers(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setAllQuotedIdentifiers(boolean allQuotedIdentifiers);
 
   /**
@@ -499,21 +994,53 @@ public interface DatabaseBuilder {
   /**
    * Set the constraint naming convention used in DDL generation.
    */
+  default DatabaseBuilder constraintNaming(DbConstraintNaming constraintNaming) {
+    return setConstraintNaming(constraintNaming);
+  }
+
+  /**
+   * @deprecated migrate to {@link #constraintNaming(DbConstraintNaming)}.
+   */
+  @Deprecated
   DatabaseBuilder setConstraintNaming(DbConstraintNaming constraintNaming);
 
   /**
    * Set the configuration for AutoTune.
    */
+  default DatabaseBuilder autoTuneConfig(AutoTuneConfig autoTuneConfig) {
+    return setAutoTuneConfig(autoTuneConfig);
+  }
+
+  /**
+   * @deprecated migrate to {@link #autoTuneConfig(AutoTuneConfig)}.
+   */
+  @Deprecated
   DatabaseBuilder setAutoTuneConfig(AutoTuneConfig autoTuneConfig);
 
   /**
    * Set to true to skip the startup DataSource check.
    */
+  default DatabaseBuilder skipDataSourceCheck(boolean skipDataSourceCheck) {
+    return setSkipDataSourceCheck(skipDataSourceCheck);
+  }
+
+  /**
+   * @deprecated migrate to {@link #skipDataSourceCheck(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setSkipDataSourceCheck(boolean skipDataSourceCheck);
 
   /**
    * Set a DataSource.
    */
+  default DatabaseBuilder dataSource(DataSource dataSource) {
+    return setDataSource(dataSource);
+  }
+
+  /**
+   * @deprecated migrate to {@link #dataSource(DataSource)}.
+   */
+  @Deprecated
   DatabaseBuilder setDataSource(DataSource dataSource);
 
   /**
@@ -525,22 +1052,54 @@ public interface DatabaseBuilder {
    * This read only DataSource will be used for implicit query only transactions. It is not
    * used if the transaction is created explicitly or if the query is an update or delete query.
    */
+  default DatabaseBuilder readOnlyDataSource(DataSource readOnlyDataSource) {
+    return setReadOnlyDataSource(readOnlyDataSource);
+  }
+
+  /**
+   * @deprecated migrate to {@link #readOnlyDataSource(DataSource)}.
+   */
+  @Deprecated
   DatabaseBuilder setReadOnlyDataSource(DataSource readOnlyDataSource);
 
   /**
    * Set the configuration required to build a DataSource using Ebean's own
    * DataSource implementation.
    */
+  default DatabaseBuilder dataSourceBuilder(DataSourceBuilder dataSourceConfig) {
+    return setDataSourceConfig(dataSourceConfig);
+  }
+
+  /**
+   * @deprecated migrate to {@link #dataSourceBuilder(DataSourceBuilder)}.
+   */
+  @Deprecated
   DatabaseBuilder setDataSourceConfig(DataSourceBuilder dataSourceConfig);
 
   /**
    * Set to true if Ebean should create a DataSource for use with implicit read only transactions.
    */
+  default DatabaseBuilder autoReadOnlyDataSource(boolean autoReadOnlyDataSource) {
+    return setAutoReadOnlyDataSource(autoReadOnlyDataSource);
+  }
+
+  /**
+   * @deprecated migrate to {@link #autoReadOnlyDataSource(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setAutoReadOnlyDataSource(boolean autoReadOnlyDataSource);
 
   /**
    * Set the configuration for the read only DataSource.
    */
+  default DatabaseBuilder readOnlyDataSourceBuilder(DataSourceBuilder readOnlyDataSourceConfig) {
+    return setReadOnlyDataSourceConfig(readOnlyDataSourceConfig);
+  }
+
+  /**
+   * @deprecated migrate to {@link #readOnlyDataSourceBuilder(DataSourceBuilder)}.
+   */
+  @Deprecated
   DatabaseBuilder setReadOnlyDataSourceConfig(DataSourceBuilder readOnlyDataSourceConfig);
 
   /**
@@ -550,6 +1109,14 @@ public interface DatabaseBuilder {
    * <p>
    * The value set is either a Integer or a String (e.g. "1", or "T").
    */
+  default DatabaseBuilder databaseBooleanTrue(String databaseTrue) {
+    return setDatabaseBooleanTrue(databaseTrue);
+  }
+
+  /**
+   * @deprecated migrate to {@link #databaseBooleanTrue(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDatabaseBooleanTrue(String databaseTrue);
 
   /**
@@ -559,6 +1126,14 @@ public interface DatabaseBuilder {
    * <p>
    * The value set is either a Integer or a String (e.g. "0", or "F").
    */
+  default DatabaseBuilder databaseBooleanFalse(String databaseFalse) {
+    return setDatabaseBooleanFalse(databaseFalse);
+  }
+
+  /**
+   * @deprecated migrate to {@link #databaseBooleanFalse(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDatabaseBooleanFalse(String databaseFalse);
 
   /**
@@ -574,6 +1149,14 @@ public interface DatabaseBuilder {
    * the cache drops to have full (which is 5 by default) Ebean will fetch
    * another batch of Id's in a background thread.
    */
+  default DatabaseBuilder databaseSequenceBatch(int databaseSequenceBatchSize) {
+    return setDatabaseSequenceBatch(databaseSequenceBatchSize);
+  }
+
+  /**
+   * @deprecated migrate to {@link #databaseSequenceBatch(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setDatabaseSequenceBatch(int databaseSequenceBatchSize);
 
   /**
@@ -589,6 +1172,14 @@ public interface DatabaseBuilder {
    * <p>
    * Values are oracle, h2, postgres, mysql, sqlserver16, sqlserver17.
    */
+  default DatabaseBuilder databasePlatformName(String databasePlatformName) {
+    return setDatabasePlatformName(databasePlatformName);
+  }
+
+  /**
+   * @deprecated migrate to {@link #databasePlatformName(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDatabasePlatformName(String databasePlatformName);
 
   /**
@@ -597,11 +1188,27 @@ public interface DatabaseBuilder {
    * If none is set then the platform is determined via the databasePlatformName
    * or automatically via the JDBC driver information.
    */
+  default DatabaseBuilder databasePlatform(DatabasePlatform databasePlatform) {
+    return setDatabasePlatform(databasePlatform);
+  }
+
+  /**
+   * @deprecated migrate to {@link #databasePlatform(DatabasePlatform)}.
+   */
+  @Deprecated
   DatabaseBuilder setDatabasePlatform(DatabasePlatform databasePlatform);
 
   /**
    * Set the preferred DB platform IdType.
    */
+  default DatabaseBuilder idType(IdType idType) {
+    return setIdType(idType);
+  }
+
+  /**
+   * @deprecated migrate to {@link #idType(IdType)}.
+   */
+  @Deprecated
   DatabaseBuilder setIdType(IdType idType);
 
   /**
@@ -616,6 +1223,14 @@ public interface DatabaseBuilder {
    * ebean.encryptKeyManager=org.avaje.tests.basic.encrypt.BasicEncyptKeyManager
    * }</pre>
    */
+  default DatabaseBuilder encryptKeyManager(EncryptKeyManager encryptKeyManager) {
+    return setEncryptKeyManager(encryptKeyManager);
+  }
+
+  /**
+   * @deprecated migrate to {@link #encryptKeyManager(EncryptKeyManager)}.
+   */
+  @Deprecated
   DatabaseBuilder setEncryptKeyManager(EncryptKeyManager encryptKeyManager);
 
   /**
@@ -624,6 +1239,14 @@ public interface DatabaseBuilder {
    * This is optionally used to programmatically define which columns are
    * encrypted instead of using the {@link Encrypted} Annotation.
    */
+  default DatabaseBuilder encryptDeployManager(EncryptDeployManager encryptDeployManager) {
+    return setEncryptDeployManager(encryptDeployManager);
+  }
+
+  /**
+   * @deprecated migrate to {@link #encryptDeployManager(EncryptDeployManager)}.
+   */
+  @Deprecated
   DatabaseBuilder setEncryptDeployManager(EncryptDeployManager encryptDeployManager);
 
   /**
@@ -633,6 +1256,14 @@ public interface DatabaseBuilder {
    * Ebean has a default implementation that it will use if you do not set your
    * own Encryptor implementation.
    */
+  default DatabaseBuilder encryptor(Encryptor encryptor) {
+    return setEncryptor(encryptor);
+  }
+
+  /**
+   * @deprecated migrate to {@link #encryptor(Encryptor)}.
+   */
+  @Deprecated
   DatabaseBuilder setEncryptor(Encryptor encryptor);
 
   /**
@@ -641,6 +1272,14 @@ public interface DatabaseBuilder {
    * Typically used to create an Database instance for DDL Migration generation
    * without requiring a real DataSource / Database to connect to.
    */
+  default DatabaseBuilder offline(boolean dbOffline) {
+    return setDbOffline(dbOffline);
+  }
+
+  /**
+   * @deprecated migrate to {@link #offline(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDbOffline(boolean dbOffline);
 
   /**
@@ -649,31 +1288,79 @@ public interface DatabaseBuilder {
    * Note that if this is not set then the DbPlatform may already have a
    * DbEncrypt set (H2, MySql, Postgres and Oracle platforms have a DbEncrypt)
    */
+  default DatabaseBuilder dbEncrypt(DbEncrypt dbEncrypt) {
+    return setDbEncrypt(dbEncrypt);
+  }
+
+  /**
+   * @deprecated migrate to {@link #dbEncrypt(DbEncrypt)}.
+   */
+  @Deprecated
   DatabaseBuilder setDbEncrypt(DbEncrypt dbEncrypt);
 
   /**
    * Set the configuration for DB platform (such as UUID and custom mappings).
    */
+  default DatabaseBuilder platformConfig(PlatformConfig platformConfig) {
+    return setPlatformConfig(platformConfig);
+  }
+
+  /**
+   * @deprecated migrate to {@link #platformConfig(PlatformConfig)}.
+   */
+  @Deprecated
   DatabaseBuilder setPlatformConfig(PlatformConfig platformConfig);
 
   /**
    * Set the DB type used to store UUID.
    */
+  default DatabaseBuilder dbUuid(PlatformConfig.DbUuid dbUuid) {
+    return setDbUuid(dbUuid);
+  }
+
+  /**
+   * @deprecated migrate to {@link #dbUuid(PlatformConfig.DbUuid)}.
+   */
+  @Deprecated
   DatabaseBuilder setDbUuid(PlatformConfig.DbUuid dbUuid);
 
   /**
    * Sets the UUID version mode.
    */
+  default DatabaseBuilder uuidVersion(DatabaseConfig.UuidVersion uuidVersion) {
+    return setUuidVersion(uuidVersion);
+  }
+
+  /**
+   * @deprecated migrate to {@link #uuidVersion(DatabaseConfig.UuidVersion)}.
+   */
+  @Deprecated
   DatabaseBuilder setUuidVersion(DatabaseConfig.UuidVersion uuidVersion);
 
   /**
    * Set the UUID state file.
    */
+  default DatabaseBuilder uuidStateFile(String uuidStateFile) {
+    return setUuidStateFile(uuidStateFile);
+  }
+
+  /**
+   * @deprecated migrate to {@link #uuidStateFile(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setUuidStateFile(String uuidStateFile);
 
   /**
    * Sets the V1-UUID-NodeId.
    */
+  default DatabaseBuilder uuidNodeId(String uuidNodeId) {
+    return setUuidNodeId(uuidNodeId);
+  }
+
+  /**
+   * @deprecated migrate to {@link #uuidNodeId(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setUuidNodeId(String uuidNodeId);
 
   /**
@@ -681,6 +1368,14 @@ public interface DatabaseBuilder {
    * <p>
    * Otherwise it is persisted using java.sql.Time which is seconds precision.
    */
+  default DatabaseBuilder localTimeWithNanos(boolean localTimeWithNanos) {
+    return setLocalTimeWithNanos(localTimeWithNanos);
+  }
+
+  /**
+   * @deprecated migrate to {@link #localTimeWithNanos(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setLocalTimeWithNanos(boolean localTimeWithNanos);
 
   /**
@@ -688,6 +1383,14 @@ public interface DatabaseBuilder {
    * <p>
    * Otherwise it is persisted with second precision (SQL INTEGER).
    */
+  default DatabaseBuilder durationWithNanos(boolean durationWithNanos) {
+    return setDurationWithNanos(durationWithNanos);
+  }
+
+  /**
+   * @deprecated migrate to {@link #durationWithNanos(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDurationWithNanos(boolean durationWithNanos);
 
   /**
@@ -696,6 +1399,14 @@ public interface DatabaseBuilder {
    * This is the same as config.getMigrationConfig().setRunMigration(). We have added this method here
    * as it is often the only thing we need to configure for migrations.
    */
+  default DatabaseBuilder runMigration(boolean runMigration) {
+    return setRunMigration(runMigration);
+  }
+
+  /**
+   * @deprecated migrate to {@link #runMigration(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setRunMigration(boolean runMigration);
 
   /**
@@ -704,6 +1415,14 @@ public interface DatabaseBuilder {
    * Typically we want this on when we are running tests locally (and often using H2)
    * and we want to create the full DB schema from scratch to run tests.
    */
+  default DatabaseBuilder ddlGenerate(boolean ddlGenerate) {
+    return setDdlGenerate(ddlGenerate);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlGenerate(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlGenerate(boolean ddlGenerate);
 
   /**
@@ -712,6 +1431,14 @@ public interface DatabaseBuilder {
    * Typically we want this on when we are running tests locally (and often using H2)
    * and we want to create the full DB schema from scratch to run tests.
    */
+  default DatabaseBuilder ddlRun(boolean ddlRun) {
+    return setDdlRun(ddlRun);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlRun(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlRun(boolean ddlRun);
 
   /**
@@ -719,6 +1446,14 @@ public interface DatabaseBuilder {
    * <p>
    * Typically we want this on when we are running tests.
    */
+  default DatabaseBuilder ddlExtra(boolean ddlExtra) {
+    return setDdlExtra(ddlExtra);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlExtra(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlExtra(boolean ddlExtra);
 
   /**
@@ -727,6 +1462,14 @@ public interface DatabaseBuilder {
    * Typically we want to do this when using H2 (in memory) as our test database and the drop statements
    * are not required so skipping the drop table statements etc makes it faster with less noise in the logs.
    */
+  default DatabaseBuilder ddlCreateOnly(boolean ddlCreateOnly) {
+    return setDdlCreateOnly(ddlCreateOnly);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlCreateOnly(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlCreateOnly(boolean ddlCreateOnly);
 
   /**
@@ -735,31 +1478,79 @@ public interface DatabaseBuilder {
    * Typically this is a sql script that inserts test seed data when running tests.
    * Place a sql script in src/test/resources that inserts test seed data.
    */
+  default DatabaseBuilder ddlSeedSql(String ddlSeedSql) {
+    return setDdlSeedSql(ddlSeedSql);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlSeedSql(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlSeedSql(String ddlSeedSql);
 
   /**
    * Set a SQL script to execute before the "create all" DDL has been run.
    */
+  default DatabaseBuilder ddlInitSql(String ddlInitSql) {
+    return setDdlInitSql(ddlInitSql);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlInitSql(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlInitSql(String ddlInitSql);
 
   /**
    * Set the header to use with DDL generation.
    */
+  default DatabaseBuilder ddlHeader(String ddlHeader) {
+    return setDdlHeader(ddlHeader);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlHeader(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlHeader(String ddlHeader);
 
   /**
    * Set to false to turn off strict mode allowing non-null columns to not have a default value.
    */
+  default DatabaseBuilder ddlStrictMode(boolean ddlStrictMode) {
+    return setDdlStrictMode(ddlStrictMode);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlStrictMode(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlStrictMode(boolean ddlStrictMode);
 
   /**
    * Set a comma and equals delimited placeholders that are substituted in DDL scripts.
    */
+  default DatabaseBuilder ddlPlaceholders(String ddlPlaceholders) {
+    return setDdlPlaceholders(ddlPlaceholders);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlPlaceholders(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlPlaceholders(String ddlPlaceholders);
 
   /**
    * Set a map of placeholder values that are substituted in DDL scripts.
    */
+  default DatabaseBuilder ddlPlaceholderMap(Map<String, String> ddlPlaceholderMap) {
+    return setDdlPlaceholderMap(ddlPlaceholderMap);
+  }
+
+  /**
+   * @deprecated migrate to {@link #ddlPlaceholderMap(Map)}.
+   */
+  @Deprecated
   DatabaseBuilder setDdlPlaceholderMap(Map<String, String> ddlPlaceholderMap);
 
   /**
@@ -767,11 +1558,27 @@ public interface DatabaseBuilder {
    * have been registered. This can be used to start an Database instance just to use the
    * SQL functions such as SqlQuery, SqlUpdate etc.
    */
+  default DatabaseBuilder disableClasspathSearch(boolean disableClasspathSearch) {
+    return setDisableClasspathSearch(disableClasspathSearch);
+  }
+
+  /**
+   * @deprecated migrate to {@link #disableClasspathSearch(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDisableClasspathSearch(boolean disableClasspathSearch);
 
   /**
    * Set the mode to use for Joda LocalTime support 'normal' or 'utc'.
    */
+  default DatabaseBuilder jodaLocalTimeMode(String jodaLocalTimeMode) {
+    return setJodaLocalTimeMode(jodaLocalTimeMode);
+  }
+
+  /**
+   * @deprecated migrate to {@link #jodaLocalTimeMode(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setJodaLocalTimeMode(String jodaLocalTimeMode);
 
   /**
@@ -820,6 +1627,14 @@ public interface DatabaseBuilder {
   /**
    * Set to false when we still want to hit the cache after a write has occurred on a transaction.
    */
+  default DatabaseBuilder skipCacheAfterWrite(boolean skipCacheAfterWrite) {
+    return setSkipCacheAfterWrite(skipCacheAfterWrite);
+  }
+
+  /**
+   * @deprecated migrate to {@link #skipCacheAfterWrite(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setSkipCacheAfterWrite(boolean skipCacheAfterWrite);
 
   /**
@@ -829,11 +1644,27 @@ public interface DatabaseBuilder {
    *
    * @see Transaction#setUpdateAllLoadedProperties(boolean)
    */
+  default DatabaseBuilder updateAllPropertiesInBatch(boolean updateAllPropertiesInBatch) {
+    return setUpdateAllPropertiesInBatch(updateAllPropertiesInBatch);
+  }
+
+  /**
+   * @deprecated migrate to {@link #updateAllPropertiesInBatch(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setUpdateAllPropertiesInBatch(boolean updateAllPropertiesInBatch);
 
   /**
    * Sets the resource directory.
    */
+  default DatabaseBuilder resourceDirectory(String resourceDirectory) {
+    return setResourceDirectory(resourceDirectory);
+  }
+
+  /**
+   * @deprecated migrate to {@link #resourceDirectory(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setResourceDirectory(String resourceDirectory);
 
   /**
@@ -983,12 +1814,28 @@ public interface DatabaseBuilder {
    *
    * @see Query#setPersistenceContextScope(PersistenceContextScope)
    */
+  default DatabaseBuilder persistenceContextScope(PersistenceContextScope persistenceContextScope) {
+    return setPersistenceContextScope(persistenceContextScope);
+  }
+
+  /**
+   * @deprecated migrate to {@link #persistenceContextScope(PersistenceContextScope)}.
+   */
+  @Deprecated
   DatabaseBuilder setPersistenceContextScope(PersistenceContextScope persistenceContextScope);
 
   /**
    * Set the ClassLoadConfig which is used to detect Joda, Java8 types etc and also
    * create new instances of plugins given a className.
    */
+  default DatabaseBuilder classLoadConfig(ClassLoadConfig classLoadConfig) {
+    return setClassLoadConfig(classLoadConfig);
+  }
+
+  /**
+   * @deprecated migrate to {@link #classLoadConfig(ClassLoadConfig)}.
+   */
+  @Deprecated
   DatabaseBuilder setClassLoadConfig(ClassLoadConfig classLoadConfig);
 
   /**
@@ -1009,6 +1856,14 @@ public interface DatabaseBuilder {
    * <p>
    * Note that this is not strongly typed as Jackson ObjectMapper is an optional dependency.
    */
+  default DatabaseBuilder objectMapper(Object objectMapper) {
+    return setObjectMapper(objectMapper);
+  }
+
+  /**
+   * @deprecated migrate to {@link #objectMapper(Object)}.
+   */
+  @Deprecated
   DatabaseBuilder setObjectMapper(Object objectMapper);
 
   /**
@@ -1018,26 +1873,66 @@ public interface DatabaseBuilder {
    * ne(propertyName, value) have no effect when the value is null. The expression factory adds a NoopExpression
    * which will add "1=1" into the SQL rather than "is null".
    */
+  default DatabaseBuilder expressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop) {
+    return setExpressionEqualsWithNullAsNoop(expressionEqualsWithNullAsNoop);
+  }
+
+  /**
+   * @deprecated migrate to {@link #expressionEqualsWithNullAsNoop(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setExpressionEqualsWithNullAsNoop(boolean expressionEqualsWithNullAsNoop);
 
   /**
    * Set to true to use native ILIKE expression if supported by the database platform (e.g. Postgres).
    */
+  default DatabaseBuilder expressionNativeIlike(boolean expressionNativeIlike) {
+    return setExpressionNativeIlike(expressionNativeIlike);
+  }
+
+  /**
+   * @deprecated migrate to {@link #expressionNativeIlike(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setExpressionNativeIlike(boolean expressionNativeIlike);
 
   /**
    * Set the enabled L2 cache regions (comma delimited).
    */
+  default DatabaseBuilder enabledL2Regions(String enabledL2Regions) {
+    return setEnabledL2Regions(enabledL2Regions);
+  }
+
+  /**
+   * @deprecated migrate to {@link #enabledL2Regions(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setEnabledL2Regions(String enabledL2Regions);
 
   /**
    * Set to true to disable L2 caching. Typically useful in performance testing.
    */
+  default DatabaseBuilder disableL2Cache(boolean disableL2Cache) {
+    return setDisableL2Cache(disableL2Cache);
+  }
+
+  /**
+   * @deprecated migrate to {@link #disableL2Cache(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDisableL2Cache(boolean disableL2Cache);
 
   /**
    * Force the use of local only L2 cache. Effectively ignore l2 cache plugin like ebean-redis etc.
    */
+  default DatabaseBuilder localOnlyL2Cache(boolean localOnlyL2Cache) {
+    return setLocalOnlyL2Cache(localOnlyL2Cache);
+  }
+
+  /**
+   * @deprecated migrate to {@link #localOnlyL2Cache(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setLocalOnlyL2Cache(boolean localOnlyL2Cache);
 
   /**
@@ -1049,6 +1944,14 @@ public interface DatabaseBuilder {
    * Set this to <code>false</code> and the javax NotNull annotation is effectively ignored (and
    * we instead use Ebean's own NotNull annotation or JPA Column(nullable=false) annotation.
    */
+  default DatabaseBuilder useValidationNotNull(boolean useValidationNotNull) {
+    return setUseValidationNotNull(useValidationNotNull);
+  }
+
+  /**
+   * @deprecated migrate to {@link #useValidationNotNull(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setUseValidationNotNull(boolean useValidationNotNull);
 
   /**
@@ -1058,6 +1961,14 @@ public interface DatabaseBuilder {
    * we are making network calls and we prefer to do this in background and not impact the response time
    * of the executing transaction.
    */
+  default DatabaseBuilder notifyL2CacheInForeground(boolean notifyL2CacheInForeground) {
+    return setNotifyL2CacheInForeground(notifyL2CacheInForeground);
+  }
+
+  /**
+   * @deprecated migrate to {@link #notifyL2CacheInForeground(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setNotifyL2CacheInForeground(boolean notifyL2CacheInForeground);
 
   /**
@@ -1066,6 +1977,14 @@ public interface DatabaseBuilder {
    * This is the plan that knows how to execute the query, read the result
    * and collects execution metrics. By default this is set to 5 mins.
    */
+  default DatabaseBuilder queryPlanTTLSeconds(int queryPlanTTLSeconds) {
+    return setQueryPlanTTLSeconds(queryPlanTTLSeconds);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryPlanTTLSeconds(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryPlanTTLSeconds(int queryPlanTTLSeconds);
 
   /**
@@ -1091,17 +2010,41 @@ public interface DatabaseBuilder {
    * <p>
    * This is only used if classes have not been explicitly specified.
    */
+  default DatabaseBuilder mappingLocations(List<String> mappingLocations) {
+    return setMappingLocations(mappingLocations);
+  }
+
+  /**
+   * @deprecated migrate to {@link #mappingLocations(List)}.
+   */
+  @Deprecated
   DatabaseBuilder setMappingLocations(List<String> mappingLocations);
 
   /**
    * Set to false such that Id properties require explicit <code>@GeneratedValue</code>
    * mapping before they are assigned Identity or Sequence generation based on platform.
    */
+  default DatabaseBuilder idGeneratorAutomatic(boolean idGeneratorAutomatic) {
+    return setIdGeneratorAutomatic(idGeneratorAutomatic);
+  }
+
+  /**
+   * @deprecated migrate to {@link #idGeneratorAutomatic(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setIdGeneratorAutomatic(boolean idGeneratorAutomatic);
 
   /**
    * Set to true to enable query plan capture.
    */
+  default DatabaseBuilder queryPlanEnable(boolean queryPlanEnable) {
+    return setQueryPlanEnable(queryPlanEnable);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryPlanEnable(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryPlanEnable(boolean queryPlanEnable);
 
   /**
@@ -1110,16 +2053,40 @@ public interface DatabaseBuilder {
    * Queries executing slower than this will have bind values captured such that later
    * the query plan can be captured and reported.
    */
+  default DatabaseBuilder queryPlanThresholdMicros(long queryPlanThresholdMicros) {
+    return setQueryPlanThresholdMicros(queryPlanThresholdMicros);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryPlanThresholdMicros(long)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryPlanThresholdMicros(long queryPlanThresholdMicros);
 
   /**
    * Set to true to turn on periodic capture of query plans.
    */
+  default DatabaseBuilder queryPlanCapture(boolean queryPlanCapture) {
+    return setQueryPlanCapture(queryPlanCapture);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryPlanCapture(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryPlanCapture(boolean queryPlanCapture);
 
   /**
    * Set the frequency in seconds to capture query plans.
    */
+  default DatabaseBuilder queryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs) {
+    return setQueryPlanCapturePeriodSecs(queryPlanCapturePeriodSecs);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryPlanCapturePeriodSecs(long)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryPlanCapturePeriodSecs(long queryPlanCapturePeriodSecs);
 
   /**
@@ -1129,21 +2096,53 @@ public interface DatabaseBuilder {
    * Effectively this controls the amount of load/time we want to
    * allow for query plan capture.
    */
+  default DatabaseBuilder queryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis) {
+    return setQueryPlanCaptureMaxTimeMillis(queryPlanCaptureMaxTimeMillis);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryPlanCaptureMaxTimeMillis(long)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryPlanCaptureMaxTimeMillis(long queryPlanCaptureMaxTimeMillis);
 
   /**
    * Set the max number of query plans captured per request.
    */
+  default DatabaseBuilder queryPlanCaptureMaxCount(int queryPlanCaptureMaxCount) {
+    return setQueryPlanCaptureMaxCount(queryPlanCaptureMaxCount);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryPlanCaptureMaxCount(int)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryPlanCaptureMaxCount(int queryPlanCaptureMaxCount);
 
   /**
    * Set the listener used to process captured query plans.
    */
+  default DatabaseBuilder queryPlanListener(QueryPlanListener queryPlanListener) {
+    return setQueryPlanListener(queryPlanListener);
+  }
+
+  /**
+   * @deprecated migrate to {@link #queryPlanListener(QueryPlanListener)}.
+   */
+  @Deprecated
   DatabaseBuilder setQueryPlanListener(QueryPlanListener queryPlanListener);
 
   /**
    * Set to true if metrics should be dumped when the server is shutdown.
    */
+  default DatabaseBuilder dumpMetricsOnShutdown(boolean dumpMetricsOnShutdown) {
+    return setDumpMetricsOnShutdown(dumpMetricsOnShutdown);
+  }
+
+  /**
+   * @deprecated migrate to {@link #dumpMetricsOnShutdown(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setDumpMetricsOnShutdown(boolean dumpMetricsOnShutdown);
 
   /**
@@ -1151,6 +2150,14 @@ public interface DatabaseBuilder {
    *
    * @param dumpMetricsOptions Example "sql,hash", "sql"
    */
+  default DatabaseBuilder dumpMetricsOptions(String dumpMetricsOptions) {
+    return setDumpMetricsOptions(dumpMetricsOptions);
+  }
+
+  /**
+   * @deprecated migrate to {@link #dumpMetricsOptions(String)}.
+   */
+  @Deprecated
   DatabaseBuilder setDumpMetricsOptions(String dumpMetricsOptions);
 
   /**
@@ -1160,13 +2167,28 @@ public interface DatabaseBuilder {
    * can register the entity bean classes (to aDatabaseBuilder classpath scanning).
    * This is on by default and setting this to false turns it off.
    */
+  default DatabaseBuilder loadModuleInfo(boolean loadModuleInfo) {
+    return setLoadModuleInfo(loadModuleInfo);
+  }
+
+  /**
+   * @deprecated migrate to {@link #loadModuleInfo(boolean)}.
+   */
+  @Deprecated
   DatabaseBuilder setLoadModuleInfo(boolean loadModuleInfo);
 
   /**
    * Set the naming convention to apply to metrics names.
    */
-  DatabaseBuilder setMetricNaming(Function<String, String> metricNaming);
+  default DatabaseBuilder metricNaming(Function<String, String> metricNaming) {
+    return setMetricNaming(metricNaming);
+  }
 
+  /**
+   * @deprecated migrate to {@link #metricNaming(Function)}.
+   */
+  @Deprecated
+  DatabaseBuilder setMetricNaming(Function<String, String> metricNaming);
 
   /**
    * Provides read access (getters) for the DatabaseBuilder configuration
