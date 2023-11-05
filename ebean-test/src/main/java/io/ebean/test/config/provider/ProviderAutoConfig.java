@@ -45,7 +45,7 @@ public class ProviderAutoConfig {
     if (keyManager == null) {
       // Must be 16 Chars for Oracle function
       String keyVal = properties.getProperty("ebean.test.encryptKey", "simple0123456789");
-      log.log(DEBUG, "for testing - using FixedEncryptKeyManager() keyVal:{0}", keyVal);
+      log.log(DEBUG, "for testing purposes using FixedEncryptKeyManager() keyVal:{0}", keyVal);
       config.setEncryptKeyManager(new FixedEncryptKeyManager(keyVal));
     }
 
@@ -57,7 +57,7 @@ public class ProviderAutoConfig {
   String msg(int providerSetFlag) {
     String msg = msgProvider(providerSetFlag);
     String usage = msgUsage(providerSetFlag);
-    return "For testing purposes " + msg + " has been configured. Use io.ebean.test.UserContext to " + usage + " in tests.";
+    return "for testing purposes " + msg + " has been configured. Use io.ebean.test.UserContext to " + usage + " in tests.";
   }
 
   private String msgProvider(int providerSetFlag) {
