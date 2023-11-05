@@ -127,7 +127,7 @@ public class InitDataSourceTest {
   @Test
   public void readOnlyConfig_when_urlSet_2() {
     DatabaseConfig config = new DatabaseConfig();
-    config.settings().getReadOnlyDataSourceConfig().url("foo");
+    config.getReadOnlyDataSourceConfig().url("foo");
 
     final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);

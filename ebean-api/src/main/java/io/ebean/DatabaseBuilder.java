@@ -20,10 +20,16 @@ import jakarta.persistence.EnumType;
 import javax.sql.DataSource;
 import java.time.Clock;
 import java.util.*;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
  * Build a Database instance.
+ * <p>
+ * Note that {@link #settings()} provides access to read the builder configuration
+ * (the getters). The DatabaseBuilder only has the methods to set builder configuration
+ * (the setters) so use {@link #settings()} to access to everything.
  *
  * <pre>{@code
  *
@@ -64,6 +70,23 @@ public interface DatabaseBuilder {
    */
   Settings settings();
 
+  /**
+   * Apply configuration to this builder using a lambda.
+   */
+  DatabaseBuilder apply(Consumer<DatabaseBuilder.Settings> applyConfiguration);
+
+  /**
+   * Conditionally apply configuration to this builder via a lambda.
+   *
+   * @param predicate The condition to apply configuration when true.
+   * @param apply     The configuration to apply to this builder.
+   */
+  default DatabaseBuilder alsoIf(BooleanSupplier predicate, Consumer<DatabaseBuilder.Settings> apply) {
+    if (predicate.getAsBoolean()) {
+      apply(apply);
+    }
+    return this;
+  }
   /**
    * Set the name of the Database.
    */
@@ -2598,7 +2621,7 @@ public interface DatabaseBuilder {
      * Return the configuration to build a DataSource using Ebean's own DataSource
      * implementation.
      */
-    DataSourceBuilder getDataSourceConfig();
+    DataSourceBuilder.Settings getDataSourceConfig();
 
     /**
      * Return true if Ebean should create a DataSource for use with implicit read only transactions.
@@ -2614,7 +2637,7 @@ public interface DatabaseBuilder {
      * set on this configuration. This means there is actually no need to set any configuration here and we only
      * set configuration for url, username and password etc if it is different from the main DataSource.
      */
-    DataSourceBuilder getReadOnlyDataSourceConfig();
+    DataSourceBuilder.Settings getReadOnlyDataSourceConfig();
 
     /**
      * Return a value used to represent TRUE in the database.

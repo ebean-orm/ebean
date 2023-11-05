@@ -27,6 +27,7 @@ import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -316,7 +317,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   /**
    * The data source config.
    */
-  private DataSourceBuilder dataSourceConfig = DataSourceBuilder.create();
+  private DataSourceBuilder.Settings dataSourceConfig = DataSourceBuilder.create().settings();
 
   /**
    * When true create a read only DataSource using readOnlyDataSourceConfig defaulting values from dataSourceConfig.
@@ -329,7 +330,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   /**
    * Optional configuration for a read only data source.
    */
-  private DataSourceBuilder readOnlyDataSourceConfig = DataSourceBuilder.create();
+  private DataSourceBuilder.Settings readOnlyDataSourceConfig = DataSourceBuilder.create().settings();
 
   /**
    * Optional - the database schema that should be used to own the tables etc.
@@ -557,6 +558,12 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
 
   @Override
   public Settings settings() {
+    return this;
+  }
+
+  @Override
+  public DatabaseBuilder apply(Consumer<DatabaseBuilder.Settings> applyConfiguration) {
+    applyConfiguration.accept(this);
     return this;
   }
 
@@ -1359,13 +1366,13 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public DataSourceBuilder getDataSourceConfig() {
+  public DataSourceBuilder.Settings getDataSourceConfig() {
     return dataSourceConfig;
   }
 
   @Override
   public DatabaseConfig setDataSourceConfig(DataSourceBuilder dataSourceConfig) {
-    this.dataSourceConfig = dataSourceConfig;
+    this.dataSourceConfig = dataSourceConfig.settings();
     return this;
   }
 
@@ -1381,13 +1388,13 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public DataSourceBuilder getReadOnlyDataSourceConfig() {
+  public DataSourceBuilder.Settings getReadOnlyDataSourceConfig() {
     return readOnlyDataSourceConfig;
   }
 
   @Override
-  public DatabaseConfig setReadOnlyDataSourceConfig(DataSourceBuilder readOnlyDataSourceConfig) {
-    this.readOnlyDataSourceConfig = readOnlyDataSourceConfig;
+  public DatabaseConfig setReadOnlyDataSourceConfig(DataSourceBuilder readOnly) {
+    this.readOnlyDataSourceConfig = readOnly == null ? null : readOnly.settings();
     return this;
   }
 
@@ -2098,7 +2105,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     loadAutoTuneSettings(p);
 
     if (dataSourceConfig == null) {
-      dataSourceConfig = DataSourceBuilder.create();
+      dataSourceConfig = DataSourceBuilder.create().settings();
     }
     loadDataSourceSettings(p);
 

@@ -71,11 +71,11 @@ public class AutoConfigureForTesting implements AutoConfigure {
     }
   }
 
-  private void makeV1Compatible(DataSourceBuilder ds) {
+  private void makeV1Compatible(DataSourceBuilder.Settings ds) {
     if (ds == null) {
       return;
     }
-    String url = ds.settings().getUrl();
+    String url = ds.getUrl();
     if (url == null || !url.startsWith("jdbc:h2:")) {
       return;
     }
