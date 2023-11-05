@@ -1,5 +1,6 @@
 package io.ebean.xtest.config;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.migration.MigrationConfig;
 import org.junit.jupiter.api.Test;

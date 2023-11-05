@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceAlert;
 import io.ebean.datasource.DataSourceBuilder;
@@ -18,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class InitDataSourceTest {
 
-  private DatabaseConfig newConfig(String readOnlyUrl) {
-    DatabaseConfig config = new DatabaseConfig();
+  private DatabaseBuilder.Settings newConfig(String readOnlyUrl) {
+    DatabaseBuilder config = new DatabaseConfig();
     DataSourceConfig roConfig = new DataSourceConfig();
     roConfig.setUrl(readOnlyUrl);
     config.setReadOnlyDataSourceConfig(roConfig);
-    return config;
+    return config.settings();
   }
 
   @Test
@@ -64,7 +65,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_autoReadOnlyDataSource_expect_setToNull() {
-    DatabaseConfig config = newConfig("none");
+    var config = newConfig("none");
     config.setAutoReadOnlyDataSource(true);
 
     final DataSourceBuilder readOnlyConfig = new InitDataSource(config).readOnlyConfig();
@@ -74,7 +75,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_urlSet() {
-    DatabaseConfig config = newConfig("foo");
+    var config = newConfig("foo");
 
     final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);
@@ -83,7 +84,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain() {
-    DatabaseConfig config = newConfig(null);
+    var config = newConfig(null);
     // alternate location to set read-only url for developer convenience
     config.getDataSourceConfig().readOnlyUrl("bar");
 
@@ -94,7 +95,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain_withNone() {
-    DatabaseConfig config = newConfig("None");
+    var config = newConfig("None");
     // alternate location to set read-only url for developer convenience
     config.getDataSourceConfig().readOnlyUrl("bar");
 
@@ -105,7 +106,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_bothReadOnlyUrlsSet() {
-    DatabaseConfig config = newConfig("one");
+    var config = newConfig("one");
     config.getDataSourceConfig().readOnlyUrl("two");
 
     final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
@@ -115,7 +116,7 @@ public class InitDataSourceTest {
 
   @Test
   public void readOnlyConfig_when_readOnlyUrlSetOnMain_withNoneNone() {
-    DatabaseConfig config = newConfig("none");
+    var config = newConfig("none");
     // alternate location to set read-only url for developer convenience
     config.getDataSourceConfig().readOnlyUrl("none");
 
@@ -126,7 +127,7 @@ public class InitDataSourceTest {
   @Test
   public void readOnlyConfig_when_urlSet_2() {
     DatabaseConfig config = new DatabaseConfig();
-    config.getReadOnlyDataSourceConfig().url("foo");
+    config.settings().getReadOnlyDataSourceConfig().url("foo");
 
     final DataSourceBuilder roConfig = new InitDataSource(config).readOnlyConfig();
     assertNotNull(roConfig);

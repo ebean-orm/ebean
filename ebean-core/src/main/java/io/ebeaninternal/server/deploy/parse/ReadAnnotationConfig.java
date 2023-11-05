@@ -4,7 +4,7 @@ import io.ebean.annotation.Aggregation;
 import io.ebean.annotation.Formula;
 import io.ebean.annotation.Where;
 import io.ebean.config.ClassLoadConfig;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
@@ -31,7 +31,7 @@ final class ReadAnnotationConfig {
   private final ReadValidationAnnotations jakartaValidation;
   private final Set<Class<?>> metaAnnotations = new HashSet<>();
 
-  ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config) {
+  ReadAnnotationConfig(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseBuilder.Settings config) {
     this.generatedPropFactory = generatedPropFactory;
     this.asOfViewSuffix = asOfViewSuffix;
     this.versionsBetweenSuffix = versionsBetweenSuffix;

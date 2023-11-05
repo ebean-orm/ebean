@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 
 /**
  * Detect existence of JAXB
@@ -10,7 +10,7 @@ public class Detect {
   /**
    * Return true if JAXB is present.
    */
-  public static boolean isJAXBPresent(DatabaseConfig config) {
+  public static boolean isJAXBPresent(DatabaseBuilder.Settings config) {
     return config.getClassLoadConfig().isPresent("jakarta.xml.bind.JAXBException");
   }
 }

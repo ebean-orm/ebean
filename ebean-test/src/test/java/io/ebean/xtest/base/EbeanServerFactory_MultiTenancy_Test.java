@@ -1,5 +1,6 @@
 package io.ebean.xtest.base;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
@@ -27,7 +28,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     TenantDataSourceProvider dataSourceProvider = Mockito.mock(TenantDataSourceProvider.class);
     Mockito.doReturn(mockedDataSource).when(dataSourceProvider).dataSource(tenant);
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("multiTenantDb");
     config.loadFromProperties();
     config.setRegister(false);
@@ -62,7 +63,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     TenantSchemaProvider schemaProvider = Mockito.mock(TenantSchemaProvider.class);
     Mockito.doReturn("tenant_schema").when(schemaProvider).schema(tenant);
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("multi-tenancy");
@@ -93,7 +94,7 @@ public class EbeanServerFactory_MultiTenancy_Test extends BaseTestCase {
     TenantCatalogProvider catalogProvider = Mockito.mock(TenantCatalogProvider.class);
     Mockito.doReturn("tenant_catalog").when(catalogProvider).catalog(tenant);
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("multi-tenancy");

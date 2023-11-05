@@ -2,6 +2,7 @@ package io.ebean.xtest.base;
 
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.ServerConfigStartup;
 import io.ebeaninternal.api.SpiLogger;
@@ -45,7 +46,7 @@ public class EbeanServerFactory_ServerConfigStart_Test {
   @Test
   public void test() throws InterruptedException {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");
@@ -82,10 +83,10 @@ public class EbeanServerFactory_ServerConfigStart_Test {
 
   public static class OnStartup implements ServerConfigStartup {
 
-    DatabaseConfig calledWithConfig;
+    DatabaseBuilder calledWithConfig;
 
     @Override
-    public void onStart(DatabaseConfig serverConfig) {
+    public void onStart(DatabaseBuilder serverConfig) {
       calledWithConfig = serverConfig;
     }
   }
@@ -93,10 +94,10 @@ public class EbeanServerFactory_ServerConfigStart_Test {
 
   public static class OnStartupViaClass implements ServerConfigStartup {
 
-    static DatabaseConfig calledWithConfig;
+    static DatabaseBuilder calledWithConfig;
 
     @Override
-    public void onStart(DatabaseConfig serverConfig) {
+    public void onStart(DatabaseBuilder serverConfig) {
       calledWithConfig = serverConfig;
     }
   }

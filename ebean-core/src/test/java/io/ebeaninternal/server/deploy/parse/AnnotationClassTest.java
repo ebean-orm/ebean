@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
@@ -45,7 +46,7 @@ public class AnnotationClassTest {
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})
-  private AnnotationClass createAnnotationClass(DatabaseConfig config) {
+  private AnnotationClass createAnnotationClass(DatabaseBuilder.Settings config) {
     DeployUtil deployUtil = new DeployUtil(new DefaultTypeManager(config, new BootupClasses()), config);
 
     DeployBeanInfo deployBeanInfo = new DeployBeanInfo(deployUtil, new DeployBeanDescriptor<>(null, Customer.class, null));
@@ -53,9 +54,9 @@ public class AnnotationClassTest {
     return new AnnotationClass(deployBeanInfo, readAnnotationConfig);
   }
 
-  private DatabaseConfig sqlServerPlatform(boolean allQuotedIdentifiers) {
+  private DatabaseBuilder.Settings sqlServerPlatform(boolean allQuotedIdentifiers) {
     SqlServer17Platform sqlServer17Platform = new SqlServer17Platform();
-    DatabaseConfig config = new DatabaseConfig();
+    var config = new DatabaseConfig().settings();
     config.setDatabasePlatform(sqlServer17Platform);
     config.setAllQuotedIdentifiers(allQuotedIdentifiers);
 

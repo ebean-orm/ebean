@@ -2,6 +2,7 @@ package io.ebeaninternal.dbmigration.model.build;
 
 
 import io.ebean.DatabaseFactory;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
@@ -20,7 +21,7 @@ class ModelBuild_explicitSequencesTest extends BaseTestCase {
 
   private SpiEbeanServer createServer(boolean postgres) {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");

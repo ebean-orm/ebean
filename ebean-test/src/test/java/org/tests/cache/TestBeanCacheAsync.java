@@ -1,13 +1,11 @@
 package org.tests.cache;
 
+import io.ebean.DatabaseBuilder;
+import io.ebean.config.*;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
-import io.ebean.config.BackgroundExecutorWrapper;
-import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.MdcBackgroundExecutorWrapper;
 import io.ebeaninternal.server.cache.DefaultServerCachePlugin;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCachedBean;
@@ -65,7 +63,7 @@ public class TestBeanCacheAsync extends BaseTestCase {
 
   @Test
   public void findById_with_tenant() throws InterruptedException {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName(DB.getDefault().name());
     config.loadFromProperties();
     config.setDataSource(DB.getDefault().dataSource());

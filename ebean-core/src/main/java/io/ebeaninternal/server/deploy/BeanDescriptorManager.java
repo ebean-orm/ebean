@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.DatabaseBuilder;
 import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
@@ -78,7 +79,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final NamingConvention namingConvention;
   private final DeployCreateProperties createProperties;
   private final BeanManagerFactory beanManagerFactory;
-  private final DatabaseConfig config;
+  private final DatabaseBuilder.Settings config;
   private final ChangeLogListener changeLogListener;
   private final ChangeLogRegister changeLogRegister;
   private final ChangeLogPrepare changeLogPrepare;
@@ -195,19 +196,19 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   /**
    * Return the AsOfViewSuffix based on the DbHistorySupport.
    */
-  private String asOfViewSuffix(DatabasePlatform databasePlatform, DatabaseConfig serverConfig) {
+  private String asOfViewSuffix(DatabasePlatform databasePlatform, DatabaseBuilder.Settings config) {
     DbHistorySupport historySupport = databasePlatform.historySupport();
     // with historySupport returns a simple view suffix or the sql2011 as of timestamp suffix
-    return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(serverConfig.getAsOfViewSuffix());
+    return (historySupport == null) ? config.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(config.getAsOfViewSuffix());
   }
 
   /**
    * Return the versions between timestamp suffix based on the DbHistorySupport.
    */
-  private String versionsBetweenSuffix(DatabasePlatform databasePlatform, DatabaseConfig serverConfig) {
+  private String versionsBetweenSuffix(DatabasePlatform databasePlatform, DatabaseBuilder.Settings config) {
     DbHistorySupport historySupport = databasePlatform.historySupport();
     // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
-    return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
+    return (historySupport == null) ? config.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(config.getAsOfViewSuffix());
   }
 
   @Override
@@ -216,7 +217,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   @Override
-  public DatabaseConfig config() {
+  public DatabaseBuilder.Settings config() {
     return config;
   }
 

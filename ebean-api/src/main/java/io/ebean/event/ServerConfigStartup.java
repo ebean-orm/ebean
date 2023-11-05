@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 
 /**
  * Used to configure the server on startup.
@@ -13,6 +13,6 @@ public interface ServerConfigStartup {
   /**
    * On starting configure the DatabaseConfig.
    */
-  void onStart(DatabaseConfig config);
+  void onStart(DatabaseBuilder config);
 
 }
