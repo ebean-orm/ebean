@@ -5,6 +5,7 @@ import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.annotation.Platform;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
@@ -133,7 +134,7 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
 
   private Database createOtherDatabase() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2ebasicver");
     config.loadFromProperties();
     config.setDdlGenerate(true);

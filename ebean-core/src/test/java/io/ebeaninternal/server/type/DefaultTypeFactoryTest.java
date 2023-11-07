@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.DatabaseConfig;
 import io.ebean.core.type.ScalarType;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class DefaultTypeFactoryTest {
 
-  DefaultTypeFactory defaultTypeFactory = new DefaultTypeFactory(null);
+  DefaultTypeFactory defaultTypeFactory = new DefaultTypeFactory(new DatabaseConfig());
 
   @Test
   public void testCreateBoolean() throws Exception {

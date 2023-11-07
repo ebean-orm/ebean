@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.23.0-jakarta</version>
+    <version>13.25.0-jakarta</version>
   </parent>
 
   <artifactId>ebean-spring-txn</artifactId>
@@ -28,7 +28,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
       <scope>provided</scope>
     </dependency>
 
@@ -77,14 +77,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.23.0-jakarta</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
+      <version>13.25.0-jakarta</version>
       <scope>test</scope>
     </dependency>
 

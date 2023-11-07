@@ -1,7 +1,7 @@
 package io.ebean.test.config.platform;
 
 import io.avaje.applog.AppLog;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.test.containers.ContainerFactory;
 
 import java.util.HashMap;
@@ -38,14 +38,14 @@ public class PlatformAutoConfig {
     KNOWN_PLATFORMS.put("yugabyte", new YugabyteSetup());
   }
 
-  private final DatabaseConfig config;
+  private final DatabaseBuilder.Settings config;
   private final Properties properties;
   private String db;
   private String platform;
   private PlatformSetup platformSetup;
   private String databaseName;
 
-  public PlatformAutoConfig(String db, DatabaseConfig config) {
+  public PlatformAutoConfig(String db, DatabaseBuilder.Settings config) {
     this.db = db;
     this.config = config;
     this.properties = config.getProperties();
@@ -62,7 +62,7 @@ public class PlatformAutoConfig {
 
       Config config = new Config(db, platform, databaseName, this.config);
       platformSetup.setupExtraDbDataSource(config);
-      log.log(DEBUG, "configured dataSource for extraDb name:{0} url:{1}", db, this.config.getDataSourceConfig().getUrl());
+      log.log(DEBUG, "configured dataSource for extraDb name:{0} url:{1}", db, this.config.getDataSourceConfig().settings().getUrl());
     }
   }
 

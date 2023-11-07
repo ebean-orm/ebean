@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.autotune;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.api.SpiEbeanServer;
 
 public interface AutoTuneServiceProvider {
 
-  AutoTuneService create(SpiEbeanServer server, DatabaseConfig config);
+  AutoTuneService create(SpiEbeanServer server, DatabaseBuilder config);
 }

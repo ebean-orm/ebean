@@ -2,9 +2,8 @@ package io.ebean.querybean.generator;
 
 interface Constants {
 
-  String AT_GENERATED = "@Generated(\"io.ebean.querybean.generator\")";
-
-  String AT_TYPEQUERYBEAN = "@TypeQueryBean(\"v1\")";
+  String AT_GENERATED = "@io.ebean.typequery.Generated(\"io.ebean.querybean.generator\")";
+  String AT_TYPEQUERYBEAN = "@io.ebean.typequery.TypeQueryBean(\"v1\")";
   String GENERATED = "io.ebean.typequery.Generated";
 
   String MAPPED_SUPERCLASS = "jakarta.persistence.MappedSuperclass";
@@ -23,12 +22,7 @@ interface Constants {
   String TQROOTBEAN = "io.ebean.typequery.TQRootBean";
   String TQASSOCBEAN = "io.ebean.typequery.TQAssocBean";
   String TQASSOC = "io.ebean.typequery.TQAssoc";
-  String TYPEQUERYBEAN = "io.ebean.typequery.TypeQueryBean";
-  String DATABASE = "io.ebean.Database";
   String DB = "io.ebean.DB";
-  String FETCHGROUP = "io.ebean.FetchGroup";
-  String QUERY = "io.ebean.Query";
-  String TRANSACTION = "io.ebean.Transaction";
 
   String MODULEINFO = "io.ebean.config.ModuleInfo";
   String METAINF_MANIFEST = "META-INF/ebean-generated-info.mf";

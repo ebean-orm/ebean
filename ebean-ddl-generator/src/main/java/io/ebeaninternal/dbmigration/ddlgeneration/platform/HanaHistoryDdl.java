@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlAlterTable;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
@@ -17,7 +17,7 @@ public class HanaHistoryDdl extends DbTableBasedHistoryDdl implements PlatformHi
   private String systemPeriodEnd;
 
   @Override
-  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     super.configure(config, platformDdl);
     this.systemPeriodStart = config.getAsOfSysPeriod() + "_start";
     this.systemPeriodEnd = config.getAsOfSysPeriod() + "_end";

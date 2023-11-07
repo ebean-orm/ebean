@@ -71,7 +71,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private static final System.Logger log = CoreLog.internal;
 
   private final ReentrantLock lock = new ReentrantLock();
-  private final DatabaseConfig config;
+  private final DatabaseBuilder.Settings config;
   private final String serverName;
   private final DatabasePlatform databasePlatform;
   private final TransactionManager transactionManager;
@@ -158,7 +158,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   /**
    * Create the CallStackFactory depending if AutoTune is being used.
    */
-  private CallOriginFactory initCallStackFactory(DatabaseConfig config) {
+  private CallOriginFactory initCallStackFactory(DatabaseBuilder.Settings config) {
     if (!config.getAutoTuneConfig().isActive()) {
       // use a common CallStack for performance as we don't care with no AutoTune
       return new NoopCallOriginFactory();
@@ -210,7 +210,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public DatabaseConfig config() {
+  public DatabaseBuilder.Settings config() {
     return config;
   }
 

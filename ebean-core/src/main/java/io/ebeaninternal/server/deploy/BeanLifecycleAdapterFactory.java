@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.annotation.PostSoftDelete;
 import io.ebean.annotation.PreSoftDelete;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.BeanPostConstructListener;
@@ -34,7 +34,7 @@ final class BeanLifecycleAdapterFactory {
 
   private final boolean postConstructPresent;
 
-  BeanLifecycleAdapterFactory(DatabaseConfig config) {
+  BeanLifecycleAdapterFactory(DatabaseBuilder.Settings config) {
     this.postConstructPresent = config.getClassLoadConfig().isJavaxPostConstructPresent();
   }
 

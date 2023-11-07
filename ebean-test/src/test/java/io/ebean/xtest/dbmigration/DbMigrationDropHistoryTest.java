@@ -2,6 +2,7 @@ package io.ebean.xtest.dbmigration;
 
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.dbmigration.DbMigration;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ class DbMigrationDropHistoryTest {
 
     migration.setPathToResources("src/test/resources");
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("migrationtest-history");
     config.loadFromProperties();
     config.setRegister(false);

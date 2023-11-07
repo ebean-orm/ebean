@@ -1,6 +1,6 @@
 package org.tests.model.basic;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.event.AbstractBeanPersistListener;
 import io.ebean.event.BulkTableEvent;
 import io.ebean.event.BulkTableEventListener;
@@ -23,7 +23,7 @@ public class MyEBasicConfigStartup implements ServerConfigStartup {
   }
 
   @Override
-  public void onStart(DatabaseConfig serverConfig) {
+  public void onStart(DatabaseBuilder serverConfig) {
 
     serverConfig.add(new EbasicPersistList());
     serverConfig.add(new EbasicBulkListener());

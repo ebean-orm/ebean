@@ -42,7 +42,7 @@ import java.util.concurrent.Callable;
  * <h5>Constructing a Database</h5>
  * <p>
  * Databases are constructed by the DatabaseFactory. They can be created
- * programmatically via {@link DatabaseFactory#create(DatabaseConfig)} or they
+ * programmatically via {@link DatabaseFactory#create(DatabaseBuilder)} or they
  * can be automatically constructed on demand using configuration information in
  * the application.properties file.
  *
@@ -85,6 +85,23 @@ import java.util.concurrent.Callable;
  */
 @NonNullApi
 public interface Database {
+
+  /**
+   * Return a new database builder.
+    * <pre>{@code
+ *
+ *   // build the 'default' database using configuration
+ *   // from application.properties / application.yaml
+ *
+ *   Database db = Database.builder()
+ *     .loadFromProperties()
+ *     .build();
+ *
+ * }</pre>
+   */
+  static DatabaseBuilder builder() {
+    return new DatabaseConfig();
+  }
 
   /**
    * Shutdown the Database instance.

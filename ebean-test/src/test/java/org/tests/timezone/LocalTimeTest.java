@@ -2,6 +2,7 @@ package org.tests.timezone;
 
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -52,7 +53,7 @@ public class LocalTimeTest {
   }
 
   private Database createServer(String dbTimeZone) {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName(platform);
     config.loadFromProperties();
     config.setDdlExtra(false);

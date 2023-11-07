@@ -101,7 +101,7 @@ public final class LoadManyRequest extends LoadRequest {
     query.setLazyLoadForParents(many);
     many.addWhereParentIdIn(query, parentIdList(server));
     query.setPersistenceContext(loadContext.persistenceContext());
-    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
+    query.setLoadDescription(lazy ? "lazy" : "query", description());
     if (lazy) {
       query.setLazyLoadBatchSize(loadContext.batchSize());
     } else {

@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.server.type.GeoTypeBinder;
 
 /**
@@ -11,5 +11,5 @@ public interface GeoTypeProvider {
   /**
    * Create a binder for binding geometry types.
    */
-  GeoTypeBinder createBinder(DatabaseConfig config);
+  GeoTypeBinder createBinder(DatabaseBuilder.Settings config);
 }

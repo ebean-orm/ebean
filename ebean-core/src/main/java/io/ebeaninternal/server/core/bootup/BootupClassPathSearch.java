@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.core.bootup;
 
 import io.avaje.classpath.scanner.ClassPathScanner;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.server.core.ClassPathScanners;
 
@@ -24,11 +24,11 @@ public class BootupClassPathSearch {
    * Search the classPath for the classes we are interested in returning
    * them as BootupClasses.
    */
-  public static BootupClasses search(DatabaseConfig config) {
+  public static BootupClasses search(DatabaseBuilder.Settings config) {
     return new BootupClassPathSearch(config).getBootupClasses();
   }
 
-  private BootupClassPathSearch(DatabaseConfig config) {
+  private BootupClassPathSearch(DatabaseBuilder.Settings config) {
     // find packages defined in ebean.mf resources
     Set<String> mfPackages = ManifestReader.create(config.getClassLoadConfig().getClassLoader())
       .read("META-INF/ebean.mf")

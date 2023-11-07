@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
@@ -236,9 +237,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final void setProfilePath(String label, String relativePath, ProfileLocation profileLocation) {
+  public final void setProfilePath(String label, String relativePath, @Nullable ProfileLocation profileLocation) {
     this.profileLocation = profileLocation;
-    this.label = ((profileLocation == null) ? label : profileLocation.label()) + "_" + relativePath;
+    this.label = (profileLocation == null ? label : profileLocation.label()) + '_' + relativePath;
   }
 
   @Override

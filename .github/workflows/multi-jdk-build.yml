@@ -34,6 +34,8 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
+    - name: Maven version
+      run: mvn --version
     - name: Build with Maven
       run: mvn package
 

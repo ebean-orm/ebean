@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.avaje.lang.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;
@@ -322,7 +323,7 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   /**
    * Set the on a secondary query given the label, relativePath and profile location of the parent query.
    */
-  void setProfilePath(String label, String relativePath, ProfileLocation profileLocation);
+  void setProfilePath(String label, String relativePath, @Nullable ProfileLocation profileLocation);
 
   /**
    * Set the query mode.

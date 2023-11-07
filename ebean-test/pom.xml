@@ -4,12 +4,17 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.23.0-jakarta</version>
+    <version>13.25.0-jakarta</version>
   </parent>
 
   <name>ebean test</name>
   <description>Testing support for Ebean</description>
   <artifactId>ebean-test</artifactId>
+
+  <properties>
+    <bytebuddy.version>1.14.9</bytebuddy.version>
+    <assertj.version>3.24.2</assertj.version>
+  </properties>
 
   <dependencies>
 
@@ -28,20 +33,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
     </dependency>
 
     <dependency>
@@ -64,10 +69,22 @@
       <version>${ebean-test-containers.version}</version>
     </dependency>
 
+    <!-- support JDK 22+ -->
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <version>${bytebuddy.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy-agent</artifactId>
+      <version>${bytebuddy.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.23.1</version>
+      <version>${assertj.version}</version>
     </dependency>
 
     <!-- Including JAXB for DB Migration generation with Java 11+ -->
@@ -118,28 +135,28 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-joda-time</artifactId>
-      <version>13.18.0</version>
+      <version>13.24.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-jsonnode</artifactId>
-      <version>13.18.0</version>
+      <version>13.24.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-mapper</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
       <scope>test</scope>
     </dependency>
 
@@ -272,18 +289,11 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.11</version>
-      <scope>test</scope>
-    </dependency>
-
     <!-- provided scope for Java 11 compilation (not required for Java 17+) -->
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.1</version>
+      <version>1.3</version>
       <scope>provided</scope>
     </dependency>
 

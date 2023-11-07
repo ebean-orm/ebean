@@ -2,6 +2,7 @@ package org.tests.changelog;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ebean.DatabaseBuilder;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
@@ -171,7 +172,7 @@ public class TestChangeLog extends BaseTestCase {
 
   private Database createServer() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2other");
     config.loadFromProperties();
     config.setDdlGenerate(true);

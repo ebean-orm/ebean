@@ -3,7 +3,7 @@ package org.example;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.annotation.PersistBatch;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 
@@ -18,7 +18,7 @@ public class EbeanServerFactoryBean implements InitializingBean, FactoryBean<Dat
   /**
    * The Ebean server configuration.
    */
-  private DatabaseConfig serverConfig;
+  private DatabaseBuilder serverConfig;
 
   /**
    * The EbeanServer instance.
@@ -54,14 +54,14 @@ public class EbeanServerFactoryBean implements InitializingBean, FactoryBean<Dat
   /**
    * Return the server configuration.
    */
-  public DatabaseConfig getServerConfig() {
+  public DatabaseBuilder getServerConfig() {
     return serverConfig;
   }
 
   /**
    * Set the server configuration.
    */
-  public void setServerConfig(DatabaseConfig serverConfig) {
+  public void setServerConfig(DatabaseBuilder serverConfig) {
     this.serverConfig = serverConfig;
   }
 }

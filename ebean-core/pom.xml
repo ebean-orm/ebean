@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.23.0-jakarta</version>
+    <version>13.25.0-jakarta</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
     </dependency>
 
     <dependency>
@@ -46,9 +46,8 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
     </dependency>
-
 
     <!--
     Class retention Nonnull and Nullable annotations
@@ -148,21 +147,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>13.23.0-jakarta</version>
+      <version>13.25.0-jakarta</version>
       <scope>test</scope>
     </dependency>
 
@@ -170,13 +169,6 @@
       <groupId>io.ebean</groupId>
       <artifactId>ebean-datasource</artifactId>
       <version>${ebean-datasource.version}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -229,7 +221,6 @@
           </systemProperties>
         </configuration>
       </plugin>
-
 
     </plugins>
 
