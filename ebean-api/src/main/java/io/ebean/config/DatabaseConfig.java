@@ -304,6 +304,8 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
 
   private boolean skipDataSourceCheck;
 
+  private boolean readOnlyDatabase;
+
   /**
    * The data source (if programmatically provided).
    */
@@ -1341,6 +1343,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   public DatabaseConfig setSkipDataSourceCheck(boolean skipDataSourceCheck) {
     this.skipDataSourceCheck = skipDataSourceCheck;
     return this;
+  }
+
+  @Override
+  public DatabaseBuilder readOnlyDatabase(boolean readOnlyDatabase) {
+    this.readOnlyDatabase = readOnlyDatabase;
+    return this;
+  }
+
+  @Override
+  public boolean readOnlyDatabase() {
+    return readOnlyDatabase;
   }
 
   @Override
