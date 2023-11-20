@@ -5,7 +5,6 @@ import io.ebean.Database;
 import io.ebean.config.ContainerConfig;
 import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 
-import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -20,38 +19,22 @@ public class ClusterManager implements ServerLookup {
   private static final System.Logger clusterLogger = AppLog.getLogger("io.ebean.Cluster");
 
   private final ReentrantLock lock = new ReentrantLock();
-
   private final ConcurrentHashMap<String, Database> serverMap = new ConcurrentHashMap<>();
-
-  private final Object monitor = new Object();
-
   private final ClusterBroadcast broadcast;
-
   private boolean started;
-
   private boolean shutdown;
 
   public ClusterManager(ContainerConfig config) {
-    ClusterBroadcastFactory factory = createFactory();
-    if (factory != null && config.isActive()) {
-      broadcast = factory.create(this, config);
+    if (config.isActive()) {
+      ClusterBroadcastFactory factory = createFactory();
+      broadcast = factory != null ? factory.create(this, config) : null;
     } else {
       broadcast = null;
     }
   }
 
-  /**
-   * Return the ClusterTransportFactory via ServiceLoader.
-   */
   private ClusterBroadcastFactory createFactory() {
-
-    ServiceLoader<ClusterBroadcastFactory> load = ServiceLoader.load(ClusterBroadcastFactory.class);
-    ClusterBroadcastFactory factory = null;
-    Iterator<ClusterBroadcastFactory> iterator = load.iterator();
-    if (iterator.hasNext()) {
-      factory = iterator.next();
-    }
-    return factory;
+    return ServiceLoader.load(ClusterBroadcastFactory.class).findFirst().orElse(null);
   }
 
   public void registerServer(Database server) {
