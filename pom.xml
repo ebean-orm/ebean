@@ -53,7 +53,8 @@
     <ebean-migration.version>13.11.1</ebean-migration.version>
     <ebean-test-containers.version>7.1</ebean-test-containers.version>
     <ebean-datasource.version>8.9</ebean-datasource.version>
-    <ebean-agent.version>13.25.0-FOC1-SNAPSHOT</ebean-agent.version>
+<!--    <ebean-agent.version>13.25.0-FOC1-SNAPSHOT</ebean-agent.version>-->
+    <ebean-agent.version>13.20.1-FOC1</ebean-agent.version>
     <ebean-maven-plugin.version>13.25.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
