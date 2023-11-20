@@ -127,7 +127,7 @@ public class DefaultDbMigration implements DbMigration {
       this.constraintNaming = databaseBuilder.getConstraintNaming();
     }
     if (databasePlatform == null) {
-      this.databasePlatform = databaseConfig.getDatabasePlatform();
+      this.databasePlatform = databaseBuilder.getDatabasePlatform();
     }
     Properties properties = config.getProperties();
     if (properties != null) {
@@ -157,7 +157,7 @@ public class DefaultDbMigration implements DbMigration {
     }
   }
 
-  protected void parsePlatforms(PropertiesWrapper props, DatabaseConfig config) {
+  protected void parsePlatforms(PropertiesWrapper props, DatabaseBuilder.Settings config) {
     String platforms = props.get("migration.platforms");
     if (platforms == null || platforms.isEmpty()) {
       return;
