@@ -15,6 +15,7 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.plugin.CustomDeployParser;
 import jakarta.persistence.EnumType;
 
 import javax.sql.DataSource;
@@ -296,6 +297,14 @@ public interface DatabaseBuilder {
    */
   @Deprecated
   DatabaseBuilder setClock(Clock clock);
+
+  /**
+   * @deprecated migrate to {@link #tempFileProvider(TempFileProvider)}.
+   */
+  @Deprecated
+  void setTempFileProvider(final TempFileProvider tempFileProvider);
+
+  void tempFileProvider(final TempFileProvider tempFileProvider);
 
   /**
    * Set the slow query time in millis.
@@ -894,6 +903,18 @@ public interface DatabaseBuilder {
    */
   @Deprecated
   DatabaseBuilder setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper);
+
+  /**
+   * Sets the tenant partitioning mode for caches. This means, caches are created on demand,
+   * but they may not get invalidated across tenant boundaries   *
+   */
+  void tenantPartitionedCache(boolean tenantPartitionedCache);
+
+  /**
+   * @deprecated migrate to {@link #tenantPartitionedCache(boolean)}.
+   */
+  @Deprecated
+  void setTenantPartitionedCache(boolean tenantPartitionedCache);
 
   /**
    * Set the L2 cache default max size.
@@ -1827,6 +1848,11 @@ public interface DatabaseBuilder {
   DatabaseBuilder addServerConfigStartup(ServerConfigStartup configStartupListener);
 
   /**
+   * Add a CustomDeployParser.
+   */
+  void addCustomDeployParser(CustomDeployParser customDeployParser);
+
+  /**
    * Register all the BeanPersistListener instances.
    * <p>
    * Note alternatively you can use {@link #add(BeanPersistListener)} to add
@@ -2095,6 +2121,17 @@ public interface DatabaseBuilder {
   DatabaseBuilder setQueryPlanThresholdMicros(long queryPlanThresholdMicros);
 
   /**
+   * @deprecated migrate to {@link #queryPlanOptions(String)}.
+   */
+  @Deprecated
+  void setQueryPlanOptions(String queryPlanOptions);
+
+  /**
+   * Set platform specific query plan options.
+   */
+  void queryPlanOptions(String queryPlanOptions);
+
+  /**
    * Set to true to turn on periodic capture of query plans.
    */
   default DatabaseBuilder queryPlanCapture(boolean queryPlanCapture) {
@@ -2244,6 +2281,8 @@ public interface DatabaseBuilder {
      * Get the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
      */
     Clock getClock();
+
+    TempFileProvider getTempFileProvider();
 
     /**
      * Return the slow query time in millis.
@@ -2542,6 +2581,11 @@ public interface DatabaseBuilder {
      * Return the background executor wrapper.
      */
     BackgroundExecutorWrapper getBackgroundExecutorWrapper();
+
+    /**
+     * Returns, if the caches are partitioned by tenant.
+     */
+    boolean isTenantPartitionedCache();
 
     /**
      * Return true if dirty beans are automatically persisted.
@@ -2945,6 +2989,8 @@ public interface DatabaseBuilder {
      */
     List<BeanPersistController> getPersistControllers();
 
+    List<CustomDeployParser> getCustomDeployParsers();
+
     /**
      * Return the BeanPersistListener instances.
      */
@@ -3045,6 +3091,11 @@ public interface DatabaseBuilder {
      * Return true if query plan capture is enabled.
      */
     boolean isQueryPlanEnable();
+
+    /**
+     * Returns platform specific query plan options.
+     */
+     String getQueryPlanOptions();
 
     /**
      * Return the query plan collection threshold in microseconds.

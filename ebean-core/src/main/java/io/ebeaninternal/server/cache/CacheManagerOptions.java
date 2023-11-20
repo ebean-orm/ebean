@@ -14,7 +14,6 @@ public final class CacheManagerOptions {
 
   private final ClusterManager clusterManager;
   private final String serverName;
-  private final DatabaseBuilder.Settings databaseBuilder;
   private final boolean localL2Caching;
   private CurrentTenantProvider currentTenantProvider;
   private QueryCacheEntryValidate queryCacheEntryValidate;

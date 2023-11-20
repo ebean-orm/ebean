@@ -595,9 +595,11 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     return tempFileProvider;
   }
 
-  public void setTempFileProvider(final TempFileProvider tempFileProvider) {
+  public void tempFileProvider(final TempFileProvider tempFileProvider) {
     this.tempFileProvider = tempFileProvider;
   }
+
+  public void setTempFileProvider(final TempFileProvider tempFileProvider) { tempFileProvider(tempFileProvider); }
 
   /**
    * Return the slow query time in millis.
@@ -1214,20 +1216,15 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     return this;
   }
 
-  /**
-   * Returns, if the caches are partitioned by tenant.
-   */
   public boolean isTenantPartitionedCache() {
     return tenantPartitionedCache;
   }
 
-  /**
-   * Sets the tenant partitioning mode for caches. This means, caches are created on demand,
-   * but they may not get invalidated across tenant boundaries   *
-   */
-  public void setTenantPartitionedCache(boolean tenantPartitionedCache) {
+  public void tenantPartitionedCache(boolean tenantPartitionedCache) {
     this.tenantPartitionedCache = tenantPartitionedCache;
   }
+
+  public void setTenantPartitionedCache(boolean tenantPartitionedCache) { tenantPartitionedCache(tenantPartitionedCache); }
 
   /**
    * Return the L2 cache default max size.
@@ -2039,9 +2036,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     return configStartupListeners;
   }
 
-  /**
-   * Add a CustomDeployParser.
-   */
   public void addCustomDeployParser(CustomDeployParser customDeployParser) {
     customDeployParsers.add(customDeployParser);
   }
@@ -2515,6 +2509,18 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   public DatabaseConfig setQueryPlanEnable(boolean queryPlanEnable) {
     this.queryPlanEnable = queryPlanEnable;
     return this;
+  }
+
+  public String getQueryPlanOptions() {
+    return queryPlanOptions;
+  }
+
+  public void queryPlanOptions(String queryPlanOptions) {
+    this.queryPlanOptions = queryPlanOptions;
+  }
+
+  public void setQueryPlanOptions(String queryPlanOptions) {
+    queryPlanOptions(queryPlanOptions) ;
   }
 
   @Override
