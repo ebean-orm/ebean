@@ -4,6 +4,7 @@ import io.avaje.applog.AppLog;
 import io.avaje.classpath.scanner.core.Location;
 import io.ebean.DB;
 import io.ebean.Database;
+import io.ebean.DatabaseBuilder;
 import io.ebean.annotation.Platform;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -71,7 +72,7 @@ public class DefaultDbMigration implements DbMigration {
   protected DatabasePlatform databasePlatform;
   private boolean vanillaPlatform;
   protected List<Pair> platforms = new ArrayList<>();
-  protected DatabaseConfig databaseConfig;
+  protected DatabaseBuilder.Settings databaseBuilder;
   protected DbConstraintNaming constraintNaming;
   @Deprecated
   protected Boolean strictMode;
@@ -117,12 +118,13 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   @Override
-  public void setServerConfig(DatabaseConfig config) {
-    if (this.databaseConfig == null) {
-      this.databaseConfig = config;
+  public void setServerConfig(DatabaseBuilder builder) {
+    var config = builder.settings();
+    if (this.databaseBuilder == null) {
+      this.databaseBuilder = config;
     }
     if (constraintNaming == null) {
-      this.constraintNaming = databaseConfig.getConstraintNaming();
+      this.constraintNaming = databaseBuilder.getConstraintNaming();
     }
     if (databasePlatform == null) {
       this.databasePlatform = databaseConfig.getDatabasePlatform();
@@ -426,7 +428,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void configurePlatforms() {
     for (Pair pair : platforms) {
-      PlatformConfig config = databaseConfig.newPlatformConfig("dbmigration.platform", pair.prefix);
+      PlatformConfig config = databaseBuilder.newPlatformConfig("dbmigration.platform", pair.prefix);
       pair.platform.configure(config);
     }
   }
@@ -716,7 +718,7 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   private PlatformDdlWriter createDdlWriter(DatabasePlatform platform) {
-    return new PlatformDdlWriter(platform, databaseConfig, lockTimeoutSeconds);
+    return new PlatformDdlWriter(platform, databaseBuilder, lockTimeoutSeconds);
   }
 
   /**
@@ -745,15 +747,15 @@ public class DefaultDbMigration implements DbMigration {
       // not explicitly set so use the platform of the server
       databasePlatform = server.databasePlatform();
     }
-    if (databaseConfig != null) {
+    if (databaseBuilder != null) {
       // FIXME: StrictMode and header may be defined HERE and in DatabaseConfig.
       //  We shoild change either DefaultDbMigration or databaseConfig, so that it is only
       //  defined on one place
       if (strictMode != null) {
-        databaseConfig.setDdlStrictMode(strictMode);
+        databaseBuilder.setDdlStrictMode(strictMode);
       }
       if (header != null) {
-        databaseConfig.setDdlHeader(header);
+        databaseBuilder.setDdlHeader(header);
       }
     }
   }

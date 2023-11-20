@@ -1,14 +1,11 @@
 package io.ebeaninternal.server.core;
 
 import com.fasterxml.jackson.core.JsonFactory;
+import io.ebean.DatabaseBuilder;
 import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.cache.*;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.ExternalTransactionManager;
-import io.ebean.config.ProfilingConfig;
-import io.ebean.config.SlowQueryListener;
-import io.ebean.config.TempFileProvider;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.event.changelog.ChangeLogListener;
@@ -72,7 +69,7 @@ public final class InternalConfiguration {
 
   private final TableModState tableModState;
   private final boolean online;
-  private final DatabaseConfig config;
+  private final DatabaseBuilder.Settings config;
   private final BootupClasses bootupClasses;
   private final DatabasePlatform databasePlatform;
   private final DeployInherit deployInherit;
@@ -102,12 +99,12 @@ public final class InternalConfiguration {
   private boolean localL2Caching;
 
   InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
-                        DatabaseConfig config, BootupClasses bootupClasses) {
+                        DatabaseBuilder.Settings config, BootupClasses bootupClasses) {
 
     this.online = online;
     this.config = config;
     this.jacksonCorePresent = config.getClassLoadConfig().isJacksonCorePresent();
-    this.clockService = new ClockService(config.getClock());
+    this.clockService = new ClockService(config.settings().getClock());
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(service(DocStoreFactory.class));
@@ -178,7 +175,7 @@ public final class InternalConfiguration {
   /**
    * Create and return the ExpressionFactory based on configuration and database platform.
    */
-  private ExpressionFactory initExpressionFactory(DatabaseConfig config) {
+  private ExpressionFactory initExpressionFactory(DatabaseBuilder.Settings config) {
     boolean nativeIlike = config.isExpressionNativeIlike() && databasePlatform.supportsNativeIlike();
     return new DefaultExpressionFactory(config.isExpressionEqualsWithNullAsNoop(), nativeIlike);
   }
@@ -336,7 +333,7 @@ public final class InternalConfiguration {
     return config.getDatabasePlatform();
   }
 
-  public DatabaseConfig getConfig() {
+  public DatabaseBuilder.Settings getConfig() {
     return config;
   }
 
@@ -598,16 +595,18 @@ public final class InternalConfiguration {
    */
   QueryPlanLogger queryPlanLogger(Platform platform) {
     switch (platform.base()) {
-      case POSTGRES:
-        return new QueryPlanLoggerPostgres();
       case SQLSERVER:
         return new QueryPlanLoggerSqlServer();
       case ORACLE:
         return new QueryPlanLoggerOracle();
       case DB2:
         return new QueryPlanLoggerDb2(config.getQueryPlanOptions());
+      case POSTGRES:
+        return new QueryPlanLoggerExplain("explain (analyze, buffers) ");
+      case YUGABYTE:
+        return new QueryPlanLoggerExplain("explain (analyze, buffers, dist) ");
       default:
-        return new QueryPlanLoggerExplain();
+        return new QueryPlanLoggerExplain("explain ");
     }
   }
 

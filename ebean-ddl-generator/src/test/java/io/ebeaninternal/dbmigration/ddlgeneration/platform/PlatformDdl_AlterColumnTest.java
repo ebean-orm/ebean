@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.DB;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.platform.db2.DB2LuwPlatform;
 import io.ebean.platform.h2.H2Platform;
@@ -36,7 +36,7 @@ public class PlatformDdl_AlterColumnTest {
   private final SoftAssertions softly = new SoftAssertions();
 
   {
-    DatabaseConfig serverConfig = DB.getDefault().pluginApi().config();
+    DatabaseBuilder.Settings serverConfig = DB.getDefault().pluginApi().config();
     sqlServerDdl.configure(serverConfig);
   }
 

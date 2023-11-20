@@ -39,7 +39,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>3.8</version>
+      <version>3.9</version>
     </dependency>
 
     <dependency>
@@ -106,13 +106,6 @@
       <optional>true</optional>
     </dependency>
     <!-- JAKARTA-DEPENDENCY-END -->
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
 
   </dependencies>
 

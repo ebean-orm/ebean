@@ -1,7 +1,7 @@
 package io.ebean.service;
 
 import io.ebean.Database;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 
 /**
  * Creates the Database implementations. This is used internally by the EbeanServerFactory and is not currently
@@ -14,7 +14,7 @@ public interface SpiContainer {
    *
    * @param configuration The configuration information for this database.
    */
-  Database createServer(DatabaseConfig configuration);
+  Database createServer(DatabaseBuilder configuration);
 
   /**
    * Create an EbeanServer just using the name.

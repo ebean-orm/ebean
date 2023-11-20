@@ -1,6 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlWrite;
 import io.ebeaninternal.dbmigration.migration.AddHistoryTable;
 import io.ebeaninternal.dbmigration.migration.DropHistoryTable;
@@ -14,7 +14,7 @@ public interface PlatformHistoryDdl {
   /**
    * Configure typically reading the necessary parameters from DatabaseConfig and Platform.
    */
-  void configure(DatabaseConfig config, PlatformDdl platformDdl);
+  void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl);
 
   /**
    * Creates a new table and add history support to the table using platform specific mechanism.
@@ -33,7 +33,7 @@ public interface PlatformHistoryDdl {
 
   /**
    * Regenerate the history triggers/stored function due to column added/dropped/included or excluded.
-   * 
+   *
    * Note: This function may be called multiple times for the same table.
    */
   default void updateTriggers(DdlWrite writer, String tableName) {

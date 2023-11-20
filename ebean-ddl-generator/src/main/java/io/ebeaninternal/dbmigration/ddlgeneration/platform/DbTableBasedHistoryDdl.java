@@ -1,11 +1,11 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DbConstraintNaming;
 
 /**
  * Base implementation for all histories, where we must maintain history table (trigger based, db2 and hana)
- * 
+ *
  * @author Roland Praml, FOCONIS AG
  *
  */
@@ -16,7 +16,7 @@ public abstract class DbTableBasedHistoryDdl implements PlatformHistoryDdl.Table
   protected PlatformDdl platformDdl;
 
   @Override
-  public void configure(DatabaseConfig config, PlatformDdl platformDdl) {
+  public void configure(DatabaseBuilder.Settings config, PlatformDdl platformDdl) {
     this.platformDdl = platformDdl;
     this.historySuffix = config.getHistoryTableSuffix();
     this.constraintNaming = config.getConstraintNaming();

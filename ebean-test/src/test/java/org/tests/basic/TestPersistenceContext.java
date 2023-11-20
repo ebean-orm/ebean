@@ -4,6 +4,7 @@ import io.ebean.DB;
 import io.ebean.DatabaseFactory;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiPersistenceContext;

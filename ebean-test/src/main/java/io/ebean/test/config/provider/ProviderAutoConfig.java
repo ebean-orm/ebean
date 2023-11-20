@@ -1,10 +1,8 @@
 package io.ebean.test.config.provider;
 
 import io.avaje.applog.AppLog;
-import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.CurrentUserProvider;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.EncryptKeyManager;
+import io.ebean.DatabaseBuilder;
+import io.ebean.config.*;
 
 import java.util.Properties;
 
@@ -18,10 +16,10 @@ public class ProviderAutoConfig {
 
   private static final System.Logger log = AppLog.getLogger("io.ebean.test");
 
-  private final DatabaseConfig config;
+  private final DatabaseBuilder.Settings config;
   private final Properties properties;
 
-  public ProviderAutoConfig(DatabaseConfig config) {
+  public ProviderAutoConfig(DatabaseBuilder.Settings config) {
     this.config = config;
     this.properties = config.getProperties();
   }
@@ -47,7 +45,7 @@ public class ProviderAutoConfig {
     if (keyManager == null) {
       // Must be 16 Chars for Oracle function
       String keyVal = properties.getProperty("ebean.test.encryptKey", "simple0123456789");
-      log.log(DEBUG, "for testing - using FixedEncryptKeyManager() keyVal:{0}", keyVal);
+      log.log(DEBUG, "for testing purposes using FixedEncryptKeyManager() keyVal:{0}", keyVal);
       config.setEncryptKeyManager(new FixedEncryptKeyManager(keyVal));
     }
 
@@ -59,7 +57,7 @@ public class ProviderAutoConfig {
   String msg(int providerSetFlag) {
     String msg = msgProvider(providerSetFlag);
     String usage = msgUsage(providerSetFlag);
-    return "For testing purposes " + msg + " has been configured. Use io.ebean.test.UserContext to " + usage + " in tests.";
+    return "for testing purposes " + msg + " has been configured. Use io.ebean.test.UserContext to " + usage + " in tests.";
   }
 
   private String msgProvider(int providerSetFlag) {

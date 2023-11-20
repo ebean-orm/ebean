@@ -75,21 +75,12 @@ class SimpleQueryBeanWriter {
   }
 
   private void gatherPropertyDetails() {
-    importTypes.add(Constants.GENERATED);
     importTypes.add(beanFullName);
-    importTypes.add(Constants.TYPEQUERYBEAN);
     if (embeddable) {
       importTypes.add(Constants.TQASSOC);
     } else {
       importTypes.add(Constants.TQASSOCBEAN);
       importTypes.add(Constants.TQROOTBEAN);
-      importTypes.add(Constants.DATABASE);
-      importTypes.add(Constants.FETCHGROUP);
-      importTypes.add(Constants.QUERY);
-      importTypes.add(Constants.TRANSACTION);
-      importTypes.add(Constants.CONSUMER);
-      importTypes.add(Constants.EXPR);
-      importTypes.add(Constants.EXPRESSIONLIST);
     }
 
     if (implementsInterface != null) {
@@ -170,7 +161,7 @@ class SimpleQueryBeanWriter {
     writer.append("   * }</pre>").eol();
     writer.append("   */").eol();
     writer.append("  public static Q%s forFetchGroup() {", shortName).eol();
-    writer.append("    return new Q%s(FetchGroup.queryFor(%s.class));", shortName, shortName).eol();
+    writer.append("    return new Q%s(io.ebean.FetchGroup.queryFor(%s.class));", shortName, shortName).eol();
     writer.append("  }").eol();
     writer.eol();
 
@@ -186,7 +177,7 @@ class SimpleQueryBeanWriter {
     writer.eol();
 
     writer.append("  /** Construct with a given transaction */").eol();
-    writer.append("  public Q%s(Transaction transaction) {", shortName).eol();
+    writer.append("  public Q%s(io.ebean.Transaction transaction) {", shortName).eol();
     if (dbName == null) {
       writer.append("    super(%s.class, transaction);", shortName).eol();
     } else {
@@ -196,7 +187,7 @@ class SimpleQueryBeanWriter {
 
     writer.eol();
     writer.append("  /** Construct with a given Database */").eol();
-    writer.append("  public Q%s(Database database) {", shortName).eol();
+    writer.append("  public Q%s(io.ebean.Database database) {", shortName).eol();
     writer.append("    super(%s.class, database);", shortName).eol();
     writer.append("  }").eol();
     writer.eol();
@@ -209,13 +200,13 @@ class SimpleQueryBeanWriter {
 
     writer.eol();
     writer.append("  /** Private constructor for FetchGroup building */").eol();
-    writer.append("  private Q%s(Query<%s> fetchGroupQuery) {", shortName, shortName).eol();
+    writer.append("  private Q%s(io.ebean.Query<%s> fetchGroupQuery) {", shortName, shortName).eol();
     writer.append("    super(fetchGroupQuery);").eol();
     writer.append("  }").eol();
 
     writer.eol();
     writer.append("  /** Private constructor for filterMany */").eol();
-    writer.append("  private Q%s(ExpressionList<%s> filter) {", shortName, shortName).eol();
+    writer.append("  private Q%s(io.ebean.ExpressionList<%s> filter) {", shortName, shortName).eol();
     writer.append("    super(filter);").eol();
     writer.append("  }").eol();
   }
@@ -301,8 +292,8 @@ class SimpleQueryBeanWriter {
 
   private void writeAssocFilterMany() {
     writer.eol();
-    writer.append("    public final R filterMany(Consumer<Q%s> apply) {", shortName).eol();
-    writer.append("      final ExpressionList list = Expr.factory().expressionList();", shortName).eol();
+    writer.append("    public final R filterMany(java.util.function.Consumer<Q%s> apply) {", shortName).eol();
+    writer.append("      final io.ebean.ExpressionList list = io.ebean.Expr.factory().expressionList();", shortName).eol();
     writer.append("      final var qb = new Q%s(list);", shortName).eol();
     writer.append("      apply.accept(qb);").eol();
     writer.append("      expr().filterMany(_name).addAll(list);").eol();

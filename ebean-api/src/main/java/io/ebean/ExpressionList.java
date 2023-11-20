@@ -54,7 +54,7 @@ public interface ExpressionList<T> {
   Query<T> orderById(boolean orderById);
 
   /**
-   * Deprecated migrate to {@link #orderBy(String)}
+   * @deprecated migrate to {@link #orderBy(String)}
    */
   @Deprecated(since = "13.19", forRemoval = true)
   default ExpressionList<T> order(String orderByClause) {
@@ -72,7 +72,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> orderBy(String orderBy);
 
   /**
-   * Deprecated migrate to orderBy().
+   * @deprecated migrate to {@link #orderBy()}.
    */
   @Deprecated(forRemoval = true)
   default OrderBy<T> order() {
@@ -508,7 +508,7 @@ public interface ExpressionList<T> {
   ExpressionList<T> filterMany(String manyProperty);
 
   /**
-   * Deprecated for removal - migrate to filterManyRaw()
+   * @deprecated for removal - migrate to {@link #filterManyRaw(String, String, Object...)}.
    * <p>
    * Add filter expressions to the many property.
    *

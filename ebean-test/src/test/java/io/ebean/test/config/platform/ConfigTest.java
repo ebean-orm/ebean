@@ -1,8 +1,9 @@
 package io.ebean.test.config.platform;
 
 import io.ebean.annotation.Platform;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.datasource.DataSourceConfig;
+import io.ebean.datasource.DataSourceBuilder;
 import io.ebeaninternal.api.DbOffline;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,10 +38,10 @@ class ConfigTest {
 
   @Test
   void extensions_whenNoSetValues() {
-    DatabaseConfig databaseConfig = new DatabaseConfig();
-    databaseConfig.loadFromProperties(new Properties());
+    DatabaseConfig databaseBuilder = new DatabaseConfig();
+    databaseBuilder.loadFromProperties(new Properties());
 
-    Config config = new Config("db", "postgis", "db", databaseConfig);
+    Config config = new Config("db", "postgis", "db", databaseBuilder);
 
     config.setUsernameDefault();
     config.setPasswordDefault();
@@ -55,13 +56,13 @@ class ConfigTest {
 
   @Test
   void extensions_whenSetValues() {
-    DatabaseConfig databaseConfig = new DatabaseConfig();
+    DatabaseConfig databaseBuilder = new DatabaseConfig();
     Properties properties = new Properties();
     properties.setProperty("ebean.test.extensions", "x,y");
     properties.setProperty("ebean.test.extraDb.extensions", "z");
-    databaseConfig.loadFromProperties(properties);
+    databaseBuilder.loadFromProperties(properties);
 
-    Config config = new Config("db", "postgis", "db", databaseConfig);
+    Config config = new Config("db", "postgis", "db", databaseBuilder);
 
     config.setExtensions("a,b");
     config.setExtraExtensions("c,d");
@@ -85,8 +86,8 @@ class ConfigTest {
     PostgresSetup postgresSetup = new PostgresSetup();
     postgresSetup.setupExtraDbDataSource(config);
 
-    DataSourceConfig ds = serverConfig.getDataSourceConfig();
-    assertThat(ds.getUsername()).isEqualTo("other");
+    DataSourceBuilder ds = serverConfig.getDataSourceConfig();
+    assertThat(ds.settings().getUsername()).isEqualTo("other");
 
     p = serverConfig.getProperties();
     assertThat(p.getProperty("datasource.other.username")).isEqualTo("other");
@@ -107,8 +108,8 @@ class ConfigTest {
     PostgresSetup postgresSetup = new PostgresSetup();
     postgresSetup.setupExtraDbDataSource(config);
 
-    DataSourceConfig ds = serverConfig.getDataSourceConfig();
-    assertThat(ds.getUsername()).isEqualTo("other");
+    DataSourceBuilder ds = serverConfig.getDataSourceConfig();
+    assertThat(ds.settings().getUsername()).isEqualTo("other");
 
     p = serverConfig.getProperties();
     assertThat(p.getProperty("datasource.other.username")).isEqualTo("other");
@@ -135,8 +136,8 @@ class ConfigTest {
     postgresSetup.setupExtraDbDataSource(config);
 
 
-    DataSourceConfig ds = serverConfig.getDataSourceConfig();
-    assertThat(ds.getUsername()).isEqualTo("other_user");
+    DataSourceBuilder ds = serverConfig.getDataSourceConfig();
+    assertThat(ds.settings().getUsername()).isEqualTo("other_user");
 
     p = serverConfig.getProperties();
     assertThat(p.getProperty("datasource.other_db_name.username")).isEqualTo("other_user");
@@ -163,7 +164,7 @@ class ConfigTest {
     assertThat(mainProps.getProperty("datasource.main.username")).isEqualTo("main");
 
 
-    DatabaseConfig centralConfig = new DatabaseConfig();
+    DatabaseBuilder centralConfig = new DatabaseConfig();
     centralConfig.setName("central");
     centralConfig.loadFromProperties(sourceProperties);
 

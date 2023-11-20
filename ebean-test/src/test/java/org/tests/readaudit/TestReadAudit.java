@@ -1,5 +1,6 @@
 package org.tests.readaudit;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
@@ -302,7 +303,7 @@ public class TestReadAudit extends BaseTestCase {
 
   private Database createServer() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2other");
     config.loadFromProperties();
 

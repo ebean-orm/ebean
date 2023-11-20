@@ -4,6 +4,7 @@ package io.ebean.xtest.config;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.annotation.Platform;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Disabled;
@@ -26,7 +27,7 @@ public class ServerConfigSqlServerTest {
     // no explicit databasePlatformName set ..
     //props.setProperty("ebean.some_sqlserver.databasePlatformName", "sqlserver17");
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("some_sqlserver");
     config.loadFromProperties(props);
 
@@ -61,7 +62,7 @@ public class ServerConfigSqlServerTest {
 
     String name = "testsqlserver17";
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName(name);
 
     Properties props = props(name);
@@ -94,7 +95,7 @@ public class ServerConfigSqlServerTest {
     Properties props = props(name);
     //props.setProperty("ebean.testsqlserver16.databasePlatformName", "sqlserver16");
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setDefaultServer(false);
     config.setRegister(false);
     config.setDdlGenerate(true);

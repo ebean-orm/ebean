@@ -113,13 +113,13 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-joda-time</artifactId>
-        <version>13.18.0</version>
+        <version>13.24.0</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-jackson-jsonnode</artifactId>
-        <version>13.18.0</version>
+        <version>13.24.0</version>
       </dependency>
 
       <dependency>
@@ -162,21 +162,18 @@
         <groupId>io.ebean</groupId>
         <artifactId>querybean-generator</artifactId>
         <version>13.25.0-jakarta</version>
-        <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>kotlin-querybean-generator</artifactId>
         <version>13.25.0-jakarta</version>
-        <scope>provided</scope>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-test</artifactId>
         <version>13.25.0-jakarta</version>
-        <scope>test</scope>
       </dependency>
 
       <dependency>

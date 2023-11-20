@@ -188,7 +188,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
   }
 
   /**
-   * Deprecated for removal - migrate to filterManyRaw()
+   * @deprecated for removal - migrate to {@link #filterManyRaw(String, Object...)}.
    * <p>
    * Apply a filter when fetching these beans.
    * <p>

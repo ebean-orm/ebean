@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 
+import io.ebean.DatabaseBuilder;
 import io.localtest.BaseTestCase;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelBuild_compound_IdClassTest extends BaseTestCase {
 
   private SpiEbeanServer createServer() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");

@@ -222,9 +222,9 @@ final class AnnotationAssocManys extends AnnotationAssoc {
 
     int sortOrder = 0;
     if (!prop.getManyType().isMap()) {
-      elementDescriptor.setProperties(new String[]{"value"});
+      elementDescriptor.setPropertyNames(new String[]{"value"});
     } else {
-      elementDescriptor.setProperties(new String[]{"key", "value"});
+      elementDescriptor.setPropertyNames(new String[]{"key", "value"});
       String dbKeyColumn = "mkey";
       MapKeyColumn mapKeyColumn = get(prop, MapKeyColumn.class);
       if (mapKeyColumn != null) {

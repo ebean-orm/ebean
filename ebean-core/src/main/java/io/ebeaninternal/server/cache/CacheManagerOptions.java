@@ -4,7 +4,7 @@ import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.config.CurrentTenantProvider;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.server.cluster.ClusterManager;
 
 /**
@@ -14,6 +14,7 @@ public final class CacheManagerOptions {
 
   private final ClusterManager clusterManager;
   private final String serverName;
+  private final DatabaseBuilder.Settings databaseBuilder;
   private final boolean localL2Caching;
   private CurrentTenantProvider currentTenantProvider;
   private QueryCacheEntryValidate queryCacheEntryValidate;
@@ -32,7 +33,7 @@ public final class CacheManagerOptions {
     this.queryDefault = new ServerCacheOptions();
   }
 
-  public CacheManagerOptions(ClusterManager clusterManager, DatabaseConfig config, boolean localL2Caching) {
+  public CacheManagerOptions(ClusterManager clusterManager, DatabaseBuilder.Settings config, boolean localL2Caching) {
     this.clusterManager = clusterManager;
     this.serverName = config.getName();
     this.localL2Caching = localL2Caching;
