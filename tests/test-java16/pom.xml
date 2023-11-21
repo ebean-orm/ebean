@@ -5,7 +5,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.25.0-FOC2-SNAPSHOT</version>
+    <version>13.25.0-FOC3-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-java16</artifactId>
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-h2</artifactId>
-      <version>13.25.0-FOC2-SNAPSHOT</version>
+      <version>13.25.0-FOC3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
