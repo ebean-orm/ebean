@@ -1,8 +1,8 @@
 package org.tests.basic;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Update;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +10,7 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,13 +38,17 @@ public class TestUpdate extends BaseTestCase {
 
   @Test
   public void testNormal() {
+    String sillyContent = "a123456789b123456789c123456789d123456789e123456789";
     for (int i = 1; i <= 3; i++) {
       Update<Customer> update = DB.createUpdate(Customer.class,
         "update customer set smallnote = :smallnote where name in (:name)");
-      update.setParameter("name", Arrays.asList("testUpdate" + i)).setParameter("smallnote", "Note #" + i).execute();
+      update
+        .setParameter("name", List.of("testUpdate" + i))
+        .setParameter("smallnote", "Note #" + i + sillyContent)
+        .execute();
     }
     Customer cust = DB.find(Customer.class).where().eq("name", "testUpdate3").findOne();
-    assertThat(cust.getSmallnote()).isEqualTo("Note #3");
+    assertThat(cust.getSmallnote()).isEqualTo("Note #3" + sillyContent);
   }
 
   @Test

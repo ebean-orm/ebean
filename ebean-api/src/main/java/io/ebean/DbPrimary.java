@@ -46,23 +46,10 @@ final class DbPrimary {
   static String getDefaultServerName() {
     lock.lock();
     try {
-      getProperties();
-      return defaultServerName;
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  /**
-   * Return the default configuration Properties.
-   */
-  static Properties getProperties() {
-    lock.lock();
-    try {
       if (defaultServerName == null) {
         defaultServerName = determineDefaultServerName();
       }
-      return Config.asProperties();
+      return defaultServerName;
     } finally {
       lock.unlock();
     }

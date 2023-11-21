@@ -3,10 +3,9 @@ package io.ebean;
 import io.ebean.config.ContainerConfig;
 import io.ebean.service.SpiContainer;
 import io.ebean.service.SpiContainerFactory;
-
 import jakarta.persistence.PersistenceException;
+
 import java.util.Iterator;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -146,12 +145,9 @@ public final class DatabaseFactory {
     if (container != null) {
       return container;
     }
-
     if (containerConfig == null) {
       // effectively load configuration from ebean.properties
-      Properties properties = DbPrimary.getProperties();
       containerConfig = new ContainerConfig();
-      containerConfig.loadFromProperties(properties);
     }
     container = createContainer(containerConfig);
     return container;
@@ -160,7 +156,7 @@ public final class DatabaseFactory {
   /**
    * Create the container instance using the configuration.
    */
-  protected static SpiContainer createContainer(ContainerConfig containerConfig) {
+  private static SpiContainer createContainer(ContainerConfig containerConfig) {
     Iterator<SpiContainerFactory> factories = ServiceLoader.load(SpiContainerFactory.class).iterator();
     if (factories.hasNext()) {
       return factories.next().create(containerConfig);

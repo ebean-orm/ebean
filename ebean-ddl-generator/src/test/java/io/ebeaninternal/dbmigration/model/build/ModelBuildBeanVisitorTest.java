@@ -1,8 +1,6 @@
 package io.ebeaninternal.dbmigration.model.build;
 
 
-import io.ebean.DatabaseBuilder;
-import io.localtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
@@ -11,11 +9,13 @@ import io.ebean.platform.h2.H2Platform;
 import io.ebean.platform.sqlserver.SqlServer17Platform;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DefaultConstraintMaxLength;
+import io.ebeaninternal.dbmigration.migration.ForeignKey;
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MCompoundForeignKey;
 import io.ebeaninternal.dbmigration.model.MTable;
 import io.ebeaninternal.dbmigration.model.ModelContainer;
 import io.ebeaninternal.dbmigration.model.visitor.VisitAllUsing;
+import io.localtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.CKeyAssoc;
 import org.tests.model.basic.CKeyDetail;
@@ -44,10 +44,12 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     new VisitAllUsing(addTable, defaultServer).visitAllBeans();
 
     assert_compound_pk(model);
+    assert_compound_fk(model);
 
     assert_discriminatorColumn_explicit(model);
     assert_discriminatorColumn_implied(model);
     assert_discriminatorColumn_length(model);
+    assert_comment_onManyToOne(model);
   }
 
   @Test
@@ -73,7 +75,7 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     config.setDbOffline(true);
     config.setDatabasePlatform(new SqlServer17Platform());
 
-    final SpiEbeanServer database = (SpiEbeanServer)DatabaseFactory.create(config);
+    final SpiEbeanServer database = (SpiEbeanServer) DatabaseFactory.create(config);
     try {
       ModelBuildContext ctx = new ModelBuildContext(model, config.getDatabasePlatform(), config.getConstraintNaming(), true);
 
@@ -105,6 +107,21 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     assertThat(item.primaryKeyColumns()).hasSize(2);
   }
 
+  private void assert_compound_fk(ModelContainer model) {
+    MTable item = model.getTable("item");
+    assertThat(item).isNotNull();
+    List<MCompoundForeignKey> compoundKeys = item.getCompoundKeys();
+    assertThat(compoundKeys).hasSize(1);
+
+    MCompoundForeignKey compoundForeignKey = compoundKeys.get(0);
+    ForeignKey foreignKey = compoundForeignKey.createForeignKey();
+    assertThat(foreignKey.getName()).isEqualTo("fk_item_etype");
+    assertThat(foreignKey.getColumnNames()).isEqualTo("customer,type");
+    assertThat(foreignKey.getRefTableName()).isEqualTo("\"type\"");
+    assertThat(foreignKey.getOnDelete()).isEqualTo("SET_NULL");
+    assertThat(foreignKey.getOnUpdate()).isEqualTo("SET_DEFAULT");
+  }
+
   private void assert_discriminatorColumn_explicit(ModelContainer model) {
 
     MTable configuration = model.getTable("configuration");
@@ -127,5 +144,12 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     MColumn discTypeColumn = configuration.getColumn("dtype");
     assertThat(discTypeColumn.getType()).isEqualTo("varchar(3)");
     assertThat(discTypeColumn.isNotnull()).isTrue();
+  }
+
+  private void assert_comment_onManyToOne(ModelContainer model) {
+    MTable message = model.getTable("c_message");
+    MColumn conversation = message.getColumn("conversation_id");
+    assertThat(conversation.getType()).isEqualTo("bigint");
+    assertThat(conversation.getComment()).isEqualTo("A ManyToOne comment");
   }
 }

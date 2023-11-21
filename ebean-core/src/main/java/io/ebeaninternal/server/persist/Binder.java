@@ -119,7 +119,11 @@ public final class Binder {
             if (param.isEncryptionKey()) {
               bindLog.append("****");
             } else {
-              bindLog.append(value);
+              String sv = String.valueOf(value);
+              if (sv.length() > 50) {
+                sv = sv.substring(0, 47) + "...";
+              }
+              bindLog.append(sv);
             }
           }
           if (value instanceof Collection) {

@@ -21,9 +21,4 @@ class DbPrimaryTest {
     assertEquals("h2", DbPrimary.getDefaultServerName());
   }
 
-  @Test
-  void testLoadProperties() {
-    Properties properties = DbPrimary.getProperties();
-    assertFalse(properties.isEmpty());
-  }
 }
