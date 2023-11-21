@@ -30,14 +30,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.25.0-FOC2-SNAPSHOT</version>
+      <version>13.25.0-FOC3-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>13.25.0-FOC2-SNAPSHOT</version>
+      <version>13.25.0-FOC3-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
 
