@@ -278,7 +278,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.partitionMeta = deploy.getPartitionMeta();
     this.tablespaceMeta = deploy.getTablespaceMeta();
     this.storageEngine = deploy.getStorageEngine();
-    this.autoTunable = beanFinder == null && (entityType == EntityType.ORM || entityType == EntityType.VIEW);
+    this.autoTunable = entityType == EntityType.ORM || entityType == EntityType.VIEW;
     // helper object used to derive lists of properties
     DeployBeanPropertyLists listHelper = new DeployBeanPropertyLists(owner, this, deploy);
     this.softDeleteProperty = listHelper.getSoftDeleteProperty();
