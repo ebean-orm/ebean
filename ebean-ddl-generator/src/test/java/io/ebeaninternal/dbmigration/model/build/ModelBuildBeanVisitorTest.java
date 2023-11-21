@@ -49,6 +49,7 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     assert_discriminatorColumn_explicit(model);
     assert_discriminatorColumn_implied(model);
     assert_discriminatorColumn_length(model);
+    assert_comment_onManyToOne(model);
   }
 
   @Test
@@ -143,5 +144,12 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
     MColumn discTypeColumn = configuration.getColumn("dtype");
     assertThat(discTypeColumn.getType()).isEqualTo("varchar(3)");
     assertThat(discTypeColumn.isNotnull()).isTrue();
+  }
+
+  private void assert_comment_onManyToOne(ModelContainer model) {
+    MTable message = model.getTable("c_message");
+    MColumn conversation = message.getColumn("conversation_id");
+    assertThat(conversation.getType()).isEqualTo("bigint");
+    assertThat(conversation.getComment()).isEqualTo("A ManyToOne comment");
   }
 }

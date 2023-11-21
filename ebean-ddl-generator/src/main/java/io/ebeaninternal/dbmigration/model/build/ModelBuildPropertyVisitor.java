@@ -203,6 +203,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       MColumn col = table.addColumn(dbCol, columnDefn, !p.isNullable());
       col.setDbMigrationInfos(p.dbMigrationInfos());
       col.setDefaultValue(p.dbColumnDefault());
+      col.setComment(p.dbComment());
       if (addForeignKey) {
         if (columns.length > 1) {
           compoundKey.addColumnPair(dbCol, refColumn);
