@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.25.0-FOC3-SNAPSHOT</version>
+    <version>13.25.0-FOC3</version>
   </parent>
 
   <name>querybean generator</name>
