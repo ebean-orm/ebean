@@ -6,9 +6,7 @@ import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
 import io.ebean.annotation.Platform;
-import io.ebean.config.DbConstraintNaming;
-import io.ebean.config.PlatformConfig;
-import io.ebean.config.PropertiesWrapper;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatformProvider;
 import io.ebean.dbmigration.DbMigration;
@@ -336,10 +334,10 @@ public class DefaultDbMigration implements DbMigration {
     final File topDir = migrationDirectory(false);
     if (!platforms.isEmpty()) {
       for (Pair pair : platforms) {
-        new IndexMigration(topDir, migrationPath, pair, databaseBuilder.getClassLoadConfig()).generate();
+        new IndexMigration(topDir, pair).generate();
       }
     } else {
-      new IndexMigration(topDir, migrationPath, databasePlatform, databaseBuilder.getClassLoadConfig()).generate();
+      new IndexMigration(topDir, databasePlatform).generate();
     }
   }
 

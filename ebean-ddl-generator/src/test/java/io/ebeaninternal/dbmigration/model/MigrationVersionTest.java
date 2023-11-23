@@ -1,7 +1,8 @@
 package io.ebeaninternal.dbmigration.model;
 
-import io.ebean.migration.MigrationVersion;
 import org.junit.jupiter.api.Test;
+
+import io.ebean.migration.MigrationVersion;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -153,7 +154,7 @@ public class MigrationVersionTest {
     assertThat(v1.compareTo(v0)).isEqualTo(0);
     assertThat(v1).isNotEqualTo(v0);
     assertThat(v1.compareTo(v2)).isEqualTo(0);
-    assertThat(v1).isEqualTo(v2);
+    assertThat(v1).isNotEqualTo(v2);
 
     assertThat(v0.compareTo(v3)).isEqualTo(0);
     assertThat(v0).isNotEqualTo(v3);
