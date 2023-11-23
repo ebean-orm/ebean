@@ -1336,7 +1336,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
 
   @Override
   public boolean skipDataSourceCheck() {
-    return skipDataSourceCheck;
+    return skipDataSourceCheck || readOnlyDatabase;
   }
 
   @Override
