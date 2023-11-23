@@ -2128,6 +2128,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     loadDocStoreSettings(p);
 
     defaultServer = p.getBoolean("defaultServer", defaultServer);
+    readOnlyDatabase = p.getBoolean("readOnlyDatabase", readOnlyDatabase);
     autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
     maxCallStack = p.getInt("maxCallStack", maxCallStack);

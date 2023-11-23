@@ -74,6 +74,7 @@ class DatabaseConfigTest {
     props.setProperty("forUpdateNoKey", "true");
     props.setProperty("defaultServer", "false");
     props.setProperty("skipDataSourceCheck", "true");
+    props.setProperty("readOnlyDatabase", "true");
 
     props.setProperty("queryPlan.enable", "true");
     props.setProperty("queryPlan.thresholdMicros", "10000");
@@ -93,6 +94,7 @@ class DatabaseConfigTest {
     assertTrue(settings.isAutoLoadModuleInfo());
     assertTrue(settings.isLoadModuleInfo());
     assertTrue(settings.skipDataSourceCheck());
+    assertTrue(settings.readOnlyDatabase());
 
     assertTrue(settings.isIdGeneratorAutomatic());
     assertFalse(settings.getPlatformConfig().isCaseSensitiveCollation());
