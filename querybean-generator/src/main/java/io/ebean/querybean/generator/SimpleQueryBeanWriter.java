@@ -76,13 +76,6 @@ class SimpleQueryBeanWriter {
 
   private void gatherPropertyDetails() {
     importTypes.add(beanFullName);
-    if (embeddable) {
-      importTypes.add(Constants.TQASSOC);
-    } else {
-      importTypes.add(Constants.TQASSOCBEAN);
-      importTypes.add(Constants.TQROOTBEAN);
-    }
-
     if (implementsInterface != null) {
       implementsInterfaceFullName = implementsInterface.getQualifiedName().toString();
       boolean nested = implementsInterface.getNestingKind().isNested();
@@ -233,7 +226,7 @@ class SimpleQueryBeanWriter {
       writer.append("public final class Q%s {", shortName).eol();
     } else {
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      writer.append("public final class Q%s extends TQRootBean<%1$s,Q%1$s> {", shortName).eol();
+      writer.append("public final class Q%s extends io.ebean.typequery.TQRootBean<%1$s,Q%1$s> {", shortName).eol();
     }
     writer.eol();
   }
@@ -272,9 +265,9 @@ class SimpleQueryBeanWriter {
     writer.append("  ").append(Constants.AT_GENERATED).eol();
     writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
     if (embeddable) {
-      writer.append("  public static final class Assoc<R> extends TQAssoc<%s,R> {", shortInnerName).eol();
+      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssoc<%s,R> {", shortInnerName).eol();
     } else {
-      writer.append("  public static final class Assoc<R> extends TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName).eol();
+      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName).eol();
     }
     for (PropertyMeta property : properties) {
       writer.append("  ");
