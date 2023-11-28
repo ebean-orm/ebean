@@ -19,8 +19,6 @@ interface Constants {
   String DBJSONB = "io.ebean.annotation.DbJsonB";
   String DBNAME = "io.ebean.annotation.DbName";
 
-  String DB = "io.ebean.DB";
-
   String MODULEINFO = "io.ebean.config.ModuleInfo";
   String METAINF_MANIFEST = "META-INF/ebean-generated-info.mf";
   String METAINF_SERVICES_MODULELOADER = "META-INF/services/io.ebean.config.EntityClassRegister";

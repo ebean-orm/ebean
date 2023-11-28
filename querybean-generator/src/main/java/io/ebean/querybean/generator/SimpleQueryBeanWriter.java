@@ -85,9 +85,6 @@ class SimpleQueryBeanWriter {
       importTypes.add(Constants.JAVA_COLLECTION);
       importTypes.add(implementsInterfaceFullName);
     }
-    if (dbName != null) {
-      importTypes.add(Constants.DB);
-    }
     addClassProperties();
   }
 
@@ -164,7 +161,7 @@ class SimpleQueryBeanWriter {
     if (dbName == null) {
       writer.append("    super(%s.class);", shortName).eol();
     } else {
-      writer.append("    super(%s.class, DB.byName(\"%s\"));", shortName, dbName).eol();
+      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"));", shortName, dbName).eol();
     }
     writer.append("  }").eol();
     writer.eol();
@@ -174,7 +171,7 @@ class SimpleQueryBeanWriter {
     if (dbName == null) {
       writer.append("    super(%s.class, transaction);", shortName).eol();
     } else {
-      writer.append("    super(%s.class, DB.byName(\"%s\"), transaction);", shortName, dbName).eol();
+      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"), transaction);", shortName, dbName).eol();
     }
     writer.append("  }").eol();
 
