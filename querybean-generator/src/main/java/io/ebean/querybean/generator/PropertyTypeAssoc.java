@@ -16,7 +16,7 @@ class PropertyTypeAssoc extends PropertyType {
    * @param importName the import for the Assoc bean.
    */
   PropertyTypeAssoc(String qAssocTypeName, String importName) {
-    super(qAssocTypeName);
+    super(qAssocTypeName, "");
     this.importName = importName;
   }
 
@@ -24,7 +24,7 @@ class PropertyTypeAssoc extends PropertyType {
    * All required imports to the allImports set.
    */
   @Override
-  void addImports(Set<String> allImports) {
+  void addImports(Set<String> allImports, boolean fullyQualify) {
     allImports.add(importName);
   }
 

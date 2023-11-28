@@ -7,13 +7,8 @@ import java.net.InetAddress;
 import java.net.URI;
 import java.net.URL;
 import java.sql.Timestamp;
-import java.util.Calendar;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Holds the Property types and how they match to class types.
@@ -25,7 +20,9 @@ class PropertyTypeMap {
    */
   private final PropertyType dbJsonType = new PropertyType("PJson");
 
-  private final Map<String,PropertyType> map = new HashMap<>();
+  private final Map<String, PropertyType> map = new HashMap<>();
+
+  private final Set<String> propertyNames;
 
   PropertyTypeMap() {
     map.put("boolean", new PropertyType("PBoolean"));
@@ -64,11 +61,17 @@ class PropertyTypeMap {
     map.put("io.ebean.types.Cidr", new PropertyType("PCidr"));
     addJava8Types();
     addJodaTypes();
+
+    propertyNames = map.values().stream().map(PropertyType::propertyType).collect(Collectors.toSet());
+  }
+
+  boolean isNameClash(String name) {
+    return propertyNames.contains(name);
   }
 
   private void addType(Class<?> cls) {
     String simpleName = cls.getSimpleName();
-    map.put(cls.getName(), new PropertyType("P"+simpleName));
+    map.put(cls.getName(), new PropertyType("P" + simpleName));
   }
 
   private void addJava8Types() {

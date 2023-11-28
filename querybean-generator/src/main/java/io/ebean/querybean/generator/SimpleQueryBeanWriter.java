@@ -33,6 +33,7 @@ class SimpleQueryBeanWriter {
   private String shortName;
   private final String shortInnerName;
   private final String origShortName;
+  private final boolean fullyQualify;
   private Append writer;
 
   SimpleQueryBeanWriter(TypeElement element, ProcessingContext processingContext) {
@@ -49,6 +50,7 @@ class SimpleQueryBeanWriter {
     this.embeddable = processingContext.isEmbeddable(element);
     this.dbName = findDbName();
     this.implementsInterface = initInterface(element);
+    this.fullyQualify = processingContext.isNameClash(shortName);
   }
 
   private TypeElement initInterface(TypeElement element) {
@@ -76,13 +78,6 @@ class SimpleQueryBeanWriter {
 
   private void gatherPropertyDetails() {
     importTypes.add(beanFullName);
-    if (embeddable) {
-      importTypes.add(Constants.TQASSOC);
-    } else {
-      importTypes.add(Constants.TQASSOCBEAN);
-      importTypes.add(Constants.TQROOTBEAN);
-    }
-
     if (implementsInterface != null) {
       implementsInterfaceFullName = implementsInterface.getQualifiedName().toString();
       boolean nested = implementsInterface.getNestingKind().isNested();
@@ -91,9 +86,6 @@ class SimpleQueryBeanWriter {
       importTypes.add(Constants.AVAJE_LANG_NULLABLE);
       importTypes.add(Constants.JAVA_COLLECTION);
       importTypes.add(implementsInterfaceFullName);
-    }
-    if (dbName != null) {
-      importTypes.add(Constants.DB);
     }
     addClassProperties();
   }
@@ -107,7 +99,7 @@ class SimpleQueryBeanWriter {
     for (VariableElement field : processingContext.allFields(element)) {
       PropertyType type = processingContext.getPropertyType(field);
       if (type != null) {
-        type.addImports(importTypes);
+        type.addImports(importTypes, fullyQualify);
         properties.add(new PropertyMeta(field.getSimpleName().toString(), type));
       }
     }
@@ -171,7 +163,7 @@ class SimpleQueryBeanWriter {
     if (dbName == null) {
       writer.append("    super(%s.class);", shortName).eol();
     } else {
-      writer.append("    super(%s.class, DB.byName(\"%s\"));", shortName, dbName).eol();
+      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"));", shortName, dbName).eol();
     }
     writer.append("  }").eol();
     writer.eol();
@@ -181,7 +173,7 @@ class SimpleQueryBeanWriter {
     if (dbName == null) {
       writer.append("    super(%s.class, transaction);", shortName).eol();
     } else {
-      writer.append("    super(%s.class, DB.byName(\"%s\"), transaction);", shortName, dbName).eol();
+      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"), transaction);", shortName, dbName).eol();
     }
     writer.append("  }").eol();
 
@@ -216,7 +208,7 @@ class SimpleQueryBeanWriter {
    */
   private void writeFields() {
     for (PropertyMeta property : properties) {
-      property.writeFieldDefn(writer, shortName, false);
+      property.writeFieldDefn(writer, shortName, false, fullyQualify);
       writer.eol();
     }
     writer.eol();
@@ -233,7 +225,7 @@ class SimpleQueryBeanWriter {
       writer.append("public final class Q%s {", shortName).eol();
     } else {
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      writer.append("public final class Q%s extends TQRootBean<%1$s,Q%1$s> {", shortName).eol();
+      writer.append("public final class Q%s extends io.ebean.typequery.TQRootBean<%1$s,Q%1$s> {", shortName).eol();
     }
     writer.eol();
   }
@@ -260,7 +252,7 @@ class SimpleQueryBeanWriter {
     writer.append("  ").append(Constants.AT_GENERATED).eol();
     writer.append("  public static final class Alias {").eol();
     for (PropertyMeta property : properties) {
-      property.writeFieldAliasDefn(writer, shortName);
+      property.writeFieldAliasDefn(writer, shortName, fullyQualify);
       writer.eol();
     }
     writer.append("  }").eol();
@@ -272,13 +264,13 @@ class SimpleQueryBeanWriter {
     writer.append("  ").append(Constants.AT_GENERATED).eol();
     writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
     if (embeddable) {
-      writer.append("  public static final class Assoc<R> extends TQAssoc<%s,R> {", shortInnerName).eol();
+      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssoc<%s,R> {", shortInnerName).eol();
     } else {
-      writer.append("  public static final class Assoc<R> extends TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName).eol();
+      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName).eol();
     }
     for (PropertyMeta property : properties) {
       writer.append("  ");
-      property.writeFieldDefn(writer, shortName, true);
+      property.writeFieldDefn(writer, shortName, true, fullyQualify);
       writer.eol();
     }
     writer.eol();
