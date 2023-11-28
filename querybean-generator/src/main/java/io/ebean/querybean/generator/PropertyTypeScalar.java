@@ -24,21 +24,20 @@ class PropertyTypeScalar extends PropertyType {
 
   protected PropertyTypeScalar(String propertyType, String attributeClass) {
     super(propertyType);
-
     final Entry<String, Set<String>> signature = Split.genericsSplit(attributeClass);
-
     this.attributeCompleteSignature = signature.getKey();
     this.assocImports = signature.getValue();
   }
 
   @Override
-  String getTypeDefn(String shortName, boolean assoc) {
+  String getTypeDefn(String shortName, boolean assoc, boolean fullyQualify) {
+    String q = fullyQualify ? pkg : "";
     if (assoc) {
       // PScalarType<R, PhoneNumber>
-      return propertyType + "<R, " + attributeCompleteSignature + ">";
+      return q + propertyType + "<R, " + attributeCompleteSignature + ">";
     } else {
       // PScalarType<QCustomer, PhoneNumber>
-      return propertyType + "<Q" + shortName + ", " + attributeCompleteSignature + ">";
+      return q + propertyType + "<Q" + shortName + ", " + attributeCompleteSignature + ">";
     }
   }
 
@@ -46,8 +45,8 @@ class PropertyTypeScalar extends PropertyType {
    * All required imports to the allImports set.
    */
   @Override
-  void addImports(Set<String> allImports) {
-    super.addImports(allImports);
+  void addImports(Set<String> allImports, boolean fullyQualify) {
+    super.addImports(allImports, fullyQualify);
     allImports.addAll(assocImports);
   }
 }

@@ -33,6 +33,7 @@ class SimpleQueryBeanWriter {
   private String shortName;
   private final String shortInnerName;
   private final String origShortName;
+  private final boolean fullyQualify;
   private Append writer;
 
   SimpleQueryBeanWriter(TypeElement element, ProcessingContext processingContext) {
@@ -49,6 +50,7 @@ class SimpleQueryBeanWriter {
     this.embeddable = processingContext.isEmbeddable(element);
     this.dbName = findDbName();
     this.implementsInterface = initInterface(element);
+    this.fullyQualify = processingContext.isNameClash(shortName);
   }
 
   private TypeElement initInterface(TypeElement element) {
@@ -97,7 +99,7 @@ class SimpleQueryBeanWriter {
     for (VariableElement field : processingContext.allFields(element)) {
       PropertyType type = processingContext.getPropertyType(field);
       if (type != null) {
-        type.addImports(importTypes);
+        type.addImports(importTypes, fullyQualify);
         properties.add(new PropertyMeta(field.getSimpleName().toString(), type));
       }
     }
@@ -206,7 +208,7 @@ class SimpleQueryBeanWriter {
    */
   private void writeFields() {
     for (PropertyMeta property : properties) {
-      property.writeFieldDefn(writer, shortName, false);
+      property.writeFieldDefn(writer, shortName, false, fullyQualify);
       writer.eol();
     }
     writer.eol();
@@ -250,7 +252,7 @@ class SimpleQueryBeanWriter {
     writer.append("  ").append(Constants.AT_GENERATED).eol();
     writer.append("  public static final class Alias {").eol();
     for (PropertyMeta property : properties) {
-      property.writeFieldAliasDefn(writer, shortName);
+      property.writeFieldAliasDefn(writer, shortName, fullyQualify);
       writer.eol();
     }
     writer.append("  }").eol();
@@ -268,7 +270,7 @@ class SimpleQueryBeanWriter {
     }
     for (PropertyMeta property : properties) {
       writer.append("  ");
-      property.writeFieldDefn(writer, shortName, true);
+      property.writeFieldDefn(writer, shortName, true, fullyQualify);
       writer.eol();
     }
     writer.eol();
