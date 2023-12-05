@@ -813,6 +813,30 @@ public class QCustomerTest {
     new QContact()
       .firstName.inRangeWith(lastName, "B")
       .findList();
+
+    new QContact()
+      .firstName.between("A", "B")
+      .findList();
+  }
+
+  @Test
+  void betweenProperties() {
+    var query = new QContact()
+      .firstName.betweenProperties(lastName, "B");
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where ? between t0.first_name and t0.last_name");
+  }
+
+  @Test
+  void betweenProperties_notFirstPredicate() {
+    var query = new QContact()
+      .lastName.isNotNull()
+      .firstName.betweenProperties(lastName, "B")
+      .email.isNotNull();
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where t0.last_name is not null and ? between t0.first_name and t0.last_name and t0.email is not null");
   }
 
   @Test
