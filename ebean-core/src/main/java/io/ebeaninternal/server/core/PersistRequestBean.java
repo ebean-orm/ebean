@@ -272,24 +272,30 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       } else {
         // @WhenModified set without invoking interception
         Object oldVal = prop.getValue(entityBean);
-        Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
-        prop.setValueChanged(entityBean, value);
-        intercept.setOldValue(prop.propertyIndex(), oldVal);
+        if (transaction == null || transaction.isOverwriteGeneratedProperties() || oldVal == null) { // version handled above
+          Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
+          prop.setValueChanged(entityBean, value);
+          intercept.setOldValue(prop.propertyIndex(), oldVal);
+        }
       }
     }
   }
 
   private void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      Object oldVal = intercept.origValue(prop.propertyIndex());
-      prop.setValue(entityBean, oldVal);
+      if (transaction == null || transaction.isOverwriteGeneratedProperties() || prop.isVersion()) {
+        Object oldVal = intercept.origValue(prop.propertyIndex());
+        prop.setValue(entityBean, oldVal);
+      }
     }
   }
 
   private void onInsertGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
-      Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
-      prop.setValueChanged(entityBean, value);
+      if (transaction == null || transaction.isOverwriteGeneratedProperties() || prop.isVersion() || prop.getValue(entityBean) == null) {
+        Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
+        prop.setValueChanged(entityBean, value);
+      }
     }
   }
 
@@ -935,13 +941,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         transaction.logSummary("Inserted [{0}] [{1}]{2}", name, (idValue == null ? "" : idValue), draft);
         break;
       case UPDATE:
-        transaction.logSummary("Updated [{0}] [{1}]{2}", name, idValue , draft);
+        transaction.logSummary("Updated [{0}] [{1}]{2}", name, idValue, draft);
         break;
       case DELETE:
-        transaction.logSummary("Deleted [{0}] [{1}]{2}", name, idValue , draft);
+        transaction.logSummary("Deleted [{0}] [{1}]{2}", name, idValue, draft);
         break;
       case DELETE_SOFT:
-        transaction.logSummary("SoftDelete [{0}] [{1}]{2}", name, idValue , draft);
+        transaction.logSummary("SoftDelete [{0}] [{1}]{2}", name, idValue, draft);
         break;
       default:
         break;
