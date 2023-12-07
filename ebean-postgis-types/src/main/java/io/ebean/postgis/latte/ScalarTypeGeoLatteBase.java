@@ -8,8 +8,8 @@ import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import org.geolatte.geom.Geometry;
 import org.geolatte.geom.codec.Wkt;
-import org.postgis.PGgeometry;
-import org.postgis.PGgeometryLW;
+import net.postgis.jdbc.PGgeometry;
+import net.postgis.jdbc.PGgeometryLW;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -61,7 +61,7 @@ abstract class ScalarTypeGeoLatteBase<T extends Geometry> implements ScalarType<
       return null;
     }
     if (object instanceof PGgeometry) {
-      org.postgis.Geometry geometry = ((PGgeometry) object).getGeometry();
+      net.postgis.jdbc.geometry.Geometry geometry = ((PGgeometry) object).getGeometry();
       return (T) Wkt.newDecoder(Wkt.Dialect.POSTGIS_EWKT_1).decode(geometry.toString());
     }
     throw new IllegalStateException("Received object of type " + object.getClass().getCanonicalName());

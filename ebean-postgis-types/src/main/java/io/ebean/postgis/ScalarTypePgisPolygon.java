@@ -1,7 +1,7 @@
 package io.ebean.postgis;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
-import org.postgis.Polygon;
+import net.postgis.jdbc.geometry.Polygon;
 
 import java.sql.SQLException;
 

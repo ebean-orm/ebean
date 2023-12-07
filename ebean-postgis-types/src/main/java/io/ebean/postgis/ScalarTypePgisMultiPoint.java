@@ -1,7 +1,7 @@
 package io.ebean.postgis;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
-import org.postgis.MultiPoint;
+import net.postgis.jdbc.geometry.MultiPoint;
 
 import java.sql.SQLException;
 

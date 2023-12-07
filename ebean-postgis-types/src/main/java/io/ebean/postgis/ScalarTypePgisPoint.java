@@ -1,7 +1,7 @@
 package io.ebean.postgis;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
-import org.postgis.Point;
+import net.postgis.jdbc.geometry.Point;
 
 import java.sql.SQLException;
 

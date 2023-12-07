@@ -1,7 +1,7 @@
 package io.ebean.postgis;
 
 import io.ebean.config.dbplatform.ExtraDbTypes;
-import org.postgis.MultiLineString;
+import net.postgis.jdbc.geometry.MultiLineString;
 
 import java.sql.SQLException;
 

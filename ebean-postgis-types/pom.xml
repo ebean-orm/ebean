@@ -11,7 +11,7 @@
   <artifactId>ebean-postgis-types</artifactId>
 
   <properties>
-    <postgis.jdbc.version>2.5.1</postgis.jdbc.version>
+    <postgis.jdbc.version>2021.1.0</postgis.jdbc.version>
   </properties>
 
   <dependencies>
