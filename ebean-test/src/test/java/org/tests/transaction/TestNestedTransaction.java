@@ -1,9 +1,14 @@
 package org.tests.transaction;
 
+<<<<<<< HEAD
 import io.ebean.TxScope;
 import io.ebean.xtest.BaseTestCase;
+=======
+>>>>>>> 8ec23b7aa (FIX: nested NOT_SUPPORTED transaction with an inner REQUIRES transaction)
 import io.ebean.DB;
 import io.ebean.Transaction;
+import io.ebean.TxScope;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -251,4 +256,22 @@ public class TestNestedTransaction extends BaseTestCase {
     }
   }
 
+  public void test_txn_with_not_supported() {
+
+    try (Transaction txn1 = DB.beginTransaction()) {
+      assertThat(getInScopeTransaction()).isNotNull();
+      getInScopeTransaction().putUserObject("foo", "bar");
+
+      try (Transaction txn2 = DB.beginTransaction(TxScope.notSupported())) {
+        // pause txn1
+        try (Transaction txn3 = DB.beginTransaction()) {
+          // create a new Txn scope
+          txn3.commit();
+        }
+        txn2.commit();
+      }
+      // resume txn1
+      assertThat(getInScopeTransaction().getUserObject("foo")).isEqualTo("bar");
+    }
+  }
 }
