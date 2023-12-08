@@ -243,11 +243,15 @@ public class TestNestedTransaction extends BaseTestCase {
     try (Transaction txn1 = DB.beginTransaction()) {
       assertThat(getInScopeTransaction()).isNotNull();
       getInScopeTransaction().putUserObject("foo", "bar");
+      assertThat(Transaction.current()).isNotNull();
 
       try (Transaction txn2 = DB.beginTransaction(TxScope.notSupported())) {
         // pause txn1
+        assertThat(Transaction.current()).isNull();
+
         try (Transaction txn3 = DB.beginTransaction()) {
           // create a new Txn scope
+          assertThat(Transaction.current()).isNotNull();
           txn3.commit();
         }
         txn2.commit();

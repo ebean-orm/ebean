@@ -587,6 +587,7 @@ public class TransactionManager implements SpiTransactionManager {
   private boolean isCreateNewTransaction(SpiTransaction current, TxType type) {
     switch (type) {
       case REQUIRED:
+        return current == null || !current.isActive();
       case SUPPORTS:
         return current == null;
       case REQUIRES_NEW:
