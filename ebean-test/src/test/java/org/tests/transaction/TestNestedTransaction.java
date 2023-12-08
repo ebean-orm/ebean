@@ -252,8 +252,10 @@ public class TestNestedTransaction extends BaseTestCase {
         try (Transaction txn3 = DB.beginTransaction()) {
           // create a new Txn scope
           assertThat(Transaction.current()).isNotNull();
+          DB.save(new EBasic());
           txn3.commit();
         }
+        DB.save(new EBasic());
         txn2.commit();
       }
       // resume txn1
