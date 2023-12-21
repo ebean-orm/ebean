@@ -260,7 +260,7 @@ class SimpleQueryBeanWriter {
 
   private void writeAssocClass() {
     writer.eol();
-    writer.append("  /**  Association query bean */").eol();
+    writer.append("  /** Association query bean */").eol();
     writer.append("  ").append(Constants.AT_GENERATED).eol();
     writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
     if (embeddable) {
@@ -284,6 +284,7 @@ class SimpleQueryBeanWriter {
 
   private void writeAssocFilterMany() {
     writer.eol();
+    writer.append("    @SuppressWarnings({\"unchecked\", \"rawtypes\"})").eol();
     writer.append("    public final R filterMany(java.util.function.Consumer<Q%s> apply) {", shortName).eol();
     writer.append("      final io.ebean.ExpressionList list = io.ebean.Expr.factory().expressionList();", shortName).eol();
     writer.append("      final var qb = new Q%s(list);", shortName).eol();
