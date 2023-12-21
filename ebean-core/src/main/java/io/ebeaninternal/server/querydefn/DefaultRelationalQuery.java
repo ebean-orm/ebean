@@ -7,7 +7,9 @@ import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlQuery;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -47,6 +49,12 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   @Override
   public SqlQuery usingTransaction(Transaction transaction) {
     this.transaction = (SpiTransaction) transaction;
+    return this;
+  }
+
+  @Override
+  public SqlQuery usingConnection(Connection connection) {
+    this.transaction = new ExternalJdbcTransaction(connection);
     return this;
   }
 
