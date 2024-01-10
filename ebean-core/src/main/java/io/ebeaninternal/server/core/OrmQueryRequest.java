@@ -338,7 +338,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   private int notifyCache(int rows, boolean update) {
     if (rows > 0) {
-      beanDescriptor.contextClear(transaction.persistenceContext());
       beanDescriptor.cacheUpdateQuery(update, transaction);
     }
     return rows;
@@ -782,5 +781,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public int forwardOnlyFetchSize() {
     return queryEngine.forwardOnlyFetchSize();
+  }
+
+  public void clearContext() {
+    if (!transaction.isAutoPersistUpdates()) {
+      beanDescriptor.contextClear(transaction.persistenceContext());
+    }
   }
 }

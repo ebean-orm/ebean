@@ -78,7 +78,7 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
   @Override
   public void postExecute() {
     OrmUpdateType ormUpdateType = ormUpdate.ormUpdateType();
-    if (OrmUpdateType.INSERT != ormUpdateType) {
+    if (OrmUpdateType.INSERT != ormUpdateType && !transaction.isAutoPersistUpdates()) {
       beanDescriptor.contextClear(transaction.persistenceContext());
     }
     if (startNanos > 0) {

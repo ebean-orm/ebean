@@ -159,7 +159,7 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   @Override
   public void postExecute() {
-    if (sqlType != SqlType.SQL_INSERT) {
+    if (sqlType != SqlType.SQL_INSERT && !transaction.isAutoPersistUpdates()) {
       List<BeanDescriptor<?>> descriptors = server.descriptors(tableName);
       if (descriptors != null) {
         for (BeanDescriptor<?> descriptor : descriptors) {
