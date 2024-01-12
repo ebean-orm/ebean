@@ -8,7 +8,6 @@ import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -41,13 +40,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     BeanProperty beanProp = targetDescriptor.beanProperty(mapKey);
     if (bc instanceof BeanMap<?, ?>) {
       BeanMap<Object, Object> bm = (BeanMap<Object, Object>) bc;
-      var actualMap = bm.actualMap();
-      if (actualMap == null) {
-        actualMap = new LinkedHashMap<>();
-        bm.setActualMap(actualMap);
-      }
-      return new Adder(beanProp, actualMap);
-
+      return new Adder(beanProp, bm.collectionAdd());
     } else {
       throw new RuntimeException("Unhandled type " + bc);
     }
@@ -123,8 +116,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     } else if (current instanceof BeanMap<?, ?>) {
       // normally this case, replace just the underlying list
       BeanMap<?, ?> currentBeanMap = (BeanMap<?, ?>) current;
-      currentBeanMap.setActualMap(newBeanMap.actualMap());
-      currentBeanMap.setModifyListening(many.modifyListenMode());
+      currentBeanMap.refresh(many.modifyListenMode(), newBeanMap);
 
     } else {
       // replace the entire set

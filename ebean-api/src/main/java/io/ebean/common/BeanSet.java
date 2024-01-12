@@ -3,10 +3,7 @@ package io.ebean.common;
 import io.ebean.bean.*;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Set capable of lazy loading and modification aware.
@@ -144,12 +141,16 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     }
   }
 
-  /**
-   * Set the underlying set (used for lazy fetch).
-   */
-  @SuppressWarnings("unchecked")
-  public void setActualSet(LinkedHashSet<?> set) {
-    this.set = (LinkedHashSet<E>) set;
+  public BeanCollectionAdd collectionAdd() {
+    if (set == null) {
+      set = new LinkedHashSet<>();
+    }
+    return this;
+  }
+
+  public void refresh(ModifyListenMode modifyListenMode, BeanSet<E> newSet) {
+    setModifyListening(modifyListenMode);
+    this.set = newSet.actualSet();
   }
 
   /**

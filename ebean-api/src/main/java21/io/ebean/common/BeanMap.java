@@ -160,12 +160,17 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Se
     }
   }
 
-  /**
-   * Set the actual underlying map. Used for performing lazy fetch.
-   */
+  public LinkedHashMap<K, E> collectionAdd() {
+    if (map == null) {
+      map = new LinkedHashMap<>();
+    }
+    return map;
+  }
+
   @SuppressWarnings("unchecked")
-  public void setActualMap(LinkedHashMap<?, ?> map) {
-    this.map = (LinkedHashMap<K, E>) map;
+  public void refresh(ModifyListenMode modifyListenMode, BeanMap<?, ?> newMap) {
+    setModifyListening(modifyListenMode);
+    this.map = (LinkedHashMap<K, E>) newMap.actualMap();
   }
 
   /**

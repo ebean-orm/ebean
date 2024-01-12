@@ -144,12 +144,16 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Seque
     }
   }
 
-  /**
-   * Set the underlying set (used for lazy fetch).
-   */
-  @SuppressWarnings("unchecked")
-  public void setActualSet(LinkedHashSet<?> set) {
-    this.set = (LinkedHashSet<E>) set;
+  public BeanCollectionAdd collectionAdd() {
+    if (set == null) {
+      set = new LinkedHashSet<>();
+    }
+    return this;
+  }
+
+  public void refresh(ModifyListenMode modifyListenMode, BeanSet<E> newSet) {
+    setModifyListening(modifyListenMode);
+    this.set = newSet.actualSet();
   }
 
   /**

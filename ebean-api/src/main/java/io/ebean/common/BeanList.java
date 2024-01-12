@@ -141,14 +141,16 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     }
   }
 
-  /**
-   * Set the actual underlying list.
-   * <p>
-   * This is primarily for the deferred fetching function.
-   */
-  @SuppressWarnings("unchecked")
-  public void setActualList(List<?> list) {
-    this.list = (List<E>) list;
+  public BeanCollectionAdd collectionAdd() {
+    if (list == null) {
+      list = new ArrayList<>();
+    }
+    return this;
+  }
+
+  public void refresh(ModifyListenMode modifyListenMode, BeanList<E> newList) {
+    setModifyListening(modifyListenMode);
+    this.list = newList.actualList();
   }
 
   /**
