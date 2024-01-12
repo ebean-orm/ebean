@@ -16,16 +16,16 @@ public class BeanSetTest {
   Object object2 = new Object();
   Object object3 = new Object();
 
-  private Set<Object> all() {
-    Set<Object> all = new LinkedHashSet<>();
+  private LinkedHashSet<Object> all() {
+    var all = new LinkedHashSet<>();
     all.add(object1);
     all.add(object2);
     all.add(object3);
     return all;
   }
 
-  private Set<Object> some() {
-    Set<Object> some = new LinkedHashSet<>();
+  private LinkedHashSet<Object> some() {
+    var some = new LinkedHashSet<>();
     some.add(object2);
     some.add(object3);
     return some;

@@ -1,12 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
@@ -21,10 +18,6 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
 
   BeanListHelp(BeanPropertyAssocMany<T> many) {
     super(many);
-  }
-
-  BeanListHelp() {
-    super();
   }
 
   @Override

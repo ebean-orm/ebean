@@ -136,13 +136,13 @@ class ToStringBuilderTest {
   @Test
   void beanSet_null_empty() {
     assertThat(toStringFor(new BeanSet<String>(null))).isEqualTo("[]");
-    assertThat(toStringFor(new BeanSet<String>(Collections.emptySet()))).isEqualTo("[]");
+    assertThat(toStringFor(new BeanSet<String>(new LinkedHashSet<>()))).isEqualTo("[]");
   }
 
   @Test
   void beanMap_null_empty() {
     assertThat(toStringFor(new BeanMap<String, String>(null))).isEqualTo("{}");
-    assertThat(toStringFor(new BeanMap<String, String>(Collections.emptyMap()))).isEqualTo("{}");
+    assertThat(toStringFor(new BeanMap<String, String>(new LinkedHashMap<>()))).isEqualTo("{}");
   }
 
   @Test
@@ -159,7 +159,7 @@ class ToStringBuilderTest {
 
   @Test
   void beanMap_some() {
-    Map<String, Recurse> under = new LinkedHashMap<>();
+    var under = new LinkedHashMap<String, Recurse>();
     under.put("a", new Recurse(1, "a"));
     under.put("b", new Recurse(2, "b"));
     BeanMap<String, Recurse> list = new BeanMap<>(under);

@@ -11,14 +11,14 @@ import java.util.Set;
  */
 final class DetermineManyType {
 
-  ManyType getManyType(Class<?> type) {
+  ManyType manyType(Class<?> type) {
     if (type.equals(List.class)) {
       return ManyType.LIST;
     }
-    if (type.equals(Set.class)) {
+    if (type.equals(Set.class) || type.getCanonicalName().equals("java.util.SequencedSet")) {
       return ManyType.SET;
     }
-    if (type.equals(Map.class)) {
+    if (type.equals(Map.class) || type.getCanonicalName().equals("java.util.SequencedMap")) {
       return ManyType.MAP;
     }
     return null;

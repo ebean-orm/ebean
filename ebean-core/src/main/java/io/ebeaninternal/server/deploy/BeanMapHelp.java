@@ -1,12 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanMap;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
@@ -44,7 +41,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
     BeanProperty beanProp = targetDescriptor.beanProperty(mapKey);
     if (bc instanceof BeanMap<?, ?>) {
       BeanMap<Object, Object> bm = (BeanMap<Object, Object>) bc;
-      Map<Object, Object> actualMap = bm.actualMap();
+      var actualMap = bm.actualMap();
       if (actualMap == null) {
         actualMap = new LinkedHashMap<>();
         bm.setActualMap(actualMap);

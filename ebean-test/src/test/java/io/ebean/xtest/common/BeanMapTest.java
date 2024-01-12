@@ -20,16 +20,16 @@ public class BeanMapTest {
   private final EBasic object4 = new EBasic("o4");
   private final EBasic object5 = new EBasic("o5");
 
-  private Map<String, Object> all() {
-    Map<String, Object> all = new LinkedHashMap<>();
+  private LinkedHashMap<String, Object> all() {
+    LinkedHashMap<String, Object> all = new LinkedHashMap<>();
     all.put("1", object1);
     all.put("2", object2);
     all.put("3", object3);
     return all;
   }
 
-  private Map<String, Object> some() {
-    Map<String, Object> all = new LinkedHashMap<>();
+  private LinkedHashMap<String, Object> some() {
+    LinkedHashMap<String, Object> all = new LinkedHashMap<>();
     all.put("2", object2);
     all.put("3", object3);
     return all;
