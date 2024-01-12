@@ -20,7 +20,7 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
+  public final BeanCollectionAdd collectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanList<?>) {
       BeanList<?> bl = (BeanList<?>) bc;
       return bl.collectionAdd();

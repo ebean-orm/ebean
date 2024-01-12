@@ -33,7 +33,7 @@ public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   @SuppressWarnings("unchecked")
-  public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
+  public final BeanCollectionAdd collectionAdd(Object bc, String mapKey) {
     if (mapKey == null) {
       mapKey = many.mapKey();
     }

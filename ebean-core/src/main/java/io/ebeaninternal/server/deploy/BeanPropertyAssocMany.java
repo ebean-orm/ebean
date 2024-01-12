@@ -655,7 +655,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   private BeanCollectionAdd beanCollectionAdd(Object bc) {
-    return help.getBeanCollectionAdd(bc, null);
+    return help.collectionAdd(bc, null);
   }
 
   public Object parentId(EntityBean parentBean) {

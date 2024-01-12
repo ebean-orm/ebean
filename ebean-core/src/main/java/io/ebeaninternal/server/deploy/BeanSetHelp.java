@@ -23,7 +23,7 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
   }
 
   @Override
-  public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
+  public final BeanCollectionAdd collectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanSet<?>) {
       BeanSet<?> beanSet = (BeanSet<?>) bc;
       return beanSet.collectionAdd();
