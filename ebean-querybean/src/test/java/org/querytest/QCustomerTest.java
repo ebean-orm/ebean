@@ -64,6 +64,25 @@ public class QCustomerTest {
   }
 
   @Test
+  public void copy() {
+    var origin = new QCustomer()
+      .setDistinct(true)
+      .status.equalTo(Customer.Status.BAD);
+
+    var copy1 = origin.copy().name.isNotNull();
+    var q1 = copy1.query();
+    copy1.findList();
+
+    assertThat(q1.getGeneratedSql()).contains("from be_customer t0 where t0.status = ? and t0.name is not null");
+
+    var copy2 = origin.copy().version.ge(1L);
+    var q2 = copy2.query();
+    copy2.findList();
+
+    assertThat(q2.getGeneratedSql()).contains("from be_customer t0 where t0.status = ? and t0.version >= ?");
+  }
+
+  @Test
   public void findSingleAttribute() {
 
     List<String> names = new QCustomer()
