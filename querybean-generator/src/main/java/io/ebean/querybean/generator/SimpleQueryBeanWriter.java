@@ -21,7 +21,6 @@ class SimpleQueryBeanWriter {
   private final List<PropertyMeta> properties = new ArrayList<>();
   private final TypeElement element;
   private final TypeElement implementsInterface;
-  private String implementsInterfaceFullName;
   private String implementsInterfaceShortName;
   private final ProcessingContext processingContext;
   private final String dbName;
@@ -29,10 +28,9 @@ class SimpleQueryBeanWriter {
   private final boolean isEntity;
   private final boolean embeddable;
 
-  private String destPackage;
-  private String shortName;
+  private final String destPackage;
+  private final String shortName;
   private final String shortInnerName;
-  private final String origShortName;
   private final boolean fullyQualify;
   private Append writer;
 
@@ -45,7 +43,6 @@ class SimpleQueryBeanWriter {
     String sn = Util.shortName(nested, beanFullName);
     this.shortInnerName = Util.shortName(false, sn);
     this.shortName = sn.replace('.', '$');
-    this.origShortName = shortName;
     this.isEntity = processingContext.isEntity(element);
     this.embeddable = processingContext.isEmbeddable(element);
     this.dbName = findDbName();
@@ -72,14 +69,10 @@ class SimpleQueryBeanWriter {
     return isEntity;
   }
 
-  private boolean isEmbeddable() {
-    return embeddable;
-  }
-
   private void gatherPropertyDetails() {
     importTypes.add(beanFullName);
     if (implementsInterface != null) {
-      implementsInterfaceFullName = implementsInterface.getQualifiedName().toString();
+      String implementsInterfaceFullName = implementsInterface.getQualifiedName().toString();
       boolean nested = implementsInterface.getNestingKind().isNested();
       implementsInterfaceShortName = Util.shortName(nested, implementsInterfaceFullName);
 
