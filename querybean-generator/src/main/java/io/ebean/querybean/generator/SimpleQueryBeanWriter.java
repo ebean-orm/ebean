@@ -194,6 +194,12 @@ class SimpleQueryBeanWriter {
     writer.append("  private Q%s(io.ebean.ExpressionList<%s> filter) {", shortName, shortName).eol();
     writer.append("    super(filter);").eol();
     writer.append("  }").eol();
+
+    writer.eol();
+    writer.append("  /** Return a copy of the query bean. */").eol();
+    writer.append("  public Q%s copy() {", shortName).eol();
+    writer.append("    return new Q%s(query().copy());", shortName).eol();
+    writer.append("  }").eol();
   }
 
   /**
