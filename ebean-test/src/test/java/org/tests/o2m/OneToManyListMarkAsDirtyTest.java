@@ -41,6 +41,7 @@ public class OneToManyListMarkAsDirtyTest extends BaseTestCase {
     var refreshedPlanSecondCapacity = DB.find(StrategicPlan.class, planStart.getId());
     assertThat(refreshedPlanSecondCapacity.getGoodsCapacities().size()).isEqualTo(1);
     assertThat(refreshedPlanSecondCapacity.getGoodsCapacities().get(0).getId()).isEqualTo(a_c.getId());
+    // todo is this expected?
     assertThat(refreshedPlanSecondCapacity.getVersion()).isEqualTo(planFirstCapacity.getVersion());
     assertThat(refreshedPlanSecondCapacity.getWhenModified()).isEqualTo(planFirstCapacity.getWhenModified());
   }
@@ -103,7 +104,6 @@ public class OneToManyListMarkAsDirtyTest extends BaseTestCase {
     a_c.setGoods(g);
     planSecondCapacity.getGoodsCapacities().add(a_c);
     // force version increase
-    // without this the goods capacity is saved correctly, but version isn't
     DB.markAsDirty(planSecondCapacity);
     DB.save(planSecondCapacity);
 
