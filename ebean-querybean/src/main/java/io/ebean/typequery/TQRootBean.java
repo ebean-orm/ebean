@@ -745,7 +745,7 @@ public abstract class TQRootBean<T, R> {
    * Add EXISTS sub-query predicate.
    */
   public R exists(Query<?> subQuery) {
-    query.where().exists(subQuery);
+    peekExprList().exists(subQuery);
     return root;
   }
 
@@ -753,7 +753,7 @@ public abstract class TQRootBean<T, R> {
    * Add NOT EXISTS sub-query predicate.
    */
   public R notExists(Query<?> subQuery) {
-    query.where().notExists(subQuery);
+    peekExprList().notExists(subQuery);
     return root;
   }
 
@@ -764,7 +764,7 @@ public abstract class TQRootBean<T, R> {
    * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
    */
   public final R exists(String sqlSubQuery, Object... bindValues) {
-    query().where().exists(sqlSubQuery, bindValues);
+    peekExprList().exists(sqlSubQuery, bindValues);
     return root;
   }
 
@@ -775,7 +775,7 @@ public abstract class TQRootBean<T, R> {
    * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
    */
   public final R notExists(String sqlSubQuery, Object... bindValues) {
-    query().where().notExists(sqlSubQuery, bindValues);
+    peekExprList().notExists(sqlSubQuery, bindValues);
     return root;
   }
 

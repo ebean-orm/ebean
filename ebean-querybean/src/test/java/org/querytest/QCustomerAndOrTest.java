@@ -1,6 +1,8 @@
 package org.querytest;
 
+import org.example.domain.Contact;
 import org.example.domain.Customer;
+import org.example.domain.query.QCustomer;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -8,6 +10,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class QCustomerAndOrTest {
 
@@ -53,6 +57,30 @@ public class QCustomerAndOrTest {
 //    //where t0.id > ?  and (t0.id < ?  or (t0.name like ?  and t0.name like ? ) )  order by t0.id; --bind(12,1234,one,two)
 //
 
+  }
+
+  @Test
+  public void testOrWithExists() {
+    QCustomer query = Customer.find.typed()
+      .alias("customer")
+      .or()
+      .name.eq("Superman")
+      .exists(Contact.find.typed()
+        .alias("contact")
+        .firstName.eq("Superman")
+        .raw("contact.customer_id = customer.id")
+        .query()
+      )
+      .endOr()
+      .select(QCustomer.alias().id);
+
+    query.findList();
+
+    assertThat(query.getGeneratedSql()).isEqualTo(
+      "select customer.id from be_customer customer where (" +
+        "customer.name = ? or exists (select 1 from be_contact contact where " +
+        "contact.first_name = ? and contact.customer_id = customer.id))"
+    );
   }
 
   private Date fiveDaysAgo() {
