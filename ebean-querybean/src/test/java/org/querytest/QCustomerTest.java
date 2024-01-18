@@ -1069,6 +1069,32 @@ public class QCustomerTest {
     assertThat(maxDate).isNotNull();
   }
 
+  @Test
+  public void findSingleAttributeOrEmpty() {
+
+    Customer cust = new Customer();
+    cust.setName("MaybeIExist yeah");
+    cust.setStatus(Customer.Status.GOOD);
+    cust.setRegistered(new Date());
+    cust.save();
+
+    Optional<String> customerName = new QCustomer()
+      .select(name)
+      .status.eq(Customer.Status.GOOD)
+      .name.startsWith("MaybeIExist")
+      .findSingleAttributeOrEmpty();
+
+    assertThat(customerName).isPresent();
+
+    Optional<String> customerName2 = new QCustomer()
+      .select(name)
+      .status.eq(Customer.Status.GOOD)
+      .name.eq("NahIDoNotExist")
+      .findSingleAttributeOrEmpty();
+
+    assertThat(customerName2).isEmpty();
+  }
+
 
   @Test
   public void testFetchByScalarValue() {

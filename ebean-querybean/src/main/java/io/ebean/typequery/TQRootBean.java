@@ -1868,6 +1868,28 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Execute the query returning a single optional attribute value.
+   * <p>
+   * <h3>Example</h3>
+   * <pre>{@code
+   *
+   *  Optional<String> maybeName =
+   *    new QCustomer()
+   *      .select(name)
+   *      .id.eq(42)
+   *      .status.eq(NEW)
+   *      .findSingleAttributeOrEmpty();
+   *
+   * }</pre>
+   *
+   * @return an optional value for the selected property
+   */
+  @Nullable
+  public <A> Optional<A> findSingleAttributeOrEmpty() {
+    return query.findSingleAttributeOrEmpty();
+  }
+
+  /**
    * Execute the query processing the beans one at a time.
    * <p>
    * This method is appropriate to process very large query results as the
