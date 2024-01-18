@@ -62,13 +62,13 @@ public class QCustomerAndOrTest {
   @Test
   public void testOrWithExists() {
     QCustomer query = Customer.find.typed()
-      .alias("customer")
+      .alias("_cust")
       .or()
       .name.eq("Superman")
       .exists(Contact.find.typed()
         .alias("contact")
         .firstName.eq("Superman")
-        .raw("contact.customer_id = customer.id")
+        .raw("contact.customer_id = _cust.id")
         .query()
       )
       .endOr()
@@ -77,9 +77,9 @@ public class QCustomerAndOrTest {
     query.findList();
 
     assertThat(query.getGeneratedSql()).isEqualTo(
-      "select customer.id from be_customer customer where (" +
-        "customer.name = ? or exists (select 1 from be_contact contact where " +
-        "contact.first_name = ? and contact.customer_id = customer.id))"
+      "select _cust.id from be_customer _cust where (" +
+        "_cust.name = ? or exists (select 1 from be_contact contact where " +
+        "contact.first_name = ? and contact.customer_id = _cust.id))"
     );
   }
 
