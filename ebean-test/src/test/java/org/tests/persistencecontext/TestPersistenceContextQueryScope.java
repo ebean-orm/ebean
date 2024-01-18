@@ -23,6 +23,7 @@ class TestPersistenceContextQueryScope extends BaseTestCase {
       EBasicVer bean1 = DB.find(EBasicVer.class, bean.getId());
 
       // do an update of the name in the DB
+      // With #3295 this now automatically clears the persistence context for BasicVer.class
       int rowCount = DB.sqlUpdate("update e_basicver set name=? where id=?")
         .setParameter("second")
         .setParameter(bean.getId())
@@ -30,15 +31,14 @@ class TestPersistenceContextQueryScope extends BaseTestCase {
 
       assertEquals(1, rowCount);
 
-      // fetch the bean again... but doesn't hit DB as it
-      // is in the PersistenceContext which is transaction scoped
+      // Prior to #3295 this returns the same bean via transaction scoped Persistence Context
+      // With #3295 this is now a fresh bean
       EBasicVer bean2 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .findOne();
 
       // QUERY scope hits the DB (doesn't use the existing transactions persistence context)
-      // ... also explicitly not use bean cache
       EBasicVer bean3 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
@@ -78,21 +78,21 @@ class TestPersistenceContextQueryScope extends BaseTestCase {
       EBasicVer bean1 = DB.find(EBasicVer.class, bean.getId());
 
       // do an update of the name in the DB
+      // With #3295 this now automatically clears the persistence context for BasicVer.class
       int rowCount = DB.update(EBasicVer.class)
         .set("name", "second")
         .where().idEq(bean.getId())
         .update();
       assertEquals(1, rowCount);
 
-      // fetch the bean again... but doesn't hit DB as it
-      // is in the PersistenceContext which is transaction scoped
+      // Prior to #3295 this returns the same bean via transaction scoped Persistence Context
+      // With #3295 this is now a fresh bean
       EBasicVer bean2 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .findOne();
 
       // QUERY scope hits the DB (doesn't use the existing transactions persistence context)
-      // ... also explicitly not use bean cache
       EBasicVer bean3 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
@@ -121,7 +121,6 @@ class TestPersistenceContextQueryScope extends BaseTestCase {
     }
   }
 
-
   @Test
   void ormUpdate_expect_clearsContext() {
 
@@ -132,21 +131,22 @@ class TestPersistenceContextQueryScope extends BaseTestCase {
       EBasicVer bean1 = DB.find(EBasicVer.class, bean.getId());
 
       // do an update of the name in the DB
+      // With #3295 this now automatically clears the persistence context for BasicVer.class
       int rowCount = DB.createUpdate(EBasicVer.class, "update ebasicver set name = ? where id = ?")
         .setParameter(1, "second")
         .setParameter(2, bean.getId())
         .execute();
       assertEquals(1, rowCount);
 
-      // fetch the bean again... but doesn't hit DB as it
-      // is in the PersistenceContext which is transaction scoped
+      // fetch the bean again...
+      // Prior to #3295 this returns the same bean via transaction scoped Persistence Context
+      // With #3295 this is now a fresh bean
       EBasicVer bean2 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .findOne();
 
       // QUERY scope hits the DB (doesn't use the existing transactions persistence context)
-      // ... also explicitly not use bean cache
       EBasicVer bean3 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
@@ -187,21 +187,21 @@ class TestPersistenceContextQueryScope extends BaseTestCase {
       EBasicVer bean1 = DB.find(EBasicVer.class, bean.getId());
 
       // do an update of the name in the DB
+      // With #3295 this now automatically clears the persistence context for BasicVer.class
       int rowCount = DB.update(EBasicVer.class)
         .set("name", "second")
         .where().idEq(bean.getId())
         .update();
       assertEquals(1, rowCount);
 
-      // fetch the bean again... but doesn't hit DB as it
-      // is in the PersistenceContext which is transaction scoped
+      // Prior to #3295 this returns the same bean via transaction scoped Persistence Context
+      // With #3295 this is now a fresh bean
       EBasicVer bean2 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
         .findOne();
 
       // QUERY scope hits the DB (doesn't use the existing transactions persistence context)
-      // ... also explicitly not use bean cache
       EBasicVer bean3 = DB.find(EBasicVer.class)
         .setId(bean.getId())
         .setUseCache(false) // ignore L2 cache
