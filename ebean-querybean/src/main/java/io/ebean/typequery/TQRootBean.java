@@ -1275,7 +1275,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * @deprecated migrate to {@link #orderBy()}.
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   public R order() {
     return root;
   }
@@ -1295,7 +1295,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * @deprecated migrate to {@link #orderBy(String)}
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   public R order(String orderByClause) {
     return orderBy(orderByClause);
   }
