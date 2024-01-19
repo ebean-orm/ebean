@@ -971,6 +971,25 @@ public interface Query<T> extends CancelableQuery {
   <A> A findSingleAttribute();
 
   /**
+   * Execute the query returning a single optional attribute value.
+   * <p>
+   * <h3>Example</h3>
+   * <pre>{@code
+   *
+   *  Optional<String> maybeName =
+   *    new QCustomer()
+   *      .select(name)
+   *      .id.eq(42)
+   *      .status.eq(NEW)
+   *      .findSingleAttributeOrEmpty();
+   *
+   * }</pre>
+   *
+   * @return an optional value for the selected property
+   */
+  <A> Optional<A> findSingleAttributeOrEmpty();
+
+  /**
    * Return true if this is countDistinct query.
    */
   boolean isCountDistinct();
