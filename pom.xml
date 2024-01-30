@@ -154,6 +154,10 @@
           <id>github-release</id>
           <url>https://maven.pkg.github.com/foconis/ebean-agent</url>
         </repository>
+        <repository>
+          <id>github-release</id>
+          <url>https://maven.pkg.github.com/foconis/ebean-migration</url>
+        </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
