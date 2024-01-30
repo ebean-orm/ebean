@@ -42,9 +42,13 @@ public class TestQueryOrderById extends BaseTestCase {
       for (Order order : orders) {
         Customer customer = order.getCustomer();
         if (cachedCustomerIds.contains(customer.getId())) {
-          List<Order> orders1 = customer.getOrders();
-          assertThat(orders1).isEmpty();
-          assertThat(orders1).isSameAs(Collections.EMPTY_LIST);
+          // Illegal to access customer.orders as that was not loaded and no lazy loading is allowed
+          // List<Order> orders1 = customer.getOrders();
+          // assertThat(orders1).isEmpty();
+          // assertThat(orders1).isSameAs(Collections.EMPTY_LIST);
+
+          List<Contact> contacts = customer.getContacts();
+          assertThat(contacts).isNotNull();
 
           // customer.setContacts(new ArrayList<>());
           // customer.setName("modified");
@@ -118,6 +122,7 @@ public class TestQueryOrderById extends BaseTestCase {
 
       // perform some lazy loading if we desire
       for (Customer customer : list) {
+        customer.getContacts().size();
         Address billingAddress = customer.getBillingAddress();
         if (billingAddress != null) {
           Country country = billingAddress.getCountry();

@@ -1140,6 +1140,10 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     if (value instanceof BeanCollection) {
       BeanCollection<?> bc = (BeanCollection<?>) value;
       setValue(entityBean, bc.freeze());
+      if (bc.isReference()) {
+        // make it an error to access the collection (no lazy loading allowed)
+        entityBean._ebean_getIntercept().setPropertyUnloaded(propertyIndex);
+      }
     }
   }
 }

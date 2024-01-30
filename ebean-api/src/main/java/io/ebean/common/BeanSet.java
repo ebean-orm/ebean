@@ -42,7 +42,8 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public Object freeze() {
-    return set == null ? Collections.emptySet() : Collections.unmodifiableSet(set);
+    // null -> illegal to access reference collection
+    return set == null ? null : Collections.unmodifiableSet(set);
   }
 
   @Override

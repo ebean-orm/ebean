@@ -39,7 +39,8 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   @Override
   public Object freeze() {
-    return map == null ? Collections.emptyMap() : Collections.unmodifiableMap(map);
+    // null -> illegal to access reference collection
+    return map == null ? null : Collections.unmodifiableMap(map);
   }
 
   @Override
