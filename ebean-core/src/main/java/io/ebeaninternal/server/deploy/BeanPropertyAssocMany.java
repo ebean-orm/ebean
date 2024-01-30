@@ -1133,4 +1133,13 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       return false;
     }
   }
+
+  @Override
+  public void freeze(EntityBean entityBean) {
+    Object value = getValue(entityBean);
+    if (value instanceof BeanCollection) {
+      BeanCollection<?> bc = (BeanCollection<?>) value;
+      setValue(entityBean, bc.freeze());
+    }
+  }
 }

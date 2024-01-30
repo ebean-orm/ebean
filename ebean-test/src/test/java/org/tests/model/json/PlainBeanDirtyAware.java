@@ -36,6 +36,11 @@ public class PlainBeanDirtyAware implements ModifyAwareType {
   }
 
   @Override
+  public Object freeze() {
+    return this;
+  }
+
+  @Override
   public void setMarkedDirty(boolean markedDirty) {
     this.markedDirty = markedDirty;
   }

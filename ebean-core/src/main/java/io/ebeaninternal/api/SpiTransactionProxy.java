@@ -3,6 +3,7 @@ package io.ebeaninternal.api;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.bean.FrozenBeans;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebeaninternal.server.core.PersistDeferredRelationship;
@@ -221,6 +222,16 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   @Override
   public void register(TransactionCallback callback) {
     transaction.register(callback);
+  }
+
+  @Override
+  public FrozenBeans freezeAndDetach() {
+    return transaction.freezeAndDetach();
+  }
+
+  @Override
+  public void attach(FrozenBeans frozenBeans) {
+    transaction.attach(frozenBeans);
   }
 
   @Override

@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.bean.FrozenBeans;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiBeanType;
 import io.ebeaninternal.api.SpiBeanTypeManager;
@@ -42,6 +43,33 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
    * Create a new PersistenceContext.
    */
   public DefaultPersistenceContext() {
+  }
+
+  public void attach(FrozenBeans other) {
+    lock.lock();
+    try {
+      DFrozenBeans otherContext = (DFrozenBeans) other;
+      for (Map.Entry<Class<?>, Map<Object, EntityBean>> entry : otherContext.entries()) {
+        classContext(entry.getKey()).attach(entry.getValue());
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  @Override
+  public Map<Class<?>, List<EntityBean>> detach() {
+    lock.lock();
+    try {
+      expungeStaleEntries();
+      Map<Class<?>, List<EntityBean>> result = new LinkedHashMap<>();
+      for (Map.Entry<Class<?>, ClassContext> entry : typeCache.entrySet()) {
+        result.put(entry.getKey(), entry.getValue().beans());
+      }
+      return result;
+    } finally {
+      lock.unlock();
+    }
   }
 
   @Override
@@ -245,6 +273,23 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     @Override
     public String toString() {
       return "size:" + map.size() + " (" + weakCount + " weak)";
+    }
+
+    List<EntityBean> beans() {
+      List<EntityBean> beans = new ArrayList<>(map.size());
+      for (Object value : map.values()) {
+        if (value instanceof BeanRef) {
+          value = ((BeanRef) value).get();
+        }
+        if (value != null) {
+          beans.add((EntityBean) value);
+        }
+      }
+      return beans;
+    }
+
+    void attach(Map<Object, EntityBean> value) {
+      map.putAll(value);
     }
 
     private Object get(Object id) {

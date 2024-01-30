@@ -3,10 +3,7 @@ package io.ebeaninternal.json;
 import io.ebean.ModifyAwareType;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Wraps a Set for the purposes of detecting modifications.
@@ -31,6 +28,11 @@ public final class ModifyAwareSet<E> implements Set<E>, ModifyAwareType, Seriali
   public ModifyAwareSet(ModifyAwareType owner, Set<E> underlying) {
     this.owner = owner;
     this.set = underlying;
+  }
+
+  @Override
+  public Set<E> freeze() {
+    return Collections.unmodifiableSet(set);
   }
 
   @Override

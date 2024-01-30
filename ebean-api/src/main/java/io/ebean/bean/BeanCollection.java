@@ -36,6 +36,11 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
   }
 
   /**
+   * Return a unmodifiable collection of the underlying entities.
+   */
+  Object freeze();
+
+  /**
    * Set the disableLazyLoad state.
    */
   void setDisableLazyLoad(boolean disableLazyLoad);

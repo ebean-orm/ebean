@@ -38,6 +38,11 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   @Override
+  public Object freeze() {
+    return map == null ? Collections.emptyMap() : Collections.unmodifiableMap(map);
+  }
+
+  @Override
   public void toString(ToStringBuilder builder) {
     if (map == null || map.isEmpty()) {
       builder.addRaw("{}");

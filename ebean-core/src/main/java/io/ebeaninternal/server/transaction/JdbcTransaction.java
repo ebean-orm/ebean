@@ -3,6 +3,7 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.ProfileLocation;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
+import io.ebean.bean.FrozenBeans;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
@@ -128,6 +129,16 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     } catch (Exception e) {
       throw new PersistenceException(e);
     }
+  }
+
+  @Override
+  public FrozenBeans freezeAndDetach() {
+    return manager.freezeAndDetach(persistenceContext);
+  }
+
+  @Override
+  public void attach(FrozenBeans frozenBeans) {
+    persistenceContext.attach(frozenBeans);
   }
 
   @Override

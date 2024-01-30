@@ -6,6 +6,8 @@ import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.TxType;
+import io.ebean.bean.FrozenBeans;
+import io.ebean.bean.EntityBean;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
@@ -22,6 +24,7 @@ import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.profile.TimedProfileLocation;
 import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
@@ -33,7 +36,9 @@ import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -637,4 +642,21 @@ public class TransactionManager implements SpiTransactionManager {
     }
   }
 
+  public FrozenBeans freezeAndDetach(SpiPersistenceContext persistenceContext) {
+    Map<Class<?>, Map<Object, EntityBean>> allBeans = new HashMap<>();
+    for (Map.Entry<Class<?>, List<EntityBean>> entry : persistenceContext.detach().entrySet()) {
+      allBeans.put(entry.getKey(), freezeBeanMap(entry));
+    }
+    return new DFrozenBeans(allBeans);
+  }
+
+  private Map<Object, EntityBean> freezeBeanMap(Map.Entry<Class<?>, List<EntityBean>> entry) {
+    BeanDescriptor<?> descriptor = beanDescriptorManager.descriptor(entry.getKey());
+    Map<Object, EntityBean> beanMap = new HashMap<>();
+    for (EntityBean entityBean : entry.getValue()) {
+      descriptor.freeze(entityBean);
+      beanMap.put(descriptor.getId(entityBean), entityBean);
+    }
+    return beanMap;
+  }
 }

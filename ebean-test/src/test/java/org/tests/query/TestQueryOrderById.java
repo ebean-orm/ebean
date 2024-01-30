@@ -1,5 +1,7 @@
 package org.tests.query;
 
+import io.ebean.Transaction;
+import io.ebean.bean.FrozenBeans;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.InterceptReadOnly;
@@ -7,15 +9,137 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.ResetBasicData;
+import org.tests.model.basic.*;
 
+import java.io.*;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryOrderById extends BaseTestCase {
+
+
+  private Set<Integer> cachedCustomerIds;
+
+  @Test
+  void cachedBeanContext_attach() {
+    ResetBasicData.reset();
+
+    FrozenBeans cachedBeanContext = testSerialiseCachedBeans(buildCachedBeans());
+
+    testSerialiseCustomer(cachedCustomers.get(0));
+
+    try (Transaction txn = DB.beginTransaction()) {
+
+      txn.attach(cachedBeanContext);
+
+      List<Order> orders = DB.find(Order.class)
+        .findList();
+
+      for (Order order : orders) {
+        Customer customer = order.getCustomer();
+        if (cachedCustomerIds.contains(customer.getId())) {
+          List<Order> orders1 = customer.getOrders();
+          assertThat(orders1).isEmpty();
+          assertThat(orders1).isSameAs(Collections.EMPTY_LIST);
+
+          // customer.setContacts(new ArrayList<>());
+          // customer.setName("modified");
+          Address billingAddress = customer.getBillingAddress();
+          if (billingAddress != null) {
+            String line1 = billingAddress.getLine1();
+            Country country = billingAddress.getCountry();
+          }
+          Address shippingAddress = customer.getShippingAddress();
+//          if (shippingAddress != null) {
+//            // shippingAddress.getCountry();
+//          }
+        }
+      }
+    }
+  }
+
+  private static FrozenBeans testSerialiseCachedBeans(FrozenBeans source) {
+    try {
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(os);
+      oos.writeObject(source);
+      oos.close();
+
+      byte[] byteArray = os.toByteArray();
+
+      var is = new ByteArrayInputStream(byteArray);
+      ObjectInputStream ois = new ObjectInputStream(is);
+      FrozenBeans result = (FrozenBeans)ois.readObject();
+      assertThat(result).isNotNull();
+
+      return result;
+
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void testSerialiseCustomer(Customer source) {
+    try {
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      ObjectOutputStream oos = new ObjectOutputStream(os);
+      oos.writeObject(source);
+      oos.close();
+
+      byte[] byteArray = os.toByteArray();
+
+      var is = new ByteArrayInputStream(byteArray);
+      ObjectInputStream ois = new ObjectInputStream(is);
+      Customer customer = (Customer)ois.readObject();
+
+      assertThat(customer.getId()).isEqualTo(source.getId());
+      assertThat(customer.getName()).isEqualTo(source.getName());
+
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private List<Customer> cachedCustomers;
+
+  private FrozenBeans buildCachedBeans() {
+    try (Transaction txn = DB.beginTransaction()) {
+
+      List<Customer> list = DB.find(Customer.class)
+        .setReadOnly(true)
+        //.setDisableLazyLoading(true)
+        .orderBy("id")
+        .setMaxRows(3)
+        .findList();
+
+      // perform some lazy loading if we desire
+      for (Customer customer : list) {
+        Address billingAddress = customer.getBillingAddress();
+        if (billingAddress != null) {
+          Country country = billingAddress.getCountry();
+          if (country != null) {
+            country.getName();
+          }
+        }
+      }
+
+      // can selectively use DisableLazyLoad which is "lazy loading is NO-operation"
+      //for (Customer customer : list) {
+      //  DB.beanState(customer).setDisableLazyLoad(true);
+      //}
+
+      cachedCustomerIds = list.stream()
+        .map(BasicDomain::getId)
+        .collect(Collectors.toSet());
+
+      cachedCustomers = list;
+      return txn.freezeAndDetach();
+    }
+  }
 
   @Test
   public void orderById_default_expectNotOrderById() {
@@ -23,7 +147,7 @@ public class TestQueryOrderById extends BaseTestCase {
 
     Query<Customer> query = DB.find(Customer.class)
       .select("id,name")
-      .order("id")
+      .orderBy("id")
       .setFirstRow(1)
       .setMaxRows(5);
 

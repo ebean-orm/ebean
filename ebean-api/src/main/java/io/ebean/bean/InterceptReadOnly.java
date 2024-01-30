@@ -10,52 +10,107 @@ import java.util.Set;
  * EntityBeanIntercept optimised for read only use.
  * <p>
  * For the read only use this intercept doesn't need to hold any state that is normally
- * required for updates such as per property changed, loaded, dirty state, original values
+ * required for updates such as per property changed, dirty state, original values
  * bean state etc.
  */
-public class InterceptReadOnly implements EntityBeanIntercept {
-
-  private final EntityBean owner;
+public final class InterceptReadOnly extends InterceptBase {
 
   /**
    * Create with a given entity.
    */
   public InterceptReadOnly(Object ownerBean) {
-    this.owner = (EntityBean) ownerBean;
+    super(ownerBean);
   }
 
   @Override
-  public String toString() {
-    return "InterceptReadOnly{" + owner + '}';
+  public void preGetId() {
+    // do nothing
   }
 
   @Override
-  public EntityBean owner() {
-    return owner;
+  public void preGetter(int propertyIndex) {
+    if (disableLazyLoad) {
+      return;
+    }
+    if (!isLoadedProperty(propertyIndex)) {
+      loadBean(propertyIndex);
+    }
+  }
+
+  private void preSetter(int propertyIndex) {
+    if (readOnly) {
+      throw new IllegalStateException("This bean is readOnly");
+    }
+    setLoadedProperty(propertyIndex);
   }
 
   @Override
-  public PersistenceContext persistenceContext() {
-    return null;
+  public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
+    preSetter(propertyIndex);
   }
 
   @Override
-  public void setPersistenceContext(PersistenceContext persistenceContext) {
-
+  public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
+    preSetter(propertyIndex);
   }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
+    preSetter(propertyIndex);
+  }
+
+  @Override
+  public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
+    preSetter(propertyIndex);
+  }
+
+
+  // ------------------------------------------------------------------------------------
+  // The following method have "Do Nothing" behaviour as not interested in mutation state
+  // ------------------------------------------------------------------------------------
 
   @Override
   public void setNodeUsageCollector(NodeUsageCollector usageCollector) {
-
-  }
-
-  @Override
-  public Object ownerId() {
-    return null;
-  }
-
-  @Override
-  public void setOwnerId(Object ownerId) {
 
   }
 
@@ -85,31 +140,6 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public void setBeanLoader(BeanLoader beanLoader, PersistenceContext ctx) {
-
-  }
-
-  @Override
-  public void setBeanLoader(BeanLoader beanLoader) {
-
-  }
-
-  @Override
-  public boolean isFullyLoadedBean() {
-    return false;
-  }
-
-  @Override
-  public void setFullyLoadedBean(boolean fullyLoadedBean) {
-
-  }
-
-  @Override
-  public boolean isPartial() {
-    return false;
-  }
-
-  @Override
   public boolean isDirty() {
     return false;
   }
@@ -135,11 +165,6 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public boolean hasIdOnly(int idIndex) {
-    return false;
-  }
-
-  @Override
   public boolean isReference() {
     return false;
   }
@@ -157,16 +182,6 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   @Override
   public boolean isLoadedFromCache() {
     return false;
-  }
-
-  @Override
-  public boolean isReadOnly() {
-    return true;
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-
   }
 
   @Override
@@ -200,31 +215,6 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public void setLazyLoadFailure(Object ownerId) {
-
-  }
-
-  @Override
-  public boolean isLazyLoadFailure() {
-    return false;
-  }
-
-  @Override
-  public boolean isDisableLazyLoad() {
-    return false;
-  }
-
-  @Override
-  public void setDisableLazyLoad(boolean disableLazyLoad) {
-
-  }
-
-  @Override
-  public void setEmbeddedLoaded(Object embeddedBean) {
-
-  }
-
-  @Override
   public boolean isEmbeddedNewOrDirty(Object embeddedBean) {
     return false;
   }
@@ -234,45 +224,6 @@ public class InterceptReadOnly implements EntityBeanIntercept {
     return null;
   }
 
-  @Override
-  public int findProperty(String propertyName) {
-    return 0;
-  }
-
-  @Override
-  public String property(int propertyIndex) {
-    return null;
-  }
-
-  @Override
-  public int propertyLength() {
-    return 0;
-  }
-
-  @Override
-  public void setPropertyLoaded(String propertyName, boolean loaded) {
-
-  }
-
-  @Override
-  public void setPropertyUnloaded(int propertyIndex) {
-
-  }
-
-  @Override
-  public void setLoadedProperty(int propertyIndex) {
-
-  }
-
-  @Override
-  public void setLoadedPropertyAll() {
-
-  }
-
-  @Override
-  public boolean isLoadedProperty(int propertyIndex) {
-    return false;
-  }
 
   @Override
   public boolean isChangedProperty(int propertyIndex) {
@@ -317,11 +268,6 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   @Override
   public void setNewBeanForUpdate() {
 
-  }
-
-  @Override
-  public Set<String> loadedPropertyNames() {
-    return Collections.emptySet();
   }
 
   @Override
@@ -370,57 +316,7 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public StringBuilder loadedPropertyKey() {
-    return null;
-  }
-
-  @Override
-  public boolean[] loaded() {
-    return new boolean[0];
-  }
-
-  @Override
-  public int lazyLoadPropertyIndex() {
-    return 0;
-  }
-
-  @Override
-  public String lazyLoadProperty() {
-    return null;
-  }
-
-  @Override
-  public void loadBean(int loadProperty) {
-
-  }
-
-  @Override
-  public void loadBeanInternal(int loadProperty, BeanLoader loader) {
-
-  }
-
-  @Override
-  public void initialisedMany(int propertyIndex) {
-
-  }
-
-  @Override
   public void preGetterCallback(int propertyIndex) {
-
-  }
-
-  @Override
-  public void preGetId() {
-
-  }
-
-  @Override
-  public void preGetter(int propertyIndex) {
-
-  }
-
-  @Override
-  public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
 
   }
 
@@ -431,61 +327,6 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public void setDirtyStatus() {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
-
-  }
-
-  @Override
-  public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
 
   }
 
