@@ -1,13 +1,19 @@
 package org.tests.model.docstore;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.ebean.annotation.DocStore;
-
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.OneToMany;
+
 import java.util.List;
 
 @DocStore
 @Inheritance
+@DiscriminatorColumn
+@JsonSerialize(using = ReportJsonSerializer.class)
+@JsonDeserialize(using = ReportJsonDeserializer.class)
 public class Report {
   private String title;
 
