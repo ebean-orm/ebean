@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>13.25.0-FOC6-SNAPSHOT</version>
+  <version>13.26.0-jakarta</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
