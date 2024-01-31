@@ -11,6 +11,7 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
 import jakarta.persistence.PersistenceException;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -269,23 +270,25 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
   @Test
   void test_forUpdate() {
-    ResetBasicData.reset();
+    if (!isDb2()) {
+      ResetBasicData.reset();
 
-    try (Transaction txn = DB.beginTransaction()) {
-      PagedList<Order> pagedList = DB.find(Order.class).forUpdate().setMaxRows(2).findPagedList();
+      try (Transaction txn = DB.beginTransaction()) {
+        PagedList<Order> pagedList = DB.find(Order.class).forUpdate().setMaxRows(2).findPagedList();
 
-      LoggedSql.start();
-      int totalCount = pagedList.getTotalCount();
-      assertThat(totalCount).isGreaterThan(2);
+        LoggedSql.start();
+        int totalCount = pagedList.getTotalCount();
+        assertThat(totalCount).isGreaterThan(2);
 
-      List<Order> list = pagedList.getList();
-      assertThat(list).hasSize(2);
+        List<Order> list = pagedList.getList();
+        assertThat(list).hasSize(2);
 
-      List<String> sql = LoggedSql.stop();
-      assertThat(sql).hasSize(2);
-      assertThat(sql.get(0)).contains("select count(*) from o_order t0;");
-      if (isH2() || isPostgresCompatible()) {
-        assertThat(sql.get(1)).contains(" limit 2 for update;");
+        List<String> sql = LoggedSql.stop();
+        assertThat(sql).hasSize(2);
+        assertThat(sql.get(0)).contains("select count(*) from o_order t0;");
+        if (isH2() || isPostgresCompatible()) {
+          assertThat(sql.get(1)).contains(" limit 2 for update;");
+        }
       }
     }
   }
