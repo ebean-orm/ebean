@@ -356,6 +356,24 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
+  public void testFetchAndFilterMany() {
+
+    ResetBasicData.reset();
+    LoggedSql.start();
+    DB.find(Customer.class)
+      .fetch("contacts")
+      .filterMany("contacts.notes").istartsWith("title", "foo")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql.size()).isEqualTo(2);
+    assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id");
+    platformAssertIn(sql.get(1), " from contact_note t0 where (t0.contact_id)");
+    assertSql(sql.get(1)).contains(" and lower(t0.title) like");
+  }
+
+  @Test
   public void testFilterManyUsingExpression() {
 
     ResetBasicData.reset();

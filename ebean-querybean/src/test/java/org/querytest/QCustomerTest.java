@@ -64,6 +64,25 @@ public class QCustomerTest {
   }
 
   @Test
+  public void copy() {
+    var origin = new QCustomer()
+      .setDistinct(true)
+      .status.equalTo(Customer.Status.BAD);
+
+    var copy1 = origin.copy().name.isNotNull();
+    var q1 = copy1.query();
+    copy1.findList();
+
+    assertThat(q1.getGeneratedSql()).contains("from be_customer t0 where t0.status = ? and t0.name is not null");
+
+    var copy2 = origin.copy().version.ge(1L);
+    var q2 = copy2.query();
+    copy2.findList();
+
+    assertThat(q2.getGeneratedSql()).contains("from be_customer t0 where t0.status = ? and t0.version >= ?");
+  }
+
+  @Test
   public void findSingleAttribute() {
 
     List<String> names = new QCustomer()
@@ -813,6 +832,30 @@ public class QCustomerTest {
     new QContact()
       .firstName.inRangeWith(lastName, "B")
       .findList();
+
+    new QContact()
+      .firstName.between("A", "B")
+      .findList();
+  }
+
+  @Test
+  void betweenProperties() {
+    var query = new QContact()
+      .firstName.betweenProperties(lastName, "B");
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where ? between t0.first_name and t0.last_name");
+  }
+
+  @Test
+  void betweenProperties_notFirstPredicate() {
+    var query = new QContact()
+      .lastName.isNotNull()
+      .firstName.betweenProperties(lastName, "B")
+      .email.isNotNull();
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where t0.last_name is not null and ? between t0.first_name and t0.last_name and t0.email is not null");
   }
 
   @Test
@@ -1024,6 +1067,32 @@ public class QCustomerTest {
       .findSingleAttribute();
 
     assertThat(maxDate).isNotNull();
+  }
+
+  @Test
+  public void findSingleAttributeOrEmpty() {
+
+    Customer cust = new Customer();
+    cust.setName("MaybeIExist yeah");
+    cust.setStatus(Customer.Status.GOOD);
+    cust.setRegistered(new Date());
+    cust.save();
+
+    Optional<String> customerName = new QCustomer()
+      .select(name)
+      .status.eq(Customer.Status.GOOD)
+      .name.startsWith("MaybeIExist")
+      .findSingleAttributeOrEmpty();
+
+    assertThat(customerName).isPresent();
+
+    Optional<String> customerName2 = new QCustomer()
+      .select(name)
+      .status.eq(Customer.Status.GOOD)
+      .name.eq("NahIDoNotExist")
+      .findSingleAttributeOrEmpty();
+
+    assertThat(customerName2).isEmpty();
   }
 
 

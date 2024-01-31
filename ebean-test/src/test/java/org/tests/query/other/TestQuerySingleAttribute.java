@@ -20,6 +20,7 @@ import org.tests.o2m.OmBasicParent;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -137,6 +138,32 @@ class TestQuerySingleAttribute extends BaseTestCase {
 
     assertThat(sqlOf(query)).contains("select t0.name from o_customer t0");
     assertThat(name).isNotNull();
+  }
+
+  @Test
+  void findSingleAttributeOrEmpty() {
+    ResetBasicData.reset();
+
+    Query<Customer> query = DB.find(Customer.class)
+      .select("name")
+      .where().eq("name", "Rob").query();
+
+    Optional<String> name = query.findSingleAttributeOrEmpty();
+
+    assertThat(sqlOf(query)).contains("select t0.name from o_customer t0");
+    assertThat(name).isPresent().contains("Rob");
+  }
+
+  @Test
+  void findSingleAttributeOrEmpty_when_empty() {
+    ResetBasicData.reset();
+
+    Query<Customer> query = DB.find(Customer.class)
+      .select("name")
+      .where().eq("name", "I_Do_Not_ExistO!").query();
+
+    Optional<String> name = query.findSingleAttributeOrEmpty();
+    assertThat(name).isEmpty();
   }
 
   @Test

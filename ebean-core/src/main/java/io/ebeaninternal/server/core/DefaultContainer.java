@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -64,10 +65,8 @@ public final class DefaultContainer implements SpiContainer {
    */
   @Override
   public SpiEbeanServer createServer(String name) {
-    DatabaseBuilder config = new DatabaseConfig();
-    config.setName(name);
-    config.loadFromProperties();
-    return createServer(config);
+    var builder = Database.builder().name(name).loadFromProperties();
+    return createServer(builder);
   }
 
   private SpiBackgroundExecutor createBackgroundExecutor(DatabaseBuilder builder) {
@@ -94,7 +93,7 @@ public final class DefaultContainer implements SpiContainer {
 
       boolean online = true;
       if (config.isDocStoreOnly()) {
-        config.setDatabasePlatform(new DatabasePlatform());
+        config.databasePlatform(new DatabasePlatform());
       } else {
         TenantMode tenantMode = config.getTenantMode();
         if (TenantMode.DB != tenantMode) {
@@ -204,7 +203,7 @@ public final class DefaultContainer implements SpiContainer {
    */
   private void setNamingConvention(DatabaseBuilder.Settings config) {
     if (config.getNamingConvention() == null) {
-      config.setNamingConvention(new UnderscoreNamingConvention());
+      config.namingConvention(new UnderscoreNamingConvention());
     }
   }
 
@@ -219,7 +218,7 @@ public final class DefaultContainer implements SpiContainer {
       }
       // automatically determine the platform
       platform = new DatabasePlatformFactory().create(config);
-      config.setDatabasePlatform(platform);
+      config.databasePlatform(platform);
     }
     platform.configure(config.getPlatformConfig());
   }
@@ -243,11 +242,9 @@ public final class DefaultContainer implements SpiContainer {
    * Check the autoCommit and Transaction Isolation levels of the DataSource.
    * <p>
    * If autoCommit is true this could be a real problem.
-   * </p>
    * <p>
    * If the Isolation level is not READ_COMMITTED then optimistic concurrency
    * checking may not work as expected.
-   * </p>
    */
   private boolean checkDataSource(DatabaseBuilder.Settings config) {
     if (isOfflineMode(config)) {

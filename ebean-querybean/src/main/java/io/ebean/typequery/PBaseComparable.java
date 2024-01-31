@@ -305,6 +305,14 @@ public abstract class PBaseComparable<R, T> extends PBaseValueEqual<R, T> {
   }
 
   /**
+   * Between - value between this property and another property
+   */
+  public final R betweenProperties(Query.Property<T> highProperty, T value) {
+    expr().betweenProperties(_name, highProperty.toString(), value);
+    return _root;
+  }
+
+  /**
    * Greater than.
    *
    * @param value the bind value
