@@ -6,10 +6,86 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestFindFutureRowCount extends BaseTestCase {
+
+  @Test
+  void futureCount_doesNotTriggerFlush() throws ExecutionException, InterruptedException {
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setBatchMode(true);
+      transaction.setBatchSize(100);
+
+      EBasic basic = new EBasic("count_batched");
+      DB.save(basic);
+
+      FutureRowCount<EBasic> futureCount = DB.find(EBasic.class)
+        .where().eq("name", "count_batched")
+        .findFutureCount();
+
+      assertThat(futureCount.get()).isEqualTo(0);
+
+      transaction.flush();
+
+      FutureRowCount<EBasic> futureCountAfter = DB.find(EBasic.class)
+        .where().eq("name", "count_batched")
+        .findFutureCount();
+
+      assertThat(futureCountAfter.get()).isEqualTo(1);
+    }
+  }
+
+  @Test
+  void futureList_doesNotTriggerFlush() throws ExecutionException, InterruptedException {
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setBatchMode(true);
+      transaction.setBatchSize(100);
+
+      EBasic basic = new EBasic("list_batched");
+      DB.save(basic);
+
+      FutureList<EBasic> futureList = DB.find(EBasic.class)
+        .where().eq("name", "list_batched")
+        .findFutureList();
+
+      assertThat(futureList.get()).isEmpty();
+
+      transaction.flush();
+
+      FutureList<EBasic> futureListAfter = DB.find(EBasic.class)
+        .where().eq("name", "list_batched")
+        .findFutureList();
+
+      assertThat(futureListAfter.get()).hasSize(1);
+    }
+  }
+
+  @Test
+  void futureIds_doesNotTriggerFlush() throws ExecutionException, InterruptedException {
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setBatchMode(true);
+      transaction.setBatchSize(100);
+
+      EBasic basic = new EBasic("ids_batched");
+      DB.save(basic);
+
+      FutureIds<EBasic> futureIds = DB.find(EBasic.class)
+        .where().eq("name", "ids_batched")
+        .findFutureIds();
+
+      assertThat(futureIds.get()).isEmpty();
+
+      transaction.flush();
+
+      FutureIds<EBasic> futureIdsAfter = DB.find(EBasic.class)
+        .where().eq("name", "ids_batched")
+        .findFutureIds();
+
+      assertThat(futureIdsAfter.get()).hasSize(1);
+    }
+  }
 
   @Test
   void count_when_inTransaction() throws Exception {

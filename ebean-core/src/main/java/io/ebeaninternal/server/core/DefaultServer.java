@@ -1273,6 +1273,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query) {
     SpiQuery<T> copy = query.copy();
+    copy.usingFuture();
     boolean createdTransaction = false;
     SpiTransaction transaction = query.transaction();
     if (transaction == null) {
@@ -1291,6 +1292,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> FutureIds<T> findFutureIds(SpiQuery<T> query) {
     SpiQuery<T> copy = query.copy();
+    copy.usingFuture();
     boolean createdTransaction = false;
     SpiTransaction transaction = query.transaction();
     if (transaction == null) {
@@ -1309,6 +1311,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> FutureList<T> findFutureList(SpiQuery<T> query) {
     SpiQuery<T> spiQuery = query.copy();
+    spiQuery.usingFuture();
     // FutureList query always run in it's own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
     if (!spiQuery.isDisableReadAudit()) {
