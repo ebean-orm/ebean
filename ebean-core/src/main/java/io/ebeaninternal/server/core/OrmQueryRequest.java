@@ -35,7 +35,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private final OrmQueryEngine queryEngine;
   private final SpiQuery<T> query;
   private final BeanFindController finder;
-  private final Boolean readOnly;
   private LoadContext loadContext;
   private PersistenceContext persistenceContext;
   private HashQuery cacheKey;
@@ -52,7 +51,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     this.finder = beanDescriptor.beanFinder();
     this.queryEngine = queryEngine;
     this.query = query;
-    this.readOnly = query.isReadOnly();
     this.persistenceContext = query.persistenceContext();
   }
 
@@ -133,13 +131,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   public int secondaryQueriesMinBatchSize() {
     return loadContext.secondaryQueriesMinBatchSize();
-  }
-
-  /**
-   * Return the Normal, sharedInstance, ReadOnly state of this query.
-   */
-  public Boolean isReadOnly() {
-    return readOnly;
   }
 
   /**
