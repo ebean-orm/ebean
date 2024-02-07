@@ -29,8 +29,12 @@ public class TestOrphanRemovalOverwrite {
     // Refreshing here generates new objects for the associated children that are referred to by the parent.
     parent.refresh();
 
-    assertNotNull(childList.get(0).getId());
-    assertEquals(childList.get(0).getId(), parent.getChildren().get(0).getId());
+    OmBeanListChild child = childList.get(0);
+    assertNotNull(child.getId());
+
+    OmBeanListChild refreshedChild = parent.getChildren().get(0);
+    assertEquals(child.getId(), refreshedChild.getId());
+    assertEquals(child, refreshedChild);
     assertEquals(childList, parent.getChildren());
   }
 }

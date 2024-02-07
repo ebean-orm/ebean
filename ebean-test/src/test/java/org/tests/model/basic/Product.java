@@ -39,6 +39,13 @@ public class Product implements Serializable {
   @Version
   Timestamp updtime;
 
+  public Product(Integer id) {
+    this.id = id;
+  }
+
+  public Product() {
+  }
+
   /**
    * Return id.
    */
