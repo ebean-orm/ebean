@@ -58,6 +58,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private Type type;
   private String label;
   private Mode mode = Mode.NORMAL;
+  private boolean usingFuture;
   private Object tenantId;
   /**
    * Holds query in structured form.
@@ -969,6 +970,16 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final void setMode(Mode mode) {
     this.mode = mode;
+  }
+
+  @Override
+  public final void usingFuture() {
+    this.usingFuture = true;
+  }
+
+  @Override
+  public final boolean isUsingFuture() {
+    return usingFuture;
   }
 
   @Override
