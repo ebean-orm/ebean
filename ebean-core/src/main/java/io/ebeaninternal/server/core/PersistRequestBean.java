@@ -380,6 +380,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return intercept.dirtyPropertyNames();
   }
 
+  public boolean isChangedProperty(int propertyIndex) {
+    if (dirtyProperties == null) {
+      return intercept.isChangedProperty(propertyIndex);
+    } else {
+      return dirtyProperties[propertyIndex];
+    }
+  }
+
   /**
    * Return the dirty properties on this request.
    */
@@ -865,8 +873,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     setNotifyCache();
     boolean isChangeLog = beanDescriptor.isChangeLog();
-    if (type == Type.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
-      // get the dirty properties for update notification to the doc store
+    if (type == Type.UPDATE) {
+      // get the dirty properties for notify cache & orphanRemoval of vanilla collection detection
       dirtyProperties = intercept.dirtyProperties();
     }
     if (isChangeLog) {
