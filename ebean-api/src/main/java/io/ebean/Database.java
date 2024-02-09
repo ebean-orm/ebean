@@ -1228,6 +1228,16 @@ public interface Database {
   void insert(Object bean);
 
   /**
+   * Insert the bean with options - typically ON CONFLICT DO UPDATE | DO NOTHING.
+   * <p>
+   * Currently, this is limited to use with Postgres only,
+   * <p>
+   * When using this ebean will look to determine the unique columns by looking at
+   * the mapping like {@code @Column(unique=true} and {@code @Index(unique=true}.
+   */
+  void insert(Object bean, InsertOptions insertOptions);
+
+  /**
    * Insert the bean with a transaction.
    */
   void insert(Object bean, Transaction transaction);
@@ -1237,6 +1247,13 @@ public interface Database {
    * insert all the beans in the collection.
    */
   void insertAll(Collection<?> beans);
+
+  /**
+   * Insert the beans with options - typically ON CONFLICT DO UPDATE | DO NOTHING.
+   * <p>
+   * Currently, this is limited to use with Postgres only,
+   */
+  void insertAll(Collection<?> beans, InsertOptions options);
 
   /**
    * Insert a collection of beans with an explicit transaction.

@@ -1,11 +1,15 @@
 package io.ebeaninternal.server.persist.dml;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Helper to support the generation of DML statements.
  */
 public final class GenerateDmlRequest {
 
   private final StringBuilder sb = new StringBuilder(100);
+  private final List<String> columns = new ArrayList<>();
   private StringBuilder insertBindBuffer;
   private String prefix;
   private String prefix2;
@@ -26,7 +30,7 @@ public final class GenerateDmlRequest {
     ++bindColumnCount;
     sb.append(prefix);
     sb.append(column);
-    //sb.append(expr);
+    columns.add(column);
     if (insertMode > 0) {
       if (insertMode++ > 1) {
         insertBindBuffer.append(',');
@@ -74,5 +78,9 @@ public final class GenerateDmlRequest {
 
   public boolean isUpdate() {
     return insertMode == 0;
+  }
+
+  public List<String> columns() {
+    return columns;
   }
 }

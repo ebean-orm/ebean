@@ -1651,41 +1651,44 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }, transaction);
   }
 
-  /**
-   * Insert the bean.
-   */
   @Override
   public void insert(Object bean) {
-    insert(bean, null);
+    persister.insert(checkEntityBean(bean), null, null);
   }
 
-  /**
-   * Insert the bean with a transaction.
-   */
+  @Override
+  public void insert(Object bean, @Nullable InsertOptions insertOptions) {
+    persister.insert(checkEntityBean(bean), insertOptions, null);
+  }
+
   @Override
   public void insert(Object bean, @Nullable Transaction transaction) {
-    persister.insert(checkEntityBean(bean), transaction);
+    persister.insert(checkEntityBean(bean), null, transaction);
   }
 
-  /**
-   * Insert all beans in the collection.
-   */
   @Override
   public void insertAll(Collection<?> beans) {
-    insertAll(beans, null);
+    insertAll(beans, null, null);
   }
 
-  /**
-   * Insert all beans in the collection with a transaction.
-   */
+  @Override
+  public void insertAll(Collection<?> beans, InsertOptions options) {
+    insertAll(beans, options, null);
+  }
+
   @Override
   public void insertAll(@Nullable Collection<?> beans, @Nullable Transaction transaction) {
+    insertAll(beans, null, transaction);
+  }
+
+  private void insertAll(@Nullable Collection<?> beans, InsertOptions options, @Nullable Transaction transaction) {
     if (beans == null || beans.isEmpty()) {
       return;
     }
     executeInTrans((txn) -> {
+      txn.checkBatchEscalationOnCollection();
       for (Object bean : beans) {
-        persister.insert(checkEntityBean(bean), txn);
+        persister.insert(checkEntityBean(bean), options, txn);
       }
       return 0;
     }, transaction);
