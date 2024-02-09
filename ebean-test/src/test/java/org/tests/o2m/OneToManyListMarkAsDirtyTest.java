@@ -7,6 +7,8 @@ import org.tests.model.orphanremoval.OmBeanListChild;
 import org.tests.model.orphanremoval.OmBeanListParent;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,6 +20,7 @@ class OneToManyListMarkAsDirtyTest extends BaseTestCase {
     var a_b = new OmBeanListChild("b");
     parent.getChildren().add(a_b);
     DB.save(parent);
+    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
 
     // act
     var secondParent = DB.find(OmBeanListParent.class, parent.getId());
@@ -42,6 +45,7 @@ class OneToManyListMarkAsDirtyTest extends BaseTestCase {
     var a_b = new OmBeanListChild("b");
     parent.getChildren().add(a_b);
     DB.save(parent);
+    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
 
     // act
     var secondParent = DB.find(OmBeanListParent.class, parent.getId());
@@ -66,6 +70,7 @@ class OneToManyListMarkAsDirtyTest extends BaseTestCase {
     var a_b = new OmBeanListChild("b");
     parent.getChildren().add(a_b);
     DB.save(parent);
+    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
 
     // act
     var secondParent = DB.find(OmBeanListParent.class, parent.getId());
@@ -90,6 +95,7 @@ class OneToManyListMarkAsDirtyTest extends BaseTestCase {
     var a_b = new OmBeanListChild("b");
     parent.getChildren().add(a_b);
     DB.save(parent);
+    LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1));
 
     // act
     var secondParent = DB.find(OmBeanListParent.class, parent.getId());
