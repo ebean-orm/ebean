@@ -3,6 +3,7 @@ package org.tests.insert;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.InsertOptions;
+import io.ebean.Transaction;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
@@ -22,6 +23,39 @@ class TestInsertOnConflict extends BaseTestCase {
     .onConflictUpdate()
     .getGeneratedKeys(true)
     .build();
+
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @Test
+  void insertOnConflictUpdateExplicitTransaction() {
+    Database db = DB.getDefault();
+    db.truncate(EPersonOnline.class);
+    LoggedSql.start();
+
+    var bean = newBean("a@b.com");
+
+    try (Transaction txn = DB.createTransaction()) {
+      db.insert(bean, ON_CONFLICT_UPDATE, txn);
+      txn.commit();
+    }
+    assertThat(bean.getId()).isNotNull();
+
+    var bean2 = newBean("a@b.com");
+    bean2.setOnlineStatus(false);
+    try (Transaction txn = DB.createTransaction()) {
+      db.insert(bean2, ON_CONFLICT_UPDATE, txn);
+      txn.commit();
+    }
+    assertThat(bean2.getId()).isEqualTo(bean.getId());
+
+    var sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("insert into e_person_online (email, online_status, when_updated) values (?,?,?) on conflict (email) do update set online_status=excluded.online_status, when_updated=excluded.when_updated");
+    assertThat(sql.get(1)).contains("insert into e_person_online (email, online_status, when_updated) values (?,?,?) on conflict (email) do update set online_status=excluded.online_status, when_updated=excluded.when_updated");
+
+    List<EPersonOnline> list = db.find(EPersonOnline.class).findList();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getWhenUpdated()).isEqualTo(bean2.getWhenUpdated());
+  }
 
   @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
   @Test
@@ -102,6 +136,38 @@ class TestInsertOnConflict extends BaseTestCase {
     var bean4 = newBean("a1@b.com");
     var bean5 = newBean("a5@b.com");
     db.insertAll(List.of(bean4, bean5), ON_CONFLICT_UPDATE);
+
+    List<EPersonOnline> list = db.find(EPersonOnline.class).orderBy("id").findList();
+    assertThat(list).hasSize(4);
+  }
+
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @Test
+  void insertAll_onConflictUpdate_explicitTransaction() {
+    Database db = DB.getDefault();
+    db.truncate(EPersonOnline.class);
+    LoggedSql.start();
+
+    try (Transaction txn = DB.createTransaction()) {
+      txn.setBatchSize(3);
+      var bean = newBean("a1@b.com");
+      var bean2 = newBean("a2@b.com");
+      var bean3 = newBean("a3@b.com");
+      var bean4 = newBean("a4@b.com");
+      db.insertAll(List.of(bean, bean2, bean3, bean4), ON_CONFLICT_UPDATE, txn);
+      txn.commit();
+    }
+
+    var sql = LoggedSql.stop();
+    assertThat(sql).hasSize(8);
+    assertThat(sql.get(0)).contains("insert into e_person_online (email, online_status, when_updated) values (?,?,?) on conflict (email) do update set online_status=excluded.online_status, when_updated=excluded.when_updated");
+    assertThat(sql.get(1)).contains(" -- bind");
+    assertThat(sql.get(2)).contains(" -- bind");
+    assertThat(sql.get(3)).contains(" -- bind");
+    assertThat(sql.get(4)).contains(" -- executeBatch()");
+    assertThat(sql.get(5)).contains("insert into e_person_online (email, online_status, when_updated) values (?,?,?) on conflict (email) do update set online_status=excluded.online_status, when_updated=excluded.when_updated");
+    assertThat(sql.get(6)).contains(" -- bind");
+    assertThat(sql.get(7)).contains(" -- executeBatch()");
 
     List<EPersonOnline> list = db.find(EPersonOnline.class).orderBy("id").findList();
     assertThat(list).hasSize(4);

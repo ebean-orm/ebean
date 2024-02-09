@@ -1228,7 +1228,7 @@ public interface Database {
   void insert(Object bean);
 
   /**
-   * Insert the bean with options - typically ON CONFLICT DO UPDATE | DO NOTHING.
+   * Insert the bean with options (ON CONFLICT DO UPDATE | DO NOTHING).
    * <p>
    * Currently, this is limited to use with Postgres only,
    * <p>
@@ -1241,6 +1241,13 @@ public interface Database {
    * Insert the bean with a transaction.
    */
   void insert(Object bean, Transaction transaction);
+
+  /**
+   * Insert the beans with options (ON CONFLICT DO UPDATE | DO NOTHING) and transaction.
+   * <p>
+   * Currently, this is limited to use with Postgres only,
+   */
+  void insert(Object bean, InsertOptions insertOptions, Transaction transaction);
 
   /**
    * Insert a collection of beans. If there is no current transaction one is created and used to
@@ -1259,6 +1266,13 @@ public interface Database {
    * Insert a collection of beans with an explicit transaction.
    */
   void insertAll(Collection<?> beans, Transaction transaction);
+
+  /**
+   * Insert the beans with options (ON CONFLICT DO UPDATE | DO NOTHING) and transaction.
+   * <p>
+   * Currently, this is limited to use with Postgres only,
+   */
+  void insertAll(Collection<?> beans, InsertOptions options, Transaction transaction);
 
   /**
    * Execute explicitly passing a transaction.

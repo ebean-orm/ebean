@@ -1667,6 +1667,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public void insert(Object bean, InsertOptions insertOptions, Transaction transaction) {
+    persister.insert(checkEntityBean(bean), insertOptions, transaction);
+  }
+
+  @Override
   public void insertAll(Collection<?> beans) {
     insertAll(beans, null, null);
   }
@@ -1681,7 +1686,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     insertAll(beans, null, transaction);
   }
 
-  private void insertAll(@Nullable Collection<?> beans, InsertOptions options, @Nullable Transaction transaction) {
+  @Override
+  public void insertAll(@Nullable Collection<?> beans, InsertOptions options, @Nullable Transaction transaction) {
     if (beans == null || beans.isEmpty()) {
       return;
     }
