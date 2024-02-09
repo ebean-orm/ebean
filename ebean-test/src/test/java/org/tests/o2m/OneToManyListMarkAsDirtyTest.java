@@ -27,12 +27,12 @@ class OneToManyListMarkAsDirtyTest extends BaseTestCase {
     // working here as secondParent itself is not dirty
     DB.save(secondParent);
 
-    var refreshedPlanSecondCapacity = DB.find(OmBeanListParent.class, parent.getId());
-    assertThat(refreshedPlanSecondCapacity.getChildren().size()).isEqualTo(1);
-    assertThat(refreshedPlanSecondCapacity.getChildren().get(0).getId()).isEqualTo(a_c.getId());
+    var refreshedParent = DB.find(OmBeanListParent.class, parent.getId());
+    assertThat(refreshedParent.getChildren().size()).isEqualTo(1);
+    assertThat(refreshedParent.getChildren().get(0).getId()).isEqualTo(a_c.getId());
     // Q: is this expected? A: Rob Bygrave - Yes it is expected
-    assertThat(refreshedPlanSecondCapacity.getVersion()).isEqualTo(parent.getVersion());
-    assertThat(refreshedPlanSecondCapacity.getWhenModified()).isEqualTo(parent.getWhenModified());
+    assertThat(refreshedParent.getVersion()).isEqualTo(parent.getVersion());
+    assertThat(refreshedParent.getWhenModified()).isEqualTo(parent.getWhenModified());
   }
 
   @Test
@@ -52,11 +52,11 @@ class OneToManyListMarkAsDirtyTest extends BaseTestCase {
     DB.markAsDirty(secondParent);
     DB.save(secondParent);
 
-    var refreshedPlanSecondCapacity = DB.find(OmBeanListParent.class, parent.getId());
-    assertThat(refreshedPlanSecondCapacity.getChildren().size()).isEqualTo(1);
-    assertThat(refreshedPlanSecondCapacity.getChildren().get(0).getId()).isEqualTo(a_c.getId());
-    assertThat(refreshedPlanSecondCapacity.getVersion()).isGreaterThan(parent.getVersion());
-    assertThat(refreshedPlanSecondCapacity.getWhenModified()).isAfter(parent.getWhenModified());
+    var refreshedParent = DB.find(OmBeanListParent.class, parent.getId());
+    assertThat(refreshedParent.getChildren().size()).isEqualTo(1);
+    assertThat(refreshedParent.getChildren().get(0).getId()).isEqualTo(a_c.getId());
+    assertThat(refreshedParent.getVersion()).isGreaterThan(parent.getVersion());
+    assertThat(refreshedParent.getWhenModified()).isAfter(parent.getWhenModified());
   }
 
   @Test
