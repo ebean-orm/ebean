@@ -28,6 +28,11 @@ public class OmBeanListChild extends Model {
   public Long getId() {
     return id;
   }
+
+  public OmBeanListChild setId(Long id) {
+    this.id = id;
+    return this;
+  }
 }
 
 

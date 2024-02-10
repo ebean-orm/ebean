@@ -27,14 +27,14 @@ public class TestQueryForUpdate extends BaseTestCase {
     try (final Transaction transaction = DB.beginTransaction()) {
       query = DB.find(Customer.class)
         .forUpdate()
-        .order().desc("id");
+        .orderBy().desc("id");
 
       query.findList();
     }
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else if (!isDb2()){
+    } else {
       assertThat(sqlOf(query)).contains("for update");
     }
   }
@@ -48,21 +48,21 @@ public class TestQueryForUpdate extends BaseTestCase {
       query = DB.find(Customer.class)
         .forUpdate()
         .setMaxRows(3)
-        .order().desc("id");
+        .orderBy().desc("id");
 
       query.findList();
     }
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else if (!isOracle() && !isDb2()) {
+    } else if (!isOracle()) {
       // Oracle does not support FOR UPDATE with FETCH
       assertThat(sqlOf(query)).contains("for update");
     }
   }
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2})
   public void testForUpdate_when_alreadyInPCAsReference() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -96,7 +96,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2})
   public void testForUpdate_when_alreadyInPCAsReference_usingLock() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -131,7 +131,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2})
   public void testForUpdate_when_alreadyInPC() {
 
     EBasic basic = new EBasic("initialValue");
@@ -193,7 +193,7 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     Query<Customer> query = DB.find(Customer.class)
       .forUpdateNoWait()
-      .order().desc("id");
+      .orderBy().desc("id");
 
     query.findList();
     if (isOracle()) {
@@ -219,7 +219,7 @@ public class TestQueryForUpdate extends BaseTestCase {
       Query<Customer> query = DB.find(Customer.class)
         .forUpdateNoWait()
         .setMaxRows(1)
-        .order().desc("id");
+        .orderBy().desc("id");
 
       List<Customer> list = query.findList();
       Customer first = list.get(0);

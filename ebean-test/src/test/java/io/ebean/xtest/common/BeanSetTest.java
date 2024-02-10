@@ -3,6 +3,7 @@ package io.ebean.xtest.common;
 import io.ebean.bean.BeanCollection;
 import io.ebean.common.BeanSet;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Product;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -12,22 +13,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BeanSetTest {
 
-  Object object1 = new Object();
-  Object object2 = new Object();
-  Object object3 = new Object();
+  Product object1 = new Product(1);
+  Product object2 = new Product(2);
+  Product object3 = new Product(3);
 
-  private LinkedHashSet<Object> all() {
-    var all = new LinkedHashSet<>();
-    all.add(object1);
-    all.add(object2);
-    all.add(object3);
+  private Set<Object> all() {
+    Set<Object> all = new LinkedHashSet<>();
+    all.add(new Product(1));
+    all.add(new Product(2));
+    all.add(new Product(3));
     return all;
   }
 
-  private LinkedHashSet<Object> some() {
-    var some = new LinkedHashSet<>();
-    some.add(object2);
-    some.add(object3);
+  private Set<Object> some() {
+    Set<Object> some = new LinkedHashSet<>();
+    some.add(new Product(2));
+    some.add(new Product(3));
     return some;
   }
 
@@ -99,7 +100,9 @@ public class BeanSetTest {
 
     BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
-    set.addAll(all());
+
+    Set<Object> all = Set.of(object1, object2, object3);
+    set.addAll(all);
     assertThat(set.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
@@ -115,11 +118,13 @@ public class BeanSetTest {
 
     BeanSet<Object> set = new BeanSet<>();
     set.setModifyListening(BeanCollection.ModifyListenMode.ALL);
-    set.addAll(all());
+
+    Set<Object> all = Set.of(object1, object2, object3);
+    set.addAll(all);
     assertThat(set.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
-    set.removeAll(some());
+    set.removeAll(Set.of(object2, object3));
 
     assertThat(set.modifyAdditions()).containsOnly(object1);
     assertThat(set.modifyRemovals()).isEmpty();

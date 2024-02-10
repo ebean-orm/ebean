@@ -69,7 +69,7 @@ public final class InsertHandler extends DmlHandler {
 
     SpiTransaction t = persistRequest.transaction();
     // get the appropriate sql
-    sql = meta.getSql(withId, persistRequest.isPublish());
+    sql = meta.sql(withId, persistRequest.isPublish(), persistRequest.insertOptions());
     PreparedStatement pstmt;
     if (persistRequest.isBatched()) {
       pstmt = pstmtBatch(t, sql, persistRequest, useGeneratedKeys);
@@ -134,7 +134,8 @@ public final class InsertHandler extends DmlHandler {
       if (idValue != null) {
         persistRequest.setGeneratedKey(idValue);
       }
-    } else {
+    } else if (persistRequest.insertOptions() == null) {
+      // insert on conflict do nothing can not return generated key
       throw new PersistenceException("Autoincrement getGeneratedKeys() returned no rows?");
     }
   }

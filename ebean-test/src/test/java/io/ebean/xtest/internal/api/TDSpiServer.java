@@ -454,7 +454,17 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
+  public void insert(Object bean, InsertOptions insertOptions) {
+
+  }
+
+  @Override
   public void insert(Object bean, Transaction transaction) {
+
+  }
+
+  @Override
+  public void insert(Object bean, InsertOptions insertOptions, Transaction transaction) {
 
   }
 
@@ -464,7 +474,17 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
+  public void insertAll(Collection<?> beans, InsertOptions options) {
+
+  }
+
+  @Override
   public void insertAll(Collection<?> beans, Transaction transaction) {
+
+  }
+
+  @Override
+  public void insertAll(Collection<?> beans, InsertOptions options, Transaction transaction) {
 
   }
 

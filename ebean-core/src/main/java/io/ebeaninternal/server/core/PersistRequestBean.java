@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.InsertOptions;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.EntityBean;
@@ -124,6 +125,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Many-to-many intersection table changes that are held for later batch processing.
    */
   private List<SaveMany> saveMany;
+  private InsertOptions insertOptions;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -378,6 +380,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public Set<String> updatedProperties() {
     return intercept.dirtyPropertyNames();
+  }
+
+  public boolean isChangedProperty(int propertyIndex) {
+    if (dirtyProperties == null) {
+      return intercept.isChangedProperty(propertyIndex);
+    } else {
+      return dirtyProperties[propertyIndex];
+    }
   }
 
   /**
@@ -865,8 +875,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     setNotifyCache();
     boolean isChangeLog = beanDescriptor.isChangeLog();
-    if (type == Type.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
-      // get the dirty properties for update notification to the doc store
+    if (type == Type.UPDATE) {
+      // get the dirty properties for notify cache & orphanRemoval of vanilla collection detection
       dirtyProperties = intercept.dirtyProperties();
     }
     if (isChangeLog) {
@@ -1407,5 +1417,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void setGeneratedId() {
     beanDescriptor.setGeneratedId(entityBean, transaction);
+  }
+
+  public void setInsertOptions(InsertOptions insertOptions) {
+    this.insertOptions  = insertOptions;
+  }
+
+  public InsertOptions insertOptions() {
+    return insertOptions;
   }
 }
