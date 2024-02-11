@@ -321,27 +321,41 @@ class TestInsertOnConflict extends BaseTestCase {
       txn.commit();
     }
 
-    List<SqlRow> sqlRowList = DB.sqlQuery(sql)
-      .setParameter("%bee.com")
-      .findList();
+    try (Transaction txn = db.beginTransaction()) {
+      List<SqlRow> sqlRowList = DB.sqlQuery(sql)
+        .setParameter("%bee.com")
+        .findList();
 
-    assertThat(sqlRowList).hasSize(2);
-    assertThat(sqlRowList.get(0).getString("email")).startsWith("xx");
+      assertThat(sqlRowList).hasSize(2);
+      assertThat(sqlRowList.get(0).getString("email")).startsWith("xx");
 
-    List<ReturnDto> dtoList = db.findDto(ReturnDto.class, sql)
-      .setParameter("%bee.com")
-      .findList();
+      txn.addModification("e_person_online", false, true, false);
+      txn.commit();
+    }
 
-    assertThat(dtoList).hasSize(2);
-    assertThat(dtoList.get(0).email).startsWith("xxx");
+    try (Transaction txn = db.beginTransaction()) {
+      List<ReturnDto> dtoList = db.findDto(ReturnDto.class, sql)
+        .setParameter("%bee.com")
+        .findList();
 
-    List<ReturnDto2> dtoList2 = db.findDto(ReturnDto2.class, sql)
-      .setParameter("%bee.com")
-      .findList();
+      assertThat(dtoList).hasSize(2);
+      assertThat(dtoList.get(0).email).startsWith("xxx");
 
-    assertThat(dtoList2).hasSize(2);
-    assertThat(dtoList2.get(0).email).startsWith("xxxx");
-    assertThat(dtoList2.get(0).id).isGreaterThan(0);
+      txn.addModification("e_person_online", false, true, false);
+      txn.commit();
+    }
+
+    try (Transaction txn = db.beginTransaction()) {
+      List<ReturnDto2> dtoList2 = db.findDto(ReturnDto2.class, sql)
+        .setParameter("%bee.com")
+        .findList();
+
+      assertThat(dtoList2).hasSize(2);
+      assertThat(dtoList2.get(0).email).startsWith("xxxx");
+      assertThat(dtoList2.get(0).id).isGreaterThan(0);
+      txn.addModification("e_person_online", false, true, false);
+      txn.commit();
+    }
   }
 
   public static class ReturnDto {
