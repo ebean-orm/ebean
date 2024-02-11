@@ -1,9 +1,6 @@
 package org.tests.insert;
 
-import io.ebean.DB;
-import io.ebean.Database;
-import io.ebean.InsertOptions;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
@@ -11,6 +8,10 @@ import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.update.EPersonOnline;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import static io.ebean.InsertOptions.ON_CONFLICT_NOTHING;
@@ -286,6 +287,105 @@ class TestInsertOnConflict extends BaseTestCase {
 
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getWhenUpdated()).isEqualTo(bean.getWhenUpdated());
+  }
+
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @Test
+  void updateQueryReturning() throws SQLException {
+    Database db = DB.getDefault();
+    db.truncate(EPersonOnline.class);
+
+    var bean1 = newBean("a1@bee.com");
+    var bean2 = newBean("a2@cee.com");
+    var bean3 = newBean("a3@bee.com");
+    db.saveAll(bean1, bean2, bean3);
+
+    String sql = "update e_person_online set email = concat('x',email) where email like ? returning id, email, online_status";
+
+    try (Transaction txn = db.createTransaction()) {
+      Connection connection = txn.connection();
+      try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setString(1, "%bee.com");
+        try (ResultSet resultSet = pstmt.executeQuery()) {
+          while (resultSet.next()) {
+            long id = resultSet.getLong(1);
+            String email = resultSet.getString(2);
+            boolean status = resultSet.getBoolean(3);
+            // do something with the id, email and status
+            assertThat(id).isGreaterThan(0);
+            assertThat(email).startsWith("x");
+            assertThat(status).isTrue();
+          }
+        }
+      }
+      txn.commit();
+    }
+
+    List<SqlRow> sqlRowList = DB.sqlQuery(sql)
+      .setParameter("%bee.com")
+      .findList();
+
+    assertThat(sqlRowList).hasSize(2);
+    assertThat(sqlRowList.get(0).getString("email")).startsWith("xx");
+
+    List<ReturnDto> dtoList = db.findDto(ReturnDto.class, sql)
+      .setParameter("%bee.com")
+      .findList();
+
+    assertThat(dtoList).hasSize(2);
+    assertThat(dtoList.get(0).email).startsWith("xxx");
+
+    List<ReturnDto2> dtoList2 = db.findDto(ReturnDto2.class, sql)
+      .setParameter("%bee.com")
+      .findList();
+
+    assertThat(dtoList2).hasSize(2);
+    assertThat(dtoList2.get(0).email).startsWith("xxxx");
+    assertThat(dtoList2.get(0).id).isGreaterThan(0);
+  }
+
+  public static class ReturnDto {
+
+    private final long id;
+    private final String email;
+    private final boolean onlineStatus;
+
+      public ReturnDto(long id, String email, boolean onlineStatus) {
+          this.id = id;
+          this.email = email;
+          this.onlineStatus = onlineStatus;
+      }
+  }
+
+  public static class ReturnDto2 {
+
+    private long id;
+    private String email;
+    private boolean onlineStatus;
+
+    public long getId() {
+      return id;
+    }
+
+    public void setId(long id) {
+      this.id = id;
+    }
+
+    public String getEmail() {
+      return email;
+    }
+
+    public void setEmail(String email) {
+      this.email = email;
+    }
+
+    public boolean isOnlineStatus() {
+      return onlineStatus;
+    }
+
+    public void setOnlineStatus(boolean onlineStatus) {
+      this.onlineStatus = onlineStatus;
+    }
   }
 
   private static EPersonOnline newBean(String email) {
