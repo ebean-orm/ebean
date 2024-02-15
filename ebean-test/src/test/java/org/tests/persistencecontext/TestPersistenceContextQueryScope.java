@@ -1,5 +1,6 @@
 package org.tests.persistencecontext;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -21,8 +22,7 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
 
     //DB.cacheManager().setCaching(EBasicVer.class, true);
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       EBasicVer bean1 = DB.find(EBasicVer.class, bean.getId());
 
       // do an update of the name in the DB
@@ -65,10 +65,7 @@ public class TestPersistenceContextQueryScope extends BaseTestCase {
       assertEquals("second", bean3.getName());
       DB.delete(bean3);
 
-      DB.commitTransaction();
-
-    } finally {
-      DB.endTransaction();
+      txn.commit();
     }
   }
 }

@@ -223,21 +223,6 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public void commitTransaction() {
-
-  }
-
-  @Override
-  public void rollbackTransaction() {
-
-  }
-
-  @Override
-  public void endTransaction() {
-
-  }
-
-  @Override
   public void refresh(Object bean) {
 
   }

@@ -1,5 +1,6 @@
 package org.tests.cache;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -26,8 +27,7 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
     order.setCustomer(customer);
     DB.save(order);
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
 
       Order foundOrder = DB.find(Order.class)
         .where().eq("id", order.getId())
@@ -47,9 +47,6 @@ public class TestCacheInterceptSaveWhenLazyLoaded extends BaseTestCase {
 
       assertSame(foundOrder, order1);
       assertTrue(DB.beanState(foundOrder).isDirty());
-
-    } finally {
-      DB.endTransaction();
     }
 
     // cleanup

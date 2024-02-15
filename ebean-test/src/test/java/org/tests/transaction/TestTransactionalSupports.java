@@ -33,12 +33,9 @@ public class TestTransactionalSupports extends BaseTestCase {
   public void withOuterTransaction_expect_currentTransactionAvailable() {
 
     outerTxn = null;
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       new SomeTransactionalWithSupports().doStuff();
       assertNotNull(outerTxn);
-    } finally {
-      DB.endTransaction();
     }
   }
 
