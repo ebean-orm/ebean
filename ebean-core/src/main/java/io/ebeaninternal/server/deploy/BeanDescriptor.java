@@ -2057,6 +2057,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
+   * Clear a bean from the persistence context.
+   */
+  public void contextClear(PersistenceContext pc) {
+    pc.clear(rootBeanType);
+  }
+
+  /**
    * Delete a bean from the persistence context (such that we don't fetch it in the same transaction).
    */
   public void contextDeleted(PersistenceContext pc, Object idValue) {

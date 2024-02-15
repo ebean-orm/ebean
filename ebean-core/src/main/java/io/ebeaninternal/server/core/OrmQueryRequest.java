@@ -773,4 +773,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public int forwardOnlyFetchSize() {
     return queryEngine.forwardOnlyFetchSize();
   }
+
+  public void clearContext() {
+    if (!transaction.isAutoPersistUpdates()) {
+      beanDescriptor.contextClear(transaction.persistenceContext());
+    }
+  }
 }
