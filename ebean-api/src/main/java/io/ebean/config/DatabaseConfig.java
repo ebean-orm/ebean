@@ -236,7 +236,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   private PersistBatch persistBatchOnCascade = PersistBatch.INHERIT;
 
-  private int persistBatchSize = 20;
+  private int persistBatchSize = 100;
 
   private EnumType defaultEnumType = EnumType.ORDINAL;
 
