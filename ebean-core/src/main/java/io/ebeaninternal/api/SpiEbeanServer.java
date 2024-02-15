@@ -87,6 +87,11 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
   SpiTransactionManager transactionManager();
 
   /**
+   * End the current transaction if it is active.
+   */
+  void endTransaction();
+
+  /**
    * Return all the descriptors.
    */
   List<BeanDescriptor<?>> descriptors();

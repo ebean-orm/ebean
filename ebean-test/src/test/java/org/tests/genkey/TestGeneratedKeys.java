@@ -1,6 +1,7 @@
 package org.tests.genkey;
 
 import io.ebean.DB;
+import io.ebean.Transaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.TOne;
 
@@ -19,12 +20,10 @@ public class TestGeneratedKeys {
     c1.setName("Two");
     c1.setDescription("Test Gen Key Two");
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       DB.save(c);
       DB.save(c1);
-    } finally {
-      DB.commitTransaction();
+      txn.commit();
     }
     Integer id = c.getId();
     assertNotNull(id);

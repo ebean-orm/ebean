@@ -49,7 +49,7 @@ public class TestInsertBatchThenFlushThenUpdate extends BaseTestCase {
       // nothing flushed yet
       assertThat(LoggedSql.start()).isEmpty();
 
-      DB.commitTransaction();
+      txn.commit();
 
       // insert statements for EdExtendedParent
       List<String> loggedSql2 = LoggedSql.start();

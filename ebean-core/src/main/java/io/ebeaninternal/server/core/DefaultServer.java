@@ -757,16 +757,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void commitTransaction() {
-    currentTransaction().commit();
-  }
-
-  @Override
-  public void rollbackTransaction() {
-    currentTransaction().rollback();
-  }
-
-  @Override
   public void endTransaction() {
     Transaction transaction = transactionManager.inScope();
     if (transaction != null) {
