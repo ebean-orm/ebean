@@ -226,6 +226,7 @@ class TestPersistenceContextQueryScope extends BaseTestCase {
       assertNotSame(bean3, bean5);
 
       DB.delete(bean3);
+
       txn.commit();
     }
   }

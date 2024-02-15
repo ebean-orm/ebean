@@ -3,6 +3,7 @@ package io.ebean.xtest.common;
 import io.ebean.bean.BeanCollection;
 import io.ebean.common.BeanList;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Product;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -13,22 +14,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BeanListTest {
 
-  private final Object object1 = new Object();
-  private final Object object2 = new Object();
-  private final Object object3 = new Object();
+  private final Product object1 = new Product(1);
+  private final Product object2 = new Product(2);
+  private final Product object3 = new Product(3);
 
   private List<Object> all() {
     List<Object> all = new ArrayList<>();
-    all.add(object1);
-    all.add(object2);
-    all.add(object3);
+    all.add(new Product(1));
+    all.add(new Product(2));
+    all.add(new Product(3));
     return all;
   }
 
   private List<Object> some() {
     List<Object> some = new ArrayList<>();
-    some.add(object2);
-    some.add(object3);
+    some.add(new Product(2));
+    some.add(new Product(3));
     return some;
   }
 
@@ -163,14 +164,15 @@ public class BeanListTest {
   @Test
   public void testRemove_given_beansInAdditions() {
 
+    List<Object> all = all();
     BeanList<Object> list = new BeanList<>();
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
-    list.addAll(all());
+    list.addAll(all);
     assertThat(list.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
-    list.remove(object2);
-    list.remove(object3);
+    list.remove(all.get(1));
+    list.remove(all.get(2));
 
     assertThat(list.modifyAdditions()).containsOnly(object1);
     assertThat(list.modifyRemovals()).isEmpty();
@@ -179,13 +181,14 @@ public class BeanListTest {
   @Test
   public void testRemoveAll_given_beansInAdditions() {
 
+    List<Object> all = all();
     BeanList<Object> list = new BeanList<>();
     list.setModifyListening(BeanCollection.ModifyListenMode.ALL);
-    list.addAll(all());
+    list.addAll(all);
     assertThat(list.modifyAdditions()).containsOnly(object1, object2, object3);
 
     // act
-    list.removeAll(some());
+    list.removeAll(List.of(all.get(1), all.get(2)));
 
     assertThat(list.modifyAdditions()).containsOnly(object1);
     assertThat(list.modifyRemovals()).isEmpty();

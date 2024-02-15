@@ -94,6 +94,13 @@ class KotlinLangAdapter implements LangAdapter {
     writer.append("   * Private constructor for FetchGroup building.").eol();
     writer.append("   */").eol();
     writer.append("  private constructor(fetchGroupQuery: Query<%s>) : super(fetchGroupQuery)", shortName).eol();
+
+    writer.eol();
+    writer.append("  /** Return a copy of the query. */").eol();
+    writer.append("  fun copy() : Q%s {", shortName).eol();
+    writer.append("    return Q%s(query().copy())", shortName).eol();
+    writer.append("  }").eol();
+    writer.eol();
   }
 
   @Override

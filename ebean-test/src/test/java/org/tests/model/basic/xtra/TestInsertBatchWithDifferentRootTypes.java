@@ -58,7 +58,7 @@ public class TestInsertBatchWithDifferentRootTypes extends BaseTestCase {
       // insert statements for EdParent
       List<String> loggedSql1 = LoggedSql.start();
 
-      DB.commitTransaction();
+      txn.commit();
 
       assertEquals(0, loggedSql1.size());
 

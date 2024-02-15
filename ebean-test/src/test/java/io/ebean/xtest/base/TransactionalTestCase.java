@@ -1,5 +1,6 @@
 package io.ebean.xtest.base;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.AfterEach;
@@ -18,15 +19,17 @@ import org.tests.model.basic.ResetBasicData;
  */
 public abstract class TransactionalTestCase extends BaseTestCase {
 
+  private Transaction transaction;
+
   @BeforeEach
   public void startTransaction() {
     ResetBasicData.reset();
-    DB.beginTransaction();
+    transaction = DB.beginTransaction();
   }
 
   @AfterEach
   public void endTransaction() {
-    DB.rollbackTransaction();
-    DB.endTransaction();
+    transaction.rollback();
+    transaction.end();
   }
 }
