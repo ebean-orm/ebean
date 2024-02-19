@@ -552,4 +552,16 @@ public interface EntityBeanIntercept extends Serializable {
    * Update the 'next' mutable info returning the content that was obtained via dirty detection.
    */
   String mutableNext(int propertyIndex);
+
+  /**
+   * Set that lazy loading if invoked throws a PersistenceException.
+   */
+  void errorOnLazyLoad(boolean lazyLoadAsError);
+
+  /**
+   * Freeze the intercept so that it is readOnly.
+   * Lazy loading and mutation of the bean is not allowed.
+   */
+  void freeze();
+
 }

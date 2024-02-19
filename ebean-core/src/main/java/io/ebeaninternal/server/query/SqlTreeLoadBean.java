@@ -31,7 +31,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
   final boolean readId;
   private final boolean readIdNormal;
   private final boolean disableLazyLoad;
-  private final boolean readOnlyNoIntercept;
+  private final boolean readOnly;
   private final InheritInfo inheritInfo;
   final String prefix;
   private final Map<String, String> pathMap;
@@ -54,7 +54,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
     this.readId = node.readId;
     this.readIdNormal = readId && !temporalVersions;
     this.disableLazyLoad = node.disableLazyLoad;
-    this.readOnlyNoIntercept = disableLazyLoad && node.readOnly;
+    this.readOnly = node.readOnly;
     this.partialObject = node.partialObject;
     this.properties = node.properties;
     this.pathMap = node.pathMap;
@@ -162,7 +162,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
 
     void initBeanType() throws SQLException {
       localDesc = desc;
-      localBean = desc.createEntityBean2(readOnlyNoIntercept);
+      localBean = desc.createEntityBean2(readOnly);
       localIdBinder = idBinder;
     }
 
@@ -302,7 +302,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
       boolean forceNewReference = queryMode == Mode.REFRESH_BEAN;
       for (STreePropertyAssocMany many : localDesc.propsMany()) {
         if (many != loadingChildProperty) {
-          if (readOnlyNoIntercept) {
+          if (disableLazyLoad && readOnly) {
             many.createEmptyReference(localBean);
           } else {
             // create a proxy for the many (deferred fetching)

@@ -1,11 +1,7 @@
 package io.ebean.bean;
 
-import io.ebean.DB;
-import io.ebean.Database;
 import io.ebean.ValuePair;
 
-import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.PersistenceException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,8 +9,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This is the object added to every entity bean using byte code enhancement.
@@ -22,7 +16,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * This provides the mechanisms to support deferred fetching of reference beans
  * and oldValues generation for concurrency checking.
  */
-public final class InterceptReadWrite implements EntityBeanIntercept {
+public final class InterceptReadWrite extends InterceptBase {
 
   private static final long serialVersionUID = -3664031775464862649L;
 
@@ -30,10 +24,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   private static final int STATE_REFERENCE = 1;
   private static final int STATE_LOADED = 2;
 
-  /**
-   * Used when a bean is partially loaded.
-   */
-  private static final byte FLAG_LOADED_PROP = 1;
   private static final byte FLAG_CHANGED_PROP = 2;
   private static final byte FLAG_CHANGEDLOADED_PROP = 3;
   /**
@@ -47,43 +37,21 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    */
   private static final byte FLAG_MUTABLE_HASH_SET = 16;
 
-  private final ReentrantLock lock = new ReentrantLock();
   private transient NodeUsageCollector nodeUsageCollector;
-  private transient PersistenceContext persistenceContext;
-  private transient BeanLoader beanLoader;
   private transient PreGetterCallback preGetterCallback;
 
-  private String ebeanServerName;
-  private boolean deletedFromCollection;
-
-  /**
-   * The actual entity bean that 'owns' this intercept.
-   */
-  private final EntityBean owner;
   private EntityBean embeddedOwner;
   private int embeddedOwnerIndex;
   /**
-   * One of NEW, REF, UPD.
+   * One of NEW, REF, LOADED.
    */
   private int state;
+  private boolean deletedFromCollection;
   private boolean forceUpdate;
-  private boolean readOnly;
   private boolean dirty;
-  /**
-   * Flag set to disable lazy loading.
-   */
-  private boolean disableLazyLoad;
-  /**
-   * Flag set when lazy loading failed due to the underlying bean being deleted in the DB.
-   */
-  private boolean lazyLoadFailure;
-  private boolean fullyLoadedBean;
   private boolean loadedFromCache;
-  private final byte[] flags;
   private Object[] origValues;
   private Exception[] loadErrors;
-  private int lazyLoadProperty = -1;
-  private Object ownerId;
   private int sortOrder;
 
   /**
@@ -101,64 +69,19 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    * Create with a given entity.
    */
   public InterceptReadWrite(Object ownerBean) {
-    this.owner = (EntityBean) ownerBean;
-    this.flags = new byte[owner._ebean_getPropertyNames().length];
+    super(ownerBean);
   }
 
   /**
    * EXPERIMENTAL - Constructor only for use by serialization frameworks.
    */
   public InterceptReadWrite() {
-    this.owner = null;
-    this.flags = null;
-  }
-
-  @Override
-  public String toString() {
-    return "InterceptReadWrite@" + hashCode() + "{state=" + state +
-      (dirty ? " dirty;" : "") +
-      (forceUpdate ? " forceUpdate;" : "") +
-      (readOnly ? " readOnly;" : "") +
-      (disableLazyLoad ? " disableLazyLoad;" : "") +
-      (lazyLoadFailure ? " lazyLoadFailure;" : "") +
-      (fullyLoadedBean ? " fullyLoadedBean;" : "") +
-      (loadedFromCache ? " loadedFromCache;" : "") +
-      ", pc=" + System.identityHashCode(persistenceContext) +
-      ", flags=" + Arrays.toString(flags) +
-      (lazyLoadProperty > -1 ? (", lazyLoadProperty=" + lazyLoadProperty) : "") +
-      ", loader=" + beanLoader +
-      (ownerId != null ? (", ownerId=" + ownerId) : "") +
-      '}';
-  }
-
-  @Override
-  public EntityBean owner() {
-    return owner;
-  }
-
-  @Override
-  public PersistenceContext persistenceContext() {
-    return persistenceContext;
-  }
-
-  @Override
-  public void setPersistenceContext(PersistenceContext persistenceContext) {
-    this.persistenceContext = persistenceContext;
+    super();
   }
 
   @Override
   public void setNodeUsageCollector(NodeUsageCollector usageCollector) {
     this.nodeUsageCollector = usageCollector;
-  }
-
-  @Override
-  public Object ownerId() {
-    return ownerId;
-  }
-
-  @Override
-  public void setOwnerId(Object ownerId) {
-    this.ownerId = ownerId;
   }
 
   @Override
@@ -185,39 +108,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   public void setEmbeddedOwner(EntityBean parentBean, int embeddedOwnerIndex) {
     this.embeddedOwner = parentBean;
     this.embeddedOwnerIndex = embeddedOwnerIndex;
-  }
-
-  @Override
-  public void setBeanLoader(BeanLoader beanLoader, PersistenceContext ctx) {
-    this.beanLoader = beanLoader;
-    this.persistenceContext = ctx;
-    this.ebeanServerName = beanLoader.name();
-  }
-
-  @Override
-  public void setBeanLoader(BeanLoader beanLoader) {
-    this.beanLoader = beanLoader;
-    this.ebeanServerName = beanLoader.name();
-  }
-
-  @Override
-  public boolean isFullyLoadedBean() {
-    return fullyLoadedBean;
-  }
-
-  @Override
-  public void setFullyLoadedBean(boolean fullyLoadedBean) {
-    this.fullyLoadedBean = fullyLoadedBean;
-  }
-
-  @Override
-  public boolean isPartial() {
-    for (byte flag : flags) {
-      if ((flag & FLAG_LOADED_PROP) == 0) {
-        return true;
-      }
-    }
-    return false;
   }
 
   @Override
@@ -258,18 +148,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public boolean hasIdOnly(int idIndex) {
-    for (int i = 0; i < flags.length; i++) {
-      if (i == idIndex) {
-        if ((flags[i] & FLAG_LOADED_PROP) == 0) return false;
-      } else if ((flags[i] & FLAG_LOADED_PROP) != 0) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
   public boolean isReference() {
     return state == STATE_REFERENCE;
   }
@@ -296,16 +174,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   @Override
   public boolean isLoadedFromCache() {
     return loadedFromCache;
-  }
-
-  @Override
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
   }
 
   @Override
@@ -357,34 +225,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public void setLazyLoadFailure(Object ownerId) {
-    this.lazyLoadFailure = true;
-    this.ownerId = ownerId;
-  }
-
-  @Override
-  public boolean isLazyLoadFailure() {
-    return lazyLoadFailure;
-  }
-
-  @Override
-  public boolean isDisableLazyLoad() {
-    return disableLazyLoad;
-  }
-
-  @Override
-  public void setDisableLazyLoad(boolean disableLazyLoad) {
-    this.disableLazyLoad = disableLazyLoad;
-  }
-
-  @Override
-  public void setEmbeddedLoaded(Object embeddedBean) {
-    if (embeddedBean instanceof EntityBean) {
-      ((EntityBean) embeddedBean)._ebean_getIntercept().setLoaded();
-    }
-  }
-
-  @Override
   public boolean isEmbeddedNewOrDirty(Object embeddedBean) {
     if (embeddedBean == null) {
       // if it was previously set then the owning bean would
@@ -409,65 +249,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       return null;
     }
     return origValues[propertyIndex];
-  }
-
-  @Override
-  public int findProperty(String propertyName) {
-    final String[] names = owner._ebean_getPropertyNames();
-    for (int i = 0; i < names.length; i++) {
-      if (names[i].equals(propertyName)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  @Override
-  public String property(int propertyIndex) {
-    if (propertyIndex == -1) {
-      return null;
-    }
-    return owner._ebean_getPropertyName(propertyIndex);
-  }
-
-  @Override
-  public int propertyLength() {
-    return flags.length;
-  }
-
-  @Override
-  public void setPropertyLoaded(String propertyName, boolean loaded) {
-    final int position = findProperty(propertyName);
-    if (position == -1) {
-      throw new IllegalArgumentException("Property " + propertyName + " not found");
-    }
-    if (loaded) {
-      flags[position] |= FLAG_LOADED_PROP;
-    } else {
-      flags[position] &= ~FLAG_LOADED_PROP;
-    }
-  }
-
-  @Override
-  public void setPropertyUnloaded(int propertyIndex) {
-    flags[propertyIndex] &= ~FLAG_LOADED_PROP;
-  }
-
-  @Override
-  public void setLoadedProperty(int propertyIndex) {
-    flags[propertyIndex] |= FLAG_LOADED_PROP;
-  }
-
-  @Override
-  public void setLoadedPropertyAll() {
-    for (int i = 0; i < flags.length; i++) {
-      flags[i] |= FLAG_LOADED_PROP;
-    }
-  }
-
-  @Override
-  public boolean isLoadedProperty(int propertyIndex) {
-    return (flags[propertyIndex] & FLAG_LOADED_PROP) != 0;
   }
 
   @Override
@@ -528,20 +309,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       }
     }
     setDirty(true);
-  }
-
-  @Override
-  public Set<String> loadedPropertyNames() {
-    if (fullyLoadedBean) {
-      return null;
-    }
-    final Set<String> props = new LinkedHashSet<>();
-    for (int i = 0; i < flags.length; i++) {
-      if ((flags[i] & FLAG_LOADED_PROP) != 0) {
-        props.add(property(i));
-      }
-    }
-    return props;
   }
 
   @Override
@@ -668,86 +435,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
   }
 
-  @Override
-  public StringBuilder loadedPropertyKey() {
-    final StringBuilder sb = new StringBuilder();
-    final int len = propertyLength();
-    for (int i = 0; i < len; i++) {
-      if (isLoadedProperty(i)) {
-        sb.append(i).append(',');
-      }
-    }
-    return sb;
-  }
-
-  @Override
-  public boolean[] loaded() {
-    final boolean[] ret = new boolean[flags.length];
-    for (int i = 0; i < ret.length; i++) {
-      ret[i] = (flags[i] & FLAG_LOADED_PROP) != 0;
-    }
-    return ret;
-  }
-
-  @Override
-  public int lazyLoadPropertyIndex() {
-    return lazyLoadProperty;
-  }
-
-  @Override
-  public String lazyLoadProperty() {
-    return property(lazyLoadProperty);
-  }
-
-  @Override
-  public void loadBean(int loadProperty) {
-    lock.lock();
-    try {
-      if (beanLoader == null) {
-        final Database database = DB.byName(ebeanServerName);
-        if (database == null) {
-          throw new PersistenceException(ebeanServerName == null ? "No registered default server" : "Database [" + ebeanServerName + "] is not registered");
-        }
-        // For stand alone reference bean or after deserialisation lazy load
-        // using the ebeanServer. Synchronise only on the bean.
-        loadBeanInternal(loadProperty, database.pluginApi().beanLoader());
-        return;
-      }
-    } finally {
-      lock.unlock();
-    }
-    final Lock lock = beanLoader.lock();
-    try {
-      // Lazy loading using LoadBeanContext which supports batch loading
-      // Synchronise on the beanLoader (a 'node' of the LoadBeanContext 'tree')
-      loadBeanInternal(loadProperty, beanLoader);
-    } finally {
-      lock.unlock();
-    }
-  }
-
-  @Override
-  public void loadBeanInternal(int loadProperty, BeanLoader loader) {
-    if ((flags[loadProperty] & FLAG_LOADED_PROP) != 0) {
-      // race condition where multiple threads calling preGetter concurrently
-      return;
-    }
-    if (lazyLoadFailure) {
-      // failed when batch lazy loaded by another bean in the batch
-      throw new EntityNotFoundException("(Lazy) loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted. BeanLoader: " + beanLoader);
-    }
-    if (lazyLoadProperty == -1) {
-      lazyLoadProperty = loadProperty;
-      loader.loadBean(this);
-      if (lazyLoadFailure) {
-        // failed when lazy loading this bean
-        throw new EntityNotFoundException("Lazy loading failed on type:" + owner.getClass().getName() + " id:" + ownerId + " - Bean has been deleted. BeanLoader: " + beanLoader);
-      }
-      // bean should be loaded and intercepting now. setLoaded() has
-      // been called by the lazy loading mechanism
-    }
-  }
-
   /**
    * Helper method to check if two objects are equal.
    */
@@ -806,11 +493,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     } catch (IOException e) {
       return true; // handle them as "not equals"
     }
-  }
-
-  @Override
-  public void initialisedMany(int propertyIndex) {
-    flags[propertyIndex] |= FLAG_LOADED_PROP;
   }
 
   @Override
@@ -1075,5 +757,17 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
     }
     final MutableValueNext next = mutableNext[propertyIndex];
     return next != null ? next.content() : null;
+  }
+
+  @Override
+  public void freeze() {
+    super.freeze();
+    // not allowed to be used for updates
+    this.dirty = false;
+    this.forceUpdate = false;
+    this.deletedFromCollection = false;
+    this.origValues = null;
+    this.nodeUsageCollector = null;
+    this.embeddedOwner = null;
   }
 }

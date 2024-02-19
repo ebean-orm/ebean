@@ -23,4 +23,8 @@ public final class ModifyAwareFlag implements ModifyAwareType, Serializable {
     this.markedDirty = markedDirty;
   }
 
+  @Override
+  public Object freeze() {
+    throw new UnsupportedOperationException();
+  }
 }

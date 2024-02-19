@@ -3,10 +3,7 @@ package io.ebean.common;
 import io.ebean.bean.*;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Set capable of lazy loading and modification aware.
@@ -41,6 +38,12 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   @Override
   public void toString(ToStringBuilder builder) {
     builder.addCollection(set);
+  }
+
+  @Override
+  public Object freeze() {
+    // null -> illegal to access reference collection
+    return set == null ? null : Collections.unmodifiableSet(set);
   }
 
   @Override

@@ -16,4 +16,9 @@ public interface ModifyAwareType {
    */
   void setMarkedDirty(boolean markedDirty);
 
+  /**
+   * Return a unmodifiable version of this type.
+   */
+  Object freeze();
+
 }

@@ -38,6 +38,12 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   @Override
+  public Object freeze() {
+    // null -> illegal to access reference collection
+    return map == null ? null : Collections.unmodifiableMap(map);
+  }
+
+  @Override
   public void toString(ToStringBuilder builder) {
     if (map == null || map.isEmpty()) {
       builder.addRaw("{}");

@@ -45,6 +45,12 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   @Override
+  public Object freeze() {
+    // null -> illegal to access reference collection
+    return list == null ? null : Collections.unmodifiableList(list);
+  }
+
+  @Override
   public void reset(EntityBean ownerBean, String propertyName) {
     this.ownerBean = ownerBean;
     this.propertyName = propertyName;

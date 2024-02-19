@@ -2,6 +2,7 @@ package io.ebean;
 
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.bean.FrozenBeans;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DocStoreConfig;
 
@@ -53,6 +54,24 @@ public interface Transaction extends AutoCloseable {
    * java.sql.Connection.TRANSACTION_SERIALIZABLE.
    */
   int SERIALIZABLE = java.sql.Connection.TRANSACTION_SERIALIZABLE;
+
+
+  /**
+   * Experimental Feature - Freeze the beans in the persistence context and detach them.
+   */
+  @Deprecated(since = "Experimental Feature")
+  default FrozenBeans freezeAndDetach() {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * Experimental Feature - Attach frozen beans to the persistence context so that they can be
+   * used with ORM queries (with the persistence context acting like a cache).
+   */
+  @Deprecated(since = "Experimental Feature")
+  default void attach(FrozenBeans frozenBeans) {
+    throw new UnsupportedOperationException();
+  }
 
   /**
    * Register a TransactionCallback with this transaction.
