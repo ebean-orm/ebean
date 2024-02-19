@@ -224,7 +224,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   private PersistBatch persistBatchOnCascade = PersistBatch.INHERIT;
 
-  private int persistBatchSize = 20;
+  private int persistBatchSize = 100;
 
   private EnumType defaultEnumType = EnumType.ORDINAL;
 
@@ -291,6 +291,8 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private ExternalTransactionManager externalTransactionManager;
 
   private boolean skipDataSourceCheck;
+
+  private boolean readOnlyDatabase;
 
   /**
    * The data source (if programmatically provided).
@@ -1276,13 +1278,24 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
 
   @Override
   public boolean skipDataSourceCheck() {
-    return skipDataSourceCheck;
+    return skipDataSourceCheck || readOnlyDatabase;
   }
 
   @Override
   public DatabaseConfig setSkipDataSourceCheck(boolean skipDataSourceCheck) {
     this.skipDataSourceCheck = skipDataSourceCheck;
     return this;
+  }
+
+  @Override
+  public DatabaseBuilder readOnlyDatabase(boolean readOnlyDatabase) {
+    this.readOnlyDatabase = readOnlyDatabase;
+    return this;
+  }
+
+  @Override
+  public boolean readOnlyDatabase() {
+    return readOnlyDatabase;
   }
 
   @Override
@@ -2045,6 +2058,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     loadDataSourceSettings(p);
 
     defaultServer = p.getBoolean("defaultServer", defaultServer);
+    readOnlyDatabase = p.getBoolean("readOnlyDatabase", readOnlyDatabase);
     autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
     maxCallStack = p.getInt("maxCallStack", maxCallStack);

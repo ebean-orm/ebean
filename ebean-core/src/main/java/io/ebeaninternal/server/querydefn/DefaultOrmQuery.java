@@ -57,6 +57,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private Type type;
   private String label;
   private Mode mode = Mode.NORMAL;
+  private boolean usingFuture;
   private Object tenantId;
   /**
    * Holds query in structured form.
@@ -909,6 +910,16 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final void usingFuture() {
+    this.usingFuture = true;
+  }
+
+  @Override
+  public final boolean isUsingFuture() {
+    return usingFuture;
+  }
+
+  @Override
   public final boolean isUsageProfiling() {
     return usageProfiling;
   }
@@ -1092,7 +1103,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // add the rawSql statement - if any
     if (orderByIsEmpty()) {
       if (rawSql != null && rawSql.getSql() != null) {
-        order(rawSql.getSql().getOrderBy());
+        orderBy(rawSql.getSql().getOrderBy());
       }
     }
     if (checkPagingOrderBy()) {
@@ -1448,7 +1459,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public final <A> List<A> findSingleAttributeList() {
     return server.findSingleAttributeList(this);
   }
@@ -1462,6 +1472,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final <A> A findSingleAttribute() {
     List<A> list = findSingleAttributeList();
     return !list.isEmpty() ? list.get(0) : null;
+  }
+
+  @Override
+  public final <A> Optional<A> findSingleAttributeOrEmpty() {
+    return Optional.ofNullable(findSingleAttribute());
   }
 
   @Override

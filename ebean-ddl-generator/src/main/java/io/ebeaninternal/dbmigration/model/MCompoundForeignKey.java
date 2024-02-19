@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.model;
 
+import io.ebean.annotation.ConstraintMode;
 import io.ebeaninternal.dbmigration.ddlgeneration.platform.DdlHelp;
 import io.ebeaninternal.dbmigration.migration.AlterForeignKey;
 import io.ebeaninternal.dbmigration.migration.ForeignKey;
@@ -22,6 +23,8 @@ public class MCompoundForeignKey {
   private final List<String> columns = new ArrayList<>();
   private final List<String> referenceColumns = new ArrayList<>();
   private String indexName;
+  private ConstraintMode fkeyOnDelete;
+  private ConstraintMode fkeyOnUpdate;
 
   public MCompoundForeignKey(String name, String referenceTable, String indexName) {
     this.name = name;
@@ -47,9 +50,15 @@ public class MCompoundForeignKey {
     fk.setColumnNames(toColumnNames(columns));
     fk.setRefColumnNames(toColumnNames(referenceColumns));
     fk.setRefTableName(referenceTable);
+    fk.setOnDelete(fkeyModeOf(fkeyOnDelete));
+    fk.setOnUpdate(fkeyModeOf(fkeyOnUpdate));
     return fk;
   }
-  
+
+  private String fkeyModeOf(ConstraintMode mode) {
+    return (mode == null) ? null : mode.name();
+  }
+
   /**
    * Create and return an AlterForeignKey migration element.
    */
@@ -63,7 +72,7 @@ public class MCompoundForeignKey {
     fk.setTableName(tableName);
     return fk;
   }
-  
+
   /**
    * Create and return an AlterForeignKey migration element.
    */
@@ -117,7 +126,6 @@ public class MCompoundForeignKey {
    * Return as an array of string column names.
    */
   private String toColumnNames(List<String> columns) {
-
     StringBuilder sb = new StringBuilder(40);
     for (int i = 0; i < columns.size(); i++) {
       if (i > 0) {
@@ -139,7 +147,7 @@ public class MCompoundForeignKey {
       return true;
     if (!(obj instanceof MCompoundForeignKey))
       return false;
-    
+
     MCompoundForeignKey other = (MCompoundForeignKey) obj;
     return Objects.equals(columns, other.columns)
         && Objects.equals(indexName, other.indexName)
@@ -148,4 +156,8 @@ public class MCompoundForeignKey {
         && Objects.equals(referenceTable, other.referenceTable);
   }
 
+  public void setForeignKeyModes(ConstraintMode onDelete, ConstraintMode onUpdate) {
+    this.fkeyOnDelete = onDelete;
+    this.fkeyOnUpdate = onUpdate;
+  }
 }

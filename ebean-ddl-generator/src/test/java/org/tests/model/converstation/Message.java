@@ -1,5 +1,6 @@
 package org.tests.model.converstation;
 
+import io.ebean.annotation.DbComment;
 import org.tests.model.BaseModel;
 
 import jakarta.persistence.Entity;
@@ -14,6 +15,7 @@ public class Message extends BaseModel {
 
   String body;
 
+  @DbComment("A ManyToOne comment")
   @ManyToOne
   Conversation conversation;
 

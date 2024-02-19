@@ -169,7 +169,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.queryMode = query.mode();
     this.loadContextBean = queryMode.isLoadContextBean() || query.getForUpdateLockType() != null;
     this.lazyLoadManyProperty = query.lazyLoadMany();
-    this.readOnly = request.isReadOnly();
+    this.readOnly = query.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.objectGraphNode = query.parentNode();
     this.profilingListener = query.profilingListener();

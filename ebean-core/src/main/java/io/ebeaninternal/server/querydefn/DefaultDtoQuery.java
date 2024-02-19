@@ -9,8 +9,10 @@ import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
+import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
 import javax.annotation.Nullable;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -83,6 +85,12 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   @Override
   public DtoQuery<T> usingTransaction(Transaction transaction) {
     this.transaction = (SpiTransaction) transaction;
+    return this;
+  }
+
+  @Override
+  public DtoQuery<T> usingConnection(Connection connection) {
+    this.transaction = new ExternalJdbcTransaction(connection);
     return this;
   }
 

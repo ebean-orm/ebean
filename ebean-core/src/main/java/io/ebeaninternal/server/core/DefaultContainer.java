@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -13,11 +14,13 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 import io.ebeaninternal.server.core.bootup.BootupClassPathSearch;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.executor.DefaultBackgroundExecutor;
-
 import jakarta.persistence.PersistenceException;
+
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -33,12 +36,22 @@ public final class DefaultContainer implements SpiContainer {
 
   private final ReentrantLock lock = new ReentrantLock();
   private final ClusterManager clusterManager;
+  private final List<EntityClassRegister> entityClassRegisters;
 
   public DefaultContainer(ContainerConfig containerConfig) {
     this.clusterManager = new ClusterManager(containerConfig);
     // register so that we can shutdown any Ebean wide
     // resources such as clustering
     ShutdownManager.registerContainer(this);
+    entityClassRegisters = initEntityRegisters();
+  }
+
+  private List<EntityClassRegister> initEntityRegisters() {
+    var entityClassRegisters = new ArrayList<EntityClassRegister>();
+    for (EntityClassRegister entityClassRegister : ServiceLoader.load(EntityClassRegister.class)) {
+      entityClassRegisters.add(entityClassRegister);
+    }
+    return entityClassRegisters;
   }
 
   @Override
@@ -52,10 +65,8 @@ public final class DefaultContainer implements SpiContainer {
    */
   @Override
   public SpiEbeanServer createServer(String name) {
-    DatabaseBuilder config = new DatabaseConfig();
-    config.setName(name);
-    config.loadFromProperties();
-    return createServer(config);
+    var builder = Database.builder().name(name).loadFromProperties();
+    return createServer(builder);
   }
 
   private SpiBackgroundExecutor createBackgroundExecutor(DatabaseBuilder builder) {
@@ -122,12 +133,10 @@ public final class DefaultContainer implements SpiContainer {
     }
     if (config.isLoadModuleInfo()) {
       // auto register entity classes
-      boolean found = false;
-      for (EntityClassRegister loader : ServiceLoader.load(EntityClassRegister.class)) {
+      for (EntityClassRegister loader : entityClassRegisters) {
         config.addAll(loader.classesFor(config.getName(), config.isDefaultServer()));
-        found = true;
       }
-      if (!found) {
+      if (entityClassRegisters.isEmpty()) {
         checkMissingModulePathProvides();
       }
     }
@@ -189,7 +198,7 @@ public final class DefaultContainer implements SpiContainer {
    */
   private void setNamingConvention(DatabaseBuilder.Settings config) {
     if (config.getNamingConvention() == null) {
-      config.setNamingConvention(new UnderscoreNamingConvention());
+      config.namingConvention(new UnderscoreNamingConvention());
     }
   }
 
@@ -204,7 +213,7 @@ public final class DefaultContainer implements SpiContainer {
       }
       // automatically determine the platform
       platform = new DatabasePlatformFactory().create(config);
-      config.setDatabasePlatform(platform);
+      config.databasePlatform(platform);
     }
     platform.configure(config.getPlatformConfig());
   }
@@ -228,11 +237,9 @@ public final class DefaultContainer implements SpiContainer {
    * Check the autoCommit and Transaction Isolation levels of the DataSource.
    * <p>
    * If autoCommit is true this could be a real problem.
-   * </p>
    * <p>
    * If the Isolation level is not READ_COMMITTED then optimistic concurrency
    * checking may not work as expected.
-   * </p>
    */
   private boolean checkDataSource(DatabaseBuilder.Settings config) {
     if (isOfflineMode(config)) {

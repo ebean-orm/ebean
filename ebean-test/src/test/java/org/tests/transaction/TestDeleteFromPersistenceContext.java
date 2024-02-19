@@ -1,5 +1,6 @@
 package org.tests.transaction;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiTransaction;
@@ -19,9 +20,8 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
     EBasicVer bean = new EBasicVer("Please Delete Me");
     DB.save(bean);
 
-    SpiTransaction transaction = (SpiTransaction) DB.beginTransaction();
-    try {
-
+    try (Transaction txn = DB.beginTransaction()) {
+      SpiTransaction spiTransaction = (SpiTransaction)txn;
       EBasicVer bean2 = DB.find(EBasicVer.class, bean.getId());
       assertNotSame(bean, bean2);
 
@@ -29,18 +29,15 @@ public class TestDeleteFromPersistenceContext extends BaseTestCase {
       // same instance from PersistenceContext
       assertSame(bean2, bean3);
 
-      Object bean4 = transaction.persistenceContext().get(EBasicVer.class, bean.getId());
+      Object bean4 = spiTransaction.persistenceContext().get(EBasicVer.class, bean.getId());
       assertSame(bean2, bean4);
 
       DB.delete(bean2);
 
-      Object bean5 = transaction.persistenceContext().get(EBasicVer.class, bean.getId());
+      Object bean5 = spiTransaction.persistenceContext().get(EBasicVer.class, bean.getId());
       assertNull(bean5);
 
-      DB.commitTransaction();
-
-    } finally {
-      DB.endTransaction();
+      txn.commit();
     }
 
     EBasicVer bean6 = DB.find(EBasicVer.class).where().eq("id", bean.getId()).findOne();

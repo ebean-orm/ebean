@@ -288,6 +288,11 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  public <A> Optional<A> findSingleAttributeOrEmpty() {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
   public boolean isCountDistinct() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }

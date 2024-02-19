@@ -267,55 +267,6 @@ public final class DB {
   }
 
   /**
-   * Deprecated for removal migrate using try-with-resources and commit on the transaction itself.
-   * <p>
-   * Commit the current transaction.
-   */
-  @Deprecated(forRemoval = true)
-  public static void commitTransaction() {
-    getDefault().commitTransaction();
-  }
-
-  /**
-   * Deprecated for removal migrate to using try-with-resources and rollback on the transaction itself.
-   * <p>
-   * Rollback the current transaction.
-   */
-  @Deprecated(forRemoval = true)
-  public static void rollbackTransaction() {
-    getDefault().rollbackTransaction();
-  }
-
-  /**
-   * If the current transaction has already been committed do nothing otherwise
-   * rollback the transaction.
-   * <p>
-   * It is preferable to use <em>try with resources</em> rather than this.
-   * <p>
-   * Useful to put in a finally block to ensure the transaction is ended, rather
-   * than a rollbackTransaction() in each catch block.
-   * <p>
-   * Code example:
-   *
-   * <pre>{@code
-   *   DB.beginTransaction();
-   *   try {
-   *     // do some fetching and or persisting
-   *
-   *     // commit at the end
-   *     DB.commitTransaction();
-   *
-   *   } finally {
-   *     // if commit didn't occur then rollback the transaction
-   *     DB.endTransaction();
-   *   }
-   * }</pre>
-   */
-  public static void endTransaction() {
-    getDefault().endTransaction();
-  }
-
-  /**
    * Mark the current transaction as rollback only.
    */
   public static void setRollbackOnly() {

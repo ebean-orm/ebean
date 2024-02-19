@@ -3,9 +3,12 @@ package io.ebeaninternal.server.core;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.persist.PersistExecute;
 import io.ebeaninternal.server.persist.TrimLogSql;
+
+import java.util.List;
 
 /**
  * Persist request specifically for CallableSql.
@@ -156,6 +159,14 @@ public final class PersistRequestUpdateSql extends PersistRequest {
    */
   @Override
   public void postExecute() {
+    if (sqlType != SqlType.SQL_INSERT && !transaction.isAutoPersistUpdates()) {
+      List<BeanDescriptor<?>> descriptors = server.descriptors(tableName);
+      if (descriptors != null) {
+        for (BeanDescriptor<?> descriptor : descriptors) {
+          descriptor.contextClear(transaction.persistenceContext());
+        }
+      }
+    }
     if (startNanos > 0) {
       persistExecute.collectSqlUpdate(label, startNanos);
     }

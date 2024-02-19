@@ -19,11 +19,6 @@ interface Constants {
   String DBJSONB = "io.ebean.annotation.DbJsonB";
   String DBNAME = "io.ebean.annotation.DbName";
 
-  String TQROOTBEAN = "io.ebean.typequery.TQRootBean";
-  String TQASSOCBEAN = "io.ebean.typequery.TQAssocBean";
-  String TQASSOC = "io.ebean.typequery.TQAssoc";
-  String DB = "io.ebean.DB";
-
   String MODULEINFO = "io.ebean.config.ModuleInfo";
   String METAINF_MANIFEST = "META-INF/ebean-generated-info.mf";
   String METAINF_SERVICES_MODULELOADER = "META-INF/services/io.ebean.config.EntityClassRegister";

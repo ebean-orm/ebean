@@ -1,5 +1,6 @@
 package org.tests.level.test;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,7 @@ public class ManyToManyTest extends BaseTestCase {
   @Test
   public void test() {
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       Level4 i = new Level4("i");
       Level4 ii = new Level4("ii");
       Level4 iii = new Level4("iii");
@@ -92,9 +92,6 @@ public class ManyToManyTest extends BaseTestCase {
         .findList();
 
       validateObjectGraph(i, ii, iii, one, two, x1, x2, x3, x4, x5, things);
-
-    } finally {
-      DB.endTransaction();
     }
   }
 

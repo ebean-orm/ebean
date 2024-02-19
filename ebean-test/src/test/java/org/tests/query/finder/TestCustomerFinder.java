@@ -84,15 +84,10 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void currentTransaction() {
-
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       Transaction t1 = DB.currentTransaction();
       Transaction t2 = Customer.find.currentTransaction();
       assertThat(t2).isSameAs(t1);
-
-    } finally {
-      DB.endTransaction();
     }
   }
 

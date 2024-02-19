@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.25.0-jakarta</version>
+    <version>14.0.0</version>
   </parent>
 
   <name>ebean test</name>
@@ -12,8 +12,8 @@
   <artifactId>ebean-test</artifactId>
 
   <properties>
-    <bytebuddy.version>1.14.9</bytebuddy.version>
-    <assertj.version>3.24.2</assertj.version>
+    <bytebuddy.version>1.14.12</bytebuddy.version>
+    <assertj.version>3.25.3</assertj.version>
   </properties>
 
   <dependencies>
@@ -33,20 +33,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.25.0-jakarta</version>
+      <version>14.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.25.0-jakarta</version>
+      <version>14.0.0</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.25.0-jakarta</version>
+      <version>14.0.0</version>
     </dependency>
 
     <dependency>
@@ -149,14 +149,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-mapper</artifactId>
-      <version>13.25.0-jakarta</version>
+      <version>14.0.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>13.25.0-jakarta</version>
+      <version>14.0.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -293,7 +293,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.3</version>
+      <version>1.4</version>
       <scope>provided</scope>
     </dependency>
 

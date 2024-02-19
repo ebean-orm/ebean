@@ -5,7 +5,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.25.0-jakarta</version>
+    <version>14.0.0</version>
   </parent>
 
   <artifactId>test-java16</artifactId>
@@ -18,26 +18,26 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-h2</artifactId>
-      <version>13.25.0-jakarta</version>
+      <version>14.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.11</version>
+      <version>1.3.12</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.25.0-jakarta</version>
+      <version>14.0.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>13.25.0-jakarta</version>
+      <version>14.0.0</version>
       <scope>provided</scope>
     </dependency>
 

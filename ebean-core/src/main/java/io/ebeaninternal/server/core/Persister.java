@@ -1,11 +1,7 @@
 package io.ebeaninternal.server.core;
 
-import io.ebean.CallableSql;
-import io.ebean.MergeOptions;
-import io.ebean.Query;
-import io.ebean.SqlUpdate;
-import io.ebean.Transaction;
-import io.ebean.Update;
+import io.avaje.lang.Nullable;
+import io.ebean.*;
 import io.ebean.bean.EntityBean;
 import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.api.SpiSqlUpdate;
@@ -31,9 +27,9 @@ public interface Persister {
   void update(EntityBean entityBean, Transaction t);
 
   /**
-   * Force an Insert using the given bean.
+   * Perform an Insert using the given bean.
    */
-  void insert(EntityBean entityBean, Transaction t);
+  void insert(EntityBean entityBean, @Nullable InsertOptions insertOptions, @Nullable Transaction t);
 
   /**
    * Insert or update the bean depending on its state.
@@ -44,7 +40,6 @@ public interface Persister {
    * Delete a bean given it's type and id value.
    * <p>
    * This will also cascade delete one level of children.
-   * </p>
    */
   int delete(Class<?> beanType, Object id, Transaction transaction, boolean permanent);
 

@@ -1,9 +1,12 @@
 package io.ebeaninternal.server.type;
 
-import io.ebean.core.type.ScalarType;
 import io.ebean.core.type.BasicTypeConverter;
+import io.ebean.core.type.ScalarType;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 /**
@@ -32,6 +35,8 @@ interface ArrayElementConverter<T> {
   ArrayElementConverter<Double> DOUBLE = new DoubleConverter();
   ArrayElementConverter<Float> FLOAT = new FloatConverter();
   ArrayElementConverter<BigDecimal> BIG_DECIMAL = new BigDecimalConverter();
+  ArrayElementConverter<Instant> INSTANT = new InstantConverter();
+  ArrayElementConverter<LocalDate> LOCAL_DATE = new LocalDateConverter();
 
   class LongConverter implements ArrayElementConverter<Long> {
 
@@ -101,6 +106,48 @@ interface ArrayElementConverter<T> {
     }
   }
 
+  class InstantConverter implements ArrayElementConverter<Instant> {
+
+    @Override
+    public Instant fromSerialized(Object rawValue) {
+      return fromDbArray(rawValue);
+    }
+
+    @Override
+    public Instant fromDbArray(Object rawValue) {
+      if (rawValue instanceof Instant) {
+        return (Instant) rawValue;
+      } else if (rawValue instanceof Timestamp) {
+        return ((Timestamp) rawValue).toInstant();
+      } else if (rawValue instanceof String) {
+        return Instant.parse((String) rawValue);
+      } else {
+        throw new IllegalStateException("Instant fromDbArray unsupported for " + rawValue);
+      }
+    }
+  }
+
+  class LocalDateConverter implements ArrayElementConverter<LocalDate> {
+
+    @Override
+    public LocalDate fromSerialized(Object rawValue) {
+      return fromDbArray(rawValue);
+    }
+
+    @Override
+    public LocalDate fromDbArray(Object rawValue) {
+      if (rawValue instanceof LocalDate) {
+        return (LocalDate) rawValue;
+      } else if (rawValue instanceof java.sql.Date) {
+        return ((java.sql.Date) rawValue).toLocalDate();
+      } else if (rawValue instanceof String) {
+        return LocalDate.parse((String) rawValue);
+      } else {
+        throw new IllegalStateException("Instant fromDbArray unsupported for " + rawValue);
+      }
+    }
+  }
+
   class BigDecimalConverter implements ArrayElementConverter<BigDecimal> {
 
     @Override
@@ -141,7 +188,7 @@ interface ArrayElementConverter<T> {
 
     @Override
     public java.util.UUID fromSerialized(Object rawValue) {
-      return java.util.UUID.fromString((String)rawValue);
+      return java.util.UUID.fromString((String) rawValue);
     }
 
     @Override

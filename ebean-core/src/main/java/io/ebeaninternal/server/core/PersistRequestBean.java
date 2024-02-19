@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.InsertOptions;
 import io.ebean.ValuePair;
-import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PreGetterCallback;
@@ -19,8 +19,6 @@ import io.ebeaninternal.server.transaction.BeanPersistIdMap;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.OptimisticLockException;
-import jakarta.persistence.PersistenceException;
-import java.io.IOException;
 import java.sql.Statement;
 import java.util.*;
 
@@ -119,6 +117,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Many-to-many intersection table changes that are held for later batch processing.
    */
   private List<SaveMany> saveMany;
+  private InsertOptions insertOptions;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -350,6 +349,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return intercept.dirtyPropertyNames();
   }
 
+  public boolean isChangedProperty(int propertyIndex) {
+    if (dirtyProperties == null) {
+      return intercept.isChangedProperty(propertyIndex);
+    } else {
+      return dirtyProperties[propertyIndex];
+    }
+  }
+
   /**
    * Return the dirty properties on this request.
    */
@@ -396,7 +403,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private boolean isNotifyListeners() {
     return isNotifyPersistListener();
   }
-
 
   private boolean isNotifyPersistListener() {
     return beanPersistListener != null;
@@ -757,7 +763,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     setNotifyCache();
     boolean isChangeLog = beanDescriptor.isChangeLog();
-    if (type == Type.UPDATE && (isChangeLog || notifyCache)) {
+    if (type == Type.UPDATE) {
       // get the dirty properties for update notification to the doc store
       dirtyProperties = intercept.dirtyProperties();
     }
@@ -1235,5 +1241,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void setGeneratedId() {
     beanDescriptor.setGeneratedId(entityBean, transaction);
+  }
+
+  public void setInsertOptions(InsertOptions insertOptions) {
+    this.insertOptions  = insertOptions;
+  }
+
+  public InsertOptions insertOptions() {
+    return insertOptions;
   }
 }

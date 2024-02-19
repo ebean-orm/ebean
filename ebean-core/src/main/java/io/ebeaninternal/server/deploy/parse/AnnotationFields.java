@@ -90,6 +90,10 @@ final class AnnotationFields extends AnnotationParser {
     if (formula != null) {
       prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));
     }
+    DbComment comment = get(prop, DbComment.class);
+    if (comment != null) {
+      prop.setDbComment(comment.value());
+    }
     initWhoProperties(prop);
     initDbMigration(prop);
   }

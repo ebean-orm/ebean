@@ -628,6 +628,16 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   ObjectGraphNode parentNode();
 
   /**
+   * Set that this is a future query that will execute in the background.
+   */
+  void usingFuture();
+
+  /**
+   * Return true if this is a future query.
+   */
+  boolean isUsingFuture();
+
+  /**
    * Return false when this is a lazy load or refresh query for a bean.
    * <p>
    * We just take/copy the data from those beans and don't collect AutoTune

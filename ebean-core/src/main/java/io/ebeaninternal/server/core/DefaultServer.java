@@ -715,16 +715,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public void commitTransaction() {
-    currentTransaction().commit();
-  }
-
-  @Override
-  public void rollbackTransaction() {
-    currentTransaction().rollback();
-  }
-
-  @Override
   public void endTransaction() {
     Transaction transaction = transactionManager.inScope();
     if (transaction != null) {
@@ -885,7 +875,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       transaction = currentServerTransaction();
     }
     if (!query.isRawSql()) {
-      if (query.isAutoTunable() && !autoTuneService.tuneQuery(query)) {
+      if (!query.isAutoTunable() || !autoTuneService.tuneQuery(query)) {
         // use deployment FetchType.LAZY/EAGER annotations
         // to define the 'default' select clause
         query.setDefaultSelectClause();
@@ -1194,6 +1184,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query) {
     SpiQuery<T> copy = query.copy();
+    copy.usingFuture();
     boolean createdTransaction = false;
     SpiTransaction transaction = query.transaction();
     if (transaction == null) {
@@ -1511,41 +1502,50 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }, transaction);
   }
 
-  /**
-   * Insert the bean.
-   */
   @Override
   public void insert(Object bean) {
-    insert(bean, null);
+    persister.insert(checkEntityBean(bean), null, null);
   }
 
-  /**
-   * Insert the bean with a transaction.
-   */
+  @Override
+  public void insert(Object bean, @Nullable InsertOptions insertOptions) {
+    persister.insert(checkEntityBean(bean), insertOptions, null);
+  }
+
   @Override
   public void insert(Object bean, @Nullable Transaction transaction) {
-    persister.insert(checkEntityBean(bean), transaction);
+    persister.insert(checkEntityBean(bean), null, transaction);
   }
 
-  /**
-   * Insert all beans in the collection.
-   */
+  @Override
+  public void insert(Object bean, InsertOptions insertOptions, Transaction transaction) {
+    persister.insert(checkEntityBean(bean), insertOptions, transaction);
+  }
+
   @Override
   public void insertAll(Collection<?> beans) {
-    insertAll(beans, null);
+    insertAll(beans, null, null);
   }
 
-  /**
-   * Insert all beans in the collection with a transaction.
-   */
+  @Override
+  public void insertAll(Collection<?> beans, InsertOptions options) {
+    insertAll(beans, options, null);
+  }
+
   @Override
   public void insertAll(@Nullable Collection<?> beans, @Nullable Transaction transaction) {
+    insertAll(beans, null, transaction);
+  }
+
+  @Override
+  public void insertAll(@Nullable Collection<?> beans, InsertOptions options, @Nullable Transaction transaction) {
     if (beans == null || beans.isEmpty()) {
       return;
     }
     executeInTrans((txn) -> {
+      txn.checkBatchEscalationOnCollection();
       for (Object bean : beans) {
-        persister.insert(checkEntityBean(bean), txn);
+        persister.insert(checkEntityBean(bean), options, txn);
       }
       return 0;
     }, transaction);

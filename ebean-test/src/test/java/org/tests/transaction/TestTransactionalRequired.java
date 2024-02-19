@@ -40,8 +40,7 @@ public class TestTransactionalRequired extends BaseTestCase {
   public void withOuterBegin() {
 
     outerTxn = null;
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       currentTxn = DB.currentTransaction();
       assertNotNull(currentTxn);
       new OuterTransactionalWithRequired().doOuter();
@@ -51,8 +50,6 @@ public class TestTransactionalRequired extends BaseTestCase {
       assertSame(currentTxn, restored);
       assertSame(currentTxn, innerTxn);
       assertSame(currentTxn, outerTxn);
-    } finally {
-      DB.endTransaction();
     }
 
     assertNull(DB.currentTransaction());

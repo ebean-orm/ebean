@@ -501,14 +501,6 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public void commitTransaction() {
-  }
-
-  @Override
-  public void rollbackTransaction() {
-  }
-
-  @Override
   public void endTransaction() {
   }
 

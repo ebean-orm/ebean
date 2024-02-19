@@ -1,8 +1,9 @@
 package org.example.domain;
 
 import io.ebean.annotation.DbArray;
-
 import jakarta.persistence.*;
+import org.example.domain.finder.ContactFinder;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.ZonedDateTime;
@@ -16,6 +17,11 @@ import java.util.Map;
 @Entity
 @Table(name = "be_contact")
 public class Contact extends BaseModel {
+
+  /**
+   * Convenience Finder for 'active record' style.
+   */
+  public static final ContactFinder find = new ContactFinder();
 
   @DbArray
   List<@Size(max=20) String> phoneNumbers = new ArrayList<>();

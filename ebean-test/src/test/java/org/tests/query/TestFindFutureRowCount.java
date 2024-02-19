@@ -5,14 +5,12 @@ import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasic;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class TestFindFutureRowCount extends BaseTestCase {
 
   @Test
-  void count_when_inTransaction() throws Exception {
+  void count_when_inTransaction() {
     try (Transaction transaction = DB.beginTransaction()) {
       EBasic basic = new EBasic("count_when_inTransaction");
       DB.save(basic);

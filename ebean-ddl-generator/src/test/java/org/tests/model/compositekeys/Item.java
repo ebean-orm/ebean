@@ -1,5 +1,7 @@
 package org.tests.model.compositekeys;
 
+import io.ebean.annotation.ConstraintMode;
+import io.ebean.annotation.DbForeignKey;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -32,11 +34,13 @@ public class Item {
   @Version
   private Long version;
 
+  @DbForeignKey(onDelete = ConstraintMode.SET_NULL, onUpdate = ConstraintMode.SET_DEFAULT)
   @ManyToOne
   @JoinColumn(name = "customer", referencedColumnName = "customer", insertable = false, updatable = false)
   @JoinColumn(name = "type", referencedColumnName = "type", insertable = false, updatable = false)
   private Type eType;
 
+  @DbForeignKey(noConstraint = true)
   @ManyToOne
   @JoinColumn(name = "customer", referencedColumnName = "customer", insertable = false, updatable = false)
   @JoinColumn(name = "region", referencedColumnName = "type", insertable = false, updatable = false)

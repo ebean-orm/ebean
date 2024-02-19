@@ -38,15 +38,19 @@ final class InitDataSource {
    * Initialise the "main" read write DataSource from configuration.
    */
   private DataSource initDataSource() {
-    return createFromConfig(config.getDataSourceConfig(), false);
+    return createFromConfig(config.getDataSourceConfig(), config.readOnlyDatabase(), false);
   }
 
   /**
    * Initialise the "read only" DataSource from configuration.
    */
   private DataSource initReadOnlyDataSource() {
+    if (config.readOnlyDatabase()) {
+      // using the same DataSource instance
+      return config.getDataSource();
+    }
     var roConfig = readOnlyConfig();
-    return roConfig == null ? null : createFromConfig(roConfig, true);
+    return roConfig == null ? null : createFromConfig(roConfig, false, true);
   }
 
   DataSourceBuilder.Settings readOnlyConfig() {
@@ -76,20 +80,21 @@ final class InitDataSource {
     return url != null && !"none".equalsIgnoreCase(url) && !url.trim().isEmpty();
   }
 
-  private DataSource createFromConfig(DataSourceBuilder.Settings dsConfig, boolean readOnly) {
+  private DataSource createFromConfig(DataSourceBuilder.Settings dsConfig, boolean readOnlyDB, boolean readOnly) {
     if (dsConfig == null) {
       throw new PersistenceException("No  DataSourceBuilder defined for " + config.getName());
     }
-    if (dsConfig.isOffline()) {
-      if (config.getDatabasePlatformName() == null) {
-        throw new PersistenceException("You MUST specify a DatabasePlatformName on DatabaseConfig when offline");
-      }
+    if (dsConfig.isOffline() && config.getDatabasePlatformName() == null) {
+      throw new PersistenceException("You MUST specify a DatabasePlatformName on DatabaseConfig when offline");
     }
 
     attachAlert(dsConfig);
     attachListener(dsConfig);
 
-    if (readOnly) {
+    if (readOnlyDB) {
+      dsConfig.autoCommit(true);
+      dsConfig.readOnly(true);
+    } else if (readOnly) {
       // setup to use AutoCommit such that we skip explicit commit
       var mainSettings = config.getDataSourceConfig();
       dsConfig.autoCommit(true);

@@ -3,6 +3,8 @@ package io.ebeaninternal.api;
 import io.ebean.TxScope;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Used internally to handle the scoping of transactions for methods.
@@ -46,6 +48,11 @@ public final class ScopeTrans {
    */
   private boolean nestedCommit;
   private boolean nestedUseSavepoint;
+
+  /**
+   * The UserObjects when using in nested transactions.
+   */
+  private Map<String, Object> userObjects;
 
   public ScopeTrans(boolean rollbackOnChecked, boolean created, SpiTransaction transaction, TxScope txScope) {
     this.rollbackOnChecked = rollbackOnChecked;
@@ -218,4 +225,17 @@ public final class ScopeTrans {
     return e instanceof RuntimeException || rollbackOnChecked;
   }
 
+  public void putUserObject(String name, Object value) {
+    if (userObjects == null) {
+      userObjects = new HashMap<>();
+    }
+    userObjects.put(name, value);
+  }
+
+  public Object getUserObject(String name) {
+    if (userObjects == null) {
+      return null;
+    }
+    return userObjects.get(name);
+  }
 }

@@ -315,7 +315,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * Return the BeanDescriptors mapped to the table.
    */
   public List<BeanDescriptor<?>> descriptors(String tableName) {
-    return tableToDescMap.get(tableName.toLowerCase());
+    return tableName == null ? Collections.emptyList() : tableToDescMap.get(tableName.toLowerCase());
   }
 
   /**

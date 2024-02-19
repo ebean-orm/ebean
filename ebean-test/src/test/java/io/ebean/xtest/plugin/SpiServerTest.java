@@ -26,7 +26,7 @@ public class SpiServerTest extends BaseTestCase {
     BeanType<Customer> beanType = pluginApi.beanType(Customer.class);
     assertEquals("o_customer", beanType.baseTable());
     assertNotNull(pluginApi.databasePlatform());
-    assertNull(beanType.findController());
+    assertNotNull(beanType.findController());
     assertNotNull(beanType.persistController());
     assertNull(beanType.persistListener());
     assertNull(beanType.queryAdapter());

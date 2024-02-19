@@ -547,4 +547,8 @@ class ProcessingContext implements Constants {
   Element asElement(TypeMirror mirror) {
     return typeUtils.asElement(mirror);
   }
+
+  boolean isNameClash(String shortName) {
+    return propertyTypeMap.isNameClash(shortName);
+  }
 }

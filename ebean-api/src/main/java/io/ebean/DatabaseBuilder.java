@@ -1010,6 +1010,14 @@ public interface DatabaseBuilder {
   DatabaseBuilder setSkipDataSourceCheck(boolean skipDataSourceCheck);
 
   /**
+   * Set to true if this database is used in a read only way.
+   * <p>
+   * The DataSource and read-only DataSource are expected to be the same
+   * and use readOnly=true and autoCommit=true.
+   */
+  DatabaseBuilder readOnlyDatabase(boolean readOnlyDatabase);
+
+  /**
    * Set a DataSource.
    */
   default DatabaseBuilder dataSource(DataSource dataSource) {
@@ -2542,6 +2550,14 @@ public interface DatabaseBuilder {
      * Return true if the startup DataSource check should be skipped.
      */
     boolean skipDataSourceCheck();
+
+    /**
+     * Return true if this database is used in a read only way.
+     * <p>
+     * The DataSource and read-only DataSource are expected to be the same
+     * and use readOnly=true and autoCommit=true.
+     */
+    boolean readOnlyDatabase();
 
     /**
      * Return the DataSource.

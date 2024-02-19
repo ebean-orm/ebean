@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist.dml;
 
+import io.ebean.InsertOptions;
 import io.ebean.annotation.Platform;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -30,15 +31,17 @@ final class InsertMeta {
   private final Bindable shadowFKey;
   private final String[] identityDbColumns;
   private final Platform platform;
+  private final InsertMetaOptions options;
 
   InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
     this.platform = dbPlatform.platform();
+    this.options = InsertMetaPlatform.create(platform, desc, this);
     this.id = id;
     this.all = all;
     this.shadowFKey = shadowFKey;
 
     String tableName = desc.baseTable();
-    this.sqlWithId = genSql(false, tableName);
+    this.sqlWithId = sql(false, tableName);
 
     // only available for single Id property
     if (id.isConcatenated()) {
@@ -61,7 +64,7 @@ final class InsertMeta {
         this.supportsGetGeneratedKeys = dbPlatform.dbIdentity().isSupportsGetGeneratedKeys();
         this.supportsSelectLastInsertedId = desc.supportsSelectLastInsertedId();
       }
-      this.sqlNullId = genSql(true, tableName);
+      this.sqlNullId = sql(true, tableName);
     }
   }
 
@@ -113,22 +116,31 @@ final class InsertMeta {
   }
 
   /**
-   * get the sql based whether the id value(s) are null.
+   * Return the sql for the given options.
    */
-  public String getSql(boolean withId) {
-    if (withId) {
-      return sqlWithId;
-    } else {
-      return sqlNullId;
+  public String sql(boolean withId, InsertOptions insertOptions) {
+    if (insertOptions == null) {
+      return sqlFor(withId);
     }
+    return options.sql(withId, insertOptions);
   }
 
-  private String genSql(boolean nullId, String table) {
+  String sqlFor(boolean withId) {
+    return withId ? sqlWithId : sqlNullId;
+  }
+
+  private String sql(boolean nullId, String table) {
     GenerateDmlRequest request = new GenerateDmlRequest();
+    sql(request, nullId, table);
+    return request.toString();
+  }
+
+  void sql(GenerateDmlRequest request, boolean nullId, String table) {
     request.setInsertSetMode();
     request.append("insert into ").append(table);
     if (nullId && noColumnsForInsert()) {
-      return request.append(defaultValues()).toString();
+      request.append(defaultValues());
+      return;
     }
     request.append(" (");
     if (!nullId) {
@@ -142,7 +154,6 @@ final class InsertMeta {
     request.append(") values (");
     request.append(request.insertBindBuffer());
     request.append(")");
-    return request.toString();
   }
 
   private String defaultValues() {
@@ -165,5 +176,4 @@ final class InsertMeta {
     return shadowFKey == null
       && all.isEmpty();
   }
-
 }

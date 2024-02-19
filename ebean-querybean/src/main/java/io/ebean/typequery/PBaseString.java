@@ -32,7 +32,7 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public final R equalToType(T value) {
     expr().eq(_name, value);
     return _root;
@@ -46,7 +46,7 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public final R notEqualToType(T value) {
     expr().ne(_name, value);
     return _root;

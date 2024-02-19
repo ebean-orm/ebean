@@ -326,7 +326,7 @@ final class SaveManyBeans extends SaveManyBase {
   }
 
   private boolean isChangedProperty() {
-    return parentBean._ebean_getIntercept().isChangedProperty(many.propertyIndex());
+    return request.isChangedProperty(many.propertyIndex());
   }
 
   private void removeAssocManyOrphans() {

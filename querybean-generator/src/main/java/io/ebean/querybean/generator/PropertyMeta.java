@@ -26,19 +26,19 @@ class PropertyMeta {
   /**
    * Return the type definition given the type short name and flag indicating if it is an associated bean type.
    */
-  private String getTypeDefn(String shortName, boolean assoc) {
-    return type.getTypeDefn(shortName, assoc);
+  private String getTypeDefn(String shortName, boolean assoc, boolean fullyQualify) {
+    return type.getTypeDefn(shortName, assoc, fullyQualify);
   }
 
-  void writeFieldDefn(Append writer, String shortName, boolean assoc) {
+  void writeFieldDefn(Append writer, String shortName, boolean assoc, boolean fullyQualify) {
     writer.append("  public ");
-    writer.append(getTypeDefn(shortName, assoc));
+    writer.append(getTypeDefn(shortName, assoc, fullyQualify));
     writer.append(" ").append(name).append(";");
   }
 
-  void writeFieldAliasDefn(Append writer, String shortName) {
+  void writeFieldAliasDefn(Append writer, String shortName, boolean fullyQualify) {
     writer.append("    public static ");
-    writer.append(getTypeDefn(shortName, false));
+    writer.append(getTypeDefn(shortName, false, fullyQualify));
     writer.append(" ").append(name).append(" = _alias.").append(name).append(";");
   }
 }

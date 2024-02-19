@@ -212,7 +212,7 @@ public final class DefaultPersister implements Persister {
     if (bean._ebean_getIntercept().isUpdate()) {
       update(bean, t);
     } else {
-      insert(bean, t);
+      insert(bean, null, t);
     }
   }
 
@@ -220,11 +220,14 @@ public final class DefaultPersister implements Persister {
    * Insert this bean.
    */
   @Override
-  public void insert(EntityBean bean, Transaction t) {
+  public void insert(EntityBean bean, InsertOptions insertOptions, Transaction t) {
     PersistRequestBean<?> req = createRequest(bean, t, PersistRequest.Type.INSERT);
     if (req.isSkipReference()) {
       // skip insert on reference bean
       return;
+    }
+    if (insertOptions != null) {
+      req.setInsertOptions(insertOptions);
     }
     try {
       req.initTransIfRequiredWithBatchCascade();

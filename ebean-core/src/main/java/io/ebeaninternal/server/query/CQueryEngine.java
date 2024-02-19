@@ -74,6 +74,9 @@ public final class CQueryEngine {
       if (request.logSql()) {
         request.logSql("{0}; --bind({1}) --micros({2}) --rows({3})", query.generatedSql(), query.bindLog(), query.micros(), rows);
       }
+      if (rows > 0) {
+        request.clearContext();
+      }
       return rows;
     } catch (SQLException e) {
       throw translate(request, query.bindLog(), query.generatedSql(), e);
