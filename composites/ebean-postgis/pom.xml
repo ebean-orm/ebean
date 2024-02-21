@@ -14,7 +14,7 @@
 
   <properties>
     <postgis.jdbc.version>2.5.1</postgis.jdbc.version>
-    <postgres.jdbc.version>42.6.0</postgres.jdbc.version>
+    <postgres.jdbc.version>42.7.2</postgres.jdbc.version>
   </properties>
 
   <dependencies>
