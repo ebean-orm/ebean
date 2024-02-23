@@ -37,8 +37,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
       try (Transaction txn1 = server.beginTransaction()) {
         bean.setName("x2");
         server.save(bean);
-        //txn1.commit();
-        server.commitTransaction();
+        txn1.commit();
       }
 
       EBasic fresh = server.find(EBasic.class, bean.getId());
@@ -48,8 +47,7 @@ public class TestNestedSubTransaction extends BaseTestCase {
       try (Transaction txn2 = server.beginTransaction()) {
         bean.setName("barney");
         DB.save(bean);
-        //txn2.commit();
-        server.commitTransaction();
+        txn2.commit();
       }
 
       fresh = server.find(EBasic.class)

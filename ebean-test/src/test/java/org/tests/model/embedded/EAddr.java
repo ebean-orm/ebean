@@ -2,8 +2,8 @@ package org.tests.model.embedded;
 
 import org.tests.model.basic.Country;
 
-import javax.persistence.Embeddable;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.ManyToOne;
 
 @Embeddable
 public class EAddr {

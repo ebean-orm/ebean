@@ -37,6 +37,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   }
 
   @Override
+  public <T> ExpressionList<T> expressionList() {
+    return new DefaultExpressionList<>(this);
+  }
+
+  @Override
   public Expression textMatch(String propertyName, String search, Match options) {
     return new TextMatchExpression(propertyName, search, options);
   }
@@ -469,6 +474,11 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
   @Override
   public Expression inPairs(Pairs pairs) {
     return new InPairsExpression(pairs, false);
+  }
+
+  @Override
+  public Expression inTuples(InTuples pairs) {
+    return new InTuplesExpression(pairs, false);
   }
 
   /**

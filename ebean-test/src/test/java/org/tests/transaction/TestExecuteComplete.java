@@ -1,11 +1,14 @@
 package org.tests.transaction;
 
-import io.ebean.*;
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.xtest.ForPlatform;
+import io.ebean.DB;
+import io.ebean.DataIntegrityException;
+import io.ebean.Transaction;
+import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -43,7 +46,7 @@ public class TestExecuteComplete extends BaseTestCase {
 
     try {
       DB.execute(TxScope.required().setBatch(PersistBatch.ALL), () ->
-      DB.execute(() -> {
+        DB.execute(() -> {
 
           Customer customer = DB.reference(Customer.class, 42424242L);
           Order order = new Order();
@@ -156,6 +159,28 @@ public class TestExecuteComplete extends BaseTestCase {
     }
 
     assertThat(getInScopeTransaction()).isNull();
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void test_nested_userobjects() {
+
+    try (Transaction txn1 = DB.beginTransaction()) {
+      assertThat(getInScopeTransaction()).isNotNull();
+      getInScopeTransaction().putUserObject("foo", "bar");
+
+      try (Transaction txn2 = DB.beginTransaction()) {
+        assertThat(getInScopeTransaction().getUserObject("foo")).isEqualTo("bar");
+        getInScopeTransaction().putUserObject("foo", "xxx");
+        getInScopeTransaction().putUserObject("test", "xxx");
+        assertThat(getInScopeTransaction().getUserObject("foo")).isEqualTo("xxx");
+        txn2.commit();
+      }
+      // CHECKME: What would we expect here? I would expect "bar" but get "xxx"
+      // NOTE: with TxScope.requiresNew() - I'll get "bar"
+      assertThat(getInScopeTransaction().getUserObject("test")).isNull();
+      assertThat(getInScopeTransaction().getUserObject("foo")).isEqualTo("bar");
+    }
   }
 
 }

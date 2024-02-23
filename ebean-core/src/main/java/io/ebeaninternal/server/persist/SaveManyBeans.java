@@ -8,8 +8,11 @@ import io.ebeaninternal.api.SpiSqlUpdate;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.*;
 
-import javax.persistence.PersistenceException;
-import java.util.*;
+import jakarta.persistence.PersistenceException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import static io.ebeaninternal.server.persist.DmlUtil.isNullOrZero;
 import static java.lang.System.Logger.Level.WARNING;
@@ -205,9 +208,10 @@ final class SaveManyBeans extends SaveManyBase {
 
   /**
    * Return the Id values of beans we know are being updated (any others are orphans)
+   * If there are no IDs, null is returned.
    */
-  private List<Object> detailIds() {
-    final var detailIds = new ArrayList<>();
+  private Set<Object> detailIds() {
+    final var detailIds = new HashSet<>();
     for (Object detailBean : collection) {
       if (isMap) {
         detailBean = ((Map.Entry<?, ?>) detailBean).getValue();
@@ -222,7 +226,7 @@ final class SaveManyBeans extends SaveManyBase {
         }
       }
     }
-    return detailIds;
+    return detailIds.isEmpty() ? null : detailIds;
   }
 
   /**
@@ -324,7 +328,7 @@ final class SaveManyBeans extends SaveManyBase {
   }
 
   private boolean isChangedProperty() {
-    return parentBean._ebean_getIntercept().isChangedProperty(many.propertyIndex());
+    return request.isChangedProperty(many.propertyIndex());
   }
 
   private void removeAssocManyOrphans() {

@@ -111,7 +111,7 @@ public final class LoadBeanRequest extends LoadRequest {
   }
 
   private String mode() {
-    return lazy ? "+lazy" : loadBuffer.isCache() ? "+cache" : "+query";
+    return lazy ? "lazy" : loadBuffer.isCache() ? "cache" : "query";
   }
 
   /**

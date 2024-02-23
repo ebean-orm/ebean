@@ -2,7 +2,7 @@ package org.tests.model.rawsql;
 
 import io.ebean.annotation.Sql;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import java.time.LocalDate;
 
 @Entity

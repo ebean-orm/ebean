@@ -57,7 +57,7 @@ final class SubQueryExpression extends AbstractExpression implements Unsupported
   public void queryPlanHash(StringBuilder builder) {
     builder.append("SubQuery[").append(propName).append(op.expression)
       .append(" sql:").append(sql)
-      .append(" ?:").append(bindParams.size()).append("]");
+      .append(" ?:").append(bindParams.size()).append(']');
   }
 
   /**
@@ -75,7 +75,7 @@ final class SubQueryExpression extends AbstractExpression implements Unsupported
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.property(propName).append(op.expression).append("(").parse(sql).append(")");
+    request.property(propName).append(op.expression).append('(').parse(sql).append(')');
   }
 
   @Override

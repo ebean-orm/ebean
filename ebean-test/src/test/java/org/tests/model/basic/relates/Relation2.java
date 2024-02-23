@@ -3,10 +3,10 @@ package org.tests.model.basic.relates;
 
 import io.ebean.annotation.ChangeLog;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import java.util.UUID;
 
 /**

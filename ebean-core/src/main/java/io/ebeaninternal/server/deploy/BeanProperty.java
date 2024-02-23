@@ -45,7 +45,7 @@ import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 import io.ebeanservice.docstore.api.support.DocStructure;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -464,7 +464,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (formula && sqlFormulaJoin != null) {
-      ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
+      String alias = ctx.tableAliasManyWhere(manyWhere);
+      ctx.appendFormulaJoin(sqlFormulaJoin, joinType, alias);
     } else if (secondaryTableJoin != null) {
       String relativePrefix = ctx.relativePrefix(secondaryTableJoinPrefix);
       secondaryTableJoin.addJoin(joinType, relativePrefix, ctx);

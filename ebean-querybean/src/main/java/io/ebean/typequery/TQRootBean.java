@@ -12,9 +12,11 @@ import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -132,6 +134,13 @@ public abstract class TQRootBean<T, R> {
    */
   public TQRootBean(boolean aliasDummy) {
     this.query = null;
+  }
+
+  /** Construct for FilterMany */
+  protected TQRootBean(ExpressionList<T> filter) {
+    this.query = null;
+    this.whereStack = new ArrayStack<>();
+    whereStack.push(filter);
   }
 
   /**
@@ -486,6 +495,21 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Apply changes to the query conditional on the supplied predicate.
+   * <p>
+   * Typically, the changes are extra predicates etc.
+   *
+   * @param predicate The predicate which when true the changes are applied
+   * @param apply The changes to apply to the query
+   */
+  public R alsoIf(BooleanSupplier predicate, Consumer<R> apply) {
+    if (predicate.getAsBoolean()) {
+      apply.accept(root);
+    }
+    return root;
+  }
+
+  /**
    * Perform an 'As of' query using history tables to return the object graph
    * as of a time in the past.
    * <p>
@@ -721,7 +745,7 @@ public abstract class TQRootBean<T, R> {
    * Add EXISTS sub-query predicate.
    */
   public R exists(Query<?> subQuery) {
-    query.where().exists(subQuery);
+    peekExprList().exists(subQuery);
     return root;
   }
 
@@ -729,7 +753,7 @@ public abstract class TQRootBean<T, R> {
    * Add NOT EXISTS sub-query predicate.
    */
   public R notExists(Query<?> subQuery) {
-    query.where().notExists(subQuery);
+    peekExprList().notExists(subQuery);
     return root;
   }
 
@@ -740,7 +764,7 @@ public abstract class TQRootBean<T, R> {
    * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
    */
   public final R exists(String sqlSubQuery, Object... bindValues) {
-    query().where().exists(sqlSubQuery, bindValues);
+    peekExprList().exists(sqlSubQuery, bindValues);
     return root;
   }
 
@@ -751,7 +775,7 @@ public abstract class TQRootBean<T, R> {
    * @param bindValues  Optional bind values if the SubQuery uses {@code ? } bind values.
    */
   public final R notExists(String sqlSubQuery, Object... bindValues) {
-    query().where().notExists(sqlSubQuery, bindValues);
+    peekExprList().notExists(sqlSubQuery, bindValues);
     return root;
   }
 
@@ -1220,6 +1244,14 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * In expression using multiple columns.
+   */
+  public R inTuples(InTuples inTuples) {
+    peekExprList().inTuples(inTuples);
+    return root;
+  }
+
+  /**
    * Marker that can be used to indicate that the order by clause is defined after this.
    * <p>
    * <h2>Example: order by customer name, order date</h2>
@@ -1241,9 +1273,9 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Deprecated migrate to orderBy().
+   * @deprecated migrate to {@link #orderBy()}.
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   public R order() {
     return root;
   }
@@ -1261,9 +1293,9 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
-   * Deprecated migrate to {@link #orderBy(String)}
+   * @deprecated migrate to {@link #orderBy(String)}
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   public R order(String orderByClause) {
     return orderBy(orderByClause);
   }
@@ -1553,6 +1585,21 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  public R usingMaster() {
+    query.usingMaster();
+    return root;
+  }
+
+  /**
    * Execute the query returning true if a row is found.
    * <p>
    * The query is executed using max rows of 1 and will only select the id property.
@@ -1818,6 +1865,28 @@ public abstract class TQRootBean<T, R> {
   @Nullable
   public <A> A findSingleAttribute() {
     return query.findSingleAttribute();
+  }
+
+  /**
+   * Execute the query returning a single optional attribute value.
+   * <p>
+   * <h3>Example</h3>
+   * <pre>{@code
+   *
+   *  Optional<String> maybeName =
+   *    new QCustomer()
+   *      .select(name)
+   *      .id.eq(42)
+   *      .status.eq(NEW)
+   *      .findSingleAttributeOrEmpty();
+   *
+   * }</pre>
+   *
+   * @return an optional value for the selected property
+   */
+  @Nullable
+  public <A> Optional<A> findSingleAttributeOrEmpty() {
+    return query.findSingleAttributeOrEmpty();
   }
 
   /**

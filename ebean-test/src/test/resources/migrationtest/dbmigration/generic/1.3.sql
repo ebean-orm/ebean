@@ -17,6 +17,7 @@ alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_stat
 alter table drop_main_drop_ref_many drop constraint if exists fk_drop_main_drop_ref_many_drop_main;
 alter table drop_main_drop_ref_many drop constraint if exists fk_drop_main_drop_ref_many_drop_ref_many;
 alter table drop_ref_one drop constraint if exists fk_drop_ref_one_parent_id;
+alter table drop_ref_one_to_one drop constraint if exists fk_drop_ref_one_to_one_parent_id;
 alter table migtest_mtm_c_migtest_mtm_m drop constraint if exists fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c;
 alter table migtest_mtm_c_migtest_mtm_m drop constraint if exists fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m;
 alter table migtest_mtm_m_migtest_mtm_c drop constraint if exists fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m;

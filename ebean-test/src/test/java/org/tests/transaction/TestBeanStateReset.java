@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.tests.model.m2m.MnyB;
 import org.tests.model.m2m.MnyC;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -1,6 +1,6 @@
 package org.tests.idkeys.db;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 public class GenKeySeqB {

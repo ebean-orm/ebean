@@ -4,7 +4,7 @@ import io.ebean.config.CurrentTenantProvider;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -23,14 +23,14 @@ final class TransactionFactoryTenantWithRead extends TransactionFactoryTenant {
   }
 
   @Override
-  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
     Connection connection = null;
     try {
       if (tenantId == null) {
         // obtain the tenantId if the DataSource requires it
         tenantId = dataSourceSupplier.currentTenantId();
       }
-      connection = dataSourceSupplier.readOnlyConnection(tenantId);
+      connection = dataSourceSupplier.readOnlyConnection(tenantId, useMaster);
       return new ImplicitReadOnlyTransaction(manager, connection, tenantId);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);

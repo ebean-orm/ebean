@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.persist.dml;
 
+import io.ebean.InsertOptions;
 import io.ebean.annotation.Platform;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.dbplatform.DatabasePlatform;
@@ -36,10 +37,12 @@ final class InsertMeta {
   private final Bindable shadowFKey;
   private final String[] identityDbColumns;
   private final Platform platform;
+  private final InsertMetaOptions options;
 
   InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
     this.platform = dbPlatform.platform();
-    this.discriminator = getDiscriminator(desc);
+    this.options = InsertMetaPlatform.create(platform, desc, this);
+    this.discriminator = discriminator(desc);
     this.id = id;
     this.all = all;
     this.allExcludeDraftOnly = all.excludeDraftOnly();
@@ -47,8 +50,8 @@ final class InsertMeta {
 
     String tableName = desc.baseTable();
     String draftTableName = desc.draftTable();
-    this.sqlWithId = genSql(false, tableName, false);
-    this.sqlDraftWithId = desc.isDraftable() ? genSql(false, draftTableName, true) : sqlWithId;
+    this.sqlWithId = sql(false, tableName, false);
+    this.sqlDraftWithId = desc.isDraftable() ? sql(false, draftTableName, true) : sqlWithId;
 
     // only available for single Id property
     if (id.isConcatenated()) {
@@ -72,12 +75,12 @@ final class InsertMeta {
         this.supportsGetGeneratedKeys = dbPlatform.dbIdentity().isSupportsGetGeneratedKeys();
         this.supportsSelectLastInsertedId = desc.supportsSelectLastInsertedId();
       }
-      this.sqlNullId = genSql(true, tableName, false);
-      this.sqlDraftNullId = desc.isDraftable() ? genSql(true, draftTableName, true) : sqlNullId;
+      this.sqlNullId = sql(true, tableName, false);
+      this.sqlDraftNullId = desc.isDraftable() ? sql(true, draftTableName, true) : sqlNullId;
     }
   }
 
-  private static Bindable getDiscriminator(BeanDescriptor<?> desc) {
+  private static Bindable discriminator(BeanDescriptor<?> desc) {
     InheritInfo inheritInfo = desc.inheritInfo();
     return inheritInfo != null ? new BindableDiscriminator(inheritInfo) : null;
   }
@@ -89,7 +92,7 @@ final class InsertMeta {
     return concatenatedKey;
   }
 
-  String[] getIdentityDbColumns() {
+  String[] identityDbColumns() {
     return identityDbColumns;
   }
 
@@ -137,9 +140,20 @@ final class InsertMeta {
   }
 
   /**
-   * get the sql based whether the id value(s) are null.
+   * Return the sql for the given options.
    */
-  public String getSql(boolean withId, boolean publish) {
+  public String sql(boolean withId, boolean publish, InsertOptions insertOptions) {
+    if (insertOptions == null) {
+      return sql(withId, publish);
+    }
+    return options.sql(withId, insertOptions);
+  }
+
+  String sqlFor(boolean withId) {
+    return withId ? sqlWithId : sqlNullId;
+  }
+
+  private String sql(boolean withId, boolean publish) {
     if (withId) {
       return publish ? sqlWithId : sqlDraftWithId;
     } else {
@@ -147,12 +161,18 @@ final class InsertMeta {
     }
   }
 
-  private String genSql(boolean nullId, String table, boolean draftTable) {
+  private String sql(boolean nullId, String table, boolean draftTable) {
     GenerateDmlRequest request = new GenerateDmlRequest();
+    sql(request, nullId, table, draftTable);
+    return request.toString();
+  }
+
+  void sql(GenerateDmlRequest request, boolean nullId, String table, boolean draftTable) {
     request.setInsertSetMode();
     request.append("insert into ").append(table);
     if (nullId && noColumnsForInsert(draftTable)) {
-      return request.append(defaultValues()).toString();
+      request.append(defaultValues());
+      return;
     }
     request.append(" (");
     if (!nullId) {
@@ -170,9 +190,8 @@ final class InsertMeta {
       allExcludeDraftOnly.dmlAppend(request);
     }
     request.append(") values (");
-    request.append(request.getInsertBindBuffer());
+    request.append(request.insertBindBuffer());
     request.append(")");
-    return request.toString();
   }
 
   private String defaultValues() {
@@ -196,5 +215,4 @@ final class InsertMeta {
       && discriminator == null
       && (draftTable ? all.isEmpty() : allExcludeDraftOnly.isEmpty());
   }
-
 }

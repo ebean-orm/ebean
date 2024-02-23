@@ -2,7 +2,7 @@ package org.tests.cascade;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

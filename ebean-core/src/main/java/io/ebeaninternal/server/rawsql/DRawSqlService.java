@@ -77,10 +77,10 @@ public final class DRawSqlService implements SpiRawSqlService {
   String combine(String schemaName, String tableName, String name) {
     StringBuilder sb = new StringBuilder();
     if (schemaName != null) {
-      sb.append(schemaName).append(".");
+      sb.append(schemaName).append('.');
     }
     if (tableName != null) {
-      sb.append(tableName).append(".");
+      sb.append(tableName).append('.');
     }
     return sb.append(name).toString();
   }

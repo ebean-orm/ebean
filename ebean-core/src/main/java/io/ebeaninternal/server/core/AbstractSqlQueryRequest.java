@@ -33,10 +33,10 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   /**
    * Create the BeanFindRequest.
    */
-  AbstractSqlQueryRequest(SpiEbeanServer server, SpiSqlBinding query, Transaction t) {
+  AbstractSqlQueryRequest(SpiEbeanServer server, SpiSqlBinding query) {
     this.server = server;
     this.query = query;
-    this.transaction = (SpiTransaction) t;
+    this.transaction = query.transaction();
     this.query.setCancelableQuery(this);
   }
 
@@ -48,7 +48,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
       transaction = server.currentServerTransaction();
       if (transaction == null || !transaction.isActive()) {
         // create a local readOnly transaction
-        transaction = server.createReadOnlyTransaction(null);
+        transaction = server.createReadOnlyTransaction(null, query.isUseMaster());
         createdTransaction = true;
       }
     }

@@ -9,7 +9,7 @@ import io.ebeaninternal.server.deploy.ManyType;
 import io.ebeaninternal.server.deploy.meta.*;
 import io.ebeaninternal.server.type.TypeManager;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.lang.reflect.*;
 
 import static java.lang.System.Logger.Level.*;

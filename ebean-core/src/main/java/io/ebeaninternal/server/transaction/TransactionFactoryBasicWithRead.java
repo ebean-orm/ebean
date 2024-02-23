@@ -3,7 +3,7 @@ package io.ebeaninternal.server.transaction;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.SpiTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -26,11 +26,11 @@ final class TransactionFactoryBasicWithRead extends TransactionFactoryBasic {
   }
 
   @Override
-  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
+  public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
     Connection connection = null;
     try {
-      connection = readOnlyDataSource.getConnection();
-      return new ImplicitReadOnlyTransaction(manager, connection);
+      connection = useMaster ? dataSource.getConnection() : readOnlyDataSource.getConnection();
+      return new ImplicitReadOnlyTransaction(useMaster, manager, connection);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
       throw ex;

@@ -68,7 +68,7 @@ final class AllEqualsExpression extends NonPrepareExpression {
     if (propMap.isEmpty()) {
       return;
     }
-    request.append("(");
+    request.append('(');
     int count = 0;
     for (Map.Entry<String, Object> entry : propMap.entrySet()) {
       Object value = entry.getValue();
@@ -84,7 +84,7 @@ final class AllEqualsExpression extends NonPrepareExpression {
       }
       count++;
     }
-    request.append(")");
+    request.append(')');
   }
 
   /**
@@ -105,9 +105,9 @@ final class AllEqualsExpression extends NonPrepareExpression {
       } else {
         builder.append(" =?");
       }
-      builder.append(",");
+      builder.append(',');
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

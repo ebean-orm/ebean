@@ -1,9 +1,22 @@
 package io.ebeaninternal.api;
 
+import io.avaje.lang.Nullable;
+
 /**
  * SQL query binding (for SqlQuery and DtoQuery).
  */
 public interface SpiSqlBinding extends SpiCancelableQuery {
+
+  /**
+   * Return the transaction explicitly associated to the query.
+   */
+  @Nullable
+  SpiTransaction transaction();
+
+  /**
+   * Return true if this query should not use the read only data source.
+   */
+  boolean isUseMaster();
 
   /**
    * Return the named or positioned parameters.

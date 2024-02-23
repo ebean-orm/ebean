@@ -66,13 +66,32 @@ public class TestQueryUsingConnection extends BaseTestCase {
         .findCount();
 
       final int otherCount = DB.find(Country.class).findCount();
+      final int masterCount = DB.find(Country.class).usingMaster().findCount();
 
       transaction.rollback();
 
       assertThat(count).isEqualTo(otherCount + 1);
+      assertThat(otherCount).isEqualTo(masterCount);
     }
-
   }
+
+  @IgnorePlatform({Platform.SQLSERVER, Platform.COCKROACH})
+  @Test
+  public void dtoQueryUsingConnection() {
+    ResetBasicData.reset();
+
+    try (Transaction transaction = DB.createTransaction()) {
+      final CountryDto dto = DB.findDto(CountryDto.class, "select code, name from o_country where code=?")
+        .usingConnection(transaction.connection())
+        .setParameter("NZ")
+        .findOne();
+
+      assertThat(dto).isNotNull();
+      assertEquals("NZ", dto.code);
+      transaction.rollback();
+    }
+  }
+
 
   public static class CountryDto {
     final String code;

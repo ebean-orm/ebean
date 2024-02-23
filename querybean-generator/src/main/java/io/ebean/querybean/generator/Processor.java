@@ -114,7 +114,6 @@ public class Processor extends AbstractProcessor implements Constants {
     try {
       SimpleQueryBeanWriter beanWriter = new SimpleQueryBeanWriter((TypeElement) element, processingContext);
       beanWriter.writeRootBean();
-      beanWriter.writeAssocBean();
     } catch (Throwable e) {
       e.printStackTrace();
       processingContext.logError(element, "Error generating query beans: " + e);

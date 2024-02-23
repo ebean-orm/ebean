@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.EncryptKey;
 import io.ebean.config.NamingConvention;
 import io.ebean.core.type.ScalarType;
@@ -25,7 +25,7 @@ public interface BeanDescriptorMap {
   /**
    * Return the DatabaseConfig.
    */
-  DatabaseConfig config();
+  DatabaseBuilder.Settings config();
 
   /**
    * Return the Cache Manager.

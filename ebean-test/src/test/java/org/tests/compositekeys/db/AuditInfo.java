@@ -1,6 +1,6 @@
 package org.tests.compositekeys.db;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import java.util.Date;
 
 @Embeddable

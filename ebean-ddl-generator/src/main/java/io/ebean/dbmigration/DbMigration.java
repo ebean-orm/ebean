@@ -2,7 +2,7 @@ package io.ebean.dbmigration;
 
 import io.ebean.Database;
 import io.ebean.annotation.Platform;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.DatabasePlatform;
 
 import java.io.File;
@@ -109,7 +109,7 @@ public interface DbMigration {
   /**
    * Set the DatabaseConfig to use. Usually this is not called explicitly.
    */
-  void setServerConfig(DatabaseConfig config);
+  void setServerConfig(DatabaseBuilder config);
 
   /**
    * Set the specific platform to generate DDL for.

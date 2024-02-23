@@ -58,7 +58,7 @@ final class ExistsSqlQueryExpression implements SpiExpression, UnsupportedDocSto
   @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("ExistsSqlQuery[").append(" not:").append(not);
-    builder.append(" sql:").append(subQuery).append(" ?:").append(bindParams.length).append("]");
+    builder.append(" sql:").append(subQuery).append(" ?:").append(bindParams.length).append(']');
   }
 
   @Override
@@ -73,7 +73,7 @@ final class ExistsSqlQueryExpression implements SpiExpression, UnsupportedDocSto
     if (not) {
       request.append("not ");
     }
-    request.append("exists (").parse(subQuery).append(")");
+    request.append("exists (").parse(subQuery).append(')');
   }
 
   @Override

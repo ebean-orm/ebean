@@ -1,5 +1,6 @@
 package org.integration;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.redis.DuelCache;
 import org.domain.Person;
 import io.ebean.DB;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ClusterTest {
 
   private Database createOther(DataSource dataSource) {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setDataSource(dataSource);
     config.loadFromProperties();
     config.setDefaultServer(false);

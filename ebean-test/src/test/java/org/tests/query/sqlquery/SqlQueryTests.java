@@ -253,6 +253,46 @@ class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
+  void queryUsingMaster() {
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer where name is not null";
+    List<CustDto> custDtos = DB.sqlQuery(sql)
+      .usingMaster()
+      .mapTo(CUST_MAPPER)
+      .findList();
+
+    assertThat(custDtos).isNotEmpty();
+  }
+
+  @Test
+  void queryUsingConnection() throws SQLException {
+    ResetBasicData.reset();
+    boolean h2 = isH2();
+
+    String sql = h2 ? "select id, name||session_id(), status from o_customer where name is not null"
+      : "select id, name, status from o_customer where name is not null";
+
+    try (Transaction txn = DB.createTransaction()) {
+      String h2SessionId = h2 ? h2SessionId(txn) : null;
+
+      AtomicInteger counter = new AtomicInteger();
+      DB.sqlQuery(sql)
+        .usingConnection(txn.connection())
+        .mapTo(CUST_MAPPER)
+        .findEach(custDto -> {
+          counter.incrementAndGet();
+          assertThat(custDto.name).isNotNull();
+          if (h2) {
+            assertThat(custDto.name).endsWith(h2SessionId);
+          }
+        });
+
+      assertThat(counter.get()).isGreaterThan(0);
+    }
+  }
+
+  @Test
   void queryUsingTransaction() throws SQLException {
     ResetBasicData.reset();
     boolean h2 = isH2();

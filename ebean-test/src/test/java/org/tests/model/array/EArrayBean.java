@@ -5,10 +5,12 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.NotNull;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +59,12 @@ public class EArrayBean {
 
   @DbArray
   Set<Status> status2;
+
+  @DbArray
+  List<Instant> times;
+
+  @DbArray
+  List<LocalDate> dates;
 
   @Version
   Long version;
@@ -163,6 +171,24 @@ public class EArrayBean {
 
   public void setStatus2(Set<Status> status2) {
     this.status2 = status2;
+  }
+
+  public List<Instant> getTimes() {
+    return times;
+  }
+
+  public EArrayBean setTimes(List<Instant> times) {
+    this.times = times;
+    return this;
+  }
+
+  public List<LocalDate> getDates() {
+    return dates;
+  }
+
+  public EArrayBean setDates(List<LocalDate> dates) {
+    this.dates = dates;
+    return this;
   }
 
   public Long getVersion() {

@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.avaje.lang.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;
@@ -236,6 +237,16 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   String planLabel();
 
   /**
+   * Return the transaction explicitly assigned or null.
+   */
+  SpiTransaction transaction();
+
+  /**
+   * Return true if this query should not use the read only data source.
+   */
+  boolean isUseMaster();
+
+  /**
    * Return true if this is a "find by id" query. This includes a check for a single "equal to" expression for the Id.
    */
   boolean isFindById();
@@ -329,7 +340,7 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   /**
    * Set the on a secondary query given the label, relativePath and profile location of the parent query.
    */
-  void setProfilePath(String label, String relativePath, ProfileLocation profileLocation);
+  void setProfilePath(String label, String relativePath, @Nullable ProfileLocation profileLocation);
 
   /**
    * Set the query mode.
@@ -644,6 +655,16 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   ObjectGraphNode parentNode();
 
   /**
+   * Set that this is a future query that will execute in the background.
+   */
+  void usingFuture();
+
+  /**
+   * Return true if this is a future query.
+   */
+  boolean isUsingFuture();
+
+  /**
    * Return false when this is a lazy load or refresh query for a bean.
    * <p>
    * We just take/copy the data from those beans and don't collect AutoTune
@@ -866,17 +887,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if read auditing is disabled on this query.
    */
   boolean isDisableReadAudit();
-
-  /**
-   * Return true if this is a query executing in the background.
-   */
-  boolean isFutureFetch();
-
-  /**
-   * Set to true to indicate the query is executing in a background thread
-   * asynchronously.
-   */
-  void setFutureFetch(boolean futureFetch);
 
   /**
    * Set the readEvent for future queries (as prepared in foreground thread).

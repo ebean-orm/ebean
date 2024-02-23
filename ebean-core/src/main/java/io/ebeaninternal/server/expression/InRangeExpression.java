@@ -55,12 +55,12 @@ final class InRangeExpression extends AbstractExpression {
     if (prop != null && prop.isDbEncrypted()) {
       pname = prop.beanProperty().decryptProperty(propName);
     }
-    request.append("(").property(pname).append(" >= ? and ").property(pname).append(" < ?)");
+    request.append('(').property(pname).append(" >= ? and ").property(pname).append(" < ?)");
   }
 
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("InRange[").append(propName).append("]");
+    builder.append("InRange[").append(propName).append(']');
   }
 
   @Override

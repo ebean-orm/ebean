@@ -156,6 +156,13 @@ end if;
 end$$;
 delimiter $$
 begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_DROP_REF_ONE_TO_ONE_PARENT_ID' and ucase(tabname) = 'DROP_REF_ONE_TO_ONE') then
+  prepare stmt from 'alter table drop_ref_one_to_one drop constraint fk_drop_ref_one_to_one_parent_id';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
 if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'FK_MIGTEST_MTM_C_MIGTEST_MTM_M_MIGTEST_MTM_C' and ucase(tabname) = 'MIGTEST_MTM_C_MIGTEST_MTM_M') then
   prepare stmt from 'alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c';
   execute stmt;

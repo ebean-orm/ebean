@@ -88,14 +88,14 @@ final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
 
     if (nodeBeanProp instanceof STreePropertyAssocOne) {
       nodeBeanProp.addJoin(joinType, parentAlias, alias, ctx);
-      if (softDelete) {
+      if (softDelete && ctx.joinAdded()) {
         ctx.append(" and ").append(target.softDeletePredicate(alias));
       }
     } else {
       STreePropertyAssocMany manyProp = (STreePropertyAssocMany) nodeBeanProp;
       if (!manyProp.hasJoinTable()) {
         manyProp.addJoin(joinType, parentAlias, alias, ctx);
-        if (softDelete) {
+        if (softDelete && ctx.joinAdded()) {
           ctx.append(" and ").append(target.softDeletePredicate(alias));
         }
       } else {

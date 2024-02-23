@@ -135,12 +135,12 @@ public class DbConstraintNaming {
    */
   protected String joinColumnNames(String[] columns) {
     if (columns.length == 1) {
-      return normaliseColumn(columns[0]);
+      return normaliseColumn(columns[0]).replace(" ", "_");
     }
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < columns.length; i++) {
       if (i > 0) {
-        sb.append("_");
+        sb.append('_');
       }
       sb.append(normaliseColumn(columns[i]));
     }

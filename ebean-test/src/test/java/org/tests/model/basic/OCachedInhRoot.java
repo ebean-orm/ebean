@@ -2,10 +2,10 @@ package org.tests.model.basic;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.Table;
 
 /**
  * Cached entity for inheritance.

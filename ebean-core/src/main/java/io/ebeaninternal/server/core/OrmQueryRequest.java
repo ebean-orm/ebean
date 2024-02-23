@@ -18,7 +18,7 @@ import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
@@ -35,7 +35,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private final OrmQueryEngine queryEngine;
   private final SpiQuery<T> query;
   private final BeanFindController finder;
-  private final Boolean readOnly;
   private LoadContext loadContext;
   private PersistenceContext persistenceContext;
   private HashQuery cacheKey;
@@ -52,12 +51,16 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     this.finder = beanDescriptor.beanFinder();
     this.queryEngine = queryEngine;
     this.query = query;
-    this.readOnly = query.isReadOnly();
     this.persistenceContext = query.persistenceContext();
   }
 
   public PersistenceException translate(String bindLog, String sql, SQLException e) {
     return queryEngine.translate(this, bindLog, sql, e);
+  }
+
+  @Override
+  public boolean isGetAllFromBeanCache() {
+    return (transaction == null || !transaction.isSkipCache()) && getFromBeanCache();
   }
 
   @Override
@@ -128,13 +131,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   public int secondaryQueriesMinBatchSize() {
     return loadContext.secondaryQueriesMinBatchSize();
-  }
-
-  /**
-   * Return the Normal, sharedInstance, ReadOnly state of this query.
-   */
-  public Boolean isReadOnly() {
-    return readOnly;
   }
 
   /**
@@ -220,7 +216,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       } else {
         // create an implicit transaction to execute this query
         // potentially using read-only DataSource with autoCommit
-        transaction = server.createReadOnlyTransaction(query.tenantId());
+        transaction = server.createReadOnlyTransaction(query.tenantId(), query.isUseMaster());
       }
       createdTransaction = true;
     }
@@ -776,5 +772,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public int forwardOnlyFetchSize() {
     return queryEngine.forwardOnlyFetchSize();
+  }
+
+  public void clearContext() {
+    if (!transaction.isAutoPersistUpdates()) {
+      beanDescriptor.contextClear(transaction.persistenceContext());
+    }
   }
 }

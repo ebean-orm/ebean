@@ -1,6 +1,6 @@
 package org.tests.model.bridge;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 import java.util.Objects;
 import java.util.UUID;
 

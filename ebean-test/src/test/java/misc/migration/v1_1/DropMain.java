@@ -1,6 +1,6 @@
 package misc.migration.v1_1;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 /**
@@ -21,6 +21,9 @@ public class DropMain {
 
   @ManyToMany(cascade = CascadeType.ALL)
   List<DropRefMany> refsMany;
+
+  @OneToOne(mappedBy = "parent")
+  DropRefOneToOne refsOneToOne;
 
   public Integer getId() {
     return id;
@@ -44,5 +47,13 @@ public class DropMain {
 
   public void setRefsMany(List<DropRefMany> refsMany) {
     this.refsMany = refsMany;
+  }
+
+  public DropRefOneToOne getRefsOneToOne() {
+    return refsOneToOne;
+  }
+
+  public void setRefsOneToOne(DropRefOneToOne refsOneToOne) {
+    this.refsOneToOne = refsOneToOne;
   }
 }

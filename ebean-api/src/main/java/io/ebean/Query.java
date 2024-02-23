@@ -3,13 +3,15 @@ package io.ebean;
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 
-import javax.persistence.NonUniqueResultException;
+import jakarta.persistence.NonUniqueResultException;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -671,6 +673,16 @@ public interface Query<T> extends CancelableQuery {
   Query<T> apply(FetchPath fetchPath);
 
   /**
+   * Apply changes to the query conditional on the supplied predicate.
+   * <p>
+   * Typically, the changes are extra predicates etc.
+   *
+   * @param predicate The predicate which when true the changes are applied
+   * @param apply The changes to apply to the query
+   */
+  Query<T> alsoIf(BooleanSupplier predicate, Consumer<Query<T>> apply);
+
+  /**
    * Execute the query using the given transaction.
    */
   Query<T> usingTransaction(Transaction transaction);
@@ -684,6 +696,18 @@ public interface Query<T> extends CancelableQuery {
    * Execute the query using the given database.
    */
   Query<T> usingDatabase(Database database);
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.DatabaseBuilder#readOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  Query<T> usingMaster();
 
   /**
    * Execute the query returning the list of Id's.
@@ -945,6 +969,25 @@ public interface Query<T> extends CancelableQuery {
    */
   @Nullable
   <A> A findSingleAttribute();
+
+  /**
+   * Execute the query returning a single optional attribute value.
+   * <p>
+   * <h3>Example</h3>
+   * <pre>{@code
+   *
+   *  Optional<String> maybeName =
+   *    new QCustomer()
+   *      .select(name)
+   *      .id.eq(42)
+   *      .status.eq(NEW)
+   *      .findSingleAttributeOrEmpty();
+   *
+   * }</pre>
+   *
+   * @return an optional value for the selected property
+   */
+  <A> Optional<A> findSingleAttributeOrEmpty();
 
   /**
    * Return true if this is countDistinct query.
@@ -1372,9 +1415,9 @@ public interface Query<T> extends CancelableQuery {
   Query<T> orderBy(String orderByClause);
 
   /**
-   * Deprecated migrate to orderBy().
+   * @deprecated migrate to {@link #orderBy()}.
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   default Query<T> order(String orderByClause) {
     return orderBy(orderByClause);
   }
@@ -1391,9 +1434,9 @@ public interface Query<T> extends CancelableQuery {
   OrderBy<T> orderBy();
 
   /**
-   * Deprecated migrate to orderBy().
+   * @deprecated migrate to {@link #orderBy()}.
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   default OrderBy<T> order() {
     return orderBy();
   }
@@ -1404,9 +1447,9 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setOrderBy(OrderBy<T> orderBy);
 
   /**
-   * Deprecated migrate to setOrderBy().
+   * @deprecated migrate to {@link #setOrderBy(OrderBy)}.
    */
-  @Deprecated(since = "13.19")
+  @Deprecated(since = "13.19", forRemoval = true)
   default Query<T> setOrder(OrderBy<T> orderBy) {
     return setOrderBy(orderBy);
   }

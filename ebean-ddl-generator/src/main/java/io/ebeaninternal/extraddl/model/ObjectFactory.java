@@ -1,6 +1,6 @@
 package io.ebeaninternal.extraddl.model;
 
-import javax.xml.bind.annotation.XmlRegistry;
+import jakarta.xml.bind.annotation.XmlRegistry;
 
 
 /**

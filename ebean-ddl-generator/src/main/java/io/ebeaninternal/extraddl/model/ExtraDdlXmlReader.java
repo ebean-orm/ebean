@@ -3,9 +3,9 @@ package io.ebeaninternal.extraddl.model;
 import io.avaje.applog.AppLog;
 import io.ebean.annotation.Platform;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -47,9 +47,9 @@ public class ExtraDdlXmlReader {
         sb.append(value);
         if (value.lastIndexOf(';') == -1) {
           // add statement terminator as we didn't find one
-          sb.append(";");
+          sb.append(';');
         }
-        sb.append("\n");
+        sb.append('\n');
       }
     }
     return sb.toString();

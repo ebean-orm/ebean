@@ -1,8 +1,8 @@
 package org.tests.inheritance.order;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
 
 @Entity
 @Inheritance

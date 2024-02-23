@@ -1,9 +1,9 @@
 package org.tests.model.aggregation;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -163,7 +163,8 @@ public class TestAggregationTopLevel extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertSql(sql.get(0)).contains("select t0.edate, sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id where t0.edate > ? group by t0.edate, t1.id, t1.name having sum(t0.hours) > ?");  }
+    assertSql(sql.get(0)).contains("select t0.edate, sum(t0.total_kms), sum(t0.hours), t1.id, t1.name from d_machine_stats t0 join dmachine t1 on t1.id = t0.machine_id where t0.edate > ? group by t0.edate, t1.id, t1.name having sum(t0.hours) > ?");
+  }
 
 
   @Test
@@ -269,7 +270,6 @@ public class TestAggregationTopLevel extends BaseTestCase {
 
     assertThat(sqlOf(query)).contains("select t0.id, t0.name, t1.edate, max(t1.rate), sum(t1.total_kms) from dmachine t0 left join d_machine_stats t1 on t1.machine_id = t0.id where t0.name = ? group by t0.id, t0.name, t1.edate order by t0.id");
   }
-
 
   public static void loadData() {
 

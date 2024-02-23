@@ -3,6 +3,7 @@ package io.ebean.xtest.dbmigration;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.annotation.Platform;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.dbmigration.DbMigration;
 import org.junit.jupiter.api.Test;

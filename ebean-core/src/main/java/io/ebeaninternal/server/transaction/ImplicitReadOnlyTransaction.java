@@ -11,7 +11,7 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -32,6 +32,10 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   private static final String illegalStateMessage = "Transaction is Inactive";
   private static final String notExpectedMessage = "Not expected on read only transaction";
 
+  /**
+   * Set false when using autoCommit (as a performance optimisation for the read-only case).
+   */
+  private final boolean useCommit;
   private final TransactionManager manager;
   private final SpiTxnLogger logger;
   private final boolean logSql;
@@ -60,7 +64,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   /**
    * Create without a tenantId.
    */
-  ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection) {
+  ImplicitReadOnlyTransaction(boolean useCommit, TransactionManager manager, Connection connection) {
     this.manager = manager;
     this.logger = manager.loggerReadOnly();
     this.logSql = logger.isLogSql();
@@ -69,13 +73,18 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     this.connection = connection;
     this.persistenceContext = new DefaultPersistenceContext();
     this.startNanos = System.nanoTime();
+    try {
+      this.useCommit = useCommit && !connection.getAutoCommit();
+    } catch (SQLException e) {
+      throw new PersistenceException(e);
+    }
   }
 
   /**
    * Create with a tenantId.
    */
   ImplicitReadOnlyTransaction(TransactionManager manager, Connection connection, Object tenantId) {
-    this(manager, connection);
+    this(true, manager, connection);
     this.tenantId = tenantId;
   }
 
@@ -505,16 +514,22 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     // do nothing, expect AutoCommit
   }
 
-  /**
-   * Commit the transaction.
-   */
   @Override
   public void commit() {
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    // expect AutoCommit so just deactivate / put back into pool
-    deactivate();
+    try {
+      if (useCommit) {
+        try {
+          connection.commit();
+        } catch (SQLException e) {
+          throw new PersistenceException(e);
+        }
+      }
+    } finally {
+      deactivate();
+    }
   }
 
   /**
@@ -556,8 +571,17 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     if (!active) {
       throw new IllegalStateException(illegalStateMessage);
     }
-    // expect AutoCommit so it really has already committed
-    deactivate();
+    try {
+      if (useCommit) {
+        try {
+          connection.rollback();
+        } catch (SQLException e) {
+          throw new PersistenceException(e);
+        }
+      }
+    } finally {
+      deactivate();
+    }
   }
 
   /**
@@ -565,7 +589,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    */
   @Override
   public void end() throws PersistenceException {
-    if (isActive()) {
+    if (active) {
       rollback();
     }
   }

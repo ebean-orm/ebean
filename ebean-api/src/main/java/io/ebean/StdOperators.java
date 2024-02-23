@@ -9,7 +9,6 @@ import java.util.Collection;
  * <p>
  * This is currently deemed to be experimental and subject to change.
  */
-@Deprecated(since = "experimental")
 public final class StdOperators {
 
   // ---- Functions ---- //
@@ -77,9 +76,9 @@ public final class StdOperators {
     StringBuilder expression = new StringBuilder(50);
     expression.append("concat(").append(property.toString());
     for (Object value : values) {
-      expression.append(",").append(sqlConcatString(value));
+      expression.append(',').append(sqlConcatString(value));
     }
-    expression.append(")");
+    expression.append(')');
     return Property.of(expression.toString());
   }
 

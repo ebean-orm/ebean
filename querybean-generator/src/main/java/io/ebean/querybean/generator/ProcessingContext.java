@@ -80,7 +80,7 @@ class ProcessingContext implements Constants {
   /**
    * For partial compile the previous list of prefixed entity classes.
    */
-  private List<String> loadedPrefixEntities = new ArrayList<>();
+  private final List<String> loadedPrefixEntities = new ArrayList<>();
 
   /**
    * The package for the generated EntityClassRegister.
@@ -157,7 +157,7 @@ class ProcessingContext implements Constants {
     return (
       modifiers.contains(Modifier.STATIC) ||
       modifiers.contains(Modifier.TRANSIENT) ||
-      hasAnnotations(field, "javax.persistence.Transient")
+      hasAnnotations(field, "jakarta.persistence.Transient")
     );
   }
 
@@ -360,21 +360,18 @@ class ProcessingContext implements Constants {
    * Create the QAssoc PropertyType.
    */
   private PropertyType createPropertyTypeAssoc(String fullName) {
-    String[] split = Split.split(fullName);
-    String propertyName = "QAssoc" + split[1];
-    String packageName = packageAppend(split[0]);
-    return new PropertyTypeAssoc(propertyName, packageName);
-  }
-
-  /**
-   * Prepend the package to the suffix taking null into account.
-   */
-  private String packageAppend(String origPackage) {
-    if (origPackage == null) {
-      return "query.assoc";
+    TypeElement typeElement = elementUtils.getTypeElement(fullName);
+    String type;
+    if (typeElement.getNestingKind().isNested()) {
+      type = typeElement.getEnclosingElement().toString() + "$" + typeElement.getSimpleName();
     } else {
-      return origPackage + "." + "query.assoc";
+      type = typeElement.getQualifiedName().toString();
     }
+
+    String[] split = Split.split(type);
+    String propertyName = "Q" + split[1] + ".Assoc";
+    String importName = split[0] + ".query.Q" + split[1];
+    return new PropertyTypeAssoc(propertyName, importName);
   }
 
   /**
@@ -478,6 +475,11 @@ class ProcessingContext implements Constants {
     return createMetaInfWriter(METAINF_MANIFEST);
   }
 
+  FileObject createNativeImageWriter(String name) throws IOException {
+    String nm = "META-INF/native-image/" + name + "/reflect-config.json";
+    return createMetaInfWriter(nm);
+  }
+
   FileObject createMetaInfWriter(String target) throws IOException {
     return filer.createResource(StandardLocation.CLASS_OUTPUT, "", target);
   }
@@ -544,5 +546,9 @@ class ProcessingContext implements Constants {
 
   Element asElement(TypeMirror mirror) {
     return typeUtils.asElement(mirror);
+  }
+
+  boolean isNameClash(String shortName) {
+    return propertyTypeMap.isNameClash(shortName);
   }
 }

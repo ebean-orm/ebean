@@ -29,7 +29,7 @@ import io.ebeanservice.docstore.api.DocStoreTransaction;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -274,7 +274,7 @@ public class TransactionManager implements SpiTransactionManager {
 
   private SpiTransaction createTransaction(TxScope txScope) {
     if (txScope.isReadonly()) {
-      return createReadOnlyTransaction(null);
+      return createReadOnlyTransaction(null, false);
     } else {
       return createTransaction(true, txScope.getIsolationLevel());
     }
@@ -290,8 +290,8 @@ public class TransactionManager implements SpiTransactionManager {
   /**
    * Create a new Transaction for query only purposes (can use read only datasource).
    */
-  public SpiTransaction createReadOnlyTransaction(Object tenantId) {
-    return transactionFactory.createReadOnlyTransaction(tenantId);
+  public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
+    return transactionFactory.createReadOnlyTransaction(tenantId, useMaster);
   }
 
   /**

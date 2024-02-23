@@ -1,29 +1,61 @@
 package org.tests.batchinsert;
 
-import io.ebean.*;
-import io.ebean.xtest.BaseTestCase;
-import io.ebean.xtest.IgnorePlatform;
+import io.ebean.DB;
+import io.ebean.Database;
+import io.ebean.Transaction;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import io.ebean.xtest.base.DtoQuery2Test;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.EBasicVer;
-import org.tests.model.basic.TSDetail;
-import org.tests.model.basic.TSMaster;
+import org.tests.model.basic.*;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class TestBatchInsertFlush extends BaseTestCase {
+
+  @Test
+  public void batchFlush() {
+
+    TSMaster m = new TSMaster();
+    m.setName("master1");
+    DB.save(m);
+    DB.getDefault().cacheManager().clearAll();
+
+    try (Transaction txn = DB.beginTransaction()) {
+      txn.setBatchSize(2);
+      txn.setBatchMode(true);
+
+      List<Customer> customers = new ArrayList<>();
+
+      for (int i = 0; i < 3; i++) {
+        Customer customer = ResetBasicData.createCustomer("BatchFlushPreInsert " + i, null, null, 3);
+        customer.addContact(new Contact("Fred" + i, "Blue"));
+        customers.add(customer);
+      }
+
+      for (int i = 3; i < 6; i++) {
+        Customer customer = ResetBasicData.createCustomer("BatchFlushPostInsert " + i, null, null, 3);
+        customer.addContact(new Contact("Fred" + i, "Blue"));
+        customers.add(customer);
+      }
+
+      DB.saveAll(customers);
+
+      txn.commit();
+    }
+  }
 
   @Test
   public void no_cascade() {
@@ -68,9 +100,9 @@ public class TestBatchInsertFlush extends BaseTestCase {
       assertSql(sql.get(0)).contains("insert into t_atable_thatisrelatively");
       assertSql(sql.get(1)).contains("-- bind(");
       // detail
-      assertThat(sql.get(3)).contains("insert into t_detail_with_other_namexxxyy");
+      assertThat(sql.get(4)).contains("insert into t_detail_with_other_namexxxyy");
 
-      assertThat(((SpiTransaction)transaction).label()).isEqualTo("TestBatchInsertFlush.no_cascade");
+      assertThat(((SpiTransaction) transaction).label()).isEqualTo("TestBatchInsertFlush.no_cascade");
 
     } finally {
       transaction.end();
@@ -133,7 +165,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     // trigger JDBC batch by default
     DB.findDto(DtoQuery2Test.DCust.class, "select id, name from o_customer")
-    .findList();
+      .findList();
 
     List<String> sql = LoggedSql.stop();
     assertSql(sql.get(0)).contains("insert into e_basicver");
@@ -173,7 +205,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
     assertThat(LoggedSql.collect()).isEmpty();
     Integer id = b1.getId();
     assertNotNull(id);
-    assertThat(LoggedSql.collect()).hasSize(3);
+    assertThat(LoggedSql.collect()).hasSize(4);
 
     EBasicVer b3 = new EBasicVer("b3");
     server.save(b3);
@@ -199,7 +231,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       assertThat(LoggedSql.collect()).isEmpty();
       Integer id = b1.getId();
       assertNotNull(id);
-      assertThat(LoggedSql.collect()).hasSize(3);
+      assertThat(LoggedSql.collect()).hasSize(4);
 
       EBasicVer b3 = new EBasicVer("b3");
       server.save(b3, txn);
@@ -266,7 +298,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       server.save(b3, txn);
 
       txn.commit();
-      assertThat(LoggedSql.collect()).hasSize(5);
+      assertThat(LoggedSql.collect()).hasSize(7);
 
     } finally {
       txn.end();

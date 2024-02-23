@@ -1,5 +1,6 @@
 package io.ebean.platform.sqlserver;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.*;
 import org.junit.jupiter.api.Test;

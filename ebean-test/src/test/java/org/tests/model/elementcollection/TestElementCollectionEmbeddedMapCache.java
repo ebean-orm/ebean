@@ -49,11 +49,11 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
 
     sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(5); // update of collection only
+      assertThat(sql).hasSize(7); // update of collection only
       assertSql(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
       assertSqlBind(sql.get(1));
-      assertSql(sql.get(2)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,phnum) values (?,?,?,?,?)");
-      assertSqlBind(sql, 3, 4);
+      assertSql(sql.get(3)).contains("insert into ecbm_person_phone_numbers (person_id,mkey,country_code,area,phnum) values (?,?,?,?,?)");
+      assertSqlBind(sql, 4, 5);
     } else {
       assertThat(sql).hasSize(4); // update of collection only
       assertSql(sql.get(0)).contains("delete from ecbm_person_phone_numbers where person_id=?");
@@ -79,7 +79,7 @@ public class TestElementCollectionEmbeddedMapCache extends BaseTestCase {
     DB.save(three);
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(7);
 
     EcbmPerson four = DB.find(EcbmPerson.class)
       .setId(person.getId())

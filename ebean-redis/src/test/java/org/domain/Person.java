@@ -5,7 +5,7 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.CacheBeanTuning;
 import io.ebean.annotation.Index;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 import java.time.LocalDate;
 
 @Cache(enableQueryCache = true, nearCache = true, naturalKey = "name")
@@ -27,6 +27,11 @@ public class Person extends EBase {
   LocalDate localDate;
 
   String notes;
+
+  /**
+   * Test that KEY and VALUE are now by default not h2database keywords.
+   */
+  String key;
 
   public Person(String name) {
     this.name = name;

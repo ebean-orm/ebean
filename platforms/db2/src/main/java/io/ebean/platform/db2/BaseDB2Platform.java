@@ -1,6 +1,7 @@
 package io.ebean.platform.db2;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.Query;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.*;
 
@@ -53,4 +54,9 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
     return new DB2SequenceIdGenerator(be, ds, seqName, sequenceBatchSize);
   }
 
+  @Override
+  protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
+    // NOWAIT and SKIP LOCKED not supported with Db2
+    return sql + " for update";
+  }
 }

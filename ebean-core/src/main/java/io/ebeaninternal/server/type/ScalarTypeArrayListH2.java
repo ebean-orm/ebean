@@ -8,6 +8,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +59,12 @@ final class ScalarTypeArrayListH2 extends ScalarTypeArrayList {
         }
         if (valueType.equals(String.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
+        }
+        if (valueType.equals(Instant.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "timestamp", DocPropertyType.TEXT, ArrayElementConverter.INSTANT));
+        }
+        if (valueType.equals(LocalDate.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayListH2(nullable, "date", DocPropertyType.TEXT, ArrayElementConverter.LOCAL_DATE));
         }
         throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
       } finally {

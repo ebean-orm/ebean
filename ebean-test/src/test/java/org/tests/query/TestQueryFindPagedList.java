@@ -10,7 +10,8 @@ import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -218,8 +219,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     // kinda not normal but just wrap in a transaction to assert
     // the background fetch does not occur (which explicitly creates
     // its own transaction) ... so a bit naughty with the test here
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
 
       List<Order> orders = pagedList.getList();
       int totalRowCount = pagedList.getTotalCount();
@@ -237,12 +237,8 @@ public class TestQueryFindPagedList extends BaseTestCase {
       String secTxn = loggedSql.get(1).substring(0, 10);
 
       assertEquals(firstTxn, secTxn);
-
-    } finally {
-      DB.endTransaction();
     }
   }
-
 
   @Test
   public void test_usingAlias() {
@@ -269,23 +265,25 @@ public class TestQueryFindPagedList extends BaseTestCase {
 
   @Test
   void test_forUpdate() {
-    ResetBasicData.reset();
+    if (!isDb2()) {
+      ResetBasicData.reset();
 
-    try (Transaction txn = DB.beginTransaction()) {
-      PagedList<Order> pagedList = DB.find(Order.class).forUpdate().setMaxRows(2).findPagedList();
+      try (Transaction txn = DB.beginTransaction()) {
+        PagedList<Order> pagedList = DB.find(Order.class).forUpdate().setMaxRows(2).findPagedList();
 
-      LoggedSql.start();
-      int totalCount = pagedList.getTotalCount();
-      assertThat(totalCount).isGreaterThan(2);
+        LoggedSql.start();
+        int totalCount = pagedList.getTotalCount();
+        assertThat(totalCount).isGreaterThan(2);
 
-      List<Order> list = pagedList.getList();
-      assertThat(list).hasSize(2);
+        List<Order> list = pagedList.getList();
+        assertThat(list).hasSize(2);
 
-      List<String> sql = LoggedSql.stop();
-      assertThat(sql).hasSize(2);
-      assertThat(sql.get(0)).contains("select count(*) from o_order t0;");
-      if (isH2() || isPostgresCompatible()) {
-        assertThat(sql.get(1)).contains(" limit 2 for update;");
+        List<String> sql = LoggedSql.stop();
+        assertThat(sql).hasSize(2);
+        assertThat(sql.get(0)).contains("select count(*) from o_order t0;");
+        if (isH2() || isPostgresCompatible()) {
+          assertThat(sql.get(1)).contains(" limit 2 for update;");
+        }
       }
     }
   }

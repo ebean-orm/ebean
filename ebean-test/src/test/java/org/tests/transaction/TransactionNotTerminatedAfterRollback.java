@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.PersistenceException;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Table;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,10 +60,10 @@ public class TransactionNotTerminatedAfterRollback {
     @Override
     public String toString() {
       StringBuilder s = new StringBuilder();
-      s.append("{");
+      s.append('{');
       s.append("id: ").append(id).append(", ");
       s.append("name: ").append(name);
-      s.append("}");
+      s.append('}');
       return s.toString();
     }
   }

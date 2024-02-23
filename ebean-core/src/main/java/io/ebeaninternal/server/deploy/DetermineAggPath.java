@@ -72,7 +72,7 @@ final class DetermineAggPath {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < pos; i++) {
           if (i > 0) {
-            sb.append(".");
+            sb.append('.');
           }
           sb.append(paths[i]);
         }

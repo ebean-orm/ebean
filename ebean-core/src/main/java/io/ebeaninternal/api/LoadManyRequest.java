@@ -101,7 +101,7 @@ public final class LoadManyRequest extends LoadRequest {
     query.setLazyLoadForParents(many);
     many.addWhereParentIdIn(query, parentIdList(server), loadContext.isUseDocStore());
     query.setPersistenceContext(loadContext.persistenceContext());
-    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
+    query.setLoadDescription(lazy ? "lazy" : "query", description());
     if (lazy) {
       query.setLazyLoadBatchSize(loadContext.batchSize());
     } else {
@@ -111,7 +111,12 @@ public final class LoadManyRequest extends LoadRequest {
     loadContext.configureQuery(query);
     if (onlyIds) {
       // lazy loading invoked via clear() and removeAll()
-      query.select(many.targetIdProperty());
+      String mapKey = many.mapKey();
+      if (mapKey != null) {
+        query.select(mapKey);
+      } else {
+        query.select(many.targetIdProperty());
+      }
     }
     return query;
   }

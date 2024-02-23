@@ -12,7 +12,7 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.persist.Binder;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -51,6 +51,10 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
    * Flushes the jdbc batch by default unless explicitly turned off on the transaction.
    */
   private <T> void flushJdbcBatchOnQuery(OrmQueryRequest<T> request) {
+    if (request.query().isUsingFuture()) {
+      // future queries never invoke a flush
+      return;
+    }
     SpiTransaction t = request.transaction();
     if (t.isFlushOnQuery()) {
       // before we perform a query, we need to flush any

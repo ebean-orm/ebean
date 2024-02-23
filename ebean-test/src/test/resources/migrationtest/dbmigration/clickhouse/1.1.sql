@@ -24,6 +24,11 @@ create table drop_ref_one (
   parent_id                     UInt32
 ) ENGINE = Log();
 
+create table drop_ref_one_to_one (
+  id                            UInt32,
+  parent_id                     UInt32
+) ENGINE = Log();
+
 create table migtest_e_test_binary (
   id                            UInt32,
   test_byte16                   String,

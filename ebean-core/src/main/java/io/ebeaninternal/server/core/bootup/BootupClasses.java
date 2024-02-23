@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.core.bootup;
 
 import io.ebean.annotation.DocStore;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.IdGenerator;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.core.type.ScalarType;
@@ -14,10 +14,10 @@ import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -91,7 +91,7 @@ public class BootupClasses implements Predicate<Class<?>> {
   /**
    * Run any ServerConfigStartup listeners.
    */
-  public void runServerConfigStartup(DatabaseConfig config) {
+  public void runServerConfigStartup(DatabaseBuilder config) {
     for (Class<?> cls : serverConfigStartupCandidates) {
       try {
         ServerConfigStartup newInstance = (ServerConfigStartup) cls.getDeclaredConstructor().newInstance();
@@ -172,7 +172,7 @@ public class BootupClasses implements Predicate<Class<?>> {
     add(startupInstances, serverConfigStartupInstances, serverConfigStartupCandidates);
   }
 
-  public void addChangeLogInstances(DatabaseConfig config) {
+  public void addChangeLogInstances(DatabaseBuilder.Settings config) {
     readAuditPrepare = config.getReadAuditPrepare();
     readAuditLogger = config.getReadAuditLogger();
     changeLogPrepare = config.getChangeLogPrepare();

@@ -4,6 +4,7 @@ import javax.tools.FileObject;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
@@ -38,6 +39,7 @@ class SimpleModuleInfoWriter {
     writer.close();
     writeServicesFile();
     writeManifestFile();
+    writeNativeImageFile();
   }
 
   private void writeServicesFile() {
@@ -48,9 +50,7 @@ class SimpleModuleInfoWriter {
         writer.write(factoryFullName);
         writer.close();
       }
-
     } catch (IOException e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to write services file " + e.getMessage());
     }
   }
@@ -68,9 +68,7 @@ class SimpleModuleInfoWriter {
           writer.close();
         }
       }
-
     } catch (IOException e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to write services file " + e.getMessage());
     }
   }
@@ -79,15 +77,46 @@ class SimpleModuleInfoWriter {
     StringBuilder builder = new StringBuilder("entity-packages: ");
     for (String pkg : allEntityPackages) {
       // one package per line
-      builder.append(pkg).append("\n").append("  ");
+      builder.append(pkg).append('\n').append("  ");
     }
-    return builder.delete(builder.lastIndexOf("\n"), builder.length()).append("\n").toString();
+    return builder.delete(builder.lastIndexOf("\n"), builder.length()).append('\n').toString();
+  }
+
+  private void writeNativeImageFile() {
+    try {
+      Set<String> allEntities = new LinkedHashSet<>(processingContext.getDbEntities());
+      for (Set<String> value : processingContext.getOtherDbEntities().values()) {
+        allEntities.addAll(value);
+      }
+
+      if (!allEntities.isEmpty()) {
+        FileObject jfo = processingContext.createNativeImageWriter(factoryPackage + ".ebean-entity");
+        if (jfo != null) {
+          boolean first = true;
+          Writer writer = jfo.openWriter();
+          writer.write("[");
+          for (String entity : allEntities) {
+            if (first) {
+              first = false;
+            } else {
+              writer.write(",");
+            }
+            writer.write("\n  {\"name\": \"");
+            writer.write(entity);
+            writer.write("\", \"allDeclaredConstructors\": true, \"allDeclaredFields\": true}");
+          }
+          writer.write("\n]\n");
+          writer.write("\n");
+          writer.close();
+        }
+      }
+    } catch (IOException e) {
+      processingContext.logError(null, "Failed to write services file " + e.getMessage());
+    }
   }
 
   private void writePackage() {
-
     writer.append("package %s;", factoryPackage).eol().eol();
-
     writer.append("import java.util.ArrayList;").eol();
     writer.append("import java.util.Collections;").eol();
     writer.append("import java.util.List;").eol();
@@ -125,7 +154,6 @@ class SimpleModuleInfoWriter {
   }
 
   private void writeStartClass() {
-
     buildAtContextModule(writer);
 
     writer.append("public class %s implements EntityClassRegister {", factoryShortName).eol().eol();

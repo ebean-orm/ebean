@@ -20,7 +20,7 @@ import io.ebeaninternal.server.type.ScalarTypeBytesBase;
 import io.ebeaninternal.server.type.ScalarTypeBytesEncrypted;
 import io.ebeaninternal.server.type.ScalarTypeEncryptedWrapper;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Types;
 import java.util.Set;
 import java.util.UUID;
@@ -98,6 +98,10 @@ final class AnnotationFields extends AnnotationParser {
     Formula formula = prop.getMetaAnnotationFormula(platform);
     if (formula != null) {
       prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));
+    }
+    DbComment comment = get(prop, DbComment.class);
+    if (comment != null) {
+      prop.setDbComment(comment.value());
     }
     initWhoProperties(prop);
     initDbMigration(prop);

@@ -3,9 +3,9 @@ package io.ebean.config;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.AnnotationUtil;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Inheritance;
-import javax.persistence.Table;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.Table;
 
 import static io.ebean.util.StringHelper.isNull;
 
@@ -228,7 +228,7 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   public TableName getM2MJoinTableName(TableName lhsTable, TableName rhsTable) {
     StringBuilder buffer = new StringBuilder();
     buffer.append(unQuote(lhsTable.getName()));
-    buffer.append("_");
+    buffer.append('_');
 
     String rhsTableName = unQuote(rhsTable.getName());
     if (rhsTableName.indexOf('_') < rhsPrefixLength) {
@@ -271,10 +271,10 @@ public abstract class AbstractNamingConvention implements NamingConvention {
   public String getTableName(String catalog, String schema, String name) {
     StringBuilder sb = new StringBuilder();
     if (!isNull(catalog)) {
-      sb.append(quoteIdentifiers(catalog)).append(".");
+      sb.append(quoteIdentifiers(catalog)).append('.');
     }
     if (!isNull(schema)) {
-      sb.append(quoteIdentifiers(schema)).append(".");
+      sb.append(quoteIdentifiers(schema)).append('.');
     }
     return sb.append(quoteIdentifiers(name)).toString();
   }

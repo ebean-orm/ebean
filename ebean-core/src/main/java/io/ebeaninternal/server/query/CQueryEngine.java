@@ -7,7 +7,7 @@ import io.ebean.annotation.Platform;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.ObjectGraphNode;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.util.JdbcClose;
 import io.ebean.util.StringHelper;
@@ -19,7 +19,7 @@ import io.ebeaninternal.server.core.SpiResultSet;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.persist.Binder;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -38,7 +38,7 @@ public final class CQueryEngine {
   private final CQueryHistorySupport historySupport;
   private final DatabasePlatform dbPlatform;
 
-  public CQueryEngine(DatabaseConfig config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
+  public CQueryEngine(DatabaseBuilder.Settings config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
     this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = config.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();
@@ -73,6 +73,9 @@ public final class CQueryEngine {
       int rows = query.execute();
       if (request.logSql()) {
         request.logSql("{0}; --bind({1}) --micros({2}) --rows({3})", query.generatedSql(), query.bindLog(), query.micros(), rows);
+      }
+      if (rows > 0) {
+        request.clearContext();
       }
       return rows;
     } catch (SQLException e) {
@@ -162,9 +165,6 @@ public final class CQueryEngine {
       }
       if (request.logSummary()) {
         request.transaction().logSummary(rcQuery.summary());
-      }
-      if (request.query().isFutureFetch()) {
-        request.transaction().end();
       }
       if (request.isQueryCachePut()) {
         request.addDependentTables(rcQuery.dependentTables());
@@ -444,7 +444,7 @@ public final class CQueryEngine {
     }
     msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
     msg.append("] rows[").append(q.loadedRowDetail());
-    msg.append("] bind[").append(q.bindLog()).append("]");
+    msg.append("] bind[").append(q.bindLog()).append(']');
     q.transaction().logSummary(msg.toString());
   }
 
@@ -489,7 +489,7 @@ public final class CQueryEngine {
     msg.append("exeMicros[").append(q.queryExecutionTimeMicros());
     msg.append("] rows[").append(q.loadedRowDetail());
     msg.append("] predicates[").append(q.logWhereSql());
-    msg.append("] bind[").append(q.bindLog()).append("]");
+    msg.append("] bind[").append(q.bindLog()).append(']');
     q.transaction().logSummary(msg.toString());
   }
 }

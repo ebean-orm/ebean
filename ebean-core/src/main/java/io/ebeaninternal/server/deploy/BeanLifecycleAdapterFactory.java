@@ -2,7 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.annotation.PostSoftDelete;
 import io.ebean.annotation.PreSoftDelete;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.event.BeanPersistAdapter;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.BeanPostConstructListener;
@@ -10,14 +10,14 @@ import io.ebean.event.BeanPostLoad;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.PersistenceException;
-import javax.persistence.PostLoad;
-import javax.persistence.PostPersist;
-import javax.persistence.PostRemove;
-import javax.persistence.PostUpdate;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.PostRemove;
+import jakarta.persistence.PostUpdate;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreRemove;
+import jakarta.persistence.PreUpdate;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -34,7 +34,7 @@ final class BeanLifecycleAdapterFactory {
 
   private final boolean postConstructPresent;
 
-  BeanLifecycleAdapterFactory(DatabaseConfig config) {
+  BeanLifecycleAdapterFactory(DatabaseBuilder.Settings config) {
     this.postConstructPresent = config.getClassLoadConfig().isJavaxPostConstructPresent();
   }
 

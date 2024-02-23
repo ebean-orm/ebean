@@ -3,6 +3,8 @@ package io.ebean;
 import io.avaje.lang.NonNullApi;
 import io.avaje.lang.Nullable;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -205,4 +207,21 @@ public interface DtoQuery<T> extends CancelableQuery {
    * Use the explicit transaction to execute the query.
    */
   DtoQuery<T> usingTransaction(Transaction transaction);
+
+  /**
+   * Execute the query using the given connection.
+   */
+  DtoQuery<T> usingConnection(Connection connection);
+
+  /**
+   * Ensure that the master DataSource is used if there is a read only data source
+   * being used (that is using a read replica database potentially with replication lag).
+   * <p>
+   * When the database is configured with a read-only DataSource via
+   * say {@link io.ebean.DatabaseBuilder#readOnlyDataSource(DataSource)} then
+   * by default when a query is run without an active transaction, it uses the read-only data
+   * source. We use {@code usingMaster()} to instead ensure that the query is executed
+   * against the master data source.
+   */
+  DtoQuery<T> usingMaster();
 }

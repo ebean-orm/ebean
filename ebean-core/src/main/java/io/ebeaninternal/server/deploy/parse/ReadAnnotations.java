@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy.parse;
 
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedPropertyFactory;
 
@@ -12,7 +12,7 @@ public final class ReadAnnotations {
 
   private final ReadAnnotationConfig readConfig;
 
-  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseConfig config) {
+  public ReadAnnotations(GeneratedPropertyFactory generatedPropFactory, String asOfViewSuffix, String versionsBetweenSuffix, DatabaseBuilder.Settings config) {
     this.readConfig = new ReadAnnotationConfig(generatedPropFactory, asOfViewSuffix, versionsBetweenSuffix, config);
   }
 

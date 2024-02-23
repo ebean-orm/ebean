@@ -1,6 +1,7 @@
 package io.ebean.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ebean.DatabaseBuilder;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.config.dbplatform.IdType;
@@ -17,7 +18,7 @@ class DatabaseConfigTest {
 
   @Test
   void testLoadFromEbeanProperties() {
-    DatabaseConfig config = new DatabaseConfig();
+    var config = new DatabaseConfig().settings();
     config.loadFromProperties();
 
     assertEquals(PersistBatch.NONE, config.getPersistBatch());
@@ -32,7 +33,7 @@ class DatabaseConfigTest {
     Properties props = new Properties();
     props.setProperty("ddl.initSql", "${user.home}" + fileSeparator + "initSql");
 
-    DatabaseConfig config = new DatabaseConfig();
+    var config = new DatabaseConfig().settings();
     config.loadFromProperties(props);
 
     String ddlInitSql = config.getDdlInitSql();
@@ -41,7 +42,7 @@ class DatabaseConfigTest {
 
   @Test
   void testLoadWithProperties() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setPersistBatch(PersistBatch.NONE);
     config.setPersistBatchOnCascade(PersistBatch.NONE);
     config.setAutoReadOnlyDataSource(false);
@@ -73,6 +74,7 @@ class DatabaseConfigTest {
     props.setProperty("forUpdateNoKey", "true");
     props.setProperty("defaultServer", "false");
     props.setProperty("skipDataSourceCheck", "true");
+    props.setProperty("readOnlyDatabase", "true");
 
     props.setProperty("queryPlan.enable", "true");
     props.setProperty("queryPlan.thresholdMicros", "10000");
@@ -83,46 +85,48 @@ class DatabaseConfigTest {
 
     config.loadFromProperties(props);
 
-    assertFalse(config.isDefaultServer());
-    assertTrue(config.isDisableL2Cache());
-    assertTrue(config.isNotifyL2CacheInForeground());
-    assertTrue(config.isDbOffline());
-    assertTrue(config.isAutoReadOnlyDataSource());
-    assertTrue(config.isAutoLoadModuleInfo());
-    assertTrue(config.isLoadModuleInfo());
-    assertTrue(config.skipDataSourceCheck());
+    var settings = config.settings();
+    assertFalse(settings.isDefaultServer());
+    assertTrue(settings.isDisableL2Cache());
+    assertTrue(settings.isNotifyL2CacheInForeground());
+    assertTrue(settings.isDbOffline());
+    assertTrue(settings.isAutoReadOnlyDataSource());
+    assertTrue(settings.isAutoLoadModuleInfo());
+    assertTrue(settings.isLoadModuleInfo());
+    assertTrue(settings.skipDataSourceCheck());
+    assertTrue(settings.readOnlyDatabase());
 
-    assertTrue(config.isIdGeneratorAutomatic());
-    assertFalse(config.getPlatformConfig().isCaseSensitiveCollation());
-    assertTrue(config.getPlatformConfig().isForUpdateNoKey());
+    assertTrue(settings.isIdGeneratorAutomatic());
+    assertFalse(settings.getPlatformConfig().isCaseSensitiveCollation());
+    assertTrue(settings.getPlatformConfig().isForUpdateNoKey());
 
-    assertThat(config.getNamingConvention()).isInstanceOf(MatchingNamingConvention.class);
+    assertThat(settings.getNamingConvention()).isInstanceOf(MatchingNamingConvention.class);
 
-    assertEquals(MutationDetection.NONE, config.getJsonMutationDetection());
+    assertEquals(MutationDetection.NONE, settings.getJsonMutationDetection());
     config.setJsonMutationDetection(MutationDetection.SOURCE);
-    assertEquals(MutationDetection.SOURCE, config.getJsonMutationDetection());
-    assertEquals(IdType.SEQUENCE, config.getIdType());
-    assertEquals(PersistBatch.ALL, config.getPersistBatch());
-    assertEquals(PersistBatch.ALL, config.getPersistBatchOnCascade());
-    Assertions.assertEquals(PlatformConfig.DbUuid.BINARY, config.getPlatformConfig().getDbUuid());
-    Assertions.assertEquals(JsonConfig.DateTime.MILLIS, config.getJsonDateTime());
-    assertEquals(JsonConfig.Date.MILLIS, config.getJsonDate());
+    assertEquals(MutationDetection.SOURCE, settings.getJsonMutationDetection());
+    assertEquals(IdType.SEQUENCE, settings.getIdType());
+    assertEquals(PersistBatch.ALL, settings.getPersistBatch());
+    assertEquals(PersistBatch.ALL, settings.getPersistBatchOnCascade());
+    Assertions.assertEquals(PlatformConfig.DbUuid.BINARY, settings.getPlatformConfig().getDbUuid());
+    Assertions.assertEquals(JsonConfig.DateTime.MILLIS, settings.getJsonDateTime());
+    assertEquals(JsonConfig.Date.MILLIS, settings.getJsonDate());
 
-    assertEquals("r0,users,orgs", config.getEnabledL2Regions());
+    assertEquals("r0,users,orgs", settings.getEnabledL2Regions());
 
-    assertEquals(42, config.getJdbcFetchSizeFindEach());
-    assertEquals(43, config.getJdbcFetchSizeFindList());
-    assertEquals(4, config.getBackgroundExecutorSchedulePoolSize());
-    assertEquals(98, config.getBackgroundExecutorShutdownSecs());
+    assertEquals(42, settings.getJdbcFetchSizeFindEach());
+    assertEquals(43, settings.getJdbcFetchSizeFindList());
+    assertEquals(4, settings.getBackgroundExecutorSchedulePoolSize());
+    assertEquals(98, settings.getBackgroundExecutorShutdownSecs());
 
-    assertTrue(config.isQueryPlanEnable());
-    assertEquals(10000, config.getQueryPlanThresholdMicros());
-    assertTrue(config.isQueryPlanCapture());
-    assertEquals(42, config.getQueryPlanCapturePeriodSecs());
-    assertEquals(560, config.getQueryPlanCaptureMaxTimeMillis());
-    assertEquals(7, config.getQueryPlanCaptureMaxCount());
+    assertTrue(settings.isQueryPlanEnable());
+    assertEquals(10000, settings.getQueryPlanThresholdMicros());
+    assertTrue(settings.isQueryPlanCapture());
+    assertEquals(42, settings.getQueryPlanCapturePeriodSecs());
+    assertEquals(560, settings.getQueryPlanCaptureMaxTimeMillis());
+    assertEquals(7, settings.getQueryPlanCaptureMaxCount());
 
-    assertThat(config.getMappingLocations()).containsExactly("classpath:/foo","bar");
+    assertThat(settings.getMappingLocations()).containsExactly("classpath:/foo","bar");
 
     config.setPersistBatch(PersistBatch.NONE);
     config.setPersistBatchOnCascade(PersistBatch.NONE);
@@ -137,19 +141,19 @@ class DatabaseConfigTest {
     props1.setProperty("ebean.notifyL2CacheInForeground", "false");
 
     config.loadFromProperties(props1);
-    assertFalse(config.isDisableL2Cache());
-    assertFalse(config.isNotifyL2CacheInForeground());
+    assertFalse(settings.isDisableL2Cache());
+    assertFalse(settings.isNotifyL2CacheInForeground());
 
-    assertEquals(PersistBatch.ALL, config.getPersistBatch());
-    assertEquals(PersistBatch.ALL, config.getPersistBatchOnCascade());
+    assertEquals(PersistBatch.ALL, settings.getPersistBatch());
+    assertEquals(PersistBatch.ALL, settings.getPersistBatchOnCascade());
 
     config.setEnabledL2Regions("r0,orgs");
-    assertEquals("r0,orgs", config.getEnabledL2Regions());
+    assertEquals("r0,orgs", settings.getEnabledL2Regions());
   }
 
   @Test
   void test_defaults() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder.Settings config = new DatabaseConfig().settings();
     assertTrue(config.isIdGeneratorAutomatic());
     assertTrue(config.isDefaultServer());
     assertFalse(config.isAutoPersistUpdates());
@@ -184,7 +188,7 @@ class DatabaseConfigTest {
   void test_putServiceObject() {
     ObjectMapper objectMapper = new ObjectMapper();
 
-    DatabaseConfig config = new DatabaseConfig();
+    var config = new DatabaseConfig().settings();
     config.putServiceObject(objectMapper);
 
     ObjectMapper mapper0 = config.getServiceObject(ObjectMapper.class);

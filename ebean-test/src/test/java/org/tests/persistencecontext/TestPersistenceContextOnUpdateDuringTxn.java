@@ -1,5 +1,6 @@
 package org.tests.persistencecontext;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
@@ -12,12 +13,9 @@ public class TestPersistenceContextOnUpdateDuringTxn extends BaseTestCase {
 
   @Test
   public void test() {
-
     Database server = DB.getDefault();
 
-    server.beginTransaction();
-    try {
-
+    try (Transaction txn = server.beginTransaction()) {
       EBasic bean1 = new EBasic();
       bean1.setName("hello");
 
@@ -33,11 +31,7 @@ public class TestPersistenceContextOnUpdateDuringTxn extends BaseTestCase {
       EBasic loadedEntity = server.find(EBasic.class, bean1.getId());
 
       assertThat(loadedEntity.getName()).isEqualTo("hello-changed");
-
-    } finally {
-      server.endTransaction();
     }
-
   }
 
 }

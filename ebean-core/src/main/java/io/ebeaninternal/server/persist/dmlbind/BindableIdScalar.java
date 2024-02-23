@@ -5,7 +5,7 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.persist.dml.GenerateDmlRequest;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -33,11 +33,6 @@ final class BindableIdScalar implements BindableId {
   @Override
   public String getIdentityColumn() {
     return uidProp.dbColumn();
-  }
-
-  @Override
-  public String toString() {
-    return uidProp.toString();
   }
 
   @Override

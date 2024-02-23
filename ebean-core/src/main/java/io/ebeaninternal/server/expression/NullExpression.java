@@ -86,7 +86,7 @@ final class NullExpression extends AbstractExpression {
     } else {
       builder.append("Null[");
     }
-    builder.append(propName).append("]");
+    builder.append(propName).append(']');
   }
 
   @Override

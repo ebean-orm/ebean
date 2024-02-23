@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.20.1-SNAPSHOT</version>
+    <version>14.0.0</version>
   </parent>
 
   <artifactId>tests</artifactId>
@@ -21,16 +21,16 @@
     <profile>
       <id>jdk16plus</id>
       <activation>
-        <jdk>[16,20]</jdk>
+        <jdk>[17,21]</jdk>
       </activation>
       <modules>
         <module>test-java16</module>
       </modules>
     </profile>
     <profile>
-      <id>jdk15less</id>
+      <id>jdk11</id>
       <activation>
-        <jdk>[8,15]</jdk>
+        <jdk>11</jdk>
       </activation>
       <modules>
         <module>test-kotlin</module>

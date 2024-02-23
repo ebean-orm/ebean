@@ -1,5 +1,8 @@
 package org.tests.model.basic.cache;
 
+import io.ebean.InTuples;
+import io.ebean.annotation.Platform;
+import io.ebean.service.SpiInTuples;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.CacheMode;
 import io.ebean.DB;
@@ -8,10 +11,12 @@ import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.test.LoggedSql;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -419,6 +424,34 @@ public class TestCacheViaComplexNaturalKey3 extends BaseTestCase {
     } else {
       assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and concat(t0.sku,':',t0.code,'-foo')");
     }
+  }
 
+  @IgnorePlatform({Platform.SQLSERVER, Platform.DB2})
+  @Test
+  public void findList_inTuples_noCache() {
+    setup();
+
+    InTuples tuples = InTuples.of("sku", "code")
+      .add("2", 1000)
+      .add("2", 1001)
+      .add("3", 1000);
+
+    LoggedSql.start();
+
+    List<OCachedNatKeyBean3> list = DB.find(OCachedNatKeyBean3.class)
+      .where()
+      .eq("store", "def")
+      .inTuples(tuples)
+      .setUseCache(false)
+      .orderBy("sku desc")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+
+    SpiInTuples spiTuples = (SpiInTuples)tuples;
+    assertThat(spiTuples.properties()).containsOnly("sku", "code");
+    assertThat(spiTuples.entries()).hasSize(3);
+    assertThat(list).hasSize(3);
+    assertSql(sql.get(0)).contains("from o_cached_natkey3 t0 where t0.store = ? and (t0.sku,t0.code) in ((?,?),(?,?),(?,?)) order by t0.sku desc;");
   }
 }

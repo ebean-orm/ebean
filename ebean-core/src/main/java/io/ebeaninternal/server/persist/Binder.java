@@ -13,7 +13,7 @@ import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.type.*;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.Collection;
@@ -119,7 +119,11 @@ public final class Binder {
             if (param.isEncryptionKey()) {
               bindLog.append("****");
             } else {
-              bindLog.append(value);
+              String sv = String.valueOf(value);
+              if (sv.length() > 50) {
+                sv = sv.substring(0, 47) + "...";
+              }
+              bindLog.append(sv);
             }
           }
           if (value instanceof Collection) {
