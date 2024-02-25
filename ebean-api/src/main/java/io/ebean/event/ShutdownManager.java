@@ -8,6 +8,7 @@ import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -23,7 +24,7 @@ public final class ShutdownManager {
 
   private static final System.Logger log = EbeanVersion.log;
   private static final ReentrantLock lock = new ReentrantLock();
-  private static final List<Database> databases = new ArrayList<>();
+  private static final List<Database> databases = Collections.synchronizedList(new ArrayList<>());
   private static final ShutdownHook shutdownHook = new ShutdownHook();
 
   private static boolean stopping;
@@ -177,12 +178,7 @@ public final class ShutdownManager {
    * Register an ebeanServer to be shutdown when the JVM is shutdown.
    */
   public static void registerDatabase(Database server) {
-    lock.lock();
-    try {
-      databases.add(server);
-    } finally {
-      lock.unlock();
-    }
+    databases.add(server);
   }
 
   /**
@@ -192,12 +188,7 @@ public final class ShutdownManager {
    * </p>
    */
   public static void unregisterDatabase(Database server) {
-    lock.lock();
-    try {
-      databases.remove(server);
-    } finally {
-      lock.unlock();
-    }
+    databases.remove(server);
   }
 
   private static class ShutdownHook extends Thread {
