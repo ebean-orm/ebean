@@ -50,6 +50,21 @@ public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
   }
 
   @Override
+  public FutureIds<T> findFutureIds() {
+    return rootQuery.findFutureIds();
+  }
+
+  @Override
+  public FutureList<T> findFutureList() {
+    return rootQuery.findFutureList();
+  }
+
+  @Override
+  public FutureRowCount<T> findFutureCount() {
+    return rootQuery.findFutureCount();
+  }
+
+  @Override
   public List<T> findList() {
     return rootQuery.findList();
   }

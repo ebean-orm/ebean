@@ -138,7 +138,10 @@ class TestRawSqlOrmQuery extends BaseTestCase {
     List<Customer> list = query.findList();
 
     int rowCount = query.findCount();
+    FutureRowCount<Customer> futureRowCount = query.findFutureCount();
+
     assertEquals(initialRowCount, rowCount);
+    assertEquals(initialRowCount, futureRowCount.get().intValue());
 
     // check that lazy loading still executes
     for (Customer customer : list) {

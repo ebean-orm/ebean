@@ -1490,6 +1490,21 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final FutureIds<T> findFutureIds() {
+    return server.findFutureIds(this);
+  }
+
+  @Override
+  public final FutureList<T> findFutureList() {
+    return server.findFutureList(this);
+  }
+
+  @Override
+  public final FutureRowCount<T> findFutureCount() {
+    return server.findFutureCount(this);
+  }
+
+  @Override
   public final PagedList<T> findPagedList() {
     return server.findPagedList(this);
   }

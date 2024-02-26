@@ -1201,6 +1201,45 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <T> FutureIds<T> findFutureIds(SpiQuery<T> query) {
+    SpiQuery<T> copy = query.copy();
+    boolean createdTransaction = false;
+    SpiTransaction transaction = query.transaction();
+    if (transaction == null) {
+      transaction = currentServerTransaction();
+      if (transaction == null) {
+        transaction = (SpiTransaction) createTransaction();
+        createdTransaction = true;
+      }
+      copy.usingTransaction(transaction);
+    }
+    QueryFutureIds<T> queryFuture = new QueryFutureIds<>(new CallableQueryIds<>(this, copy, createdTransaction));
+    backgroundExecutor.execute(queryFuture.futureTask());
+    return queryFuture;
+  }
+
+  @Override
+  public <T> FutureList<T> findFutureList(SpiQuery<T> query) {
+    SpiQuery<T> spiQuery = query.copy();
+    // FutureList query always run in it's own persistence content
+    spiQuery.setPersistenceContext(new DefaultPersistenceContext());
+    // Create a new transaction solely to execute the findList() at some future time
+    boolean createdTransaction = false;
+    SpiTransaction transaction = query.transaction();
+    if (transaction == null) {
+      transaction = currentServerTransaction();
+      if (transaction == null) {
+        transaction = (SpiTransaction) createTransaction();
+        createdTransaction = true;
+      }
+      spiQuery.usingTransaction(transaction);
+    }
+    QueryFutureList<T> queryFuture = new QueryFutureList<>(new CallableQueryList<>(this, spiQuery, createdTransaction));
+    backgroundExecutor.execute(queryFuture.futureTask());
+    return queryFuture;
+  }
+
+  @Override
   public <T> PagedList<T> findPagedList(SpiQuery<T> query) {
     int maxRows = query.getMaxRows();
     if (maxRows == 0) {
