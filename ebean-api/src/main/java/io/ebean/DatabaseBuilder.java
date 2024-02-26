@@ -87,6 +87,7 @@ public interface DatabaseBuilder {
     }
     return this;
   }
+
   /**
    * Set the name of the Database.
    */
@@ -3103,5 +3104,9 @@ public interface DatabaseBuilder {
      */
     Function<String, String> getMetricNaming();
 
+    /**
+     * Returns the length check mode.
+     */
+    LengthCheck getLengthCheck();
   }
 }

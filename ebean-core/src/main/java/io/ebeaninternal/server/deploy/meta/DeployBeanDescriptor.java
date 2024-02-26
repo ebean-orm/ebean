@@ -8,6 +8,7 @@ import io.ebean.annotation.Identity;
 import io.ebean.config.TableName;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
+import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;

@@ -1,9 +1,6 @@
 package org.tests.model.types;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
 
 import java.io.File;
 
