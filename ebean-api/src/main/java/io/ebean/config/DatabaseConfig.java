@@ -546,6 +546,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private String dumpMetricsOptions;
 
   private LengthCheck lengthCheck = LengthCheck.OFF;
+
   private Function<String, String> metricNaming = MetricNamingMatch.INSTANCE;
 
   /**

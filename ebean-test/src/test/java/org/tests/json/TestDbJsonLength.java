@@ -11,7 +11,7 @@ import java.util.Map;
 class TestDbJsonLength {
 
 
-    /**
+  /**
    * The property 'EBasicJsonMap.content' is annotated with @DbJson(length=5000). So we assume, that we cannot save Json-objects
    * where the serialized form exceed that limit and we would expect an error on save.
    * The length check works for platforms like h2, as H2 uses a 'varchar(5000)'. So it is impossible to save such long jsons,
