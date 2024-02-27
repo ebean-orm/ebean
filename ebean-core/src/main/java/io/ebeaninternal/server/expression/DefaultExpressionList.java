@@ -219,6 +219,21 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public FutureIds<T> findFutureIds() {
+    return query.findFutureIds();
+  }
+
+  @Override
+  public FutureRowCount<T> findFutureCount() {
+    return query.findFutureCount();
+  }
+
+  @Override
+  public FutureList<T> findFutureList() {
+    return query.findFutureList();
+  }
+
+  @Override
   public PagedList<T> findPagedList() {
     return query.findPagedList();
   }

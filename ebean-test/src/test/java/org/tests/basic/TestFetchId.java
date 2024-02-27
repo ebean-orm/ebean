@@ -2,6 +2,7 @@ package org.tests.basic;
 
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.FutureIds;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -29,6 +30,12 @@ public class TestFetchId extends BaseTestCase {
 
     List<Object> ids = query.findIds();
     assertThat(ids).isNotEmpty();
+
+    FutureIds<Order> futureIds = query.findFutureIds();
+
+    // wait for all the id's to be fetched
+    List<Object> idList = futureIds.get();
+    assertThat(idList).isNotEmpty();
   }
 
   @Test
@@ -46,6 +53,11 @@ public class TestFetchId extends BaseTestCase {
     List<Object> ids = query.findIds();
     // TODO: assert(query.getGeneratedSql())
     assertThat(ids).isNotEmpty();
+    FutureIds<Order> futureIds = query.findFutureIds();
+
+    // wait for all the id's to be fetched
+    List<Object> idList = futureIds.get();
+    assertThat(idList).isNotEmpty();
   }
 
   @Test
