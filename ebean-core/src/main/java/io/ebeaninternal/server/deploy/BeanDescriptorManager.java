@@ -106,6 +106,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final String asOfViewSuffix;
   private final boolean jacksonCorePresent;
   private final int queryPlanTTLSeconds;
+  private final BindMaxLength bindMaxLength;
   private int entityBeanCount;
   private List<BeanDescriptor<?>> immutableDescriptorList;
   /**
@@ -160,6 +161,19 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.changeLogListener = config.changeLogListener(bootupClasses.getChangeLogListener());
     this.changeLogRegister = config.changeLogRegister(bootupClasses.getChangeLogRegister());
     this.jacksonCorePresent = config.isJacksonCorePresent();
+    this.bindMaxLength = initMaxLength();
+  }
+
+  BindMaxLength initMaxLength() {
+    LengthCheck lengthCheck = this.config.getLengthCheck();
+    switch (lengthCheck) {
+      case OFF:
+        return null;
+      case UTF8:
+        return BindMaxLength.ofUtf8();
+      default:
+        return BindMaxLength.ofStandard();
+    }
   }
 
   @Override
@@ -1499,6 +1513,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       desc.queryPlanInit(request, list);
     }
     return list;
+  }
+
+  public BindMaxLength bindMaxLength() {
+    return bindMaxLength;
   }
 
   /**
