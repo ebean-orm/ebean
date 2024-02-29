@@ -31,12 +31,15 @@ public final class WriteJson implements SpiJsonWriter {
   private final ArrayStack<Object> parentBeans;
   private final Object objectMapper;
   private final JsonConfig.Include include;
+  private final boolean includeLoadedImplicit;
+
 
   /**
    * Construct for full bean use (normal).
    */
   public WriteJson(SpiEbeanServer server, JsonGenerator generator, FetchPath fetchPath,
-                   Map<String, JsonWriteBeanVisitor<?>> visitors, Object objectMapper, JsonConfig.Include include) {
+                   Map<String, JsonWriteBeanVisitor<?>> visitors, Object objectMapper, JsonConfig.Include include,
+                   boolean includeLoadedImplicit) {
 
     this.server = server;
     this.generator = generator;
@@ -44,6 +47,7 @@ public final class WriteJson implements SpiJsonWriter {
     this.visitors = visitors;
     this.objectMapper = objectMapper;
     this.include = include;
+    this.includeLoadedImplicit = includeLoadedImplicit;
     this.parentBeans = new ArrayStack<>();
     this.pathStack = new PathStack();
   }
@@ -54,6 +58,7 @@ public final class WriteJson implements SpiJsonWriter {
   public WriteJson(JsonGenerator generator, JsonConfig.Include include) {
     this.generator = generator;
     this.include = include;
+    this.includeLoadedImplicit = true;
     this.visitors = null;
     this.server = null;
     this.fetchPath = null;
@@ -443,7 +448,7 @@ public final class WriteJson implements SpiJsonWriter {
         currentIncludeProps = null;
       }
     }
-    return new WriteBean(desc, explicitAllProps, currentIncludeProps, bean, visitor);
+    return new WriteBean(desc, explicitAllProps, includeLoadedImplicit, currentIncludeProps, bean, visitor);
   }
 
   @Override
@@ -477,6 +482,7 @@ public final class WriteJson implements SpiJsonWriter {
   public static class WriteBean {
 
     final boolean explicitAllProps;
+    final boolean includeLoadedImplicit;
     final Set<String> currentIncludeProps;
     final BeanDescriptor<?> desc;
     final EntityBean currentBean;
@@ -485,14 +491,15 @@ public final class WriteJson implements SpiJsonWriter {
     final JsonWriteBeanVisitor visitor;
 
     WriteBean(BeanDescriptor<?> desc, EntityBean currentBean, JsonWriteBeanVisitor<?> visitor) {
-      this(desc, false, null, currentBean, visitor);
+      this(desc, false, true, null, currentBean, visitor);
     }
 
-    WriteBean(BeanDescriptor<?> desc, boolean explicitAllProps, Set<String> currentIncludeProps, EntityBean currentBean, JsonWriteBeanVisitor<?> visitor) {
+    WriteBean(BeanDescriptor<?> desc, boolean explicitAllProps, boolean includeLoadedImplicit, Set<String> currentIncludeProps, EntityBean currentBean, JsonWriteBeanVisitor<?> visitor) {
       super();
       this.desc = desc;
       this.currentBean = currentBean;
       this.explicitAllProps = explicitAllProps;
+      this.includeLoadedImplicit = includeLoadedImplicit;
       this.currentIncludeProps = currentIncludeProps;
       this.visitor = visitor;
     }
@@ -507,9 +514,11 @@ public final class WriteJson implements SpiJsonWriter {
       if (currentIncludeProps != null) {
         // explicitly controlled by pathProperties
         return currentIncludeProps.contains(prop.name());
-      } else {
+      } else if (includeLoadedImplicit){
         // include only loaded properties
         return currentBean._ebean_getIntercept().isLoadedProperty(prop.propertyIndex());
+      } else {
+        return prop.isId();
       }
     }
 

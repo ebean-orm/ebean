@@ -22,6 +22,8 @@ public class JsonWriteOptions {
 
   protected JsonConfig.Include include;
 
+  protected boolean includeLoadedImplicit = true;
+
   protected Map<String, JsonWriteBeanVisitor<?>> visitorMap;
 
   /**
@@ -71,6 +73,20 @@ public class JsonWriteOptions {
    */
   public void setInclude(JsonConfig.Include include) {
     this.include = include;
+  }
+
+  /**
+   * Should loaded properties be included implicit, if no other fetch path is specified (default = true).
+   */
+  public boolean isIncludeLoadedImplicit() {
+    return includeLoadedImplicit;
+  }
+
+  /**
+   * Set include loaded properties implicit (default = true).
+   */
+  public void setIncludeLoadedImplicit(boolean includeLoadedImplicit) {
+    this.includeLoadedImplicit = includeLoadedImplicit;
   }
 
   /**
