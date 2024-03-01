@@ -35,7 +35,9 @@ public interface BindMaxLength {
 
     @Override
     public long length(int dbLength, Object obj) {
-      if (obj instanceof String) {
+      if (obj == null) {
+        return -1;
+      } else if (obj instanceof String) {
         String s = (String) obj;
         return utf8String(dbLength, s);
       } else if (obj instanceof byte[]) {
@@ -69,7 +71,9 @@ public interface BindMaxLength {
 
     @Override
     public long length(int dbLength, Object obj) {
-      if (obj instanceof String) {
+      if (obj == null) {
+        return -1;
+      } else if (obj instanceof String) {
         return ((String) obj).length();
       } else if (obj instanceof byte[]) {
         return ((byte[]) obj).length;
