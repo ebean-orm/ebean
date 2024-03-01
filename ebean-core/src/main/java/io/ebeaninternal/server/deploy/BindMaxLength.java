@@ -35,23 +35,31 @@ public interface BindMaxLength {
 
     @Override
     public long length(int dbLength, Object obj) {
-      if (obj instanceof String) {
+      if (obj == null) {
+        return -1;
+      } else if (obj instanceof String) {
         String s = (String) obj;
-        int stringLength = s.length();
-        if (stringLength > dbLength) {
-          return stringLength;
-        } else if (stringLength * 4 <= dbLength) {
-          return -1;
-        } else {
-          return s.getBytes(StandardCharsets.UTF_8).length;
-        }
-
+        return utf8String(dbLength, s);
       } else if (obj instanceof byte[]) {
         return ((byte[]) obj).length;
       } else if (obj instanceof InputStreamInfo) {
         return ((InputStreamInfo) obj).length();
+      } else if ("org.postgresql.util.PGobject".equals(obj.getClass().getCanonicalName())) {
+        String value = ((org.postgresql.util.PGobject) obj).getValue();
+        return value == null ? -1 : utf8String(dbLength, value);
       } else {
         return -1;
+      }
+    }
+
+    private static int utf8String(int dbLength, String s) {
+      int stringLength = s.length();
+      if (stringLength > dbLength) {
+        return stringLength;
+      } else if (stringLength * 4 <= dbLength) {
+        return -1;
+      } else {
+        return s.getBytes(StandardCharsets.UTF_8).length;
       }
     }
   }
@@ -63,12 +71,17 @@ public interface BindMaxLength {
 
     @Override
     public long length(int dbLength, Object obj) {
-      if (obj instanceof String) {
+      if (obj == null) {
+        return -1;
+      } else if (obj instanceof String) {
         return ((String) obj).length();
       } else if (obj instanceof byte[]) {
         return ((byte[]) obj).length;
       } else if (obj instanceof InputStreamInfo) {
         return ((InputStreamInfo) obj).length();
+      } else if ("org.postgresql.util.PGobject".equals(obj.getClass().getCanonicalName())) {
+        String value = ((org.postgresql.util.PGobject) obj).getValue();
+        return value == null ? -1 : value.length();
       } else {
         return -1;
       }
