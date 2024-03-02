@@ -70,7 +70,6 @@ class SimpleQueryBeanWriter {
   }
 
   private void gatherPropertyDetails() {
-    importTypes.add(beanFullName);
     if (implementsInterface != null) {
       String implementsInterfaceFullName = implementsInterface.getQualifiedName().toString();
       boolean nested = implementsInterface.getNestingKind().isNested();
@@ -146,7 +145,7 @@ class SimpleQueryBeanWriter {
     writer.append("   * }</pre>").eol();
     writer.append("   */").eol();
     writer.append("  public static Q%s forFetchGroup() {", shortName).eol();
-    writer.append("    return new Q%s(io.ebean.FetchGroup.queryFor(%s.class));", shortName, shortName).eol();
+    writer.append("    return new Q%s(io.ebean.FetchGroup.queryFor(%s.class));", shortName, beanFullName).eol();
     writer.append("  }").eol();
     writer.eol();
 
@@ -154,9 +153,9 @@ class SimpleQueryBeanWriter {
     writer.append("  /** Construct using the %s Database */", name).eol();
     writer.append("  public Q%s() {", shortName).eol();
     if (dbName == null) {
-      writer.append("    super(%s.class);", shortName).eol();
+      writer.append("    super(%s.class);", beanFullName).eol();
     } else {
-      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"));", shortName, dbName).eol();
+      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"));", beanFullName, dbName).eol();
     }
     writer.append("  }").eol();
     writer.eol();
@@ -164,16 +163,16 @@ class SimpleQueryBeanWriter {
     writer.append("  /** Construct with a given transaction */").eol();
     writer.append("  public Q%s(io.ebean.Transaction transaction) {", shortName).eol();
     if (dbName == null) {
-      writer.append("    super(%s.class, transaction);", shortName).eol();
+      writer.append("    super(%s.class, transaction);", beanFullName).eol();
     } else {
-      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"), transaction);", shortName, dbName).eol();
+      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"), transaction);", beanFullName, dbName).eol();
     }
     writer.append("  }").eol();
 
     writer.eol();
     writer.append("  /** Construct with a given Database */").eol();
     writer.append("  public Q%s(io.ebean.Database database) {", shortName).eol();
-    writer.append("    super(%s.class, database);", shortName).eol();
+    writer.append("    super(%s.class, database);", beanFullName).eol();
     writer.append("  }").eol();
     writer.eol();
 
@@ -185,13 +184,13 @@ class SimpleQueryBeanWriter {
 
     writer.eol();
     writer.append("  /** Private constructor for FetchGroup building */").eol();
-    writer.append("  private Q%s(io.ebean.Query<%s> fetchGroupQuery) {", shortName, shortName).eol();
+    writer.append("  private Q%s(io.ebean.Query<%s> fetchGroupQuery) {", shortName, beanFullName).eol();
     writer.append("    super(fetchGroupQuery);").eol();
     writer.append("  }").eol();
 
     writer.eol();
     writer.append("  /** Private constructor for filterMany */").eol();
-    writer.append("  private Q%s(io.ebean.ExpressionList<%s> filter) {", shortName, shortName).eol();
+    writer.append("  private Q%s(io.ebean.ExpressionList<%s> filter) {", shortName, beanFullName).eol();
     writer.append("    super(filter);").eol();
     writer.append("  }").eol();
 
@@ -224,7 +223,7 @@ class SimpleQueryBeanWriter {
       writer.append("public final class Q%s {", shortName).eol();
     } else {
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      writer.append("public final class Q%s extends io.ebean.typequery.TQRootBean<%1$s,Q%1$s> {", shortName).eol();
+      writer.append("public final class Q%s extends io.ebean.typequery.TQRootBean<%s,Q%s> {", shortName, beanFullName, shortName).eol();
     }
     writer.eol();
   }
@@ -263,9 +262,9 @@ class SimpleQueryBeanWriter {
     writer.append("  ").append(Constants.AT_GENERATED).eol();
     writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
     if (embeddable) {
-      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssoc<%s,R> {", shortInnerName).eol();
+      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssoc<%s,R> {", beanFullName).eol();
     } else {
-      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName).eol();
+      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssocBean<%s,R,Q%s> {", beanFullName, shortInnerName).eol();
     }
     for (PropertyMeta property : properties) {
       writer.append("  ");

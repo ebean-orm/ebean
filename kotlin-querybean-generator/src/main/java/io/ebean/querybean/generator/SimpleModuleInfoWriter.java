@@ -91,7 +91,6 @@ class SimpleModuleInfoWriter {
     writer.append("import java.util.ArrayList;").eol();
     writer.append("import java.util.Collections;").eol();
     writer.append("import java.util.List;").eol();
-    writer.append("import %s;", Constants.GENERATED).eol();
     writer.eol();
     writer.append("import io.ebean.config.ModuleInfo;").eol();
     writer.append("import io.ebean.config.EntityClassRegister;").eol();

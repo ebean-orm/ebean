@@ -2,9 +2,8 @@ package io.ebean.querybean.generator;
 
 interface Constants {
 
-  String AT_GENERATED = "@Generated(\"io.ebean.querybean.kotlin-generator\")";
-  String AT_TYPEQUERYBEAN = "@TypeQueryBean(\"v1\")";
-  String GENERATED = "io.ebean.typequery.Generated";
+  String AT_GENERATED = "@io.ebean.typequery.Generated(\"io.ebean.querybean.kotlin-generator\")";
+  String AT_TYPEQUERYBEAN = "@io.ebean.typequery.TypeQueryBean(\"v1\")";
 
   String MAPPED_SUPERCLASS = "jakarta.persistence.MappedSuperclass";
   String DISCRIMINATOR_VALUE = "jakarta.persistence.DiscriminatorValue";
@@ -19,16 +18,9 @@ interface Constants {
   String DBJSONB = "io.ebean.annotation.DbJsonB";
   String DBNAME = "io.ebean.annotation.DbName";
 
-  String TQROOTBEAN = "io.ebean.typequery.TQRootBean";
   String TQASSOC = "io.ebean.typequery.TQAssoc";
   String TQASSOCBEAN = "io.ebean.typequery.TQAssocBean";
   String TQPROPERTY = "io.ebean.typequery.TQProperty";
-  String TYPEQUERYBEAN = "io.ebean.typequery.TypeQueryBean";
-  String DATABASE = "io.ebean.Database";
-  String DB = "io.ebean.DB";
-  String FETCHGROUP = "io.ebean.FetchGroup";
-  String QUERY = "io.ebean.Query";
-  String TRANSACTION = "io.ebean.Transaction";
 
   String MODULEINFO = "io.ebean.config.ModuleInfo";
   String METAINF_MANIFEST = "META-INF/ebean-generated-info.mf";
