@@ -15,9 +15,9 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <ebean-maven-plugin.version>13.13.0</ebean-maven-plugin.version>
-    <kotlin.version>1.8.10</kotlin.version>
-    <jackson.version>2.12.1</jackson.version>
+    <ebean-maven-plugin.version>14.0.0</ebean-maven-plugin.version>
+    <kotlin.version>1.9.22</kotlin.version>
+    <jackson.version>2.16.1</jackson.version>
   </properties>
 
   <dependencies>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.3.12</version>
+      <version>1.5.0</version>
     </dependency>
     <dependency>
       <groupId>javax.validation</groupId>
@@ -91,7 +91,8 @@
                 <annotationProcessorPath>
                   <groupId>io.ebean</groupId>
                   <artifactId>kotlin-querybean-generator</artifactId>
-                  <version>13.14.0</version>
+<!--                  <artifactId>querybean-generator</artifactId>-->
+                  <version>14.0.0</version>
                 </annotationProcessorPath>
               </annotationProcessorPaths>
             </configuration>
