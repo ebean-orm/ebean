@@ -2,7 +2,6 @@ package org.tests.json.include;
 
 import io.ebean.DB;
 import io.ebean.FetchPath;
-import io.ebean.annotation.Transactional;
 import io.ebean.config.JsonConfig;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonWriteOptions;
@@ -12,13 +11,11 @@ import org.tests.model.basic.ResetBasicData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestJsonImplicitLoaded {
+class TestJsonImplicitLoaded {
 
   @Test
-  @Transactional
-  public void testToBeanToJson() throws Exception {
+  void testToBeanToJson() {
     ResetBasicData.reset();
-
 
     FetchPath path = PathProperties.parse("*");
     Contact bean = DB.find(Contact.class).setId(1).apply(path).findOne();
@@ -34,8 +31,6 @@ public class TestJsonImplicitLoaded {
     bean.getCustomer().getName(); // lazy-load bean;
     asJson = DB.json().toJson(bean, options);
     assertThat(asJson).contains("customer\":{\"id\":1}"); // expect the same result
-
-
   }
 
 }
