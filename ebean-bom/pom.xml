@@ -113,13 +113,13 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-joda-time</artifactId>
-        <version>13.24.0</version>
+        <version>14.0.0</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-jackson-jsonnode</artifactId>
-        <version>13.24.0</version>
+        <version>14.0.0</version>
       </dependency>
 
       <dependency>
@@ -137,19 +137,19 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-externalmapping-api</artifactId>
-        <version>13.18.0</version>
+        <version>14.0.0</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-externalmapping-xml</artifactId>
-        <version>13.18.0</version>
+        <version>14.0.0</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-autotune</artifactId>
-        <version>13.18.0</version>
+        <version>14.0.0</version>
       </dependency>
 
       <dependency>
