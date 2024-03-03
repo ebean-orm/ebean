@@ -52,7 +52,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-externalmapping-api</artifactId>
-      <version>13.18.0</version>
+      <version>14.0.0</version>
     </dependency>
 
     <dependency>
