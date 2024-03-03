@@ -21,7 +21,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test-containers</artifactId>
-      <version>6.3</version>
+      <version>${ebean-test-containers.version}</version>
       <scope>test</scope>
     </dependency>
 
