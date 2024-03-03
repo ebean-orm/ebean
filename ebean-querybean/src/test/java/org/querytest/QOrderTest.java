@@ -1,6 +1,7 @@
 package org.querytest;
 
 import io.ebean.DB;
+import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
@@ -8,6 +9,7 @@ import org.example.domain.Customer;
 import org.example.domain.Order;
 import org.example.domain.OrderDetail;
 import org.example.domain.otherpackage.PhoneNumber;
+import org.example.domain.query.QContact;
 import org.example.domain.query.QCustomer;
 import org.example.domain.query.QOrder;
 import org.example.domain.query.QOrderDetail;
@@ -26,8 +28,15 @@ public class QOrderTest {
 
   private static final QOrder or = QOrder.alias();
 
+  private static final QContact co = QContact.alias();
+
   private static final FetchGroup<Customer> fgC = QCustomer.forFetchGroup()
     .select(cu.name, cu.phoneNumber)
+    .buildFetchGroup();
+
+  private static final FetchGroup<Customer> fgCustomerWithContacts = QCustomer.forFetchGroup()
+    .select(cu.name, cu.phoneNumber)
+    .contacts.fetch(FetchConfig.ofQuery(1000), co.firstName, co.lastName, co.email)
     .buildFetchGroup();
 
   private static final FetchGroup<Order> fgNested1 = QOrder.forFetchGroup()
@@ -68,6 +77,20 @@ public class QOrderTest {
   public static void after() {
     DB.delete(order);
     DB.delete(customer);
+  }
+
+  @Test
+  void fetchQueryWithBatch() {
+    LoggedSql.start();
+
+    new QCustomer()
+      .select(fgCustomerWithContacts)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select t0.id, t0.name, t0.phone_number from be_customer t0");
+    assertThat(sql.get(1)).contains("select t0.customer_id, t0.id, t0.first_name, t0.last_name, t0.email from be_contact t0 where");
   }
 
   @Test
