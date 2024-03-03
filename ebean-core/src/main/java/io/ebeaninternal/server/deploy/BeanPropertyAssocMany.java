@@ -360,6 +360,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     for (ExportedProperty exportedProperty : exportedProperties) {
       row.addColumn(exportedProperty.getForeignDbColumn());
     }
+    if (importedId == null) {
+      throw new PersistenceException("Missing @Id property on bean related to ManyToMany " + fullName());
+    }
     importedId.buildImport(row);
     return row.build();
   }

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.0.0</version>
+    <version>14.0.1</version>
     <relativePath>../..</relativePath>
   </parent>
 
@@ -15,20 +15,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>14.0.0</version>
+      <version>14.0.1</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test-containers</artifactId>
-      <version>6.3</version>
+      <version>${ebean-test-containers.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.6.0</version>
+      <version>42.7.2</version>
       <scope>test</scope>
     </dependency>
 

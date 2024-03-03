@@ -531,6 +531,8 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
 
   private String dumpMetricsOptions;
 
+  private LengthCheck lengthCheck = LengthCheck.OFF;
+
   private Function<String, String> metricNaming = MetricNamingMatch.INSTANCE;
 
   /**
@@ -2124,6 +2126,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
+    lengthCheck = p.getEnum(LengthCheck.class, "lengthCheck", lengthCheck);
 
     uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
     uuidStateFile = p.get("uuidStateFile", uuidStateFile);
@@ -2497,6 +2500,19 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public DatabaseConfig setMetricNaming(Function<String, String> metricNaming) {
     this.metricNaming = metricNaming;
+    return this;
+  }
+
+  /**
+   * Returns the length check mode.
+   */
+  public LengthCheck getLengthCheck() {
+    return lengthCheck;
+  }
+
+  @Override
+  public DatabaseConfig lengthCheck(LengthCheck lengthCheck) {
+    this.lengthCheck = lengthCheck;
     return this;
   }
 
