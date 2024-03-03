@@ -108,6 +108,18 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
     return fetchWithProperties(FETCH_DEFAULT, properties);
   }
 
+
+  /**
+   * Fetch this association with config for the type of fetch and the specified properties.
+   *
+   * @param config Fetch configuration to define the type of fetch to use
+   * @param properties The properties to fetch
+   */
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetch(FetchConfig config, TQProperty<QB,?>... properties) {
+    return fetchWithProperties(config, properties);
+  }
+
   /**
    * Eagerly fetch this association using a 'query join' loading the specified properties.
    */
