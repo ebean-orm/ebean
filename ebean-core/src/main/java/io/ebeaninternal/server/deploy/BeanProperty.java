@@ -41,8 +41,8 @@ import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 import io.ebeanservice.docstore.api.support.DocStructure;
-
 import jakarta.persistence.PersistenceException;
+
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -1189,7 +1189,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     switch (dbType) {
       case DbPlatformType.JSON:
       case DbPlatformType.JSONB:
-        return dbLength == 0; // must be analog to DbPlatformTypeMapping.lookup
+        return dbLength == 0 || dbLength > 255; // must be analog to DbPlatformTypeMapping.lookup
       case DbPlatformType.JSONBlob:
       case DbPlatformType.JSONClob:
         return true;
