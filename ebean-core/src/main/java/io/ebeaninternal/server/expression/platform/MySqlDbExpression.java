@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression.platform;
 
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.expression.Op;
 
 /**
@@ -9,7 +8,7 @@ import io.ebeaninternal.server.expression.Op;
 final class MySqlDbExpression extends BasicDbExpression {
 
   @Override
-  public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
+  public void json(DbExpressionRequest request, String propName, String path, Op operator, Object value) {
     request.append('(').property(propName).append(" ->> '$.").append(path).append("')").append(operator.bind());
   }
 
