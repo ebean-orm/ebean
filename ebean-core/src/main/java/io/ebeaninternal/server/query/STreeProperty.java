@@ -33,7 +33,7 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   /**
    * Returns true, if this is a lob property from db-perspective.
    */
-  boolean isDbLob();
+  boolean isLobForPlatform();
 
   /**
    * Return true if the property is an embedded type.
