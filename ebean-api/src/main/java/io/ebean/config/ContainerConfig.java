@@ -1,8 +1,5 @@
 package io.ebean.config;
 
-import io.avaje.config.Config;
-import io.avaje.config.Configuration;
-
 import java.util.Properties;
 
 /**
@@ -19,16 +16,6 @@ public class ContainerConfig {
   private String podName;
   private int port;
   private Properties properties;
-  private Configuration configuration;
-
-  public ContainerConfig() {
-    this.configuration = Config.asConfiguration();
-    this.active = configuration.getBool("ebean.cluster.active", active);
-    this.serviceName = configuration.getNullable("ebean.cluster.serviceName", serviceName);
-    this.namespace = configuration.getNullable("ebean.cluster.namespace", namespace);
-    this.podName = configuration.getNullable("ebean.cluster.podName", podName);
-    this.port = configuration.getInt("ebean.cluster.port", 0);
-  }
 
   /**
    * Return the service name.
@@ -104,7 +91,7 @@ public class ContainerConfig {
    * Return the deployment properties.
    */
   public Properties getProperties() {
-    return properties != null ? properties : configuration.asProperties();
+    return properties;
   }
 
   /**
@@ -114,4 +101,25 @@ public class ContainerConfig {
     this.properties = properties;
   }
 
+  /**
+   * Load the settings from properties.
+   */
+  public void loadFromProperties(Properties properties) {
+    this.properties = properties;
+    this.active = getProperty(properties, "ebean.cluster.active", active);
+    this.serviceName = properties.getProperty("ebean.cluster.serviceName", serviceName);
+    this.namespace = properties.getProperty("ebean.cluster.namespace", namespace);
+    this.podName = properties.getProperty("ebean.cluster.podName", podName);
+    String portParam = properties.getProperty("ebean.cluster.port");
+    if (portParam != null) {
+      this.port = Integer.parseInt(portParam);
+    }
+  }
+
+  /**
+   * Return the boolean property setting.
+   */
+  protected boolean getProperty(Properties properties, String key, boolean defaultValue) {
+    return "true".equalsIgnoreCase(properties.getProperty(key, Boolean.toString(defaultValue)));
+  }
 }
