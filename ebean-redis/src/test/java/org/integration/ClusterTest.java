@@ -1,12 +1,9 @@
 package org.integration;
 
-import io.ebean.DatabaseBuilder;
-import io.ebean.redis.DuelCache;
-import org.domain.Person;
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.redis.DuelCache;
+import org.domain.Person;
 import org.domain.query.QPerson;
 import org.junit.jupiter.api.Test;
 
@@ -14,21 +11,21 @@ import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ClusterTest {
+class ClusterTest {
 
   private Database createOther(DataSource dataSource) {
-    DatabaseBuilder config = new DatabaseConfig();
-    config.setDataSource(dataSource);
-    config.loadFromProperties();
-    config.setDefaultServer(false);
-    config.setName("other");
-    config.setDdlGenerate(false);
-    config.setDdlRun(false);
-    return DatabaseFactory.create(config);
+    return Database.builder()
+      .dataSource(dataSource)
+      .loadFromProperties()
+      .defaultDatabase(false)
+      .name("other")
+      .ddlGenerate(false)
+      .ddlRun(false)
+      .build();
   }
 
   @Test
-  public void testBothNear() throws InterruptedException {
+  void testBothNear() throws InterruptedException {
     // ensure the default server exists first
     final Database db = DB.getDefault();
     Database other = createOther(db.pluginApi().dataSource());
@@ -61,7 +58,7 @@ public class ClusterTest {
   }
 
   @Test
-  public void test() throws InterruptedException {
+  void test() throws InterruptedException {
     // ensure the default server exists first
     final Database db = DB.getDefault();
     Database other = createOther(db.pluginApi().dataSource());
@@ -116,6 +113,6 @@ public class ClusterTest {
   }
 
   private void allowAsyncMessaging() throws InterruptedException {
-    Thread.sleep(100);
+    Thread.sleep(200);
   }
 }
