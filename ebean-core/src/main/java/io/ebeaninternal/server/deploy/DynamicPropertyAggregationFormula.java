@@ -63,7 +63,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   }
 
   @Override
-  public boolean isDbLob() {
+  public boolean isLobForPlatform() {
     return false;
   }
 
