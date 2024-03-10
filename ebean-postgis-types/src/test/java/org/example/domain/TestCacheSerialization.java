@@ -2,8 +2,8 @@ package org.example.domain;
 
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
-import org.postgis.Point;
-import org.postgis.Polygon;
+import net.postgis.jdbc.geometry.Point;
+import net.postgis.jdbc.geometry.Polygon;
 
 import java.sql.SQLException;
 
