@@ -2,11 +2,13 @@ package org.tests.model.history;
 
 import io.ebean.DB;
 import io.ebean.annotation.Platform;
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,6 +34,30 @@ class TestHistoryOneToOne extends BaseTestCase {
     findViaLess_fetch();
     findViaHistory_fetch();
   }
+
+  @IgnorePlatform({Platform.ORACLE, Platform.COCKROACH})
+  @Test
+  void testVersionsWithHistoryOverHistoryless() throws InterruptedException {
+    HistorylessOneToOne historylessOneToOne = new HistorylessOneToOne("less");
+    historylessOneToOne.setHistoryOneToOne(new HistoryOneToOne("one"));
+    historylessOneToOne.setHistoryManyToOne(new HistoryManyToOne("many"));
+    DB.save(historylessOneToOne);
+
+    LoggedSql.start();
+    int count = DB.find(HistoryOneToOne.class)
+      .where()
+      .eq("historylessOneToOne.historyManyToOne.deleted", false)
+      .findVersions()
+      .size();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(count)
+      .describedAs("sql was: " + sql.get(0))
+      .isEqualTo(1);
+    assertSql(sql.get(0)).contains("this does not exist");
+  }
+
+
 
   private void findViaLess() {
     HistorylessOneToOne lessFetched = DB.find(HistorylessOneToOne.class)
