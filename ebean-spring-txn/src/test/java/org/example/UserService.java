@@ -16,4 +16,6 @@ public interface UserService {
 	void batchInsert();
 
 	void requiresNew();
+
+  void insideTestRollback(long oid);
 }
