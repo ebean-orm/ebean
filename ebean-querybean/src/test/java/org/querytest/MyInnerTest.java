@@ -68,9 +68,9 @@ class MyInnerTest {
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(4);
-    assertThat(sql.get(0)).contains("select /* MyInnerTest.insert_and_find */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.one = ?;");
-    assertThat(sql.get(1)).contains("select /* MyInnerTest.insert_and_find */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.description = ?;");
-    assertThat(sql.get(2)).contains("select /* MyInnerTest.insert_and_find */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.id < ? and t0.description = ?;");
-    assertThat(sql.get(3)).contains("select /* MyInnerTest.insert_and_find */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.id < ? and t0.one > ? and t0.one >= ? and t0.one < ? and t0.one <= ? and t0.id > ?;");
+    assertThat(sql.get(0)).contains("select /* MyInnerTest.insert_and_find:36 */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.one = ?;");
+    assertThat(sql.get(1)).contains("select /* MyInnerTest.insert_and_find:43 */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.description = ?;");
+    assertThat(sql.get(2)).contains("select /* MyInnerTest.insert_and_find:54 */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.id < ? and t0.description = ?;");
+    assertThat(sql.get(3)).contains("select /* MyInnerTest.insert_and_find:65 */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.id < ? and t0.one > ? and t0.one >= ? and t0.one < ? and t0.one <= ? and t0.id > ?;");
   }
 }

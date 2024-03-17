@@ -622,14 +622,9 @@ final class CQueryBuilder {
       }
       final var profileLocation = query.profileLocation();
       if (profileLocation != null) {
-        return dbPlatform.inlineSqlComment(trimLabel(profileLocation.label()));
+        return dbPlatform.inlineSqlComment(profileLocation.label());
       }
       return "";
-    }
-
-    private String trimLabel(String label) {
-      int pos = label.indexOf(':');
-      return pos == -1 ? label : label.substring(0, pos);
     }
 
     private void appendFrom() {
