@@ -2210,6 +2210,15 @@ public interface DatabaseBuilder {
   DatabaseBuilder setLoadModuleInfo(boolean loadModuleInfo);
 
   /**
+   * Set if generated SQL SELECT should include the query label as an
+   * inline SQL comment (to help reference back from the SQL to the code
+   * that executed the query.
+   *
+   * @param includeLabelInSql When true include a SQL inline comment in generated SELECT queries.
+   */
+  DatabaseConfig includeLabelInSql(boolean includeLabelInSql);
+
+  /**
    * Set the naming convention to apply to metrics names.
    */
   default DatabaseBuilder metricNaming(Function<String, String> metricNaming) {
@@ -3103,6 +3112,12 @@ public interface DatabaseBuilder {
      * scanning to find and register entity classes.
      */
     boolean isLoadModuleInfo();
+
+    /**
+     * Return true if generated sql select query should include an inline sql comment with the
+     * query label or profile location label.
+     */
+    boolean isIncludeLabelInSql();
 
     /**
      * Return the naming convention to apply to metrics names.

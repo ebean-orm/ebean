@@ -1,9 +1,6 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.CountDistinctOrder;
-import io.ebean.Query;
-import io.ebean.RawSql;
-import io.ebean.RawSqlBuilder;
+import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.SqlLimitRequest;
@@ -52,11 +49,13 @@ final class CQueryBuilder {
   private final CQueryDraftSupport draftSupport;
   private final DatabasePlatform dbPlatform;
   private final boolean selectCountWithColumnAlias;
+  private final boolean includeLabelInSql;
 
   /**
    * Create the SqlGenSelect.
    */
-  CQueryBuilder(DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+  CQueryBuilder(DatabaseBuilder.Settings config, DatabasePlatform dbPlatform, Binder binder, CQueryHistorySupport historySupport, CQueryDraftSupport draftSupport) {
+    this.includeLabelInSql = config.isIncludeLabelInSql();
     this.dbPlatform = dbPlatform;
     this.binder = binder;
     this.draftSupport = draftSupport;
@@ -596,7 +595,7 @@ final class CQueryBuilder {
     }
 
     private void appendSelectDistinct() {
-      sb.append("select ");
+      sb.append("select ").append(inlineSqlComment());
       if (distinct && !countSingleAttribute) {
         if (request.isInlineCountDistinct()) {
           sb.append("count(");
@@ -607,6 +606,25 @@ final class CQueryBuilder {
           sb.append("on (").append(distinctOn).append(") ");
         }
       }
+    }
+
+    private String inlineSqlComment() {
+      if (!includeLabelInSql) {
+        return "";
+      }
+      SpiQuery.Type type = query.type();
+      if (type == SpiQuery.Type.SQ_EX || type == SpiQuery.Type.SQ_EXISTS) {
+        return "";
+      }
+      final var label = query.label();
+      if (label != null) {
+        return dbPlatform.inlineSqlComment(label);
+      }
+      final var profileLocation = query.profileLocation();
+      if (profileLocation != null) {
+        return dbPlatform.inlineSqlComment(profileLocation.label());
+      }
+      return "";
     }
 
     private void appendFrom() {

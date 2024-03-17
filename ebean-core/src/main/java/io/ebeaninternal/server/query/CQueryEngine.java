@@ -44,7 +44,7 @@ public final class CQueryEngine {
     this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.forwardOnlyHintOnFindIterate();
     this.historySupport = new CQueryHistorySupport(dbPlatform.historySupport(), asOfTableMapping, config.getAsOfSysPeriod());
-    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
+    this.queryBuilder = new CQueryBuilder(config, dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
   }
 
   public int forwardOnlyFetchSize() {

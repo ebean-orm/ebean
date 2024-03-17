@@ -62,6 +62,7 @@ public class QCustomerAndOrTest {
   @Test
   public void testOrWithExists() {
     QCustomer query = Customer.find.typed()
+      .setLabel("hiLabel")
       .alias("_cust")
       .or()
       .name.eq("Superman")
@@ -72,12 +73,12 @@ public class QCustomerAndOrTest {
         .query()
       )
       .endOr()
-      .select(QCustomer.alias().id);
+      .select(QCustomer.Alias.id);
 
     query.findList();
 
     assertThat(query.getGeneratedSql()).isEqualTo(
-      "select _cust.id from be_customer _cust where (" +
+      "select /* hiLabel */ _cust.id from be_customer _cust where (" +
         "_cust.name = ? or exists (select 1 from be_contact contact where " +
         "contact.first_name = ? and contact.customer_id = _cust.id))"
     );
