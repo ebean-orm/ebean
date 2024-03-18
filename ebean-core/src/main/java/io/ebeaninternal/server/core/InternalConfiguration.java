@@ -96,6 +96,7 @@ public final class InternalConfiguration {
   private final ExtraMetrics extraMetrics = new ExtraMetrics();
   private ServerCacheNotify cacheNotify;
   private boolean localL2Caching;
+  private final DataSourceSupplier dataSourceSupplier;
 
   InternalConfiguration(boolean online, ClusterManager clusterManager, SpiBackgroundExecutor backgroundExecutor,
                         DatabaseBuilder.Settings config, BootupClasses bootupClasses) {
@@ -123,6 +124,7 @@ public final class InternalConfiguration {
 
     final InternalConfigXmlMap xmlMap = initExternalMapping();
     this.dtoBeanManager = new DtoBeanManager(typeManager, xmlMap.readDtoMapping());
+    this.dataSourceSupplier = createDataSourceSupplier();
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlMap.xmlDeployment());
     Map<String, String> draftTableMap = beanDescriptorManager.draftTableMap();
@@ -315,6 +317,10 @@ public final class InternalConfiguration {
     return new DefaultPersister(server, binder, beanDescriptorManager);
   }
 
+  public DataSourceSupplier getDataSourceSupplier() {
+    return dataSourceSupplier;
+  }
+
   public SpiCacheManager getCacheManager() {
     return cacheManager;
   }
@@ -389,7 +395,7 @@ public final class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
-        indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
+        indexUpdateProcessor, beanDescriptorManager, getDataSourceSupplier(), profileHandler(), logManager,
         tableModState, cacheNotify, clockService);
 
     if (config.isDocStoreOnly()) {
@@ -414,7 +420,7 @@ public final class InternalConfiguration {
   /**
    * Return the DataSource supplier based on the tenancy mode.
    */
-  private DataSourceSupplier dataSource() {
+  private DataSourceSupplier createDataSourceSupplier() {
     switch (config.getTenantMode()) {
       case DB:
       case DB_WITH_MASTER:
