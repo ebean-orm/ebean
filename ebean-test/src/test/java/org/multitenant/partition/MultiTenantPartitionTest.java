@@ -5,6 +5,9 @@ import io.ebean.DatabaseFactory;
 import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantMode;
+import io.ebean.meta.MetaQueryPlan;
+import io.ebean.meta.QueryPlanInit;
+import io.ebean.meta.QueryPlanRequest;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterAll;
@@ -23,12 +26,13 @@ class MultiTenantPartitionTest extends BaseTestCase {
   static List<MtTenant> tenants() {
     List<MtTenant> tenants = new ArrayList<>();
     for (int i = 0; i < 5; i++) {
-      tenants.add(new MtTenant("ten_"+i, names[i], names[i]+"@foo.com".toLowerCase()));
+      tenants.add(new MtTenant("ten_" + i, names[i], names[i] + "@foo.com".toLowerCase()));
     }
     return tenants;
   }
 
   private static final Database server = init();
+
   static {
     server.saveAll(tenants());
   }
@@ -76,6 +80,41 @@ class MultiTenantPartitionTest extends BaseTestCase {
 
     LoggedSql.stop();
   }
+
+  @Test
+  void queryPlanCapture() throws InterruptedException {
+
+    QueryPlanRequest request = new QueryPlanRequest();
+    request.maxCount(1_000);
+    request.maxTimeMillis(10_000);
+    server.metaInfo().queryPlanCollectNow(request);
+
+    QueryPlanInit init = new QueryPlanInit();
+    init.setAll(true);
+    init.thresholdMicros(1);
+    server.metaInfo().queryPlanInit(init);
+
+    try {
+
+      // run queries again
+      UserContext.set("rob", "ten_1");
+      server.find(MtContent.class).findList();
+
+      UserContext.set("fred", "ten_2");
+      server.find(MtContent.class).setId(2).findOne();
+
+      // obtains db query plans ...
+      List<MetaQueryPlan> plans0 = server.metaInfo().queryPlanCollectNow(request);
+      assertThat(plans0).isNotEmpty();
+
+      assertThat(plans0).extracting(MetaQueryPlan::tenantId).containsExactlyInAnyOrder("ten_1", "ten_2");
+    } finally {
+      // disable capturing
+      init.thresholdMicros(Long.MAX_VALUE);
+      server.metaInfo().queryPlanInit(init);
+    }
+  }
+
 
   @Test
   void deleteById() {
