@@ -80,6 +80,19 @@ class QOrderTest {
   }
 
   @Test
+  void hint() {
+    LoggedSql.start();
+    new QCustomer()
+      .setHint("FirstRows")
+      .select(QCustomer.Alias.id, QCustomer.Alias.name)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select /*+ FirstRows */ /* QOrderTest.hint */ t0.id, t0.name from be_customer t0");
+  }
+
+  @Test
   void fetchQueryWithBatch() {
     LoggedSql.start();
 

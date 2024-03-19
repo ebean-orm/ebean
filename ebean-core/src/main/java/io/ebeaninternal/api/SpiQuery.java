@@ -227,6 +227,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   ProfileLocation profileLocation();
 
   /**
+   * Return the SQL hint to include in the query.
+   */
+  String hint();
+
+  /**
    * Return the label set on the query.
    */
   String label();

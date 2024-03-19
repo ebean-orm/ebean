@@ -776,4 +776,8 @@ public class DatabasePlatform {
     }
     return "/* " + label + " */ ";
   }
+
+  public String inlineSqlHint(String hint) {
+    return "/*+ " + hint + " */ ";
+  }
 }

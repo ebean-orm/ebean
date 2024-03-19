@@ -133,6 +133,11 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
     return this;
   }
 
+  @Override
+  public Query<T> setHint(String hint) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
   // Everything else deemed invalid
 
   @Override
