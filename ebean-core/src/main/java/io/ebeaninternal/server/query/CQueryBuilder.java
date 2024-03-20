@@ -595,7 +595,7 @@ final class CQueryBuilder {
     }
 
     private void appendSelectDistinct() {
-      sb.append("select ").append(inlineSqlComment());
+      sb.append("select ").append(hint()).append(inlineSqlComment());
       if (distinct && !countSingleAttribute) {
         if (request.isInlineCountDistinct()) {
           sb.append("count(");
@@ -606,6 +606,11 @@ final class CQueryBuilder {
           sb.append("on (").append(distinctOn).append(") ");
         }
       }
+    }
+
+    private String hint() {
+      String hint = query.hint();
+      return hint == null ? "" : dbPlatform.inlineSqlHint(hint);
     }
 
     private String inlineSqlComment() {

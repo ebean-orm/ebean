@@ -913,6 +913,17 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Set a SQL query hint.
+   * <p>
+   * This results in an inline comment that immediately follows
+   * after the select keyword in the form: {@code /*+ hint *\/ }
+   */
+  public R setHint(String hint) {
+    query.setHint(hint);
+    return root;
+  }
+
+  /**
    * Set the profile location.
    * <p>
    * This is typically set automatically via enhancement when profile location enhancement

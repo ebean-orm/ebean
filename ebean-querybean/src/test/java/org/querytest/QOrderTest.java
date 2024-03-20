@@ -80,6 +80,19 @@ class QOrderTest {
   }
 
   @Test
+  void hint() {
+    LoggedSql.start();
+    new QCustomer()
+      .setHint("FirstRows")
+      .select(QCustomer.Alias.id, QCustomer.Alias.name)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select /*+ FirstRows */ /* QOrderTest.hint */ t0.id, t0.name from be_customer t0");
+  }
+
+  @Test
   void fetchQueryWithBatch() {
     LoggedSql.start();
 
@@ -159,8 +172,7 @@ class QOrderTest {
 
   @Test
   void viaFetchGraph_withNested_fetchQuery() {
-
-    DB.getDefault();
+    DB.cacheManager().clearAll();
     LoggedSql.start();
 
     final Order found = new QOrder()
@@ -181,8 +193,7 @@ class QOrderTest {
 
   @Test
   void viaFetchGraph_withNested_fetchCache() {
-
-    DB.getDefault();
+    DB.cacheManager().clearAll();
 
     // ensure the customer is loaded in the L2 cache
     new QCustomer().id.eq(customer.getId()).findOne();

@@ -1602,6 +1602,14 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setLabel(String label);
 
   /**
+   * Set a SQL query hint.
+   * <p>
+   * This results in an inline comment that immediately follows
+   * after the select keyword in the form: {@code /*+ hint *\/ }
+   */
+  Query<T> setHint(String hint);
+
+  /**
    * Set to true if this query should execute against the doc store.
    * <p>
    * When setting this you may also consider disabling lazy loading.
