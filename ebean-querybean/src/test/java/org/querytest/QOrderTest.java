@@ -172,8 +172,7 @@ class QOrderTest {
 
   @Test
   void viaFetchGraph_withNested_fetchQuery() {
-
-    DB.getDefault();
+    DB.cacheManager().clearAll();
     LoggedSql.start();
 
     final Order found = new QOrder()
@@ -194,8 +193,7 @@ class QOrderTest {
 
   @Test
   void viaFetchGraph_withNested_fetchCache() {
-
-    DB.getDefault();
+    DB.cacheManager().clearAll();
 
     // ensure the customer is loaded in the L2 cache
     new QCustomer().id.eq(customer.getId()).findOne();
