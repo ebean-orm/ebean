@@ -588,10 +588,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
-   * Set the join properties from the parent bean to the child bean.
-   * This is only valid for OneToMany and NOT valid for ManyToMany.
+   * Set the parent bean to the child (update the relationship).
    */
-  public void setJoinValuesToChild(EntityBean parent, EntityBean child, Object mapKeyValue) {
+  public void setParentToChild(EntityBean parent, EntityBean child, Object mapKeyValue) {
     if (mapKeyProperty != null) {
       mapKeyProperty.setValue(child, mapKeyValue);
     }
@@ -600,6 +599,31 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       // exists on the 'detail' bean
       childMasterProperty.setValueIntercept(child, parent);
     }
+  }
+
+  /**
+   * Return true if the parent bean has been set to the child (updated the relationship).
+   */
+  public boolean setParentToChild(EntityBean parent, EntityBean child, Object mapKeyValue, BeanDescriptor<?> parentDesc) {
+    if (manyToMany
+      || childMasterProperty == null
+      || !child._ebean_getIntercept().isLoadedProperty(childMasterProperty.propertyIndex())) {
+      return false;
+    }
+
+    Object currentParent = childMasterProperty.getValue(child);
+    if (currentParent != null) {
+      Object newId = parentDesc.getId(parent);
+      Object oldId = parentDesc.id(currentParent);
+      if (Objects.equals(newId, oldId)) {
+        return false;
+      }
+    }
+    childMasterProperty.setValueIntercept(child, parent);
+    if (mapKeyProperty != null) {
+      mapKeyProperty.setValue(child, mapKeyValue);
+    }
+    return true;
   }
 
   /**
