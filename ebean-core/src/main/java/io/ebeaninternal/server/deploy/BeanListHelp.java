@@ -1,16 +1,12 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,19 +19,11 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
     super(many);
   }
 
-  BeanListHelp() {
-    super();
-  }
-
   @Override
-  public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
+  public final BeanCollectionAdd collectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanList<?>) {
       BeanList<?> bl = (BeanList<?>) bc;
-      if (bl.actualList() == null) {
-        bl.setActualList(new ArrayList<>());
-      }
-      return bl;
-
+      return bl.collectionAdd();
     } else {
       throw new RuntimeException("Unhandled type " + bc);
     }
@@ -67,20 +55,20 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
     return beanList;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {
-    BeanList<?> newBeanList = (BeanList<?>) bc;
+    BeanList<T> newBeanList = (BeanList<T>) bc;
     List<?> currentList = (List<?>) many.getValue(parentBean);
     newBeanList.setModifyListening(many.modifyListenMode());
     if (currentList == null) {
       // the currentList is null? Not really expecting this...
       many.setValue(parentBean, newBeanList);
 
-    } else if (currentList instanceof BeanList<?>) {
+    } else if (currentList instanceof BeanList) {
       // normally this case, replace just the underlying list
-      BeanList<?> currentBeanList = (BeanList<?>) currentList;
-      currentBeanList.setActualList(newBeanList.actualList());
-      currentBeanList.setModifyListening(many.modifyListenMode());
+      BeanList<T> currentBeanList = (BeanList<T>) currentList;
+      currentBeanList.refresh(many.modifyListenMode(), newBeanList);
 
     } else {
       // replace the entire list with the BeanList

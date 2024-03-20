@@ -122,7 +122,7 @@ public final class DeployCreateProperties {
       return new DeployBeanProperty(desc, propertyType, field.getGenericType());
     }
     // check for Collection type (list, set or map)
-    ManyType manyType = determineManyType.getManyType(propertyType);
+    ManyType manyType = determineManyType.manyType(propertyType);
     if (manyType != null) {
       // List, Set or Map based object
       Class<?> targetType = determineTargetType(field);

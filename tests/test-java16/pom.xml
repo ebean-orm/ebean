@@ -11,7 +11,7 @@
   <artifactId>test-java16</artifactId>
 
   <properties>
-    <java.release>16</java.release>
+    <maven.compiler.release>21</maven.compiler.release>
   </properties>
 
   <dependencies>
@@ -52,7 +52,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.22.0</tile>
+            <tile>io.ebean.tile:enhancement:13.26.0</tile>
           </tiles>
         </configuration>
       </plugin>
