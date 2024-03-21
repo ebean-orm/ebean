@@ -15,6 +15,9 @@ mvn -T 4 clean package
 mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests -DskipStagingRepositoryClose=true -DstagingProgressTimeoutMinutes=9
 
 ## git commit, git tag, git push --tags
+git commit -am 'Version 14.0.2'
+git tag 14.0.2
+git push --tags
 
 ## convert to javax
 ./jakarta-to-javax.sh
