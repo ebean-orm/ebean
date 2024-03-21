@@ -919,21 +919,27 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private void controllerPost() {
-    switch (type) {
-      case INSERT:
-        controller.postInsert(this);
-        break;
-      case UPDATE:
-        controller.postUpdate(this);
-        break;
-      case DELETE_SOFT:
-        controller.postSoftDelete(this);
-        break;
-      case DELETE:
-        controller.postDelete(this);
-        break;
-      default:
-        break;
+    boolean old = transaction.isFlushOnQuery();
+    transaction.setFlushOnQuery(false);
+    try {
+      switch (type) {
+        case INSERT:
+          controller.postInsert(this);
+          break;
+        case UPDATE:
+          controller.postUpdate(this);
+          break;
+        case DELETE_SOFT:
+          controller.postSoftDelete(this);
+          break;
+        case DELETE:
+          controller.postDelete(this);
+          break;
+        default:
+          break;
+      }
+    } finally {
+      transaction.setFlushOnQuery(old);
     }
   }
 
