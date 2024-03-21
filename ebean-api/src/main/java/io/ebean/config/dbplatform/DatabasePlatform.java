@@ -769,4 +769,15 @@ public class DatabasePlatform {
   public boolean supportsNativeJavaTime() {
     return supportsNativeJavaTime;
   }
+
+  public String inlineSqlComment(String label) {
+    if (label == null) {
+      return "";
+    }
+    return "/* " + label + " */ ";
+  }
+
+  public String inlineSqlHint(String hint) {
+    return "/*+ " + hint + " */ ";
+  }
 }

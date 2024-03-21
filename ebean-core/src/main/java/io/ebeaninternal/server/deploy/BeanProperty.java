@@ -11,7 +11,6 @@ import io.ebean.config.EncryptKey;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataReader;
-import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
@@ -1144,14 +1143,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Returns true if this <code>isLob()</code> or the type will effectively map to a lob.
    */
   @Override
-  public boolean isDbLob() {
+  public boolean isLobForPlatform() {
     if (lob) {
       return true;
     }
     switch (dbType) {
       case DbPlatformType.JSON:
       case DbPlatformType.JSONB:
-        return dbLength == 0; // must be analog to DbPlatformTypeMapping.lookup
+        return dbLength == 0 || dbLength > 4000; // must be analog to DbPlatformTypeMapping.lookup
       case DbPlatformType.JSONBlob:
       case DbPlatformType.JSONClob:
         return true;

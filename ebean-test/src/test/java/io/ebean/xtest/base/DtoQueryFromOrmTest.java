@@ -164,8 +164,14 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     DtoQuery<ContactDto> query = DB.find(Contact.class)
       // we must explicitly add the id property for DTO query (if we want it)
-      .select("id, email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
-      .isNotNull("lastName").order().asc("lastName").asDto(ContactDto.class).setLabel("explicitId")
+      .setHint("SomeHint")
+      .select("id, email, " + concat("lastName", ", ", "firstName") + " as fullName")
+      .where()
+      .isNotNull("email")
+      .isNotNull("lastName")
+      .orderBy().asc("lastName")
+      .asDto(ContactDto.class)
+      .setLabel("explicitId")
       .setRelaxedMode();
 
     List<ContactDto> dtos = query.findList();
@@ -178,7 +184,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSql.stop();
-    assertSql(sql.get(0)).contains("select t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+    assertSql(sql.get(0)).contains("select /*+ SomeHint */ /* explicitId */ t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
       + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
 

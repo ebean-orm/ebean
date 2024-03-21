@@ -349,16 +349,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
 
   @Override
-  public void unselectLobs() {
+  public void unselectLobsForPlatform() {
     if (children != null) {
       for (SqlTreeNode child : children) {
-        child.unselectLobs();
+        child.unselectLobsForPlatform();
       }
     }
     if (hasLob()) {
       List<STreeProperty> lst = new ArrayList<>();
       for (STreeProperty prop : properties) {
-        if (!prop.isDbLob()) {
+        if (!prop.isLobForPlatform()) {
           lst.add(prop);
         }
       }
@@ -369,7 +369,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private boolean hasLob() {
     for (STreeProperty prop : properties) {
-      if (prop.isDbLob()) {
+      if (prop.isLobForPlatform()) {
         return true;
       }
     }

@@ -226,7 +226,7 @@ public final class BatchControl {
   void executeNow(ArrayList<PersistRequest> list) throws BatchedSqlException {
     boolean old = transaction.isFlushOnQuery();
     transaction.setFlushOnQuery(false);
-    // disable flush on query due transsaction callbacks
+    // disable flush on query due transaction callbacks
     try {
       for (int i = 0; i < list.size(); i++) {
         if (i % batchSize == 0) {

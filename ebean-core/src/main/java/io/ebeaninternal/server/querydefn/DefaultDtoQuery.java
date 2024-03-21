@@ -250,6 +250,9 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   @Override
   public DtoQuery<T> setLabel(String label) {
     this.label = label;
+    if (ormQuery != null) {
+      ormQuery.setLabel(label);
+    }
     return this;
   }
 

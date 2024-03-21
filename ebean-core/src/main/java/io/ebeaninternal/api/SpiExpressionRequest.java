@@ -3,13 +3,14 @@ package io.ebeaninternal.api;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
+import io.ebeaninternal.server.expression.platform.DbExpressionRequest;
 
 import java.util.List;
 
 /**
  * Request object used for gathering expression sql and bind values.
  */
-public interface SpiExpressionRequest {
+public interface SpiExpressionRequest extends DbExpressionRequest {
 
   /**
    * Return the DB specific handler for JSON and ARRAY expressions.
@@ -34,11 +35,13 @@ public interface SpiExpressionRequest {
   /**
    * Append to the expression sql without any parsing.
    */
+  @Override
   SpiExpressionRequest append(String expression);
 
   /**
    * Append to the expression sql without any parsing.
    */
+  @Override
   SpiExpressionRequest append(char c);
 
   /**
@@ -47,6 +50,7 @@ public interface SpiExpressionRequest {
    * This is a fast path case when expression is a bean property path and falls back to using parse()
    * when that isn't the case.
    */
+  @Override
   SpiExpressionRequest property(String expression);
 
   /**

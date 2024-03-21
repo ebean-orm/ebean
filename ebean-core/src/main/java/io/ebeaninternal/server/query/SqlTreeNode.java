@@ -82,6 +82,6 @@ interface SqlTreeNode {
   /**
    * Unselect lobs (for distinct queries on DB2 and Oracle).
    */
-  default void unselectLobs() {
+  default void unselectLobsForPlatform() {
   }
 }

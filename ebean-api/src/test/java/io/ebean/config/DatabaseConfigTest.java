@@ -76,6 +76,7 @@ class DatabaseConfigTest {
     props.setProperty("skipDataSourceCheck", "true");
     props.setProperty("readOnlyDatabase", "true");
     props.setProperty("lengthCheck", "ON");
+    props.setProperty("includeLabelInSql", "true");
 
     props.setProperty("queryPlan.enable", "true");
     props.setProperty("queryPlan.thresholdMicros", "10000");
@@ -96,6 +97,7 @@ class DatabaseConfigTest {
     assertTrue(settings.isLoadModuleInfo());
     assertTrue(settings.skipDataSourceCheck());
     assertTrue(settings.readOnlyDatabase());
+    assertTrue(settings.isIncludeLabelInSql());
     assertThat(settings.getLengthCheck()).isEqualTo(LengthCheck.ON);
 
     assertTrue(settings.isIdGeneratorAutomatic());
@@ -181,6 +183,7 @@ class DatabaseConfigTest {
     assertEquals(10000L, config.getQueryPlanCaptureMaxTimeMillis());
     assertEquals(10, config.getQueryPlanCaptureMaxCount());
     assertThat(config.getLengthCheck()).isEqualTo(LengthCheck.OFF);
+    assertFalse(config.isIncludeLabelInSql());
 
     config.setLoadModuleInfo(false);
     assertFalse(config.isAutoLoadModuleInfo());

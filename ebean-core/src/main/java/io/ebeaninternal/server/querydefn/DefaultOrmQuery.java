@@ -56,6 +56,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private ProfilingListener profilingListener;
   private Type type;
   private String label;
+  private String hint;
   private Mode mode = Mode.NORMAL;
   private boolean usingFuture;
   private Object tenantId;
@@ -227,6 +228,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final String hint() {
+    return hint;
+  }
+
+  @Override
   public final String planLabel() {
     if (label != null) {
       return label;
@@ -246,6 +252,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> setLabel(String label) {
     this.label = label;
+    return this;
+  }
+
+  @Override
+  public final Query<T> setHint(String hint) {
+    this.hint = hint;
     return this;
   }
 
@@ -681,6 +693,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.timeout = timeout;
     copy.mapKey = mapKey;
     copy.id = id;
+    copy.hint = hint;
     copy.label = label;
     copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
@@ -999,6 +1012,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     }
     if (manualId) {
       sb.append("/md");
+    }
+    if (hint != null) {
+      sb.append("/h:").append(hint);
     }
     if (distinct) {
       sb.append("/dt");

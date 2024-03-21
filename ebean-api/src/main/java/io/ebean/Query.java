@@ -1529,6 +1529,14 @@ public interface Query<T> extends CancelableQuery {
   Query<T> setLabel(String label);
 
   /**
+   * Set a SQL query hint.
+   * <p>
+   * This results in an inline comment that immediately follows
+   * after the select keyword in the form: {@code /*+ hint *\/ }
+   */
+  Query<T> setHint(String hint);
+
+  /**
    * When set to true when you want the returned beans to be read only.
    */
   Query<T> setReadOnly(boolean readOnly);
