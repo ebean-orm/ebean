@@ -77,7 +77,7 @@ final class ExistsSqlQueryExpression implements SpiExpression, UnsupportedDocSto
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }

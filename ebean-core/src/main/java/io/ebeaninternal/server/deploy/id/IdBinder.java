@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -143,7 +144,7 @@ public interface IdBinder {
   /**
    * Binds multiple id value to a request.
    */
-  void addBindValues(SpiExpressionRequest request, Collection<?> ids);
+  void addBindValues(SpiExpressionBind request, Collection<?> ids);
 
   /**
    * Return the sql for binding the id using an IN clause.
