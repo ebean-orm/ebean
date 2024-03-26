@@ -1,50 +1,29 @@
 package io.ebean.config;
 
+import io.ebean.ProfileLocation;
 import io.ebean.bean.ObjectGraphNode;
 
+import java.util.List;
+
 /**
- * Slow query event.
+ * The data for the slow query.
  */
-public class SlowQueryEvent {
-
-  private final String sql;
-
-  private final long timeMillis;
-
-  private final int rowCount;
-
-  private final ObjectGraphNode originNode;
-
-  /**
-   * Construct with the SQL and execution time in millis.
-   */
-  public SlowQueryEvent(String sql, long timeMillis, int rowCount, ObjectGraphNode originNode) {
-    this.sql = sql;
-    this.timeMillis = timeMillis;
-    this.rowCount = rowCount;
-    this.originNode = originNode;
-  }
+public interface SlowQueryEvent {
 
   /**
    * Return the SQL for the slow query.
    */
-  public String getSql() {
-    return sql;
-  }
+  String getSql();
 
   /**
    * Return the execution time in millis.
    */
-  public long getTimeMillis() {
-    return timeMillis;
-  }
+  long getTimeMillis();
 
   /**
    * Return the total row count associated with the query.
    */
-  public int getRowCount() {
-    return rowCount;
-  }
+  int getRowCount();
 
   /**
    * Return the origin point for the root query.
@@ -53,7 +32,20 @@ public class SlowQueryEvent {
    * shows the code that invoked the query.
    * </p>
    */
-  public ObjectGraphNode getOriginNode() {
-    return originNode;
-  }
+  ObjectGraphNode getOriginNode();
+
+  /**
+   * Return the bind parameters.
+   */
+  List<Object> getBindParams();
+
+  /**
+   * Return the label.
+   */
+  String getLabel();
+
+  /**
+   * Return the profile location.
+   */
+  ProfileLocation getProfileLocation();
 }

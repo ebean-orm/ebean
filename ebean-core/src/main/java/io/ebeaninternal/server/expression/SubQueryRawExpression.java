@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.util.Arrays;
@@ -47,7 +48,7 @@ final class SubQueryRawExpression extends AbstractExpression implements Unsuppor
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }

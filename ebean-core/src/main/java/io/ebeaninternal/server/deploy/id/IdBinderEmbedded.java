@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -269,7 +270,7 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request, Collection<?> values) {
+  public void addBindValues(SpiExpressionBind request, Collection<?> values) {
     for (Object value : values) {
       final EntityBean bean = (EntityBean) value;
       for (BeanProperty prop : props) {

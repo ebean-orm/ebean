@@ -5,12 +5,7 @@ import io.ebean.LikeType;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -194,8 +189,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
    * Adds bind values to the request.
    */
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
-
+  public void addBindValues(SpiExpressionBind request) {
     for (SpiExpression item : list) {
       item.addBindValues(request);
     }

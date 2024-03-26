@@ -78,7 +78,7 @@ final class NoopExpression implements SpiExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     // nothing to do
   }
 

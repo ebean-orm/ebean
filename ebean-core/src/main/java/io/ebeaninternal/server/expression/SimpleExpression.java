@@ -2,10 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.plugin.ExpressionPath;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
 import java.io.IOException;
@@ -68,8 +65,7 @@ public final class SimpleExpression extends AbstractValueExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
-
+  public void addBindValues(SpiExpressionBind request) {
     ElPropertyValue prop = getElProp(request);
     if (prop != null) {
       if (prop.isAssocId()) {

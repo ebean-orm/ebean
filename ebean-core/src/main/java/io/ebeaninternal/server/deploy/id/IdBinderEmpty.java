@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
@@ -130,7 +131,7 @@ final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request, Collection<?> ids) {
+  public void addBindValues(SpiExpressionBind request, Collection<?> ids) {
   }
 
   @Override

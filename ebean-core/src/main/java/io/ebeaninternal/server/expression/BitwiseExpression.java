@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
 /**
@@ -52,7 +53,7 @@ final class BitwiseExpression extends AbstractExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     request.addBindValue(flags);
     request.addBindValue(match);
   }
