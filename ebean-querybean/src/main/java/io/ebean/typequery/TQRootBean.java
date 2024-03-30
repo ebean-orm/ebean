@@ -147,7 +147,7 @@ public abstract class TQRootBean<T, R> {
    * Return the fetch group.
    */
   public FetchGroup<T> buildFetchGroup() {
-    return ((SpiFetchGroupQuery) query()).buildFetchGroup();
+    return ((SpiFetchGroupQuery<T>) query()).buildFetchGroup();
   }
 
   /**
@@ -311,7 +311,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param path the property path of an associated (OneToOne, OneToMany, ManyToOne or ManyToMany) bean.
    */
-  public R fetch(String path) {
+  public final R fetch(String path) {
     query.fetch(path);
     return root;
   }
@@ -331,7 +331,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param path the property path of an associated (OneToOne, OneToMany, ManyToOne or ManyToMany) bean.
    */
-  public R fetchQuery(String path) {
+  public final R fetchQuery(String path) {
     query.fetchQuery(path);
     return root;
   }
@@ -351,7 +351,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param path the property path to load from L2 cache.
    */
-  public R fetchCache(String path) {
+  public final R fetchCache(String path) {
     query.fetchCache(path);
     return root;
   }
@@ -372,7 +372,7 @@ public abstract class TQRootBean<T, R> {
    * @param path       the property path of an associated (OneToOne, OneToMany, ManyToOne or ManyToMany) bean.
    * @param properties the properties to load for this path.
    */
-  public R fetchQuery(String path, String properties) {
+  public final R fetchQuery(String path, String properties) {
     query.fetchQuery(path, properties);
     return root;
   }
@@ -393,7 +393,7 @@ public abstract class TQRootBean<T, R> {
    * @param path       the property path to load from L2 cache.
    * @param properties the properties to load for this path.
    */
-  public R fetchCache(String path, String properties) {
+  public final R fetchCache(String path, String properties) {
     query.fetchCache(path, properties);
     return root;
   }
@@ -438,7 +438,7 @@ public abstract class TQRootBean<T, R> {
    * @param properties properties of the associated bean that you want to include in the
    *                   fetch (* means all properties, null also means all properties).
    */
-  public R fetch(String path, String properties) {
+  public final R fetch(String path, String properties) {
     query.fetch(path, properties);
     return root;
   }
@@ -458,7 +458,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R fetch(String path, String properties, FetchConfig fetchConfig) {
+  public final R fetch(String path, String properties, FetchConfig fetchConfig) {
     query.fetch(path, properties, fetchConfig);
     return root;
   }
@@ -478,7 +478,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R fetch(String path, FetchConfig fetchConfig) {
+  public final R fetch(String path, FetchConfig fetchConfig) {
     query.fetch(path, fetchConfig);
     return root;
   }
@@ -489,7 +489,7 @@ public abstract class TQRootBean<T, R> {
    * This is typically used when the PathProperties is applied to both the query and the JSON output.
    * </p>
    */
-  public R apply(PathProperties pathProperties) {
+  public final R apply(PathProperties pathProperties) {
     query.apply(pathProperties);
     return root;
   }
@@ -502,7 +502,7 @@ public abstract class TQRootBean<T, R> {
    * @param predicate The predicate which when true the changes are applied
    * @param apply The changes to apply to the query
    */
-  public R alsoIf(BooleanSupplier predicate, Consumer<R> apply) {
+  public final R alsoIf(BooleanSupplier predicate, Consumer<R> apply) {
     if (predicate.getAsBoolean()) {
       apply.accept(root);
     }
@@ -518,7 +518,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param asOf the date time in the past at which you want to view the data
    */
-  public R asOf(Timestamp asOf) {
+  public final R asOf(Timestamp asOf) {
     query.asOf(asOf);
     return root;
   }
@@ -526,7 +526,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Execute the query against the draft set of tables.
    */
-  public R asDraft() {
+  public final R asDraft() {
     query.asDraft();
     return root;
   }
@@ -534,7 +534,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Execute the query including soft deleted rows.
    */
-  public R setIncludeSoftDeletes() {
+  public final R setIncludeSoftDeletes() {
     query.setIncludeSoftDeletes();
     return root;
   }
@@ -542,7 +542,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Add an expression to the WHERE or HAVING clause.
    */
-  public R add(Expression expression) {
+  public final R add(Expression expression) {
     peekExprList().add(expression);
     return root;
   }
@@ -550,7 +550,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Set root table alias.
    */
-  public R alias(String alias) {
+  public final R alias(String alias) {
     query.alias(alias);
     return root;
   }
@@ -560,7 +560,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param maxRows the maximum number of rows to return in the query.
    */
-  public R setMaxRows(int maxRows) {
+  public final R setMaxRows(int maxRows) {
     query.setMaxRows(maxRows);
     return root;
   }
@@ -570,7 +570,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param firstRow the first row to include in the query result.
    */
-  public R setFirstRow(int firstRow) {
+  public final R setFirstRow(int firstRow) {
     query.setFirstRow(firstRow);
     return root;
   }
@@ -594,7 +594,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R setAllowLoadErrors() {
+  public final R setAllowLoadErrors() {
     query.setAllowLoadErrors();
     return root;
   }
@@ -611,7 +611,7 @@ public abstract class TQRootBean<T, R> {
    * fetch paths AutoTune will not remove them.
    * </p>
    */
-  public R setAutoTune(boolean autoTune) {
+  public final R setAutoTune(boolean autoTune) {
     query.setAutoTune(autoTune);
     return root;
   }
@@ -623,7 +623,7 @@ public abstract class TQRootBean<T, R> {
    * fetched from the database when more rows are needed for ResultSet.
    * </p>
    */
-  public R setBufferFetchSizeHint(int fetchSize) {
+  public final R setBufferFetchSizeHint(int fetchSize) {
     query.setBufferFetchSizeHint(fetchSize);
     return root;
   }
@@ -631,7 +631,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Set whether this query uses DISTINCT.
    */
-  public R setDistinct(boolean distinct) {
+  public final R setDistinct(boolean distinct) {
     query.setDistinct(distinct);
     return root;
   }
@@ -671,7 +671,7 @@ public abstract class TQRootBean<T, R> {
    * @param indexName The index or indexes to search against
    * @return This query
    */
-  public R setDocIndexName(String indexName) {
+  public final R setDocIndexName(String indexName) {
     query.setDocIndexName(indexName);
     return root;
   }
@@ -688,7 +688,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R setInheritType(Class<? extends T> type) {
+  public final R setInheritType(Class<? extends T> type) {
     query.setInheritType(type);
     return root;
   }
@@ -708,7 +708,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R setBaseTable(String baseTable) {
+  public final R setBaseTable(String baseTable) {
     query.setBaseTable(baseTable);
     return root;
   }
@@ -722,7 +722,7 @@ public abstract class TQRootBean<T, R> {
    * Provides us with the ability to explicitly use Postgres
    * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
-  public R withLock(Query.LockType lockType) {
+  public final R withLock(Query.LockType lockType) {
     query.withLock(lockType);
     return root;
   }
@@ -736,7 +736,7 @@ public abstract class TQRootBean<T, R> {
    * Provides us with the ability to explicitly use Postgres
    * SHARE, KEY SHARE, NO KEY UPDATE and UPDATE row locks.
    */
-  public R withLock(Query.LockType lockType, Query.LockWait lockWait) {
+  public final R withLock(Query.LockType lockType, Query.LockWait lockWait) {
     query.withLock(lockType, lockWait);
     return root;
   }
@@ -744,7 +744,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Add EXISTS sub-query predicate.
    */
-  public R exists(Query<?> subQuery) {
+  public final R exists(Query<?> subQuery) {
     peekExprList().exists(subQuery);
     return root;
   }
@@ -752,7 +752,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Add NOT EXISTS sub-query predicate.
    */
-  public R notExists(Query<?> subQuery) {
+  public final R notExists(Query<?> subQuery) {
     peekExprList().notExists(subQuery);
     return root;
   }
@@ -782,7 +782,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Execute using "for update" clause which results in the DB locking the record.
    */
-  public R forUpdate() {
+  public final R forUpdate() {
     query.forUpdate();
     return root;
   }
@@ -792,7 +792,7 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * This is typically a Postgres and Oracle only option at this stage.
    */
-  public R forUpdateNoWait() {
+  public final R forUpdateNoWait() {
     query.forUpdateNoWait();
     return root;
   }
@@ -803,7 +803,7 @@ public abstract class TQRootBean<T, R> {
    * This is typically a Postgres and Oracle only option at this stage.
    * </p>
    */
-  public R forUpdateSkipLocked() {
+  public final R forUpdateSkipLocked() {
     query.forUpdateSkipLocked();
     return root;
   }
@@ -825,7 +825,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @return This query as an UpdateQuery
    */
-  public UpdateQuery<T> asUpdate() {
+  public final UpdateQuery<T> asUpdate() {
     return query.asUpdate();
   }
 
@@ -835,7 +835,7 @@ public abstract class TQRootBean<T, R> {
    * We effectively use the underlying ORM query to build the SQL and then execute
    * and map it into DTO beans.
    */
-  public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
+  public final <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return query.asDto(dtoClass);
   }
 
@@ -859,7 +859,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R setId(Object id) {
+  public final R setId(Object id) {
     query.setId(id);
     return root;
   }
@@ -876,7 +876,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R setIdIn(Object... ids) {
+  public final R setIdIn(Object... ids) {
     query.where().idIn(ids);
     return root;
   }
@@ -895,7 +895,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R setIdIn(Collection<?> ids) {
+  public final R setIdIn(Collection<?> ids) {
     query.where().idIn(ids);
     return root;
   }
@@ -907,7 +907,7 @@ public abstract class TQRootBean<T, R> {
    * profile location enhancement on Finders so for some that would be a better option.
    * </p>
    */
-  public R setLabel(String label) {
+  public final R setLabel(String label) {
     query.setLabel(label);
     return root;
   }
@@ -918,7 +918,7 @@ public abstract class TQRootBean<T, R> {
    * This results in an inline comment that immediately follows
    * after the select keyword in the form: {@code /*+ hint *\/ }
    */
-  public R setHint(String hint) {
+  public final R setHint(String hint) {
     query.setHint(hint);
     return root;
   }
@@ -930,7 +930,7 @@ public abstract class TQRootBean<T, R> {
    * is turned on. It is generally not set by application code.
    * </p>
    */
-  public R setProfileLocation(ProfileLocation profileLocation) {
+  public final R setProfileLocation(ProfileLocation profileLocation) {
     query.setProfileLocation(profileLocation);
     return root;
   }
@@ -943,7 +943,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param lazyLoadBatchSize the number of beans to lazy load in a single batch
    */
-  public R setLazyLoadBatchSize(int lazyLoadBatchSize) {
+  public final R setLazyLoadBatchSize(int lazyLoadBatchSize) {
     query.setLazyLoadBatchSize(lazyLoadBatchSize);
     return root;
   }
@@ -968,7 +968,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param mapKey the property to use as keys for a map.
    */
-  public R setMapKey(String mapKey) {
+  public final R setMapKey(String mapKey) {
     query.setMapKey(mapKey);
     return root;
   }
@@ -986,7 +986,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param scope The scope to use for this query and subsequent lazy loading.
    */
-  public R setPersistenceContextScope(PersistenceContextScope scope) {
+  public final R setPersistenceContextScope(PersistenceContextScope scope) {
     query.setPersistenceContextScope(scope);
     return root;
   }
@@ -994,7 +994,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Set RawSql to use for this query.
    */
-  public R setRawSql(RawSql rawSql) {
+  public final R setRawSql(RawSql rawSql) {
     query.setRawSql(rawSql);
     return root;
   }
@@ -1002,7 +1002,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * When set to true when you want the returned beans to be read only.
    */
-  public R setReadOnly(boolean readOnly) {
+  public final R setReadOnly(boolean readOnly) {
     query.setReadOnly(readOnly);
     return root;
   }
@@ -1012,9 +1012,8 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * If the query result is in cache then by default this same instance is
    * returned. In this sense it should be treated as a read only object graph.
-   * </p>
    */
-  public R setUseCache(boolean useCache) {
+  public final R setUseCache(boolean useCache) {
     query.setUseCache(useCache);
     return root;
   }
@@ -1026,13 +1025,11 @@ public abstract class TQRootBean<T, R> {
    * By default "find by id" and "find by natural key" will use the bean cache
    * when bean caching is enabled. Setting this to false means that the query
    * will not use the bean cache and instead hit the database.
-   * </p>
    * <p>
-   * By default findList() with natural keys will not use the bean cache. In that
+   * By default, findList() with natural keys will not use the bean cache. In that
    * case we need to explicitly use the bean cache.
-   * </p>
    */
-  public R setBeanCacheMode(CacheMode beanCacheMode) {
+  public final R setBeanCacheMode(CacheMode beanCacheMode) {
     query.setBeanCacheMode(beanCacheMode);
     return root;
   }
@@ -1041,9 +1038,8 @@ public abstract class TQRootBean<T, R> {
    * Set to true if this query should execute against the doc store.
    * <p>
    * When setting this you may also consider disabling lazy loading.
-   * </p>
    */
-  public R setUseDocStore(boolean useDocStore) {
+  public final R setUseDocStore(boolean useDocStore) {
     query.setUseDocStore(useDocStore);
     return root;
   }
@@ -1052,9 +1048,8 @@ public abstract class TQRootBean<T, R> {
    * Set true if you want to disable lazy loading.
    * <p>
    * That is, once the object graph is returned further lazy loading is disabled.
-   * </p>
    */
-  public R setDisableLazyLoading(boolean disableLazyLoading) {
+  public final R setDisableLazyLoading(boolean disableLazyLoading) {
     query.setDisableLazyLoading(disableLazyLoading);
     return root;
   }
@@ -1065,9 +1060,8 @@ public abstract class TQRootBean<T, R> {
    * This is intended to be used when the query is not a user initiated query and instead
    * part of the internal processing in an application to load a cache or document store etc.
    * In these cases we don't want the query to be part of read auditing.
-   * </p>
    */
-  public R setDisableReadAuditing() {
+  public final R setDisableReadAuditing() {
     query.setDisableReadAuditing();
     return root;
   }
@@ -1075,7 +1069,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Set this to true to use the query cache.
    */
-  public R setUseQueryCache(boolean useCache) {
+  public final R setUseQueryCache(boolean useCache) {
     query.setUseQueryCache(useCache);
     return root;
   }
@@ -1083,7 +1077,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Set the {@link CacheMode} to use the query for executing this query.
    */
-  public R setUseQueryCache(CacheMode cacheMode) {
+  public final R setUseQueryCache(CacheMode cacheMode) {
     query.setUseQueryCache(cacheMode);
     return root;
   }
@@ -1094,11 +1088,10 @@ public abstract class TQRootBean<T, R> {
    * This will typically result in a call to setQueryTimeout() on a
    * preparedStatement. If the timeout occurs an exception will be thrown - this
    * will be a SQLException wrapped up in a PersistenceException.
-   * </p>
    *
    * @param secs the query timeout limit in seconds. Zero means there is no limit.
    */
-  public R setTimeout(int secs) {
+  public final R setTimeout(int secs) {
     query.setTimeout(secs);
     return root;
   }
@@ -1108,9 +1101,8 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * Validate the query checking the where and orderBy expression paths to confirm if
    * they represent valid properties or paths for the given bean type.
-   * </p>
    */
-  public Set<String> validate() {
+  public final Set<String> validate() {
     return query.validate();
   }
 
@@ -1120,7 +1112,6 @@ public abstract class TQRootBean<T, R> {
    * When properties in the clause are fully qualified as table-column names
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -1135,7 +1126,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R raw(String rawExpression) {
+  public final R raw(String rawExpression) {
     peekExprList().raw(rawExpression);
     return root;
   }
@@ -1145,14 +1136,12 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * The raw expression should contain the same number of ? as there are
    * parameters.
-   * </p>
    * <p>
    * When properties in the clause are fully qualified as table-column names
    * then they are not translated. logical property name names (not fully
    * qualified) will still be translated to their physical name.
-   * </p>
    */
-  public R raw(String rawExpression, Object... bindValues) {
+  public final R raw(String rawExpression, Object... bindValues) {
     peekExprList().raw(rawExpression, bindValues);
     return root;
   }
@@ -1217,7 +1206,7 @@ public abstract class TQRootBean<T, R> {
    * @param raw    The raw expression that is typically a subquery
    * @param values The values which is typically a list or set of id values.
    */
-  public R rawOrEmpty(String raw, Collection<?> values) {
+  public final R rawOrEmpty(String raw, Collection<?> values) {
     peekExprList().rawOrEmpty(raw, values);
     return root;
   }
@@ -1249,7 +1238,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R raw(String rawExpression, Object bindValue) {
+  public final R raw(String rawExpression, Object bindValue) {
     peekExprList().raw(rawExpression, bindValue);
     return root;
   }
@@ -1257,7 +1246,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * In expression using multiple columns.
    */
-  public R inTuples(InTuples inTuples) {
+  public final R inTuples(InTuples inTuples) {
     peekExprList().inTuples(inTuples);
     return root;
   }
@@ -1277,7 +1266,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R orderBy() {
+  public final R orderBy() {
     // Yes this does not actually do anything! We include it because style wise it makes
     // the query nicer to read and suggests that order by definitions are added after this
     return root;
@@ -1287,7 +1276,7 @@ public abstract class TQRootBean<T, R> {
    * @deprecated migrate to {@link #orderBy()}.
    */
   @Deprecated(since = "13.19", forRemoval = true)
-  public R order() {
+  public final R order() {
     return root;
   }
 
@@ -1298,7 +1287,7 @@ public abstract class TQRootBean<T, R> {
    * optional asc and desc keywords representing ascending and descending order
    * respectively.
    */
-  public R orderBy(String orderByClause) {
+  public final R orderBy(String orderByClause) {
     query.orderBy(orderByClause);
     return root;
   }
@@ -1307,7 +1296,7 @@ public abstract class TQRootBean<T, R> {
    * @deprecated migrate to {@link #orderBy(String)}
    */
   @Deprecated(since = "13.19", forRemoval = true)
-  public R order(String orderByClause) {
+  public final R order(String orderByClause) {
     return orderBy(orderByClause);
   }
 
@@ -1347,7 +1336,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R or() {
+  public final R or() {
     pushExprList(peekExprList().or());
     return root;
   }
@@ -1391,7 +1380,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R and() {
+  public final R and() {
     pushExprList(peekExprList().and());
     return root;
   }
@@ -1400,9 +1389,8 @@ public abstract class TQRootBean<T, R> {
    * Begin a list of expressions added by NOT.
    * <p>
    * Use endNot() or endJunction() to stop added to NOT and 'pop' to the parent expression list.
-   * </p>
    */
-  public R not() {
+  public final R not() {
     pushExprList(peekExprList().not());
     return root;
   }
@@ -1411,12 +1399,10 @@ public abstract class TQRootBean<T, R> {
    * Begin a list of expressions added by MUST.
    * <p>
    * This automatically makes this query a document store query.
-   * </p>
    * <p>
    * Use endJunction() to stop added to MUST and 'pop' to the parent expression list.
-   * </p>
    */
-  public R must() {
+  public final R must() {
     pushExprList(peekExprList().must());
     return root;
   }
@@ -1425,12 +1411,10 @@ public abstract class TQRootBean<T, R> {
    * Begin a list of expressions added by MUST NOT.
    * <p>
    * This automatically makes this query a document store query.
-   * </p>
    * <p>
    * Use endJunction() to stop added to MUST NOT and 'pop' to the parent expression list.
-   * </p>
    */
-  public R mustNot() {
+  public final R mustNot() {
     return pushExprList(peekExprList().mustNot());
   }
 
@@ -1438,19 +1422,17 @@ public abstract class TQRootBean<T, R> {
    * Begin a list of expressions added by SHOULD.
    * <p>
    * This automatically makes this query a document store query.
-   * </p>
    * <p>
    * Use endJunction() to stop added to SHOULD and 'pop' to the parent expression list.
-   * </p>
    */
-  public R should() {
+  public final R should() {
     return pushExprList(peekExprList().should());
   }
 
   /**
    * End a list of expressions added by 'OR'.
    */
-  public R endJunction() {
+  public final R endJunction() {
     if (textMode) {
       textStack.pop();
     } else {
@@ -1462,21 +1444,21 @@ public abstract class TQRootBean<T, R> {
   /**
    * End OR junction - synonym for endJunction().
    */
-  public R endOr() {
+  public final R endOr() {
     return endJunction();
   }
 
   /**
    * End AND junction - synonym for endJunction().
    */
-  public R endAnd() {
+  public final R endAnd() {
     return endJunction();
   }
 
   /**
    * End NOT junction - synonym for endJunction().
    */
-  public R endNot() {
+  public final R endNot() {
     return endJunction();
   }
 
@@ -1496,15 +1478,13 @@ public abstract class TQRootBean<T, R> {
    * Add expression after this to the WHERE expression list.
    * <p>
    * For queries against the normal database (not the doc store) this has no effect.
-   * </p>
    * <p>
    * This is intended for use with Document Store / ElasticSearch where expressions can be put into either
    * the "query" section or the "filter" section of the query. Full text expressions like MATCH are in the
    * "query" section but many expression can be in either - expressions after the where() are put into the
    * "filter" section which means that they don't add to the relevance and are also cache-able.
-   * </p>
    */
-  public R where() {
+  public final R where() {
     textMode = false;
     return root;
   }
@@ -1513,13 +1493,11 @@ public abstract class TQRootBean<T, R> {
    * Begin added expressions to the 'Text' expression list.
    * <p>
    * This automatically makes the query a document store query.
-   * </p>
    * <p>
    * For ElasticSearch expressions added to 'text' go into the ElasticSearch 'query context'
    * and expressions added to 'where' go into the ElasticSearch 'filter context'.
-   * </p>
    */
-  public R text() {
+  public final R text() {
     textMode = true;
     return root;
   }
@@ -1528,9 +1506,8 @@ public abstract class TQRootBean<T, R> {
    * Add a Text Multi-match expression (document store only).
    * <p>
    * This automatically makes the query a document store query.
-   * </p>
    */
-  public R multiMatch(String query, MultiMatch multiMatch) {
+  public final R multiMatch(String query, MultiMatch multiMatch) {
     peekExprList().multiMatch(query, multiMatch);
     return root;
   }
@@ -1539,9 +1516,8 @@ public abstract class TQRootBean<T, R> {
    * Add a Text Multi-match expression (document store only).
    * <p>
    * This automatically makes the query a document store query.
-   * </p>
    */
-  public R multiMatch(String query, String... properties) {
+  public final R multiMatch(String query, String... properties) {
     peekExprList().multiMatch(query, properties);
     return root;
   }
@@ -1550,9 +1526,8 @@ public abstract class TQRootBean<T, R> {
    * Add a Text common terms expression (document store only).
    * <p>
    * This automatically makes the query a document store query.
-   * </p>
    */
-  public R textCommonTerms(String query, TextCommonTerms options) {
+  public final R textCommonTerms(String query, TextCommonTerms options) {
     peekExprList().textCommonTerms(query, options);
     return root;
   }
@@ -1561,9 +1536,8 @@ public abstract class TQRootBean<T, R> {
    * Add a Text simple expression (document store only).
    * <p>
    * This automatically makes the query a document store query.
-   * </p>
    */
-  public R textSimple(String query, TextSimple options) {
+  public final R textSimple(String query, TextSimple options) {
     peekExprList().textSimple(query, options);
     return root;
   }
@@ -1572,9 +1546,8 @@ public abstract class TQRootBean<T, R> {
    * Add a Text query string expression (document store only).
    * <p>
    * This automatically makes the query a document store query.
-   * </p>
    */
-  public R textQueryString(String query, TextQueryString options) {
+  public final R textQueryString(String query, TextQueryString options) {
     peekExprList().textQueryString(query, options);
     return root;
   }
@@ -1582,7 +1555,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Execute the query using the given transaction.
    */
-  public R usingTransaction(Transaction transaction) {
+  public final R usingTransaction(Transaction transaction) {
     query.usingTransaction(transaction);
     return root;
   }
@@ -1590,7 +1563,7 @@ public abstract class TQRootBean<T, R> {
   /**
    * Execute the query using the given connection.
    */
-  public R usingConnection(Connection connection) {
+  public final R usingConnection(Connection connection) {
     query.usingConnection(connection);
     return root;
   }
@@ -1605,7 +1578,7 @@ public abstract class TQRootBean<T, R> {
    * source. We we use {@code usingMaster()} to instead ensure that the query is executed
    * against the master data source.
    */
-  public R usingMaster() {
+  public final R usingMaster() {
     query.usingMaster();
     return root;
   }
@@ -1616,7 +1589,6 @@ public abstract class TQRootBean<T, R> {
    * The query is executed using max rows of 1 and will only select the id property.
    * This method is really just a convenient way to optimise a query to perform a
    * 'does a row exist in the db' check.
-   * </p>
    *
    * <h2>Example using a query bean:</h2>
    * <pre>{@code
@@ -1639,7 +1611,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @return True if the query finds a matching row in the database
    */
-  public boolean exists() {
+  public final boolean exists() {
     return query.exists();
   }
 
@@ -1649,11 +1621,9 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * If more than 1 row is found for this query then a PersistenceException is
    * thrown.
-   * </p>
    * <p>
    * This is useful when your predicates dictate that your query should only
    * return 0 or 1 results.
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -1665,10 +1635,8 @@ public abstract class TQRootBean<T, R> {
    * ...
    * }</pre>
    * <p>
-   * <p>
    * It is also useful with finding objects by their id when you want to specify
    * further join information to optimise the query.
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -1685,14 +1653,14 @@ public abstract class TQRootBean<T, R> {
    * }</pre>
    */
   @Nullable
-  public T findOne() {
+  public final T findOne() {
     return query.findOne();
   }
 
   /**
    * Execute the query returning an optional bean.
    */
-  public Optional<T> findOneOrEmpty() {
+  public final Optional<T> findOneOrEmpty() {
     return query.findOneOrEmpty();
   }
 
@@ -1700,7 +1668,6 @@ public abstract class TQRootBean<T, R> {
    * Execute the query returning the list of objects.
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -1713,7 +1680,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @see Query#findList()
    */
-  public List<T> findList() {
+  public final List<T> findList() {
     return query.findList();
   }
 
@@ -1736,7 +1703,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public Stream<T> findStream() {
+  public final Stream<T> findStream() {
     return query.findStream();
   }
 
@@ -1744,7 +1711,6 @@ public abstract class TQRootBean<T, R> {
    * Execute the query returning the set of objects.
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -1757,7 +1723,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @see Query#findSet()
    */
-  public Set<T> findSet() {
+  public final Set<T> findSet() {
     return query.findSet();
   }
 
@@ -1765,11 +1731,10 @@ public abstract class TQRootBean<T, R> {
    * Execute the query returning the list of Id's.
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
-   * </p>
    *
    * @see Query#findIds()
    */
-  public <A> List<A> findIds() {
+  public final <A> List<A> findIds() {
     return query.findIds();
   }
 
@@ -1777,11 +1742,9 @@ public abstract class TQRootBean<T, R> {
    * Execute the query returning a map of the objects.
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
-   * </p>
    * <p>
    * You can use setMapKey() or asMapKey() to specify the property to be used as keys
    * on the map. If one is not specified then the id property is used.
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -1794,7 +1757,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @see Query#findMap()
    */
-  public <K> Map<K, T> findMap() {
+  public final <K> Map<K, T> findMap() {
     return query.findMap();
   }
 
@@ -1804,15 +1767,12 @@ public abstract class TQRootBean<T, R> {
    * Note that findIterate (and findEach and findEachWhile) uses a "per graph"
    * persistence context scope and adjusts jdbc fetch buffer size for large
    * queries. As such it is better to use findList for small queries.
-   * </p>
    * <p>
    * Remember that with {@link QueryIterator} you must call {@link QueryIterator#close()}
    * when you have finished iterating the results (typically in a finally block).
-   * </p>
    * <p>
    * findEach() and findEachWhile() are preferred to findIterate() as they ensure
    * the jdbc statement and resultSet are closed at the end of the iteration.
-   * </p>
    * <p>
    * This query will execute against the EbeanServer that was used to create it.
    * </p>
@@ -1834,7 +1794,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public QueryIterator<T> findIterate() {
+  public final QueryIterator<T> findIterate() {
     return query.findIterate();
   }
 
@@ -1854,7 +1814,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @return the list of values for the selected property
    */
-  public <A> List<A> findSingleAttributeList() {
+  public final <A> List<A> findSingleAttributeList() {
     return query.findSingleAttributeList();
   }
 
@@ -1874,7 +1834,7 @@ public abstract class TQRootBean<T, R> {
    * @return a single value or null for the selected property
    */
   @Nullable
-  public <A> A findSingleAttribute() {
+  public final <A> A findSingleAttribute() {
     return query.findSingleAttribute();
   }
 
@@ -1895,8 +1855,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @return an optional value for the selected property
    */
-  @Nullable
-  public <A> Optional<A> findSingleAttributeOrEmpty() {
+  public final <A> Optional<A> findSingleAttributeOrEmpty() {
     return query.findSingleAttributeOrEmpty();
   }
 
@@ -1934,7 +1893,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param consumer the consumer used to process the queried beans.
    */
-  public void findEach(Consumer<T> consumer) {
+  public final void findEach(Consumer<T> consumer) {
     query.findEach(consumer);
   }
 
@@ -1951,7 +1910,7 @@ public abstract class TQRootBean<T, R> {
    * @param batch    The number of beans processed in the batch
    * @param consumer Process the batch of beans
    */
-  public void findEach(int batch, Consumer<List<T>> consumer) {
+  public final void findEach(int batch, Consumer<List<T>> consumer) {
     query.findEach(batch, consumer);
   }
 
@@ -1980,7 +1939,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @param consumer the consumer used to process the queried beans.
    */
-  public void findEachWhile(Predicate<T> consumer) {
+  public final void findEachWhile(Predicate<T> consumer) {
     query.findEachWhile(consumer);
   }
 
@@ -1989,9 +1948,8 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * Generally this query is expected to be a find by id or unique predicates query.
    * It will execute the query against the history returning the versions of the bean.
-   * </p>
    */
-  public List<Version<T>> findVersions() {
+  public final List<Version<T>> findVersions() {
     return query.findVersions();
   }
 
@@ -2000,9 +1958,8 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * Generally this query is expected to be a find by id or unique predicates query.
    * It will execute the query against the history returning the versions of the bean.
-   * </p>
    */
-  public List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end) {
+  public final List<Version<T>> findVersionsBetween(Timestamp start, Timestamp end) {
     return query.findVersionsBetween(start, end);
   }
 
@@ -2010,9 +1967,8 @@ public abstract class TQRootBean<T, R> {
    * Return the count of entities this query should return.
    * <p>
    * This is the number of 'top level' or 'root level' entities.
-   * </p>
    */
-  public int findCount() {
+  public final int findCount() {
     return query.findCount();
   }
 
@@ -2022,11 +1978,10 @@ public abstract class TQRootBean<T, R> {
    * This returns a Future object which can be used to cancel, check the
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
-   * </p>
    *
    * @return a Future object for the row count query
    */
-  public FutureRowCount<T> findFutureCount() {
+  public final FutureRowCount<T> findFutureCount() {
     return query.findFutureCount();
   }
 
@@ -2036,11 +1991,10 @@ public abstract class TQRootBean<T, R> {
    * This returns a Future object which can be used to cancel, check the
    * execution status (isDone etc) and get the value (with or without a
    * timeout).
-   * </p>
    *
    * @return a Future object for the list of Id's
    */
-  public FutureIds<T> findFutureIds() {
+  public final FutureIds<T> findFutureIds() {
     return query.findFutureIds();
   }
 
@@ -2049,11 +2003,10 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * This query will execute in it's own PersistenceContext and using its own transaction.
    * What that means is that it will not share any bean instances with other queries.
-   * </p>
    *
    * @return a Future object for the list result of the query
    */
-  public FutureList<T> findFutureList() {
+  public final FutureList<T> findFutureList() {
     return query.findFutureList();
   }
 
@@ -2062,11 +2015,9 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * The benefit of using this over findList() is that it provides functionality to get the
    * total row count etc.
-   * </p>
    * <p>
    * If maxRows is not set on the query prior to calling findPagedList() then a
    * PersistenceException is thrown.
-   * </p>
    * <p>
    * <pre>{@code
    *
@@ -2086,7 +2037,7 @@ public abstract class TQRootBean<T, R> {
    *
    * @return The PagedList
    */
-  public PagedList<T> findPagedList() {
+  public final PagedList<T> findPagedList() {
     return query.findPagedList();
   }
 
@@ -2096,11 +2047,10 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * Note that if the query includes joins then the generated delete statement may not be
    * optimal depending on the database platform.
-   * </p>
    *
    * @return the number of beans/rows that were deleted.
    */
-  public int delete() {
+  public final int delete() {
     return query.delete();
   }
 
@@ -2109,23 +2059,22 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * This is only available after the query has been executed and provided only
    * for informational purposes.
-   * </p>
    */
-  public String getGeneratedSql() {
+  public final String getGeneratedSql() {
     return query.getGeneratedSql();
   }
 
   /**
    * Return the type of beans being queried.
    */
-  public Class<T> getBeanType() {
+  public final Class<T> getBeanType() {
     return query.getBeanType();
   }
 
   /**
    * Return the expression list that has been built for this query.
    */
-  public ExpressionList<T> getExpressionList() {
+  public final ExpressionList<T> getExpressionList() {
     return query.where();
   }
 
@@ -2147,7 +2096,7 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public R having() {
+  public final R having() {
     if (whereStack == null) {
       whereStack = new ArrayStack<>();
     }
@@ -2162,7 +2111,6 @@ public abstract class TQRootBean<T, R> {
    * <p>
    * Note that after this we no longer have the query bean so typically we use this right
    * at the end of the query.
-   * </p>
    *
    * <pre>{@code
    *
@@ -2183,14 +2131,14 @@ public abstract class TQRootBean<T, R> {
    *
    * }</pre>
    */
-  public ExpressionList<T> havingClause() {
+  public final ExpressionList<T> havingClause() {
     return query.having();
   }
 
   /**
    * Return the current expression list that expressions should be added to.
    */
-  protected ExpressionList<T> peekExprList() {
+  protected final ExpressionList<T> peekExprList() {
     if (textMode) {
       // return the current text expression list
       return _peekText();
@@ -2203,7 +2151,7 @@ public abstract class TQRootBean<T, R> {
     return whereStack.peek();
   }
 
-  protected ExpressionList<T> _peekText() {
+  protected final ExpressionList<T> _peekText() {
     if (textStack == null) {
       textStack = new ArrayStack<>();
       // empty so push on the queries base expression list
