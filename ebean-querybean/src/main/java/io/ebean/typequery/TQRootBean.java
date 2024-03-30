@@ -69,6 +69,11 @@ public abstract class TQRootBean<T, R> {
   private final Query<T> query;
 
   /**
+   * The root query bean instance. Used to provide fluid query construction.
+   */
+  private final R root;
+
+  /**
    * The underlying expression lists held as a stack. Pushed and popped based on and/or (conjunction/disjunction).
    */
   private ArrayStack<ExpressionList<T>> whereStack;
@@ -83,11 +88,6 @@ public abstract class TQRootBean<T, R> {
    * rather than the "where" stack.
    */
   private boolean textMode;
-
-  /**
-   * The root query bean instance. Used to provide fluid query construction.
-   */
-  private R root;
 
   /**
    * Construct using the type of bean to query on and the default database.
@@ -134,11 +134,13 @@ public abstract class TQRootBean<T, R> {
    */
   public TQRootBean(boolean aliasDummy) {
     this.query = null;
+    this.root = null;
   }
 
   /** Construct for FilterMany */
   protected TQRootBean(ExpressionList<T> filter) {
     this.query = null;
+    this.root = null;
     this.whereStack = new ArrayStack<>();
     whereStack.push(filter);
   }
@@ -148,13 +150,6 @@ public abstract class TQRootBean<T, R> {
    */
   public FetchGroup<T> buildFetchGroup() {
     return ((SpiFetchGroupQuery<T>) query()).buildFetchGroup();
-  }
-
-  /**
-   * Sets the root query bean instance. Used to provide fluid query construction.
-   */
-  protected void setRoot(R root) {
-    this.root = root;
   }
 
   /**
