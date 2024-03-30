@@ -1,7 +1,6 @@
 package io.ebeaninternal.api;
 
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
 import io.ebeaninternal.server.expression.platform.DbExpressionRequest;
 
@@ -10,7 +9,7 @@ import java.util.List;
 /**
  * Request object used for gathering expression sql and bind values.
  */
-public interface SpiExpressionRequest extends DbExpressionRequest {
+public interface SpiExpressionRequest extends SpiExpressionBind, DbExpressionRequest {
 
   /**
    * Return the DB specific handler for JSON and ARRAY expressions.
@@ -21,11 +20,6 @@ public interface SpiExpressionRequest extends DbExpressionRequest {
    * Parse the logical property name to the deployment name.
    */
   String parseDeploy(String logicalProp);
-
-  /**
-   * Return the bean descriptor for the root type.
-   */
-  BeanDescriptor<?> descriptor();
 
   /**
    * Return the associated QueryRequest.
@@ -59,16 +53,6 @@ public interface SpiExpressionRequest extends DbExpressionRequest {
   SpiExpressionRequest parse(String expression);
 
   /**
-   * Add an encryption key to bind to this request.
-   */
-  void addBindEncryptKey(Object encryptKey);
-
-  /**
-   * Add a bind value to this request.
-   */
-  void addBindValue(Object bindValue);
-
-  /**
    * Return the accumulated expression sql for all expressions in this request.
    */
   String sql();
@@ -87,11 +71,6 @@ public interface SpiExpressionRequest extends DbExpressionRequest {
    * Append a DB Like clause.
    */
   void appendLike(boolean rawLikeExpression);
-
-  /**
-   * Escapes a string to use it as exact match in Like clause.
-   */
-  String escapeLikeString(String value);
 
   /**
    * Append IN expression taking into account platform and type support for Multi-value.

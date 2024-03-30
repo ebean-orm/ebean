@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.id;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.core.InternString;
@@ -143,7 +144,7 @@ public final class IdBinderSimple implements IdBinder {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request, Collection<?> values) {
+  public void addBindValues(SpiExpressionBind request, Collection<?> values) {
     List<Object> copy = new ArrayList<>(values);
     copy.replaceAll(idValue -> convertSetId(idValue, null));
     request.addBindValue(new MultiValueWrapper(copy));
