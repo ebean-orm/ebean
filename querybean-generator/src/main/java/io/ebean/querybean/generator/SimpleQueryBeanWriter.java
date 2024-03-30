@@ -160,7 +160,8 @@ class SimpleQueryBeanWriter {
     writer.append("  }").eol();
     writer.eol();
 
-    writer.append("  /** Construct with a given transaction */").eol();
+    writer.append("  /** @deprecated migrate to query.usingTransaction() */").eol();
+    writer.append("  @Deprecated(forRemoval = true)").eol();
     writer.append("  public Q%s(io.ebean.Transaction transaction) {", shortName).eol();
     if (dbName == null) {
       writer.append("    super(%s.class, transaction);", beanFullName).eol();
