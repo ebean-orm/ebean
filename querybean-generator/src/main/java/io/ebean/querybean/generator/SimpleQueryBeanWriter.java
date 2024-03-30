@@ -197,6 +197,7 @@ class SimpleQueryBeanWriter {
 
     writer.eol();
     writer.append("  /** Return a copy of the query bean. */").eol();
+    writer.append("  @Override").eol();
     writer.append("  public Q%s copy() {", shortName).eol();
     writer.append("    return new Q%s(query().copy());", shortName).eol();
     writer.append("  }").eol();

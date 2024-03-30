@@ -88,7 +88,7 @@ class KotlinLangAdapter implements LangAdapter {
 
     writer.eol();
     writer.append("  /** Return a copy of the query. */").eol();
-    writer.append("  fun copy() : Q%s {", shortName).eol();
+    writer.append("  override fun copy() : Q%s {", shortName).eol();
     writer.append("    return Q%s(query().copy())", shortName).eol();
     writer.append("  }").eol();
     writer.eol();
