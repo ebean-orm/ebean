@@ -132,9 +132,10 @@ public abstract class TQRootBean<T, R> {
    * Construct for using as an 'Alias' to use the properties as known string
    * values for select() and fetch().
    */
+  @SuppressWarnings("unchecked")
   public TQRootBean(boolean aliasDummy) {
     this.query = null;
-    this.root = null;
+    this.root = (R) this;
   }
 
   /** Construct for FilterMany */
