@@ -92,10 +92,11 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
 
   @Override
   public int getTotalCount() {
-    // already fetched?
-    if (totalRowCount > -1) return totalRowCount;
     lock.lock();
     try {
+      if (totalRowCount > -1) {
+        return totalRowCount;
+      }
       if (futureRowCount != null) {
         try {
           // background query already initiated so get it with a wait
@@ -105,7 +106,6 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
           throw new PersistenceException(e);
         }
       }
-
       // just using foreground thread
       totalRowCount = server.findCount(query);
       return totalRowCount;
