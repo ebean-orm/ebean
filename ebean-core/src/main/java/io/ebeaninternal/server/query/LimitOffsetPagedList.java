@@ -3,7 +3,6 @@ package io.ebeaninternal.server.query;
 import io.ebean.PagedList;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-
 import jakarta.persistence.PersistenceException;
 
 import java.util.Collections;
@@ -60,7 +59,7 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
     try {
       if (list == null) {
         if (totalRowCount == 0) {
-          //already count and no rows
+          // already count and no rows
           list = Collections.emptyList();
         } else {
           list = server.findList(query);
