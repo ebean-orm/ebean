@@ -154,6 +154,11 @@ public abstract class TQRootBean<T, R> {
   }
 
   /**
+   * Return a copy of the query bean.
+   */
+  public abstract R copy();
+
+  /**
    * Return the underlying query.
    * <p>
    * Generally it is not expected that you will need to do this but typically use
