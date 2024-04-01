@@ -8,7 +8,6 @@ import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
 import io.ebean.service.SpiFetchGroupQuery;
-import io.ebean.text.PathProperties;
 import io.ebeaninternal.api.SpiQueryFetch;
 import io.ebeaninternal.server.util.ArrayStack;
 
@@ -235,7 +234,19 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
   }
 
   @Override
-  public final R apply(PathProperties pathProperties) {
+  public R fetchLazy(String path, String fetchProperties) {
+    query.fetchLazy(path, fetchProperties);
+    return root;
+  }
+
+  @Override
+  public R fetchLazy(String path) {
+    query.fetchLazy(path);
+    return root;
+  }
+
+  @Override
+  public final R apply(FetchPath pathProperties) {
     query.apply(pathProperties);
     return root;
   }
@@ -451,6 +462,12 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
   }
 
   @Override
+  public R setCountDistinct(CountDistinctOrder orderBy) {
+    query.setCountDistinct(orderBy);
+    return root;
+  }
+
+  @Override
   public final R setRawSql(RawSql rawSql) {
     query.setRawSql(rawSql);
     return root;
@@ -461,13 +478,6 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
     query.setReadOnly(readOnly);
     return root;
   }
-
-  @Override
-  public final R setUseCache(boolean useCache) {
-    query.setUseCache(useCache);
-    return root;
-  }
-
 
   @Override
   public final R setBeanCacheMode(CacheMode beanCacheMode) {
@@ -490,12 +500,6 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
   @Override
   public final R setDisableReadAuditing() {
     query.setDisableReadAuditing();
-    return root;
-  }
-
-  @Override
-  public final R setUseQueryCache(boolean useCache) {
-    query.setUseQueryCache(useCache);
     return root;
   }
 
@@ -562,6 +566,12 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
   @Override
   public final R orderBy(String orderByClause) {
     query.orderBy(orderByClause);
+    return root;
+  }
+
+  @Override
+  public R setOrderBy(OrderBy<T> orderBy) {
+    query.setOrderBy(orderBy);
     return root;
   }
 
@@ -697,6 +707,12 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
   }
 
   @Override
+  public R usingDatabase(Database database) {
+    query.usingDatabase(database);
+    return root;
+  }
+
+  @Override
   public final R usingMaster() {
     query.usingMaster();
     return root;
@@ -751,6 +767,11 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
   @Override
   public final <A> List<A> findSingleAttributeList() {
     return query.findSingleAttributeList();
+  }
+
+  @Override
+  public final <A> Set<A> findSingleAttributeSet() {
+    return query.findSingleAttributeSet();
   }
 
   @Override
