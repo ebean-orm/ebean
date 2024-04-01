@@ -6,8 +6,7 @@ import io.avaje.lang.NonNullApi;
  * Object relational query for finding a List, Set, Map or single entity bean.
  * <p>
  * Example: Create the query using the API.
- * </p>
- * <p>
+ *
  * <pre>{@code
  *
  * List<Order> orderList = DB.find(Order.class)
@@ -18,11 +17,10 @@ import io.avaje.lang.NonNullApi;
  *     .setMaxRows(50)
  *     .findList();
  *
- * ...
  * }</pre>
  * <p>
  * Example: The same query using the query language
- * </p>
+ *
  * <pre>{@code
  *
  * String oql =
@@ -40,36 +38,32 @@ import io.avaje.lang.NonNullApi;
  * <p>
  * Ebean has built in support for "AutoTune". This is a mechanism where a query
  * can be automatically tuned based on profiling information that is collected.
- * </p>
  * <p>
  * This is effectively the same as automatically using select() and fetch() to
  * build a query that will fetch all the data required by the application and no
  * more.
- * </p>
  * <p>
  * It is expected that AutoTune will be the default approach for many queries
  * in a system. It is possibly not as useful where the result of a query is sent
  * to a remote client or where there is some requirement for "Read Consistency"
  * guarantees.
- * </p>
+ *
  * <h3>Query Language</h3>
  * <p>
  * <b>Partial Objects</b>
- * </p>
  * <p>
  * The <em>find</em> and <em>fetch</em> clauses support specifying a list of
  * properties to fetch. This results in objects that are "partially populated".
  * If you try to get a property that was not populated a "lazy loading" query
  * will automatically fire and load the rest of the properties of the bean (This
  * is very similar behaviour as a reference object being "lazy loaded").
- * </p>
  * <p>
  * Partial objects can be saved just like fully populated objects. If you do
  * this you should remember to include the <em>"Version"</em> property in the
  * initial fetch. If you do not include a version property then optimistic
  * concurrency checking will occur but only include the fetched properties.
  * Refer to "ALL Properties/Columns" mode of Optimistic Concurrency checking.
- * </p>
+ *
  * <pre>{@code
  * [ select [ ( * | {fetch properties} ) ] ]
  * [ fetch {path} [ ( * | {fetch properties} ) ] ]
@@ -79,50 +73,39 @@ import io.avaje.lang.NonNullApi;
  * }</pre>
  * <p>
  * <b>SELECT</b> [ ( <i>*</i> | <i>{fetch properties}</i> ) ]
- * </p>
  * <p>
  * With the select you can specify a list of properties to fetch.
- * </p>
  * <p>
  * <b>FETCH</b> <b>{path}</b> [ ( <i>*</i> | <i>{fetch properties}</i> ) ]
- * </p>
  * <p>
  * With the fetch you specify the associated property to fetch and populate. The
  * path is a OneToOne, ManyToOne, OneToMany or ManyToMany property.
- * </p>
  * <p>
  * For fetch of a path we can optionally specify a list of properties to fetch.
  * If you do not specify a list of properties ALL the properties for that bean
  * type are fetched.
- * </p>
  * <p>
  * <b>WHERE</b> <b>{list of predicates}</b>
- * </p>
  * <p>
  * The list of predicates which are joined by AND OR NOT ( and ). They can
  * include named (or positioned) bind parameters. These parameters will need to
  * be bound by {@link Query#setParameter(String, Object)}.
- * </p>
  * <p>
  * <b>ORDER BY</b> <b>{order by properties}</b>
- * </p>
  * <p>
  * The list of properties to order the result. You can include ASC (ascending)
  * and DESC (descending) in the order by clause.
- * </p>
  * <p>
  * <b>LIMIT</b> <b>{max rows}</b> [ OFFSET <i>{first row}</i> ]
- * </p>
  * <p>
  * The limit offset specifies the max rows and first row to fetch. The offset is
  * optional.
- * </p>
  * <h4>Examples of Ebean's Query Language</h4>
  * <p>
  * Find orders fetching its id, shipDate and status properties. Note that the id
  * property is always fetched even if it is not included in the list of fetch
  * properties.
- * </p>
+ *
  * <pre>{@code
  *
  * select (shipDate, status)
@@ -131,7 +114,7 @@ import io.avaje.lang.NonNullApi;
  * <p>
  * Find orders with a named bind variable (that will need to be bound via
  * {@link Query#setParameter(String, Object)}).
- * </p>
+ *
  * <pre>{@code
  *
  * where customer.name like :custLike
@@ -140,7 +123,7 @@ import io.avaje.lang.NonNullApi;
  * <p>
  * Find orders and also fetch the customer with a named bind parameter. This
  * will fetch and populate both the order and customer objects.
- * </p>
+ *
  * <pre>{@code
  *
  * fetch customer
@@ -154,7 +137,7 @@ import io.avaje.lang.NonNullApi;
  * objects will have their id, name and shipping address populated. The product
  * objects (associated with each order detail) will have their id, sku and name
  * populated.
- * </p>
+ *
  * <pre>{@code
  *
  * fetch customer (name)
@@ -236,21 +219,26 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
   boolean isCountDistinct();
 
   /**
+   * @deprecated migrate to {@link #usingTransaction(Transaction)} then delete().
+   * <p>
    * Execute as a delete query returning the number of rows deleted using the given transaction.
    * <p>
    * Note that if the query includes joins then the generated delete statement may not be
    * optimal depending on the database platform.
-   * </p>
    *
    * @return the number of beans/rows that were deleted.
    */
+  @Deprecated(forRemoval = true, since = "14.1.0")
   int delete(Transaction transaction);
 
   /**
+   * @deprecated migrate to {@link #usingTransaction(Transaction)} then update().
+   * <p>
    * Execute the UpdateQuery returning the number of rows updated using the given transaction.
    *
    * @return the number of beans/rows updated.
    */
+  @Deprecated(forRemoval = true, since = "14.1.0")
   int update(Transaction transaction);
 
   /**
@@ -327,7 +315,7 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
    * <p>
    * You can use this to have further control over the query. For example adding
    * fetch joins.
-   * </p>
+   *
    * <pre>{@code
    *
    * Order order = DB.find(Order.class)
@@ -384,19 +372,15 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
    * <p>
    * This is currently ElasticSearch only and provides the full text
    * expressions such as Match and Multi-Match.
-   * </p>
    * <p>
    * This automatically makes this query a "Doc Store" query and will execute
    * against the document store (ElasticSearch).
-   * </p>
    * <p>
    * Expressions added here are added to the "query" section of an ElasticSearch
    * query rather than the "filter" section.
-   * </p>
    * <p>
    * Expressions added to the where() are added to the "filter" section of an
    * ElasticSearch query.
-   * </p>
    */
   ExpressionList<T> text();
 
@@ -404,12 +388,12 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
    * This applies a filter on the 'many' property list rather than the root
    * level objects.
    * <p>
-   * Typically you will use this in a scenario where the cardinality is high on
+   * Typically, you will use this in a scenario where the cardinality is high on
    * the 'many' property you wish to join to. Say you want to fetch customers
    * and their associated orders... but instead of getting all the orders for
    * each customer you only want to get the new orders they placed since last
    * week. In this case you can use filterMany() to filter the orders.
-   * </p>
+   *
    * <pre>{@code
    *
    * List<Customer> list = DB.find(Customer.class)
@@ -423,7 +407,6 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
    * Please note you have to be careful that you add expressions to the correct
    * expression list - as there is one for the 'root level' and one for each
    * filterMany that you have.
-   * </p>
    *
    * @param propertyName the name of the many property that you want to have a filter on.
    * @return the expression list that you add filter expressions for the many to.
@@ -434,11 +417,9 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
    * Add Expressions to the Having clause return the ExpressionList.
    * <p>
    * Currently only beans based on raw sql will use the having clause.
-   * </p>
    * <p>
    * Note that this returns the ExpressionList (so you can add multiple
    * expressions to the query in a fluent API way).
-   * </p>
    *
    * @return The ExpressionList for adding more expressions to.
    * @see Expr
@@ -449,12 +430,10 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
    * Add an expression to the having clause returning the query.
    * <p>
    * Currently only beans based on raw sql will use the having clause.
-   * </p>
    * <p>
    * This is similar to {@link #having()} except it returns the query rather
    * than the ExpressionList. This is useful when you want to further specify
    * something on the query.
-   * </p>
    *
    * @param addExpressionToHaving the expression to add to the having clause.
    * @return the Query object

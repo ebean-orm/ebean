@@ -222,6 +222,8 @@ public interface ExpressionList<T> {
   int delete();
 
   /**
+   * @deprecated migrate to {@link #usingTransaction(Transaction)} then delete().
+   * <p>
    * Execute as a delete query deleting the 'root level' beans that match the predicates
    * in the query.
    * <p>
@@ -231,6 +233,7 @@ public interface ExpressionList<T> {
    *
    * @return the number of rows that were deleted.
    */
+  @Deprecated(forRemoval = true, since = "13.1.0")
   int delete(Transaction transaction);
 
   /**
@@ -242,11 +245,14 @@ public interface ExpressionList<T> {
   int update();
 
   /**
+   * @deprecated migrate to {@link #usingTransaction(Transaction)} then update().
+   * <p>
    * Execute as a update query with the given transaction.
    *
    * @return the number of rows that were updated.
    * @see UpdateQuery
    */
+  @Deprecated(forRemoval = true, since = "13.1.0")
   int update(Transaction transaction);
 
   /**
