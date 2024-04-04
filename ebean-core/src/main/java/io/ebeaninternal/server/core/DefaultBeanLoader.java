@@ -63,8 +63,8 @@ final class DefaultBeanLoader {
     Object parentId = parentDesc.getId(parentBean);
     if (pc == null) {
       pc = new DefaultPersistenceContext();
-      parentDesc.contextPut(pc, parentId, parentBean);
     }
+    parentDesc.contextPutIfAbsent(pc, parentId, parentBean);
     boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching() && many.isUseCache();
     if (useManyIdCache) {
       Boolean readOnly = null;
