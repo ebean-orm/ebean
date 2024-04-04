@@ -46,7 +46,7 @@ public class TestElementCollectionCascade extends BaseTestCase {
     assertThat(sql.get(0)).contains("select t0.id, t0.name, t0.version from ecsm_parent t0 where t0.id = ?");
     if (!isPostgresCompatible()) {
       assertThat(sql.get(1)).contains("select t0.ecsm_parent_id, t0.one_id, t0.name, t0.version from ecsm_child t0 where (t0.ecsm_parent_id) in (?)");
-      assertThat(sql.get(2)).contains("select t0.host_id, t0.value from ecsm_values t0 where (t0.host_id) in (?,?)");
+      assertThat(sql.get(2)).contains("select t0.host_id, t0.value from ecsm_values t0 where (t0.host_id) in (?,?,?,?,?)");
     }
 
     Set<String> vals0 = childVals.get("c0");
