@@ -142,6 +142,13 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
     whereStack.push(filter);
   }
 
+  /**
+   * The enhancement will no longer use this method. Will be removed once the new IntelliJ plugin is released.
+   */
+  protected void setRoot(R root) {
+    // do nothing, remove this method shortly.
+  }
+
   @Override
   public FetchGroup<T> buildFetchGroup() {
     return ((SpiFetchGroupQuery<T>) query()).buildFetchGroup();
