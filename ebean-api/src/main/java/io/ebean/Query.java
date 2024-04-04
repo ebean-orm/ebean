@@ -511,14 +511,6 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
   QueryType getQueryType();
 
   /**
-   * Controls, if paginated queries should always append an 'order by id' statement at the end to
-   * guarantee a deterministic sort result. This may affect performance.
-   * If this is not enabled, and an orderBy is set on the query, it's up to the programmer that
-   * this query provides a deterministic result.
-   */
-  Query<T> orderById(boolean orderById);
-
-  /**
    * Set the profile location of this query. This is used to relate query execution metrics
    * back to a location like a specific line of code.
    */

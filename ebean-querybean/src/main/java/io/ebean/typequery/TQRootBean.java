@@ -583,6 +583,12 @@ public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
   }
 
   @Override
+  public R orderById(boolean orderById) {
+    query.orderById(orderById);
+    return root;
+  }
+
+  @Override
   @Deprecated(since = "13.19", forRemoval = true)
   public final R order(String orderByClause) {
     return orderBy(orderByClause);
