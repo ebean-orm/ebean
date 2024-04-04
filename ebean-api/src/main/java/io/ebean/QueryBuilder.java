@@ -467,6 +467,14 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
   SELF setOrderBy(OrderBy<T> orderBy);
 
   /**
+   * Controls, if paginated queries should always append an 'order by id' statement at the end to
+   * guarantee a deterministic sort result. This may affect performance.
+   * If this is not enabled, and an orderBy is set on the query, it's up to the programmer that
+   * this query provides a deterministic result.
+   */
+  SELF orderById(boolean orderById);
+
+  /**
    * Execute the query with the given lock type and WAIT.
    * <p>
    * Note that <code>forUpdate()</code> is the same as
