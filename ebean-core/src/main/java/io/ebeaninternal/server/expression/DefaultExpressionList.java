@@ -446,7 +446,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (SpiExpression expr : list) {
       expr.addBindValues(request);
     }

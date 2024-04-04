@@ -3,8 +3,9 @@ package io.ebeaninternal.server.query;
 import io.ebean.PagedList;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
-
 import jakarta.persistence.PersistenceException;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.ReentrantLock;
@@ -20,7 +21,7 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
   private final int firstRow;
   private final int maxRows;
 
-  private int foregroundTotalRowCount = -1;
+  private int totalRowCount = -1;
   private Future<Integer> futureRowCount;
   private List<T> list;
 
@@ -57,7 +58,12 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
     lock.lock();
     try {
       if (list == null) {
-        list = server.findList(query);
+        if (totalRowCount == 0) {
+          // already count and no rows
+          list = Collections.emptyList();
+        } else {
+          list = server.findList(query);
+        }
       }
       return list;
     } finally {
@@ -87,20 +93,21 @@ public final class LimitOffsetPagedList<T> implements PagedList<T> {
   public int getTotalCount() {
     lock.lock();
     try {
+      if (totalRowCount > -1) {
+        return totalRowCount;
+      }
       if (futureRowCount != null) {
         try {
           // background query already initiated so get it with a wait
-          return futureRowCount.get();
+          totalRowCount = futureRowCount.get();
+          return totalRowCount;
         } catch (Exception e) {
           throw new PersistenceException(e);
         }
       }
-      // already fetched?
-      if (foregroundTotalRowCount > -1) return foregroundTotalRowCount;
-
       // just using foreground thread
-      foregroundTotalRowCount = server.findCount(query);
-      return foregroundTotalRowCount;
+      totalRowCount = server.findCount(query);
+      return totalRowCount;
     } finally {
       lock.unlock();
     }

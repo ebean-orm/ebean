@@ -80,6 +80,28 @@ class QOrderTest {
   }
 
   @Test
+  void orderById() {
+    Query<Order> query = new QOrder()
+      .select(QOrder.Alias.status)
+      .orderById(true).query();
+
+    query.findList();
+
+    String sql = query.getGeneratedSql();
+    assertThat(sql).contains("select /* QOrderTest.orderById:88 */ t0.id, t0.status from o_order t0 order by t0.id");
+
+    Query<Order> query2 = new QOrder()
+      .select(QOrder.Alias.status)
+      .orderById(true).orderBy().status.asc()
+      .query();
+
+    query2.findList();
+
+    String sql2 = query2.getGeneratedSql();
+    assertThat(sql2).contains("select /* QOrderTest.orderById:98 */ t0.id, t0.status from o_order t0 order by t0.status, t0.id");
+  }
+
+  @Test
   void hint() {
     LoggedSql.start();
     new QCustomer()

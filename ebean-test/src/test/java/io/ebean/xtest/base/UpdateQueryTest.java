@@ -356,7 +356,7 @@ public class UpdateQueryTest extends BaseTestCase {
         .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
         .where()
         .gt("id", 10000)
-        .update(transaction);
+        .update(transaction); // .usingTransaction(transaction).update();
 
       rowsQuery = server
         .update(Customer.class)

@@ -2,10 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.InTuples;
 import io.ebean.service.SpiInTuples;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.api.*;
 
 import java.util.List;
 
@@ -32,7 +29,7 @@ final class InTuplesExpression extends AbstractExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (Object[] entry : entries) {
       for (Object value : entry) {
         requireNonNull(value);

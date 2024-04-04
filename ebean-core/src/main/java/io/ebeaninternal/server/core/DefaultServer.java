@@ -2020,7 +2020,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
     if (timeMicros > slowQueryMicros && slowQueryListener != null) {
-      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.parentNode()));
+      List<Object> bindParams = new SlowQueryBindCapture(query).capture();
+      slowQueryListener.process(new DSlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount,
+        query.parentNode(), bindParams, query.label(), query.profileLocation()));
     }
   }
 

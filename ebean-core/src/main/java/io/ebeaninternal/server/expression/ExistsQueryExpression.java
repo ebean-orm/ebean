@@ -94,7 +94,7 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }

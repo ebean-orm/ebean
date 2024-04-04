@@ -41,7 +41,7 @@ final class AllEqualsExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     if (propMap.isEmpty()) {
       return;
     }

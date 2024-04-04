@@ -54,7 +54,7 @@ final class BetweenPropertyExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     request.addBindValue(val());
   }
 

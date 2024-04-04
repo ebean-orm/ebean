@@ -122,7 +122,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (SpiExpression expr : exprList.internalList()) {
       expr.addBindValues(request);
     }
