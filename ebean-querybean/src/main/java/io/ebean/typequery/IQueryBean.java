@@ -1,21 +1,12 @@
 package io.ebean.typequery;
 
-import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
 import io.ebean.search.TextQueryString;
 import io.ebean.search.TextSimple;
-import io.ebean.text.PathProperties;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.Timestamp;
-import java.util.*;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.Collection;
 
 /**
  * Query bean for strongly typed query construction and execution.
@@ -53,7 +44,7 @@ import java.util.stream.Stream;
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
  * @param <R> the specific query bean type (e.g. QCustomer)
  */
-public interface QueryBean<T, R> extends QueryBuilder<R, T> {
+public interface IQueryBean<T, R> extends QueryBuilder<R, T> {
 
   /**
    * Return the underlying query.

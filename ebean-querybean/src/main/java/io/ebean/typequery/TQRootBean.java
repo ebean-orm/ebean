@@ -57,7 +57,7 @@ import java.util.stream.Stream;
  * @param <R> the specific root query bean type (e.g. QCustomer)
  */
 @NonNullApi
-public abstract class TQRootBean<T, R> implements QueryBean<T, R> {
+public abstract class TQRootBean<T, R> implements IQueryBean<T, R> {
 
   /**
    * The underlying query.
