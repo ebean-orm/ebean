@@ -46,7 +46,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Eagerly fetch this association fetching all the properties.
    */
   public final R fetch() {
-    ((TQRootBean) _root).query().fetch(_name);
+    ((QueryBean) _root).query().fetch(_name);
     return _root;
   }
 
@@ -54,7 +54,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Eagerly fetch this association using a "query join".
    */
   public final R fetchQuery() {
-    ((TQRootBean) _root).query().fetchQuery(_name);
+    ((QueryBean) _root).query().fetchQuery(_name);
     return _root;
   }
 
@@ -63,7 +63,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Cache misses are populated via fetchQuery().
    */
   public final R fetchCache() {
-    ((TQRootBean) _root).query().fetchCache(_name);
+    ((QueryBean) _root).query().fetchCache(_name);
     return _root;
   }
 
@@ -71,7 +71,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Use lazy loading for fetching this association.
    */
   public final R fetchLazy() {
-    ((TQRootBean) _root).query().fetchLazy(_name);
+    ((QueryBean) _root).query().fetchLazy(_name);
     return _root;
   }
 
@@ -79,7 +79,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Eagerly fetch this association with the properties specified.
    */
   public final R fetch(String properties) {
-    ((TQRootBean) _root).query().fetch(_name, properties);
+    ((QueryBean) _root).query().fetch(_name, properties);
     return _root;
   }
 
@@ -87,7 +87,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Eagerly fetch this association using a "query join" with the properties specified.
    */
   public final R fetchQuery(String properties) {
-    ((TQRootBean) _root).query().fetchQuery(_name, properties);
+    ((QueryBean) _root).query().fetchQuery(_name, properties);
     return _root;
   }
 
@@ -96,7 +96,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Cache misses are populated via  fetchQuery().
    */
   public final R fetchCache(String properties) {
-    ((TQRootBean) _root).query().fetchCache(_name, properties);
+    ((QueryBean) _root).query().fetchCache(_name, properties);
     return _root;
   }
 
@@ -177,7 +177,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
   }
 
   private SpiQueryFetch spiQuery() {
-    return (SpiQueryFetch) ((TQRootBean) _root).query();
+    return (SpiQueryFetch) ((QueryBean) _root).query();
   }
 
   private Set<String> properties(TQProperty<?, ?>... props) {
