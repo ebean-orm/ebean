@@ -1,5 +1,6 @@
 package io.ebean.bean;
 
+import io.avaje.applog.AppLog;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.ValuePair;
@@ -16,6 +17,8 @@ import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * This is the object added to every entity bean using byte code enhancement.
  * <p>
@@ -24,6 +27,8 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class InterceptReadWrite extends InterceptBase implements EntityBeanIntercept {
   private static final long serialVersionUID = 1834735632647183821L;
+
+  public static final System.Logger log = AppLog.getLogger("io.ebean.bean");
 
   private static final int STATE_NEW = 0;
   private static final int STATE_REFERENCE = 1;
@@ -45,6 +50,11 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
    * Flags indicating if the mutable hash is set.
    */
   private static final byte FLAG_MUTABLE_HASH_SET = 16;
+
+  /**
+   * Flag indicates that warning was logged.
+   */
+  private static final byte FLAG_MUTABLE_WARN_LOGGED = 32;
 
   private final ReentrantLock lock = new ReentrantLock();
   private transient NodeUsageCollector nodeUsageCollector;
@@ -221,11 +231,17 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
     }
     if (mutableInfo != null) {
       for (int i = 0; i < mutableInfo.length; i++) {
+        if ((flags[i] & FLAG_MUTABLE_WARN_LOGGED) == FLAG_MUTABLE_WARN_LOGGED) {
+           break; // do not check again and do NOT mark as dirty
+        }
         if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(value(i))) {
           if (readOnly) {
-            throw new IllegalStateException("Some mutableinfo changed on readonly bean");
+            log.log(WARNING, "Mutable object in {0}.{1} ({2}) changed. Not setting bean dirty, because it is readonly",
+              owner.getClass().getName(), property(i), owner);
+            flags[i] |= FLAG_MUTABLE_WARN_LOGGED;
+          } else {
+            dirty = true;
           }
-          dirty = true;
           break;
         }
       }
