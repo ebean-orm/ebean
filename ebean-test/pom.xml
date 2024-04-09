@@ -12,7 +12,7 @@
   <artifactId>ebean-test</artifactId>
 
   <properties>
-    <bytebuddy.version>1.14.12</bytebuddy.version>
+    <bytebuddy.version>1.14.13</bytebuddy.version>
     <assertj.version>3.25.3</assertj.version>
   </properties>
 
@@ -293,7 +293,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
       <scope>provided</scope>
     </dependency>
 
