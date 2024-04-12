@@ -225,7 +225,7 @@ class SimpleQueryBeanWriter {
       writer.append("public final class Q%s {", shortName).eol();
     } else {
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      writer.append("public final class Q%s extends io.ebean.typequery.TQRootBean<%s,Q%s> {", shortName, beanFullName, shortName).eol();
+      writer.append("public final class Q%s extends io.ebean.typequery.QueryBean<%s,Q%s> {", shortName, beanFullName, shortName).eol();
     }
     writer.eol();
   }
