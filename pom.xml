@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>3.12</version>
+    <version>4.1</version>
   </parent>
 
   <groupId>io.ebean</groupId>
@@ -51,10 +51,10 @@
     <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>14.0.0</ebean-migration.version>
-    <ebean-test-containers.version>7.3</ebean-test-containers.version>
-    <ebean-datasource.version>8.12</ebean-datasource.version>
-    <ebean-agent.version>14.2.0</ebean-agent.version>
-    <ebean-maven-plugin.version>14.2.0</ebean-maven-plugin.version>
+    <ebean-test-containers.version>7.4</ebean-test-containers.version>
+    <ebean-datasource.version>8.14</ebean-datasource.version>
+    <ebean-agent.version>14.2.1</ebean-agent.version>
+    <ebean-maven-plugin.version>14.2.1</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
@@ -63,7 +63,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
       <scope>test</scope>
     </dependency>
 
