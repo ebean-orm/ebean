@@ -11,7 +11,7 @@
   <artifactId>test-java16</artifactId>
 
   <properties>
-    <java.release>16</java.release>
+    <maven.compiler.release>17</maven.compiler.release>
   </properties>
 
   <dependencies>
