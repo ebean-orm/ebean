@@ -445,6 +445,9 @@ public final class InternalConfiguration {
    */
   private DataTimeZone initDataTimeZone() {
     String tz = config.getDataTimeZone();
+    if ("NoTimeZone".equals(tz)) {
+      return new NoDataTimeZone();
+    }
     if (tz == null) {
       if (isMySql(getPlatform())) {
         return new MySqlDataTimeZone();
