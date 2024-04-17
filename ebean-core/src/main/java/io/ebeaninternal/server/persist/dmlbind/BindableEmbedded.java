@@ -36,6 +36,13 @@ final class BindableEmbedded implements Bindable {
   }
 
   @Override
+  public void dmlType(GenerateDmlRequest request) {
+    for (Bindable item : items) {
+      item.dmlType(request);
+    }
+  }
+
+  @Override
   public void addToUpdate(PersistRequestBean<?> request, List<Bindable> list) {
     if (request.isAddToUpdate(embProp)) {
       list.add(this);

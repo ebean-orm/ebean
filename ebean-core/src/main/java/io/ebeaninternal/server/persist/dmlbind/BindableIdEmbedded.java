@@ -82,6 +82,13 @@ final class BindableIdEmbedded implements BindableId {
   }
 
   @Override
+  public void dmlType(GenerateDmlRequest request) {
+    for (BeanProperty prop : props) {
+      request.appendColumn(prop.dbColumnDefn());
+    }
+  }
+
+  @Override
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
     if (matches == null) {
       String m = "No matches for " + embId.fullName() + " the concatenated key columns where not found?"

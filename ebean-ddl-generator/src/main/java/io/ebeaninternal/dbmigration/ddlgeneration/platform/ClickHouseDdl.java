@@ -5,6 +5,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlBuffer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlHandler;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
+import io.ebeaninternal.dbmigration.migration.Column;
 
 public class ClickHouseDdl extends PlatformDdl {
 
@@ -15,6 +16,16 @@ public class ClickHouseDdl extends PlatformDdl {
     this.includeStorageEngine = true;
     this.identitySuffix = "";
     this.columnNotNull = null;
+  }
+
+  @Override
+  protected String columnDefn(Column column) {
+    String defn = super.columnDefn(column);
+    if (isTrue(column.isNotnull()) || isTrue(column.isPrimaryKey())) {
+      return defn;
+    } else {
+      return "Nullable(" + defn + ")";
+    }
   }
 
   @Override

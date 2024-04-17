@@ -67,6 +67,16 @@ public final class ImportedIdEmbedded implements ImportedId {
   }
 
   @Override
+  public void dmlType(GenerateDmlRequest request) {
+    boolean update = request.isUpdate();
+    for (ImportedIdSimple anImported : imported) {
+      if (anImported.isInclude(update)) {
+        anImported.dmlType(request);
+      }
+    }
+  }
+
+  @Override
   public String importedIdClause() {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < imported.length; i++) {

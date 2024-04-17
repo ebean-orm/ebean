@@ -230,13 +230,13 @@ public class PlatformDdl {
    * Write the column definition to the create table statement.
    */
   protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) {
-    String columnDefn = convert(column.getType());
+    buffer.append("  ");
+    buffer.append(quote(column.getName()), 29);
+
+    String columnDefn = columnDefn(column);
     if (identity.useIdentity() && isTrue(column.isPrimaryKey())) {
       columnDefn = asIdentityColumn(columnDefn, identity);
     }
-
-    buffer.append("  ");
-    buffer.append(quote(column.getName()), 29);
     buffer.append(columnDefn);
     if (!Boolean.TRUE.equals(column.isPrimaryKey())) {
       String defaultValue = convertDefaultValue(column.getDefaultValue());
@@ -249,6 +249,13 @@ public class PlatformDdl {
     }
     // add check constraints later as we really want to give them a nice name
     // so that the database can potentially provide a nice SQL error
+  }
+
+  /**
+   * Return the plaform specific column type definition.
+   */
+  protected String columnDefn(Column column) {
+    return convert(column.getType());
   }
 
   /**
