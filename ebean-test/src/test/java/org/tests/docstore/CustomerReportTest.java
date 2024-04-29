@@ -1,14 +1,18 @@
 package org.tests.docstore;
 
 
-import io.ebean.xtest.BaseTestCase;
+import io.ebean.BeanState;
+import io.ebean.DB;
+import io.ebean.test.LoggedSql;
 import io.ebean.text.json.JsonReadOptions;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Product;
 import org.tests.model.basic.ResetBasicData;
 import org.tests.model.docstore.CustomerReport;
 import org.tests.model.docstore.ProductReport;
+import org.tests.model.docstore.ReportContainer;
 
 import java.util.Arrays;
 
@@ -19,7 +23,6 @@ public class CustomerReportTest extends BaseTestCase {
   @Test
   public void testToJson() throws Exception {
     ResetBasicData.reset();
-
 
 
     String json = server().json().toJson(getCustomerReport());
@@ -52,9 +55,9 @@ public class CustomerReportTest extends BaseTestCase {
     String json = server().json().toJson(report);
 
     assertThat(json).isEqualTo("{\"dtype\":\"CR\","
-        + "\"embeddedReports\":[{\"dtype\":\"PR\",\"title\":\"This is a good product\",\"product\":{\"id\":1}}],"
-        + "\"friends\":[{\"id\":2},{\"id\":3}],"
-        + "\"customer\":{\"id\":1}}");
+      + "\"embeddedReports\":[{\"dtype\":\"PR\",\"title\":\"This is a good product\",\"product\":{\"id\":1}}],"
+      + "\"friends\":[{\"id\":2},{\"id\":3}],"
+      + "\"customer\":{\"id\":1}}");
 
     JsonReadOptions opts = new JsonReadOptions();
     opts.setEnableLazyLoading(true);
@@ -84,5 +87,86 @@ public class CustomerReportTest extends BaseTestCase {
     report.setTitle("This is a good product");
     report.setProduct(product);
     return report;
+  }
+
+  /**
+   * Tests the inheritance support for DocStore/Jsons.
+   * We do not use default jackson serialization. In Report-class
+   * there are (de)serializers, that will delegate the (de)serialization
+   * back to ebean.
+   * <p>
+   * Big advantage: Ebean supports Inheritance with JSONS and some kind
+   * of "autodiscovery".
+   * <p>
+   * In theory, Jackson could do serialization with `@JsonSubTypes`, but
+   * they have to be specified in the top class. See
+   * https://github.com/FasterXML/jackson-databind/issues/2104
+   */
+  @Test
+  public void testInheritance() {
+    ReportContainer container = new ReportContainer();
+    container.setReport(new ProductReport());
+    DB.save(container);
+
+    ReportContainer container2 = new ReportContainer();
+    container2.setReport(new CustomerReport());
+    DB.save(container2);
+
+    container = DB.find(ReportContainer.class, container.getId());
+    container2 = DB.find(ReportContainer.class, container2.getId());
+
+    assertThat(container.getReport()).isInstanceOf(ProductReport.class);
+    assertThat(container2.getReport()).isInstanceOf(CustomerReport.class);
+  }
+
+  /**
+   * This test shows how we do the (de)serialization when we reference entites, that are persisted in the DB
+   */
+  @Test
+  public void testReferenceBean() {
+    ResetBasicData.reset();
+    ReportContainer container = new ReportContainer();
+    CustomerReport report = new CustomerReport();
+    container.setReport(report);
+
+    Object robId = DB.find(Customer.class).where().eq("name", "Rob").findIds().get(0);
+    report.setFriends(DB.find(Customer.class).where().eq("name", "Fiona").findList());
+    LoggedSql.start();
+    report.setCustomer(DB.reference(Customer.class, robId));
+    DB.save(container);
+    assertThat(LoggedSql.stop()).hasSize(1); // no lazy load
+
+    container = DB.find(ReportContainer.class, container.getId());
+    assertThat(((CustomerReport) container.getReport()).getCustomer().getName()).isEqualTo("Rob");
+    assertThat(((CustomerReport) container.getReport()).getFriends().get(0).getName()).isEqualTo("Fiona");
+  }
+
+  /**
+   * This test shows the dirty detection on docstore beans.
+   */
+  @Test
+  public void testJsonBeanState() {
+    ResetBasicData.reset();
+    ReportContainer container = new ReportContainer();
+    CustomerReport report = new CustomerReport();
+    report.setTitle("Foo");
+    container.setReport(report);
+
+    BeanState state = DB.beanState(container.getReport());
+    assertThat(state.isNew()).isTrue();
+
+    DB.save(container);
+    container = DB.find(ReportContainer.class, container.getId());
+
+     state = DB.beanState(container.getReport());
+    assertThat(state.isDirty()).isFalse();
+    assertThat(state.isNew()).isFalse(); // this detection does not work on JSONs
+
+    container.getReport().setTitle("Bar");
+    state = DB.beanState(container.getReport());
+    assertThat(state.isDirty()).isTrue();
+    //BTW: ValuePair has no equals & hashcode
+    //assertThat(state.dirtyValues()).hasSize(1).containsEntry("title", new ValuePair("Bar", "Foo"));
+    assertThat(state.dirtyValues()).hasSize(1).hasToString("{title=Bar,Foo}");
   }
 }
