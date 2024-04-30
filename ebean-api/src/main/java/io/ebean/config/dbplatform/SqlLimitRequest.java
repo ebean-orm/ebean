@@ -9,6 +9,21 @@ import io.ebean.Query;
 public interface SqlLimitRequest {
 
   /**
+   * Return ANSI SQL Offset and next rows.
+   */
+  String ansiOffsetRows();
+
+  /**
+   * Create and return buffer including the select distinct clause.
+   */
+  StringBuilder selectDistinct();
+
+  /**
+   * Create and return buffer including the select distinct on clause.
+   */
+  StringBuilder selectDistinctOnSql();
+
+  /**
    * Return true if the query uses distinct.
    */
   boolean isDistinct();
