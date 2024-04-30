@@ -552,7 +552,7 @@ final class CQueryBuilder {
       this.countSingleAttribute = query.isCountDistinct() && query.isSingleAttribute();
       this.useSqlLimiter = selectClause == null
         && query.hasMaxRowsOrFirstRow()
-        && (select.manyProperty() == null || query.isSingleAttribute());
+        && (select.distinctOn() != null || select.manyProperty() == null || query.isSingleAttribute());
     }
 
     private void appendSelect() {

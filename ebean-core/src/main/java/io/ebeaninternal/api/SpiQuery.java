@@ -440,6 +440,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   SpiQuery<T> copy();
 
   /**
+   * Return the distinct on clause.
+   */
+  String distinctOn();
+
+  /**
    * Return a copy of the query attaching to a different EbeanServer.
    */
   SpiQuery<T> copy(SpiEbeanServer server);
@@ -549,7 +554,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if the query should include the Id property.
    * <p>
    * distinct and single attribute queries exclude the Id property.
-   * </p>
    */
   boolean isWithId();
 
