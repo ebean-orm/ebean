@@ -314,7 +314,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("select t0.id, t0.name from be_customer t0 limit 10");
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterManySeparateQuery */ t0.id, t0.name from be_customer t0 limit 10");
   }
 
   @Test

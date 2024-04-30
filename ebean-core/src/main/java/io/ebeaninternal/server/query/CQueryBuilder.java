@@ -533,7 +533,7 @@ final class CQueryBuilder {
     private final boolean distinct;
     private final boolean countSingleAttribute;
     private final String dbOrderBy;
-    private boolean useSqlLimiter;
+    private final boolean useSqlLimiter;
     private boolean hasWhere;
 
     private BuildReq(String selectClause, OrmQueryRequest<?> request, CQueryPredicates predicates, SqlTree select) {
@@ -550,13 +550,15 @@ final class CQueryBuilder {
       this.distinct = query.isDistinct() || select.isSqlDistinct();
       this.dbOrderBy = predicates.dbOrderBy();
       this.countSingleAttribute = query.isCountDistinct() && query.isSingleAttribute();
+      this.useSqlLimiter = selectClause == null
+        && query.hasMaxRowsOrFirstRow()
+        && (select.manyProperty() == null || query.isSingleAttribute());
     }
 
     private void appendSelect() {
       if (selectClause != null) {
         sb.append(selectClause);
       } else {
-        useSqlLimiter = (query.hasMaxRowsOrFirstRow() && (select.manyProperty() == null || query.isSingleAttribute()));
         if (!useSqlLimiter) {
           appendSelectDistinct();
         }
@@ -733,7 +735,7 @@ final class CQueryBuilder {
       }
       if (useSqlLimiter) {
         // use LIMIT/OFFSET, ROW_NUMBER() or rownum type SQL query limitation
-        SqlLimitRequest r = new OrmQueryLimitRequest(sb.toString(), dbOrderBy, query, dbPlatform, distinct);
+        var r = new OrmQueryLimitRequest(sb.toString(), dbOrderBy, query, dbPlatform, distinct, select.distinctOn(), hint(), inlineSqlComment());
         return sqlLimiter.limit(r);
       } else {
         if (updateStatement) {
