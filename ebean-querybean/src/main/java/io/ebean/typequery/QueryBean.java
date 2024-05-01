@@ -160,6 +160,12 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   }
 
   @Override
+  public R distinctOn(String distinctOn) {
+    query.distinctOn(distinctOn);
+    return root;
+  }
+
+  @Override
   public R select(String properties) {
     query.select(properties);
     return root;
@@ -168,6 +174,17 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   @Override
   public R select(FetchGroup<T> fetchGroup) {
     query.select(fetchGroup);
+    return root;
+  }
+
+  @Override
+  @SafeVarargs
+  public final R distinctOn(TQProperty<R, ?>... properties) {
+    final var joiner = new StringJoiner(", ");
+    for (Query.Property<?> property : properties) {
+      joiner.add(property.toString());
+    }
+    distinctOn(joiner.toString());
     return root;
   }
 

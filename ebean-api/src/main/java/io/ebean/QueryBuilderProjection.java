@@ -41,6 +41,13 @@ public interface QueryBuilderProjection<SELF, T> {
   SELF select(String fetchProperties);
 
   /**
+   * Set DISTINCT ON clause. This is a Postgres only SQL feature.
+   *
+   * @param distinctOn The properties to include in the DISTINCT ON clause.
+   */
+  SELF distinctOn(String distinctOn);
+
+  /**
    * Apply the fetchGroup which defines what part of the object graph to load.
    */
   SELF select(FetchGroup<T> fetchGroup);

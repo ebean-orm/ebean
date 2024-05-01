@@ -60,6 +60,11 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  public Query<T> distinctOn(String distinctOn) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public Query<T> select(String columns) {
     detail.select(columns);
     return this;
