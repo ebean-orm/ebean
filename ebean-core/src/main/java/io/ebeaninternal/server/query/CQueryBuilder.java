@@ -3,7 +3,6 @@ package io.ebeaninternal.server.query;
 import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.SqlLimitRequest;
 import io.ebean.config.dbplatform.SqlLimitResponse;
 import io.ebean.config.dbplatform.SqlLimiter;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
@@ -583,7 +582,7 @@ final class CQueryBuilder {
         if (request.isInlineCountDistinct()) {
           sb.append(')');
         }
-        if (distinct && dbOrderBy != null) {
+        if (distinct && dbOrderBy != null && query.distinctOn() == null) {
           // add the orderBy columns to the select clause (due to distinct)
           String[] tokens = DbOrderByTrim.trim(dbOrderBy).split(",");
           for (String token : tokens) {

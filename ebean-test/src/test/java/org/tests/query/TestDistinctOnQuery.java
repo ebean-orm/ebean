@@ -1,6 +1,7 @@
 package org.tests.query;
 
 import io.ebean.DB;
+import io.ebean.Query;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
@@ -8,6 +9,7 @@ import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
@@ -39,6 +41,31 @@ class TestDistinctOnQuery extends BaseTestCase {
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("select distinct on (t0.id) t0.id, t0.name, t1.id, t1.first_name, t1.last_name from o_customer t0 left join contact t1 on t1.customer_id = t0.id order by t0.id, t1.last_name limit 10;");
+  }
+
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @Test
+  void distinctOnSubQuery() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+
+    Query<OrderDetail> subQuery = DB.find(OrderDetail.class)
+      .distinctOn("product")
+      .select("id")
+      .orderBy("product, updtime desc")
+      .setMaxRows(10);
+
+    List<OrderDetail> lines = DB.find(OrderDetail.class)
+      .select("product, orderQty, shipQty, created")
+      .where().in("id", subQuery)
+      .orderBy().asc("cretime")
+      .findList();
+
+    assertThat(lines).isNotEmpty();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select t0.id, t0.product_id, t0.order_qty, t0.ship_qty, t0.id from o_order_detail t0 where t0.id in (select distinct on (t0.product_id) t0.id from o_order_detail t0 order by t0.product_id, t0.updtime desc limit 10) order by t0.cretime");
   }
 
   @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
