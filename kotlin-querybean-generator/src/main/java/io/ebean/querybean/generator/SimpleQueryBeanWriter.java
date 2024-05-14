@@ -337,7 +337,7 @@ class SimpleQueryBeanWriter {
       writer.append(" */").eol();
       writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      writer.append("class Q%s : io.ebean.typequery.TQRootBean<%s, Q%s> {", shortName, beanFullName, shortName).eol();
+      writer.append("class Q%s : io.ebean.typequery.QueryBean<%s, Q%s> {", shortName, beanFullName, shortName).eol();
     }
 
     writer.eol();

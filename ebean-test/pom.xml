@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.1.0</version>
+    <version>14.3.0</version>
   </parent>
 
   <name>ebean test</name>
@@ -12,7 +12,7 @@
   <artifactId>ebean-test</artifactId>
 
   <properties>
-    <bytebuddy.version>1.14.12</bytebuddy.version>
+    <bytebuddy.version>1.14.13</bytebuddy.version>
     <assertj.version>3.25.3</assertj.version>
   </properties>
 
@@ -33,20 +33,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>14.1.0</version>
+      <version>14.3.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>14.1.0</version>
+      <version>14.3.0</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>14.1.0</version>
+      <version>14.3.0</version>
     </dependency>
 
     <dependency>
@@ -149,14 +149,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-mapper</artifactId>
-      <version>14.1.0</version>
+      <version>14.3.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>14.1.0</version>
+      <version>14.3.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -293,7 +293,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
       <scope>provided</scope>
     </dependency>
 
@@ -305,11 +305,11 @@
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.34</version>
+        <version>2.40</version>
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:14.1.0</tile>
+            <tile>io.ebean.tile:enhancement:14.3.0</tile>
           </tiles>
         </configuration>
       </plugin>

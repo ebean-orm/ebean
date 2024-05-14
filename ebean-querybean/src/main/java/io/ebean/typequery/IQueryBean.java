@@ -56,6 +56,13 @@ public interface IQueryBean<T, R> extends QueryBuilder<R, T> {
   FetchGroup<T> buildFetchGroup();
 
   /**
+   * Set DISTINCT ON properties. This is a Postgres only SQL feature.
+   *
+   * @param properties The properties to include in the DISTINCT ON clause.
+   */
+  R distinctOn(TQProperty<R, ?>... properties);
+
+  /**
    * Specify the properties to be loaded on the 'main' root level entity bean.
    * <p>
    * The resulting entities with be "partially loaded" aka partial objects.

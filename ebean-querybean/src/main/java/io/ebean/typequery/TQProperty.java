@@ -41,7 +41,7 @@ public class TQProperty<R, T> implements Query.Property<T> {
    * Internal method to return the underlying expression list.
    */
   protected final ExpressionList<?> expr() {
-    return ((TQRootBean<?, ?>) _root).peekExprList();
+    return ((QueryBean<?, ?>) _root).peekExprList();
   }
 
   /**
