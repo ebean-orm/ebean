@@ -190,6 +190,9 @@ final class ScalarTypeJsonSet {
 
     @SuppressWarnings("unchecked")
     private Set convertList(List list) {
+      if (list == null) {
+        return null;
+      }
       return new LinkedHashSet(list);
     }
   }
