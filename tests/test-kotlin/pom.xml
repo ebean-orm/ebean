@@ -92,7 +92,7 @@
                   <groupId>io.ebean</groupId>
                   <artifactId>kotlin-querybean-generator</artifactId>
 <!--                  <artifactId>querybean-generator</artifactId>-->
-                  <version>14.1.0</version>
+                  <version>14.3.0</version>
                 </annotationProcessorPath>
               </annotationProcessorPaths>
             </configuration>
