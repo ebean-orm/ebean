@@ -6,7 +6,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.1.0</version>
+    <version>14.3.0</version>
   </parent>
 
   <artifactId>test-kotlin</artifactId>
@@ -40,20 +40,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>14.1.0</version>
+      <version>14.3.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.4</version>
+      <version>1.5</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>14.1.0</version>
+      <version>14.3.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -92,7 +92,7 @@
                   <groupId>io.ebean</groupId>
                   <artifactId>kotlin-querybean-generator</artifactId>
 <!--                  <artifactId>querybean-generator</artifactId>-->
-                  <version>14.0.2</version>
+                  <version>14.3.0</version>
                 </annotationProcessorPath>
               </annotationProcessorPaths>
             </configuration>

@@ -154,6 +154,10 @@ public final class SqlTreeBuilder {
   }
 
   private String buildDistinctOn() {
+    String distinctOn = predicates.dbDistinctOn();
+    if (distinctOn != null) {
+      return distinctOn;
+    }
     if (rawSql || !distinctOnPlatform || !sqlDistinct || Type.COUNT == query.type()) {
       return null;
     }

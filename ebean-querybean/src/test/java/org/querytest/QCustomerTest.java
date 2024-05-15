@@ -4,6 +4,7 @@ import io.ebean.*;
 import io.ebean.annotation.Transactional;
 import io.ebean.test.LoggedSql;
 import io.ebean.types.Inet;
+import io.ebeaninternal.api.SpiQuery;
 import org.example.domain.Address;
 import org.example.domain.Country;
 import org.example.domain.Customer;
@@ -226,6 +227,22 @@ public class QCustomerTest {
       .findList();
   }
 
+  @Test
+  public void distinctOn() {
+    var c = QContact.alias();
+    var q = new QContact()
+      .distinctOn(c.customer)
+      .select(c.lastName, c.whenCreated)
+      .orderBy()
+      .customer.id.asc()
+      .whenCreated.desc()
+      .query();
+
+    SpiQuery<?> spiQuery = (SpiQuery<?>) q;
+    assertThat(spiQuery.distinctOn()).isEqualTo("customer");
+    assertThat(spiQuery.isDistinct()).isTrue();
+  }
+
   @Transactional
   @Test
   public void forUpdate() {
@@ -314,7 +331,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("select t0.id, t0.name from be_customer t0 limit 10");
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterManySeparateQuery */ t0.id, t0.name from be_customer t0 limit 10");
   }
 
   @Test

@@ -62,6 +62,7 @@ public final class CQueryPredicates {
    */
   private String dbFilterMany;
   private String dbOrderBy;
+  private String dbDistinctOn;
   private String dbUpdateClause;
   /**
    * Includes from where and order by clauses.
@@ -209,6 +210,10 @@ public final class CQueryPredicates {
       }
     }
     if (buildSql) {
+      final String distinctOn = query.distinctOn();
+      if (distinctOn != null) {
+        dbDistinctOn = deployParser.parse(distinctOn);
+      }
       predicateIncludes = deployParser.includes();
     }
   }
@@ -230,6 +235,9 @@ public final class CQueryPredicates {
     }
     if (dbOrderBy != null) {
       dbOrderBy = alias.parse(dbOrderBy);
+    }
+    if (dbDistinctOn != null) {
+      dbDistinctOn = alias.parse(dbDistinctOn);
     }
   }
 
@@ -349,6 +357,13 @@ public final class CQueryPredicates {
    */
   String dbOrderBy() {
     return dbOrderBy;
+  }
+
+  /**
+   * Return the db distinct on clause.
+   */
+  String dbDistinctOn() {
+    return dbDistinctOn;
   }
 
   /**

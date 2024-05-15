@@ -18,6 +18,7 @@ class TestLazyLoadMany extends BaseTestCase {
     }
     return m0;
   }
+
   @Test
   void loadAfterPCCleared() {
 
@@ -31,6 +32,7 @@ class TestLazyLoadMany extends BaseTestCase {
       List<COOne> children = DB.find(COOne.class)
         .setLazyLoadBatchSize(2)
         .where().startsWith("name", "tll-m")
+        .orderBy("name")
         .findList();
 
       assertThat(children).hasSize(3);

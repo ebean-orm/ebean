@@ -71,6 +71,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Lazy loading batch size (can override server wide default).
    */
   private int lazyLoadBatchSize;
+  private String distinctOn;
   private OrderBy<T> orderBy;
   private String loadMode;
   private String loadDescription;
@@ -474,7 +475,10 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Limit the number of fetch joins to Many properties, mark as query joins as needed.
    */
   private void markQueryJoins() {
-    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
+    if (distinctOn == null) {
+      // no automatic join to query join conversion when distinctOn is used
+      detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
+    }
   }
 
   private boolean isAllowOneManyFetch() {
@@ -588,12 +592,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     return countDistinctOrder;
   }
 
-  /**
-   * Return true if the Id should be included in the query.
-   */
   @Override
   public final boolean isWithId() {
-    return !manualId && !distinct && !singleAttribute;
+    // distinctOn orm query will auto include the id property
+    // distinctOn dto query does NOT (via setting manualId to true)
+    return !manualId && !singleAttribute && (!distinct || distinctOn != null);
   }
 
   @Override
@@ -689,6 +692,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.baseTable = baseTable;
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
+    copy.distinctOn = distinctOn;
     copy.allowLoadErrors = allowLoadErrors;
     copy.timeout = timeout;
     copy.mapKey = mapKey;
@@ -746,6 +750,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final void setType(Type type) {
     this.type = type;
+  }
+
+  @Override
+  public String distinctOn() {
+    return distinctOn;
   }
 
   @Override
@@ -1018,6 +1027,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     }
     if (distinct) {
       sb.append("/dt");
+      if (distinctOn != null) {
+        sb.append("/o:").append(distinctOn);
+      }
     }
     if (allowLoadErrors) {
       sb.append("/ae");
@@ -1269,6 +1281,13 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final void addNested(String name, OrmQueryDetail nestedDetail, FetchConfig config) {
     detail.addNested(name, nestedDetail, config);
+  }
+
+  @Override
+  public final Query<T> distinctOn(String distinctOn) {
+    this.distinctOn = distinctOn;
+    this.distinct = true;
+    return this;
   }
 
   @Override

@@ -53,7 +53,7 @@ import java.util.stream.Stream;
  * @param <R> the specific root query bean type (e.g. QCustomer)
  */
 @NonNullApi
-public abstract class TQRootBean<T, R> implements IQueryBean<T, R> {
+public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
 
   /**
    * The underlying query.
@@ -73,21 +73,21 @@ public abstract class TQRootBean<T, R> implements IQueryBean<T, R> {
   /**
    * Construct using the type of bean to query on and the default database.
    */
-  public TQRootBean(Class<T> beanType) {
+  public QueryBean(Class<T> beanType) {
     this(beanType, DB.getDefault());
   }
 
   /**
    * Construct using the type of bean to query on and a given database.
    */
-  public TQRootBean(Class<T> beanType, Database database) {
+  public QueryBean(Class<T> beanType, Database database) {
     this(database.find(beanType));
   }
 
   /**
    * Construct with a transaction.
    */
-  protected TQRootBean(Class<T> beanType, Transaction transaction) {
+  protected QueryBean(Class<T> beanType, Transaction transaction) {
     this(beanType);
     query.usingTransaction(transaction);
   }
@@ -95,7 +95,7 @@ public abstract class TQRootBean<T, R> implements IQueryBean<T, R> {
   /**
    * Construct with a database and transaction.
    */
-  protected TQRootBean(Class<T> beanType, Database database, Transaction transaction) {
+  protected QueryBean(Class<T> beanType, Database database, Transaction transaction) {
     this(beanType, database);
     query.usingTransaction(transaction);
   }
@@ -104,7 +104,7 @@ public abstract class TQRootBean<T, R> implements IQueryBean<T, R> {
    * Construct using a query.
    */
   @SuppressWarnings("unchecked")
-  public TQRootBean(Query<T> query) {
+  public QueryBean(Query<T> query) {
     this.query = query;
     this.root = (R) this;
   }
@@ -114,13 +114,13 @@ public abstract class TQRootBean<T, R> implements IQueryBean<T, R> {
    * values for select() and fetch().
    */
   @SuppressWarnings("unchecked")
-  public TQRootBean(boolean aliasDummy) {
+  public QueryBean(boolean aliasDummy) {
     this.query = null;
     this.root = (R) this;
   }
 
   /** Construct for FilterMany */
-  protected TQRootBean(ExpressionList<T> filter) {
+  protected QueryBean(ExpressionList<T> filter) {
     this.query = null;
     this.root = null;
     this.whereStack = new ArrayStack<>();
@@ -145,6 +145,12 @@ public abstract class TQRootBean<T, R> implements IQueryBean<T, R> {
   }
 
   @Override
+  public R distinctOn(String distinctOn) {
+    query.distinctOn(distinctOn);
+    return root;
+  }
+
+  @Override
   public R select(String properties) {
     query.select(properties);
     return root;
@@ -153,6 +159,17 @@ public abstract class TQRootBean<T, R> implements IQueryBean<T, R> {
   @Override
   public R select(FetchGroup<T> fetchGroup) {
     query.select(fetchGroup);
+    return root;
+  }
+
+  @Override
+  @SafeVarargs
+  public final R distinctOn(TQProperty<R, ?>... properties) {
+    final var joiner = new StringJoiner(", ");
+    for (Query.Property<?> property : properties) {
+      joiner.add(property.toString());
+    }
+    distinctOn(joiner.toString());
     return root;
   }
 
