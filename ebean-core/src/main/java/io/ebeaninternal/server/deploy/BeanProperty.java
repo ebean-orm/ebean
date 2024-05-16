@@ -744,9 +744,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
-   * creates a mutableHash for the given JSON value.
+   * creates a mutableHash for the given Object value.
    */
-  public MutableValueInfo createMutableInfo(String json) {
+  public MutableValueInfo createMutableInfo(Object value) {
     throw new UnsupportedOperationException();
   }
 
