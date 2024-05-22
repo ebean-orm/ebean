@@ -28,6 +28,7 @@ AS SET NOCOUNT ON
 declare @sql nvarchar(1000)
 declare @indexName nvarchar(255)
 BEGIN
+-- !Play-Evolutions: KEEP SEMICOLONS START
   DECLARE index_cursor CURSOR FOR SELECT i.name from sys.indexes i
     join sys.index_columns ic on ic.object_id = i.object_id and ic.index_id = i.index_id
     join sys.columns c on c.object_id = ic.object_id and c.column_id = ic.column_id
@@ -43,6 +44,7 @@ BEGIN
     END;
   CLOSE index_cursor;
   DEALLOCATE index_cursor;
+-- !Play-Evolutions: KEEP SEMICOLONS END
 END
 GO
 
@@ -54,11 +56,13 @@ CREATE OR ALTER PROCEDURE usp_ebean_drop_default_constraint @tableName nvarchar(
 AS SET NOCOUNT ON
 declare @tmp nvarchar(1000)
 BEGIN
+-- !Play-Evolutions: KEEP SEMICOLONS START
   select @tmp = t1.name from sys.default_constraints t1
     join sys.columns t2 on t1.object_id = t2.default_object_id
     where t1.parent_object_id = OBJECT_ID(@tableName) and t2.name = @columnName;
 
   if @tmp is not null EXEC('alter table [' + @tableName +'] drop constraint ' + @tmp);
+-- !Play-Evolutions: KEEP SEMICOLONS END
 END
 GO
 
@@ -71,6 +75,7 @@ AS SET NOCOUNT ON
 declare @sql nvarchar(1000)
 declare @constraintName nvarchar(255)
 BEGIN
+-- !Play-Evolutions: KEEP SEMICOLONS START
   DECLARE name_cursor CURSOR FOR
   SELECT cc.name from sys.check_constraints cc
     join sys.columns c on c.object_id = cc.parent_object_id and c.column_id = cc.parent_column_id
@@ -92,6 +97,7 @@ BEGIN
     END;
   CLOSE name_cursor;
   DEALLOCATE name_cursor;
+-- !Play-Evolutions: KEEP SEMICOLONS END
 END
 GO
 
@@ -103,12 +109,14 @@ CREATE OR ALTER PROCEDURE usp_ebean_drop_column @tableName nvarchar(255), @colum
 AS SET NOCOUNT ON
 declare @sql nvarchar(1000)
 BEGIN
+-- !Play-Evolutions: KEEP SEMICOLONS START
   EXEC usp_ebean_drop_indices @tableName, @columnName;
   EXEC usp_ebean_drop_default_constraint @tableName, @columnName;
   EXEC usp_ebean_drop_constraints @tableName, @columnName;
 
   set @sql = 'alter table [' + @tableName + '] drop column [' + @columnName + ']';
   EXECUTE(@sql);
+-- !Play-Evolutions: KEEP SEMICOLONS END
 END
 GO
 </ddl-script>
@@ -122,6 +130,7 @@ delimiter $$
 --
 CREATE PROCEDURE usp_ebean_drop_foreign_keys(IN p_table_name VARCHAR(255), IN p_column_name VARCHAR(255))
 BEGIN
+-- !Play-Evolutions: KEEP SEMICOLONS START
 DECLARE done INT DEFAULT FALSE;
 DECLARE c_fk_name CHAR(255);
 DECLARE curs CURSOR FOR SELECT CONSTRAINT_NAME from information_schema.KEY_COLUMN_USAGE
@@ -142,6 +151,7 @@ EXECUTE stmt;
 END LOOP;
 
 CLOSE curs;
+-- !Play-Evolutions: KEEP SEMICOLONS END
 END
 $$
 
@@ -154,10 +164,12 @@ delimiter $$
 --
 CREATE PROCEDURE usp_ebean_drop_column(IN p_table_name VARCHAR(255), IN p_column_name VARCHAR(255))
 BEGIN
+-- !Play-Evolutions: KEEP SEMICOLONS START
 CALL usp_ebean_drop_foreign_keys(p_table_name, p_column_name);
 SET @sql = CONCAT('ALTER TABLE `', p_table_name, '` DROP COLUMN `', p_column_name, '`');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
+-- !Play-Evolutions: KEEP SEMICOLONS END
 END
 $$
 </ddl-script>
@@ -171,6 +183,7 @@ delimiter $$
 CREATE OR REPLACE PROCEDURE usp_ebean_drop_foreign_keys(IN table_name NVARCHAR(256), IN column_name NVARCHAR(256))
 AS
 BEGIN
+-- !Play-Evolutions: KEEP SEMICOLONS START
 DECLARE foreign_key_names TABLE(CONSTRAINT_NAME NVARCHAR(256), TABLE_NAME NVARCHAR(256));
 DECLARE i INT;
 
@@ -180,6 +193,7 @@ FOR I IN 1 .. RECORD_COUNT(:foreign_key_names) DO
 EXEC 'ALTER TABLE "' || ESCAPE_DOUBLE_QUOTES(:foreign_key_names.TABLE_NAME[i]) || '" DROP CONSTRAINT "' || ESCAPE_DOUBLE_QUOTES(:foreign_key_names.CONSTRAINT_NAME[i]) || '"';
 END FOR;
 
+-- !Play-Evolutions: KEEP SEMICOLONS END
 END;
 $$
 
@@ -191,8 +205,10 @@ delimiter $$
 CREATE OR REPLACE PROCEDURE usp_ebean_drop_column(IN table_name NVARCHAR(256), IN column_name NVARCHAR(256))
 AS
 BEGIN
+-- !Play-Evolutions: KEEP SEMICOLONS START
 CALL usp_ebean_drop_foreign_keys(table_name, column_name);
 EXEC 'ALTER TABLE "' || UPPER(ESCAPE_DOUBLE_QUOTES(table_name)) || '" DROP ("' || UPPER(ESCAPE_DOUBLE_QUOTES(column_name)) || '")';
+-- !Play-Evolutions: KEEP SEMICOLONS END
 END;
 $$
 </ddl-script>
