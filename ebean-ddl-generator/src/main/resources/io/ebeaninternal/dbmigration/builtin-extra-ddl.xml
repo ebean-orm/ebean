@@ -24,7 +24,9 @@ GO
 -- deletes all indices referring to TABLE.COLUMN
 --
 CREATE OR ALTER PROCEDURE usp_ebean_drop_indices @tableName nvarchar(255), @columnName nvarchar(255)
-AS SET NOCOUNT ON
+AS
+-- play-ebean-start
+SET NOCOUNT ON
 declare @sql nvarchar(1000)
 declare @indexName nvarchar(255)
 BEGIN
@@ -44,6 +46,7 @@ BEGIN
   CLOSE index_cursor;
   DEALLOCATE index_cursor;
 END
+-- play-ebean-end
 GO
 
 --
@@ -51,7 +54,9 @@ GO
 -- deletes the default constraint, which has a random name
 --
 CREATE OR ALTER PROCEDURE usp_ebean_drop_default_constraint @tableName nvarchar(255), @columnName nvarchar(255)
-AS SET NOCOUNT ON
+AS
+-- play-ebean-start
+SET NOCOUNT ON
 declare @tmp nvarchar(1000)
 BEGIN
   select @tmp = t1.name from sys.default_constraints t1
@@ -60,6 +65,7 @@ BEGIN
 
   if @tmp is not null EXEC('alter table [' + @tableName +'] drop constraint ' + @tmp);
 END
+-- play-ebean-end
 GO
 
 --
@@ -67,7 +73,9 @@ GO
 -- deletes constraints and foreign keys refering to TABLE.COLUMN
 --
 CREATE OR ALTER PROCEDURE usp_ebean_drop_constraints @tableName nvarchar(255), @columnName nvarchar(255)
-AS SET NOCOUNT ON
+AS
+-- play-ebean-start
+SET NOCOUNT ON
 declare @sql nvarchar(1000)
 declare @constraintName nvarchar(255)
 BEGIN
@@ -93,6 +101,7 @@ BEGIN
   CLOSE name_cursor;
   DEALLOCATE name_cursor;
 END
+-- play-ebean-end
 GO
 
 --
@@ -100,7 +109,9 @@ GO
 -- deletes the column annd ensures that all indices and constraints are dropped first
 --
 CREATE OR ALTER PROCEDURE usp_ebean_drop_column @tableName nvarchar(255), @columnName nvarchar(255)
-AS SET NOCOUNT ON
+AS
+-- play-ebean-start
+SET NOCOUNT ON
 declare @sql nvarchar(1000)
 BEGIN
   EXEC usp_ebean_drop_indices @tableName, @columnName;
@@ -110,6 +121,7 @@ BEGIN
   set @sql = 'alter table [' + @tableName + '] drop column [' + @columnName + ']';
   EXECUTE(@sql);
 END
+-- play-ebean-end
 GO
 </ddl-script>
 <ddl-script name="create procs" platforms="mysql mariadb" init="true">-- Inital script to create stored procedures etc for mysql platform
@@ -121,6 +133,7 @@ delimiter $$
 -- deletes all constraints and foreign keys referring to TABLE.COLUMN
 --
 CREATE PROCEDURE usp_ebean_drop_foreign_keys(IN p_table_name VARCHAR(255), IN p_column_name VARCHAR(255))
+-- play-ebean-start
 BEGIN
 DECLARE done INT DEFAULT FALSE;
 DECLARE c_fk_name CHAR(255);
@@ -143,6 +156,7 @@ END LOOP;
 
 CLOSE curs;
 END
+-- play-ebean-end
 $$
 
 DROP PROCEDURE IF EXISTS usp_ebean_drop_column;
@@ -153,12 +167,14 @@ delimiter $$
 -- deletes the column and ensures that all indices and constraints are dropped first
 --
 CREATE PROCEDURE usp_ebean_drop_column(IN p_table_name VARCHAR(255), IN p_column_name VARCHAR(255))
+-- play-ebean-start
 BEGIN
 CALL usp_ebean_drop_foreign_keys(p_table_name, p_column_name);
 SET @sql = CONCAT('ALTER TABLE `', p_table_name, '` DROP COLUMN `', p_column_name, '`');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 END
+-- play-ebean-end
 $$
 </ddl-script>
 
@@ -170,6 +186,7 @@ delimiter $$
 --
 CREATE OR REPLACE PROCEDURE usp_ebean_drop_foreign_keys(IN table_name NVARCHAR(256), IN column_name NVARCHAR(256))
 AS
+-- play-ebean-start
 BEGIN
 DECLARE foreign_key_names TABLE(CONSTRAINT_NAME NVARCHAR(256), TABLE_NAME NVARCHAR(256));
 DECLARE i INT;
@@ -181,6 +198,7 @@ EXEC 'ALTER TABLE "' || ESCAPE_DOUBLE_QUOTES(:foreign_key_names.TABLE_NAME[i]) |
 END FOR;
 
 END;
+-- play-ebean-end
 $$
 
 delimiter $$
@@ -190,10 +208,12 @@ delimiter $$
 --
 CREATE OR REPLACE PROCEDURE usp_ebean_drop_column(IN table_name NVARCHAR(256), IN column_name NVARCHAR(256))
 AS
+-- play-ebean-start
 BEGIN
 CALL usp_ebean_drop_foreign_keys(table_name, column_name);
 EXEC 'ALTER TABLE "' || UPPER(ESCAPE_DOUBLE_QUOTES(table_name)) || '" DROP ("' || UPPER(ESCAPE_DOUBLE_QUOTES(column_name)) || '")';
 END;
+-- play-ebean-end
 $$
 </ddl-script>
 </extra-ddl>
