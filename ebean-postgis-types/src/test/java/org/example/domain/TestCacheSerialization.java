@@ -35,6 +35,8 @@ public class TestCacheSerialization {
     assertEquals(p1, r2.getPoint());  // and did fail https://github.com/ebean-orm/ebean/issues/3026
     assertEquals(pol, r2.getPolygon());
 
+    DB.delete(tb);
+
   }
 
   @Test
@@ -75,6 +77,8 @@ public class TestCacheSerialization {
     assertNotNull(r2);
     assertEquals(pol, r2.getPolygon());  // and did fail https://github.com/ebean-orm/ebean/issues/3026
     assertNull(r1.getPoint());
+
+    DB.delete(tb);
 
   }
 }
