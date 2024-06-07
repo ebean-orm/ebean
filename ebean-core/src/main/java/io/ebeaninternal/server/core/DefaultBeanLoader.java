@@ -126,9 +126,7 @@ final class DefaultBeanLoader {
     if (loadRequest.checkEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
-    final SpiQuery<?> query = server.createQuery(loadRequest.beanType());
-    query.usingTransaction(loadRequest.transaction());
-    loadRequest.configureQuery(query);
+    final SpiQuery<?> query = loadRequest.createQuery(server);
     loadRequest.postLoad(executeQuery(loadRequest, query));
   }
 
