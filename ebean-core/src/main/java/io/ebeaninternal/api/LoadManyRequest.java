@@ -94,6 +94,7 @@ public final class LoadManyRequest extends LoadRequest {
   public SpiQuery<?> createQuery(SpiEbeanServer server) {
     BeanPropertyAssocMany<?> many = many();
     SpiQuery<?> query = many.newQuery(server);
+    query.usingTransaction(transaction);
     String orderBy = many.lazyFetchOrderBy();
     if (orderBy != null) {
       query.orderBy(orderBy);
