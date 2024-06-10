@@ -88,14 +88,14 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   /**
    * Construct using the type of bean to query on and the default database.
    */
-  public QueryBean(Class<T> beanType) {
+  protected QueryBean(Class<T> beanType) {
     this(beanType, DB.getDefault());
   }
 
   /**
    * Construct using the type of bean to query on and a given database.
    */
-  public QueryBean(Class<T> beanType, Database database) {
+  protected QueryBean(Class<T> beanType, Database database) {
     this(database.find(beanType));
   }
 
@@ -119,7 +119,7 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
    * Construct using a query.
    */
   @SuppressWarnings("unchecked")
-  public QueryBean(Query<T> query) {
+  protected QueryBean(Query<T> query) {
     this.query = query;
     this.root = (R) this;
   }
@@ -129,7 +129,7 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
    * values for select() and fetch().
    */
   @SuppressWarnings("unchecked")
-  public QueryBean(boolean aliasDummy) {
+  protected QueryBean(boolean aliasDummy) {
     this.query = null;
     this.root = (R) this;
   }

@@ -217,9 +217,10 @@ class SimpleQueryBeanWriter {
   private void writeClass() {
     writer.append("/**").eol();
     writer.append(" * Query bean for %s.", shortName).eol();
-    writer.append(" * ").eol();
+    writer.append(" * <p>").eol();
     writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
     writer.append(" */").eol();
+    writer.append("@SuppressWarnings(\"unused\")").eol();
     writer.append(Constants.AT_GENERATED).eol();
     if (embeddable) {
       writer.append("public final class Q%s {", shortName).eol();
@@ -285,7 +286,7 @@ class SimpleQueryBeanWriter {
   private void writeAssocFilterMany() {
     writer.eol();
     writer.append("    @SuppressWarnings({\"unchecked\", \"rawtypes\"})").eol();
-    writer.append("    public final R filterMany(java.util.function.Consumer<Q%s> apply) {", shortName).eol();
+    writer.append("    public R filterMany(java.util.function.Consumer<Q%s> apply) {", shortName).eol();
     writer.append("      final io.ebean.ExpressionList list = io.ebean.Expr.factory().expressionList();", shortName).eol();
     writer.append("      final var qb = new Q%s(list);", shortName).eol();
     writer.append("      apply.accept(qb);").eol();
