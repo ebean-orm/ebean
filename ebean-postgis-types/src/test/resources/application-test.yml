@@ -15,4 +15,4 @@ ebean:
       image: ghcr.io/baosystems/postgis:15
 #      extensions: postgis
 #      url: jdbc:postgresql_lwgis://localhost:6432/mygisapp
-#      driver: org.postgis.DriverWrapperLW
+      driver: net.postgis.jdbc.DriverWrapperLW
