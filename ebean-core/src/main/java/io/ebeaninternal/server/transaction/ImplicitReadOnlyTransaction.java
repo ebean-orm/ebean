@@ -618,6 +618,11 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  @Override
   public boolean isPersistCascade() {
     return false;
   }

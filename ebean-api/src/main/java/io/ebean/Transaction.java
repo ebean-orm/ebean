@@ -211,6 +211,8 @@ public interface Transaction extends AutoCloseable {
    */
   boolean isActive();
 
+  void setActive(boolean active);
+
   /**
    * Set the behavior for document store updates on this transaction.
    * <p>

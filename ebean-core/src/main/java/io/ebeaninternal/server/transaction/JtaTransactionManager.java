@@ -94,9 +94,16 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     // check current Ebean transaction
     SpiTransaction currentEbeanTransaction = scope.inScope();
     if (currentEbeanTransaction != null) {
-      // NOT expecting this so log WARNING
-      log.log(WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.id());
-      return currentEbeanTransaction;
+      if (currentEbeanTransaction.isActive()) {
+        // NOT expecting this so log WARNING
+        log.log(WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.id());
+        return currentEbeanTransaction;
+      } else {
+        log.log(WARNING, "JTA Transaction - no current txn, but found Ebean inactive transaction. Clearing.", currentEbeanTransaction.id());
+        // thread local references no longer active transaction. This can happen if the JtaTxnListener#afterCompletion
+        // was triggered by a different thread than the one which created the scope (ThreadLocal).
+        scope.clearExternal();
+      }
     }
 
     UserTransaction ut = userTransaction();
@@ -198,6 +205,7 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
           log.log(DEBUG, "Jta Txn [{0}] rollback", transaction.id());
           transaction.postRollback(null);
           // Remove this transaction object as it is completed
+          transaction.setActive(false);
           transactionManager.scope().clearExternal();
           break;
 

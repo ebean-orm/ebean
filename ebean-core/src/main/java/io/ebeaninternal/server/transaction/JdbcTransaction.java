@@ -1083,6 +1083,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
+  @Override
   public final boolean isPersistCascade() {
     return persistCascade;
   }

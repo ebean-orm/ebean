@@ -68,6 +68,12 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public void setActive(boolean active) {
+
+  }
+
+
+  @Override
   public void commitAndContinue() {
     // do nothing
   }

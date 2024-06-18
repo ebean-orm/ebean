@@ -239,6 +239,11 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void setActive(boolean active) {
+    transaction.setActive(active);
+  }
+
+  @Override
   public void setPersistCascade(boolean persistCascade) {
     transaction.setPersistCascade(persistCascade);
   }
