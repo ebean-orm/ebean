@@ -357,4 +357,8 @@ public interface SpiTransaction extends Transaction {
    */
   void postRollback(Throwable cause);
 
+  /**
+   * Set the transaction to be inactive via external transaction manager.
+   */
+  void deactivateExternal();
 }

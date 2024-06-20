@@ -447,4 +447,9 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   public void postRollback(Throwable cause) {
     transaction.postRollback(cause);
   }
+
+  @Override
+  public void deactivateExternal() {
+    transaction.deactivateExternal();
+  }
 }

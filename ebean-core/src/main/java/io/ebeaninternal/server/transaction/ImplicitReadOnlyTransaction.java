@@ -609,6 +609,11 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     // do nothing
   }
 
+  @Override
+  public void deactivateExternal() {
+    this.active = false;
+  }
+
   /**
    * Return true if the transaction is active.
    */
