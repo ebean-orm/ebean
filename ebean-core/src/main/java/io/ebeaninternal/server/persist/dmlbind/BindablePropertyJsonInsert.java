@@ -29,7 +29,7 @@ final class BindablePropertyJsonInsert extends BindableProperty {
       } else {
         // on insert store hash and push json
         final String json = prop.format(value);
-        final MutableValueInfo hash = prop.createMutableInfo(json);
+        final MutableValueInfo hash = prop.createMutableInfo(value);
         bean._ebean_getIntercept().mutableInfo(propertyIndex, hash);
         request.pushJson(json);
         request.bind(value, prop);
