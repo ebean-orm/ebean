@@ -37,6 +37,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
 
   final BeanPropertyAssoc<?> owner;
   final String localDbColumn;
+  private final String localColumnDefn;
   private final String localSqlFormula;
   final BeanProperty foreignProperty;
   private final int position;
@@ -49,6 +50,7 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
     this.localDbColumn = InternString.intern(localDbColumn);
     this.localSqlFormula = InternString.intern(localSqlFormula);
     this.foreignProperty = foreignProperty;
+    this.localColumnDefn = foreignProperty.dbColumnDefn();
     this.position = position;
     this.insertable = insertable;
     this.updateable = updateable;
@@ -141,6 +143,11 @@ public final class ImportedIdSimple implements ImportedId, Comparable<ImportedId
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
     request.appendColumn(localDbColumn);
+  }
+
+  @Override
+  public void dmlType(GenerateDmlRequest request) {
+    request.appendColumnDefn(localDbColumn, localColumnDefn);
   }
 
   @Override

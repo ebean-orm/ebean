@@ -4,6 +4,7 @@ import io.ebean.InsertOptions;
 import io.ebean.annotation.Platform;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.InsertSqlSyntaxExtension;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.InheritInfo;
@@ -37,10 +38,13 @@ final class InsertMeta {
   private final Bindable shadowFKey;
   private final String[] identityDbColumns;
   private final Platform platform;
+  private final InsertSqlSyntaxExtension insertMetaSql;
+
   private final InsertMetaOptions options;
 
   InsertMeta(DatabasePlatform dbPlatform, BeanDescriptor<?> desc, Bindable shadowFKey, BindableId id, BindableList all) {
     this.platform = dbPlatform.platform();
+    this.insertMetaSql = dbPlatform.insertSqlSyntaxExtension();
     this.options = InsertMetaPlatform.create(platform, desc, this);
     this.discriminator = discriminator(desc);
     this.id = id;
@@ -174,7 +178,7 @@ final class InsertMeta {
       request.append(defaultValues());
       return;
     }
-    request.append(" (");
+    request.append(insertMetaSql.startColumns());
     if (!nullId) {
       id.dmlAppend(request);
     }
@@ -189,9 +193,28 @@ final class InsertMeta {
     } else {
       allExcludeDraftOnly.dmlAppend(request);
     }
-    request.append(") values (");
-    request.append(request.insertBindBuffer());
-    request.append(")");
+    request.append(insertMetaSql.endColumns());
+    if (insertMetaSql.useBinding()) {
+      request.append(request.insertBindBuffer());
+      request.append(")");
+    } else {
+      request.append(insertMetaSql.startTypes());
+      if (!nullId) {
+        id.dmlType(request);
+      }
+      if (shadowFKey != null) {
+        shadowFKey.dmlType(request);
+      }
+      if (discriminator != null) {
+        discriminator.dmlType(request);
+      }
+      if (draftTable) {
+        all.dmlType(request);
+      } else {
+        allExcludeDraftOnly.dmlType(request);
+      }
+      request.append(insertMetaSql.endTypes());
+    }
   }
 
   private String defaultValues() {

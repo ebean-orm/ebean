@@ -58,17 +58,18 @@ final class BindableIdScalar implements BindableId {
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
-
     request.appendColumn(uidProp.dbColumn());
   }
 
   @Override
+  public void dmlType(GenerateDmlRequest request) {
+    request.appendColumnDefn(uidProp.dbColumn(), uidProp.dbColumnDefn());
+  }
+
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
-
     Object value = uidProp.getValue(bean);
-
     request.bind(value, uidProp);
-
     // used for summary logging
     request.setIdValue(value);
   }

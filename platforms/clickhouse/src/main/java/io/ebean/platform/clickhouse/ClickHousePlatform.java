@@ -13,13 +13,9 @@ public class ClickHousePlatform extends DatabasePlatform {
   public ClickHousePlatform() {
     super();
     this.platform = Platform.CLICKHOUSE;
-    //this.dbEncrypt =
-    //this.historySupport =
-    //this.exceptionTranslator =
+    this.insertSqlSyntaxExtension = new ClickHouseInsertSqlSyntax();
     this.nativeUuidType = true;
     this.dbDefaultValue.setNow("now()");
-    this.dbDefaultValue.setFalse("0");
-    this.dbDefaultValue.setTrue("1");
 
     this.dbIdentity.setIdType(IdType.IDENTITY);
     this.dbIdentity.setSupportsGetGeneratedKeys(false);
@@ -27,7 +23,7 @@ public class ClickHousePlatform extends DatabasePlatform {
     this.dbIdentity.setSupportsIdentity(true);
 
     this.booleanDbType = Types.INTEGER;
-    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("UInt8"));
+    dbTypeMap.put(DbType.BOOLEAN, new DbPlatformType("Bool"));
     // using unsigned as default types ...
     dbTypeMap.put(DbType.TINYINT, new DbPlatformType("UInt8", false));
     dbTypeMap.put(DbType.SMALLINT, new DbPlatformType("UInt16", false));
@@ -41,7 +37,10 @@ public class ClickHousePlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("String", false));
     dbTypeMap.put(DbType.LONGVARCHAR, new DbPlatformType("String", false));
     dbTypeMap.put(DbType.CLOB, new DbPlatformType("String", false));
-    dbTypeMap.put(DbType.JSONVARCHAR, new DbPlatformType("String", false));
+    dbTypeMap.put(DbType.HSTORE, new DbPlatformType("Map(String,String)", false));
+    dbTypeMap.put(DbType.JSON, new DbPlatformType("JSON", false));
+    dbTypeMap.put(DbType.JSONB, new DbPlatformType("JSON", false));
+    dbTypeMap.put(DbType.JSONVARCHAR, new DbPlatformType("JSON", false));
     dbTypeMap.put(DbType.UUID, new DbPlatformType("UUID", false));
     dbTypeMap.put(DbType.INET, new DbPlatformType("String", false));
     dbTypeMap.put(DbType.CIDR, new DbPlatformType("String", false));
