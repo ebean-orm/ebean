@@ -129,7 +129,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * When true then include a sql comment in generated SELECT queries with the query
    * label or profile location label.
    */
-  private boolean includeLabelInSql;
+  private boolean includeLabelInSql = true;
 
   /**
    * Interesting classes such as entities, embedded, ScalarTypes,
