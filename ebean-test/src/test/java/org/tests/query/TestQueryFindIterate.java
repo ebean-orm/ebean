@@ -228,7 +228,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       dsPool = (DataSourcePool) server().dataSource();
     }
 
-    int startConns = dsPool.getStatus(false).getBusy();
+    int startConns = dsPool.status(false).busy();
     final Query<Customer> query = server().find(Customer.class)
       .where()
       .isNotNull("name")
@@ -241,22 +241,22 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     QueryIterator<Customer> queryIterator = query.findIterate();
 
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertFalse(queryIterator.hasNext());
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns);
     try {
       queryIterator.next();
       fail("noSuchElementException expected");
