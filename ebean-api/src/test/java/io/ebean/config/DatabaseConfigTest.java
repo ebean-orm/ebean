@@ -75,6 +75,7 @@ class DatabaseConfigTest {
     props.setProperty("defaultServer", "false");
     props.setProperty("skipDataSourceCheck", "true");
     props.setProperty("readOnlyDatabase", "true");
+    props.setProperty("lengthCheck", "ON");
 
     props.setProperty("queryPlan.enable", "true");
     props.setProperty("queryPlan.thresholdMicros", "10000");
@@ -95,6 +96,7 @@ class DatabaseConfigTest {
     assertTrue(settings.isLoadModuleInfo());
     assertTrue(settings.skipDataSourceCheck());
     assertTrue(settings.readOnlyDatabase());
+    assertThat(settings.getLengthCheck()).isEqualTo(LengthCheck.ON);
 
     assertTrue(settings.isIdGeneratorAutomatic());
     assertFalse(settings.getPlatformConfig().isCaseSensitiveCollation());
@@ -128,8 +130,11 @@ class DatabaseConfigTest {
 
     assertThat(settings.getMappingLocations()).containsExactly("classpath:/foo","bar");
 
-    config.setPersistBatch(PersistBatch.NONE);
-    config.setPersistBatchOnCascade(PersistBatch.NONE);
+    config.persistBatch(PersistBatch.NONE)
+      .persistBatchOnCascade(PersistBatch.NONE)
+      .lengthCheck(LengthCheck.ON)
+      .lengthCheck(LengthCheck.UTF8);
+
 
     Properties props1 = new Properties();
     props1.setProperty("ebean.persistBatch", "ALL");
@@ -146,6 +151,7 @@ class DatabaseConfigTest {
 
     assertEquals(PersistBatch.ALL, settings.getPersistBatch());
     assertEquals(PersistBatch.ALL, settings.getPersistBatchOnCascade());
+    assertEquals(LengthCheck.UTF8, settings.getLengthCheck());
 
     config.setEnabledL2Regions("r0,orgs");
     assertEquals("r0,orgs", settings.getEnabledL2Regions());
@@ -174,6 +180,7 @@ class DatabaseConfigTest {
     assertEquals(600, config.getQueryPlanCapturePeriodSecs());
     assertEquals(10000L, config.getQueryPlanCaptureMaxTimeMillis());
     assertEquals(10, config.getQueryPlanCaptureMaxCount());
+    assertThat(config.getLengthCheck()).isEqualTo(LengthCheck.OFF);
 
     config.setLoadModuleInfo(false);
     assertFalse(config.isAutoLoadModuleInfo());
