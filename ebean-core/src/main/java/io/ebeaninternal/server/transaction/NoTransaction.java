@@ -115,6 +115,10 @@ final class NoTransaction implements SpiTransaction {
     // do nothing
   }
 
+  @Override
+  public void deactivateExternal() {
+    // do nothing
+  }
 
   @Override
   public boolean isLogSql() {

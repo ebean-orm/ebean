@@ -1054,6 +1054,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
+  public void deactivateExternal() {
+    this.active = false;
+  }
+
+  @Override
   public final boolean isPersistCascade() {
     return persistCascade;
   }
