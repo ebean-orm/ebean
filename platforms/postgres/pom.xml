@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.26.0-FOC4</version>
+    <version>13.26.0-FOC5-SNAPSHOT</version>
     <relativePath>../..</relativePath>
   </parent>
 
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>13.26.0-FOC4</version>
+      <version>13.26.0-FOC5-SNAPSHOT</version>
     </dependency>
 
     <dependency>
