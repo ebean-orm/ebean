@@ -2,6 +2,7 @@ package org.tests.basic;
 
 import io.ebean.DB;
 import io.ebean.DataIntegrityException;
+import io.ebean.LengthCheckException;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonList;
@@ -92,7 +93,7 @@ public class TestLength extends BaseTestCase {
       assertThatThrownBy(() -> {
         // we expect, that we can NOT save the bean, this is ensured by the bind validator.
         DB.save(bean);
-      }).isInstanceOf(DataIntegrityException.class);
+      }).isInstanceOf(LengthCheckException.class);
     } else {
       DB.save(bean);
     }

@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.DataIntegrityException;
+import io.ebean.LengthCheckException;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -573,7 +574,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
         if (s.length() > 50) {
           s = s.substring(0, 47) + "...";
         }
-        throw new DataIntegrityException("Cannot bind value '" + s + "' (effective length=" + length + ") to column '" + dbColumn + "' (length=" + dbLength + ")");
+        throw new LengthCheckException("Cannot bind value '" + s + "' (effective length=" + length + ") to column '" + dbColumn + "' (length=" + dbLength + ")");
       }
     }
   }
