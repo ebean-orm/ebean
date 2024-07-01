@@ -1,9 +1,7 @@
 package org.tests.model.types;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-import jakarta.persistence.Version;
+import jakarta.persistence.*;
+
 import java.io.File;
 
 @Entity
@@ -18,6 +16,7 @@ public class SomeFileBean {
   String name;
 
   @Lob
+  @Column(length = 100 * 1024) // limit to 100kb
   File content;
 
   public Long getId() {

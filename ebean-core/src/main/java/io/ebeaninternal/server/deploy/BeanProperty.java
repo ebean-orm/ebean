@@ -1,16 +1,20 @@
 package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.DataIntegrityException;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.MutableValueInfo;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.config.EncryptKey;
+import io.ebean.config.LengthCheck;
 import io.ebean.config.dbplatform.DbEncryptFunction;
 import io.ebean.config.dbplatform.DbPlatformType;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.InputStreamInfo;
 import io.ebean.core.type.ScalarType;
 import io.ebean.plugin.Property;
 import io.ebean.text.StringParser;
@@ -46,6 +50,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.List;
@@ -166,6 +171,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   private final String dbComment;
   private final DbEncryptFunction dbEncryptFunction;
+  private final BindMaxLength bindMaxLength;
   private int deployOrder;
   final boolean jsonSerialize;
   final boolean jsonDeserialize;
@@ -258,6 +264,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     }
     this.jsonSerialize = deploy.isJsonSerialize();
     this.jsonDeserialize = deploy.isJsonDeserialize();
+    this.bindMaxLength = deploy.bindMaxLength();
   }
 
   private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
@@ -345,6 +352,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
     this.jsonSerialize = source.jsonSerialize;
     this.jsonDeserialize = source.jsonDeserialize;
+    this.bindMaxLength = source.bindMaxLength;
   }
 
   /**
@@ -555,6 +563,18 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @SuppressWarnings("unchecked")
   public void bind(DataBind b, Object value) throws SQLException {
     scalarType.bind(b, value);
+    if (bindMaxLength != null) {
+      Object obj = b.popLastObject();
+      long length = bindMaxLength.length(dbLength, obj);
+      if (length > dbLength) {
+        b.closeInputStreams();
+        String s = String.valueOf(value); // take original bind value here.
+        if (s.length() > 50) {
+          s = s.substring(0, 47) + "...";
+        }
+        throw new DataIntegrityException("Cannot bind value '" + s + "' (effective length=" + length + ") to column '" + dbColumn + "' (length=" + dbLength + ")");
+      }
+    }
   }
 
   @SuppressWarnings(value = "unchecked")

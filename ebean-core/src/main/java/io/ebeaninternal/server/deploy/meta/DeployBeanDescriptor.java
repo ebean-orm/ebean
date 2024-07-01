@@ -1,10 +1,10 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.annotation.Cache;
 import io.ebean.annotation.DocStore;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.Identity;
-import io.ebean.DatabaseBuilder;
 import io.ebean.bean.ExtensionAccessor;
 import io.ebean.bean.ExtensionAccessors;
 import io.ebean.config.TableName;
@@ -24,7 +24,6 @@ import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
 import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
 import io.ebeaninternal.server.idgen.UuidV4IdGenerator;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.MappedSuperclass;
 
@@ -147,6 +146,10 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
     this.manager = manager;
     this.config = config;
     this.beanType = beanType;
+  }
+
+  public BindMaxLength bindMaxLength() {
+    return manager.bindMaxLength();
   }
 
   private String[] readPropertyNames() {
