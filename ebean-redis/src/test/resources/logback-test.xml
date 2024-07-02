@@ -1,14 +1,11 @@
-<configuration scan="true" scanPeriod="10 seconds">
+<configuration>
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-      <level>TRACE</level>
-    </filter>
     <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
 
-  <root level="WARN">
+  <root level="TRACE">
     <appender-ref ref="STDOUT"/>
   </root>
 
