@@ -1,5 +1,6 @@
 package org.tests.basic.type;
 
+import io.ebean.Query;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -11,21 +12,31 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestTransientMap extends BaseTestCase {
+class TestTransientMap extends BaseTestCase {
 
   @Test
-  public void testMe() {
+  void testMe() {
 
     Map<String, List<String>> map = new HashMap<>();
     map.put("foo", new ArrayList<>());
 
     BSimpleWithGen b = new BSimpleWithGen("blah");
     b.setSomeMap(map);
+    b.setDesc("hi");
     DB.save(b);
 
     final BSimpleWithGen found = DB.find(BSimpleWithGen.class, b.getId());
     assertThat(found.getName()).isEqualTo("blah");
     assertThat(found.getSomeMap()).isNull();
+
+    Query<BSimpleWithGen> query = DB.find(BSimpleWithGen.class)
+      .where().startsWith("desc", "h")
+      .orderBy().desc("desc");
+
+    var list = query.findList();
+    assertThat(list).hasSize(1);
+    assertThat(query.getGeneratedSql()).contains("where t0.desc like");
+    assertThat(query.getGeneratedSql()).contains("order by t0.desc desc");
 
     DB.delete(b);
   }

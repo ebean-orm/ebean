@@ -11,6 +11,7 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOrderByWithMany extends BaseTestCase {
@@ -64,7 +65,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     String sql = query.getGeneratedSql();
 
-    assertTrue(sql.contains("order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc"));
+    assertThat(sql).contains("order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc");
   }
 
   private void checkWithBuiltInMany() {
@@ -151,6 +152,6 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     String sql = query.getGeneratedSql();
     // prepend id in order by
-    assertTrue(sql.contains("order by t0.order_date, t0.id, t1.ship_time desc"));
+    assertThat(sql).contains("order by t0.order_date, t0.id, t1.ship_time desc");
   }
 }

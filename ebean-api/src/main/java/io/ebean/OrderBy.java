@@ -186,15 +186,15 @@ public class OrderBy<T> implements Serializable {
     if (list.isEmpty()) {
       return null;
     }
-    StringBuilder sb = new StringBuilder();
+    var append = new StringAppend();
     for (int i = 0; i < list.size(); i++) {
       Property property = list.get(i);
       if (i > 0) {
-        sb.append(", ");
+        append.append(", ");
       }
-      sb.append(property.toStringFormat());
+      property.toStringFormat(append);
     }
-    return sb.toString();
+    return append.toString();
   }
 
   @Override
@@ -229,6 +229,55 @@ public class OrderBy<T> implements Serializable {
   public OrderBy<T> clear() {
     list.clear();
     return this;
+  }
+
+  /**
+   * Append the order by clause.
+   */
+  public interface Append {
+
+    /**
+     * Append a property expression.
+     */
+    Append property(String property);
+
+    /**
+     * Append a literal.
+     */
+    Append append(String literal);
+
+    /**
+     * Parse and append an expression.
+     */
+    Append parse(String expression);
+  }
+
+  private static final class StringAppend implements Append {
+
+    private final StringBuilder builder = new StringBuilder();
+
+    @Override
+    public String toString() {
+      return builder.toString();
+    }
+
+    @Override
+    public Append property(String property) {
+      builder.append(property);
+      return this;
+    }
+
+    @Override
+    public Append append(String literal) {
+      builder.append(literal);
+      return this;
+    }
+
+    @Override
+    public Append parse(String raw) {
+      builder.append(raw);
+      return this;
+    }
   }
 
   /**
@@ -309,36 +358,25 @@ public class OrderBy<T> implements Serializable {
 
     @Override
     public String toString() {
-      return toStringFormat();
+      return property;
     }
 
-    public String toStringFormat() {
-      if (nulls == null && collation == null) {
-        if (ascending) {
-          return property;
+    public void toStringFormat(Append append) {
+      if (collation != null)  {
+        if (collation.contains("${}")) {
+          // this is a complex collation, e.g. DB2 - we must replace the property
+          append.parse(collation.replace("${}", property));
         } else {
-          return property + " desc";
+          append.property(property).append(" collate ").append(collation);
         }
       } else {
-        StringBuilder sb = new StringBuilder();
-        if (collation != null)  {
-          if (collation.contains("${}")) {
-            // this is a complex collation, e.g. DB2 - we must replace the property
-            sb.append(collation.replace("${}", property));
-          } else {
-            sb.append(property);
-            sb.append(" collate ").append(collation);
-          }
-        } else {
-          sb.append(property);
-        }
-        if (!ascending) {
-          sb.append(' ').append("desc");
-        }
-        if (nulls != null) {
-          sb.append(' ').append(nulls).append(' ').append(highLow);
-        }
-        return sb.toString();
+        append.property(property);
+      }
+      if (!ascending) {
+        append.append(" desc");
+      }
+      if (nulls != null) {
+        append.append(" ").append(nulls).append(" ").append(highLow);
       }
     }
 
