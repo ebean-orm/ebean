@@ -14,6 +14,8 @@ public class BSimpleWithGen {
 
   private String name;
 
+  private String desc;
+
   @Transient
   private Map<String, List<String>> someMap;
 
@@ -45,4 +47,11 @@ public class BSimpleWithGen {
     this.someMap = someMap;
   }
 
+  public String getDesc() {
+    return desc;
+  }
+
+  public void setDesc(String desc) {
+    this.desc = desc;
+  }
 }
