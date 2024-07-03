@@ -1,6 +1,7 @@
 package io.ebeaninternal.api;
 
 import io.ebean.ProfileLocation;
+import io.ebean.Transaction;
 import io.ebean.TransactionCallback;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.event.changelog.BeanChange;
@@ -456,5 +457,10 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   @Override
   public void postRollback(Throwable cause) {
     transaction.postRollback(cause);
+  }
+
+  @Override
+  public Transaction root() {
+    return transaction.root();
   }
 }

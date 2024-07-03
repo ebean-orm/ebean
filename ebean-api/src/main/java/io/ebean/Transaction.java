@@ -561,4 +561,12 @@ public interface Transaction extends AutoCloseable {
    * Get an object added with {@link #putUserObject(String, Object)}.
    */
   Object getUserObject(String name);
+
+  /**
+   * In case of nested transaction, this returns the root transaction.
+   * @return
+   */
+  default Transaction root() {
+    return this;
+  }
 }
