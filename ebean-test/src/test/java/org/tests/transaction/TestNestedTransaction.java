@@ -274,4 +274,32 @@ public class TestNestedTransaction extends BaseTestCase {
       assertThat(getInScopeTransaction().getUserObject("foo")).isEqualTo("bar");
     }
   }
+
+  @Test
+  public void test_txn_putUserObjectInRoot() {
+
+    try (Transaction txn1 = DB.beginTransaction(TxScope.requiresNew())) {
+      try (Transaction txn2 = DB.beginTransaction()) {
+        for (int i = 0; i < 2; i++) {
+
+          try (Transaction txn3 = DB.beginTransaction()) {
+            Object x = Transaction.current().root().getUserObject("x");
+            Object y = Transaction.current().getUserObject("y");
+            if (i == 0) {
+              assertThat(x).isNull();
+              assertThat(y).isNull();
+            } else {
+              assertThat(x).isEqualTo(2);
+              assertThat(y).isNull();
+            }
+            Transaction.current().root().putUserObject("x", 2);
+            Transaction.current().putUserObject("y", 3);
+            txn3.commit();
+          }
+        }
+        txn2.commit();
+      }
+    }
+  }
+
 }
