@@ -4,6 +4,7 @@ import io.ebean.DB;
 import io.ebean.DataIntegrityException;
 import io.ebean.LengthCheckException;
 import io.ebean.xtest.BaseTestCase;
+import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonList;
 import org.tests.model.json.EBasicJsonMap;
@@ -12,6 +13,8 @@ import org.tests.model.types.SomeFileBean;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.SocketException;
+import java.sql.SQLNonTransientConnectionException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,9 +47,14 @@ public class TestLength extends BaseTestCase {
 
     SomeFileBean sfb2 = new SomeFileBean();
     sfb2.setContent(f1);
-    assertThatThrownBy(() -> DB.save(sfb2)).isInstanceOf(DataIntegrityException.class);
-  }
+    // SqlServer uses varbinary(max) and MariaDB uses a mediumblob (can not set a length), therefore the save works without exception.
+    if (isSqlServer() || isMariaDB()) {
+      DB.save(sfb2);
+    } else {
+      assertThatThrownBy(() -> DB.save(sfb2)).isInstanceOf(DataIntegrityException.class);
+    }
 
+  }
 
   /**
    * The property 'EBasicJsonMap.content' is annotated with @DbJson(length=5000). So we assume, that we cannot save Json-objects
@@ -68,10 +76,19 @@ public class TestLength extends BaseTestCase {
     bean.setName("b1");
     bean.setContent(Map.of("string", s));
 
-    assertThatThrownBy(() -> {
-      // we expect, that we can NOT save the bean, this is ensured by the bind validator.
+    if (isSqlServer()) {
       DB.save(bean);
-    }).isInstanceOf(DataIntegrityException.class);
+    } else if (isMariaDB()) {
+      assertThatThrownBy(() -> {
+        // max_allowed_packet from MariaDb Default: 16MB => SocketException https://mariadb.com/docs/server/ref/mdb/system-variables/max_allowed_packet/
+        DB.save(bean);
+      }).isInstanceOf(PersistenceException.class).cause().isInstanceOf(SQLNonTransientConnectionException.class).cause().isInstanceOf(SocketException.class);
+    } else {
+      assertThatThrownBy(() -> {
+        // we expect, that we can NOT save the bean, this is ensured by the bind validator.
+        DB.save(bean);
+      }).isInstanceOf(DataIntegrityException.class);
+    }
 
   }
 
