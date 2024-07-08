@@ -22,7 +22,7 @@ class TestTransientMap extends BaseTestCase {
 
     BSimpleWithGen b = new BSimpleWithGen("blah");
     b.setSomeMap(map);
-    b.setDesc("hi");
+    b.setDescription("hi");
     DB.save(b);
 
     final BSimpleWithGen found = DB.find(BSimpleWithGen.class, b.getId());
@@ -30,13 +30,13 @@ class TestTransientMap extends BaseTestCase {
     assertThat(found.getSomeMap()).isNull();
 
     Query<BSimpleWithGen> query = DB.find(BSimpleWithGen.class)
-      .where().startsWith("desc", "h")
-      .orderBy().desc("desc");
+      .where().startsWith("description", "h")
+      .orderBy().desc("description");
 
     var list = query.findList();
     assertThat(list).hasSize(1);
-    assertThat(query.getGeneratedSql()).contains("where t0.desc like");
-    assertThat(query.getGeneratedSql()).contains("order by t0.desc desc");
+    assertThat(query.getGeneratedSql()).contains("where t0.description like");
+    assertThat(query.getGeneratedSql()).contains("order by t0.description desc");
 
     DB.delete(b);
   }
