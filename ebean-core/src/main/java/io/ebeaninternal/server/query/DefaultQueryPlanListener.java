@@ -1,4 +1,4 @@
-package io.ebeaninternal.server.core;
+package io.ebeaninternal.server.query;
 
 import io.avaje.applog.AppLog;
 import io.ebean.config.QueryPlanCapture;

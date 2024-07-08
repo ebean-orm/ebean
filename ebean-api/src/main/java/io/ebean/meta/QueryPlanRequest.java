@@ -3,13 +3,24 @@ package io.ebean.meta;
 /**
  * Request used to capture query plans.
  */
-public class QueryPlanRequest {
+public final class QueryPlanRequest {
 
   private long since;
 
-  private int maxCount;
+  private final int maxCount;
 
-  private long maxTimeMillis;
+  private final long maxTimeMillis;
+
+  /**
+   * Create with the max number of plans and max capture time.
+   *
+   * @param maxCount      The maximum number of plans to capture
+   * @param maxTimeMillis The maximum time after which we stop capturing more plans
+   */
+  public QueryPlanRequest(int maxCount, long maxTimeMillis) {
+    this.maxCount = maxCount;
+    this.maxTimeMillis = maxTimeMillis;
+  }
 
   /**
    * Return the epoch time in millis for minimum bind capture time.
@@ -40,32 +51,11 @@ public class QueryPlanRequest {
   }
 
   /**
-   * Set the maximum number of plans to capture.
-   * <p>
-   * Use this to limit how much query plan capturing is done as query
-   * plan capture is actual database load.
-   */
-  public void maxCount(int maxCount) {
-    this.maxCount = maxCount;
-  }
-
-  /**
    * Return the maximum amount of time we want to use to capture plans.
    * <p>
    * Query plan collection will stop once this time is exceeded.
    */
   public long maxTimeMillis() {
     return maxTimeMillis;
-  }
-
-  /**
-   * Set the maximum amount of time we want to use to capture plans.
-   * <p>
-   * Query plan collection will stop once this time is exceeded. We use
-   * this to ensure the query plan capture does not use excessive amount
-   * of time - put too much load on the database.
-   */
-  public void maxTimeMillis(long maxTimeMillis) {
-    this.maxTimeMillis = maxTimeMillis;
   }
 }
