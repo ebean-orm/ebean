@@ -39,11 +39,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private PersistenceContext persistenceContext;
   private HashQuery cacheKey;
   private CQueryPlanKey queryPlanKey;
+  // The queryPlan during the request.
+  private CQueryPlan queryPlan;
   private SpiQuerySecondary secondaryQueries;
   private List<T> cacheBeans;
   private BeanPropertyAssocMany<?> manyProperty;
   private boolean inlineCountDistinct;
-  private Set<String> dependentTables;
+  private boolean prepared;
 
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
     super(server, t);
@@ -71,6 +73,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     } else {
       // delete by ids due to cascading delete needs
       queryPlanKey = query.setDeleteByIdsPlan();
+      queryPlan = null;
       return false;
     }
   }
@@ -168,10 +171,24 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void prepareQuery() {
-    secondaryQueries = query.convertJoins();
-    beanDescriptor.prepareQuery(query);
-    adapterPreQuery();
-    queryPlanKey = query.prepare(this);
+    if (!prepared) {
+      secondaryQueries = query.convertJoins();
+      beanDescriptor.prepareQuery(query);
+      adapterPreQuery();
+      queryPlanKey = query.prepare(this);
+      prepared = true;
+    }
+
+  }
+
+  /**
+   * The queryPlanKey has to be updated, if elements are removed from an already prepared query.
+   */
+  private void updateQueryPlanKey() {
+    if (prepared) {
+      queryPlanKey = query.prepare(this);
+      queryPlan = null;
+    }
   }
 
   public boolean isNativeSql() {
@@ -466,7 +483,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * query plan for this query exists.
    */
   public CQueryPlan queryPlan() {
-    return beanDescriptor.queryPlan(queryPlanKey);
+    if (queryPlan == null) {
+      queryPlan = beanDescriptor.queryPlan(queryPlanKey);
+    }
+    return queryPlan;
   }
 
   /**
@@ -484,6 +504,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    * Put the QueryPlan into the cache.
    */
   public void putQueryPlan(CQueryPlan queryPlan) {
+    this.queryPlan = queryPlan;
     beanDescriptor.queryPlan(queryPlanKey, queryPlan);
   }
 
@@ -493,7 +514,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   public boolean isQueryCachePut() {
-    return cacheKey != null && query.queryCacheMode().isPut();
+    return cacheKey != null && queryPlan != null && query.queryCacheMode().isPut();
   }
 
   public boolean isBeanCachePutMany() {
@@ -602,7 +623,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, idLookup.idValues());
       // adjust the query (IN clause) based on the cache hits
       this.cacheBeans = idLookup.removeHits(cacheResult);
-      return idLookup.allHits();
+      if (idLookup.allHits()) {
+        return true;
+      } else {
+        if (!this.cacheBeans.isEmpty()) {
+          updateQueryPlanKey();
+        }
+        return false;
+      }
     }
     if (!beanDescriptor.isNaturalKeyCaching()) {
       return false;
@@ -615,7 +643,14 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
         BeanCacheResult<T> cacheResult = beanDescriptor.naturalKeyLookup(persistenceContext, naturalKeySet.keys());
         // adjust the query (IN clause) based on the cache hits
         this.cacheBeans = data.removeHits(cacheResult);
-        return data.allHits();
+        if (data.allHits()) {
+          return true;
+        } else {
+          if (!this.cacheBeans.isEmpty()) {
+            updateQueryPlanKey();
+          }
+          return false;
+        }
       }
     }
     return false;
@@ -684,7 +719,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   public void putToQueryCache(Object result) {
-    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, transaction.startNanoTime()));
+    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, queryPlan.dependentTables(), transaction.startNanoTime()));
   }
 
   /**
@@ -752,15 +787,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public boolean isInlineCountDistinct() {
     return inlineCountDistinct;
-  }
-
-  public void addDependentTables(Set<String> tables) {
-    if (tables != null && !tables.isEmpty()) {
-      if (dependentTables == null) {
-        dependentTables = new LinkedHashSet<>();
-      }
-      dependentTables.addAll(tables);
-    }
   }
 
   /**
