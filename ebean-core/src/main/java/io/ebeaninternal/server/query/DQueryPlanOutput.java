@@ -24,6 +24,8 @@ final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   private long captureMicros;
   private Instant whenCaptured;
 
+  private Object tenantId;
+
   DQueryPlanOutput(Class<?> beanType, String label, String hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
     this.beanType = beanType;
     this.label = label;
@@ -85,6 +87,14 @@ final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   }
 
   /**
+   * Returns the tenant id of this plan.
+   */
+  @Override
+  public Object tenantId() {
+    return tenantId;
+  }
+
+  /**
    * Return the query execution time associated with the capture of bind values used
    * to build the query plan.
    */
@@ -113,18 +123,27 @@ final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
 
   @Override
   public String toString() {
-    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + hash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
+    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName())
+      + " planHash:" + hash
+      + " label:" + label
+      + " queryTimeMicros:" + queryTimeMicros
+      + " captureCount:" + captureCount
+      + (tenantId == null ? "" : (" tenant:" + tenantId))
+      + "\n SQL:" + sql
+      + "\nBIND:" + bind
+      + "\nPLAN:" + plan;
   }
 
   /**
    * Additionally set the query execution time and the number of bind captures.
    */
   @Override
-  public DQueryPlanOutput with(long queryTimeMicros, long captureCount, long captureMicros, Instant whenCaptured) {
+  public DQueryPlanOutput with(long queryTimeMicros, long captureCount, long captureMicros, Instant whenCaptured, Object tenantId) {
     this.queryTimeMicros = queryTimeMicros;
     this.captureCount = captureCount;
     this.captureMicros = captureMicros;
     this.whenCaptured = whenCaptured;
+    this.tenantId = tenantId;
     return this;
   }
 }
