@@ -40,6 +40,59 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
+  public void testConcurrentForUpdate() throws InterruptedException {
+
+    ResetBasicData.reset();
+
+    Thread t1 = new Thread() {
+      @Override
+      public void run() {
+        try (final Transaction transaction = DB.beginTransaction()) {
+          System.out.println("Thread: vor find");
+          DB.find(Customer.class)
+            .forUpdate()
+            .orderBy().desc("1")
+            .findList();
+          System.out.println("Thread: nach find");
+          try {
+            Thread.sleep(30000);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          System.out.println("Thread: fertig");
+        }
+      }
+    };
+
+    t1.start();
+
+    Thread.sleep(5000);
+
+    long start = System.currentTimeMillis();
+    try (final Transaction transaction = DB.beginTransaction()) {
+      if (isH2()) {
+        DB.sqlUpdate("SET LOCK_TIMEOUT 5000").execute();
+      }
+      System.out.println("Main: vor find");
+      DB.find(Customer.class)
+        .forUpdate()
+        .orderBy().desc("1")
+        .findList();
+      System.out.println("Main: nach find");
+    }
+
+    start = System.currentTimeMillis() - start;
+
+    assertThat(start).isGreaterThan(28000);
+
+//    if (isSqlServer()) {
+//      assertThat(sqlOf(query)).contains("with (updlock)");
+//    } else {
+//      assertThat(sqlOf(query)).contains("for update");
+//    }
+  }
+
+  @Test
   public void testForUpdate_withLimit() {
     ResetBasicData.reset();
 
