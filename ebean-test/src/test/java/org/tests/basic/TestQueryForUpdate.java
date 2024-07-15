@@ -40,6 +40,56 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
+  public void testConcurrentForUpdate() throws InterruptedException {
+
+    ResetBasicData.reset();
+
+    Thread t1 = new Thread() {
+      @Override
+      public void run() {
+        try (final Transaction transaction = DB.beginTransaction()) {
+          System.out.println("Thread: before find");
+          DB.find(Customer.class)
+            .forUpdate()
+           // .orderBy().desc("1") // this would help by the locks in DB2
+            .findList();
+
+          System.out.println("Thread: after find");
+          try {
+            Thread.sleep(3000);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          System.out.println("Thread: done");
+        }
+      }
+    };
+
+    t1.start();
+
+    Thread.sleep(100);
+
+    long start = System.currentTimeMillis();
+    try (final Transaction transaction = DB.beginTransaction()) {
+      if (isH2()) {
+        DB.sqlUpdate("SET LOCK_TIMEOUT 5000").execute();
+      }
+      System.out.println("Main: before find");
+      DB.find(Customer.class)
+        .forUpdate()
+        //.orderBy().desc("1") // this would help by the locks in DB2
+        .findList();
+
+      System.out.println("Main: after find");
+    }
+
+    start = System.currentTimeMillis() - start;
+
+    assertThat(start).isGreaterThan(2800);
+
+  }
+
+  @Test
   public void testForUpdate_withLimit() {
     ResetBasicData.reset();
 
