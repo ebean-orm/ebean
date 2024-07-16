@@ -186,7 +186,7 @@ class SimpleModuleInfoWriter {
   private void writeMethodEntityClasses(Set<String> dbEntities, String dbName) {
     String method = "defaultEntityClasses";
     if (dbName != null) {
-      method = "entitiesFor_" + dbName;
+      method = "entitiesFor_" + Util.stripForMethod(dbName);
       writeMethodComment("Entities for @DbName(name=\"%s\"))", dbName);
     } else {
       writeMethodComment("Entities with no @DbName", dbName);
@@ -216,7 +216,7 @@ class SimpleModuleInfoWriter {
   private void writeMethodEntityClassesFor(Set<String> otherDbNames) {
     writer.append("  private List<Class<?>> classesFor(String dbName) {").eol();
     for (String dbName : otherDbNames) {
-      writer.append("    if (\"%s\".equals(dbName)) return entitiesFor_%s();", dbName, dbName).eol();
+      writer.append("    if (\"%s\".equals(dbName)) return entitiesFor_%s();", dbName, Util.stripForMethod(dbName)).eol();
     }
     writer.append("    return new ArrayList<>();").eol();
     writer.append("  }").eol().eol();
