@@ -34,6 +34,8 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (isDb2()) {
+      assertThat(sqlOf(query)).contains("with rs use and keep update locks");
     } else {
       assertThat(sqlOf(query)).contains("for update");
     }
@@ -105,6 +107,8 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (isDb2()) {
+      assertThat(sqlOf(query)).contains("with rs use and keep update locks");
     } else if (!isOracle()) {
       // Oracle does not support FOR UPDATE with FETCH
       assertThat(sqlOf(query)).contains("for update");
@@ -138,6 +142,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_order");
       if (isSqlServer()) {
         assertThat(sql.get(1)).contains("from o_customer t0 with (updlock) where t0.id = ?");
+      } else if (isDb2()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? with rs use and keep update locks");
       } else {
         assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
       }
