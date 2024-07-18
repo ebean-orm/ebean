@@ -8,6 +8,7 @@ module io.ebean.api {
   uses io.ebean.service.SpiRawSqlService;
   uses io.ebean.service.SpiProfileLocationFactory;
   uses io.ebean.service.SpiFetchGroupService;
+  uses io.ebean.service.SpiJsonService;
 
   requires transitive java.sql;
   requires transitive io.avaje.config;
