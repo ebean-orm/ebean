@@ -94,6 +94,7 @@
     <module>kotlin-querybean-generator</module>
     <module>ebean-querybean</module>
     <module>ebean-postgis-types</module>
+    <module>ebean-net-postgis-types</module>
     <module>ebean-redis</module>
     <module>platforms</module>
     <module>composites</module>
