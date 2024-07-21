@@ -7,7 +7,6 @@ import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.core.OrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
@@ -178,10 +177,7 @@ public final class CQueryPredicates {
 
     BeanPropertyAssocMany<?> manyProperty = request.determineMany();
     if (buildSql) {
-      String logicalOrderBy = deriveOrderByWithMany(request.manyPropertyForOrderBy());
-      if (logicalOrderBy != null) {
-        dbOrderBy = deployParser.parse(logicalOrderBy);
-      }
+      dbOrderBy = deriveOrderByWithMany(deployParser, request.manyPropertyForOrderBy());
       // create a copy of the includes required to support the orderBy
       orderByIncludes = new HashSet<>(deployParser.includes());
     }
@@ -241,49 +237,47 @@ public final class CQueryPredicates {
     }
   }
 
-  private String parseOrderBy() {
+  private String parseOrderBy(DeployParser parser) {
     OrderBy<?> orderBy = query.getOrderBy();
     if (orderBy == null) {
       return null;
     }
-    return CQueryOrderBy.parse(request.descriptor(), orderBy);
+    return CQueryOrderBy.parse(parser, request.descriptor(), orderBy);
   }
 
   /**
    * There is a many property we need to make sure the ordering is appropriate.
    */
-  private String deriveOrderByWithMany(BeanPropertyAssocMany<?> manyProp) {
+  private String deriveOrderByWithMany(DeployParser parser, BeanPropertyAssocMany<?> manyProp) {
+    String orderBy = parseOrderBy(parser);
     if (manyProp == null) {
-      return parseOrderBy();
+      return orderBy;
     }
-    String orderBy = parseOrderBy();
-    BeanDescriptor<?> desc = request.descriptor();
-    String orderById = desc.defaultOrderBy();
+    String orderById = parser.parse(request.descriptor().defaultOrderBy());
     if (orderBy == null) {
       orderBy = orderById;
     }
     // check for default ordering on the many property...
     String manyOrderBy = manyProp.fetchOrderBy();
     if (manyOrderBy != null) {
-      orderBy = orderBy + ", " + CQueryBuilder.prefixOrderByFields(manyProp.name(), manyOrderBy);
+      orderBy = orderBy + ", " + parser.parse(CQueryBuilder.prefixOrderByFields(manyProp.name(), manyOrderBy));
     }
     if (request.isFindById()) {
       // only one master bean so should be fine...
       return orderBy;
     }
-    if (orderBy.startsWith(orderById)) {
-      return orderBy;
-    }
     // more than one top level row may be returned so
     // we need to make sure their is an order by on the
     // top level first (to ensure master/detail construction).
-    int manyPos = orderBy.indexOf(manyProp.name());
-    int idPos = orderBy.indexOf(" " + orderById);
+    int idPos = orderBy.indexOf(orderById);
+    if (idPos == 0) {
+      return orderBy;
+    }
+    int manyPos = orderBy.indexOf("${" + manyProp.name() + "}");
     if (manyPos == -1) {
       // no ordering of the many
       if (idPos == -1) {
         // append the orderById so that master level objects are ordered
-        // even if the orderBy is not unique for the master object
         return orderBy + ", " + orderById;
       }
       // orderById is already in the order by clause
@@ -292,7 +286,7 @@ public final class CQueryPredicates {
     if (idPos == -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
-        String msg = "A Query on [" + desc + "] includes a join to a 'many' association [" + manyProp.name()
+        String msg = "A Query on [" + request.descriptor() + "] includes a join to a 'many' association [" + manyProp.name()
         + "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById
         + "] must come before the many property [" + manyProp.name() + "] in the orderBy."
         + " Ebean has automatically modified the orderBy clause to do this.";

@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>14.4.0</version>
+  <version>14.5.0</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -50,11 +50,11 @@
     <ebean-annotation.version>8.4</ebean-annotation.version>
     <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
-    <ebean-migration.version>14.1.0</ebean-migration.version>
+    <ebean-migration.version>14.2.0</ebean-migration.version>
     <ebean-test-containers.version>7.4</ebean-test-containers.version>
     <ebean-datasource.version>9.0</ebean-datasource.version>
-    <ebean-agent.version>14.4.0</ebean-agent.version>
-    <ebean-maven-plugin.version>14.4.0</ebean-maven-plugin.version>
+    <ebean-agent.version>14.5.0</ebean-agent.version>
+    <ebean-maven-plugin.version>14.5.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
@@ -94,6 +94,7 @@
     <module>kotlin-querybean-generator</module>
     <module>ebean-querybean</module>
     <module>ebean-postgis-types</module>
+    <module>ebean-net-postgis-types</module>
     <module>ebean-redis</module>
     <module>platforms</module>
     <module>composites</module>

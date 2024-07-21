@@ -34,9 +34,61 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (isDb2()) {
+      assertThat(sqlOf(query)).contains("with rs use and keep update locks");
     } else {
       assertThat(sqlOf(query)).contains("for update");
     }
+  }
+
+  @Test
+  public void testConcurrentForUpdate() throws InterruptedException {
+
+    ResetBasicData.reset();
+
+    Thread t1 = new Thread() {
+      @Override
+      public void run() {
+        try (final Transaction transaction = DB.beginTransaction()) {
+          System.out.println("Thread: before find");
+          DB.find(Customer.class)
+            .forUpdate()
+           // .orderBy().desc("1") // this would help by the locks in DB2
+            .findList();
+
+          System.out.println("Thread: after find");
+          try {
+            Thread.sleep(3000);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          System.out.println("Thread: done");
+        }
+      }
+    };
+
+    t1.start();
+
+    Thread.sleep(100);
+
+    long start = System.currentTimeMillis();
+    try (final Transaction transaction = DB.beginTransaction()) {
+      if (isH2()) {
+        DB.sqlUpdate("SET LOCK_TIMEOUT 5000").execute();
+      }
+      System.out.println("Main: before find");
+      DB.find(Customer.class)
+        .forUpdate()
+        //.orderBy().desc("1") // this would help by the locks in DB2
+        .findList();
+
+      System.out.println("Main: after find");
+    }
+
+    start = System.currentTimeMillis() - start;
+
+    assertThat(start).isGreaterThan(2800);
+
   }
 
   @Test
@@ -55,6 +107,8 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (isDb2()) {
+      assertThat(sqlOf(query)).contains("with rs use and keep update locks");
     } else if (!isOracle()) {
       // Oracle does not support FOR UPDATE with FETCH
       assertThat(sqlOf(query)).contains("for update");
@@ -88,6 +142,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_order");
       if (isSqlServer()) {
         assertThat(sql.get(1)).contains("from o_customer t0 with (updlock) where t0.id = ?");
+      } else if (isDb2()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? with rs use and keep update locks");
       } else {
         assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
       }
@@ -123,6 +179,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_order");
       if (isSqlServer()) {
         assertThat(sql.get(1)).contains("from o_customer t0 with (updlock,nowait) where t0.id = ?");
+      } else if (isDb2()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? with rs use and keep update locks");
       } else {
         assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
       }

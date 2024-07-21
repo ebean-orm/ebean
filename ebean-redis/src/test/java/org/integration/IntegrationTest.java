@@ -3,10 +3,8 @@ package org.integration;
 import io.ebean.DB;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import org.domain.Person;
-import org.domain.RCust;
-import org.domain.UChild;
-import org.domain.UParent;
+import org.domain.*;
+import org.domain.query.QOtherOne;
 import org.domain.query.QPerson;
 import org.domain.query.QRCust;
 import org.junit.jupiter.api.Test;
@@ -146,6 +144,37 @@ class IntegrationTest {
     assertThat(f2).hasSize(3);
     ServerCacheStatistics stats2 = beanCache.statistics(true);
     assertThat(stats2.getHitCount()).isEqualTo(3);
+  }
+
+  @Test
+  void testOtherOne() {
+    DB.save(new OtherOne("A", "B", "ab"));
+    DB.save(new OtherOne("A", "C", "ac"));
+    DB.save(new OtherOne("B", "B", "bb"));
+
+    ServerCache nkeyCache = DB.cacheManager().naturalKeyCache(OtherOne.class);
+    nkeyCache.clear();
+    nkeyCache.statistics(true);
+
+    OtherOne ab0 = findOther("A", "B");
+    OtherOne ab1 = findOther("A", "B");
+    OtherOne ab2 = findOther("A", "B");
+    OtherOne bb = findOther("B", "B");
+
+    assertThat(ab0).isNotNull();
+    assertThat(ab1).isNotNull();
+    assertThat(ab2).isNotNull();
+    assertThat(bb).isNotNull();
+
+    ServerCacheStatistics statistics = nkeyCache.statistics(true);
+    assertThat(statistics.getHitCount()).isEqualTo(2);
+  }
+
+  private static OtherOne findOther(String a, String b) {
+    return new QOtherOne()
+      .one.eq(a)
+      .two.eq(b)
+      .findOne();
   }
 
   @Test

@@ -15,7 +15,7 @@ mvn -T 4 clean package
 mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests -DskipStagingRepositoryClose=true -DstagingProgressTimeoutMinutes=9
 
 ## git commit, git tag, git push --tags
-git commit -am 'Version 14.4.0'
+git commit -am 'Version 14.5.0'
 git tag 14.4.0
 git push --tags
 

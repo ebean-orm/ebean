@@ -57,6 +57,6 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
   @Override
   protected String withForUpdate(String sql, Query.LockWait lockWait, Query.LockType lockType) {
     // NOWAIT and SKIP LOCKED not supported with Db2
-    return sql + " for update";
+    return sql + " with rs use and keep update locks";
   }
 }
