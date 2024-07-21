@@ -24,6 +24,7 @@
     <module>ebean-oracle</module>
     <module>ebean-postgres</module>
     <module>ebean-postgis</module>
+    <module>ebean-net-postgis</module>
 <!--    <module>sqlanywhere</module>-->
     <module>ebean-sqlite</module>
     <module>ebean-sqlserver</module>

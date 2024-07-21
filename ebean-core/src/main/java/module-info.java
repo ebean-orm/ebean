@@ -47,7 +47,7 @@ module io.ebean.core {
   exports io.ebeanservice.docstore.api.support to io.ebean.elastic, io.ebean.test;
   exports io.ebeanservice.docstore.api.mapping to io.ebean.elastic;
 
-  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.spring.txn;
+  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.postgis.types;
   exports io.ebeaninternal.api.json to io.ebean.test;
   exports io.ebeaninternal.json to io.ebean.test;
   exports io.ebeaninternal.server.autotune to io.ebean.autotune;
@@ -69,7 +69,7 @@ module io.ebean.core {
   exports io.ebeaninternal.server.querydefn to io.ebean.autotune, io.ebean.querybean, io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.rawsql to io.ebean.test;
   exports io.ebeaninternal.server.json to io.ebean.test, io.ebean.elastic;
-  exports io.ebeaninternal.server.type to io.ebean.postgis, io.ebean.test;
+  exports io.ebeaninternal.server.type to io.ebean.postgis, io.ebean.test, io.ebean.postgis.types;
   exports io.ebeaninternal.server.transaction to io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.k8scache;
   exports io.ebeaninternal.server.util to io.ebean.querybean;
 
