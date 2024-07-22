@@ -9,7 +9,7 @@ ebean:
     ddlMode: dropCreate # none | dropCreate | create | migration | createOnly | migrationDropCreate
     dbName: mygisapp
 
-    postgis:
+    netpostgis:
       containerName: ebeanbuild_postgis
       port: 9432
       image: ghcr.io/baosystems/postgis:15
