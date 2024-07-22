@@ -8,14 +8,14 @@ import java.util.*;
 /**
  * List capable of lazy loading and modification awareness.
  */
-public final class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, BeanCollectionAdd {
+public class BeanList<E> extends AbstractBeanCollection<E> implements List<E>, BeanCollectionAdd {
 
   private static final long serialVersionUID = 1L;
 
   /**
    * The underlying List implementation.
    */
-  private List<E> list;
+  List<E> list;
 
   /**
    * Specify the underlying List implementation.
@@ -111,30 +111,30 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     }
   }
 
+  protected void initList(boolean skipLoad, boolean onlyIds) {
+    if (skipLoad) {
+      list = new ArrayList<>();
+    } else {
+      lazyLoadCollection(onlyIds);
+    }
+  }
+
   private void initClear() {
     lock.lock();
     try {
       if (list == null) {
-        if (!disableLazyLoad && modifyListening) {
-          lazyLoadCollection(true);
-        } else {
-          list = new ArrayList<>();
-        }
+        initList(disableLazyLoad || !modifyListening, true);
       }
     } finally {
       lock.unlock();
     }
   }
 
-  private void init() {
+  void init() {
     lock.lock();
     try {
       if (list == null) {
-        if (disableLazyLoad) {
-          list = new ArrayList<>();
-        } else {
-          lazyLoadCollection(false);
-        }
+        initList(disableLazyLoad, false);
       }
     } finally {
       lock.unlock();
