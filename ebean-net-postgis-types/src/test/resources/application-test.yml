@@ -5,13 +5,13 @@ ebean:
   test:
 #    useDocker: false
 #    shutdown: stop # stop | remove
-    platform: netpostgis
+    platform: postgis
     ddlMode: dropCreate # none | dropCreate | create | migration | createOnly | migrationDropCreate
     dbName: mynetgisapp
 
-    netpostgis:
-      containerName: ebeanbuild_postgisnet
-      port: 9433
+    postgis:
+      containerName: ebeanbuild_postgis
+      port: 9432
       image: ghcr.io/baosystems/postgis:15
 #      extensions: postgis
 #      url: jdbc:postgresql_lwgis://localhost:6432/mygisapp
