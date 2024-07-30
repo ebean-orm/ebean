@@ -10,8 +10,8 @@ ebean:
     dbName: mynetgisapp
 
     postgis:
-      containerName: ebeanbuild_postgis
-      port: 9432
+      containerName: ebeanbuild_postgis2
+      port: 9433
       image: ghcr.io/baosystems/postgis:15
 #      extensions: postgis
 #      url: jdbc:postgresql_lwgis://localhost:6432/mygisapp
