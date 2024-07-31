@@ -26,7 +26,6 @@ public class PlatformAutoConfig {
     KNOWN_PLATFORMS.put("sqlite", new SqliteSetup());
     KNOWN_PLATFORMS.put("postgres", new PostgresSetup());
     KNOWN_PLATFORMS.put("postgis", new PostgisSetup());
-    KNOWN_PLATFORMS.put("netpostgis", new NetPostgisSetup());
     KNOWN_PLATFORMS.put("nuodb", new NuoDBSetup());
     KNOWN_PLATFORMS.put("mysql", new MySqlSetup());
     KNOWN_PLATFORMS.put("mariadb", new MariaDBSetup());

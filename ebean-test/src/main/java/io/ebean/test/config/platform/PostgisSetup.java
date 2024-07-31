@@ -9,6 +9,9 @@ import java.util.Properties;
  */
 class PostgisSetup implements PlatformSetup {
 
+  private static final String NET_POSTGIS_DRIVER = "net.postgis.jdbc.DriverWrapperLW";
+  private static final String ORG_POSTGIS_DRIVER = "org.postgis.DriverWrapperLW";
+
   @Override
   public Properties setup(Config config) {
     int defaultPort = config.isUseDocker() ? 7432 : 5432;
@@ -17,15 +20,27 @@ class PostgisSetup implements PlatformSetup {
     config.setDefaultPort(defaultPort);
     config.setUsernameDefault();
     config.setPasswordDefault();
-    config.setDriver("org.postgis.DriverWrapperLW");
+    config.setDriver(driver(config));
     config.setUrl("jdbc:postgresql_lwgis://${host}:${port}/${databaseName}");
-
     String schema = config.getSchema();
     if (schema != null && !schema.equals(config.getUsername())) {
       config.urlAppend("?currentSchema=" + schema);
     }
     config.datasourceDefaults();
     return dockerProperties(config);
+  }
+
+  private String driver(Config config) {
+    String driver = config.getPlatformKey("driver", "");
+    if (!driver.isEmpty()) {
+      return driver;
+    }
+    try {
+      Class.forName(NET_POSTGIS_DRIVER);
+      return NET_POSTGIS_DRIVER;
+    } catch (ClassNotFoundException e){
+      return ORG_POSTGIS_DRIVER;
+    }
   }
 
   private Properties dockerProperties(Config config) {
