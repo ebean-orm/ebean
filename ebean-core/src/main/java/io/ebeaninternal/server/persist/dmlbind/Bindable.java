@@ -34,6 +34,11 @@ public interface Bindable {
   void dmlAppend(GenerateDmlRequest request);
 
   /**
+   * Append column and type for Insert (ClickHouse).
+   */
+  void dmlType(GenerateDmlRequest request);
+
+  /**
    * Bind given the request and bean. The bean could be the oldValues bean
    * when binding a update or delete where clause with ALL concurrency mode.
    */
