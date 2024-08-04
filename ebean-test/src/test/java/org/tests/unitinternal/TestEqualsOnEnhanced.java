@@ -1,14 +1,21 @@
 package org.tests.unitinternal;
 
 import io.ebean.xtest.BaseTestCase;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class TestEqualsOnEnhanced extends BaseTestCase {
+
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
 
   @Test
   public void test() {

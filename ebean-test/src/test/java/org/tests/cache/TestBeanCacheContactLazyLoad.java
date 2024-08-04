@@ -3,9 +3,11 @@ package org.tests.cache;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Date;
 import java.time.LocalDate;
@@ -17,6 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Test class testing a wrong behaviour of the bean cache.
  */
 public class TestBeanCacheContactLazyLoad extends BaseTestCase {
+
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
 
   /**
    * This test shows a wrong behaviour of the bean cache up to at least Ebean 12.4.*:
