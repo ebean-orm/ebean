@@ -45,12 +45,13 @@ public class ResetBasicData {
       me.insertProducts();
       me.insertTestCustAndOrders();
     });
+    outputState();
     runOnce = true;
   }
 
   private static void outputState() {
     StringBuilder sb = new StringBuilder();
-    sb.append("Customers:");
+    sb.append("CustomerIds:");
     server.find(Customer.class).findEach(c -> sb.append(' ').append(c.getId()));
     sb.append(", Orders:");
     server.find(Order.class).findEach(c -> sb.append(' ').append(c.getId()));
@@ -64,7 +65,7 @@ public class ResetBasicData {
 
   private static void outputCustomerIds() {
     List<Object> ids = server.find(Customer.class).findIds();
-    System.err.println("Customers:" + ids);
+    System.err.println("CustomerIds:" + ids);
   }
 
   private void insertCountries() {
