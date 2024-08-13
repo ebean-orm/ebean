@@ -56,7 +56,7 @@ Work at the highest level of abstraction and drop down levels as needed.
     <tr>
       <td align="center" valign="middle">
         <a href="https://www.foconis.de/" target="_blank">
-          <img width="222px" src="https://www.foconis.de/templates/yootheme/cache/foconis_logo_322-709da1de.png">
+          <img width="222px" src="https://group.foconis.com/download/ci/logo/png-72dpi/logo-quer/foconis-analytics-quer.png">
         </a>
       </td>
       <td align="center" valign="middle">
