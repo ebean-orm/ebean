@@ -57,6 +57,7 @@ import java.util.stream.Stream;
  * @param <R> the specific root query bean type (e.g. QCustomer)
  */
 @NonNullApi
+//public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryBean<T, R> {
 public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
 
   /**
@@ -272,6 +273,13 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   @Override
   public final R apply(FetchPath pathProperties) {
     query.apply(pathProperties);
+    return root;
+  }
+
+
+  @Override
+  public R also(Consumer<QueryBuilder<?, ?>> apply) {
+    apply.accept(this);
     return root;
   }
 
