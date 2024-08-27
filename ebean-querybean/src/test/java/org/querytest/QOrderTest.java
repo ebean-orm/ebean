@@ -143,6 +143,22 @@ class QOrderTest {
   }
 
   @Test
+  void viaNullFetchGraph() {
+    DB.getDefault();
+    LoggedSql.start();
+
+    FetchGroup<Order> fg = null;
+    new QOrder()
+      .select(fg)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select /* QOrderTest.viaNullFetchGraph */ t0.id, ");
+  }
+
+  @Test
   void viaFetchGraph() {
 
     DB.getDefault();
