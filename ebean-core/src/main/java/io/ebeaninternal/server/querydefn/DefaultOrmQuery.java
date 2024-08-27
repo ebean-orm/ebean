@@ -1367,7 +1367,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final Query<T> select(FetchGroup<T> fetchGroup) {
-    this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+    if (fetchGroup != null) {
+      this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+    }
     return this;
   }
 
