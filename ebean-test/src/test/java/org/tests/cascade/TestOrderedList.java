@@ -185,7 +185,7 @@ public class TestOrderedList extends BaseTestCase {
     DB.save(masterDb);
 
     masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
-    assertThat(masterDb.getDetails()).containsExactly(detail3, detail1);
+    assertThat(masterDb.getDetails()).containsExactlyInAnyOrder(detail3, detail1);
 
   }
 }

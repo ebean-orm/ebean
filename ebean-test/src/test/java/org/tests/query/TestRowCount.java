@@ -1,5 +1,6 @@
 package org.tests.query;
 
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
@@ -17,9 +18,9 @@ public class TestRowCount extends BaseTestCase {
 
   @Test
   public void test() {
-
     ResetBasicData.reset();
 
+    LoggedSql.start();
     Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .where()
@@ -28,11 +29,14 @@ public class TestRowCount extends BaseTestCase {
       .order("id desc").query();
 
     int rc = query.findCount();
-
     List<Object> ids = query.findIds();
-
     List<Order> list = query.findList();
-    System.out.println(list);
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).doesNotContain("order by");
+    assertThat(sql.get(1)).contains("order by");
+    assertThat(sql.get(2)).contains("order by t0.id desc");
     for (Order order : list) {
       order.getStatus();
     }
