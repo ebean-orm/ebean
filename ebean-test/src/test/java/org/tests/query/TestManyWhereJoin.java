@@ -181,5 +181,6 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     // additional join for fetching the many details
     assertThat(sql).contains(" left join o_order_detail t1 on t1.order_id = t0.id");
+    assertThat(sql).contains("order by t0.cretime, t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc");
   }
 }

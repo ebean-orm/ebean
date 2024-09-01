@@ -1,5 +1,6 @@
 package org.tests.query;
 
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,8 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Date;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryFilterManySimple extends BaseTestCase {
 
@@ -20,6 +23,7 @@ public class TestQueryFilterManySimple extends BaseTestCase {
     // not really last week :)
     Date lastWeek = Date.valueOf("2010-01-01");
 
+    LoggedSql.start();
     List<Customer> list = DB.find(Customer.class)
       // .join("orders", new JoinConfig().lazy())
       // .join("orders", new JoinConfig().query())
@@ -29,5 +33,14 @@ public class TestQueryFilterManySimple extends BaseTestCase {
 
     // invoke lazy loading
     list.get(0).getOrders().size();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where");
+    assertThat(sql.get(0)).contains("order by t0.id");
+    if (isPostgresCompatible()) {
+      assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) = any(?) and t0.first_name is not null;");
+    } else {
+      assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) in (?) and t0.first_name is not null;");
+    }
   }
 }
