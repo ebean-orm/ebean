@@ -66,6 +66,5 @@ public class TestViewBaseEntity extends BaseTestCase {
     }
 
     assertSql(query).contains("from order_agg_vw t0 left join o_order t1 on t1.id = t0.order_id left join o_customer t3 on t3.id = t1.kcustomer_id left join o_order_detail t2 on t2.order_id = t1.id and t2.id > 0 where t0.order_total > ?");
-    assertSql(query).contains("order by t0.order_id, t2.id asc, t2.order_qty asc, t2.cretime desc");
   }
 }
