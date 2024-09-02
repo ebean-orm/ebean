@@ -2,9 +2,11 @@ package org.tests.batchload;
 
 import io.ebean.DB;
 import io.ebean.xtest.base.TransactionalTestCase;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 

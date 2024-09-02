@@ -10,20 +10,25 @@ import io.ebean.annotation.Transactional;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
 import io.ebeaninternal.api.SpiTransaction;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
+import org.tests.model.basic.ResetBasicData;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestExecuteComplete extends BaseTestCase {
 
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
 
   @ForPlatform(Platform.H2)
   @Test
   public void execute_when_errorOnCommit_threadLocalIsCleared() {
-
     try {
       DB.execute(TxScope.required().setBatch(PersistBatch.ALL), () -> {
 
@@ -43,7 +48,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void nestedExecute_when_errorOnCommit_threadLocalIsCleared() {
-
     try {
       DB.execute(TxScope.required().setBatch(PersistBatch.ALL), () ->
         DB.execute(() -> {
@@ -64,7 +68,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void transactional_errorOnCommit_expect_threadScopeCleanup() {
-
     try {
       errorOnCommit();
       fail();
@@ -85,7 +88,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void normal_expect_threadScopeCleanup() {
-
     Transaction txn1 = server().beginTransaction();
     try {
       txn1.commit();
@@ -99,7 +101,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void missingEnd_expect_threadScopeCleanup() {
-
     Transaction txn1 = server().beginTransaction();
     try {
       txn1.commit();
@@ -114,7 +115,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void missingEnd_withRollbackOnly_expect_threadScopeCleanup() {
-
     Transaction txn1 = server().beginTransaction();
     try {
       txn1.rollback();
@@ -129,7 +129,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void implicit_query_expect_threadScopeCleanup() {
-
     DB.find(Customer.class).findList();
 
     assertThat(getInScopeTransaction()).isNull();
@@ -138,7 +137,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void implicit_save_expect_threadScopeCleanup() {
-
     Customer cust = new Customer();
     cust.setName("Roland");
     DB.save(cust);
@@ -149,7 +147,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void no_transaction_expect_threadScopeCleanup() {
-
     try (Transaction txn = DB.beginTransaction(TxScope.notSupported())) {
       SpiTransaction txn2 = getInScopeTransaction();
       // The NoTransaction placeholder can normally only occur inside
@@ -164,7 +161,6 @@ public class TestExecuteComplete extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void test_nested_userobjects() {
-
     try (Transaction txn1 = DB.beginTransaction()) {
       assertThat(getInScopeTransaction()).isNotNull();
       getInScopeTransaction().putUserObject("foo", "bar");

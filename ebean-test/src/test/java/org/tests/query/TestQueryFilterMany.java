@@ -215,6 +215,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("from o_customer t0 left join o_order t1");
     assertThat(sql.get(0)).contains("where t1.order_date is not null");
+    assertThat(sql.get(0)).contains("order by t0.id");
   }
 
   @Test
@@ -271,6 +272,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
     assertThat(sqlList.get(0)).contains("select count(*) from o_customer");
+    assertThat(sqlList.get(0)).doesNotContain("order by");
   }
 
   @Test

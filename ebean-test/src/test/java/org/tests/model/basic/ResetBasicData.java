@@ -14,10 +14,9 @@ public class ResetBasicData {
 
   private static boolean runOnce;
 
-  private static Database server = DB.getDefault();
+  private static final Database server = DB.getDefault();
 
   public static synchronized void reset() {
-
     if (runOnce) {
       int cnt1 = server.find(Customer.class).findCount();
       int cnt2 = server.find(Order.class).findCount();
@@ -25,18 +24,9 @@ public class ResetBasicData {
       int cnt4 = server.find(Product.class).findCount();
       if (cnt1 == 4 && cnt2 == 5 && cnt3 == 2 && cnt4 == 4) {
         // OK, test data not modified
+        outputCustomerIds();
       } else {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Customers:");
-        server.find(Customer.class).findEach(c -> sb.append(' ').append(c.getId()));
-        sb.append(", Orders:");
-        server.find(Order.class).findEach(c -> sb.append(' ').append(c.getId()));
-        sb.append(", Countries:");
-        server.find(Country.class).findEach(c -> sb.append(' ').append(c.getCode()));
-        sb.append(", Products:");
-        server.find(Product.class).findEach(c -> sb.append(' ').append(c.getId()));
-        System.err.println("WARNING: basic test data was modified. Current content:");
-        System.err.println(sb.toString());
+        outputState();
       }
       return;
     }
@@ -55,9 +45,28 @@ public class ResetBasicData {
       me.insertProducts();
       me.insertTestCustAndOrders();
     });
+    outputState();
     runOnce = true;
   }
 
+  private static void outputState() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("CustomerIds:");
+    server.find(Customer.class).findEach(c -> sb.append(' ').append(c.getId()));
+    sb.append(", Orders:");
+    server.find(Order.class).findEach(c -> sb.append(' ').append(c.getId()));
+    sb.append(", Countries:");
+    server.find(Country.class).findEach(c -> sb.append(' ').append(c.getCode()));
+    sb.append(", Products:");
+    server.find(Product.class).findEach(c -> sb.append(' ').append(c.getId()));
+    System.err.println("WARNING: basic test data was modified. Current content:");
+    System.err.println(sb);
+  }
+
+  private static void outputCustomerIds() {
+    List<Object> ids = server.find(Customer.class).findIds();
+    System.err.println("CustomerIds:" + ids);
+  }
 
   private void insertCountries() {
     Country c = new Country();

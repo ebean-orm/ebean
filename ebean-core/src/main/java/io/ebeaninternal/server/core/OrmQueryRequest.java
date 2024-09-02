@@ -41,9 +41,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private CQueryPlanKey queryPlanKey;
   private SpiQuerySecondary secondaryQueries;
   private List<T> cacheBeans;
-  private BeanPropertyAssocMany<?> manyProperty;
   private boolean inlineCountDistinct;
   private Set<String> dependentTables;
+  private SpiQueryManyJoin manyJoin;
 
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
     super(server, t);
@@ -162,7 +162,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void prepareQuery() {
-    secondaryQueries = query.convertJoins();
+    manyJoin = query.convertJoins();
+    secondaryQueries = query.secondaryQuery();
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
     queryPlanKey = query.prepare(this);
@@ -422,19 +423,19 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return query;
   }
 
-  /**
-   * Determine and return the ToMany property that is included in the query.
-   */
-  public BeanPropertyAssocMany<?> determineMany() {
-    manyProperty = beanDescriptor.manyProperty(query);
-    return manyProperty;
+  public SpiQueryManyJoin manyJoin() {
+    return manyJoin;
   }
 
   /**
-   * Return the many property that is fetched in the query or null if there is not one.
+   * Return true if there is a manyJoin that should be included with this query.
    */
-  public BeanPropertyAssocMany<?> manyPropertyForOrderBy() {
-    return query.isSingleAttribute() ? null : manyProperty;
+  public boolean includeManyJoin() {
+    if (manyJoin == null || query.isSingleAttribute()) {
+      return false;
+    }
+    final Type type = query.type();
+    return type != Type.SQ_EX && type != Type.COUNT;
   }
 
   /**

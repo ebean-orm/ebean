@@ -1302,19 +1302,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
-   * Return the many property included in the query or null if one is not.
-   */
-  public BeanPropertyAssocMany<?> manyProperty(SpiQuery<?> query) {
-    OrmQueryDetail detail = query.detail();
-    for (BeanPropertyAssocMany<?> many : propertiesMany) {
-      if (detail.includesPath(many.name())) {
-        return many;
-      }
-    }
-    return null;
-  }
-
-  /**
    * Return a raw expression for 'where parent id in ...' clause.
    */
   String parentIdInExpr(int parentIdSize, String rawWhere) {

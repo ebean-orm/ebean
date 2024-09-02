@@ -5,6 +5,7 @@ import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
+import org.example.domain.Contact;
 import org.example.domain.Customer;
 import org.example.domain.Order;
 import org.example.domain.OrderDetail;
@@ -88,7 +89,7 @@ class QOrderTest {
     query.findList();
 
     String sql = query.getGeneratedSql();
-    assertThat(sql).contains("select /* QOrderTest.orderById:88 */ t0.id, t0.status from o_order t0 order by t0.id");
+    assertThat(sql).contains("select /* QOrderTest.orderById:89 */ t0.id, t0.status from o_order t0 order by t0.id");
 
     Query<Order> query2 = new QOrder()
       .select(QOrder.Alias.status)
@@ -98,7 +99,7 @@ class QOrderTest {
     query2.findList();
 
     String sql2 = query2.getGeneratedSql();
-    assertThat(sql2).contains("select /* QOrderTest.orderById:98 */ t0.id, t0.status from o_order t0 order by t0.status, t0.id");
+    assertThat(sql2).contains("select /* QOrderTest.orderById:99 */ t0.id, t0.status from o_order t0 order by t0.status, t0.id");
   }
 
   @Test
@@ -112,6 +113,70 @@ class QOrderTest {
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).contains("select /*+ FirstRows */ /* QOrderTest.hint */ t0.id, t0.name from be_customer t0");
+  }
+
+  @Test
+  void fetchGroup_nestedMany_expect_orderByClauseAdded() {
+    var o = QOrder.alias();
+    var c = QCustomer.alias();
+    var ct = QContact.alias();
+
+    var fg = QOrder.forFetchGroup()
+      .select(o.status, o.orderDate)
+      .customer.fetch(c.email)
+      .customer.contacts.fetch(ct.firstName, ct.lastName)
+      .buildFetchGroup();
+
+    LoggedSql.start();
+
+    new QOrder()
+      .select(fg)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("order by t0.id");
+  }
+
+  @Test
+  void fetchGroup_nestedMany2_expect_orderByClauseAdded() {
+    var fg1 = FetchGroup.of(Order.class)
+      .fetch("customer")
+      .fetch("customer.contacts")
+      .build();
+
+    LoggedSql.start();
+
+    new QOrder()
+      .select(fg1)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("order by t0.id");
+  }
+
+  @Test
+  void fetchGroup_nestedMany3_expect_orderByClauseAdded() {
+    var fg = FetchGroup.of(Order.class)
+      .fetch("customer", FetchGroup.of(Customer.class)
+        .fetch("contacts", FetchGroup.of(Contact.class)
+          .build())
+        .build())
+      .build();
+
+    LoggedSql.start();
+
+    new QOrder()
+      .select(fg)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("order by t0.id");
   }
 
   @Test
@@ -140,6 +205,22 @@ class QOrderTest {
       .status.eq(Order.Status.NEW)
       .customer.fetchCache()
       .findList();
+  }
+
+  @Test
+  void viaNullFetchGraph() {
+    DB.getDefault();
+    LoggedSql.start();
+
+    FetchGroup<Order> fg = null;
+    new QOrder()
+      .select(fg)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select /* QOrderTest.viaNullFetchGraph */ t0.id, ");
   }
 
   @Test

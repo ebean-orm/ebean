@@ -5,6 +5,7 @@ import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.xtest.BaseTestCase;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -18,6 +19,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestBeanState extends BaseTestCase {
 
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
+
   @Test
   void invalid() {
     assertThrows(IllegalArgumentException.class, () -> DB.beanState(new Object()));
@@ -25,7 +31,6 @@ class TestBeanState extends BaseTestCase {
 
   @Test
   void loadErrors_when_empty() {
-    ResetBasicData.reset();
     Customer one = DB.find(Customer.class).setMaxRows(1).findOne();
     BeanState beanState = DB.beanState(one);
 
@@ -34,8 +39,6 @@ class TestBeanState extends BaseTestCase {
 
   @Test
   void test() {
-    ResetBasicData.reset();
-
     List<Customer> custs = DB.find(Customer.class).findList();
 
     Customer customer = DB.find(Customer.class).setId(custs.get(0).getId()).select("name")
@@ -69,8 +72,6 @@ class TestBeanState extends BaseTestCase {
 
   @Test
   void setDisableLazyLoad_expect_lazyLoadingDisabled() {
-    ResetBasicData.reset();
-
     List<Customer> custs = DB.find(Customer.class).order("id").findList();
 
     Customer customer = DB.find(Customer.class)
@@ -86,7 +87,6 @@ class TestBeanState extends BaseTestCase {
 
   @Test
   void changedProps_when_setManyProperty() {
-    ResetBasicData.reset();
 
     Customer customer = DB.find(Customer.class).order("id").setMaxRows(1).findOne();
 

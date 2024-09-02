@@ -465,20 +465,24 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final SpiQuerySecondary convertJoins() {
+  public final SpiQueryManyJoin convertJoins() {
     createExtraJoinsToSupportManyWhereClause();
-    markQueryJoins();
+    return markQueryJoins();
+  }
+
+  @Override
+  public SpiQuerySecondary secondaryQuery() {
     return new OrmQuerySecondary(removeQueryJoins(), removeLazyJoins());
   }
 
   /**
    * Limit the number of fetch joins to Many properties, mark as query joins as needed.
+   *
+   * @return The query join many property or null.
    */
-  private void markQueryJoins() {
-    if (distinctOn == null) {
-      // no automatic join to query join conversion when distinctOn is used
-      detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
-    }
+  private SpiQueryManyJoin markQueryJoins() {
+    // no automatic join to query join conversion when distinctOn is used
+    return distinctOn != null ? null : detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
   }
 
   private boolean isAllowOneManyFetch() {
@@ -1298,7 +1302,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final Query<T> select(FetchGroup<T> fetchGroup) {
-    this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+    if (fetchGroup != null) {
+      this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+    }
     return this;
   }
 
