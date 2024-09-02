@@ -1,13 +1,9 @@
 package io.ebeaninternal.server.query;
 
 import io.ebean.OrderBy;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.CoreLog;
-import io.ebeaninternal.api.SpiExpressionList;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.core.OrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.DeployParser;
 import io.ebeaninternal.server.expression.DefaultExpressionRequest;
 import io.ebeaninternal.server.persist.Binder;
@@ -175,9 +171,8 @@ public final class CQueryPredicates {
     buildUpdateClause(buildSql, deployParser);
     buildBindWhereRawSql(buildSql);
 
-    BeanPropertyAssocMany<?> manyProperty = request.determineMany();
     if (buildSql) {
-      dbOrderBy = deriveOrderByWithMany(deployParser, request.manyPropertyForOrderBy());
+      dbOrderBy = deriveOrderByWithMany(deployParser);
       // create a copy of the includes required to support the orderBy
       orderByIncludes = new HashSet<>(deployParser.includes());
     }
@@ -188,13 +183,16 @@ public final class CQueryPredicates {
         dbWhere = where.buildSql();
       }
     }
+    SpiQueryManyJoin manyProperty = request.manyJoin();
     if (manyProperty != null) {
-      OrmQueryProperties chunk = query.detail().getChunk(manyProperty.name(), false);
-      SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
-      if (filterManyExpr != null) {
-        this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
-        if (buildSql) {
-          dbFilterMany = filterMany.buildSql();
+      OrmQueryProperties chunk = query.detail().getChunk(manyProperty.path(), false);
+      if (chunk != null) {
+        SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
+        if (filterManyExpr != null) {
+          this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
+          if (buildSql) {
+            dbFilterMany = filterMany.buildSql();
+          }
         }
       }
     }
@@ -248,9 +246,9 @@ public final class CQueryPredicates {
   /**
    * There is a many property we need to make sure the ordering is appropriate.
    */
-  private String deriveOrderByWithMany(DeployParser parser, BeanPropertyAssocMany<?> manyProp) {
+  private String deriveOrderByWithMany(DeployParser parser) {
     String orderBy = parseOrderBy(parser);
-    if (manyProp == null) {
+    if (!request.includeManyJoin()) {
       return orderBy;
     }
     String orderById = parser.parse(request.descriptor().defaultOrderBy());
@@ -258,9 +256,10 @@ public final class CQueryPredicates {
       orderBy = orderById;
     }
     // check for default ordering on the many property...
+    SpiQueryManyJoin manyProp = request.manyJoin();
     String manyOrderBy = manyProp.fetchOrderBy();
     if (manyOrderBy != null) {
-      orderBy = orderBy + ", " + parser.parse(CQueryBuilder.prefixOrderByFields(manyProp.name(), manyOrderBy));
+      orderBy = orderBy + ", " + parser.parse(CQueryBuilder.prefixOrderByFields(manyProp.path(), manyOrderBy));
     }
     if (request.isFindById()) {
       // only one master bean so should be fine...
@@ -273,7 +272,7 @@ public final class CQueryPredicates {
     if (idPos == 0) {
       return orderBy;
     }
-    int manyPos = orderBy.indexOf("${" + manyProp.name() + "}");
+    int manyPos = orderBy.indexOf("${" + manyProp.path() + "}");
     if (manyPos == -1) {
       // no ordering of the many
       if (idPos == -1) {
@@ -286,10 +285,10 @@ public final class CQueryPredicates {
     if (idPos == -1 || idPos >= manyPos) {
       if (idPos > manyPos) {
         // there was an error with the order by...
-        String msg = "A Query on [" + request.descriptor() + "] includes a join to a 'many' association [" + manyProp.name()
-        + "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById
-        + "] must come before the many property [" + manyProp.name() + "] in the orderBy."
-        + " Ebean has automatically modified the orderBy clause to do this.";
+        String msg = "A Query on [" + request.descriptor() + "] includes a join to a 'many' association [" + manyProp.path()
+          + "] with an incorrect orderBy [" + orderBy + "]. The id property [" + orderById
+          + "] must come before the many property [" + manyProp.path() + "] in the orderBy."
+          + " Ebean has automatically modified the orderBy clause to do this.";
         CoreLog.log.log(WARNING, msg);
       }
       // the id needs to come before the manyPropName

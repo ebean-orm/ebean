@@ -580,7 +580,12 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   /**
    * Convert joins as necessary to query joins etc.
    */
-  SpiQuerySecondary convertJoins();
+  SpiQueryManyJoin convertJoins();
+
+  /**
+   * Return secondary queries if required.
+   */
+  SpiQuerySecondary secondaryQuery();
 
   /**
    * Return the TransactionContext.
