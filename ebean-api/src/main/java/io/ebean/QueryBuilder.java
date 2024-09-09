@@ -20,12 +20,22 @@ import java.util.stream.Stream;
  * @param <SELF> The type of the builder
  * @param <T>    The entity bean type
  */
+//public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends QueryBuilderProjection<SELF, T> {
 public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
 
   /**
    * Set root table alias.
    */
   SELF alias(String alias);
+
+  /**
+   * Apply changes to the query using a function.
+   * <p>
+   * This can be used to apply generic features to queries.
+   *
+   * @param apply The changes to apply to the query
+   */
+  SELF also(Consumer<QueryBuilder<?, ?>> apply);
 
   /**
    * Apply changes to the query conditional on the supplied predicate.

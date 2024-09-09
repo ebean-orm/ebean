@@ -294,6 +294,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public Query<T> also(Consumer<QueryBuilder<?, ?>> apply) {
+    apply.accept(this);
+    return this;
+  }
+
+  @Override
   public Query<T> alsoIf(BooleanSupplier predicate, Consumer<Query<T>> consumer) {
     if (predicate.getAsBoolean()) {
       consumer.accept(this);

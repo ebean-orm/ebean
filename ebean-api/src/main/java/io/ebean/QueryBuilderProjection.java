@@ -6,6 +6,7 @@ package io.ebean;
  * @param <SELF> The builder type
  * @param <T>    The entity bean type
  */
+//public interface QueryBuilderProjection<SELF extends QueryBuilderProjection<SELF, T>, T> {
 public interface QueryBuilderProjection<SELF, T> {
 
   /**
