@@ -12,6 +12,18 @@ class QueryAlsoIfTest {
   int dummy = 1;
 
   @Test
+  void also() {
+    var q = new QCustomer()
+      .select(name)
+      .name.isNotNull()
+      .also(query -> query.email.isNotNull())
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QueryAlsoIfTest.also */ t0.id, t0.name from be_customer t0 where t0.name is not null and t0.email is not null");
+  }
+
+  @Test
   void apply() {
     var q = new QCustomer()
       .select(name)

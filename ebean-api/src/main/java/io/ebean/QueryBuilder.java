@@ -28,6 +28,13 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
   SELF alias(String alias);
 
   /**
+   * Apply changes to the query using a function.
+   *
+   * @param apply Function that applies changes to the query.
+   */
+  SELF also(Consumer<SELF> apply);
+
+  /**
    * Apply changes to the query conditional on the supplied predicate.
    * <p>
    * Typically, the changes are extra predicates etc.

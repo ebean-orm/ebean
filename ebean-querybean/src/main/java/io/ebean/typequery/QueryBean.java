@@ -276,6 +276,12 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   }
 
   @Override
+  public final R also(Consumer<R> apply) {
+    apply.accept(root);
+    return root;
+  }
+
+  @Override
   public final R alsoIf(BooleanSupplier predicate, Consumer<R> apply) {
     if (predicate.getAsBoolean()) {
       apply.accept(root);
