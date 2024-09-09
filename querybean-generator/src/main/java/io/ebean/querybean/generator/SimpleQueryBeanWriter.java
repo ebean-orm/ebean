@@ -267,19 +267,42 @@ class SimpleQueryBeanWriter {
     if (embeddable) {
       writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssoc<%s,R> {", beanFullName).eol();
     } else {
-      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssocBean<%s,R,Q%s> {", beanFullName, shortInnerName).eol();
+      writer.append("  public static abstract class Assoc<R> extends io.ebean.typequery.TQAssocBean<%s,R,Q%s> {", beanFullName, shortInnerName).eol();
     }
+    writer.eol();
     for (PropertyMeta property : properties) {
       writer.append("  ");
       property.writeFieldDefn(writer, shortName, true, fullyQualify);
       writer.eol();
     }
     writer.eol();
-    writeAssocBeanConstructor();
+    writeAssocBeanConstructor("protected Assoc");
+    writeAssocBeanFetch();
+    writer.append("  }").eol();
     if (!embeddable) {
-      writeAssocFilterMany();
-      writeAssocBeanFetch();
+      writeAssocOne();
+      writeAssocMany();
     }
+  }
+
+  private void writeAssocOne() {
+    writer.eol();
+    writer.append("  /** Associated ToOne query bean */").eol();
+    writer.append("  ").append(Constants.AT_GENERATED).eol();
+    writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
+    writer.append("  public static final class AssocOne<R> extends Assoc<R> {").eol();
+    writeAssocBeanConstructor("public AssocOne");
+    writer.append("  }").eol();
+  }
+
+  private void writeAssocMany() {
+    writer.eol();
+    writer.append("  /** Associated ToMany query bean */").eol();
+    writer.append("  ").append(Constants.AT_GENERATED).eol();
+    writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
+    writer.append("  public static final class AssocMany<R> extends Assoc<R> implements io.ebean.typequery.TQMany<%s, R>{", beanFullName).eol();
+    writeAssocBeanConstructor("public AssocMany");
+    writeAssocFilterMany();
     writer.append("  }").eol();
   }
 
@@ -295,14 +318,9 @@ class SimpleQueryBeanWriter {
     writer.append("    }").eol();
   }
 
-  private void writeAssocBeanConstructor() {
-    writer.append("    public Assoc(String name, R root) {").eol();
-    writer.append("      super(name, root);").eol();
-    writer.append("    }").eol().eol();
-
-    writer.append("    public Assoc(String name, R root, String prefix) {").eol();
-    writer.append("      super(name, root, prefix);").eol();
-    writer.append("    }").eol();
+  private void writeAssocBeanConstructor(String prefix) {
+    writer.append("    %s(String name, R root) { super(name, root); }", prefix).eol();
+    writer.append("    %s(String name, R root, String prefix) { super(name, root, prefix); }", prefix).eol();
   }
 
   private void writeAssocBeanFetch() {

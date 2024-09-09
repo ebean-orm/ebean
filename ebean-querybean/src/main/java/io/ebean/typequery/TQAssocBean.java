@@ -18,7 +18,7 @@ import java.util.Set;
  * @param <QB> the query bean type
  */
 @SuppressWarnings("rawtypes")
-public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
+public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> implements TQBase<R> {
 
   private static final FetchConfig FETCH_DEFAULT = FetchConfig.ofDefault();
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
@@ -40,6 +40,21 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    */
   public TQAssocBean(String name, R root, String prefix) {
     super(name, root, prefix);
+  }
+
+  @Override
+  public ExpressionList _expr() {
+    return expr();
+  }
+
+  @Override
+  public String _name() {
+    return _name;
+  }
+
+  @Override
+  public R _root() {
+    return _root;
   }
 
   /**
@@ -186,104 +201,6 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
       set.add(prop.propertyName());
     }
     return set;
-  }
-
-
-  /**
-   * Apply a filter when fetching these beans.
-   */
-  public final R filterMany(ExpressionList<T> filter) {
-    @SuppressWarnings("unchecked")
-    ExpressionList<T> expressionList = (ExpressionList<T>) expr().filterMany(_name);
-    expressionList.addAll(filter);
-    return _root;
-  }
-
-  /**
-   * @deprecated for removal - migrate to {@link #filterManyRaw(String, Object...)}.
-   * <p>
-   * Apply a filter when fetching these beans.
-   * <p>
-   * The expressions can use any valid Ebean expression and contain
-   * placeholders for bind values using <code>?</code> or <code>?1</code> style.
-   * </p>
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("firstName istartsWith ?", "Rob")
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("whenCreated inRange ? to ?", startDate, endDate)
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
-   * @param params      The bind parameter values
-   */
-  @Deprecated(forRemoval = true)
-  public final R filterMany(String expressions, Object... params) {
-    expr().filterMany(_name, expressions, params);
-    return _root;
-  }
-
-  /**
-   * Add filter expressions for the many path. The expressions can include SQL functions if
-   * desired and the property names are translated to column names.
-   * <p>
-   * The expressions can contain placeholders for bind values using <code>?</code> or <code>?1</code> style.
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Shrek")
-   *       .contacts.filterManyRaw("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * @param rawExpressions The raw expressions which can include ? and ?1 style bind parameter placeholders
-   * @param params The parameter values to bind
-   */
-  public final R filterManyRaw(String rawExpressions, Object... params) {
-    expr().filterManyRaw(_name, rawExpressions, params);
-    return _root;
-  }
-
-  /**
-   * Is empty for a collection property.
-   * <p>
-   * This effectively adds a not exists sub-query on the collection property.
-   * </p>
-   * <p>
-   * This expression only works on OneToMany and ManyToMany properties.
-   * </p>
-   */
-  public final R isEmpty() {
-    expr().isEmpty(_name);
-    return _root;
-  }
-
-  /**
-   * Is not empty for a collection property.
-   * <p>
-   * This effectively adds an exists sub-query on the collection property.
-   * </p>
-   * <p>
-   * This expression only works on OneToMany and ManyToMany properties.
-   * </p>
-   */
-  public final R isNotEmpty() {
-    expr().isNotEmpty(_name);
-    return _root;
   }
 
 }
