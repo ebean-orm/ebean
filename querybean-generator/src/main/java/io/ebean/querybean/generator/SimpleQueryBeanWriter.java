@@ -300,7 +300,7 @@ class SimpleQueryBeanWriter {
     writer.append("  /** Associated ToMany query bean */").eol();
     writer.append("  ").append(Constants.AT_GENERATED).eol();
     writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
-    writer.append("  public static final class AssocMany<R> extends Assoc<R> implements io.ebean.typequery.TQMany<%s, R>{", beanFullName).eol();
+    writer.append("  public static final class AssocMany<R> extends Assoc<R> implements io.ebean.typequery.TQAssocMany<%s, R, Q%s>{", beanFullName, shortInnerName).eol();
     writeAssocBeanConstructor("public AssocMany");
     writeAssocFilterMany();
     writer.append("  }").eol();
@@ -308,14 +308,29 @@ class SimpleQueryBeanWriter {
 
   private void writeAssocFilterMany() {
     writer.eol();
-    writer.append("    @SuppressWarnings({\"unchecked\", \"rawtypes\"})").eol();
+    writer.append("    @Override").eol();
     writer.append("    public R filterMany(java.util.function.Consumer<Q%s> apply) {", shortName).eol();
-    writer.append("      final io.ebean.ExpressionList list = io.ebean.Expr.factory().expressionList();", shortName).eol();
-    writer.append("      final var qb = new Q%s(list);", shortName).eol();
-    writer.append("      apply.accept(qb);").eol();
-    writer.append("      expr().filterMany(_name).addAll(list);").eol();
-    writer.append("      return _root;").eol();
+    writer.append("      final io.ebean.ExpressionList<%s> list = _newExpressionList();", beanFullName).eol();
+    writer.append("      apply.accept(new Q%s(list));", shortName).eol();
+    writer.append("      return _filterMany(list);").eol();
     writer.append("    }").eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    public R filterMany(io.ebean.ExpressionList<%s> filter) { return _filterMany(filter); }", beanFullName).eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    public R filterManyRaw(String rawExpressions, Object... params) { return _filterManyRaw(rawExpressions, params); }").eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    @Deprecated(forRemoval = true)").eol();
+    writer.append("    public R filterMany(String expressions, Object... params) { return _filterMany(expressions, params); }").eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    public R isEmpty() { return _isEmpty(); }").eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    public R isNotEmpty() { return _isNotEmpty(); }").eol();
+
   }
 
   private void writeAssocBeanConstructor(String prefix) {

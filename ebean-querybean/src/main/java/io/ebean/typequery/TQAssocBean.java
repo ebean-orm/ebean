@@ -1,5 +1,6 @@
 package io.ebean.typequery;
 
+import io.ebean.Expr;
 import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
@@ -18,7 +19,7 @@ import java.util.Set;
  * @param <QB> the query bean type
  */
 @SuppressWarnings("rawtypes")
-public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> implements TQBase<R> {
+public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
 
   private static final FetchConfig FETCH_DEFAULT = FetchConfig.ofDefault();
   private static final FetchConfig FETCH_QUERY = FetchConfig.ofQuery();
@@ -40,21 +41,6 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> implements TQB
    */
   public TQAssocBean(String name, R root, String prefix) {
     super(name, root, prefix);
-  }
-
-  @Override
-  public ExpressionList _expr() {
-    return expr();
-  }
-
-  @Override
-  public String _name() {
-    return _name;
-  }
-
-  @Override
-  public R _root() {
-    return _root;
   }
 
   /**
@@ -201,6 +187,38 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> implements TQB
       set.add(prop.propertyName());
     }
     return set;
+  }
+
+  protected final R _filterMany(ExpressionList<T> filter) {
+    @SuppressWarnings("unchecked")
+    ExpressionList<T> expressionList = (ExpressionList<T>) expr().filterMany(_name);
+    expressionList.addAll(filter);
+    return _root;
+  }
+
+  @Deprecated(forRemoval = true)
+  protected final R _filterMany(String expressions, Object... params) {
+    expr().filterMany(_name, expressions, params);
+    return _root;
+  }
+
+  protected final R _filterManyRaw(String rawExpressions, Object... params) {
+    expr().filterManyRaw(_name, rawExpressions, params);
+    return _root;
+  }
+
+  protected final R _isEmpty() {
+    expr().isEmpty(_name);
+    return _root;
+  }
+
+  protected final R _isNotEmpty() {
+    expr().isNotEmpty(_name);
+    return _root;
+  }
+
+  protected final <S> ExpressionList<S> _newExpressionList() {
+    return Expr.factory().expressionList();
   }
 
 }

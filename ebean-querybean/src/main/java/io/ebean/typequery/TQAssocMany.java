@@ -8,19 +8,23 @@ import io.ebean.ExpressionList;
  * @param <T> The entity bean type
  * @param <R> The root query bean type
  */
-public interface TQMany<T, R> extends TQBase<R> {
+public interface TQAssocMany<T, R, QB> {
 
   /**
-   * Apply a filter when fetching these beans.
+   * Filter the beans fetched for this relationship.
+   *
+   * @param filter The filter to apply
    */
-  default R filterMany(ExpressionList<T> filter) {
-    @SuppressWarnings("unchecked")
-    ExpressionList<T> expressionList = (ExpressionList<T>) _expr().filterMany(_name());
-    expressionList.addAll(filter);
-    return _root();
-  }
+  R filterMany(java.util.function.Consumer<QB> filter);
 
   /**
+   * Filter the beans fetched for this relationship.
+   */
+  R filterMany(ExpressionList<T> filter);
+
+  /**
+   * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
+   * @param params      The bind parameter values
    * @deprecated for removal - migrate to {@link #filterManyRaw(String, Object...)}.
    * <p>
    * Apply a filter when fetching these beans.
@@ -46,15 +50,9 @@ public interface TQMany<T, R> extends TQBase<R> {
    *       .findList();
    *
    * }</pre>
-   *
-   * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
-   * @param params      The bind parameter values
    */
   @Deprecated(forRemoval = true)
-  default R filterMany(String expressions, Object... params) {
-    _expr().filterMany(_name(), expressions, params);
-    return _root();
-  }
+  R filterMany(String expressions, Object... params);
 
   /**
    * Add filter expressions for the many path. The expressions can include SQL functions if
@@ -72,38 +70,25 @@ public interface TQMany<T, R> extends TQBase<R> {
    * }</pre>
    *
    * @param rawExpressions The raw expressions which can include ? and ?1 style bind parameter placeholders
-   * @param params The parameter values to bind
+   * @param params         The parameter values to bind
    */
-  default R filterManyRaw(String rawExpressions, Object... params) {
-    _expr().filterManyRaw(_name(), rawExpressions, params);
-    return _root();
-  }
+  R filterManyRaw(String rawExpressions, Object... params);
 
   /**
    * Is empty for a collection property.
    * <p>
    * This effectively adds a not exists sub-query on the collection property.
-   * </p>
    * <p>
    * This expression only works on OneToMany and ManyToMany properties.
-   * </p>
    */
-  default R isEmpty() {
-    _expr().isEmpty(_name());
-    return _root();
-  }
+  R isEmpty();
 
   /**
    * Is not empty for a collection property.
    * <p>
    * This effectively adds an exists sub-query on the collection property.
-   * </p>
    * <p>
    * This expression only works on OneToMany and ManyToMany properties.
-   * </p>
    */
-  default R isNotEmpty() {
-    _expr().isNotEmpty(_name());
-    return _root();
-  }
+  R isNotEmpty();
 }
