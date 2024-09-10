@@ -14,4 +14,9 @@ public interface SpiQueryManyJoin {
    * Order by clause defined via mapping on the ToMany property.
    */
   String fetchOrderBy();
+
+  /**
+   * Wrap the filter many expression with a condition allowing lEFT JOIN null matching row.
+   */
+  String idNullOr(String filterManyExpression);
 }
