@@ -14,9 +14,6 @@ public class VehicleDriver extends BaseModel {
   private String name;
 
   @ManyToOne(optional = true)
-  private Vehicle vehicle;
-
-  @ManyToOne(optional = true)
   private Address address;
 
   private Date licenseIssuedOn;
@@ -27,14 +24,6 @@ public class VehicleDriver extends BaseModel {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Vehicle getVehicle() {
-    return vehicle;
-  }
-
-  public void setVehicle(Vehicle vehicle) {
-    this.vehicle = vehicle;
   }
 
   public Address getAddress() {
