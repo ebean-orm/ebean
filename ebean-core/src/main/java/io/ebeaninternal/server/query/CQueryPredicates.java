@@ -191,7 +191,7 @@ public final class CQueryPredicates {
         if (filterManyExpr != null) {
           this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
           if (buildSql) {
-            dbFilterMany = filterMany.buildSql();
+            dbFilterMany = manyProperty.idNullOr(filterMany.buildSql());
           }
         }
       }

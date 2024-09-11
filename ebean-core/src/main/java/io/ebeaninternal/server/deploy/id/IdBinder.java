@@ -27,6 +27,11 @@ public interface IdBinder {
    */
   void initialise();
 
+  /**
+   * Wrap the filter many expression with a condition allowing lEFT JOIN null matching row.
+   */
+  String idNullOr(String name, String filterManyExpression);
+
   String idSelect();
 
   /**
