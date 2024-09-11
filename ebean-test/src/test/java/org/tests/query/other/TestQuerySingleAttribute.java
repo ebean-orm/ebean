@@ -787,10 +787,10 @@ class TestQuerySingleAttribute extends BaseTestCase {
     List<Order.Status> statusList = query.findSingleAttributeList();
     assertSql(query)
       .contains("select distinct t1.status from o_customer t0 "
-        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null where t1.status is not null")
+        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null where (t1.id is null or (t1.status is not null))")
       .doesNotContain("order by");
 
-    assertThat(statusList).hasSize(3);
+    assertThat(statusList).hasSize(4);
   }
 
   @Test
