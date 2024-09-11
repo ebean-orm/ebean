@@ -75,6 +75,9 @@ final class AnnotationClass extends AnnotationParser {
   }
 
   private void read(Class<?> cls) {
+    if (typeGet(cls, Inheritance.class) != null) {
+      throw new IllegalStateException("@Inheritance is not supported in Ebean 15, refer to https://ebean.io/ug15 - type " + cls);
+    }
     // maybe doc store only so check for this before @Entity
     DocStore docStore = typeGet(cls, DocStore.class);
     if (docStore != null) {

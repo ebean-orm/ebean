@@ -2,7 +2,6 @@ package io.ebeaninternal.server.changelog;
 
 import io.ebean.event.changelog.ChangeLogFilter;
 import org.junit.jupiter.api.Test;
-import org.tests.inheritance.model.ProductConfiguration;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Country;
@@ -57,15 +56,6 @@ class DefaultChangeLogRegisterTest {
     DefaultChangeLogRegister.BasicFilter contactFilter = (DefaultChangeLogRegister.BasicFilter) changeFilter;
     assertFalse(contactFilter.includeInserts);
 
-  }
-
-  @Test
-  void test_inheritance() {
-    DefaultChangeLogRegister register = new DefaultChangeLogRegister(true);
-    ChangeLogFilter changeFilter = register.getChangeFilter(ProductConfiguration.class);
-    assertNotNull(changeFilter);
-    DefaultChangeLogRegister.BasicFilter basicFilter = (DefaultChangeLogRegister.BasicFilter) changeFilter;
-    assertTrue(basicFilter.includeInserts);
   }
 
 }

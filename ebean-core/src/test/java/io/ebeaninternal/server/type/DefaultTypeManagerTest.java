@@ -6,7 +6,6 @@ import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Car;
 import org.tests.model.basic.IntEnum;
 import org.tests.model.basic.VarcharEnum;
 
@@ -125,12 +124,5 @@ public class DefaultTypeManagerTest {
     // withConstraint true
     assertThat(enumWithMapping.getDbCheckConstraintValues()).hasSize(3);
     assertThat(enumWithMapping.getDbCheckConstraintValues()).contains("100", "101", "102");
-
-    type = typeManager.enumType(Car.Size.class, EnumType.ORDINAL);
-    assertThat(type).isInstanceOf(ScalarTypeEnumWithMapping.class);
-    enumWithMapping = (ScalarTypeEnumWithMapping) type;
-    // withConstraint true
-    assertThat(enumWithMapping.getDbCheckConstraintValues()).hasSize(2);
-    assertThat(enumWithMapping.getDbCheckConstraintValues()).contains("'L'", "'S'");
   }
 }
