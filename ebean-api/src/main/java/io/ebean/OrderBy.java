@@ -25,6 +25,13 @@ public class OrderBy<T> implements Serializable {
   private final List<Property> list;
 
   /**
+   * Create an OrderBy parsing the given order by clause.
+   */
+  public static <P> OrderBy<P> of(String orderByClause) {
+    return new OrderBy<>(orderByClause);
+  }
+
+  /**
    * Create an empty OrderBy with no associated query.
    */
   public OrderBy() {
