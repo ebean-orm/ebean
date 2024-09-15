@@ -14,9 +14,9 @@ import io.avaje.lang.Nullable;
  *   var orderBy = OrderBy.of("lastName desc nulls first, firstName asc");
  *   var paging = Paging.of(0, 100, orderBy);
  *
- *   DB.find(Contact.class)
+ *   new QCustomer()
+ *       .name.isNotNull()
  *       .setPaging(paging)
- *       .where().startsWith("lastName", "foo")
  *       .findList();
  *
  * }</pre>

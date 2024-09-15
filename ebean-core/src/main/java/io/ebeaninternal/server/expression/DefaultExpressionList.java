@@ -33,6 +33,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   private final boolean textRoot;
 
+  public static <P> ExpressionList<P> forFetchGroup(Query<P> q) {
+    return new DefaultExpressionList<>(q, null, null, null, false);
+  }
+
   /**
    * Construct for Text root expression list - this handles implicit Bool Should, Must etc.
    */

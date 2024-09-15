@@ -5,6 +5,7 @@ import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebeaninternal.api.SpiQueryFetch;
+import io.ebeaninternal.server.expression.DefaultExpressionList;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 
@@ -30,6 +31,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private OrmQueryDetail detail = new OrmQueryDetail();
+  private OrderBy<T> orderBy;
 
   @Override
   public FetchGroup<T> buildFetchGroup() {
@@ -415,7 +417,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
 
   @Override
   public ExpressionList<T> where() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+    return DefaultExpressionList.forFetchGroup(this);
   }
 
   @Override
@@ -445,7 +447,10 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
 
   @Override
   public OrderBy<T> orderBy() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+    if (orderBy == null) {
+      orderBy = new OrderBy<>();
+    }
+    return orderBy;
   }
 
   @Override
