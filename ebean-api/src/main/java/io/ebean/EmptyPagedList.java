@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.concurrent.Future;
 
 /**
+ * @deprecated migrate to using {@link PagedList#emptyList()} only.
+ * <p>
  * An empty PagedList.
  * <p>
  * For use in application code when we need to return a PagedList but don't want to
@@ -17,7 +19,8 @@ import java.util.concurrent.Future;
  *
  * }</pre>
  */
-public class EmptyPagedList<T> implements PagedList<T> {
+@Deprecated(forRemoval = true)
+public final class EmptyPagedList<T> implements PagedList<T> {
 
   @Override
   public void loadCount() {
