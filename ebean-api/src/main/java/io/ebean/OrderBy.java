@@ -8,13 +8,11 @@ import java.util.Objects;
 /**
  * Represents an Order By for a Query.
  * <p>
- * Is a ordered list of OrderBy.Property objects each specifying a property and
+ * Is an ordered list of OrderBy.Property objects each specifying a property and
  * whether it is ascending or descending order.
- * </p>
  * <p>
- * Typically you will not construct an OrderBy yourself but use one that exists
+ * Typically, you will not construct an OrderBy yourself but use one that exists
  * on the Query object.
- * </p>
  */
 public class OrderBy<T> implements Serializable {
 
@@ -25,8 +23,22 @@ public class OrderBy<T> implements Serializable {
   private final List<Property> list;
 
   /**
+   * Create an OrderBy parsing the given order by clause.
+   * <p>
+   * The order by clause follows SQL order by clause with comma's between each
+   * property and optionally "asc" or "desc" to represent ascending or
+   * descending order respectively.
+   */
+  public static <P> OrderBy<P> of(String orderByClause) {
+    return new OrderBy<>(orderByClause);
+  }
+
+  /**
+   * @deprecated This method will be removed from public API.
+   * <p>
    * Create an empty OrderBy with no associated query.
    */
+  @Deprecated(forRemoval = true)
   public OrderBy() {
     this.list = new ArrayList<>(3);
   }
@@ -36,20 +48,17 @@ public class OrderBy<T> implements Serializable {
   }
 
   /**
-   * Create an orderBy parsing the order by clause.
-   * <p>
-   * The order by clause follows SQL order by clause with comma's between each
-   * property and optionally "asc" or "desc" to represent ascending or
-   * descending order respectively.
-   * </p>
+   * @deprecated migrate to {@link OrderBy#of(String)}.
    */
+  @Deprecated(forRemoval = true)
   public OrderBy(String orderByClause) {
     this(null, orderByClause);
   }
 
   /**
-   * Construct with a given query and order by clause.
+   * @deprecated This method will be removed from public API.
    */
+  @Deprecated(forRemoval = true)
   public OrderBy(Query<T> query, String orderByClause) {
     this.query = query;
     this.list = new ArrayList<>(3);
@@ -110,8 +119,11 @@ public class OrderBy<T> implements Serializable {
   }
 
   /**
+   * @deprecated This method will become internal only API.
+   * <p>
    * Return a copy of this OrderBy with the path trimmed.
    */
+  @Deprecated(forRemoval = true)
   public OrderBy<T> copyWithTrim(String path) {
     List<Property> newList = new ArrayList<>(list.size());
     for (Property aList : list) {
