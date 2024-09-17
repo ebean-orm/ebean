@@ -6,7 +6,7 @@ import io.ebean.FetchGroupBuilder;
 /**
  * Service that parses FetchGroup expressions.
  */
-public interface SpiFetchGroupService {
+public interface SpiFetchGroupService extends BootstrapService {
 
   /**
    * Return the FetchGroup with the given select clause.

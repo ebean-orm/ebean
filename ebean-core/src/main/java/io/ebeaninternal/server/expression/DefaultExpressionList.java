@@ -26,6 +26,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   private final ExpressionList<T> parentExprList;
   protected final ExpressionFactory expr;
 
+  public static <P> ExpressionList<P> forFetchGroup(Query<P> q) {
+    return new DefaultExpressionList<>(q, null, null, null);
+  }
+
   public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
     this(query, query.getExpressionFactory(), parentExprList, new ArrayList<>());
   }

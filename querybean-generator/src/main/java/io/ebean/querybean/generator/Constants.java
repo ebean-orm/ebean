@@ -6,6 +6,8 @@ interface Constants {
   String AT_TYPEQUERYBEAN = "@io.ebean.typequery.TypeQueryBean(\"v1\")";
   String GENERATED = "io.ebean.typequery.Generated";
 
+  String ONE_TO_MANY = "jakarta.persistence.OneToMany";
+  String MANY_TO_MANY = "jakarta.persistence.ManyToMany";
   String MAPPED_SUPERCLASS = "jakarta.persistence.MappedSuperclass";
   String DISCRIMINATOR_VALUE = "jakarta.persistence.DiscriminatorValue";
   String INHERITANCE = "jakarta.persistence.Inheritance";

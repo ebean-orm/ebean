@@ -259,6 +259,8 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
    */
   SELF setMaxRows(int maxRows);
 
+  SELF setPaging(Paging paging);
+
   /**
    * Set RawSql to use for this query.
    */

@@ -5,7 +5,7 @@ import io.ebean.ProfileLocation;
 /**
  * Factory for creating profile locations.
  */
-public interface SpiProfileLocationFactory {
+public interface SpiProfileLocationFactory extends BootstrapService {
 
   /**
    * Create a profile location.

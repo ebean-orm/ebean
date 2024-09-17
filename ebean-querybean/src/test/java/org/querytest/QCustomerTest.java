@@ -148,6 +148,31 @@ public class QCustomerTest {
     assertThat(batchSizes.get(1)).isEqualTo(9);
   }
 
+  // using QCustomer.forFetchGroup() ... does not need any Ebean Database initialisation etc
+  // and so is good for when we want to build a static final OrderBy
+  static final OrderBy<Customer> orderBy = QCustomer.forFetchGroup()
+    .name.asc()
+    .email.desc()
+    .query().orderBy();
+
+  @Test
+  void findWithPaging() {
+    // OrderBy<Customer> orderBy = new QCustomer().name.asc().email.desc().query().orderBy();
+    OrderBy<Customer> orderBy = OrderBy.of("name, email desc");
+    var paging = Paging.of(2, 10, QCustomerTest.orderBy);
+
+    LoggedSql.start();
+
+    new QCustomer()
+      .name.isNotNull()
+      .setPaging(paging)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("where t0.name is not null order by t0.name, t0.email desc limit 10 offset 20");
+  }
+
   @Test
   public void findIterate() {
 

@@ -299,6 +299,12 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   }
 
   @Override
+  public R setPaging(Paging paging) {
+    query.setPaging(paging);
+    return root;
+  }
+
+  @Override
   public final R setMaxRows(int maxRows) {
     query.setMaxRows(maxRows);
     return root;

@@ -1,13 +1,8 @@
 module io.ebean.api {
 
   uses io.ebean.config.AutoConfigure;
-  uses io.ebean.config.dbplatform.DatabasePlatformProvider;
   uses io.ebean.datasource.DataSourceAlertFactory;
-  uses io.ebean.metric.MetricFactory;
-  uses io.ebean.service.SpiContainerFactory;
-  uses io.ebean.service.SpiRawSqlService;
-  uses io.ebean.service.SpiProfileLocationFactory;
-  uses io.ebean.service.SpiFetchGroupService;
+  uses io.ebean.service.BootstrapService;
   uses io.ebean.service.SpiJsonService;
 
   requires transitive java.sql;

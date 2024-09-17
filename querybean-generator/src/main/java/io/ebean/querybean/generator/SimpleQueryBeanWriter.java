@@ -267,42 +267,71 @@ class SimpleQueryBeanWriter {
     if (embeddable) {
       writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssoc<%s,R> {", beanFullName).eol();
     } else {
-      writer.append("  public static final class Assoc<R> extends io.ebean.typequery.TQAssocBean<%s,R,Q%s> {", beanFullName, shortInnerName).eol();
+      writer.append("  public static abstract class Assoc<R> extends io.ebean.typequery.TQAssocBean<%s,R,Q%s> {", beanFullName, shortInnerName).eol();
     }
+    writer.eol();
     for (PropertyMeta property : properties) {
       writer.append("  ");
       property.writeFieldDefn(writer, shortName, true, fullyQualify);
       writer.eol();
     }
     writer.eol();
-    writeAssocBeanConstructor();
+    writeAssocBeanConstructor("protected Assoc");
+    writeAssocBeanFetch();
+    writer.append("  }").eol();
     if (!embeddable) {
-      writeAssocFilterMany();
-      writeAssocBeanFetch();
+      writeAssocOne();
+      writeAssocMany();
     }
+  }
+
+  private void writeAssocOne() {
+    writer.eol();
+    writer.append("  /** Associated ToOne query bean */").eol();
+    writer.append("  ").append(Constants.AT_GENERATED).eol();
+    writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
+    writer.append("  public static final class AssocOne<R> extends Assoc<R> {").eol();
+    writeAssocBeanConstructor("public AssocOne");
+    writer.append("  }").eol();
+  }
+
+  private void writeAssocMany() {
+    writer.eol();
+    writer.append("  /** Associated ToMany query bean */").eol();
+    writer.append("  ").append(Constants.AT_GENERATED).eol();
+    writer.append("  ").append(Constants.AT_TYPEQUERYBEAN).eol();
+    writer.append("  public static final class AssocMany<R> extends Assoc<R> implements io.ebean.typequery.TQAssocMany<%s, R, Q%s>{", beanFullName, shortInnerName).eol();
+    writeAssocBeanConstructor("public AssocMany");
+    writeAssocFilterMany();
     writer.append("  }").eol();
   }
 
   private void writeAssocFilterMany() {
     writer.eol();
-    writer.append("    @SuppressWarnings({\"unchecked\", \"rawtypes\"})").eol();
+    writer.append("    @Override").eol();
     writer.append("    public R filterMany(java.util.function.Consumer<Q%s> apply) {", shortName).eol();
-    writer.append("      final io.ebean.ExpressionList list = io.ebean.Expr.factory().expressionList();", shortName).eol();
-    writer.append("      final var qb = new Q%s(list);", shortName).eol();
-    writer.append("      apply.accept(qb);").eol();
-    writer.append("      expr().filterMany(_name).addAll(list);").eol();
-    writer.append("      return _root;").eol();
+    writer.append("      final io.ebean.ExpressionList<%s> list = _newExpressionList();", beanFullName).eol();
+    writer.append("      apply.accept(new Q%s(list));", shortName).eol();
+    writer.append("      return _filterMany(list);").eol();
     writer.append("    }").eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    public R filterMany(io.ebean.ExpressionList<%s> filter) { return _filterMany(filter); }", beanFullName).eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    public R filterManyRaw(String rawExpressions, Object... params) { return _filterManyRaw(rawExpressions, params); }").eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    public R isEmpty() { return _isEmpty(); }").eol();
+    writer.eol();
+    writer.append("    @Override").eol();
+    writer.append("    public R isNotEmpty() { return _isNotEmpty(); }").eol();
+
   }
 
-  private void writeAssocBeanConstructor() {
-    writer.append("    public Assoc(String name, R root) {").eol();
-    writer.append("      super(name, root);").eol();
-    writer.append("    }").eol().eol();
-
-    writer.append("    public Assoc(String name, R root, String prefix) {").eol();
-    writer.append("      super(name, root, prefix);").eol();
-    writer.append("    }").eol();
+  private void writeAssocBeanConstructor(String prefix) {
+    writer.append("    %s(String name, R root) { super(name, root); }", prefix).eol();
+    writer.append("    %s(String name, R root, String prefix) { super(name, root, prefix); }", prefix).eol();
   }
 
   private void writeAssocBeanFetch() {

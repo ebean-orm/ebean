@@ -1739,6 +1739,22 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Query<T> setPaging(@Nullable Paging paging) {
+    if (paging != null && paging.pageSize() > 0) {
+      firstRow = paging.pageIndex() * paging.pageSize();
+      maxRows = paging.pageSize();
+      orderBy = (OrderBy<T>) paging.orderBy();
+      if (orderBy == null || orderBy.isEmpty()) {
+        // should not be paging without any order by clause so set
+        // orderById such that the Id property is used
+        orderById = true;
+      }
+    }
+    return this;
+  }
+
+  @Override
   public final String mapKey() {
     return mapKey;
   }

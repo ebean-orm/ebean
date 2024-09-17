@@ -1,5 +1,6 @@
 package io.ebean.typequery;
 
+import io.ebean.Expr;
 import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
@@ -188,66 +189,30 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
     return set;
   }
 
-
-  /**
-   * Apply a filter when fetching these beans.
-   */
-  public final R filterMany(ExpressionList<T> filter) {
+  protected final R _filterMany(ExpressionList<T> filter) {
     @SuppressWarnings("unchecked")
     ExpressionList<T> expressionList = (ExpressionList<T>) expr().filterMany(_name);
     expressionList.addAll(filter);
     return _root;
   }
 
-  /**
-   * Add filter expressions for the many path. The expressions can include SQL functions if
-   * desired and the property names are translated to column names.
-   * <p>
-   * The expressions can contain placeholders for bind values using <code>?</code> or <code>?1</code> style.
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Shrek")
-   *       .contacts.filterManyRaw("status = ? and firstName like ?", Contact.Status.NEW, "Rob%")
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * @param rawExpressions The raw expressions which can include ? and ?1 style bind parameter placeholders
-   * @param params The parameter values to bind
-   */
-  public final R filterManyRaw(String rawExpressions, Object... params) {
+  protected final R _filterManyRaw(String rawExpressions, Object... params) {
     expr().filterManyRaw(_name, rawExpressions, params);
     return _root;
   }
 
-  /**
-   * Is empty for a collection property.
-   * <p>
-   * This effectively adds a not exists sub-query on the collection property.
-   * </p>
-   * <p>
-   * This expression only works on OneToMany and ManyToMany properties.
-   * </p>
-   */
-  public final R isEmpty() {
+  protected final R _isEmpty() {
     expr().isEmpty(_name);
     return _root;
   }
 
-  /**
-   * Is not empty for a collection property.
-   * <p>
-   * This effectively adds an exists sub-query on the collection property.
-   * </p>
-   * <p>
-   * This expression only works on OneToMany and ManyToMany properties.
-   * </p>
-   */
-  public final R isNotEmpty() {
+  protected final R _isNotEmpty() {
     expr().isNotEmpty(_name);
     return _root;
+  }
+
+  protected final <S> ExpressionList<S> _newExpressionList() {
+    return Expr.factory().expressionList();
   }
 
 }
