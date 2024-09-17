@@ -73,11 +73,12 @@ module io.ebean.core {
   exports io.ebeaninternal.server.transaction to io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.k8scache;
   exports io.ebeaninternal.server.util to io.ebean.querybean;
 
-  provides io.ebean.metric.MetricFactory with io.ebeaninternal.server.profile.DMetricFactory;
-  provides io.ebean.service.SpiContainerFactory with io.ebeaninternal.server.DContainerFactory;
-  provides io.ebean.service.SpiFetchGroupService with io.ebeaninternal.server.query.DFetchGroupService;
-  provides io.ebean.service.SpiJsonService with io.ebeaninternal.json.DJsonService;
-  provides io.ebean.service.SpiProfileLocationFactory with io.ebeaninternal.server.profile.DProfileLocationFactory;
-  provides io.ebean.service.SpiRawSqlService with io.ebeaninternal.server.rawsql.DRawSqlService;
+  provides io.ebean.service.BootstrapService with
+    io.ebeaninternal.server.DContainerFactory,
+    io.ebeaninternal.server.query.DFetchGroupService,
+    io.ebeaninternal.server.profile.DProfileLocationFactory,
+    io.ebeaninternal.server.rawsql.DRawSqlService,
+    io.ebeaninternal.server.profile.DMetricFactory,
+    io.ebeaninternal.json.DJsonService;
 
 }

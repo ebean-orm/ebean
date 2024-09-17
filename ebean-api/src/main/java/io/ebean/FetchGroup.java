@@ -84,7 +84,7 @@ public interface FetchGroup<T> {
    * @return The FetchGroup with the given select clause
    */
   static <T> FetchGroup<T> of(Class<T> cls, String select) {
-    return XServiceProvider.fetchGroupOf(cls, select);
+    return XBootstrapService.fetchGroupOf(cls, select);
   }
 
   /**
@@ -108,14 +108,14 @@ public interface FetchGroup<T> {
    * @return The FetchGroupBuilder with the given select clause which we will add fetch clauses to
    */
   static <T> FetchGroupBuilder<T> of(Class<T> cls) {
-    return XServiceProvider.fetchGroupOf(cls);
+    return XBootstrapService.fetchGroupOf(cls);
   }
 
   /**
    * Return a query to be used by query beans for constructing FetchGroup.
    */
   static <T> SpiFetchGroupQuery<T> queryFor(Class<T> beanType) {
-    return XServiceProvider.fetchGroupQueryFor(beanType);
+    return XBootstrapService.fetchGroupQueryFor(beanType);
   }
 
 }
