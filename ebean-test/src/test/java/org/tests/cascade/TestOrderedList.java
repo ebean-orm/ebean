@@ -188,4 +188,36 @@ public class TestOrderedList extends BaseTestCase {
     assertThat(masterDb.getDetails()).containsExactlyInAnyOrder(detail3, detail1);
 
   }
+
+  @Test
+  public void testModifyListWithCache2() {
+    final OmCacheOrderedMaster master = new OmCacheOrderedMaster("Master");
+    final OmCacheOrderedDetail detail1 = new OmCacheOrderedDetail("Detail1");
+    final OmCacheOrderedDetail detail2 = new OmCacheOrderedDetail("Detail2");
+    final OmCacheOrderedDetail detail3 = new OmCacheOrderedDetail("Detail3");
+    DB.save(detail1);
+    DB.save(detail2);
+    DB.save(detail3);
+    master.getDetails().add(detail1);
+    master.getDetails().add(detail2);
+    master.getDetails().add(detail3);
+
+    DB.save(master);
+
+    OmCacheOrderedMaster masterDb = DB.find(OmCacheOrderedMaster.class, master.getId()); // load cache
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3);
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3); // hit cache
+
+    // 1 und 2 tauschen
+    masterDb.getDetails().add(0, masterDb.getDetails().remove(1));
+    DB.save(masterDb);
+
+    masterDb.getDetails().remove(2);
+    DB.save(masterDb);
+
+    OmCacheOrderedMaster masterDbNew = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDbNew.getDetails()).containsExactly(detail2, detail1);
+  }
 }
