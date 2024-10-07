@@ -32,6 +32,7 @@ final class DefaultCacheHolder {
   private final ServerCacheOptions queryDefault;
   private final CurrentTenantProvider tenantProvider;
   private final QueryCacheEntryValidate queryCacheEntryValidate;
+  private final boolean tenantPartitionedCache;
 
   DefaultCacheHolder(CacheManagerOptions builder) {
     this.cacheFactory = builder.getCacheFactory();
@@ -39,6 +40,7 @@ final class DefaultCacheHolder {
     this.queryDefault = builder.getQueryDefault();
     this.tenantProvider = builder.getCurrentTenantProvider();
     this.queryCacheEntryValidate = builder.getQueryCacheEntryValidate();
+    this.tenantPartitionedCache = builder.isTenantPartitionedCache();
   }
 
   void visitMetrics(MetricVisitor visitor) {
@@ -56,16 +58,42 @@ final class DefaultCacheHolder {
     return getCacheInternal(beanType, ServerCacheType.COLLECTION_IDS, collectionProperty);
   }
 
+  private String key(String beanName) {
+    if (tenantPartitionedCache) {
+      StringBuilder sb = new StringBuilder(beanName.length() + 64);
+      sb.append(beanName);
+      sb.append('.');
+      sb.append(tenantProvider.currentId());
+      return sb.toString();
+    } else {
+      return beanName;
+    }
+  }
+
   private String key(String beanName, ServerCacheType type) {
-    return beanName + type.code();
+    StringBuilder sb = new StringBuilder(beanName.length() + 64);
+    sb.append(beanName);
+    if (tenantPartitionedCache) {
+      sb.append('.');
+      sb.append(tenantProvider.currentId());
+    }
+    sb.append(type.code());
+    return sb.toString();
   }
 
   private String key(String beanName, String collectionProperty, ServerCacheType type) {
-    if (collectionProperty != null) {
-      return beanName + "." + collectionProperty + type.code();
-    } else {
-      return beanName + type.code();
+    StringBuilder sb = new StringBuilder(beanName.length() + 64);
+    sb.append(beanName);
+    if (tenantPartitionedCache) {
+      sb.append('.');
+      sb.append(tenantProvider.currentId());
     }
+    if (collectionProperty != null) {
+      sb.append('.');
+      sb.append(collectionProperty);
+    }
+    sb.append(type.code());
+    return sb.toString();
   }
 
   /**
@@ -82,12 +110,17 @@ final class DefaultCacheHolder {
     if (type == ServerCacheType.COLLECTION_IDS) {
       lock.lock();
       try {
-        collectIdCaches.computeIfAbsent(beanType.getName(), s -> new ConcurrentSkipListSet<>()).add(key);
+        collectIdCaches.computeIfAbsent(key(beanType.getName()), s -> new ConcurrentSkipListSet<>()).add(key);
       } finally {
         lock.unlock();
       }
     }
-    return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, tenantProvider, queryCacheEntryValidate));
+    if (tenantPartitionedCache) {
+      return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, null, queryCacheEntryValidate));
+    } else {
+      return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, tenantProvider, queryCacheEntryValidate));
+    }
+
   }
 
   void clearAll() {
@@ -103,7 +136,7 @@ final class DefaultCacheHolder {
     clearIfExists(key(name, ServerCacheType.QUERY));
     clearIfExists(key(name, ServerCacheType.BEAN));
     clearIfExists(key(name, ServerCacheType.NATURAL_KEY));
-    Set<String> keys = collectIdCaches.get(name);
+    Set<String> keys = collectIdCaches.get(key(name));
     if (keys != null) {
       for (String collectionIdKey : keys) {
         clearIfExists(collectionIdKey);
@@ -147,4 +180,7 @@ final class DefaultCacheHolder {
     return beanDefault.copy(nearCache);
   }
 
+  boolean isTenantPartitionedCache() {
+    return tenantPartitionedCache;
+  }
 }
