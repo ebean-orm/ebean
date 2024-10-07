@@ -1,15 +1,25 @@
 package org.tests.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.ebean.xtest.BaseTestCase;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import io.ebean.DB;
+import io.ebean.annotation.DbJson;
+import io.ebean.annotation.DbJsonB;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
+import org.tests.model.json.BasicJacksonType;
 import org.tests.model.json.EBasicJsonJackson;
 import org.tests.model.json.EBasicJsonJackson2;
 import org.tests.model.json.LongJacksonType;
 import org.tests.model.json.StringJacksonType;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -59,9 +69,56 @@ public class TestDbJson_Jackson extends BaseTestCase {
     assertThat(found.getValueMap()).containsEntry(1L, "one").containsEntry(2L, "two");
   }
 
+  public static class DtoJackson {
+    @DbJson(length = 700)
+    Set<BasicJacksonType<?>> valueSet = new LinkedHashSet<>();
+
+    @DbJsonB
+    List<BasicJacksonType<?>> valueList = new ArrayList<>();
+
+    @DbJson(length = 700)
+    @JsonDeserialize(keyAs = Long.class)
+    Map<Number, BasicJacksonType<?>> valueMap = new LinkedHashMap<>();
+
+    @DbJson(length = 500)
+    BasicJacksonType<?> plainValue;
+
+    public Set<BasicJacksonType<?>> getValueSet() {
+      return valueSet;
+    }
+
+    public void setValueSet(Set<BasicJacksonType<?>> valueSet) {
+      this.valueSet = valueSet;
+    }
+
+    public List<BasicJacksonType<?>> getValueList() {
+      return valueList;
+    }
+
+    public void setValueList(List<BasicJacksonType<?>> valueList) {
+      this.valueList = valueList;
+    }
+
+    public Map<Number, BasicJacksonType<?>> getValueMap() {
+      return valueMap;
+    }
+
+    public void setValueMap(Map<Number, BasicJacksonType<?>> valueMap) {
+      this.valueMap = valueMap;
+    }
+
+    public BasicJacksonType<?> getPlainValue() {
+      return plainValue;
+    }
+
+    public void setPlainValue(BasicJacksonType<?> plainValue) {
+      this.plainValue = plainValue;
+    }
+  }
+
   /**
    * This testcase verifies if polymorph objects will work in ebean.
-   *
+   * <p>
    * for BasicJacksonType there exists two types and has a &#64;JsonTypeInfo
    * annotation. It is expected that this information is also honored by ebean.
    */
@@ -94,7 +151,8 @@ public class TestDbJson_Jackson extends BaseTestCase {
     assertThat(found.getPlainValue()).isInstanceOf(LongJacksonType.class);
     assertThat(found.getValueList()).hasSize(2);
     assertThat(found.getValueSet()).hasSize(2);
-    assertThat(found.getValueMap()).hasSize(2);;
+    assertThat(found.getValueMap()).hasSize(2);
+    ;
 
     DB.save(bean);
 
@@ -103,7 +161,16 @@ public class TestDbJson_Jackson extends BaseTestCase {
     assertThat(found.getPlainValue()).isInstanceOf(LongJacksonType.class);
     assertThat(found.getValueList()).hasSize(2);
     assertThat(found.getValueSet()).hasSize(2);
-    assertThat(found.getValueMap()).hasSize(2);;
+    assertThat(found.getValueMap()).hasSize(2);
+
+
+    DtoJackson dto = DB.find(EBasicJsonJackson2.class).setId(bean.getId())
+      .select("valueSet,valueList,valueMap,plainValue").asDto(DtoJackson.class).findOne();
+
+    assertThat(dto.getPlainValue()).isInstanceOf(LongJacksonType.class);
+    assertThat(dto.getValueList()).hasSize(2);
+    assertThat(dto.getValueSet()).hasSize(2);
+    assertThat(dto.getValueMap()).hasSize(2);
 
   }
 
