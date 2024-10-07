@@ -105,6 +105,9 @@ final class DefaultBeanLoader {
     if (ebi.isReadOnly()) {
       query.setReadOnly(true);
     }
+    if (many.hasOrderColumn()) {
+      query.orderBy(many.path() + "." +  many.fetchOrderBy());
+    }
 
     server.findOne(query);
     if (beanCollection != null) {
