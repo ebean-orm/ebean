@@ -950,12 +950,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public Set<Property> checkUniqueness(Object bean) {
-    return Collections.emptySet();
-  }
-
-  @Override
-  public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+  public Set<Property> checkUniqueness(Object bean, Transaction transaction, boolean useQueryCache, boolean skipClean) {
     return Collections.emptySet();
   }
 
