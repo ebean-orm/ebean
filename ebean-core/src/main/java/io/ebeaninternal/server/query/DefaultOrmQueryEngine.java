@@ -164,8 +164,13 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
     if (finder != null) {
       result = finder.postProcess(request, result);
     }
-    if (result != null && request.isBeanCachePut()) {
-      request.descriptor().cacheBeanPut((EntityBean) result);
+    if (result != null) {
+      if (request.isBeanCachePut()) {
+        request.descriptor().cacheBeanPut((EntityBean) result);
+      }
+      if (request.isQueryCachePut()) {
+        request.putToQueryCache(result);
+      }
     }
     return result;
   }
