@@ -2,8 +2,8 @@ package io.ebeaninternal.server.query;
 
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.QueryPlanRequest;
+import io.ebeaninternal.api.SpiTransactionManager;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,27 +15,21 @@ final class CQueryPlanRequest {
 
   private final List<MetaQueryPlan> plans = new ArrayList<>();
 
-  private final Connection connection;
+  private final SpiTransactionManager transactionManager;
   private final long since;
   private final int maxCount;
   private final long maxTime;
   private final Iterator<CQueryBindCapture> iterator;
 
-  CQueryPlanRequest(Connection connection, QueryPlanRequest req, Iterator<CQueryBindCapture> iterator) {
-    this.connection = connection;
+
+  CQueryPlanRequest(SpiTransactionManager transactionManager, QueryPlanRequest req, Iterator<CQueryBindCapture> iterator) {
+    this.transactionManager = transactionManager;
     this.iterator = iterator;
     this.maxCount = req.maxCount();
     long reqSince = req.since();
     this.since = (reqSince == 0) ? Long.MAX_VALUE: reqSince;
     long maxTimeMillis = req.maxTimeMillis();
     this.maxTime = maxTimeMillis > 0 ? System.currentTimeMillis() + maxTimeMillis : 0;
-  }
-
-  /**
-   * Return the connection used to collect the db query plan.
-   */
-  Connection connection() {
-    return connection;
   }
 
   /**
@@ -71,7 +65,7 @@ final class CQueryPlanRequest {
    */
   void nextCapture() {
     final CQueryBindCapture next = iterator.next();
-    if (next.collectQueryPlan(this)) {
+    if (next.collectQueryPlan(this, transactionManager)) {
       iterator.remove();
     }
   }
