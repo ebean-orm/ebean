@@ -26,13 +26,6 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
     super(many);
   }
 
-  /**
-   * For a query that returns a set.
-   */
-  BeanSetHelp() {
-    super();
-  }
-
   @Override
   public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanSet<?>) {
