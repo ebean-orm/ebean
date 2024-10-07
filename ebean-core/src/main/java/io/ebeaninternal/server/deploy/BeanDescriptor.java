@@ -318,7 +318,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.idOnlyReference = isIdOnlyReference(propertiesBaseScalar);
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
-    this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.cacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
+    this.cacheHelp = BeanDescriptorCacheHelpPartitioned.create(this, owner.cacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
     this.jsonHelp = initJsonHelp();
     this.draftHelp = new BeanDescriptorDraftHelp<>(this);
     this.docStoreAdapter = owner.createDocStoreBeanAdapter(this, deploy);

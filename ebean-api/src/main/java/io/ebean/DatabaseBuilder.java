@@ -897,6 +897,12 @@ public interface DatabaseBuilder {
   DatabaseBuilder setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper);
 
   /**
+   * Sets the tenant partitioning mode for caches. This means, caches are created on demand,
+   * but they may not get invalidated across tenant boundaries   *
+   */
+  void setTenantPartitionedCache(boolean tenantPartitionedCache);
+
+  /**
    * Set the L2 cache default max size.
    */
   default DatabaseBuilder cacheMaxSize(int cacheMaxSize) {
@@ -2562,6 +2568,11 @@ public interface DatabaseBuilder {
      * Return true if dirty beans are automatically persisted.
      */
     boolean isAutoPersistUpdates();
+
+    /**
+     * Returns, if the caches are partitioned by tenant.
+     */
+    boolean isTenantPartitionedCache();
 
     /**
      * Return the L2 cache default max size.
