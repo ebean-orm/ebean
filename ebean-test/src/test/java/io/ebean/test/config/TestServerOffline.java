@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,9 +67,6 @@ public class TestServerOffline {
     @Override
     public void dataSourceDown(DataSource dataSource, SQLException reason) {}
 
-    @Override
-    public void dataSourceWarning(DataSource dataSource, String msg) {}
-
   }
 
   @Test
@@ -89,8 +86,8 @@ public class TestServerOffline {
       DatabaseConfig config = config(props);
 
       LazyDatasourceInitializer alert = new LazyDatasourceInitializer() ;
-      config.getDataSourceConfig().setAlert(alert);
-      config.getDataSourceConfig().setHeartbeatFreqSecs(1);
+      config.getDataSourceConfig().alert(alert);
+      config.getDataSourceConfig().heartbeatFreqSecs(1);
 
       Database h2Offline = DatabaseFactory.create(config);
       alert.server = h2Offline;
@@ -147,7 +144,7 @@ public class TestServerOffline {
     config.loadFromProperties(props);
     config.setDefaultServer(false);
     config.setRegister(false);
-    config.getClasses().add(EBasicVer.class);
+    config.classes().add(EBasicVer.class);
     return config;
   }
 
