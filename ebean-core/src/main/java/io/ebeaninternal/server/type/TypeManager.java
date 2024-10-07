@@ -1,9 +1,10 @@
 package io.ebeaninternal.server.type;
 
 import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import io.ebeaninternal.server.deploy.meta.DeployProperty;
 
 import jakarta.persistence.EnumType;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 /**
@@ -40,7 +41,7 @@ public interface TypeManager {
    * <p>
    * For example Array based ScalarType for types like {@code List<String>}.
    */
-  ScalarType<?> type(Type propertyType, Class<?> type);
+  ScalarType<?> type(DeployProperty property);
 
   /**
    * Create a ScalarType for an Enum using a mapping (rather than JPA Ordinal or String which has limitations).
@@ -48,12 +49,17 @@ public interface TypeManager {
   ScalarType<?> enumType(Class<? extends Enum<?>> enumType, EnumType enumerated);
 
   /**
+   * Returns the Json Marker annotation (e.g. JacksonAnnotation)
+   */
+  Class<? extends Annotation> jsonMarkerAnnotation();
+
+  /**
    * Return the ScalarType used to handle JSON content.
    * <p>
    * Note that type expected to be JsonNode or Map.
    * </p>
    */
-  ScalarType<?> dbJsonType(DeployBeanProperty prop, int dbType, int dbLength);
+  ScalarType<?> dbJsonType(DeployProperty prop, int dbType, int dbLength);
 
   /**
    * Return the ScalarType used to handle DB ARRAY.
