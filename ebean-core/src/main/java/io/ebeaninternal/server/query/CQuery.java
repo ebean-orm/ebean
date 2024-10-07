@@ -17,7 +17,7 @@ import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
 import io.ebeaninternal.server.deploy.*;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -186,7 +186,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.queryMode = query.mode();
     this.loadContextBean = queryMode.isLoadContextBean() || query.getForUpdateLockType() != null;
     this.lazyLoadManyProperty = query.lazyLoadMany();
-    this.readOnly = request.isReadOnly();
+    this.readOnly = query.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.objectGraphNode = query.parentNode();
     this.profilingListener = query.profilingListener();

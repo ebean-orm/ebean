@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.DataIntegrityException;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -40,8 +41,8 @@ import io.ebeanservice.docstore.api.mapping.DocMappingBuilder;
 import io.ebeanservice.docstore.api.mapping.DocPropertyMapping;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 import io.ebeanservice.docstore.api.support.DocStructure;
+import jakarta.persistence.PersistenceException;
 
-import javax.persistence.PersistenceException;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -166,6 +167,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   private final String dbComment;
   private final DbEncryptFunction dbEncryptFunction;
+  private final BindMaxLength bindMaxLength;
   private int deployOrder;
   final boolean jsonSerialize;
   final boolean jsonDeserialize;
@@ -258,6 +260,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     }
     this.jsonSerialize = deploy.isJsonSerialize();
     this.jsonDeserialize = deploy.isJsonDeserialize();
+    this.bindMaxLength = deploy.bindMaxLength();
   }
 
   private String tableAliasIntern(BeanDescriptor<?> descriptor, String s, boolean dbEncrypted, String dbColumn) {
@@ -345,6 +348,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.elPlaceHolderEncrypted = override.replace(source.elPlaceHolderEncrypted, source.dbColumn);
     this.jsonSerialize = source.jsonSerialize;
     this.jsonDeserialize = source.jsonDeserialize;
+    this.bindMaxLength = source.bindMaxLength;
   }
 
   /**
@@ -456,7 +460,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (formula && sqlFormulaJoin != null) {
-      ctx.appendFormulaJoin(sqlFormulaJoin, joinType, manyWhere);
+      String alias = ctx.tableAliasManyWhere(manyWhere);
+      ctx.appendFormulaJoin(sqlFormulaJoin, joinType, alias);
     } else if (secondaryTableJoin != null) {
       String relativePrefix = ctx.relativePrefix(secondaryTableJoinPrefix);
       secondaryTableJoin.addJoin(joinType, relativePrefix, ctx);
@@ -508,6 +513,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
+  public String idNullOr(String filterManyExpression) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public void loadIgnore(DbReadContext ctx) {
     ctx.dataReader().incrementPos(1);
   }
@@ -554,6 +564,18 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   @SuppressWarnings("unchecked")
   public void bind(DataBind b, Object value) throws SQLException {
     scalarType.bind(b, value);
+    if (bindMaxLength != null) {
+      Object obj = b.popLastObject();
+      long length = bindMaxLength.length(dbLength, obj);
+      if (length > dbLength) {
+        b.closeInputStreams();
+        String s = String.valueOf(value); // take original bind value here.
+        if (s.length() > 50) {
+          s = s.substring(0, 47) + "...";
+        }
+        throw new DataIntegrityException("Cannot bind value '" + s + "' (effective length=" + length + ") to column '" + dbColumn + "' (length=" + dbLength + ")");
+      }
+    }
   }
 
   @SuppressWarnings(value = "unchecked")
@@ -1165,14 +1187,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Returns true if this <code>isLob()</code> or the type will effectively map to a lob.
    */
   @Override
-  public boolean isDbLob() {
+  public boolean isLobForPlatform() {
     if (lob) {
       return true;
     }
     switch (dbType) {
       case DbPlatformType.JSON:
       case DbPlatformType.JSONB:
-        return dbLength == 0; // must be analog to DbPlatformTypeMapping.lookup
+        return dbLength == 0 || dbLength > 4000; // must be analog to DbPlatformTypeMapping.lookup
       case DbPlatformType.JSONBlob:
       case DbPlatformType.JSONClob:
         return true;

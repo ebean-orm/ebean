@@ -15,7 +15,7 @@ public abstract class QueryPlanLogger {
   final SpiDbQueryPlan readQueryPlan(SpiQueryPlan plan, BindCapture bind, ResultSet rset) throws SQLException {
     StringBuilder sb = new StringBuilder();
     for (int i = 1; i <= rset.getMetaData().getColumnCount(); i++) {
-      sb.append(rset.getMetaData().getColumnLabel(i)).append("\t");
+      sb.append(rset.getMetaData().getColumnLabel(i)).append('\t');
     }
     sb.setLength(sb.length() - 1);
     readPlanData(sb, rset);
@@ -37,7 +37,7 @@ public abstract class QueryPlanLogger {
     while (rset.next()) {
       sb.append('\n');
       for (int i = 1; i <= rset.getMetaData().getColumnCount(); i++) {
-        sb.append(rset.getString(i)).append("\t");
+        sb.append(rset.getString(i)).append('\t');
       }
       sb.setLength(sb.length() - 1);
     }

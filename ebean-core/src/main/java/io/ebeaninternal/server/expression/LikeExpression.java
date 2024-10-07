@@ -3,6 +3,7 @@ package io.ebeaninternal.server.expression;
 import io.ebean.LikeType;
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
@@ -25,7 +26,7 @@ final class LikeExpression extends AbstractValueExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
       // bind the key as well as the value
@@ -44,7 +45,7 @@ final class LikeExpression extends AbstractValueExpression {
       pname = prop.beanProperty().decryptProperty(propName);
     }
     if (caseInsensitive) {
-      request.append("lower(").property(pname).append(")");
+      request.append("lower(").property(pname).append(')');
     } else {
       request.property(pname);
     }
@@ -62,9 +63,9 @@ final class LikeExpression extends AbstractValueExpression {
   @Override
   public void queryPlanHash(StringBuilder builder) {
     if (caseInsensitive){
-      builder.append("I");
+      builder.append('I');
     }
-    builder.append("Like[").append(type).append(" ").append(propName).append("]");
+    builder.append("Like[").append(type).append(' ').append(propName).append(']');
   }
 
   @Override
@@ -78,7 +79,7 @@ final class LikeExpression extends AbstractValueExpression {
     return strValue().equals(that.strValue());
   }
 
-  private static String getValue(String value, boolean caseInsensitive, LikeType type, SpiExpressionRequest request) {
+  private static String getValue(String value, boolean caseInsensitive, LikeType type, SpiExpressionBind request) {
     if (caseInsensitive) {
       value = value.toLowerCase();
     }

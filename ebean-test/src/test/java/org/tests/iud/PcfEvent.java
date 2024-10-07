@@ -1,6 +1,6 @@
 package org.tests.iud;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class PcfEvent extends PcfModel {

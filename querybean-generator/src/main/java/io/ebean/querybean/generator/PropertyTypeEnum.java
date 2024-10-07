@@ -19,18 +19,18 @@ class PropertyTypeEnum extends PropertyType {
   }
 
   @Override
-  String getTypeDefn(String shortName, boolean assoc) {
+  String getTypeDefn(String shortName, boolean assoc, boolean fullyQualify) {
+    String q = fullyQualify ? pkg : "";
     if (assoc) {
-      return "PEnum<R," + enumShortName + ">";
-
+      return q + "PEnum<R," + enumShortName + ">";
     } else {
-      return "PEnum<Q" + shortName + "," + enumShortName + ">";
+      return q + "PEnum<Q" + shortName + "," + enumShortName + ">";
     }
   }
 
   @Override
-  void addImports(Set<String> allImports) {
-    super.addImports(allImports);
+  void addImports(Set<String> allImports, boolean fullyQualify) {
+    super.addImports(allImports, fullyQualify);
     allImports.add(enumClass);
   }
 

@@ -13,7 +13,7 @@ import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 
 import static java.lang.System.Logger.Level.DEBUG;
@@ -63,8 +63,8 @@ final class DefaultBeanLoader {
     Object parentId = parentDesc.getId(parentBean);
     if (pc == null) {
       pc = new DefaultPersistenceContext();
-      parentDesc.contextPut(pc, parentId, parentBean);
     }
+    parentDesc.contextPutIfAbsent(pc, parentId, parentBean);
     boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching() && many.isUseCache();
     if (useManyIdCache) {
       Boolean readOnly = null;
@@ -82,12 +82,12 @@ final class DefaultBeanLoader {
       // populate a new collection
       BeanCollection<?> emptyCollection = many.createEmpty(parentBean);
       many.setValue(parentBean, emptyCollection);
-      query.setLoadDescription("+refresh", null);
+      query.setLoadDescription("refresh", null);
     } else {
-      query.setLoadDescription("+lazy", null);
+      query.setLoadDescription("lazy", null);
     }
 
-    query.select(parentDesc.idBinder().getIdProperty());
+    query.select(parentDesc.idBinder().idSelect());
     if (onlyIds) {
       query.fetch(many.name(), many.targetIdProperty());
     } else {
@@ -106,7 +106,7 @@ final class DefaultBeanLoader {
       query.setReadOnly(true);
     }
 
-    server.findOne(query, null);
+    server.findOne(query);
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
         if (log.isLoggable(DEBUG)) {
@@ -126,8 +126,7 @@ final class DefaultBeanLoader {
     if (loadRequest.checkEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
-    final SpiQuery<?> query = server.createQuery(loadRequest.beanType());
-    loadRequest.configureQuery(query);
+    final SpiQuery<?> query = loadRequest.createQuery(server);
     loadRequest.postLoad(executeQuery(loadRequest, query));
   }
 
@@ -139,12 +138,13 @@ final class DefaultBeanLoader {
       // MySql - we need a different transaction to execute the secondary query
       SpiTransaction extraTxn = server.createReadOnlyTransaction(query.tenantId(), query.isUseMaster());
       try {
-        return server.findList(query, extraTxn);
+        query.usingTransaction(extraTxn);
+        return server.findList(query);
       } finally {
         extraTxn.end();
       }
     } else {
-      return server.findList(query, loadRequest.transaction());
+      return server.findList(query);
     }
   }
 

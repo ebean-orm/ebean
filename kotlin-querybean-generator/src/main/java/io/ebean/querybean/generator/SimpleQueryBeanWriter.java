@@ -123,21 +123,10 @@ class SimpleQueryBeanWriter {
   }
 
   private void gatherPropertyDetails() {
-    importTypes.add(Constants.GENERATED);
-    importTypes.add(beanFullName);
-    importTypes.add(Constants.TQROOTBEAN);
-    importTypes.add(Constants.TYPEQUERYBEAN);
-    importTypes.add(Constants.DATABASE);
-    importTypes.add(Constants.FETCHGROUP);
-    importTypes.add(Constants.QUERY);
-    importTypes.add(Constants.TRANSACTION);
     if (implementsInterface != null) {
       implementsInterfaceFullName = implementsInterface.getQualifiedName().toString();
       boolean nested = implementsInterface.getNestingKind().isNested();
       implementsInterfaceShortName = Util.shortName(nested, implementsInterfaceFullName);
-    }
-    if (dbName != null) {
-      importTypes.add(Constants.DB);
     }
     addClassProperties();
   }
@@ -230,12 +219,6 @@ class SimpleQueryBeanWriter {
    * Prepare the imports for writing assoc bean.
    */
   private void prepareAssocBeanImports() {
-
-    importTypes.remove(Constants.DB);
-    importTypes.remove(Constants.TQROOTBEAN);
-    importTypes.remove(Constants.DATABASE);
-    importTypes.remove(Constants.FETCHGROUP);
-    importTypes.remove(Constants.QUERY);
     if (embeddable) {
       importTypes.add(Constants.TQASSOC);
     } else {
@@ -266,7 +249,6 @@ class SimpleQueryBeanWriter {
    * Write constructors.
    */
   private void writeConstructors() {
-
     if (writingAssocBean) {
       writeAssocBeanFetch();
       writeAssocBeanConstructor();
@@ -279,7 +261,7 @@ class SimpleQueryBeanWriter {
    * Write the constructors for 'root' type query bean.
    */
   private void writeRootBeanConstructor() {
-    lang().rootBeanConstructor(writer, shortName, dbName);
+    lang().rootBeanConstructor(writer, shortName, dbName, beanFullName);
   }
 
   private void writeAssocBeanFetch() {
@@ -315,7 +297,6 @@ class SimpleQueryBeanWriter {
    * Write constructor for 'assoc' type query bean.
    */
   private void writeAssocBeanConstructor() {
-
     lang().assocBeanConstructor(writer, shortName);
   }
 
@@ -344,11 +325,10 @@ class SimpleQueryBeanWriter {
       writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
       if (embeddable) {
-        writer.append("class Q%s<R> : TQAssoc<%s,R> {", shortName, shortInnerName).eol();
+        writer.append("class Q%s<R> : TQAssoc<%s,R> {", shortName, beanFullName).eol();
       } else {
-        writer.append("class Q%s<R> : TQAssocBean<%s,R,Q%s> {", shortName, shortInnerName, origShortName).eol();
+        writer.append("class Q%s<R> : TQAssocBean<%s,R,Q%s> {", shortName, beanFullName, origShortName).eol();
       }
-
     } else {
       writer.append("/**").eol();
       writer.append(" * Query bean for %s.", shortName).eol();
@@ -357,7 +337,7 @@ class SimpleQueryBeanWriter {
       writer.append(" */").eol();
       writer.append(Constants.AT_GENERATED).eol();
       writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      lang().beginClass(writer, shortName);
+      writer.append("class Q%s : io.ebean.typequery.QueryBean<%s, Q%s> {", shortName, beanFullName, shortName).eol();
     }
 
     writer.eol();
@@ -365,7 +345,7 @@ class SimpleQueryBeanWriter {
 
   private void writeAlias() {
     if (!writingAssocBean) {
-      lang().alias(writer, shortName);
+      lang().alias(writer, shortName, beanFullName);
     }
   }
 

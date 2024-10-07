@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.avaje.lang.NonNullApi;
+import io.avaje.lang.Nullable;
 import io.ebean.*;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
@@ -22,10 +23,11 @@ import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -55,7 +57,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private ProfilingListener profilingListener;
   private Type type;
   private String label;
+  private String hint;
   private Mode mode = Mode.NORMAL;
+  private boolean usingFuture;
   private Object tenantId;
   /**
    * Holds query in structured form.
@@ -68,6 +72,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Lazy loading batch size (can override server wide default).
    */
   private int lazyLoadBatchSize;
+  private String distinctOn;
   private OrderBy<T> orderBy;
   private String loadMode;
   private String loadDescription;
@@ -84,11 +89,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Set to true by a user wanting a DISTINCT query (id property must be excluded).
    */
   private boolean distinct;
-
-  /**
-   * Set to true if this is a future fetch using background threads.
-   */
-  private boolean futureFetch;
 
   /**
    * Only used for read auditing with findFutureList() query.
@@ -238,6 +238,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final String hint() {
+    return hint;
+  }
+
+  @Override
   public final String planLabel() {
     if (label != null) {
       return label;
@@ -249,14 +254,20 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final void setProfilePath(String label, String relativePath, ProfileLocation profileLocation) {
+  public final void setProfilePath(String label, String relativePath, @Nullable ProfileLocation profileLocation) {
     this.profileLocation = profileLocation;
-    this.label = ((profileLocation == null) ? label : profileLocation.label()) + "_" + relativePath;
+    this.label = (profileLocation == null ? label : profileLocation.label()) + '_' + relativePath;
   }
 
   @Override
   public final Query<T> setLabel(String label) {
     this.label = label;
+    return this;
+  }
+
+  @Override
+  public final Query<T> setHint(String hint) {
+    this.hint = hint;
     return this;
   }
 
@@ -279,6 +290,20 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> apply(FetchPath fetchPath) {
     fetchPath.apply(this);
+    return this;
+  }
+
+  @Override
+  public Query<T> also(Consumer<Query<T>> apply) {
+    apply.accept(this);
+    return this;
+  }
+
+  @Override
+  public Query<T> alsoIf(BooleanSupplier predicate, Consumer<Query<T>> consumer) {
+    if (predicate.getAsBoolean()) {
+      consumer.accept(this);
+    }
     return this;
   }
 
@@ -485,19 +510,26 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final SpiQuerySecondary convertJoins() {
+  public final SpiQueryManyJoin convertJoins() {
     if (!useDocStore) {
       createExtraJoinsToSupportManyWhereClause();
     }
-    markQueryJoins();
+    return markQueryJoins();
+  }
+
+  @Override
+  public SpiQuerySecondary secondaryQuery() {
     return new OrmQuerySecondary(removeQueryJoins(), removeLazyJoins());
   }
 
   /**
    * Limit the number of fetch joins to Many properties, mark as query joins as needed.
+   *
+   * @return The query join many property or null.
    */
-  private void markQueryJoins() {
-    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
+  private SpiQueryManyJoin markQueryJoins() {
+    // no automatic join to query join conversion when distinctOn is used
+    return distinctOn != null ? null : detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
   }
 
   private boolean isAllowOneManyFetch() {
@@ -621,12 +653,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     return countDistinctOrder;
   }
 
-  /**
-   * Return true if the Id should be included in the query.
-   */
   @Override
   public final boolean isWithId() {
-    return !manualId && !distinct && !singleAttribute;
+    // distinctOn orm query will auto include the id property
+    // distinctOn dto query does NOT (via setting manualId to true)
+    return !manualId && !singleAttribute && (!distinct || distinctOn != null);
   }
 
   @Override
@@ -722,10 +753,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.baseTable = baseTable;
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
+    copy.distinctOn = distinctOn;
     copy.allowLoadErrors = allowLoadErrors;
     copy.timeout = timeout;
     copy.mapKey = mapKey;
     copy.id = id;
+    copy.hint = hint;
     copy.label = label;
     copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
@@ -778,6 +811,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final void setType(Type type) {
     this.type = type;
+  }
+
+  @Override
+  public String distinctOn() {
+    return distinctOn;
   }
 
   @Override
@@ -967,6 +1005,16 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final void usingFuture() {
+    this.usingFuture = true;
+  }
+
+  @Override
+  public final boolean isUsingFuture() {
+    return usingFuture;
+  }
+
+  @Override
   public final boolean isUsageProfiling() {
     return usageProfiling;
   }
@@ -1038,13 +1086,13 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (temporalMode != SpiQuery.TemporalMode.CURRENT) {
       sb.append("/tm").append(temporalMode.ordinal());
       if (versionsStart != null) {
-        sb.append("v");
+        sb.append('v');
       }
     }
     if (forUpdate != null) {
       sb.append("/fu").append(forUpdate.ordinal());
       if (lockType != null) {
-        sb.append("t").append(lockType.ordinal());
+        sb.append('t').append(lockType.ordinal());
       }
     }
     if (id != null) {
@@ -1053,8 +1101,14 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (manualId) {
       sb.append("/md");
     }
+    if (hint != null) {
+      sb.append("/h:").append(hint);
+    }
     if (distinct) {
       sb.append("/dt");
+      if (distinctOn != null) {
+        sb.append("/o:").append(distinctOn);
+      }
     }
     if (allowLoadErrors) {
       sb.append("/ae");
@@ -1083,27 +1137,27 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (detail != null) {
       sb.append("/d[");
       detail.queryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     if (bindParams != null) {
       sb.append("/b[");
       bindParams.buildQueryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     if (whereExpressions != null) {
       sb.append("/w[");
       whereExpressions.queryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     if (havingExpressions != null) {
       sb.append("/h[");
       havingExpressions.queryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     if (updateProperties != null) {
       sb.append("/u[");
       updateProperties.buildQueryPlanHash(sb);
-      sb.append("]");
+      sb.append(']');
     }
     return sb.toString();
   }
@@ -1156,7 +1210,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // add the rawSql statement - if any
     if (orderByIsEmpty()) {
       if (rawSql != null && rawSql.getSql() != null) {
-        order(rawSql.getSql().getOrderBy());
+        orderBy(rawSql.getSql().getOrderBy());
       }
     }
     if (checkPagingOrderBy()) {
@@ -1309,6 +1363,13 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final Query<T> distinctOn(String distinctOn) {
+    this.distinctOn = distinctOn;
+    this.distinct = true;
+    return this;
+  }
+
+  @Override
   public final Query<T> select(String columns) {
     detail.select(columns);
     return this;
@@ -1316,7 +1377,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final Query<T> select(FetchGroup<T> fetchGroup) {
-    this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+    if (fetchGroup != null) {
+      this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+    }
     return this;
   }
 
@@ -1380,6 +1443,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public SpiTransaction transaction() {
+    return transaction;
+  }
+
+  @Override
   public final Query<T> usingTransaction(Transaction transaction) {
     this.transaction = (SpiTransaction) transaction;
     return this;
@@ -1410,22 +1478,22 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final int delete() {
-    return server.delete(this, transaction);
+    return server.delete(this);
   }
 
   @Override
   public final int delete(Transaction transaction) {
-    return server.delete(this, transaction);
+    return server.delete(this);
   }
 
   @Override
   public final int update() {
-    return server.update(this, transaction);
+    return server.update(this);
   }
 
   @Override
   public final int update(Transaction transaction) {
-    return server.update(this, transaction);
+    return server.update(this);
   }
 
   @Override
@@ -1433,12 +1501,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
     // the copy rather than this query instance)
-    return server.findIds(this, transaction);
+    return server.findIds(this);
   }
 
   @Override
   public final boolean exists() {
-    return server.exists(this, transaction);
+    return server.exists(this);
   }
 
   @Override
@@ -1446,38 +1514,38 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     // a copy of this query is made in the server
     // as the query needs to modified (so we modify
     // the copy rather than this query instance)
-    return server.findCount(this, transaction);
+    return server.findCount(this);
   }
 
   @Override
   public final void findEachWhile(Predicate<T> consumer) {
-    server.findEachWhile(this, consumer, transaction);
+    server.findEachWhile(this, consumer);
   }
 
   @Override
   public final void findEach(Consumer<T> consumer) {
-    server.findEach(this, consumer, transaction);
+    server.findEach(this, consumer);
   }
 
   @Override
   public final void findEach(int batch, Consumer<List<T>> consumer) {
-    server.findEach(this, batch, consumer, transaction);
+    server.findEach(this, batch, consumer);
   }
 
   @Override
   public final QueryIterator<T> findIterate() {
-    return server.findIterate(this, transaction);
+    return server.findIterate(this);
   }
 
   @Override
   public final Stream<T> findStream() {
-    return server.findStream(this, transaction);
+    return server.findStream(this);
   }
 
   @Override
   public final List<Version<T>> findVersions() {
     this.temporalMode = TemporalMode.VERSIONS;
-    return server.findVersions(this, transaction);
+    return server.findVersions(this);
   }
 
   @Override
@@ -1488,33 +1556,32 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     this.temporalMode = TemporalMode.VERSIONS;
     this.versionsStart = start;
     this.versionsEnd = end;
-    return server.findVersions(this, transaction);
+    return server.findVersions(this);
   }
 
   @Override
   public final List<T> findList() {
-    return server.findList(this, transaction);
+    return server.findList(this);
   }
 
   @Override
   public final Set<T> findSet() {
-    return server.findSet(this, transaction);
+    return server.findSet(this);
   }
 
   @Override
   public final <K> Map<K, T> findMap() {
-    return server.findMap(this, transaction);
+    return server.findMap(this);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public final <A> List<A> findSingleAttributeList() {
-    return server.findSingleAttributeList(this, transaction);
+    return server.findSingleAttributeList(this);
   }
 
   @Override
   public final <A> Set<A> findSingleAttributeSet() {
-    return server.findSingleAttributeSet(this, transaction);
+    return server.findSingleAttributeSet(this);
   }
 
   @Override
@@ -1524,33 +1591,38 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final <A> Optional<A> findSingleAttributeOrEmpty() {
+    return Optional.ofNullable(findSingleAttribute());
+  }
+
+  @Override
   public final T findOne() {
-    return server.findOne(this, transaction);
+    return server.findOne(this);
   }
 
   @Override
   public final Optional<T> findOneOrEmpty() {
-    return server.findOneOrEmpty(this, transaction);
+    return server.findOneOrEmpty(this);
   }
 
   @Override
   public final FutureIds<T> findFutureIds() {
-    return server.findFutureIds(this, transaction);
+    return server.findFutureIds(this);
   }
 
   @Override
   public final FutureList<T> findFutureList() {
-    return server.findFutureList(this, transaction);
+    return server.findFutureList(this);
   }
 
   @Override
   public final FutureRowCount<T> findFutureCount() {
-    return server.findFutureCount(this, transaction);
+    return server.findFutureCount(this);
   }
 
   @Override
   public final PagedList<T> findPagedList() {
-    return server.findPagedList(this, transaction);
+    return server.findPagedList(this);
   }
 
   @Override
@@ -1756,6 +1828,22 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Query<T> setPaging(@Nullable Paging paging) {
+    if (paging != null && paging.pageSize() > 0) {
+      firstRow = paging.pageIndex() * paging.pageSize();
+      maxRows = paging.pageSize();
+      orderBy = (OrderBy<T>) paging.orderBy();
+      if (orderBy == null || orderBy.isEmpty()) {
+        // should not be paging without any order by clause so set
+        // orderById such that the Id property is used
+        orderById = true;
+      }
+    }
+    return this;
+  }
+
+  @Override
   public final String mapKey() {
     return mapKey;
   }
@@ -1906,16 +1994,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final boolean isDisableReadAudit() {
     return disableReadAudit;
-  }
-
-  @Override
-  public final boolean isFutureFetch() {
-    return futureFetch;
-  }
-
-  @Override
-  public final void setFutureFetch(boolean backgroundFetch) {
-    this.futureFetch = backgroundFetch;
   }
 
   @Override

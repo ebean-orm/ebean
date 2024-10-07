@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,6 +60,8 @@ class TestDbArray_basic extends BaseTestCase {
     bean.setStatus2(new LinkedHashSet<>());
     bean.getStatus2().add(EArrayBean.Status.TWO);
     bean.getStatus2().add(EArrayBean.Status.ONE);
+    bean.setTimes(List.of(Instant.now(), Instant.now().minusSeconds(60)));
+    bean.setDates(List.of(LocalDate.now(), LocalDate.now().minusDays(1)));
 
     DB.save(bean);
 
@@ -66,6 +70,8 @@ class TestDbArray_basic extends BaseTestCase {
     assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
     assertThat(found.getDoubs()).hasSize(2);
     assertThat(found.getFloats()).hasSize(2);
+    assertThat(found.getTimes()).hasSize(2);
+    assertThat(found.getDates()).hasSize(2);
 
     if (isPostgresCompatible()) {
       Query<EArrayBean> query = DB.find(EArrayBean.class)

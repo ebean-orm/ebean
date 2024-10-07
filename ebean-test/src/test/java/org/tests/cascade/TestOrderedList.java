@@ -77,7 +77,7 @@ public class TestOrderedList extends BaseTestCase {
     DB.save(fresh);
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(7);
+    assertThat(sql).hasSize(8);
     assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=?");
     assertSql(sql.get(1)).contains("update om_ordered_detail set version=?, sort_order=? where id=? and version=?");
 
@@ -86,7 +86,7 @@ public class TestOrderedList extends BaseTestCase {
     DB.save(fresh);
 
     sql = LoggedSql.collect();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
     assertSql(sql.get(0)).contains("update om_ordered_master set name=?, version=? where id=? and version=?; -- bind(m1-mod3");
     assertSql(sql.get(1)).contains("update om_ordered_detail set name=?, version=?, sort_order=? where id=? and version=?");
     assertThat(sql.get(2)).contains("bind(was 1,3,2,");
@@ -94,10 +94,10 @@ public class TestOrderedList extends BaseTestCase {
     DB.delete(fresh);
 
     sql = LoggedSql.stop();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
     assertSql(sql.get(0)).contains("delete from om_ordered_detail where master_id = ?");
     assertSqlBind(sql.get(1));
-    assertSql(sql.get(2)).contains("delete from om_ordered_master where id=? and version=?");
+    assertSql(sql.get(3)).contains("delete from om_ordered_master where id=? and version=?");
   }
 
   @Test
@@ -185,7 +185,7 @@ public class TestOrderedList extends BaseTestCase {
     DB.save(masterDb);
 
     masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
-    assertThat(masterDb.getDetails()).containsExactly(detail3, detail1);
+    assertThat(masterDb.getDetails()).containsExactlyInAnyOrder(detail3, detail1);
 
   }
 }

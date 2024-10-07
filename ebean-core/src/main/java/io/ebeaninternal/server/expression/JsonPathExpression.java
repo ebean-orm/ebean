@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.io.IOException;
@@ -80,7 +81,7 @@ final class JsonPathExpression extends AbstractExpression {
     if (upperValue != null) {
       builder.append(" ?2");
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override
@@ -102,7 +103,7 @@ final class JsonPathExpression extends AbstractExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     if (value != null) {
       // value is null for EXISTS/NOT EXISTS
       request.addBindValue(value);

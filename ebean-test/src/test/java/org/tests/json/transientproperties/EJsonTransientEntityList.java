@@ -3,9 +3,9 @@ package org.tests.json.transientproperties;
 import io.ebean.annotation.Sql;
 import org.tests.model.basic.Order;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import java.util.List;
 
 @Sql

@@ -4,23 +4,12 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.20.2-SNAPSHOT</version>
+    <version>14.6.0</version>
   </parent>
 
   <name>querybean generator</name>
   <description>Querybean generator</description>
   <artifactId>querybean-generator</artifactId>
-
-  <dependencies>
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
-
-  </dependencies>
 
   <build>
     <plugins>
@@ -31,7 +20,7 @@
           <source>11</source>
           <target>11</target>
           <!-- Turn off annotation processing for building -->
-          <compilerArgument>-proc:none</compilerArgument>
+          <compilerArgs>-proc:none</compilerArgs>
         </configuration>
       </plugin>
     </plugins>

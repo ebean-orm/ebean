@@ -1,6 +1,6 @@
 package org.tests.model.basic;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "l2_cldf_reset_bean_child")

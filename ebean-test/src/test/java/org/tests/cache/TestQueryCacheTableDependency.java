@@ -4,6 +4,7 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
@@ -18,10 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryCacheTableDependency extends BaseTestCase {
 
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
+
   @Test
   public void testFindCountOnDependent() {
-
-    ResetBasicData.reset();
 
     ServerCache customerCache = DB.cacheManager().queryCache(Customer.class);
     customerCache.clear();
@@ -94,8 +98,6 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
   @Test
   public void testFindCountOnOtherL2Cached() {
-
-    ResetBasicData.reset();
 
     Customer fi = DB.find(Customer.class).where().eq("name", "Fiona").findOne();
 

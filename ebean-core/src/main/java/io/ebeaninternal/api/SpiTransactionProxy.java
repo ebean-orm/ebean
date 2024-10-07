@@ -11,7 +11,7 @@ import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -446,5 +446,10 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   @Override
   public void postRollback(Throwable cause) {
     transaction.postRollback(cause);
+  }
+
+  @Override
+  public void deactivateExternal() {
+    transaction.deactivateExternal();
   }
 }

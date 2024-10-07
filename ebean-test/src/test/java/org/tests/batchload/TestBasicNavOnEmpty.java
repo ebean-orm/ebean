@@ -2,6 +2,7 @@ package org.tests.batchload;
 
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -13,11 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestBasicNavOnEmpty extends BaseTestCase {
 
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
+
   @Test
   public void test() {
-
-    ResetBasicData.reset();
-
     Customer c = new Customer();
     c.setName("HelloRob");
 

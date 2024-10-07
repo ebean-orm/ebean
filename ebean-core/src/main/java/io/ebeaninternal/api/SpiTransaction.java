@@ -11,7 +11,7 @@ import io.ebeaninternal.server.persist.BatchControl;
 import io.ebeaninternal.server.transaction.ProfileStream;
 import io.ebeanservice.docstore.api.DocStoreTransaction;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -357,4 +357,8 @@ public interface SpiTransaction extends Transaction {
    */
   void postRollback(Throwable cause);
 
+  /**
+   * Set the transaction to be inactive via external transaction manager.
+   */
+  void deactivateExternal();
 }

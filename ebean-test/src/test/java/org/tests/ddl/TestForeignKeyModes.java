@@ -79,10 +79,10 @@ public class TestForeignKeyModes extends BaseTestCase {
     DB.delete(none);
 
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(4);
     assertSql(sql.get(0)).contains("delete from dfk_none_via_mto_m_dfk_one where dfk_none_via_mto_m_id = ?");
     assertSqlBind(sql.get(1));
-    assertSql(sql.get(2)).contains("delete from dfk_none_via_mto_m where id=?");
+    assertSql(sql.get(3)).contains("delete from dfk_none_via_mto_m where id=?");
   }
 
   @IgnorePlatform(Platform.NUODB)

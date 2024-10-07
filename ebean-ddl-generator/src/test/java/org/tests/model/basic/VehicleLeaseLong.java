@@ -1,8 +1,8 @@
 package org.tests.model.basic;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Inheritance;
 import java.math.BigDecimal;
 
 @Entity

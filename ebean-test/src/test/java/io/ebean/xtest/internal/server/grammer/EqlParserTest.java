@@ -409,7 +409,7 @@ class EqlParserTest extends BaseTestCase {
     Query<Customer> query = parse("where 'x' between name and smallnote");
     query.findList();
 
-    assertSql(query).contains("where  ? between t0.name and t0.smallnote");
+    assertSql(query).contains("where ? between t0.name and t0.smallnote");
   }
 
   @Test
@@ -418,7 +418,7 @@ class EqlParserTest extends BaseTestCase {
     query.setParameter("some", "A");
     query.findList();
 
-    assertSql(query).contains("where  ? between t0.name and t0.smallnote");
+    assertSql(query).contains("where ? between t0.name and t0.smallnote");
   }
 
   @Test
@@ -748,7 +748,7 @@ class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("id isNotNull and name = ? and smallnote istartsWith ?", "Rob", "Foo");
     query.findList();
     if (isH2()) {
-      assertSql(query).contains("where (t0.id is not null and t0.name = ? and lower(t0.smallnote) like ? escape'|' )");
+      assertSql(query).contains("where (t0.id is not null and t0.name = ? and lower(t0.smallnote) like ? escape'|')");
     }
   }
 
@@ -757,7 +757,7 @@ class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("name = ?1 and smallnote istartsWith ?2 and name like ?1", "Rob", "Foo");
     query.findList();
     if (isH2()) {
-      assertSql(query).contains(" where (t0.name = ? and lower(t0.smallnote) like ? escape'|'  and t0.name like ? escape'' )");
+      assertSql(query).contains(" where (t0.name = ? and lower(t0.smallnote) like ? escape'|' and t0.name like ? escape'')");
     }
   }
 
@@ -775,7 +775,7 @@ class EqlParserTest extends BaseTestCase {
     final Query<Customer> query = where("(id isNotNull or name = ?) and smallnote istartsWith ?", "Rob", "Foo");
     query.findList();
     if (isH2()) {
-      assertSql(query).contains("where ((t0.id is not null or t0.name = ?) and lower(t0.smallnote) like ? escape'|' )");
+      assertSql(query).contains("where ((t0.id is not null or t0.name = ?) and lower(t0.smallnote) like ? escape'|')");
     }
   }
 

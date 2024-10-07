@@ -10,12 +10,14 @@ import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareList;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -62,6 +64,12 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
         }
         if (valueType.equals(String.class)) {
           return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
+        }
+        if (valueType.equals(Instant.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "timestamptz", DocPropertyType.TEXT, ArrayElementConverter.INSTANT));
+        }
+        if (valueType.equals(LocalDate.class)) {
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "date", DocPropertyType.TEXT, ArrayElementConverter.LOCAL_DATE));
         }
         throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
       } finally {

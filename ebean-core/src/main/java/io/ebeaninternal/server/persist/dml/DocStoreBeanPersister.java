@@ -3,7 +3,7 @@ package io.ebeaninternal.server.persist.dml;
 import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.persist.BeanPersister;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * Document store based BeanPersister.

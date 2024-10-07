@@ -7,6 +7,7 @@ import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.*;
 import io.ebean.test.LoggedSql;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
@@ -19,11 +20,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestCustomerFinder extends BaseTestCase {
 
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
+
   @Test
   public void a_runFirst_metricsAsJson_sqlInInitialCollectionOnly() {
-
-    ResetBasicData.reset();
-
     runQueries();
 
     StringBuilder buffer0 = new StringBuilder();
@@ -55,18 +58,12 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void test_ref() {
-
-    ResetBasicData.reset();
-
     Customer customer = Customer.find.ref(1);
     assertThat(customer.getId()).isEqualTo(1);
   }
 
   @Test
   public void test_all_byId_byName() {
-
-    ResetBasicData.reset();
-
     List<Customer> all = Customer.find.all();
     List<Customer> list = DB.find(Customer.class).findList();
 
@@ -84,21 +81,15 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void currentTransaction() {
-
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       Transaction t1 = DB.currentTransaction();
       Transaction t2 = Customer.find.currentTransaction();
       assertThat(t2).isSameAs(t1);
-
-    } finally {
-      DB.endTransaction();
     }
   }
 
   @Test
   public void flush() {
-
     Transaction transaction = DB.beginTransaction();
     try {
       Customer.find.currentTransaction().setBatchMode(true);
@@ -119,7 +110,6 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void test_byName_deleteById() {
-
     Customer customer = new Customer();
     customer.setName("Newbie-879879897");
 
@@ -139,16 +129,12 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void test_update() {
-
     int rowsUpdated = Customer.find.updateToInactive("Frankie Who");
     logger.debug("updated {}", rowsUpdated);
   }
 
   @Test
   public void test_ormQuery() {
-
-    ResetBasicData.reset();
-
     List<Customer> customers =
       Customer.find.byNameStatus("R", Customer.Status.NEW);
 
@@ -157,9 +143,6 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void test_nativeSingleAttribute() {
-
-    ResetBasicData.reset();
-
     List<String> names = Customer.find.namesStartingWith("F");
     assertThat(names).isNotEmpty();
   }
@@ -167,9 +150,6 @@ public class TestCustomerFinder extends BaseTestCase {
   @Test
   @IgnorePlatform(Platform.DB2) // no query plans yet, for DB2
   public void test_finders_queryPlans() {
-
-    ResetBasicData.reset();
-
     // change default collect query plan threshold to 20 micros
     QueryPlanInit init0 = new QueryPlanInit();
     init0.setAll(true);
@@ -224,9 +204,6 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void test_metricsAsJson_withAll() {
-
-    ResetBasicData.reset();
-
     runQueries();
 
     String metricsJson = server().metaInfo()
@@ -241,16 +218,13 @@ public class TestCustomerFinder extends BaseTestCase {
     assertThat(metricsJson).contains("\"name\":\"orm.Customer.findList\"");
     assertThat(metricsJson).contains("\"loc\":\"org.tests.model.basic.finder.CustomerFinder.byNameStatus\"");
     if (isH2() || isPostgresCompatible()) {
-      assertThat(metricsJson).contains("\"hash\":\"de3affa5b4bff07e19c1c012590dcde6\"");
+      assertThat(metricsJson).contains("\"hash\":\"25c7fe502c5a20ebe5b13db21e70e6a9\"");
       assertThat(metricsJson).contains("\"sql\":\"select t0.id, t0.status,");
     }
   }
 
   @Test
   public void test_metricsAsJson_minimal() {
-
-    ResetBasicData.reset();
-
     runQueries();
 
     String metricsJson = server().metaInfo()
@@ -270,9 +244,6 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void test_metricsAsJson_write() {
-
-    ResetBasicData.reset();
-
     runQueries();
 
     StringBuilder buffer = new StringBuilder();
@@ -288,9 +259,6 @@ public class TestCustomerFinder extends BaseTestCase {
 
   @Test
   public void test_metricsAsJson_writeWithHeader() {
-
-    ResetBasicData.reset();
-
     runQueries();
 
     StringBuilder buffer = new StringBuilder();

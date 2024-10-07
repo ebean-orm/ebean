@@ -5,15 +5,14 @@ import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
-import io.ebeaninternal.api.BindParams;
-import io.ebeaninternal.api.SpiDtoQuery;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.dto.DtoBeanDescriptor;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
+import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
 import javax.annotation.Nullable;
+import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +38,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   private String label;
   private ProfileLocation profileLocation;
   private final BindParams bindParams = new BindParams();
-  private Transaction transaction;
+  private SpiTransaction transaction;
 
   /**
    * Create given an underlying ORM query.
@@ -85,7 +84,13 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
 
   @Override
   public DtoQuery<T> usingTransaction(Transaction transaction) {
-    this.transaction = transaction;
+    this.transaction = (SpiTransaction) transaction;
+    return this;
+  }
+
+  @Override
+  public DtoQuery<T> usingConnection(Connection connection) {
+    this.transaction = new ExternalJdbcTransaction(connection);
     return this;
   }
 
@@ -227,7 +232,7 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public Transaction transaction() {
+  public SpiTransaction transaction() {
     return transaction;
   }
 
@@ -245,6 +250,9 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   @Override
   public DtoQuery<T> setLabel(String label) {
     this.label = label;
+    if (ormQuery != null) {
+      ormQuery.setLabel(label);
+    }
     return this;
   }
 

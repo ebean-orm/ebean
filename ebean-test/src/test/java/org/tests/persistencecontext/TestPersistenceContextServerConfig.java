@@ -2,6 +2,7 @@ package org.tests.persistencecontext;
 
 import io.ebean.*;
 import io.ebean.config.ContainerConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -30,7 +31,7 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
 
   static Database create() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName("withPCQuery");
     config.setDdlExtra(false);
 

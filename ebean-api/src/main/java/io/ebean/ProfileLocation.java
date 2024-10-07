@@ -13,21 +13,21 @@ public interface ProfileLocation {
    * Create and return a new ProfileLocation.
    */
   static ProfileLocation create() {
-    return XServiceProvider.profileLocationFactory().create();
+    return XBootstrapService.profileLocationFactory().create();
   }
 
   /**
    * Create and return a new ProfileLocation with line number.
    */
   static ProfileLocation createWithLine() {
-    return XServiceProvider.profileLocationFactory().createWithLine();
+    return XBootstrapService.profileLocationFactory().createWithLine();
   }
 
   /**
    * Create and return a new ProfileLocation with a given lineNumber and label.
    */
   static ProfileLocation create(String label) {
-    return XServiceProvider.profileLocationFactory().create(label);
+    return XBootstrapService.profileLocationFactory().create(label);
   }
 
   /**

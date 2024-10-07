@@ -159,7 +159,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       lazyLoadParent.addSelectExported(ctx, prefix);
     }
     if (readId) {
-      appendSelectId(ctx, idBinder.getBeanProperty());
+      appendSelectId(ctx, idBinder.beanProperty());
     }
     for (STreeProperty property : properties) {
       if (!property.isAggregation()) {
@@ -201,7 +201,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
       if (!subQuery && inheritInfo != null) {
         ctx.appendColumn(inheritInfo.getDiscriminatorColumn());
       }
-      appendSelectId(ctx, idBinder.getBeanProperty());
+      appendSelectId(ctx, idBinder.beanProperty());
     }
     appendSelect(ctx, subQuery, properties);
     for (SqlTreeNode child : children) {
@@ -379,16 +379,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
 
   @Override
-  public void unselectLobs() {
+  public void unselectLobsForPlatform() {
     if (children != null) {
       for (SqlTreeNode child : children) {
-        child.unselectLobs();
+        child.unselectLobsForPlatform();
       }
     }
     if (hasLob()) {
       List<STreeProperty> lst = new ArrayList<>();
       for (STreeProperty prop : properties) {
-        if (!prop.isDbLob()) {
+        if (!prop.isLobForPlatform()) {
           lst.add(prop);
         }
       }
@@ -399,7 +399,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private boolean hasLob() {
     for (STreeProperty prop : properties) {
-      if (prop.isDbLob()) {
+      if (prop.isLobForPlatform()) {
         return true;
       }
     }

@@ -1,5 +1,6 @@
 package org.tests.basic;
 
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.FutureIds;
@@ -28,8 +29,13 @@ public class TestFetchId extends BaseTestCase {
       .gt("details.id", 0)
       .query();
 
+    LoggedSql.start();
     List<Object> ids = query.findIds();
     assertThat(ids).isNotEmpty();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).doesNotContain("order by");
+    assertThat(sql.get(0)).doesNotContain("join o_order_detail t1");
 
     FutureIds<Order> futureIds = query.findFutureIds();
 

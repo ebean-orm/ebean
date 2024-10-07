@@ -514,7 +514,7 @@ final class BeanDescriptorCacheHelp<T> {
 
     if (natKeys != null && !natKeys.isEmpty()) {
       if (natLog.isLoggable(DEBUG)) {
-        natLog.log(DEBUG, " MPUT {0}({1}, {2})", cacheName, naturalKey, natKeys.keySet());
+        natLog.log(DEBUG, " MPUT {0}({1}, {2})", cacheName, Arrays.toString(naturalKey), natKeys.keySet());
       }
       naturalKeyCache.putAll(natKeys);
     }
@@ -552,7 +552,7 @@ final class BeanDescriptorCacheHelp<T> {
       if (val == null) {
         return null;
       }
-      sb.append(val).append(";");
+      sb.append(val).append(';');
     }
     return sb.toString();
   }

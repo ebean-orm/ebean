@@ -1,14 +1,10 @@
 package io.ebean;
 
 import io.ebean.config.ContainerConfig;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.service.SpiContainer;
 import io.ebean.service.SpiContainerFactory;
+import jakarta.persistence.PersistenceException;
 
-import javax.persistence.PersistenceException;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.ServiceLoader;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -76,9 +72,10 @@ public final class DatabaseFactory {
    *
    * }</pre>
    */
-  public static Database create(DatabaseConfig config) {
+  public static Database create(DatabaseBuilder builder) {
     lock.lock();
     try {
+      var config = builder.settings();
       if (config.getName() == null) {
         throw new PersistenceException("The name is null (it is required)");
       }
@@ -102,7 +99,7 @@ public final class DatabaseFactory {
   /**
    * Create using the DatabaseConfig additionally specifying a classLoader to use as the context class loader.
    */
-  public static Database createWithContextClassLoader(DatabaseConfig config, ClassLoader classLoader) {
+  public static Database createWithContextClassLoader(DatabaseBuilder config, ClassLoader classLoader) {
     lock.lock();
     try {
       ClassLoader currentContextLoader = Thread.currentThread().getContextClassLoader();
@@ -132,7 +129,7 @@ public final class DatabaseFactory {
     }
   }
 
-  private static Database createInternal(DatabaseConfig config) {
+  private static Database createInternal(DatabaseBuilder.Settings config) {
     return container(config.getContainerConfig()).createServer(config);
   }
 
@@ -146,12 +143,9 @@ public final class DatabaseFactory {
     if (container != null) {
       return container;
     }
-
     if (containerConfig == null) {
       // effectively load configuration from ebean.properties
-      Properties properties = DbPrimary.getProperties();
       containerConfig = new ContainerConfig();
-      containerConfig.loadFromProperties(properties);
     }
     container = createContainer(containerConfig);
     return container;
@@ -160,11 +154,11 @@ public final class DatabaseFactory {
   /**
    * Create the container instance using the configuration.
    */
-  protected static SpiContainer createContainer(ContainerConfig containerConfig) {
-    Iterator<SpiContainerFactory> factories = ServiceLoader.load(SpiContainerFactory.class).iterator();
-    if (factories.hasNext()) {
-      return factories.next().create(containerConfig);
+  private static SpiContainer createContainer(ContainerConfig containerConfig) {
+    SpiContainerFactory factory = XBootstrapService.containerFactory();
+    if (factory == null) {
+      throw new IllegalStateException("Service loader didn't find a SpiContainerFactory?");
     }
-    throw new IllegalStateException("Service loader didn't find a SpiContainerFactory?");
+    return factory.create(containerConfig);
   }
 }

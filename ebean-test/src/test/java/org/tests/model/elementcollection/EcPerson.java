@@ -2,7 +2,7 @@ package org.tests.model.elementcollection;
 
 import io.ebean.annotation.Cache;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

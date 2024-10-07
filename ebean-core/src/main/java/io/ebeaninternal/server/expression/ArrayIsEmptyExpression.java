@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.io.IOException;
@@ -30,7 +31,7 @@ final class ArrayIsEmptyExpression extends AbstractExpression {
     } else {
       builder.append("ArrayIsNotEmpty[");
     }
-    builder.append(propName).append("]");
+    builder.append(propName).append(']');
   }
 
   @Override
@@ -49,7 +50,7 @@ final class ArrayIsEmptyExpression extends AbstractExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     // nothing to bind
   }
 }

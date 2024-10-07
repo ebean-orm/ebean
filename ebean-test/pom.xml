@@ -4,12 +4,17 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.20.2-SNAPSHOT</version>
+    <version>14.6.0</version>
   </parent>
 
   <name>ebean test</name>
   <description>Testing support for Ebean</description>
   <artifactId>ebean-test</artifactId>
+
+  <properties>
+    <bytebuddy.version>1.14.17</bytebuddy.version>
+    <assertj.version>3.26.0</assertj.version>
+  </properties>
 
   <dependencies>
 
@@ -28,20 +33,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
     </dependency>
 
     <dependency>
@@ -64,14 +69,26 @@
       <version>${ebean-test-containers.version}</version>
     </dependency>
 
+    <!-- support JDK 22+ -->
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy</artifactId>
+      <version>${bytebuddy.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.bytebuddy</groupId>
+      <artifactId>byte-buddy-agent</artifactId>
+      <version>${bytebuddy.version}</version>
+    </dependency>
+
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.23.1</version>
+      <version>${assertj.version}</version>
     </dependency>
 
     <!-- Including JAXB for DB Migration generation with Java 11+ -->
-    <!-- JAVAX-DEPENDENCY-START -->
+    <!-- JAVAX-DEPENDENCY-START ___
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
@@ -83,20 +100,20 @@
       <version>1.2.1</version>
       <scope>provided</scope>
     </dependency>
-    <!-- JAVAX-DEPENDENCY-END -->
-    <!-- JAKARTA-DEPENDENCY-START ___
+    ____ JAVAX-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-START -->
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
       <version>4.0.0</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>4.0.0</version>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>4.0.3</version>
       <scope>runtime</scope>
     </dependency>
-    ____ JAKARTA-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-END -->
 
     <!-- Not strictly required but bring in H2 Driver because we use it so much -->
     <dependency>
@@ -118,28 +135,28 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-joda-time</artifactId>
-      <version>13.18.0</version>
+      <version>14.0.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-jsonnode</artifactId>
-      <version>13.18.0</version>
+      <version>14.0.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-mapper</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -196,7 +213,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.5.1</version>
+      <version>42.7.2</version>
       <exclusions>
         <exclusion>
           <groupId>org.checkerframework</groupId>
@@ -272,18 +289,11 @@
       <scope>test</scope>
     </dependency>
 
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.11</version>
-      <scope>test</scope>
-    </dependency>
-
     <!-- provided scope for Java 11 compilation (not required for Java 17+) -->
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.1</version>
+      <version>1.5</version>
       <scope>provided</scope>
     </dependency>
 
@@ -295,11 +305,11 @@
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.34</version>
+        <version>2.40</version>
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.17.1</tile>
+            <tile>io.ebean.tile:enhancement:14.6.0</tile>
           </tiles>
         </configuration>
       </plugin>

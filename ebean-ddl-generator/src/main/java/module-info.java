@@ -7,7 +7,7 @@ module io.ebean.ddl.generator {
 
   requires transitive io.ebean.ddl.runner;
   requires transitive io.ebean.core;
-  requires transitive java.xml.bind;
+  requires transitive jakarta.xml.bind;
   requires io.ebean.core.type;
   requires io.ebean.migration;
 
@@ -15,4 +15,6 @@ module io.ebean.ddl.generator {
 
   // support existing tests
   exports io.ebeaninternal.extraddl.model to io.ebean.test;
+
+  opens io.ebeaninternal.extraddl.model to jakarta.xml.bind;
 }

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.20.2-SNAPSHOT</version>
+    <version>14.6.0</version>
   </parent>
 
   <name>ebean querybean</name>
@@ -17,7 +17,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
       <scope>provided</scope>
     </dependency>
 
@@ -63,28 +63,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>querybean-generator</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
+      <version>14.6.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -95,6 +81,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>querybean-generator</artifactId>
+      <version>14.6.0</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -103,11 +96,11 @@
       <plugin>
         <groupId>io.repaint.maven</groupId>
         <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.34</version>
+        <version>2.40</version>
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:13.17.1</tile>
+            <tile>io.ebean.tile:enhancement:14.6.0</tile>
           </tiles>
         </configuration>
       </plugin>

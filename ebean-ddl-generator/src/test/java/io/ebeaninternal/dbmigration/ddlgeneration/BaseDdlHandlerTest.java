@@ -1,5 +1,6 @@
 package io.ebeaninternal.dbmigration.ddlgeneration;
 
+import io.ebean.DatabaseBuilder;
 import io.localtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.config.DatabaseConfig;

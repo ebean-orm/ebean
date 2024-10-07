@@ -1,0 +1,18 @@
+ebean:
+  dbSchema: mynetgisapp
+  geometrySRID: 4674
+
+  test:
+#    useDocker: false
+#    shutdown: stop # stop | remove
+    platform: postgis
+    ddlMode: dropCreate # none | dropCreate | create | migration | createOnly | migrationDropCreate
+    dbName: mynetgisapp
+
+    postgis:
+      containerName: ebeanbuild_postgis2
+      port: 9433
+      image: ghcr.io/baosystems/postgis:15
+#      extensions: postgis
+#      url: jdbc:postgresql_lwgis://localhost:6432/mygisapp
+#      driver: org.postgis.DriverWrapperLW

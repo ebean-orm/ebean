@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.core;
 
+import io.ebean.InsertOptions;
 import io.ebean.ValuePair;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.EntityBean;
@@ -20,9 +21,9 @@ import io.ebeanservice.docstore.api.DocStoreUpdate;
 import io.ebeanservice.docstore.api.DocStoreUpdateContext;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
-import javax.persistence.EntityNotFoundException;
-import javax.persistence.OptimisticLockException;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.OptimisticLockException;
+import jakarta.persistence.PersistenceException;
 import java.io.IOException;
 import java.sql.Statement;
 import java.util.*;
@@ -124,6 +125,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Many-to-many intersection table changes that are held for later batch processing.
    */
   private List<SaveMany> saveMany;
+  private InsertOptions insertOptions;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -378,6 +380,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   @Override
   public Set<String> updatedProperties() {
     return intercept.dirtyPropertyNames();
+  }
+
+  public boolean isChangedProperty(int propertyIndex) {
+    if (dirtyProperties == null) {
+      return intercept.isChangedProperty(propertyIndex);
+    } else {
+      return dirtyProperties[propertyIndex];
+    }
   }
 
   /**
@@ -865,8 +875,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
     setNotifyCache();
     boolean isChangeLog = beanDescriptor.isChangeLog();
-    if (type == Type.UPDATE && (isChangeLog || notifyCache || docStoreMode == DocStoreMode.UPDATE)) {
-      // get the dirty properties for update notification to the doc store
+    if (type == Type.UPDATE) {
+      // get the dirty properties for notify cache & orphanRemoval of vanilla collection detection
       dirtyProperties = intercept.dirtyProperties();
     }
     if (isChangeLog) {
@@ -909,21 +919,27 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private void controllerPost() {
-    switch (type) {
-      case INSERT:
-        controller.postInsert(this);
-        break;
-      case UPDATE:
-        controller.postUpdate(this);
-        break;
-      case DELETE_SOFT:
-        controller.postSoftDelete(this);
-        break;
-      case DELETE:
-        controller.postDelete(this);
-        break;
-      default:
-        break;
+    boolean old = transaction.isFlushOnQuery();
+    transaction.setFlushOnQuery(false);
+    try {
+      switch (type) {
+        case INSERT:
+          controller.postInsert(this);
+          break;
+        case UPDATE:
+          controller.postUpdate(this);
+          break;
+        case DELETE_SOFT:
+          controller.postSoftDelete(this);
+          break;
+        case DELETE:
+          controller.postDelete(this);
+          break;
+        default:
+          break;
+      }
+    } finally {
+      transaction.setFlushOnQuery(old);
     }
   }
 
@@ -1407,5 +1423,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void setGeneratedId() {
     beanDescriptor.setGeneratedId(entityBean, transaction);
+  }
+
+  public void setInsertOptions(InsertOptions insertOptions) {
+    this.insertOptions  = insertOptions;
+  }
+
+  public InsertOptions insertOptions() {
+    return insertOptions;
   }
 }

@@ -2,7 +2,7 @@ package org.tests.idkeys.db;
 
 import io.ebean.Model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ea_object")

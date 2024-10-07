@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.h2.H2Platform;
 import io.ebean.core.type.DataReader;
@@ -13,7 +14,7 @@ import org.tests.model.basic.enums.MySex;
 import org.tests.model.ivo.Money;
 import org.tests.model.ivo.converter.MoneyTypeConverter;
 
-import javax.persistence.EnumType;
+import jakarta.persistence.EnumType;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.GregorianCalendar;
@@ -121,7 +122,7 @@ class TestTypeManager extends BaseTest {
   }
 
   private DefaultTypeManager createTypeManager() {
-    DatabaseConfig config = new DatabaseConfig();
+    var config = new DatabaseConfig();
     config.setDatabasePlatform(new H2Platform());
 
     BootupClasses bootupClasses = new BootupClasses();
@@ -131,7 +132,7 @@ class TestTypeManager extends BaseTest {
   }
 
   private DefaultTypeManager createTypeManagerDefaultEnumTypeString() {
-    DatabaseConfig config = new DatabaseConfig();
+    var config = new DatabaseConfig();
     config.setDatabasePlatform(new H2Platform());
     config.setDefaultEnumType(EnumType.STRING);
 

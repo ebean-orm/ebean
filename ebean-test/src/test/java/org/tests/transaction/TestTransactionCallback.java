@@ -6,7 +6,7 @@ import io.ebean.Transaction;
 import io.ebean.TransactionCallbackAdapter;
 import org.junit.jupiter.api.Test;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,11 +31,8 @@ public class TestTransactionCallback extends BaseTestCase {
     assertEquals(0, countPreRollback);
     assertEquals(0, countPostRollback);
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       DB.register(new MyCallback());
-    } finally {
-      DB.rollbackTransaction();
     }
 
     assertEquals(1, countPreCommit);

@@ -30,7 +30,7 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   @Override
   public void appendDistinctOn(DbSqlContext ctx, boolean subQuery) {
     ctx.pushTableAlias(prefix);
-    appendSelectId(ctx, idBinder.getBeanProperty());
+    appendSelectId(ctx, idBinder.beanProperty());
     ctx.popTableAlias();
   }
 

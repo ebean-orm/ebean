@@ -1,15 +1,15 @@
 package io.ebeaninternal.api;
 
 import io.ebeaninternal.server.core.SpiOrmQueryRequest;
-import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.expression.platform.DbExpressionHandler;
+import io.ebeaninternal.server.expression.platform.DbExpressionRequest;
 
 import java.util.List;
 
 /**
  * Request object used for gathering expression sql and bind values.
  */
-public interface SpiExpressionRequest {
+public interface SpiExpressionRequest extends SpiExpressionBind, DbExpressionRequest {
 
   /**
    * Return the DB specific handler for JSON and ARRAY expressions.
@@ -22,11 +22,6 @@ public interface SpiExpressionRequest {
   String parseDeploy(String logicalProp);
 
   /**
-   * Return the bean descriptor for the root type.
-   */
-  BeanDescriptor<?> descriptor();
-
-  /**
    * Return the associated QueryRequest.
    */
   SpiOrmQueryRequest<?> queryRequest();
@@ -34,7 +29,14 @@ public interface SpiExpressionRequest {
   /**
    * Append to the expression sql without any parsing.
    */
+  @Override
   SpiExpressionRequest append(String expression);
+
+  /**
+   * Append to the expression sql without any parsing.
+   */
+  @Override
+  SpiExpressionRequest append(char c);
 
   /**
    * Append to the expression sql with logical property parsing to db columns with logical path prefix.
@@ -42,22 +44,13 @@ public interface SpiExpressionRequest {
    * This is a fast path case when expression is a bean property path and falls back to using parse()
    * when that isn't the case.
    */
+  @Override
   SpiExpressionRequest property(String expression);
 
   /**
    * Append to the expression sql with logical property parsing to db columns with logical path prefix.
    */
   SpiExpressionRequest parse(String expression);
-
-  /**
-   * Add an encryption key to bind to this request.
-   */
-  void addBindEncryptKey(Object encryptKey);
-
-  /**
-   * Add a bind value to this request.
-   */
-  void addBindValue(Object bindValue);
 
   /**
    * Return the accumulated expression sql for all expressions in this request.
@@ -78,11 +71,6 @@ public interface SpiExpressionRequest {
    * Append a DB Like clause.
    */
   void appendLike(boolean rawLikeExpression);
-
-  /**
-   * Escapes a string to use it as exact match in Like clause.
-   */
-  String escapeLikeString(String value);
 
   /**
    * Append IN expression taking into account platform and type support for Multi-value.

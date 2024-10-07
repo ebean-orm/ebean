@@ -141,7 +141,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (SpiExpression expr : exprList.internalList()) {
       expr.addBindValues(request);
     }
@@ -152,7 +152,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
     List<SpiExpression> list = exprList.internalList();
     if (!list.isEmpty()) {
       request.append(type.prefix());
-      request.append("(");
+      request.append('(');
       for (int i = 0; i < list.size(); i++) {
         SpiExpression item = list.get(i);
         if (i > 0) {
@@ -160,7 +160,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
         }
         item.addSql(request);
       }
-      request.append(")");
+      request.append(')');
     }
   }
 
@@ -176,12 +176,12 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
    */
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append(type).append("[");
+    builder.append(type).append('[');
     for (SpiExpression expr : exprList.internalList()) {
       expr.queryPlanHash(builder);
-      builder.append(",");
+      builder.append(',');
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override
@@ -314,6 +314,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
 
   @Override
   public ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params) {
+    throw new IllegalStateException("filterMany not allowed on Junction expression list");
+  }
+
+  @Override
+  public ExpressionList<T> filterManyRaw(String manyProperty, String rawExpression, Object... params) {
     throw new IllegalStateException("filterMany not allowed on Junction expression list");
   }
 

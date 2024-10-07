@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.avaje.lang.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;
@@ -226,6 +227,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   ProfileLocation profileLocation();
 
   /**
+   * Return the SQL hint to include in the query.
+   */
+  String hint();
+
+  /**
    * Return the label set on the query.
    */
   String label();
@@ -234,6 +240,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return the label manually set on the query or from the profile location.
    */
   String planLabel();
+
+  /**
+   * Return the transaction explicitly assigned or null.
+   */
+  SpiTransaction transaction();
 
   /**
    * Return true if this query should not use the read only data source.
@@ -334,7 +345,7 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   /**
    * Set the on a secondary query given the label, relativePath and profile location of the parent query.
    */
-  void setProfilePath(String label, String relativePath, ProfileLocation profileLocation);
+  void setProfilePath(String label, String relativePath, @Nullable ProfileLocation profileLocation);
 
   /**
    * Set the query mode.
@@ -427,6 +438,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    */
   @Override
   SpiQuery<T> copy();
+
+  /**
+   * Return the distinct on clause.
+   */
+  String distinctOn();
 
   /**
    * Return a copy of the query attaching to a different EbeanServer.
@@ -538,7 +554,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if the query should include the Id property.
    * <p>
    * distinct and single attribute queries exclude the Id property.
-   * </p>
    */
   boolean isWithId();
 
@@ -565,7 +580,12 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   /**
    * Convert joins as necessary to query joins etc.
    */
-  SpiQuerySecondary convertJoins();
+  SpiQueryManyJoin convertJoins();
+
+  /**
+   * Return secondary queries if required.
+   */
+  SpiQuerySecondary secondaryQuery();
 
   /**
    * Return the TransactionContext.
@@ -647,6 +667,16 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * </p>
    */
   ObjectGraphNode parentNode();
+
+  /**
+   * Set that this is a future query that will execute in the background.
+   */
+  void usingFuture();
+
+  /**
+   * Return true if this is a future query.
+   */
+  boolean isUsingFuture();
 
   /**
    * Return false when this is a lazy load or refresh query for a bean.
@@ -871,17 +901,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if read auditing is disabled on this query.
    */
   boolean isDisableReadAudit();
-
-  /**
-   * Return true if this is a query executing in the background.
-   */
-  boolean isFutureFetch();
-
-  /**
-   * Set to true to indicate the query is executing in a background thread
-   * asynchronously.
-   */
-  void setFutureFetch(boolean futureFetch);
 
   /**
    * Set the readEvent for future queries (as prepared in foreground thread).

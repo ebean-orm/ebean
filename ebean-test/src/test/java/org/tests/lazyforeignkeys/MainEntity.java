@@ -4,9 +4,9 @@ import io.ebean.annotation.Formula;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.SoftDelete;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "main_entity")

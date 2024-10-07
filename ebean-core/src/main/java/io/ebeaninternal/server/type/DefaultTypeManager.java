@@ -1,11 +1,9 @@
 package io.ebeaninternal.server.type;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.ebean.DatabaseBuilder;
 import io.ebean.annotation.*;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.JsonConfig;
-import io.ebean.config.PlatformConfig;
-import io.ebean.config.ScalarTypeConverter;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.*;
@@ -19,8 +17,8 @@ import io.ebeaninternal.server.core.ServiceUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 
-import javax.persistence.AttributeConverter;
-import javax.persistence.EnumType;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.EnumType;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -78,7 +76,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Create the DefaultTypeManager.
    */
-  public DefaultTypeManager(DatabaseConfig config, BootupClasses bootupClasses) {
+  public DefaultTypeManager(DatabaseBuilder.Settings config, BootupClasses bootupClasses) {
     this.jsonDateTime = config.getJsonDateTime();
     this.jsonDate = config.getJsonDate();
     this.typeMap = new ConcurrentHashMap<>();
@@ -110,7 +108,7 @@ public final class DefaultTypeManager implements TypeManager {
     }
   }
 
-  private void loadGeoTypeBinder(DatabaseConfig config) {
+  private void loadGeoTypeBinder(DatabaseBuilder.Settings config) {
     GeoTypeProvider provider = config.getServiceObject(GeoTypeProvider.class);
     if (provider == null) {
       provider = ServiceUtil.service(GeoTypeProvider.class);
@@ -141,7 +139,7 @@ public final class DefaultTypeManager implements TypeManager {
   /**
    * Load custom scalar types registered via ExtraTypeFactory and ServiceLoader.
    */
-  private void loadTypesFromProviders(DatabaseConfig config, Object objectMapper) {
+  private void loadTypesFromProviders(DatabaseBuilder.Settings config, Object objectMapper) {
     for (ExtraTypeFactory plugin : ServiceLoader.load(ExtraTypeFactory.class)) {
       for (ScalarType<?> type : plugin.createTypes(config, objectMapper)) {
         add(type);
@@ -618,7 +616,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
 
-  private Object initObjectMapper(DatabaseConfig config) {
+  private Object initObjectMapper(DatabaseBuilder.Settings config) {
     Object objectMapper = config.getObjectMapper();
     if (objectMapper == null) {
       objectMapper = InitObjectMapper.init();
@@ -676,7 +674,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
 
-  private void initialiseJavaTimeTypes(DatabaseConfig config) {
+  private void initialiseJavaTimeTypes(DatabaseBuilder.Settings config) {
     ZoneId zoneId = zoneId(config);
 
     typeMap.put(java.nio.file.Path.class, new ScalarTypePath());
@@ -704,7 +702,7 @@ public final class DefaultTypeManager implements TypeManager {
     addType(Duration.class, (durationNanos) ? new ScalarTypeDurationWithNanos() : new ScalarTypeDuration());
   }
 
-  private ZoneId zoneId(DatabaseConfig config) {
+  private ZoneId zoneId(DatabaseBuilder.Settings config) {
     final String dataTimeZone = config.getDataTimeZone();
     return (dataTimeZone == null) ? ZoneOffset.systemDefault() : TimeZone.getTimeZone(dataTimeZone).toZoneId();
   }
@@ -718,7 +716,7 @@ public final class DefaultTypeManager implements TypeManager {
    * Register all the standard types supported. This is the standard JDBC types
    * plus some other common types such as java.util.Date and java.util.Calendar.
    */
-  private void initialiseStandard(DatabaseConfig config) {
+  private void initialiseStandard(DatabaseBuilder.Settings config) {
     DatabasePlatform databasePlatform = config.getDatabasePlatform();
     int platformClobType = databasePlatform.clobDbType();
     int platformBlobType = databasePlatform.blobDbType();

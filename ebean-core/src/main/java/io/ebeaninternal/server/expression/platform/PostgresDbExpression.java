@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression.platform;
 
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.expression.Op;
 
 /**
@@ -14,17 +13,17 @@ final class PostgresDbExpression extends BaseDbExpression {
   }
 
   @Override
-  public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
+  public void json(DbExpressionRequest request, String propName, String path, Op operator, Object value) {
     String[] paths = path.split("\\.");
     if (paths.length == 1) {
       // (t0.content ->> 'title') = 'Some value'
-      request.append("(").property(propName).append(" ->> '").append(path).append("')");
+      request.append('(').property(propName).append(" ->> '").append(path).append("')");
     } else {
       // (t0.content #>> '{path,inner}') = 'Some value'
-      request.append("(").property(propName).append(" #>> '{");
+      request.append('(').property(propName).append(" #>> '{");
       for (int i = 0; i < paths.length; i++) {
         if (i > 0) {
-          request.append(",");
+          request.append(',');
         }
         request.append(paths[i]);
       }
@@ -34,7 +33,7 @@ final class PostgresDbExpression extends BaseDbExpression {
   }
 
   @Override
-  public void arrayContains(SpiExpressionRequest request, String propName, boolean contains, Object... values) {
+  public void arrayContains(DbExpressionRequest request, String propName, boolean contains, Object... values) {
     if (!contains) {
       request.append("not (");
     }
@@ -42,14 +41,14 @@ final class PostgresDbExpression extends BaseDbExpression {
     for (int i = 1; i < values.length; i++) {
       request.append(",?");
     }
-    request.append("]").append(PostgresCast.cast(values[0], true));
+    request.append(']').append(PostgresCast.cast(values[0], true));
     if (!contains) {
-      request.append(")");
+      request.append(')');
     }
   }
 
   @Override
-  public void arrayIsEmpty(SpiExpressionRequest request, String propName, boolean empty) {
+  public void arrayIsEmpty(DbExpressionRequest request, String propName, boolean empty) {
     request.append("coalesce(cardinality(").property(propName).append("),0)");
     if (empty) {
       request.append(" = 0");

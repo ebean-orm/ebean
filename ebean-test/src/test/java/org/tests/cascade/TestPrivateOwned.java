@@ -71,7 +71,7 @@ public class TestPrivateOwned extends BaseTestCase {
     DB.save(m0);
 
     List<String> loggedSql = LoggedSql.stop();
-    assertThat(loggedSql).hasSize(2);
+    assertThat(loggedSql).hasSize(3);
     assertThat(loggedSql.get(0)).contains("delete from t_detail_with_other_namexxxyy where id=?");
     assertSqlBind(loggedSql.get(1));
 

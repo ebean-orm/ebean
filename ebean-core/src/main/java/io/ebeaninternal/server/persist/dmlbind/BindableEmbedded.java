@@ -24,18 +24,12 @@ final class BindableEmbedded implements Bindable {
   }
 
   @Override
-  public String toString() {
-    return "BindableEmbedded " + embProp + " items:" + Arrays.toString(items);
-  }
-
-  @Override
   public boolean isDraftOnly() {
     return embProp.isDraftOnly();
   }
 
   @Override
   public void dmlAppend(GenerateDmlRequest request) {
-
     for (Bindable item : items) {
       item.dmlAppend(request);
     }
@@ -50,7 +44,6 @@ final class BindableEmbedded implements Bindable {
 
   @Override
   public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
-
     // get the embedded bean
     EntityBean embBean = (EntityBean) embProp.getValue(bean);
     if (embBean == null) {

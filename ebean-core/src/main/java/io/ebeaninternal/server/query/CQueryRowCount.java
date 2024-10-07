@@ -8,7 +8,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -58,7 +58,7 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
       .append("] rows[").append(rowCount)
       .append("] type[").append(desc.fullName())
       .append("] predicates[").append(predicates.logWhereSql())
-      .append("] bind[").append(bindLog).append("]");
+      .append("] bind[").append(bindLog).append(']');
 
     return sb.toString();
   }

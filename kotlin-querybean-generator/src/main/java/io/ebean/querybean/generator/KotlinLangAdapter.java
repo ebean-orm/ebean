@@ -3,17 +3,7 @@ package io.ebean.querybean.generator;
 class KotlinLangAdapter implements LangAdapter {
 
   @Override
-  public void beginClass(Append writer, String shortName) {
-    writer.append("class Q%s : TQRootBean<%1$s, Q%1$s> {", shortName).eol();
-  }
-
-  @Override
-  public void beginAssocClass(Append writer, String shortName, String origShortName) {
-//    writer.append("class Q%s<R> : TQAssocBean<%s,R> {", shortName, origShortName).eol();
-  }
-
-  @Override
-  public void alias(Append writer, String shortName) {
+  public void alias(Append writer, String shortName, String fullName) {
     writer.append("  companion object {").eol();
     writer.append("    /**").eol();
     writer.append("     * shared 'Alias' instance used to provide").eol();
@@ -25,7 +15,7 @@ class KotlinLangAdapter implements LangAdapter {
     writer.append("     * Return a query bean used to build a FetchGroup.").eol();
     writer.append("     */").eol();
     writer.append("    fun forFetchGroup(): Q%s {", shortName).eol();
-    writer.append("      return Q%s(FetchGroup.queryFor(%s::class.java));", shortName, shortName).eol();
+    writer.append("      return Q%s(io.ebean.FetchGroup.queryFor(%s::class.java));", shortName, fullName).eol();
     writer.append("    }").eol();
     writer.append("  }").eol().eol();
   }
@@ -59,31 +49,32 @@ class KotlinLangAdapter implements LangAdapter {
   }
 
   @Override
-  public void rootBeanConstructor(Append writer, String shortName, String dbName) {
+  public void rootBeanConstructor(Append writer, String shortName, String dbName, String fullName) {
     String name = (dbName == null) ? "default" : dbName;
     writer.append("  /**").eol();
     writer.append("   * Construct using the %s Database.", name).eol();
     writer.append("   */").eol();
     if (dbName == null) {
-      writer.append("  constructor() : super(%s::class.java)", shortName).eol().eol();
+      writer.append("  constructor() : super(%s::class.java)", fullName).eol().eol();
     } else {
-      writer.append("  constructor() : super(%s::class.java, DB.byName(\"%s\"))", shortName, dbName).eol().eol();
+      writer.append("  constructor() : super(%s::class.java, io.ebean.DB.byName(\"%s\"))", fullName, dbName).eol().eol();
     }
 
     writer.append("  /**").eol();
-    writer.append("   * Construct with a given Transaction.", name).eol();
+    writer.append("   * @deprecated migrate to query.usingTransaction()", name).eol();
     writer.append("   */").eol();
+    writer.append("   @Deprecated(message=\"migrate to query.usingTransaction()\")").eol();
     if (dbName == null) {
-      writer.append("  constructor(transaction: Transaction) : super(%s::class.java, transaction)", shortName).eol().eol();
+      writer.append("  constructor(transaction: io.ebean.Transaction) : super(%s::class.java, transaction)", fullName).eol().eol();
     } else {
-      writer.append("  constructor(transaction: Transaction) : super(%s::class.java, DB.byName(\"%s\"), transaction)", shortName, dbName).eol().eol();
+      writer.append("  constructor(transaction: io.ebean.Transaction) : super(%s::class.java, io.ebean.DB.byName(\"%s\"), transaction)", fullName, dbName).eol().eol();
     }
 
     writer.eol();
     writer.append("  /**").eol();
     writer.append("   * Construct with a given Database.").eol();
     writer.append("   */").eol();
-    writer.append("  constructor(database: Database) : super(%s::class.java, database)", shortName).eol().eol();
+    writer.append("  constructor(database: io.ebean.Database) : super(%s::class.java, database)", fullName).eol().eol();
 
     writer.append("  /**").eol();
     writer.append("   * Construct for Alias.").eol();
@@ -93,7 +84,14 @@ class KotlinLangAdapter implements LangAdapter {
     writer.append("  /**").eol();
     writer.append("   * Private constructor for FetchGroup building.").eol();
     writer.append("   */").eol();
-    writer.append("  private constructor(fetchGroupQuery: Query<%s>) : super(fetchGroupQuery)", shortName).eol();
+    writer.append("  private constructor(fetchGroupQuery: io.ebean.Query<%s>) : super(fetchGroupQuery)", fullName).eol();
+
+    writer.eol();
+    writer.append("  /** Return a copy of the query. */").eol();
+    writer.append("  override fun copy() : Q%s {", shortName).eol();
+    writer.append("    return Q%s(query().copy())", shortName).eol();
+    writer.append("  }").eol();
+    writer.eol();
   }
 
   @Override

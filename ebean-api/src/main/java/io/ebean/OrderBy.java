@@ -8,13 +8,11 @@ import java.util.Objects;
 /**
  * Represents an Order By for a Query.
  * <p>
- * Is a ordered list of OrderBy.Property objects each specifying a property and
+ * Is an ordered list of OrderBy.Property objects each specifying a property and
  * whether it is ascending or descending order.
- * </p>
  * <p>
- * Typically you will not construct an OrderBy yourself but use one that exists
+ * Typically, you will not construct an OrderBy yourself but use one that exists
  * on the Query object.
- * </p>
  */
 public class OrderBy<T> implements Serializable {
 
@@ -25,8 +23,22 @@ public class OrderBy<T> implements Serializable {
   private final List<Property> list;
 
   /**
+   * Create an OrderBy parsing the given order by clause.
+   * <p>
+   * The order by clause follows SQL order by clause with comma's between each
+   * property and optionally "asc" or "desc" to represent ascending or
+   * descending order respectively.
+   */
+  public static <P> OrderBy<P> of(String orderByClause) {
+    return new OrderBy<>(orderByClause);
+  }
+
+  /**
+   * @deprecated This method will be removed from public API.
+   * <p>
    * Create an empty OrderBy with no associated query.
    */
+  @Deprecated(forRemoval = true)
   public OrderBy() {
     this.list = new ArrayList<>(3);
   }
@@ -36,20 +48,17 @@ public class OrderBy<T> implements Serializable {
   }
 
   /**
-   * Create an orderBy parsing the order by clause.
-   * <p>
-   * The order by clause follows SQL order by clause with comma's between each
-   * property and optionally "asc" or "desc" to represent ascending or
-   * descending order respectively.
-   * </p>
+   * @deprecated migrate to {@link OrderBy#of(String)}.
    */
+  @Deprecated(forRemoval = true)
   public OrderBy(String orderByClause) {
     this(null, orderByClause);
   }
 
   /**
-   * Construct with a given query and order by clause.
+   * @deprecated This method will be removed from public API.
    */
+  @Deprecated(forRemoval = true)
   public OrderBy(Query<T> query, String orderByClause) {
     this.query = query;
     this.list = new ArrayList<>(3);
@@ -110,8 +119,11 @@ public class OrderBy<T> implements Serializable {
   }
 
   /**
+   * @deprecated This method will become internal only API.
+   * <p>
    * Return a copy of this OrderBy with the path trimmed.
    */
+  @Deprecated(forRemoval = true)
   public OrderBy<T> copyWithTrim(String path) {
     List<Property> newList = new ArrayList<>(list.size());
     for (Property aList : list) {
@@ -186,15 +198,15 @@ public class OrderBy<T> implements Serializable {
     if (list.isEmpty()) {
       return null;
     }
-    StringBuilder sb = new StringBuilder();
+    var append = new StringAppend();
     for (int i = 0; i < list.size(); i++) {
       Property property = list.get(i);
       if (i > 0) {
-        sb.append(", ");
+        append.append(", ");
       }
-      sb.append(property.toStringFormat());
+      property.toStringFormat(append);
     }
-    return sb.toString();
+    return append.toString();
   }
 
   @Override
@@ -229,6 +241,55 @@ public class OrderBy<T> implements Serializable {
   public OrderBy<T> clear() {
     list.clear();
     return this;
+  }
+
+  /**
+   * Append the order by clause.
+   */
+  public interface Append {
+
+    /**
+     * Append a property expression.
+     */
+    Append property(String property);
+
+    /**
+     * Append a literal.
+     */
+    Append append(String literal);
+
+    /**
+     * Parse and append an expression.
+     */
+    Append parse(String expression);
+  }
+
+  private static final class StringAppend implements Append {
+
+    private final StringBuilder builder = new StringBuilder();
+
+    @Override
+    public String toString() {
+      return builder.toString();
+    }
+
+    @Override
+    public Append property(String property) {
+      builder.append(property);
+      return this;
+    }
+
+    @Override
+    public Append append(String literal) {
+      builder.append(literal);
+      return this;
+    }
+
+    @Override
+    public Append parse(String raw) {
+      builder.append(raw);
+      return this;
+    }
   }
 
   /**
@@ -309,36 +370,25 @@ public class OrderBy<T> implements Serializable {
 
     @Override
     public String toString() {
-      return toStringFormat();
+      return property;
     }
 
-    public String toStringFormat() {
-      if (nulls == null && collation == null) {
-        if (ascending) {
-          return property;
+    public void toStringFormat(Append append) {
+      if (collation != null)  {
+        if (collation.contains("${}")) {
+          // this is a complex collation, e.g. DB2 - we must replace the property
+          append.parse(collation.replace("${}", property));
         } else {
-          return property + " desc";
+          append.property(property).append(" collate ").append(collation);
         }
       } else {
-        StringBuilder sb = new StringBuilder();
-        if (collation != null)  {
-          if (collation.contains("${}")) {
-            // this is a complex collation, e.g. DB2 - we must replace the property
-            sb.append(collation.replace("${}", property));
-          } else {
-            sb.append(property);
-            sb.append(" collate ").append(collation);
-          }
-        } else {
-          sb.append(property);
-        }
-        if (!ascending) {
-          sb.append(" ").append("desc");
-        }
-        if (nulls != null) {
-          sb.append(" ").append(nulls).append(" ").append(highLow);
-        }
-        return sb.toString();
+        append.property(property);
+      }
+      if (!ascending) {
+        append.append(" desc");
+      }
+      if (nulls != null) {
+        append.append(" ").append(nulls).append(" ").append(highLow);
       }
     }
 

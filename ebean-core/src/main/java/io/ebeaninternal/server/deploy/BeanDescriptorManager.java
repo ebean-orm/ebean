@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.BackgroundExecutor;
+import io.ebean.DatabaseBuilder;
 import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
@@ -42,9 +43,9 @@ import io.ebeaninternal.xmapping.api.XmapRawSql;
 import io.ebeanservice.docstore.api.DocStoreBeanAdapter;
 import io.ebeanservice.docstore.api.DocStoreFactory;
 
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PersistenceException;
-import javax.persistence.Transient;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PersistenceException;
+import jakarta.persistence.Transient;
 import javax.sql.DataSource;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -78,7 +79,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final NamingConvention namingConvention;
   private final DeployCreateProperties createProperties;
   private final BeanManagerFactory beanManagerFactory;
-  private final DatabaseConfig config;
+  private final DatabaseBuilder.Settings config;
   private final ChangeLogListener changeLogListener;
   private final ChangeLogRegister changeLogRegister;
   private final ChangeLogPrepare changeLogPrepare;
@@ -105,6 +106,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final String asOfViewSuffix;
   private final boolean jacksonCorePresent;
   private final int queryPlanTTLSeconds;
+  private final BindMaxLength bindMaxLength;
   private int entityBeanCount;
   private List<BeanDescriptor<?>> immutableDescriptorList;
   /**
@@ -159,6 +161,19 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.changeLogListener = config.changeLogListener(bootupClasses.getChangeLogListener());
     this.changeLogRegister = config.changeLogRegister(bootupClasses.getChangeLogRegister());
     this.jacksonCorePresent = config.isJacksonCorePresent();
+    this.bindMaxLength = initMaxLength();
+  }
+
+  BindMaxLength initMaxLength() {
+    LengthCheck lengthCheck = this.config.getLengthCheck();
+    switch (lengthCheck) {
+      case OFF:
+        return null;
+      case UTF8:
+        return BindMaxLength.ofUtf8();
+      default:
+        return BindMaxLength.ofStandard();
+    }
   }
 
   @Override
@@ -195,19 +210,19 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   /**
    * Return the AsOfViewSuffix based on the DbHistorySupport.
    */
-  private String asOfViewSuffix(DatabasePlatform databasePlatform, DatabaseConfig serverConfig) {
+  private String asOfViewSuffix(DatabasePlatform databasePlatform, DatabaseBuilder.Settings config) {
     DbHistorySupport historySupport = databasePlatform.historySupport();
     // with historySupport returns a simple view suffix or the sql2011 as of timestamp suffix
-    return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(serverConfig.getAsOfViewSuffix());
+    return (historySupport == null) ? config.getAsOfViewSuffix() : historySupport.getAsOfViewSuffix(config.getAsOfViewSuffix());
   }
 
   /**
    * Return the versions between timestamp suffix based on the DbHistorySupport.
    */
-  private String versionsBetweenSuffix(DatabasePlatform databasePlatform, DatabaseConfig serverConfig) {
+  private String versionsBetweenSuffix(DatabasePlatform databasePlatform, DatabaseBuilder.Settings config) {
     DbHistorySupport historySupport = databasePlatform.historySupport();
     // with historySupport returns a simple view suffix or the sql2011 versions between timestamp suffix
-    return (historySupport == null) ? serverConfig.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(serverConfig.getAsOfViewSuffix());
+    return (historySupport == null) ? config.getAsOfViewSuffix() : historySupport.getVersionsBetweenSuffix(config.getAsOfViewSuffix());
   }
 
   @Override
@@ -216,7 +231,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   @Override
-  public DatabaseConfig config() {
+  public DatabaseBuilder.Settings config() {
     return config;
   }
 
@@ -398,7 +413,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * Return the BeanDescriptors mapped to the table.
    */
   public List<BeanDescriptor<?>> descriptors(String tableName) {
-    return tableToDescMap.get(tableName.toLowerCase());
+    return tableName == null ? Collections.emptyList() : tableToDescMap.get(tableName.toLowerCase());
   }
 
   /**
@@ -443,11 +458,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
         // build map of tables to view entities dependent on those tables
         // for the purpose of invalidating appropriate query caches
         String[] dependentTables = desc.dependentTables();
-        if (dependentTables != null && dependentTables.length > 0) {
+        if (dependentTables != null) {
           for (String depTable : dependentTables) {
             depTable = depTable.toLowerCase();
-            List<BeanDescriptor<?>> list = tableToViewDescMap.computeIfAbsent(depTable, k -> new ArrayList<>(1));
-            list.add(desc);
+            tableToViewDescMap.computeIfAbsent(depTable, k -> new ArrayList<>(1)).add(desc);
           }
         }
       }
@@ -518,7 +532,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     IdBinder idBinder = d.idBinder();
     if (idBinder instanceof IdBinderEmbedded) {
       IdBinderEmbedded embId = (IdBinderEmbedded) idBinder;
-      BeanDescriptor<?> idBeanDescriptor = embId.getIdBeanDescriptor();
+      BeanDescriptor<?> idBeanDescriptor = embId.descriptor();
       Class<?> idType = idBeanDescriptor.type();
       try {
         idType.getDeclaredMethod("hashCode");
@@ -578,7 +592,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     }
   }
 
-  private <T> String errNothingRegistered() {
+  private String errNothingRegistered() {
     return "There are no registered entities. If using query beans, that generates EbeanEntityRegister.java into " +
       "generated sources and is service loaded. If using module-info.java, then probably missing 'provides io.ebean.config.EntityClassRegister with EbeanEntityRegister' clause.";
   }
@@ -1186,7 +1200,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       setConcurrencyMode(desc);
     }
     // generate the byte code
-    createByteCode(desc);
+    setAccessors(desc);
   }
 
   /**
@@ -1255,13 +1269,13 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, stepSize, seqName);
   }
 
-  private void createByteCode(DeployBeanDescriptor<?> deploy) {
+  private void setAccessors(DeployBeanDescriptor<?> deploy) {
     // check to see if the bean supports EntityBean interface
     // generate a subclass if required
-    setEntityBeanClass(deploy);
+    confirmEnhanced(deploy);
     // use Code generation or Standard reflection to support
     // getter and setter methods
-    setBeanReflect(deploy);
+    setPropertyAccessors(deploy);
   }
 
   /**
@@ -1288,15 +1302,14 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
    * and getting of properties. It is generally faster to use code generation
    * rather than reflection to do this.
    */
-  private void setBeanReflect(DeployBeanDescriptor<?> desc) {
+  private void setPropertyAccessors(DeployBeanDescriptor<?> desc) {
     // Set the BeanReflectGetter and BeanReflectSetter that typically
     // use generated code. NB: Due to Bug 166 so now doing this for
     // abstract classes as well.
-    BeanPropertiesReader reflectProps = new BeanPropertiesReader(desc.getBeanType());
-    desc.setProperties(reflectProps.getProperties());
+    BeanPropertiesReader reflectProps = new BeanPropertiesReader(desc.propertyNames());
     for (DeployBeanProperty prop : desc.propertiesAll()) {
       String propName = prop.getName();
-      Integer pos = reflectProps.getPropertyIndex(propName);
+      Integer pos = reflectProps.propertyIndex(propName);
       if (pos == null) {
         if (isPersistentField(prop)) {
           throw new IllegalStateException(
@@ -1368,7 +1381,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   /**
    * Test the bean type to see if it implements EntityBean interface already.
    */
-  private void setEntityBeanClass(DeployBeanDescriptor<?> desc) {
+  private void confirmEnhanced(DeployBeanDescriptor<?> desc) {
     Class<?> beanClass = desc.getBeanType();
     if (!hasEntityBeanInterface(beanClass)) {
       String msg = "Bean " + beanClass + " is not enhanced? Check packages specified in ebean.mf. If you are running in IDEA or " +
@@ -1500,6 +1513,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       desc.queryPlanInit(request, list);
     }
     return list;
+  }
+
+  public BindMaxLength bindMaxLength() {
+    return bindMaxLength;
   }
 
   /**

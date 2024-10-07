@@ -39,7 +39,7 @@ final class DeleteMeta extends BaseMeta {
   /**
    * Bind the request based on the concurrency mode.
    */
-  public void bind(PersistRequestBean<?> persist, DmlHandler bind) throws SQLException {
+  void bind(PersistRequestBean<?> persist, DmlHandler bind) throws SQLException {
     EntityBean bean = persist.entityBean();
     id.dmlBind(bind, bean);
     if (tenantId != null) {
@@ -54,7 +54,7 @@ final class DeleteMeta extends BaseMeta {
   /**
    * get or generate the sql based on the concurrency mode.
    */
-  public String getSql(PersistRequestBean<?> request) {
+  String getSql(PersistRequestBean<?> request) {
     if (id.isEmpty()) {
       throw new IllegalStateException("Can not deleteById on " + request.fullName() + " as no @Id property");
     }

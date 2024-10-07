@@ -91,7 +91,6 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitEnd() {
-
     // set the primary key name
     table.setPkName(primaryKeyName());
 
@@ -169,6 +168,8 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
 
   @Override
   public void visitOneImported(BeanPropertyAssocOne<?> p) {
+    PropertyForeignKey foreignKey = p.foreignKey();
+    boolean addForeignKey = foreignKey == null || !foreignKey.isNoConstraint();
 
     TableJoinColumn[] columns = p.tableJoin().columns();
     if (columns.length == 0) {
@@ -178,17 +179,19 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     List<MColumn> modelColumns = new ArrayList<>(columns.length);
 
     MCompoundForeignKey compoundKey = null;
-    if (columns.length > 1) {
+    if (addForeignKey && columns.length > 1) {
       // compound foreign key
       String refTable = p.targetDescriptor().baseTable();
       String fkName = foreignKeyConstraintName(p.name());
       String fkIndex = foreignKeyIndexName(p.name());
       compoundKey = new MCompoundForeignKey(fkName, refTable, fkIndex);
+      if (foreignKey != null) {
+        compoundKey.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
+      }
       table.addForeignKey(compoundKey);
     }
 
     for (TableJoinColumn column : columns) {
-
       String dbCol = column.getLocalDbColumn();
       BeanProperty importedProperty = p.findMatchImport(dbCol);
       if (importedProperty == null) {
@@ -200,26 +203,28 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       MColumn col = table.addColumn(dbCol, columnDefn, !p.isNullable());
       col.setDbMigrationInfos(p.dbMigrationInfos());
       col.setDefaultValue(p.dbColumnDefault());
-      if (columns.length == 1) {
-        if (p.hasForeignKeyConstraint() && !importedProperty.descriptor().suppressForeignKey()) {
-          // single references column (put it on the column)
-          String refTable = importedProperty.descriptor().baseTable();
-          if (refTable == null) {
-            // odd case where an EmbeddedId only has 1 property
-            refTable = p.targetDescriptor().baseTable();
-          }
-          col.setReferences(refTable + "." + refColumn);
-          col.setForeignKeyName(foreignKeyConstraintName(col.getName()));
-          if (p.hasForeignKeyIndex()) {
-            col.setForeignKeyIndex(foreignKeyIndexName(col.getName()));
-          }
-          PropertyForeignKey foreignKey = p.foreignKey();
-          if (foreignKey != null) {
-            col.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
+      col.setComment(p.dbComment());
+      if (addForeignKey) {
+        if (columns.length > 1) {
+          compoundKey.addColumnPair(dbCol, refColumn);
+        } else {
+          if (p.hasForeignKeyConstraint() && !importedProperty.descriptor().suppressForeignKey()) {
+            // single references column (put it on the column)
+            String refTable = importedProperty.descriptor().baseTable();
+            if (refTable == null) {
+              // odd case where an EmbeddedId only has 1 property
+              refTable = p.targetDescriptor().baseTable();
+            }
+            col.setReferences(refTable + "." + refColumn);
+            col.setForeignKeyName(foreignKeyConstraintName(col.getName()));
+            if (p.hasForeignKeyIndex()) {
+              col.setForeignKeyIndex(foreignKeyIndexName(col.getName()));
+            }
+            if (foreignKey != null) {
+              col.setForeignKeyModes(foreignKey.getOnDelete(), foreignKey.getOnUpdate());
+            }
           }
         }
-      } else {
-        compoundKey.addColumnPair(dbCol, refColumn);
       }
       modelColumns.add(col);
     }
@@ -303,7 +308,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
     int count = 0;
     for (String value : checkConstraintValues) {
       if (count++ > 0) {
-        sb.append(",");
+        sb.append(',');
       }
       sb.append(value);
     }

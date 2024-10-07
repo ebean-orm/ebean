@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
@@ -34,7 +35,7 @@ final class BetweenExpression extends AbstractExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     ElPropertyValue prop = getElProp(request);
     if (prop != null && prop.isDbEncrypted()) {
       // bind the key as well as the value
@@ -57,7 +58,7 @@ final class BetweenExpression extends AbstractExpression {
 
   @Override
   public void queryPlanHash(StringBuilder builder) {
-    builder.append("Between[").append(propName).append("]");
+    builder.append("Between[").append(propName).append(']');
   }
 
   @Override

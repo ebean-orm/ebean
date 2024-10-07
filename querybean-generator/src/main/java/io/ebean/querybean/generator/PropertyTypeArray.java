@@ -19,18 +19,18 @@ class PropertyTypeArray extends PropertyType {
   }
 
   @Override
-  String getTypeDefn(String shortName, boolean assoc) {
+  String getTypeDefn(String shortName, boolean assoc, boolean fullyQualify) {
+    String q = fullyQualify ? pkg : "";
     if (assoc) {
-      return "PArray<R," + elementShortName + ">";
-
+      return q + "PArray<R," + elementShortName + ">";
     } else {
-      return "PArray<Q" + shortName + "," + elementShortName + ">";
+      return q + "PArray<Q" + shortName + "," + elementShortName + ">";
     }
   }
 
   @Override
-  void addImports(Set<String> allImports) {
-    super.addImports(allImports);
+  void addImports(Set<String> allImports, boolean fullyQualify) {
+    super.addImports(allImports, fullyQualify);
     allImports.add(elementClass);
   }
 

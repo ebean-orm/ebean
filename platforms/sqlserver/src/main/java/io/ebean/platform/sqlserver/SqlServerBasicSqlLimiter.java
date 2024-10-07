@@ -14,8 +14,8 @@ final class SqlServerBasicSqlLimiter implements BasicSqlLimiter {
     if (!dbSql.toLowerCase().contains("order by")) {
       sb.append(" order by 1");
     }
-    sb.append(" ").append("offset");
-    sb.append(" ").append(firstRow).append(" rows");
+    sb.append(' ').append("offset");
+    sb.append(' ').append(firstRow).append(" rows");
     if (maxRows > 0) {
       sb.append(" fetch next ").append(maxRows).append(" rows only");
     }

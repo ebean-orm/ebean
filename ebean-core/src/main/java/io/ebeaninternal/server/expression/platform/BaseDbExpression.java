@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression.platform;
 
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.expression.BitwiseOp;
 
 /**
@@ -9,9 +8,9 @@ import io.ebeaninternal.server.expression.BitwiseOp;
 abstract class BaseDbExpression implements DbExpressionHandler {
 
   @Override
-  public void bitwise(SpiExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare, long match) {
+  public void bitwise(DbExpressionRequest request, String propName, BitwiseOp operator, long flags, String compare, long match) {
     final String bitOp = bitOp(operator);
-    request.append("(").property(propName).append(" ").append(bitOp).append(" ? ").append(compare).append(" ?)");
+    request.append('(').property(propName).append(' ').append(bitOp).append(" ? ").append(compare).append(" ?)");
   }
 
   private String bitOp(BitwiseOp operator) {
@@ -28,9 +27,9 @@ abstract class BaseDbExpression implements DbExpressionHandler {
   /**
    * Common alternative where the bitwise operation is a function (specifically bitand is used - H2 and Oracle).
    */
-  protected void bitwiseFunction(SpiExpressionRequest request, String propName, BitwiseOp operator, String compare) {
+  protected void bitwiseFunction(DbExpressionRequest request, String propName, BitwiseOp operator, String compare) {
     final String funcName = functionName(operator);
-    request.append(funcName).append("(").property(propName).append(", ?) ").append(compare).append(" ?");
+    request.append(funcName).append('(').property(propName).append(", ?) ").append(compare).append(" ?");
   }
 
   protected String functionName(BitwiseOp operator) {
@@ -60,7 +59,7 @@ abstract class BaseDbExpression implements DbExpressionHandler {
    */
   String concatOperator(String property0, String separator, String property1, String suffix) {
     StringBuilder sb = new StringBuilder(40);
-    sb.append("(").append(property0).append("||'").append(separator).append("'||").append(property1);
+    sb.append('(').append(property0).append("||'").append(separator).append("'||").append(property1);
     if (suffix != null && !suffix.isEmpty()) {
       sb.append("||'").append(suffix).append('\'');
     }

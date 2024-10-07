@@ -3,7 +3,7 @@ package org.tests.model.family;
 import io.ebean.annotation.Formula;
 import org.tests.model.basic.EBasic;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

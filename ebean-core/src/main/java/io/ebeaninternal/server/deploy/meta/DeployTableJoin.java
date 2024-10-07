@@ -5,7 +5,7 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.parse.DeployUtil;
 import io.ebeaninternal.server.query.SqlJoinType;
 
-import javax.persistence.JoinColumn;
+import jakarta.persistence.JoinColumn;
 import java.util.ArrayList;
 import java.util.Set;
 

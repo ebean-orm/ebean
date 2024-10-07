@@ -1,5 +1,6 @@
 package io.ebean.typequery;
 
+import io.ebean.Expr;
 import io.ebean.ExpressionList;
 import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
@@ -46,7 +47,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Eagerly fetch this association fetching all the properties.
    */
   public final R fetch() {
-    ((TQRootBean) _root).query().fetch(_name);
+    ((QueryBean) _root).query().fetch(_name);
     return _root;
   }
 
@@ -54,7 +55,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Eagerly fetch this association using a "query join".
    */
   public final R fetchQuery() {
-    ((TQRootBean) _root).query().fetchQuery(_name);
+    ((QueryBean) _root).query().fetchQuery(_name);
     return _root;
   }
 
@@ -63,7 +64,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Cache misses are populated via fetchQuery().
    */
   public final R fetchCache() {
-    ((TQRootBean) _root).query().fetchCache(_name);
+    ((QueryBean) _root).query().fetchCache(_name);
     return _root;
   }
 
@@ -71,7 +72,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Use lazy loading for fetching this association.
    */
   public final R fetchLazy() {
-    ((TQRootBean) _root).query().fetchLazy(_name);
+    ((QueryBean) _root).query().fetchLazy(_name);
     return _root;
   }
 
@@ -79,7 +80,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Eagerly fetch this association with the properties specified.
    */
   public final R fetch(String properties) {
-    ((TQRootBean) _root).query().fetch(_name, properties);
+    ((QueryBean) _root).query().fetch(_name, properties);
     return _root;
   }
 
@@ -87,7 +88,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Eagerly fetch this association using a "query join" with the properties specified.
    */
   public final R fetchQuery(String properties) {
-    ((TQRootBean) _root).query().fetchQuery(_name, properties);
+    ((QueryBean) _root).query().fetchQuery(_name, properties);
     return _root;
   }
 
@@ -96,7 +97,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
    * Cache misses are populated via  fetchQuery().
    */
   public final R fetchCache(String properties) {
-    ((TQRootBean) _root).query().fetchCache(_name, properties);
+    ((QueryBean) _root).query().fetchCache(_name, properties);
     return _root;
   }
 
@@ -106,6 +107,18 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
   @SafeVarargs @SuppressWarnings("varargs")
   public final R fetch(TQProperty<QB,?>... properties) {
     return fetchWithProperties(FETCH_DEFAULT, properties);
+  }
+
+
+  /**
+   * Fetch this association with config for the type of fetch and the specified properties.
+   *
+   * @param config Fetch configuration to define the type of fetch to use
+   * @param properties The properties to fetch
+   */
+  @SafeVarargs @SuppressWarnings("varargs")
+  public final R fetch(FetchConfig config, TQProperty<QB,?>... properties) {
+    return fetchWithProperties(config, properties);
   }
 
   /**
@@ -165,7 +178,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
   }
 
   private SpiQueryFetch spiQuery() {
-    return (SpiQueryFetch) ((TQRootBean) _root).query();
+    return (SpiQueryFetch) ((QueryBean) _root).query();
   }
 
   private Set<String> properties(TQProperty<?, ?>... props) {
@@ -176,76 +189,36 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
     return set;
   }
 
-
-  /**
-   * Apply a filter when fetching these beans.
-   */
-  public final R filterMany(ExpressionList<T> filter) {
+  protected final R _filterMany(ExpressionList<T> filter) {
     @SuppressWarnings("unchecked")
     ExpressionList<T> expressionList = (ExpressionList<T>) expr().filterMany(_name);
     expressionList.addAll(filter);
     return _root;
   }
 
-  /**
-   * Apply a filter when fetching these beans.
-   * <p>
-   * The expressions can use any valid Ebean expression and contain
-   * placeholders for bind values using <code>?</code> or <code>?1</code> style.
-   * </p>
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("firstName istartsWith ?", "Rob")
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("whenCreated inRange ? to ?", startDate, endDate)
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
-   * @param params      The bind parameter values
-   */
-  public final R filterMany(String expressions, Object... params) {
+  @Deprecated(forRemoval = true)
+  protected final R _filterMany(String expressions, Object... params) {
     expr().filterMany(_name, expressions, params);
     return _root;
   }
 
-  /**
-   * Is empty for a collection property.
-   * <p>
-   * This effectively adds a not exists sub-query on the collection property.
-   * </p>
-   * <p>
-   * This expression only works on OneToMany and ManyToMany properties.
-   * </p>
-   */
-  public final R isEmpty() {
+  protected final R _filterManyRaw(String rawExpressions, Object... params) {
+    expr().filterManyRaw(_name, rawExpressions, params);
+    return _root;
+  }
+
+  protected final R _isEmpty() {
     expr().isEmpty(_name);
     return _root;
   }
 
-  /**
-   * Is not empty for a collection property.
-   * <p>
-   * This effectively adds an exists sub-query on the collection property.
-   * </p>
-   * <p>
-   * This expression only works on OneToMany and ManyToMany properties.
-   * </p>
-   */
-  public final R isNotEmpty() {
+  protected final R _isNotEmpty() {
     expr().isNotEmpty(_name);
     return _root;
+  }
+
+  protected final <S> ExpressionList<S> _newExpressionList() {
+    return Expr.factory().expressionList();
   }
 
 }

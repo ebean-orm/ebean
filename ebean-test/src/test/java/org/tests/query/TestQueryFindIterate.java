@@ -15,7 +15,7 @@ import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderShipment;
 import org.tests.model.basic.ResetBasicData;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -172,9 +172,9 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     List<String> loggedSql = LoggedSql.stop();
 
-    assertEquals(2, loggedSql.size());
-    assertThat(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name, t2.id, t2.order_qty, t2.ship_qty"));
-    assertThat(trimSql(loggedSql.get(1), 7).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship"));
+    assertThat(loggedSql).hasSize(2);
+    assertThat(trimSql(loggedSql.get(0), 7)).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name, t2.id, t2.order_qty, t2.ship_qty");
+    assertThat(trimSql(loggedSql.get(1), 7)).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship");
   }
 
   @ForPlatform(Platform.H2)
@@ -228,7 +228,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       dsPool = (DataSourcePool) server().dataSource();
     }
 
-    int startConns = dsPool.getStatus(false).getBusy();
+    int startConns = dsPool.status(false).busy();
     final Query<Customer> query = server().find(Customer.class)
       .where()
       .isNotNull("name")
@@ -241,22 +241,22 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     QueryIterator<Customer> queryIterator = query.findIterate();
 
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertFalse(queryIterator.hasNext());
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns);
     try {
       queryIterator.next();
       fail("noSuchElementException expected");

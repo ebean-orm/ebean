@@ -9,7 +9,7 @@ import io.ebean.config.CustomDbTypeMapping;
 import io.ebean.config.PlatformConfig;
 import io.ebean.util.JdbcClose;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.sql.*;
 
@@ -768,5 +768,16 @@ public class DatabasePlatform {
 
   public boolean supportsNativeJavaTime() {
     return supportsNativeJavaTime;
+  }
+
+  public String inlineSqlComment(String label) {
+    if (label == null) {
+      return "";
+    }
+    return "/* " + label + " */ ";
+  }
+
+  public String inlineSqlHint(String hint) {
+    return "/*+ " + hint + " */ ";
   }
 }

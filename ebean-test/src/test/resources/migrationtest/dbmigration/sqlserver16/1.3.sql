@@ -22,6 +22,7 @@ IF OBJECT_ID('ck_migtest_e_enum_test_status', 'C') IS NOT NULL alter table migte
 IF OBJECT_ID('fk_drop_main_drop_ref_many_drop_main', 'F') IS NOT NULL alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_main;
 IF OBJECT_ID('fk_drop_main_drop_ref_many_drop_ref_many', 'F') IS NOT NULL alter table drop_main_drop_ref_many drop constraint fk_drop_main_drop_ref_many_drop_ref_many;
 IF OBJECT_ID('fk_drop_ref_one_parent_id', 'F') IS NOT NULL alter table drop_ref_one drop constraint fk_drop_ref_one_parent_id;
+IF OBJECT_ID('fk_drop_ref_one_to_one_parent_id', 'F') IS NOT NULL alter table drop_ref_one_to_one drop constraint fk_drop_ref_one_to_one_parent_id;
 IF OBJECT_ID('fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c', 'F') IS NOT NULL alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_c;
 IF OBJECT_ID('fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m', 'F') IS NOT NULL alter table migtest_mtm_c_migtest_mtm_m drop constraint fk_migtest_mtm_c_migtest_mtm_m_migtest_mtm_m;
 IF OBJECT_ID('fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m', 'F') IS NOT NULL alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_m;

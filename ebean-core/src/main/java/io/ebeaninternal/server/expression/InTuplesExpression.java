@@ -2,15 +2,11 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.InTuples;
 import io.ebean.service.SpiInTuples;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.api.*;
 
 import java.util.List;
 
 import static java.util.Objects.requireNonNull;
-
 
 final class InTuplesExpression extends AbstractExpression {
 
@@ -20,7 +16,7 @@ final class InTuplesExpression extends AbstractExpression {
 
   InTuplesExpression(InTuples pairs, boolean not) {
     super("");
-    SpiInTuples inTuples = (SpiInTuples)pairs;
+    SpiInTuples inTuples = (SpiInTuples) pairs;
     this.properties = inTuples.properties();
     // the entries might be modified on cache hit.
     this.entries = inTuples.entries();
@@ -38,7 +34,7 @@ final class InTuplesExpression extends AbstractExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (Object[] entry : entries) {
       for (Object value : entry) {
         requireNonNull(value);
@@ -53,22 +49,26 @@ final class InTuplesExpression extends AbstractExpression {
       request.append(not ? SQL_TRUE : SQL_FALSE);
       return;
     }
-    request.append("(");
+    request.append('(');
     for (int i = 0; i < properties.length; i++) {
       if (i > 0) {
-        request.append(",");
+        request.append(',');
       }
       request.property(properties[i]);
     }
     request.append(") in (");
+    addSqlBinding(request);
+    request.append(')');
+  }
+
+  private void addSqlBinding(SpiExpressionRequest request) {
     final String eb = entryBinding();
     for (int i = 0; i < entries.size(); i++) {
       if (i > 0) {
-        request.append(",");
+        request.append(',');
       }
       request.append(eb);
     }
-    request.append(")");
   }
 
   private String entryBinding() {
@@ -93,9 +93,9 @@ final class InTuplesExpression extends AbstractExpression {
     }
     builder.append("InTuple[");
     for (String property : properties) {
-      builder.append(property).append("-");
+      builder.append(property).append('-');
     }
-    builder.append(entries.size()).append("]");
+    builder.append(entries.size()).append(']');
   }
 
   @Override

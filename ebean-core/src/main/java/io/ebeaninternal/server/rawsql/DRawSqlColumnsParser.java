@@ -3,7 +3,7 @@ package io.ebeaninternal.server.rawsql;
 import io.ebeaninternal.server.rawsql.SpiRawSql.ColumnMapping;
 import io.ebeaninternal.server.util.DSelectColumnsParser;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -67,7 +67,7 @@ final class DRawSqlColumnsParser {
     StringBuilder sb = new StringBuilder();
     sb.append(split[0]);
     for (int i = 1; i < split.length - 2; i++) {
-      sb.append(" ").append(split[i]);
+      sb.append(' ').append(split[i]);
     }
     return new ColumnMapping.Column(indexPos++, sb.toString(), split[split.length - 1]);
   }

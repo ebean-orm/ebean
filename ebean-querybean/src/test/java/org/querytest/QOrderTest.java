@@ -1,13 +1,16 @@
 package org.querytest;
 
 import io.ebean.DB;
+import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
+import org.example.domain.Contact;
 import org.example.domain.Customer;
 import org.example.domain.Order;
 import org.example.domain.OrderDetail;
 import org.example.domain.otherpackage.PhoneNumber;
+import org.example.domain.query.QContact;
 import org.example.domain.query.QCustomer;
 import org.example.domain.query.QOrder;
 import org.example.domain.query.QOrderDetail;
@@ -20,14 +23,21 @@ import java.util.List;
 import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class QOrderTest {
+class QOrderTest {
 
   private static final QCustomer cu = QCustomer.alias();
 
   private static final QOrder or = QOrder.alias();
 
+  private static final QContact co = QContact.alias();
+
   private static final FetchGroup<Customer> fgC = QCustomer.forFetchGroup()
     .select(cu.name, cu.phoneNumber)
+    .buildFetchGroup();
+
+  private static final FetchGroup<Customer> fgCustomerWithContacts = QCustomer.forFetchGroup()
+    .select(cu.name, cu.phoneNumber)
+    .contacts.fetch(FetchConfig.ofQuery(1000), co.firstName, co.lastName, co.email)
     .buildFetchGroup();
 
   private static final FetchGroup<Order> fgNested1 = QOrder.forFetchGroup()
@@ -71,7 +81,120 @@ public class QOrderTest {
   }
 
   @Test
-  public void fetchCache() {
+  void orderById() {
+    Query<Order> query = new QOrder()
+      .select(QOrder.Alias.status)
+      .orderById(true).query();
+
+    query.findList();
+
+    String sql = query.getGeneratedSql();
+    assertThat(sql).contains("select /* QOrderTest.orderById:89 */ t0.id, t0.status from o_order t0 order by t0.id");
+
+    Query<Order> query2 = new QOrder()
+      .select(QOrder.Alias.status)
+      .orderById(true).orderBy().status.asc()
+      .query();
+
+    query2.findList();
+
+    String sql2 = query2.getGeneratedSql();
+    assertThat(sql2).contains("select /* QOrderTest.orderById:99 */ t0.id, t0.status from o_order t0 order by t0.status, t0.id");
+  }
+
+  @Test
+  void hint() {
+    LoggedSql.start();
+    new QCustomer()
+      .setHint("FirstRows")
+      .select(QCustomer.Alias.id, QCustomer.Alias.name)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select /*+ FirstRows */ /* QOrderTest.hint */ t0.id, t0.name from be_customer t0");
+  }
+
+  @Test
+  void fetchGroup_nestedMany_expect_orderByClauseAdded() {
+    var o = QOrder.alias();
+    var c = QCustomer.alias();
+    var ct = QContact.alias();
+
+    var fg = QOrder.forFetchGroup()
+      .select(o.status, o.orderDate)
+      .customer.fetch(c.email)
+      .customer.contacts.fetch(ct.firstName, ct.lastName)
+      .buildFetchGroup();
+
+    LoggedSql.start();
+
+    new QOrder()
+      .select(fg)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("order by t0.id");
+  }
+
+  @Test
+  void fetchGroup_nestedMany2_expect_orderByClauseAdded() {
+    var fg1 = FetchGroup.of(Order.class)
+      .fetch("customer")
+      .fetch("customer.contacts")
+      .build();
+
+    LoggedSql.start();
+
+    new QOrder()
+      .select(fg1)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("order by t0.id");
+  }
+
+  @Test
+  void fetchGroup_nestedMany3_expect_orderByClauseAdded() {
+    var fg = FetchGroup.of(Order.class)
+      .fetch("customer", FetchGroup.of(Customer.class)
+        .fetch("contacts", FetchGroup.of(Contact.class)
+          .build())
+        .build())
+      .build();
+
+    LoggedSql.start();
+
+    new QOrder()
+      .select(fg)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("order by t0.id");
+  }
+
+  @Test
+  void fetchQueryWithBatch() {
+    LoggedSql.start();
+
+    new QCustomer()
+      .select(fgCustomerWithContacts)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("select /* QOrderTest.fetchQueryWithBatch */ t0.id, t0.name, t0.phone_number from be_customer t0");
+    assertThat(sql.get(1)).contains("select /* QOrderTest.fetchQueryWithBatch_contacts__query */ t0.customer_id, t0.id, t0.first_name, t0.last_name, t0.email from be_contact t0 where");
+  }
+
+  @Test
+  void fetchCache() {
 
     new QOrder()
       .status.eq(Order.Status.NEW)
@@ -85,7 +208,23 @@ public class QOrderTest {
   }
 
   @Test
-  public void viaFetchGraph() {
+  void viaNullFetchGraph() {
+    DB.getDefault();
+    LoggedSql.start();
+
+    FetchGroup<Order> fg = null;
+    new QOrder()
+      .select(fg)
+      .status.eq(Order.Status.NEW)
+      .findList();
+
+    final List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("select /* QOrderTest.viaNullFetchGraph */ t0.id, ");
+  }
+
+  @Test
+  void viaFetchGraph() {
 
     DB.getDefault();
     LoggedSql.start();
@@ -98,11 +237,11 @@ public class QOrderTest {
 
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.status, t0.ship_date, t0.customer_id from o_order t0 where");
+    assertThat(sql.get(0)).contains("select /* QOrderTest.viaFetchGraph */ t0.id, t0.status, t0.ship_date, t0.customer_id from o_order t0 where");
   }
 
   @Test
-  public void viaFetchGraph_withJoin() {
+  void viaFetchGraph_withJoin() {
 
     DB.getDefault();
     LoggedSql.start();
@@ -115,11 +254,11 @@ public class QOrderTest {
 
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.status, t1.id, t1.name from o_order t0 join be_customer t1 on t1.id = t0.customer_id where");
+    assertThat(sql.get(0)).contains("select /* QOrderTest.viaFetchGraph_withJoin */ t0.id, t0.status, t1.id, t1.name from o_order t0 join be_customer t1 on t1.id = t0.customer_id where");
   }
 
   @Test
-  public void viaFetchGraph_withNested() {
+  void viaFetchGraph_withNested() {
 
     DB.getDefault();
     LoggedSql.start();
@@ -131,13 +270,12 @@ public class QOrderTest {
 
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.status, t0.ship_date, t1.id, t1.name, t1.phone_number from o_order t0 join be_customer t1 on t1.id = t0.customer_id where");
+    assertThat(sql.get(0)).contains("select /* QOrderTest.viaFetchGraph_withNested */ t0.id, t0.status, t0.ship_date, t1.id, t1.name, t1.phone_number from o_order t0 join be_customer t1 on t1.id = t0.customer_id where");
   }
 
   @Test
-  public void viaFetchGraph_withNested_fetchQuery() {
-
-    DB.getDefault();
+  void viaFetchGraph_withNested_fetchQuery() {
+    DB.cacheManager().clearAll();
     LoggedSql.start();
 
     final Order found = new QOrder()
@@ -149,17 +287,16 @@ public class QOrderTest {
 
     // assert fetching customer via fetchQuery
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id, t0.status, t0.customer_id from o_order t0 where t0.id = ?");
-    assertThat(sql.get(1)).contains("select t0.id, t0.name, t0.phone_number from be_customer t0 where t0.id = ?");
+    assertThat(sql.get(0)).contains("select /* QOrderTest.viaFetchGraph_withNested_fetchQuery */ t0.id, t0.status, t0.customer_id from o_order t0 where t0.id = ?");
+    assertThat(sql.get(1)).contains("select /* QOrderTest.viaFetchGraph_withNested_fetchQuery_customer__query */ t0.id, t0.name, t0.phone_number from be_customer t0 where t0.id = ?");
 
     assertThat(found.getCustomer().getPhoneNumber().getMsisdn()).isEqualTo("Ph1");
   }
 
 
   @Test
-  public void viaFetchGraph_withNested_fetchCache() {
-
-    DB.getDefault();
+  void viaFetchGraph_withNested_fetchCache() {
+    DB.cacheManager().clearAll();
 
     // ensure the customer is loaded in the L2 cache
     new QCustomer().id.eq(customer.getId()).findOne();
@@ -178,11 +315,11 @@ public class QOrderTest {
 
     // assert we only hit DB for order
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.status, t0.customer_id from o_order t0 where t0.id = ?");
+    assertThat(sql.get(0)).contains("select /* QOrderTest.viaFetchGraph_withNested_fetchQuery */ t0.id, t0.status, t0.customer_id from o_order t0 where t0.id = ?");
   }
 
   @Test
-  public void select_partial() {
+  void select_partial() {
 
     DB.getDefault();
     LoggedSql.start();
@@ -195,11 +332,11 @@ public class QOrderTest {
 
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.status, t0.order_date from o_order t0");
+    assertThat(sql.get(0)).contains("select /* QOrderTest.select_partial */ t0.id, t0.status, t0.order_date from o_order t0");
   }
 
   @Test
-  public void fetch_partial() {
+  void fetch_partial() {
 
     DB.getDefault();
     LoggedSql.start();
@@ -214,12 +351,12 @@ public class QOrderTest {
 
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.status, t1.id, t1.email, t1.name from o_order t0 join be_customer t1 on t1.id = t0.customer_id");
+    assertThat(sql.get(0)).contains("select /* QOrderTest.fetch_partial */ t0.id, t0.status, t1.id, t1.email, t1.name from o_order t0 join be_customer t1 on t1.id = t0.customer_id");
 
   }
 
   @Test
-  public void updateQuery() {
+  void updateQuery() {
     LoggedSql.start();
     new QOrder()
       .status.eq(Order.Status.COMPLETE)
@@ -235,7 +372,7 @@ public class QOrderTest {
   }
 
   @Test
-  public void stdExpression_iLikeConcatCoalesce() {
+  void stdExpression_iLikeConcatCoalesce() {
     QOrder o = QOrder.alias();
 
     // LOWER(CONCAT(COALESCE(a.name, ""), ":", a.description)) LIKE LOWER(:param)
@@ -250,7 +387,7 @@ public class QOrderTest {
   }
 
   @Test
-  public void stdExpression_gtCoalesce() {
+  void stdExpression_gtCoalesce() {
     QOrder o = QOrder.alias();
 
     Query<Order> query = new QOrder()
@@ -265,7 +402,7 @@ public class QOrderTest {
 
     String sql = query.getGeneratedSql();
     assertThat(sql).contains(" where (coalesce(t1.version,0) > ? or t0.id < ?)");
-    assertThat(sql).isEqualTo("select t0.id, t0.status from o_order t0 join be_customer t1 on t1.id = t0.customer_id where (coalesce(t1.version,0) > ? or t0.id < ?)");
+    assertThat(sql).isEqualTo("select /* QOrderTest.stdExpression_gtCoalesce */ t0.id, t0.status from o_order t0 join be_customer t1 on t1.id = t0.customer_id where (coalesce(t1.version,0) > ? or t0.id < ?)");
   }
 
   @Test
@@ -278,7 +415,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered >= (select max(o.order_date) as foo from o_order o)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.geSqlSubQuery */ t0.id from be_customer t0 where t0.registered >= (select max(o.order_date) as foo from o_order o)");
   }
 
   @Test
@@ -291,7 +428,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered > (select max(o.order_date) as foo from o_order o)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.gtSqlSubQuery */ t0.id from be_customer t0 where t0.registered > (select max(o.order_date) as foo from o_order o)");
   }
 
   @Test
@@ -304,7 +441,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered <= (select max(o.order_date) as foo from o_order o)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.leSqlSubQuery */ t0.id from be_customer t0 where t0.registered <= (select max(o.order_date) as foo from o_order o)");
   }
 
   @Test
@@ -317,7 +454,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered < (select max(o.order_date) as foo from o_order o)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.ltSqlSubQuery */ t0.id from be_customer t0 where t0.registered < (select max(o.order_date) as foo from o_order o)");
   }
 
   @Test
@@ -330,7 +467,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered = (select max(o.order_date) as foo from o_order o)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.eqSqlSubQuery */ t0.id from be_customer t0 where t0.registered = (select max(o.order_date) as foo from o_order o)");
   }
 
   @Test
@@ -343,7 +480,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered <> (select max(o.order_date) as foo from o_order o)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.neSqlSubQuery */ t0.id from be_customer t0 where t0.registered <> (select max(o.order_date) as foo from o_order o)");
   }
 
   @Test
@@ -361,7 +498,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered >= (select max(t0.order_date) from o_order t0)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.geSubQuery */ t0.id from be_customer t0 where t0.registered >= (select max(t0.order_date) from o_order t0)");
   }
 
   @Test
@@ -376,7 +513,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.version > (select sum(t0.version) from o_order t0)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.gtSubQuery */ t0.id from be_customer t0 where t0.version > (select sum(t0.version) from o_order t0)");
   }
 
   @Test
@@ -391,7 +528,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered <= (select max(t0.order_date) from o_order t0)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.leSubQuery */ t0.id from be_customer t0 where t0.registered <= (select max(t0.order_date) from o_order t0)");
   }
 
   @Test
@@ -406,7 +543,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered < (select max(t0.order_date) from o_order t0)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.ltSubQuery */ t0.id from be_customer t0 where t0.registered < (select max(t0.order_date) from o_order t0)");
   }
 
   @Test
@@ -421,7 +558,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered = (select max(t0.order_date) from o_order t0)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.eqSubQuery */ t0.id from be_customer t0 where t0.registered = (select max(t0.order_date) from o_order t0)");
   }
 
   @Test
@@ -436,7 +573,7 @@ public class QOrderTest {
       .query();
     query.findList();
 
-    assertThat(query.getGeneratedSql()).contains("select t0.id from be_customer t0 where t0.registered <> (select max(t0.order_date) from o_order t0)");
+    assertThat(query.getGeneratedSql()).contains("select /* QOrderTest.neSubQuery */ t0.id from be_customer t0 where t0.registered <> (select max(t0.order_date) from o_order t0)");
   }
 
   @Test

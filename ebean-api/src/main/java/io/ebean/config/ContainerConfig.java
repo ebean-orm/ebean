@@ -15,7 +15,6 @@ public class ContainerConfig {
   private String namespace;
   private String podName;
   private int port;
-
   private Properties properties;
 
   /**
@@ -123,5 +122,4 @@ public class ContainerConfig {
   protected boolean getProperty(Properties properties, String key, boolean defaultValue) {
     return "true".equalsIgnoreCase(properties.getProperty(key, Boolean.toString(defaultValue)));
   }
-
 }

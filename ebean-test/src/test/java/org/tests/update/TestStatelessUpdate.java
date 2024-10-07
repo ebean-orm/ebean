@@ -11,7 +11,7 @@ import org.tests.model.basic.EBasic;
 import org.tests.model.basic.EBasic.Status;
 import org.tests.model.basic.ResetBasicData;
 
-import javax.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityNotFoundException;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -100,7 +100,7 @@ public class TestStatelessUpdate extends TransactionalTestCase {
 
   /**
    * I am expecting that Ebean detects there aren't any changes and don't execute any query.
-   * Currently a {@link javax.persistence.PersistenceException} with message 'Invalid value "null" for parameter "SQL"' is thrown.
+   * Currently a {@link jakarta.persistence.PersistenceException} with message 'Invalid value "null" for parameter "SQL"' is thrown.
    */
   @Test
   public void testWithoutChangesAndIgnoreNullValues() {
@@ -347,12 +347,14 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     DB.update(updateCustomer);
     final List<String> sql = LoggedSql.stop();
 
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(7);
     assertThat(sql.get(0)).contains("update o_customer set updtime=? where id=?");
     assertThat(sql.get(1)).contains("insert into contact");
     assertThat(sql.get(2)).contains(" -- bind(");
-    assertThat(sql.get(3)).contains("update contact set last_name=?, customer_id=? where id=?");
-    assertThat(sql.get(4)).contains(" -- bind(");
+    assertThat(sql.get(3)).contains(" -- executeBatch");
+    assertThat(sql.get(4)).contains("update contact set last_name=?, customer_id=? where id=?");
+    assertThat(sql.get(5)).contains(" -- bind(");
+    assertThat(sql.get(6)).contains(" -- executeBatch");
 
     // assert
     Customer assCustomer = DB.find(Customer.class, customer.getId());
@@ -402,12 +404,13 @@ public class TestStatelessUpdate extends TransactionalTestCase {
     DB.update(updateCustomer);
     final List<String> sql = LoggedSql.stop();
 
-    assertThat(sql).hasSize(5);
+    assertThat(sql).hasSize(7);
     assertThat(sql.get(0)).contains("update o_customer set updtime=? where id=?");
     assertThat(sql.get(1)).contains("insert into contact");
     assertThat(sql.get(2)).contains(" -- bind(");
-    assertThat(sql.get(3)).contains("update contact set last_name=?, customer_id=? where id=?");
-    assertThat(sql.get(4)).contains(" -- bind(");
+    assertThat(sql.get(3)).contains(" -- executeBatch");
+    assertThat(sql.get(4)).contains("update contact set last_name=?, customer_id=? where id=?");
+    assertThat(sql.get(5)).contains(" -- bind(");
 
     // assert
     Customer assCustomer = DB.find(Customer.class, customer.getId());

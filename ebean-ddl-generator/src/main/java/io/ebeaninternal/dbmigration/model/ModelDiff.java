@@ -130,7 +130,7 @@ public class ModelDiff {
         existingTable.getCompoundKeys().forEach(it -> addAlterForeignKey(it.dropForeignKey(existingTable.getName())));
         // Foreign keys through direct mapping (oneToMany)
         existingTable.allColumns().stream()
-          .filter(it -> it.getForeignKeyIndex() != null)
+          .filter(it -> it.getForeignKeyIndex() != null || it.getForeignKeyName() != null)
           .map(it -> {
             AlterForeignKey fk = new AlterForeignKey();
             fk.setName(it.getForeignKeyName());

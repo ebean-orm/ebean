@@ -1,9 +1,10 @@
 package org.tests.query.joins;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Expr;
 import io.ebean.Query;
+import io.ebean.Transaction;
+import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.basic.one2one.Wheel;
 import org.tests.model.basic.MRole;
@@ -18,8 +19,7 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
   @Test
   public void test() {
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
 
       MRole r1 = new MRole();
       r1.setRoleName("role1B");
@@ -63,8 +63,6 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
       assertSqlOuterJoins(sql);
       assertThat(sql).contains(".role_name = ?");
 
-    } finally {
-      DB.rollbackTransaction();
     }
   }
 
@@ -76,7 +74,7 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
       .eq("roles.roleid", roleid)
       .endOr().query();
 
-      query.findList();
+    query.findList();
 
     String sql = sqlOf(query);
     assertSqlOuterJoins(sql);
@@ -85,19 +83,16 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
   @Test
   public void testSelectOneToOneDisjunction() {
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       Query<Wheel> query = DB.find(Wheel.class)
-              .select("id")
-              .where().or()
-              .ge("tire.id", 100)
-              .lt("tire.id", 100)
-              .endOr().query();
+        .select("id")
+        .where().or()
+        .ge("tire.id", 100)
+        .lt("tire.id", 100)
+        .endOr().query();
       query.findList();
       String sql = sqlOf(query);
       assertThat(sql).contains("join");
-    } finally {
-      DB.rollbackTransaction();
     }
   }
 

@@ -25,28 +25,28 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
   }
 
   /**
-   * Deprecated migrate to eq().
+   * @deprecated migrate to {@link #eq(Object)}.
    * <p>
    * Is equal to. The same as <code>eq</code> but uses the strong type as argument rather than String.
    *
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public final R equalToType(T value) {
     expr().eq(_name, value);
     return _root;
   }
 
   /**
-   * Deprecated migrate to ne().
+   * @deprecated migrate to {@link #ne(Object)}.
    * <p>
    * Is not equal to. The same as <code>ne</code> but uses the strong type as argument rather than String.
    *
    * @param value the equal to bind value
    * @return the root query bean instance
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public final R notEqualToType(T value) {
     expr().ne(_name, value);
     return _root;

@@ -27,16 +27,68 @@ public class TestQueryForUpdate extends BaseTestCase {
     try (final Transaction transaction = DB.beginTransaction()) {
       query = DB.find(Customer.class)
         .forUpdate()
-        .order().desc("id");
+        .orderBy().desc("id");
 
       query.findList();
     }
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else if (!isDb2()){
+    } else if (isDb2()) {
+      assertThat(sqlOf(query)).contains("with rs use and keep update locks");
+    } else {
       assertThat(sqlOf(query)).contains("for update");
     }
+  }
+
+  @Test
+  public void testConcurrentForUpdate() throws InterruptedException {
+
+    ResetBasicData.reset();
+
+    Thread t1 = new Thread() {
+      @Override
+      public void run() {
+        try (final Transaction transaction = DB.beginTransaction()) {
+          System.out.println("Thread: before find");
+          DB.find(Customer.class)
+            .forUpdate()
+           // .orderBy().desc("1") // this would help by the locks in DB2
+            .findList();
+
+          System.out.println("Thread: after find");
+          try {
+            Thread.sleep(3000);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          System.out.println("Thread: done");
+        }
+      }
+    };
+
+    t1.start();
+
+    Thread.sleep(100);
+
+    long start = System.currentTimeMillis();
+    try (final Transaction transaction = DB.beginTransaction()) {
+      if (isH2()) {
+        DB.sqlUpdate("SET LOCK_TIMEOUT 5000").execute();
+      }
+      System.out.println("Main: before find");
+      DB.find(Customer.class)
+        .forUpdate()
+        //.orderBy().desc("1") // this would help by the locks in DB2
+        .findList();
+
+      System.out.println("Main: after find");
+    }
+
+    start = System.currentTimeMillis() - start;
+
+    assertThat(start).isGreaterThan(2800);
+
   }
 
   @Test
@@ -48,21 +100,23 @@ public class TestQueryForUpdate extends BaseTestCase {
       query = DB.find(Customer.class)
         .forUpdate()
         .setMaxRows(3)
-        .order().desc("id");
+        .orderBy().desc("id");
 
       query.findList();
     }
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
-    } else if (!isOracle() && !isDb2()) {
+    } else if (isDb2()) {
+      assertThat(sqlOf(query)).contains("with rs use and keep update locks");
+    } else if (!isOracle()) {
       // Oracle does not support FOR UPDATE with FETCH
       assertThat(sqlOf(query)).contains("for update");
     }
   }
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2})
   public void testForUpdate_when_alreadyInPCAsReference() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -88,6 +142,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_order");
       if (isSqlServer()) {
         assertThat(sql.get(1)).contains("from o_customer t0 with (updlock) where t0.id = ?");
+      } else if (isDb2()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? with rs use and keep update locks");
       } else {
         assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
       }
@@ -96,7 +152,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2})
   public void testForUpdate_when_alreadyInPCAsReference_usingLock() {
     ResetBasicData.reset();
     Order o0 = DB.find(Order.class).orderBy("id").setMaxRows(1).findOne();
@@ -123,6 +179,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_order");
       if (isSqlServer()) {
         assertThat(sql.get(1)).contains("from o_customer t0 with (updlock,nowait) where t0.id = ?");
+      } else if (isDb2()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? with rs use and keep update locks");
       } else {
         assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
       }
@@ -131,7 +189,7 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   @Test
-  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB})
+  @ForPlatform({Platform.H2, Platform.ORACLE, Platform.POSTGRES, Platform.SQLSERVER, Platform.MYSQL, Platform.MARIADB, Platform.DB2})
   public void testForUpdate_when_alreadyInPC() {
 
     EBasic basic = new EBasic("initialValue");
@@ -193,7 +251,7 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     Query<Customer> query = DB.find(Customer.class)
       .forUpdateNoWait()
-      .order().desc("id");
+      .orderBy().desc("id");
 
     query.findList();
     if (isOracle()) {
@@ -219,7 +277,7 @@ public class TestQueryForUpdate extends BaseTestCase {
       Query<Customer> query = DB.find(Customer.class)
         .forUpdateNoWait()
         .setMaxRows(1)
-        .order().desc("id");
+        .orderBy().desc("id");
 
       List<Customer> list = query.findList();
       Customer first = list.get(0);

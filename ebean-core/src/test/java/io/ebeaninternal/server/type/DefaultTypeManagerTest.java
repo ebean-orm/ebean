@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebean.core.type.ScalarType;
@@ -9,7 +10,7 @@ import org.tests.model.basic.Car;
 import org.tests.model.basic.IntEnum;
 import org.tests.model.basic.VarcharEnum;
 
-import javax.persistence.EnumType;
+import jakarta.persistence.EnumType;
 import java.time.DayOfWeek;
 import java.time.Month;
 
@@ -20,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class DefaultTypeManagerTest {
 
   private DefaultTypeManager create() {
-    DatabaseConfig serverConfig = new DatabaseConfig();
+    var serverConfig = new DatabaseConfig();
     serverConfig.setDatabasePlatform(new PostgresPlatform());
     BootupClasses bootupClasses = new BootupClasses();
     return new DefaultTypeManager(serverConfig, bootupClasses);

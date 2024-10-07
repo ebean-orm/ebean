@@ -33,6 +33,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   private final boolean textRoot;
 
+  public static <P> ExpressionList<P> forFetchGroup(Query<P> q) {
+    return new DefaultExpressionList<>(q, null, null, null, false);
+  }
+
   /**
    * Construct for Text root expression list - this handles implicit Bool Should, Must etc.
    */
@@ -54,6 +58,10 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     this.query = query;
     this.expr = expr;
     this.parentExprList = parentExprList;
+  }
+
+  protected DefaultExpressionList(ExpressionFactory expr) {
+    this(null, expr, null, new ArrayList<>());
   }
 
   private DefaultExpressionList() {
@@ -112,10 +120,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    * <p>
    * If this is the Top level "text" expressions then it detects if explicit or implicit Bool Should, Must etc is required
    * to wrap the expressions.
-   * </p>
    * <p>
    * If implicit Bool is required SHOULD is used.
-   * </p>
    */
   @Override
   public void writeDocQuery(DocQueryContext context) throws IOException {
@@ -443,6 +449,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> filterManyRaw(String manyProperty, String rawExpression, Object... params) {
+    return query.filterMany(manyProperty).raw(rawExpression, params);
+  }
+
+  @Override
   public Query<T> withLock(Query.LockType lockType) {
     return query.withLock(lockType);
   }
@@ -584,7 +595,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (SpiExpression expr : list) {
       expr.addBindValues(request);
     }
@@ -608,13 +619,13 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
       builder.append("textRoot:true ");
     }
     if (allDocNestedPath != null) {
-      builder.append("path:").append(allDocNestedPath).append(" ");
+      builder.append("path:").append(allDocNestedPath).append(' ');
     }
     for (SpiExpression expr : list) {
       expr.queryPlanHash(builder);
-      builder.append(",");
+      builder.append(',');
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

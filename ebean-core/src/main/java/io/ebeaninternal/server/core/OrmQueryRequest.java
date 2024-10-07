@@ -18,7 +18,7 @@ import io.ebeaninternal.server.loadcontext.DLoadContext;
 import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.function.Consumer;
@@ -35,16 +35,15 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private final OrmQueryEngine queryEngine;
   private final SpiQuery<T> query;
   private final BeanFindController finder;
-  private final Boolean readOnly;
   private LoadContext loadContext;
   private PersistenceContext persistenceContext;
   private HashQuery cacheKey;
   private CQueryPlanKey queryPlanKey;
   private SpiQuerySecondary secondaryQueries;
   private List<T> cacheBeans;
-  private BeanPropertyAssocMany<?> manyProperty;
   private boolean inlineCountDistinct;
   private Set<String> dependentTables;
+  private SpiQueryManyJoin manyJoin;
 
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
     super(server, t);
@@ -52,12 +51,16 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     this.finder = beanDescriptor.beanFinder();
     this.queryEngine = queryEngine;
     this.query = query;
-    this.readOnly = query.isReadOnly();
     this.persistenceContext = query.persistenceContext();
   }
 
   public PersistenceException translate(String bindLog, String sql, SQLException e) {
     return queryEngine.translate(this, bindLog, sql, e);
+  }
+
+  @Override
+  public boolean isGetAllFromBeanCache() {
+    return (transaction == null || !transaction.isSkipCache()) && getFromBeanCache();
   }
 
   @Override
@@ -131,13 +134,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
-   * Return the Normal, sharedInstance, ReadOnly state of this query.
-   */
-  public Boolean isReadOnly() {
-    return readOnly;
-  }
-
-  /**
    * Return the BeanDescriptor for the associated bean.
    */
   @Override
@@ -172,7 +168,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void prepareQuery() {
-    secondaryQueries = query.convertJoins();
+    manyJoin = query.convertJoins();
+    secondaryQueries = query.secondaryQuery();
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
     queryPlanKey = query.prepare(this);
@@ -450,19 +447,19 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return query;
   }
 
-  /**
-   * Determine and return the ToMany property that is included in the query.
-   */
-  public BeanPropertyAssocMany<?> determineMany() {
-    manyProperty = beanDescriptor.manyProperty(query);
-    return manyProperty;
+  public SpiQueryManyJoin manyJoin() {
+    return manyJoin;
   }
 
   /**
-   * Return the many property that is fetched in the query or null if there is not one.
+   * Return true if there is a manyJoin that should be included with this query.
    */
-  public BeanPropertyAssocMany<?> manyPropertyForOrderBy() {
-    return query.isSingleAttribute() ? null : manyProperty;
+  public boolean includeManyJoin() {
+    if (manyJoin == null || query.isSingleAttribute()) {
+      return false;
+    }
+    final Type type = query.type();
+    return type != Type.SQ_EX && type != Type.COUNT;
   }
 
   /**
@@ -776,5 +773,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public int forwardOnlyFetchSize() {
     return queryEngine.forwardOnlyFetchSize();
+  }
+
+  public void clearContext() {
+    if (!transaction.isAutoPersistUpdates()) {
+      beanDescriptor.contextClear(transaction.persistenceContext());
+    }
   }
 }

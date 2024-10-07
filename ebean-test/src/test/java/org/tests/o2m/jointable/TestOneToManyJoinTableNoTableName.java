@@ -38,7 +38,7 @@ public class TestOneToManyJoinTableNoTableName extends BaseTestCase {
 
     List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(3);
+      assertThat(sql).hasSize(4);
       assertSql(sql.get(0)).contains("insert into mkeygroup_monkey (mkeygroup_pid, monkey_mid) values (?, ?)");
       assertSqlBind(sql, 1, 2);
     } else {

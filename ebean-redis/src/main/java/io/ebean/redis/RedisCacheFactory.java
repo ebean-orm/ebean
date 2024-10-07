@@ -3,7 +3,7 @@ package io.ebean.redis;
 import io.avaje.applog.AppLog;
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.*;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetric;
@@ -74,7 +74,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
   private final ReentrantLock lock = new ReentrantLock();
   private ServerCacheNotify listener;
 
-  RedisCacheFactory(DatabaseConfig config, BackgroundExecutor executor) {
+  RedisCacheFactory(DatabaseBuilder.Settings config, BackgroundExecutor executor) {
     this.executor = executor;
     this.nearCacheNotify = new DNearCacheNotify();
     MetricFactory factory = MetricFactory.get();
@@ -95,7 +95,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
   /**
    * Return the JedisPool to use (only 1 at this stage).
    */
-  private JedisPool getJedisPool(DatabaseConfig config) {
+  private JedisPool getJedisPool(DatabaseBuilder.Settings config) {
     JedisPool jedisPool = config.getServiceObject(JedisPool.class);
     if (jedisPool != null) {
       return jedisPool;
@@ -230,7 +230,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
       if (dependentTables != null && !dependentTables.isEmpty()) {
         StringBuilder msg = new StringBuilder(50);
         for (String table : dependentTables) {
-          msg.append(table).append(",");
+          msg.append(table).append(',');
         }
         String formattedMsg = msg.toString();
         if (tableModLogger.isLoggable(DEBUG)) {

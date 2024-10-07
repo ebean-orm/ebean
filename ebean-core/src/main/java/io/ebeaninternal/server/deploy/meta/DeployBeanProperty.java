@@ -1,14 +1,17 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import io.avaje.lang.Nullable;
 import io.ebean.annotation.*;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BindMaxLength;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
 import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
@@ -18,10 +21,10 @@ import io.ebeaninternal.server.properties.BeanPropertySetter;
 import io.ebeaninternal.server.type.ScalarTypeWrapper;
 import io.ebeanservice.docstore.api.mapping.DocPropertyOptions;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.Version;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Version;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -1132,5 +1135,21 @@ public class DeployBeanProperty {
 
   boolean isJsonType() {
     return mutationDetection != null;
+  }
+
+  @Nullable
+  public BindMaxLength bindMaxLength() {
+      if (dbLength == 0) {
+        return null;
+      }
+      switch (dbType) {
+        case Types.VARCHAR:
+        case Types.BLOB:
+        case ExtraDbTypes.JSON:
+          return desc.bindMaxLength();
+        default:
+          return null;
+      }
+
   }
 }

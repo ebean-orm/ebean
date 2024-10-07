@@ -5,12 +5,7 @@ import io.ebean.LikeType;
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.ManyWhereJoins;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
-import io.ebeaninternal.api.SpiExpressionValidation;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
@@ -194,8 +189,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
    * Adds bind values to the request.
    */
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
-
+  public void addBindValues(SpiExpressionBind request) {
     for (SpiExpression item : list) {
       item.addBindValues(request);
     }
@@ -209,7 +203,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
     if (list.isEmpty()) {
       request.append(SQL_TRUE);
     } else {
-      request.append("(");
+      request.append('(');
       for (int i = 0; i < list.size(); i++) {
         SpiExpression item = list.get(i);
         if (i > 0) {
@@ -217,7 +211,7 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
         }
         item.addSql(request);
       }
-      request.append(")");
+      request.append(')');
     }
   }
 
@@ -229,9 +223,9 @@ final class DefaultExampleExpression implements SpiExpression, ExampleExpression
     builder.append("Example[");
     for (SpiExpression expr : list) {
       expr.queryPlanHash(builder);
-      builder.append(",");
+      builder.append(',');
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

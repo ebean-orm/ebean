@@ -23,7 +23,7 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.query.STreePropertyAssocMany;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
@@ -296,23 +296,38 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     // do not add to the selectChain at the top level of the Many bean
   }
 
-  public SpiSqlUpdate deleteByParentId(Object parentId, List<Object> parentIdist) {
-    if (parentId != null) {
-      return sqlHelp.deleteByParentId(parentId);
-    } else {
-      return sqlHelp.deleteByParentIdList(parentIdist);
-    }
+  @Override
+  public SpiSqlUpdate deleteByParentId(Object parentId) {
+    return sqlHelp.deleteByParentId(parentId);
+  }
+
+  @Override
+  public SpiSqlUpdate deleteByParentIdList(List<Object> parentIdist) {
+    return sqlHelp.deleteByParentIdList(parentIdist);
+  }
+
+
+  /**
+   * Find the Id's of detail beans given a parent Id
+   */
+  @Override
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean includeSoftDeletes) {
+    return sqlHelp.findIdsByParentId(parentId, t, includeSoftDeletes, null);
   }
 
   /**
-   * Find the Id's of detail beans given a parent Id or list of parent Id's.
+   * Find the Id's of detail beans given a parent Id and optionally exclude detail IDs
    */
-  public List<Object> findIdsByParentId(Object parentId, List<Object> parentIdList, Transaction t, List<Object> excludeDetailIds, boolean hard) {
-    if (parentId != null) {
-      return sqlHelp.findIdsByParentId(parentId, t, excludeDetailIds, hard);
-    } else {
-      return sqlHelp.findIdsByParentIdList(parentIdList, t, excludeDetailIds, hard);
-    }
+  public List<Object> findIdsByParentId(Object parentId, Transaction t, boolean includeSoftDeletes, Set<Object> excludeDetailIds) {
+    return sqlHelp.findIdsByParentId(parentId, t, includeSoftDeletes, excludeDetailIds);
+  }
+
+  /**
+   * Find the Id's of detail beans given a list of parent Id's.
+   */
+  @Override
+  public List<Object> findIdsByParentIdList(List<Object> parentIdList, Transaction t, boolean includeSoftDeletes) {
+    return sqlHelp.findIdsByParentIdList(parentIdList, t, includeSoftDeletes);
   }
 
   /**
@@ -363,6 +378,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     IntersectionBuilder row = new IntersectionBuilder(intersectionPublishTable, intersectionDraftTable);
     for (ExportedProperty exportedProperty : exportedProperties) {
       row.addColumn(exportedProperty.getForeignDbColumn());
+    }
+    if (importedId == null) {
+      throw new PersistenceException("Missing @Id property on bean related to ManyToMany " + fullName());
     }
     importedId.buildImport(row);
     return row.build();
@@ -458,7 +476,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public Object[] assocIdValues(EntityBean bean) {
-    return targetDescriptor.idBinder().getIdValues(bean);
+    return targetDescriptor.idBinder().values(bean);
   }
 
   /**
@@ -466,7 +484,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public String assocIdExpression(String prefix, String operator) {
-    return targetDescriptor.idBinder().getAssocOneIdExpr(prefix, operator);
+    return targetDescriptor.idBinder().assocExpr(prefix, operator);
   }
 
   /**
@@ -474,7 +492,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public String assocIdInValueExpr(boolean not, int size) {
-    return targetDescriptor.idBinder().getIdInValueExpr(not, size);
+    return targetDescriptor.idBinder().idInValueExpr(not, size);
   }
 
   /**
@@ -482,7 +500,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   @Override
   public String assocIdInExpr(String prefix) {
-    return targetDescriptor.idBinder().getAssocIdInExpr(prefix);
+    return targetDescriptor.idBinder().assocInExpr(prefix);
   }
 
   @Override
@@ -570,10 +588,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
-   * Set the join properties from the parent bean to the child bean.
-   * This is only valid for OneToMany and NOT valid for ManyToMany.
+   * Set the parent bean to the child (update the relationship).
    */
-  public void setJoinValuesToChild(EntityBean parent, EntityBean child, Object mapKeyValue) {
+  public void setParentToChild(EntityBean parent, EntityBean child, Object mapKeyValue) {
     if (mapKeyProperty != null) {
       mapKeyProperty.setValue(child, mapKeyValue);
     }
@@ -585,11 +602,41 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   /**
+   * Return true if the parent bean has been set to the child (updated the relationship).
+   */
+  public boolean setParentToChild(EntityBean parent, EntityBean child, Object mapKeyValue, BeanDescriptor<?> parentDesc) {
+    if (manyToMany
+      || childMasterProperty == null
+      || !child._ebean_getIntercept().isLoadedProperty(childMasterProperty.propertyIndex())) {
+      return false;
+    }
+
+    Object currentParent = childMasterProperty.getValue(child);
+    if (currentParent != null) {
+      Object newId = parentDesc.getId(parent);
+      Object oldId = parentDesc.id(currentParent);
+      if (Objects.equals(newId, oldId)) {
+        return false;
+      }
+    }
+    childMasterProperty.setValueIntercept(child, parent);
+    if (mapKeyProperty != null) {
+      mapKeyProperty.setValue(child, mapKeyValue);
+    }
+    return true;
+  }
+
+  /**
    * Return the order by clause used to order the fetching of the data for
    * this list, set or map.
    */
   public String fetchOrderBy() {
     return fetchOrderBy;
+  }
+
+  @Override
+  public String idNullOr(String filterManyExpression) {
+    return targetIdBinder.idNullOr(name, filterManyExpression);
   }
 
   /**
@@ -740,7 +787,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     throw new PersistenceException(from + ": Could not find mapKey property " + mapKey + " on " + to);
   }
 
-  public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, List<Object> excludeDetailIds) {
+  public IntersectionRow buildManyDeleteChildren(EntityBean parentBean, Set<Object> excludeDetailIds) {
     IntersectionRow row = new IntersectionRow(tableJoin.getTable(), targetDescriptor);
     if (excludeDetailIds != null && !excludeDetailIds.isEmpty()) {
       row.setExcludeIds(excludeDetailIds, targetDescriptor());

@@ -2,6 +2,7 @@ package io.ebean.spring.txn;
 
 import io.avaje.applog.AppLog;
 import io.ebean.TxScope;
+import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.ExternalTransactionManager;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.transaction.TransactionManager;
@@ -9,7 +10,7 @@ import org.springframework.jdbc.datasource.ConnectionHolder;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
 import java.util.List;
 
@@ -27,13 +28,25 @@ public final class SpringJdbcTransactionManager implements ExternalTransactionMa
 
   private static final System.Logger log = AppLog.getLogger(SpringJdbcTransactionManager.class);
 
+  private final CurrentTenantProvider tenantProvider;
+
   private DataSource dataSource;
   private TransactionManager transactionManager;
+
+  /**
+   * Instantiate with a CurrentTenantProvider for Multi-Tenant support.
+   * <p>
+   * When a new transaction is detected, this will set the TenantId on that transaction.
+   */
+  public SpringJdbcTransactionManager(CurrentTenantProvider tenantProvider) {
+    this.tenantProvider = tenantProvider;
+  }
 
   /**
    * Instantiates a new spring aware transaction scope manager.
    */
   public SpringJdbcTransactionManager() {
+    this.tenantProvider = null;
   }
 
   /**
@@ -73,7 +86,13 @@ public final class SpringJdbcTransactionManager implements ExternalTransactionMa
     } else {
       // This is a new spring transaction that we have not seen before.
       // "wrap" it in a SpringJdbcTransaction for use with Ebean
-      SpringJdbcTransaction newTrans = new SpringJdbcTransaction(holder, transactionManager);
+      final var newTrans = new SpringJdbcTransaction(holder, transactionManager);
+      if (tenantProvider != null) {
+        final var tenantId = tenantProvider.currentId();
+        if (tenantId != null) {
+          newTrans.setTenantId(tenantId);
+        }
+      }
 
       // Create and register a Spring TransactionSynchronization for this transaction
       springTxnLister = createListener(newTrans);

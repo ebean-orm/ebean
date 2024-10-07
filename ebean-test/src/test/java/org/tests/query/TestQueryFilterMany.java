@@ -124,7 +124,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sqlList = LoggedSql.stop();
     assertEquals(2, sqlList.size());
     assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
-    assertThat(sqlList.get(1)).contains("status = ?");
+    assertThat(sqlList.get(1)).contains("t0.status = ?");
 
     if (isH2() || isPostgresCompatible()) {
       assertThat(sqlList.get(0)).doesNotContain("offset");
@@ -134,18 +134,85 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
-  public void test_with_findOne() {
-
+  public void filterManyRaw_firstMaxRows_expressionFluidStyle() {
     ResetBasicData.reset();
 
+    LoggedSql.start();
+
+    final Query<Customer> query = DB.find(Customer.class)
+      .where().ieq("name", "Rob")
+      // use expression + fluid style adding maxRows/firstRow to filterMany
+      .filterManyRaw("orders", "status = ?", Order.Status.NEW)
+      .setMaxRows(100).setFirstRow(3).order("orderDate desc, id")
+      .order().asc("id").setMaxRows(5);
+
+    final List<Customer> customers = query.findList();
+    assertThat(customers).isNotEmpty();
+    List<String> sqlList = LoggedSql.stop();
+    assertEquals(2, sqlList.size());
+    assertThat(sqlList.get(0)).contains("lower(t0.name) = ?");
+    assertThat(sqlList.get(1)).contains("t0.status = ?");
+
+    if (isH2() || isPostgresCompatible()) {
+      assertThat(sqlList.get(0)).doesNotContain("offset");
+      assertThat(sqlList.get(0)).contains(" limit 5");
+      assertThat(sqlList.get(1)).contains(" order by t0.order_date desc, t0.id limit 100 offset 3");
+    }
+  }
+
+  @Test
+  public void filterManyRaw_singleQuery() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+
+    final Query<Customer> query = DB.find(Customer.class)
+      .where().ieq("name", "Rob")
+      .filterManyRaw("orders", "status = ?", Order.Status.NEW)
+      .order().asc("id");
+
+    final List<Customer> customers = query.findList();
+    assertThat(customers).isNotEmpty();
+    List<String> sqlList = LoggedSql.stop();
+    assertEquals(1, sqlList.size());
+    assertThat(sqlList.get(0)).contains(" where lower(t0.name) = ? and (t1.id is null or (t1.status = ?)) order by t0.id");
+  }
+
+  @Test
+  public void test_with_findOne_rawSeparateQuery() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
     Customer customer = DB.find(Customer.class)
       .setMaxRows(1)
       .order().asc("id")
       .fetch("orders")
-      .filterMany("orders").raw("1 = 0")
+      .filterMany("orders").raw("orderDate is not null")
       .findOne();
 
     assertThat(customer).isNotNull();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("from o_customer t0 order by");
+    assertThat(sql.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where");
+  }
+
+  @Test
+  public void test_with_findOne_rawSameQuery() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+    var result = DB.find(Customer.class)
+      .order().asc("id")
+      .fetch("orders")
+      .filterMany("orders").raw("orderDate is not null")
+      .findList();
+
+    assertThat(result).isNotEmpty();
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("from o_customer t0 left join o_order t1");
+    assertThat(sql.get(0)).contains("where (t1.id is null or (t1.order_date is not null)) order by t0.id");
   }
 
   @Test
@@ -182,7 +249,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
-    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where exists (select 1 from o_order x where x.kcustomer_id = t0.id and x.order_date is not null) and 1=0 order by t0.id");
+    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where exists (select 1 from o_order x where x.kcustomer_id = t0.id and x.order_date is not null) and (t1.id is null or (1=0)) order by t0.id");
   }
 
   @Test
@@ -202,6 +269,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
     assertThat(sqlList.get(0)).contains("select count(*) from o_customer");
+    assertThat(sqlList.get(0)).doesNotContain("order by");
   }
 
   @Test
@@ -219,11 +287,11 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
-    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where t1.status ");
+    assertThat(sqlList.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where (t1.id is null or (t1.status ");
     if (isPostgresCompatible()) {
-      assertThat(sqlList.get(0)).contains("where t1.status = any(?) order by t0.id");
+      assertThat(sqlList.get(0)).contains("where (t1.id is null or (t1.status = any(?))) order by t0.id");
     } else {
-      assertThat(sqlList.get(0)).contains("where t1.status in (?) order by t0.id");
+      assertThat(sqlList.get(0)).contains("where (t1.id is null or (t1.status in (?))) order by t0.id");
     }
   }
 
@@ -267,7 +335,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
     assertEquals(1, sql.size());
-    assertSql(sql.get(0)).contains(" from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where (t1.status = ? or t1.order_date = ?) order by t0.id");
+    assertSql(sql.get(0)).contains(" from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where (t1.id is null or ((t1.status = ? or t1.order_date = ?))) order by t0.id");
   }
 
   @Test
@@ -283,7 +351,25 @@ public class TestQueryFilterMany extends BaseTestCase {
     List<String> sql = LoggedSql.stop();
 
     assertThat(sql.size()).isGreaterThan(1);
-    assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where t1.first_name is not null order by t0.id; --bind()");
+    assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name is not null)) order by t0.id; --bind()");
+    platformAssertIn(sql.get(1), " from contact_note t0 where (t0.contact_id)");
+    assertSql(sql.get(1)).contains(" and lower(t0.title) like");
+  }
+
+  @Test
+  public void testFetchAndFilterMany() {
+
+    ResetBasicData.reset();
+    LoggedSql.start();
+    DB.find(Customer.class)
+      .fetch("contacts")
+      .filterMany("contacts.notes").istartsWith("title", "foo")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql.size()).isEqualTo(2);
+    assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id");
     platformAssertIn(sql.get(1), " from contact_note t0 where (t0.contact_id)");
     assertSql(sql.get(1)).contains(" and lower(t0.title) like");
   }
@@ -303,9 +389,9 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? ) order by t0.id; --bind(rob%)");
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.id is null or ((t1.first_name is not null and lower(t1.email) like ?))) order by t0.id; --bind(rob%)");
     } else {
-      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.first_name is not null and lower(t1.email) like ? escape'|' ) order by t0.id; --bind(rob%)");
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id where (t1.id is null or ((t1.first_name is not null and lower(t1.email) like ? escape'|'))) order by t0.id; --bind(rob%)");
     }
   }
 }

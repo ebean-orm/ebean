@@ -80,7 +80,7 @@ class ProcessingContext implements Constants {
   /**
    * For partial compile the previous list of prefixed entity classes.
    */
-  private List<String> loadedPrefixEntities = new ArrayList<>();
+  private final List<String> loadedPrefixEntities = new ArrayList<>();
 
   /**
    * The package for the generated EntityClassRegister.
@@ -157,7 +157,7 @@ class ProcessingContext implements Constants {
     return (
       modifiers.contains(Modifier.STATIC) ||
       modifiers.contains(Modifier.TRANSIENT) ||
-      hasAnnotations(field, "javax.persistence.Transient")
+      hasAnnotations(field, "jakarta.persistence.Transient")
     );
   }
 
@@ -217,6 +217,10 @@ class ProcessingContext implements Constants {
     return hasAnnotations(field, DBARRAY);
   }
 
+  private static boolean dbToMany(Element field) {
+    return hasAnnotations(field, ONE_TO_MANY, MANY_TO_MANY);
+  }
+
   /**
    * Escape the type (e.g. java.lang.String) from the TypeMirror toString().
    */
@@ -239,6 +243,7 @@ class ProcessingContext implements Constants {
   }
 
   PropertyType getPropertyType(VariableElement field) {
+    boolean toMany = dbToMany(field);
     if (dbJsonField(field)) {
       return propertyTypeMap.getDbJsonType();
     }
@@ -278,13 +283,15 @@ class ProcessingContext implements Constants {
     if (targetEntity != null) {
       final TypeElement element = elementUtils.getTypeElement(targetEntity);
       if (isEntityOrEmbedded(element)) {
-        return createPropertyTypeAssoc(typeDef(element.asType()));
+        boolean embeddable = isEmbeddable(element);
+        return createPropertyTypeAssoc(embeddable, toMany, typeDef(element.asType()));
       }
     }
 
     if (isEntityOrEmbedded(fieldType)) {
       //  public QAssocContact<QCustomer> contacts;
-      return createPropertyTypeAssoc(typeDef(typeMirror));
+      boolean embeddable = isEmbeddable(fieldType);
+      return createPropertyTypeAssoc(embeddable, toMany, typeDef(typeMirror));
     }
 
     final PropertyType result;
@@ -322,16 +329,19 @@ class ProcessingContext implements Constants {
   }
 
   private PropertyType createManyTypeAssoc(VariableElement field, DeclaredType declaredType) {
+    boolean toMany = dbToMany(field);
     List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
     if (typeArguments.size() == 1) {
       Element argElement = typeUtils.asElement(typeArguments.get(0));
       if (isEntityOrEmbedded(argElement)) {
-        return createPropertyTypeAssoc(typeDef(argElement.asType()));
+        boolean embeddable = isEmbeddable(argElement);
+        return createPropertyTypeAssoc(embeddable, toMany, typeDef(argElement.asType()));
       }
     } else if (typeArguments.size() == 2) {
       Element argElement = typeUtils.asElement(typeArguments.get(1));
       if (isEntityOrEmbedded(argElement)) {
-        return createPropertyTypeAssoc(typeDef(argElement.asType()));
+        boolean embeddable = isEmbeddable(argElement);
+        return createPropertyTypeAssoc(embeddable, toMany, typeDef(argElement.asType()));
       }
     }
     return null;
@@ -359,22 +369,20 @@ class ProcessingContext implements Constants {
   /**
    * Create the QAssoc PropertyType.
    */
-  private PropertyType createPropertyTypeAssoc(String fullName) {
-    String[] split = Split.split(fullName);
-    String propertyName = "QAssoc" + split[1];
-    String packageName = packageAppend(split[0]);
-    return new PropertyTypeAssoc(propertyName, packageName);
-  }
-
-  /**
-   * Prepend the package to the suffix taking null into account.
-   */
-  private String packageAppend(String origPackage) {
-    if (origPackage == null) {
-      return "query.assoc";
+  private PropertyType createPropertyTypeAssoc(boolean embeddable, boolean toMany, String fullName) {
+    TypeElement typeElement = elementUtils.getTypeElement(fullName);
+    String type;
+    if (typeElement.getNestingKind().isNested()) {
+      type = typeElement.getEnclosingElement().toString() + "$" + typeElement.getSimpleName();
     } else {
-      return origPackage + "." + "query.assoc";
+      type = typeElement.getQualifiedName().toString();
     }
+
+    String suffix = toMany ? "Many" : embeddable ? "": "One";
+    String[] split = Split.split(type);
+    String propertyName = "Q" + split[1] + ".Assoc" + suffix;
+    String importName = split[0] + ".query.Q" + split[1];
+    return new PropertyTypeAssoc(propertyName, importName);
   }
 
   /**
@@ -478,6 +486,11 @@ class ProcessingContext implements Constants {
     return createMetaInfWriter(METAINF_MANIFEST);
   }
 
+  FileObject createNativeImageWriter(String name) throws IOException {
+    String nm = "META-INF/native-image/" + name + "/reflect-config.json";
+    return createMetaInfWriter(nm);
+  }
+
   FileObject createMetaInfWriter(String target) throws IOException {
     return filer.createResource(StandardLocation.CLASS_OUTPUT, "", target);
   }
@@ -544,5 +557,9 @@ class ProcessingContext implements Constants {
 
   Element asElement(TypeMirror mirror) {
     return typeUtils.asElement(mirror);
+  }
+
+  boolean isNameClash(String shortName) {
+    return propertyTypeMap.isNameClash(shortName);
   }
 }

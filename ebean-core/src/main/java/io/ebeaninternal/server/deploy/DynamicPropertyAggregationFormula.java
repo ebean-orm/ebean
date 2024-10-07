@@ -4,7 +4,7 @@ import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.query.SqlBeanLoad;
 
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * Dynamic property based on aggregation (max, min, avg, count).
@@ -63,7 +63,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   }
 
   @Override
-  public boolean isDbLob() {
+  public boolean isLobForPlatform() {
     return false;
   }
 

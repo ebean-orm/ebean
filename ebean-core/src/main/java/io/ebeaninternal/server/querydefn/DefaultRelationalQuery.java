@@ -6,7 +6,10 @@ import io.ebean.*;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlQuery;
+import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -28,7 +31,7 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   private int timeout;
   private int bufferFetchSizeHint;
   private final BindParams bindParams = new BindParams();
-  private Transaction transaction;
+  private SpiTransaction transaction;
 
   /**
    * Additional supply a query detail object.
@@ -39,13 +42,19 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   @Override
-  public Transaction transaction() {
+  public SpiTransaction transaction() {
     return transaction;
   }
 
   @Override
   public SqlQuery usingTransaction(Transaction transaction) {
-    this.transaction = transaction;
+    this.transaction = (SpiTransaction) transaction;
+    return this;
+  }
+
+  @Override
+  public SqlQuery usingConnection(Connection connection) {
+    this.transaction = new ExternalJdbcTransaction(connection);
     return this;
   }
 
@@ -61,22 +70,22 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   private void transaction(Transaction transaction) {
-    this.transaction = transaction;
+    this.transaction = (SpiTransaction) transaction;
   }
 
   @Override
   public void findEach(Consumer<SqlRow> consumer) {
-    server.findEach(this, consumer, transaction);
+    server.findEach(this, consumer);
   }
 
   @Override
   public void findEachWhile(Predicate<SqlRow> consumer) {
-    server.findEachWhile(this, consumer, transaction);
+    server.findEachWhile(this, consumer);
   }
 
   @Override
   public List<SqlRow> findList() {
-    return server.findList(this, transaction);
+    return server.findList(this);
   }
 
   @Override
@@ -86,7 +95,7 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
 
   @Override
   public SqlRow findOne() {
-    return server.findOne(this, transaction);
+    return server.findOne(this);
   }
 
   @Override

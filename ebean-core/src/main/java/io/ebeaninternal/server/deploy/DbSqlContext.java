@@ -73,7 +73,7 @@ public interface DbSqlContext {
    * Append a Sql Formula join. This converts the "${ta}" keyword to the current
    * table alias.
    */
-  void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String manyWhere);
+  void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String tableAlias);
 
   /**
    * Return the current content length.
@@ -148,4 +148,10 @@ public interface DbSqlContext {
    * Add extra joins *IF* required to support inheritance discriminator in projection.
    */
   void flushExtraJoins();
+
+  /**
+   * Return true if the last join was added and false means the join was suppressed
+   * as it was already added to the query.
+   */
+  boolean joinAdded();
 }

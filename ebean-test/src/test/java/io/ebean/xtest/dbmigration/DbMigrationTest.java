@@ -2,6 +2,7 @@ package io.ebean.xtest.dbmigration;
 
 import io.ebean.*;
 import io.ebean.annotation.Platform;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.datasource.DataSourcePool;
@@ -88,6 +89,7 @@ public class DbMigrationTest extends BaseTestCase {
       "migtest_QuOtEd",
       "\"migtest_QuOtEd\"",
       "drop_main_drop_ref_many",
+      "drop_ref_one_to_one",
       "drop_ref_many",
       "drop_ref_one",
       "drop_main",
@@ -214,7 +216,7 @@ public class DbMigrationTest extends BaseTestCase {
     if (history == null) {
       return;
     }
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName(server().name());
     config.loadFromProperties(server().pluginApi().config().getProperties());
     config.setDataSource(server().dataSource());
@@ -286,7 +288,7 @@ public class DbMigrationTest extends BaseTestCase {
 
   // do some history tests with V1.1 models
   private void testReservedKeywords() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = new DatabaseConfig();
     config.setName(server().name());
     config.loadFromProperties(server().pluginApi().config().getProperties());
     config.setDataSource(server().dataSource());

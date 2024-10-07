@@ -28,7 +28,7 @@ class TestElementCollectionBasic extends BaseTestCase {
 
     List<String> sql = LoggedSql.collect();
     assertThat(eventLog()).containsOnly("preInsert", "postInsert");
-    assertThat(sql).hasSize(4);
+    assertThat(sql).hasSize(5);
 
     final EcPerson found = DB.find(EcPerson.class)
       .setId(person.getId())
@@ -66,10 +66,11 @@ class TestElementCollectionBasic extends BaseTestCase {
 
     List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(4);
+      assertThat(sql).hasSize(5);
       assertSql(sql.get(0)).contains("insert into ec_person");
       assertSql(sql.get(1)).contains("insert into ec_person_phone");
       assertSqlBind(sql, 2, 3);
+      assertThat(sql.get(4)).contains("-- executeBatch");
     } else {
       assertThat(sql).hasSize(3);
       assertSql(sql.get(0)).contains("insert into ec_person");
@@ -148,7 +149,7 @@ class TestElementCollectionBasic extends BaseTestCase {
     }
 
     List<String> sql = LoggedSql.collect();
-    assertThat(sql).hasSize(2);
+    assertThat(sql).hasSize(3);
     assertSql(sql.get(0)).contains("update ec_person");
 
     assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
@@ -163,12 +164,12 @@ class TestElementCollectionBasic extends BaseTestCase {
 
     List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(7);
+      assertThat(sql).hasSize(9);
       assertSql(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
       assertSql(sql.get(1)).contains("delete from ec_person_phone where owner_id=?");
       assertSqlBind(sql.get(2));
-      assertThat(sql.get(3)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
-      assertSqlBind(sql, 4, 6);
+      assertThat(sql.get(4)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertSqlBind(sql, 5, 7);
 
     } else {
       assertThat(sql).hasSize(5);
@@ -194,12 +195,12 @@ class TestElementCollectionBasic extends BaseTestCase {
     }
 
     List<String> sql = LoggedSql.collect();
-    assertThat(sql).hasSize(9);
+    assertThat(sql).hasSize(12);
     assertSql(sql.get(0)).contains("update ec_person set name=?, version=? where id=? and version=?");
-    assertSql(sql.get(2)).contains("delete from ec_person_phone where owner_id=?");
-    assertSqlBind(sql, 3);
-    assertThat(sql.get(4)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
-    assertSqlBind(sql, 5, 8);
+    assertSql(sql.get(3)).contains("delete from ec_person_phone where owner_id=?");
+    assertSqlBind(sql, 4);
+    assertThat(sql.get(6)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    assertSqlBind(sql, 7, 10);
 
     assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
 
@@ -226,11 +227,11 @@ class TestElementCollectionBasic extends BaseTestCase {
     }
 
     List<String> sql = LoggedSql.collect();
-    assertThat(sql).hasSize(8);
+    assertThat(sql).hasSize(10);
     assertSql(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
     assertSqlBind(sql, 1);
-    assertSql(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
-    assertSqlBind(sql, 3, 7);
+    assertSql(sql.get(3)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+    assertSqlBind(sql, 4, 8);
 
     assertThat(eventLog()).containsExactly("preUpdate", "postUpdate");
 
@@ -243,11 +244,11 @@ class TestElementCollectionBasic extends BaseTestCase {
 
     List<String> sql = LoggedSql.collect();
     if (isPersistBatchOnCascade()) {
-      assertThat(sql).hasSize(9);
+      assertThat(sql).hasSize(11);
       assertSql(sql.get(0)).contains("delete from ec_person_phone where owner_id=?");
       assertSqlBind(sql.get(1));
-      assertSql(sql.get(2)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
-      assertSqlBind(sql, 3, 8);
+      assertSql(sql.get(3)).contains("insert into ec_person_phone (owner_id,phone) values (?,?)");
+      assertSqlBind(sql, 4, 9);
 
     } else {
       assertThat(sql).hasSize(7);

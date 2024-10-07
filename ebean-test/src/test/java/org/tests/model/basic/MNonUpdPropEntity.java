@@ -1,6 +1,6 @@
 package org.tests.model.basic;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "non_updateprop")

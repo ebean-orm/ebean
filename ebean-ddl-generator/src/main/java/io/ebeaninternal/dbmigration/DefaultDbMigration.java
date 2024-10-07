@@ -3,11 +3,9 @@ package io.ebeaninternal.dbmigration;
 import io.avaje.applog.AppLog;
 import io.ebean.DB;
 import io.ebean.Database;
+import io.ebean.DatabaseBuilder;
 import io.ebean.annotation.Platform;
-import io.ebean.config.DatabaseConfig;
-import io.ebean.config.DbConstraintNaming;
-import io.ebean.config.PlatformConfig;
-import io.ebean.config.PropertiesWrapper;
+import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatformProvider;
 import io.ebean.dbmigration.DbMigration;
@@ -75,7 +73,7 @@ public class DefaultDbMigration implements DbMigration {
   protected DatabasePlatform databasePlatform;
   private boolean vanillaPlatform;
   protected List<Pair> platforms = new ArrayList<>();
-  protected DatabaseConfig databaseConfig;
+  protected DatabaseBuilder.Settings databaseBuilder;
   protected DbConstraintNaming constraintNaming;
   protected Boolean strictMode;
   protected Boolean includeGeneratedFileComment;
@@ -116,12 +114,13 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   @Override
-  public void setServerConfig(DatabaseConfig config) {
-    if (this.databaseConfig == null) {
-      this.databaseConfig = config;
+  public void setServerConfig(DatabaseBuilder builder) {
+    var config = builder.settings();
+    if (this.databaseBuilder == null) {
+      this.databaseBuilder = config;
     }
     if (constraintNaming == null) {
-      this.constraintNaming = databaseConfig.getConstraintNaming();
+      this.constraintNaming = databaseBuilder.getConstraintNaming();
     }
     Properties properties = config.getProperties();
     if (properties != null) {
@@ -360,7 +359,7 @@ public class DefaultDbMigration implements DbMigration {
    */
   private void configurePlatforms() {
     for (Pair pair : platforms) {
-      PlatformConfig config = databaseConfig.newPlatformConfig("dbmigration.platform", pair.prefix);
+      PlatformConfig config = databaseBuilder.newPlatformConfig("dbmigration.platform", pair.prefix);
       pair.platform.configure(config);
     }
   }
@@ -645,7 +644,7 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   private PlatformDdlWriter createDdlWriter(DatabasePlatform platform) {
-    return new PlatformDdlWriter(platform, databaseConfig, lockTimeoutSeconds);
+    return new PlatformDdlWriter(platform, databaseBuilder, lockTimeoutSeconds);
   }
 
   /**
@@ -674,12 +673,12 @@ public class DefaultDbMigration implements DbMigration {
       // not explicitly set so use the platform of the server
       databasePlatform = server.databasePlatform();
     }
-    if (databaseConfig != null) {
+    if (databaseBuilder != null) {
       if (strictMode != null) {
-        databaseConfig.setDdlStrictMode(strictMode);
+        databaseBuilder.setDdlStrictMode(strictMode);
       }
       if (header != null) {
-        databaseConfig.setDdlHeader(header);
+        databaseBuilder.setDdlHeader(header);
       }
     }
   }

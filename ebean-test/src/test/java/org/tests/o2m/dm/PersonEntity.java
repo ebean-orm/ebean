@@ -2,7 +2,7 @@ package org.tests.o2m.dm;
 
 import org.tests.model.draftable.BaseDomain;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class PersonEntity extends BaseDomain {

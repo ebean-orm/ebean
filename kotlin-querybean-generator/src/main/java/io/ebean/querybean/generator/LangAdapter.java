@@ -2,13 +2,10 @@ package io.ebean.querybean.generator;
 
 public interface LangAdapter {
 
-  void beginClass(Append writer, String shortName);
 
-  void beginAssocClass(Append writer, String shortName, String origShortName);
+  void alias(Append writer, String shortName, String beanFullName);
 
-  void alias(Append writer, String shortName);
-
-  void rootBeanConstructor(Append writer, String shortName, String dbName);
+  void rootBeanConstructor(Append writer, String shortName, String dbName, String beanFullName);
 
   void assocBeanConstructor(Append writer, String shortName);
 

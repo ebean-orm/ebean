@@ -3,6 +3,7 @@ package org.tests.json;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.ValuePair;
+import io.ebean.DatabaseBuilder;
 import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.Platform;

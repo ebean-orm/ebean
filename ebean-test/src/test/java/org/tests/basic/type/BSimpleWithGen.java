@@ -1,8 +1,8 @@
 package org.tests.basic.type;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Transient;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +13,8 @@ public class BSimpleWithGen {
   private Integer id;
 
   private String name;
+
+  private String description;
 
   @Transient
   private Map<String, List<String>> someMap;
@@ -45,4 +47,11 @@ public class BSimpleWithGen {
     this.someMap = someMap;
   }
 
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
 }

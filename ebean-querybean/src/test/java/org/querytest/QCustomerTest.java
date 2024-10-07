@@ -4,10 +4,12 @@ import io.ebean.*;
 import io.ebean.annotation.Transactional;
 import io.ebean.test.LoggedSql;
 import io.ebean.types.Inet;
-import org.example.domain.*;
+import io.ebeaninternal.api.SpiQuery;
+import org.example.domain.Address;
+import org.example.domain.Country;
+import org.example.domain.Customer;
 import org.example.domain.otherpackage.PhoneNumber;
 import org.example.domain.otherpackage.ValidEmail;
-import org.example.domain.query.QAnimal;
 import org.example.domain.query.QContact;
 import org.example.domain.query.QCustomer;
 import org.junit.jupiter.api.Disabled;
@@ -26,7 +28,9 @@ import static io.ebean.StdOperators.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.example.domain.query.QAddress.Alias.country;
 import static org.example.domain.query.QAddress.Alias.line1;
+import static org.example.domain.query.QContact.Alias.firstName;
 import static org.example.domain.query.QContact.Alias.lastName;
+import static org.example.domain.query.QCustomer.Alias.*;
 import static org.example.domain.query.QCustomer.Alias.billingAddress;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -58,6 +62,25 @@ public class QCustomerTest {
       txn.commit();
     }
 
+  }
+
+  @Test
+  public void copy() {
+    var origin = new QCustomer()
+      .setDistinct(true)
+      .status.equalTo(Customer.Status.BAD);
+
+    var copy1 = origin.copy().name.isNotNull();
+    var q1 = copy1.query();
+    copy1.findList();
+
+    assertThat(q1.getGeneratedSql()).contains("from be_customer t0 where t0.status = ? and t0.name is not null");
+
+    var copy2 = origin.copy().version.ge(1L);
+    var q2 = copy2.query();
+    copy2.findList();
+
+    assertThat(q2.getGeneratedSql()).contains("from be_customer t0 where t0.status = ? and t0.version >= ?");
   }
 
   @Test
@@ -125,6 +148,31 @@ public class QCustomerTest {
     assertThat(batchSizes.get(1)).isEqualTo(9);
   }
 
+  // using QCustomer.forFetchGroup() ... does not need any Ebean Database initialisation etc
+  // and so is good for when we want to build a static final OrderBy
+  static final OrderBy<Customer> orderBy = QCustomer.forFetchGroup()
+    .name.asc()
+    .email.desc()
+    .query().orderBy();
+
+  @Test
+  void findWithPaging() {
+    // OrderBy<Customer> orderBy = new QCustomer().name.asc().email.desc().query().orderBy();
+    OrderBy<Customer> orderBy = OrderBy.of("name, email desc");
+    var paging = Paging.of(2, 10, QCustomerTest.orderBy);
+
+    LoggedSql.start();
+
+    new QCustomer()
+      .name.isNotNull()
+      .setPaging(paging)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("where t0.name is not null order by t0.name, t0.email desc limit 10 offset 20");
+  }
+
   @Test
   public void findIterate() {
 
@@ -161,8 +209,8 @@ public class QCustomerTest {
   @Test
   void equalTo_byProperty() {
     Query<Customer> query = new QCustomer()
-      .select(QCustomer.Alias.id)
-      .billingAddress.city.eq(QCustomer.Alias.shippingAddress.city)
+      .select(id)
+      .billingAddress.city.eq(shippingAddress.city)
       .query();
 
     query.findList();
@@ -178,8 +226,8 @@ public class QCustomerTest {
   @Test
   void notEqual_byProperty() {
     Query<Customer> query = new QCustomer()
-      .select(QCustomer.Alias.id)
-      .billingAddress.city.ne(QCustomer.Alias.shippingAddress.city)
+      .select(id)
+      .billingAddress.city.ne(shippingAddress.city)
       .query();
 
     query.findList();
@@ -202,6 +250,22 @@ public class QCustomerTest {
     new QCustomer()
       .contacts.isNotEmpty()
       .findList();
+  }
+
+  @Test
+  public void distinctOn() {
+    var c = QContact.alias();
+    var q = new QContact()
+      .distinctOn(c.customer)
+      .select(c.lastName, c.whenCreated)
+      .orderBy()
+      .customer.id.asc()
+      .whenCreated.desc()
+      .query();
+
+    SpiQuery<?> spiQuery = (SpiQuery<?>) q;
+    assertThat(spiQuery.distinctOn()).isEqualTo("customer");
+    assertThat(spiQuery.isDistinct()).isTrue();
   }
 
   @Transactional
@@ -246,6 +310,72 @@ public class QCustomerTest {
       .findList();
   }
 
+  static final FetchGroup<Customer> FGCustomerContacts = QCustomer.forFetchGroup()
+    .select(name)
+    .contacts.fetch(firstName, lastName)
+    .buildFetchGroup();
+
+  @Test
+  void filterMany() {
+
+    var q = new QCustomer()
+      .select(FGCustomerContacts)
+      .contacts.filterMany(contacts -> contacts
+        .firstName.startsWith("r")
+        .email.isNotNull())
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterMany */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? escape'|' and t1.email is not null)) order by t0.id");
+  }
+
+  @Test
+  void filterManySingle() {
+
+    var q = new QCustomer()
+      .select(FGCustomerContacts)
+      .contacts.filterMany(c -> c.firstName.startsWith("r"))
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterManySingle */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? escape'|')) order by t0.id");
+  }
+
+  @Test
+  void filterManySeparateQuery() {
+    Customer cust = new Customer();
+    cust.setName("filterManySeparateQuery");
+    cust.setStatus(Customer.Status.GOOD);
+    cust.save();
+
+    var q = new QCustomer()
+      .select(FGCustomerContacts)
+      .contacts.filterManyRaw("firstName like ?", "R%")
+      .contacts.filterMany(c -> c.firstName.startsWith("R")) // same as filterManyRaw() expression
+      .setMaxRows(10) // force the ToMany path to be in a separate secondary query
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterManySeparateQuery */ t0.id, t0.name from be_customer t0 limit 10");
+  }
+
+  @Test
+  void filterManySingleQuery() {
+    Customer cust = new Customer();
+    cust.setName("filterManySingleQuery");
+    cust.setStatus(Customer.Status.GOOD);
+    cust.save();
+
+    var q = new QCustomer()
+      .select(FGCustomerContacts)
+      .contacts.filterManyRaw("firstName like ?", "R%")
+      .contacts.filterMany(c -> c.firstName.startsWith("R")) // same as filterManyRaw() expression
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? and t1.first_name like ? escape'|')) order by t0.id");
+  }
+
   @Test
   public void testIdIn() {
 
@@ -277,10 +407,10 @@ public class QCustomerTest {
 
   @Test
   public void usingMaster() {
-      new QCustomer()
-        .registered.isNull()
-        .usingMaster()
-        .findList();
+    new QCustomer()
+      .registered.isNull()
+      .usingMaster()
+      .findList();
   }
 
   @Test
@@ -555,7 +685,7 @@ public class QCustomerTest {
     assertContains(new QCustomer().registered.lt(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.before(new Date()).query(), " where t0.registered < ?");
     assertContains(new QCustomer().registered.lessThan(new Date()).query(), " where t0.registered < ?");
-    assertContains(new QCustomer().whenCreated.lt(QCustomer.Alias.whenUpdated).query(), " where t0.when_created < t0.when_updated");
+    assertContains(new QCustomer().whenCreated.lt(whenUpdated).query(), " where t0.when_created < t0.when_updated");
   }
 
   @Test
@@ -563,7 +693,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.le(new Date()).query(), " where t0.registered <= ?");
     assertContains(new QCustomer().registered.lessOrEqualTo(new Date()).query(), " where t0.registered <= ?");
-    assertContains(new QCustomer().whenCreated.le(QCustomer.Alias.whenUpdated).query(), " where t0.when_created <= t0.when_updated");
+    assertContains(new QCustomer().whenCreated.le(whenUpdated).query(), " where t0.when_created <= t0.when_updated");
   }
 
   @Test
@@ -571,7 +701,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.after(new Date()).query(), " where t0.registered > ?");
     assertContains(new QCustomer().registered.gt(new Date()).query(), " where t0.registered > ?");
-    assertContains(new QCustomer().whenCreated.gt(QCustomer.Alias.whenUpdated).query(), " where t0.when_created > t0.when_updated");
+    assertContains(new QCustomer().whenCreated.gt(whenUpdated).query(), " where t0.when_created > t0.when_updated");
     assertContains(new QCustomer().registered.greaterThan(new Date()).query(), " where t0.registered > ?");
   }
 
@@ -581,7 +711,7 @@ public class QCustomerTest {
 
     assertContains(new QCustomer().registered.ge(new Date()).query(), " where t0.registered >= ?");
     assertContains(new QCustomer().registered.greaterOrEqualTo(new Date()).query(), " where t0.registered >= ?");
-    assertContains(new QCustomer().whenCreated.ge(QCustomer.Alias.whenUpdated).query(), " where t0.when_created >= t0.when_updated");
+    assertContains(new QCustomer().whenCreated.ge(whenUpdated).query(), " where t0.when_created >= t0.when_updated");
   }
 
   private void assertContains(Query<Customer> query, String match) {
@@ -597,8 +727,6 @@ public class QCustomerTest {
       .setAllowLoadErrors()
       .findList();
   }
-
-
 
   @Test
   public void select_assocManyToOne() {
@@ -746,6 +874,30 @@ public class QCustomerTest {
     new QContact()
       .firstName.inRangeWith(lastName, "B")
       .findList();
+
+    new QContact()
+      .firstName.between("A", "B")
+      .findList();
+  }
+
+  @Test
+  void betweenProperties() {
+    var query = new QContact()
+      .firstName.betweenProperties(lastName, "B");
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where ? between t0.first_name and t0.last_name");
+  }
+
+  @Test
+  void betweenProperties_notFirstPredicate() {
+    var query = new QContact()
+      .lastName.isNotNull()
+      .firstName.betweenProperties(lastName, "B")
+      .email.isNotNull();
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).contains(" where t0.last_name is not null and ? between t0.first_name and t0.last_name and t0.email is not null");
   }
 
   @Test
@@ -788,16 +940,16 @@ public class QCustomerTest {
       .findList();
 
     new QCustomer()
-      .add(in(QCustomer.Alias.name, List.of("foo", "bar")))
-      .add(eq(QCustomer.Alias.currentInet, Inet.of("127.0.0.1")))
+      .add(in(name, List.of("foo", "bar")))
+      .add(eq(currentInet, Inet.of("127.0.0.1")))
       .findList();
 
     new QCustomer()
       //.add(gt(sum(QCustomer.Alias.version), 45))
-      .add(eq(QCustomer.Alias.version, 45L))
-      .add(eq(QCustomer.Alias.name, "junk"))
-      .add(eq(QCustomer.Alias.registered, new Date()))
-      .add(eq(QCustomer.Alias.whenUpdated, new Timestamp(System.currentTimeMillis())))
+      .add(eq(version, 45L))
+      .add(eq(name, "junk"))
+      .add(eq(registered, new Date()))
+      .add(eq(whenUpdated, new Timestamp(System.currentTimeMillis())))
       .findList();
   }
 
@@ -957,6 +1109,32 @@ public class QCustomerTest {
       .findSingleAttribute();
 
     assertThat(maxDate).isNotNull();
+  }
+
+  @Test
+  public void findSingleAttributeOrEmpty() {
+
+    Customer cust = new Customer();
+    cust.setName("MaybeIExist yeah");
+    cust.setStatus(Customer.Status.GOOD);
+    cust.setRegistered(new Date());
+    cust.save();
+
+    Optional<String> customerName = new QCustomer()
+      .select(name)
+      .status.eq(Customer.Status.GOOD)
+      .name.startsWith("MaybeIExist")
+      .findSingleAttributeOrEmpty();
+
+    assertThat(customerName).isPresent();
+
+    Optional<String> customerName2 = new QCustomer()
+      .select(name)
+      .status.eq(Customer.Status.GOOD)
+      .name.eq("NahIDoNotExist")
+      .findSingleAttributeOrEmpty();
+
+    assertThat(customerName2).isEmpty();
   }
 
 

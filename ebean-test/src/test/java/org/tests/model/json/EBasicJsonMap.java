@@ -2,7 +2,7 @@ package org.tests.model.json;
 
 import io.ebean.annotation.DbJson;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class EBasicJsonMap {
 
   String name;
 
-  @DbJson
+  @DbJson(length = 5000)
   Map<String, Object> content;
 
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)

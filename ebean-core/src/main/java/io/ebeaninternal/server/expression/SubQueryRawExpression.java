@@ -2,6 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiExpression;
+import io.ebeaninternal.api.SpiExpressionBind;
 import io.ebeaninternal.api.SpiExpressionRequest;
 
 import java.util.Arrays;
@@ -31,7 +32,7 @@ final class SubQueryRawExpression extends AbstractExpression implements Unsuppor
   public void queryPlanHash(StringBuilder builder) {
     builder.append("SubQueryRaw[").append(propName).append(op.expression)
       .append(" subQuery:").append(subQuery)
-      .append(" ?:").append(bindParams.length).append("]");
+      .append(" ?:").append(bindParams.length).append(']');
   }
 
   @Override
@@ -43,11 +44,11 @@ final class SubQueryRawExpression extends AbstractExpression implements Unsuppor
 
   @Override
   public void addSql(SpiExpressionRequest request) {
-    request.property(propName).append(op.expression).append("(").append(subQuery).append(")");
+    request.property(propName).append(op.expression).append('(').append(subQuery).append(')');
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }

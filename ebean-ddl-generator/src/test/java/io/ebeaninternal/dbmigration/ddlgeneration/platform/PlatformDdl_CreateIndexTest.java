@@ -1,7 +1,7 @@
 package io.ebeaninternal.dbmigration.ddlgeneration.platform;
 
 import io.ebean.DB;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.DatabaseBuilder;
 import io.ebean.platform.db2.DB2LuwPlatform;
 import io.ebean.platform.h2.H2Platform;
 import io.ebean.platform.hana.HanaPlatform;
@@ -27,7 +27,7 @@ public class PlatformDdl_CreateIndexTest {
   private final PlatformDdl db2LuwDdl = PlatformDdlBuilder.create(new DB2LuwPlatform());
 
   {
-    DatabaseConfig config = DB.getDefault().pluginApi().config();
+    DatabaseBuilder.Settings config = DB.getDefault().pluginApi().config();
     h2Ddl.configure(config);
     pgDdl.configure(config);
     mysqlDdl.configure(config);
@@ -38,7 +38,6 @@ public class PlatformDdl_CreateIndexTest {
   }
 
   WriteCreateIndex writeCreateIndex() {
-
     return writeCreateIndex(true, true);
   }
 

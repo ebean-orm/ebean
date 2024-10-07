@@ -224,14 +224,21 @@ public final class BatchControl {
    * Execute all the requests contained in the list.
    */
   void executeNow(ArrayList<PersistRequest> list) throws BatchedSqlException {
-    for (int i = 0; i < list.size(); i++) {
-      if (i % batchSize == 0) {
-        // hit the batch size so flush
-        flushPstmtHolder();
+    boolean old = transaction.isFlushOnQuery();
+    transaction.setFlushOnQuery(false);
+    // disable flush on query due transaction callbacks
+    try {
+      for (int i = 0; i < list.size(); i++) {
+        if (i % batchSize == 0) {
+          // hit the batch size so flush
+          flushPstmtHolder();
+        }
+        list.get(i).executeNow();
       }
-      list.get(i).executeNow();
+      flushPstmtHolder();
+    } finally {
+      transaction.setFlushOnQuery(old);
     }
-    flushPstmtHolder();
   }
 
   public void flushOnCommit() throws BatchedSqlException {

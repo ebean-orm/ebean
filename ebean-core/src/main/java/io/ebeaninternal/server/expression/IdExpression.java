@@ -45,7 +45,7 @@ final class IdExpression extends NonPrepareExpression implements SpiExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     // 'flatten' EmbeddedId and multiple ID cases
     // into an array of the underlying scalar field values
     for (Object bindIdValue : request.descriptor().bindIdValues(value)) {

@@ -3,6 +3,7 @@ package io.ebeaninternal.api;
 import io.ebean.CacheMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.core.BindPadding;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -57,17 +58,22 @@ public final class LoadManyRequest extends LoadRequest {
     return loadContext.fullPath();
   }
 
-  private List<Object> parentIdList(SpiEbeanServer server) {
-    List<Object> idList = new ArrayList<>();
-    BeanPropertyAssocMany<?> many = many();
+  private List<Object> parentIdList(SpiEbeanServer server, BeanPropertyAssocMany<?> many, PersistenceContext pc) {
+    final var idList = new ArrayList<>(loadContext.size());
+    final var descriptor = many.descriptor();
     for (int i = 0; i < loadContext.size(); i++) {
-      BeanCollection<?> bc = loadContext.get(i);
+      final BeanCollection<?> bc = loadContext.get(i);
       if (bc != null) {
-        if (lazy && !originIncluded && bc == originCollection) {
-          originIncluded = true;
-        }
-        idList.add(many.parentId(bc.owner()));
+        final var parent = bc.owner();
+        final var parentId = descriptor.getId(parent);
+        idList.add(parentId);
         bc.setLoader(server); // don't use the load buffer again
+        if (lazy) {
+          descriptor.contextPutIfAbsent(pc, parentId, parent);
+          if (!originIncluded && bc == originCollection) {
+            originIncluded = true;
+          }
+        }
       }
     }
     if (originCollection != null && !originIncluded) {
@@ -75,7 +81,7 @@ public final class LoadManyRequest extends LoadRequest {
       idList.add(many.parentId(originCollection.owner()));
       originCollection.setLoader(server); // don't use the load buffer again
     }
-    if (many.targetDescriptor().isPadInExpression()) {
+    if (descriptor.isPadInExpression()) {
       BindPadding.padIds(idList);
     }
     return idList;
@@ -88,6 +94,7 @@ public final class LoadManyRequest extends LoadRequest {
   public SpiQuery<?> createQuery(SpiEbeanServer server) {
     BeanPropertyAssocMany<?> many = many();
     SpiQuery<?> query = many.newQuery(server);
+    query.usingTransaction(transaction);
     String orderBy = many.lazyFetchOrderBy();
     if (orderBy != null) {
       query.orderBy(orderBy);
@@ -99,9 +106,10 @@ public final class LoadManyRequest extends LoadRequest {
       query.where().raw(extraWhere.replace("${ta}", "t0").replace("${mta}", "int_"));
     }
     query.setLazyLoadForParents(many);
-    many.addWhereParentIdIn(query, parentIdList(server), loadContext.isUseDocStore());
-    query.setPersistenceContext(loadContext.persistenceContext());
-    query.setLoadDescription(lazy ? "+lazy" : "+query", description());
+    final var pc = loadContext.persistenceContext();
+    many.addWhereParentIdIn(query, parentIdList(server, many, pc), loadContext.isUseDocStore());
+    query.setPersistenceContext(pc);
+    query.setLoadDescription(lazy ? "lazy" : "query", description());
     if (lazy) {
       query.setLazyLoadBatchSize(loadContext.batchSize());
     } else {
@@ -111,7 +119,12 @@ public final class LoadManyRequest extends LoadRequest {
     loadContext.configureQuery(query);
     if (onlyIds) {
       // lazy loading invoked via clear() and removeAll()
-      query.select(many.targetIdProperty());
+      String mapKey = many.mapKey();
+      if (mapKey != null) {
+        query.select(mapKey);
+      } else {
+        query.select(many.targetIdProperty());
+      }
     }
     return query;
   }

@@ -63,10 +63,10 @@ public class TestMergeBasic extends BaseTestCase {
       assertThat(sql.get(3)).contains("insert into uutwo (id, name, notes, version, master_id) values (?,?,?,?,?)");
       assertThat(sql.get(4)).contains("-- bind(");
       assertThat(sql.get(5)).contains("-- bind(");
-      assertThat(sql.get(6)).contains("update uutwo set name=?, notes=?, version=?, master_id=? where id=? and version=?");
-      assertThat(sql.get(7)).contains("-- bind(");
+      assertThat(sql.get(7)).contains("update uutwo set name=?, notes=?, version=?, master_id=? where id=? and version=?");
       assertThat(sql.get(8)).contains("-- bind(");
       assertThat(sql.get(9)).contains("-- bind(");
+      assertThat(sql.get(10)).contains("-- bind(");
 
     } else {
       assertThat(sql.get(3)).contains("insert into uutwo (id, name, notes, version, master_id) values (?,?,?,?,?);");
@@ -111,8 +111,8 @@ public class TestMergeBasic extends BaseTestCase {
       assertThat(sql.get(3)).contains("insert into uutwo (id, name, notes, version, master_id) values (?,?,?,?,?)");
       assertThat(sql.get(4)).contains("-- bind(");
       assertThat(sql.get(5)).contains("-- bind(");
-      assertThat(sql.get(6)).contains("update uutwo set name=?, notes=?, version=?, master_id=? where id=? and version=?");
-      assertThat(sql.get(9)).contains("-- bind(");
+      assertThat(sql.get(7)).contains("update uutwo set name=?, notes=?, version=?, master_id=? where id=? and version=?");
+      assertThat(sql.get(10)).contains("-- bind(");
 
     } else {
       assertThat(sql.get(3)).contains("insert into uutwo (id, name, notes, version, master_id) values (?,?,?,?,?);");

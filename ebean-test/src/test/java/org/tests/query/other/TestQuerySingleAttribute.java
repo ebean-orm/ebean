@@ -20,6 +20,7 @@ import org.tests.o2m.OmBasicParent;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -137,6 +138,32 @@ class TestQuerySingleAttribute extends BaseTestCase {
 
     assertThat(sqlOf(query)).contains("select t0.name from o_customer t0");
     assertThat(name).isNotNull();
+  }
+
+  @Test
+  void findSingleAttributeOrEmpty() {
+    ResetBasicData.reset();
+
+    Query<Customer> query = DB.find(Customer.class)
+      .select("name")
+      .where().eq("name", "Rob").query();
+
+    Optional<String> name = query.findSingleAttributeOrEmpty();
+
+    assertThat(sqlOf(query)).contains("select t0.name from o_customer t0");
+    assertThat(name).isPresent().contains("Rob");
+  }
+
+  @Test
+  void findSingleAttributeOrEmpty_when_empty() {
+    ResetBasicData.reset();
+
+    Query<Customer> query = DB.find(Customer.class)
+      .select("name")
+      .where().eq("name", "I_Do_Not_ExistO!").query();
+
+    Optional<String> name = query.findSingleAttributeOrEmpty();
+    assertThat(name).isEmpty();
   }
 
   @Test
@@ -760,10 +787,10 @@ class TestQuerySingleAttribute extends BaseTestCase {
     List<Order.Status> statusList = query.findSingleAttributeList();
     assertSql(query)
       .contains("select distinct t1.status from o_customer t0 "
-        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null where t1.status is not null")
+        + "left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null where (t1.id is null or (t1.status is not null))")
       .doesNotContain("order by");
 
-    assertThat(statusList).hasSize(3);
+    assertThat(statusList).hasSize(4);
   }
 
   @Test

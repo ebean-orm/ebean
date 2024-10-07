@@ -52,7 +52,7 @@ final class ExportedProperty {
   public void appendWhere(StringBuilder sb, String alias, String path) {
     sb.append(alias).append(foreignDbColumn).append(" = ");
     if (path != null) {
-      sb.append(path).append(".");
+      sb.append(path).append('.');
     }
     sb.append(property.name());
   }

@@ -35,7 +35,7 @@ module io.ebean.core {
   requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;
   requires static jakarta.validation;
-  requires static java.transaction;
+  requires static jakarta.transaction;
   requires static java.naming;
   requires static java.validation;
   requires static org.postgresql.jdbc;
@@ -47,7 +47,7 @@ module io.ebean.core {
   exports io.ebeanservice.docstore.api.support to io.ebean.elastic, io.ebean.test;
   exports io.ebeanservice.docstore.api.mapping to io.ebean.elastic;
 
-  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.spring.txn;
+  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.postgis.types;
   exports io.ebeaninternal.api.json to io.ebean.test;
   exports io.ebeaninternal.json to io.ebean.test;
   exports io.ebeaninternal.server.autotune to io.ebean.autotune;
@@ -69,15 +69,16 @@ module io.ebean.core {
   exports io.ebeaninternal.server.querydefn to io.ebean.autotune, io.ebean.querybean, io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.rawsql to io.ebean.test;
   exports io.ebeaninternal.server.json to io.ebean.test, io.ebean.elastic;
-  exports io.ebeaninternal.server.type to io.ebean.postgis, io.ebean.test;
+  exports io.ebeaninternal.server.type to io.ebean.postgis, io.ebean.test, io.ebean.postgis.types;
   exports io.ebeaninternal.server.transaction to io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.k8scache;
   exports io.ebeaninternal.server.util to io.ebean.querybean;
 
-  provides io.ebean.metric.MetricFactory with io.ebeaninternal.server.profile.DMetricFactory;
-  provides io.ebean.service.SpiContainerFactory with io.ebeaninternal.server.DContainerFactory;
-  provides io.ebean.service.SpiFetchGroupService with io.ebeaninternal.server.query.DFetchGroupService;
-  provides io.ebean.service.SpiJsonService with io.ebeaninternal.json.DJsonService;
-  provides io.ebean.service.SpiProfileLocationFactory with io.ebeaninternal.server.profile.DProfileLocationFactory;
-  provides io.ebean.service.SpiRawSqlService with io.ebeaninternal.server.rawsql.DRawSqlService;
+  provides io.ebean.service.BootstrapService with
+    io.ebeaninternal.server.DContainerFactory,
+    io.ebeaninternal.server.query.DFetchGroupService,
+    io.ebeaninternal.server.profile.DProfileLocationFactory,
+    io.ebeaninternal.server.rawsql.DRawSqlService,
+    io.ebeaninternal.server.profile.DMetricFactory,
+    io.ebeaninternal.json.DJsonService;
 
 }

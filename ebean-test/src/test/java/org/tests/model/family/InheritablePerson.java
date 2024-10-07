@@ -2,9 +2,9 @@ package org.tests.model.family;
 
 import org.tests.model.basic.EBasic;
 
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MappedSuperclass;
 import java.io.Serializable;
 
 @MappedSuperclass

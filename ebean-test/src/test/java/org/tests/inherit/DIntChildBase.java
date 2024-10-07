@@ -1,6 +1,6 @@
 package org.tests.inherit;
 
-import javax.persistence.Entity;
+import jakarta.persistence.Entity;
 
 @Entity
 public class DIntChildBase extends DIntParent {

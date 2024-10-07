@@ -2,7 +2,7 @@ package org.tests.model.lazywithid;
 
 import io.ebean.common.BeanList;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity

@@ -7,12 +7,12 @@ import io.ebeaninternal.api.SpiTransaction;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 import javax.sql.DataSource;
-import javax.transaction.Status;
-import javax.transaction.Synchronization;
-import javax.transaction.TransactionSynchronizationRegistry;
-import javax.transaction.UserTransaction;
+import jakarta.transaction.Status;
+import jakarta.transaction.Synchronization;
+import jakarta.transaction.TransactionSynchronizationRegistry;
+import jakarta.transaction.UserTransaction;
 
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.WARNING;
@@ -94,9 +94,14 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
     // check current Ebean transaction
     SpiTransaction currentEbeanTransaction = scope.inScope();
     if (currentEbeanTransaction != null) {
-      // NOT expecting this so log WARNING
-      log.log(WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.id());
-      return currentEbeanTransaction;
+      if (currentEbeanTransaction.isActive()) {
+        // NOT expecting this so log WARNING
+        log.log(WARNING, "JTA Transaction - no current txn BUT using current Ebean one {0}", currentEbeanTransaction.id());
+        return currentEbeanTransaction;
+      } else {
+        log.log(DEBUG, "JTA Transaction - clearing inActive Ebean transaction {0}", currentEbeanTransaction.id());
+        scope.clearExternal();
+      }
     }
 
     UserTransaction ut = userTransaction();
@@ -186,27 +191,27 @@ public final class JtaTransactionManager implements ExternalTransactionManager {
 
     @Override
     public void afterCompletion(int status) {
-      switch (status) {
-        case Status.STATUS_COMMITTED:
-          log.log(DEBUG, "Jta Txn [{0}] committed", transaction.id());
-          transaction.postCommit();
-          // Remove this transaction object as it is completed
-          transactionManager.scope().clearExternal();
-          break;
+      try {
+        switch (status) {
+          case Status.STATUS_COMMITTED:
+            log.log(DEBUG, "Jta Txn [{0}] committed", transaction.id());
+            transaction.postCommit();
+            break;
 
-        case Status.STATUS_ROLLEDBACK:
-          log.log(DEBUG, "Jta Txn [{0}] rollback", transaction.id());
-          transaction.postRollback(null);
-          // Remove this transaction object as it is completed
-          transactionManager.scope().clearExternal();
-          break;
+          case Status.STATUS_ROLLEDBACK:
+            log.log(DEBUG, "Jta Txn [{0}] rollback", transaction.id());
+            transaction.postRollback(null);
+            break;
 
-        default:
-          log.log(DEBUG, "Jta Txn [{0}] status:{1}", transaction.id(), status);
+          default:
+            log.log(DEBUG, "Jta Txn [{0}] status:{1}", transaction.id(), status);
+        }
+      } finally {
+        transaction.deactivateExternal();
+        transactionManager.scope().clearExternal();
+        // No matter the completion status of the transaction, we release the connection we got from the pool.
+        JdbcClose.close(transaction.internalConnection());
       }
-
-      // No matter the completion status of the transaction, we release the connection we got from the pool.
-      JdbcClose.close(transaction.internalConnection());
     }
   }
 

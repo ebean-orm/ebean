@@ -4,6 +4,7 @@ import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.Query;
 import io.ebean.SqlRow;
+import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebean.datasource.DataSourceConfig;
@@ -37,7 +38,7 @@ public class MainDbBoolean {
    * DDL generation etc.
    */
   private Database createOracleEbeanServer() {
-    DatabaseConfig c = new DatabaseConfig();
+    DatabaseBuilder c = new DatabaseConfig();
     c.setName("ora");
     c.setDdlExtra(false);
 
@@ -70,7 +71,7 @@ public class MainDbBoolean {
   }
 
   private Database createEbeanServer() {
-    DatabaseConfig c = new DatabaseConfig();
+    DatabaseBuilder c = new DatabaseConfig();
     c.setName("pgtest");
     c.setDdlExtra(false);
 

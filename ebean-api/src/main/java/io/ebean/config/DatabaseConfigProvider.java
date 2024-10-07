@@ -1,5 +1,7 @@
 package io.ebean.config;
 
+import io.ebean.DatabaseBuilder;
+
 /**
  * Provides a ServiceLoader based mechanism to configure a DatabaseConfig.
  * <p>
@@ -35,5 +37,5 @@ public interface DatabaseConfigProvider {
    * Typically we explicitly register entity bean classes and thus avoid classpath scanning.
    * </p>
    */
-  void apply(DatabaseConfig config);
+  void apply(DatabaseBuilder config);
 }

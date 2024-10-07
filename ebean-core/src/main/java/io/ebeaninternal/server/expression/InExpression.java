@@ -2,10 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.event.BeanQueryRequest;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.persist.MultiValueWrapper;
 
@@ -103,7 +100,7 @@ public final class InExpression extends AbstractExpression implements IdInCommon
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     if (empty) {
       return;
     }
@@ -193,7 +190,7 @@ public final class InExpression extends AbstractExpression implements IdInCommon
         builder.append(bindValues.size());
       }
     }
-    builder.append("]");
+    builder.append(']');
   }
 
   @Override

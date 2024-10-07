@@ -2,8 +2,7 @@ package io.ebeaninternal.api;
 
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import io.ebeaninternal.server.util.ArrayStack;
-
-import javax.persistence.PersistenceException;
+import jakarta.persistence.PersistenceException;
 
 /**
  * Manage scoped (typically thread local) transactions.
@@ -171,6 +170,33 @@ public final class ScopedTransaction extends SpiTransactionProxy {
    */
   public Exception caughtThrowable(Exception e) {
     return current.caughtThrowable(e);
+  }
+
+  /**
+   * New user objects are always written to the current ScopeTrans.
+   */
+  @Override
+  public void putUserObject(String name, Object value) {
+    current.putUserObject(name, value);
+  }
+
+  /**
+   * Returns the userObject in the stack, Herew we search
+   * the stack and return the first found userObject
+   */
+  @Override
+  public Object getUserObject(String name) {
+    Object obj = current.getUserObject(name);
+    if (obj != null) {
+      return obj;
+    }
+    for (ScopeTrans trans : stack) {
+      obj = trans.getUserObject(name);
+      if (obj != null) {
+        return obj;
+      }
+    }
+    return transaction.getUserObject(name);
   }
 
 }

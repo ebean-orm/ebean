@@ -1,14 +1,14 @@
 package org.tests.model.basic;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.util.List;
 
@@ -19,7 +19,7 @@ public class Person implements Serializable {
   private static final long serialVersionUID = 495045977245770183L;
 
   @Id
-  @GeneratedValue(strategy = javax.persistence.GenerationType.AUTO)
+  @GeneratedValue(strategy = jakarta.persistence.GenerationType.AUTO)
   @SequenceGenerator(name = "PERSONS_SEQ", initialValue = 1000, allocationSize = 40)
   @Column(name = "ID", unique = true, nullable = false)
   private Long id;

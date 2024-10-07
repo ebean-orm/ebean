@@ -82,7 +82,7 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
   @Override
   public void queryPlanHash(StringBuilder builder) {
     builder.append("ExistsQuery[").append(" not:").append(not);
-    builder.append(" sql:").append(sql).append(" ?:").append(bindParams.size()).append("]");
+    builder.append(" sql:").append(sql).append(" ?:").append(bindParams.size()).append(']');
   }
 
   @Override
@@ -95,11 +95,11 @@ final class ExistsQueryExpression implements SpiExpression, UnsupportedDocStoreE
     if (not) {
       request.append("not ");
     }
-    request.append("exists (").parse(sql).append(")");
+    request.append("exists (").parse(sql).append(')');
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (Object bindParam : bindParams) {
       request.addBindValue(bindParam);
     }

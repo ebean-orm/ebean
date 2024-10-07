@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.20.2-SNAPSHOT</version>
+    <version>14.6.0</version>
   </parent>
 
   <name>ebean ddl generation</name>
@@ -28,51 +28,44 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
       <scope>provided</scope>
     </dependency>
 
-    <!-- JAVAX-DEPENDENCY-START -->
+    <!-- JAVAX-DEPENDENCY-START ___
     <dependency>
       <groupId>org.glassfish.jaxb</groupId>
       <artifactId>jaxb-runtime</artifactId>
       <version>2.3.6</version>
       <scope>provided</scope>
     </dependency>
-    <!-- JAVAX-DEPENDENCY-END -->
-    <!-- JAKARTA-DEPENDENCY-START ___
+    ____ JAVAX-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-START -->
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
       <version>4.0.0</version>
     </dependency>
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>4.0.0</version>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>4.0.3</version>
       <scope>runtime</scope>
     </dependency>
-    ____ JAKARTA-DEPENDENCY-END -->
+    <!-- JAKARTA-DEPENDENCY-END -->
 
     <!-- test dependencies -->
     <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>junit</artifactId>
-      <version>1.1</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>13.20.2-SNAPSHOT</version>
+      <version>14.6.0</version>
       <scope>test</scope>
     </dependency>
 

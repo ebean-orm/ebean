@@ -3,9 +3,9 @@ package org.example.records;
 import io.ebean.Model;
 import io.ebean.annotation.Identity;
 
-import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Version;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Version;
 
 @Identity(start = 1000, cache = 100)
 @MappedSuperclass
