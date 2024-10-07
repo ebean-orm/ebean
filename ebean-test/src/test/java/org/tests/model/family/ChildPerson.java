@@ -29,7 +29,7 @@ public class ChildPerson extends InheritablePerson {
   @Formula(select = "coalesce(${ta}.address, j1.address, j2.address)", join = PARENTS_JOIN)
   private String effectiveAddress;
 
-  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id, j2.some_bean_id)")
+  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id, j2.some_bean_id)", join = PARENTS_JOIN)
   @ManyToOne
   private EBasic effectiveBean;
 
