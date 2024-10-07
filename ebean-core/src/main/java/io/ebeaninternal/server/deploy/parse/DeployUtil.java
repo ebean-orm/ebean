@@ -219,7 +219,7 @@ public final class DeployUtil {
   /**
    * Return the JDBC type for the JSON storage type.
    */
-  private int dbJsonStorage(DbJsonType dbJsonType) {
+  public static int dbJsonStorage(DbJsonType dbJsonType) {
     switch (dbJsonType) {
       case JSONB:
         return DbPlatformType.JSONB;
