@@ -168,10 +168,6 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
       .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId());
   }
 
-  Set<String> dependentTables() {
-    return queryPlan.dependentTables();
-  }
-
   @Override
   public void cancel() {
     lock.lock();

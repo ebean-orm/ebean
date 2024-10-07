@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Cached bean for testing caching implementation.
  */
-@Cache
+@Cache(enableQueryCache = true)
 @Entity
 @Table(name = "o_cached_bean")
 public class OCachedBean {
