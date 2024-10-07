@@ -80,13 +80,11 @@ class DbMigrationDropHistoryTest {
     List<String> pendingDrops = migration.getPendingDrops();
     assertThat(pendingDrops).contains("1.1");
 
-    //System.setProperty("ddl.migration.pendingDropsFor", "1.1");
     migration.setGeneratePendingDrop("1.1");
     assertThat(migration.generateMigration()).isEqualTo("1.2__dropsFor_1.1");
     assertThatThrownBy(()->migration.generateMigration())
       .isInstanceOf(IllegalArgumentException.class)
       .hasMessageContaining("No 'pendingDrops'"); // subsequent call
-    System.clearProperty("ddl.migration.pendingDropsFor");
 
     server.shutdown();
     logger.info("end");

@@ -5,6 +5,8 @@ import io.ebean.DatabaseFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
+import io.ebeaninternal.api.DbOffline;
+
 import io.ebean.dbmigration.DbMigration;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -18,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 /**
@@ -97,7 +98,7 @@ public class DbMigrationGenerateTest {
     config.getProperties().put("ebean.hana.generateUniqueDdl", "true"); // need to generate unique statements to prevent them from being filtered out as duplicates by the DdlRunner
 
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
-    Database server = DatabaseFactory.create(config);
+    Database server = createServer(config);
     migration.setServer(server);
 
     // then we generate migration scripts for v1_0
@@ -108,43 +109,28 @@ public class DbMigrationGenerateTest {
     // and now for v1_1
     config.setPackages(Arrays.asList("misc.migration.v1_1"));
     server.shutdown();
-    server = DatabaseFactory.create(config);
+    server = createServer(config);
     migration.setServer(server);
-    assertThat(migration.generateMigration()).isEqualTo("1.1");
-    assertThat(migration.generateMigration()).isNull(); // subsequent call
-
-
-
-    System.setProperty("ddl.migration.pendingDropsFor", "1.1");
-    assertThat(migration.generateMigration()).isEqualTo("1.2__dropsFor_1.1");
-
-    assertThatThrownBy(()->migration.generateMigration())
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("No 'pendingDrops'"); // subsequent call
-
-    System.clearProperty("ddl.migration.pendingDropsFor");
+    assertThat(migration.generateMigration()).isEqualTo("1.1,1.2__dropsFor_1.1");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 
     // and now for v1_2 with
     config.setPackages(Arrays.asList("misc.migration.v1_2"));
     server.shutdown();
-    server = DatabaseFactory.create(config);
+    server = createServer(config);
     migration.setServer(server);
-    assertThat(migration.generateMigration()).isEqualTo("1.3");
-    assertThat(migration.generateMigration()).isNull(); // subsequent call
-
-
-    System.setProperty("ddl.migration.pendingDropsFor", "1.3");
-    assertThat(migration.generateMigration()).isEqualTo("1.4__dropsFor_1.3");
-    assertThatThrownBy(migration::generateMigration)
-      .isInstanceOf(IllegalArgumentException.class)
-      .hasMessageContaining("No 'pendingDrops'"); // subsequent call
-
-    System.clearProperty("ddl.migration.pendingDropsFor");
+    assertThat(migration.generateMigration()).isEqualTo("1.3,1.4__dropsFor_1.3");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
 
     server.shutdown();
     logger.info("end");
+  }
+
+  private static Database createServer(DatabaseConfig config) {
+    DbOffline.setGenerateMigration();
+    Database server = DatabaseFactory.create(config);
+    DbOffline.reset();
+    return server;
   }
 
 }
