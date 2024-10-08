@@ -93,19 +93,8 @@ public final class LoadManyRequest extends LoadRequest {
 
   public SpiQuery<?> createQuery(SpiEbeanServer server) {
     BeanPropertyAssocMany<?> many = many();
-    SpiQuery<?> query = many.newQuery(server);
+    SpiQuery<?> query = many.newLoadManyQuery(server, onlyIds);
     query.usingTransaction(transaction);
-    String orderBy = many.lazyFetchOrderBy();
-    if (orderBy != null) {
-      query.orderBy(orderBy);
-    }
-    String extraWhere = many.extraWhere();
-    if (extraWhere != null) {
-      // replace special ${ta} placeholder with the base table alias
-      // which is always t0 and add the extra where clause
-      query.where().raw(extraWhere.replace("${ta}", "t0").replace("${mta}", "int_"));
-    }
-    query.setLazyLoadForParents(many);
     final var pc = loadContext.persistenceContext();
     many.addWhereParentIdIn(query, parentIdList(server, many, pc), loadContext.isUseDocStore());
     query.setPersistenceContext(pc);
@@ -117,15 +106,7 @@ public final class LoadManyRequest extends LoadRequest {
     }
     // potentially changes the joins, selected properties, cache mode
     loadContext.configureQuery(query);
-    if (onlyIds) {
-      // lazy loading invoked via clear() and removeAll()
-      String mapKey = many.mapKey();
-      if (mapKey != null) {
-        query.select(mapKey);
-      } else {
-        query.select(many.targetIdProperty());
-      }
-    }
+
     return query;
   }
 

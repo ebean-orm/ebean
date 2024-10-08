@@ -14,6 +14,7 @@ import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import jakarta.persistence.EntityNotFoundException;
+
 import java.util.List;
 
 import static java.lang.System.Logger.Level.DEBUG;
@@ -77,7 +78,11 @@ final class DefaultBeanLoader {
       }
     }
 
-    SpiQuery<?> query = server.createQuery(parentDesc.type());
+
+    SpiQuery<?> query = many.newLoadManyQuery(server, onlyIds);
+
+    many.addWhereParentIdIn(query, List.of(parentId), false);
+
     if (refresh) {
       // populate a new collection
       BeanCollection<?> emptyCollection = many.createEmpty(parentBean);
@@ -87,26 +92,12 @@ final class DefaultBeanLoader {
       query.setLoadDescription("lazy", null);
     }
 
-    query.select(parentDesc.idBinder().idSelect());
-    if (onlyIds) {
-      query.fetch(many.name(), many.targetIdProperty());
-    } else {
-      query.fetch(many.name());
-    }
-    if (filterMany != null) {
-      query.setFilterMany(many.name(), filterMany);
-    }
-
-    query.where().idEq(parentId);
-    query.setBeanCacheMode(CacheMode.OFF);
-    query.setMode(Mode.LAZYLOAD_MANY);
-    query.setLazyLoadManyPath(many.name());
     query.setPersistenceContext(pc);
     if (ebi.isReadOnly()) {
       query.setReadOnly(true);
     }
 
-    server.findOne(query);
+    server.findList(query);
     if (beanCollection != null) {
       if (beanCollection.checkEmptyLazyLoad()) {
         if (log.isLoggable(DEBUG)) {

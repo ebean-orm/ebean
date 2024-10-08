@@ -1165,4 +1165,28 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       return false;
     }
   }
+
+  public SpiQuery<?> newLoadManyQuery(SpiEbeanServer server, boolean onlyIds) {
+    SpiQuery<?> query = newQuery(server);
+    String orderBy = lazyFetchOrderBy();
+    if (orderBy != null) {
+      query.orderBy(orderBy);
+    }
+    String extraWhere = extraWhere();
+    if (extraWhere != null) {
+      // replace special ${ta} placeholder with the base table alias
+      // which is always t0 and add the extra where clause
+      query.where().raw(extraWhere.replace("${ta}", "t0").replace("${mta}", "int_"));
+    }
+    query.setLazyLoadForParents(this);
+    if (onlyIds) {
+      // lazy loading invoked via clear() and removeAll()
+      if (mapKey() != null) {
+        query.select(mapKey());
+      } else {
+        query.select(targetIdProperty());
+      }
+    }
+    return query;
+  }
 }
