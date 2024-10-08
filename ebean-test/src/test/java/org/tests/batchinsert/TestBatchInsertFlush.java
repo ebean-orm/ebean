@@ -15,6 +15,7 @@ import io.ebean.xtest.base.DtoQuery2Test;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;
+import org.tests.query.cache.Acl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -357,6 +358,24 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     } finally {
       txn.end();
+    }
+  }
+
+  @Test
+  public void testBatchEscalationInsert() {
+    try (Transaction txn = DB.beginTransaction()) {
+      assertThat(txn.isBatchMode()).isFalse();
+      DB.insertAll(List.of(new Acl("test")));
+      assertThat(txn.isBatchMode()).isFalse();
+    }
+  }
+
+  @Test
+  public void testBatchEscalationSave() {
+    try (Transaction txn = DB.beginTransaction()) {
+      assertThat(txn.isBatchMode()).isFalse();
+      DB.saveAll(List.of(new Acl("test")));
+      assertThat(txn.isBatchMode()).isFalse();
     }
   }
 }
