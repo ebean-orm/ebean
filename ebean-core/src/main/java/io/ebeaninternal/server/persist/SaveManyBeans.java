@@ -319,7 +319,7 @@ final class SaveManyBeans extends SaveManyBase {
         // the object from the 'other' side of the ManyToMany
         // build a intersection row for 'delete'
         IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherDelete, publish);
-        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD);
+        SpiSqlUpdate sqlDelete = intRow.createDelete(server, DeleteMode.HARD, many.extraWhere());
         persister.executeOrQueue(sqlDelete, transaction, queue, BatchControl.DELETE_QUEUE);
       }
     }

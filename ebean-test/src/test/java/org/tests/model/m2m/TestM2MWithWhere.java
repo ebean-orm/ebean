@@ -4,6 +4,7 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -17,6 +18,79 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  */
 public class TestM2MWithWhere extends BaseTestCase {
+
+  @Test
+  @Disabled
+  public void testModify() throws Exception {
+
+    MnyNode node1 = new MnyNode();
+    node1.setName("node1");
+    node1.setId(111);
+    MnyNode node2 = new MnyNode();
+    node2.setName("node2");
+    node2.setId(222);
+    MnyNode node3 = new MnyNode();
+    node3.setName("node3");
+    node3.setId(333);
+    MnyNode node4 = new MnyNode();
+    node4.setName("node4");
+    node4.setId(444);
+
+    node1.getAllReverseRelations().add(node2);
+    node1.getAllRelations().add(node2);
+    node2.getAllRelations().add(node3);
+    node3.getAllRelations().add(node4);
+    DB.save(node1);
+    DB.save(node1);
+
+    DB.refresh(node2);
+    DB.refresh(node3);
+    assertThat(node2.getAllRelations()).containsExactlyInAnyOrder(node1, node3);
+    assertThat(node3.getAllReverseRelations()).containsExactlyInAnyOrder(node2);
+
+    DB.refresh(node1);
+    node1.getAllReverseRelations().clear();
+    System.out.println("Clearing");
+    DB.save(node1);
+    DB.refresh(node2);
+    assertThat(node2.getAllRelations()).containsExactlyInAnyOrder(node3);
+
+    node2.getAllRelations().clear();
+    node2.getAllRelations().add(node3);
+    LoggedSql.start();
+    DB.save(node2);
+    LoggedSql.stop().forEach(System.out::println);
+
+  }
+
+  @Test
+  @Disabled
+  public void testAccessAndModify() throws Exception {
+    createTestData();
+
+    MnyNode node = DB.find(MnyNode.class, 1);
+    node.setName("fooBarBaz");
+    MnyNode removed = node.getAllRelations().remove(0);
+
+    LoggedSql.start();
+    DB.save(node);
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(4);
+    assertThat(sql.get(0)).contains("update mny_node set name=? where id=?; -- bind(fooBarBaz");
+    assertThat(sql.get(1)).contains("delete from mny_edge where from_id = ? and to_id = ? and mny_edge.flags != 12345 and 'mny_node' = 'mny_node'");
+    assertThat(sql.get(2)).contains("-- bind");
+    assertThat(sql.get(3)).contains("executeBatch() size:1 sql:delete from mny_edge where from_id = ? and to_id = ? and mny_edge.flags != 12345 and 'mny_node' = 'mny_node'");
+
+    node.getAllRelations().add(removed);
+    LoggedSql.start();
+    DB.save(node);
+    sql = LoggedSql.stop();
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).contains("insert into mny_edge (id, flags, from_id, to_id) values (?,?,?,?)");
+    assertThat(sql.get(1)).contains("-- bind");
+    assertThat(sql.get(2)).contains("-- executeBatch() size:1 sql:insert into mny_edge (id, flags, from_id, to_id) values (?,?,?,?)");
+
+  }
 
   @Test
   public void testQuery() throws Exception {

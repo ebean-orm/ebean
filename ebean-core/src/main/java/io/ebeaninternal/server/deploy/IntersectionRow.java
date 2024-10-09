@@ -66,7 +66,7 @@ public final class IntersectionRow {
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-  public SpiSqlUpdate createDelete(SpiEbeanServer server, DeleteMode deleteMode) {
+  public SpiSqlUpdate createDelete(SpiEbeanServer server, DeleteMode deleteMode, String extraWhere) {
     BindParams bindParams = new BindParams();
     StringBuilder sb = new StringBuilder();
     if (deleteMode.isHard()) {
@@ -90,15 +90,32 @@ public final class IntersectionRow {
         bindParams.setParameter(++count, bindValue);
       }
     }
+    addExtraWhere(sb, extraWhere);
+
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
   }
 
-  public SpiSqlUpdate createDeleteChildren(SpiEbeanServer server) {
+
+  public SpiSqlUpdate createDeleteChildren(SpiEbeanServer server, String extraWhere) {
     BindParams bindParams = new BindParams();
     StringBuilder sb = new StringBuilder();
     sb.append("delete from ").append(tableName).append(" where ");
     setBindParams(bindParams, sb);
+    addExtraWhere(sb, extraWhere);
     return new DefaultSqlUpdate(server, sb.toString(), bindParams);
+  }
+
+  private void addExtraWhere(StringBuilder sb, String extraWhere) {
+    if (extraWhere != null) {
+      if (extraWhere.indexOf("${ta}") == -1) {
+        // no table alias append ${mta} to query.
+        sb.append(" and ").append(extraWhere.replace("${mta}", tableName));
+      } else if (extraWhere.indexOf("${mta}") != -1) {
+        // we have a table alias - this is not interesting for deletion.
+        // but if have also a m2m table alias - this is a problem now!
+        throw new UnsupportedOperationException("extraWhere \'" + extraWhere + "\' has both ${ta} and ${mta} - this is not yet supported");
+      }
+    }
   }
 
   private int setBindParams(BindParams bindParams, StringBuilder sb) {
