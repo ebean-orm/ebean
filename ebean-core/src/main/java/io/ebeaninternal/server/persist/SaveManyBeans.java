@@ -9,8 +9,12 @@ import io.ebeaninternal.server.core.PersistRequestBean;
 import io.ebeaninternal.server.deploy.*;
 
 import jakarta.persistence.PersistenceException;
+
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -93,6 +97,22 @@ final class SaveManyBeans extends SaveManyBase {
     if (!many.isManyToMany()) {
       // OneToMany JoinTable
       return true;
+    }
+    if (many.isTableManaged()) {
+      List<String> tables = new ArrayList<>(3);
+      tables.add(many.descriptor().baseTable());
+      tables.add(many.targetDescriptor().baseTable());
+      tables.add(many.intersectionTableJoin().getTable());
+      // put all tables in a deterministic order
+      tables.sort(Comparator.naturalOrder());
+
+      if (transaction.isSaveAssocManyIntersection(String.join("-", tables), many.descriptor().rootName())) {
+        // notify others, that we do save this transaction
+        transaction.isSaveAssocManyIntersection(many.intersectionTableJoin().getTable(), many.descriptor().rootName());
+        return true;
+      } else {
+        return false;
+      }
     }
     return transaction.isSaveAssocManyIntersection(many.intersectionTableJoin().getTable(), many.descriptor().rootName());
   }
