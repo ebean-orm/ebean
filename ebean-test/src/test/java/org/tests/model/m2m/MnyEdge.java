@@ -20,6 +20,22 @@ public class MnyEdge {
   @ManyToOne
   private MnyNode to;
 
+
+  public MnyEdge() {
+// default
+  }
+
+  public MnyEdge(Object from, Object to) {
+    this.from = (MnyNode) from;
+    this.to = (MnyNode) to;
+    this.id = this.from.id * 10000 + this.to.id;
+    this.flags = this.from.id + this.to.id;
+  }
+
+  public static MnyEdge createReverseRelation(Object to, MnyNode from) {
+    return new MnyEdge(from, to);
+  }
+
   private int flags;
 
   public Integer getId() {

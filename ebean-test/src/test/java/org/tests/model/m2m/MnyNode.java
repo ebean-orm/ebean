@@ -16,13 +16,14 @@ public class MnyNode {
 
   String name;
 
-  @ManyToMany
+  @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "mny_edge",
     joinColumns = @JoinColumn(name = "from_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "to_id", referencedColumnName = "id"))
+  @Where(clause = "${mta}.flags != 12345 and '${dbTableName}' = 'mny_node'")
   List<MnyNode> allRelations;
 
-  @ManyToMany
+  @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(name = "mny_edge",
     joinColumns = @JoinColumn(name = "to_id", referencedColumnName = "id"),
     inverseJoinColumns = @JoinColumn(name = "from_id", referencedColumnName = "id"))
