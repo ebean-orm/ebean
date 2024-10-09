@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -134,8 +135,20 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   @Override
+  public DefaultRelationalQuery setArrayParameter(int position, Collection<?> value) {
+    bindParams.setArrayParameter(position, value);
+    return this;
+  }
+
+  @Override
   public DefaultRelationalQuery setParameter(String paramName, Object value) {
     bindParams.setParameter(paramName, value);
+    return this;
+  }
+
+  @Override
+  public DefaultRelationalQuery setArrayParameter(String paramName, Collection<?> value) {
+    bindParams.setArrayParameter(paramName, value);
     return this;
   }
 
