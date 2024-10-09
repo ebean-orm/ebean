@@ -88,4 +88,10 @@ public interface SpiCacheManager {
    */
   void clearLocal(Class<?> beanType);
 
+  /**
+   * returns true, if this chacheManager runs in tenant partitioned mode
+   * @return
+   */
+  boolean isTenantPartitionedCache();
+
 }
