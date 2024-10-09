@@ -50,7 +50,7 @@
     <ebean-annotation.version>8.4</ebean-annotation.version>
     <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
-    <ebean-migration.version>14.2.0</ebean-migration.version>
+    <ebean-migration.version>14.2.1-FOC1</ebean-migration.version>
     <ebean-test-containers.version>7.4</ebean-test-containers.version>
     <ebean-datasource.version>9.0</ebean-datasource.version>
     <ebean-agent.version>14.5.2-FOC1</ebean-agent.version>
