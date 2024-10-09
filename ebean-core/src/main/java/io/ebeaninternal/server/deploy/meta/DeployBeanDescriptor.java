@@ -39,6 +39,13 @@ public class DeployBeanDescriptor<T> implements DeployBeanDescriptorMeta {
 
   private static final Map<String, SpiRawSql> EMPTY_RAW_MAP = new HashMap<>();
 
+  /**
+   * Returns true, if the table is managed (i.e. an existing m2m relation).
+   */
+  public boolean isTableManaged(String tableName) {
+    return manager.isTableManaged(tableName);
+  }
+
   private static class PropOrder implements Comparator<DeployBeanProperty> {
 
     @Override
