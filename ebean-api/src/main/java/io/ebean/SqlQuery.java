@@ -6,6 +6,7 @@ import io.avaje.lang.Nullable;
 import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -171,7 +172,7 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    *   List<SqlRow> list =
    *     DB.sqlQuery(sql)
    *       .setParameter("Rob")
-   *       .setParameter("Status.NEW)
+   *       .setParameter(Status.NEW)
    *       .findList();
    *
    *   // the same as ...
@@ -242,9 +243,30 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   SqlQuery setParameter(int position, Object value);
 
   /**
+   * Bind the array parameter by its index position (1 based like JDBC).
+   *
+   * <pre>{@code
+   *
+   *    String sql = "select name from customer where id in (:1)";
+   *
+   *    List<SqlRow> list =
+   *      DB.sqlQuery(sql)
+   *        .setArrayParameter(List.of(1, 2, 3))
+   *        .findList();
+   *
+   * }</pre>
+   */
+  SqlQuery setArrayParameter(int position, Collection<?> value);
+
+  /**
    * Bind the named parameter value.
    */
   SqlQuery setParameter(String name, Object value);
+
+  /**
+   * Bind the named array parameter value.
+   */
+  SqlQuery setArrayParameter(String name, Collection<?> value);
 
   /**
    * Set the index of the first row of the results to return.
