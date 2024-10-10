@@ -54,7 +54,7 @@ public final class IdBinderEmbedded implements IdBinder {
       if (i > 0) {
         sb.append(" and ");
       }
-      sb.append("${").append(prefix).append('.').append(embIdProperty.name()).append('}').append(props[i].name()).append(" is null");
+      sb.append("${").append(prefix).append('}').append(props[i].dbColumn()).append(" is null");
     }
     sb.append(") or (").append(filterManyExpression).append("))");
     return sb.toString();
