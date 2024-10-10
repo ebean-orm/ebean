@@ -3,8 +3,10 @@ package org.tests.query;
 import io.ebean.DB;
 import io.ebean.OrderBy;
 import io.ebean.Paging;
+import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.ResetBasicData;
@@ -15,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TestQueryPaging extends BaseTestCase {
 
+  @ForPlatform({Platform.H2, Platform.POSTGRES})
   @Test
   void example() {
     var orderBy = OrderBy.of("lastName desc nulls first, firstName asc");

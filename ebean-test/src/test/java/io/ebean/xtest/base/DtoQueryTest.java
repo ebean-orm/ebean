@@ -230,11 +230,30 @@ class DtoQueryTest extends BaseTestCase {
 
     assertThat(list2).isNotEmpty();
 
+    List<SqlRow> list3 = DB.sqlQuery("select id, name from o_customer where id in (:idList)")
+      .setParameter("idList", ids)
+      .findList();
+    assertThat(list3).isNotEmpty();
+
+    List<SqlRow> list4 = DB.sqlQuery("select id, name from o_customer where id = any(:idList)")
+      .setArrayParameter("idList", ids)
+      .findList();
+    assertThat(list4).isNotEmpty();
+
+    List<SqlRow> list5 = DB.sqlQuery("select id, name from o_customer where id = any(?) and name like ?")
+      .setArrayParameter(1, ids)
+      .setParameter(2, "foo%")
+      .findList();
+    assertThat(list5).isEmpty();
+
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(6);
     assertThat(sql.get(0)).contains(" id = any(?)");
     assertThat(sql.get(1)).contains(" id in (?,?)");
     assertThat(sql.get(2)).contains(" id = any(?)");
+    assertThat(sql.get(3)).contains(" id in (?,?)");
+    assertThat(sql.get(4)).contains(" id = any(?)");
+    assertThat(sql.get(5)).contains(" id = any(?) and name like ?");
   }
 
   @ForPlatform(Platform.POSTGRES)
