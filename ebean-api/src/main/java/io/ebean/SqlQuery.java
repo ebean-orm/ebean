@@ -243,15 +243,16 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   SqlQuery setParameter(int position, Object value);
 
   /**
-   * Bind the array parameter by its index position (1 based like JDBC).
-   *
+   * Bind the array parameter by its index position for use with Postgres ANY.
+   * <p>
+   * For Postgres this binds an ARRAY rather than expands into multiple bind values.
    * <pre>{@code
    *
-   *    String sql = "select name from customer where id in (:1)";
+   *    String sql = "select name from customer where id = any(?)";
    *
    *    List<SqlRow> list =
    *      DB.sqlQuery(sql)
-   *        .setArrayParameter(List.of(1, 2, 3))
+   *        .setArrayParameter(1, List.of(1, 2, 3))
    *        .findList();
    *
    * }</pre>
@@ -264,7 +265,19 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   SqlQuery setParameter(String name, Object value);
 
   /**
-   * Bind the named array parameter value.
+   * Bind the named array parameter which we would use with Postgres ANY.
+   * <p>
+   * For Postgres this binds an ARRAY rather than expands into multiple bind values.
+   * <pre>{@code
+   *
+   *    String sql = "select name from customer where id = any(:idList)";
+   *
+   *    List<SqlRow> list =
+   *      DB.sqlQuery(sql)
+   *        .setArrayParameter("idList", List.of(1, 2, 3))
+   *        .findList();
+   *
+   * }</pre>
    */
   SqlQuery setArrayParameter(String name, Collection<?> value);
 
