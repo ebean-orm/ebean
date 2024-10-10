@@ -14,8 +14,6 @@ public class DataWithFormula {
   @ManyToOne
   private DataWithFormulaMain main;
 
-  //  @Index
-//  private String stringValue;
   public DataWithFormulaKey getId() {
     return id;
   }
@@ -39,10 +37,4 @@ public class DataWithFormula {
   public void setValueIndex(Integer valueIndex) {
     this.valueIndex = valueIndex;
   }
-//  public String getStringValue() {
-//    return stringValue;
-//  }
-//  public void setStringValue(String stringValue) {
-//    this.stringValue = stringValue;
-//  }
 }
