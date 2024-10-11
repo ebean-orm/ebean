@@ -1,6 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.DB;
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.base.TransactionalTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
@@ -10,6 +11,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -41,8 +43,10 @@ public class TestDeleteByIdCollection extends TransactionalTestCase {
     DB.deleteAll(Customer.class, ids);
     awaitL2Cache();
 
+    LoggedSql.start();
     c0Back = DB.find(Customer.class, c0.getId());
     c1Back = DB.find(Customer.class, "" + c1.getId());
+    assertThat(LoggedSql.stop()).isEmpty();
 
     assertNull(c0Back);
     assertNull(c1Back);
