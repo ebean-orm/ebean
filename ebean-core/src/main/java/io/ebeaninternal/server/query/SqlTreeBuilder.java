@@ -677,11 +677,6 @@ public final class SqlTreeBuilder {
         } else {
           // look in register ...
           String parentPropertyName = includeProp.substring(0, dotPos);
-          if (selectIncludes.contains(parentPropertyName)) {
-            // parent already handled by select
-            return childJoin;
-          }
-
           SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
           if (parentJoin == null) {
             // we need to create this the parent implicitly...
