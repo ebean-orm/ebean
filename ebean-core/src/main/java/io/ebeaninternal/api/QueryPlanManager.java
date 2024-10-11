@@ -13,6 +13,11 @@ public interface QueryPlanManager {
   QueryPlanManager NOOP = new NoopQueryPlanManager();
 
   /**
+   * Start background capture of query plans if enabled.
+   */
+  void startPlanCapture();
+
+  /**
    * Update the global default threshold used when new query plans are created.
    */
   void setDefaultThreshold(long thresholdMicros);

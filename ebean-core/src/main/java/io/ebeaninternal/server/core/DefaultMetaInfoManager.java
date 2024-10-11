@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.meta.*;
+import io.ebeaninternal.api.QueryPlanManager;
 
 import java.util.List;
 import java.util.function.Function;
@@ -11,11 +12,13 @@ import java.util.function.Function;
 final class DefaultMetaInfoManager implements MetaInfoManager {
 
   private final DefaultServer server;
+  private final QueryPlanManager queryPlanManager;
   private final Function<String, String> naming;
 
-  DefaultMetaInfoManager(DefaultServer server, Function<String, String> naming) {
+  DefaultMetaInfoManager(DefaultServer server, QueryPlanManager queryPlanManager) {
     this.server = server;
-    this.naming = naming;
+    this.naming = server.config().getMetricNaming();
+    this.queryPlanManager = queryPlanManager;
   }
 
   @Override
@@ -25,7 +28,7 @@ final class DefaultMetaInfoManager implements MetaInfoManager {
 
   @Override
   public List<MetaQueryPlan> queryPlanCollectNow(QueryPlanRequest request) {
-    return server.queryPlanCollectNow(request);
+    return queryPlanManager.collect(request);
   }
 
   @Override
