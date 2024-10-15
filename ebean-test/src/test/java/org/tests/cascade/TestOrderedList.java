@@ -230,8 +230,13 @@ public class TestOrderedList extends BaseTestCase {
     LoggedSql.start();
     masterDbNew.getDetails().size();
     sql = LoggedSql.stop();
-    assertThat(sql).hasSize(1).first().asString()
-      .startsWith("select t0.master_id, t0.id, t0.name, t0.version, t0.sort_order, t0.master_id from om_cache_ordered_detail t0 where (t0.master_id) in (?) order by t0.master_id, t0.sort_order;");
+    if (isPostgresCompatible()) {
+      assertThat(sql).hasSize(1).first().asString()
+        .startsWith("select t0.master_id, t0.id, t0.name, t0.version, t0.sort_order, t0.master_id from om_cache_ordered_detail t0 where (t0.master_id) = any(?) order by t0.master_id, t0.sort_order;");
+    } else {
+      assertThat(sql).hasSize(1).first().asString()
+        .startsWith("select t0.master_id, t0.id, t0.name, t0.version, t0.sort_order, t0.master_id from om_cache_ordered_detail t0 where (t0.master_id) in (?) order by t0.master_id, t0.sort_order;");
+    }
 
     assertThat(masterDbNew.getDetails()).containsExactly(detail2, detail1);
   }
