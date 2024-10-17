@@ -213,7 +213,7 @@ class ToStringBuilderTest {
 
     final int id;
 
-    final Map<String, ParamValue> map = new HashMap<>();
+    final Map<String, ParamValue> map = new LinkedHashMap<>();
 
 
     ParamStore(final int id) {
