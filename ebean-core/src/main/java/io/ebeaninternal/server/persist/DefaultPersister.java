@@ -87,6 +87,7 @@ public final class DefaultPersister implements Persister {
   private int executeOrQueue(PersistRequest request) {
     try {
       request.initTransIfRequired();
+      request.transaction().markNotQueryOnly();
       int rc = request.executeOrQueue();
       request.commitTransIfRequired();
       return rc;
@@ -383,6 +384,7 @@ public final class DefaultPersister implements Persister {
     req.checkDraft();
     try {
       req.initTransIfRequiredWithBatchCascade();
+      req.transaction().markNotQueryOnly();
       if (req.isReference()) {
         // its a reference so see if there are manys to save...
         if (req.isPersistCascade()) {
@@ -430,6 +432,7 @@ public final class DefaultPersister implements Persister {
     }
     try {
       req.initTransIfRequiredWithBatchCascade();
+      req.transaction().markNotQueryOnly();
       insert(req);
       req.resetDepth();
       req.commitTransIfRequired();
@@ -562,6 +565,7 @@ public final class DefaultPersister implements Persister {
     }
     try {
       req.initTransIfRequiredWithBatchCascade();
+      req.transaction().markNotQueryOnly();
       int rows = delete(req);
       if (draftReq != null) {
         // delete the 'draft' bean ('live' bean deleted first)
