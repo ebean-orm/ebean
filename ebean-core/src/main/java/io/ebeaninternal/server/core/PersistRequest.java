@@ -149,6 +149,13 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
   }
 
   /**
+   * Mark the underlying transaction as not being query only.
+   */
+  public void markNotQueryOnly() {
+    transaction.markNotQueryOnly();
+  }
+
+  /**
    * Return the type of this request. One of INSERT, UPDATE, DELETE, UPDATESQL or CALLABLESQL.
    */
   public Type type() {
