@@ -99,7 +99,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:14.6.0</tile>
+            <tile>io.ebean.tile:enhancement:14.7.1</tile>
           </tiles>
         </configuration>
       </plugin>
