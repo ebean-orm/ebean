@@ -1,1 +1,1 @@
-ebean-version: 145
+ebean-version: 148
