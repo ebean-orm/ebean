@@ -7,7 +7,7 @@ module io.ebean.api {
 
   requires transitive java.sql;
   requires transitive io.avaje.config;
-  requires transitive io.avaje.lang;
+  requires transitive org.jspecify;
   requires transitive jakarta.persistence.api;
   requires transitive io.ebean.annotation;
   requires transitive io.ebean.datasource.api;

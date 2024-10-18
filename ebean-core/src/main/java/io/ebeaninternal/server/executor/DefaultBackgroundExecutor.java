@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.executor;
 
 import io.avaje.applog.AppLog;
-import io.avaje.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
 import io.ebean.config.BackgroundExecutorWrapper;
 import io.ebeaninternal.api.SpiBackgroundExecutor;
 
@@ -12,7 +12,7 @@ import static java.lang.System.Logger.Level.*;
 /**
  * The default implementation of the BackgroundExecutor.
  */
-@NonNullApi
+@NullMarked
 public final class DefaultBackgroundExecutor implements SpiBackgroundExecutor {
 
   private static final System.Logger log = AppLog.getLogger("io.ebean.BackgroundExecutor");

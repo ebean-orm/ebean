@@ -1,6 +1,6 @@
 package io.ebean;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.sql.Connection;

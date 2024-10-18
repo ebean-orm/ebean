@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
@@ -83,7 +83,7 @@ import java.util.concurrent.Callable;
  * @see DatabaseFactory
  * @see DatabaseConfig
  */
-@NonNullApi
+@NullMarked
 public interface Database {
 
   /**

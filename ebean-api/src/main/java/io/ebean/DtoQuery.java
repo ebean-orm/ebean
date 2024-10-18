@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -42,7 +42,7 @@ import java.util.stream.Stream;
  *
  * }</pre>
  */
-@NonNullApi
+@NullMarked
 public interface DtoQuery<T> extends CancelableQuery {
 
   /**

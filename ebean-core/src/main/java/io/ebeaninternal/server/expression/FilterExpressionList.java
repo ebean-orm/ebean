@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQuery;
@@ -9,7 +9,7 @@ import io.ebeaninternal.api.SpiQuery;
 import jakarta.persistence.PersistenceException;
 import java.util.*;
 
-@NonNullApi
+@NullMarked
 public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
 
   private static final String notAllowedMessage = "This method is not allowed on a filter";

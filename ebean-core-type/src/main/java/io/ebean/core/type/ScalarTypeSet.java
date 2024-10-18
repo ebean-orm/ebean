@@ -1,6 +1,6 @@
 package io.ebean.core.type;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A ScalarType that has variations based on the mapped JDBC type (like VARCHAR, CLOB, JSON etc).

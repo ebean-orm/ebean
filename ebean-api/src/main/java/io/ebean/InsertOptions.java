@@ -1,6 +1,6 @@
 package io.ebean;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Options to be used with insert such as ON CONFLICT DO UPDATE | NOTHING.
