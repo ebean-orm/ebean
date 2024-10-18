@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import io.ebean.annotation.*;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DbDefaultValue;

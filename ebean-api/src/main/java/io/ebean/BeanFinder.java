@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ import java.util.Optional;
  *
  * @see BeanRepository
  */
-@NonNullApi
+@NullMarked
 public abstract class BeanFinder<I,T> {
 
   protected final Database database;

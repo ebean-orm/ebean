@@ -28,14 +28,10 @@
       <scope>provided</scope>
     </dependency>
 
-    <!--
-    Class retention Nonnull and Nullable annotations
-    to assist with IDE auto-completion with Ebean API
-    -->
     <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>avaje-lang</artifactId>
-      <version>1.1</version>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>

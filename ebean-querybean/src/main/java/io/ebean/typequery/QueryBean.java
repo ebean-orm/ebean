@@ -1,7 +1,7 @@
 package io.ebean.typequery;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
@@ -56,7 +56,7 @@ import java.util.stream.Stream;
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
  * @param <R> the specific root query bean type (e.g. QCustomer)
  */
-@NonNullApi
+@NullMarked
 public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
 
   /**

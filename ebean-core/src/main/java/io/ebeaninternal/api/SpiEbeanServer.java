@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.CallOrigin;
