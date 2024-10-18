@@ -11,6 +11,7 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
+import jakarta.persistence.PersistenceException;
 
 import java.util.*;
 
@@ -440,12 +441,9 @@ public final class SqlTreeBuilder {
 
     } else {
       // find the property including searching the
-      // sub class hierarchy if required
       STreeProperty p = desc.findPropertyWithDynamic(propName, queryProps.getPath());
       if (p == null) {
-        log.log(ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
-        p = desc.findProperty("id");
-        selectProps.add(p);
+        throw new PersistenceException("Property not found - " + SplitName.add(queryProps.getPath(), propName));
 
       } else if (p.isId() && excludeIdProperty()) {
         // do not bother to include id for normal queries as the

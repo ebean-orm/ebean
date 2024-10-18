@@ -48,7 +48,7 @@ public class TestFileTypeFetching extends BaseTestCase {
     DB.update(statelessUpdateBean);
 
     SomeFileBean bean2 = DB.find(SomeFileBean.class)
-      .select("file")
+      .select("content")
       .setId(bean0.getId())
       .findOne();
 
