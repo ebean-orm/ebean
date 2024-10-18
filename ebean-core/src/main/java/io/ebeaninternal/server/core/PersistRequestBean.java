@@ -228,6 +228,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       docStoreMode = calcDocStoreMode(transaction, type);
     }
     checkBatchEscalationOnCascade();
+    transaction.markNotQueryOnly();
   }
 
   /**
