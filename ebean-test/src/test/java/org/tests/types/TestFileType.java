@@ -14,10 +14,10 @@ import java.net.URL;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestFileType extends BaseTestCase {
+class TestFileType extends BaseTestCase {
 
-  private File file = getFile("/profile-image.jpg");
-  private File file2 = getFile("/java-64.png");
+  private final File file = getFile("/profile-image.jpg");
+  private final File file2 = getFile("/java-64.png");
 
   private File newTempFile() throws IOException {
     File tempFile = File.createTempFile("testfile", "txt");
@@ -113,7 +113,7 @@ public class TestFileType extends BaseTestCase {
     DB.save(bean0);
 
     SomeFileBean bean1 = DB.find(SomeFileBean.class)
-      .select("name, file")
+      .select("name, content")
       .setId(bean0.getId())
       .findOne();
 
@@ -124,7 +124,7 @@ public class TestFileType extends BaseTestCase {
     DB.save(bean1);
 
     SomeFileBean bean2 = DB.find(SomeFileBean.class)
-      .select("name, file")
+      .select("name, content")
       .setId(bean0.getId())
       .findOne();
 
@@ -146,7 +146,7 @@ public class TestFileType extends BaseTestCase {
     DB.save(bean0);
 
     SomeFileBean bean1 = DB.find(SomeFileBean.class)
-      .select("name, file")
+      .select("name, content")
       .setId(bean0.getId())
       .findOne();
 
@@ -161,7 +161,7 @@ public class TestFileType extends BaseTestCase {
 
 
     SomeFileBean bean2 = DB.find(SomeFileBean.class)
-      .select("name, file")
+      .select("name, content")
       .setId(bean0.getId())
       .findOne();
 
@@ -173,7 +173,7 @@ public class TestFileType extends BaseTestCase {
     DB.save(bean2);
 
     SomeFileBean bean3 = DB.find(SomeFileBean.class)
-      .select("name, file")
+      .select("name, content")
       .setId(bean0.getId())
       .findOne();
 
@@ -194,7 +194,7 @@ public class TestFileType extends BaseTestCase {
     DB.save(bean0);
 
     SomeFileBean bean1 = DB.find(SomeFileBean.class)
-        .select("name, file")
+        .select("name, content")
         .setId(bean0.getId())
         .findOne();
 
