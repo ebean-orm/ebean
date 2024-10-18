@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.7.0-FOC1</version>
+    <version>14.7.0-FOC2-SNAPSHOT</version>
     <relativePath>../..</relativePath>
   </parent>
 
@@ -22,13 +22,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>14.7.0-FOC1</version>
+      <version>14.7.0-FOC2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>14.7.0-FOC1</version>
+      <version>14.7.0-FOC2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -47,19 +47,19 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-querybean</artifactId>
-      <version>14.7.0-FOC1</version>
+      <version>14.7.0-FOC2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>14.7.0-FOC1</version>
+      <version>14.7.0-FOC2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-postgis-types</artifactId>
-      <version>14.7.0-FOC1</version>
+      <version>14.7.0-FOC2-SNAPSHOT</version>
     </dependency>
 
     <dependency>
