@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  * @param <SELF> The type of the builder
  * @param <T>    The entity bean type
  */
-public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
+public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends QueryBuilderProjection<SELF, T> {
 
   /**
    * Set root table alias.
