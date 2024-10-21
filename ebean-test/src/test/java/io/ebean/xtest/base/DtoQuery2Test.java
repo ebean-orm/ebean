@@ -1,5 +1,7 @@
 package io.ebean.xtest.base;
 
+import io.ebean.DB;
+import io.ebean.Query;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DtoQuery;
 import io.ebean.QueryIterator;
@@ -406,6 +408,25 @@ public class DtoQuery2Test extends BaseTestCase {
     assertThat(robs).isNotEmpty();
   }
 
+  @Test
+  void dto_test_formula_with_group_by() {
+    ResetBasicData.reset();
+    Customer rob2 = new Customer();
+    rob2.setName("Rob");
+    DB.save(rob2);
+
+    Query<Customer> query = server().find(Customer.class)
+      .select("concat('Dr. ',name) as custname, count(*) as cnt")
+      .orderBy("cnt desc");
+
+    List<DCustFormula> ret = query.asDto(DCustFormula.class).findList();
+
+    log.info(query.getGeneratedSql());
+    log.info(ret.toString());
+    assertThat(ret.get(0).getCustname()).isEqualTo("Dr. Rob");
+    assertThat(ret.get(0).getCnt()).isEqualTo(2L);
+  }
+
   public static class DCust {
 
     final Integer id;
@@ -612,6 +633,35 @@ public class DtoQuery2Test extends BaseTestCase {
     public DCustCamelCols2 setNameFORMe(String nameFORMe) {
       this.nameFORMe = nameFORMe;
       return this;
+    }
+  }
+
+  public static class DCustFormula {
+
+    String custname;
+    Long cnt;
+
+    public DCustFormula() {}
+
+    public void setCustname(String custname) {
+      this.custname = custname;
+    }
+
+    public String getCustname() {
+      return custname;
+    }
+
+    public void setCnt(Long cnt) {
+      this.cnt = cnt;
+    }
+
+    public Long getCnt() {
+      return cnt;
+    }
+
+    @Override
+    public String toString() {
+      return getCustname() + ": " + getCnt();
     }
   }
 }
