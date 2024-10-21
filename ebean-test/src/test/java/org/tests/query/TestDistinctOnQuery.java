@@ -57,7 +57,7 @@ class TestDistinctOnQuery extends BaseTestCase {
       .setMaxRows(10);
 
     List<OrderDetail> lines = DB.find(OrderDetail.class)
-      .select("product, orderQty, shipQty, created")
+      .select("product, orderQty, shipQty, cretime")
       .where().in("id", subQuery)
       .orderBy().asc("cretime")
       .findList();
