@@ -65,7 +65,7 @@ class TestDistinctOnQuery extends BaseTestCase {
     assertThat(lines).isNotEmpty();
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains("select t0.id, t0.product_id, t0.order_qty, t0.ship_qty, t0.id from o_order_detail t0 where t0.id in (select distinct on (t0.product_id) t0.id from o_order_detail t0 order by t0.product_id, t0.updtime desc limit 10) order by t0.cretime");
+    assertThat(sql.get(0)).contains("select t0.id, t0.product_id, t0.order_qty, t0.ship_qty, t0.cretime from o_order_detail t0 where t0.id in (select distinct on (t0.product_id) t0.id from o_order_detail t0 order by t0.product_id, t0.updtime desc limit 10) order by t0.cretime");
   }
 
   @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
