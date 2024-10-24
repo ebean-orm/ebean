@@ -46,7 +46,7 @@ public class TestBatchLazyWithCacheHits extends BaseTestCase {
     List<UUOne> list = DB.find(UUOne.class)
       .select("id")
       .where().startsWith("name", "testBLWCH")
-      .order("name")
+      .orderBy("name")
       .findList();
 
     // invoke lazy loading

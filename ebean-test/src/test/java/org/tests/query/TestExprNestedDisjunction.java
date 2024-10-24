@@ -22,7 +22,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
       .disjunction()
       .conjunction().startsWith("name", "r").eq("anniversary", onAfter).endJunction()
       .conjunction().eq("status", Customer.Status.ACTIVE).gt("id", 0).endJunction()
-      .order().asc("name");
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();
@@ -46,7 +46,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
       .startsWith("name", "r").eq("anniversary", onAfter).endAnd()
       .and()
       .eq("status", Customer.Status.ACTIVE).gt("id", 0).endAnd()
-      .order().asc("name");
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();
@@ -68,7 +68,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
       .gt("id", 1)
       .eq("anniversary", onAfter)
       .endNot()
-      .order().asc("name");
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();
@@ -90,7 +90,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
       .not()
       .gt("id", 1)
       .eq("anniversary", onAfter)
-      .order().asc("name");
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();
@@ -114,7 +114,7 @@ public class TestExprNestedDisjunction extends BaseTestCase {
       .eq("anniversary", onAfter)
       .endNot()
       .endOr()
-      .order().asc("name");
+      .orderBy().asc("name");
 
     q.findList();
     String s = q.getGeneratedSql();

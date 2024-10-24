@@ -20,16 +20,16 @@ public class TestQueryFetchJoinWithOrder extends BaseTestCase {
 
     List<Order> list = DB.find(Order.class)
       .fetchQuery("details")
-      .order().asc("id")
-      .order().desc("details.id").findList();
+      .orderBy().asc("id")
+      .orderBy().desc("details.id").findList();
 
     assertNotNull(list);
 
     List<Order> list2 = DB.find(Order.class)
       .fetchQuery("customer")
       .fetch("customer.contacts")
-      .order().asc("id")
-      .order().asc("customer.contacts.lastName")
+      .orderBy().asc("id")
+      .orderBy().asc("customer.contacts.lastName")
       .findList();
 
     assertNotNull(list2);
@@ -37,7 +37,7 @@ public class TestQueryFetchJoinWithOrder extends BaseTestCase {
     List<Customer> list3 = DB.find(Customer.class)
       .fetch("orders")
       .filterMany("orders").eq("status", Order.Status.NEW)
-      .order().desc("orders.id")
+      .orderBy().desc("orders.id")
       .findList();
 
     assertNotNull(list3);

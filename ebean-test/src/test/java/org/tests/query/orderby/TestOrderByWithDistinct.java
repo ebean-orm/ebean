@@ -32,7 +32,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       .where()
       .eq("junk", "blah")
       .eq("name", "jim")
-      .order("id desc,path.that.does.not.exist,contacts.group.name asc").query();
+      .orderBy("id desc,path.that.does.not.exist,contacts.group.name asc").query();
 
     Set<String> unknownProperties = query.validate();
     assertThat(unknownProperties).isNotEmpty();
@@ -50,7 +50,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
     Query<MUser> query = DB.find(MUser.class)
       .where()
       .eq("roles", role)
-      .order("userName asc nulls first").query();
+      .orderBy("userName asc nulls first").query();
 
     query.findList();
 
@@ -149,7 +149,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       .fetch("userType", "name")
       .where()
       .eq("roles.roleName", "A")
-      .order("userType.name, userName").query();
+      .orderBy("userType.name, userName").query();
     List<MUser> list = query.findList();
 
     // select distinct t0.userid c0, t0.user_name c1, t1.id c2, t1.name c3
@@ -183,7 +183,7 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       .fetch("userType", "name")
       .where()
       .eq("roles.roleName", "A")
-      .order("userType.name").query();
+      .orderBy("userType.name").query();
     list = query.findList();
 
     assertEquals(1, list.size());

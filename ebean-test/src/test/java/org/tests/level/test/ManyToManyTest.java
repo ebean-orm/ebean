@@ -69,7 +69,7 @@ public class ManyToManyTest extends BaseTestCase {
         .fetch("level4s")
         .fetch("level2s")
         .fetch("level2s.level3s")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
       validateObjectGraph(i, ii, iii, one, two, x1, x2, x3, x4, x5, things);
@@ -79,7 +79,7 @@ public class ManyToManyTest extends BaseTestCase {
         .fetch("level2s")
         .fetch("level2s.level3s")
         .fetch("level4s")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
       validateObjectGraph(i, ii, iii, one, two, x1, x2, x3, x4, x5, things);
@@ -88,7 +88,7 @@ public class ManyToManyTest extends BaseTestCase {
       things = DB.find(Level1.class)
         .fetch("level2s")
         .fetch("level4s")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
       validateObjectGraph(i, ii, iii, one, two, x1, x2, x3, x4, x5, things);

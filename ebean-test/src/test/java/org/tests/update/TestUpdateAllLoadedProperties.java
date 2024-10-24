@@ -65,7 +65,7 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
     List<EBasicVer> beans = DB.find(EBasicVer.class)
       .select("name, other")
       .where().idIn(ids)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertEquals(2, beans.size());

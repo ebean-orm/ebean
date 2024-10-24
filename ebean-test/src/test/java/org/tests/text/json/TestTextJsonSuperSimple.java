@@ -20,7 +20,7 @@ public class TestTextJsonSuperSimple extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = DB.find(Customer.class).select("id, name").order().desc("id")
+    List<Customer> list = DB.find(Customer.class).select("id, name").orderBy().desc("id")
       .findList();
 
     Database server = DB.getDefault();
