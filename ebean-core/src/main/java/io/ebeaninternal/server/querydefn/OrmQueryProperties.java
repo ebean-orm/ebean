@@ -150,7 +150,7 @@ public final class OrmQueryProperties implements Serializable {
   /**
    * Move a OrderBy.Property from the main query to this query join.
    */
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings({ "rawtypes", "removal"}) // uses internal API
   void addSecJoinOrderProperty(OrderBy.Property orderProp) {
     if (orderBy == null) {
       orderBy = new OrderBy();
@@ -222,7 +222,7 @@ public final class OrmQueryProperties implements Serializable {
   /**
    * Define the select and joins for this query.
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "removal"}) // uses internal API
   public void configureBeanQuery(SpiQuery<?> query) {
     if (hasProperties()) {
       query.selectProperties(this);

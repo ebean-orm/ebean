@@ -106,6 +106,7 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
+  @SuppressWarnings("removal") // tests deprecated API
   public void filterMany_firstMaxRows_expressionFluidStyle() {
 
     ResetBasicData.reset();
@@ -375,6 +376,7 @@ public class TestQueryFilterMany extends BaseTestCase {
   }
 
   @Test
+  @SuppressWarnings("removal") // tests deprecated API
   public void testFilterManyUsingExpression() {
 
     ResetBasicData.reset();

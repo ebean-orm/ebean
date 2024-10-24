@@ -333,6 +333,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public int delete(Transaction transaction) {
     return query.delete(transaction);
   }
@@ -343,6 +344,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public int update(Transaction transaction) {
     return query.update(transaction);
   }
@@ -444,6 +446,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params) {
     return query.filterMany(manyProperty).where(expressions, params);
   }
