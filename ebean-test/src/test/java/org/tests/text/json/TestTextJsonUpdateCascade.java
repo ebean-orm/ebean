@@ -45,7 +45,7 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
 
     Product p = DB.reference(Product.class, 1);
     OrderDetail newDetail = new OrderDetail(p, 899, BigDecimal.valueOf(12.12d));
-    // newDetail.setOrder(order);
+    // newDetail.setOrderBy(order);
     order.addDetail(newDetail);
 
     Database server = DB.getDefault();
