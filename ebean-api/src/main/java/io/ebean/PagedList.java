@@ -62,6 +62,7 @@ public interface PagedList<T> {
   /**
    * Return an empty PagedList.
    */
+  @SuppressWarnings("removal") // uses internal API
   static <B> PagedList<B> emptyList() {
     return new EmptyPagedList<>();
   }
