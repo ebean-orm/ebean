@@ -419,8 +419,10 @@ public class DtoQuery2Test extends BaseTestCase {
 
     List<DCustFormula> ret = query.asDto(DCustFormula.class).findList();
 
-    log.info(query.getGeneratedSql());
-    log.info(ret.toString());
+    String sql = query.getGeneratedSql();
+    assertThat(sql)
+      .describedAs("group by formula only")
+      .contains("from contact t0 group by concat(first_name, last_name) order by custname desc");
     assertThat(ret.get(0).getCustname()).isEqualTo("TracyRed");
     assertThat(ret.get(0).getCnt()).isEqualTo(1L);
   }

@@ -63,7 +63,7 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   }
 
   @Override
-  public void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+  public final void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
     ctx.appendParseSelect(parsedFormula, null);
   }
 
