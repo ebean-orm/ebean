@@ -22,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * This provides the mechanisms to support deferred fetching of reference beans
  * and oldValues generation for concurrency checking.
  */
-public final class InterceptReadWrite implements EntityBeanIntercept {
+public final class InterceptReadWrite extends InterceptBase {
 
   private static final long serialVersionUID = -3664031775464862649L;
 
@@ -56,10 +56,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   private String ebeanServerName;
   private boolean deletedFromCollection;
 
-  /**
-   * The actual entity bean that 'owns' this intercept.
-   */
-  private final EntityBean owner;
   private EntityBean embeddedOwner;
   private int embeddedOwnerIndex;
   /**
@@ -77,7 +73,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    * Flag set when lazy loading failed due to the underlying bean being deleted in the DB.
    */
   private boolean lazyLoadFailure;
-  private boolean fullyLoadedBean;
   private boolean loadedFromCache;
   private final byte[] flags;
   private Object[] origValues;
@@ -101,7 +96,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    * Create with a given entity.
    */
   public InterceptReadWrite(Object ownerBean) {
-    this.owner = (EntityBean) ownerBean;
+    super(ownerBean);
     this.flags = new byte[owner._ebean_getPropertyNames().length];
   }
 
@@ -109,7 +104,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
    * EXPERIMENTAL - Constructor only for use by serialization frameworks.
    */
   public InterceptReadWrite() {
-    this.owner = null;
+    super();
     this.flags = null;
   }
 
@@ -129,11 +124,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       ", loader=" + beanLoader +
       (ownerId != null ? (", ownerId=" + ownerId) : "") +
       '}';
-  }
-
-  @Override
-  public EntityBean owner() {
-    return owner;
   }
 
   @Override
@@ -198,16 +188,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   public void setBeanLoader(BeanLoader beanLoader) {
     this.beanLoader = beanLoader;
     this.ebeanServerName = beanLoader.name();
-  }
-
-  @Override
-  public boolean isFullyLoadedBean() {
-    return fullyLoadedBean;
-  }
-
-  @Override
-  public void setFullyLoadedBean(boolean fullyLoadedBean) {
-    this.fullyLoadedBean = fullyLoadedBean;
   }
 
   @Override
@@ -409,25 +389,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       return null;
     }
     return origValues[propertyIndex];
-  }
-
-  @Override
-  public int findProperty(String propertyName) {
-    final String[] names = owner._ebean_getPropertyNames();
-    for (int i = 0; i < names.length; i++) {
-      if (names[i].equals(propertyName)) {
-        return i;
-      }
-    }
-    return -1;
-  }
-
-  @Override
-  public String property(int propertyIndex) {
-    if (propertyIndex == -1) {
-      return null;
-    }
-    return owner._ebean_getPropertyName(propertyIndex);
   }
 
   @Override
@@ -669,18 +630,6 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   }
 
   @Override
-  public StringBuilder loadedPropertyKey() {
-    final StringBuilder sb = new StringBuilder();
-    final int len = propertyLength();
-    for (int i = 0; i < len; i++) {
-      if (isLoadedProperty(i)) {
-        sb.append(i).append(',');
-      }
-    }
-    return sb;
-  }
-
-  @Override
   public boolean[] loaded() {
     final boolean[] ret = new boolean[flags.length];
     for (int i = 0; i < ret.length; i++) {
@@ -701,6 +650,10 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
 
   @Override
   public void loadBean(int loadProperty) {
+    if (errorOnLazyLoad) {
+      final String property = property(loadProperty);
+      throw new IllegalStateException("Lazy loading not allowed for " + property);
+    }
     lock.lock();
     try {
       if (beanLoader == null) {
@@ -846,7 +799,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
       setLoadedProperty(propertyIndex);
     } else {
       if (readOnly) {
-        throw new IllegalStateException("This bean is readOnly");
+        throw new IllegalStateException("ReadOnly");
       }
       setChangeLoaded(propertyIndex);
     }
@@ -855,7 +808,7 @@ public final class InterceptReadWrite implements EntityBeanIntercept {
   @Override
   public void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
     if (readOnly) {
-      throw new IllegalStateException("This bean is readOnly");
+      throw new IllegalStateException("ReadOnly");
     }
     setChangedProperty(propertyIndex);
     if (setDirtyState) {

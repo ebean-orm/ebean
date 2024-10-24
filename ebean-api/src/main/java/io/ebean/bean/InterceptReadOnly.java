@@ -2,9 +2,7 @@ package io.ebean.bean;
 
 import io.ebean.ValuePair;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * EntityBeanIntercept optimised for read only use.
@@ -13,25 +11,21 @@ import java.util.Set;
  * required for updates such as per property changed, loaded, dirty state, original values
  * bean state etc.
  */
-public class InterceptReadOnly implements EntityBeanIntercept {
+public final class InterceptReadOnly extends InterceptBase {
 
-  private final EntityBean owner;
+  private final boolean[] flags;
 
   /**
    * Create with a given entity.
    */
   public InterceptReadOnly(Object ownerBean) {
-    this.owner = (EntityBean) ownerBean;
+    super(ownerBean);
+    this.flags = new boolean[owner._ebean_getPropertyNames().length];
   }
 
   @Override
   public String toString() {
     return "InterceptReadOnly{" + owner + '}';
-  }
-
-  @Override
-  public EntityBean owner() {
-    return owner;
   }
 
   @Override
@@ -95,17 +89,12 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public boolean isFullyLoadedBean() {
-    return false;
-  }
-
-  @Override
-  public void setFullyLoadedBean(boolean fullyLoadedBean) {
-
-  }
-
-  @Override
   public boolean isPartial() {
+    for (boolean flag : flags) {
+      if (flag) {
+        return true;
+      }
+    }
     return false;
   }
 
@@ -136,7 +125,14 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public boolean hasIdOnly(int idIndex) {
-    return false;
+    for (int i = 0; i < flags.length; i++) {
+      if (i == idIndex) {
+        if (!flags[i]) return false;
+      } else if (flags[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -235,43 +231,37 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public int findProperty(String propertyName) {
-    return 0;
-  }
-
-  @Override
-  public String property(int propertyIndex) {
-    return null;
-  }
-
-  @Override
   public int propertyLength() {
-    return 0;
+    return flags.length;
   }
 
   @Override
   public void setPropertyLoaded(String propertyName, boolean loaded) {
-
+    final int position = findProperty(propertyName);
+    if (position == -1) {
+      throw new IllegalArgumentException("Property not found - " + propertyName);
+    }
+    flags[position] = loaded;
   }
 
   @Override
   public void setPropertyUnloaded(int propertyIndex) {
-
+    flags[propertyIndex] = false;
   }
 
   @Override
   public void setLoadedProperty(int propertyIndex) {
-
+    flags[propertyIndex] = true;
   }
 
   @Override
   public void setLoadedPropertyAll() {
-
+    Arrays.fill(flags, true);
   }
 
   @Override
   public boolean isLoadedProperty(int propertyIndex) {
-    return false;
+    return flags[propertyIndex];
   }
 
   @Override
@@ -321,7 +311,16 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public Set<String> loadedPropertyNames() {
-    return Collections.emptySet();
+    if (fullyLoadedBean) {
+      return null;
+    }
+    final Set<String> props = new LinkedHashSet<>();
+    for (int i = 0; i < flags.length; i++) {
+      if (flags[i]) {
+        props.add(property(i));
+      }
+    }
+    return props;
   }
 
   @Override
@@ -370,13 +369,10 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public StringBuilder loadedPropertyKey() {
-    return null;
-  }
-
-  @Override
   public boolean[] loaded() {
-    return new boolean[0];
+    final boolean[] ret = new boolean[flags.length];
+    System.arraycopy(flags, 0, ret, 0, ret.length);
+    return ret;
   }
 
   @Override
@@ -401,7 +397,7 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public void initialisedMany(int propertyIndex) {
-
+    flags[propertyIndex] = true;
   }
 
   @Override
@@ -416,12 +412,15 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public void preGetter(int propertyIndex) {
-
+    if (errorOnLazyLoad && !flags[propertyIndex]) {
+      final String property = property(propertyIndex);
+      throw new IllegalStateException("Property not loaded: " + property);
+    }
   }
 
   @Override
   public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
@@ -436,57 +435,57 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
-
+    throw new IllegalStateException("ReadOnly");
   }
 
   @Override

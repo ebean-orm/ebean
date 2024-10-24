@@ -115,7 +115,7 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
 
   void checkReadOnly() {
     if (readOnly) {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
+      throw new IllegalStateException("ReadOnly");
     }
   }
 
