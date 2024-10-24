@@ -25,7 +25,7 @@ import java.util.concurrent.Future;
  *
  *     PagedList<Order> pagedList = DB.find(Order.class)
  *       .where().eq("status", Order.Status.NEW)
- *       .order().asc("id")
+ *       .orderBy().asc("id")
  *       .setFirstRow(0)
  *       .setMaxRows(50)
  *       .findPagedList();

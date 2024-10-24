@@ -24,7 +24,7 @@ public class TestLazyJoin extends BaseTestCase {
       .select("status")
       .fetchLazy("customer", "name, status")
       .fetch("customer.contacts")
-      .order().asc("id");
+      .orderBy().asc("id");
 
     List<Order> list = query.findList();
 

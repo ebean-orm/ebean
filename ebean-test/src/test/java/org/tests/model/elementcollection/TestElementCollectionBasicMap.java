@@ -48,7 +48,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
     List<EcmPerson> found =
       DB.find(EcmPerson.class).where()
         .startsWith("name", "MFiona0")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
     assertThat(found).hasSize(2);
@@ -72,7 +72,7 @@ public class TestElementCollectionBasicMap extends BaseTestCase {
         .fetch("phoneNumbers")
         .where()
         .startsWith("name", "MFiona0")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
     assertThat(found2).hasSize(2);

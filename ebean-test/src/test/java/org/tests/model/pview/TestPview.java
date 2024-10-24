@@ -19,7 +19,7 @@ public class TestPview extends BaseTestCase {
     Query<Paggview> query = DB.find(Paggview.class);
     query.select("amount");
     query.where().eq("pview.wviews", wview);
-    query.order("pview.value");
+    query.orderBy("pview.value");
     query.findList();
     String generatedSql = sqlOf(query, 1);
 

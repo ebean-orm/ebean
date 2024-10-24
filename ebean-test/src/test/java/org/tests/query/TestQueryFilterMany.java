@@ -30,7 +30,7 @@ public class TestQueryFilterMany extends BaseTestCase {
       .fetchLazy("orders")
       .filterMany("orders").eq("status", Order.Status.NEW)
       .where().ieq("name", "Rob")
-      .order().asc("id").setMaxRows(1)
+      .orderBy().asc("id").setMaxRows(1)
       .findList().get(0);
 
     final int size = customer.getOrders().size();
@@ -55,8 +55,8 @@ public class TestQueryFilterMany extends BaseTestCase {
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
       // fluid style adding maxRows/firstRow to filterMany
-      .filterMany("orders").eq("status", Order.Status.NEW).order("id desc").setMaxRows(100).setFirstRow(3)
-      .order().asc("id").setMaxRows(5);
+      .filterMany("orders").eq("status", Order.Status.NEW).orderBy("id desc").setMaxRows(100).setFirstRow(3)
+      .orderBy().asc("id").setMaxRows(5);
 
     final List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
@@ -82,10 +82,10 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
-      .order().asc("id").setMaxRows(5);
+      .orderBy().asc("id").setMaxRows(5);
 
     // non-fluid style adding maxRows/firstRow
-    final ExpressionList<Customer> filterMany = query.filterMany("orders").order("id desc").eq("status", Order.Status.NEW);
+    final ExpressionList<Customer> filterMany = query.filterMany("orders").orderBy("id desc").eq("status", Order.Status.NEW);
     filterMany.setMaxRows(100);
     filterMany.setFirstRow(3);
 
@@ -116,8 +116,8 @@ public class TestQueryFilterMany extends BaseTestCase {
       .where().ieq("name", "Rob")
       // use expression + fluid style adding maxRows/firstRow to filterMany
       .filterMany("orders", "status = ?", Order.Status.NEW)
-        .setMaxRows(100).setFirstRow(3).order("orderDate desc, id")
-      .order().asc("id").setMaxRows(5);
+        .setMaxRows(100).setFirstRow(3).orderBy("orderDate desc, id")
+      .orderBy().asc("id").setMaxRows(5);
 
     final List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
@@ -143,8 +143,8 @@ public class TestQueryFilterMany extends BaseTestCase {
       .where().ieq("name", "Rob")
       // use expression + fluid style adding maxRows/firstRow to filterMany
       .filterManyRaw("orders", "status = ?", Order.Status.NEW)
-      .setMaxRows(100).setFirstRow(3).order("orderDate desc, id")
-      .order().asc("id").setMaxRows(5);
+      .setMaxRows(100).setFirstRow(3).orderBy("orderDate desc, id")
+      .orderBy().asc("id").setMaxRows(5);
 
     final List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
@@ -169,7 +169,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     final Query<Customer> query = DB.find(Customer.class)
       .where().ieq("name", "Rob")
       .filterManyRaw("orders", "status = ?", Order.Status.NEW)
-      .order().asc("id");
+      .orderBy().asc("id");
 
     final List<Customer> customers = query.findList();
     assertThat(customers).isNotEmpty();
@@ -185,7 +185,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     LoggedSql.start();
     Customer customer = DB.find(Customer.class)
       .setMaxRows(1)
-      .order().asc("id")
+      .orderBy().asc("id")
       .fetch("orders")
       .filterMany("orders").raw("orderDate is not null")
       .findOne();
@@ -203,7 +203,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     LoggedSql.start();
     var result = DB.find(Customer.class)
-      .order().asc("id")
+      .orderBy().asc("id")
       .fetch("orders")
       .filterMany("orders").raw("orderDate is not null")
       .findList();
@@ -222,7 +222,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     Optional<Customer> customer = DB.find(Customer.class)
       .setMaxRows(1)
-      .order().asc("id")
+      .orderBy().asc("id")
       .fetch("orders")
       .filterMany("orders").raw("1 = 0")
       .findOneOrEmpty();
@@ -262,7 +262,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     Query<Customer> query = DB.find(Customer.class)
       .fetch("orders")
       .filterMany("orders").in("status", Order.Status.NEW)
-      .order().asc("id");
+      .orderBy().asc("id");
 
     query.findCount();
 
@@ -281,7 +281,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     Query<Customer> query = DB.find(Customer.class)
       .fetch("orders")
       .filterMany("orders").in("status", Order.Status.NEW)
-      .order().asc("id");
+      .orderBy().asc("id");
 
     query.copy().findList();
 
@@ -304,7 +304,7 @@ public class TestQueryFilterMany extends BaseTestCase {
     Query<Customer> query = DB.find(Customer.class)
       .fetchQuery("orders") // explicitly fetch orders separately
       .filterMany("orders").in("status", Order.Status.NEW)
-      .order().asc("id");
+      .orderBy().asc("id");
 
     query.findList();
 

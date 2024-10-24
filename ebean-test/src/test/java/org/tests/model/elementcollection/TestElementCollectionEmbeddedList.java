@@ -44,7 +44,7 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
     List<EcblPerson> found =
       DB.find(EcblPerson.class).where()
         .startsWith("name", "Fiona640")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
     List<EcPhone> phoneNumbers0 = found.get(0).getPhoneNumbers();
@@ -64,7 +64,7 @@ public class TestElementCollectionEmbeddedList extends BaseTestCase {
         .fetch("phoneNumbers")
         .where()
         .startsWith("name", "Fiona640")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
     assertThat(found2).hasSize(2);

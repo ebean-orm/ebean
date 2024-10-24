@@ -35,7 +35,7 @@ public class TestTextJsonSelfRef extends BaseTestCase {
       }
     });
 
-    List<SelfRefCustomer> customers = DB.find(SelfRefCustomer.class).order("id desc").findList();
+    List<SelfRefCustomer> customers = DB.find(SelfRefCustomer.class).orderBy("id desc").findList();
 
     // Check that there are no 'reference' beans here
     for (SelfRefCustomer cust : customers) {

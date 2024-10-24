@@ -54,7 +54,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       .where()
       .isNotNull("name")
       .setMaxRows(3)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findIterate();
 
     try {
@@ -161,7 +161,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       .fetch("customer", "name")
       .fetch("details")
       .where().gt("id", 0).le("id", 10)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findEach(order -> {
         Customer customer = order.getCustomer();
         order.getId();
@@ -233,7 +233,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       .where()
       .isNotNull("name")
       .setMaxRows(3)
-      .order().asc("id");
+      .orderBy().asc("id");
 
     if (withLoadBatch) {
       query.setLazyLoadBatchSize(1);

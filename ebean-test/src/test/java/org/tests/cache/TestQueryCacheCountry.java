@@ -35,7 +35,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     List<Country> countryList0 = DB.find(Country.class)
       .setUseQueryCache(true)
       .where().startsWith("name", "XLKMG")
-      .order().asc("name")
+      .orderBy().asc("name")
       .findList();
 
     assertThat(countryList0).isEmpty();
@@ -47,7 +47,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
     List<Country> countryList1 = DB.find(Country.class)
       .setUseQueryCache(true)
       .where().startsWith("name", "XLKMG")
-      .order().asc("name")
+      .orderBy().asc("name")
       .findList();
 
     assertThat(countryList1).isEmpty();
@@ -124,7 +124,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     List<Country> countryList0 = DB.find(Country.class)
       .setUseQueryCache(true)
-      .order().asc("name")
+      .orderBy().asc("name")
       .findList();
 
     assertEquals(1, queryCache.statistics(false).getSize());
@@ -132,7 +132,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     List<Country> countryList1 = DB.find(Country.class)
       .setUseQueryCache(true)
-      .order().asc("name")
+      .orderBy().asc("name")
       .findList();
 
     ServerCacheStatistics statistics = queryCache.statistics(false);
@@ -150,7 +150,7 @@ public class TestQueryCacheCountry extends BaseTestCase {
 
     List<Country> countryList2 = DB.find(Country.class)
       .setUseQueryCache(true)
-      .order().asc("name")
+      .orderBy().asc("name")
       .findList();
 
     assertNotSame(countryList2, countryList0);
