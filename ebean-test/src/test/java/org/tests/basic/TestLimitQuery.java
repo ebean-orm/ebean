@@ -36,7 +36,7 @@ public class TestLimitQuery extends BaseTestCase {
       .where().gt("details.id", 0)
       .setMaxRows(0)
       .setFirstRow(3)
-      .order().asc("orderDate");
+      .orderBy().asc("orderDate");
 
     query.findList();
 

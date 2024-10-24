@@ -313,6 +313,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public ExpressionList<T> filterMany(String manyProperty, String expressions, Object... params) {
     throw new IllegalStateException("filterMany not allowed on Junction expression list");
   }
@@ -338,6 +339,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public int delete(Transaction transaction) {
     return exprList.delete(transaction);
   }
@@ -348,6 +350,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public int update(Transaction transaction) {
     return exprList.update(transaction);
   }

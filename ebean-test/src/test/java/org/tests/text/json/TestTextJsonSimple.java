@@ -66,7 +66,7 @@ public class TestTextJsonSimple extends BaseTestCase {
       .select("id, name, status, shippingAddress")
       .fetch("billingAddress", "line1, city").fetch("billingAddress.country", "*")
       .fetch("contacts", "firstName,email")
-      .order().desc("id").findList();
+      .orderBy().desc("id").findList();
 
     Database server = DB.getDefault();
 
@@ -102,7 +102,7 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     List<Customer> list = DB.find(Customer.class)
       .select("id, name")
-      .order().desc("id").findList();
+      .orderBy().desc("id").findList();
 
     Database server = DB.getDefault();
 
@@ -125,7 +125,7 @@ public class TestTextJsonSimple extends BaseTestCase {
 
     List<Customer> list = DB.find(Customer.class)
       .select("id, name")
-      .order().desc("id").findList();
+      .orderBy().desc("id").findList();
 
     Database server = DB.getDefault();
 

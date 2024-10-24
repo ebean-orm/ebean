@@ -355,7 +355,7 @@ public interface ExpressionList<T> {
    *  List<String> names =
    *    DB.find(Customer.class)
    *      .select("name")
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
@@ -368,7 +368,7 @@ public interface ExpressionList<T> {
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .setMaxRows(100)
    *      .findSingleAttributeList();
    *
@@ -1713,7 +1713,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findList();
    * }</pre>
    */
@@ -1734,7 +1734,7 @@ public interface ExpressionList<T> {
    *    .or()
    *      .eq("status", Customer.Status.ACTIVE)
    *      .isNull("anniversary")
-   *    .order().asc("name")
+   *    .orderBy().asc("name")
    *    .findList();
    *
    * }</pre>
@@ -1754,7 +1754,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findList();
    *
    * }</pre>

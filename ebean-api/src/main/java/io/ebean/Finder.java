@@ -35,7 +35,7 @@ import java.util.List;
  *   public List<Customer> findNew() {
  *     return query().where()
  *       .eq("status", Customer.Status.NEW)
- *       .order("name")
+ *       .orderBy("name")
  *       .findList()
  *   }
  * }

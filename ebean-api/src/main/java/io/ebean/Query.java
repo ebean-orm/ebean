@@ -13,7 +13,7 @@ import org.jspecify.annotations.NullMarked;
  *     .where()
  *       .like("customer.name","rob%")
  *       .gt("orderDate",lastWeek)
- *     .order("customer.id, id desc")
+ *     .orderBy("customer.id, id desc")
  *     .setMaxRows(50)
  *     .findList();
  *

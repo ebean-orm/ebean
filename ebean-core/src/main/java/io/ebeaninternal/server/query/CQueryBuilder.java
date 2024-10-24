@@ -233,7 +233,7 @@ final class CQueryBuilder {
   <T> CQueryRowCount buildRowCountQuery(OrmQueryRequest<T> request) {
     SpiQuery<T> query = request.query();
     // always set the order by to null for row count query
-    query.setOrder(null);
+    query.setOrderBy(null);
     query.setFirstRow(0);
     query.setMaxRows(0);
 

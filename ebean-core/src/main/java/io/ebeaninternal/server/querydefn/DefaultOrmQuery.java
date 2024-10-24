@@ -1482,6 +1482,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public final int delete(Transaction transaction) {
     return server.delete(this);
   }
@@ -1492,6 +1493,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public final int update(Transaction transaction) {
     return server.update(this);
   }
@@ -1688,6 +1690,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  @SuppressWarnings("removal") // uses internal API
   public final OrderBy<T> orderBy() {
     if (orderBy == null) {
       orderBy = new OrderBy<>(this, null);
@@ -1696,6 +1699,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  @SuppressWarnings("removal") // uses internal API
   public final Query<T> orderBy(String orderByClause) {
     if (orderByClause == null || orderByClause.trim().isEmpty()) {
       this.orderBy = null;

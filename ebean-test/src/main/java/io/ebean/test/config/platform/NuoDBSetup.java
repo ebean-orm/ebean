@@ -18,7 +18,7 @@ class NuoDBSetup implements PlatformSetup {
     config.setDriver("com.nuodb.jdbc.Driver");
 
     final DataSourceConfig dsConfig = config.datasourceDefaults();
-    dsConfig.setSchema(config.getSchema());
+    dsConfig.schema(config.getSchema());
     return dockerProperties(config);
   }
 

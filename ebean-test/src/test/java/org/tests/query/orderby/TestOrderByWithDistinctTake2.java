@@ -25,7 +25,7 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     Query<Customer> query = DB.find(Customer.class)
       .select("id, name")
       .where().ilike("contacts.firstName", "R%")
-      .order("name desc").query();
+      .orderBy("name desc").query();
 
     query.findList();
 
@@ -53,7 +53,7 @@ public class TestOrderByWithDistinctTake2 extends BaseTestCase {
     Query<Customer> query = DB.find(Customer.class)
       .select("id")
       .where().ilike("contacts.firstName", "R%")
-      .order("name asc,id desc").query();
+      .orderBy("name asc,id desc").query();
 
     query.findList();
 

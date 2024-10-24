@@ -341,6 +341,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public int delete(Transaction transaction) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
@@ -351,6 +352,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  @SuppressWarnings("removal") // old API
   public int update(Transaction transaction) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
@@ -446,6 +448,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  @SuppressWarnings("removal") // uses internal API
   public OrderBy<T> orderBy() {
     if (orderBy == null) {
       orderBy = new OrderBy<>();

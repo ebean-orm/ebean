@@ -283,6 +283,7 @@ public interface DatabaseBuilder {
   /**
    * @deprecated migrate to {@link #lazyLoadBatchSize(int)}.
    */
+  @Deprecated
   DatabaseBuilder setLazyLoadBatchSize(int lazyLoadBatchSize);
 
   /**
@@ -371,6 +372,7 @@ public interface DatabaseBuilder {
   /**
    * @deprecated migrate to {@link #jsonFactory(JsonFactory)}.
    */
+  @Deprecated
   DatabaseBuilder setJsonFactory(JsonFactory jsonFactory);
 
   /**
@@ -383,6 +385,7 @@ public interface DatabaseBuilder {
   /**
    * @deprecated migrate to {@link #jsonDateTime(JsonConfig.DateTime)}.
    */
+  @Deprecated
   DatabaseBuilder setJsonDateTime(JsonConfig.DateTime jsonDateTime);
 
   /**

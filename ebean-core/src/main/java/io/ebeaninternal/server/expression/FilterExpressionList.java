@@ -172,7 +172,7 @@ public final class FilterExpressionList<T> extends DefaultExpressionList<T> {
       query.setMaxRows(maxRows);
     }
     if (orderByClause != null) {
-      query.order(orderByClause);
+      query.orderBy(orderByClause);
     }
   }
 

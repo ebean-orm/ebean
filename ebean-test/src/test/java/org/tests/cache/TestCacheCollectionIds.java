@@ -33,7 +33,7 @@ class TestCacheCollectionIds extends BaseTestCase {
     custManyIdsCache.clear();
 
     List<Customer> list = DB.find(Customer.class).setAutoTune(false).setBeanCacheMode(CacheMode.PUT)
-      .order().asc("id").findList();
+      .orderBy().asc("id").findList();
 
     assertTrue(list.size() > 1);
     // Assert.assertEquals(list.size(),

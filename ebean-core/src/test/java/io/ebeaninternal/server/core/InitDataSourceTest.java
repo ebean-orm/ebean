@@ -22,7 +22,7 @@ public class InitDataSourceTest {
   private DatabaseBuilder.Settings newConfig(String readOnlyUrl) {
     DatabaseBuilder config = new DatabaseConfig();
     DataSourceConfig roConfig = new DataSourceConfig();
-    roConfig.setUrl(readOnlyUrl);
+    roConfig.url(readOnlyUrl);
     config.setReadOnlyDataSourceConfig(roConfig);
     return config.settings();
   }
