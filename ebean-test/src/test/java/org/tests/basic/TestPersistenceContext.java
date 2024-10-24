@@ -254,9 +254,9 @@ public class TestPersistenceContext extends BaseTestCase {
     config.setName("h2-batch");
     config.loadFromProperties();
     config.setDdlExtra(false);
-    config.getDataSourceConfig().setUsername("sa");
-    config.getDataSourceConfig().setPassword("sa");
-    config.getDataSourceConfig().setUrl("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
+    config.getDataSourceConfig().username("sa");
+    config.getDataSourceConfig().password("sa");
+    config.getDataSourceConfig().url("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
     config.addClass(TestModel2.class);
     config.addClass(TmId.class);
     DatabaseFactory.create(config);
@@ -288,9 +288,9 @@ public class TestPersistenceContext extends BaseTestCase {
     config.setName("h2-batch");
     config.loadFromProperties();
     config.setDdlRun(false);
-    config.getDataSourceConfig().setUsername("sa");
-    config.getDataSourceConfig().setPassword("sa");
-    config.getDataSourceConfig().setUrl("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
+    config.getDataSourceConfig().username("sa");
+    config.getDataSourceConfig().password("sa");
+    config.getDataSourceConfig().url("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
     config.addClass(TestModel2.class);
     config.addClass(TmId.class);
     DatabaseFactory.create(config);

@@ -101,10 +101,10 @@ public class PlatformNoGeneratedKeysTest {
     dbIdentity.setSelectLastInsertedIdTemplate("select identity() --{table}");
 
     config.setDatabasePlatform(platform);
-    config.getDataSourceConfig().setUsername("sa");
-    config.getDataSourceConfig().setPassword("");
-    config.getDataSourceConfig().setUrl("jdbc:h2:mem:withPCQuery;MODE=LEGACY");
-    config.getDataSourceConfig().setDriver("org.h2.Driver");
+    config.getDataSourceConfig().username("sa");
+    config.getDataSourceConfig().password("");
+    config.getDataSourceConfig().url("jdbc:h2:mem:withPCQuery;MODE=LEGACY");
+    config.getDataSourceConfig().driver("org.h2.Driver");
 
     config.setDisableLazyLoading(true);
     config.setDisableL2Cache(true);

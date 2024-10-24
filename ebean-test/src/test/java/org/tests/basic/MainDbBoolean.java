@@ -44,11 +44,11 @@ public class MainDbBoolean {
 
     // requires oracle driver in class path
     DataSourceConfig oraDb = new DataSourceConfig();
-    oraDb.setDriver("oracle.jdbc.driver.OracleDriver");
-    oraDb.setUsername("junk");
-    oraDb.setPassword("junk");
-    oraDb.setUrl("jdbc:oracle:thin:junk/junk@localhost:1521:XE");
-    oraDb.setHeartbeatSql("select count(*) from dual");
+    oraDb.driver("oracle.jdbc.driver.OracleDriver");
+    oraDb.username("junk");
+    oraDb.password("junk");
+    oraDb.url("jdbc:oracle:thin:junk/junk@localhost:1521:XE");
+    oraDb.heartbeatSql("select count(*) from dual");
 
 
     c.loadFromProperties();
@@ -77,11 +77,11 @@ public class MainDbBoolean {
 
     // requires postgres driver in class path
     DataSourceConfig postgresDb = new DataSourceConfig();
-    postgresDb.setDriver("org.postgresql.Driver");
-    postgresDb.setUsername("test");
-    postgresDb.setPassword("test");
-    postgresDb.setUrl("jdbc:postgresql://127.0.0.1:5432/test");
-    postgresDb.setHeartbeatSql("select count(*) from t_one");
+    postgresDb.driver("org.postgresql.Driver");
+    postgresDb.username("test");
+    postgresDb.password("test");
+    postgresDb.url("jdbc:postgresql://127.0.0.1:5432/test");
+    postgresDb.heartbeatSql("select count(*) from t_one");
 
     c.loadFromProperties();
     c.setDdlGenerate(true);

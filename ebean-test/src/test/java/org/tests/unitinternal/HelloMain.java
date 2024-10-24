@@ -22,10 +22,10 @@ public class HelloMain {
 
     // ### Configuration Settings ###
     // -> data source
-    dataSourceConfig.setDriver("org.h2.Driver");
-    dataSourceConfig.setUsername("howtouser");
-    dataSourceConfig.setPassword("");
-    dataSourceConfig.setUrl("jdbc:h2:~/db/howto1");
+    dataSourceConfig.driver("org.h2.Driver");
+    dataSourceConfig.username("howtouser");
+    dataSourceConfig.password("");
+    dataSourceConfig.url("jdbc:h2:~/db/howto1");
 
     // -> server
     serverConfig.setName("default");

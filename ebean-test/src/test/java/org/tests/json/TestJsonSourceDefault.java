@@ -25,9 +25,9 @@ class TestJsonSourceDefault {
   void testDirtyValues_diffSource() {
     DatabaseConfig config = new DatabaseConfig();
     config.getDataSourceConfig()
-      .setUsername("sa")
-      .setPassword("")
-      .setUrl("jdbc:h2:mem:testJsonSourceDirtyValues");
+      .username("sa")
+      .password("")
+      .url("jdbc:h2:mem:testJsonSourceDirtyValues");
 
     config.setName("jsonSource");
     config.setDefaultServer(false);

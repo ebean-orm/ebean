@@ -195,16 +195,16 @@ class Config {
     }
 
     DataSourceConfig ds = new DataSourceConfig();
-    ds.setUsername(datasourceProperty(platform, "username", username));
-    ds.setPassword(datasourceProperty(platform, "password", password));
-    ds.setOwnerUsername(datasourceProperty(platform, "ownerUsername", null));
-    ds.setOwnerPassword(datasourceProperty(platform, "ownerPassword", null));
-    ds.setUrl(datasourceProperty(platform, "url", url));
+    ds.username(datasourceProperty(platform, "username", username));
+    ds.password(datasourceProperty(platform, "password", password));
+    ds.ownerUsername(datasourceProperty(platform, "ownerUsername", null));
+    ds.ownerPassword(datasourceProperty(platform, "ownerPassword", null));
+    ds.url(datasourceProperty(platform, "url", url));
     String driverClass = datasourceProperty(platform, "driver", driver);
-    ds.setDriver(driverClass);
+    ds.driver(driverClass);
     config.setDataSourceConfig(ds);
 
-    log.log(INFO, "Using jdbc settings - username:{0} url:{1} driver:{2}", ds.getUsername(), ds.getUrl(), ds.getDriver());
+    log.log(INFO, "Using jdbc settings - username:{0} url:{1} driver:{2}", ds.getUsername(), ds.getUrl(), ds.driverClassName());
     if (driverClass != null) {
       try {
         Class.forName(driverClass);
