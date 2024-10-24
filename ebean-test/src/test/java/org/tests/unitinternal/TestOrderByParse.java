@@ -15,7 +15,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void testParseRaw() {
 
-    OrderBy<Object> o1 = new OrderBy<>("case when status='N' then 1 when status='F' then 2 else 99 end");
+    OrderBy<Object> o1 = OrderBy.of("case when status='N' then 1 when status='F' then 2 else 99 end");
     assertEquals(1, o1.getProperties().size());
     assertTrue(o1.getProperties().get(0).isAscending());
     assertThat(o1.toStringFormat()).isEqualTo("case when status='N' then 1 when status='F' then 2 else 99 end");
@@ -25,25 +25,25 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void testParsingOne() {
 
-    OrderBy<Object> o1 = new OrderBy<>("id");
+    OrderBy<Object> o1 = OrderBy.of("id");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(o1.getProperties().get(0).isAscending());
     assertEquals("id", o1.toStringFormat());
 
-    o1 = new OrderBy<>("id asc");
+    o1 = OrderBy.of("id asc");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(o1.getProperties().get(0).isAscending());
     assertEquals("id", o1.toStringFormat());
 
-    o1 = new OrderBy<>("id desc");
+    o1 = OrderBy.of("id desc");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertFalse(o1.getProperties().get(0).isAscending());
     assertEquals("id desc", o1.toStringFormat());
 
-    o1 = new OrderBy<>(" id  asc ");
+    o1 = OrderBy.of(" id  asc ");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(o1.getProperties().get(0).isAscending());
@@ -56,7 +56,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void parseNullsHigh() {
 
-    OrderBy<Object> o1 = new OrderBy<>("id desc nulls high");
+    OrderBy<Object> o1 = OrderBy.of("id desc nulls high");
     assertEquals(1, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertFalse(o1.getProperties().get(0).isAscending());
@@ -64,6 +64,7 @@ public class TestOrderByParse extends BaseTestCase {
   }
 
   @Test
+  @SuppressWarnings("removal") // uses internal API
   public void add_parse() {
 
     OrderBy<Object> o1 = new OrderBy<>();
@@ -77,7 +78,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void parseNullsHigh_with_second() {
 
-    OrderBy<Object> o1 = new OrderBy<>("id desc nulls high, name");
+    OrderBy<Object> o1 = OrderBy.of("id desc nulls high, name");
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertFalse(o1.getProperties().get(0).isAscending());
@@ -89,7 +90,7 @@ public class TestOrderByParse extends BaseTestCase {
   @Test
   public void testParsingTwo() {
 
-    OrderBy<?> o1 = new OrderBy<>("id,name");
+    OrderBy<?> o1 = OrderBy.of("id,name");
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(o1.getProperties().get(0).isAscending());
@@ -97,7 +98,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id, name", o1.toStringFormat());
 
-    o1 = new OrderBy<>("  id  , name ");
+    o1 = OrderBy.of("  id  , name ");
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(o1.getProperties().get(0).isAscending());
@@ -105,7 +106,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertTrue(o1.getProperties().get(1).isAscending());
     assertEquals("id, name", o1.toStringFormat());
 
-    o1 = new OrderBy<>("  id desc , name  desc ");
+    o1 = OrderBy.of("  id desc , name  desc ");
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertFalse(o1.getProperties().get(0).isAscending());
@@ -113,7 +114,7 @@ public class TestOrderByParse extends BaseTestCase {
     assertFalse(o1.getProperties().get(1).isAscending());
     assertEquals("id desc, name desc", o1.toStringFormat());
 
-    o1 = new OrderBy<>("  id ascending, name  asc");
+    o1 = OrderBy.of("  id ascending, name  asc");
     assertEquals(2, o1.getProperties().size());
     assertEquals("id", o1.getProperties().get(0).getProperty());
     assertTrue(o1.getProperties().get(0).isAscending());
@@ -124,6 +125,7 @@ public class TestOrderByParse extends BaseTestCase {
   }
 
   @Test
+  @SuppressWarnings("removal") // uses internal API
   public void testAddMethods() {
 
     OrderBy<?> o1 = new OrderBy<>();
@@ -166,6 +168,7 @@ public class TestOrderByParse extends BaseTestCase {
   }
 
   @Test
+  @SuppressWarnings("removal") // uses internal API
   public void testParsingWithCollation() {
 
     OrderBy<Object> o1 = new OrderBy<>();
@@ -212,19 +215,20 @@ public class TestOrderByParse extends BaseTestCase {
   }
 
   @Test
+  @SuppressWarnings("removal") // uses internal API
   public void equals_with_nulls() {
 
-    OrderBy<Object> o1 = new OrderBy<>("id desc nulls high");
-    OrderBy<Object> o2 = new OrderBy<>("id desc nulls high");
+    OrderBy<Object> o1 = OrderBy.of("id desc nulls high");
+    OrderBy<Object> o2 = OrderBy.of("id desc nulls high");
     OrderBy<Object> o3 = new OrderBy<>();
     o3.add("id desc nulls high");
 
     assertEquals(o1, o2);
     assertEquals(o1, o3);
 
-    OrderBy<Object> o4 = new OrderBy<>("id desc");
-    OrderBy<Object> o5 = new OrderBy<>("oid desc nulls high");
-    OrderBy<Object> o6 = new OrderBy<>("id desc nulls low");
+    OrderBy<Object> o4 = OrderBy.of("id desc");
+    OrderBy<Object> o5 = OrderBy.of("oid desc nulls high");
+    OrderBy<Object> o6 = OrderBy.of("id desc nulls low");
 
     assertNotEquals(o1, o4);
     assertNotEquals(o1, o5);
@@ -232,6 +236,7 @@ public class TestOrderByParse extends BaseTestCase {
   }
 
   @Test
+  @SuppressWarnings("removal") // uses internal API
   public void equals_with_collation() {
     OrderBy<Object> o1 = new OrderBy<>();
     o1.asc("name", "latin_1");
