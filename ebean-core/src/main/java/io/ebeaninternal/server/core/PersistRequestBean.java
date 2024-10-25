@@ -195,6 +195,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void initTransIfRequiredWithBatchCascade() {
     createImplicitTransIfRequired();
     checkBatchEscalationOnCascade();
+    transaction.markNotQueryOnly();
   }
 
   /**

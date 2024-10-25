@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.query;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebeaninternal.api.SpiQueryFetch;
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 /**
  * Implementation of FetchGroup query for use to create FetchGroup via query beans.
  */
-@NonNullApi
+@NullMarked
 final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();

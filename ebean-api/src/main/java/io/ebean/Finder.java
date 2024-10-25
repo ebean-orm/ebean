@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 /**
@@ -60,7 +60,7 @@ import java.util.List;
  * @see BeanRepository
  * @see BeanFinder
  */
-@NonNullApi
+@NullMarked
 public class Finder<I, T> {
 
   /**

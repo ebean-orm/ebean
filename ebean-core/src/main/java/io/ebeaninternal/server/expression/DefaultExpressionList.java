@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
 import io.ebeaninternal.api.*;
@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 /**
  * Default implementation of ExpressionList.
  */
-@NonNullApi
+@NullMarked
 public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private static final String AND = " and ";

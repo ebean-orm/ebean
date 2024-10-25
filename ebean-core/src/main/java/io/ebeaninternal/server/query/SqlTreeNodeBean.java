@@ -156,7 +156,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
     for (STreeProperty property : properties) {
       if (!property.isAggregation()) {
-        property.appendSelect(ctx, subQuery);
+        property.appendGroupBy(ctx, subQuery);
       }
     }
     for (SqlTreeNode child : children) {

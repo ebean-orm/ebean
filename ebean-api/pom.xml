@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.7.0</version>
+    <version>14.8.0</version>
   </parent>
 
   <name>ebean api</name>
@@ -26,14 +26,10 @@
       <version>1.0</version>
     </dependency>
 
-    <!--
-    Class retention Nonnull and Nullable annotations
-    to assist with IDE auto-completion with Ebean API
-    -->
     <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>avaje-lang</artifactId>
-      <version>1.1</version>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>

@@ -40,7 +40,7 @@ import java.util.Collection;
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
  * @param <R> the specific query bean type (e.g. QCustomer)
  */
-public interface IQueryBean<T, R> extends QueryBuilder<R, T> {
+public interface IQueryBean<T, R extends IQueryBean<T, R>> extends QueryBuilder<R, T> {
 
   /**
    * Return the underlying query.
@@ -60,6 +60,7 @@ public interface IQueryBean<T, R> extends QueryBuilder<R, T> {
    *
    * @param properties The properties to include in the DISTINCT ON clause.
    */
+  @SuppressWarnings("unchecked")
   R distinctOn(TQProperty<R, ?>... properties);
 
   /**

@@ -388,6 +388,10 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public final void markNotQueryOnly() {
     this.queryOnly = false;
+    // if the transaction is readonly, it should not allow updates/deletes
+    if (localReadOnly){
+      throw new IllegalStateException("This transaction is read-only");
+    }
   }
 
   @Override

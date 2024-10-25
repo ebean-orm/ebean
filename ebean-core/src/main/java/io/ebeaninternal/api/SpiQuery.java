@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;

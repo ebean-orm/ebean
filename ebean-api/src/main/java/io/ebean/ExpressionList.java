@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import jakarta.persistence.NonUniqueResultException;
 import java.sql.Connection;
@@ -30,7 +30,7 @@ import java.util.function.Predicate;
  *
  * @see Query#where()
  */
-@NonNullApi
+@NullMarked
 public interface ExpressionList<T> {
 
   /**

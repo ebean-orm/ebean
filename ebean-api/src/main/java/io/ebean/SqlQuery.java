@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
@@ -40,7 +40,7 @@ import java.util.function.Predicate;
  *
  * }</pre>
  */
-@NonNullApi
+@NullMarked
 public interface SqlQuery extends Serializable, CancelableQuery {
 
   /**

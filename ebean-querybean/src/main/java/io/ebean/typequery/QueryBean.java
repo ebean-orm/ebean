@@ -1,7 +1,7 @@
 package io.ebean.typequery;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebeaninternal.api.SpiQueryFetch;
@@ -52,8 +52,8 @@ import java.util.stream.Stream;
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
  * @param <R> the specific root query bean type (e.g. QCustomer)
  */
-@NonNullApi
-public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
+@NullMarked
+public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryBean<T, R> {
 
   /**
    * The underlying query.
