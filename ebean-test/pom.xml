@@ -309,7 +309,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:14.7.1</tile>
+            <tile>io.ebean.tile:enhancement:14.8.0</tile>
           </tiles>
         </configuration>
       </plugin>
