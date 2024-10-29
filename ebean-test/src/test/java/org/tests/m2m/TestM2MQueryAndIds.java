@@ -56,7 +56,8 @@ public class TestM2MQueryAndIds extends BaseTestCase {
     Query<Role> query = DB.find(Role.class).select("id").where().exists(sq1).query();
     List<Role> models = query.findList();
     assertThat(models).hasSize(1);
-    assertThat(query.getGeneratedSql()).isEqualTo("select distinct t0.id from mt_role t0 left join mt_role_permission t1z_ on t1z_.mt_role_id = t0.id left join mt_permission t1 on t1.id = t1z_.mt_permission_id where exists (select 1 from mt_permission sq1 where sq1.name = ? and (sq1.id = t1.id))");
+    assertThat(query.getGeneratedSql()).isEqualTo("select distinct t0.id from mt_role t0 left join mt_role_permission t1z_ on t1z_.mt_role_id = t0.id where exists (select 1 from mt_permission sq1 where sq1.name = ? and (sq1.id = t1z_.mt_permission_id))");
+//    assertThat(query.getGeneratedSql()).isEqualTo("select distinct t0.id from mt_role t0 left join mt_role_permission t1z_ on t1z_.mt_role_id = t0.id left join mt_permission t1 on t1.id = t1z_.mt_permission_id where exists (select 1 from mt_permission sq1 where sq1.name = ? and (sq1.id = t1.id))");
   }
 
   @ForPlatform(Platform.H2)
