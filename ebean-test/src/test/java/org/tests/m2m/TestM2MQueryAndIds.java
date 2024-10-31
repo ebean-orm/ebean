@@ -80,6 +80,38 @@ public class TestM2MQueryAndIds extends BaseTestCase {
   @ForPlatform(Platform.H2)
   @Test
   public void testO2MWithId() {
+    Query<Role> sq1 = DB.find(Role.class)
+      .alias("sq1")
+      .where()
+      .eq("name", "TestRole")
+      .raw("(sq1.id = roles.id)")
+      .query();
+
+    Query<Tenant> query = DB.find(Tenant.class).select("id").where().exists(sq1).query();
+    List<Tenant> models = query.findList();
+    assertThat(models).hasSize(1);
+    assertThat(query.getGeneratedSql()).isEqualTo("select distinct t0.id from mt_tenant t0 left join mt_role t1 on t1.tenant_id = t0.id where exists (select 1 from mt_role sq1 where sq1.name = ? and (sq1.id = t1.id))");
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void testO2MWithoutId() {
+    Query<Role> sq1 = DB.find(Role.class)
+      .alias("sq1")
+      .where()
+      .eq("name", "TestRole")
+      .raw("(sq1.id = roles)")
+      .query();
+
+    Query<Tenant> query = DB.find(Tenant.class).select("id").where().exists(sq1).query();
+    List<Tenant> models = query.findList();
+    assertThat(models).hasSize(1);
+    assertThat(query.getGeneratedSql()).isEqualTo("select t0.id from mt_tenant t0 where exists (select 1 from mt_role sq1 where sq1.name = ? and (sq1.id = t0.roles_id))");
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void testM2OWithId() {
     Query<Tenant> sq1 = DB.find(Tenant.class)
       .alias("sq1")
       .where()
@@ -95,7 +127,7 @@ public class TestM2MQueryAndIds extends BaseTestCase {
 
   @ForPlatform(Platform.H2)
   @Test
-  public void testO2MWithoutId() {
+  public void testM2OWithoutId() {
     Query<Tenant> sq1 = DB.find(Tenant.class)
       .alias("sq1")
       .where()
