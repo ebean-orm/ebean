@@ -239,7 +239,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <doctitle>Ebean 12</doctitle>
+          <doctitle>Ebean 14</doctitle>
           <overview>src/main/java/io/ebean/overview.html</overview>
           <excludePackageNames>io.ebeaninternal.*:io.ebeanservice:io.ebean.common:io.ebean.bean:io.ebean.service:io.ebean.metric:io.ebean.util:io.ebean.config.properties:io.ebean.config.dbplatform</excludePackageNames>
           <linksource>true</linksource>
