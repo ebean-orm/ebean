@@ -47,8 +47,9 @@ public class QCustomerTest {
 
       database.save(customer, txn);
 
-      final Customer found = new QCustomer(txn)
+      final Customer found = new QCustomer()
         .name.eq("explicitTransaction")
+        .usingTransaction(txn)
         .findOne();
       assertThat(found).isNotNull();
 

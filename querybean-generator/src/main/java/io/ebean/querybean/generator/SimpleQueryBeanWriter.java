@@ -160,16 +160,6 @@ class SimpleQueryBeanWriter {
     writer.append("  }").eol();
     writer.eol();
 
-    writer.append("  /** @deprecated migrate to query.usingTransaction() */").eol();
-    writer.append("  @Deprecated(forRemoval = true)").eol();
-    writer.append("  public Q%s(io.ebean.Transaction transaction) {", shortName).eol();
-    if (dbName == null) {
-      writer.append("    super(%s.class, transaction);", beanFullName).eol();
-    } else {
-      writer.append("    super(%s.class, io.ebean.DB.byName(\"%s\"), transaction);", beanFullName, dbName).eol();
-    }
-    writer.append("  }").eol();
-
     writer.eol();
     writer.append("  /** Construct with a given Database */").eol();
     writer.append("  public Q%s(io.ebean.Database database) {", shortName).eol();
