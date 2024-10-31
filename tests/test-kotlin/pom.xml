@@ -15,7 +15,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <ebean-maven-plugin.version>15.6.0</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>15.8.0</ebean-maven-plugin.version>
     <kotlin.version>1.9.22</kotlin.version>
     <jackson.version>2.16.1</jackson.version>
   </properties>
@@ -92,7 +92,7 @@
                   <groupId>io.ebean</groupId>
                   <artifactId>kotlin-querybean-generator</artifactId>
 <!--                  <artifactId>querybean-generator</artifactId>-->
-                  <version>14.6.0</version>
+                  <version>14.8.0</version>
                 </annotationProcessorPath>
               </annotationProcessorPaths>
             </configuration>
