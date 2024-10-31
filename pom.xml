@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>4.3</version>
+    <version>4.5</version>
   </parent>
 
   <groupId>io.ebean</groupId>
@@ -103,20 +103,6 @@
     <module>ebean-spring-txn</module>
   </modules>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-javadoc-plugin</artifactId>
-          <version>${maven-javadoc-plugin.version}</version>
-          <configuration>
-            <additionalOptions>-Xdoclint:none</additionalOptions>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
   <profiles>
     <profile>
       <id>central</id>
