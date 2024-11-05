@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestLazyAddBeanList extends BaseTestCase {
 
   private Customer cust;
+  private List<Customer> custs;
   private OrderMaster orderMaster;
 
   @BeforeEach
@@ -39,6 +40,7 @@ public class TestLazyAddBeanList extends BaseTestCase {
   void tearDown() {
     DB.delete(cust);
     DB.delete(orderMaster);
+    DB.deleteAll(custs);
   }
 
   @Test
@@ -147,7 +149,7 @@ public class TestLazyAddBeanList extends BaseTestCase {
     }
 
     LoggedSql.start();
-    List<Customer> custs = DB.find(Customer.class).where().startsWith("name", "batch").findList();
+    custs = DB.find(Customer.class).where().startsWith("name", "batch").findList();
     assertThat(custs).hasSize(10);
     assertThat(LoggedSql.stop()).hasSize(1);
 
