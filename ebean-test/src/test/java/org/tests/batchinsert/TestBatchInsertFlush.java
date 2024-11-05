@@ -42,13 +42,13 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
       for (int i = 0; i < 3; i++) {
         Customer customer = ResetBasicData.createCustomer("BatchFlushPreInsert " + i, null, null, 3);
-        customer.addContact(new Contact("Fred" + i, "Blue"));
+        customer.addContact(new Contact("BatchFlush" + i, "Blue"));
         customers.add(customer);
       }
 
       for (int i = 3; i < 6; i++) {
         Customer customer = ResetBasicData.createCustomer("BatchFlushPostInsert " + i, null, null, 3);
-        customer.addContact(new Contact("Fred" + i, "Blue"));
+        customer.addContact(new Contact("BatchFlush" + i, "Blue"));
         customers.add(customer);
       }
 
@@ -57,7 +57,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       txn.commit();
     } finally {
       DB.find(Customer.class).where().startsWith("name", "BatchFlush").delete();
-      DB.find(Contact.class).where().startsWith("firstName", "Fred").startsWith("lastName", "Blue").delete();
+      DB.find(Contact.class).where().startsWith("firstName", "BatchFlush").startsWith("lastName", "Blue").delete();
     }
   }
 
