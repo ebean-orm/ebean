@@ -55,6 +55,9 @@ public class TestBatchInsertFlush extends BaseTestCase {
       DB.saveAll(customers);
 
       txn.commit();
+    } finally {
+      DB.find(Customer.class).where().startsWith("name", "BatchFlush").delete();
+      DB.find(Contact.class).where().startsWith("firstName", "Fred").startsWith("lastName", "Blue").delete();
     }
   }
 
