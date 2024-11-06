@@ -35,7 +35,14 @@ jobs:
           key: build-${{ env.cache-name }}
       - name: Maven version
         run: mvn --version
+      - name: maven-settings
+        uses: s4u/maven-settings-action@v2
+        with:
+          servers: '[{"id": "github-release", "username": "dummy", "password": "${GITHUB_TOKEN}"}]'
+          githubServer: false
 #      - name: Prepare
 #        run: ./jakarta-to-valhalla.sh
       - name: Build with Maven
-        run: mvn package
+        run: mvn package -Pgithub
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
