@@ -60,16 +60,6 @@ class KotlinLangAdapter implements LangAdapter {
       writer.append("  constructor() : super(%s::class.java, io.ebean.DB.byName(\"%s\"))", fullName, dbName).eol().eol();
     }
 
-    writer.append("  /**").eol();
-    writer.append("   * @deprecated migrate to query.usingTransaction()", name).eol();
-    writer.append("   */").eol();
-    writer.append("   @Deprecated(message=\"migrate to query.usingTransaction()\")").eol();
-    if (dbName == null) {
-      writer.append("  constructor(transaction: io.ebean.Transaction) : super(%s::class.java, transaction)", fullName).eol().eol();
-    } else {
-      writer.append("  constructor(transaction: io.ebean.Transaction) : super(%s::class.java, io.ebean.DB.byName(\"%s\"), transaction)", fullName, dbName).eol().eol();
-    }
-
     writer.eol();
     writer.append("  /**").eol();
     writer.append("   * Construct with a given Database.").eol();
