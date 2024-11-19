@@ -15,14 +15,26 @@ public final class GenerateDmlRequest {
   private String prefix2;
   private int insertMode;
   private int bindColumnCount;
+  private boolean hasColumnDefn;
 
   GenerateDmlRequest append(String s) {
     sb.append(s);
     return this;
   }
 
+  /**
+   * Append column and type for Insert (ClickHouse).
+   */
+  public void appendColumnDefn(String columnName, String columnDefn) {
+    if (hasColumnDefn) {
+      sb.append(", ");
+    } else {
+      hasColumnDefn = true;
+    }
+    sb.append(columnName).append(' ').append(columnDefn);
+  }
+
   public void appendColumn(String column) {
-    //String bind = (insertMode > 0) ? "?" : "=?";
     appendColumn(column, "?");
   }
 
