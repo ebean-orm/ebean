@@ -785,6 +785,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   Boolean isReadOnly();
 
   /**
+   * Return true if the beans returned by this query should be unmodifiable.
+   */
+  boolean isUnmodifiable();
+
+  /**
    * Return the query timeout.
    */
   int timeout();

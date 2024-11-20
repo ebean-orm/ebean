@@ -240,4 +240,9 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
    * Return a shallow copy of this collection that is modifiable.
    */
   BeanCollection<E> shallowCopy();
+
+  /**
+   * Freeze the collection returning an unmodifiable version.
+   */
+  Object freeze();
 }

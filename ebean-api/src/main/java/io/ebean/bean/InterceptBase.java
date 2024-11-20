@@ -7,7 +7,6 @@ abstract class InterceptBase implements EntityBeanIntercept {
 
   final EntityBean owner;
   boolean fullyLoadedBean;
-  boolean errorOnLazyLoad;
 
   /**
    * Create with a given entity.
@@ -26,11 +25,6 @@ abstract class InterceptBase implements EntityBeanIntercept {
   @Override
   public final EntityBean owner() {
     return owner;
-  }
-
-  @Override
-  public final void errorOnLazyLoad(boolean errorOnLazyLoad) {
-    this.errorOnLazyLoad = errorOnLazyLoad;
   }
 
   @Override

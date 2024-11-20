@@ -510,6 +510,12 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
+  public R setUnmodifiable(boolean unmodifiable) {
+    query.setUnmodifiable(unmodifiable);
+    return root;
+  }
+
+  @Override
   public final R setReadOnly(boolean readOnly) {
     query.setReadOnly(readOnly);
     return root;

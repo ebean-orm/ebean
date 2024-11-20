@@ -8,7 +8,7 @@ import java.util.*;
  * EntityBeanIntercept optimised for read only use.
  * <p>
  * For the read only use this intercept doesn't need to hold any state that is normally
- * required for updates such as per property changed, loaded, dirty state, original values
+ * required for updates such as per property changed, dirty state, original values
  * bean state etc.
  */
 public final class InterceptReadOnly extends InterceptBase {
@@ -91,7 +91,7 @@ public final class InterceptReadOnly extends InterceptBase {
   @Override
   public boolean isPartial() {
     for (boolean flag : flags) {
-      if (flag) {
+      if (!flag) {
         return true;
       }
     }
@@ -412,9 +412,8 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public void preGetter(int propertyIndex) {
-    if (errorOnLazyLoad && !flags[propertyIndex]) {
-      final String property = property(propertyIndex);
-      throw new IllegalStateException("Property not loaded: " + property);
+    if (!flags[propertyIndex]) {
+      throw new IllegalStateException("Property not loaded: " + property(propertyIndex));
     }
   }
 

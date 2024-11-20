@@ -40,6 +40,11 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   @Override
+  public List<E> freeze() {
+    return list == null ? null : Collections.unmodifiableList(list);
+  }
+
+  @Override
   public void toString(ToStringBuilder builder) {
     builder.addCollection(list);
   }

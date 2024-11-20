@@ -30,12 +30,6 @@ public interface EntityBeanIntercept extends Serializable {
   void setPersistenceContext(PersistenceContext persistenceContext);
 
   /**
-   * When accessing a property that is not loaded, throw a IllegalStateException
-   * when true or invoke lazy loading.
-   */
-  void errorOnLazyLoad(boolean lazyLoadAsError);
-
-  /**
    * Turn on profile collection.
    */
   void setNodeUsageCollector(NodeUsageCollector usageCollector);

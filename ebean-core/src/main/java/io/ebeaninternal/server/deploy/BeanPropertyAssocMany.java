@@ -1165,4 +1165,15 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
       return false;
     }
   }
+
+  @Override
+  public void freeze(EntityBean entityBean) {
+    Object value = getValue(entityBean);
+    if (value instanceof BeanCollection) {
+      setValue(entityBean, ((BeanCollection<?>) value).freeze());
+    } else if (value == null) {
+      // make it an error to access the collection (no lazy loading allowed)
+      entityBean._ebean_getIntercept().setPropertyUnloaded(propertyIndex);
+    }
+  }
 }

@@ -1,25 +1,64 @@
 package org.tests.query;
 
-import io.ebean.bean.BeanCollection;
+import io.ebean.DB;
+import io.ebean.Query;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.InterceptReadOnly;
 import io.ebean.xtest.BaseTestCase;
-import io.ebean.DB;
-import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
-import java.util.Collections;
+import java.io.*;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class TestQueryOrderById extends BaseTestCase {
+
+  @Test
+  void unmodifiableResult() throws IOException, ClassNotFoundException {
+    ResetBasicData.reset();
+
+    List<Customer> result = DB.find(Customer.class)
+      .setUnmodifiable(true)
+      .select("id,name")
+      .fetch("contacts")
+      .orderBy("id")
+      .findList();
+
+    assertThat(result).isNotEmpty();
+    assertThatThrownBy(() -> result.add(new Customer()))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("ReadOnly");
+
+    Customer customer = result.get(0);
+    List<Contact> contacts = customer.getContacts();
+    assertThat(contacts).isNotEmpty();
+    assertThatThrownBy(() -> contacts.add(new Contact()))
+      .isInstanceOf(UnsupportedOperationException.class);
+
+    assertThatThrownBy(customer::getOrders)
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("Property not loaded: orders");
+
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(os);
+
+    oos.writeObject(customer);
+    oos.flush();
+    oos.close();
+
+    ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+    ObjectInputStream ois = new ObjectInputStream(is);
+
+    Customer read = (Customer) ois.readObject();
+    assertThat(read.getName()).isEqualTo(customer.getName());
+  }
 
   @Test
   void immutableResult() {
@@ -38,12 +77,8 @@ class TestQueryOrderById extends BaseTestCase {
 
     List<Contact> contacts = result.get(0).getContacts();
     assertThat(contacts).isNotEmpty();
-    assertThat(contacts).isInstanceOf(BeanCollection.class);
-    BeanCollection<?> bc = (BeanCollection<?>)contacts;
-    assertThat(bc.isReadOnly()).isTrue();
     assertThatThrownBy(() -> contacts.add(new Contact()))
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("ReadOnly");
+      .isInstanceOf(UnsupportedOperationException.class);
   }
 
   @Test
@@ -70,24 +105,27 @@ class TestQueryOrderById extends BaseTestCase {
     EntityBeanIntercept intercept = ((EntityBean) customer)._ebean_getIntercept();
     int pos = intercept.findProperty("billingAddress");
     assertThat(intercept.isLoadedProperty(pos)).isFalse();
-    assertThat(customer.getBillingAddress())
+    assertThatThrownBy(() -> customer.getBillingAddress())
       .describedAs("Not loaded property returns null")
-      .isNull();
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThatThrownBy(() -> customer.setBillingAddress(new Address()))
       .describedAs("Not allowed to mutate a readOnly bean")
       .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("ReadOnly");
-
-    intercept.errorOnLazyLoad(true);
+      .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThatThrownBy(customer::getBillingAddress)
       .isInstanceOf(IllegalStateException.class)
       .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThat(intercept).isInstanceOf(InterceptReadOnly.class);
-    assertThat(customer.getOrders()).isSameAs(Collections.EMPTY_LIST);
-    assertThat(customer.getContacts()).isSameAs(Collections.EMPTY_LIST);
+    assertThatThrownBy(customer::getOrders)
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("Property not loaded: orders");
+    assertThatThrownBy(customer::getContacts)
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("Property not loaded: contacts");
   }
 
   @Test

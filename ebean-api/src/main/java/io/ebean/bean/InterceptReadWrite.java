@@ -650,10 +650,6 @@ public final class InterceptReadWrite extends InterceptBase {
 
   @Override
   public void loadBean(int loadProperty) {
-    if (errorOnLazyLoad) {
-      final String property = property(loadProperty);
-      throw new IllegalStateException("Lazy loading not allowed for " + property);
-    }
     lock.lock();
     try {
       if (beanLoader == null) {
@@ -661,7 +657,7 @@ public final class InterceptReadWrite extends InterceptBase {
         if (database == null) {
           throw new PersistenceException(ebeanServerName == null ? "No registered default server" : "Database [" + ebeanServerName + "] is not registered");
         }
-        // For stand alone reference bean or after deserialisation lazy load
+        // For stand-alone reference bean or after deserialisation lazy load
         // using the ebeanServer. Synchronise only on the bean.
         loadBeanInternal(loadProperty, database.pluginApi().beanLoader());
         return;
