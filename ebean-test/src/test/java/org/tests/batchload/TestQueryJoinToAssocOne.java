@@ -84,7 +84,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
       .select("status, shipDate")
       .fetchQuery("details", "orderQty, unitPrice")
       .fetch("details.product", "sku, name")
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(l0).isNotEmpty();
@@ -122,7 +122,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
     List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
       .select("status, shipDate")
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(l0).isNotEmpty();

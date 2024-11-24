@@ -118,7 +118,7 @@ public class MainDbBoolean {
 
     List<TOne> list = server.find(TOne.class)
       .setAutoTune(false)
-      .order("id")
+      .orderBy("id")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -135,7 +135,7 @@ public class MainDbBoolean {
 
     Query<TOne> query = server.find(TOne.class)
       .setAutoTune(false)
-      .order("id");
+      .orderBy("id");
 
     int rc = query.findCount();
     assertThat(rc).isGreaterThan(0);

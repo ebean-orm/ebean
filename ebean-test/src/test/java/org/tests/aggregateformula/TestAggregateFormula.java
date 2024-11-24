@@ -26,7 +26,7 @@ public class TestAggregateFormula extends BaseTestCase {
     List<Contact> contacts = DB.find(Contact.class)
       .setDistinct(true)
       .select("lastName, min(customer)")
-      .order("min(customer) asc nulls last")
+      .orderBy("min(customer) asc nulls last")
       .findList();
 
     List<String> sql = LoggedSql.stop();

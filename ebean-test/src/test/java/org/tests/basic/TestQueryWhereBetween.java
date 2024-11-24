@@ -25,7 +25,7 @@ public class TestQueryWhereBetween extends BaseTestCase {
     Timestamp t = new Timestamp(System.currentTimeMillis());
 
     Query<Order> query = DB.find(Order.class).setAutoTune(false).where()
-      .betweenProperties("cretime", "updtime", t).order().asc("orderDate").order().desc("id");
+      .betweenProperties("cretime", "updtime", t).orderBy().asc("orderDate").orderBy().desc("id");
 
     query.findList();
 
@@ -91,8 +91,8 @@ public class TestQueryWhereBetween extends BaseTestCase {
     Query<Order> query = DB.find(Order.class).setAutoTune(false)
       .where()
       .le("cretime", t)
-      .order().asc("orderDate")
-      .order().desc("id");
+      .orderBy().asc("orderDate")
+      .orderBy().desc("id");
 
     query.findList();
 

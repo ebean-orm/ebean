@@ -605,7 +605,7 @@ public final class DB {
    *   // find orders and their customers
    *   List<Order> list = DB.find(Order.class)
    *     .fetch("customer")
-   *     .order("id")
+   *     .orderBy("id")
    *     .findList();
    *
    *   // sort by customer name ascending, then by order shipDate

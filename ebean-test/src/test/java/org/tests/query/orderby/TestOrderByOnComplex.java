@@ -19,7 +19,7 @@ public class TestOrderByOnComplex extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Query<Order> query = DB.find(Order.class).order().desc("customer");
+    Query<Order> query = DB.find(Order.class).orderBy().desc("customer");
 
     query.findList();
 
@@ -33,7 +33,7 @@ public class TestOrderByOnComplex extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = DB.find(Order.class)
-      .order("case when status=3 then 10 when status=2 then 11 else 99 end");
+      .orderBy("case when status=3 then 10 when status=2 then 11 else 99 end");
 
     List<Order> list = query.findList();
 

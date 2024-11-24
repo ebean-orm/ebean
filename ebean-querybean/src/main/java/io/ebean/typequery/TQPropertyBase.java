@@ -29,7 +29,7 @@ public abstract class TQPropertyBase<R, T> extends TQProperty<R, T> {
    * Order by ascending on this property.
    */
   public final R asc() {
-    expr().order().asc(_name);
+    expr().orderBy().asc(_name);
     return _root;
   }
 
@@ -37,7 +37,7 @@ public abstract class TQPropertyBase<R, T> extends TQProperty<R, T> {
    * Order by descending on this property.
    */
   public final R desc() {
-    expr().order().desc(_name);
+    expr().orderBy().desc(_name);
     return _root;
   }
 

@@ -22,7 +22,7 @@ public class TestBasicLazy extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    Order order = DB.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
+    Order order = DB.find(Order.class).select("totalAmount").setMaxRows(1).orderBy("id")
       .findOne();
 
     assertNotNull(order);
@@ -70,7 +70,7 @@ public class TestBasicLazy extends BaseTestCase {
   public void testRaceCondition_Simple() throws Throwable {
     ResetBasicData.reset();
 
-    Order order = DB.find(Order.class).select("totalAmount").setMaxRows(1).order("id")
+    Order order = DB.find(Order.class).select("totalAmount").setMaxRows(1).orderBy("id")
       .findOne();
 
     assertNotNull(order);

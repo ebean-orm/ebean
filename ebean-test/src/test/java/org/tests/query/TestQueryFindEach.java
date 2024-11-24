@@ -39,7 +39,7 @@ public class TestQueryFindEach extends BaseTestCase {
 
     Query<Customer> query = DB.find(Customer.class)
       .fetchQuery("contacts")
-      .where().gt("id", 0).order("id")
+      .where().gt("id", 0).orderBy("id")
       .setMaxRows(2).query();
 
     final AtomicInteger counter = new AtomicInteger(0);
@@ -146,7 +146,7 @@ public class TestQueryFindEach extends BaseTestCase {
 
     Query<Customer> query = DB.find(Customer.class)
       .fetchQuery("contacts")
-      .where().gt("id", 0).order("id")
+      .where().gt("id", 0).orderBy("id")
       .setMaxRows(2).query();
 
     final AtomicInteger counter = new AtomicInteger(0);

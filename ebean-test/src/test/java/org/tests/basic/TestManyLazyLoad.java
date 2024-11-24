@@ -21,7 +21,7 @@ public class TestManyLazyLoad extends BaseTestCase {
 
     awaitL2Cache();
 
-    List<Order> list = DB.find(Order.class).order().asc("id").findList();
+    List<Order> list = DB.find(Order.class).orderBy().asc("id").findList();
     assertFalse(list.isEmpty());
 
     // just use the first one

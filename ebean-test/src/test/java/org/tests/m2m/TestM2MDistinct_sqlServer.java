@@ -24,7 +24,7 @@ public class TestM2MDistinct_sqlServer extends BaseTestCase {
     LoggedSql.start();
 
     List<Role> roles = DB.find(Role.class).where().eq("permissions", perm)
-      .order().asc("name", "Latin1_General_CI_AS")
+      .orderBy().asc("name", "Latin1_General_CI_AS")
       .findList();
 
     List<String> sqls = LoggedSql.stop();

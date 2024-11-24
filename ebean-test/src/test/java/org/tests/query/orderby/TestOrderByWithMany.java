@@ -70,7 +70,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkWithBuiltInMany() {
 
-    Query<Order> query = DB.find(Order.class).fetch("details").order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).fetch("details").orderBy().desc("customer.name");
 
     query.findList();
 
@@ -83,7 +83,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkAppendId() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy().desc("customer.name");
 
     query.findList();
 
@@ -95,7 +95,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkNone() {
 
-    Query<Order> query = DB.find(Order.class).order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).orderBy().desc("customer.name");
 
     query.findList();
 
@@ -109,7 +109,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkBoth() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy()
       .desc("customer.name, shipments.shipTime");
 
     query.findList();
@@ -121,7 +121,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkPrepend() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy()
       .desc("shipments.shipTime");
 
     query.findList();
@@ -133,7 +133,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkAlreadyIncluded() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy()
       .desc("id, shipments.shipTime");
 
     query.findList();
@@ -145,7 +145,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
   private void checkAlreadyIncluded2() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy()
       .desc("orderDate, id, shipments.shipTime");
 
     query.findList();

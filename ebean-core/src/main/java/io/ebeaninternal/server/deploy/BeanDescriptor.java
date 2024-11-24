@@ -3186,8 +3186,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * provides unique ordering of the rows (so that the paging is predicable).
    */
   public void appendOrderById(SpiQuery<T> query) {
-    if (idProperty != null && !idProperty.isEmbedded() && !query.order().containsProperty(idProperty.name())) {
-      query.order().asc(idProperty.name());
+    if (idProperty != null && !idProperty.isEmbedded() && !query.orderBy().containsProperty(idProperty.name())) {
+      query.orderBy().asc(idProperty.name());
     }
   }
 
