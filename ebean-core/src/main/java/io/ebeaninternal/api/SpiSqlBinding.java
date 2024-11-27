@@ -53,4 +53,9 @@ public interface SpiSqlBinding extends SpiCancelableQuery {
    */
   int getBufferFetchSizeHint();
 
+  /**
+   * Set the JDBC fetchSize buffer hint if not explicitly set.
+   */
+  void setDefaultFetchBuffer(int fetchSize);
+
 }
