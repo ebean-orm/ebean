@@ -595,6 +595,8 @@ public final class InternalConfiguration {
         return new QueryPlanLoggerSqlServer();
       case ORACLE:
         return new QueryPlanLoggerOracle();
+      case DB2:
+        return new QueryPlanLoggerDb2(config.getQueryPlanOptions());
       case POSTGRES:
         return new QueryPlanLoggerExplain("explain (analyze, buffers) ");
       case YUGABYTE:
